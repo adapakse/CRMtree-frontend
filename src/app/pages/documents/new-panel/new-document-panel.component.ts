@@ -1,0 +1,202 @@
+import { Component, inject, Input, Output, EventEmitter, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DocumentService } from '@core/services/document.service';
+import { GroupProfile, Document, DocType, GdprType } from '@core/models/models';
+import { ToastService } from '@core/services/toast.service';
+
+@Component({
+  selector: 'wt-new-document-panel',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="overlay open" (click)="onOverlay($event)">
+      <div class="panel" (click)="$event.stopPropagation()">
+
+        <div class="ph">
+          <div>
+            <div class="pt">New Document</div>
+            <div class="ps">Fill in metadata and optionally attach a file</div>
+          </div>
+          <div class="pc" (click)="close.emit()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="pb">
+          <div class="sec-title">Basic Information</div>
+          <div class="fgrid">
+
+            <div class="fg full">
+              <label class="fl">Document Name <span class="req">*</span></label>
+              <input class="fi" placeholder="e.g. Partner Agreement — ABC Sp. z o.o." [(ngModel)]="form.name">
+            </div>
+
+            <div class="fg">
+              <label class="fl">Document Type <span class="req">*</span></label>
+              <select class="fsel" [(ngModel)]="form.doc_type">
+                <option value="">— Select type —</option>
+                <option value="partner_agreement">Partner Agreement</option>
+                <option value="it_supplier_agreement">IT Supplier Agreement</option>
+                <option value="employee_agreement">Employee Agreement</option>
+                <option value="nda">NDA</option>
+                <option value="operator_agreement">Operator Agreement</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="fl">GDPR Classification <span class="req">*</span></label>
+              <select class="fsel" [(ngModel)]="form.gdpr_type">
+                <option value="">— Select GDPR —</option>
+                <option value="data_processing_entrustment">Data Processing Entrustment</option>
+                <option value="data_administration">Data Administration</option>
+                <option value="no_gdpr">No GDPR</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="fl">Group <span class="req">*</span></label>
+              <select class="fsel" [(ngModel)]="form.group_id">
+                <option value="">— Select group —</option>
+                @for (g of groups; track g.id) {
+                  <option [value]="g.id">{{ g.display_name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="fl">Signing Date</label>
+              <input class="fi" type="date" [(ngModel)]="form.signing_date">
+            </div>
+            <div class="fg">
+              <label class="fl">Expiration Date</label>
+              <input class="fi" type="date" [(ngModel)]="form.expiration_date">
+            </div>
+
+            <div class="fg">
+              <label class="fl">Entity 1 <span class="req">*</span></label>
+              <input class="fi" placeholder="np. WorkTrips Sp. z o.o." [(ngModel)]="entity1">
+            </div>
+            <div class="fg">
+              <label class="fl">Entity 2</label>
+              <input class="fi" placeholder="np. Partner Ltd." [(ngModel)]="entity2">
+            </div>
+
+          </div>
+
+          <!-- Tags -->
+          <div class="sec-title" style="margin-top:20px">Tags (optional)</div>
+          @for (tag of form.tags; track $index) {
+            <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+              <input class="fi" style="flex:1" placeholder="key" [(ngModel)]="tag.key">
+              <input class="fi" style="flex:2" placeholder="value" [(ngModel)]="tag.value">
+              <button class="btn btn-d btn-sm" (click)="removeTag($index)">✕</button>
+            </div>
+          }
+          <button class="btn btn-g btn-sm" (click)="addTag()" style="margin-bottom:20px">+ Add Tag</button>
+
+          <!-- File Upload -->
+          <div class="sec-title">File Attachment (optional)</div>
+          <div class="upz" [class.drag-over]="isDragging"
+               (dragover)="$event.preventDefault(); isDragging=true"
+               (dragleave)="isDragging=false"
+               (drop)="onDrop($event)"
+               (click)="fileInput.click()">
+            @if (selectedFile) {
+              <div style="font-size:14px;font-weight:600;color:var(--gray-800)">📄 {{ selectedFile.name }}</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ formatSize(selectedFile.size) }}</div>
+              <button class="btn btn-g btn-sm" style="margin-top:8px" (click)="$event.stopPropagation();selectedFile=null">Remove</button>
+            } @else {
+              <div style="font-size:24px;margin-bottom:8px">📂</div>
+              <div style="font-size:13px;font-weight:600;color:var(--gray-700)">Drop file here or click to browse</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-top:4px">PDF, DOCX — max 50 MB</div>
+            }
+          </div>
+          <input #fileInput type="file" hidden accept=".pdf,.docx,.doc" (change)="onFileChange($event)">
+        </div>
+
+        <div class="pf">
+          <button class="btn btn-g" (click)="close.emit()">Cancel</button>
+          <button class="btn btn-p" [disabled]="!isValid() || saving()" (click)="save()">
+            @if (saving()) { <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;display:inline-block"></span> }
+            Create Document
+          </button>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; backdrop-filter: blur(2px); display: flex; align-items: flex-start; justify-content: flex-end; }
+    .panel { width: 640px; height: 100vh; background: white; box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
+    .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; background: white; position: sticky; top: 0; z-index: 1; }
+    .pt { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
+    .ps { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+    .pc { margin-left: auto; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 6px; }
+    .pc:hover { background: var(--gray-100); color: var(--gray-700); }
+    .pb { padding: 24px; flex: 1; }
+    .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 10px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+  `],
+})
+export class NewDocumentPanelComponent {
+  @Input() groups: GroupProfile[] = [];
+  @Output() close   = new EventEmitter<void>();
+  @Output() created = new EventEmitter<Document>();
+
+  private docSvc = inject(DocumentService);
+  private toast  = inject(ToastService);
+
+  saving       = signal(false);
+  isDragging   = false;
+  selectedFile: File | null = null;
+  entity1 = '';
+  entity2 = '';
+
+  form: {
+    name: string; doc_type: DocType | ''; gdpr_type: GdprType | '';
+    group_id: string; signing_date: string; expiration_date: string; entities: string[];
+    tags: { key: string; value: string }[];
+  } = { name: '', doc_type: '', gdpr_type: '', group_id: '', signing_date: '', expiration_date: '', entities: [], tags: [] };
+
+  isValid(): boolean {
+    return !!(this.form.name.trim() && this.form.doc_type && this.form.gdpr_type && this.form.group_id && this.entity1.trim());
+  }
+
+  addTag(): void    { this.form.tags.push({ key: '', value: '' }); }
+  removeTag(i: number): void { this.form.tags.splice(i, 1); }
+
+  onFileChange(e: Event): void {
+    this.selectedFile = (e.target as HTMLInputElement).files?.[0] ?? null;
+  }
+  onDrop(e: DragEvent): void {
+    e.preventDefault(); this.isDragging = false;
+    this.selectedFile = e.dataTransfer?.files[0] ?? null;
+  }
+  formatSize(b: number): string {
+    return b < 1024 * 1024 ? `${(b/1024).toFixed(1)} KB` : `${(b/1024/1024).toFixed(1)} MB`;
+  }
+
+  onOverlay(e: Event): void {
+    if ((e.target as HTMLElement).classList.contains('overlay')) this.close.emit();
+  }
+
+  save(): void {
+    if (!this.isValid()) return;
+    this.saving.set(true);
+    this.docSvc.create({
+      name:             this.form.name,
+      doc_type:         this.form.doc_type as DocType,
+      gdpr_type:        this.form.gdpr_type as GdprType,
+      group_id:         this.form.group_id,
+      entities:         [this.entity1, this.entity2].filter(s => !!s.trim()).map(s => s.trim()),
+      signing_date:     this.form.signing_date || undefined,
+      expiration_date:  this.form.expiration_date || undefined,
+      tags:             this.form.tags.filter(t => t.key && t.value),
+      file:             this.selectedFile ?? undefined,
+    }).subscribe({
+      next: doc => { this.saving.set(false); this.created.emit(doc); },
+      error: () => { this.saving.set(false); this.toast.error('Failed to create document'); },
+    });
+  }
+}
