@@ -6,7 +6,7 @@ import { DocumentService } from '../../../core/services/document.service';
 import { GroupService } from '../../../core/services/api.services';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { Document, DocStatus, DocType, GroupProfile } from '../../../core/models/models';
+import { Document, DocStatus, DocType, GroupProfile, ActiveTaskInfo } from '../../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent } from '../../../shared/components/badges.components';
 import { DOC_TYPE_MAP, triggerDownload, isExpiringSoon } from '../../../core/services/helpers';
 import { DetailPanelComponent } from '../detail-panel/detail-panel.component';
@@ -22,10 +22,11 @@ const STATUSES: { key: DocStatus | 'all'; label: string }[] = [
   { key: 'rejected',     label: 'Rejected' },
 ];
 
-// Columns supported by backend sort
 const BACKEND_SORT_COLS = new Set(['doc_number','name','status','expiration_date']);
-
 type SortDir = 'asc' | 'desc';
+
+// Grid: checkbox | number | name | type | group | gdpr | status | active-tasks | expiry | owner
+const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
 
 @Component({
   selector: 'wt-documents-list',
@@ -70,35 +71,20 @@ type SortDir = 'asc' | 'desc';
 
       <!-- Table -->
       <div class="tw">
-        <div class="thead">
+        <div class="thead" [style.grid-template-columns]="grid">
           <div class="th"><input type="checkbox" class="chk"></div>
-          <div class="th sortable" (click)="sortBy('doc_number')">
-            Number <span class="sort-icon">{{ sortIcon('doc_number') }}</span>
+          <div class="th sortable" (click)="sortBy('doc_number')">Number <span class="sort-icon">{{ sortIcon('doc_number') }}</span></div>
+          <div class="th sortable" (click)="sortBy('name')">Name <span class="sort-icon">{{ sortIcon('name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('doc_type')">Type <span class="sort-icon">{{ sortIcon('doc_type') }}</span></div>
+          <div class="th sortable" (click)="sortBy('group_name')">Group <span class="sort-icon">{{ sortIcon('group_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('gdpr_type')">GDPR <span class="sort-icon">{{ sortIcon('gdpr_type') }}</span></div>
+          <div class="th sortable" (click)="sortBy('status')">Status <span class="sort-icon">{{ sortIcon('status') }}</span></div>
+          <div class="th" style="color:var(--orange)">
+            Active Tasks
+            <span style="font-size:8.5px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">NEW</span>
           </div>
-          <div class="th sortable" (click)="sortBy('name')">
-            Name <span class="sort-icon">{{ sortIcon('name') }}</span>
-          </div>
-          <div class="th sortable" (click)="sortBy('doc_type')">
-            Type <span class="sort-icon">{{ sortIcon('doc_type') }}</span>
-          </div>
-          <div class="th sortable" (click)="sortBy('group_name')">
-            Group <span class="sort-icon">{{ sortIcon('group_name') }}</span>
-          </div>
-          <div class="th sortable" (click)="sortBy('entities')">
-            Entity <span class="sort-icon">{{ sortIcon('entities') }}</span>
-          </div>
-          <div class="th sortable" (click)="sortBy('gdpr_type')">
-            GDPR <span class="sort-icon">{{ sortIcon('gdpr_type') }}</span>
-          </div>
-          <div class="th sortable" (click)="sortBy('status')">
-            Status <span class="sort-icon">{{ sortIcon('status') }}</span>
-          </div>
-          <div class="th sortable" (click)="sortBy('expiration_date')">
-            Expiry <span class="sort-icon">{{ sortIcon('expiration_date') }}</span>
-          </div>
-          <div class="th sortable" (click)="sortBy('owner_name')">
-            Owner <span class="sort-icon">{{ sortIcon('owner_name') }}</span>
-          </div>
+          <div class="th sortable" (click)="sortBy('expiration_date')">Expiry <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
+          <div class="th sortable" (click)="sortBy('owner_name')">Owner <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
         </div>
 
         @if (loading()) {
@@ -106,17 +92,36 @@ type SortDir = 'asc' | 'desc';
         }
 
         @for (doc of displayedDocuments(); track doc.id) {
-          <div class="tr" (click)="openDocument(doc)">
+          <div class="tr" [style.grid-template-columns]="grid" [style.align-items]="doc.active_task_details?.length ? 'start' : 'center'"
+               (click)="openDocument(doc)">
             <div class="td"><input type="checkbox" class="chk" (click)="$event.stopPropagation()"></div>
             <div class="td td-num">{{ doc.doc_number }}</div>
             <div class="td td-n" [title]="doc.name">{{ doc.name }}</div>
             <div class="td"><wt-type-badge [type]="doc.doc_type" /></div>
             <div class="td"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
-            <div class="td td-ent" [title]="(doc.entities ?? []).join(', ')">
-              {{ (doc.entities ?? []).join(', ') || '—' }}
-            </div>
             <div class="td"><wt-gdpr-badge [gdpr]="doc.gdpr_type" /></div>
             <div class="td"><wt-status-badge [status]="doc.status" /></div>
+
+            <!-- ★ Active Tasks column -->
+            <div class="td task-col">
+              @if (doc.active_task_details?.length) {
+                @for (task of doc.active_task_details!; track task.id) {
+                  <div class="task-cell-row" [title]="taskTooltip(task)">
+                    <wt-avatar [name]="task.assignee_name" [size]="18" />
+                    <span class="tbadge" [class]="'tbadge-' + task.task_type">{{ task.task_type.toUpperCase() }}</span>
+                    <span class="task-assignee">{{ task.assignee_name }}</span>
+                    @if (task.due_date) {
+                      <span class="task-due" [class.overdue]="isDue(task.due_date)">
+                        {{ task.due_date | date:'dd.MM' }}
+                      </span>
+                    }
+                  </div>
+                }
+              } @else {
+                <span class="task-none">—</span>
+              }
+            </div>
+
             <div class="td" [style.color]="isExpiring(doc.expiration_date) ? '#DC2626' : ''">
               {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
             </div>
@@ -174,18 +179,37 @@ type SortDir = 'asc' | 'desc';
     .srch:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(242,101,34,.1); background: white; }
     #content { flex: 1; overflow-y: auto; padding: 24px; }
     .toolbar { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
-    .thead { display: grid; grid-template-columns: 36px 110px 1fr 120px 110px 130px 100px 105px 82px 52px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
+    .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
     .th { padding: 10px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; gap: 4px; }
     .th.sortable { cursor: pointer; user-select: none; }
     .th.sortable:hover { color: var(--gray-800); }
     .sort-icon { font-size: 10px; color: var(--gray-400); min-width: 10px; }
-    .tr { display: grid; grid-template-columns: 36px 110px 1fr 120px 110px 130px 100px 105px 82px 52px; padding: 0 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .1s; align-items: center; }
+    .tr { display: grid; padding: 0 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .1s; }
     .tr:last-child { border-bottom: none; }
     .tr:hover { background: var(--gray-50); }
-    .td { padding: 11px 8px; font-size: 13px; color: var(--gray-700); overflow: hidden; }
+    .td { padding: 10px 8px; font-size: 13px; color: var(--gray-700); overflow: hidden; }
     .td-n { font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .td-num { font-family: 'Sora', monospace; font-size: 11px; color: var(--gray-500); font-weight: 600; }
-    .td-ent { font-size: 12px; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Active Tasks column ── */
+    .task-col { display: flex; flex-direction: column; gap: 4px; overflow: visible; }
+    .task-cell-row {
+      display: flex; align-items: center; gap: 4px;
+      background: #FFF8F0; border: 1px solid #FDDBB4;
+      border-radius: 6px; padding: 3px 6px;
+      cursor: default;
+    }
+    .task-assignee { font-size: 11px; font-weight: 600; color: #92400E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .task-due { font-size: 10px; font-weight: 700; color: #065F46; white-space: nowrap; flex-shrink: 0; }
+    .task-due.overdue { color: #DC2626; }
+    .task-none { font-size: 12px; color: var(--gray-300); }
+
+    /* ── Task type badges ── */
+    .tbadge { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+    .tbadge-sign    { background: #EDE9FE; color: #5B21B6; }
+    .tbadge-edit    { background: #DBEAFE; color: #1E40AF; }
+    .tbadge-approve { background: #FEF3C7; color: #92400E; }
+    .tbadge-read    { background: var(--gray-100); color: var(--gray-600); }
   `],
 })
 export class DocumentsListComponent implements OnInit {
@@ -195,13 +219,14 @@ export class DocumentsListComponent implements OnInit {
   private toast    = inject(ToastService);
   auth             = inject(AuthService);
 
-  statuses   = STATUSES;
-  docTypes   = Object.entries(DOC_TYPE_MAP).map(([key, label]) => ({ key, label }));
-  groups     = signal<GroupProfile[]>([]);
-  documents  = signal<Document[]>([]);
-  loading    = signal(true);
-  page       = signal(1);
-  totalPages = signal(1);
+  readonly grid  = GRID;
+  statuses       = STATUSES;
+  docTypes       = Object.entries(DOC_TYPE_MAP).map(([key, label]) => ({ key, label }));
+  groups         = signal<GroupProfile[]>([]);
+  documents      = signal<Document[]>([]);
+  loading        = signal(true);
+  page           = signal(1);
+  totalPages     = signal(1);
 
   activeStatus: DocStatus | 'all' = 'all';
   selectedGroup = '';
@@ -215,19 +240,32 @@ export class DocumentsListComponent implements OnInit {
 
   isExpiring = (d?: string) => isExpiringSoon(d, 30);
 
+  isDue(dateStr?: string): boolean {
+    if (!dateStr) return false;
+    return new Date(dateStr).getTime() < Date.now() + 7 * 86_400_000;
+  }
+
+  taskTooltip(task: ActiveTaskInfo): string {
+    const lines = [
+      `Typ: ${task.task_type.toUpperCase()}`,
+      `Wykonuje: ${task.assignee_name}`,
+      `Przekazał: ${task.assigner_name}`,
+    ];
+    if (task.due_date) lines.push(`Due: ${new Date(task.due_date).toLocaleDateString('pl-PL')}`);
+    if (task.message)  lines.push(`Wiadomość: ${task.message}`);
+    return lines.join('\n');
+  }
+
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  /** Dokumenty po ewentualnym sortowaniu frontendowym */
   displayedDocuments = computed(() => {
     const docs = this.documents();
     const col  = this.sortCol();
     const dir  = this.sortDir();
-    if (BACKEND_SORT_COLS.has(col)) return docs; // backend już posortował
+    if (BACKEND_SORT_COLS.has(col)) return docs;
     return [...docs].sort((a, b) => {
-      let va: string = '';
-      let vb: string = '';
-      if (col === 'entities')   { va = (a.entities ?? []).join(','); vb = (b.entities ?? []).join(','); }
-      if (col === 'doc_type')   { va = a.doc_type ?? ''; vb = b.doc_type ?? ''; }
+      let va = '', vb = '';
+      if (col === 'doc_type')   { va = a.doc_type ?? '';  vb = b.doc_type ?? ''; }
       if (col === 'group_name') { va = a.group_display ?? a.group_name ?? ''; vb = b.group_display ?? b.group_name ?? ''; }
       if (col === 'gdpr_type')  { va = a.gdpr_type ?? ''; vb = b.gdpr_type ?? ''; }
       if (col === 'owner_name') { va = a.owner_name ?? ''; vb = b.owner_name ?? ''; }
@@ -243,10 +281,7 @@ export class DocumentsListComponent implements OnInit {
       this.sortCol.set(col);
       this.sortDir.set('asc');
     }
-    if (BACKEND_SORT_COLS.has(col)) {
-      this.page.set(1);
-      this.loadDocuments();
-    }
+    if (BACKEND_SORT_COLS.has(col)) { this.page.set(1); this.loadDocuments(); }
   }
 
   sortIcon(col: string): string {
@@ -257,11 +292,8 @@ export class DocumentsListComponent implements OnInit {
   ngOnInit(): void {
     this.groupSvc.list().subscribe(g => this.groups.set(g));
     this.loadDocuments();
-
     const openId = this.route.snapshot.queryParamMap.get('open');
-    if (openId) {
-      this.docSvc.get(openId).subscribe(doc => this.selectedDoc.set(doc));
-    }
+    if (openId) this.docSvc.get(openId).subscribe(doc => this.selectedDoc.set(doc));
   }
 
   loadDocuments(): void {
@@ -283,16 +315,8 @@ export class DocumentsListComponent implements OnInit {
     });
   }
 
-  setStatus(s: DocStatus | 'all'): void {
-    this.activeStatus = s;
-    this.page.set(1);
-    this.loadDocuments();
-  }
-
-  setPage(p: number): void {
-    this.page.set(p);
-    this.loadDocuments();
-  }
+  setStatus(s: DocStatus | 'all'): void { this.activeStatus = s; this.page.set(1); this.loadDocuments(); }
+  setPage(p: number): void { this.page.set(p); this.loadDocuments(); }
 
   onSearch(): void {
     if (this.searchTimer) clearTimeout(this.searchTimer);

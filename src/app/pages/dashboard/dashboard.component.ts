@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { DocumentService } from '../../core/services/document.service';
 import { WorkflowService } from '../../core/services/api.services';
 import { AuthService } from '../../core/auth/auth.service';
-import { Document, WorkflowTask } from '../../core/models/models';
+import { Document, WorkflowTask, ActiveTaskInfo } from '../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent } from '../../shared/components/badges.components';
 import { isExpiringSoon } from '../../core/services/helpers';
 
@@ -74,16 +74,45 @@ import { isExpiringSoon } from '../../core/services/helpers';
                 <div class="th">Expiry</div>
               </div>
               @for (doc of recentDocs(); track doc.id) {
-                <div class="tr" style="grid-template-columns:130px 1fr 130px 110px 80px"
+                <div class="tr" style="grid-template-columns:130px 1fr 130px 110px 80px;align-items:start"
                      [routerLink]="['/documents']" [queryParams]="{ open: doc.id }">
-                  <div class="td td-num">{{ doc.doc_number }}</div>
-                  <div class="td td-n">{{ doc.name }}</div>
-                  <div class="td"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
-                  <div class="td"><wt-status-badge [status]="doc.status" /></div>
-                  <div class="td" [class.text-red]="isExpiring(doc.expiration_date)">
-                    <span [style.color]="isExpiring(doc.expiration_date) ? '#DC2626' : ''">
-                      {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
-                    </span>
+                  <div class="td td-num" style="padding-top:14px">{{ doc.doc_number }}</div>
+                  <div class="td td-n" style="overflow:visible">
+                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;color:var(--gray-900)">
+                      {{ doc.name }}
+                    </div>
+                    <!-- ★ Active task strips -->
+                    @if (doc.active_task_details?.length) {
+                      <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px">
+                        @for (task of doc.active_task_details!; track task.id) {
+                          <div class="task-strip" (click)="$event.stopPropagation()">
+                            <span class="task-type-ico">{{ taskIcon(task.task_type) }}</span>
+                            <div class="task-strip-body">
+                              <div class="task-strip-line1">
+                                <span class="tbadge" [class]="'tbadge-' + task.task_type">
+                                  {{ task.task_type.toUpperCase() }}
+                                </span>
+                                &nbsp;u: <strong>{{ task.assignee_name }}</strong>
+                              </div>
+                              <div class="task-strip-line2">
+                                <wt-avatar [name]="task.assignee_name" [size]="14" />
+                                Od: {{ task.assigner_name }}
+                                @if (task.due_date) {
+                                  <span class="task-due" [class.overdue]="isDue(task.due_date)">
+                                    ⏰ {{ task.due_date | date:'dd.MM.yy' }}
+                                  </span>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="td" style="padding-top:14px"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
+                  <div class="td" style="padding-top:14px"><wt-status-badge [status]="doc.status" /></div>
+                  <div class="td" style="padding-top:14px" [style.color]="isExpiring(doc.expiration_date) ? '#DC2626' : ''">
+                    {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
                   </div>
                 </div>
               }
@@ -107,12 +136,18 @@ import { isExpiringSoon } from '../../core/services/helpers';
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
                   <wt-task-badge [taskType]="task.task_type" />
                   <span style="font-size:11px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM' }}</span>
+                  @if (task.due_date) {
+                    <span style="font-size:10.5px;font-weight:600;margin-left:auto"
+                          [style.color]="isDue(task.due_date) ? '#DC2626' : '#065F46'">
+                      ⏰ {{ task.due_date | date:'dd.MM.yy' }}
+                    </span>
+                  }
                 </div>
                 <div style="font-size:13px;font-weight:500;color:var(--gray-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                   {{ task.document_name }}
                 </div>
                 <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
-                  From: {{ task.assigner_name }}
+                  Od: {{ task.assigner_name }}
                 </div>
               </div>
             }
@@ -142,12 +177,32 @@ import { isExpiringSoon } from '../../core/services/helpers';
     .ico-or { background: var(--orange-pale); } .ico-bl { background: #EFF6FF; } .ico-gr { background: #F0FDF4; } .ico-pu { background: #F5F3FF; } .ico-re { background: #FEF2F2; }
     .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
     .th { padding: 10px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; }
-    .tr { display: grid; padding: 0 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .1s; align-items: center; }
+    .tr { display: grid; padding: 0 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .1s; }
     .tr:last-child { border-bottom: none; }
     .tr:hover { background: var(--gray-50); }
     .td { padding: 11px 8px; font-size: 13px; color: var(--gray-700); overflow: hidden; }
-    .td-n { font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .td-n { overflow: visible; }
     .td-num { font-family: 'Sora', monospace; font-size: 11px; color: var(--gray-500); font-weight: 600; }
+
+    /* ── Task strip ── */
+    .task-strip {
+      display: flex; align-items: flex-start; gap: 7px;
+      background: #FFF8F0; border: 1px solid #FDDBB4;
+      border-radius: 7px; padding: 5px 8px;
+    }
+    .task-type-ico { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+    .task-strip-body { flex: 1; min-width: 0; }
+    .task-strip-line1 { font-size: 11.5px; font-weight: 600; color: #92400E; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .task-strip-line2 { font-size: 11px; color: #B45309; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .task-due { font-size: 10.5px; font-weight: 600; background: #D1FAE5; color: #065F46; padding: 1px 5px; border-radius: 4px; }
+    .task-due.overdue { background: #FEE2E2; color: #DC2626; }
+
+    /* ── Task type badges ── */
+    .tbadge { display: inline-flex; align-items: center; font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }
+    .tbadge-sign    { background: #EDE9FE; color: #5B21B6; }
+    .tbadge-edit    { background: #DBEAFE; color: #1E40AF; }
+    .tbadge-approve { background: #FEF3C7; color: #92400E; }
+    .tbadge-read    { background: var(--gray-100); color: var(--gray-600); }
   `],
 })
 export class DashboardComponent implements OnInit {
@@ -162,10 +217,19 @@ export class DashboardComponent implements OnInit {
 
   isExpiring = (d?: string) => isExpiringSoon(d, 30);
 
+  isDue(dateStr?: string): boolean {
+    if (!dateStr) return false;
+    return new Date(dateStr).getTime() < Date.now() + 7 * 86_400_000;
+  }
+
+  taskIcon(type: string): string {
+    return { sign: '✍️', edit: '✏️', approve: '✅', read: '👁' }[type] ?? '📋';
+  }
+
   ngOnInit(): void {
     this.docSvc.list({ limit: 6, sort: 'created_at', order: 'desc' }).subscribe(res => {
       this.recentDocs.set(res.data);
-      const exp = res.data.filter(d => isExpiringSoon(d.expiration_date)).length;
+      const exp    = res.data.filter(d => isExpiringSoon(d.expiration_date)).length;
       const signed = res.data.filter(d => ['signed','completed'].includes(d.status)).length;
       const wf     = res.data.filter(d => ['being_edited','being_signed'].includes(d.status)).length;
       this.stats.set({ total: res.total, inWorkflow: wf, signed, expiring: exp });

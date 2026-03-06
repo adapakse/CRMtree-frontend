@@ -70,6 +70,18 @@ export interface DocumentVersion {
   created_at: string;
 }
 
+// ── Active Task Info (for list views) ─────────────────────
+export interface ActiveTaskInfo {
+  id: string;
+  task_type: TaskType;
+  task_status: TaskStatus;
+  assigned_to: string;
+  assignee_name: string;
+  assigner_name: string;
+  due_date?: string;
+  message?: string;
+}
+
 export interface Document {
   id: string;
   doc_number: string;
@@ -96,11 +108,16 @@ export interface Document {
   tags?: DocumentTag[];
   versions?: DocumentVersion[];
   workflow_tasks?: WorkflowTask[];
+  /** Count of active tasks (list view) */
   active_tasks?: number;
+  /** Full active task details (list view) — includes assignee, assigner, due_date */
+  active_task_details?: ActiveTaskInfo[];
   version_count?: number;
   created_at: string;
   updated_at: string;
   _access?: AccessLevel;
+  /** True if user can see this doc only because of an active task (not group membership) */
+  _task_access?: boolean;
 }
 
 export interface DocumentListResponse {

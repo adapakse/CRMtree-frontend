@@ -9,7 +9,6 @@ import { ToastService } from '../../core/services/toast.service';
 import { AppSettingsService } from '../../core/services/app-settings.service';
 import { environment } from '../../../environments/environment';
 
-// Mapowanie statusu dokumentu → kolumna kanbana
 const STATUS_COLUMN: Record<string, 'pending' | 'in_progress' | 'completed' | 'cancelled'> = {
   new:             'pending',
   being_edited:    'in_progress',
@@ -56,7 +55,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
       @if (view === 'mine') {
         @if (myTasks().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
-            <div class="empty-icon">&#9989;</div>
+            <div class="empty-icon">✅</div>
             <div class="empty-title">No pending tasks</div>
             <div>You're all caught up!</div>
           </div>
@@ -72,9 +71,13 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                 <div style="font-size:12px;color:var(--gray-400);display:flex;align-items:center;gap:8px">
                   <span class="mono">{{ task.doc_number }}</span>
                   <span>·</span>
-                  <span>From: {{ task.assigner_name }}</span>
+                  <span>Od: {{ task.assigner_name }}</span>
                   @if (task.group_name) { <span>· {{ task.group_name }}</span> }
-                  @if (task.due_date) { <span style="color:#DC2626">· Due: {{ task.due_date | date:'dd.MM.yy' }}</span> }
+                  @if (task.due_date) {
+                    <span [style.color]="isDue(task.due_date) ? '#DC2626' : '#065F46'">
+                      · ⏰ {{ task.due_date | date:'dd.MM.yy' }}
+                    </span>
+                  }
                 </div>
                 @if (task.message) {
                   <div style="font-size:12px;color:var(--gray-500);margin-top:4px;font-style:italic">"{{ task.message }}"</div>
@@ -96,7 +99,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
       @if (view === 'kanban') {
         @if (kanbanDocs().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
-            <div class="empty-icon">&#128203;</div>
+            <div class="empty-icon">📋</div>
             <div class="empty-title">No documents yet</div>
             <div>Documents will appear here once created</div>
           </div>
@@ -115,6 +118,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                 @for (doc of docsByColumn(col.id); track doc.id) {
                   <div class="card" style="padding:12px 14px;cursor:pointer"
                        [routerLink]="['/documents']" [queryParams]="{open: doc.id}">
+                    <!-- Header row: status badge + task count -->
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
                       <wt-status-badge [status]="doc.status" />
                       <span style="flex:1"></span>
@@ -124,10 +128,14 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                         </span>
                       }
                     </div>
+
+                    <!-- Document name + number -->
                     <div style="font-size:13px;font-weight:600;color:var(--gray-900);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                       {{ doc.name }}
                     </div>
                     <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">{{ doc.doc_number }}</div>
+
+                    <!-- Owner row -->
                     <div style="display:flex;align-items:center;gap:6px">
                       <wt-avatar [name]="doc.owner_name ?? ''" [size]="18" />
                       <span style="font-size:11.5px;color:var(--gray-500)">{{ doc.owner_name }}</span>
@@ -136,7 +144,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                       }
                     </div>
 
-                    <!-- ── Expiration date z dynamicznym kolorem ── -->
+                    <!-- Expiration date -->
                     @if (doc.expiration_date) {
                       <div style="font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px"
                            [style.color]="expirationColor(doc.expiration_date)">
@@ -150,11 +158,23 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                       </div>
                     }
 
-                    <!-- Active tasks badges -->
+                    <!-- ★ Active task details -->
                     @if (doc.active_tasks?.length > 0) {
-                      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+                      <div style="border-top:1px solid var(--gray-100);margin-top:8px;padding-top:8px;display:flex;flex-direction:column;gap:4px">
                         @for (t of doc.active_tasks; track t.id) {
-                          <wt-task-badge [taskType]="t.task_type" />
+                          <div class="ktask-row">
+                            <wt-avatar [name]="t.assignee_name ?? ''" [size]="16" />
+                            <span class="kbadge" [class]="'kbadge-' + t.task_type">{{ t.task_type.toUpperCase() }}</span>
+                            <span class="ktask-name">{{ t.assignee_name }}</span>
+                            @if (t.assigner_name) {
+                              <span class="ktask-from" title="Assigned by {{ t.assigner_name }}">← {{ t.assigner_name }}</span>
+                            }
+                            @if (t.due_date) {
+                              <span class="ktask-due" [class.overdue]="isDue(t.due_date)">
+                                {{ t.due_date | date:'dd.MM' }}
+                              </span>
+                            }
+                          </div>
                         }
                       </div>
                     }
@@ -182,6 +202,24 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
     .dot-in_progress { background:#3B82F6; }
     .dot-completed   { background:#10B981; }
     .dot-cancelled   { background:#9CA3AF; }
+
+    /* ── Kanban task row ── */
+    .ktask-row {
+      display: flex; align-items: center; gap: 4px;
+      background: #FFF8F0; border: 1px solid #FDDBB4;
+      border-radius: 5px; padding: 3px 6px;
+    }
+    .ktask-name { font-size: 10.5px; font-weight: 600; color: #92400E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ktask-from { font-size: 9.5px; color: #B45309; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60px; flex-shrink: 0; }
+    .ktask-due  { font-size: 9.5px; font-weight: 700; color: #065F46; white-space: nowrap; flex-shrink: 0; }
+    .ktask-due.overdue { color: #DC2626; }
+
+    /* ── Kanban task type badges ── */
+    .kbadge { display: inline-flex; align-items: center; font-size: 8.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+    .kbadge-sign    { background: #EDE9FE; color: #5B21B6; }
+    .kbadge-edit    { background: #DBEAFE; color: #1E40AF; }
+    .kbadge-approve { background: #FEF3C7; color: #92400E; }
+    .kbadge-read    { background: var(--gray-100); color: var(--gray-600); }
   `],
 })
 export class WorkflowComponent implements OnInit, OnDestroy {
@@ -198,41 +236,27 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   private refreshTimer: ReturnType<typeof setInterval> | null = null;
 
-  // Computed helpers that re-read settings on each call (settings are reactive signals)
-  expirationColor(dateStr?: string): string {
-    return this.appSettings.expirationColor(dateStr);
-  }
+  expirationColor(dateStr?: string): string { return this.appSettings.expirationColor(dateStr); }
+  isExpiringSoon(dateStr?: string): boolean  { return this.appSettings.isExpiringSoon(dateStr); }
+  isExpired(dateStr?: string): boolean       { return this.appSettings.isExpired(dateStr); }
+  refreshIntervalSec(): number               { return this.appSettings.get('kanban_refresh_interval_sec'); }
 
-  isExpiringSoon(dateStr?: string): boolean {
-    return this.appSettings.isExpiringSoon(dateStr);
-  }
-
-  isExpired(dateStr?: string): boolean {
-    return this.appSettings.isExpired(dateStr);
-  }
-
-  refreshIntervalSec(): number {
-    return this.appSettings.get('kanban_refresh_interval_sec');
+  isDue(dateStr?: string): boolean {
+    if (!dateStr) return false;
+    return new Date(dateStr).getTime() < Date.now() + 7 * 86_400_000;
   }
 
   docsByColumn(colId: 'pending'|'in_progress'|'completed'|'cancelled'): any[] {
     return this.kanbanDocs().filter(d => STATUS_COLUMN[d.status] === colId);
   }
 
-  ngOnInit(): void {
-    this.loadMyTasks();
-  }
-
-  ngOnDestroy(): void {
-    this.clearRefreshTimer();
-  }
+  ngOnInit(): void { this.loadMyTasks(); }
+  ngOnDestroy(): void { this.clearRefreshTimer(); }
 
   switchView(v: string): void {
     this.view = v;
     if (v === 'kanban') {
-      if (this.kanbanDocs().length === 0) {
-        this.loadKanbanDocs();
-      }
+      if (this.kanbanDocs().length === 0) this.loadKanbanDocs();
       this.startRefreshTimer();
     } else {
       this.clearRefreshTimer();
@@ -247,10 +271,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   private clearRefreshTimer(): void {
-    if (this.refreshTimer) {
-      clearInterval(this.refreshTimer);
-      this.refreshTimer = null;
-    }
+    if (this.refreshTimer) { clearInterval(this.refreshTimer); this.refreshTimer = null; }
   }
 
   loadMyTasks(): void {
@@ -268,7 +289,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.kanbanDocs.set(docs.map(d => ({
           ...d,
           active_task_count: parseInt(d.active_task_count ?? '0'),
-          active_tasks: d.active_tasks ?? [],
+          active_tasks: Array.isArray(d.active_tasks) ? d.active_tasks : [],
         })));
         this.loading.set(false);
       },

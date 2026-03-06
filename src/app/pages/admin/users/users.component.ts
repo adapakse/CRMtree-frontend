@@ -173,9 +173,7 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
 
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50)">
             <button class="btn btn-g" (click)="showNew.set(false)">Cancel</button>
-            <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">
-              Create User
-            </button>
+            <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">Create User</button>
           </div>
         </div>
       </div>
@@ -207,6 +205,21 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
                 <label class="fl">Last Name</label>
                 <input class="fi" [(ngModel)]="editLast">
               </div>
+
+              <!-- ★ Email edit -->
+              <div class="fg" style="grid-column:1/-1">
+                <label class="fl">Email Address</label>
+                <input class="fi" type="email" [(ngModel)]="editEmail"
+                       [class.fi-err]="!!emailError"
+                       (ngModelChange)="emailError = ''">
+                @if (emailError) {
+                  <span class="ferr">{{ emailError }}</span>
+                }
+                <span style="font-size:11px;color:var(--gray-400);margin-top:2px;line-height:1.5">
+                  Zmiana e-maila wpływa na logowanie SAML — upewnij się, że adres odpowiada kontu Google Workspace.
+                </span>
+              </div>
+
               <div class="fg">
                 <label class="fl">Status</label>
                 <select class="fsel" [(ngModel)]="editActive">
@@ -323,11 +336,14 @@ export class UsersComponent implements OnInit {
   filterGroup  = '';
   filterActive = '';
 
-  editFirst    = '';
-  editLast     = '';
-  editActive   = true;
-  editAdmin    = false;
-  newRoleGroup = '';
+  editFirst  = '';
+  editLast   = '';
+  editEmail  = '';        // ★ nowe pole
+  editActive = true;
+  editAdmin  = false;
+  emailError = '';        // ★ walidacja inline
+
+  newRoleGroup  = '';
   newRoleAccess: 'read' | 'full' = 'read';
 
   newFirst       = '';
@@ -341,12 +357,10 @@ export class UsersComponent implements OnInit {
 
   private timer: ReturnType<typeof setTimeout> | null = null;
 
-  /** Slice ról do wyświetlenia inline — wg roles_preview_count z settings */
   rolesPreview(user: User): any[] {
     return (user.roles ?? []).slice(0, this.appSettings.get('roles_preview_count'));
   }
 
-  /** Liczba ukrytych ról ("+N more") */
   rolesOverflow(user: User): number {
     return Math.max(0, (user.roles ?? []).length - this.appSettings.get('roles_preview_count'));
   }
@@ -398,7 +412,6 @@ export class UsersComponent implements OnInit {
   createUser(): void {
     this.submitted = true;
     if (!this.newFirst || !this.newLast || !this.newEmail) return;
-
     this.saving.set(true);
     this.userSvc.create({
       first_name: this.newFirst,
@@ -429,8 +442,10 @@ export class UsersComponent implements OnInit {
       this.selected.set(u);
       this.editFirst  = u.first_name;
       this.editLast   = u.last_name;
+      this.editEmail  = u.email;   // ★ wypełnij email
       this.editActive = u.is_active;
       this.editAdmin  = u.is_admin;
+      this.emailError    = '';
       this.newRoleGroup  = '';
       this.newRoleAccess = 'read';
     });
@@ -439,15 +454,35 @@ export class UsersComponent implements OnInit {
   saveUser(): void {
     const u = this.selected();
     if (!u) return;
+
+    // Walidacja email
+    if (!this.editEmail || !this.editEmail.includes('@')) {
+      this.emailError = 'Wprowadź prawidłowy adres e-mail';
+      return;
+    }
+    this.emailError = '';
+
     this.userSvc.update(u.id, {
       first_name: this.editFirst,
       last_name:  this.editLast,
+      email:      this.editEmail,  // ★ wyślij email
       is_active:  this.editActive,
       is_admin:   this.editAdmin,
-    }).subscribe(updated => {
-      this.selected.set({ ...u, ...updated });
-      this.users.update(list => list.map(x => x.id === u.id ? { ...x, ...updated } : x));
-      this.toast.success('User updated');
+    }).subscribe({
+      next: updated => {
+        this.selected.set({ ...u, ...updated });
+        this.users.update(list => list.map(x => x.id === u.id ? { ...x, ...updated } : x));
+        this.toast.success('User updated');
+      },
+      error: err => {
+        const msg: string = err?.error?.error ?? '';
+        // Backend zwraca błąd unique constraint jeśli email zajęty
+        if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique')) {
+          this.emailError = 'Ten adres e-mail jest już zajęty';
+        } else {
+          this.toast.error(msg || 'Failed to update user');
+        }
+      },
     });
   }
 
