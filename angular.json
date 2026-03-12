@@ -47,20 +47,22 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
-  "builder": "@angular-devkit/build-angular:dev-server",
-  "configurations": {
-    "production": {
-      "buildTarget": "worktrips-doc-frontend:build:production"
-    },
-    "development": {
-      "buildTarget": "worktrips-doc-frontend:build:development",
-      "proxyConfig": "src/proxy.conf.json"
-    }
-  },
-  "defaultConfiguration": "development",
-          "options": { "proxyConfig": "src/proxy.conf.json" }
+    "serve": {
+      "builder": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "proxyConfig": "src/proxy.conf.json",
+        "allowedHosts": ["docs.htcd.pl"]
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "worktrips-doc-frontend:build:production"
+        },
+        "development": {
+          "buildTarget": "worktrips-doc-frontend:build:development"
         }
+      },
+      "defaultConfiguration": "development"
+    }
       }
     }
   },
