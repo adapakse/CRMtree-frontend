@@ -17,6 +17,16 @@ export class AuthService {
   readonly user  = this._user.asReadonly();
   readonly isLoggedIn  = computed(() => this._user() !== null);
   readonly isAdmin     = computed(() => this._user()?.is_admin ?? false);
+  readonly isCrmUser   = computed(() =>
+    this._user()?.is_admin === true ||
+    this._user()?.crm_role === 'salesperson' ||
+    this._user()?.crm_role === 'sales_manager'
+  );
+
+  /** Synchroniczny dostęp do bieżącego użytkownika (dla guardów i komponentów CRM) */
+  get currentUser(): User | null {
+    return this._user();
+  }
 
   constructor(private http: HttpClient, private router: Router) {}
 

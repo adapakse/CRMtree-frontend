@@ -41,11 +41,12 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
       </div>
 
       <div class="tw">
-        <div class="thead" style="grid-template-columns:40px 1fr 200px 1fr 120px 80px">
+        <div class="thead" style="grid-template-columns:40px 1fr 200px 1fr 110px 120px 80px">
           <div class="th"></div>
           <div class="th">User</div>
           <div class="th">Email</div>
           <div class="th">Groups &amp; Roles</div>
+          <div class="th">CRM Role</div>
           <div class="th">Last Login</div>
           <div class="th">Status</div>
         </div>
@@ -55,7 +56,7 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
         }
 
         @for (user of users(); track user.id) {
-          <div class="tr" style="grid-template-columns:40px 1fr 200px 1fr 120px 80px" (click)="openUser(user)">
+          <div class="tr" style="grid-template-columns:40px 1fr 200px 1fr 110px 120px 80px" (click)="openUser(user)">
             <div class="td"><wt-avatar [name]="user.display_name" [size]="28" /></div>
             <div class="td">
               <div style="font-weight:500;color:var(--gray-900)">{{ user.display_name }}</div>
@@ -74,6 +75,15 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
                   <span style="font-size:11px;color:var(--gray-400)">+{{ rolesOverflow(user) }}</span>
                 }
               </div>
+            </div>
+            <div class="td">
+              @if (user.crm_role === 'sales_manager') {
+                <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">Manager</span>
+              } @else if (user.crm_role === 'salesperson') {
+                <span style="font-size:10px;background:#dcfce7;color:#166534;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">Handlowiec</span>
+              } @else {
+                <span style="font-size:11px;color:var(--gray-300)">—</span>
+              }
             </div>
             <div class="td" style="font-size:12px;color:var(--gray-400)">
               {{ user.last_login_at ? (user.last_login_at | date:'dd.MM.yy HH:mm') : 'Never' }}
@@ -147,6 +157,14 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
                 <select class="fsel" [(ngModel)]="newAdmin">
                   <option [ngValue]="false">Regular User</option>
                   <option [ngValue]="true">Administrator</option>
+                </select>
+              </div>
+              <div class="fg" style="grid-column:1/-1">
+                <label class="fl">Rola CRM</label>
+                <select class="fsel" [(ngModel)]="newCrmRole">
+                  <option value="">Brak roli CRM</option>
+                  <option value="salesperson">Handlowiec (salesperson)</option>
+                  <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
                 </select>
               </div>
               <div class="fg" style="grid-column:1/-1">
@@ -232,6 +250,14 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
                 <select class="fsel" [(ngModel)]="editAdmin">
                   <option [ngValue]="false">Regular User</option>
                   <option [ngValue]="true">Administrator</option>
+                </select>
+              </div>
+              <div class="fg" style="grid-column:1/-1">
+                <label class="fl">Rola CRM</label>
+                <select class="fsel" [(ngModel)]="editCrmRole">
+                  <option value="">Brak roli CRM</option>
+                  <option value="salesperson">Handlowiec (salesperson)</option>
+                  <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
                 </select>
               </div>
             </div>
@@ -341,6 +367,7 @@ export class UsersComponent implements OnInit {
   editEmail  = '';        // ★ nowe pole
   editActive = true;
   editAdmin  = false;
+  editCrmRole: string = '';   // ★ rola CRM
   emailError = '';        // ★ walidacja inline
 
   newRoleGroup  = '';
@@ -351,6 +378,7 @@ export class UsersComponent implements OnInit {
   newEmail       = '';
   newActive      = true;
   newAdmin       = false;
+  newCrmRole     = '';           // ★ rola CRM dla nowego usera
   newGroup       = '';
   newGroupAccess: 'read' | 'full' = 'read';
   submitted      = false;
@@ -403,7 +431,7 @@ export class UsersComponent implements OnInit {
 
   openNew(): void {
     this.newFirst = ''; this.newLast = ''; this.newEmail = '';
-    this.newActive = true; this.newAdmin = false;
+    this.newActive = true; this.newAdmin = false; this.newCrmRole = '';
     this.newGroup = ''; this.newGroupAccess = 'read';
     this.submitted = false;
     this.showNew.set(true);
@@ -419,7 +447,8 @@ export class UsersComponent implements OnInit {
       email:      this.newEmail,
       is_active:  this.newActive,
       is_admin:   this.newAdmin,
-    }).subscribe({
+      crm_role:   this.newCrmRole || null,
+    } as any).subscribe({
       next: (user) => {
         if (this.newGroup) {
           this.userSvc.assignRole(user.id, this.newGroup, this.newGroupAccess).subscribe();
@@ -440,11 +469,12 @@ export class UsersComponent implements OnInit {
   openUser(user: User): void {
     this.userSvc.get(user.id).subscribe(u => {
       this.selected.set(u);
-      this.editFirst  = u.first_name;
-      this.editLast   = u.last_name;
-      this.editEmail  = u.email;   // ★ wypełnij email
-      this.editActive = u.is_active;
-      this.editAdmin  = u.is_admin;
+      this.editFirst   = u.first_name;
+      this.editLast    = u.last_name;
+      this.editEmail   = u.email;
+      this.editActive  = u.is_active;
+      this.editAdmin   = u.is_admin;
+      this.editCrmRole = (u as any).crm_role ?? '';
       this.emailError    = '';
       this.newRoleGroup  = '';
       this.newRoleAccess = 'read';
@@ -465,13 +495,14 @@ export class UsersComponent implements OnInit {
     this.userSvc.update(u.id, {
       first_name: this.editFirst,
       last_name:  this.editLast,
-      email:      this.editEmail,  // ★ wyślij email
+      email:      this.editEmail,
       is_active:  this.editActive,
       is_admin:   this.editAdmin,
-    }).subscribe({
+      crm_role:   this.editCrmRole || null,
+    } as any).subscribe({
       next: updated => {
         this.selected.set({ ...u, ...updated });
-        this.users.update(list => list.map(x => x.id === u.id ? { ...x, ...updated } : x));
+        this.users.update(list => list.map(x => x.id === u.id ? { ...x, ...updated, crm_role: (updated as any).crm_role } : x));
         this.toast.success('User updated');
       },
       error: err => {

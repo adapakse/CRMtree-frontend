@@ -15,6 +15,7 @@ export interface User {
   display_name: string;
   is_admin: boolean;
   is_active: boolean;
+  crm_role?: 'salesperson' | 'sales_manager' | null;
   last_login_at?: string;
   created_at?: string;
   roles?: UserRole[];

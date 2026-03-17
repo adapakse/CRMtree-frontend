@@ -65,21 +65,6 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/crm/reports/crm-reports.component').then(m => m.CrmReportsComponent),
       },
       {
-        path: 'crm/reports/leads',
-        canActivate: [crmGuard],
-        loadComponent: () => import('./pages/crm/reports/crm-reports-leads.component').then(m => m.CrmReportsLeadsComponent),
-      },
-      {
-        path: 'crm/reports/partners',
-        canActivate: [crmGuard],
-        loadComponent: () => import('./pages/crm/reports/crm-reports-partners.component').then(m => m.CrmReportsPartnersComponent),
-      },
-      {
-        path: 'crm/calendar',
-        canActivate: [crmGuard],
-        loadComponent: () => import('./pages/crm/calendar/crm-calendar.component').then(m => m.CrmCalendarComponent),
-      },
-      {
         path: 'crm/import',
         canActivate: [crmGuard],
         loadComponent: () => import('./pages/crm/import/crm-import.component').then(m => m.CrmImportComponent),
@@ -87,17 +72,7 @@ export const routes: Routes = [
       {
         path: 'crm/partners',
         canActivate: [crmGuard],
-        loadComponent: () => import('./pages/crm/partners/crm-partners-list.component').then(m => m.CrmPartnersListComponent),
-      },
-      {
-        path: 'crm/partners/:id',
-        canActivate: [crmGuard],
         loadComponent: () => import('./pages/crm/partners/crm-partner-detail.component').then(m => m.CrmPartnerDetailComponent),
-      },
-      {
-        path: 'crm/partner-groups',
-        canActivate: [crmGuard],
-        loadComponent: () => import('./pages/crm/groups/crm-groups.component').then(m => m.CrmGroupsComponent),
       },
       // ─────────────────────────────────────────────────────────────────────
     ],
