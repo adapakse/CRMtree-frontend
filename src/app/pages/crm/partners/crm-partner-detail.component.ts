@@ -1,0 +1,1352 @@
+// src/app/pages/crm/partners/crm-partner-detail.component.ts
+import { Component, OnInit, inject, Input, ChangeDetectorRef, NgZone } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup } from '../../../core/services/crm-api.service';
+import { AuthService } from '../../../core/auth/auth.service';
+
+@Component({
+  selector: 'wt-crm-partner-detail',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
+  template: `
+<div class="detail-page" *ngIf="partner">
+  <div class="detail-header">
+    <button class="back-btn" routerLink="/crm/partners">← Partnerzy</button>
+    <h1>{{partner.company}}</h1>
+    <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
+    <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
+    <button class="btn-outline" (click)="openEdit()">✏️ Edytuj</button>
+  </div>
+
+  <!-- Onboarding stepper + zadania -->
+  <div class="onboarding-panel" *ngIf="partner.status === 'onboarding'">
+
+    <!-- Pasek etapów -->
+    <div class="onboarding-steps">
+      <div *ngFor="let s of onboardingSteps; let i = index"
+           class="step" [class.done]="partner.onboarding_step > i"
+           [class.current]="activeStep === i"
+           (click)="selectStep(i)" style="cursor:pointer">
+        <div class="step-circle">
+          <span *ngIf="partner.onboarding_step <= i">{{i + 1}}</span>
+          <span *ngIf="partner.onboarding_step > i">✓</span>
+        </div>
+        <div class="step-label">{{s}}</div>
+        <div class="step-tasks-count" *ngIf="tasksByStep[i]?.length">
+          <span [class.all-done]="allTasksDone(i)">{{doneCount(i)}}/{{tasksByStep[i].length}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel zadań aktywnego etapu -->
+    <div class="step-tasks-panel">
+      <div class="step-tasks-header">
+        <span class="step-tasks-title">📋 Zadania: <strong>{{onboardingSteps[activeStep]}}</strong></span>
+        <button class="btn-sm" (click)="openAddTask()" style="font-size:12px">+ Dodaj zadanie</button>
+        <button class="btn-sm"
+                *ngIf="partner.onboarding_step === activeStep && isManager && allTasksDone(activeStep) && activeStep < 3"
+                (click)="advanceStep(activeStep + 1)"
+                style="background:#22c55e;color:white;border:none">
+          Następny etap →
+        </button>
+        <button class="btn-sm"
+                *ngIf="partner.onboarding_step === activeStep && isManager && allTasksDone(activeStep) && activeStep === 3"
+                (click)="finishOnboarding()"
+                style="background:#22c55e;color:white;border:none">
+          Zakończ wdrożenie ✓
+        </button>
+      </div>
+
+      <!-- Formularz nowego zadania -->
+      <div class="task-form" *ngIf="showTaskForm && activeStep === taskFormStep">
+        <div class="task-form-row">
+          <select [(ngModel)]="taskForm.type" class="tf-sel">
+            <option value="task">✅ Zadanie</option>
+            <option value="call">📞 Połączenie</option>
+            <option value="email">📧 Email</option>
+            <option value="meeting">🤝 Spotkanie</option>
+            <option value="doc_sent">📄 Dokument</option>
+            <option value="training">🎓 Szkolenie</option>
+          </select>
+          <input [(ngModel)]="taskForm.title" placeholder="Tytuł zadania *" class="tf-input" style="flex:1">
+        </div>
+        <div class="task-form-row">
+          <select [(ngModel)]="taskForm.assigned_to" class="tf-sel" style="flex:1">
+            <option value="">— osoba odpowiedzialna —</option>
+            <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+          </select>
+          <label style="font-size:11px;color:#9ca3af;display:flex;align-items:center;gap:4px;white-space:nowrap">
+            Termin: <input type="date" [(ngModel)]="taskForm.due_date" class="tf-input" style="width:140px">
+          </label>
+        </div>
+        <textarea [(ngModel)]="taskForm.body" placeholder="Opis (opcjonalnie)…" rows="2" class="tf-input tf-textarea"></textarea>
+        <div class="task-form-actions">
+          <button class="btn-sm" (click)="cancelTaskForm()">Anuluj</button>
+          <button class="btn-sm primary" (click)="saveTask()" [disabled]="!taskForm.title || savingTask">
+            {{savingTask ? '…' : 'Zapisz'}}
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista zadań -->
+      <div class="task-list" *ngIf="tasksByStep[activeStep]?.length; else noTasks">
+        <div *ngFor="let t of tasksByStep[activeStep]" class="task-item" [class.task-done]="t.done">
+          <button class="task-check" (click)="toggleTask(t)">{{t.done ? '✓' : '○'}}</button>
+          <div class="task-body" *ngIf="editingTaskId !== t.id">
+            <div class="task-title">
+              <span class="task-type-icon">{{taskIcon(t.type)}}</span> {{t.title}}
+            </div>
+            <div class="task-meta">
+              <span *ngIf="t.assigned_to_name">👤 {{t.assigned_to_name}}</span>
+              <span *ngIf="t.due_date" [class.overdue]="isOverdue(t)">
+                📅 {{t.due_date | date:'dd.MM.yyyy'}}
+                <span *ngIf="isOverdue(t)" class="overdue-badge">Po terminie</span>
+              </span>
+              <span *ngIf="t.done && t.done_by_name" style="color:#22c55e">✓ {{t.done_by_name}}</span>
+            </div>
+            <div class="task-desc" *ngIf="t.body">{{t.body}}</div>
+          </div>
+          <div class="task-body task-edit" *ngIf="editingTaskId === t.id">
+            <div class="task-form-row">
+              <select [(ngModel)]="taskEditForm.type" class="tf-sel">
+                <option value="task">✅ Zadanie</option>
+                <option value="call">📞 Połączenie</option>
+                <option value="email">📧 Email</option>
+                <option value="meeting">🤝 Spotkanie</option>
+                <option value="doc_sent">📄 Dokument</option>
+                <option value="training">🎓 Szkolenie</option>
+              </select>
+              <input [(ngModel)]="taskEditForm.title" class="tf-input" style="flex:1">
+            </div>
+            <div class="task-form-row">
+              <select [(ngModel)]="taskEditForm.assigned_to" class="tf-sel" style="flex:1">
+                <option value="">— brak —</option>
+                <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+              </select>
+              <input type="date" [(ngModel)]="taskEditForm.due_date" class="tf-input" style="width:140px">
+            </div>
+            <textarea [(ngModel)]="taskEditForm.body" rows="2" class="tf-input tf-textarea" placeholder="Opis…"></textarea>
+            <div class="task-form-actions">
+              <button class="btn-sm" (click)="cancelEditTask()">Anuluj</button>
+              <button class="btn-sm primary" (click)="saveEditTask(t)" [disabled]="savingTask">{{savingTask ? '…' : 'Zapisz'}}</button>
+            </div>
+          </div>
+          <div class="task-actions" *ngIf="editingTaskId !== t.id">
+            <button class="task-act-btn" (click)="startEditTask(t)">✏️</button>
+            <button class="task-act-btn del" (click)="deleteTask(t)">🗑️</button>
+          </div>
+        </div>
+      </div>
+      <ng-template #noTasks>
+        <div class="task-empty">Brak zadań dla tego etapu. Kliknij „+ Dodaj zadanie".</div>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="detail-body">
+    <div class="info-card">
+      <h3>Informacje</h3>
+      <div class="info-grid">
+        <span class="lbl">Nr partnera</span>
+        <span>
+          <span *ngIf="partner.partner_number" style="font-family:monospace;font-weight:600;color:var(--orange)">{{partner.partner_number}}</span>
+          <span *ngIf="!partner.partner_number" style="color:var(--gray-400)">— nie ustawiono</span>
+        </span>
+        <span class="lbl">NIP</span><span>{{partner.nip || '—'}}</span>
+        <span class="lbl">Adres</span><span>{{partner.address || '—'}}</span>
+        <span class="lbl">Branża</span><span>{{partner.industry || '—'}}</span>
+        <span class="lbl">Opiekun</span><span>{{partner.manager_name || '—'}}</span>
+        <span class="lbl">Umowa od</span><span>{{partner.contract_signed ? (partner.contract_signed | date:'dd.MM.yyyy') : '—'}}</span>
+        <span class="lbl">Umowa do</span><span>{{partner.contract_expires ? (partner.contract_expires | date:'dd.MM.yyyy') : '—'}}</span>
+        <span class="lbl">Wartość umowy</span><span>{{(partner.contract_value || 0) | number:'1.0-0'}} PLN</span>
+        <span class="lbl">ARR</span><span class="accent">{{(partner.arr || 0) | number:'1.0-0'}} PLN</span>
+        <span class="lbl">Licencje</span><span>{{partner.license_count || 0}}</span>
+        <span class="lbl">Aktywni użytk.</span>
+        <span>{{partner.active_users || 0}} / {{partner.license_count || 0}}
+          <span class="sub" *ngIf="partner.license_count">({{adoptionPct}}%)</span>
+        </span>
+      </div>
+
+      <!-- Kontakt do spraw umowy -->
+      <div class="info-subsection">
+        <div class="info-subsection-title">Kontakt do spraw umowy</div>
+        <div class="info-grid">
+          <span class="lbl">Imię i nazwisko</span><span>{{partner.contact_name || '—'}}</span>
+          <span class="lbl">Stanowisko</span><span>{{partner.contact_title || '—'}}</span>
+          <span class="lbl">Email</span><span>{{partner.email || '—'}}</span>
+          <span class="lbl">Telefon</span><span>{{partner.phone || '—'}}</span>
+        </div>
+      </div>
+
+      <!-- Kontakt do spraw rozliczeń -->
+      <div class="info-subsection">
+        <div class="info-subsection-title">Kontakt do spraw rozliczeń</div>
+        <div class="info-grid">
+          <span class="lbl">Imię i nazwisko</span><span>{{partner.billing_contact_name || '—'}}</span>
+          <span class="lbl">Stanowisko</span><span>{{partner.billing_contact_title || '—'}}</span>
+          <span class="lbl">Email</span><span>{{partner.billing_email || '—'}}</span>
+          <span class="lbl">Telefon</span><span>{{partner.billing_phone || '—'}}</span>
+        </div>
+      </div>
+
+      <!-- Finansowe dodatkowe -->
+      <div class="info-subsection" *ngIf="partner.credit_limit_value != null || partner.deposit_value != null || partner.commission_value != null">
+        <div class="info-subsection-title">Warunki finansowe</div>
+        <div class="info-grid">
+          <ng-container *ngIf="partner.credit_limit_value != null">
+            <span class="lbl">Limit kredytowy</span>
+            <span>{{partner.credit_limit_value | number:'1.0-2'}} {{partner.credit_limit_currency}}</span>
+          </ng-container>
+          <ng-container *ngIf="partner.deposit_value != null">
+            <span class="lbl">Kwota depozytu</span>
+            <span>{{partner.deposit_value | number:'1.0-2'}} {{partner.deposit_currency}}</span>
+            <span class="lbl">Data wpłaty</span>
+            <span>{{partner.deposit_date_in ? (partner.deposit_date_in | date:'dd.MM.yyyy') : '—'}}</span>
+            <span class="lbl">Data zwrotu</span>
+            <span>{{partner.deposit_date_out ? (partner.deposit_date_out | date:'dd.MM.yyyy') : '—'}}</span>
+          </ng-container>
+          <ng-container *ngIf="partner.commission_value != null">
+            <span class="lbl">Prowizja WT/TM</span>
+            <span>{{partner.commission_value | number:'1.0-4'}} · {{commissionBasisLabel(partner.commission_basis)}}</span>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="info-grid" style="margin-top:10px">
+        <span class="lbl">Notatki</span><span class="notes">{{partner.notes || '—'}}</span>
+      </div>
+
+      <div *ngIf="activeOpps.length" class="opp-section">
+        <h4>Szanse sprzedaży ({{ activeOpps.length }})</h4>
+        <div *ngFor="let o of activeOpps" class="opp-item">
+          <span class="opp-status-badge opp-st-{{o.opp_status}}">{{oppStatusLabel(o.opp_status)}}</span>
+          <span class="opp-title">{{o.title}}</span>
+          <span class="opp-value" *ngIf="o.opp_value">{{o.opp_value | number:'1.0-0'}} {{o.opp_currency}}</span>
+          <span class="opp-due" *ngIf="o.opp_due_date">do {{o.opp_due_date | date:'dd.MM.yy'}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="activities-card">
+      <div class="card-header">
+        <h3>Aktywności</h3>
+        <button class="btn-sm" (click)="showNewActivity = !showNewActivity">+ Dodaj</button>
+      </div>
+      <div class="new-activity-form" *ngIf="showNewActivity">
+        <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
+          <option value="call">📞 Połączenie</option>
+          <option value="email">📧 Email</option>
+          <option value="meeting">🤝 Spotkanie</option>
+          <option value="note">📝 Notatka</option>
+          <option value="training">🎓 Szkolenie</option>
+          <option value="qbr">📊 QBR</option>
+          <option value="opportunity">💡 Szansa</option>
+        </select>
+        <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
+        <ng-container *ngIf="actForm.type === 'meeting'">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Data i czas
+              <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
+            </label>
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Czas trwania (min)
+              <input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="np. 60" class="act-input" style="font-size:11px">
+            </label>
+          </div>
+          <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+            Miejsce spotkania
+            <input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A" class="act-input" style="font-size:11px">
+          </label>
+          <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+            Uczestnicy (emaile)
+            <div class="participant-input-wrap">
+              <div class="participant-chips">
+                <span *ngFor="let e of actForm.participantList; let i = index" class="participant-chip">
+                  {{e}} <button (click)="removeParticipant(actForm, i)" type="button">✕</button>
+                </span>
+                <input class="participant-input" [(ngModel)]="participantQuery"
+                       (ngModelChange)="filterSuggestions()"
+                       (keydown.enter)="addParticipantFromInput(actForm)"
+                       (keydown.Tab)="addParticipantFromInput(actForm)"
+                       placeholder="Wpisz email lub imię…" autocomplete="off">
+              </div>
+              <div class="suggestions-dropdown" *ngIf="filteredSuggestions.length && participantQuery">
+                <div *ngFor="let s of filteredSuggestions" class="suggestion-item"
+                     (mousedown)="pickSuggestion(actForm, s)">
+                  <span style="font-weight:600">{{s.name}}</span>
+                  <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
+                </div>
+              </div>
+            </div>
+          </label>
+        </ng-container>
+        <!-- Szansa sprzedaży -->
+        <ng-container *ngIf="actForm.type === 'opportunity'">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Status szansy
+              <select [(ngModel)]="actForm.opp_status" class="act-input" style="font-size:11px">
+                <option value="new">Nowa</option>
+                <option value="in_progress">W trakcie</option>
+                <option value="closed">Zamknięta</option>
+              </select>
+            </label>
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Termin
+              <input type="date" [(ngModel)]="actForm.opp_due_date" class="act-input" style="font-size:11px">
+            </label>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Wartość
+              <input type="number" min="0" step="0.01" [(ngModel)]="actForm.opp_value" placeholder="0.00" class="act-input" style="font-size:11px">
+            </label>
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Waluta
+              <select [(ngModel)]="actForm.opp_currency" class="act-input" style="font-size:11px">
+                <option value="PLN">PLN</option>
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </label>
+          </div>
+        </ng-container>
+        <textarea [(ngModel)]="actForm.body" placeholder="Treść / opis…" rows="2" class="act-input"></textarea>
+        <div class="act-actions">
+          <button class="btn-sm" (click)="showNewActivity = false">Anuluj</button>
+          <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
+            {{savingActivity ? '…' : 'Zapisz'}}
+          </button>
+        </div>
+      </div>
+      <div class="activity-list">
+        <div *ngFor="let a of sortedActivities" class="act-item">
+          <span class="act-icon">{{actIcon(a.type)}}</span>
+          <div *ngIf="editingActId !== a.id">
+            <strong>{{a.title}}</strong>
+            <div class="act-meta">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · {{a.created_by_name}}</div>
+            <div *ngIf="a.meeting_location" class="act-text">📍 {{a.meeting_location}}</div>
+            <div *ngIf="a.participants" class="act-text">👥 {{a.participants}}</div>
+            <ng-container *ngIf="a.type === 'opportunity'">
+              <div class="act-text" style="display:flex;gap:8px;align-items:center">
+                <span class="opp-status-badge opp-st-{{a.opp_status}}">{{oppStatusLabel(a.opp_status)}}</span>
+                <span *ngIf="a.opp_value" style="font-weight:700;color:#f97316">{{a.opp_value | number:'1.0-0'}} {{a.opp_currency}}</span>
+                <span *ngIf="a.opp_due_date" style="color:#9ca3af">do {{a.opp_due_date | date:'dd.MM.yy'}}</span>
+              </div>
+            </ng-container>
+            <div class="act-text" *ngIf="a.body">{{a.body}}</div>
+          </div>
+          <div class="act-edit-form" *ngIf="editingActId === a.id">
+            <select [(ngModel)]="actEditForm.type" class="act-sel">
+              <option value="call">📞 Połączenie</option>
+              <option value="email">📧 Email</option>
+              <option value="meeting">🤝 Spotkanie</option>
+              <option value="note">📝 Notatka</option>
+              <option value="training">🎓 Szkolenie</option>
+              <option value="qbr">📊 QBR</option>
+              <option value="opportunity">💡 Szansa</option>
+            </select>
+            <input [(ngModel)]="actEditForm.title" placeholder="Tytuł *" class="act-input">
+            <ng-container *ngIf="actEditForm.type === 'meeting'">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                  Data i czas<input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input" style="font-size:11px">
+                </label>
+                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                  Czas trwania (min)<input type="number" min="0" [(ngModel)]="actEditForm.duration_min" placeholder="60" class="act-input" style="font-size:11px">
+                </label>
+              </div>
+              <input [(ngModel)]="actEditForm.meeting_location" placeholder="Miejsce spotkania" class="act-input">
+              <input [(ngModel)]="actEditForm.participants" placeholder="Uczestnicy (emaile oddzielone przecinkiem)" class="act-input">
+            </ng-container>
+            <ng-container *ngIf="actEditForm.type === 'opportunity'">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                  Status szansy
+                  <select [(ngModel)]="actEditForm.opp_status" class="act-input" style="font-size:11px">
+                    <option value="new">Nowa</option>
+                    <option value="in_progress">W trakcie</option>
+                    <option value="closed">Zamknięta</option>
+                  </select>
+                </label>
+                <input type="date" [(ngModel)]="actEditForm.opp_due_date" class="act-input" style="font-size:11px;align-self:flex-end">
+              </div>
+              <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
+                <input type="number" min="0" step="0.01" [(ngModel)]="actEditForm.opp_value" placeholder="Wartość" class="act-input">
+                <select [(ngModel)]="actEditForm.opp_currency" class="act-input">
+                  <option value="PLN">PLN</option><option value="EUR">EUR</option>
+                  <option value="USD">USD</option><option value="GBP">GBP</option>
+                </select>
+              </div>
+            </ng-container>
+            <textarea [(ngModel)]="actEditForm.body" placeholder="Treść…" rows="2" class="act-input"></textarea>
+            <div class="act-actions">
+              <button class="btn-sm" (click)="cancelEditActivity()">Anuluj</button>
+              <button class="btn-sm primary" (click)="saveEditActivity(a)" [disabled]="!actEditForm.title || savingActivity">
+                {{savingActivity ? '…' : 'Zapisz'}}
+              </button>
+            </div>
+          </div>
+          <div class="act-controls" *ngIf="editingActId !== a.id && canEditActivity(a)">
+            <button class="act-ctrl-btn" (click)="startEditActivity(a)" title="Edytuj">✏️</button>
+            <button class="act-ctrl-btn del" (click)="deleteActivity(a)" title="Usuń">🗑️</button>
+          </div>
+        </div>
+        <div class="empty-act" *ngIf="!sortedActivities.length">Brak aktywności.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit modal -->
+  <div class="modal-overlay" *ngIf="showEdit" (click)="showEdit = false">
+    <div class="modal modal-wide" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edytuj partnera</h3>
+        <button class="close-btn" (click)="showEdit = false">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="edit-section">
+          <div class="edit-section-title">Podstawowe</div>
+          <div class="edit-row">
+            <label>Nazwa firmy *<input [(ngModel)]="editForm.company" placeholder="Nazwa firmy" required></label>
+            <label>Status
+              <select [(ngModel)]="editForm.status">
+                <option value="onboarding">Wdrożenie</option>
+                <option value="active" [disabled]="hasOpenTasks && partner?.status === 'onboarding'"
+                        [title]="hasOpenTasks && partner?.status === 'onboarding' ? 'Są niewykonane zadania wdrożeniowe' : ''">
+                  Aktywny {{ hasOpenTasks && partner?.status === 'onboarding' ? '🔒' : '' }}
+                </option>
+                <option value="inactive">Nieaktywny</option>
+                <option value="churned">Utracony</option>
+              </select>
+              <div *ngIf="hasOpenTasks && partner?.status === 'onboarding'" class="validation-msg" style="color:#f59e0b;margin-top:4px">
+                ⚠ {{ openTasksCount }} niewykonan{{ openTasksCount === 1 ? 'e zadanie' : 'ych zadań' }} wdrożeniowych — nie można ustawić statusu Aktywny
+              </div>
+            </label>
+          </div>
+          <div class="edit-row">
+            <label>
+              Numer partnera
+              <input [(ngModel)]="editForm.partner_number" placeholder="np. P-0001"
+                     style="font-family:monospace">
+              <span style="font-size:10px;color:var(--gray-400);margin-top:2px;display:block">
+                Klucz łączący z danymi w systemie transakcyjnym
+              </span>
+            </label>
+            <label>NIP<input [(ngModel)]="editForm.nip" placeholder="000-000-00-00"></label>
+          </div>
+          <div class="edit-row">
+            <label class="full">Adres<input [(ngModel)]="editForm.address" placeholder="ul. Przykładowa 1, 00-001 Warszawa"></label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Kontakt do spraw umowy *</div>
+          <div class="edit-row">
+            <label>Imię i nazwisko *
+              <input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"
+                     [class.input-warn]="submitAttempted && !editForm.contact_name">
+            </label>
+            <label>Stanowisko *
+              <input [(ngModel)]="editForm.contact_title" placeholder="CEO"
+                     [class.input-warn]="submitAttempted && !editForm.contact_title">
+            </label>
+          </div>
+          <div class="edit-row">
+            <label>Email *
+              <input [(ngModel)]="editForm.email" type="email" placeholder="jan@firma.pl"
+                     [class.input-warn]="submitAttempted && !editForm.email">
+            </label>
+            <label>Telefon *
+              <input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"
+                     [class.input-warn]="submitAttempted && !editForm.phone">
+            </label>
+          </div>
+          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.contact_name || !editForm.contact_title || !editForm.email || !editForm.phone)" style="color:#f59e0b">
+            ⚠ Zalecane jest uzupełnienie wszystkich pól kontaktu do spraw umowy.
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Kontakt do spraw rozliczeń *</div>
+          <div class="edit-row">
+            <label>Imię i nazwisko *
+              <input [(ngModel)]="editForm.billing_contact_name" placeholder="Anna Nowak"
+                     [class.input-warn]="submitAttempted && !editForm.billing_contact_name">
+            </label>
+            <label>Stanowisko *
+              <input [(ngModel)]="editForm.billing_contact_title" placeholder="Kierownik rozliczeń"
+                     [class.input-warn]="submitAttempted && !editForm.billing_contact_title">
+            </label>
+          </div>
+          <div class="edit-row">
+            <label>Email *
+              <input [(ngModel)]="editForm.billing_email" type="email" placeholder="rozliczenia@firma.pl"
+                     [class.input-warn]="submitAttempted && !editForm.billing_email">
+            </label>
+            <label>Telefon *
+              <input [(ngModel)]="editForm.billing_phone" placeholder="+48 600 000 000"
+                     [class.input-warn]="submitAttempted && !editForm.billing_phone">
+            </label>
+          </div>
+          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_contact_name || !editForm.billing_contact_title || !editForm.billing_email || !editForm.billing_phone)" style="color:#f59e0b">
+            ⚠ Zalecane jest uzupełnienie wszystkich pól kontaktu do spraw rozliczeń.
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Limit kredytowy</div>
+          <div class="edit-row">
+            <label>Wartość
+              <input [(ngModel)]="editForm.credit_limit_value" type="number" min="0" placeholder="np. 50000">
+            </label>
+            <label>Waluta
+              <select [(ngModel)]="editForm.credit_limit_currency">
+                <option value="PLN">PLN</option>
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Kwota depozytu</div>
+          <div class="edit-row">
+            <label>Wartość
+              <input [(ngModel)]="editForm.deposit_value" type="number" min="0" placeholder="np. 10000">
+            </label>
+            <label>Waluta
+              <select [(ngModel)]="editForm.deposit_currency">
+                <option value="PLN">PLN</option>
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </label>
+          </div>
+          <div class="edit-row">
+            <label>Data wpłaty<input [(ngModel)]="editForm.deposit_date_in" type="date"></label>
+            <label>Data zwrotu<input [(ngModel)]="editForm.deposit_date_out" type="date"></label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Prowizja WT/TM</div>
+          <div class="edit-row">
+            <label>Wartość
+              <input [(ngModel)]="editForm.commission_value" type="number" min="0" step="0.0001" placeholder="np. 0.05">
+            </label>
+            <label>Podstawa
+              <select [(ngModel)]="editForm.commission_basis">
+                <option value="nie_dotyczy">Nie dotyczy</option>
+                <option value="segmenty">Ilość segmentów</option>
+                <option value="rezerwacje">Ilość rezerwacji</option>
+                <option value="progi_obrotowe">Progi obrotowe</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Opiekun i Grupa</div>
+          <div class="edit-row">
+            <label>Opiekun / Handlowiec
+              <select [(ngModel)]="editForm.manager_id">
+                <option value="">— nieprzypisany —</option>
+                <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+              </select>
+            </label>
+            <label>Grupa partnerów
+              <select [(ngModel)]="editForm.group_id">
+                <option value="">— brak grupy —</option>
+                <option *ngFor="let g of partnerGroups" [value]="g.id">{{g.name}}</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Umowa i finansowe</div>
+          <div class="edit-row">
+            <label>Data podpisania<input [(ngModel)]="editForm.contract_signed" type="date"></label>
+            <label>Data wygaśnięcia<input [(ngModel)]="editForm.contract_expires" type="date"></label>
+          </div>
+          <div class="edit-row">
+            <label>Wartość kontraktu (PLN)<input [(ngModel)]="editForm.contract_value" type="number" min="0" placeholder="0"></label>
+            <label>ARR (PLN)<input [(ngModel)]="editForm.arr" type="number" min="0" placeholder="0"></label>
+          </div>
+          <div class="edit-row">
+            <label>Liczba licencji<input [(ngModel)]="editForm.license_count" type="number" min="0" placeholder="0"></label>
+            <label>Aktywni użytkownicy<input [(ngModel)]="editForm.active_users" type="number" min="0" placeholder="0"></label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">Notatki</div>
+          <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="showEdit = false; submitAttempted = false">Anuluj</button>
+        <button class="btn-primary" (click)="savePartner()" [disabled]="saving">
+          {{saving ? 'Zapisywanie…' : 'Zapisz zmiany'}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!partner && !loading" class="not-found">{{ loadError ? 'Błąd ładowania.' : 'Partner nie znaleziony.' }}</div>
+<div *ngIf="loading" class="loading">Ładowanie…</div>
+  `,
+  styles: [`
+    :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
+    .detail-page { padding:20px; max-width:1000px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
+    .detail-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; flex-shrink:0; }
+    .back-btn { background:none; border:none; color:#f97316; cursor:pointer; font-size:13px; }
+    .detail-header h1 { font-size:22px; font-weight:800; margin:0; flex:1; }
+    .pbadge { padding:3px 10px; border-radius:10px; font-size:12px; font-weight:700; }
+    .pbadge-active{background:#dcfce7;color:#166534} .pbadge-onboarding{background:#dbeafe;color:#1e40af}
+    .pbadge-inactive{background:#f3f4f6;color:#374151} .pbadge-churned{background:#fee2e2;color:#991b1b}
+    .group-badge { background:#f3f4f6; border-radius:8px; padding:3px 10px; font-size:11px; }
+    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
+    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
+    /* Onboarding */
+    /* Onboarding panel */
+    .onboarding-panel { flex-shrink:0; margin-bottom:16px; background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
+    .onboarding-steps { display:flex; padding:16px 16px 0; border-bottom:1px solid #f3f4f6; }
+    .step { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative; padding-bottom:12px; }
+    .step:not(:last-child)::after { content:''; position:absolute; top:14px; left:calc(50% + 16px); right:0; height:2px; background:#e5e7eb; }
+    .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid #e5e7eb; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:white; position:relative; z-index:1; transition:all .2s; }
+    .step.done .step-circle { background:#f97316; border-color:#f97316; color:white; }
+    .step.current .step-circle { border-color:#f97316; color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.15); }
+    .step-label { font-size:10px; color:#9ca3af; text-align:center; }
+    .step.current .step-label { color:#f97316; font-weight:700; }
+    .step.done .step-label { color:#6b7280; }
+    .step-tasks-count { font-size:10px; font-weight:700; padding:1px 5px; border-radius:8px; background:#f3f4f6; color:#6b7280; }
+    .step-tasks-count .all-done { color:#22c55e; }
+    /* Tasks panel */
+    .step-tasks-panel { padding:14px 16px; }
+    .step-tasks-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .step-tasks-title { font-size:12px; color:#374151; flex:1; }
+    .step-tasks-title strong { color:#111827; }
+    /* Task form */
+    .task-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:7px; }
+    .task-form-row { display:flex; gap:7px; align-items:center; }
+    .tf-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; background:white; outline:none; font-family:inherit; }
+    .tf-sel:focus { border-color:#f97316; }
+    .tf-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; outline:none; }
+    .tf-input:focus { border-color:#f97316; }
+    .tf-textarea { resize:vertical; width:100%; box-sizing:border-box; }
+    .task-form-actions { display:flex; gap:6px; justify-content:flex-end; }
+    /* Task list */
+    .task-list { display:flex; flex-direction:column; gap:6px; }
+    .task-item { display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border:1px solid #f3f4f6; border-radius:8px; background:white; transition:background .1s; }
+    .task-item:hover { background:#fafafa; }
+    .task-item.task-done { background:#f9fafb; }
+    .task-item.task-done .task-title { text-decoration:line-through; color:#9ca3af; }
+    .task-check { width:22px; height:22px; border-radius:50%; border:2px solid #d1d5db; background:white; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer; flex-shrink:0; font-weight:700; transition:all .15s; }
+    .task-item.task-done .task-check { background:#22c55e; border-color:#22c55e; color:white; }
+    .task-check:hover { border-color:#f97316; }
+    .task-body { flex:1; min-width:0; }
+    .task-title { font-size:12.5px; font-weight:600; color:#111827; display:flex; align-items:center; gap:5px; }
+    .task-type-icon { font-size:13px; }
+    .task-meta { display:flex; gap:10px; flex-wrap:wrap; font-size:11px; color:#9ca3af; margin-top:3px; }
+    .task-meta .overdue { color:#ef4444; }
+    .overdue-badge { background:#fee2e2; color:#991b1b; border-radius:4px; padding:0 5px; font-size:10px; font-weight:600; }
+    .task-desc { font-size:11px; color:#6b7280; margin-top:3px; white-space:pre-line; }
+    .task-edit { display:flex; flex-direction:column; gap:6px; }
+    .task-actions { display:flex; gap:3px; opacity:0; transition:opacity .15s; flex-shrink:0; }
+    .task-item:hover .task-actions { opacity:1; }
+    .task-act-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 4px; border-radius:4px; color:#9ca3af; }
+    .task-act-btn:hover { background:#f3f4f6; color:#374151; }
+    .task-act-btn.del:hover { color:#ef4444; }
+    .task-empty { font-size:12px; color:#9ca3af; text-align:center; padding:16px; }
+    /* Body */
+    .detail-body { display:grid; grid-template-columns:320px 1fr; gap:16px; flex:1; overflow:hidden; min-height:0; }
+    @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
+    .info-card, .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
+    .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
+    .info-grid { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; }
+    .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; padding-top:2px; }
+    .sub { color:#9ca3af; }
+    .accent { color:#f97316; font-weight:700; }
+    .notes { white-space:pre-line; }
+    .opp-section { margin-top:16px; padding-top:12px; border-top:1px solid #f3f4f6; }
+    .opp-section h4 { font-size:12px; font-weight:700; margin:0 0 8px; }
+    .opp-item { font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .opp-title { flex:1; font-weight:600; }
+    .opp-value { font-weight:700; color:#f97316; }
+    .opp-due { color:#9ca3af; font-size:11px; }
+    .opp-status-badge { font-size:10px; font-weight:700; padding:1px 7px; border-radius:8px; white-space:nowrap; }
+    .opp-st-new { background:#dbeafe; color:#1e40af; }
+    .opp-st-in_progress { background:#fef3c7; color:#92400e; }
+    .opp-st-closed { background:#f3f4f6; color:#6b7280; }
+    .opp-type { font-size:10px; font-weight:700; padding:1px 6px; border-radius:6px; background:#f3f4f6; margin-right:4px; }
+    .opp-type.upsell { background:#fef3c7; color:#92400e; }
+    .opp-value { color:#f97316; font-weight:700; }
+    .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .card-header h3 { margin:0; }
+    .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:3px 10px; cursor:pointer; }
+    .btn-sm.primary { background:#f97316; color:white; border-color:#f97316; }
+    .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; display:flex; flex-direction:column; gap:7px; }
+    .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
+    .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; }
+    .act-actions { display:flex; gap:6px; justify-content:flex-end; }
+    .activity-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
+    .act-item { display:flex; gap:10px; }
+    .act-icon { font-size:18px; }
+    .act-item strong { font-size:13px; }
+    .act-meta { font-size:10px; color:#9ca3af; }
+    .act-text { font-size:12px; color:#6b7280; margin-top:2px; white-space:pre-line; }
+    .act-edit-form { display:flex;flex-direction:column;gap:6px;flex:1; }
+    .act-controls { display:flex;gap:4px;align-self:flex-start;opacity:0;transition:opacity .15s; }
+    .act-item:hover .act-controls { opacity:1; }
+    .act-ctrl-btn { background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;color:#9ca3af; }
+    .act-ctrl-btn:hover { background:#f3f4f6;color:#374151; }
+    .act-ctrl-btn.del:hover { color:#ef4444; }
+    .participant-input-wrap { position:relative; }
+    .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;min-height:32px;background:white; }
+    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px; }
+    .participant-chip button { background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px;padding:0;line-height:1; }
+    .participant-chip button:hover { color:#ef4444; }
+    .participant-input { border:none;outline:none;font-size:12px;min-width:120px;flex:1;font-family:inherit; }
+    .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:160px;overflow-y:auto;margin-top:2px; }
+    .suggestion-item { padding:7px 12px;font-size:12px;cursor:pointer; }
+    .suggestion-item:hover { background:#f9fafb; }
+    .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:16px; }
+    .loading, .not-found { padding:40px; text-align:center; color:#9ca3af; }
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
+    .modal-wide { background:white; border-radius:14px; width:min(720px,100%); max-height:88vh; overflow-y:auto; display:flex; flex-direction:column; }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px 14px; border-bottom:1px solid #f3f4f6; position:sticky; top:0; background:white; z-index:1; }
+    .modal-header h3 { margin:0; font-size:16px; font-weight:700; }
+    .close-btn { background:none; border:none; font-size:18px; color:#9ca3af; cursor:pointer; }
+    .modal-body { padding:20px 24px; display:flex; flex-direction:column; gap:16px; }
+    .modal-footer { padding:14px 24px; border-top:1px solid #f3f4f6; display:flex; justify-content:flex-end; gap:8px; position:sticky; bottom:0; background:white; }
+    .edit-section { display:flex; flex-direction:column; gap:10px; }
+    .edit-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; }
+    .edit-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .edit-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
+    .edit-row label.full { grid-column:1/-1; }
+    .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
+    .edit-row label input:focus, .edit-row label select:focus { border-color:#f97316; }
+    .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
+    .edit-textarea:focus { border-color:#f97316; }
+    .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid #f3f4f6; }
+    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#f97316; margin-bottom:8px; }
+    .input-error { border-color:#ef4444 !important; background:#fff5f5; }
+    .input-warn  { border-color:#f59e0b !important; background:#fffbeb; }
+    .validation-msg { font-size:11px; color:#ef4444; margin-top:2px; }
+  `],
+})
+export class CrmPartnerDetailComponent implements OnInit {
+  @Input() id!: string;
+  private route = inject(ActivatedRoute);
+  private zone  = inject(NgZone);
+  private cdr   = inject(ChangeDetectorRef);
+  private api   = inject(CrmApiService);
+  private auth  = inject(AuthService);
+
+  partner: Partner | null = null;
+  loading        = false;
+  loadError      = false;
+  saving         = false;
+  savingActivity = false;
+  showNewActivity = false;
+  showEdit = false;
+  submitAttempted = false;
+  editForm: any  = {};
+  actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
+  actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '', opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
+  editingActId: number | null = null;
+  allSuggestions: { email: string; name: string }[] = [];
+  filteredSuggestions: { email: string; name: string }[] = [];
+  participantQuery = '';
+  crmUsers: CrmUser[] = [];
+  partnerGroups: PartnerGroup[] = [];
+
+  onboardingSteps = ['Umowa podpisana', 'Konfiguracja systemu', 'Szkolenie użytkowników', 'Gotowy'];
+  activeStep = 0;
+  // Tasks
+  tasks: OnboardingTask[] = [];
+  tasksByStep: Record<number, OnboardingTask[]> = { 0:[], 1:[], 2:[], 3:[] };
+  showTaskForm = false;
+  taskFormStep = 0;
+  savingTask   = false;
+  editingTaskId: number | null = null;
+  taskForm: any = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
+  taskEditForm: any = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
+
+  get isManager() {
+    const u = this.auth.user();
+    return u?.is_admin || u?.crm_role === 'sales_manager';
+  }
+
+  get sortedActivities(): any[] {
+    return [...(this.partner?.activities || [])].sort((a, b) =>
+      new Date(b.activity_at).getTime() - new Date(a.activity_at).getTime()
+    );
+  }
+
+  get activeOpps(): any[] {
+    return (this.partner?.all_opportunities || [])
+      .filter((o: any) => o.opp_status !== 'closed')
+      .sort((a: any, b: any) => (b.opp_value || 0) - (a.opp_value || 0));
+  }
+
+  oppStatusLabel(s: string | null): string {
+    return { new: 'Nowa', in_progress: 'W trakcie', closed: 'Zamknięta' }[s || ''] || s || '—';
+  }
+
+  get openTasksCount(): number {
+    return this.tasks.filter(t => !t.done).length;
+  }
+
+  get hasOpenTasks(): boolean {
+    return this.openTasksCount > 0;
+  }
+
+  get adoptionPct() {
+    if (!this.partner?.license_count) return 0;
+    return Math.round(((this.partner.active_users || 0) / this.partner.license_count) * 100);
+  }
+
+  ngOnInit() {
+    const rawId = this.id || this.route.snapshot.paramMap.get('id') || '';
+    const numId = parseInt(rawId, 10);
+    if (!numId || isNaN(numId)) { this.loadError = true; return; }
+    this.loadPartner(numId);
+    this.loadSuggestions(numId);
+    this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
+  }
+
+  private loadSuggestions(partnerId: number): void {
+    this.api.getContactSuggestions(undefined, partnerId).subscribe({
+      next: s => { this.allSuggestions = s; },
+      error: () => {},
+    });
+  }
+
+  loadPartner(numId?: number) {
+    const id = numId ?? parseInt(this.id, 10);
+    if (!id || isNaN(id)) return;
+    this.loading = true;
+    this.loadError = false;
+    this.partner = null;
+    this.api.getPartner(id).pipe(
+      finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
+    ).subscribe({
+      next: p  => { this.zone.run(() => { this.partner = p; this.activeStep = p.onboarding_step || 0; this.cdr.markForCheck(); if (p.status === 'onboarding') this.loadTasks(p.id); }); },
+      error: () => { this.zone.run(() => { this.loadError = true; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  openEdit() {
+    if (!this.partner) return;
+    this.editForm = {
+      company:               this.partner.company,
+      partner_number:        this.partner.partner_number || '',
+      status:                this.partner.status,
+      nip:                   this.partner.nip || '',
+      address:               this.partner.address || '',
+      industry:              this.partner.industry || '',
+      contact_name:          this.partner.contact_name || '',
+      contact_title:         this.partner.contact_title || '',
+      email:                 this.partner.email || '',
+      phone:                 this.partner.phone || '',
+      billing_contact_name:  this.partner.billing_contact_name || '',
+      billing_contact_title: this.partner.billing_contact_title || '',
+      billing_email:         this.partner.billing_email || '',
+      billing_phone:         this.partner.billing_phone || '',
+      credit_limit_value:    this.partner.credit_limit_value ?? null,
+      credit_limit_currency: this.partner.credit_limit_currency || 'PLN',
+      deposit_value:         this.partner.deposit_value ?? null,
+      deposit_currency:      this.partner.deposit_currency || 'PLN',
+      deposit_date_in:       this.partner.deposit_date_in   ? this.partner.deposit_date_in.substring(0, 10)   : '',
+      deposit_date_out:      this.partner.deposit_date_out  ? this.partner.deposit_date_out.substring(0, 10)  : '',
+      commission_value:      this.partner.commission_value ?? null,
+      commission_basis:      this.partner.commission_basis || 'nie_dotyczy',
+      manager_id:            this.partner.manager_id || '',
+      group_id:              this.partner.group_id || '',
+      contract_signed:       this.partner.contract_signed  ? this.partner.contract_signed.substring(0, 10)   : '',
+      contract_expires:      this.partner.contract_expires ? this.partner.contract_expires.substring(0, 10)  : '',
+      contract_value:        this.partner.contract_value ?? null,
+      arr:                   this.partner.arr ?? null,
+      license_count:         this.partner.license_count ?? null,
+      active_users:          this.partner.active_users ?? null,
+      notes:                 this.partner.notes || '',
+    };
+    this.submitAttempted = false;
+    // Zawsze ładuj listę użytkowników przy otwarciu (manager i salesperson)
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
+    this.showEdit = true;
+  }
+
+  savePartner() {
+    this.submitAttempted = true;
+    if (!this.editForm.company) return;
+
+    if (!this.partner) return;
+    this.saving = true;
+    const payload: Partial<Partner> = {
+      company:               this.editForm.company,
+      partner_number:        this.editForm.partner_number || null,
+      status:                this.editForm.status,
+      nip:                   this.editForm.nip || null,
+      address:               this.editForm.address || null,
+      industry:              this.editForm.industry || null,
+      contact_name:          this.editForm.contact_name || null,
+      contact_title:         this.editForm.contact_title || null,
+      email:                 this.editForm.email || null,
+      phone:                 this.editForm.phone || null,
+      billing_contact_name:  this.editForm.billing_contact_name || null,
+      billing_contact_title: this.editForm.billing_contact_title || null,
+      billing_email:         this.editForm.billing_email || null,
+      billing_phone:         this.editForm.billing_phone || null,
+      credit_limit_value:    this.editForm.credit_limit_value != null && this.editForm.credit_limit_value !== '' ? +this.editForm.credit_limit_value : null,
+      credit_limit_currency: this.editForm.credit_limit_currency || 'PLN',
+      deposit_value:         this.editForm.deposit_value != null && this.editForm.deposit_value !== '' ? +this.editForm.deposit_value : null,
+      deposit_currency:      this.editForm.deposit_currency || 'PLN',
+      deposit_date_in:       this.editForm.deposit_date_in || null,
+      deposit_date_out:      this.editForm.deposit_date_out || null,
+      commission_value:      this.editForm.commission_value != null && this.editForm.commission_value !== '' ? +this.editForm.commission_value : null,
+      commission_basis:      this.editForm.commission_basis || 'nie_dotyczy',
+      manager_id:            this.editForm.manager_id || null,
+      group_id:              this.editForm.group_id && this.editForm.group_id !== '' ? +this.editForm.group_id : null,
+      contract_signed:       this.editForm.contract_signed || null,
+      contract_expires:      this.editForm.contract_expires || null,
+      contract_value:        this.editForm.contract_value != null && this.editForm.contract_value !== '' ? +this.editForm.contract_value : null,
+      arr:                   this.editForm.arr != null && this.editForm.arr !== '' ? +this.editForm.arr : null,
+      license_count:         this.editForm.license_count != null && this.editForm.license_count !== '' ? +this.editForm.license_count : null,
+      active_users:          this.editForm.active_users != null && this.editForm.active_users !== '' ? +this.editForm.active_users : null,
+      notes:                 this.editForm.notes || null,
+    };
+    this.api.updatePartner(this.partner.id, payload).subscribe({
+      next: updated => {
+        this.zone.run(() => {
+          this.partner = { ...this.partner!, ...updated, activities: this.partner!.activities };
+          // Zaktualizuj manager_name lokalnie
+          if (this.editForm.manager_id) {
+            const u = this.crmUsers.find(x => x.id === this.editForm.manager_id);
+            if (u) this.partner!.manager_name = u.display_name;
+          } else {
+            this.partner!.manager_name = null;
+          }
+          this.saving = false;
+          this.showEdit = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.saving = false;
+          const msg = err?.error?.error || 'Błąd zapisu';
+          alert(msg);
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  loadTasks(partnerId: number): void {
+    this.api.getOnboardingTasks(partnerId).subscribe({
+      next: tasks => {
+        this.zone.run(() => {
+          this.tasks = tasks;
+          this.tasksByStep = { 0:[], 1:[], 2:[], 3:[] };
+          tasks.forEach(t => { if (this.tasksByStep[t.step]) this.tasksByStep[t.step].push(t); });
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => {},
+    });
+  }
+
+  selectStep(i: number): void {
+    this.activeStep = i;
+    this.showTaskForm = false;
+    this.editingTaskId = null;
+    this.cdr.markForCheck();
+  }
+
+  doneCount(step: number): number {
+    return (this.tasksByStep[step] || []).filter(t => t.done).length;
+  }
+
+  allTasksDone(step: number): boolean {
+    const tasks = this.tasksByStep[step] || [];
+    return tasks.length === 0 || tasks.every(t => t.done);
+  }
+
+  isOverdue(t: OnboardingTask): boolean {
+    if (!t.due_date || t.done) return false;
+    return new Date(t.due_date) < new Date(new Date().toDateString());
+  }
+
+  taskIcon(type: string): string {
+    return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓' }[type] || '✅';
+  }
+
+  openAddTask(): void {
+    this.taskFormStep  = this.activeStep;
+    this.taskForm      = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
+    this.showTaskForm  = true;
+    this.editingTaskId = null;
+    if (!this.crmUsers.length && this.partner) {
+      this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
+    }
+    this.cdr.markForCheck();
+  }
+
+  cancelTaskForm(): void { this.showTaskForm = false; this.cdr.markForCheck(); }
+
+  saveTask(): void {
+    if (!this.taskForm.title || !this.partner) return;
+    this.savingTask = true;
+    const payload = {
+      step:        this.activeStep,
+      title:       this.taskForm.title,
+      body:        this.taskForm.body || null,
+      type:        this.taskForm.type || 'task',
+      assigned_to: this.taskForm.assigned_to || null,
+      due_date:    this.taskForm.due_date || null,
+    };
+    this.api.createOnboardingTask(this.partner.id, payload).subscribe({
+      next: task => {
+        this.zone.run(() => {
+          if (!this.tasksByStep[task.step]) this.tasksByStep[task.step] = [];
+          this.tasksByStep[task.step] = [...this.tasksByStep[task.step], task];
+          this.tasks = [...this.tasks, task];
+          this.taskForm     = { type: 'task', title: '', body: '', assigned_to: '', due_date: '' };
+          this.showTaskForm = false;
+          this.savingTask   = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingTask = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  startEditTask(t: OnboardingTask): void {
+    this.editingTaskId = t.id;
+    this.showTaskForm  = false;
+    this.taskEditForm  = {
+      type:        t.type,
+      title:       t.title,
+      body:        t.body || '',
+      assigned_to: t.assigned_to || '',
+      due_date:    t.due_date || '',
+    };
+    if (!this.crmUsers.length && this.partner) {
+      this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
+    }
+    this.cdr.markForCheck();
+  }
+
+  cancelEditTask(): void { this.editingTaskId = null; this.cdr.markForCheck(); }
+
+  saveEditTask(t: OnboardingTask): void {
+    if (!this.taskEditForm.title || !this.partner) return;
+    this.savingTask = true;
+    const payload = {
+      title:       this.taskEditForm.title,
+      body:        this.taskEditForm.body || null,
+      type:        this.taskEditForm.type,
+      assigned_to: this.taskEditForm.assigned_to || null,
+      due_date:    this.taskEditForm.due_date || null,
+    };
+    this.api.updateOnboardingTask(this.partner.id, t.id, payload).subscribe({
+      next: updated => {
+        this.zone.run(() => {
+          this.tasksByStep[t.step] = this.tasksByStep[t.step].map(x => x.id === t.id ? updated : x);
+          this.tasks = this.tasks.map(x => x.id === t.id ? updated : x);
+          this.editingTaskId = null;
+          this.savingTask    = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingTask = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  toggleTask(t: OnboardingTask): void {
+    if (!this.partner) return;
+    this.api.updateOnboardingTask(this.partner.id, t.id, { done: !t.done }).subscribe({
+      next: updated => {
+        this.zone.run(() => {
+          this.tasksByStep[t.step] = this.tasksByStep[t.step].map(x => x.id === t.id ? updated : x);
+          this.tasks = this.tasks.map(x => x.id === t.id ? updated : x);
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => {},
+    });
+  }
+
+  deleteTask(t: OnboardingTask): void {
+    if (!this.partner || !confirm(`Usunąć zadanie "${t.title}"?`)) return;
+    this.api.deleteOnboardingTask(this.partner.id, t.id).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.tasksByStep[t.step] = this.tasksByStep[t.step].filter(x => x.id !== t.id);
+          this.tasks = this.tasks.filter(x => x.id !== t.id);
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => {},
+    });
+  }
+
+  finishOnboarding(): void {
+    if (!this.partner) return;
+    // Krok 3 = ostatni — backend sprawdzi wszystkie zadania i ustawi status=active
+    this.api.updateOnboardingStep(this.partner.id, 3).subscribe({
+      next: p => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = { ...this.partner, ...p, activities: this.partner.activities };
+            this.activeStep = 3;
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          const msg = err?.error?.error || 'Nie można zakończyć wdrożenia';
+          alert(msg);
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  advanceStep(step: number) {
+    if (!this.partner) return;
+    this.api.updateOnboardingStep(this.partner.id, step).subscribe({
+      next: p => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = { ...this.partner, ...p, activities: this.partner.activities };
+            // Jeśli status zmienił się na active - przeładuj partnera
+            if (p.status === 'active') {
+              this.activeStep = 3;
+            }
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          const msg = err?.error?.error || 'Nie można zakończyć etapu';
+          alert(msg);
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  addActivity() {
+    if (!this.actForm.title || !this.partner) return;
+    this.savingActivity = true;
+    const payload: any = {
+      type:  this.actForm.type,
+      title: this.actForm.title,
+      body:  this.actForm.body || null,
+    };
+    if (this.actForm.type === 'meeting') {
+      if (this.actForm.activity_at) payload.activity_at = this.actForm.activity_at;
+      if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
+      payload.meeting_location = this.actForm.meeting_location || null;
+      payload.participants = (this.actForm.participantList || []).join(', ') || null;
+    }
+    if (this.actForm.type === 'opportunity') {
+      payload.opp_value    = this.actForm.opp_value != null && this.actForm.opp_value !== '' ? +this.actForm.opp_value : null;
+      payload.opp_currency = this.actForm.opp_currency || 'PLN';
+      payload.opp_status   = this.actForm.opp_status || 'new';
+      payload.opp_due_date = this.actForm.opp_due_date || null;
+    }
+    this.api.createPartnerActivity(this.partner.id, payload).subscribe({
+      next: newAct => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
+          }
+          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
+          this.participantQuery = '';
+          this.showNewActivity  = false;
+          this.savingActivity   = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }
+  actIcon(type: string) {
+    return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
+  }
+  commissionBasisLabel(basis: string | null): string {
+    const map: Record<string, string> = {
+      segmenty:       'Ilość segmentów',
+      rezerwacje:     'Ilość rezerwacji',
+      progi_obrotowe: 'Progi obrotowe',
+      nie_dotyczy:    'Nie dotyczy',
+    };
+    return map[basis || 'nie_dotyczy'] ?? basis ?? '—';
+  }
+
+  canEditActivity(a: any): boolean {
+    const u = this.auth.user();
+    return u?.is_admin || u?.crm_role === 'sales_manager' || a.created_by === u?.id;
+  }
+
+  startEditActivity(a: any): void {
+    this.editingActId = a.id;
+    this.actEditForm  = {
+      type:             a.type,
+      title:            a.title,
+      body:             a.body || '',
+      activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      duration_min:     a.duration_min ?? '',
+      meeting_location: a.meeting_location || '',
+      participants:     a.participants || '',
+      opp_value:        a.opp_value ?? '',
+      opp_currency:     a.opp_currency || 'PLN',
+      opp_status:       a.opp_status || 'new',
+      opp_due_date:     a.opp_due_date || '',
+    };
+  }
+
+  cancelEditActivity(): void {
+    this.editingActId = null;
+  }
+
+  saveEditActivity(a: any): void {
+    if (!this.actEditForm.title || !this.partner) return;
+    this.savingActivity = true;
+    const payload: any = {
+      type:  this.actEditForm.type,
+      title: this.actEditForm.title,
+      body:  this.actEditForm.body || null,
+    };
+    if (this.actEditForm.type === 'meeting') {
+      if (this.actEditForm.activity_at)        payload.activity_at      = this.actEditForm.activity_at;
+      if (this.actEditForm.duration_min !== '') payload.duration_min     = +this.actEditForm.duration_min;
+      payload.meeting_location = this.actEditForm.meeting_location || null;
+      payload.participants     = this.actEditForm.participants || null;
+    }
+    if (this.actEditForm.type === 'opportunity') {
+      payload.opp_value    = this.actEditForm.opp_value != null && this.actEditForm.opp_value !== '' ? +this.actEditForm.opp_value : null;
+      payload.opp_currency = this.actEditForm.opp_currency || 'PLN';
+      payload.opp_status   = this.actEditForm.opp_status || 'new';
+      payload.opp_due_date = this.actEditForm.opp_due_date || null;
+    }
+    this.api.updatePartnerActivity(this.partner.id, a.id, payload).subscribe({
+      next: (updated: PartnerActivity) => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = {
+              ...this.partner,
+              activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
+            };
+          }
+          this.editingActId   = null;
+          this.savingActivity = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  deleteActivity(a: any): void {
+    if (!this.partner || !confirm(`Usunąć aktywność "${a.title}"?`)) return;
+    this.api.deletePartnerActivity(this.partner.id, a.id).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = {
+              ...this.partner,
+              activities: (this.partner.activities || []).filter(x => x.id !== a.id),
+            };
+          }
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => {},
+    });
+  }
+
+  onActTypeChange(): void {
+    if (this.actForm.type !== 'meeting') {
+      this.actForm.participantList = [];
+      this.participantQuery = '';
+    }
+    this.cdr.markForCheck();
+  }
+
+  filterSuggestions(): void {
+    const q = this.participantQuery.toLowerCase();
+    if (!q) { this.filteredSuggestions = []; this.cdr.markForCheck(); return; }
+    // Załaduj sugestie jeśli jeszcze nie załadowane
+    if (!this.allSuggestions.length && this.partner?.id) {
+      this.api.getContactSuggestions(undefined, this.partner.id).subscribe({
+        next: s => {
+          this.allSuggestions = s;
+          this._applyFilter(q);
+        },
+        error: () => {},
+      });
+      return;
+    }
+    this._applyFilter(q);
+  }
+
+  private _applyFilter(q: string): void {
+    const existing = new Set((this.actForm.participantList || []) as string[]);
+    this.filteredSuggestions = this.allSuggestions.filter(
+      s => !existing.has(s.email) && (s.email.toLowerCase().includes(q) || s.name.toLowerCase().includes(q))
+    ).slice(0, 8);
+    this.cdr.markForCheck();
+  }
+
+  pickSuggestion(form: any, s: { email: string; name: string }): void {
+    if (!form.participantList) form.participantList = [];
+    if (!form.participantList.includes(s.email)) form.participantList.push(s.email);
+    this.participantQuery = '';
+    this.filteredSuggestions = [];
+    this.cdr.markForCheck();
+  }
+
+  addParticipantFromInput(form: any): void {
+    const val = this.participantQuery.trim().replace(/,\s*$/, '');
+    if (!val) return;
+    if (!form.participantList) form.participantList = [];
+    const emails = val.split(/[,;\s]+/).map((e: string) => e.trim()).filter(Boolean);
+    emails.forEach((e: string) => { if (!form.participantList.includes(e)) form.participantList.push(e); });
+    this.participantQuery = '';
+    this.filteredSuggestions = [];
+    this.cdr.markForCheck();
+  }
+
+  removeParticipant(form: any, idx: number): void {
+    form.participantList.splice(idx, 1);
+    this.cdr.markForCheck();
+  }
+
+}

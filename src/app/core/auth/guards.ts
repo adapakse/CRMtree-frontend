@@ -35,3 +35,20 @@ export const adminGuard: CanActivateFn = () => {
   router.navigate(['/dashboard']);
   return false;
 };
+
+// CRM Dodaj na końcu pliku guards.ts:
+export const crmGuard: CanActivateFn = () => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+  const user = auth.user();
+
+  const hasCrmAccess = user?.is_admin ||
+    user?.crm_role === 'salesperson' ||
+    user?.crm_role === 'sales_manager';
+
+  if (hasCrmAccess) return true;
+  router.navigate(['/dashboard']);
+  return false;
+};
+
+

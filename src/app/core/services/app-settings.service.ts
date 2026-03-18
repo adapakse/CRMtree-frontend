@@ -8,7 +8,7 @@ export interface AppSettingsMeta {
   value: string;
   label: string;
   description: string;
-  value_type: 'number' | 'boolean' | 'string';
+  value_type: 'number' | 'boolean' | 'string' | 'json';
   category: string;
   updated_at: string;
   updated_by_name: string | null;
