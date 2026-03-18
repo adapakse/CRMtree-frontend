@@ -161,12 +161,17 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span class="lbl">Opiekun</span><span>{{partner.manager_name || '—'}}</span>
         <span class="lbl">Umowa od</span><span>{{partner.contract_signed ? (partner.contract_signed | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Umowa do</span><span>{{partner.contract_expires ? (partner.contract_expires | date:'dd.MM.yyyy') : '—'}}</span>
-        <span class="lbl">Wartość umowy</span><span>{{(partner.contract_value || 0) | number:'1.0-0'}} PLN</span>
-        <span class="lbl">ARR</span><span class="accent">{{(partner.arr || 0) | number:'1.0-0'}} PLN</span>
-        <span class="lbl">Licencje</span><span>{{partner.license_count || 0}}</span>
+        <span class="lbl">Obrót roczny</span><span class="accent">{{(partner.contract_value || 0) | number:'1.0-0'}} {{partner.annual_turnover_currency || 'PLN'}}</span>
+        </div>
+        <div class="info-row">
+          <span class="lbl">% Online</span><span>{{partner.online_pct != null ? partner.online_pct + '%' : '—'}}</span>
+        </div>
+        <div class="info-row" *ngIf="partner.tags?.length">
+          <span class="lbl">Tagi</span>
+          <span>{{partner.tags?.join(', ')}}</span>
+
         <span class="lbl">Aktywni użytk.</span>
-        <span>{{partner.active_users || 0}} / {{partner.license_count || 0}}
-          <span class="sub" *ngIf="partner.license_count">({{adoptionPct}}%)</span>
+        <span>{{partner.active_users || 0}} aktywnych
         </span>
       </div>
 
@@ -580,18 +585,46 @@ import { AuthService } from '../../../core/auth/auth.service';
             <label>Data wygaśnięcia<input [(ngModel)]="editForm.contract_expires" type="date"></label>
           </div>
           <div class="edit-row">
-            <label>Wartość kontraktu (PLN)<input [(ngModel)]="editForm.contract_value" type="number" min="0" placeholder="0"></label>
-            <label>ARR (PLN)<input [(ngModel)]="editForm.arr" type="number" min="0" placeholder="0"></label>
+            <label>Obrót roczny
+              <div style="display:flex;gap:6px">
+                <input [(ngModel)]="editForm.contract_value" type="number" min="0" placeholder="0" style="flex:1">
+                <select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px">
+                  <option value="PLN">PLN</option>
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CHF">CHF</option>
+                </select>
+              </div>
+            </label>
+            <label>% Online (udział kanału online)
+              <select [(ngModel)]="editForm.online_pct">
+                <option value="">— brak —</option>
+                <option value="0">0%</option>
+                <option value="10">10%</option>
+                <option value="20">20%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
+                <option value="60">60%</option>
+                <option value="70">70%</option>
+                <option value="80">80%</option>
+                <option value="90">90%</option>
+                <option value="100">100%</option>
+              </select>
+            </label>
           </div>
           <div class="edit-row">
-            <label>Liczba licencji<input [(ngModel)]="editForm.license_count" type="number" min="0" placeholder="0"></label>
             <label>Aktywni użytkownicy<input [(ngModel)]="editForm.active_users" type="number" min="0" placeholder="0"></label>
           </div>
         </div>
 
         <div class="edit-section">
-          <div class="edit-section-title">Notatki</div>
-          <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…"></textarea>
+          <div class="edit-section-title">Tagi i Notatki</div>
+          <label style="font-size:12px;font-weight:600;color:#6b7280;display:flex;flex-direction:column;gap:4px">Tagi (oddzielone przecinkiem)
+            <input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2" class="edit-input">
+          </label>
+          <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…" style="margin-top:8px"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -880,9 +913,10 @@ export class CrmPartnerDetailComponent implements OnInit {
       contract_signed:       this.partner.contract_signed  ? this.partner.contract_signed.substring(0, 10)   : '',
       contract_expires:      this.partner.contract_expires ? this.partner.contract_expires.substring(0, 10)  : '',
       contract_value:        this.partner.contract_value ?? null,
-      arr:                   this.partner.arr ?? null,
-      license_count:         this.partner.license_count ?? null,
+      annual_turnover_currency: this.partner.annual_turnover_currency || 'PLN',
+      online_pct:               this.partner.online_pct ?? '',
       active_users:          this.partner.active_users ?? null,
+      tagsStr:               (this.partner.tags || []).join(', '),
       notes:                 this.partner.notes || '',
     };
     this.submitAttempted = false;
@@ -930,9 +964,10 @@ export class CrmPartnerDetailComponent implements OnInit {
       contract_signed:       this.editForm.contract_signed || null,
       contract_expires:      this.editForm.contract_expires || null,
       contract_value:        this.editForm.contract_value != null && this.editForm.contract_value !== '' ? +this.editForm.contract_value : null,
-      arr:                   this.editForm.arr != null && this.editForm.arr !== '' ? +this.editForm.arr : null,
-      license_count:         this.editForm.license_count != null && this.editForm.license_count !== '' ? +this.editForm.license_count : null,
+      annual_turnover_currency: this.editForm.annual_turnover_currency || 'PLN',
+      online_pct:               this.editForm.online_pct !== '' && this.editForm.online_pct != null ? +this.editForm.online_pct : null,
       active_users:          this.editForm.active_users != null && this.editForm.active_users !== '' ? +this.editForm.active_users : null,
+      tags:                  this.editForm.tagsStr ? this.editForm.tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       notes:                 this.editForm.notes || null,
     };
     this.api.updatePartner(this.partner.id, payload).subscribe({
