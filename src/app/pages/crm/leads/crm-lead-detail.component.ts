@@ -38,7 +38,10 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span class="lbl">Telefon</span><span>{{lead.phone || '—'}}</span>
         <span class="lbl">Branża</span><span>{{lead.industry || '—'}}</span>
         <span class="lbl">Źródło</span><span>{{sourceLabel(lead.source) || '—'}}</span>
-        <span class="lbl">Wartość</span><span>{{(lead.value_pln || 0) | number:'1.0-0'}} PLN</span>
+        <span class="lbl">Obrót roczny</span><span>{{(lead.value_pln || 0) | number:'1.0-0'}} {{lead.annual_turnover_currency || 'PLN'}}</span>
+        </div>
+        <div class="info-row">
+          <span class="lbl">% Online</span><span>{{lead.online_pct != null ? lead.online_pct + '%' : '—'}}</span>
         <span class="lbl">Prawdopodob.</span><span>{{lead.probability || 0}}%</span>
         <span class="lbl">Data zamkn.</span><span>{{lead.close_date ? (lead.close_date | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Handlowiec</span><span>{{lead.assigned_to_name || '—'}}</span>
@@ -207,8 +210,50 @@ import { AuthService } from '../../../core/auth/auth.service';
         <div class="edit-section">
           <div class="edit-section-title">Szczegóły sprzedażowe</div>
           <div class="edit-row">
-            <label>Wartość (PLN)<input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0"></label>
-            <label>Prawdopodobieństwo (%)<input [(ngModel)]="editForm.probability" type="number" min="0" max="100" placeholder="0"></label>
+            <label>Obrót roczny
+              <div style="display:flex;gap:6px">
+                <input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1">
+                <select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px">
+                  <option value="PLN">PLN</option>
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CHF">CHF</option>
+                </select>
+              </div>
+            </label>
+            <label>% Online (udział kanału online)
+              <select [(ngModel)]="editForm.online_pct">
+                <option value="">— brak —</option>
+                <option value="0">0%</option>
+                <option value="10">10%</option>
+                <option value="20">20%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
+                <option value="60">60%</option>
+                <option value="70">70%</option>
+                <option value="80">80%</option>
+                <option value="90">90%</option>
+                <option value="100">100%</option>
+              </select>
+            </label>
+            <label>Prawdopodobieństwo (%)
+              <select [(ngModel)]="editForm.probability">
+                <option value="">— brak —</option>
+                <option value="0">0%</option>
+                <option value="10">10%</option>
+                <option value="20">20%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
+                <option value="60">60%</option>
+                <option value="70">70%</option>
+                <option value="80">80%</option>
+                <option value="90">90%</option>
+                <option value="100">100%</option>
+              </select>
+            </label>
           </div>
           <div class="edit-row">
             <label>Data zamknięcia<input [(ngModel)]="editForm.close_date" type="date"></label>
@@ -424,7 +469,9 @@ export class CrmLeadDetailComponent implements OnInit {
       contact_title:this.lead.contact_title || '',
       email:        this.lead.email || '',
       phone:        this.lead.phone || '',
-      value_pln:    this.lead.value_pln ?? null,
+      value_pln:                this.lead.value_pln ?? null,
+      annual_turnover_currency: this.lead.annual_turnover_currency || 'PLN',
+      online_pct:           this.lead.online_pct ?? '',
       probability:  this.lead.probability ?? null,
       close_date:   this.lead.close_date || '',
       source:       this.lead.source || '',
@@ -454,7 +501,9 @@ export class CrmLeadDetailComponent implements OnInit {
       contact_title: this.editForm.contact_title || null,
       email:         this.editForm.email || null,
       phone:         this.editForm.phone || null,
-      value_pln:     this.editForm.value_pln != null && this.editForm.value_pln !== '' ? +this.editForm.value_pln : null,
+      value_pln:                this.editForm.value_pln != null && this.editForm.value_pln !== '' ? +this.editForm.value_pln : null,
+      annual_turnover_currency: this.editForm.annual_turnover_currency || 'PLN',
+      online_pct:               this.editForm.online_pct !== '' && this.editForm.online_pct != null ? +this.editForm.online_pct : null,
       probability:   this.editForm.probability != null && this.editForm.probability !== '' ? +this.editForm.probability : null,
       close_date:    this.editForm.close_date || null,
       source:        this.editForm.source || null,

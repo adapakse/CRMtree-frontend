@@ -120,6 +120,7 @@ const PROB_MAP: Record<LeadStage, number> = {
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
             </div>
             <div class="lead-value" *ngIf="lead.value_pln">{{ lead.value_pln | number:'1.0-0' }} PLN</div>
+            <div class="lead-value" *ngIf="lead.value_pln" style="color:#3b82f6;font-size:11px">↻ {{ lead.value_pln | number:'1.0-0' }} {{ lead.annual_turnover_currency }}<span *ngIf="lead.online_pct != null"> · {{lead.online_pct}}% online</span></div>
             <div class="lead-meta">
               <span *ngIf="lead.source" class="tag" [class]="srcTagCls(lead.source)">{{ srcLabel(lead.source) }}</span>
               <span class="avatar-sm" *ngIf="lead.assigned_to_name" style="margin-left:auto" [title]="lead.assigned_to_name">
@@ -146,6 +147,7 @@ const PROB_MAP: Record<LeadStage, number> = {
             <div class="lead-company">{{ lead.company }}</div>
             <div class="lead-contact" *ngIf="lead.contact_name">{{ lead.contact_name }}</div>
             <div class="lead-value" *ngIf="lead.value_pln">{{ lead.value_pln | number:'1.0-0' }} PLN</div>
+            <div class="lead-value" *ngIf="lead.value_pln" style="color:#3b82f6;font-size:11px">↻ {{ lead.value_pln | number:'1.0-0' }} {{ lead.annual_turnover_currency }}<span *ngIf="lead.online_pct != null"> · {{lead.online_pct}}% online</span></div>
             <div class="lead-meta">
               <span class="tag" [class]="lead.stage==='closed_won' ? 'tag-green' : 'tag-red'">
                 {{ lead.stage==='closed_won' ? '✓ Wygrany' : '✗ Przegrany' }}
@@ -217,6 +219,10 @@ const PROB_MAP: Record<LeadStage, number> = {
             </span>
           </div>
           <div class="info-row">
+            <span class="info-label">Obrót roczny</span>
+            <span class="info-val">{{ selected.value_pln != null ? ((selected.value_pln | number:'1.0-0')+' '+(selected.annual_turnover_currency||'PLN')) : '—' }}<span *ngIf="selected.online_pct != null"> · {{selected.online_pct}}% online</span></span>
+          </div>
+          <div class="info-row">
             <span class="info-label">Prawdopodob.</span>
             <span class="info-val">{{ selected.probability ?? prob(selected.stage) }}%</span>
           </div>
@@ -283,14 +289,16 @@ const PROB_MAP: Record<LeadStage, number> = {
   <!-- ════ TABLE ════ -->
   <div *ngIf="!loading && viewMode==='table'" class="tw">
     <div class="thead" style="grid-template-columns:2fr 150px 140px 130px 110px 100px">
-      <div class="th">Firma / Kontakt</div>
-      <div class="th">Etap</div>
-      <div class="th">Wartość</div>
-      <div class="th">Handlowiec</div>
-      <div class="th">Źródło</div>
-      <div class="th">Zamkn.</div>
+      <div class="th sortable" (click)="sortBy('company')">Firma / Kontakt <span class="si">{{sortIcon('company')}}</span></div>
+      <div class="th sortable" (click)="sortBy('stage')">Etap <span class="si">{{sortIcon('stage')}}</span></div>
+      <div class="th sortable" (click)="sortBy('value_pln')">Wartość <span class="si">{{sortIcon('value_pln')}}</span></div>
+      <div class="th sortable" (click)="sortBy('value_pln')">Obrót roczny <span class="si">{{sortIcon('value_pln')}}</span></div>
+      <div class="th" style="text-align:center">% Online</div>
+      <div class="th sortable" (click)="sortBy('assigned_to_name')">Handlowiec <span class="si">{{sortIcon('assigned_to_name')}}</span></div>
+      <div class="th sortable" (click)="sortBy('source')">Źródło <span class="si">{{sortIcon('source')}}</span></div>
+      <div class="th sortable" (click)="sortBy('close_date')">Zamkn. <span class="si">{{sortIcon('close_date')}}</span></div>
     </div>
-    <div *ngFor="let lead of allLeads; trackBy:trackById"
+    <div *ngFor="let lead of sortedLeads; trackBy:trackById"
          class="tr-row" style="grid-template-columns:2fr 150px 140px 130px 110px 100px"
          [routerLink]="['/crm/leads',lead.id]">
       <div class="td">
@@ -299,7 +307,9 @@ const PROB_MAP: Record<LeadStage, number> = {
       </div>
       <div class="td"><span class="stage-pill stage-{{ lead.stage }}">{{ stageLabel(lead.stage) }}</span></div>
       <div class="td" style="font-family:'Sora',sans-serif;font-weight:700;color:var(--orange)">
-        {{ lead.value_pln ? (lead.value_pln | number:'1.0-0')+' PLN' : '—' }}
+        {{ lead.value_pln ? (lead.value_pln | number:'1.0-0')+' PLN' : '—' }}</div>
+      <div class="td" style="font-size:12px;color:#3b82f6;font-weight:600">{{ lead.value_pln ? (lead.value_pln | number:'1.0-0')+' '+(lead.annual_turnover_currency||'PLN') : '—' }}</div>
+      <div class="td" style="font-size:12px;text-align:center">{{ lead.online_pct != null ? lead.online_pct+'%' : '—' }}
       </div>
       <div class="td" style="font-size:12px">{{ lead.assigned_to_name||'—' }}</div>
       <div class="td" style="font-size:12px">{{ lead.source ? srcLabel(lead.source) : '—' }}</div>
@@ -521,7 +531,10 @@ const PROB_MAP: Record<LeadStage, number> = {
     /* Table */
     .tw { background:white; border:1px solid var(--gray-200); border-radius:10px; overflow:hidden; flex:1; min-height:0; display:flex; flex-direction:column; }
     .thead { display:grid; background:var(--gray-50); border-bottom:1px solid var(--gray-200); padding:0 16px; flex-shrink:0; }
-    .th { padding:9px 8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-500); display:flex; align-items:center; }
+    .th { padding:9px 8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-500); display:flex; align-items:center; gap:4px; }
+    .th.sortable { cursor:pointer; user-select:none; }
+    .th.sortable:hover { color:#374151; }
+    .si { font-size:10px; color:#d1d5db; }
     .tr-row { display:grid; padding:0 16px; border-bottom:1px solid var(--gray-100); cursor:pointer; transition:background .1s; align-items:center; }
     .tr-row:hover { background:var(--gray-50); }
     .td { padding:10px 8px; font-size:13px; color:var(--gray-700); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -566,6 +579,8 @@ export class CrmLeadsListComponent implements OnInit {
   saving               = false;
   loadingDetail        = false;
   viewMode: 'kanban' | 'table' = 'kanban';
+  sortCol = 'company';
+  sortDir: 'asc' | 'desc' = 'asc';
 
   selected: Lead | null = null;
   dpTab: 'info' | 'activity' = 'info';
@@ -601,6 +616,29 @@ export class CrmLeadsListComponent implements OnInit {
       next: u => this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }),
       error: () => {},
     });
+  }
+
+  get sortedLeads(): any[] {
+    const col = this.sortCol;
+    const dir = this.sortDir;
+    return [...this.allLeads].sort((a, b) => {
+      let va: any = (a as any)[col] ?? '';
+      let vb: any = (b as any)[col] ?? '';
+      if (col === 'value_pln' || col === 'value_pln' || col === 'online_pct') { va = +(va||0); vb = +(vb||0); return dir==='asc' ? va-vb : vb-va; }
+      if (col === 'close_date') { va = va?new Date(va).getTime():0; vb = vb?new Date(vb).getTime():0; return dir==='asc'?va-vb:vb-va; }
+      const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
+      return dir==='asc' ? cmp : -cmp;
+    });
+  }
+
+  sortBy(col: string): void {
+    if (this.sortCol === col) { this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc'; }
+    else { this.sortCol = col; this.sortDir = 'asc'; }
+    this.cdr.markForCheck();
+  }
+  sortIcon(col: string): string {
+    if (this.sortCol !== col) return '↕';
+    return this.sortDir === 'asc' ? '↑' : '↓';
   }
 
   load() {

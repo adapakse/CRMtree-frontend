@@ -38,6 +38,8 @@ export interface Lead {
   notes: string | null;
   hot: boolean;
   lost_reason: string | null;
+  annual_turnover_currency: string;
+  online_pct: number | null;
   converted_at: string | null;
   activity_count?: number;
   document_count?: number;
@@ -124,14 +126,17 @@ export interface Partner {
   contract_expires: string | null;
   contract_value: number | null;
   status: PartnerStatus;
-  arr: number | null;
+  annual_turnover: number | null;
+  annual_turnover_currency: string;
+  online_pct: number | null;
   license_count: number | null;
+  tags: string[];
   active_users: number | null;
   onboarding_step: number;
   notes: string | null;
   open_opp_count?: number;
   open_opp_value?: number;
-  group_siblings?: { id: number; company: string; status: string; arr: number | null }[];
+  group_siblings?: { id: number; company: string; status: string; annual_turnover: number | null }[];
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];
   all_opportunities?: PartnerActivity[];

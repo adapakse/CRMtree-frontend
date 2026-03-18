@@ -69,11 +69,18 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span>nip</span><span>address</span><span>contact_name</span><span>email</span>
         <span>phone</span><span>industry</span><span>group_name</span>
         <span>contract_signed</span><span>contract_expires</span>
-        <span>contract_value</span><span>license_count</span>
-        <span>status</span><span>notes</span>
+        <span>contract_value</span><span>status</span><span>notes</span>
+        <span class="key">annual_turnover</span>
+        <span>annual_turnover_currency</span>
+        <span>online_pct</span>
+        <span>tags</span>
       </div>
       <div class="field-hint">
-        <strong>numer_partnera</strong>: unikalny klucz partnera — <strong>musi być identyczny z <code>numer_partnera</code> w pliku danych sprzedażowych</strong>, aby dane były ze sobą powiązane (np. <code>P-0001</code>)
+        <strong>numer_partnera</strong>: klucz łączący z danymi sprzedażowymi (np. <code>P-0001</code>) &nbsp;·&nbsp;
+        <strong>annual_turnover</strong>: obrót roczny &nbsp;·&nbsp;
+        <strong>annual_turnover_currency</strong>: waluta (PLN, EUR…) &nbsp;·&nbsp;
+        <strong>online_pct</strong>: % online (0,10…100) &nbsp;·&nbsp;
+        <strong>tags</strong>: tagi oddzielone <code>|</code>
       </div>
       <button class="btn-outline" (click)="downloadTemplate('partners')">⬇ Pobierz szablon</button>
       <div class="drop-zone"
