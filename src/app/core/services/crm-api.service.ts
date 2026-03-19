@@ -126,7 +126,6 @@ export interface Partner {
   contract_expires: string | null;
   contract_value: number | null;
   status: PartnerStatus;
-  annual_turnover: number | null;
   annual_turnover_currency: string;
   online_pct: number | null;
   license_count: number | null;
@@ -136,7 +135,7 @@ export interface Partner {
   notes: string | null;
   open_opp_count?: number;
   open_opp_value?: number;
-  group_siblings?: { id: number; company: string; status: string; annual_turnover: number | null }[];
+  group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];
   all_opportunities?: PartnerActivity[];

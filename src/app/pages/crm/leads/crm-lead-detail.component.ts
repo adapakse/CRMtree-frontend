@@ -42,7 +42,7 @@ import { AuthService } from '../../../core/auth/auth.service';
         </div>
         <div class="info-row">
           <span class="lbl">% Online</span><span>{{lead.online_pct != null ? lead.online_pct + '%' : '—'}}</span>
-        <span class="lbl">Prawdopodob.</span><span>{{lead.probability || 0}}%</span>
+        <span class="lbl">% Szansa</span><span>{{lead.probability || 0}}%</span>
         <span class="lbl">Data zamkn.</span><span>{{lead.close_date ? (lead.close_date | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Handlowiec</span><span>{{lead.assigned_to_name || '—'}}</span>
         <span class="lbl">Tagi</span><span>{{lead.tags?.join(', ') || '—'}}</span>
@@ -238,7 +238,7 @@ import { AuthService } from '../../../core/auth/auth.service';
                 <option value="100">100%</option>
               </select>
             </label>
-            <label>Prawdopodobieństwo (%)
+            <label>% Szansa
               <select [(ngModel)]="editForm.probability">
                 <option value="">— brak —</option>
                 <option value="0">0%</option>
@@ -471,7 +471,7 @@ export class CrmLeadDetailComponent implements OnInit {
       phone:        this.lead.phone || '',
       value_pln:                this.lead.value_pln ?? null,
       annual_turnover_currency: this.lead.annual_turnover_currency || 'PLN',
-      online_pct:           this.lead.online_pct ?? '',
+      online_pct:           this.lead.online_pct != null ? String(this.lead.online_pct) : '',
       probability:  this.lead.probability ?? null,
       close_date:   this.lead.close_date || '',
       source:       this.lead.source || '',

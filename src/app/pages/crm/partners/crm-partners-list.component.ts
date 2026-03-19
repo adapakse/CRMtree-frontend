@@ -62,7 +62,7 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
       </div>
       <div class="pc-financials">
-        <span *ngIf="p.annual_turnover" class="pc-arr">{{p.annual_turnover | number:'1.0-0'}} {{p.annual_turnover_currency}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
+        <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
         <span *ngIf="p.open_opp_count"
               class="pc-opp" [class.pc-opp-valued]="+(p.open_opp_value||0)>0">
           💡 {{p.open_opp_count}} szans<span *ngIf="+(p.open_opp_value||0)>0"> · {{p.open_opp_value|number:'1.0-0'}} PLN</span>
@@ -78,17 +78,17 @@ type SortDir = 'asc' | 'desc';
 
   <!-- ══ TABELA ══ -->
   <div *ngIf="!loading && viewMode==='table'" class="table-wrap">
-    <div class="tw-head" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px">
+    <div class="tw-head" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px">
       <div class="th sortable" (click)="sortBy('company')">Firma <span class="si">{{sortIcon('company')}}</span></div>
       <div class="th">Status</div>
       <div class="th sortable" (click)="sortBy('industry')">Branża <span class="si">{{sortIcon('industry')}}</span></div>
       <div class="th sortable" (click)="sortBy('group_name')">Grupa <span class="si">{{sortIcon('group_name')}}</span></div>
       <div class="th sortable" (click)="sortBy('manager_name')">Handlowiec <span class="si">{{sortIcon('manager_name')}}</span></div>
-      <div class="th sortable" (click)="sortBy('annual_turnover')">Obrót roczny <span class="si">{{sortIcon('annual_turnover')}}</span></div>
+      <div class="th sortable" (click)="sortBy('contract_value')">Obrót roczny <span class="si">{{sortIcon('contract_value')}}</span></div>
       <div class="th sortable" (click)="sortBy('online_pct')">% Online <span class="si">{{sortIcon('online_pct')}}</span></div>
       <div class="th sortable" (click)="sortBy('contract_expires')">Umowa do <span class="si">{{sortIcon('contract_expires')}}</span></div>
     </div>
-    <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px"
+    <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px"
          (click)="goPartner(p.id)">
       <div class="td">
         <span class="td-main">{{p.company}}</span>
@@ -98,7 +98,8 @@ type SortDir = 'asc' | 'desc';
       <div class="td td-sm">{{p.industry||'—'}}</div>
       <div class="td td-sm">{{p.group_name||'—'}}</div>
       <div class="td td-sm">{{p.manager_name||'—'}}</div>
-      <div class="td" style="font-weight:700;color:#f97316;font-size:12px">{{p.annual_turnover?(p.annual_turnover|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
+      <div class="td" style="font-weight:700;color:#f97316;font-size:12px">{{p.contract_value?(p.contract_value|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
+      <div class="td td-sm" style="text-align:center">{{p.online_pct != null ? p.online_pct+'%' : '—'}}</div>
       <div class="td td-sm" [class.expiring]="isExpiring(p.contract_expires)">
         {{p.contract_expires?(p.contract_expires|date:'dd.MM.yy'):'—'}}
       </div>
@@ -123,7 +124,7 @@ type SortDir = 'asc' | 'desc';
       <label>Kontakt<input [(ngModel)]="newP.contact_name"></label>
       <label>Email<input [(ngModel)]="newP.email" type="email"></label>
       <label>Branża<input [(ngModel)]="newP.industry"></label>
-      <label>Wartość kontraktu (PLN)<input [(ngModel)]="newP.contract_value" type="number" min="0"></label>
+      <label>Obrót roczny<div style="display:flex;gap:6px"><input [(ngModel)]="newP.contract_value" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="newP.annual_turnover_currency" style="width:70px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
       <label>Liczba licencji<input [(ngModel)]="newP.license_count" type="number" min="0"></label>
       <label *ngIf="isManager">Opiekun / Handlowiec
         <select [(ngModel)]="newP.manager_id">
@@ -248,7 +249,7 @@ export class CrmPartnersListComponent implements OnInit {
     return [...this.partners].sort((a, b) => {
       let va: any = (a as any)[col] ?? '';
       let vb: any = (b as any)[col] ?? '';
-      if (col === 'annual_turnover' || col === 'online_pct') { va = +(va || 0); vb = +(vb || 0); return dir === 'asc' ? va - vb : vb - va; }
+      if (col === 'contract_value' || col === 'online_pct') { va = +(va || 0); vb = +(vb || 0); return dir === 'asc' ? va - vb : vb - va; }
       if (col === 'contract_expires') { va = va ? new Date(va).getTime() : 0; vb = vb ? new Date(vb).getTime() : 0; return dir === 'asc' ? va - vb : vb - va; }
       const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
       return dir === 'asc' ? cmp : -cmp;
