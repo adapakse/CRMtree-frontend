@@ -1,0 +1,36 @@
+# Dependencies (największe!)
+node_modules
+
+# Build artifacts
+dist
+.angular
+
+# Development files
+.git
+.vscode
+.idea
+*.md
+README.md
+
+# Tests
+coverage
+*.spec.ts
+e2e
+
+# Proxy configs - ignore wszystkie OPRÓCZ AKS
+src/proxy.conf.json
+src/proxy.conf-dev.json
+src/proxy.conf-local.json
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Environment
+.env
+.env.local
+.env.development
+
+# Logs
+*.log
+npm-debug.log
