@@ -3,7 +3,6 @@
 pipeline {
     
     agent any
-
     parameters {
         choice(name: "NODEJS_VERSION", choices: ["~v22", "~v18"], description: "Wersja Node.js (nazwa narzędzia w Jenkins)")
     }
