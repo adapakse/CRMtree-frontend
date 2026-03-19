@@ -914,7 +914,7 @@ export class CrmPartnerDetailComponent implements OnInit {
       contract_expires:      this.partner.contract_expires ? this.partner.contract_expires.substring(0, 10)  : '',
       contract_value:        this.partner.contract_value ?? null,
       annual_turnover_currency: this.partner.annual_turnover_currency || 'PLN',
-      online_pct:               this.partner.online_pct ?? '',
+      online_pct:               this.partner.online_pct != null ? String(this.partner.online_pct) : '',
       active_users:          this.partner.active_users ?? null,
       tagsStr:               (this.partner.tags || []).join(', '),
       notes:                 this.partner.notes || '',
