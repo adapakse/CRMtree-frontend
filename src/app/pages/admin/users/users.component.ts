@@ -118,7 +118,7 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
             </div>
           </div>
 
-          <div style="padding:24px">
+          <div style="padding:24px;max-height:calc(100vh - 200px);overflow-y:auto;">
             <div class="fgrid">
               <div class="fg">
                 <label class="fl">First Name <span style="color:var(--orange)">*</span></label>
@@ -171,7 +171,7 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
             </div>
           </div>
 
-          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50)">
+          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50);">
             <button class="btn btn-g" (click)="showNew.set(false)">Cancel</button>
             <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">Create User</button>
           </div>
@@ -298,8 +298,8 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
     .pb { padding:24px;flex:1; }
     .pf { padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50);position:sticky;bottom:0; }
     .mol { position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px); }
-    .mo { background:white;border-radius:14px;width:540px;max-width:95vw;box-shadow:var(--shadow-lg);overflow:hidden; }
-    .moh { padding:20px 24px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px; }
+    .mo { background:white;border-radius:14px;width:540px;max-width:95vw;box-shadow:var(--shadow-lg); }
+    .moh { padding:20px 24px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;flex-shrink:0; }
     .moico { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
     .mot { font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--gray-900); }
     .mos { font-size:12px;color:var(--gray-500);margin-top:2px; }

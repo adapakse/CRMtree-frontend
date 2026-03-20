@@ -1,0 +1,33 @@
+/* ── Fix: New User modal scroll ──────────────────────────────────────────────
+   Angular ViewEncapsulation blokuje rekompilację komponentu przez Vite HMR.
+   Override globalny działa natychmiast bez restartu ng serve.
+   Dotyczy wyłącznie modalu .mol / .mo (Add New User).
+*/
+.mol {
+  align-items: center !important;
+  padding: 16px !important;
+}
+
+.mo {
+  max-height: calc(100vh - 32px) !important;
+  overflow: hidden !important;       /* zachowamy hidden na .mo */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Header — nie ściska się */
+.moh {
+  flex-shrink: 0 !important;
+}
+
+/* Scrollująca część — wszystko między headerem a footerem */
+.mo > div:nth-child(2) {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+}
+
+/* Footer — zawsze widoczny */
+.mo > div:last-child {
+  flex-shrink: 0 !important;
+}
