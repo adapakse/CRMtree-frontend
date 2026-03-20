@@ -1,4 +1,4 @@
-import { Component, inject, Input, Output, EventEmitter, OnChanges, OnInit, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, OnChanges, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -37,6 +37,11 @@ import { environment } from '../../../../environments/environment';
               <button class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">{{ t.label }}</button>
             }
           </div>
+        </div>
+
+        <!-- DEBUG BANNER — usuń po naprawieniu -->
+        <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;margin:8px 24px;padding:8px 12px;font-size:11px;font-family:monospace;color:#92400e">
+          <strong>DEBUG</strong> · tab: {{ activeTab }} · blob_name: "{{ doc.blob_name ?? 'BRAK' }}" · access: {{ doc._access ?? 'BRAK' }} · id: {{ doc.id }}
         </div>
 
         <!-- Tab Content -->
@@ -202,6 +207,12 @@ import { environment } from '../../../../environments/environment';
 
           <!-- PDF PREVIEW -->
           @if (activeTab === 'preview') {
+
+            <!-- DEBUG: stan uploadu -->
+            <div style="background:#e0f2fe;border:1px solid #38bdf8;border-radius:6px;margin-bottom:12px;padding:8px 12px;font-size:11px;font-family:monospace;color:#0369a1">
+              <strong>DEBUG preview</strong> · blob_name: "{{ doc.blob_name ?? 'BRAK' }}" · uploadFileLoading: {{ uploadFileLoading }} · access: {{ doc._access ?? 'BRAK' }}
+            </div>
+
             @if (doc.blob_name) {
               <div style="background:var(--gray-100);border-radius:8px;overflow:hidden;height:600px;position:relative">
                 @if (previewLoading()) {
@@ -224,10 +235,17 @@ import { environment } from '../../../../environments/environment';
                 <div class="empty-icon">📎</div>
                 <div class="empty-title">No file attached</div>
                 @if (doc._access === 'full') {
-                  <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
-                    Upload File
-                    <input type="file" hidden accept=".pdf,.docx,.doc" (change)="uploadFile($event)">
+                  <label class="btn btn-p" style="margin-top:12px;cursor:pointer" [class.disabled]="uploadFileLoading">
+                    {{ uploadFileLoading ? 'Uploading…' : 'Upload File' }}
+                    <input type="file" hidden accept=".pdf,.docx,.doc"
+                           [disabled]="uploadFileLoading"
+                           (change)="uploadFile($event)">
                   </label>
+                } @else {
+                  <!-- Widoczne gdy access !== 'full' — pomaga zrozumieć dlaczego nie ma przycisku -->
+                  <div style="margin-top:8px;font-size:12px;color:var(--gray-400)">
+                    Brak uprawnień do uploadu (access = {{ doc._access ?? 'null' }})
+                  </div>
                 }
               </div>
             }
@@ -487,6 +505,7 @@ import { environment } from '../../../../environments/environment';
     .moico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
     .mot { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--gray-900); }
     .mos { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+    .disabled { opacity: 0.6; pointer-events: none; }
   `],
 })
 export class DetailPanelComponent implements OnChanges {
@@ -495,52 +514,54 @@ export class DetailPanelComponent implements OnChanges {
   @Output() updated = new EventEmitter<Document>();
   @Output() deleted = new EventEmitter<string>();
 
-  private docSvc   = inject(DocumentService);
-  private wfSvc    = inject(WorkflowService);
-  private groupSvc = inject(GroupService);
-  private userSvc  = inject(UserService);
-  private toast    = inject(ToastService);
+  private docSvc    = inject(DocumentService);
+  private wfSvc     = inject(WorkflowService);
+  private groupSvc  = inject(GroupService);
+  private userSvc   = inject(UserService);
+  private toast     = inject(ToastService);
   private sanitizer = inject(DomSanitizer);
   private cdr       = inject(ChangeDetectorRef);
-  auth            = inject(AuthService);
+  auth              = inject(AuthService);
 
   doc!: Document;
 
-  /**
-   * Stable getter — avoids NG0100 caused by `doc.tags ?? []` creating
-   * a new array reference on every change-detection cycle.
-   */
   get tags(): any[] { return this.doc?.tags ?? []; }
 
   private _activeTab = 'info';
   get activeTab(): string { return this._activeTab; }
   set activeTab(v: string) {
     this._activeTab = v;
-    if (v === 'preview'     && this.doc?.blob_name) this.loadPreview();
+    console.log('[DetailPanel] activeTab =', v, '| blob_name:', this.doc?.blob_name, '| access:', this.doc?._access);
+    if (v === 'preview'      && this.doc?.blob_name) this.loadPreview();
     if (v === 'attachments') this.loadAttachments();
     if (v === 'history')     this.loadHistory();
   }
+
   tabs = [
-    { id: 'overview',  label: 'Overview' },
-    { id: 'preview',   label: 'PDF Preview' },
-    { id: 'versions',  label: 'Versions' },
-    { id: 'history',   label: 'History' },
-    { id: 'attachments',  label: 'Attachments' },
-    { id: 'workflow',  label: 'Workflow' },
+    { id: 'overview',    label: 'Overview' },
+    { id: 'preview',     label: 'PDF Preview' },
+    { id: 'versions',    label: 'Versions' },
+    { id: 'history',     label: 'History' },
+    { id: 'attachments', label: 'Attachments' },
+    { id: 'workflow',    label: 'Workflow' },
   ];
 
-  newTagKey   = '';
-  newTagValue = '';
-  signusOpen  = false;
+  newTagKey    = '';
+  newTagValue  = '';
+  signusOpen   = false;
   signusEmails = '';
 
   wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
-  userDropdown = signal<User[]>([]);
-  ownerSearch  = '';
+  userDropdown  = signal<User[]>([]);
+  ownerSearch   = '';
   ownerDropdown = signal<User[]>([]);
-  groups = signal<any[]>([]);
+  groups        = signal<any[]>([]);
+
   private ownerSearchTimer: ReturnType<typeof setTimeout> | null = null;
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ── Upload file state ──────────────────────────────────
+  uploadFileLoading = false;
 
   draft: {
     name: string; status: DocStatus; doc_type: DocType; gdpr_type: GdprType;
@@ -568,8 +589,7 @@ export class DetailPanelComponent implements OnChanges {
   saveDoc(): void {
     if (this.doc._access !== 'full') return;
     const access = this.doc._access;
-    const entities = [this.draft.entity1, this.draft.entity2]
-      .map(s => s.trim()).filter(s => !!s);
+    const entities = [this.draft.entity1, this.draft.entity2].map(s => s.trim()).filter(Boolean);
     this.docSvc.update(this.doc.id, {
       name:            this.draft.name,
       status:          this.draft.status,
@@ -579,7 +599,7 @@ export class DetailPanelComponent implements OnChanges {
       owner_id:        this.draft.owner_id,
       entities,
       expiration_date: this.draft.expiration_date || undefined,
-      signing_date:    this.draft.signing_date || undefined,
+      signing_date:    this.draft.signing_date    || undefined,
     }).subscribe(updated => {
       this.doc = { ...updated, _access: access };
       this.initDraft();
@@ -590,12 +610,13 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   get docTypeLabel(): string { return DOC_TYPE_MAP[this.doc?.doc_type] ?? ''; }
+
   previewBlobUrl = signal<SafeResourceUrl | null>(null);
   previewLoading = signal(false);
   previewError   = signal<string | null>(null);
 
   loadPreview(): void {
-    if (this.previewBlobUrl()) return; // already loaded
+    if (this.previewBlobUrl()) return;
     this.previewLoading.set(true);
     this.previewError.set(null);
     this.docSvc.download(this.doc.id).subscribe({
@@ -613,7 +634,6 @@ export class DetailPanelComponent implements OnChanges {
 
   formatSize = fileSizeLabel;
 
-  /** Konwertuje ISO timestamp do YYYY-MM-DD z uwzględnieniem lokalnej strefy czasowej */
   toDateInput(val: string | null | undefined): string {
     if (!val) return '';
     const d = new Date(val);
@@ -624,6 +644,7 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
+    console.log('[DetailPanel] ngOnChanges — id:', this.document?.id, '| blob_name:', this.document?.blob_name, '| access:', this.document?._access);
     this.previewBlobUrl.set(null);
     this.previewLoading.set(false);
     this.previewError.set(null);
@@ -631,10 +652,11 @@ export class DetailPanelComponent implements OnChanges {
     this.attachmentsLoaded = false;
     this.attachmentEvents.set([]);
     this.history.set([]);
-    this.historyLoaded = false;
-    this._activeTab = 'info';
+    this.historyLoaded    = false;
+    this.uploadFileLoading = false;
+    this._activeTab       = 'info';
 
-    this.doc = { ...this.document };
+    this.doc         = { ...this.document };
     this.ownerSearch = this.document.owner_name ?? '';
     this.initDraft();
     this.activeTab = 'overview';
@@ -676,12 +698,56 @@ export class DetailPanelComponent implements OnChanges {
     });
   }
 
+  // ── Upload file (pierwsze wgranie pliku do dokumentu) ──
   uploadFile(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    this.docSvc.uploadFile(this.doc.id, file).subscribe(() => {
-      this.toast.success('File uploaded');
-      this.docSvc.get(this.doc.id).subscribe(d => { this.doc = d; this.cdr.markForCheck(); this.updated.emit(d); });
+    console.log('[uploadFile] (change) odpalony', event);
+    const input = event.target as HTMLInputElement;
+    const file  = input.files?.[0];
+
+    console.log('[uploadFile] plik:', file?.name, '| rozmiar:', file?.size, '| typ:', file?.type);
+    console.log('[uploadFile] doc.id:', this.doc?.id, '| access:', this.doc?._access, '| blob_name:', this.doc?.blob_name);
+
+    if (!file) {
+      console.warn('[uploadFile] Brak pliku — abort');
+      this.toast.error('Nie wybrano pliku');
+      return;
+    }
+
+    const targetUrl = `${environment.apiUrl}/documents/${this.doc.id}/file`;
+    console.log('[uploadFile] Wywołuję POST', targetUrl);
+
+    this.uploadFileLoading = true;
+    this.cdr.markForCheck();
+
+    this.docSvc.uploadFile(this.doc.id, file).subscribe({
+      next: (res) => {
+        console.log('[uploadFile] ✅ Sukces:', res);
+        this.toast.success('Plik wgrany pomyślnie');
+        this.reloadHistory();
+        this.docSvc.get(this.doc.id).subscribe({
+          next: d => {
+            console.log('[uploadFile] Odświeżony dokument — blob_name:', d.blob_name);
+            this.doc = d;
+            this.uploadFileLoading = false;
+            this.cdr.markForCheck();
+            this.updated.emit(d);
+          },
+          error: err => {
+            console.error('[uploadFile] Błąd odświeżania dokumentu:', err);
+            this.uploadFileLoading = false;
+            this.cdr.markForCheck();
+            this.toast.error('Upload OK, ale odświeżenie dokumentu nie powiodło się: ' + (err?.error?.error ?? err?.message ?? 'Nieznany błąd'));
+          }
+        });
+      },
+      error: (err) => {
+        console.error('[uploadFile] ❌ Błąd uploadu:', err);
+        console.error('[uploadFile] HTTP status:', err?.status, '| body:', err?.error);
+        this.uploadFileLoading = false;
+        this.cdr.markForCheck();
+        const msg = err?.error?.error ?? err?.error?.message ?? err?.message ?? 'Nieznany błąd';
+        this.toast.error(`Upload nieudany (HTTP ${err?.status ?? '?'}): ${msg}`);
+      }
     });
   }
 
@@ -689,18 +755,24 @@ export class DetailPanelComponent implements OnChanges {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     const label = 'Version ' + ((this.doc.versions?.length ?? 0) + 1);
-    this.docSvc.uploadFile(this.doc.id, file, label).subscribe(() => {
-      this.toast.success('New version uploaded');
-      this.reloadHistory();
-      this.docSvc.get(this.doc.id).subscribe(d => { this.doc = d; this.cdr.markForCheck(); this.updated.emit(d); });
+    this.docSvc.uploadFile(this.doc.id, file, label).subscribe({
+      next: () => {
+        this.toast.success('Nowa wersja wgrana');
+        this.reloadHistory();
+        this.docSvc.get(this.doc.id).subscribe(d => { this.doc = d; this.cdr.markForCheck(); this.updated.emit(d); });
+      },
+      error: err => {
+        const msg = err?.error?.error ?? err?.message ?? 'Nieznany błąd';
+        this.toast.error(`Upload nieudany (HTTP ${err?.status ?? '?'}): ${msg}`);
+      }
     });
   }
 
-  attachments = signal<any[]>([]);
+  attachments     = signal<any[]>([]);
   attachmentsLoaded = false;
   attachmentEvents = signal<{icon:string;title:string;date:string}[]>([]);
-  history = signal<any[]>([]);
-  historyLoaded = false;
+  history         = signal<any[]>([]);
+  historyLoaded   = false;
 
   loadHistory(): void {
     if (this.historyLoaded) return;
@@ -722,24 +794,36 @@ export class DetailPanelComponent implements OnChanges {
   uploadAttachment(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe(att => {
-      this.attachments.update(list => [...list, att]);
-      this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment added: ${file.name}`, date: new Date().toISOString()}, ...evts]);
-      this.toast.success('Attachment uploaded');
-      this.reloadHistory();
+    this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe({
+      next: att => {
+        this.attachments.update(list => [...list, att]);
+        this.attachmentEvents.update(evts => [{ icon: '📎', title: `Dodano załącznik: ${file.name}`, date: new Date().toISOString() }, ...evts]);
+        this.toast.success('Załącznik dodany');
+        this.reloadHistory();
+      },
+      error: err => {
+        const msg = err?.error?.error ?? err?.message ?? 'Nieznany błąd';
+        this.toast.error(`Upload załącznika nieudany (HTTP ${err?.status ?? '?'}): ${msg}`);
+      }
     });
   }
 
   uploadAttachmentVersion(event: Event, attId: string): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? file.name;
-    this.docSvc.uploadAttachmentVersion(this.doc.id, attId, file).subscribe(() => {
-      this.toast.success('New version uploaded');
-      this.reloadHistory();
-      this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment new version: ${attName}`, date: new Date().toISOString()}, ...evts]);
-      this.attachmentsLoaded = false;
-      this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
+    const attName = this.attachments().find((a: any) => a.id === attId)?.name ?? file.name;
+    this.docSvc.uploadAttachmentVersion(this.doc.id, attId, file).subscribe({
+      next: () => {
+        this.toast.success('Nowa wersja załącznika dodana');
+        this.reloadHistory();
+        this.attachmentEvents.update(evts => [{ icon: '📎', title: `Nowa wersja załącznika: ${attName}`, date: new Date().toISOString() }, ...evts]);
+        this.attachmentsLoaded = false;
+        this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
+      },
+      error: err => {
+        const msg = err?.error?.error ?? err?.message ?? 'Nieznany błąd';
+        this.toast.error(`Upload wersji nieudany (HTTP ${err?.status ?? '?'}): ${msg}`);
+      }
     });
   }
 
@@ -752,18 +836,24 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   deleteAttachment(attId: string): void {
-    if (!confirm('Delete this attachment and all its versions?')) return;
-    const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? attId;
-    this.docSvc.deleteAttachment(this.doc.id, attId).subscribe(() => {
-      this.attachments.update(list => list.filter((a: any) => a.id !== attId));
-      this.attachmentEvents.update(evts => [{icon:'🗑', title:'Attachment deleted: ' + attName, date: new Date().toISOString()}, ...evts]);
-      this.toast.success('Attachment deleted');
-      this.reloadHistory();
+    if (!confirm('Usunąć ten załącznik i wszystkie jego wersje?')) return;
+    const attName = this.attachments().find((a: any) => a.id === attId)?.name ?? attId;
+    this.docSvc.deleteAttachment(this.doc.id, attId).subscribe({
+      next: () => {
+        this.attachments.update(list => list.filter((a: any) => a.id !== attId));
+        this.attachmentEvents.update(evts => [{ icon: '🗑', title: 'Usunięto załącznik: ' + attName, date: new Date().toISOString() }, ...evts]);
+        this.toast.success('Załącznik usunięty');
+        this.reloadHistory();
+      },
+      error: err => {
+        const msg = err?.error?.error ?? err?.message ?? 'Nieznany błąd';
+        this.toast.error(`Usuwanie nieudane (HTTP ${err?.status ?? '?'}): ${msg}`);
+      }
     });
   }
 
   historyIcon(action: string): string {
-    const map: Record<string,string> = {
+    const map: Record<string, string> = {
       document_created:            '📄',
       document_updated:            '✏️',
       document_deleted:            '🗑',
@@ -788,7 +878,9 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   historyLabel(entry: any): string {
-    const after = entry.after_state ? (typeof entry.after_state === 'string' ? JSON.parse(entry.after_state) : entry.after_state) : null;
+    const after = entry.after_state
+      ? (typeof entry.after_state === 'string' ? JSON.parse(entry.after_state) : entry.after_state)
+      : null;
     switch (entry.action) {
       case 'document_created':            return 'Document created';
       case 'document_updated':            return 'Document updated';
@@ -800,15 +892,15 @@ export class DetailPanelComponent implements OnChanges {
       case 'tag_updated':                 return `Tag updated: ${after?.key ?? ''}`;
       case 'status_changed':              return `Status changed to: ${after?.status ?? ''}`;
       case 'version_uploaded':            return `New document version uploaded (v${after?.version ?? ''})`;
-      case 'workflow_task_created':       return `Workflow task assigned`;
-      case 'workflow_task_completed':     return `Workflow task completed`;
-      case 'workflow_task_cancelled':     return `Workflow task cancelled`;
+      case 'workflow_task_created':       return 'Workflow task assigned';
+      case 'workflow_task_completed':     return 'Workflow task completed';
+      case 'workflow_task_cancelled':     return 'Workflow task cancelled';
       case 'signing_initiated':           return 'E-signing initiated';
       case 'signing_completed':           return 'E-signing completed';
       case 'signing_failed':              return 'E-signing failed';
       case 'attachment_uploaded':         return `Attachment added: ${after?.name ?? after?.fileName ?? ''}`;
       case 'attachment_version_uploaded': return `Attachment new version (v${after?.version ?? ''})`;
-      case 'attachment_deleted':          return `Attachment deleted`;
+      case 'attachment_deleted':          return 'Attachment deleted';
       default:                            return entry.action.replace(/_/g, ' ');
     }
   }
@@ -822,9 +914,9 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   selectOwner(u: User): void {
-    this.ownerSearch = u.display_name + ' <' + u.email + '>';
-    this.ownerDropdown.set([]);
+    this.ownerSearch    = u.display_name + ' <' + u.email + '>';
     this.draft.owner_id = u.id;
+    this.ownerDropdown.set([]);
   }
 
   hideOwnerDropdown(): void {
@@ -840,12 +932,12 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   deleteDoc(): void {
-    if (!confirm(`Delete "${this.doc.name}"?`)) return;
+    if (!confirm(`Usunąć "${this.doc.name}"?`)) return;
     this.docSvc.delete(this.doc.id).subscribe(() => this.deleted.emit(this.doc.id));
   }
 
   onUserSearch(q: string): void {
-    this.wf.assignTo = '';
+    this.wf.assignTo     = '';
     this.wf.assignToName = '';
     if (!q || q.length < 2) { this.userDropdown.set([]); return; }
     if (this.searchTimer) clearTimeout(this.searchTimer);
@@ -869,13 +961,13 @@ export class DetailPanelComponent implements OnChanges {
     this.wfSvc.assignTask(this.doc.id, {
       assigned_to: this.wf.assignTo,
       task_type:   this.wf.taskType,
-      message:     this.wf.message || undefined,
-      due_date:    this.wf.dueDate || undefined,
+      message:     this.wf.message  || undefined,
+      due_date:    this.wf.dueDate  || undefined,
     }).subscribe(task => {
       this.doc = { ...this.doc, workflow_tasks: [...(this.doc.workflow_tasks ?? []), task] };
-      this.wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
+      this.wf  = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
       this.cdr.markForCheck();
-      this.toast.success('Task assigned — email notification sent');
+      this.toast.success('Zadanie przypisane — wysłano email');
     });
   }
 
@@ -886,7 +978,7 @@ export class DetailPanelComponent implements OnChanges {
         workflow_tasks: (this.doc.workflow_tasks ?? []).map(t => t.id === taskId ? { ...t, task_status: 'cancelled' } : t),
       };
       this.cdr.markForCheck();
-      this.toast.success('Task cancelled');
+      this.toast.success('Zadanie anulowane');
     });
   }
 
@@ -896,7 +988,7 @@ export class DetailPanelComponent implements OnChanges {
     const signatories = this.signusEmails.split(',').map(e => ({ email: e.trim() })).filter(s => s.email);
     this.docSvc.initiateSigning(this.doc.id, signatories).subscribe(res => {
       this.signusOpen = false;
-      this.toast.success('Document sent to Signus — redirecting…');
+      this.toast.success('Dokument wysłany do Signus — przekierowanie…');
       setTimeout(() => window.open(res.redirectUrl, '_blank'), 800);
     });
   }
