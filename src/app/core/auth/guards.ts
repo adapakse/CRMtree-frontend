@@ -40,13 +40,24 @@ export const adminGuard: CanActivateFn = () => {
 export const crmGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);
-  const user = auth.user();
+  const user   = auth.user();
 
   const hasCrmAccess = user?.is_admin ||
     user?.crm_role === 'salesperson' ||
     user?.crm_role === 'sales_manager';
 
   if (hasCrmAccess) return true;
+  router.navigate(['/dashboard']);
+  return false;
+};
+
+// Guard dla ekranu User Management — dostępny dla admina i Sales Managera
+export const adminOrSalesManagerGuard: CanActivateFn = () => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+  const user   = auth.user();
+
+  if (user?.is_admin || user?.crm_role === 'sales_manager') return true;
   router.navigate(['/dashboard']);
   return false;
 };

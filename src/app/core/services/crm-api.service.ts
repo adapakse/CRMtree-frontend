@@ -296,6 +296,7 @@ export interface LeadsReportKpi {
   active: number; won: number; lost: number; hot: number;
   pipeline_value: number; won_value: number;
   win_rate: number; avg_cycle_days: number;
+  pipeline_in_period?: number;
 }
 export interface LeadsReportFunnel   { stage: string; count: number; value: number; }
 export interface LeadsReportMonthly  { month: string; new_leads: number; won: number; lost: number; won_value: number; }
@@ -420,6 +421,20 @@ export interface CrmUser {
   display_name: string;
   email: string;
   crm_role: 'salesperson' | 'sales_manager' | null;
+}
+
+/** Planowany budżet sprzedażowy */
+export interface SalesBudget {
+  id: number;
+  user_id: string;
+  user_name?: string;
+  year: number;
+  period_type: 'month' | 'quarter';
+  period_number: number;
+  amount: number;
+  currency: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -698,6 +713,23 @@ export class CrmApiService {
   // ── Kalendarz ────────────────────────────────────────────────
   getCalendarMeetings(p: { date_from?: string; date_to?: string; assigned_to?: string } = {}): Observable<CalendarMeeting[]> {
     return this.http.get<CalendarMeeting[]>(`${BASE}/leads/calendar`, { params: this.toParams(p) });
+  }
+
+  // ── Planowane Budżety Sprzedażowe ─────────────────────────
+  getSalesBudgets(p: { user_id?: string; year?: number } = {}): Observable<SalesBudget[]> {
+    return this.http.get<SalesBudget[]>(`${BASE}/budgets`, { params: this.toParams(p) });
+  }
+  upsertSalesBudget(data: {
+    user_id: string; year: number; period_type: 'month' | 'quarter';
+    period_number: number; amount: number; currency?: string;
+  }): Observable<SalesBudget> {
+    return this.http.post<SalesBudget>(`${BASE}/budgets`, data);
+  }
+  deleteSalesBudgetsByUser(user_id: string, year: number): Observable<void> {
+    return this.http.delete<void>(`${BASE}/budgets/by-user`, { params: this.toParams({ user_id, year }) });
+  }
+  getSalesBudgetTotal(p: { year?: number; date_from?: string; date_to?: string; assigned_to?: string } = {}): Observable<{ total: number; year: number; currency: string }> {
+    return this.http.get<{ total: number; year: number; currency: string }>(`${BASE}/budgets/total`, { params: this.toParams(p) });
   }
 
   // ── Podpowiedzi kontaktów do aktywności ──────────────────────

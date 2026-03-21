@@ -97,7 +97,7 @@ import { initials } from '../../core/services/helpers';
           </div>
         }
 
-        @if (auth.isAdmin()) {
+        @if (auth.isAdmin() || isSalesManager()) {
           <div class="nav-item" routerLink="/users" routerLinkActive="active">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             Users
@@ -155,6 +155,8 @@ import { initials } from '../../core/services/helpers';
 })
 export class ShellComponent implements OnInit {
   auth = inject(AuthService);
+
+  isSalesManager = computed(() => (this.auth.user() as any)?.crm_role === 'sales_manager');
   private wf     = inject(WorkflowService);
   private router = inject(Router);
 

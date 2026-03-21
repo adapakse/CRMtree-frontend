@@ -3,7 +3,7 @@ import {
   Component, OnInit, inject, ChangeDetectorRef, NgZone, ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
   CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, CrmUser, CalendarMeeting,
@@ -74,6 +74,12 @@ const PROB_MAP: Record<LeadStage, number> = {
   </div>
 
   <!-- ── Toolbar ── -->
+  <div *ngIf="reportFilterLabel" style="display:flex;align-items:center;gap:8px;padding:6px 0 0 0;margin-bottom:-4px">
+    <span style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:20px;padding:3px 12px;font-size:11.5px;font-weight:600;color:#9A3412;display:flex;align-items:center;gap:6px">
+      📊 Filtr z raportu: {{ reportFilterLabel }}
+      <span style="cursor:pointer;font-size:14px;color:#9A3412;line-height:1" (click)="clearReportFilter()">×</span>
+    </span>
+  </div>
   <div class="toolbar">
     <span class="fchip" [class.on]="scopeFilter==='all'"  (click)="setScope('all')">Wszystkie</span>
     <span class="fchip" [class.on]="scopeFilter==='mine'" (click)="setScope('mine')">Moje</span>
@@ -1006,6 +1012,8 @@ export class CrmLeadsListComponent implements OnInit {
   private auth   = inject(AuthService);
   private zone   = inject(NgZone);
   readonly cdr   = inject(ChangeDetectorRef);
+  private router = inject(Router);
+  private route  = inject(ActivatedRoute);
 
   readonly kanbanCols  = KANBAN_STAGES;
   readonly leadSources = LEAD_SOURCES;
@@ -1026,6 +1034,12 @@ export class CrmLeadsListComponent implements OnInit {
   filterHot    = false;
   filterSource = '';
   filterUser   = '';
+  // Filtry z Raportu Sprzedaży (query params)
+  filterStage        = '';
+  filterCloseDateFrom = '';
+  filterCloseDateTo   = '';
+  filterLostReason    = '';
+  reportFilterLabel   = '';   // np. "Stage: Nowy" — widoczne jako chip nad listą
 
   page       = 1;
   totalPages = 1;
@@ -1061,6 +1075,17 @@ export class CrmLeadsListComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Odczytaj query params z nawigacji z Raportu Sprzedaży
+    const qp = this.route.snapshot.queryParamMap;
+    this.filterStage         = qp.get('stage')           || '';
+    this.filterSource        = qp.get('source')          || '';
+    this.filterUser          = qp.get('assigned_to')     || '';
+    this.filterCloseDateFrom = qp.get('close_date_from') || '';
+    this.filterCloseDateTo   = qp.get('close_date_to')   || '';
+    this.filterLostReason    = qp.get('lost_reason')     || '';
+    if (qp.get('hot') === 'true') this.filterHot = true;
+    this.reportFilterLabel   = qp.get('label')           || '';
+
     this.load();
     this.api.getCrmUsers().subscribe({
       next: u => this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }),
@@ -1091,14 +1116,24 @@ export class CrmLeadsListComponent implements OnInit {
     return this.sortDir === 'asc' ? '↑' : '↓';
   }
 
+  clearReportFilter(): void {
+    this.filterStage = ''; this.filterCloseDateFrom = ''; this.filterCloseDateTo = '';
+    this.filterLostReason = ''; this.reportFilterLabel = '';
+    this.load();
+  }
+
   load() {
     this.loading = true;
     const params: any = { limit: 200 };
-    if (this.filterHot)              params['hot']         = true;
-    if (this.filterSource)           params['source']      = this.filterSource;
-    if (this.filterUser)             params['assigned_to'] = this.filterUser;
-    if (this.scopeFilter === 'mine') params['assigned_to'] = this.auth.user()?.id;
-    if (this.search)                 params['search']      = this.search;
+    if (this.filterHot)              params['hot']             = true;
+    if (this.filterSource)           params['source']          = this.filterSource;
+    if (this.filterUser)             params['assigned_to']     = this.filterUser;
+    if (this.scopeFilter === 'mine') params['assigned_to']     = this.auth.user()?.id;
+    if (this.search)                 params['search']          = this.search;
+    if (this.filterStage)            params['stage']           = this.filterStage;
+    if (this.filterCloseDateFrom)    params['close_date_from'] = this.filterCloseDateFrom;
+    if (this.filterCloseDateTo)      params['close_date_to']   = this.filterCloseDateTo;
+    if (this.filterLostReason)       params['lost_reason']     = this.filterLostReason;
 
     this.api.getLeads(params).subscribe({
       next: res => this.zone.run(() => {
