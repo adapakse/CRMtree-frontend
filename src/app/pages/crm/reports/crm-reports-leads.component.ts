@@ -10,18 +10,40 @@ import {
   CrmApiService, LeadsReport, LeadsReportKpi,
   LEAD_STAGE_LABELS, LEAD_SOURCES, CrmUser,
 } from '../../../core/services/crm-api.service';
+import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 
-function getPeriodDates(preset: string): { from: string; to: string } {
+function getPeriodDates(preset: string): { from: string; to: string; periodEnd: string } {
   const now = new Date();
   const today = now.toISOString().substring(0, 10);
-  const shift = (n: number) => { const d = new Date(now); d.setMonth(d.getMonth() + n); return d.toISOString().substring(0, 10); };
+  const fmt = (d: Date) => d.toISOString().substring(0, 10);
+  const shift = (n: number) => { const d = new Date(now); d.setMonth(d.getMonth() + n); return fmt(d); };
   switch (preset) {
-    case '1m':  return { from: new Date(now.getFullYear(), now.getMonth(), 1).toISOString().substring(0,10), to: today };
-    case '3m':  return { from: shift(-3), to: today };
-    case '6m':  return { from: shift(-6), to: today };
-    case 'ytd': return { from: `${now.getFullYear()}-01-01`, to: today };
-    default:    return { from: shift(-12), to: today };
+    case '1m': {
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      return { from: fmt(new Date(now.getFullYear(), now.getMonth(), 1)), to: today, periodEnd: fmt(end) };
+    }
+    case '3m':  return { from: shift(-3), to: today, periodEnd: today };
+    case '6m':  return { from: shift(-6), to: today, periodEnd: today };
+    case 'ytd': {
+      const end = fmt(new Date(now.getFullYear(), 11, 31));
+      return { from: `${now.getFullYear()}-01-01`, to: today, periodEnd: end };
+    }
+    case 'cq': {
+      const q     = Math.floor(now.getMonth() / 3);
+      const qFrom = new Date(now.getFullYear(), q * 3, 1);
+      const qTo   = new Date(now.getFullYear(), q * 3 + 3, 0);  // ostatni dzień kwartału
+      return {
+        from:      fmt(qFrom),
+        to:        today,          // filtr created_at do dziś
+        periodEnd: fmt(qTo),       // koniec kwartału — dla close_date i budżetu
+      };
+    }
+    default: {
+      const end = fmt(new Date(now.getFullYear(), 11, 31));
+      return { from: `${now.getFullYear()}-01-01`, to: today, periodEnd: end };
+    }
   }
 }
 
@@ -39,10 +61,10 @@ function getPeriodDates(preset: string): { from: string; to: string } {
   <span style="flex:1"></span>
   <select class="sel" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
     <option value="1m">Bieżący miesiąc</option>
+    <option value="cq">Bieżący kwartał</option>
     <option value="3m">Ostatnie 3 miesiące</option>
     <option value="6m">Ostatnie 6 miesięcy</option>
-    <option value="12m">Ostatnie 12 miesięcy</option>
-    <option value="ytd">YTD {{ currentYear }}</option>
+    <option value="ytd">Bieżący rok (YTD {{ currentYear }})</option>
   </select>
   <select class="sel" *ngIf="isManager" [(ngModel)]="assignedTo" (ngModelChange)="load()">
     <option value="">Wszyscy handlowcy</option>
@@ -71,14 +93,40 @@ function getPeriodDates(preset: string): { from: string; to: string } {
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px">
     <div class="stat-card" style="border-top:3px solid #f26522">
-      <div class="stat-val" style="color:#f26522">{{ kpi.pipeline_value | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:#f26522;cursor:pointer"
+           (click)="goToLeads({}, 'Pipeline – wszystkie aktywne')"
+           title="Kliknij aby zobaczyć leady">{{ kpi.pipeline_value | number:'1.0-0' }}</div>
       <div class="stat-lbl">Pipeline (PLN)</div>
       <div class="stat-trend" *ngIf="kpi.active > 0" style="color:#16a34a">↑ {{ kpi.active }} aktywnych</div>
+      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e4e4e7;cursor:pointer"
+           (click)="goToLeads({close_date_from: dateFrom, close_date_to: periodEnd}, 'Planowane do dowiezienia w okresie')"
+           title="Kliknij aby zobaczyć leady z datą zamknięcia w tym okresie">
+        <div style="font-size:10px;color:#a1a1aa;font-weight:500">Planowane do dowiezienia ↗</div>
+        <div style="font-size:13px;font-weight:700;color:#f26522">
+          {{ (kpi.pipeline_in_period ?? 0) | number:'1.0-0' }} PLN
+        </div>
+      </div>
     </div>
     <div class="stat-card" style="border-top:3px solid #22C55E">
-      <div class="stat-val" style="color:#22C55E">{{ kpi.won_value | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:#22C55E;cursor:pointer"
+           (click)="goToLeads({stage: 'closed_won'}, 'Zamknięte / Won')"
+           title="Kliknij aby zobaczyć wygrane leady">{{ kpi.won_value | number:'1.0-0' }}</div>
       <div class="stat-lbl">Zamknięte / Won (PLN)</div>
       <div class="stat-trend" style="color:#16a34a">↑ {{ kpi.won }} kontraktów</div>
+      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e4e4e7">
+        <div style="font-size:10px;color:#a1a1aa;font-weight:500;cursor:pointer"
+             (click)="goToLeads({close_date_from: dateFrom, close_date_to: periodEnd}, 'Planowany budżet – leady w okresie')"
+             title="Kliknij aby zobaczyć leady w tym okresie">Planowany budżet ↗</div>
+        <div style="font-size:13px;font-weight:700;color:#7C3AED">
+          {{ budgetTotal | number:'1.0-0' }} PLN
+        </div>
+        <div *ngIf="budgetTotal > 0" style="height:4px;background:#e4e4e7;border-radius:2px;margin-top:4px;overflow:hidden">
+          <div [style.width.%]="min100(kpi.won_value / budgetTotal * 100)"
+               [style.background]="kpi.won_value >= budgetTotal ? '#22C55E' : '#7C3AED'"
+               style="height:100%;border-radius:2px;transition:width .3s"></div>
+        </div>
+        <div *ngIf="budgetTotal === 0" style="font-size:10px;color:#d1d5db;margin-top:2px">Brak planu</div>
+      </div>
     </div>
     <div class="stat-card" style="border-top:3px solid #3B82F6">
       <div class="stat-val">{{ kpi.win_rate || 0 }}%</div>
@@ -89,10 +137,13 @@ function getPeriodDates(preset: string): { from: string; to: string } {
       <div class="stat-val">{{ kpi.avg_cycle_days ? kpi.avg_cycle_days + ' dni' : '—' }}</div>
       <div class="stat-lbl">Avg. cykl sprzedaży</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #F59E0B">
-      <div class="stat-val">{{ kpi.active }}</div>
-      <div class="stat-lbl">Aktywne leady</div>
-      <div class="stat-trend" *ngIf="kpi.hot">{{ kpi.hot }} gorących 🔥</div>
+    <div class="stat-card" style="border-top:3px solid #7C3AED">
+      <div class="stat-val" style="color:#7C3AED">{{ budgetTotal | number:'1.0-0' }}</div>
+      <div class="stat-lbl">Planowany budżet (PLN)</div>
+      <div class="stat-trend" *ngIf="budgetTotal > 0 && kpi.won_value > 0" [style.color]="kpi.won_value >= budgetTotal ? '#16a34a' : '#dc2626'">
+        {{ kpi.won_value >= budgetTotal ? '✓' : '' }} {{ (kpi.won_value / budgetTotal * 100) | number:'1.0-0' }}% realizacji
+      </div>
+      <div class="stat-trend" *ngIf="budgetTotal === 0" style="color:#a1a1aa">Brak planu</div>
     </div>
   </div>
 
@@ -162,7 +213,10 @@ function getPeriodDates(preset: string): { from: string; to: string } {
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let r of byRep; let last = last" [style.border-bottom]="last ? 'none' : '1px solid #f4f4f5'">
+          <tr *ngFor="let r of byRep; let last = last"
+              [style.border-bottom]="last ? 'none' : '1px solid #f4f4f5'"
+              style="cursor:pointer" title="Kliknij aby zobaczyć leady handlowca"
+              (click)="goToLeads({assigned_to: r.rep_id}, 'Handlowiec: ' + r.rep_name)">
             <td style="padding:8px 8px">
               <div style="display:flex;align-items:center;gap:8px">
                 <div [style.background]="avatarColor(r.rep_name)" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;flex-shrink:0">{{ initials(r.rep_name) }}</div>
@@ -253,17 +307,20 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   @ViewChild('velocityEl',{static:false}) velocityEl!:ElementRef;
   @ViewChild('lostEl',   { static: false }) lostEl!:   ElementRef;
 
-  private api  = inject(CrmApiService);
-  private auth = inject(AuthService);
-  private cdr  = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+  private api    = inject(CrmApiService);
+  private auth   = inject(AuthService);
+  private cdr    = inject(ChangeDetectorRef);
+  private zone   = inject(NgZone);
+  private router = inject(Router);
 
   loading      = false;
-  periodPreset = '12m';
+  periodPreset = 'cq';        // pkt 3: domyślnie bieżący kwartał
   dateFrom     = '';
   dateTo       = '';
+  periodEnd    = '';  // rzeczywisty koniec okresu (nie przycięty do dziś) — dla close_date i budżetu
   assignedTo   = '';
   currentYear  = new Date().getFullYear();
+  budgetTotal  = 0;           // pkt 4/5/8: planowany budżet
 
   kpi: LeadsReportKpi | null = null;
   byRep:       any[] = [];
@@ -275,6 +332,18 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   crmUsers:    CrmUser[] = [];
 
   private chartsBuilt = false;
+
+  min100(v: number): number { return Math.min(100, Math.max(0, v || 0)); }
+
+  /** Przejdź do listy leadów z odpowiednimi filtrami */
+  goToLeads(filters: Record<string, string>, label: string): void {
+    const qp: any = { label };
+    // Przekaż handlowca jeśli jest wybrany
+    if (this.assignedTo) qp['assigned_to'] = this.assignedTo;
+    // Przekaż filtry
+    Object.assign(qp, filters);
+    this.router.navigate(['/crm/leads'], { queryParams: qp });
+  }
 
   get isManager() {
     const u = this.auth.user();
@@ -298,9 +367,10 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {}
 
   onPresetChange(): void {
-    const { from, to } = getPeriodDates(this.periodPreset);
-    this.dateFrom = from;
-    this.dateTo   = to;
+    const { from, to, periodEnd } = getPeriodDates(this.periodPreset);
+    this.dateFrom   = from;
+    this.dateTo     = to;
+    this.periodEnd  = periodEnd;
     this.load();
   }
 
@@ -308,9 +378,16 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     this.loading = true;
     this.chartsBuilt = false;
     const p: any = {};
-    if (this.dateFrom) p.date_from = this.dateFrom;
-    if (this.dateTo)   p.date_to   = this.dateTo;
+    if (this.dateFrom)  p.date_from  = this.dateFrom;
+    if (this.dateTo)    p.date_to    = this.dateTo;
+    if (this.periodEnd) p.period_end = this.periodEnd; // koniec okresu dla close_date
     if (this.assignedTo && this.isManager) p.assigned_to = this.assignedTo;
+
+    // Pobierz raport + planowany budżet równolegle (pkt 4/8)
+    const budgetP: any = { year: this.currentYear };
+    if (this.dateFrom)  budgetP.date_from = this.dateFrom;
+    if (this.periodEnd) budgetP.date_to   = this.periodEnd; // budżet wg pełnego okresu
+    if (this.assignedTo && this.isManager) budgetP.assigned_to = this.assignedTo;
 
     this.api.getLeadsReport(p).subscribe({
       next: (report: LeadsReport) => {
@@ -321,7 +398,6 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
           this.byRep       = report.by_rep || [];
           this.bySource    = report.by_source || [];
           this.lostReasons = report.lost_reasons || [];
-          // Build velocity from funnel stages
           this.velocityData = this.buildVelocityData();
           this.loading     = false;
           this.cdr.markForCheck();
@@ -329,6 +405,12 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
         });
       },
       error: () => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); },
+    });
+
+    // Budżet (pkt 4/5/8)
+    this.api.getSalesBudgetTotal(budgetP).subscribe({
+      next: b => this.zone.run(() => { this.budgetTotal = b.total || 0; this.cdr.markForCheck(); }),
+      error: () => this.zone.run(() => { this.budgetTotal = 0; this.cdr.markForCheck(); }),
     });
   }
 
@@ -377,6 +459,9 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
         ? '<div style="height:1px;background:#f4f4f5;margin:4px 0"></div>' : '';
       const row = document.createElement('div');
       row.style.cssText = 'margin-bottom:6px';
+      row.style.cursor = 'pointer';
+      row.title = `Kliknij aby zobaczyć leady w etapie: ${label}`;
+      row.addEventListener('click', () => this.goToLeads({ stage: d.stage }, `Lejek: ${label}`));
       row.innerHTML = `${sep}<div style="display:flex;align-items:center;gap:8px">
         <div style="width:88px;font-size:11.5px;color:#71717a;text-align:right;flex-shrink:0">${label}</div>
         <div style="flex:1;position:relative;height:26px">
@@ -463,6 +548,9 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     data.forEach((d, i) => {
       const item = document.createElement('div');
       item.style.cssText = 'display:flex;align-items:center;gap:6px';
+      item.style.cursor = 'pointer';
+      item.title = `Kliknij aby zobaczyć leady ze źródła: ${this.sourceLabel(d.source)}`;
+      item.addEventListener('click', () => this.goToLeads({ source: d.source }, `Źródło: ${this.sourceLabel(d.source)}`));
       item.innerHTML = `<span style="width:10px;height:10px;border-radius:2px;background:${colors[i]};flex-shrink:0;display:inline-block"></span><span style="color:#52525b;font-size:12px">${this.sourceLabel(d.source)}</span><span style="margin-left:auto;font-weight:700;color:#18181b;font-size:12px">${Math.round(d.count/total*100)}%</span>`;
       legend.appendChild(item);
     });
@@ -492,6 +580,13 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     this.lostReasons.slice(0, 5).forEach((d, i) => {
       const pct = Math.round(d.count / max * 100);
       const row = document.createElement('div');
+      row.style.cursor = 'pointer';
+      row.title = `Kliknij aby zobaczyć przegrane leady: ${d.reason}`;
+      const lostReason = d.reason === '— brak powodu —' ? '' : d.reason;
+      row.addEventListener('click', () => this.goToLeads(
+        lostReason ? { stage: 'closed_lost', lost_reason: lostReason } : { stage: 'closed_lost' },
+        `Przegrane: ${d.reason}`
+      ));
       row.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#52525b">${d.reason}</span><span style="font-size:12px;font-weight:700;color:${colors[i]}">${d.count}</span></div><div style="height:8px;background:#f4f4f5;border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[i]};border-radius:4px;opacity:.8"></div></div>`;
       el.appendChild(row);
     });

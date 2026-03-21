@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, GroupService } from '../../core/services/api.services';
@@ -6,6 +6,8 @@ import { ToastService } from '../../core/services/toast.service';
 import { AppSettingsService } from '../../core/services/app-settings.service';
 import { User, GroupProfile } from '../../core/models/models';
 import { AvatarComponent, GroupPillComponent } from '../../shared/components/badges.components';
+import { CrmApiService, SalesBudget } from '../../core/services/crm-api.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'wt-users',
@@ -263,6 +265,76 @@ import { AvatarComponent, GroupPillComponent } from '../../shared/components/bad
             </div>
             <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Save Changes</button>
 
+            <!-- ── Planowane Budżety Sprzedażowe ──────────────────────────────────── -->
+            @if (isSalesManager() && selected()!.crm_role === 'salesperson') {
+              <div class="sec-title" style="margin-top:24px">💼 Planowane Budżety Sprzedażowe</div>
+
+              <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-end">
+                <div class="fg" style="flex:1">
+                  <label class="fl">Rok</label>
+                  <select class="fsel" [(ngModel)]="budgetYear" (ngModelChange)="loadBudgets()">
+                    @for (y of budgetYears; track y) { <option [value]="y">{{ y }}</option> }
+                  </select>
+                </div>
+                <div class="fg" style="flex:1">
+                  <label class="fl">Typ okresu</label>
+                  <select class="fsel" [(ngModel)]="budgetPeriodType" (ngModelChange)="onBudgetPeriodTypeChange()">
+                    <option value="month">Miesięczny</option>
+                    <option value="quarter">Kwartalny</option>
+                  </select>
+                </div>
+              </div>
+
+              @if (budgetsLoading) {
+                <div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px">Ładowanie…</div>
+              } @else {
+
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"
+                   [style.grid-template-columns]="budgetPeriodType === 'quarter' ? 'repeat(2,1fr)' : 'repeat(3,1fr)'">
+                @for (p of budgetPeriods(); track p.num) {
+                  <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px">
+                    <div style="font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;margin-bottom:4px">{{ p.label }}</div>
+                    <div style="display:flex;gap:4px;align-items:center">
+                      <input type="number" min="0" step="1000"
+                             class="fi" style="width:100%;box-sizing:border-box;font-size:12px;padding:5px 8px;text-align:right"
+                             [value]="getBudgetAmount(p.num)"
+                             (change)="onBudgetAmountChange(p.num, $event)">
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Waluta + Suma roczna -->
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+                <div class="fg" style="width:100px">
+                  <label class="fl">Waluta</label>
+                  <select class="fsel" [(ngModel)]="budgetCurrency" style="font-size:12px;padding:5px 8px">
+                    <option value="PLN">PLN</option>
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                    <option value="GBP">GBP</option>
+                    <option value="CHF">CHF</option>
+                  </select>
+                </div>
+                <div style="flex:1;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:12px;font-weight:700;color:var(--orange-dark)">Suma roczna</span>
+                  <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--orange)">{{ budgetAnnualTotal | number:'1.0-0' }} {{ budgetCurrency }}</span>
+                </div>
+              </div>
+
+              @if (budgetDirty) {
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-p btn-sm" style="flex:1" [disabled]="budgetSaving" (click)="saveBudgets()">
+                    {{ budgetSaving ? 'Zapisywanie…' : '💾 Zapisz budżet' }}
+                  </button>
+                  <button class="btn btn-g btn-sm" (click)="loadBudgets()">Anuluj</button>
+                </div>
+              }
+
+              } <!-- /if not loading -->
+            }
+            <!-- ───────────────────────────────────────────────────────────────────────── -->
+
             <div class="sec-title" style="margin-top:24px">Group Roles ({{ (selected()!.roles ?? []).length }})</div>
             @for (role of selected()!.roles ?? []; track role.role_id) {
               <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
@@ -347,6 +419,15 @@ export class UsersComponent implements OnInit {
   private groupSvc    = inject(GroupService);
   private toast       = inject(ToastService);
   private appSettings = inject(AppSettingsService);
+  private crmApi      = inject(CrmApiService);
+  private auth        = inject(AuthService);
+  private cdr         = inject(ChangeDetectorRef);
+  private zone        = inject(NgZone);
+
+  isSalesManager = computed(() => {
+    const u = this.auth.user();
+    return !!(u?.is_admin || (u as any)?.crm_role === 'sales_manager');
+  });
 
   users      = signal<User[]>([]);
   groups     = signal<GroupProfile[]>([]);
@@ -382,6 +463,91 @@ export class UsersComponent implements OnInit {
   newGroup       = '';
   newGroupAccess: 'read' | 'full' = 'read';
   submitted      = false;
+
+  // ── Planowane Budżety ──────────────────────────────────────────
+  budgetYear        = new Date().getFullYear();
+  budgetYears       = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 1 + i);
+  budgetPeriodType: 'month' | 'quarter' = 'month';
+  budgetCurrency    = 'PLN';
+  budgetsLoading    = false;
+  budgetSaving      = false;
+  budgetDirty       = false;
+  private _budgetData: SalesBudget[]    = [];
+  private _budgetDraft: Record<number, number> = {};
+
+  budgetPeriods() {
+    if (this.budgetPeriodType === 'month') {
+      const lbl = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+      return Array.from({ length: 12 }, (_, i) => ({ num: i + 1, label: lbl[i] }));
+    }
+    return [
+      { num: 1, label: 'Q1 (I–III)' },
+      { num: 2, label: 'Q2 (IV–VI)' },
+      { num: 3, label: 'Q3 (VII–IX)' },
+      { num: 4, label: 'Q4 (X–XII)' },
+    ];
+  }
+
+  get budgetAnnualTotal(): number {
+    return Object.values(this._budgetDraft).reduce((s, v) => s + (v || 0), 0);
+  }
+
+  getBudgetAmount(num: number): number { return this._budgetDraft[num] ?? 0; }
+
+  onBudgetAmountChange(num: number, ev: Event): void {
+    this._budgetDraft[num] = parseFloat((ev.target as HTMLInputElement).value) || 0;
+    this.budgetDirty = true;
+    this.cdr.markForCheck();
+  }
+
+  loadBudgets(): void {
+    const u = this.selected(); if (!u) return;
+    this.budgetsLoading = true; this.budgetDirty = false; this._budgetDraft = {};
+    this.cdr.markForCheck();
+    this.crmApi.getSalesBudgets({ user_id: u.id, year: this.budgetYear }).subscribe({
+      next: bs => this.zone.run(() => {
+        this._budgetData = bs;
+        if (bs[0]?.period_type) this.budgetPeriodType = bs[0].period_type;
+        if (bs[0]?.currency)    this.budgetCurrency   = bs[0].currency;
+        this._budgetDraft = {};
+        for (const b of bs) this._budgetDraft[b.period_number] = Number(b.amount);
+        this.budgetsLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.budgetsLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  onBudgetPeriodTypeChange(): void {
+    if (this._budgetData.length && this._budgetData[0].period_type !== this.budgetPeriodType) {
+      if (!confirm(`Zmiana typu okresu usunie istniejące budżety na rok ${this.budgetYear}. Kontynuować?`)) {
+        this.budgetPeriodType = this._budgetData[0].period_type; return;
+      }
+      const u = this.selected();
+      if (u) this.crmApi.deleteSalesBudgetsByUser(u.id, this.budgetYear).subscribe({
+        next: () => { this._budgetData = []; this._budgetDraft = {}; this.budgetDirty = false; },
+        error: () => this.toast.error('Błąd usuwania budżetów'),
+      });
+    } else { this._budgetDraft = {}; this.budgetDirty = false; }
+  }
+
+  saveBudgets(): void {
+    const u = this.selected(); if (!u) return;
+    this.budgetSaving = true;
+    const entries = Object.entries(this._budgetDraft).map(([k, v]) => ({ num: +k, amt: v || 0 }));
+    if (!entries.length) { this.budgetSaving = false; this.budgetDirty = false; return; }
+    let pending = entries.length;
+    for (const e of entries) {
+      this.crmApi.upsertSalesBudget({
+        user_id: u.id, year: this.budgetYear,
+        period_type: this.budgetPeriodType, period_number: e.num,
+        amount: e.amt, currency: this.budgetCurrency,
+      }).subscribe({
+        next: () => { if (--pending === 0) { this.budgetSaving = false; this.budgetDirty = false; this.loadBudgets(); this.toast.success('Budżet zapisany'); } },
+        error: (err) => { this.budgetSaving = false; this.toast.error(err?.error?.error ?? 'Błąd zapisu'); },
+      });
+    }
+  }
 
   private timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -478,6 +644,11 @@ export class UsersComponent implements OnInit {
       this.emailError    = '';
       this.newRoleGroup  = '';
       this.newRoleAccess = 'read';
+      // Załaduj budżety jeśli Sales Manager otwiera handlowca
+      if (this.isSalesManager() && (u as any).crm_role === 'salesperson') {
+        this._budgetDraft = {}; this.budgetDirty = false;
+        this.loadBudgets();
+      }
     });
   }
 
