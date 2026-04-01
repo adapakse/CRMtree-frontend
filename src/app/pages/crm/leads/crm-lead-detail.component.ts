@@ -6,8 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
-  LEAD_SOURCES, CrmUser,
+  LEAD_SOURCES, LEAD_SOURCE_LABELS, LinkedDocument, LeadHistoryEntry, CrmUser,
 } from '../../../core/services/crm-api.service';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
@@ -15,360 +16,454 @@ import { AuthService } from '../../../core/auth/auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
-<div class="detail-page" *ngIf="lead">
-  <div class="detail-header">
-    <button class="back-btn" routerLink="/crm/leads">← Leady</button>
-    <div class="header-main">
-      <h1>{{lead.company}}</h1>
-      <span class="stage-badge stage-{{lead.stage}}">{{stageLabel(lead.stage)}}</span>
-      <span *ngIf="lead.hot" class="hot-badge">🔥 Gorący</span>
+<div style="display:flex;flex-direction:column;height:100%;overflow:hidden" *ngIf="lead">
+
+  <!-- HEADER -->
+  <div style="height:56px;background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0">
+    <button style="background:none;border:none;color:#f97316;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
+    <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+      <div *ngIf="lead.logo_url && logoSasUrl" style="width:34px;height:34px;border-radius:50%;background-size:cover;background-position:center;border:1px solid #e5e7eb;flex-shrink:0;background-color:#f9fafb"
+           [style.background-image]="logoSasUrl"></div>
+      <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{lead.company}}</div>
     </div>
-    <div class="header-actions">
-      <button class="btn-outline" (click)="openEdit()">✏️ Edytuj</button>
-      <button class="btn-primary" *ngIf="!lead.converted_at" (click)="showConvert = true">→ Konwertuj na partnera</button>
+    <span class="stage-badge stage-{{lead.stage}}">{{stageLabel(lead.stage)}}</span>
+    <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 Gorący</span>
+    <div style="display:flex;gap:6px">
+      <button class="hdr-btn" *ngIf="lead.phone"  (click)="mockCall()"  title="Zadzwoń: {{lead.phone}}">📞</button>
+      <button class="hdr-btn" *ngIf="lead.email"  (click)="mockEmail()" title="Email: {{lead.email}}">✉️</button>
+      <button class="hdr-btn hdr-btn-edit" (click)="openEdit()">✏️ Edytuj</button>
+      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">→ Konwertuj</button>
     </div>
   </div>
 
-  <div class="detail-body">
-    <div class="info-card">
-      <h3>Informacje</h3>
-      <div class="info-grid">
-        <span class="lbl">Kontakt</span><span>{{lead.contact_name || '—'}}<span class="sub" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span>
-        <span class="lbl">Email</span><span>{{lead.email || '—'}}</span>
-        <span class="lbl">Telefon</span><span>{{lead.phone || '—'}}</span>
-        <span class="lbl">Branża</span><span>{{lead.industry || '—'}}</span>
-        <span class="lbl">Źródło</span><span>{{sourceLabel(lead.source) || '—'}}</span>
-        <span class="lbl">Obrót roczny</span><span>{{(lead.value_pln || 0) | number:'1.0-0'}} {{lead.annual_turnover_currency || 'PLN'}}</span>
+  <!-- BODY: 3 kolumny -->
+  <div style="flex:1;display:grid;grid-template-columns:280px 1fr 340px;gap:0;overflow:hidden;min-height:0">
+
+    <!-- LEWA: Informacje -->
+    <div style="border-right:1px solid #e5e7eb;overflow-y:auto;padding:16px">
+
+      <!-- Kontakt -->
+      <div class="info-section">
+        <div class="info-section-title">Kontakt</div>
+        <div class="info-kv" *ngIf="lead.website"><span class="lbl">WWW</span><span class="val"><a class="link" [href]="'https://'+lead.website" target="_blank">{{lead.website}}</a></span></div>
+        <div class="info-kv"><span class="lbl">Firma</span><span class="val fw">{{lead.company}}</span></div>
+        <div class="info-kv" *ngIf="lead.contact_name"><span class="lbl">Osoba</span><span class="val">{{lead.contact_name}}<span style="color:#9ca3af" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span></div>
+        <div class="info-kv" *ngIf="lead.email">
+          <span class="lbl">Email</span>
+          <a class="val link" href="mailto:{{lead.email}}">{{lead.email}}</a>
         </div>
-        <div class="info-row">
-          <span class="lbl">% Online</span><span>{{lead.online_pct != null ? lead.online_pct + '%' : '—'}}</span>
-        <span class="lbl">% Szansa</span><span>{{lead.probability || 0}}%</span>
-        <span class="lbl">Data zamkn.</span><span>{{lead.close_date ? (lead.close_date | date:'dd.MM.yyyy') : '—'}}</span>
-        <span class="lbl">Handlowiec</span><span>{{lead.assigned_to_name || '—'}}</span>
-        <span class="lbl">Tagi</span><span>{{lead.tags?.join(', ') || '—'}}</span>
-        <span class="lbl">Notatki</span><span class="notes">{{lead.notes || '—'}}</span>
+        <div class="info-kv" *ngIf="lead.phone">
+          <span class="lbl">Telefon</span>
+          <span class="val">
+            <a class="link" href="tel:{{lead.phone}}">{{lead.phone}}</a>
+            <button style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;opacity:.6" (click)="mockCall()" title="Zadzwoń">📞</button>
+          </span>
+        </div>
+        <div class="info-kv" *ngIf="lead.industry"><span class="lbl">Branża</span><span class="val">{{lead.industry}}</span></div>
+        <div class="info-kv" *ngIf="lead.source"><span class="lbl">Źródło</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
+      </div>
+
+      <!-- Dane Agenta -->
+      <div class="info-section" *ngIf="lead.agent_name || lead.agent_email || lead.agent_phone">
+        <div class="info-section-title" style="color:#f97316">🤝 Agent</div>
+        <div class="info-kv" *ngIf="lead.agent_name"><span class="lbl">Imię i nazwisko</span><span class="val fw">{{lead.agent_name}}</span></div>
+        <div class="info-kv" *ngIf="lead.agent_email">
+          <span class="lbl">Email</span>
+          <a class="val link" href="mailto:{{lead.agent_email}}">{{lead.agent_email}}</a>
+        </div>
+        <div class="info-kv" *ngIf="lead.agent_phone"><span class="lbl">Telefon</span><span class="val">{{lead.agent_phone}}</span></div>
+      </div>
+
+      <!-- Pipeline -->
+      <div class="info-section">
+        <div class="info-section-title">Pipeline</div>
+        <div class="info-kv"><span class="lbl">Wartość</span><span class="val" style="color:#f97316;font-family:'Sora',sans-serif;font-weight:700">{{(lead.value_pln||0)|number:'1.0-0'}} {{lead.annual_turnover_currency||'PLN'}}</span></div>
+        <div class="info-kv"><span class="lbl">Etap</span><span class="val"><span class="stage-badge stage-{{lead.stage}}" style="font-size:10px">{{stageLabel(lead.stage)}}</span></span></div>
+        <div class="info-kv"><span class="lbl">Szansa</span><span class="val">{{lead.probability||0}}%</span></div>
+        <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">% Online</span><span class="val">{{lead.online_pct}}%</span></div>
+        <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">Data zamkn.</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
+        <div class="info-kv" *ngIf="lead.assigned_to_name"><span class="lbl">Handlowiec</span><span class="val fw">{{lead.assigned_to_name}}</span></div>
+      </div>
+
+      <!-- Tagi i notatki -->
+      <div class="info-section" *ngIf="lead.tags?.length || lead.notes">
+        <div class="info-section-title">Dodatkowe</div>
+        <div *ngIf="lead.tags?.length" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+          <span *ngFor="let t of lead.tags" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px">{{t}}</span>
+        </div>
+        <div *ngIf="lead.notes" style="font-size:12px;color:#6b7280;white-space:pre-line;line-height:1.5">{{lead.notes}}</div>
+      </div>
+
+      <!-- Powiązane dokumenty -->
+      <div class="info-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="info-section-title" style="margin-bottom:0">📎 Dokumenty ({{linkedDocs.length}})</div>
+          <button class="btn-sm" (click)="showDocPicker=true" style="font-size:10px">+ Dodaj</button>
+        </div>
+        <div *ngIf="linkedDocs.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">Brak</div>
+        <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer" (click)="openDocument(d)" title="Otwórz dokument">
+          <span style="font-size:13px">📄</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title||'#'+d.document_id}}</div>
+            <div style="font-size:10px;color:#9ca3af"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span>{{d.doc_type}}</div>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:11px;padding:2px" (click)="$event.stopPropagation();unlinkDoc(d)">✕</button>
+        </div>
       </div>
     </div>
 
-    <div class="activities-card">
-      <div class="card-header">
-        <h3>Aktywności</h3>
-        <button class="btn-sm" (click)="showNewActivity = !showNewActivity">+ Dodaj</button>
+    <!-- ŚRODEK: Aktywności (tabs: Aktywności | Historia) -->
+    <div style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+      <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0">
+        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">Aktywności <span *ngIf="lead.activities?.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{lead.activities!.length}}</span></button>
+        <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history';loadHistory()">Historia <span *ngIf="history.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{history.length}}</span></button>
       </div>
-      <div class="new-activity-form" *ngIf="showNewActivity">
-        <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
-          <option value="call">📞 Połączenie</option>
-          <option value="email">📧 Email</option>
-          <option value="meeting">🤝 Spotkanie</option>
-          <option value="note">📝 Notatka</option>
-          <option value="doc_sent">📄 Dokument</option>
-        </select>
-        <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
-        <!-- Pola tylko dla spotkania -->
-        <ng-container *ngIf="actForm.type === 'meeting'">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+
+      <!-- Aktywności tab -->
+      <div *ngIf="midTab==='activities'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn-sm primary" (click)="showNewActivity=!showNewActivity">+ Dodaj aktywność</button>
+        </div>
+
+        <!-- Nowa aktywność form -->
+        <div *ngIf="showNewActivity" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
+          <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
+            <option value="call">📞 Połączenie</option>
+            <option value="email">📧 Email</option>
+            <option value="meeting">🤝 Spotkanie</option>
+            <option value="note">📝 Notatka</option>
+            <option value="doc_sent">📄 Dokument</option>
+          </select>
+          <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
+          <ng-container *ngIf="actForm.type==='meeting'">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Data i czas<input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px"></label>
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Czas trwania (min)<input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label>
+            </div>
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Miejsce spotkania<input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A" class="act-input" style="font-size:11px"></label>
             <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Data i czas
-              <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
-            </label>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Czas trwania (min)
-              <input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="np. 60" class="act-input" style="font-size:11px">
-            </label>
-          </div>
-          <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-            Miejsce spotkania
-            <input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A, Warszawa" class="act-input" style="font-size:11px">
-          </label>
-          <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-            Uczestnicy (emaile)
-            <div class="participant-input-wrap">
-              <div class="participant-chips">
-                <span *ngFor="let e of actForm.participantList; let i = index" class="participant-chip">
-                  {{e}} <button (click)="removeParticipant(actForm, i)" type="button">✕</button>
-                </span>
-                <input class="participant-input" [(ngModel)]="participantQuery"
-                       (ngModelChange)="filterSuggestions()"
-                       (keydown.enter)="addParticipantFromInput(actForm)"
-                       (keydown.Tab)="addParticipantFromInput(actForm)"
-                       placeholder="Wpisz email lub imię…" autocomplete="off">
-              </div>
-              <div class="suggestions-dropdown" *ngIf="filteredSuggestions.length && participantQuery">
-                <div *ngFor="let s of filteredSuggestions" class="suggestion-item"
-                     (mousedown)="pickSuggestion(actForm, s)">
-                  <span style="font-weight:600">{{s.name}}</span>
-                  <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
+              Uczestnicy
+              <div class="participant-input-wrap">
+                <div class="participant-chips">
+                  <span *ngFor="let e of actForm.participantList; let i=index" class="participant-chip">{{e}}<button (click)="removeParticipant(actForm,i)" type="button">✕</button></span>
+                  <input class="participant-input" [(ngModel)]="participantQuery" (ngModelChange)="filterSuggestions()" (keydown.enter)="addParticipantFromInput(actForm)" (keydown.Tab)="addParticipantFromInput(actForm)" placeholder="Wpisz email…" autocomplete="off">
+                </div>
+                <div class="suggestions-dropdown" *ngIf="filteredSuggestions.length && participantQuery">
+                  <div *ngFor="let s of filteredSuggestions" class="suggestion-item" (mousedown)="pickSuggestion(actForm,s)"><span style="font-weight:600">{{s.name}}</span><span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span></div>
                 </div>
               </div>
-            </div>
-          </label>
-        </ng-container>
-        <textarea [(ngModel)]="actForm.body" placeholder="Treść…" rows="2" class="act-input"></textarea>
-        <div class="act-actions">
-          <button class="btn-sm" (click)="showNewActivity = false">Anuluj</button>
-          <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
-            {{savingActivity ? '…' : 'Zapisz'}}
-          </button>
+            </label>
+          </ng-container>
+          <textarea [(ngModel)]="actForm.body" placeholder="Treść…" rows="2" class="act-input"></textarea>
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn-sm" (click)="showNewActivity=false">Anuluj</button>
+            <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title||savingActivity">{{savingActivity?'…':'Zapisz'}}</button>
+          </div>
         </div>
-      </div>
-      <div class="activity-list">
-        <div *ngFor="let a of lead.activities || []" class="act-item">
+
+        <!-- Lista aktywności -->
+        <div *ngFor="let a of lead.activities||[]" class="act-item">
           <span class="act-type-icon">{{actIcon(a.type)}}</span>
-          <div class="act-body" *ngIf="editingActId !== a.id">
+          <div class="act-body" *ngIf="editingActId!==a.id">
             <strong>{{a.title}}</strong>
-            <div class="act-meta">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · {{a.created_by_name}}</div>
+            <div class="act-meta">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · {{a.created_by_name}}</div>
             <div *ngIf="a.meeting_location" class="act-text">📍 {{a.meeting_location}}</div>
             <div *ngIf="a.participants" class="act-text">👥 {{a.participants}}</div>
             <div class="act-text" *ngIf="a.body">{{a.body}}</div>
           </div>
-          <div class="act-body act-edit-form" *ngIf="editingActId === a.id">
-            <select [(ngModel)]="actEditForm.type" class="act-sel">
-              <option value="call">📞 Połączenie</option>
-              <option value="email">📧 Email</option>
-              <option value="meeting">🤝 Spotkanie</option>
-              <option value="note">📝 Notatka</option>
-              <option value="doc_sent">📄 Dokument</option>
-            </select>
+          <div class="act-body act-edit-form" *ngIf="editingActId===a.id">
+            <select [(ngModel)]="actEditForm.type" class="act-sel"><option value="call">📞 Połączenie</option><option value="email">📧 Email</option><option value="meeting">🤝 Spotkanie</option><option value="note">📝 Notatka</option><option value="doc_sent">📄 Dokument</option></select>
             <input [(ngModel)]="actEditForm.title" placeholder="Tytuł *" class="act-input">
-            <ng-container *ngIf="actEditForm.type === 'meeting'">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                  Data i czas
-                  <input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input" style="font-size:11px">
-                </label>
-                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                  Czas trwania (min)
-                  <input type="number" min="0" [(ngModel)]="actEditForm.duration_min" placeholder="60" class="act-input" style="font-size:11px">
-                </label>
-              </div>
-              <input [(ngModel)]="actEditForm.meeting_location" placeholder="Miejsce spotkania" class="act-input">
-              <input [(ngModel)]="actEditForm.participants" placeholder="Uczestnicy (emaile oddzielone przecinkiem)" class="act-input">
-            </ng-container>
+            <ng-container *ngIf="actEditForm.type==='meeting'"><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Data i czas<input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input" style="font-size:11px"></label><label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Czas trwania (min)<input type="number" min="0" [(ngModel)]="actEditForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label></div><input [(ngModel)]="actEditForm.meeting_location" placeholder="Miejsce spotkania" class="act-input"><input [(ngModel)]="actEditForm.participants" placeholder="Uczestnicy" class="act-input"></ng-container>
             <textarea [(ngModel)]="actEditForm.body" placeholder="Treść…" rows="2" class="act-input"></textarea>
-            <div class="act-actions">
-              <button class="btn-sm" (click)="cancelEditActivity()">Anuluj</button>
-              <button class="btn-sm primary" (click)="saveEditActivity(a)" [disabled]="!actEditForm.title || savingActivity">
-                {{savingActivity ? '…' : 'Zapisz'}}
-              </button>
-            </div>
+            <div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-sm" (click)="cancelEditActivity()">Anuluj</button><button class="btn-sm primary" (click)="saveEditActivity(a)" [disabled]="!actEditForm.title||savingActivity">{{savingActivity?'…':'Zapisz'}}</button></div>
           </div>
-          <div class="act-controls" *ngIf="editingActId !== a.id && canEditActivity(a)">
+          <div class="act-controls" *ngIf="editingActId!==a.id&&canEditActivity(a)">
             <button class="act-ctrl-btn" (click)="startEditActivity(a)" title="Edytuj">✏️</button>
             <button class="act-ctrl-btn del" (click)="deleteActivity(a)" title="Usuń">🗑️</button>
           </div>
         </div>
-        <div class="empty-act" *ngIf="!(lead.activities?.length)">Brak aktywności.</div>
+        <div *ngIf="!(lead.activities?.length)" class="empty-act">Brak aktywności. Dodaj pierwszą powyżej.</div>
+      </div>
+
+      <!-- Historia tab -->
+      <div *ngIf="midTab==='history'" style="flex:1;overflow-y:auto;padding:16px">
+        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">Ładowanie historii…</div>
+        <div *ngIf="!historyLoading && history.length===0" style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">Brak wpisów historii.</div>
+        <div *ngFor="let h of history" class="hist-item">
+          <div class="hist-dot" [style.background]="histColor(h.action)"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#374151">{{histLabel(h)}}</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:1px">{{h.created_at|date:'dd.MM.yyyy HH:mm'}} · {{h.user_name||h.user_email||'System'}}</div>
+            <div *ngIf="histDetail(h)" style="font-size:11px;color:#6b7280;margin-top:3px;background:#f9fafb;border-radius:4px;padding:4px 6px">{{histDetail(h)}}</div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Edit modal -->
-  <div class="modal-overlay" *ngIf="showEdit" (click)="showEdit = false">
-    <div class="modal modal-wide" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Edytuj lead</h3>
-        <button class="close-btn" (click)="showEdit = false">✕</button>
-      </div>
-      <div class="modal-body">
+    <!-- PRAWA: Mock call/email + Konwertuj info -->
+    <div style="border-left:1px solid #e5e7eb;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
 
-        <div class="edit-section">
-          <div class="edit-section-title">Podstawowe</div>
-          <div class="edit-row">
-            <label>Nazwa firmy *<input [(ngModel)]="editForm.company" placeholder="Nazwa firmy" required></label>
-            <label>Etap
-              <select [(ngModel)]="editForm.stage">
-                <option *ngFor="let s of stageOptions" [value]="s.key">{{s.label}}</option>
-              </select>
-            </label>
+      <!-- Mock akcje komunikacyjne -->
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:10px">📞 Komunikacja</div>
+        <button class="comm-btn" (click)="mockCall()" [disabled]="!lead.phone">
+          <span style="font-size:16px">📞</span>
+          <div style="flex:1;text-align:left">
+            <div style="font-size:12px;font-weight:600">Zadzwoń</div>
+            <div style="font-size:10px;color:#9ca3af">{{lead.phone||'Brak numeru'}}</div>
           </div>
-          <div class="edit-row" *ngIf="editForm.stage === 'closed_lost'">
-            <label class="full" style="color:#991b1b">
-              Powód przegranej *
-              <input [(ngModel)]="editForm.lost_reason"
-                     placeholder="np. Cena, Konkurencja, Brak budżetu, Brak decyzji…"
-                     [style.border-color]="editForm.stage === 'closed_lost' && !editForm.lost_reason ? '#ef4444' : ''">
-              <span style="font-size:11px;color:#9ca3af;font-weight:400">Podaj krótki powód — pojawi się w raportach</span>
-            </label>
-          </div>
-          <div class="edit-row">
-            <label class="check-label"><input type="checkbox" [(ngModel)]="editForm.hot"> 🔥 Gorący lead</label>
-          </div>
-        </div>
-
-        <div class="edit-section">
-          <div class="edit-section-title">Kontakt</div>
-          <div class="edit-row">
-            <label>Imię i nazwisko<input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"></label>
-            <label>Stanowisko<input [(ngModel)]="editForm.contact_title" placeholder="CEO"></label>
-          </div>
-          <div class="edit-row">
-            <label>Email<input [(ngModel)]="editForm.email" type="email" placeholder="jan@firma.pl"></label>
-            <label>Telefon<input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"></label>
-          </div>
-        </div>
-
-        <div class="edit-section">
-          <div class="edit-section-title">Szczegóły sprzedażowe</div>
-          <div class="edit-row">
-            <label>Obrót roczny
-              <div style="display:flex;gap:6px">
-                <input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1">
-                <select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px">
-                  <option value="PLN">PLN</option>
-                  <option value="EUR">EUR</option>
-                  <option value="USD">USD</option>
-                  <option value="GBP">GBP</option>
-                  <option value="CHF">CHF</option>
-                </select>
-              </div>
-            </label>
-            <label>% Online (udział kanału online)
-              <select [(ngModel)]="editForm.online_pct">
-                <option value="">— brak —</option>
-                <option value="0">0%</option>
-                <option value="10">10%</option>
-                <option value="20">20%</option>
-                <option value="30">30%</option>
-                <option value="40">40%</option>
-                <option value="50">50%</option>
-                <option value="60">60%</option>
-                <option value="70">70%</option>
-                <option value="80">80%</option>
-                <option value="90">90%</option>
-                <option value="100">100%</option>
-              </select>
-            </label>
-            <label>% Szansa
-              <select [(ngModel)]="editForm.probability">
-                <option value="">— brak —</option>
-                <option value="0">0%</option>
-                <option value="10">10%</option>
-                <option value="20">20%</option>
-                <option value="30">30%</option>
-                <option value="40">40%</option>
-                <option value="50">50%</option>
-                <option value="60">60%</option>
-                <option value="70">70%</option>
-                <option value="80">80%</option>
-                <option value="90">90%</option>
-                <option value="100">100%</option>
-              </select>
-            </label>
-          </div>
-          <div class="edit-row">
-            <label>Data zamknięcia<input [(ngModel)]="editForm.close_date" type="date"></label>
-            <label>Źródło
-              <select [(ngModel)]="editForm.source">
-                <option value="">— brak —</option>
-                <option *ngFor="let s of leadSources" [value]="s.value">{{s.label}}</option>
-              </select>
-            </label>
-          </div>
-          <div class="edit-row">
-            <label>Branża<input [(ngModel)]="editForm.industry" placeholder="np. IT, finanse"></label>
-            <label>Handlowiec
-              <select [(ngModel)]="editForm.assigned_to">
-                <option value="">— nieprzypisany —</option>
-                <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
-              </select>
-            </label>
-          </div>
-          <div class="edit-row">
-            <label class="full">Tagi (oddzielone przecinkiem)<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
-          </div>
-        </div>
-
-        <div class="edit-section">
-          <div class="edit-section-title">Notatki</div>
-          <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-outline" (click)="showEdit = false">Anuluj</button>
-        <button class="btn-primary" (click)="saveLead()" [disabled]="saving || !editForm.company">
-          {{saving ? 'Zapisywanie…' : 'Zapisz zmiany'}}
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Convert dialog -->
-  <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert = false">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>Konwertuj lead na partnera</h3>
-      <p>Firma <strong>{{lead.company}}</strong> zostanie przeniesiona do rejestru partnerów.</p>
-      <label>Wartość kontraktu (PLN)<input [(ngModel)]="convertForm.contract_value" type="number" min="0"></label>
-      <label>Data podpisania<input [(ngModel)]="convertForm.contract_signed" type="date"></label>
-      <div class="modal-actions">
-        <button class="btn-outline" (click)="showConvert = false">Anuluj</button>
-        <button class="btn-primary" (click)="convertLead()" [disabled]="converting">
-          {{converting ? '…' : 'Konwertuj'}}
+        <button class="comm-btn" (click)="mockEmail()" [disabled]="!lead.email" style="margin-top:6px">
+          <span style="font-size:16px">✉️</span>
+          <div style="flex:1;text-align:left">
+            <div style="font-size:12px;font-weight:600">Wyślij email</div>
+            <div style="font-size:10px;color:#9ca3af">{{lead.email||'Brak adresu'}}</div>
+          </div>
         </button>
+        <div *ngIf="mockCallActive" style="margin-top:8px;background:#dcfce7;border-radius:6px;padding:8px;font-size:11px;color:#15803d;text-align:center">
+          🔔 Symulacja połączenia z {{lead.phone}}…
+          <button (click)="mockCallActive=false" style="background:none;border:none;cursor:pointer;color:#15803d;margin-left:8px;font-weight:700">Rozłącz</button>
+        </div>
+        <div *ngIf="mockEmailActive" style="margin-top:8px;background:#dbeafe;border-radius:6px;padding:8px;font-size:11px;color:#1d4ed8;text-align:center">
+          📧 Otwieranie klienta email dla {{lead.email}}…
+        </div>
+      </div>
+
+      <!-- Status leada quick-change -->
+      <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:10px">Etap sprzedaży</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <button *ngFor="let s of stageOptions" class="stage-btn"
+                  [class.active]="lead.stage===s.key"
+                  (click)="quickChangeStage(s.key)"
+                  [disabled]="lead.stage===s.key">
+            <span class="stage-dot stage-dot-{{s.key}}"></span>
+            {{s.label}}
+            <span *ngIf="lead.stage===s.key" style="margin-left:auto;font-size:10px;opacity:.7">✓ aktualny</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Konwersja -->
+      <div *ngIf="!lead.converted_at" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">→ Konwersja</div>
+        <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Przekształć lead w Partnera gdy jest gotowy do podpisania umowy.</div>
+        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">Konwertuj na Partnera →</button>
+      </div>
+      <div *ngIf="lead.converted_at" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">✓ Skonwertowany</div>
+        <div style="font-size:11px;color:#9ca3af">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
       </div>
     </div>
   </div>
 </div>
-<div *ngIf="!lead && !loading" class="not-found">{{ loadError ? 'Błąd ładowania leada.' : 'Lead nie znaleziony.' }}</div>
-<div *ngIf="loading" class="loading">Ładowanie…</div>
+
+<div *ngIf="!lead&&!loading" style="padding:40px;text-align:center;color:#9ca3af">
+  {{ loadError ? 'Błąd ładowania leada.' : 'Lead nie znaleziony.' }}
+</div>
+<div *ngIf="loading" style="padding:40px;text-align:center;color:#9ca3af">Ładowanie…</div>
+
+<!-- Edit modal -->
+<div class="modal-overlay" *ngIf="showEdit" (click)="showEdit=false">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Edytuj lead</h3>
+      <button class="close-btn" (click)="showEdit=false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="edit-section">
+        <div class="edit-section-title">Podstawowe</div>
+        <div class="edit-row">
+          <label>Nazwa firmy *<input [(ngModel)]="editForm.company" placeholder="Nazwa firmy" required></label>
+          <label>Etap<select [(ngModel)]="editForm.stage"><option *ngFor="let s of stageOptions" [value]="s.key">{{s.label}}</option></select></label>
+        </div>
+        <div class="edit-row" *ngIf="editForm.stage==='closed_lost'">
+          <label class="full" style="color:#991b1b">Powód przegranej *<input [(ngModel)]="editForm.lost_reason" placeholder="np. Cena, Konkurencja…" [style.border-color]="editForm.stage==='closed_lost'&&!editForm.lost_reason?'#ef4444':''"></label>
+        </div>
+        <div class="edit-row"><label class="check-label"><input type="checkbox" [(ngModel)]="editForm.hot"> 🔥 Gorący lead</label></div>
+      </div>
+      <!-- WWW + Enrich -->
+      <div class="edit-section">
+        <div class="edit-section-title">Strona WWW</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input style="flex:1;border:1px solid #d1d5db;border-radius:6px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit"
+                 [(ngModel)]="editForm.website" placeholder="np. acme.pl"
+                 (keydown.enter)="runDetailEnrich()">
+          <button class="btn-outline" style="white-space:nowrap;flex-shrink:0"
+                  (click)="runDetailEnrich()"
+                  [disabled]="!editForm.website||detailEnriching">
+            {{detailEnriching ? '⏳ Pobieranie…' : '🔍 Pobierz dane'}}
+          </button>
+        </div>
+        <div *ngIf="detailEnrichDone" style="margin-top:6px;font-size:11px;color:#15803d;background:#f0fdf4;border-radius:6px;padding:5px 10px">
+          ✓ Dane pobrane — sprawdź pola poniżej
+        </div>
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">Kontakt</div>
+        <div class="edit-row">
+          <label>Imię i nazwisko<input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"></label>
+          <label>Stanowisko
+              <select [(ngModel)]="editForm.contact_title">
+                <option value="">— brak —</option>
+                <option *ngFor="let t of dictTitles" [value]="t">{{t}}</option>
+              </select>
+            </label>
+        </div>
+        <div class="edit-row">
+          <label>Email<input [(ngModel)]="editForm.email" type="email" placeholder="jan@firma.pl"></label>
+          <label>Telefon<input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"></label>
+        </div>
+      </div>
+      <div class="edit-section">
+        <div class="edit-section-title">Szczegóły sprzedażowe</div>
+        <div class="edit-row">
+          <label>Obrót roczny<div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
+          <label>% Online<select [(ngModel)]="editForm.online_pct"><option value="">— brak —</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+        </div>
+        <div class="edit-row">
+          <label>% Szansa<select [(ngModel)]="editForm.probability"><option value="">— brak —</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+          <label>Data zamknięcia<input [(ngModel)]="editForm.close_date" type="date"></label>
+        </div>
+        <div class="edit-row">
+          <label>Źródło<select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()"><option value="">— brak —</option><option *ngFor="let s of leadSources" [value]="s.value">{{s.label}}</option></select></label>
+          <label>Branża
+          <select [(ngModel)]="editForm.industry">
+            <option value="">— brak —</option>
+            <option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option>
+          </select>
+        </label>
+        </div>
+        <ng-container *ngIf="editForm.source==='agent'">
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#f97316">🤝 Dane Agenta</div>
+            <div class="edit-row">
+              <label>Imię i nazwisko<input [(ngModel)]="editForm.agent_name" placeholder="Jan Kowalski"></label>
+              <label>Telefon<input [(ngModel)]="editForm.agent_phone" placeholder="+48 600 000 000"></label>
+            </div>
+            <div class="edit-row"><label class="full">Email<input [(ngModel)]="editForm.agent_email" type="email" placeholder="agent@firma.pl"></label></div>
+          </div>
+        </ng-container>
+        <div class="edit-row">
+          <label>Handlowiec<select [(ngModel)]="editForm.assigned_to"><option value="">— nieprzypisany —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select></label>
+          <label class="full">Tagi (oddzielone przecinkiem)<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
+        </div>
+      </div>
+      <div class="edit-section">
+        <div class="edit-section-title">Notatki</div>
+        <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="showEdit=false">Anuluj</button>
+      <button class="btn-primary" (click)="saveLead()" [disabled]="saving||!editForm.company">{{saving?'Zapisywanie…':'Zapisz zmiany'}}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Document Picker Modal -->
+<div class="modal-overlay" *ngIf="showDocPicker" (click)="showDocPicker=false">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%)">
+    <div class="modal-header"><h3>📎 Dodaj powiązany dokument</h3><button class="close-btn" (click)="showDocPicker=false">✕</button></div>
+    <div class="modal-body" style="gap:10px">
+      <div style="font-size:12px;color:#6b7280">Wyszukaj dokumenty po nazwie, numerze lub podmiocie.</div>
+      <input class="act-input" style="font-size:13px;padding:8px 12px" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch()" placeholder="Szukaj dokumentu…">
+      <div *ngIf="docSearching" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Wyszukuję…</div>
+      <div *ngIf="!docSearching&&docResults.length===0&&docSearch.length>1" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Brak wyników</div>
+      <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
+        <div *ngFor="let doc of docResults" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer" [style.background]="isLinked(doc.id)?'#f0fdf4':'white'" (click)="toggleLinkDoc(doc)">
+          <span style="font-size:16px">📄</span>
+          <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div><div style="font-size:10px;color:#9ca3af"><span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>{{doc.doc_type}}</div></div>
+          <span *ngIf="isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
+          <span *ngIf="!isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-outline" (click)="showDocPicker=false">Zamknij</button></div>
+  </div>
+</div>
+
+<!-- Convert dialog -->
+<div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Konwertuj lead na partnera</h3>
+    <p>Firma <strong>{{lead?.company}}</strong> zostanie przeniesiona do rejestru partnerów.</p>
+    <label>Wartość kontraktu (PLN)<input [(ngModel)]="convertForm.contract_value" type="number" min="0"></label>
+    <label>Data podpisania<input [(ngModel)]="convertForm.contract_signed" type="date"></label>
+    <div class="modal-actions">
+      <button class="btn-outline" (click)="showConvert=false">Anuluj</button>
+      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'Konwertuj'}}</button>
+    </div>
+  </div>
+</div>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
-    .detail-page { padding:20px; max-width:900px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
-    .detail-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; flex-shrink:0; }
-    .back-btn { background:none; border:none; color:#f97316; cursor:pointer; font-size:13px; }
-    .header-main { display:flex; align-items:center; gap:10px; flex:1; flex-wrap:wrap; }
-    .header-main h1 { font-size:22px; font-weight:800; margin:0; }
-    .stage-badge { padding:3px 10px; border-radius:10px; font-size:12px; font-weight:700; }
+    .hdr-btn { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:5px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; }
+    .hdr-btn:hover { background:#f9fafb; }
+    .hdr-btn-edit { border-color:#d1d5db; }
+    .hdr-btn-primary { background:#f97316; color:white; border-color:#f97316; }
+    .hdr-btn-primary:hover { background:#ea6a0a; }
+    .info-section { margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #f3f4f6; }
+    .info-section:last-child { border-bottom:none; }
+    .info-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#9ca3af; margin-bottom:8px; }
+    .info-kv { display:flex; gap:8px; align-items:flex-start; margin-bottom:5px; font-size:12.5px; }
+    .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; min-width:72px; padding-top:1px; }
+    .val { color:#374151; flex:1; }
+    .val.fw { font-weight:600; color:#18181b; }
+    .link { color:#f97316; text-decoration:none; }
+    .link:hover { text-decoration:underline; }
+    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; padding:12px 16px; font-size:12.5px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; }
+    .tab-btn.active { color:#f97316; border-bottom-color:#f97316; }
+    .tab-btn:hover:not(.active) { color:#374151; }
+    .stage-badge { padding:2px 9px; border-radius:10px; font-size:11px; font-weight:700; }
     .stage-new{background:#f3f4f6;color:#374151} .stage-qualification{background:#dbeafe;color:#1e40af}
     .stage-presentation{background:#fef3c7;color:#92400e} .stage-offer{background:#f3e8ff;color:#6b21a8}
     .stage-negotiation{background:#ffedd5;color:#9a3412} .stage-closed_won{background:#dcfce7;color:#166534}
     .stage-closed_lost{background:#fee2e2;color:#991b1b}
-    .hot-badge { background:#fef3c7; color:#92400e; font-size:11px; padding:2px 8px; border-radius:8px; font-weight:700; }
-    .header-actions { display:flex; gap:8px; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
-    .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
-    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .detail-body { display:grid; grid-template-columns:300px 1fr; gap:16px; flex:1; overflow:hidden; min-height:0; }
-    @media(max-width:700px) { .detail-body { grid-template-columns:1fr; } }
-    .info-card, .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
-    .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
-    .info-grid { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; }
-    .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; padding-top:2px; }
-    .sub { color:#9ca3af; }
-    .notes { white-space:pre-line; }
-    .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .card-header h3 { margin:0; }
-    .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:3px 10px; cursor:pointer; }
-    .btn-sm.primary { background:#f97316; color:white; border-color:#f97316; }
-    .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; display:flex; flex-direction:column; gap:7px; }
-    .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
-    .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; }
-    .act-actions { display:flex; gap:6px; justify-content:flex-end; }
-    .activity-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
-    .act-item { display:flex; gap:10px; }
-    .act-type-icon { font-size:18px; }
+    .stage-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:7px; background:white; font-size:12px; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
+    .stage-btn:hover:not(:disabled) { background:#fff7ed; border-color:#f97316; }
+    .stage-btn.active { background:#fff7ed; border-color:#f97316; color:#9a3412; font-weight:600; }
+    .stage-btn:disabled { cursor:default; }
+    .stage-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .stage-dot-new{background:#94a3b8} .stage-dot-qualification{background:#f59e0b} .stage-dot-presentation{background:#3b82f6}
+    .stage-dot-offer{background:#a855f7} .stage-dot-negotiation{background:#f97316} .stage-dot-closed_won{background:#22c55e} .stage-dot-closed_lost{background:#ef4444}
+    .comm-btn { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid #bbf7d0; border-radius:8px; background:white; cursor:pointer; width:100%; transition:background .15s; }
+    .comm-btn:hover:not(:disabled) { background:#f0fdf4; }
+    .comm-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .act-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #f4f4f5; }
+    .act-item:last-child { border-bottom:none; }
+    .act-type-icon { font-size:18px; flex-shrink:0; }
     .act-body { flex:1; }
-    .act-body strong { font-size:13px; }
-    .act-meta { font-size:10px; color:#9ca3af; }
-    .act-text { font-size:12px; color:#6b7280; margin-top:2px; white-space:pre-line; }
-    .act-edit-form { display:flex;flex-direction:column;gap:6px; }
-    .act-controls { display:flex;gap:4px;align-self:flex-start;opacity:0;transition:opacity .15s; }
+    .act-body strong { font-size:12.5px; }
+    .act-meta { font-size:10px; color:#9ca3af; margin-top:1px; }
+    .act-text { font-size:11.5px; color:#6b7280; margin-top:2px; white-space:pre-line; }
+    .act-edit-form { display:flex; flex-direction:column; gap:6px; }
+    .act-controls { display:flex; gap:4px; align-self:flex-start; opacity:0; transition:opacity .15s; }
     .act-item:hover .act-controls { opacity:1; }
-    .act-ctrl-btn { background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;color:#9ca3af; }
-    .act-ctrl-btn:hover { background:#f3f4f6;color:#374151; }
+    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 4px; border-radius:4px; color:#9ca3af; }
+    .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
     .act-ctrl-btn.del:hover { color:#ef4444; }
+    .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
+    .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; outline:none; }
+    .act-input:focus { border-color:#f97316; }
+    .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:4px 12px; cursor:pointer; }
+    .btn-sm.primary { background:#f97316; color:white; border-color:#f97316; }
+    .btn-sm:disabled { opacity:.6; cursor:not-allowed; }
+    .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:20px 0; }
     .participant-input-wrap { position:relative; }
     .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;min-height:32px;background:white; }
     .participant-chip { display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px; }
     .participant-chip button { background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px;padding:0;line-height:1; }
-    .participant-chip button:hover { color:#ef4444; }
-    .participant-input { border:none;outline:none;font-size:12px;min-width:120px;flex:1;font-family:inherit; }
+    .participant-input { border:none;outline:none;font-size:12px;min-width:100px;flex:1;font-family:inherit; }
     .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:160px;overflow-y:auto;margin-top:2px; }
     .suggestion-item { padding:7px 12px;font-size:12px;cursor:pointer; }
     .suggestion-item:hover { background:#f9fafb; }
-    .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:16px; }
-    .loading, .not-found { padding:40px; text-align:center; color:#9ca3af; }
-    /* Modal shared */
+    .hist-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #f4f4f5; align-items:flex-start; }
+    .hist-item:last-child { border-bottom:none; }
+    .hist-dot { width:8px; height:8px; border-radius:50%; margin-top:4px; flex-shrink:0; }
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
     .modal { background:white; border-radius:14px; padding:24px; width:380px; display:flex; flex-direction:column; gap:12px; }
     .modal h3 { margin:0; font-size:16px; font-weight:700; }
@@ -376,7 +471,6 @@ import { AuthService } from '../../../core/auth/auth.service';
     .modal label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
     .modal input { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; }
     .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
-    /* Edit modal */
     .modal-wide { width:min(700px,100%); max-height:86vh; overflow-y:auto; padding:0; gap:0; }
     .modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px 14px; border-bottom:1px solid #f3f4f6; position:sticky; top:0; background:white; z-index:1; }
     .modal-header h3 { margin:0; font-size:16px; font-weight:700; }
@@ -391,19 +485,41 @@ import { AuthService } from '../../../core/auth/auth.service';
     .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
     .edit-row label input:focus, .edit-row label select:focus { border-color:#f97316; }
     .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
-    .edit-textarea:focus { border-color:#f97316; }
+    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary:disabled { opacity:.6; }
+    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .check-label { flex-direction:row !important; align-items:center; gap:8px !important; font-size:13px !important; font-weight:400 !important; cursor:pointer; }
     .check-label input { width:auto; }
   `],
 })
 export class CrmLeadDetailComponent implements OnInit {
   @Input() id!: string;
-  private route  = inject(ActivatedRoute);
-  private zone   = inject(NgZone);
-  private api    = inject(CrmApiService);
-  private auth   = inject(AuthService);
-  private router = inject(Router);
-  private cdr    = inject(ChangeDetectorRef);
+  private route    = inject(ActivatedRoute);
+  private zone     = inject(NgZone);
+  private api      = inject(CrmApiService);
+  private auth     = inject(AuthService);
+  private router   = inject(Router);
+  private cdr      = inject(ChangeDetectorRef);
+  private settings = inject(AppSettingsService);
+  logoSasUrl       = '';   // SAS URL for current lead logo
+
+  // Słowniki z app_settings (pkt 5)
+  get dictStages():    { value: string; label: string }[] { return this._dictList('crm_lead_stages',    LEAD_STAGE_LABELS as any); }
+  get dictIndustries(): string[] { return this._dictArr('crm_industries', ['IT','Finance','Transport','Tourism','Healthcare','Retail','Manufacturing','Legal','Education','Other']); }
+  get dictTitles():    string[] { return this._dictArr('crm_contact_titles', ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other']); }
+
+  private _dictArr(key: string, fallback: string[]): string[] {
+    try {
+      const v = this.settings.get(key);
+      if (Array.isArray(v)) return v;
+      if (typeof v === 'string') return JSON.parse(v);
+    } catch(_) {}
+    return fallback;
+  }
+
+  private _dictList(key: string, labelMap: Record<string, string>): { value: string; label: string }[] {
+    return this._dictArr(key, Object.keys(labelMap)).map(v => ({ value: v, label: labelMap[v] || v }));
+  }
 
   lead: Lead | null = null;
   loading      = false;
@@ -416,6 +532,9 @@ export class CrmLeadDetailComponent implements OnInit {
   converting   = false;
 
   editForm: any  = {};
+  // WWW Enrichment w edycji
+  detailEnriching   = false;
+  detailEnrichDone  = false;
   actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[] };
   actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '' };
   editingActId: number | null = null;
@@ -426,8 +545,26 @@ export class CrmLeadDetailComponent implements OnInit {
   convertForm    = { contract_value: null as number | null, contract_signed: '' };
 
   crmUsers: CrmUser[] = [];
-  readonly stageOptions = Object.entries(LEAD_STAGE_LABELS).map(([key, label]) => ({ key: key as LeadStage, label }));
-  readonly leadSources  = LEAD_SOURCES;
+  get stageOptions() { return this.dictStages.map(s => ({ key: s.value as LeadStage, label: s.label })); }
+  leadSources: { value: string; label: string }[] = LEAD_SOURCES;
+
+  // Powiązane dokumenty
+  linkedDocs: LinkedDocument[]  = [];
+  showDocPicker = false;
+  docSearch     = '';
+  docResults: any[] = [];
+  docSearching  = false;
+  private docSearchTimer: any;
+
+  // Historia
+  midTab: 'activities' | 'history' = 'activities';
+  history: LeadHistoryEntry[] = [];
+  historyLoading = false;
+  private historyLoaded = false;
+
+  // Mock komunikacja
+  mockCallActive  = false;
+  mockEmailActive = false;
 
   get isManager() {
     const u = this.auth.user();
@@ -439,8 +576,14 @@ export class CrmLeadDetailComponent implements OnInit {
     const numId = parseInt(rawId, 10);
     if (!numId || isNaN(numId)) { this.loadError = true; return; }
     this.loadLead(numId);
+    this.loadLinkedDocs(numId);
     this.api.getContactSuggestions(numId).subscribe({
       next: s => { this.allSuggestions = s; },
+      error: () => {},
+    });
+    // Załaduj dynamiczne źródła z app_settings
+    this.api.getLeadSources().subscribe({
+      next: sources => { this.zone.run(() => { this.leadSources = sources; this.cdr.markForCheck(); }); },
       error: () => {},
     });
   }
@@ -454,7 +597,7 @@ export class CrmLeadDetailComponent implements OnInit {
     this.api.getLead(id).pipe(
       finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
     ).subscribe({
-      next: l  => { this.zone.run(() => { this.lead = l; this.cdr.markForCheck(); }); },
+      next: l  => { this.zone.run(() => { this.lead = l; this.historyLoaded = false; this.loadLogoSas(); this.cdr.markForCheck(); }); },
       error: () => { this.zone.run(() => { this.loadError = true; this.cdr.markForCheck(); }); },
     });
   }
@@ -479,7 +622,12 @@ export class CrmLeadDetailComponent implements OnInit {
       assigned_to:  this.lead.assigned_to || '',
       tagsStr:      (this.lead.tags || []).join(', '),
       notes:        this.lead.notes || '',
+      agent_name:   (this.lead as any).agent_name || '',
+      agent_email:  (this.lead as any).agent_email || '',
+      agent_phone:  (this.lead as any).agent_phone || '',
+      website:      (this.lead as any).website || '',
     };
+    this.detailEnrichDone = false;
     // Załaduj użytkowników CRM do selecta (zawsze, gdy lista jest pusta)
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
@@ -512,6 +660,11 @@ export class CrmLeadDetailComponent implements OnInit {
       tags:          this.editForm.tagsStr ? this.editForm.tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       notes:         this.editForm.notes || null,
       lost_reason:   this.editForm.stage === 'closed_lost' ? (this.editForm.lost_reason || null) : null,
+      agent_name:    this.editForm.source === 'agent' ? (this.editForm.agent_name || null) : null,
+      agent_email:   this.editForm.source === 'agent' ? (this.editForm.agent_email || null) : null,
+      agent_phone:   this.editForm.source === 'agent' ? (this.editForm.agent_phone || null) : null,
+      website:       (this.editForm.website || null) as any,
+      logo_url:      ((this.editForm as any).logo_url || null) as any,
     };
     this.api.updateLead(this.lead.id, payload).subscribe({
       next: updated => {
@@ -527,10 +680,44 @@ export class CrmLeadDetailComponent implements OnInit {
           }
           this.saving = false;
           this.showEdit = false;
+          // Reload logo if it was set/changed
+          if (updated.logo_url && !this.logoSasUrl) this.loadLogoSas();
           this.cdr.markForCheck();
         });
       },
       error: () => { this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  runDetailEnrich() {
+    const domain = (this.editForm.website || '').trim();
+    if (!domain) return;
+    this.detailEnriching  = true;
+    this.detailEnrichDone = false;
+    this.cdr.markForCheck();
+    this.api.enrichDomain(domain).subscribe({
+      next: (r: any) => this.zone.run(() => {
+        this.detailEnriching  = false;
+        this.detailEnrichDone = true;
+        if (r.company && !this.editForm.company)  this.editForm.company = r.company;
+        if (r.email   && !this.editForm.email)    this.editForm.email   = r.email;
+        if (r.phone   && !this.editForm.phone)    this.editForm.phone   = r.phone;
+        if (r.logo_blob_path) {
+          (this.editForm as any).logo_url = r.logo_blob_path;
+          (this.lead as any).logo_url     = r.logo_blob_path;
+          this.loadLogoSas(); // reload SAS URL for live preview
+        }
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.detailEnriching = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  loadLogoSas(): void {
+    if (!this.lead?.logo_url) return;
+    this.api.getLeadLogoImg(this.lead.id).subscribe({
+      next: blobUrl => this.zone.run(() => { this.logoSasUrl = `url('${blobUrl}')`; this.cdr.markForCheck(); }),
+      error: () => {},
     });
   }
 
@@ -703,9 +890,185 @@ export class CrmLeadDetailComponent implements OnInit {
     });
   }
 
+  // ── Historia ────────────────────────────────────────────────────
+  loadHistory(): void {
+    if (this.historyLoaded || !this.lead) return;
+    this.historyLoading = true;
+    this.cdr.markForCheck();
+    this.api.getLeadHistory(this.lead.id).subscribe({
+      next: rows => this.zone.run(() => {
+        this.history = rows;
+        this.historyLoading = false;
+        this.historyLoaded = true;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.historyLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  histLabel(h: LeadHistoryEntry): string {
+    const a = h.action;
+    const after  = h.after_state  || {};
+    const before = h.before_state || {};
+    if (a === 'crm_lead_create')    return 'Lead utworzony';
+    if (a === 'crm_lead_delete')    return 'Lead usunięty';
+    if (a === 'crm_lead_converted') return 'Lead skonwertowany na Partnera';
+    if (a === 'crm_lead_update') {
+      if (after.activity_action === 'created') return `Aktywność dodana: ${after.title || ''}`;
+      if (after.activity_action === 'deleted') return `Aktywność usunięta: ${before.title || ''}`;
+      if (after.document_action === 'linked')  return 'Dokument powiązany';
+      // Detect stage change
+      if (before.stage && after.stage && before.stage !== after.stage) {
+        const bl = (LEAD_STAGE_LABELS as any)[before.stage] || before.stage;
+        const al = (LEAD_STAGE_LABELS as any)[after.stage]  || after.stage;
+        return `Zmiana etapu: ${bl} → ${al}`;
+      }
+      // Generic field changes
+      const changed = Object.keys(after).filter(k => k !== 'updated_at' && JSON.stringify(before[k]) !== JSON.stringify(after[k]));
+      if (changed.length === 1) return `Zmieniono: ${this.fieldLabel(changed[0])}`;
+      if (changed.length > 1)  return `Zmieniono pola: ${changed.map(k => this.fieldLabel(k)).join(', ')}`;
+      return 'Zaktualizowano lead';
+    }
+    return a.replace(/_/g, ' ');
+  }
+
+  private fieldLabel(key: string): string {
+    const MAP: Record<string, string> = {
+      company: 'Firma', stage: 'Etap', hot: 'Gorący', contact_name: 'Kontakt',
+      email: 'Email', phone: 'Telefon', value_pln: 'Wartość', source: 'Źródło',
+      assigned_to: 'Handlowiec', close_date: 'Data zamk.', notes: 'Notatki',
+      probability: 'Szansa', industry: 'Branża', lost_reason: 'Powód przegranej',
+      agent_name: 'Agent', annual_turnover_currency: 'Waluta', tags: 'Tagi',
+    };
+    return MAP[key] || key;
+  }
+
+  histDetail(h: LeadHistoryEntry): string {
+    const after = h.after_state || {};
+    const before = h.before_state || {};
+    if (h.action === 'crm_lead_update' && before.stage && after.stage && before.stage !== after.stage) {
+      if (after.lost_reason) return `Powód: ${after.lost_reason}`;
+    }
+    return '';
+  }
+
+  histColor(action: string): string {
+    if (action === 'crm_lead_create') return '#22c55e';
+    if (action === 'crm_lead_delete') return '#ef4444';
+    if (action === 'crm_lead_converted') return '#f97316';
+    return '#94a3b8';
+  }
+
+  // ── Mock komunikacja ─────────────────────────────────────────────
+  mockCall(): void {
+    if (!this.lead?.phone) return;
+    this.mockCallActive  = true;
+    this.mockEmailActive = false;
+    this.cdr.markForCheck();
+    setTimeout(() => { this.mockCallActive = false; this.cdr.markForCheck(); }, 5000);
+  }
+
+  mockEmail(): void {
+    if (!this.lead?.email) return;
+    this.mockEmailActive = true;
+    this.mockCallActive  = false;
+    this.cdr.markForCheck();
+    window.location.href = `mailto:${this.lead.email}`;
+    setTimeout(() => { this.mockEmailActive = false; this.cdr.markForCheck(); }, 3000);
+  }
+
+  // ── Quick stage change ───────────────────────────────────────────
+  quickChangeStage(stage: LeadStage): void {
+    if (!this.lead || this.lead.stage === stage) return;
+    this.api.updateLead(this.lead.id, { stage } as any).subscribe({
+      next: updated => this.zone.run(() => {
+        this.lead = { ...this.lead!, ...updated, activities: this.lead!.activities };
+        this.historyLoaded = false; // reset so history reloads next time
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  onSourceChange(): void {
+    // Wyczyść dane agenta gdy zmienione źródło na inne niż 'agent'
+    if (this.editForm.source !== 'agent') {
+      this.editForm.agent_name = '';
+      this.editForm.agent_email = '';
+      this.editForm.agent_phone = '';
+    }
+  }
+
+  // ── Dokumenty powiązane ──────────────────────────────────────────
+  loadLinkedDocs(id: number): void {
+    this.api.getLeadDocuments(id).subscribe({
+      next: docs => this.zone.run(() => { this.linkedDocs = docs; this.cdr.markForCheck(); }),
+      error: () => {},
+    });
+  }
+
+  isLinked(docId: string): boolean {
+    return this.linkedDocs.some(d => d.document_id === docId);
+  }
+
+  toggleLinkDoc(doc: any): void {
+    if (!this.lead) return;
+    if (this.isLinked(doc.id)) {
+      this.api.unlinkLeadDocument(this.lead.id, doc.id).subscribe({
+        next: () => this.zone.run(() => {
+          this.linkedDocs = this.linkedDocs.filter(d => d.document_id !== doc.id);
+          this.cdr.markForCheck();
+        }),
+        error: () => {},
+      });
+    } else {
+      this.api.linkLeadDocument(this.lead.id, doc.id).subscribe({
+        next: linked => this.zone.run(() => {
+          this.linkedDocs = [...this.linkedDocs, { ...linked, document_title: doc.name, doc_number: doc.doc_number, doc_type: doc.doc_type }];
+          this.cdr.markForCheck();
+        }),
+        error: () => {},
+      });
+    }
+  }
+
+  unlinkDoc(d: LinkedDocument): void {
+    if (!this.lead || !confirm('Usunąć powiązanie z dokumentem?')) return;
+    this.api.unlinkLeadDocument(this.lead.id, d.document_id).subscribe({
+      next: () => this.zone.run(() => {
+        this.linkedDocs = this.linkedDocs.filter(x => x.document_id !== d.document_id);
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  openDocument(d: LinkedDocument): void {
+    // Navigate to documents list - the list component handles ?open= to auto-open the panel
+    this.router.navigate(['/documents'], { queryParams: { open: d.document_id } });
+  }
+
+  onDocSearch(): void {
+    clearTimeout(this.docSearchTimer);
+    if (this.docSearch.length < 2) { this.docResults = []; this.cdr.markForCheck(); return; }
+    this.docSearchTimer = setTimeout(() => {
+      this.docSearching = true;
+      this.cdr.markForCheck();
+      this.api.searchDocuments(this.docSearch).subscribe({
+        next: res => this.zone.run(() => {
+          this.docResults = res.data || [];
+          this.docSearching = false;
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => { this.docSearching = false; this.cdr.markForCheck(); }),
+      });
+    }, 350);
+  }
+
   sourceLabel(val: string | null): string {
     if (!val) return '';
-    return LEAD_SOURCES.find(s => s.value === val)?.label ?? val;
+    const found = this.leadSources.find(s => s.value === val);
+    return found?.label ?? LEAD_SOURCE_LABELS[val] ?? val;
   }
 
   stageLabel(s: LeadStage) { return LEAD_STAGE_LABELS[s] || s; }
