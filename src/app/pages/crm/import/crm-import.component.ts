@@ -37,7 +37,12 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span>online_pct</span>
       </div>
       <div class="field-hint">🔤 = wartości słownikowe — rozwiń tooltip (hover) aby zobaczyć dostępne wartości · <strong>agent_*</strong>: tylko gdy source=agent</div>
-      <button class="btn-outline" (click)="downloadTemplate('leads')">⬇ Pobierz szablon</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-outline" (click)="downloadTemplate('leads')">⬇ Pobierz szablon</button>
+        <button class="btn-outline btn-export" (click)="exportData('leads')" [disabled]="exportingType==='leads'">
+          {{ exportingType==='leads' ? '⏳…' : '📤 Eksportuj dane' }}
+        </button>
+      </div>
       <div class="drop-zone"
            [class.drag-over]="isDraggingLeads"
            [class.uploading]="uploadingLeads"
@@ -92,7 +97,12 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span>agent_name</span><span>agent_email</span><span>agent_phone</span>
       </div>
       <div class="field-hint">🔤 = wartości słownikowe (hover aby zobaczyć) · <strong>partner_number</strong>: klucz łączący z danymi sprzedażowymi · <strong>tags</strong>: oddzielone <code>|</code></div>
-      <button class="btn-outline" (click)="downloadTemplate('partners')">⬇ Pobierz szablon</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-outline" (click)="downloadTemplate('partners')">⬇ Pobierz szablon</button>
+        <button class="btn-outline btn-export" (click)="exportData('partners')" [disabled]="exportingType==='partners'">
+          {{ exportingType==='partners' ? '⏳…' : '📤 Eksportuj dane' }}
+        </button>
+      </div>
       <div class="drop-zone"
            [class.drag-over]="isDraggingPartners"
            [class.uploading]="uploadingPartners"
@@ -138,7 +148,12 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span>creation_date</span><span>signing_date</span><span>expiration_date</span>
       </div>
       <div class="field-hint">🔤 = wartości słownikowe · <strong>entities</strong>: podmioty oddzielone <code>|</code> (np. "Firma ABC|Jan Kowalski") · <strong>group_name</strong>: nazwa grupy dokumentowej</div>
-      <button class="btn-outline" (click)="downloadTemplate('documents')">⬇ Pobierz szablon</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-outline" (click)="downloadTemplate('documents')">⬇ Pobierz szablon</button>
+        <button class="btn-outline btn-export" (click)="exportData('documents')" [disabled]="exportingType==='documents'">
+          {{ exportingType==='documents' ? '⏳…' : '📤 Eksportuj dane' }}
+        </button>
+      </div>
       <div class="drop-zone"
            [class.drag-over]="isDraggingDocs"
            [class.uploading]="uploadingDocs"
@@ -266,6 +281,9 @@ import { AuthService } from '../../../core/auth/auth.service';
     .field-list span.required { background:#fef3c7; color:#92400e; font-weight:700; }
     .field-list span.key { background:#dbeafe; color:#1e40af; font-weight:700; }
     .btn-outline { display:inline-block; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; text-decoration:none; color:#374151; text-align:center; cursor:pointer; }
+    .btn-export { border-color:#f97316; color:#f97316; }
+    .btn-export:hover:not(:disabled) { background:#fff7ed; }
+    .btn-export:disabled { opacity:.6; cursor:not-allowed; }
     .btn-outline:hover { border-color:#f97316; color:#f97316; }
     .drop-zone { border:2px dashed #d1d5db; border-radius:10px; padding:28px; text-align:center; cursor:pointer; font-size:13px; color:#9ca3af; transition:.2s; }
     .drop-zone:hover, .drop-zone.drag-over { border-color:#f97316; color:#f97316; background:#fff7ed; }
@@ -335,6 +353,29 @@ export class CrmImportComponent implements OnInit {
         URL.revokeObjectURL(url);
       },
       error: () => alert('Nie udało się pobrać szablonu.'),
+    });
+  }
+
+  exportingType = '';
+
+  exportData(type: 'leads' | 'partners' | 'documents') {
+    this.exportingType = type;
+    this.cdr.markForCheck();
+    const token = this.auth.getAccessToken();
+    const headers = token ? new HttpHeaders({ Authorization: 'Bearer ' + token }) : new HttpHeaders();
+    this.http.get(`/api/crm/import/export/${type}`, { headers, responseType: 'blob' }).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const date = new Date().toISOString().slice(0, 10);
+        a.download = `export_${type}_${date}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.exportingType = '';
+        this.cdr.markForCheck();
+      },
+      error: () => { this.exportingType = ''; alert('Nie udało się wyeksportować danych.'); this.cdr.markForCheck(); },
     });
   }
 
