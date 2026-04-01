@@ -22,6 +22,8 @@ export type ProductType =
 export interface Lead {
   id: number;
   company: string;
+  website?: string;
+  logo_url?: string;
   contact_name: string | null;
   contact_title: string | null;
   email: string | null;
@@ -41,6 +43,9 @@ export interface Lead {
   annual_turnover_currency: string;
   online_pct: number | null;
   converted_at: string | null;
+  agent_name: string | null;
+  agent_email: string | null;
+  agent_phone: string | null;
   activity_count?: number;
   document_count?: number;
   activities?: LeadActivity[];
@@ -83,10 +88,30 @@ export interface CalendarMeeting {
 
 export interface LinkedDocument {
   id: number;
-  document_id: number;
+  document_id: string;
   doc_role: string | null;
   document_title?: string;
   doc_number?: string;
+  doc_type?: string;
+  linked_at?: string;
+}
+
+export interface LeadHistoryEntry {
+  id: string;
+  user_name: string | null;
+  user_email: string | null;
+  action: string;
+  before_state: any;
+  after_state: any;
+  metadata: any;
+  created_at: string;
+}
+
+/** Dane agenta (pola wspólne dla Lead i Partner) */
+export interface AgentData {
+  agent_name: string | null;
+  agent_email: string | null;
+  agent_phone: string | null;
 }
 
 export interface Partner {
@@ -133,6 +158,9 @@ export interface Partner {
   active_users: number | null;
   onboarding_step: number;
   notes: string | null;
+  agent_name: string | null;
+  agent_email: string | null;
+  agent_phone: string | null;
   open_opp_count?: number;
   open_opp_value?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
@@ -485,6 +513,21 @@ export const PRODUCT_TYPE_ICONS: Record<ProductType, string> = {
 };
 
 /** Źródła leadów — spójne z importem CSV (pole source/zrodlo) */
+/** Mapa etykiet dla kluczy źródeł — używana przy renderowaniu listy z app_settings */
+export const LEAD_SOURCE_LABELS: Record<string, string> = {
+  strona_www: 'Strona www',
+  polecenie:  'Polecenie',
+  cold_call:  'Cold call',
+  linkedin:   'LinkedIn',
+  targi:      'Targi / Wydarzenie',
+  partner:    'Partner',
+  agent:      'Agent',
+  kampania:   'Kampania email',
+  inbound:    'Inbound',
+  inne:       'Inne',
+};
+
+/** Domyślna lista źródeł — używana jako fallback gdy app_settings nie załadowane */
 export const LEAD_SOURCES: { value: string; label: string }[] = [
   { value: 'strona_www',  label: 'Strona www' },
   { value: 'polecenie',   label: 'Polecenie' },
@@ -492,6 +535,7 @@ export const LEAD_SOURCES: { value: string; label: string }[] = [
   { value: 'linkedin',    label: 'LinkedIn' },
   { value: 'targi',       label: 'Targi / Wydarzenie' },
   { value: 'partner',     label: 'Partner' },
+  { value: 'agent',       label: 'Agent' },
   { value: 'kampania',    label: 'Kampania email' },
   { value: 'inbound',     label: 'Inbound' },
   { value: 'inne',        label: 'Inne' },
@@ -528,6 +572,28 @@ export class CrmApiService {
   }
   createLead(data: Partial<Lead>): Observable<Lead> {
     return this.http.post<Lead>(`${BASE}/leads`, data);
+  }
+  getLeadLogoSas(leadId: number): Observable<{ url: string }> {
+    return this.http.get<{ url: string }>(`${BASE}/leads/${leadId}/logo`);
+  }
+  getLeadLogoImg(leadId: number): Observable<string> {
+    return new Observable(observer => {
+      this.http.get(`${BASE}/leads/${leadId}/logo-img`, { responseType: 'blob' }).subscribe({
+        next: blob => {
+          const url = URL.createObjectURL(blob);
+          observer.next(url);
+          observer.complete();
+        },
+        error: e => observer.error(e),
+      });
+    });
+  }
+  enrichDomain(domain: string): Observable<{
+    domain: string; company: string | null; email: string | null;
+    phone: string | null; address: string | null;
+    nip: string | null; regon: string | null; logo_blob_path: string | null;
+  }> {
+    return this.http.post<any>(`${BASE}/leads/enrich`, { domain });
   }
   updateLead(id: number, data: Partial<Lead>): Observable<Lead> {
     return this.http.patch<Lead>(`${BASE}/leads/${id}`, data);
@@ -642,6 +708,11 @@ export class CrmApiService {
     fd.append('file', file);
     return this.http.post<ImportResult>(`${BASE}/import/partners`, fd);
   }
+  importDocumentsCsv(file: File): Observable<ImportResult> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<ImportResult>(`${BASE}/import/documents`, fd);
+  }
   getImportLogs(): Observable<ImportLog[]> {
     return this.http.get<ImportLog[]>(`${BASE}/import/logs`);
   }
@@ -709,6 +780,44 @@ export class CrmApiService {
     return this.http.get<PartnersReport>(`${BASE}/sales-data/report`, { params: this.toParams(p) });
   }
 
+
+  // ── Słownik Źródeł (z app_settings) ─────────────────────────
+  getLeadSources(): Observable<{ value: string; label: string }[]> {
+    return this.http.get<{ value: string; label: string }[]>(`${BASE}/leads/sources`);
+  }
+
+  // ── Historia Leada ────────────────────────────────────────
+  getLeadHistory(leadId: number): Observable<LeadHistoryEntry[]> {
+    return this.http.get<LeadHistoryEntry[]>(`${BASE}/leads/${leadId}/history`);
+  }
+
+  // ── Dokumenty powiązane z Leadem ──────────────────────────
+  getLeadDocuments(leadId: number): Observable<LinkedDocument[]> {
+    return this.http.get<LinkedDocument[]>(`${BASE}/leads/${leadId}/documents`);
+  }
+  linkLeadDocument(leadId: number, documentId: string, docRole?: string): Observable<LinkedDocument> {
+    return this.http.post<LinkedDocument>(`${BASE}/leads/${leadId}/documents`, { document_id: documentId, doc_role: docRole });
+  }
+  unlinkLeadDocument(leadId: number, documentId: string): Observable<void> {
+    return this.http.delete<void>(`${BASE}/leads/${leadId}/documents/${documentId}`);
+  }
+
+  // ── Dokumenty powiązane z Partnerem ───────────────────────
+  getPartnerDocuments(partnerId: number): Observable<LinkedDocument[]> {
+    return this.http.get<LinkedDocument[]>(`${BASE}/partners/${partnerId}/documents`);
+  }
+  linkPartnerDocument(partnerId: number, documentId: string, docRole?: string): Observable<LinkedDocument> {
+    return this.http.post<LinkedDocument>(`${BASE}/partners/${partnerId}/documents`, { document_id: documentId, doc_role: docRole });
+  }
+  unlinkPartnerDocument(partnerId: number, documentId: string): Observable<void> {
+    return this.http.delete<void>(`${BASE}/partners/${partnerId}/documents/${documentId}`);
+  }
+
+  // ── Wyszukiwanie dokumentów (do pickera) ──────────────────
+  searchDocuments(search: string): Observable<{ data: any[] }> {
+    const params = this.toParams({ search, limit: 20, sort: 'name', order: 'asc' });
+    return this.http.get<{ data: any[] }>(`${environment.apiUrl}/documents`, { params });
+  }
 
   // ── Kalendarz ────────────────────────────────────────────────
   getCalendarMeetings(p: { date_from?: string; date_to?: string; assigned_to?: string } = {}): Observable<CalendarMeeting[]> {

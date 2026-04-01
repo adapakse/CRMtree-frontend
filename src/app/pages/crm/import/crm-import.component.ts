@@ -3,12 +3,13 @@ import { Component, OnInit, inject, NgZone, ChangeDetectorRef} from '@angular/co
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CrmApiService, ImportResult, ImportLog, SalesImportResult, SalesImportLog } from '../../../core/services/crm-api.service';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'wt-crm-import',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
 <div class="import-page">
   <div class="import-header">
@@ -23,11 +24,19 @@ import { AuthService } from '../../../core/auth/auth.service';
       <h2>Leady sprzedażowe</h2>
       <div class="field-list">
         <span class="required">company*</span>
-        <span>contact_name</span><span>email</span><span>phone</span>
-        <span>source</span><span>stage</span><span>value_pln</span>
+        <span>contact_name</span><span>contact_title</span>
+        <span>email</span><span>phone</span>
+        <span title="strona_www|polecenie|cold_call|linkedin|targi|partner|agent|kampania|inbound|inne" class="hint">source 🔤</span>
+        <span title="new|qualification|presentation|offer|negotiation|closed_won|closed_lost" class="hint">stage 🔤</span>
+        <span>value_pln</span>
+        <span title="PLN|EUR|USD|GBP|CHF" class="hint">annual_turnover_currency 🔤</span>
         <span>probability</span><span>close_date</span>
-        <span>industry</span><span>notes</span><span>hot</span><span>tags</span>
+        <span>industry</span><span>assigned_to_email</span>
+        <span>notes</span><span>hot</span><span>tags</span>
+        <span>agent_name</span><span>agent_email</span><span>agent_phone</span>
+        <span>online_pct</span>
       </div>
+      <div class="field-hint">🔤 = wartości słownikowe — rozwiń tooltip (hover) aby zobaczyć dostępne wartości · <strong>agent_*</strong>: tylko gdy source=agent</div>
       <button class="btn-outline" (click)="downloadTemplate('leads')">⬇ Pobierz szablon</button>
       <div class="drop-zone"
            [class.drag-over]="isDraggingLeads"
@@ -65,23 +74,24 @@ import { AuthService } from '../../../core/auth/auth.service';
       <h2>Partnerzy</h2>
       <div class="field-list">
         <span class="required">company*</span>
-        <span class="key">numer_partnera</span>
-        <span>nip</span><span>address</span><span>contact_name</span><span>email</span>
-        <span>phone</span><span>industry</span><span>group_name</span>
-        <span>contract_signed</span><span>contract_expires</span>
-        <span>contract_value</span><span>status</span><span>notes</span>
-        <span class="key">annual_turnover</span>
-        <span>annual_turnover_currency</span>
-        <span>online_pct</span>
-        <span>tags</span>
+        <span class="key">partner_number</span>
+        <span>nip</span><span>address</span>
+        <span>contact_name</span><span>contact_title</span><span>email</span><span>phone</span>
+        <span>billing_contact_name</span><span>billing_contact_title</span><span>billing_email</span><span>billing_phone</span>
+        <span>industry</span><span>group_name</span><span>manager_email</span>
+        <span>contract_signed</span><span>contract_expires</span><span>contract_value</span>
+        <span title="onboarding|active|inactive|churned" class="hint">status 🔤</span>
+        <span>notes</span>
+        <span title="PLN|EUR|USD|GBP|CHF" class="hint">annual_turnover_currency 🔤</span>
+        <span>online_pct</span><span>tags</span>
+        <span>credit_limit_value</span>
+        <span title="PLN|EUR|USD|GBP" class="hint">credit_limit_currency 🔤</span>
+        <span>deposit_value</span><span>deposit_currency</span><span>deposit_date_in</span><span>deposit_date_out</span>
+        <span>commission_value</span>
+        <span title="nie_dotyczy|segmenty|rezerwacje|progi_obrotowe" class="hint">commission_basis 🔤</span>
+        <span>agent_name</span><span>agent_email</span><span>agent_phone</span>
       </div>
-      <div class="field-hint">
-        <strong>numer_partnera</strong>: klucz łączący z danymi sprzedażowymi (np. <code>P-0001</code>) &nbsp;·&nbsp;
-        <strong>annual_turnover</strong>: obrót roczny &nbsp;·&nbsp;
-        <strong>annual_turnover_currency</strong>: waluta (PLN, EUR…) &nbsp;·&nbsp;
-        <strong>online_pct</strong>: % online (0,10…100) &nbsp;·&nbsp;
-        <strong>tags</strong>: tagi oddzielone <code>|</code>
-      </div>
+      <div class="field-hint">🔤 = wartości słownikowe (hover aby zobaczyć) · <strong>partner_number</strong>: klucz łączący z danymi sprzedażowymi · <strong>tags</strong>: oddzielone <code>|</code></div>
       <button class="btn-outline" (click)="downloadTemplate('partners')">⬇ Pobierz szablon</button>
       <div class="drop-zone"
            [class.drag-over]="isDraggingPartners"
@@ -105,6 +115,52 @@ import { AuthService } from '../../../core/auth/auth.service';
           <thead><tr><th>Wiersz</th><th>Firma</th><th>Pole</th><th>Błąd</th></tr></thead>
           <tbody>
             <tr *ngFor="let e of partnersResult.errors">
+              <td>{{e.row}}</td><td>{{e.company || '—'}}</td>
+              <td>{{e.field || '—'}}</td><td class="err-msg">{{e.error}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Dokumenty -->
+    <div class="import-card">
+      <div class="card-icon">📄</div>
+      <h2>Dokumenty (metadane)</h2>
+      <p class="card-desc">Import metadanych dokumentów. Pliki fizyczne należy dodać ręcznie po imporcie. Numer dokumentu jest generowany automatycznie.</p>
+      <div class="field-list">
+        <span class="required">name*</span>
+        <span title="partner_agreement|nda|it_supplier_agreement|employee_agreement" class="hint">doc_type 🔤</span>
+        <span title="no_gdpr|data_processing_entrustment|data_administration" class="hint">gdpr_type 🔤</span>
+        <span title="new|being_edited|being_approved|being_signed|signed|completed|rejected" class="hint">status 🔤</span>
+        <span title="Accounting|HR|Marketing|Obsługa Klienta|Operations|Sprzedaz|Zarzad" class="hint">group_name 🔤</span>
+        <span>entity_1</span><span>entity_2</span>
+        <span>creation_date</span><span>signing_date</span><span>expiration_date</span>
+      </div>
+      <div class="field-hint">🔤 = wartości słownikowe · <strong>entities</strong>: podmioty oddzielone <code>|</code> (np. "Firma ABC|Jan Kowalski") · <strong>group_name</strong>: nazwa grupy dokumentowej</div>
+      <button class="btn-outline" (click)="downloadTemplate('documents')">⬇ Pobierz szablon</button>
+      <div class="drop-zone"
+           [class.drag-over]="isDraggingDocs"
+           [class.uploading]="uploadingDocs"
+           (dragover)="$event.preventDefault(); isDraggingDocs = true"
+           (dragleave)="isDraggingDocs = false"
+           (drop)="onDrop($event, 'documents')"
+           (click)="docsInput.click()">
+        <input #docsInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'documents')">
+        <span *ngIf="!uploadingDocs">📂 Przeciągnij plik CSV lub kliknij</span>
+        <span *ngIf="uploadingDocs">⏳ Importowanie…</span>
+      </div>
+      <div *ngIf="docsResult" class="result-panel">
+        <div class="result-stats">
+          <span class="stat green">✓ {{docsResult.imported}} zaimportowanych</span>
+          <span class="stat gray">⤳ {{docsResult.skipped}} pominiętych</span>
+          <span class="stat red" *ngIf="docsResult.errors_count">✗ {{docsResult.errors_count}} błędów</span>
+          <span class="stat muted">Razem: {{docsResult.rows_total}}</span>
+        </div>
+        <table class="errors-table" *ngIf="docsResult.errors.length">
+          <thead><tr><th>Wiersz</th><th>Nazwa</th><th>Pole</th><th>Błąd</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let e of docsResult.errors">
               <td>{{e.row}}</td><td>{{e.company || '—'}}</td>
               <td>{{e.field || '—'}}</td><td class="err-msg">{{e.error}}</td>
             </tr>
@@ -177,7 +233,7 @@ import { AuthService } from '../../../core/auth/auth.service';
         <tr *ngFor="let log of logs">
           <td><span class="type-badge" [class.type-leads]="log.import_type==='leads'"
                    [class.type-partners]="log.import_type==='partners'"
-                   [class.type-sales]="log.import_type==='sales'">{{log.import_type}}</span></td>
+                   [class.type-sales]="log.import_type==='sales'" [class.type-docs]="isDocImport(log.import_type)">{{log.import_type}}</span></td>
           <td class="filename">{{log.filename}}</td>
           <td class="num">{{log.rows_imported}} / {{log.rows_total}}</td>
           <td class="num" [class.has-errors]="log.rows_error > 0">{{log.rows_error}}</td>
@@ -198,6 +254,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     .import-header h1 { font-size:20px; font-weight:700; margin:0 0 4px; }
     .sub { color:#6b7280; font-size:13px; margin:0; }
     .import-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:32px; }
+    .field-list span.hint { background:#fef9c3; color:#713f12; cursor:help; border:1px dashed #fcd34d; }
     @media(max-width:720px) { .import-cards { grid-template-columns:1fr; } }
     .import-card { border:1px solid #e5e7eb; border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:12px; }
     .card-icon { font-size:28px; }
@@ -233,6 +290,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     .type-leads { background:#dbeafe; color:#1e40af; }
     .type-partners { background:#dcfce7; color:#166534; }
     .type-sales { background:#fef3c7; color:#92400e; }
+    .type-docs { background:#f3e8ff; color:#6b21a8; }
     .filename { font-size:12px; color:#374151; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .num { text-align:right; }
     .has-errors { color:#dc2626; font-weight:700; }
@@ -257,11 +315,14 @@ export class CrmImportComponent implements OnInit {
   isDraggingLeads    = false;
   isDraggingPartners = false;
   isDraggingSales    = false;
+  isDraggingDocs     = false;
   uploadingLeads    = false;
   uploadingPartners = false;
   uploadingSales    = false;
+  uploadingDocs     = false;
+  docsResult: ImportResult | null = null;
 
-  downloadTemplate(type: 'leads' | 'partners') {
+  downloadTemplate(type: 'leads' | 'partners' | 'documents') {
     const token = this.auth.getAccessToken();
     const headers = token ? new HttpHeaders({ Authorization: 'Bearer ' + token }) : new HttpHeaders();
     this.http.get(`/api/crm/import/template/${type}`, { headers, responseType: 'blob' }).subscribe({
@@ -293,6 +354,7 @@ export class CrmImportComponent implements OnInit {
     });
   }
 
+  isDocImport(t: string): boolean { return t === 'documents'; }
   ngOnInit() { this.loadLogs(); }
 
   loadLogs() {
@@ -302,10 +364,11 @@ export class CrmImportComponent implements OnInit {
     });
   }
 
-  onDrop(event: DragEvent, type: 'leads' | 'partners') {
+  onDrop(event: DragEvent, type: 'leads' | 'partners' | 'documents') {
     event.preventDefault();
     if (type === 'leads') this.isDraggingLeads = false;
-    else this.isDraggingPartners = false;
+    else if (type === 'partners') this.isDraggingPartners = false;
+    else this.isDraggingDocs = false;
     const file = event.dataTransfer?.files?.[0];
     if (file) this.uploadFile(file, type);
   }
@@ -317,7 +380,7 @@ export class CrmImportComponent implements OnInit {
     if (file) this.uploadSalesFile(file);
   }
 
-  onFileChange(event: Event, type: 'leads' | 'partners') {
+  onFileChange(event: Event, type: 'leads' | 'partners' | 'documents') {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) this.uploadFile(file, type);
   }
@@ -327,20 +390,28 @@ export class CrmImportComponent implements OnInit {
     if (file) this.uploadSalesFile(file);
   }
 
-  uploadFile(file: File, type: 'leads' | 'partners') {
+  uploadFile(file: File, type: 'leads' | 'partners' | 'documents') {
     if (type === 'leads') {
-      this.uploadingLeads = true;
-      this.leadsResult = null;
+      this.uploadingLeads = true; this.leadsResult = null;
       this.api.importLeadsCsv(file).subscribe({
-        next: r => { this.uploadingLeads = false; this.leadsResult = r; this.loadLogs(); },
-        error: () => { this.uploadingLeads = false; },
+        next: r => this.zone.run(() => { this.uploadingLeads = false; this.leadsResult = r; this.loadLogs(); this.cdr.markForCheck(); }),
+        error: () => this.zone.run(() => { this.uploadingLeads = false; this.cdr.markForCheck(); }),
+      });
+    } else if (type === 'partners') {
+      this.uploadingPartners = true; this.partnersResult = null;
+      this.api.importPartnersCsv(file).subscribe({
+        next: r => this.zone.run(() => { this.uploadingPartners = false; this.partnersResult = r; this.loadLogs(); this.cdr.markForCheck(); }),
+        error: () => this.zone.run(() => { this.uploadingPartners = false; this.cdr.markForCheck(); }),
       });
     } else {
-      this.uploadingPartners = true;
-      this.partnersResult = null;
-      this.api.importPartnersCsv(file).subscribe({
-        next: r => { this.uploadingPartners = false; this.partnersResult = r; this.loadLogs(); },
-        error: () => { this.uploadingPartners = false; },
+      this.uploadingDocs = true; this.docsResult = null; this.cdr.markForCheck();
+      this.api.importDocumentsCsv(file).subscribe({
+        next: (r: any) => this.zone.run(() => { this.uploadingDocs = false; this.docsResult = r; this.loadLogs(); this.cdr.markForCheck(); }),
+        error: (err: any) => this.zone.run(() => {
+          this.uploadingDocs = false;
+          this.docsResult = { import_id: 0, filename: file.name, rows_total: 0, imported: 0, skipped: 0, errors_count: 1, errors: [{ row: 0, error: err?.error?.error || 'Błąd serwera' }] } as any;
+          this.cdr.markForCheck();
+        }),
       });
     }
   }

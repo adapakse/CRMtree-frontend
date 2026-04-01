@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
   CrmApiService, LeadsReport, LeadsReportKpi,
-  LEAD_STAGE_LABELS, LEAD_SOURCES, CrmUser,
+  LEAD_STAGE_LABELS, LEAD_SOURCES, LEAD_SOURCE_LABELS, CrmUser,
 } from '../../../core/services/crm-api.service';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -361,6 +361,11 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     if (this.isManager) {
       this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
     }
+    // Załaduj dynamiczne źródła z app_settings
+    this.api.getLeadSources().subscribe({
+      next: sources => { this.zone.run(() => { this._dynamicSources = sources; this.cdr.markForCheck(); }); },
+      error: () => {},
+    });
     this.onPresetChange();
   }
 
@@ -592,7 +597,11 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  sourceLabel(v: string): string { return LEAD_SOURCES.find(s => s.value === v)?.label ?? v; }
+  private _dynamicSources: { value: string; label: string }[] = [];
+  sourceLabel(v: string): string {
+    const found = this._dynamicSources.find(s => s.value === v) || LEAD_SOURCES.find(s => s.value === v);
+    return found?.label ?? LEAD_SOURCE_LABELS[v] ?? v;
+  }
   barColor(wr: number): string { return wr >= 50 ? '#22C55E' : wr >= 30 ? '#f26522' : '#3B82F6'; }
   initials(name: string): string { return (name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase(); }
   avatarColor(name: string): string { let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h},55%,48%)`; }

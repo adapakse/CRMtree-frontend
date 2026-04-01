@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
-  CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, CrmUser, CalendarMeeting,
+  CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, CrmUser, CalendarMeeting,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
@@ -127,7 +127,8 @@ const PROB_MAP: Record<LeadStage, number> = {
           <div *ngFor="let lead of leadsFor(col.key); trackBy:trackById"
                class="lead-card" [class.selected]="selected?.id===lead.id"
                (click)="selectLead(lead)">
-            <div class="lead-company">
+            <div class="lead-company" style="display:flex;align-items:center;gap:6px">
+              <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
               {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
@@ -315,9 +316,12 @@ const PROB_MAP: Record<LeadStage, number> = {
     <div *ngFor="let lead of sortedLeads; trackBy:trackById"
          class="tr-row" style="grid-template-columns:2fr 110px 70px 130px 70px 110px 100px 90px"
          [routerLink]="['/crm/leads',lead.id]">
-      <div class="td">
-        <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span></div>
-        <div style="font-size:11px;color:var(--gray-400)">{{ lead.contact_name }}</div>
+      <div class="td" style="display:flex;align-items:center;gap:8px">
+        <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
+        <div>
+          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span></div>
+          <div style="font-size:11px;color:var(--gray-400)">{{ lead.contact_name }}</div>
+        </div>
       </div>
       <div class="td"><span class="stage-pill stage-{{ lead.stage }}">{{ stageLabel(lead.stage) }}</span></div>
       <div class="td" style="font-size:12px;text-align:center;font-weight:600;color:var(--gray-600)">{{ lead.probability != null ? lead.probability+'%' : '—' }}</div>
@@ -358,6 +362,28 @@ const PROB_MAP: Record<LeadStage, number> = {
     </div>
     <div class="modal-body">
       <div class="fgrid2">
+        <!-- WWW field - first -->
+        <div class="fg" style="grid-column:1/-1">
+          <label class="fl">Strona WWW <span style="font-size:10px;color:var(--gray-400)">(opcjonalne)</span></label>
+          <div style="position:relative">
+            <input class="fi" [(ngModel)]="newFormWebsite"
+                   placeholder="np. acme.pl"
+                   (ngModelChange)="onWebsiteChange()"
+                   style="padding-right:36px">
+            <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)">⏳</span>
+          </div>
+          <!-- Enrich prompt banner -->
+          <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
+            <span>🔍 Pobierz dane firmy ze strony?</span>
+            <button style="background:#f97316;color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">Tak, pobierz</button>
+            <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:11px" (click)="enrichPrompt=false">Nie</button>
+          </div>
+          <!-- Enrich result badge -->
+          <div *ngIf="enrichResult" style="margin-top:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 12px;font-size:11px;color:#15803d">
+            ✓ Dane pobrane — sprawdź pola poniżej i uzupełnij brakujące
+          </div>
+        </div>
+
         <div class="fg" style="grid-column:1/-1">
           <label class="fl">Nazwa firmy <span style="color:var(--orange)">*</span></label>
           <input class="fi" [(ngModel)]="newForm.company" placeholder="np. Acme Sp. z o.o."
@@ -379,6 +405,14 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="fg">
           <label class="fl">Telefon</label>
           <input class="fi" [(ngModel)]="newForm.phone" placeholder="+48 600 000 000">
+        </div>
+        <div class="fg" *ngIf="enrichResult?.nip">
+          <label class="fl">NIP</label>
+          <input class="fi" [value]="enrichResult.nip" readonly style="background:#f9fafb;color:var(--gray-500)">
+        </div>
+        <div class="fg" *ngIf="enrichResult?.regon">
+          <label class="fl">REGON</label>
+          <input class="fi" [value]="enrichResult.regon" readonly style="background:#f9fafb;color:var(--gray-500)">
         </div>
         <div class="fg">
           <label class="fl">Wartość (PLN)</label>
@@ -723,6 +757,7 @@ const PROB_MAP: Record<LeadStage, number> = {
     .lead-card { background:white; border:1px solid var(--gray-200); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all .15s; }
     .lead-card:hover { border-color:#fbd0b6; box-shadow:0 4px 12px rgba(242,101,34,.1); transform:translateY(-1px); }
     .lead-card.selected { border-color:var(--orange); box-shadow:0 0 0 2px rgba(242,101,34,.15); }
+    .logo-circle { display:inline-block;width:22px;height:22px;border-radius:50%;background-size:cover;background-position:center;background-repeat:no-repeat;flex-shrink:0;border:1px solid var(--gray-200);background-color:#f9fafb; }
     .lead-company { font-size:12.5px; font-weight:700; color:var(--gray-900); margin-bottom:2px; display:flex; align-items:center; gap:3px; }
     .lead-contact { font-size:11px; color:var(--gray-500); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .lead-value { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:var(--orange); margin-bottom:3px; }
@@ -1016,7 +1051,7 @@ export class CrmLeadsListComponent implements OnInit {
   private route  = inject(ActivatedRoute);
 
   readonly kanbanCols  = KANBAN_STAGES;
-  readonly leadSources = LEAD_SOURCES;
+  leadSources: { value: string; label: string }[] = LEAD_SOURCES;
 
   allLeads: Lead[]     = [];
   loading              = true;
@@ -1055,6 +1090,16 @@ export class CrmLeadsListComponent implements OnInit {
 
   private searchTimer: any;
 
+  // WWW Enrichment
+  newFormWebsite    = '';
+  enriching         = false;
+  enrichPrompt      = false;
+  enrichResult: any = null;
+  private enrichTimer: any;
+
+  // Logo SAS cache: leadId → SAS URL
+  logoSasMap: Record<number, string> = {};
+
   // ── Timeline state ──────────────────────────────────────────
   showTimeline     = false;
   timelineLoading  = false;
@@ -1075,6 +1120,11 @@ export class CrmLeadsListComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Załaduj dynamiczne źródła
+    this.api.getLeadSources().subscribe({
+      next: s => this.zone.run(() => { this.leadSources = s; this.cdr.markForCheck(); }),
+      error: () => {},
+    });
     // Odczytaj query params z nawigacji z Raportu Sprzedaży
     const qp = this.route.snapshot.queryParamMap;
     this.filterStage         = qp.get('stage')           || '';
@@ -1143,6 +1193,10 @@ export class CrmLeadsListComponent implements OnInit {
         this.calcStats();
         this.loading = false;
         this.cdr.markForCheck();
+        // Load SAS URLs for leads with logos
+        for (const lead of res.data) {
+          if ((lead as any).logo_url) this.loadLogoSas(lead);
+        }
       }),
       error: () => this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }),
     });
@@ -1180,21 +1234,7 @@ export class CrmLeadsListComponent implements OnInit {
   }
 
   selectLead(lead: Lead) {
-    if (this.selected?.id === lead.id) {
-      this.selected = null; this.cdr.markForCheck(); return;
-    }
-    this.selected     = lead;
-    this.dpTab        = 'info';
-    this.loadingDetail = true;
-    this.cdr.markForCheck();
-    this.api.getLead(lead.id).subscribe({
-      next: full => this.zone.run(() => {
-        this.selected      = full;
-        this.loadingDetail = false;
-        this.cdr.markForCheck();
-      }),
-      error: () => this.zone.run(() => { this.loadingDetail = false; this.cdr.markForCheck(); }),
-    });
+    this.router.navigate(['/crm/leads', lead.id]);
   }
 
   onSearch() {
@@ -1206,10 +1246,55 @@ export class CrmLeadsListComponent implements OnInit {
   setPage(p: number)           { this.page = p; this.load(); }
 
   openNew() {
-    this.newForm  = { company:'', contact_name:'', contact_title:'', email:'', phone:'',
-                      value_pln: null, source:'', stage:'new', hot:false, notes:'', assigned_to:'' };
-    this.submitted = false;
-    this.showNew   = true;
+    this.newForm       = { company:'', contact_name:'', contact_title:'', email:'', phone:'',
+                           value_pln: null, source:'', stage:'new', hot:false, notes:'', assigned_to:'' };
+    this.newFormWebsite = '';
+    this.enrichPrompt   = false;
+    this.enrichResult   = null;
+    this.submitted      = false;
+    this.showNew        = true;
+  }
+
+  onWebsiteChange() {
+    if (this.enrichTimer) clearTimeout(this.enrichTimer);
+    this.enrichPrompt = false;
+    const d = this.newFormWebsite.trim();
+    if (d.length < 3) return;
+    this.enrichTimer = setTimeout(() => {
+      this.enrichPrompt = true;
+      this.cdr.markForCheck();
+    }, 800);
+  }
+
+  runEnrich() {
+    this.enrichPrompt = false;
+    this.enriching    = true;
+    this.cdr.markForCheck();
+    this.api.enrichDomain(this.newFormWebsite).subscribe({
+      next: (r: any) => this.zone.run(() => {
+        this.enriching    = false;
+        this.enrichResult = r;
+        // Pre-fill form fields only if empty
+        if (r.company    && !this.newForm.company)       this.newForm.company      = r.company;
+        if (r.email      && !this.newForm.email)         this.newForm.email        = r.email;
+        if (r.phone      && !this.newForm.phone)         this.newForm.phone        = r.phone;
+        if (r.logo_blob_path) (this.newForm as any).logo_url = r.logo_blob_path;
+        (this.newForm as any).website = this.newFormWebsite;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.enriching = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  hasLogo(lead: Lead): boolean { return !!(lead as any).logo_url; }
+
+  loadLogoSas(lead: Lead): void {
+    if (!(lead as any).logo_url || this.logoSasMap[lead.id] !== undefined) return;
+    this.logoSasMap = { ...this.logoSasMap, [lead.id]: '' }; // placeholder
+    this.api.getLeadLogoImg(lead.id).subscribe({
+      next: blobUrl => { this.logoSasMap = { ...this.logoSasMap, [lead.id]: `url('${blobUrl}')` }; this.cdr.markForCheck(); },
+      error: () => {},
+    });
   }
 
   createLead() {
@@ -1227,6 +1312,8 @@ export class CrmLeadsListComponent implements OnInit {
       stage:         this.newForm.stage,
       hot:           this.newForm.hot,
       notes:         this.newForm.notes         || null,
+      website:       this.newFormWebsite        || null,
+      logo_url:      (this.newForm as any).logo_url || null,
     };
     if (this.newForm.assigned_to) payload.assigned_to = this.newForm.assigned_to;
 
@@ -1237,6 +1324,7 @@ export class CrmLeadsListComponent implements OnInit {
         this.calcStats();
         this.showNew   = false;
         this.saving    = false;
+        if ((lead as any).logo_url) this.loadLogoSas(lead);
         this.cdr.markForCheck();
       }),
       error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
@@ -1437,7 +1525,7 @@ export class CrmLeadsListComponent implements OnInit {
   // ── Helpers ──
   prob(stage: LeadStage)       { return PROB_MAP[stage] ?? 10; }
   stageLabel(s: LeadStage)     { return LEAD_STAGE_LABELS[s] || s; }
-  srcLabel(val: string | null) { return LEAD_SOURCES.find(s => s.value === val)?.label ?? val ?? ''; }
+  srcLabel(val: string | null): string { if (!val) return ''; const f = this.leadSources.find(s => s.value === val) || LEAD_SOURCES.find(s => s.value === val); return f?.label ?? LEAD_SOURCE_LABELS[val] ?? val; }
   initials(name: string)       { return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
   trackById(_: number, l: Lead){ return l.id; }
   callPhone(p: string)         { window.location.href = `tel:${p}`; }

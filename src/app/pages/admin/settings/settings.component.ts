@@ -19,10 +19,12 @@ interface SettingField {
 }
 
 // Zakładki
-type Tab = 'global' | 'crm';
+type Tab = 'global' | 'crm' | 'documents';
 
 // Kategorie globalnej aplikacji
 const GLOBAL_CATEGORIES = ['documents', 'workflow', 'general'];
+// Klucze słownikowe dokumentów - pokazywane tylko w zakładce 'Słowniki dokumentów'
+const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types'];
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
   documents: { label: 'Dokumenty i terminy',    icon: '📄' },
@@ -41,6 +43,48 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
   crm_commission_basis_options: {
     nie_dotyczy: 'Nie dotyczy', segmenty: 'Ilość segmentów',
     rezerwacje: 'Ilość rezerwacji', progi_obrotowe: 'Progi obrotowe',
+  },
+  // Słowniki leadów i partnerów
+  crm_lead_sources: {
+    strona_www: 'Strona www', polecenie: 'Polecenie', cold_call: 'Cold call',
+    linkedin: 'LinkedIn', targi: 'Targi / Wydarzenie', partner: 'Partner',
+    agent: 'Agent', kampania: 'Kampania email', inbound: 'Inbound', inne: 'Inne',
+  },
+  crm_lead_stages: {
+    new: 'Nowy', qualification: 'Kwalifikacja', presentation: 'Prezentacja',
+    offer: 'Oferta', negotiation: 'Negocjacje', closed_won: 'Wygrana', closed_lost: 'Przegrana',
+  },
+  crm_partner_statuses: {
+    onboarding: 'Wdrożenie', active: 'Aktywny', inactive: 'Nieaktywny', churned: 'Utracony',
+  },
+  crm_contact_titles: {
+    CEO: 'CEO', CFO: 'CFO', CTO: 'CTO', COO: 'COO', VP: 'VP',
+    Director: 'Dyrektor', Manager: 'Manager', Specialist: 'Specjalista',
+    Owner: 'Właściciel', Other: 'Inne',
+  },
+  crm_industries: {
+    IT: 'IT', Finance: 'Finanse', Transport: 'Transport', Tourism: 'Turystyka',
+    Healthcare: 'Zdrowie', Retail: 'Handel', Manufacturing: 'Produkcja',
+    Legal: 'Prawo', Education: 'Edukacja', Other: 'Inne',
+  },
+  crm_currencies: { PLN: 'PLN', EUR: 'EUR', USD: 'USD', GBP: 'GBP', CHF: 'CHF' },
+  crm_commission_basis: {
+    nie_dotyczy: 'Nie dotyczy', segmenty: 'Ilość segmentów',
+    rezerwacje: 'Ilość rezerwacji', progi_obrotowe: 'Progi obrotowe',
+  },
+  // Słowniki dokumentów
+  doc_types: {
+    partner_agreement: 'Umowa partnerska', nda: 'NDA',
+    it_supplier_agreement: 'Umowa z dostawcą IT', employee_agreement: 'Umowa pracownicza',
+  },
+  doc_gdpr_types: {
+    no_gdpr: 'Brak GDPR',
+    data_processing_entrustment: 'Powierzenie przetwarzania',
+    data_administration: 'Współadministrowanie',
+  },
+  doc_statuses: {
+    new: 'Nowy', being_edited: 'W edycji', being_approved: 'Do akceptacji',
+    being_signed: 'Do podpisu', signed: 'Podpisany', completed: 'Zakończony', rejected: 'Odrzucony',
   },
 };
 
@@ -79,6 +123,9 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm')">
             💼 Parametry biznesowe CRM
+          </button>
+          <button class="tab-btn" [class.active]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
+            📄 Słowniki dokumentów
           </button>
         </div>
 
@@ -221,6 +268,64 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           }
         }
 
+        <!-- TAB: Słowniki dokumentów -->
+        @if (activeTab() === 'documents') {
+
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#166534;display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">📄</span>
+            <div>
+              <strong>Słowniki dokumentów</strong> — zarządzaj dostępnymi wartościami dla typów dokumentów, statusów i klasyfikacji GDPR.
+              Uwaga: usunięcie wartości która jest już użyta w dokumentach może powodować problemy wyświetlania.
+            </div>
+          </div>
+
+          @for (field of docFields(); track field.key) {
+            <div class="card" style="margin-bottom:16px;overflow:hidden">
+              <div class="cat-header" style="padding:12px 20px">
+                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                @if (field.dirty) { <span class="field-dirty" style="margin-left:auto">● Zmienione</span> }
+              </div>
+              <div style="padding:14px 20px">
+                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+
+                @if (field.value_type === 'json') {
+                  <div class="json-list">
+                    @for (item of jsonItems(field); track item; let idx = $index) {
+                      <div class="json-item">
+                        <span class="json-item-val">{{ jsonItemLabel(field.key, item) }}</span>
+                        <span class="json-item-raw">{{ item }}</span>
+                        <button class="json-del" (click)="removeJsonItem(field, idx)" title="Usuń">✕</button>
+                      </div>
+                    }
+                    @if (jsonItems(field).length === 0) {
+                      <div style="color:var(--gray-400);font-size:12px;padding:6px 0">— lista pusta —</div>
+                    }
+                  </div>
+                  <div class="json-add-row">
+                    <input class="fi" style="flex:1" type="text" placeholder="Nowa wartość (klucz techniczny)"
+                           [(ngModel)]="jsonNewItem[field.key]"
+                           (keydown.enter)="addJsonItem(field)">
+                    <button class="btn btn-p btn-sm" (click)="addJsonItem(field)">+ Dodaj</button>
+                  </div>
+                  @if (field.error) { <span class="field-err">{{ field.error }}</span> }
+                }
+
+                @if (field.updated_by_name) {
+                  <div class="field-meta" style="margin-top:10px">
+                    Zmienione przez <strong>{{ field.updated_by_name }}</strong> · {{ field.updated_at | date:'dd.MM.yyyy HH:mm' }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (docFields().length === 0) {
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+              Brak słowników dokumentów. Uruchom migrację 0116.
+            </div>
+          }
+        }
+
       </div>
     </div>
   `,
@@ -278,7 +383,7 @@ export class SettingsComponent implements OnInit {
 
   globalCategories = computed(() => {
     const byCategory: Record<string, SettingField[]> = {};
-    for (const f of this.fields().filter(f => GLOBAL_CATEGORIES.includes(f.category))) {
+    for (const f of this.fields().filter(f => GLOBAL_CATEGORIES.includes(f.category) && !DOC_DICT_KEYS.includes(f.key))) {
       (byCategory[f.category] ??= []).push(f);
     }
     return Object.entries(byCategory).map(([key, flds]) => ({
@@ -290,6 +395,7 @@ export class SettingsComponent implements OnInit {
   });
 
   crmFields = computed(() => this.fields().filter(f => f.category === 'crm'));
+  docFields  = computed(() => this.fields().filter(f => DOC_DICT_KEYS.includes(f.key)));
 
   ngOnInit(): void {
     this.settingsSvc.reload().then(() => {
@@ -368,7 +474,7 @@ export class SettingsComponent implements OnInit {
     for (const f of dirtyFields) {
       if (f.value_type === 'number')       updates[f.key] = Number(f.draft);
       else if (f.value_type === 'boolean') updates[f.key] = f.draft === 'true';
-      else if (f.value_type === 'json')    updates[f.key] = this.jsonItems(f);
+      else if (f.value_type === 'json')    updates[f.key] = JSON.stringify(this.jsonItems(f));
       else                                 updates[f.key] = f.draft;
     }
 

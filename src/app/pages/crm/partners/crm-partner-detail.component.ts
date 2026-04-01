@@ -1,11 +1,12 @@
 // src/app/pages/crm/partners/crm-partner-detail.component.ts
 import { Component, OnInit, inject, Input, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 @Component({
   selector: 'wt-crm-partner-detail',
@@ -224,6 +225,42 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span class="lbl">Notatki</span><span class="notes">{{partner.notes || '—'}}</span>
       </div>
 
+      <!-- Agent -->
+      <div *ngIf="partner.agent_name || partner.agent_email || partner.agent_phone"
+           class="info-subsection">
+        <div class="info-subsection-title">🤝 Dane Agenta</div>
+        <div class="info-grid">
+          <span class="lbl">Imię i nazwisko</span><span>{{partner.agent_name || '—'}}</span>
+          <span class="lbl">Email</span><span>{{partner.agent_email || '—'}}</span>
+          <span class="lbl">Telefon</span><span>{{partner.agent_phone || '—'}}</span>
+        </div>
+      </div>
+
+      <!-- Powiązane dokumenty -->
+      <div class="info-subsection">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="info-subsection-title" style="margin-bottom:0">📎 Dokumenty ({{linkedDocs.length}})</div>
+          <button class="btn-sm" (click)="showDocPicker = true" style="font-size:11px">+ Dodaj</button>
+        </div>
+        <div *ngIf="linkedDocs.length === 0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px">Brak powiązanych dokumentów</div>
+        <div *ngFor="let d of linkedDocs"
+             style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f9fafb;cursor:pointer"
+             (click)="openDocument(d)" title="Przejdź do dokumentu">
+          <span style="font-size:14px">📄</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+              {{d.document_title || d.doc_number || 'Dokument #' + d.document_id}}
+            </div>
+            <div style="font-size:10px;color:#9ca3af">
+              <span *ngIf="d.doc_number">#{{d.doc_number}} · </span>
+              <span *ngIf="d.doc_type">{{d.doc_type}}</span>
+            </div>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:13px;padding:2px 4px;border-radius:4px"
+                  (click)="$event.stopPropagation(); unlinkDoc(d)" title="Usuń powiązanie">✕</button>
+        </div>
+      </div>
+
       <div *ngIf="activeOpps.length" class="opp-section">
         <h4>Szanse sprzedaży ({{ activeOpps.length }})</h4>
         <div *ngFor="let o of activeOpps" class="opp-item">
@@ -408,6 +445,46 @@ import { AuthService } from '../../../core/auth/auth.service';
   </div>
 
   <!-- Edit modal -->
+  <!-- Document Picker Modal -->
+  <div class="modal-overlay" *ngIf="showDocPicker" (click)="showDocPicker = false">
+    <div class="modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%);background:white;border-radius:14px">
+      <div class="modal-header">
+        <h3>📎 Dodaj powiązany dokument</h3>
+        <button class="close-btn" (click)="showDocPicker = false">✕</button>
+      </div>
+      <div class="modal-body" style="gap:10px">
+        <div style="font-size:12px;color:#6b7280">Wyszukaj dokumenty po nazwie, numerze lub podmiocie (Entity). Widoczne są tylko dokumenty do których masz dostęp (min. Read).</div>
+        <input class="act-input" style="font-size:13px;padding:8px 12px"
+               [(ngModel)]="docSearch"
+               (ngModelChange)="onDocSearch()"
+               placeholder="Szukaj dokumentu…">
+        <div *ngIf="docSearching" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Wyszukuję…</div>
+        <div *ngIf="!docSearching && docResults.length === 0 && docSearch.length > 1"
+             style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Brak wyników</div>
+        <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
+          <div *ngFor="let doc of docResults"
+               style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:background .1s"
+               [style.background]="isLinked(doc.id) ? '#f0fdf4' : 'white'"
+               (click)="toggleLinkDoc(doc)">
+            <span style="font-size:16px">📄</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div>
+              <div style="font-size:10px;color:#9ca3af">
+                <span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>
+                <span>{{doc.doc_type}}</span>
+              </div>
+            </div>
+            <span *ngIf="isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
+            <span *ngIf="!isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="showDocPicker = false">Zamknij</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" *ngIf="showEdit" (click)="showEdit = false">
     <div class="modal modal-wide" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -422,13 +499,10 @@ import { AuthService } from '../../../core/auth/auth.service';
             <label>Nazwa firmy *<input [(ngModel)]="editForm.company" placeholder="Nazwa firmy" required></label>
             <label>Status
               <select [(ngModel)]="editForm.status">
-                <option value="onboarding">Wdrożenie</option>
-                <option value="active" [disabled]="hasOpenTasks && partner?.status === 'onboarding'"
-                        [title]="hasOpenTasks && partner?.status === 'onboarding' ? 'Są niewykonane zadania wdrożeniowe' : ''">
-                  Aktywny {{ hasOpenTasks && partner?.status === 'onboarding' ? '🔒' : '' }}
+                <option *ngFor="let s of dictStatuses" [value]="s"
+                        [disabled]="s==='active' && hasOpenTasks && partner?.status==='onboarding'">
+                  {{statusLabelStr(s)}} {{s==='active' && hasOpenTasks && partner?.status==='onboarding' ? '🔒' : ''}}
                 </option>
-                <option value="inactive">Nieaktywny</option>
-                <option value="churned">Utracony</option>
               </select>
               <div *ngIf="hasOpenTasks && partner?.status === 'onboarding'" class="validation-msg" style="color:#f59e0b;margin-top:4px">
                 ⚠ {{ openTasksCount }} niewykonan{{ openTasksCount === 1 ? 'e zadanie' : 'ych zadań' }} wdrożeniowych — nie można ustawić statusu Aktywny
@@ -513,10 +587,7 @@ import { AuthService } from '../../../core/auth/auth.service';
             </label>
             <label>Waluta
               <select [(ngModel)]="editForm.credit_limit_currency">
-                <option value="PLN">PLN</option>
-                <option value="EUR">EUR</option>
-                <option value="USD">USD</option>
-                <option value="GBP">GBP</option>
+                <option *ngFor="let c of dictCurrencies" [value]="c">{{c}}</option>
               </select>
             </label>
           </div>
@@ -530,10 +601,7 @@ import { AuthService } from '../../../core/auth/auth.service';
             </label>
             <label>Waluta
               <select [(ngModel)]="editForm.deposit_currency">
-                <option value="PLN">PLN</option>
-                <option value="EUR">EUR</option>
-                <option value="USD">USD</option>
-                <option value="GBP">GBP</option>
+                <option *ngFor="let c of dictCurrencies" [value]="c">{{c}}</option>
               </select>
             </label>
           </div>
@@ -551,10 +619,8 @@ import { AuthService } from '../../../core/auth/auth.service';
             </label>
             <label>Podstawa
               <select [(ngModel)]="editForm.commission_basis">
-                <option value="nie_dotyczy">Nie dotyczy</option>
-                <option value="segmenty">Ilość segmentów</option>
-                <option value="rezerwacje">Ilość rezerwacji</option>
-                <option value="progi_obrotowe">Progi obrotowe</option>
+                <option value="">— brak —</option>
+                <option *ngFor="let b of dictCommBasis" [value]="b">{{commissionBasisLabel(b)}}</option>
               </select>
             </label>
           </div>
@@ -783,11 +849,29 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class CrmPartnerDetailComponent implements OnInit {
   @Input() id!: string;
-  private route = inject(ActivatedRoute);
-  private zone  = inject(NgZone);
-  private cdr   = inject(ChangeDetectorRef);
-  private api   = inject(CrmApiService);
-  private auth  = inject(AuthService);
+  private route  = inject(ActivatedRoute);
+  private zone   = inject(NgZone);
+  private cdr    = inject(ChangeDetectorRef);
+  private api    = inject(CrmApiService);
+  private auth     = inject(AuthService);
+  private router   = inject(Router);
+  private settings = inject(AppSettingsService);
+
+  // Słowniki z app_settings
+  get dictStatuses():  string[] { return this._dictArr('crm_partner_statuses', ['onboarding','active','inactive','churned']); }
+  get dictCurrencies(): string[] { return this._dictArr('crm_currencies', ['PLN','EUR','USD','GBP','CHF']); }
+  get dictCommBasis(): string[] { return this._dictArr('crm_commission_basis', ['nie_dotyczy','segmenty','rezerwacje','progi_obrotowe']); }
+  get dictIndustries(): string[] { return this._dictArr('crm_industries', ['IT','Finance','Transport','Tourism','Healthcare','Retail','Manufacturing','Legal','Education','Other']); }
+  get dictTitles():    string[] { return this._dictArr('crm_contact_titles', ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other']); }
+
+  private _dictArr(key: string, fallback: string[]): string[] {
+    try {
+      const v = this.settings.get(key);
+      if (Array.isArray(v)) return v;
+      if (typeof v === 'string') return JSON.parse(v);
+    } catch(_) {}
+    return fallback;
+  }
 
   partner: Partner | null = null;
   loading        = false;
@@ -807,6 +891,14 @@ export class CrmPartnerDetailComponent implements OnInit {
   crmUsers: CrmUser[] = [];
   partnerGroups: PartnerGroup[] = [];
 
+  // Powiązane dokumenty
+  linkedDocs: LinkedDocument[] = [];
+  showDocPicker = false;
+  docSearch     = '';
+  docResults: any[] = [];
+  docSearching  = false;
+  private docSearchTimer: any;
+
   onboardingSteps = ['Umowa podpisana', 'Konfiguracja systemu', 'Szkolenie użytkowników', 'Gotowy'];
   activeStep = 0;
   // Tasks
@@ -822,6 +914,71 @@ export class CrmPartnerDetailComponent implements OnInit {
   get isManager() {
     const u = this.auth.user();
     return u?.is_admin || u?.crm_role === 'sales_manager';
+  }
+
+  // ── Dokumenty powiązane ──────────────────────────────────────────
+  loadLinkedDocs(id: number): void {
+    this.api.getPartnerDocuments(id).subscribe({
+      next: docs => this.zone.run(() => { this.linkedDocs = docs; this.cdr.markForCheck(); }),
+      error: () => {},
+    });
+  }
+
+  isLinked(docId: string): boolean {
+    return this.linkedDocs.some(d => d.document_id === docId);
+  }
+
+  toggleLinkDoc(doc: any): void {
+    if (!this.partner) return;
+    if (this.isLinked(doc.id)) {
+      this.api.unlinkPartnerDocument(this.partner.id, doc.id).subscribe({
+        next: () => this.zone.run(() => {
+          this.linkedDocs = this.linkedDocs.filter(d => d.document_id !== doc.id);
+          this.cdr.markForCheck();
+        }),
+        error: () => {},
+      });
+    } else {
+      this.api.linkPartnerDocument(this.partner.id, doc.id).subscribe({
+        next: linked => this.zone.run(() => {
+          this.linkedDocs = [...this.linkedDocs, { ...linked, document_title: doc.name, doc_number: doc.doc_number, doc_type: doc.doc_type }];
+          this.cdr.markForCheck();
+        }),
+        error: () => {},
+      });
+    }
+  }
+
+  unlinkDoc(d: LinkedDocument): void {
+    if (!this.partner || !confirm('Usunąć powiązanie z dokumentem?')) return;
+    this.api.unlinkPartnerDocument(this.partner.id, d.document_id).subscribe({
+      next: () => this.zone.run(() => {
+        this.linkedDocs = this.linkedDocs.filter(x => x.document_id !== d.document_id);
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  openDocument(d: LinkedDocument): void {
+    this.router.navigate(['/documents'], { queryParams: { id: d.document_id } });
+  }
+
+  onDocSearch(): void {
+    clearTimeout(this.docSearchTimer);
+    if (this.docSearch.length < 2) { this.docResults = []; this.cdr.markForCheck(); return; }
+    this.docSearchTimer = setTimeout(() => {
+      this.docSearching = true;
+      this.cdr.markForCheck();
+      this.api.searchDocuments(this.docSearch).subscribe({
+        next: res => this.zone.run(() => {
+          this.docResults = res.data || [];
+          this.docSearching = false;
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => { this.docSearching = false; this.cdr.markForCheck(); }),
+      });
+    }, 350);
   }
 
   get sortedActivities(): any[] {
@@ -858,6 +1015,7 @@ export class CrmPartnerDetailComponent implements OnInit {
     const numId = parseInt(rawId, 10);
     if (!numId || isNaN(numId)) { this.loadError = true; return; }
     this.loadPartner(numId);
+    this.loadLinkedDocs(numId);
     this.loadSuggestions(numId);
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
   }
@@ -1231,6 +1389,7 @@ export class CrmPartnerDetailComponent implements OnInit {
     });
   }
 
+  statusLabelStr(s: string): string { return PARTNER_STATUS_LABELS[s as PartnerStatus] || s; }
   statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }
   actIcon(type: string) {
     return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
