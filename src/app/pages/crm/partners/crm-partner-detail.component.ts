@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 
@@ -275,7 +275,13 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     <div class="activities-card">
       <div class="card-header">
         <h3>Aktywności</h3>
-        <button class="btn-sm" (click)="showNewActivity = !showNewActivity">+ Dodaj</button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn-sm" (click)="openEmailModal()" [disabled]="!partner?.email" style="display:flex;align-items:center;gap:4px">
+            ✉️ Email
+            <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
+          </button>
+          <button class="btn-sm" (click)="showNewActivity = !showNewActivity">+ Dodaj</button>
+        </div>
       </div>
       <div class="new-activity-form" *ngIf="showNewActivity">
         <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
@@ -382,6 +388,19 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
               </div>
             </ng-container>
             <div class="act-text" *ngIf="a.body">{{a.body}}</div>
+            <div *ngIf="a.type==='email' && a.gmail_thread_id" style="margin-top:4px;display:flex;gap:6px">
+              <button class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">💬 Pokaż wątek</button>
+              <button class="btn-sm primary" style="font-size:10px" (click)="replyToThread(a)">↩ Odpowiedz</button>
+            </div>
+            <!-- Thread preview -->
+            <div *ngIf="openThreadId===a.gmail_thread_id && threadMessages.length>0"
+                 style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px">
+              <div *ngFor="let m of threadMessages" style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px">
+                <div style="font-weight:600;color:#374151">{{m.from}}</div>
+                <div style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</div>
+                <div style="margin-top:4px;color:#374151;white-space:pre-line">{{m.snippet}}</div>
+              </div>
+            </div>
           </div>
           <div class="act-edit-form" *ngIf="editingActId === a.id">
             <select [(ngModel)]="actEditForm.type" class="act-sel">
@@ -704,6 +723,60 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 </div>
 <div *ngIf="!partner && !loading" class="not-found">{{ loadError ? 'Błąd ładowania.' : 'Partner nie znaleziony.' }}</div>
 <div *ngIf="loading" class="loading">Ładowanie…</div>
+
+<!-- ── Gmail Compose Modal ─────────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showEmailModal" (click)="showEmailModal=false">
+  <div class="modal-wide" (click)="$event.stopPropagation()" style="width:min(580px,100%);background:white;border-radius:14px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column">
+    <div class="modal-header">
+      <h3>✉️ Wyślij email</h3>
+      <button class="close-btn" (click)="showEmailModal=false">✕</button>
+    </div>
+    <div class="modal-body" style="gap:12px">
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Do
+        <div class="participant-chips">
+          <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">
+            {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
+          </span>
+          <input class="participant-input" [(ngModel)]="recipientQuery"
+                 (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
+                 placeholder="email@firma.pl" autocomplete="off">
+        </div>
+      </label>
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Temat
+        <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
+      </label>
+      <div *ngIf="emailForm.threadId" style="font-size:11px;color:#6b7280;background:#eff6ff;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+        <span>📎 Odpowiedź w wątku</span>
+        <button (click)="emailForm.threadId=''" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:10px">✕ Usuń</button>
+      </div>
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Treść
+        <textarea class="act-input" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
+      </label>
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Załączniki
+        <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280">
+      </label>
+      <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+        <span *ngFor="let f of emailAttachments; let i=index"
+              style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
+          📎 {{f.name}}
+          <button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+        </span>
+      </div>
+      <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
+      <button class="btn-primary" (click)="sendEmail()"
+              [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
+        {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
+      </button>
+    </div>
+  </div>
+</div>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
@@ -845,6 +918,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .input-error { border-color:#ef4444 !important; background:#fff5f5; }
     .input-warn  { border-color:#f59e0b !important; background:#fffbeb; }
     .validation-msg { font-size:11px; color:#ef4444; margin-top:2px; }
+    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 5px; line-height:16px; display:inline-block; }
   `],
 })
 export class CrmPartnerDetailComponent implements OnInit {
@@ -898,6 +972,24 @@ export class CrmPartnerDetailComponent implements OnInit {
   docResults: any[] = [];
   docSearching  = false;
   private docSearchTimer: any;
+
+  // ── Gmail ────────────────────────────────────────────────────────────────────
+  showEmailModal  = false;
+  sendingEmail    = false;
+  emailError      = '';
+  emailForm: any  = { recipientList: [] as string[], subject: '', body: '', threadId: '' };
+  recipientQuery  = '';
+  emailAttachments: File[] = [];
+  threadMessages: any[] = [];
+  openThreadId    = '';
+
+  get emailActivities(): any[] {
+    return (this.partner?.activities || []).filter((a: any) => a.type === 'email');
+  }
+
+  get emailActivityCount(): number {
+    return this.emailActivities.length;
+  }
 
   onboardingSteps = ['Umowa podpisana', 'Konfiguracja systemu', 'Szkolenie użytkowników', 'Gotowy'];
   activeStep = 0;
@@ -1388,6 +1480,103 @@ export class CrmPartnerDetailComponent implements OnInit {
       error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
     });
   }
+
+  // ── Gmail ────────────────────────────────────────────────────────────────────
+  openEmailModal(prefillThreadId?: string): void {
+    this.emailForm = {
+      recipientList: this.partner?.email ? [this.partner.email] : [],
+      subject: '',
+      body: '',
+      threadId: prefillThreadId || '',
+    };
+    this.recipientQuery   = '';
+    this.emailAttachments = [];
+    this.emailError       = '';
+    this.showEmailModal   = true;
+    this.cdr.markForCheck();
+  }
+
+  addRecipient(): void {
+    const val = this.recipientQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.emailForm.recipientList.includes(val)) {
+      this.emailForm.recipientList.push(val);
+    }
+    this.recipientQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  onAttachmentChange(event: Event): void {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) this.emailAttachments = [...this.emailAttachments, ...Array.from(files)];
+    this.cdr.markForCheck();
+  }
+
+  removeAttachment(idx: number): void {
+    this.emailAttachments.splice(idx, 1);
+    this.cdr.markForCheck();
+  }
+
+  sendEmail(): void {
+    if (!this.partner || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
+    this.sendingEmail = true;
+    this.emailError   = '';
+    const fd = new FormData();
+    fd.append('to', this.emailForm.recipientList.join(','));
+    fd.append('subject', this.emailForm.subject);
+    fd.append('body', this.emailForm.body || '');
+    if (this.emailForm.threadId) fd.append('threadId', this.emailForm.threadId);
+    this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
+
+    this.api.sendPartnerEmail(this.partner.id, fd).subscribe({
+      next: (result: GmailSendResult) => {
+        this.zone.run(() => {
+          if (this.partner) {
+            const newAct: any = {
+              id: result.activityId,
+              type: 'email',
+              title: this.emailForm.subject,
+              body: this.emailForm.body,
+              gmail_thread_id: result.threadId,
+              gmail_message_id: result.messageId,
+              activity_at: new Date().toISOString(),
+              created_by_name: this.auth.user()?.display_name || null,
+            };
+            this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
+          }
+          this.sendingEmail   = false;
+          this.showEmailModal = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: (err: any) => {
+        this.zone.run(() => {
+          this.emailError   = err?.error?.error || 'Błąd wysyłki emaila';
+          this.sendingEmail = false;
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  openThread(threadId: string): void {
+    if (!this.partner) return;
+    if (this.openThreadId === threadId) {
+      this.openThreadId = ''; this.threadMessages = []; this.cdr.markForCheck(); return;
+    }
+    this.openThreadId = threadId;
+    this.api.getPartnerEmailThread(this.partner.id, threadId).subscribe({
+      next: msgs => this.zone.run(() => { this.threadMessages = msgs; this.cdr.markForCheck(); }),
+      error: () => {},
+    });
+  }
+
+  replyToThread(a: any): void {
+    this.openEmailModal(a.gmail_thread_id);
+    this.emailForm.subject = a.title?.startsWith('Re:') ? a.title : `Re: ${a.title}`;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
 
   statusLabelStr(s: string): string { return PARTNER_STATUS_LABELS[s as PartnerStatus] || s; }
   statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }

@@ -80,16 +80,33 @@ const PROB_MAP: Record<LeadStage, number> = {
       <span style="cursor:pointer;font-size:14px;color:#9A3412;line-height:1" (click)="clearReportFilter()">×</span>
     </span>
   </div>
+  <!-- Persistent rep filter chip -->
+  <div *ngIf="persistRepName" style="display:flex;align-items:center;gap:8px;padding:4px 0 0 0;margin-bottom:-4px">
+    <span style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:20px;padding:3px 12px;font-size:11.5px;font-weight:600;color:#1D4ED8;display:flex;align-items:center;gap:6px">
+      👤 Handlowiec: {{ persistRepName }}
+      <span style="cursor:pointer;font-size:14px;line-height:1" (click)="clearPersistRepFilter()">×</span>
+    </span>
+  </div>
   <div class="toolbar">
     <span class="fchip" [class.on]="scopeFilter==='all'"  (click)="setScope('all')">Wszystkie</span>
     <span class="fchip" [class.on]="scopeFilter==='mine'" (click)="setScope('mine')">Moje</span>
     <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()">🔥 Gorące</span>
     <span style="flex:1"></span>
+    <select class="sel" [(ngModel)]="filterStageUI" (ngModelChange)="onStageFilterChange()">
+      <option value="">Wszystkie etapy</option>
+      <option value="new">Nowy</option>
+      <option value="qualification">Kwalifikacja</option>
+      <option value="presentation">Prezentacja</option>
+      <option value="offer">Oferta</option>
+      <option value="negotiation">Negocjacje</option>
+      <option value="closed_won">✓ Wygrany</option>
+      <option value="closed_lost">✗ Przegrany</option>
+    </select>
     <select class="sel" [(ngModel)]="filterSource" (ngModelChange)="load()">
       <option value="">Wszystkie źródła</option>
       <option *ngFor="let s of leadSources" [value]="s.value">{{ s.label }}</option>
     </select>
-    <select class="sel" [(ngModel)]="filterUser" (ngModelChange)="load()" *ngIf="isManager">
+    <select class="sel" [(ngModel)]="filterUser" (ngModelChange)="onRepFilterChange($event)" *ngIf="isManager">
       <option value="">Wszyscy handlowcy</option>
       <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
     </select>
@@ -321,6 +338,10 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div>
           <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span></div>
           <div style="font-size:11px;color:var(--gray-400)">{{ lead.contact_name }}</div>
+          <div *ngIf="lead.converted_at" style="font-size:10px;color:#7C3AED;font-weight:600;margin-top:2px">
+            ✦ Migrowany →
+            <a [routerLink]="['/crm/partners', lead.converted_partner_id]" style="color:#7C3AED" (click)="$event.stopPropagation()">Partner</a>
+          </div>
         </div>
       </div>
       <div class="td"><span class="stage-pill stage-{{ lead.stage }}">{{ stageLabel(lead.stage) }}</span></div>
@@ -406,13 +427,11 @@ const PROB_MAP: Record<LeadStage, number> = {
           <label class="fl">Telefon</label>
           <input class="fi" [(ngModel)]="newForm.phone" placeholder="+48 600 000 000">
         </div>
-        <div class="fg" *ngIf="enrichResult?.nip">
-          <label class="fl">NIP</label>
-          <input class="fi" [value]="enrichResult.nip" readonly style="background:#f9fafb;color:var(--gray-500)">
-        </div>
-        <div class="fg" *ngIf="enrichResult?.regon">
-          <label class="fl">REGON</label>
-          <input class="fi" [value]="enrichResult.regon" readonly style="background:#f9fafb;color:var(--gray-500)">
+        <div class="fg">
+          <label class="fl">NIP <span style="font-size:10px;color:var(--gray-400)">(opcjonalne)</span></label>
+          <input class="fi" [(ngModel)]="newForm.nip" placeholder="np. 1234567890"
+                 [style.background]="enrichResult?.nip ? '#f9fafb' : ''"
+                 [value]="newForm.nip || enrichResult?.nip || ''">
         </div>
         <div class="fg">
           <label class="fl">Wartość (PLN)</label>
@@ -1069,6 +1088,9 @@ export class CrmLeadsListComponent implements OnInit {
   filterHot    = false;
   filterSource = '';
   filterUser   = '';
+  filterStageUI = '';   // filtr etapu w toolbarze (nowy)
+  persistRepName = '';  // wyświetlana nazwa persistowanego handlowca
+  private readonly REP_FILTER_KEY = 'crm_rep_filter';
   // Filtry z Raportu Sprzedaży (query params)
   filterStage        = '';
   filterCloseDateFrom = '';
@@ -1128,6 +1150,7 @@ export class CrmLeadsListComponent implements OnInit {
     // Odczytaj query params z nawigacji z Raportu Sprzedaży
     const qp = this.route.snapshot.queryParamMap;
     this.filterStage         = qp.get('stage')           || '';
+    this.filterStageUI       = this.filterStage;
     this.filterSource        = qp.get('source')          || '';
     this.filterUser          = qp.get('assigned_to')     || '';
     this.filterCloseDateFrom = qp.get('close_date_from') || '';
@@ -1135,6 +1158,9 @@ export class CrmLeadsListComponent implements OnInit {
     this.filterLostReason    = qp.get('lost_reason')     || '';
     if (qp.get('hot') === 'true') this.filterHot = true;
     this.reportFilterLabel   = qp.get('label')           || '';
+
+    // Załaduj persistowany filtr handlowca (sessionStorage) — tylko jeśli nie ma query param
+    if (!this.filterUser) this.loadPersistRepFilter();
 
     this.load();
     this.api.getCrmUsers().subscribe({
@@ -1167,8 +1193,43 @@ export class CrmLeadsListComponent implements OnInit {
   }
 
   clearReportFilter(): void {
-    this.filterStage = ''; this.filterCloseDateFrom = ''; this.filterCloseDateTo = '';
+    this.filterStage = ''; this.filterStageUI = ''; this.filterCloseDateFrom = ''; this.filterCloseDateTo = '';
     this.filterLostReason = ''; this.reportFilterLabel = '';
+    this.load();
+  }
+
+  onStageFilterChange(): void {
+    this.filterStage = ''; // wyczyść filtr z raportu gdy user wybiera z toolbara
+    this.load();
+  }
+
+  // ── Persistent rep filter (sessionStorage) ───────────────────────
+  private loadPersistRepFilter(): void {
+    try {
+      const saved = sessionStorage.getItem(this.REP_FILTER_KEY);
+      if (saved) {
+        const { userId, displayName } = JSON.parse(saved);
+        this.filterUser    = userId;
+        this.persistRepName = displayName;
+      }
+    } catch { }
+  }
+
+  onRepFilterChange(userId: string): void {
+    const user = this.crmUsers.find(u => u.id === userId);
+    const displayName = user?.display_name || '';
+    this.persistRepName = userId ? displayName : '';
+    try {
+      if (userId) sessionStorage.setItem(this.REP_FILTER_KEY, JSON.stringify({ userId, displayName }));
+      else        sessionStorage.removeItem(this.REP_FILTER_KEY);
+    } catch { }
+    this.load();
+  }
+
+  clearPersistRepFilter(): void {
+    this.filterUser     = '';
+    this.persistRepName = '';
+    try { sessionStorage.removeItem(this.REP_FILTER_KEY); } catch { }
     this.load();
   }
 
@@ -1180,7 +1241,9 @@ export class CrmLeadsListComponent implements OnInit {
     if (this.filterUser)             params['assigned_to']     = this.filterUser;
     if (this.scopeFilter === 'mine') params['assigned_to']     = this.auth.user()?.id;
     if (this.search)                 params['search']          = this.search;
-    if (this.filterStage)            params['stage']           = this.filterStage;
+    // filterStage z raportu lub filterStageUI z toolbara
+    const activeStage = this.filterStage || this.filterStageUI;
+    if (activeStage)                 params['stage']           = activeStage;
     if (this.filterCloseDateFrom)    params['close_date_from'] = this.filterCloseDateFrom;
     if (this.filterCloseDateTo)      params['close_date_to']   = this.filterCloseDateTo;
     if (this.filterLostReason)       params['lost_reason']     = this.filterLostReason;
@@ -1215,11 +1278,11 @@ export class CrmLeadsListComponent implements OnInit {
   }
 
   leadsFor(stage: string): Lead[] {
-    return this.allLeads.filter(l => l.stage === stage && !l.converted_at);
+    return this.allLeads.filter(l => l.stage === stage);
   }
 
   closedLeads(): Lead[] {
-    return this.allLeads.filter(l => ['closed_won','closed_lost'].includes(l.stage) && !l.converted_at);
+    return this.allLeads.filter(l => ['closed_won','closed_lost'].includes(l.stage));
   }
 
   valueFor(stage: LeadStage): number {
@@ -1312,6 +1375,7 @@ export class CrmLeadsListComponent implements OnInit {
       stage:         this.newForm.stage,
       hot:           this.newForm.hot,
       notes:         this.newForm.notes         || null,
+      nip:           this.newForm.nip           || this.enrichResult?.nip || null,
       website:       this.newFormWebsite        || null,
       logo_url:      (this.newForm as any).logo_url || null,
     };

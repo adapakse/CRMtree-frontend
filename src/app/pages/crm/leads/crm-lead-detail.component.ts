@@ -7,6 +7,7 @@ import { finalize } from 'rxjs/operators';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
   LEAD_SOURCES, LEAD_SOURCE_LABELS, LinkedDocument, LeadHistoryEntry, CrmUser,
+  GmailSendResult,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -29,10 +30,13 @@ import { AuthService } from '../../../core/auth/auth.service';
     <span class="stage-badge stage-{{lead.stage}}">{{stageLabel(lead.stage)}}</span>
     <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 Gorący</span>
     <div style="display:flex;gap:6px">
-      <button class="hdr-btn" *ngIf="lead.phone"  (click)="mockCall()"  title="Zadzwoń: {{lead.phone}}">📞</button>
-      <button class="hdr-btn" *ngIf="lead.email"  (click)="mockEmail()" title="Email: {{lead.email}}">✉️</button>
+      <button class="hdr-btn" *ngIf="lead.phone"  (click)="mockCall()"        title="Zadzwoń: {{lead.phone}}">📞</button>
+      <button class="hdr-btn" *ngIf="lead.email"  (click)="openEmailModal()"  title="Email: {{lead.email}}">
+        ✉️ Email
+        <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
+      </button>
       <button class="hdr-btn hdr-btn-edit" (click)="openEdit()">✏️ Edytuj</button>
-      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">→ Konwertuj</button>
+      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">→ Migruj na Partnera</button>
     </div>
   </div>
 
@@ -50,7 +54,10 @@ import { AuthService } from '../../../core/auth/auth.service';
         <div class="info-kv" *ngIf="lead.contact_name"><span class="lbl">Osoba</span><span class="val">{{lead.contact_name}}<span style="color:#9ca3af" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span></div>
         <div class="info-kv" *ngIf="lead.email">
           <span class="lbl">Email</span>
-          <a class="val link" href="mailto:{{lead.email}}">{{lead.email}}</a>
+          <span class="val" style="display:flex;align-items:center;gap:4px">
+            <a class="link" href="mailto:{{lead.email}}">{{lead.email}}</a>
+            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailModal()" title="Wyślij przez Gmail">✉️</button>
+          </span>
         </div>
         <div class="info-kv" *ngIf="lead.phone">
           <span class="lbl">Telefon</span>
@@ -59,6 +66,7 @@ import { AuthService } from '../../../core/auth/auth.service';
             <button style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;opacity:.6" (click)="mockCall()" title="Zadzwoń">📞</button>
           </span>
         </div>
+        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">NIP</span><span class="val" style="font-family:monospace">{{lead.nip}}</span></div>
         <div class="info-kv" *ngIf="lead.industry"><span class="lbl">Branża</span><span class="val">{{lead.industry}}</span></div>
         <div class="info-kv" *ngIf="lead.source"><span class="lbl">Źródło</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
       </div>
@@ -115,8 +123,18 @@ import { AuthService } from '../../../core/auth/auth.service';
     <!-- ŚRODEK: Aktywności (tabs: Aktywności | Historia) -->
     <div style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
       <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0">
-        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">Aktywności <span *ngIf="lead.activities?.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{lead.activities!.length}}</span></button>
-        <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history';loadHistory()">Historia <span *ngIf="history.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{history.length}}</span></button>
+        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">
+          Aktywności
+          <span *ngIf="lead.activities?.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{lead.activities!.length}}</span>
+        </button>
+        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'">
+          📧 Emaile
+          <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
+        </button>
+        <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history';loadHistory()">
+          Historia
+          <span *ngIf="history.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{history.length}}</span>
+        </button>
       </div>
 
       <!-- Aktywności tab -->
@@ -170,6 +188,12 @@ import { AuthService } from '../../../core/auth/auth.service';
             <div *ngIf="a.meeting_location" class="act-text">📍 {{a.meeting_location}}</div>
             <div *ngIf="a.participants" class="act-text">👥 {{a.participants}}</div>
             <div class="act-text" *ngIf="a.body">{{a.body}}</div>
+            <!-- Link do wątku Gmail -->
+            <div *ngIf="a.type==='email' && a.gmail_thread_id" style="margin-top:4px">
+              <button class="btn-sm" style="font-size:10px;padding:2px 8px" (click)="openThread(a.gmail_thread_id)">
+                📧 Pokaż wątek
+              </button>
+            </div>
           </div>
           <div class="act-body act-edit-form" *ngIf="editingActId===a.id">
             <select [(ngModel)]="actEditForm.type" class="act-sel"><option value="call">📞 Połączenie</option><option value="email">📧 Email</option><option value="meeting">🤝 Spotkanie</option><option value="note">📝 Notatka</option><option value="doc_sent">📄 Dokument</option></select>
@@ -184,6 +208,40 @@ import { AuthService } from '../../../core/auth/auth.service';
           </div>
         </div>
         <div *ngIf="!(lead.activities?.length)" class="empty-act">Brak aktywności. Dodaj pierwszą powyżej.</div>
+      </div>
+
+      <!-- Emaile tab -->
+      <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn-sm primary" (click)="openEmailModal()">+ Nowy email</button>
+        </div>
+        <div *ngIf="emailActivities.length===0" class="empty-act">Brak wysłanych emaili.</div>
+        <!-- Aktywności email -->
+        <div *ngFor="let a of emailActivities" class="act-item" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid #dbeafe">
+          <span class="act-type-icon">📧</span>
+          <div class="act-body" style="flex:1">
+            <strong>{{a.title}}</strong>
+            <div class="act-meta">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · {{a.created_by_name}}</div>
+            <div class="act-text" *ngIf="a.body" style="margin-top:4px;white-space:pre-line">{{a.body}}</div>
+            <div style="margin-top:6px;display:flex;gap:6px">
+              <button *ngIf="a.gmail_thread_id" class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">
+                💬 Pokaż wątek
+              </button>
+              <button *ngIf="a.gmail_thread_id" class="btn-sm primary" style="font-size:10px" (click)="replyToThread(a)">
+                ↩ Odpowiedz
+              </button>
+            </div>
+            <!-- Thread preview -->
+            <div *ngIf="openThreadId===a.gmail_thread_id && threadMessages.length>0"
+                 style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px">
+              <div *ngFor="let m of threadMessages" style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px">
+                <div style="font-weight:600;color:#374151">{{m.from}}</div>
+                <div style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</div>
+                <div style="margin-top:4px;color:#374151;white-space:pre-line">{{m.snippet}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Historia tab -->
@@ -204,7 +262,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     <!-- PRAWA: Mock call/email + Konwertuj info -->
     <div style="border-left:1px solid #e5e7eb;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
 
-      <!-- Mock akcje komunikacyjne -->
+      <!-- Komunikacja -->
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:10px">📞 Komunikacja</div>
         <button class="comm-btn" (click)="mockCall()" [disabled]="!lead.phone">
@@ -214,19 +272,17 @@ import { AuthService } from '../../../core/auth/auth.service';
             <div style="font-size:10px;color:#9ca3af">{{lead.phone||'Brak numeru'}}</div>
           </div>
         </button>
-        <button class="comm-btn" (click)="mockEmail()" [disabled]="!lead.email" style="margin-top:6px">
+        <button class="comm-btn" (click)="openEmailModal()" [disabled]="!lead.email" style="margin-top:6px">
           <span style="font-size:16px">✉️</span>
           <div style="flex:1;text-align:left">
             <div style="font-size:12px;font-weight:600">Wyślij email</div>
             <div style="font-size:10px;color:#9ca3af">{{lead.email||'Brak adresu'}}</div>
           </div>
+          <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
         <div *ngIf="mockCallActive" style="margin-top:8px;background:#dcfce7;border-radius:6px;padding:8px;font-size:11px;color:#15803d;text-align:center">
           🔔 Symulacja połączenia z {{lead.phone}}…
           <button (click)="mockCallActive=false" style="background:none;border:none;cursor:pointer;color:#15803d;margin-left:8px;font-weight:700">Rozłącz</button>
-        </div>
-        <div *ngIf="mockEmailActive" style="margin-top:8px;background:#dbeafe;border-radius:6px;padding:8px;font-size:11px;color:#1d4ed8;text-align:center">
-          📧 Otwieranie klienta email dla {{lead.email}}…
         </div>
       </div>
 
@@ -247,13 +303,17 @@ import { AuthService } from '../../../core/auth/auth.service';
 
       <!-- Konwersja -->
       <div *ngIf="!lead.converted_at" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">→ Konwersja</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">→ Migracja</div>
         <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Przekształć lead w Partnera gdy jest gotowy do podpisania umowy.</div>
-        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">Konwertuj na Partnera →</button>
+        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">Migruj na Partnera →</button>
       </div>
-      <div *ngIf="lead.converted_at" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">✓ Skonwertowany</div>
-        <div style="font-size:11px;color:#9ca3af">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
+      <div *ngIf="lead.converted_at" style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:#7C3AED;margin-bottom:4px">✦ Zmigrowany na Partnera</div>
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:8px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
+        <a *ngIf="lead.converted_partner_id" [routerLink]="['/crm/partners', lead.converted_partner_id]"
+           style="display:block;text-align:center;background:#7C3AED;color:white;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;text-decoration:none">
+          Przejdź do Partnera →
+        </a>
       </div>
     </div>
   </div>
@@ -263,6 +323,95 @@ import { AuthService } from '../../../core/auth/auth.service';
   {{ loadError ? 'Błąd ładowania leada.' : 'Lead nie znaleziony.' }}
 </div>
 <div *ngIf="loading" style="padding:40px;text-align:center;color:#9ca3af">Ładowanie…</div>
+
+<!-- ── Gmail Compose Modal ─────────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showEmailModal" (click)="showEmailModal=false">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(580px,100%)">
+    <div class="modal-header">
+      <h3>✉️ Wyślij email</h3>
+      <button class="close-btn" (click)="showEmailModal=false">✕</button>
+    </div>
+    <div class="modal-body" style="gap:10px">
+      <!-- Do: -->
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Do
+        <div class="participant-chips">
+          <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">
+            {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
+          </span>
+          <input class="participant-input" [(ngModel)]="recipientQuery"
+                 (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
+                 placeholder="email@firma.pl" autocomplete="off">
+        </div>
+      </label>
+      <!-- Temat -->
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Temat
+        <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
+      </label>
+      <!-- Thread reply info -->
+      <div *ngIf="emailForm.threadId" style="font-size:11px;color:#6b7280;background:#eff6ff;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+        <span>📎 Odpowiedź w wątku</span>
+        <button (click)="emailForm.threadId=''" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:10px">✕ Usuń</button>
+      </div>
+      <!-- Treść -->
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Treść
+        <textarea class="act-input" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
+      </label>
+      <!-- Załączniki -->
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        Załączniki
+        <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280">
+      </label>
+      <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+        <span *ngFor="let f of emailAttachments; let i=index"
+              style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
+          📎 {{f.name}}
+          <button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+        </span>
+      </div>
+      <!-- Error -->
+      <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
+      <button class="btn-primary" (click)="sendEmail()"
+              [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
+        {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Thread modal -->
+<div class="modal-overlay" *ngIf="showThreadModal" (click)="showThreadModal=false">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%)">
+    <div class="modal-header">
+      <h3>💬 Wątek email</h3>
+      <button class="close-btn" (click)="showThreadModal=false">✕</button>
+    </div>
+    <div class="modal-body" style="gap:8px">
+      <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;padding:20px">Ładowanie wątku…</div>
+      <div *ngFor="let m of threadMessages"
+           style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;font-size:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-weight:600;color:#374151">{{m.from}}</span>
+          <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
+        </div>
+        <div style="color:#6b7280;white-space:pre-line;line-height:1.5">{{m.snippet}}</div>
+        <div *ngIf="m.attachments?.length" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
+          <span *ngFor="let att of m.attachments" style="background:#f3f4f6;border-radius:8px;padding:2px 8px;font-size:10px;color:#6b7280">📎 {{att.filename}}</span>
+        </div>
+      </div>
+      <div *ngIf="!loadingThread&&threadMessages.length===0" style="text-align:center;color:#9ca3af;padding:16px">Brak wiadomości w wątku.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="showThreadModal=false">Zamknij</button>
+      <button class="btn-primary" (click)="replyToCurrentThread()">↩ Odpowiedz</button>
+    </div>
+  </div>
+</div>
 
 <!-- Edit modal -->
 <div class="modal-overlay" *ngIf="showEdit" (click)="showEdit=false">
@@ -283,7 +432,6 @@ import { AuthService } from '../../../core/auth/auth.service';
         </div>
         <div class="edit-row"><label class="check-label"><input type="checkbox" [(ngModel)]="editForm.hot"> 🔥 Gorący lead</label></div>
       </div>
-      <!-- WWW + Enrich -->
       <div class="edit-section">
         <div class="edit-section-title">Strona WWW</div>
         <div style="display:flex;gap:8px;align-items:center">
@@ -300,21 +448,18 @@ import { AuthService } from '../../../core/auth/auth.service';
           ✓ Dane pobrane — sprawdź pola poniżej
         </div>
       </div>
-
       <div class="edit-section">
         <div class="edit-section-title">Kontakt</div>
         <div class="edit-row">
           <label>Imię i nazwisko<input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"></label>
-          <label>Stanowisko
-              <select [(ngModel)]="editForm.contact_title">
-                <option value="">— brak —</option>
-                <option *ngFor="let t of dictTitles" [value]="t">{{t}}</option>
-              </select>
-            </label>
+          <label>Stanowisko<select [(ngModel)]="editForm.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
         </div>
         <div class="edit-row">
           <label>Email<input [(ngModel)]="editForm.email" type="email" placeholder="jan@firma.pl"></label>
           <label>Telefon<input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"></label>
+        </div>
+        <div class="edit-row">
+          <label>NIP<input [(ngModel)]="editForm.nip" placeholder="np. 1234567890" style="font-family:monospace"></label>
         </div>
       </div>
       <div class="edit-section">
@@ -329,12 +474,7 @@ import { AuthService } from '../../../core/auth/auth.service';
         </div>
         <div class="edit-row">
           <label>Źródło<select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()"><option value="">— brak —</option><option *ngFor="let s of leadSources" [value]="s.value">{{s.label}}</option></select></label>
-          <label>Branża
-          <select [(ngModel)]="editForm.industry">
-            <option value="">— brak —</option>
-            <option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option>
-          </select>
-        </label>
+          <label>Branża<select [(ngModel)]="editForm.industry"><option value="">— brak —</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select></label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
           <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
@@ -388,24 +528,25 @@ import { AuthService } from '../../../core/auth/auth.service';
 <!-- Convert dialog -->
 <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h3>Konwertuj lead na partnera</h3>
-    <p>Firma <strong>{{lead?.company}}</strong> zostanie przeniesiona do rejestru partnerów.</p>
+    <h3>Migruj lead na Partnera</h3>
+    <p>Firma <strong>{{lead?.company}}</strong> zostanie przeniesiona do rejestru partnerów. Lead pozostanie w rejestrze ze statusem <strong>Won</strong>.</p>
     <label>Wartość kontraktu (PLN)<input [(ngModel)]="convertForm.contract_value" type="number" min="0"></label>
     <label>Data podpisania<input [(ngModel)]="convertForm.contract_signed" type="date"></label>
     <div class="modal-actions">
       <button class="btn-outline" (click)="showConvert=false">Anuluj</button>
-      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'Konwertuj'}}</button>
+      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'Migruj na Partnera →'}}</button>
     </div>
   </div>
 </div>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
-    .hdr-btn { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:5px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; }
+    .hdr-btn { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:5px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; position:relative; }
     .hdr-btn:hover { background:#f9fafb; }
     .hdr-btn-edit { border-color:#d1d5db; }
     .hdr-btn-primary { background:#f97316; color:white; border-color:#f97316; }
     .hdr-btn-primary:hover { background:#ea6a0a; }
+    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 5px; line-height:16px; display:inline-block; }
     .info-section { margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #f3f4f6; }
     .info-section:last-child { border-bottom:none; }
     .info-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#9ca3af; margin-bottom:8px; }
@@ -501,9 +642,9 @@ export class CrmLeadDetailComponent implements OnInit {
   private router   = inject(Router);
   private cdr      = inject(ChangeDetectorRef);
   private settings = inject(AppSettingsService);
-  logoSasUrl       = '';   // SAS URL for current lead logo
+  logoSasUrl       = '';
 
-  // Słowniki z app_settings (pkt 5)
+  // Słowniki z app_settings
   get dictStages():    { value: string; label: string }[] { return this._dictList('crm_lead_stages',    LEAD_STAGE_LABELS as any); }
   get dictIndustries(): string[] { return this._dictArr('crm_industries', ['IT','Finance','Transport','Tourism','Healthcare','Retail','Manufacturing','Legal','Education','Other']); }
   get dictTitles():    string[] { return this._dictArr('crm_contact_titles', ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other']); }
@@ -532,13 +673,11 @@ export class CrmLeadDetailComponent implements OnInit {
   converting   = false;
 
   editForm: any  = {};
-  // WWW Enrichment w edycji
   detailEnriching   = false;
   detailEnrichDone  = false;
   actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[] };
   actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '' };
   editingActId: number | null = null;
-  // Autocomplete participants
   allSuggestions: { email: string; name: string }[] = [];
   filteredSuggestions: { email: string; name: string }[] = [];
   participantQuery = '';
@@ -557,14 +696,36 @@ export class CrmLeadDetailComponent implements OnInit {
   private docSearchTimer: any;
 
   // Historia
-  midTab: 'activities' | 'history' = 'activities';
+  midTab: 'activities' | 'emails' | 'history' = 'activities';
   history: LeadHistoryEntry[] = [];
   historyLoading = false;
   private historyLoaded = false;
 
   // Mock komunikacja
   mockCallActive  = false;
-  mockEmailActive = false;
+
+  // ── Gmail ────────────────────────────────────────────────────────────────────
+  showEmailModal  = false;
+  sendingEmail    = false;
+  emailError      = '';
+  emailForm: any  = { recipientList: [] as string[], subject: '', body: '', threadId: '' };
+  recipientQuery  = '';
+  emailAttachments: File[] = [];
+
+  // Thread viewer
+  showThreadModal = false;
+  loadingThread   = false;
+  threadMessages: any[] = [];
+  openThreadId    = '';
+  private currentThreadActivity: any = null;
+
+  get emailActivities(): any[] {
+    return (this.lead?.activities || []).filter(a => a.type === 'email');
+  }
+
+  get emailActivityCount(): number {
+    return this.emailActivities.length;
+  }
 
   get isManager() {
     const u = this.auth.user();
@@ -581,7 +742,6 @@ export class CrmLeadDetailComponent implements OnInit {
       next: s => { this.allSuggestions = s; },
       error: () => {},
     });
-    // Załaduj dynamiczne źródła z app_settings
     this.api.getLeadSources().subscribe({
       next: sources => { this.zone.run(() => { this.leadSources = sources; this.cdr.markForCheck(); }); },
       error: () => {},
@@ -602,6 +762,133 @@ export class CrmLeadDetailComponent implements OnInit {
     });
   }
 
+  // ── Gmail ────────────────────────────────────────────────────────────────────
+  openEmailModal(prefillThreadId?: string): void {
+    this.emailForm = {
+      recipientList: this.lead?.email ? [this.lead.email] : [],
+      subject: '',
+      body: '',
+      threadId: prefillThreadId || '',
+    };
+    this.recipientQuery   = '';
+    this.emailAttachments = [];
+    this.emailError       = '';
+    this.showEmailModal   = true;
+    this.cdr.markForCheck();
+  }
+
+  addRecipient(): void {
+    const val = this.recipientQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.emailForm.recipientList.includes(val)) {
+      this.emailForm.recipientList.push(val);
+    }
+    this.recipientQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  onAttachmentChange(event: Event): void {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) {
+      this.emailAttachments = [...this.emailAttachments, ...Array.from(files)];
+    }
+    this.cdr.markForCheck();
+  }
+
+  removeAttachment(idx: number): void {
+    this.emailAttachments.splice(idx, 1);
+    this.cdr.markForCheck();
+  }
+
+  sendEmail(): void {
+    if (!this.lead || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
+    this.sendingEmail = true;
+    this.emailError   = '';
+
+    const fd = new FormData();
+    fd.append('to', this.emailForm.recipientList.join(','));
+    fd.append('subject', this.emailForm.subject);
+    fd.append('body', this.emailForm.body || '');
+    if (this.emailForm.threadId) fd.append('threadId', this.emailForm.threadId);
+    this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
+
+    this.api.sendLeadEmail(this.lead.id, fd).subscribe({
+      next: (result: GmailSendResult) => {
+        this.zone.run(() => {
+          // Dodaj aktywność email lokalnie (backend też ją stworzył — odśwież lub dodaj)
+          if (this.lead) {
+            const newAct: any = {
+              id: result.activityId,
+              type: 'email',
+              title: this.emailForm.subject,
+              body: this.emailForm.body,
+              gmail_thread_id: result.threadId,
+              gmail_message_id: result.messageId,
+              activity_at: new Date().toISOString(),
+              created_by_name: this.auth.user()?.display_name || null,
+            };
+            this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
+          }
+          this.sendingEmail   = false;
+          this.showEmailModal = false;
+          this.midTab         = 'emails'; // przełącz na tab emaili
+          this.cdr.markForCheck();
+        });
+      },
+      error: (err: any) => {
+        this.zone.run(() => {
+          this.emailError   = err?.error?.error || 'Błąd wysyłki emaila';
+          this.sendingEmail = false;
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  openThread(threadId: string): void {
+    if (!this.lead) return;
+    if (this.openThreadId === threadId) {
+      this.openThreadId = '';
+      this.threadMessages = [];
+      this.cdr.markForCheck();
+      return;
+    }
+    this.openThreadId = threadId;
+    this.api.getLeadEmailThread(this.lead.id, threadId).subscribe({
+      next: msgs => this.zone.run(() => { this.threadMessages = msgs; this.cdr.markForCheck(); }),
+      error: () => {},
+    });
+  }
+
+  showThread(threadId: string): void {
+    if (!this.lead) return;
+    this.showThreadModal = true;
+    this.loadingThread   = true;
+    this.threadMessages  = [];
+    this.cdr.markForCheck();
+    this.api.getLeadEmailThread(this.lead.id, threadId).subscribe({
+      next: msgs => this.zone.run(() => { this.threadMessages = msgs; this.loadingThread = false; this.cdr.markForCheck(); }),
+      error: () => this.zone.run(() => { this.loadingThread = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  replyToThread(a: any): void {
+    this.openEmailModal(a.gmail_thread_id);
+    const m = this.threadMessages[0];
+    if (m && !this.emailForm.subject) {
+      this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || a.title}`;
+    }
+  }
+
+  replyToCurrentThread(): void {
+    this.showThreadModal = false;
+    const m = this.threadMessages[0];
+    this.openEmailModal(m?.threadId || '');
+    if (m) this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject}`;
+  }
+
+  // ── Reszta metod (bez zmian) ─────────────────────────────────────────────────
+
   openEdit() {
     if (!this.lead) return;
     this.editForm = {
@@ -612,6 +899,7 @@ export class CrmLeadDetailComponent implements OnInit {
       contact_title:this.lead.contact_title || '',
       email:        this.lead.email || '',
       phone:        this.lead.phone || '',
+      nip:          (this.lead as any).nip || '',
       value_pln:                this.lead.value_pln ?? null,
       annual_turnover_currency: this.lead.annual_turnover_currency || 'PLN',
       online_pct:           this.lead.online_pct != null ? String(this.lead.online_pct) : '',
@@ -628,7 +916,6 @@ export class CrmLeadDetailComponent implements OnInit {
       website:      (this.lead as any).website || '',
     };
     this.detailEnrichDone = false;
-    // Załaduj użytkowników CRM do selecta (zawsze, gdy lista jest pusta)
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
@@ -649,6 +936,7 @@ export class CrmLeadDetailComponent implements OnInit {
       contact_title: this.editForm.contact_title || null,
       email:         this.editForm.email || null,
       phone:         this.editForm.phone || null,
+      nip:           this.editForm.nip   || null,
       value_pln:                this.editForm.value_pln != null && this.editForm.value_pln !== '' ? +this.editForm.value_pln : null,
       annual_turnover_currency: this.editForm.annual_turnover_currency || 'PLN',
       online_pct:               this.editForm.online_pct !== '' && this.editForm.online_pct != null ? +this.editForm.online_pct : null,
@@ -669,9 +957,7 @@ export class CrmLeadDetailComponent implements OnInit {
     this.api.updateLead(this.lead.id, payload).subscribe({
       next: updated => {
         this.zone.run(() => {
-          // Zachowaj activities których serwer nie zwraca w PATCH
           this.lead = { ...this.lead!, ...updated, activities: this.lead!.activities };
-          // Zaktualizuj assigned_to_name jeśli zmieniono handlowca
           if (this.editForm.assigned_to) {
             const u = this.crmUsers.find(x => x.id === this.editForm.assigned_to);
             if (u) this.lead!.assigned_to_name = u.display_name;
@@ -680,7 +966,6 @@ export class CrmLeadDetailComponent implements OnInit {
           }
           this.saving = false;
           this.showEdit = false;
-          // Reload logo if it was set/changed
           if (updated.logo_url && !this.logoSasUrl) this.loadLogoSas();
           this.cdr.markForCheck();
         });
@@ -705,7 +990,7 @@ export class CrmLeadDetailComponent implements OnInit {
         if (r.logo_blob_path) {
           (this.editForm as any).logo_url = r.logo_blob_path;
           (this.lead as any).logo_url     = r.logo_blob_path;
-          this.loadLogoSas(); // reload SAS URL for live preview
+          this.loadLogoSas();
         }
         this.cdr.markForCheck();
       }),
@@ -739,9 +1024,7 @@ export class CrmLeadDetailComponent implements OnInit {
     };
   }
 
-  cancelEditActivity(): void {
-    this.editingActId = null;
-  }
+  cancelEditActivity(): void { this.editingActId = null; }
 
   saveEditActivity(a: any): void {
     if (!this.actEditForm.title || !this.lead) return;
@@ -804,13 +1087,9 @@ export class CrmLeadDetailComponent implements OnInit {
   filterSuggestions(): void {
     const q = this.participantQuery.toLowerCase();
     if (!q) { this.filteredSuggestions = []; this.cdr.markForCheck(); return; }
-    // Załaduj sugestie jeśli jeszcze nie załadowane
     if (!this.allSuggestions.length && this.lead?.id) {
       this.api.getContactSuggestions(this.lead.id).subscribe({
-        next: s => {
-          this.allSuggestions = s;
-          this._applyFilter(q);
-        },
+        next: s => { this.allSuggestions = s; this._applyFilter(q); },
         error: () => {},
       });
       return;
@@ -885,12 +1164,22 @@ export class CrmLeadDetailComponent implements OnInit {
     if (!this.lead) return;
     this.converting = true;
     this.api.convertLead(this.lead.id, this.convertForm).subscribe({
-      next: r => { this.converting = false; this.router.navigate(['/crm/partners', r.partner.id]); },
+      next: r => {
+        this.converting = false;
+        this.showConvert = false;
+        // Przeładuj leada — pokaże partner link i status Won
+        this.lead = {
+          ...this.lead!,
+          stage: 'closed_won' as any,
+          converted_at: new Date().toISOString(),
+          converted_partner_id: r.partner.id,
+        };
+        this.cdr.markForCheck();
+      },
       error: () => { this.zone.run(() => { this.converting = false; this.cdr.markForCheck(); }); },
     });
   }
 
-  // ── Historia ────────────────────────────────────────────────────
   loadHistory(): void {
     if (this.historyLoaded || !this.lead) return;
     this.historyLoading = true;
@@ -917,13 +1206,11 @@ export class CrmLeadDetailComponent implements OnInit {
       if (after.activity_action === 'created') return `Aktywność dodana: ${after.title || ''}`;
       if (after.activity_action === 'deleted') return `Aktywność usunięta: ${before.title || ''}`;
       if (after.document_action === 'linked')  return 'Dokument powiązany';
-      // Detect stage change
       if (before.stage && after.stage && before.stage !== after.stage) {
         const bl = (LEAD_STAGE_LABELS as any)[before.stage] || before.stage;
         const al = (LEAD_STAGE_LABELS as any)[after.stage]  || after.stage;
         return `Zmiana etapu: ${bl} → ${al}`;
       }
-      // Generic field changes
       const changed = Object.keys(after).filter(k => k !== 'updated_at' && JSON.stringify(before[k]) !== JSON.stringify(after[k]));
       if (changed.length === 1) return `Zmieniono: ${this.fieldLabel(changed[0])}`;
       if (changed.length > 1)  return `Zmieniono pola: ${changed.map(k => this.fieldLabel(k)).join(', ')}`;
@@ -959,31 +1246,19 @@ export class CrmLeadDetailComponent implements OnInit {
     return '#94a3b8';
   }
 
-  // ── Mock komunikacja ─────────────────────────────────────────────
   mockCall(): void {
     if (!this.lead?.phone) return;
-    this.mockCallActive  = true;
-    this.mockEmailActive = false;
+    this.mockCallActive = true;
     this.cdr.markForCheck();
     setTimeout(() => { this.mockCallActive = false; this.cdr.markForCheck(); }, 5000);
   }
 
-  mockEmail(): void {
-    if (!this.lead?.email) return;
-    this.mockEmailActive = true;
-    this.mockCallActive  = false;
-    this.cdr.markForCheck();
-    window.location.href = `mailto:${this.lead.email}`;
-    setTimeout(() => { this.mockEmailActive = false; this.cdr.markForCheck(); }, 3000);
-  }
-
-  // ── Quick stage change ───────────────────────────────────────────
   quickChangeStage(stage: LeadStage): void {
     if (!this.lead || this.lead.stage === stage) return;
     this.api.updateLead(this.lead.id, { stage } as any).subscribe({
       next: updated => this.zone.run(() => {
         this.lead = { ...this.lead!, ...updated, activities: this.lead!.activities };
-        this.historyLoaded = false; // reset so history reloads next time
+        this.historyLoaded = false;
         this.cdr.markForCheck();
       }),
       error: () => {},
@@ -991,7 +1266,6 @@ export class CrmLeadDetailComponent implements OnInit {
   }
 
   onSourceChange(): void {
-    // Wyczyść dane agenta gdy zmienione źródło na inne niż 'agent'
     if (this.editForm.source !== 'agent') {
       this.editForm.agent_name = '';
       this.editForm.agent_email = '';
@@ -999,7 +1273,6 @@ export class CrmLeadDetailComponent implements OnInit {
     }
   }
 
-  // ── Dokumenty powiązane ──────────────────────────────────────────
   loadLinkedDocs(id: number): void {
     this.api.getLeadDocuments(id).subscribe({
       next: docs => this.zone.run(() => { this.linkedDocs = docs; this.cdr.markForCheck(); }),
@@ -1044,7 +1317,6 @@ export class CrmLeadDetailComponent implements OnInit {
   }
 
   openDocument(d: LinkedDocument): void {
-    // Navigate to documents list - the list component handles ?open= to auto-open the panel
     this.router.navigate(['/documents'], { queryParams: { open: d.document_id } });
   }
 
