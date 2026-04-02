@@ -52,10 +52,13 @@ function healthColor(engagement: number): string {
     <option value="12m">Ostatnie 12 miesięcy</option>
     <option value="ytd">YTD {{ currentYear }}</option>
   </select>
-  <select class="sel" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="load()">
+  <select class="sel" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
     <option value="">Wszyscy handlowcy</option>
     <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
   </select>
+  <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer" (click)="clearRepFilter()">
+    × {{ persistRepName }}
+  </button>
   <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer" (click)="load()">{{ loading ? '…' : '↻ Odśwież' }}</button>
 </div>
 
@@ -331,6 +334,8 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   periodFrom    = '';
   periodTo      = '';
   repFilter     = '';
+  persistRepName = '';
+  private readonly REP_FILTER_KEY = 'crm_rep_filter';
   partnerFilter = '';
   currentYear   = new Date().getFullYear();
 
@@ -352,7 +357,34 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     if (this.isManager) {
       this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
     }
+    // Persistowany filtr handlowca
+    try {
+      const saved = sessionStorage.getItem(this.REP_FILTER_KEY);
+      if (saved) {
+        const { userId, displayName } = JSON.parse(saved);
+        this.repFilter     = userId;
+        this.persistRepName = displayName;
+      }
+    } catch { }
     this.onPresetChange();
+  }
+
+  onRepFilterChange(userId: string): void {
+    const user = this.crmUsers.find(u => u.id === userId);
+    const displayName = user?.display_name || '';
+    this.persistRepName = userId ? displayName : '';
+    try {
+      if (userId) sessionStorage.setItem(this.REP_FILTER_KEY, JSON.stringify({ userId, displayName }));
+      else        sessionStorage.removeItem(this.REP_FILTER_KEY);
+    } catch { }
+    this.load();
+  }
+
+  clearRepFilter(): void {
+    this.repFilter      = '';
+    this.persistRepName = '';
+    try { sessionStorage.removeItem(this.REP_FILTER_KEY); } catch { }
+    this.load();
   }
 
   ngAfterViewInit(): void {}

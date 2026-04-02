@@ -46,6 +46,9 @@ export interface Lead {
   agent_name: string | null;
   agent_email: string | null;
   agent_phone: string | null;
+  nip: string | null;
+  converted_partner_id?: number | null;
+  converted_partner_company?: string | null;
   activity_count?: number;
   document_count?: number;
   activities?: LeadActivity[];
@@ -65,6 +68,8 @@ export interface LeadActivity {
   participants: string | null;
   meeting_location: string | null;
   created_by_name: string | null;
+  gmail_thread_id: string | null;
+  gmail_message_id: string | null;
 }
 
 export interface CalendarMeeting {
@@ -187,6 +192,8 @@ export interface PartnerActivity {
   opp_due_date: string | null;
   created_by: string | null;
   created_by_name: string | null;
+  gmail_thread_id: string | null;
+  gmail_message_id: string | null;
 }
 
 export interface OnboardingTask {
@@ -465,6 +472,26 @@ export interface SalesBudget {
   updated_at: string;
 }
 
+// ── Gmail ─────────────────────────────────────────────────────────────────────
+
+export interface GmailMessage {
+  id: string;
+  threadId: string;
+  subject: string;
+  from: string;
+  to: string;
+  date: string;
+  snippet: string;
+  body: string;
+  attachments?: { filename: string; mimeType: string; attachmentId: string }[];
+}
+
+export interface GmailSendResult {
+  messageId: string;
+  threadId: string;
+  activityId: number;
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Stałe
 // ─────────────────────────────────────────────────────────────────
@@ -618,6 +645,10 @@ export class CrmApiService {
   }
   convertLead(leadId: number, data: object): Observable<{ lead_id: number; partner: Partner }> {
     return this.http.post<any>(`${BASE}/leads/${leadId}/convert`, data);
+  }
+  /** Alias — backend obsługuje /migrate i /convert (backwards compat) */
+  migrateLead(leadId: number, data: object): Observable<{ lead_id: number; partner: Partner }> {
+    return this.http.post<any>(`${BASE}/leads/${leadId}/migrate`, data);
   }
 
   // ── Partners ─────────────────────────────────────────────
@@ -862,6 +893,29 @@ export class CrmApiService {
   }
   deleteOnboardingTask(partnerId: number, taskId: number): Observable<void> {
     return this.http.delete<void>(`${BASE}/partners/${partnerId}/onboarding-tasks/${taskId}`);
+  }
+
+  // ── Gmail ─────────────────────────────────────────────────
+  sendLeadEmail(leadId: number, data: FormData): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/gmail/send/lead/${leadId}`, data);
+  }
+  getLeadEmailThread(leadId: number, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/gmail/thread/lead/${leadId}/${threadId}`);
+  }
+  sendPartnerEmail(partnerId: number, data: FormData): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/gmail/send/partner/${partnerId}`, data);
+  }
+  getPartnerEmailThread(partnerId: number, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/gmail/thread/partner/${partnerId}/${threadId}`);
+  }
+  getGmailStatus(): Observable<{ connected: boolean; email?: string }> {
+    return this.http.get<{ connected: boolean; email?: string }>(`${BASE}/gmail/status`);
+  }
+  getGmailAuthUrl(): Observable<{ url: string }> {
+    return this.http.get<{ url: string }>(`${BASE}/gmail/oauth/url`);
+  }
+  disconnectGmail(): Observable<{ ok: boolean }> {
+    return this.http.delete<{ ok: boolean }>(`${BASE}/gmail/oauth/disconnect`);
   }
 
 }

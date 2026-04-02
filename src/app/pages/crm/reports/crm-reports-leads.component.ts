@@ -66,10 +66,13 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     <option value="6m">Ostatnie 6 miesięcy</option>
     <option value="ytd">Bieżący rok (YTD {{ currentYear }})</option>
   </select>
-  <select class="sel" *ngIf="isManager" [(ngModel)]="assignedTo" (ngModelChange)="load()">
+  <select class="sel" *ngIf="isManager" [(ngModel)]="assignedTo" (ngModelChange)="onRepFilterChange($event)">
     <option value="">Wszyscy handlowcy</option>
     <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
   </select>
+  <button *ngIf="persistRepName" class="btn btn-g btn-sm" style="font-size:11.5px;border-color:#BFDBFE;color:#1D4ED8;background:#EFF6FF" (click)="clearRepFilter()">
+    × {{ persistRepName }}
+  </button>
   <button class="btn btn-g btn-sm" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer" (click)="load()">
     {{ loading ? '…' : '↻ Odśwież' }}
   </button>
@@ -319,6 +322,8 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   dateTo       = '';
   periodEnd    = '';  // rzeczywisty koniec okresu (nie przycięty do dziś) — dla close_date i budżetu
   assignedTo   = '';
+  persistRepName = '';
+  private readonly REP_FILTER_KEY = 'crm_rep_filter';
   currentYear  = new Date().getFullYear();
   budgetTotal  = 0;           // pkt 4/5/8: planowany budżet
 
@@ -366,7 +371,34 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       next: sources => { this.zone.run(() => { this._dynamicSources = sources; this.cdr.markForCheck(); }); },
       error: () => {},
     });
+    // Persistowany filtr handlowca
+    try {
+      const saved = sessionStorage.getItem(this.REP_FILTER_KEY);
+      if (saved) {
+        const { userId, displayName } = JSON.parse(saved);
+        this.assignedTo    = userId;
+        this.persistRepName = displayName;
+      }
+    } catch { }
     this.onPresetChange();
+  }
+
+  onRepFilterChange(userId: string): void {
+    const user = this.crmUsers.find(u => u.id === userId);
+    const displayName = user?.display_name || '';
+    this.persistRepName = userId ? displayName : '';
+    try {
+      if (userId) sessionStorage.setItem(this.REP_FILTER_KEY, JSON.stringify({ userId, displayName }));
+      else        sessionStorage.removeItem(this.REP_FILTER_KEY);
+    } catch { }
+    this.load();
+  }
+
+  clearRepFilter(): void {
+    this.assignedTo     = '';
+    this.persistRepName = '';
+    try { sessionStorage.removeItem(this.REP_FILTER_KEY); } catch { }
+    this.load();
   }
 
   ngAfterViewInit(): void {}

@@ -3,7 +3,8 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CrmApiService, PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, ProductType } from '../../../core/services/crm-api.service';
+import { CrmApiService, PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, ProductType, CrmUser } from '../../../core/services/crm-api.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'wt-crm-dashboard',
@@ -13,6 +14,14 @@ import { CrmApiService, PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, ProductType } f
 <div class="dash-page">
   <div class="dash-header">
     <h1>Dashboard CRM</h1>
+    <span style="flex:1"></span>
+    <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer;margin-right:4px" (click)="clearRepFilter()">
+      × {{ persistRepName }}
+    </button>
+    <select *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)" class="period-sel">
+      <option value="">Wszyscy handlowcy</option>
+      <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+    </select>
     <select [(ngModel)]="period" (ngModelChange)="loadPerformance()" class="period-sel">
       <option value="30d">Ostatnie 30 dni</option>
       <option value="90d">Ostatnie 90 dni</option>
@@ -179,14 +188,53 @@ import { CrmApiService, PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, ProductType } f
 export class CrmDashboardComponent implements OnInit {
   private api = inject(CrmApiService);
   private cdr = inject(ChangeDetectorRef);
+  private auth = inject(AuthService);
 
   pipelineData: any[] = [];
   recentActivities: any[] = [];
   perf: any = null;
   renewals: any[] = [];
   period = '12m';
+  repFilter = '';
+  persistRepName = '';
+  crmUsers: CrmUser[] = [];
+  private readonly REP_FILTER_KEY = 'crm_rep_filter';
 
-  ngOnInit() { this.load(); }
+  get isManager() { const u = this.auth.user(); return u?.is_admin || u?.crm_role === 'sales_manager'; }
+
+  ngOnInit() {
+    if (this.isManager) {
+      this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
+    }
+    // Persistowany filtr handlowca
+    try {
+      const saved = sessionStorage.getItem(this.REP_FILTER_KEY);
+      if (saved) {
+        const { userId, displayName } = JSON.parse(saved);
+        this.repFilter     = userId;
+        this.persistRepName = displayName;
+      }
+    } catch { }
+    this.load();
+  }
+
+  onRepFilterChange(userId: string): void {
+    const user = this.crmUsers.find(u => u.id === userId);
+    const displayName = user?.display_name || '';
+    this.persistRepName = userId ? displayName : '';
+    try {
+      if (userId) sessionStorage.setItem(this.REP_FILTER_KEY, JSON.stringify({ userId, displayName }));
+      else        sessionStorage.removeItem(this.REP_FILTER_KEY);
+    } catch { }
+    this.load();
+  }
+
+  clearRepFilter(): void {
+    this.repFilter      = '';
+    this.persistRepName = '';
+    try { sessionStorage.removeItem(this.REP_FILTER_KEY); } catch { }
+    this.load();
+  }
 
   load() {
     this.api.getDashboard().subscribe({
