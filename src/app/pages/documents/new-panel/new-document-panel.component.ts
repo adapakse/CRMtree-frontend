@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DocumentService } from '@core/services/document.service';
 import { GroupProfile, Document, DocType, GdprType } from '@core/models/models';
 import { ToastService } from '@core/services/toast.service';
+import { AppSettingsService } from '@core/services/app-settings.service';
 
 @Component({
   selector: 'wt-new-document-panel',
@@ -38,11 +39,9 @@ import { ToastService } from '@core/services/toast.service';
               <label class="fl">Document Type <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.doc_type">
                 <option value="">— Select type —</option>
-                <option value="partner_agreement">Partner Agreement</option>
-                <option value="it_supplier_agreement">IT Supplier Agreement</option>
-                <option value="employee_agreement">Employee Agreement</option>
-                <option value="nda">NDA</option>
-                <option value="operator_agreement">Operator Agreement</option>
+                @for (t of docTypeOptions; track t.value) {
+                  <option [value]="t.value">{{ t.label }}</option>
+                }
               </select>
             </div>
 
@@ -50,9 +49,9 @@ import { ToastService } from '@core/services/toast.service';
               <label class="fl">GDPR Classification <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.gdpr_type">
                 <option value="">— Select GDPR —</option>
-                <option value="data_processing_entrustment">Data Processing Entrustment</option>
-                <option value="data_administration">Data Administration</option>
-                <option value="no_gdpr">No GDPR</option>
+                @for (t of gdprTypeOptions; track t.value) {
+                  <option [value]="t.value">{{ t.label }}</option>
+                }
               </select>
             </div>
 
@@ -144,8 +143,47 @@ export class NewDocumentPanelComponent {
   @Output() close   = new EventEmitter<void>();
   @Output() created = new EventEmitter<Document>();
 
-  private docSvc = inject(DocumentService);
-  private toast  = inject(ToastService);
+  private docSvc      = inject(DocumentService);
+  private toast       = inject(ToastService);
+  private settingsSvc = inject(AppSettingsService);
+
+  get docTypeOptions(): { value: string; label: string }[] {
+    const DOC_LABELS: Record<string, string> = {
+      partner_agreement:    'Umowa partnerska',
+      it_supplier_agreement:'Umowa z dostawcą IT',
+      employee_agreement:   'Umowa pracownicza',
+      nda:                  'NDA',
+      operator_agreement:   'Umowa operatorska',
+    };
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_types'];
+      if (raw) {
+        const types: string[] = JSON.parse(String(raw));
+        return types
+          .map(v => ({ value: v, label: DOC_LABELS[v] ?? v }))
+          .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+      }
+    } catch { }
+    return Object.entries(DOC_LABELS)
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+  }
+
+  get gdprTypeOptions(): { value: string; label: string }[] {
+    const GDPR_LABELS: Record<string, string> = {
+      data_processing_entrustment: 'Powierzenie przetwarzania danych',
+      data_administration: 'Współadministrowanie danych',
+      no_gdpr: 'Brak GDPR',
+    };
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_gdpr_types'];
+      if (raw) {
+        const types: string[] = JSON.parse(String(raw));
+        return types.map(v => ({ value: v, label: GDPR_LABELS[v] ?? v }));
+      }
+    } catch { }
+    return Object.entries(GDPR_LABELS).map(([value, label]) => ({ value, label }));
+  }
 
   saving       = signal(false);
   isDragging   = false;

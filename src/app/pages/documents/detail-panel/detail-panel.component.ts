@@ -7,6 +7,7 @@ import { DocumentService } from '../../../core/services/document.service';
 import { WorkflowService, GroupService, UserService } from '../../../core/services/api.services';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent } from '../../../shared/components/badges.components';
 import { DOC_TYPE_MAP, fileSizeLabel, triggerDownload } from '../../../core/services/helpers';
 import { environment } from '../../../../environments/environment';
@@ -54,14 +55,9 @@ import { environment } from '../../../../environments/environment';
                 <label class="fl">Status</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.status">
-                    <option value="new">New</option>
-                    <option value="being_edited">Being Edited</option>
-                    <option value="being_signed">Being Signed</option>
-                    <option value="being_approved">Being Approved</option>
-                    <option value="signed">Signed</option>
-                    <option value="hold">Hold</option>
-                    <option value="completed">Completed</option>
-                    <option value="rejected">Rejected</option>
+                    @for (t of docStatusOptions; track t.value) {
+                      <option [value]="t.value">{{ t.label }}</option>
+                    }
                   </select>
                 } @else {
                   <wt-status-badge [status]="doc.status" />
@@ -71,11 +67,10 @@ import { environment } from '../../../../environments/environment';
                 <label class="fl">Document Type</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.doc_type">
-                    <option value="partner_agreement">Partner Agreement</option>
-                    <option value="it_supplier_agreement">IT Supplier Agreement</option>
-                    <option value="employee_agreement">Employee Agreement</option>
-                    <option value="nda">NDA</option>
-                    <option value="operator_agreement">Operator Agreement</option>
+                    <option value="">— wybierz typ —</option>
+                    @for (t of docTypeOptions; track t.value) {
+                      <option [value]="t.value">{{ t.label }}</option>
+                    }
                   </select>
                 } @else {
                   <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ docTypeLabel }}</div>
@@ -85,9 +80,9 @@ import { environment } from '../../../../environments/environment';
                 <label class="fl">GDPR</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.gdpr_type">
-                    <option value="data_processing_entrustment">Data Processing Entrustment</option>
-                    <option value="data_administration">Data Administration</option>
-                    <option value="no_gdpr">No GDPR</option>
+                    @for (t of gdprTypeOptions; track t.value) {
+                      <option [value]="t.value">{{ t.label }}</option>
+                    }
                   </select>
                 } @else {
                   <div style="padding-top:6px"><wt-gdpr-badge [gdpr]="doc.gdpr_type" /></div>
@@ -134,8 +129,16 @@ import { environment } from '../../../../environments/environment';
               </div>
               <div class="fg">
                 <label class="fl">Entity 1</label>
-                <input class="fi" [(ngModel)]="draft.entity1"
-                       [readOnly]="doc._access !== 'full'" placeholder="np. WorkTrips Sp. z o.o.">
+                @if (doc._access === 'full') {
+                  <select class="fsel" [(ngModel)]="draft.entity1">
+                    <option value="">— wybierz podmiot —</option>
+                    @for (opt of entity1Options; track opt) {
+                      <option [value]="opt">{{ opt }}</option>
+                    }
+                  </select>
+                } @else {
+                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.entity1 || '—' }}</div>
+                }
               </div>
               <div class="fg">
                 <label class="fl">Entity 2</label>
@@ -495,14 +498,86 @@ export class DetailPanelComponent implements OnChanges {
   @Output() updated = new EventEmitter<Document>();
   @Output() deleted = new EventEmitter<string>();
 
-  private docSvc   = inject(DocumentService);
-  private wfSvc    = inject(WorkflowService);
-  private groupSvc = inject(GroupService);
-  private userSvc  = inject(UserService);
-  private toast    = inject(ToastService);
-  private sanitizer = inject(DomSanitizer);
-  private cdr       = inject(ChangeDetectorRef);
-  auth            = inject(AuthService);
+  private docSvc      = inject(DocumentService);
+  private wfSvc       = inject(WorkflowService);
+  private groupSvc    = inject(GroupService);
+  private userSvc     = inject(UserService);
+  private toast       = inject(ToastService);
+  private sanitizer   = inject(DomSanitizer);
+  private cdr         = inject(ChangeDetectorRef);
+  private settingsSvc = inject(AppSettingsService);
+  auth                = inject(AuthService);
+
+  get entity1Options(): string[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_entity1_options'];
+      if (raw) return JSON.parse(String(raw));
+    } catch { }
+    return ['Worktrips Sp. z o.o.', 'Travel Manager Sp. z o.o.'];
+  }
+
+  get docTypeOptions(): { value: string; label: string }[] {
+    const DOC_LABELS: Record<string, string> = {
+      partner_agreement:    'Umowa partnerska',
+      it_supplier_agreement:'Umowa z dostawcą IT',
+      employee_agreement:   'Umowa pracownicza',
+      nda:                  'NDA',
+      operator_agreement:   'Umowa operatorska',
+    };
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_types'];
+      if (raw) {
+        const types: string[] = JSON.parse(String(raw));
+        return types
+          .map(v => ({ value: v, label: DOC_LABELS[v] ?? v }))
+          .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+      }
+    } catch { }
+    return Object.entries(DOC_LABELS)
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+  }
+
+  get gdprTypeOptions(): { value: string; label: string }[] {
+    const GDPR_LABELS: Record<string, string> = {
+      data_processing_entrustment: 'Powierzenie przetwarzania danych',
+      data_administration: 'Współadministrowanie danych',
+      no_gdpr: 'Brak GDPR',
+    };
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_gdpr_types'];
+      if (raw) {
+        const types: string[] = JSON.parse(String(raw));
+        return types.map(v => ({ value: v, label: GDPR_LABELS[v] ?? v }));
+      }
+    } catch { }
+    return Object.entries(GDPR_LABELS).map(([value, label]) => ({ value, label }));
+  }
+
+  get docStatusOptions(): { value: string; label: string }[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_statuses'];
+      if (raw) {
+        const STATUS_LABELS: Record<string, string> = {
+          new: 'New', being_edited: 'Being Edited', being_approved: 'Being Approved',
+          being_signed: 'Being Signed', signed: 'Signed', hold: 'Hold',
+          completed: 'Completed', rejected: 'Rejected',
+        };
+        const types: string[] = JSON.parse(String(raw));
+        return types.map(v => ({ value: v, label: STATUS_LABELS[v] ?? v }));
+      }
+    } catch { }
+    return [
+      { value: 'new',            label: 'New' },
+      { value: 'being_edited',   label: 'Being Edited' },
+      { value: 'being_approved', label: 'Being Approved' },
+      { value: 'being_signed',   label: 'Being Signed' },
+      { value: 'signed',         label: 'Signed' },
+      { value: 'hold',           label: 'Hold' },
+      { value: 'completed',      label: 'Completed' },
+      { value: 'rejected',       label: 'Rejected' },
+    ];
+  }
 
   doc!: Document;
 

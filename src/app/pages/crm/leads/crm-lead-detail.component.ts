@@ -36,6 +36,11 @@ import { AuthService } from '../../../core/auth/auth.service';
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
       <button class="hdr-btn hdr-btn-edit" (click)="openEdit()">✏️ Edytuj</button>
+      <button class="hdr-btn hdr-btn-test" *ngIf="!lead.converted_at" (click)="openTestAccountModal()" title="Załóż konto testowe w systemie zewnętrznym">
+        🖥️ Konto testowe
+        <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
+        <span *ngIf="testAccount?.status==='error'"   class="ta-badge-err">!</span>
+      </button>
       <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">→ Migruj na Partnera</button>
     </div>
   </div>
@@ -525,6 +530,138 @@ import { AuthService } from '../../../core/auth/auth.service';
   </div>
 </div>
 
+<!-- Test Account Modal -->
+<div class="modal-overlay" *ngIf="showTestAccount" (click)="closeTestAccountModal()">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(660px,100%)">
+    <div class="modal-header">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <h3>🖥️ Konto testowe</h3>
+        <div style="font-size:11px;color:#9ca3af;font-weight:400">{{lead?.company}}<span *ngIf="lead?.nip"> · NIP: {{lead?.nip}}</span></div>
+      </div>
+      <button class="close-btn" (click)="closeTestAccountModal()">✕</button>
+    </div>
+
+    <div class="modal-body" style="gap:20px">
+
+      <!-- Status: konto już założone -->
+      <div *ngIf="testAccount?.status==='created'" class="ta-status-ok">
+        <span style="font-size:22px">✅</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#15803d">Konto testowe założone</div>
+          <div style="font-size:12px;color:#16a34a;font-family:monospace;margin-top:2px">Nr: {{testAccount!.test_account_number}}</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Ten numer zostanie przekazany jako Nr. Partnera podczas migracji.</div>
+        </div>
+      </div>
+
+      <!-- Status: błąd poprzedniego wywołania -->
+      <div *ngIf="testAccount?.status==='error'" class="ta-status-err">
+        <span style="font-size:22px">⚠️</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#dc2626">Poprzednie wywołanie zakończyło się błędem</div>
+          <div style="font-size:12px;color:#ef4444;margin-top:2px">{{testAccount!.last_error}}</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Popraw dane poniżej i spróbuj ponownie.</div>
+        </div>
+      </div>
+
+      <!-- Błąd bieżącego wywołania -->
+      <div *ngIf="testAccountError" class="ta-status-err">
+        <span style="font-size:20px">❌</span>
+        <div style="font-size:12px;color:#dc2626;font-weight:600">{{testAccountError}}</div>
+      </div>
+
+      <!-- Sekcja A: Dane techniczne -->
+      <div class="ta-section">
+        <div class="ta-section-title">A — Dane techniczne konta</div>
+        <div class="ta-row">
+          <label>Subdomena *
+            <input [(ngModel)]="taForm.subdomain" placeholder="np. firma-testowa" [style.border-color]="taSubmitAttempt&&!taForm.subdomain?'#ef4444':''">
+          </label>
+          <label>Język *
+            <select [(ngModel)]="taForm.language" [style.border-color]="taSubmitAttempt&&!taForm.language?'#ef4444':''">
+              <option value="">— wybierz —</option>
+              <option *ngFor="let l of dictPartnerLanguages" [value]="l">{{l}}</option>
+            </select>
+          </label>
+        </div>
+        <div class="ta-row">
+          <label>Waluta *
+            <select [(ngModel)]="taForm.partner_currency" [style.border-color]="taSubmitAttempt&&!taForm.partner_currency?'#ef4444':''">
+              <option value="">— wybierz —</option>
+              <option value="PLN">PLN</option>
+              <option value="EUR">EUR</option>
+              <option value="USD">USD</option>
+              <option value="GBP">GBP</option>
+              <option value="CHF">CHF</option>
+            </select>
+          </label>
+          <label>Kraj *
+            <select [(ngModel)]="taForm.country" [style.border-color]="taSubmitAttempt&&!taForm.country?'#ef4444':''">
+              <option value="">— wybierz —</option>
+              <option *ngFor="let c of dictPartnerCountries" [value]="c">{{c}}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sekcja B: Adres rozliczeniowy -->
+      <div class="ta-section">
+        <div class="ta-section-title">B — Adres rozliczeniowy</div>
+        <div class="ta-row">
+          <label class="full">Ulica i numer *
+            <input [(ngModel)]="taForm.billing_address" placeholder="np. ul. Przykładowa 1" [style.border-color]="taSubmitAttempt&&!taForm.billing_address?'#ef4444':''">
+          </label>
+        </div>
+        <div class="ta-row">
+          <label>Kod pocztowy *
+            <input [(ngModel)]="taForm.billing_zip" placeholder="np. 00-001" [style.border-color]="taSubmitAttempt&&!taForm.billing_zip?'#ef4444':''">
+          </label>
+          <label>Miasto *
+            <input [(ngModel)]="taForm.billing_city" placeholder="np. Warszawa" [style.border-color]="taSubmitAttempt&&!taForm.billing_city?'#ef4444':''">
+          </label>
+        </div>
+        <div class="ta-row">
+          <label>Kraj rozliczeniowy *
+            <select [(ngModel)]="taForm.billing_country" [style.border-color]="taSubmitAttempt&&!taForm.billing_country?'#ef4444':''">
+              <option value="">— wybierz —</option>
+              <option *ngFor="let c of dictPartnerCountries" [value]="c">{{c}}</option>
+            </select>
+          </label>
+          <label>Email rozliczeniowy *
+            <input [(ngModel)]="taForm.billing_email_address" type="email" placeholder="faktury@firma.pl" [style.border-color]="taSubmitAttempt&&!taForm.billing_email_address?'#ef4444':''">
+          </label>
+        </div>
+      </div>
+
+      <!-- Sekcja C: Administrator konta -->
+      <div class="ta-section">
+        <div class="ta-section-title">C — Administrator konta</div>
+        <div class="ta-row">
+          <label>Imię *
+            <input [(ngModel)]="taForm.admin_first_name" placeholder="Jan" [style.border-color]="taSubmitAttempt&&!taForm.admin_first_name?'#ef4444':''">
+          </label>
+          <label>Nazwisko *
+            <input [(ngModel)]="taForm.admin_last_name" placeholder="Kowalski" [style.border-color]="taSubmitAttempt&&!taForm.admin_last_name?'#ef4444':''">
+          </label>
+        </div>
+        <div class="ta-row">
+          <label class="full">Email administratora *
+            <input [(ngModel)]="taForm.admin_email" type="email" placeholder="admin@firma.pl" [style.border-color]="taSubmitAttempt&&!taForm.admin_email?'#ef4444':''">
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="closeTestAccountModal()">Anuluj</button>
+      <button class="btn-primary" (click)="submitTestAccount()" [disabled]="submittingTestAccount" style="background:#1d4ed8;border-color:#1d4ed8;min-width:180px">
+        <span *ngIf="!submittingTestAccount">🖥️ {{testAccount?.status==='created'?'Ponów założenie':'Załóż konto testowe'}}</span>
+        <span *ngIf="submittingTestAccount">⏳ Zakładanie konta…</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Convert dialog -->
 <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
   <div class="modal" (click)="$event.stopPropagation()">
@@ -546,6 +683,19 @@ import { AuthService } from '../../../core/auth/auth.service';
     .hdr-btn-edit { border-color:#d1d5db; }
     .hdr-btn-primary { background:#f97316; color:white; border-color:#f97316; }
     .hdr-btn-primary:hover { background:#ea6a0a; }
+    .hdr-btn-test { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+    .hdr-btn-test:hover { background:#dbeafe; }
+    .ta-badge-ok { background:#16a34a; color:white; border-radius:10px; font-size:9px; font-weight:700; padding:0 5px; line-height:15px; display:inline-block; margin-left:2px; }
+    .ta-badge-err { background:#ef4444; color:white; border-radius:10px; font-size:9px; font-weight:700; padding:0 5px; line-height:15px; display:inline-block; margin-left:2px; }
+    .ta-section { display:flex; flex-direction:column; gap:10px; }
+    .ta-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; padding-bottom:4px; border-bottom:1px solid #f3f4f6; }
+    .ta-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .ta-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
+    .ta-row label.full { grid-column:1/-1; }
+    .ta-row label input, .ta-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
+    .ta-row label input:focus, .ta-row label select:focus { border-color:#1d4ed8; }
+    .ta-status-ok  { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px; }
+    .ta-status-err { background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px; }
     .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 5px; line-height:16px; display:inline-block; }
     .info-section { margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #f3f4f6; }
     .info-section:last-child { border-bottom:none; }
@@ -648,6 +798,8 @@ export class CrmLeadDetailComponent implements OnInit {
   get dictStages():    { value: string; label: string }[] { return this._dictList('crm_lead_stages',    LEAD_STAGE_LABELS as any); }
   get dictIndustries(): string[] { return this._dictArr('crm_industries', ['IT','Finance','Transport','Tourism','Healthcare','Retail','Manufacturing','Legal','Education','Other']); }
   get dictTitles():    string[] { return this._dictArr('crm_contact_titles', ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other']); }
+  get dictPartnerLanguages(): string[] { return this._dictArr('crm_partner_languages', ['Polski','Angielski','Rosyjski','Rumuński','Niemiecki']); }
+  get dictPartnerCountries(): string[] { return this._dictArr('crm_partner_countries', ['Polska','Niemcy','Francja','Wielka Brytania','Czechy','Słowacja','Węgry','Rumunia','Ukraina','Rosja']); }
 
   private _dictArr(key: string, fallback: string[]): string[] {
     try {
@@ -719,6 +871,18 @@ export class CrmLeadDetailComponent implements OnInit {
   openThreadId    = '';
   private currentThreadActivity: any = null;
 
+  // ── Konto testowe ─────────────────────────────────────────────────────────
+  showTestAccount       = false;
+  testAccount: any      = null;       // dane z GET /api/crm/leads/:id/test-account
+  submittingTestAccount = false;
+  testAccountError      = '';
+  taSubmitAttempt       = false;
+  taForm: any = {
+    subdomain: '', language: '', partner_currency: '', country: '',
+    billing_address: '', billing_zip: '', billing_city: '', billing_country: '', billing_email_address: '',
+    admin_first_name: '', admin_last_name: '', admin_email: '',
+  };
+
   get emailActivities(): any[] {
     return (this.lead?.activities || []).filter(a => a.type === 'email');
   }
@@ -738,6 +902,7 @@ export class CrmLeadDetailComponent implements OnInit {
     if (!numId || isNaN(numId)) { this.loadError = true; return; }
     this.loadLead(numId);
     this.loadLinkedDocs(numId);
+    this.loadTestAccount(numId);
     this.api.getContactSuggestions(numId).subscribe({
       next: s => { this.allSuggestions = s; },
       error: () => {},
@@ -1346,5 +1511,84 @@ export class CrmLeadDetailComponent implements OnInit {
   stageLabel(s: LeadStage) { return LEAD_STAGE_LABELS[s] || s; }
   actIcon(type: string) {
     return { call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] || '💬';
+  }
+
+  // ── Konto testowe ────────────────────────────────────────────────────────────
+
+  loadTestAccount(leadId?: number): void {
+    const id = leadId ?? (this.lead?.id);
+    if (!id) return;
+    this.api.getLeadTestAccount(id).subscribe({
+      next: rec => this.zone.run(() => {
+        this.testAccount = rec;
+        // Wstępnie wypełnij formularz zapisanymi danymi
+        if (rec) {
+          this.taForm = {
+            subdomain:             rec.subdomain             || '',
+            language:              rec.language              || '',
+            partner_currency:      rec.partner_currency      || '',
+            country:               rec.country               || '',
+            billing_address:       rec.billing_address       || '',
+            billing_zip:           rec.billing_zip           || '',
+            billing_city:          rec.billing_city          || '',
+            billing_country:       rec.billing_country       || '',
+            billing_email_address: rec.billing_email_address || '',
+            admin_first_name:      rec.admin_first_name      || '',
+            admin_last_name:       rec.admin_last_name       || '',
+            admin_email:           rec.admin_email           || '',
+          };
+        }
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  openTestAccountModal(): void {
+    this.testAccountError = '';
+    this.taSubmitAttempt  = false;
+    this.showTestAccount  = true;
+    this.cdr.markForCheck();
+  }
+
+  closeTestAccountModal(): void {
+    if (this.submittingTestAccount) return;
+    this.showTestAccount = false;
+    this.cdr.markForCheck();
+  }
+
+  submitTestAccount(): void {
+    this.taSubmitAttempt = true;
+    const f = this.taForm;
+    // Walidacja
+    const required = [
+      'subdomain','language','partner_currency','country',
+      'billing_address','billing_zip','billing_city','billing_country','billing_email_address',
+      'admin_first_name','admin_last_name','admin_email',
+    ];
+    if (required.some(k => !f[k]?.trim())) return;
+    if (!this.lead) return;
+
+    this.submittingTestAccount = true;
+    this.testAccountError      = '';
+    this.cdr.markForCheck();
+
+    this.api.createLeadTestAccount(this.lead.id, { ...f }).subscribe({
+      next: result => this.zone.run(() => {
+        this.testAccount        = result.record;
+        this.submittingTestAccount = false;
+        // Po sukcesie modal zostaje otwarty — widać nr konta
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        // HTTP 422: dane zapisane, ale zewnętrzne API odmówiło
+        if (err?.status === 422 && err?.error?.record) {
+          this.testAccount = err.error.record;
+        }
+        this.testAccountError      = err?.error?.error || 'Błąd połączenia z zewnętrznym API';
+        this.submittingTestAccount = false;
+        this.cdr.markForCheck();
+      }),
+    });
   }
 }

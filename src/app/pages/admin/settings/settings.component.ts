@@ -24,7 +24,7 @@ type Tab = 'global' | 'crm' | 'documents';
 // Kategorie globalnej aplikacji
 const GLOBAL_CATEGORIES = ['documents', 'workflow', 'general'];
 // Klucze słownikowe dokumentów - pokazywane tylko w zakładce 'Słowniki dokumentów'
-const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types'];
+const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_entity1_options'];
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
   documents: { label: 'Dokumenty i terminy',    icon: '📄' },
@@ -86,6 +86,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
     new: 'Nowy', being_edited: 'W edycji', being_approved: 'Do akceptacji',
     being_signed: 'Do podpisu', signed: 'Podpisany', completed: 'Zakończony', rejected: 'Odrzucony',
   },
+  doc_entity1_options: {},  // wartości są wyświetlane bezpośrednio (nie są kluczami technicznymi)
 };
 
 @Component({
@@ -224,11 +225,11 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                 @if (field.value_type === 'json') {
                   <!-- Edytor listy JSON -->
                   <div class="json-list">
-                    @for (item of jsonItems(field); track item; let idx = $index) {
+                    @for (item of displayItems(field); track item; let idx = $index) {
                       <div class="json-item">
                         <span class="json-item-val">{{ jsonItemLabel(field.key, item) }}</span>
                         <span class="json-item-raw">{{ item }}</span>
-                        <button class="json-del" (click)="removeJsonItem(field, idx)" title="Usuń">✕</button>
+                        <button class="json-del" (click)="removeJsonItem(field, jsonItems(field).indexOf(item))" title="Usuń">✕</button>
                       </div>
                     }
                     @if (jsonItems(field).length === 0) {
@@ -290,11 +291,11 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
 
                 @if (field.value_type === 'json') {
                   <div class="json-list">
-                    @for (item of jsonItems(field); track item; let idx = $index) {
+                    @for (item of displayItems(field); track item; let idx = $index) {
                       <div class="json-item">
                         <span class="json-item-val">{{ jsonItemLabel(field.key, item) }}</span>
                         <span class="json-item-raw">{{ item }}</span>
-                        <button class="json-del" (click)="removeJsonItem(field, idx)" title="Usuń">✕</button>
+                        <button class="json-del" (click)="removeJsonItem(field, jsonItems(field).indexOf(item))" title="Usuń">✕</button>
                       </div>
                     }
                     @if (jsonItems(field).length === 0) {
@@ -435,6 +436,19 @@ export class SettingsComponent implements OnInit {
   // JSON list helpers
   jsonItems(field: SettingField): string[] {
     try { return JSON.parse(field.draft); } catch { return []; }
+  }
+
+  /** Zwraca elementy posortowane alfabetycznie — tylko dla wybranych kluczy */
+  private readonly SORTED_KEYS = new Set(['doc_types', 'crm_contact_titles']);
+
+  displayItems(field: SettingField): string[] {
+    const items = this.jsonItems(field);
+    if (this.SORTED_KEYS.has(field.key)) {
+      return [...items].sort((a, b) =>
+        (this.jsonItemLabel(field.key, a)).localeCompare(this.jsonItemLabel(field.key, b), 'pl')
+      );
+    }
+    return items;
   }
 
   jsonItemLabel(key: string, item: string): string {

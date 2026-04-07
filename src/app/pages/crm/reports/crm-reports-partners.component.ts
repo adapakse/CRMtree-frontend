@@ -41,7 +41,7 @@ function healthColor(engagement: number): string {
 <div id="topbar" style="height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
   <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">Partner Performance</span>
   <span style="flex:1"></span>
-  <select class="sel" [(ngModel)]="partnerFilter">
+  <select class="sel" [(ngModel)]="partnerFilter" (ngModelChange)="onPartnerFilterChange()">
     <option value="">Wszyscy partnerzy</option>
     <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
   </select>
@@ -252,7 +252,7 @@ function healthColor(engagement: number): string {
   <div class="card" style="padding:0;overflow:hidden">
     <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
       <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Wyniki wszystkich partnerów</div>
-      <span style="font-size:11px;color:#a1a1aa">{{ byPartner.length }} partnerów</span>
+      <span style="font-size:11px;color:#a1a1aa">{{ filteredByPartner.length }} partnerów</span>
     </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12.5px">
@@ -269,7 +269,7 @@ function healthColor(engagement: number): string {
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of byPartner" style="border-bottom:1px solid #f4f4f5;cursor:pointer" (mouseenter)="$any($event.currentTarget).style.background='#fafafa'" (mouseleave)="$any($event.currentTarget).style.background=''">
+          <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid #f4f4f5;cursor:pointer" (mouseenter)="$any($event.currentTarget).style.background='#fafafa'" (mouseleave)="$any($event.currentTarget).style.background=''">
             <td style="padding:9px 14px">
               <a *ngIf="p.partner_id" [routerLink]="['/crm/partners', p.partner_id]" style="font-weight:600;color:#f26522;text-decoration:none">{{ p.partner_name }}</a>
               <span *ngIf="!p.partner_id" style="color:#71717a">{{ p.partner_name }}</span>
@@ -284,11 +284,11 @@ function healthColor(engagement: number): string {
             </td>
             <td style="padding:9px 10px;text-align:right;color:#71717a">{{ p.transactions_count }}</td>
           </tr>
-          <tr *ngIf="!byPartner.length">
+          <tr *ngIf="!filteredByPartner.length">
             <td [attr.colspan]="isManager ? 8 : 7" style="text-align:center;padding:24px;color:#a1a1aa;font-size:12px">Brak danych dla wybranego okresu</td>
           </tr>
         </tbody>
-        <tfoot *ngIf="kpi && byPartner.length">
+        <tfoot *ngIf="kpi && filteredByPartner.length">
           <tr style="background:#fafafa;border-top:2px solid #e4e4e7;font-weight:700">
             <td style="padding:9px 14px">RAZEM</td>
             <td *ngIf="isManager"></td>
@@ -350,8 +350,13 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   private chartsBuilt = false;
 
   get isManager() { const u = this.auth.user(); return u?.is_admin || u?.crm_role === 'sales_manager'; }
-  get topPartners() { return this.byPartner.slice(0, 8); }
+  get topPartners() { return this.filteredByPartner.slice(0, 8); }
   get partnerNames() { return [...new Set(this.byPartner.map(p => p.partner_name))]; }
+
+  /** Backend filtruje dane — getter jest już tylko aliasem */
+  get filteredByPartner(): any[] { return this.byPartner; }
+
+  onPartnerFilterChange(): void { this.load(); }
 
   ngOnInit(): void {
     if (this.isManager) {
@@ -399,8 +404,10 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     this.loading = true;
     this.chartsBuilt = false;
     const p: any = {};
-    if (this.periodFrom) p.period_from = this.periodFrom;
-    if (this.periodTo)   p.period_to   = this.periodTo;
+    if (this.periodFrom)  p.period_from  = this.periodFrom;
+    if (this.periodTo)    p.period_to    = this.periodTo;
+    if (this.repFilter && this.isManager)     p.rep_id       = this.repFilter;
+    if (this.partnerFilter)                   p.partner_name = this.partnerFilter;
 
     this.api.getPartnersReport(p).subscribe({
       next: (report: PartnersReport) => {
