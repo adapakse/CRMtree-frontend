@@ -166,6 +166,21 @@ export interface Partner {
   agent_name: string | null;
   agent_email: string | null;
   agent_phone: string | null;
+  // Zadanie A: Dane dodatkowe
+  subdomain: string | null;
+  language: string | null;
+  partner_currency: string | null;
+  country: string | null;
+  // Zadanie B: Billing Address
+  billing_address: string | null;
+  billing_zip: string | null;
+  billing_city: string | null;
+  billing_country: string | null;
+  billing_email_address: string | null;
+  // Zadanie C: Partner Admin
+  admin_first_name: string | null;
+  admin_last_name: string | null;
+  admin_email: string | null;
   open_opp_count?: number;
   open_opp_value?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
@@ -807,7 +822,7 @@ export class CrmApiService {
   }
 
   // ── Raport Partnerzy ──────────────────────────────────────────
-  getPartnersReport(p: { period_from?: string; period_to?: string; product_type?: string } = {}): Observable<PartnersReport> {
+  getPartnersReport(p: { period_from?: string; period_to?: string; product_type?: string; rep_id?: string; partner_name?: string } = {}): Observable<PartnersReport> {
     return this.http.get<PartnersReport>(`${BASE}/sales-data/report`, { params: this.toParams(p) });
   }
 
@@ -831,6 +846,19 @@ export class CrmApiService {
   }
   unlinkLeadDocument(leadId: number, documentId: string): Observable<void> {
     return this.http.delete<void>(`${BASE}/leads/${leadId}/documents/${documentId}`);
+  }
+
+  // ── Konto testowe ───────────────────────────────────────
+  getLeadTestAccount(leadId: number): Observable<any> {
+    return this.http.get<any>(`${BASE}/leads/${leadId}/test-account`);
+  }
+  createLeadTestAccount(leadId: number, data: {
+    subdomain: string; language: string; partner_currency: string; country: string;
+    billing_address: string; billing_zip: string; billing_city: string;
+    billing_country: string; billing_email_address: string;
+    admin_first_name: string; admin_last_name: string; admin_email: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${BASE}/leads/${leadId}/test-account`, data);
   }
 
   // ── Dokumenty powiązane z Partnerem ───────────────────────

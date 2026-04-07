@@ -21,6 +21,14 @@ export class StatusBadgeComponent {
 }
 
 // ── Doc Type Badge ────────────────────────────────────────
+const DOC_TYPE_POLISH: Record<string, string> = {
+  partner_agreement:    'Umowa partnerska',
+  it_supplier_agreement:'Umowa z dostawcą IT',
+  employee_agreement:   'Umowa pracownicza',
+  nda:                  'NDA',
+  operator_agreement:   'Umowa operatorska',
+};
+
 @Component({
   selector: 'wt-type-badge',
   standalone: true,
@@ -28,7 +36,9 @@ export class StatusBadgeComponent {
 })
 export class TypeBadgeComponent {
   @Input({ required: true }) set type(t: DocType) {
-    this.label = DOC_TYPE_MAP[t] ?? t;
+    // Polish label for known types; for custom types added via App Settings,
+    // the value IS the display name (e.g. "Dostawca Content Hotel")
+    this.label = DOC_TYPE_POLISH[t] ?? DOC_TYPE_MAP[t] ?? t;
   }
   label = '';
 }

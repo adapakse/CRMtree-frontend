@@ -157,15 +157,11 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           <span *ngIf="!partner.partner_number" style="color:var(--gray-400)">— nie ustawiono</span>
         </span>
         <span class="lbl">NIP</span><span>{{partner.nip || '—'}}</span>
-        <span class="lbl">Adres</span><span>{{partner.address || '—'}}</span>
         <span class="lbl">Branża</span><span>{{partner.industry || '—'}}</span>
         <span class="lbl">Opiekun</span><span>{{partner.manager_name || '—'}}</span>
         <span class="lbl">Umowa od</span><span>{{partner.contract_signed ? (partner.contract_signed | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Umowa do</span><span>{{partner.contract_expires ? (partner.contract_expires | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Obrót roczny</span><span class="accent">{{(partner.contract_value || 0) | number:'1.0-0'}} {{partner.annual_turnover_currency || 'PLN'}}</span>
-        </div>
-        <div class="info-row">
-          <span class="lbl">% Online</span><span>{{partner.online_pct != null ? partner.online_pct + '%' : '—'}}</span>
         </div>
         <div class="info-row" *ngIf="partner.tags?.length">
           <span class="lbl">Tagi</span>
@@ -176,6 +172,16 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         </span>
       </div>
 
+      <!-- Partner Admin (Zadanie C) -->
+      <div class="info-subsection">
+        <div class="info-subsection-title">👤 Partner Admin</div>
+        <div class="info-grid">
+          <span class="lbl">Imię</span><span>{{partner.admin_first_name || '—'}}</span>
+          <span class="lbl">Nazwisko</span><span>{{partner.admin_last_name || '—'}}</span>
+          <span class="lbl">Email</span><span>{{partner.admin_email || '—'}}</span>
+        </div>
+      </div>
+
       <!-- Kontakt do spraw umowy -->
       <div class="info-subsection">
         <div class="info-subsection-title">Kontakt do spraw umowy</div>
@@ -184,6 +190,18 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           <span class="lbl">Stanowisko</span><span>{{partner.contact_title || '—'}}</span>
           <span class="lbl">Email</span><span>{{partner.email || '—'}}</span>
           <span class="lbl">Telefon</span><span>{{partner.phone || '—'}}</span>
+        </div>
+      </div>
+
+      <!-- Billing Address (Zadanie B) -->
+      <div class="info-subsection">
+        <div class="info-subsection-title">Billing Address</div>
+        <div class="info-grid">
+          <span class="lbl">Adres</span><span>{{partner.billing_address || '—'}}</span>
+          <span class="lbl">Kod pocztowy</span><span>{{partner.billing_zip || '—'}}</span>
+          <span class="lbl">Miasto</span><span>{{partner.billing_city || '—'}}</span>
+          <span class="lbl">Kraj</span><span>{{partner.billing_country || '—'}}</span>
+          <span class="lbl">Email</span><span>{{partner.billing_email_address || '—'}}</span>
         </div>
       </div>
 
@@ -223,6 +241,18 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 
       <div class="info-grid" style="margin-top:10px">
         <span class="lbl">Notatki</span><span class="notes">{{partner.notes || '—'}}</span>
+      </div>
+
+      <!-- Dane dodatkowe (Zadanie A) -->
+      <div class="info-subsection">
+        <div class="info-subsection-title">⚙️ Dane dodatkowe</div>
+        <div class="info-grid">
+          <span class="lbl">% Online</span><span>{{partner.online_pct != null ? partner.online_pct + '%' : '—'}}</span>
+          <span class="lbl">Subdomena</span><span style="font-family:monospace">{{partner.subdomain || '—'}}</span>
+          <span class="lbl">Język</span><span>{{partner.language || '—'}}</span>
+          <span class="lbl">Waluta</span><span>{{partner.partner_currency || '—'}}</span>
+          <span class="lbl">Kraj</span><span>{{partner.country || '—'}}</span>
+        </div>
       </div>
 
       <!-- Agent -->
@@ -540,7 +570,31 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
             <label>NIP<input [(ngModel)]="editForm.nip" placeholder="000-000-00-00"></label>
           </div>
           <div class="edit-row">
-            <label class="full">Adres<input [(ngModel)]="editForm.address" placeholder="ul. Przykładowa 1, 00-001 Warszawa"></label>
+            <label class="full">Adres (informacyjny)<input [(ngModel)]="editForm.address" placeholder="ul. Przykładowa 1, 00-001 Warszawa"></label>
+          </div>
+        </div>
+
+        <!-- Partner Admin (Zadanie C) -->
+        <div class="edit-section">
+          <div class="edit-section-title">👤 Partner Admin *</div>
+          <div class="edit-row">
+            <label>Imię *
+              <input [(ngModel)]="editForm.admin_first_name" placeholder="Jan"
+                     [class.input-warn]="submitAttempted && !editForm.admin_first_name">
+            </label>
+            <label>Nazwisko *
+              <input [(ngModel)]="editForm.admin_last_name" placeholder="Kowalski"
+                     [class.input-warn]="submitAttempted && !editForm.admin_last_name">
+            </label>
+          </div>
+          <div class="edit-row">
+            <label class="full">Email *
+              <input [(ngModel)]="editForm.admin_email" type="email" placeholder="admin@firma.pl"
+                     [class.input-warn]="submitAttempted && (!editForm.admin_email || !isValidEmail(editForm.admin_email))">
+            </label>
+          </div>
+          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.admin_first_name || !editForm.admin_last_name || !editForm.admin_email || !isValidEmail(editForm.admin_email))" style="color:#ef4444">
+            ⚠ Uzupełnij wszystkie pola Partner Admin (wymagane).
           </div>
         </div>
 
@@ -595,6 +649,47 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </div>
           <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_contact_name || !editForm.billing_contact_title || !editForm.billing_email || !editForm.billing_phone)" style="color:#f59e0b">
             ⚠ Zalecane jest uzupełnienie wszystkich pól kontaktu do spraw rozliczeń.
+          </div>
+        </div>
+
+        <!-- Billing Address (Zadanie B) -->
+        <div class="edit-section">
+          <div class="edit-section-title">📍 Billing Address *</div>
+          <div class="edit-row">
+            <label class="full">Adres *
+              <input [(ngModel)]="editForm.billing_address" placeholder="ul. Przykładowa 1"
+                     maxlength="50"
+                     [class.input-warn]="submitAttempted && !editForm.billing_address">
+            </label>
+          </div>
+          <div class="edit-row">
+            <label>Kod pocztowy *
+              <input [(ngModel)]="editForm.billing_zip" placeholder="00-001"
+                     maxlength="10"
+                     [class.input-warn]="submitAttempted && !editForm.billing_zip">
+            </label>
+            <label>Miasto *
+              <input [(ngModel)]="editForm.billing_city" placeholder="Warszawa"
+                     maxlength="30"
+                     [class.input-warn]="submitAttempted && !editForm.billing_city">
+            </label>
+          </div>
+          <div class="edit-row">
+            <label>Kraj *
+              <select [(ngModel)]="editForm.billing_country"
+                      [class.input-warn]="submitAttempted && !editForm.billing_country">
+                <option value="">— wybierz kraj —</option>
+                <option *ngFor="let c of countryOptions" [value]="c">{{c}}</option>
+              </select>
+            </label>
+            <label>Email rozliczeniowy *
+              <input [(ngModel)]="editForm.billing_email_address" type="email"
+                     placeholder="faktury@firma.pl" maxlength="255"
+                     [class.input-warn]="submitAttempted && (!editForm.billing_email_address || !isValidEmail(editForm.billing_email_address))">
+            </label>
+          </div>
+          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_address || !editForm.billing_zip || !editForm.billing_city || !editForm.billing_country || !editForm.billing_email_address || !isValidEmail(editForm.billing_email_address))" style="color:#ef4444">
+            ⚠ Uzupełnij wszystkie pola Billing Address (wymagane).
           </div>
         </div>
 
@@ -682,7 +777,15 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 </select>
               </div>
             </label>
-            <label>% Online (udział kanału online)
+            <label>Aktywni użytkownicy<input [(ngModel)]="editForm.active_users" type="number" min="0" placeholder="0"></label>
+          </div>
+        </div>
+
+        <!-- Dane dodatkowe (Zadanie A) -->
+        <div class="edit-section">
+          <div class="edit-section-title">⚙️ Dane dodatkowe *</div>
+          <div class="edit-row">
+            <label>% Online
               <select [(ngModel)]="editForm.online_pct">
                 <option value="">— brak —</option>
                 <option value="0">0%</option>
@@ -698,9 +801,44 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 <option value="100">100%</option>
               </select>
             </label>
+            <label>Subdomena *
+              <input [(ngModel)]="editForm.subdomain"
+                     placeholder="np. acme (3-30 znaków, a-z, 0-9)"
+                     maxlength="30"
+                     (input)="onSubdomainInput($event)"
+                     [class.input-warn]="submitAttempted && !isValidSubdomain(editForm.subdomain)">
+              <span style="font-size:10px;color:var(--gray-400);margin-top:2px;display:block">
+                Tylko małe litery (a-z) i cyfry (0-9), 3–30 znaków
+              </span>
+            </label>
           </div>
           <div class="edit-row">
-            <label>Aktywni użytkownicy<input [(ngModel)]="editForm.active_users" type="number" min="0" placeholder="0"></label>
+            <label>Język *
+              <select [(ngModel)]="editForm.language"
+                      [class.input-warn]="submitAttempted && !editForm.language">
+                <option value="">— wybierz język —</option>
+                <option *ngFor="let l of languageOptions" [value]="l">{{l}}</option>
+              </select>
+            </label>
+            <label>Waluta *
+              <select [(ngModel)]="editForm.partner_currency"
+                      [class.input-warn]="submitAttempted && !editForm.partner_currency">
+                <option value="">— wybierz walutę —</option>
+                <option *ngFor="let c of currencyOptions" [value]="c">{{c}}</option>
+              </select>
+            </label>
+          </div>
+          <div class="edit-row">
+            <label>Kraj *
+              <select [(ngModel)]="editForm.country"
+                      [class.input-warn]="submitAttempted && !editForm.country">
+                <option value="">— wybierz kraj —</option>
+                <option *ngFor="let c of countryOptions" [value]="c">{{c}}</option>
+              </select>
+            </label>
+          </div>
+          <div class="validation-msg" *ngIf="submitAttempted && (!isValidSubdomain(editForm.subdomain) || !editForm.language || !editForm.partner_currency || !editForm.country)" style="color:#ef4444">
+            ⚠ Uzupełnij wszystkie pola Dane dodatkowe (wymagane).
           </div>
         </div>
 
@@ -938,6 +1076,31 @@ export class CrmPartnerDetailComponent implements OnInit {
   get dictIndustries(): string[] { return this._dictArr('crm_industries', ['IT','Finance','Transport','Tourism','Healthcare','Retail','Manufacturing','Legal','Education','Other']); }
   get dictTitles():    string[] { return this._dictArr('crm_contact_titles', ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other']); }
 
+  // Nowe słowniki (Zadania A, B)
+  get languageOptions(): string[] {
+    return this._dictArr('crm_partner_languages', ['Polski','Angielski','Rosyjski','Rumuński','Niemiecki']);
+  }
+  get currencyOptions(): string[] {
+    return this._dictArr('crm_currencies', ['PLN','EUR','USD','GBP','CHF']);
+  }
+  get countryOptions(): string[] {
+    return this._dictArr('crm_partner_countries', ['Polska','Niemcy','Francja','Wielka Brytania','Czechy','Słowacja','Węgry','Rumunia','Ukraina','Rosja']);
+  }
+
+  // Walidacje
+  isValidSubdomain(v: string): boolean {
+    return /^[a-z0-9]{3,30}$/.test(v || '');
+  }
+  isValidEmail(v: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
+  }
+  onSubdomainInput(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    // Wymuś małe litery i tylko dozwolone znaki na bieżąco
+    el.value = el.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    this.editForm.subdomain = el.value;
+  }
+
   private _dictArr(key: string, fallback: string[]): string[] {
     try {
       const v = this.settings.get(key);
@@ -1053,7 +1216,7 @@ export class CrmPartnerDetailComponent implements OnInit {
   }
 
   openDocument(d: LinkedDocument): void {
-    this.router.navigate(['/documents'], { queryParams: { id: d.document_id } });
+    this.router.navigate(['/documents'], { queryParams: { open: d.document_id } });
   }
 
   onDocSearch(): void {
@@ -1168,6 +1331,21 @@ export class CrmPartnerDetailComponent implements OnInit {
       active_users:          this.partner.active_users ?? null,
       tagsStr:               (this.partner.tags || []).join(', '),
       notes:                 this.partner.notes || '',
+      // Zadanie A
+      subdomain:             this.partner.subdomain || '',
+      language:              this.partner.language || '',
+      partner_currency:      this.partner.partner_currency || '',
+      country:               this.partner.country || '',
+      // Zadanie B
+      billing_address:       this.partner.billing_address || '',
+      billing_zip:           this.partner.billing_zip || '',
+      billing_city:          this.partner.billing_city || '',
+      billing_country:       this.partner.billing_country || '',
+      billing_email_address: this.partner.billing_email_address || '',
+      // Zadanie C
+      admin_first_name:      this.partner.admin_first_name || '',
+      admin_last_name:       this.partner.admin_last_name || '',
+      admin_email:           this.partner.admin_email || '',
     };
     this.submitAttempted = false;
     // Zawsze ładuj listę użytkowników przy otwarciu (manager i salesperson)
@@ -1183,8 +1361,19 @@ export class CrmPartnerDetailComponent implements OnInit {
   savePartner() {
     this.submitAttempted = true;
     if (!this.editForm.company) return;
-
     if (!this.partner) return;
+
+    // Walidacja nowych pól wymaganych
+    const subdomainOk = this.isValidSubdomain(this.editForm.subdomain);
+    const adminEmailOk = this.isValidEmail(this.editForm.admin_email);
+    const billingEmailOk = this.isValidEmail(this.editForm.billing_email_address);
+    const newFieldsOk = subdomainOk && adminEmailOk && billingEmailOk
+      && !!this.editForm.language && !!this.editForm.partner_currency && !!this.editForm.country
+      && !!this.editForm.admin_first_name && !!this.editForm.admin_last_name && !!this.editForm.admin_email
+      && !!this.editForm.billing_address && !!this.editForm.billing_zip
+      && !!this.editForm.billing_city && !!this.editForm.billing_country && !!this.editForm.billing_email_address;
+    if (!newFieldsOk) return;
+
     this.saving = true;
     const payload: Partial<Partner> = {
       company:               this.editForm.company,
@@ -1219,6 +1408,21 @@ export class CrmPartnerDetailComponent implements OnInit {
       active_users:          this.editForm.active_users != null && this.editForm.active_users !== '' ? +this.editForm.active_users : null,
       tags:                  this.editForm.tagsStr ? this.editForm.tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       notes:                 this.editForm.notes || null,
+      // Zadanie A
+      subdomain:             this.editForm.subdomain || null,
+      language:              this.editForm.language || null,
+      partner_currency:      this.editForm.partner_currency || null,
+      country:               this.editForm.country || null,
+      // Zadanie B
+      billing_address:       this.editForm.billing_address || null,
+      billing_zip:           this.editForm.billing_zip || null,
+      billing_city:          this.editForm.billing_city || null,
+      billing_country:       this.editForm.billing_country || null,
+      billing_email_address: this.editForm.billing_email_address || null,
+      // Zadanie C
+      admin_first_name:      this.editForm.admin_first_name || null,
+      admin_last_name:       this.editForm.admin_last_name || null,
+      admin_email:           this.editForm.admin_email || null,
     };
     this.api.updatePartner(this.partner.id, payload).subscribe({
       next: updated => {
