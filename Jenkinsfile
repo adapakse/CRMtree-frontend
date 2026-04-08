@@ -139,7 +139,7 @@ pipeline {
                                 cd docs_app
                                 sed -i "/^docs-front:/,/^[^ ]/ s/\\(tag: *\\).*/\\1\\"${params.ENVIRONMENT}-${BUILD_NUMBER}\\"/" "\$FILE_TO_EDIT"
                                 git add "\$FILE_TO_EDIT"
-                                git commit -m "bump image version for ${params.ENVIRONMENT}"
+                                git commit -m "bump image version for ${params.ENVIRONMENT} front"
                                 git push
                             """
                         }
