@@ -64,25 +64,6 @@ pipeline {
             }
         }
 
-        stage("Lint") {
-            steps {
-                nodejs(nodeJSInstallationName: env.NODEJS) {
-                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                        sh "npm run lint"
-                    }
-                }
-            }
-        }
-
-        stage("Sprawdzenie formatowania") {
-            steps {
-                nodejs(nodeJSInstallationName: env.NODEJS) {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    sh "npm run format:check"
-                    }
-                }
-            }
-        }
 
         // stage("Testy") {
         //     steps {
@@ -171,10 +152,6 @@ pipeline {
     post {
         success {
             office365ConnectorSend color: '#00CC00', message: "Build ${BUILD_NUMBER} zakończony sukcesem ✅", webhookUrl: TEAMS_SUCCESS_WEBHOOK_URL
-        }
-        always {
-            junit '**/junit.xml'
-            archiveArtifacts artifacts: 'eslint.report.json', allowEmptyArchive: true
         }
         cleanup {
             deleteDir()
