@@ -1,9 +1,11 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-settings.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { environment } from '../../../../environments/environment';
 
 interface SettingField {
   key: string;
@@ -19,7 +21,7 @@ interface SettingField {
 }
 
 // Zakładki
-type Tab = 'global' | 'crm' | 'documents';
+type Tab = 'global' | 'crm' | 'documents' | 'users';
 
 // Kategorie globalnej aplikacji
 const GLOBAL_CATEGORIES = ['documents', 'workflow', 'general'];
@@ -127,6 +129,9 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
             📄 Słowniki dokumentów
+          </button>
+          <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="activeTab.set('users'); loadGroups()">
+            👥 Grupy użytkowników
           </button>
         </div>
 
@@ -327,6 +332,103 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           }
         }
 
+        <!-- TAB: Grupy użytkowników -->
+        @if (activeTab() === 'users') {
+
+          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#0369A1;display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">👥</span>
+            <div>
+              <strong>Grupy użytkowników</strong> — zarządzaj grupami do których można przypisywać użytkowników.
+              Grupy kontrolują dostęp do dokumentów. Nie można usunąć grupy z przypisanymi użytkownikami lub dokumentami.
+            </div>
+          </div>
+
+          <!-- Formularz dodawania grupy -->
+          <div class="card" style="margin-bottom:20px;padding:20px">
+            <div class="cat-title" style="margin-bottom:14px">➕ Dodaj nową grupę</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div>
+                <label class="field-label">Nazwa techniczna <span style="color:#ef4444">*</span></label>
+                <div class="field-desc">Unikalny identyfikator (np. Accounting, HR). Bez polskich znaków.</div>
+                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:4px"
+                       placeholder="np. Accounting"
+                       [(ngModel)]="newGroup.name">
+              </div>
+              <div>
+                <label class="field-label">Nazwa wyświetlana <span style="color:#ef4444">*</span></label>
+                <div class="field-desc">Widoczna dla użytkowników (np. Obsługa Klienta, Zarząd).</div>
+                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:4px"
+                       placeholder="np. Obsługa Klienta"
+                       [(ngModel)]="newGroup.display_name">
+              </div>
+              <div>
+                <label class="field-label">Opis</label>
+                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:4px"
+                       placeholder="Opcjonalny opis grupy"
+                       [(ngModel)]="newGroup.description">
+              </div>
+              <div style="display:flex;flex-direction:column;justify-content:flex-end">
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:12px">
+                  <input type="checkbox" [(ngModel)]="newGroup.has_owner_restriction">
+                  Ograniczenie właściciela (Owner restriction)
+                </label>
+              </div>
+            </div>
+            @if (groupError()) {
+              <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#DC2626;margin-bottom:12px">
+                ⚠️ {{ groupError() }}
+              </div>
+            }
+            <button class="btn btn-p"
+                    [disabled]="!newGroup.name.trim() || !newGroup.display_name.trim() || groupSaving()"
+                    (click)="addGroup()">
+              @if (groupSaving()) { Dodawanie… } @else { ➕ Dodaj grupę }
+            </button>
+          </div>
+
+          <!-- Lista istniejących grup -->
+          @if (groupsLoading()) {
+            <div style="text-align:center;padding:40px"><div class="spinner"></div></div>
+          } @else if (groups().length === 0) {
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+              Brak grup. Dodaj pierwszą grupę powyżej lub uruchom migrację 0127.
+            </div>
+          } @else {
+            @for (g of groups(); track g.id) {
+              <div class="card" style="margin-bottom:12px;overflow:hidden">
+                <div style="padding:14px 20px;display:flex;align-items:center;gap:12px">
+                  <div style="width:36px;height:36px;background:#EFF6FF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👥</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13.5px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
+                    <div style="font-size:11.5px;color:var(--gray-400);margin-top:1px">
+                      <span style="font-family:monospace;background:var(--gray-100);padding:1px 6px;border-radius:4px">{{ g.name }}</span>
+                      <span style="margin:0 6px">·</span>
+                      <span>{{ g.member_count }} użytkowników</span>
+                      <span style="margin:0 6px">·</span>
+                      <span>{{ g.document_count }} dokumentów</span>
+                      @if (g.has_owner_restriction) {
+                        <span style="margin-left:8px;background:#FEF3C7;color:#92400E;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Owner restriction</span>
+                      }
+                      @if (!g.is_active) {
+                        <span style="margin-left:8px;background:#F3F4F6;color:#6B7280;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Nieaktywna</span>
+                      }
+                    </div>
+                    @if (g.description) {
+                      <div style="font-size:12px;color:var(--gray-500);margin-top:3px">{{ g.description }}</div>
+                    }
+                  </div>
+                  <button class="btn btn-d btn-sm"
+                          [disabled]="g.member_count > 0 || g.document_count > 0"
+                          [title]="g.member_count > 0 || g.document_count > 0 ? 'Nie można usunąć — ma przypisanych użytkowników lub dokumenty' : 'Usuń grupę'"
+                          (click)="deleteGroup(g)">
+                    🗑 Usuń
+                  </button>
+                </div>
+              </div>
+            }
+          }
+        }
+
       </div>
     </div>
   `,
@@ -373,6 +475,63 @@ export class SettingsComponent implements OnInit {
   saving    = signal(false);
   fields    = signal<SettingField[]>([]);
   activeTab = signal<Tab>('global');
+
+  private http        = inject(HttpClient);
+
+  // ── Grupy użytkowników ────────────────────────────────────────────────────
+  groups        = signal<any[]>([]);
+  groupsLoading = signal(false);
+  groupSaving   = signal(false);
+  groupError    = signal('');
+  newGroup      = { name: '', display_name: '', description: '', has_owner_restriction: false };
+  private groupsLoaded = false;
+
+  loadGroups(): void {
+    if (this.groupsLoaded) return;
+    this.groupsLoading.set(true);
+    this.http.get<any[]>(`${environment.apiUrl}/admin/settings/groups`).subscribe({
+      next: list => {
+        this.groups.set(list);
+        this.groupsLoading.set(false);
+        this.groupsLoaded = true;
+      },
+      error: () => this.groupsLoading.set(false),
+    });
+  }
+
+  addGroup(): void {
+    const { name, display_name, description, has_owner_restriction } = this.newGroup;
+    if (!name.trim() || !display_name.trim()) return;
+    this.groupSaving.set(true);
+    this.groupError.set('');
+    this.http.post<any>(`${environment.apiUrl}/admin/settings/groups`, {
+      name: name.trim(), display_name: display_name.trim(),
+      description: description.trim() || null, has_owner_restriction,
+    }).subscribe({
+      next: created => {
+        this.groups.update(list => [...list, created].sort((a, b) => a.name.localeCompare(b.name)));
+        this.newGroup = { name: '', display_name: '', description: '', has_owner_restriction: false };
+        this.groupSaving.set(false);
+        this.toast.success(`Grupa '${created.display_name}' została dodana`);
+      },
+      error: err => {
+        this.groupError.set(err?.error?.error ?? 'Błąd dodawania grupy');
+        this.groupSaving.set(false);
+      },
+    });
+  }
+
+  deleteGroup(g: any): void {
+    if (g.member_count > 0 || g.document_count > 0) return;
+    if (!confirm(`Usunąć grupę "${g.display_name}"?`)) return;
+    this.http.delete(`${environment.apiUrl}/admin/settings/groups/${g.id}`).subscribe({
+      next: () => {
+        this.groups.update(list => list.filter(x => x.id !== g.id));
+        this.toast.success(`Grupa '${g.display_name}' usunięta`);
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Błąd usuwania grupy'),
+    });
+  }
 
   // buffer for new JSON items
   jsonNewItem: Record<string, string> = {};

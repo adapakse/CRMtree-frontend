@@ -41,6 +41,12 @@ export class DocumentService {
     if (payload.document_group_id) fd.append('document_group_id', payload.document_group_id);
     if (payload.expiration_date)   fd.append('expiration_date', payload.expiration_date);
     if (payload.signing_date)      fd.append('signing_date', payload.signing_date);
+    if (payload.nip)               fd.append('nip', payload.nip);
+    if (payload.country)           fd.append('country', payload.country);
+    if (payload.contract_subject)  fd.append('contract_subject', payload.contract_subject);
+    if (payload.contact_name)      fd.append('contact_name', payload.contact_name);
+    if (payload.contact_email)     fd.append('contact_email', payload.contact_email);
+    if (payload.contact_phone)     fd.append('contact_phone', payload.contact_phone);
     (payload.entities ?? []).forEach(e => fd.append('entities[]', e));
     (payload.tags ?? []).forEach((t, i) => {
       fd.append(`tags[${i}][key]`, t.key);

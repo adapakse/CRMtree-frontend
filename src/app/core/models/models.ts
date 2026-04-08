@@ -103,6 +103,12 @@ export interface Document {
   creation_date?: string;
   signing_date?: string;
   expiration_date?: string;
+  nip?: string;
+  country?: string;
+  contract_subject?: string;
+  contact_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
   blob_name?: string;
   blob_size_bytes?: number;
   signus_envelope_id?: string;
@@ -139,6 +145,12 @@ export interface CreateDocumentPayload {
   document_group_id?: string;
   expiration_date?: string;
   signing_date?: string;
+  nip?: string;
+  country?: string;
+  contract_subject?: string;
+  contact_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
   tags?: { key: string; value: string }[];
   file?: File;
 }

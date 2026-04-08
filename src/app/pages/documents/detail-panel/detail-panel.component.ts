@@ -146,15 +146,85 @@ import { environment } from '../../../../environments/environment';
                        [readOnly]="doc._access !== 'full'" placeholder="np. Partner Ltd.">
               </div>
               <div class="fg">
-                <label class="fl">Expiration Date</label>
-                <input class="fi" type="date" [(ngModel)]="draft.expiration_date"
-                       [readOnly]="doc._access !== 'full'">
-              </div>
-              <div class="fg">
                 <label class="fl">Signing Date</label>
                 <input class="fi" type="date" [(ngModel)]="draft.signing_date"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''">
+              </div>
+              <div class="fg">
+                <label class="fl">Expiration Date</label>
+                @if (doc._access === 'full') {
+                  <select class="fsel" [(ngModel)]="draft.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
+                    <option value="indefinite">Czas nieokreślony</option>
+                    <option value="fixed">Data określona</option>
+                  </select>
+                  @if (draft.expiration_date_mode === 'fixed') {
+                    <input class="fi" type="date" [(ngModel)]="draft.expiration_date" style="margin-top:6px">
+                  }
+                } @else {
+                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">
+                    {{ draft.expiration_date ? (draft.expiration_date | date:'dd.MM.yyyy') : 'Czas nieokreślony' }}
+                  </div>
+                }
+              </div>
+              <div class="fg">
+                <label class="fl">Przedmiot umowy <span class="req">*</span></label>
+                @if (doc._access === 'full') {
+                  <select class="fsel" [(ngModel)]="draft.contract_subject">
+                    <option value="">— Wybierz —</option>
+                    @for (s of contractSubjectOptions; track s) {
+                      <option [value]="s">{{ s }}</option>
+                    }
+                  </select>
+                } @else {
+                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.contract_subject || '—' }}</div>
+                }
+              </div>
+              <div class="fg">
+                <label class="fl">NIP kontrahenta</label>
+                <input class="fi" [(ngModel)]="draft.nip" maxlength="15"
+                       [readOnly]="doc._access !== 'full'"
+                       [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
+                       placeholder="np. 1234567890">
+              </div>
+              <div class="fg">
+                <label class="fl">Kraj kontrahenta</label>
+                @if (doc._access === 'full') {
+                  <select class="fsel" [(ngModel)]="draft.country">
+                    <option value="">— Wybierz kraj —</option>
+                    @for (k of countryOptions; track k) {
+                      <option [value]="k">{{ k }}</option>
+                    }
+                  </select>
+                } @else {
+                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.country || '—' }}</div>
+                }
+              </div>
+            </div>
+
+            <!-- Dane kontaktowe ds. umowy -->
+            <div class="sec-title" style="margin-top:20px">Dane kontaktowe ds. umowy</div>
+            <div class="fgrid">
+              <div class="fg full">
+                <label class="fl">Imię i Nazwisko</label>
+                <input class="fi" [(ngModel)]="draft.contact_name"
+                       [readOnly]="doc._access !== 'full'"
+                       [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
+                       placeholder="np. Jan Kowalski">
+              </div>
+              <div class="fg">
+                <label class="fl">Email</label>
+                <input class="fi" type="email" [(ngModel)]="draft.contact_email"
+                       [readOnly]="doc._access !== 'full'"
+                       [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
+                       placeholder="np. jan.kowalski@firma.pl">
+              </div>
+              <div class="fg">
+                <label class="fl">Telefon</label>
+                <input class="fi" [(ngModel)]="draft.contact_phone"
+                       [readOnly]="doc._access !== 'full'"
+                       [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
+                       placeholder="np. +48 600 000 000">
               </div>
             </div>
 
@@ -554,6 +624,23 @@ export class DetailPanelComponent implements OnChanges {
     return Object.entries(GDPR_LABELS).map(([value, label]) => ({ value, label }));
   }
 
+  get countryOptions(): string[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['crm_partner_countries'];
+      if (raw) return JSON.parse(String(raw));
+    } catch { }
+    return ['Polska','Niemcy','Francja','Wielka Brytania','Czechy','Słowacja',
+            'Węgry','Rumunia','Ukraina','Rosja','Austria','Szwajcaria'];
+  }
+
+  get contractSubjectOptions(): string[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_contract_subjects'];
+      if (raw) return JSON.parse(String(raw));
+    } catch { }
+    return ['Podróże służbowe','Konferencje/Spotkania','Zakwaterowanie','System','Inne'];
+  }
+
   get docStatusOptions(): { value: string; label: string }[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_statuses'];
@@ -621,21 +708,32 @@ export class DetailPanelComponent implements OnChanges {
     name: string; status: DocStatus; doc_type: DocType; gdpr_type: GdprType;
     group_id: string; owner_id: string;
     entity1: string; entity2: string;
-    expiration_date: string; signing_date: string;
+    expiration_date: string; expiration_date_mode: 'indefinite' | 'fixed';
+    signing_date: string;
+    nip: string; country: string; contract_subject: string;
+    contact_name: string; contact_email: string; contact_phone: string;
   } = {} as any;
 
   initDraft(): void {
+    const expDate = this.toDateInput(this.doc.expiration_date);
     this.draft = {
-      name:            this.doc.name ?? '',
-      status:          this.doc.status ?? '',
-      doc_type:        this.doc.doc_type ?? '',
-      gdpr_type:       this.doc.gdpr_type ?? '',
-      group_id:        this.doc.group_id ?? '',
-      owner_id:        this.doc.owner_id ?? '',
-      entity1:         this.doc.entities?.[0] ?? '',
-      entity2:         this.doc.entities?.[1] ?? '',
-      expiration_date: this.toDateInput(this.doc.expiration_date),
-      signing_date:    this.toDateInput(this.doc.signing_date),
+      name:                 this.doc.name ?? '',
+      status:               this.doc.status ?? '',
+      doc_type:             this.doc.doc_type ?? '',
+      gdpr_type:            this.doc.gdpr_type ?? '',
+      group_id:             this.doc.group_id ?? '',
+      owner_id:             this.doc.owner_id ?? '',
+      entity1:              this.doc.entities?.[0] ?? '',
+      entity2:              this.doc.entities?.[1] ?? '',
+      expiration_date:      expDate,
+      expiration_date_mode: expDate ? 'fixed' : 'indefinite',
+      signing_date:         this.toDateInput(this.doc.signing_date),
+      nip:                  (this.doc as any).nip ?? '',
+      country:              (this.doc as any).country ?? '',
+      contract_subject:     (this.doc as any).contract_subject ?? '',
+      contact_name:         (this.doc as any).contact_name ?? '',
+      contact_email:        (this.doc as any).contact_email ?? '',
+      contact_phone:        (this.doc as any).contact_phone ?? '',
     };
     this.ownerSearch = this.doc.owner_name ?? '';
   }
@@ -646,15 +744,23 @@ export class DetailPanelComponent implements OnChanges {
     const entities = [this.draft.entity1, this.draft.entity2]
       .map(s => s.trim()).filter(s => !!s);
     this.docSvc.update(this.doc.id, {
-      name:            this.draft.name,
-      status:          this.draft.status,
-      doc_type:        this.draft.doc_type,
-      gdpr_type:       this.draft.gdpr_type,
-      group_id:        this.draft.group_id,
-      owner_id:        this.draft.owner_id,
+      name:             this.draft.name,
+      status:           this.draft.status,
+      doc_type:         this.draft.doc_type,
+      gdpr_type:        this.draft.gdpr_type,
+      group_id:         this.draft.group_id,
+      owner_id:         this.draft.owner_id,
       entities,
-      expiration_date: this.draft.expiration_date || undefined,
-      signing_date:    this.draft.signing_date || undefined,
+      expiration_date:  this.draft.expiration_date_mode === 'fixed'
+                          ? (this.draft.expiration_date || undefined)
+                          : null as any,
+      signing_date:     this.draft.signing_date || undefined,
+      nip:              (this.draft.nip || null) as any,
+      country:          (this.draft.country || null) as any,
+      contract_subject: (this.draft.contract_subject || null) as any,
+      contact_name:     (this.draft.contact_name || null) as any,
+      contact_email:    (this.draft.contact_email || null) as any,
+      contact_phone:    (this.draft.contact_phone || null) as any,
     }).subscribe(updated => {
       this.doc = { ...updated, _access: access };
       this.initDraft();
@@ -904,6 +1010,12 @@ export class DetailPanelComponent implements OnChanges {
 
   hideOwnerDropdown(): void {
     setTimeout(() => this.ownerDropdown.set([]), 200);
+  }
+
+  onExpDateModeChange(): void {
+    if (this.draft.expiration_date_mode === 'indefinite') {
+      this.draft.expiration_date = '';
+    }
   }
 
   downloadDoc(): void {

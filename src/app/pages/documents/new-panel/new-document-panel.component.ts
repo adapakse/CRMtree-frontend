@@ -71,7 +71,21 @@ import { AppSettingsService } from '@core/services/app-settings.service';
             </div>
             <div class="fg">
               <label class="fl">Expiration Date</label>
-              <input class="fi" type="date" [(ngModel)]="form.expiration_date">
+              <select class="fsel" [(ngModel)]="form.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
+                <option value="indefinite">Czas nieokreślony</option>
+                <option value="fixed">Data określona</option>
+              </select>
+              <input *ngIf="form.expiration_date_mode==='fixed'" class="fi" type="date" [(ngModel)]="form.expiration_date" style="margin-top:6px">
+            </div>
+
+            <div class="fg">
+              <label class="fl">Przedmiot umowy <span class="req">*</span></label>
+              <select class="fsel" [(ngModel)]="form.contract_subject">
+                <option value="">— Wybierz —</option>
+                @for (s of contractSubjectOptions; track s) {
+                  <option [value]="s">{{ s }}</option>
+                }
+              </select>
             </div>
 
             <div class="fg">
@@ -82,7 +96,37 @@ import { AppSettingsService } from '@core/services/app-settings.service';
               <label class="fl">Entity 2</label>
               <input class="fi" placeholder="np. Partner Ltd." [(ngModel)]="entity2">
             </div>
+            <div class="fg">
+              <label class="fl">NIP kontrahenta <span class="req">*</span></label>
+              <input class="fi" placeholder="np. 1234567890" maxlength="15" [(ngModel)]="form.nip">
+            </div>
+            <div class="fg">
+              <label class="fl">Kraj kontrahenta <span class="req">*</span></label>
+              <select class="fsel" [(ngModel)]="form.country">
+                <option value="">— Wybierz kraj —</option>
+                @for (k of countryOptions; track k) {
+                  <option [value]="k">{{ k }}</option>
+                }
+              </select>
+            </div>
 
+          </div>
+
+          <!-- Dane kontaktowe ds. umowy -->
+          <div class="sec-title" style="margin-top:20px">Dane kontaktowe ds. umowy</div>
+          <div class="fgrid">
+            <div class="fg full">
+              <label class="fl">Imię i Nazwisko</label>
+              <input class="fi" placeholder="np. Jan Kowalski" [(ngModel)]="form.contact_name">
+            </div>
+            <div class="fg">
+              <label class="fl">Email</label>
+              <input class="fi" type="email" placeholder="np. jan.kowalski@firma.pl" [(ngModel)]="form.contact_email">
+            </div>
+            <div class="fg">
+              <label class="fl">Telefon</label>
+              <input class="fi" placeholder="np. +48 600 000 000" [(ngModel)]="form.contact_phone">
+            </div>
           </div>
 
           <!-- Tags -->
@@ -169,6 +213,23 @@ export class NewDocumentPanelComponent {
       .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
   }
 
+  get countryOptions(): string[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['crm_partner_countries'];
+      if (raw) return JSON.parse(String(raw));
+    } catch { }
+    return ['Polska','Niemcy','Francja','Wielka Brytania','Czechy','Słowacja',
+            'Węgry','Rumunia','Ukraina','Rosja','Austria','Szwajcaria'];
+  }
+
+  get contractSubjectOptions(): string[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_contract_subjects'];
+      if (raw) return JSON.parse(String(raw));
+    } catch { }
+    return ['Podróże służbowe','Konferencje/Spotkania','Zakwaterowanie','System','Inne'];
+  }
+
   get gdprTypeOptions(): { value: string; label: string }[] {
     const GDPR_LABELS: Record<string, string> = {
       data_processing_entrustment: 'Powierzenie przetwarzania danych',
@@ -193,12 +254,33 @@ export class NewDocumentPanelComponent {
 
   form: {
     name: string; doc_type: DocType | ''; gdpr_type: GdprType | '';
-    group_id: string; signing_date: string; expiration_date: string; entities: string[];
+    group_id: string; signing_date: string; expiration_date: string;
+    expiration_date_mode: 'indefinite' | 'fixed';
+    nip: string; country: string; contract_subject: string;
+    contact_name: string; contact_email: string; contact_phone: string;
+    entities: string[];
     tags: { key: string; value: string }[];
-  } = { name: '', doc_type: '', gdpr_type: '', group_id: '', signing_date: '', expiration_date: '', entities: [], tags: [] };
+  } = {
+    name: '', doc_type: '', gdpr_type: '', group_id: '',
+    signing_date: '', expiration_date: '',
+    expiration_date_mode: 'indefinite',
+    nip: '', country: '', contract_subject: '',
+    contact_name: '', contact_email: '', contact_phone: '',
+    entities: [], tags: [],
+  };
 
   isValid(): boolean {
-    return !!(this.form.name.trim() && this.form.doc_type && this.form.gdpr_type && this.form.group_id && this.entity1.trim());
+    return !!(
+      this.form.name.trim() && this.form.doc_type && this.form.gdpr_type &&
+      this.form.group_id && this.entity1.trim() &&
+      this.form.nip.trim() && this.form.country && this.form.contract_subject
+    );
+  }
+
+  onExpDateModeChange(): void {
+    if (this.form.expiration_date_mode === 'indefinite') {
+      this.form.expiration_date = '';
+    }
   }
 
   addTag(): void    { this.form.tags.push({ key: '', value: '' }); }
@@ -229,7 +311,13 @@ export class NewDocumentPanelComponent {
       group_id:         this.form.group_id,
       entities:         [this.entity1, this.entity2].filter(s => !!s.trim()).map(s => s.trim()),
       signing_date:     this.form.signing_date || undefined,
-      expiration_date:  this.form.expiration_date || undefined,
+      expiration_date:  this.form.expiration_date_mode === 'fixed' ? (this.form.expiration_date || undefined) : undefined,
+      nip:              this.form.nip.trim() || undefined,
+      country:          this.form.country || undefined,
+      contract_subject: this.form.contract_subject,
+      contact_name:     this.form.contact_name.trim() || undefined,
+      contact_email:    this.form.contact_email.trim() || undefined,
+      contact_phone:    this.form.contact_phone.trim() || undefined,
       tags:             this.form.tags.filter(t => t.key && t.value),
       file:             this.selectedFile ?? undefined,
     }).subscribe({
