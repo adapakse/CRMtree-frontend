@@ -153,10 +153,6 @@ pipeline {
         success {
             office365ConnectorSend color: '#00CC00', message: "Build ${BUILD_NUMBER} zakończony sukcesem ✅", webhookUrl: TEAMS_SUCCESS_WEBHOOK_URL
         }
-        always {
-            junit '**/junit.xml'
-            archiveArtifacts artifacts: 'eslint.report.json', allowEmptyArchive: true
-        }
         cleanup {
             deleteDir()
         }
