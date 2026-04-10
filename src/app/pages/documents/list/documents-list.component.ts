@@ -9,6 +9,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Document, DocStatus, DocType, GroupProfile, ActiveTaskInfo } from '../../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent } from '../../../shared/components/badges.components';
 import { DOC_TYPE_MAP, triggerDownload, isExpiringSoon } from '../../../core/services/helpers';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { DetailPanelComponent } from '../detail-panel/detail-panel.component';
 import { NewDocumentPanelComponent } from '../new-panel/new-document-panel.component';
 
@@ -221,7 +222,18 @@ export class DocumentsListComponent implements OnInit {
 
   readonly grid  = GRID;
   statuses       = STATUSES;
-  docTypes       = Object.entries(DOC_TYPE_MAP).map(([key, label]) => ({ key, label }));
+  private settingsSvc = inject(AppSettingsService);
+
+  get docTypes(): { key: string; label: string }[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_types'];
+      if (raw) {
+        const types: string[] = JSON.parse(String(raw));
+        return types.map(v => ({ key: v, label: (DOC_TYPE_MAP as Record<string, string>)[v] ?? v }));
+      }
+    } catch { }
+    return Object.entries(DOC_TYPE_MAP).map(([key, label]) => ({ key, label }));
+  }
   groups         = signal<GroupProfile[]>([]);
   documents      = signal<Document[]>([]);
   loading        = signal(true);
@@ -308,10 +320,13 @@ export class DocumentsListComponent implements OnInit {
       limit:    50,
       sort:     BACKEND_SORT_COLS.has(col) ? col : 'created_at',
       order:    BACKEND_SORT_COLS.has(col) ? this.sortDir() : 'desc',
-    }).subscribe(res => {
-      this.documents.set(res.data);
-      this.totalPages.set(res.pages);
-      this.loading.set(false);
+    }).subscribe({
+      next: res => {
+        this.documents.set(res.data);
+        this.totalPages.set(res.pages);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
     });
   }
 
