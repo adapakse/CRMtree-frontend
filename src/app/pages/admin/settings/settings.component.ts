@@ -26,7 +26,7 @@ type Tab = 'global' | 'crm' | 'documents' | 'users';
 // Kategorie globalnej aplikacji
 const GLOBAL_CATEGORIES = ['documents', 'workflow', 'general'];
 // Klucze słownikowe dokumentów - pokazywane tylko w zakładce 'Słowniki dokumentów'
-const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_entity1_options'];
+const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_entity1_options', 'doc_contract_subjects'];
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
   documents: { label: 'Dokumenty i terminy',    icon: '📄' },
