@@ -78,7 +78,7 @@ pipeline {
                 script {
 
                     docker.withRegistry(BASTION_REGISTRY_URL, BASTION_REGISTRY_ACCOUNT_CREDENTIAL_ID) {
-                        def image = docker.build("${BASTION_NCA_REGISTRY_URL}:${BUILD_NUMBER}",
+                        def image = docker.build("${BASTION_NCA_REGISTRY_URL}:${params.ENVIRONMENT}-${BUILD_NUMBER}",
                             ".")
                         env.BASTION_IMAGE = image.id
                     }
@@ -137,7 +137,7 @@ pipeline {
                                 git config pull.rebase false
                                 git pull
                                 cd docs_app
-                                sed -i "/^docs-front:/,/^[^ ]/ s/\\(tag: *\\).*/\\1\\"${BUILD_NUMBER}\\"/" "\$FILE_TO_EDIT"
+                                sed -i "/^docs-front:/,/^[^ ]/ s/\\(tag: *\\).*/\\1\\"${params.ENVIRONMENT}-${BUILD_NUMBER}\\"/" "\$FILE_TO_EDIT"
                                 git add "\$FILE_TO_EDIT"
                                 git commit -m "bump image version for ${params.ENVIRONMENT}"
                                 git push
