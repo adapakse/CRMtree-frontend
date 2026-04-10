@@ -90,7 +90,16 @@ import { AppSettingsService } from '@core/services/app-settings.service';
 
             <div class="fg">
               <label class="fl">Entity 1 <span class="req">*</span></label>
-              <input class="fi" placeholder="np. WorkTrips Sp. z o.o." [(ngModel)]="entity1">
+              @if (entity1Options.length > 0) {
+                <select class="fsel" [(ngModel)]="entity1">
+                  <option value="">— Wybierz podmiot —</option>
+                  @for (opt of entity1Options; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              } @else {
+                <input class="fi" placeholder="np. WorkTrips Sp. z o.o." [(ngModel)]="entity1">
+              }
             </div>
             <div class="fg">
               <label class="fl">Entity 2</label>
@@ -228,6 +237,17 @@ export class NewDocumentPanelComponent {
       if (raw) return JSON.parse(String(raw));
     } catch { }
     return ['Podróże służbowe','Konferencje/Spotkania','Zakwaterowanie','System','Inne'];
+  }
+
+  get entity1Options(): string[] {
+    try {
+      const raw = this.settingsSvc.settings()?.['doc_entity1_options'];
+      if (raw) {
+        const parsed = JSON.parse(String(raw));
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch { }
+    return [];
   }
 
   get gdprTypeOptions(): { value: string; label: string }[] {

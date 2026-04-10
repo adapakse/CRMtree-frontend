@@ -130,12 +130,16 @@ import { environment } from '../../../../environments/environment';
               <div class="fg">
                 <label class="fl">Entity 1</label>
                 @if (doc._access === 'full') {
+                  @if (entity1Options.length > 0) {
                   <select class="fsel" [(ngModel)]="draft.entity1">
                     <option value="">— wybierz podmiot —</option>
                     @for (opt of entity1Options; track opt) {
                       <option [value]="opt">{{ opt }}</option>
                     }
                   </select>
+                } @else {
+                  <input class="fi" [(ngModel)]="draft.entity1" placeholder="np. WorkTrips Sp. z o.o.">
+                }
                 } @else {
                   <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.entity1 || '—' }}</div>
                 }
@@ -581,9 +585,12 @@ export class DetailPanelComponent implements OnChanges {
   get entity1Options(): string[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_entity1_options'];
-      if (raw) return JSON.parse(String(raw));
+      if (raw) {
+        const parsed = JSON.parse(String(raw));
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch { }
-    return ['Worktrips Sp. z o.o.', 'Travel Manager Sp. z o.o.'];
+    return [];
   }
 
   get docTypeOptions(): { value: string; label: string }[] {
