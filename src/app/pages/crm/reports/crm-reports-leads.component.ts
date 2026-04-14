@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
-  CrmApiService, LeadsReport, LeadsReportKpi,
+  CrmApiService, LeadsReport, LeadsReportKpi, LeadsReportStageVelocity,
   LEAD_STAGE_LABELS, LEAD_SOURCES, LEAD_SOURCE_LABELS, CrmUser,
 } from '../../../core/services/crm-api.service';
 import { Router } from '@angular/router';
@@ -334,6 +334,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   funnel:      any[] = [];
   monthly:     any[] = [];
   velocityData:any[] = [];
+  stageVelocity: LeadsReportStageVelocity[] = [];
   crmUsers:    CrmUser[] = [];
 
   private chartsBuilt = false;
@@ -435,6 +436,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
           this.byRep       = report.by_rep || [];
           this.bySource    = report.by_source || [];
           this.lostReasons = report.lost_reasons || [];
+          this.stageVelocity = report.stage_velocity || [];
           this.velocityData = this.buildVelocityData();
           this.loading     = false;
           this.cdr.markForCheck();
@@ -452,18 +454,16 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   }
 
   private buildVelocityData(): any[] {
-    // Build stage transition labels from funnel
-    const stages = this.funnel.filter(f => !['closed_won','closed_lost'].includes(f.stage));
-    if (stages.length < 2) return [];
-    const result = [];
-    for (let i = 0; i < stages.length - 1; i++) {
-      result.push({
-        label: `${(LEAD_STAGE_LABELS as Record<string,string>)[stages[i].stage] || stages[i].stage} → ${(LEAD_STAGE_LABELS as Record<string,string>)[stages[i+1].stage] || stages[i+1].stage}`,
-        days: Math.round(5 + Math.random() * 10), // placeholder – replace with real data if endpoint provides it
-        max: 20,
-      });
-    }
-    return result;
+    if (!this.stageVelocity?.length) return [];
+    const stageOrder = ['new','qualification','presentation','offer','negotiation','closed_won','closed_lost'];
+    const sorted = [...this.stageVelocity].sort(
+      (a, b) => stageOrder.indexOf(a.stage) - stageOrder.indexOf(b.stage)
+    );
+    return sorted.map(v => ({
+      label: (LEAD_STAGE_LABELS as Record<string,string>)[v.stage] || v.stage,
+      days:  v.avg_days ?? 0,
+      count: v.count,
+    }));
   }
 
   private buildCharts(): void {
@@ -505,8 +505,8 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
           <div style="position:absolute;inset:0;background:#f4f4f5;border-radius:4px"></div>
           <div style="position:absolute;top:0;left:0;width:${pct}%;height:100%;background:${color};border-radius:4px;opacity:.85"></div>
           <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 8px">
-            <span style="font-size:10.5px;font-weight:700;color:white;text-shadow:0 1px 2px rgba(0,0,0,.4)">${d.count} lead.</span>
-            <span style="font-size:10.5px;color:white;text-shadow:0 1px 2px rgba(0,0,0,.4);margin-left:auto">${(d.value/1000).toFixed(0)}k PLN</span>
+            <span style="font-size:10.5px;font-weight:700;color:#374151">${d.count} lead.</span>
+            <span style="font-size:10.5px;font-weight:600;color:#374151;margin-left:auto">${(d.value/1000).toFixed(0)}k PLN</span>
           </div>
         </div>${conv}</div>`;
       el.appendChild(row);
@@ -599,11 +599,25 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     el.innerHTML = '';
     if (!this.velocityData.length) return;
     const max = Math.max(...this.velocityData.map(d => d.days), 1);
-    this.velocityData.forEach(d => {
-      const pct  = Math.round(d.days / max * 100);
+    // Legend: show max scale
+    const legend = document.createElement('div');
+    legend.style.cssText = 'font-size:10px;color:#a1a1aa;text-align:right;margin-bottom:8px';
+    legend.textContent = `Skala: maks. ${max} dni`;
+    el.appendChild(legend);
+    this.velocityData.forEach((d: any) => {
+      const pct   = Math.round(d.days / max * 100);
       const color = pct > 80 ? '#EF4444' : pct > 60 ? '#F59E0B' : '#22C55E';
+      const count = d.count ? `<span style="font-size:10.5px;color:#71717a;font-weight:400">&nbsp;(${d.count} lead.)</span>` : '';
       const row = document.createElement('div');
-      row.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#52525b">${d.label}</span><span style="font-size:12px;font-weight:700;color:${color}">${d.days} dni</span></div><div style="height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px"></div></div>`;
+      row.style.cssText = 'margin-bottom:10px';
+      row.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+          <span style="font-size:12px;color:#374151;font-weight:600">${d.label}${count}</span>
+          <span style="font-size:13px;font-weight:700;color:${color}">${d.days} dni</span>
+        </div>
+        <div style="height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;transition:width .3s"></div>
+        </div>`;
       el.appendChild(row);
     });
   }

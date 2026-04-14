@@ -43,6 +43,7 @@ export interface Lead {
   annual_turnover_currency: string;
   online_pct: number | null;
   converted_at: string | null;
+  first_contact_date?: string | null;
   agent_name: string | null;
   agent_email: string | null;
   agent_phone: string | null;
@@ -353,6 +354,8 @@ export interface LeadsReportMonthly  { month: string; new_leads: number; won: nu
 export interface LeadsReportByRep    { rep_name: string; rep_id: string; total: number; active: number; won: number; lost: number; pipeline_value: number; won_value: number; win_rate: number; avg_cycle_days: number; }
 export interface LeadsReportBySource { source: string; count: number; won_count: number; won_value: number; }
 export interface LeadsReportLostReason { reason: string; count: number; }
+export interface LeadsReportStageVelocity { stage: string; count: number; avg_days: number; }
+
 export interface LeadsReport {
   kpi: LeadsReportKpi;
   funnel: LeadsReportFunnel[];
@@ -360,6 +363,7 @@ export interface LeadsReport {
   by_rep: LeadsReportByRep[];
   by_source: LeadsReportBySource[];
   lost_reasons: LeadsReportLostReason[];
+  stage_velocity: LeadsReportStageVelocity[];
 }
 
 // ── Raporty Partnerzy ────────────────────────────────────────────────────────
