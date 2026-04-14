@@ -158,6 +158,7 @@ const PROB_MAP: Record<LeadStage, number> = {
             </div>
             <div class="lead-meta">
               <span *ngIf="lead.source" class="tag" [class]="srcTagCls(lead.source)">{{ srcLabel(lead.source) }}</span>
+              <span *ngIf="lead.first_contact_date" style="font-size:10px;color:var(--gray-400);margin-left:4px">📅 {{ lead.first_contact_date | date:'dd.MM.yy' }}</span>
               <span class="avatar-sm" *ngIf="lead.assigned_to_name" style="margin-left:auto" [title]="lead.assigned_to_name">
                 {{ initials(lead.assigned_to_name) }}
               </span>
@@ -320,8 +321,9 @@ const PROB_MAP: Record<LeadStage, number> = {
 
   <!-- ════ TABLE ════ -->
   <div *ngIf="!loading && viewMode==='table'" class="tw">
-    <div class="thead" style="grid-template-columns:2fr 110px 70px 130px 70px 110px 100px 90px">
+    <div class="thead" style="grid-template-columns:2fr 90px 110px 70px 130px 70px 110px 100px 90px">
       <div class="th sortable" (click)="sortBy('company')">Firma / Kontakt <span class="si">{{sortIcon('company')}}</span></div>
+      <div class="th sortable" (click)="sortBy('first_contact_date')" style="text-align:center">Pierw. kont. <span class="si">{{sortIcon('first_contact_date')}}</span></div>
       <div class="th sortable" (click)="sortBy('stage')">Etap <span class="si">{{sortIcon('stage')}}</span></div>
       <div class="th sortable" (click)="sortBy('probability')" style="text-align:center">% Szansa <span class="si">{{sortIcon('probability')}}</span></div>
       <div class="th sortable" (click)="sortBy('value_pln')">Obrót roczny <span class="si">{{sortIcon('value_pln')}}</span></div>
@@ -331,7 +333,7 @@ const PROB_MAP: Record<LeadStage, number> = {
       <div class="th sortable" (click)="sortBy('close_date')">Zamkn. <span class="si">{{sortIcon('close_date')}}</span></div>
     </div>
     <div *ngFor="let lead of sortedLeads; trackBy:trackById"
-         class="tr-row" style="grid-template-columns:2fr 110px 70px 130px 70px 110px 100px 90px"
+         class="tr-row" style="grid-template-columns:2fr 90px 110px 70px 130px 70px 110px 100px 90px"
          [routerLink]="['/crm/leads',lead.id]">
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
@@ -344,6 +346,7 @@ const PROB_MAP: Record<LeadStage, number> = {
           </div>
         </div>
       </div>
+      <div class="td" style="font-size:12px;text-align:center;color:var(--gray-400)">{{ lead.first_contact_date ? (lead.first_contact_date | date:'dd.MM.yy') : '—' }}</div>
       <div class="td"><span class="stage-pill stage-{{ lead.stage }}">{{ stageLabel(lead.stage) }}</span></div>
       <div class="td" style="font-size:12px;text-align:center;font-weight:600;color:var(--gray-600)">{{ lead.probability != null ? lead.probability+'%' : '—' }}</div>
       <div class="td" style="font-family:'Sora',sans-serif;font-weight:700;color:var(--orange)">
@@ -383,16 +386,25 @@ const PROB_MAP: Record<LeadStage, number> = {
     </div>
     <div class="modal-body">
       <div class="fgrid2">
-        <!-- WWW field - first -->
-        <div class="fg" style="grid-column:1/-1">
-          <label class="fl">Strona WWW <span style="font-size:10px;color:var(--gray-400)">(opcjonalne)</span></label>
-          <div style="position:relative">
-            <input class="fi" [(ngModel)]="newFormWebsite"
-                   placeholder="np. acme.pl"
-                   (ngModelChange)="onWebsiteChange()"
-                   style="padding-right:36px">
-            <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)">⏳</span>
+        <!-- WWW field + hot checkbox -->
+        <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+          <div>
+            <label class="fl">Strona WWW <span style="font-size:10px;color:var(--gray-400)">(opcjonalne)</span></label>
+            <div style="position:relative">
+              <input class="fi" [(ngModel)]="newFormWebsite"
+                     placeholder="np. acme.pl"
+                     (ngModelChange)="onWebsiteChange()"
+                     style="padding-right:36px">
+              <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)">⏳</span>
+            </div>
           </div>
+          <div style="display:flex;align-items:center;gap:6px;padding-bottom:1px">
+            <input type="checkbox" [(ngModel)]="newForm.hot" id="hotchk" style="width:auto;margin:0">
+            <label for="hotchk" style="font-size:13px;cursor:pointer;font-weight:400;white-space:nowrap">🔥 Gorący lead</label>
+          </div>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <div>
           <!-- Enrich prompt banner -->
           <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
             <span>🔍 Pobierz dane firmy ze strony?</span>
@@ -402,6 +414,7 @@ const PROB_MAP: Record<LeadStage, number> = {
           <!-- Enrich result badge -->
           <div *ngIf="enrichResult" style="margin-top:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 12px;font-size:11px;color:#15803d">
             ✓ Dane pobrane — sprawdź pola poniżej i uzupełnij brakujące
+          </div>
           </div>
         </div>
 
@@ -445,6 +458,10 @@ const PROB_MAP: Record<LeadStage, number> = {
           </select>
         </div>
         <div class="fg">
+          <label class="fl">Pierwszy kontakt</label>
+          <input class="fi" type="date" [(ngModel)]="newForm.first_contact_date">
+        </div>
+        <div class="fg">
           <label class="fl">Etap</label>
           <select class="fsel" [(ngModel)]="newForm.stage">
             <option value="new">Nowy</option>
@@ -460,10 +477,6 @@ const PROB_MAP: Record<LeadStage, number> = {
             <option value="">— nieprzypisany —</option>
             <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
           </select>
-        </div>
-        <div class="fg" style="display:flex;flex-direction:row;align-items:center;gap:8px">
-          <input type="checkbox" [(ngModel)]="newForm.hot" id="hotchk" style="width:auto;margin:0">
-          <label for="hotchk" style="font-size:13px;cursor:pointer;font-weight:400">🔥 Gorący lead</label>
         </div>
         <div class="fg" style="grid-column:1/-1">
           <label class="fl">Notatki</label>
@@ -1176,7 +1189,7 @@ export class CrmLeadsListComponent implements OnInit {
       let va: any = (a as any)[col] ?? '';
       let vb: any = (b as any)[col] ?? '';
       if (col === 'value_pln' || col === 'online_pct' || col === 'probability') { va = +(va||0); vb = +(vb||0); return dir==='asc' ? va-vb : vb-va; }
-      if (col === 'close_date') { va = va?new Date(va).getTime():0; vb = vb?new Date(vb).getTime():0; return dir==='asc'?va-vb:vb-va; }
+      if (col === 'close_date' || col === 'first_contact_date') { va = va?new Date(va).getTime():0; vb = vb?new Date(vb).getTime():0; return dir==='asc'?va-vb:vb-va; }
       const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
       return dir==='asc' ? cmp : -cmp;
     });
@@ -1310,7 +1323,7 @@ export class CrmLeadsListComponent implements OnInit {
 
   openNew() {
     this.newForm       = { company:'', contact_name:'', contact_title:'', email:'', phone:'',
-                           value_pln: null, source:'', stage:'new', hot:false, notes:'', assigned_to:'' };
+                           value_pln: null, source:'', stage:'new', hot:false, notes:'', assigned_to:'', first_contact_date:'' };
     this.newFormWebsite = '';
     this.enrichPrompt   = false;
     this.enrichResult   = null;
@@ -1375,6 +1388,7 @@ export class CrmLeadsListComponent implements OnInit {
       stage:         this.newForm.stage,
       hot:           this.newForm.hot,
       notes:         this.newForm.notes         || null,
+      first_contact_date: this.newForm.first_contact_date || null,
       nip:           this.newForm.nip           || this.enrichResult?.nip || null,
       website:       this.newFormWebsite        || null,
       logo_url:      (this.newForm as any).logo_url || null,

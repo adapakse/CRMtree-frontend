@@ -94,6 +94,7 @@ import { AuthService } from '../../../core/auth/auth.service';
         <div class="info-kv"><span class="lbl">Etap</span><span class="val"><span class="stage-badge stage-{{lead.stage}}" style="font-size:10px">{{stageLabel(lead.stage)}}</span></span></div>
         <div class="info-kv"><span class="lbl">Szansa</span><span class="val">{{lead.probability||0}}%</span></div>
         <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">% Online</span><span class="val">{{lead.online_pct}}%</span></div>
+        <div class="info-kv" *ngIf="lead.first_contact_date"><span class="lbl">Pierwszy kont.</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
         <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">Data zamkn.</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
         <div class="info-kv" *ngIf="lead.assigned_to_name"><span class="lbl">Handlowiec</span><span class="val fw">{{lead.assigned_to_name}}</span></div>
       </div>
@@ -474,7 +475,7 @@ import { AuthService } from '../../../core/auth/auth.service';
           <label>% Online<select [(ngModel)]="editForm.online_pct"><option value="">— brak —</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
         </div>
         <div class="edit-row">
-          <label>% Szansa<select [(ngModel)]="editForm.probability"><option value="">— brak —</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+          <label>Pierwszy kontakt<input [(ngModel)]="editForm.first_contact_date" type="date"></label>
           <label>Data zamknięcia<input [(ngModel)]="editForm.close_date" type="date"></label>
         </div>
         <div class="edit-row">
@@ -493,6 +494,9 @@ import { AuthService } from '../../../core/auth/auth.service';
         </ng-container>
         <div class="edit-row">
           <label>Handlowiec<select [(ngModel)]="editForm.assigned_to"><option value="">— nieprzypisany —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select></label>
+          <label>% Szansa<select [(ngModel)]="editForm.probability"><option value="">— brak —</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+        </div>
+        <div class="edit-row">
           <label class="full">Tagi (oddzielone przecinkiem)<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
         </div>
       </div>
@@ -1070,6 +1074,7 @@ export class CrmLeadDetailComponent implements OnInit {
       online_pct:           this.lead.online_pct != null ? String(this.lead.online_pct) : '',
       probability:  this.lead.probability ?? null,
       close_date:   this.lead.close_date || '',
+      first_contact_date: this.lead.first_contact_date ? String(this.lead.first_contact_date).slice(0,10) : '',
       source:       this.lead.source || '',
       industry:     this.lead.industry || '',
       assigned_to:  this.lead.assigned_to || '',
@@ -1107,6 +1112,7 @@ export class CrmLeadDetailComponent implements OnInit {
       online_pct:               this.editForm.online_pct !== '' && this.editForm.online_pct != null ? +this.editForm.online_pct : null,
       probability:   this.editForm.probability != null && this.editForm.probability !== '' ? +this.editForm.probability : null,
       close_date:    this.editForm.close_date || null,
+      first_contact_date: this.editForm.first_contact_date || null,
       source:        this.editForm.source || null,
       industry:      this.editForm.industry || null,
       assigned_to:   this.editForm.assigned_to || null,
