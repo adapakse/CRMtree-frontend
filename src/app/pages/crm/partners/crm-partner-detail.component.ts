@@ -567,7 +567,12 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 Klucz łączący z danymi w systemie transakcyjnym
               </span>
             </label>
-            <label>NIP<input [(ngModel)]="editForm.nip" placeholder="000-000-00-00"></label>
+            <label>NIP <span style="color:#f97316">*</span>
+              <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
+                     (ngModelChange)="validatePartnerNip()"
+                     [style.border-color]="partnerNipEditError ? '#ef4444' : ''">
+              <span *ngIf="partnerNipEditError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipEditError }}</span>
+            </label>
           </div>
           <div class="edit-row">
             <label class="full">Adres (informacyjny)<input [(ngModel)]="editForm.address" placeholder="ul. Przykładowa 1, 00-001 Warszawa"></label>
@@ -1118,6 +1123,18 @@ export class CrmPartnerDetailComponent implements OnInit {
   showNewActivity = false;
   showEdit = false;
   submitAttempted = false;
+  partnerNipEditError = '';
+
+  validatePartnerNip(): void {
+    const val = (this.editForm.nip || '').trim().toUpperCase();
+    if (!val) { this.partnerNipEditError = 'NIP jest wymagany'; return; }
+    const cc = val.slice(0, 2);
+    const digits = val.slice(2);
+    if (!/^[A-Z]{2}$/.test(cc)) { this.partnerNipEditError = 'Podaj kod kraju (2 litery), np. PL'; return; }
+    if (cc === 'PL' && !/^\d{10}$/.test(digits)) { this.partnerNipEditError = 'Dla PL wymagane 10 cyfr po kodzie kraju'; return; }
+    if (cc !== 'PL' && digits.length === 0) { this.partnerNipEditError = 'Podaj numer po kodzie kraju'; return; }
+    this.partnerNipEditError = '';
+  }
   editForm: any  = {};
   actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
   actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '', opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
@@ -1362,6 +1379,8 @@ export class CrmPartnerDetailComponent implements OnInit {
     this.submitAttempted = true;
     if (!this.editForm.company) return;
     if (!this.partner) return;
+    this.validatePartnerNip();
+    if (this.partnerNipEditError) return;
 
     // Walidacja nowych pól wymaganych
     const subdomainOk = this.isValidSubdomain(this.editForm.subdomain);
@@ -1379,7 +1398,7 @@ export class CrmPartnerDetailComponent implements OnInit {
       company:               this.editForm.company,
       partner_number:        this.editForm.partner_number || null,
       status:                this.editForm.status,
-      nip:                   this.editForm.nip || null,
+      nip:                   this.editForm.nip ? this.editForm.nip.trim().toUpperCase() : null,
       address:               this.editForm.address || null,
       industry:              this.editForm.industry || null,
       contact_name:          this.editForm.contact_name || null,
