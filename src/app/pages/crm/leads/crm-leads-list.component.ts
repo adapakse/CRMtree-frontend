@@ -441,10 +441,13 @@ const PROB_MAP: Record<LeadStage, number> = {
           <input class="fi" [(ngModel)]="newForm.phone" placeholder="+48 600 000 000">
         </div>
         <div class="fg">
-          <label class="fl">NIP <span style="font-size:10px;color:var(--gray-400)">(opcjonalne)</span></label>
-          <input class="fi" [(ngModel)]="newForm.nip" placeholder="np. 1234567890"
-                 [style.background]="enrichResult?.nip ? '#f9fafb' : ''"
-                 [value]="newForm.nip || enrichResult?.nip || ''">
+          <label class="fl">NIP <span style="color:var(--orange)">*</span></label>
+          <input class="fi" [(ngModel)]="newForm.nip"
+                 placeholder="PL1234567890"
+                 maxlength="14"
+                 (ngModelChange)="onNipChange('lead')"
+                 [class.fi-err]="nipError">
+          <span class="ferr" *ngIf="nipError">{{ nipError }}</span>
         </div>
         <div class="fg">
           <label class="fl">Wartość (PLN)</label>
@@ -1118,6 +1121,27 @@ export class CrmLeadsListComponent implements OnInit {
   showNew   = false;
   submitted = false;
   newForm: any = {};
+  nipError = '';
+
+  onNipChange(ctx: 'lead' | 'partner' = 'lead'): void {
+    const val = (this.newForm.nip || '').trim().toUpperCase();
+    if (!val) { this.nipError = 'NIP jest wymagany'; return; }
+    const cc = val.slice(0, 2);
+    const digits = val.slice(2);
+    if (!/^[A-Z]{2}$/.test(cc)) {
+      this.nipError = 'Podaj kod kraju (2 litery), np. PL';
+      return;
+    }
+    if (cc === 'PL' && !/^\d{10}$/.test(digits)) {
+      this.nipError = 'Dla PL wymagane 10 cyfr po kodzie kraju';
+      return;
+    }
+    if (cc !== 'PL' && digits.length === 0) {
+      this.nipError = 'Podaj numer po kodzie kraju';
+      return;
+    }
+    this.nipError = '';
+  }
 
   crmUsers: CrmUser[] = [];
 
@@ -1322,7 +1346,8 @@ export class CrmLeadsListComponent implements OnInit {
   setPage(p: number)           { this.page = p; this.load(); }
 
   openNew() {
-    this.newForm       = { company:'', contact_name:'', contact_title:'', email:'', phone:'',
+    this.nipError = '';
+    this.newForm       = { company:'', contact_name:'', contact_title:'', email:'', phone:'', nip:'PL',
                            value_pln: null, source:'', stage:'new', hot:false, notes:'', assigned_to:'', first_contact_date:'' };
     this.newFormWebsite = '';
     this.enrichPrompt   = false;
@@ -1376,6 +1401,10 @@ export class CrmLeadsListComponent implements OnInit {
   createLead() {
     this.submitted = true;
     if (!this.newForm.company) return;
+    // Wyzwól walidację NIP przed sprawdzeniem (user mógł nie dotknąć pola)
+    this.onNipChange();
+    const nipVal = (this.newForm.nip || this.enrichResult?.nip || '').trim();
+    if (!nipVal || this.nipError) return;
     this.saving = true;
     const payload: any = {
       company:       this.newForm.company,
@@ -1389,7 +1418,7 @@ export class CrmLeadsListComponent implements OnInit {
       hot:           this.newForm.hot,
       notes:         this.newForm.notes         || null,
       first_contact_date: this.newForm.first_contact_date || null,
-      nip:           this.newForm.nip           || this.enrichResult?.nip || null,
+      nip:           (this.newForm.nip || this.enrichResult?.nip || '').trim().toUpperCase() || null,
       website:       this.newFormWebsite        || null,
       logo_url:      (this.newForm as any).logo_url || null,
     };

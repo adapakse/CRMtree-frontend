@@ -120,7 +120,12 @@ type SortDir = 'asc' | 'desc';
       <h3>Nowy partner</h3>
       <p class="hint">Możesz utworzyć partnera bez powiązanego leada.</p>
       <label>Firma *<input [(ngModel)]="newP.company" placeholder="Nazwa firmy"></label>
-      <label>NIP<input [(ngModel)]="newP.nip"></label>
+      <label>NIP <span style="color:#f97316">*</span>
+        <input [(ngModel)]="newP.nip" placeholder="PL1234567890" maxlength="14"
+               (ngModelChange)="onPartnerNipChange()"
+               [style.border-color]="partnerNipError ? '#ef4444' : ''">
+        <span *ngIf="partnerNipError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipError }}</span>
+      </label>
       <label>Kontakt<input [(ngModel)]="newP.contact_name"></label>
       <label>Email<input [(ngModel)]="newP.email" type="email"></label>
       <label>Branża<input [(ngModel)]="newP.industry"></label>
@@ -134,7 +139,7 @@ type SortDir = 'asc' | 'desc';
       </label>
       <div class="panel-actions">
         <button class="btn-outline" (click)="showCreate=false">Anuluj</button>
-        <button class="btn-primary" (click)="createPartner()" [disabled]="!newP.company||saving">
+        <button class="btn-primary" (click)="createPartner()" [disabled]="!newP.company||!newP.nip||!!partnerNipError||saving">
           {{saving?'Zapisywanie…':'Utwórz partnera'}}
         </button>
       </div>
@@ -236,7 +241,28 @@ export class CrmPartnersListComponent implements OnInit {
   sortCol = 'company';
   sortDir: SortDir = 'asc';
 
-  newP: Partial<Partner> = {};
+  newP: Partial<Partner> = { nip: 'PL' };
+  partnerNipError = '';
+
+  onPartnerNipChange(): void {
+    const val = (this.newP.nip || '').trim().toUpperCase();
+    if (!val) { this.partnerNipError = 'NIP jest wymagany'; return; }
+    const cc = val.slice(0, 2);
+    const digits = val.slice(2);
+    if (!/^[A-Z]{2}$/.test(cc)) {
+      this.partnerNipError = 'Podaj kod kraju (2 litery), np. PL';
+      return;
+    }
+    if (cc === 'PL' && !/^\d{10}$/.test(digits)) {
+      this.partnerNipError = 'Dla PL wymagane 10 cyfr po kodzie kraju';
+      return;
+    }
+    if (cc !== 'PL' && digits.length === 0) {
+      this.partnerNipError = 'Podaj numer po kodzie kraju';
+      return;
+    }
+    this.partnerNipError = '';
+  }
   statusOptions = Object.entries(PARTNER_STATUS_LABELS).map(([key, label]) => ({ key: key as PartnerStatus, label }));
 
   get totalPages() { return Math.ceil(this.total / this.pageSize); }
@@ -319,16 +345,29 @@ export class CrmPartnersListComponent implements OnInit {
   nextPage() { if (this.page < this.totalPages) { this.page++; this.reload(); } }
 
   openCreateForm() {
-    this.newP = {};
+    this.newP = { nip: 'PL' }; this.partnerNipError = '';
     this.showCreate = true;
   }
 
   createPartner() {
     if (!this.newP.company) return;
+    // Wyzwól walidację NIP przed sprawdzeniem
+    this.onPartnerNipChange();
+    if (!this.newP.nip || this.partnerNipError) return;
     this.saving = true;
     this.api.createPartner(this.newP).subscribe({
       next: p => { this.saving = false; this.showCreate = false; this.newP = {}; this.router.navigate(['/crm/partners', p.id]); },
-      error: () => { this.saving = false; },
+      error: (err: any) => {
+        this.zone.run(() => {
+          this.saving = false;
+          if (err?.status === 409) {
+            this.partnerNipError = err?.error?.error || 'Ten Numer NIP jest już przypisany dla innego rekordu.';
+          } else {
+            this.partnerNipError = 'Błąd tworzenia partnera. Spróbuj ponownie.';
+          }
+          this.cdr.markForCheck();
+        });
+      },
     });
   }
 }

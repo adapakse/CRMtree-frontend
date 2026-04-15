@@ -465,7 +465,13 @@ import { AuthService } from '../../../core/auth/auth.service';
           <label>Telefon<input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"></label>
         </div>
         <div class="edit-row">
-          <label>NIP<input [(ngModel)]="editForm.nip" placeholder="np. 1234567890" style="font-family:monospace"></label>
+          <label>NIP <span style="color:#f97316">*</span>
+            <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
+                   style="font-family:monospace"
+                   (ngModelChange)="validateEditNip()"
+                   [style.border-color]="editNipError ? '#ef4444' : ''">
+            <span *ngIf="editNipError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ editNipError }}</span>
+          </label>
         </div>
       </div>
       <div class="edit-section">
@@ -829,6 +835,18 @@ export class CrmLeadDetailComponent implements OnInit {
   converting   = false;
 
   editForm: any  = {};
+  editNipError = '';
+
+  validateEditNip(): void {
+    const val = (this.editForm.nip || '').trim().toUpperCase();
+    if (!val) { this.editNipError = 'NIP jest wymagany'; return; }
+    const cc = val.slice(0, 2);
+    const digits = val.slice(2);
+    if (!/^[A-Z]{2}$/.test(cc)) { this.editNipError = 'Podaj kod kraju (2 litery), np. PL'; return; }
+    if (cc === 'PL' && !/^\d{10}$/.test(digits)) { this.editNipError = 'Dla PL wymagane 10 cyfr po kodzie kraju'; return; }
+    if (cc !== 'PL' && digits.length === 0) { this.editNipError = 'Podaj numer po kodzie kraju'; return; }
+    this.editNipError = '';
+  }
   detailEnriching   = false;
   detailEnrichDone  = false;
   actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[] };
@@ -1085,6 +1103,7 @@ export class CrmLeadDetailComponent implements OnInit {
       agent_phone:  (this.lead as any).agent_phone || '',
       website:      (this.lead as any).website || '',
     };
+    this.editNipError = '';
     this.detailEnrichDone = false;
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
@@ -1097,6 +1116,8 @@ export class CrmLeadDetailComponent implements OnInit {
 
   saveLead() {
     if (!this.lead || !this.editForm.company) return;
+    this.validateEditNip();
+    if (this.editNipError) return;
     this.saving = true;
     const payload: Partial<Lead> = {
       company:       this.editForm.company,
@@ -1106,7 +1127,7 @@ export class CrmLeadDetailComponent implements OnInit {
       contact_title: this.editForm.contact_title || null,
       email:         this.editForm.email || null,
       phone:         this.editForm.phone || null,
-      nip:           this.editForm.nip   || null,
+      nip:           this.editForm.nip ? this.editForm.nip.trim().toUpperCase() : null,
       value_pln:                this.editForm.value_pln != null && this.editForm.value_pln !== '' ? +this.editForm.value_pln : null,
       annual_turnover_currency: this.editForm.annual_turnover_currency || 'PLN',
       online_pct:               this.editForm.online_pct !== '' && this.editForm.online_pct != null ? +this.editForm.online_pct : null,
@@ -1149,6 +1170,7 @@ export class CrmLeadDetailComponent implements OnInit {
     const domain = (this.editForm.website || '').trim();
     if (!domain) return;
     this.detailEnriching  = true;
+    this.editNipError = '';
     this.detailEnrichDone = false;
     this.cdr.markForCheck();
     this.api.enrichDomain(domain).subscribe({
