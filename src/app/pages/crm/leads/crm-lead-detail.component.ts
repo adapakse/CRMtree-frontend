@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
-  LEAD_SOURCES, LEAD_SOURCE_LABELS, LinkedDocument, LeadHistoryEntry, CrmUser,
+  LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
   GmailSendResult,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
@@ -57,6 +57,10 @@ import { AuthService } from '../../../core/auth/auth.service';
         <div class="info-kv" *ngIf="lead.website"><span class="lbl">WWW</span><span class="val"><a class="link" [href]="'https://'+lead.website" target="_blank">{{lead.website}}</a></span></div>
         <div class="info-kv"><span class="lbl">Firma</span><span class="val fw">{{lead.company}}</span></div>
         <div class="info-kv" *ngIf="lead.contact_name"><span class="lbl">Osoba</span><span class="val">{{lead.contact_name}}<span style="color:#9ca3af" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span></div>
+        <!-- Dodatkowe kontakty -->
+        @for (ec of lead.extra_contacts || []; track ec.id) {
+          <div class="info-kv"><span class="lbl">Kontakt</span><span class="val">{{ec.contact_name || '—'}}<span style="color:#9ca3af" *ngIf="ec.contact_title"> · {{ec.contact_title}}</span><span *ngIf="ec.email" style="color:#6b7280;font-size:11px;display:block">{{ec.email}}</span><span *ngIf="ec.phone" style="color:#6b7280;font-size:11px">{{ec.phone}}</span></span></div>
+        }
         <div class="info-kv" *ngIf="lead.email">
           <span class="lbl">Email</span>
           <span class="val" style="display:flex;align-items:center;gap:4px">
@@ -316,7 +320,7 @@ import { AuthService } from '../../../core/auth/auth.service';
       <div *ngIf="lead.converted_at" style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px">
         <div style="font-size:11px;font-weight:700;color:#7C3AED;margin-bottom:4px">✦ Zmigrowany na Partnera</div>
         <div style="font-size:11px;color:#9ca3af;margin-bottom:8px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
-        <a *ngIf="lead.converted_partner_id" [routerLink]="['/crm/partners', lead.converted_partner_id]"
+        <a *ngIf="lead.converted_partner_id" [routerLink]="['/crm/onboarding']" [queryParams]="{partner: lead.converted_partner_id}"
            style="display:block;text-align:center;background:#7C3AED;color:white;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;text-decoration:none">
           Przejdź do Partnera →
         </a>
@@ -457,15 +461,25 @@ import { AuthService } from '../../../core/auth/auth.service';
       <div class="edit-section">
         <div class="edit-section-title">Kontakt</div>
         <div class="edit-row">
-          <label>Imię i nazwisko<input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"></label>
-          <label>Stanowisko<select [(ngModel)]="editForm.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
+          <label><span style="display:flex;align-items:center;gap:4px">Imię i nazwisko <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
+            <input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"
+                   [style.border-color]="requiresFullFields && !editForm.contact_name ? '#fca5a5' : ''">
+          </label>
+          <label><span style="display:flex;align-items:center;gap:4px">Stanowisko <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span><select [(ngModel)]="editForm.contact_title"
+                   [style.border-color]="requiresFullFields && !editForm.contact_title ? '#fca5a5' : ''"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
         </div>
         <div class="edit-row">
-          <label>Email<input [(ngModel)]="editForm.email" type="email" placeholder="jan@firma.pl"></label>
-          <label>Telefon<input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"></label>
+          <label><span style="display:flex;align-items:center;gap:4px">Email <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
+            <input [(ngModel)]="editForm.email" type="email" placeholder="jan@firma.pl"
+                   [style.border-color]="requiresFullFields && !editForm.email ? '#fca5a5' : ''">
+          </label>
+          <label><span style="display:flex;align-items:center;gap:4px">Telefon <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
+            <input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"
+                   [style.border-color]="requiresFullFields && !editForm.phone ? '#fca5a5' : ''">
+          </label>
         </div>
         <div class="edit-row">
-          <label>NIP <span style="color:#f97316">*</span>
+          <label><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">NIP <span style="color:#f97316">*</span></span>
             <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                    style="font-family:monospace"
                    (ngModelChange)="validateEditNip()"
@@ -485,7 +499,10 @@ import { AuthService } from '../../../core/auth/auth.service';
           <label>Data zamknięcia<input [(ngModel)]="editForm.close_date" type="date"></label>
         </div>
         <div class="edit-row">
-          <label>Źródło<select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()"><option value="">— brak —</option><option *ngFor="let s of leadSources" [value]="s.value">{{s.label}}</option></select></label>
+          <label>Źródło<select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()"><option value="">— brak —</option>
+                  @for (s of sourcesWithoutGroup(); track s.value) { <option [value]="s.value">{{s.label}}</option> }
+                  @for (g of sourceGroups(); track g) { <optgroup [label]="g">@for (s of sourcesInGroup(g); track s.value) { <option [value]="s.value">{{s.label}}</option> }</optgroup> }
+                  </select></label>
           <label>Branża<select [(ngModel)]="editForm.industry"><option value="">— brak —</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select></label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
@@ -511,6 +528,38 @@ import { AuthService } from '../../../core/auth/auth.service';
         <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…"></textarea>
       </div>
     </div>
+      <!-- Dodatkowe kontakty -->
+      <div class="edit-section">
+        <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Dodatkowe kontakty</span>
+          <button style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addExtraContact()">+ Dodaj kontakt</button>
+        </div>
+        @for (ec of extraContacts; track $index; let i = $index) {
+          <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
+            <button style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)">✕</button>
+            <div class="edit-row">
+              <label>Imię i nazwisko<input [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></label>
+              <label>Stanowisko<select [(ngModel)]="ec.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
+            </div>
+            <div class="edit-row">
+              <label>Email<input [(ngModel)]="ec.email" type="email" placeholder="jan@firma.pl"></label>
+              <label>Telefon<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
+            </div>
+          </div>
+        }
+        @if (extraContacts.length === 0) {
+          <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px">Brak dodatkowych kontaktów</div>
+        }
+      </div>
+
+      <!-- Błędy walidacji -->
+      @if (editErrors.length > 0) {
+        <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin:0 0 8px;font-size:12px;color:#991b1b">
+          <strong>Uzupełnij wymagane pola dla etapu "{{ stageLabel(editForm.stage) }}":</strong>
+          <div style="margin-top:4px">{{ editErrors.join(', ') }}</div>
+        </div>
+      }
+
     <div class="modal-footer">
       <button class="btn-outline" (click)="showEdit=false">Anuluj</button>
       <button class="btn-primary" (click)="saveLead()" [disabled]="saving||!editForm.company">{{saving?'Zapisywanie…':'Zapisz zmiany'}}</button>
@@ -837,6 +886,48 @@ export class CrmLeadDetailComponent implements OnInit {
   editForm: any  = {};
   editNipError = '';
 
+  // ── Dodatkowe kontakty ────────────────────────────────────────────────────
+  extraContacts: LeadContact[] = [];
+
+  addExtraContact(): void {
+    this.extraContacts.push({ contact_name: null, contact_title: null, email: null, phone: null });
+  }
+
+  removeExtraContact(i: number): void {
+    this.extraContacts.splice(i, 1);
+  }
+
+  private isContactEmpty(c: LeadContact): boolean {
+    return !c.contact_name && !c.email && !c.phone;
+  }
+
+  // ── Wymagalność wg etapu ─────────────────────────────────────────────────
+  private FULL_REQUIRED_STAGES = ['qualification','presentation','offer','negotiation','closed_won'];
+
+  get requiresFullFields(): boolean {
+    return this.FULL_REQUIRED_STAGES.includes(this.editForm?.stage);
+  }
+
+  get editErrors(): string[] {
+    if (!this.requiresFullFields) return [];
+    const f = this.editForm;
+    const errs: string[] = [];
+    if (!f.website)            errs.push('Strona WWW');
+    if (!f.contact_name)       errs.push('Imię i Nazwisko');
+    if (!f.contact_title)      errs.push('Stanowisko');
+    if (!f.email)              errs.push('Email');
+    if (!f.phone)              errs.push('Telefon');
+    if (!f.value_pln && f.value_pln !== 0) errs.push('Obrót roczny');
+    if (f.online_pct === '' || f.online_pct == null) errs.push('% Online');
+    if (!f.first_contact_date) errs.push('Pierwszy kontakt');
+    if (!f.close_date)         errs.push('Data zamknięcia');
+    if (!f.source)             errs.push('Źródło');
+    if (!f.industry)           errs.push('Branża');
+    if (!f.assigned_to)        errs.push('Handlowiec');
+    if (f.probability === '' || f.probability == null) errs.push('% Szansa');
+    return errs;
+  }
+
   validateEditNip(): void {
     const val = (this.editForm.nip || '').trim().toUpperCase();
     if (!val) { this.editNipError = 'NIP jest wymagany'; return; }
@@ -846,6 +937,15 @@ export class CrmLeadDetailComponent implements OnInit {
     if (cc === 'PL' && !/^\d{10}$/.test(digits)) { this.editNipError = 'Dla PL wymagane 10 cyfr po kodzie kraju'; return; }
     if (cc !== 'PL' && digits.length === 0) { this.editNipError = 'Podaj numer po kodzie kraju'; return; }
     this.editNipError = '';
+    // Załaduj dodatkowe kontakty
+    this.extraContacts = ((this.lead as any).extra_contacts || []).map((ec: any) => ({
+      id: ec.id,
+      contact_name:  ec.contact_name  || null,
+      contact_title: ec.contact_title || null,
+      email:         ec.email         || null,
+      phone:         ec.phone         || null,
+    }));
+    if (this.extraContacts.length === 0) this.addExtraContact(); // pusty wiersz na start
   }
   detailEnriching   = false;
   detailEnrichDone  = false;
@@ -859,7 +959,11 @@ export class CrmLeadDetailComponent implements OnInit {
 
   crmUsers: CrmUser[] = [];
   get stageOptions() { return this.dictStages.map(s => ({ key: s.value as LeadStage, label: s.label })); }
-  leadSources: { value: string; label: string }[] = LEAD_SOURCES;
+  leadSources: LeadSource[] = LEAD_SOURCES;
+
+  sourcesWithoutGroup(): LeadSource[] { return this.leadSources.filter(s => !s.group); }
+  sourceGroups(): string[] { return [...new Set(this.leadSources.filter(s => s.group).map(s => s.group!))]; }
+  sourcesInGroup(g: string): LeadSource[] { return this.leadSources.filter(s => s.group === g); }
 
   // Powiązane dokumenty
   linkedDocs: LinkedDocument[]  = [];
@@ -1118,6 +1222,11 @@ export class CrmLeadDetailComponent implements OnInit {
     if (!this.lead || !this.editForm.company) return;
     this.validateEditNip();
     if (this.editNipError) return;
+    // Walidacja wymagalności wg etapu
+    if (this.editErrors.length > 0) {
+      alert('Uzupełnij wymagane pola:\n• ' + this.editErrors.join('\n• '));
+      return;
+    }
     this.saving = true;
     const payload: Partial<Lead> = {
       company:       this.editForm.company,
@@ -1156,13 +1265,23 @@ export class CrmLeadDetailComponent implements OnInit {
           } else {
             this.lead!.assigned_to_name = null;
           }
+          // Zapisz dodatkowe kontakty (pomiń puste)
+          const nonEmpty = this.extraContacts.filter(ec => !this.isContactEmpty(ec));
+          this.api.saveLeadContacts(this.lead!.id, nonEmpty).subscribe({
+            next: contacts => { (this.lead as any).extra_contacts = contacts; this.cdr.markForCheck(); },
+            error: () => {},
+          });
           this.saving = false;
           this.showEdit = false;
           if (updated.logo_url && !this.logoSasUrl) this.loadLogoSas();
           this.cdr.markForCheck();
         });
       },
-      error: () => { this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }); },
+      error: (err: any) => { this.zone.run(() => {
+        this.saving = false;
+        if (err?.status === 409) this.editNipError = err?.error?.error || 'Ten Numer NIP jest już przypisany dla innego rekordu.';
+        this.cdr.markForCheck();
+      }); },
     });
   }
 

@@ -91,6 +91,12 @@ import { initials } from '../../core/services/helpers';
             <div class="s-sec">
               <div class="s-lbl">Partnerzy</div>
 
+              <a class="nav-item" routerLink="/crm/onboarding" routerLinkActive="active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <span class="nav-label">Onboarding</span>
+                <span class="nav-tip">Onboarding</span>
+              </a>
+
               <a class="nav-item" routerLink="/crm/partners" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <span class="nav-label">Rejestr Partnerów</span>

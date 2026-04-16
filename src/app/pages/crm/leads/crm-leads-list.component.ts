@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
-  CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, CrmUser, CalendarMeeting,
+  CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, CrmUser, CalendarMeeting,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
@@ -102,9 +102,19 @@ const PROB_MAP: Record<LeadStage, number> = {
       <option value="closed_won">✓ Wygrany</option>
       <option value="closed_lost">✗ Przegrany</option>
     </select>
-    <select class="sel" [(ngModel)]="filterSource" (ngModelChange)="load()">
+    <select class="sel" [(ngModel)]="filterSource" (ngModelChange)="onSourceFilterChange()">
       <option value="">Wszystkie źródła</option>
-      <option *ngFor="let s of leadSources" [value]="s.value">{{ s.label }}</option>
+      @for (s of sourcesWithoutGroup(); track s.value) {
+        <option [value]="s.value">{{ s.label }}</option>
+      }
+      @for (g of sourceGroups(); track g) {
+        <optgroup [label]="'── ' + g">
+          <option [value]="'__group__' + g">📂 Cała grupa: {{ g }}</option>
+        </optgroup>
+        @for (s of sourcesInGroup(g); track s.value) {
+          <option [value]="s.value">{{ s.label }}</option>
+        }
+      }
     </select>
     <select class="sel" [(ngModel)]="filterUser" (ngModelChange)="onRepFilterChange($event)" *ngIf="isManager">
       <option value="">Wszyscy handlowcy</option>
@@ -425,12 +435,14 @@ const PROB_MAP: Record<LeadStage, number> = {
           <span class="ferr" *ngIf="submitted&&!newForm.company">Pole wymagane</span>
         </div>
         <div class="fg">
-          <label class="fl">Imię i nazwisko kontaktu</label>
-          <input class="fi" [(ngModel)]="newForm.contact_name" placeholder="Jan Kowalski">
+          <label class="fl" style="display:flex;align-items:center;gap:3px">Imię i nazwisko kontaktu <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <input class="fi" [(ngModel)]="newForm.contact_name" placeholder="Jan Kowalski"
+                 [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_name">
         </div>
         <div class="fg">
-          <label class="fl">Stanowisko</label>
-          <input class="fi" [(ngModel)]="newForm.contact_title" placeholder="CEO">
+          <label class="fl" style="display:flex;align-items:center;gap:3px">Stanowisko <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <input class="fi" [(ngModel)]="newForm.contact_title" placeholder="CEO"
+                 [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_title">
         </div>
         <div class="fg">
           <label class="fl">Email</label>
@@ -441,7 +453,7 @@ const PROB_MAP: Record<LeadStage, number> = {
           <input class="fi" [(ngModel)]="newForm.phone" placeholder="+48 600 000 000">
         </div>
         <div class="fg">
-          <label class="fl">NIP <span style="color:var(--orange)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">NIP <span style="color:var(--orange)">*</span></label>
           <input class="fi" [(ngModel)]="newForm.nip"
                  placeholder="PL1234567890"
                  maxlength="14"
@@ -457,7 +469,16 @@ const PROB_MAP: Record<LeadStage, number> = {
           <label class="fl">Źródło</label>
           <select class="fsel" [(ngModel)]="newForm.source">
             <option value="">— wybierz —</option>
-            <option *ngFor="let s of leadSources" [value]="s.value">{{ s.label }}</option>
+            @for (s of sourcesWithoutGroup(); track s.value) {
+              <option [value]="s.value">{{ s.label }}</option>
+            }
+            @for (g of sourceGroups(); track g) {
+              <optgroup [label]="g">
+                @for (s of sourcesInGroup(g); track s.value) {
+                  <option [value]="s.value">{{ s.label }}</option>
+                }
+              </optgroup>
+            }
           </select>
         </div>
         <div class="fg">
@@ -487,6 +508,11 @@ const PROB_MAP: Record<LeadStage, number> = {
         </div>
       </div>
     </div>
+    @if (newFormErrors.length > 0) {
+      <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin:8px 16px;font-size:12px;color:#991b1b">
+        <strong>Uzupełnij wymagane pola:</strong> {{ newFormErrors.join(', ') }}
+      </div>
+    }
     <div class="modal-foot">
       <button class="btn btn-g" (click)="showNew=false">Anuluj</button>
       <button class="btn btn-p" [disabled]="saving" (click)="createLead()">
@@ -1086,7 +1112,7 @@ export class CrmLeadsListComponent implements OnInit {
   private route  = inject(ActivatedRoute);
 
   readonly kanbanCols  = KANBAN_STAGES;
-  leadSources: { value: string; label: string }[] = LEAD_SOURCES;
+  leadSources: LeadSource[] = LEAD_SOURCES;
 
   allLeads: Lead[]     = [];
   loading              = true;
@@ -1103,6 +1129,22 @@ export class CrmLeadsListComponent implements OnInit {
   scopeFilter: 'all' | 'mine' = 'all';
   filterHot    = false;
   filterSource = '';
+
+  sourcesWithoutGroup(): LeadSource[] { return this.leadSources.filter(s => !s.group); }
+  sourceGroups(): string[] { return [...new Set(this.leadSources.filter(s => s.group).map(s => s.group!))]; }
+  sourcesInGroup(g: string): LeadSource[] { return this.leadSources.filter(s => s.group === g); }
+
+  onSourceFilterChange(): void {
+    if (this.filterSource.startsWith('__group__')) {
+      // group filter — expand to comma-separated values
+      const g = this.filterSource.replace('__group__', '');
+      this._sourceFilterValues = this.sourcesInGroup(g).map(s => s.value);
+    } else {
+      this._sourceFilterValues = this.filterSource ? [this.filterSource] : [];
+    }
+    this.load();
+  }
+  private _sourceFilterValues: string[] = [];
   filterUser   = '';
   filterStageUI = '';   // filtr etapu w toolbarze (nowy)
   persistRepName = '';  // wyświetlana nazwa persistowanego handlowca
@@ -1122,6 +1164,29 @@ export class CrmLeadsListComponent implements OnInit {
   submitted = false;
   newForm: any = {};
   nipError = '';
+  newFormErrors: string[] = [];
+
+  private NEW_FULL_REQUIRED_STAGES = ['qualification','presentation','offer','negotiation','closed_won'];
+
+  get newFormRequiresFull(): boolean {
+    return this.NEW_FULL_REQUIRED_STAGES.includes(this.newForm.stage);
+  }
+
+  validateNewForm(): string[] {
+    if (!this.newFormRequiresFull) return [];
+    const f = this.newForm;
+    const errs: string[] = [];
+    if (!this.newFormWebsite)    errs.push('Strona WWW');
+    if (!f.contact_name)         errs.push('Imię i Nazwisko');
+    if (!f.contact_title)        errs.push('Stanowisko');
+    if (!f.email)                errs.push('Email');
+    if (!f.phone)                errs.push('Telefon');
+    if (!f.value_pln && f.value_pln !== 0) errs.push('Obrót roczny');
+    if (!f.first_contact_date)   errs.push('Pierwszy kontakt');
+    if (!f.source)               errs.push('Źródło');
+    if (!f.assigned_to)          errs.push('Handlowiec');
+    return errs;
+  }
 
   onNipChange(ctx: 'lead' | 'partner' = 'lead'): void {
     const val = (this.newForm.nip || '').trim().toUpperCase();
@@ -1274,7 +1339,11 @@ export class CrmLeadsListComponent implements OnInit {
     this.loading = true;
     const params: any = { limit: 200 };
     if (this.filterHot)              params['hot']             = true;
-    if (this.filterSource)           params['source']          = this.filterSource;
+    if (this._sourceFilterValues.length === 1) {
+      params['source'] = this._sourceFilterValues[0];
+    } else if (this._sourceFilterValues.length > 1) {
+      params['source'] = this._sourceFilterValues.join(',');
+    }
     if (this.filterUser)             params['assigned_to']     = this.filterUser;
     if (this.scopeFilter === 'mine') params['assigned_to']     = this.auth.user()?.id;
     if (this.search)                 params['search']          = this.search;
@@ -1405,6 +1474,9 @@ export class CrmLeadsListComponent implements OnInit {
     this.onNipChange();
     const nipVal = (this.newForm.nip || this.enrichResult?.nip || '').trim();
     if (!nipVal || this.nipError) return;
+    // Walidacja wymagalności wg etapu
+    this.newFormErrors = this.validateNewForm();
+    if (this.newFormErrors.length > 0) return;
     this.saving = true;
     const payload: any = {
       company:       this.newForm.company,
