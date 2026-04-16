@@ -104,6 +104,11 @@ export const routes: Routes = [
         canActivate: [crmGuard],
         loadComponent: () => import('./pages/crm/groups/crm-groups.component').then(m => m.CrmGroupsComponent),
       },
+      {
+        path: 'crm/onboarding',
+        canActivate: [crmGuard],
+        loadComponent: () => import('./pages/crm/onboarding/crm-onboarding.component').then(m => m.CrmOnboardingComponent),
+      },
       // ─────────────────────────────────────────────────────────────────────
     ],
   },

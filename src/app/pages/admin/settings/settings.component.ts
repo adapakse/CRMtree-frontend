@@ -21,12 +21,13 @@ interface SettingField {
 }
 
 // Zakładki
-type Tab = 'global' | 'crm' | 'documents' | 'users';
+type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding';
 
 // Kategorie globalnej aplikacji
 const GLOBAL_CATEGORIES = ['documents', 'workflow', 'general'];
 // Klucze słownikowe dokumentów - pokazywane tylko w zakładce 'Słowniki dokumentów'
 const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_entity1_options', 'doc_contract_subjects'];
+const CRM_DICT_KEYS = ['onboarding_task_templates', 'crm_lead_sources'];
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
   documents: { label: 'Dokumenty i terminy',    icon: '📄' },
@@ -132,6 +133,9 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="activeTab.set('users'); loadGroups()">
             👥 Grupy użytkowników
+          </button>
+          <button class="tab-btn" [class.active]="activeTab() === 'onboarding'" (click)="activeTab.set('onboarding')">
+            🚀 Szablony Onboarding
           </button>
         </div>
 
@@ -429,6 +433,185 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           }
         }
 
+        <!-- TAB: Szablony zadań onboardingowych -->
+        @if (activeTab() === 'onboarding') {
+
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">🚀</span>
+            <div>
+              <strong>Szablony zadań onboardingowych</strong> — zdefiniuj standardowe zadania dla każdego kroku procesu wdrożenia.
+              Szablony są automatycznie podpowiadane podczas tworzenia zadań w panelu Onboarding.
+              Format JSON: <code style="background:#fff;padding:1px 6px;border-radius:4px;font-size:11px">[ {{ '{' }}"id":"...", "title":"...", "type":"task|call|...", "step":0{{ '}' }} ]</code>
+              Kroki: 0=Podpisanie umowy, 1=Konfiguracja, 2=Szkolenie, 3=Uruchomienie.
+            </div>
+          </div>
+
+          @for (field of crmDictFields(); track field.key) {
+            <div class="card" style="margin-bottom:16px;overflow:hidden">
+              <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center">
+                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                @if (field.dirty) { <span class="field-dirty" style="margin-left:8px">● Zmienione</span> }
+                @if (field.updated_by_name) {
+                  <span class="field-meta" style="margin-left:auto;font-size:11px;color:var(--gray-400)">
+                    Zmienione przez {{ field.updated_by_name }} · {{ field.updated_at | date:'dd.MM.yyyy' }}
+                  </span>
+                }
+              </div>
+              <div style="padding:14px 20px">
+                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+
+                <!-- Edytor tabeli szablonów -->
+                @if (field.key === 'crm_lead_sources') {
+                  <div style="overflow-x:auto">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px">
+                      <thead>
+                        <tr style="background:var(--gray-50);border-bottom:2px solid var(--gray-200)">
+                          <th style="padding:8px 10px;text-align:left;font-weight:600">Wartość (kod)</th>
+                          <th style="padding:8px 10px;text-align:left;font-weight:600">Etykieta (wyświetlana)</th>
+                          <th style="padding:8px 10px;text-align:left;font-weight:600;width:160px"
+                              title="Nazwa grupy lub puste — wartości z grupą wyświetlane w sekcji poniżej">Grupa</th>
+                          <th style="padding:8px 10px;width:40px"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (src of getTemplates(field); track src.value; let idx = $index) {
+                          <tr style="border-bottom:1px solid var(--gray-100)"
+                              [style.background]="src.group ? '#eff6ff' : 'white'">
+                            <td style="padding:6px 10px">
+                              <input style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box;font-family:monospace"
+                                     [ngModel]="src.value"
+                                     (ngModelChange)="updateTemplate(field, idx, 'value', $event)">
+                            </td>
+                            <td style="padding:6px 10px">
+                              <input style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box"
+                                     [ngModel]="src.label"
+                                     (ngModelChange)="updateTemplate(field, idx, 'label', $event)">
+                            </td>
+                            <td style="padding:6px 10px">
+                              <input style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box"
+                                     [ngModel]="src.group || ''"
+                                     (ngModelChange)="updateTemplate(field, idx, 'group', $event || null)"
+                                     placeholder="— brak grupy —">
+                            </td>
+                            <td style="padding:6px 10px;text-align:center">
+                              <button style="background:#fee2e2;border:none;border-radius:4px;padding:3px 7px;cursor:pointer;color:#991b1b;font-size:12px"
+                                      (click)="removeTemplate(field, idx)">✕</button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style="margin-top:8px;font-size:11px;color:var(--gray-400)">
+                    🔵 Niebieskie tło = wartość należy do grupy (wyświetlana w sekcji Marketingu w listach).
+                  </div>
+                  <button class="btn btn-g btn-sm" style="margin-top:8px"
+                          (click)="addLeadSource(field)">+ Dodaj źródło</button>
+                }
+
+                @if (field.key === 'onboarding_task_templates') {
+                  <div style="overflow-x:auto">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px">
+                      <thead>
+                        <tr style="background:var(--gray-50);border-bottom:2px solid var(--gray-200)">
+                          <th style="padding:8px 10px;text-align:left;font-weight:600">Tytuł</th>
+                          <th style="padding:8px 10px;text-align:left;font-weight:600;width:110px">Typ</th>
+                          <th style="padding:8px 10px;text-align:left;font-weight:600;width:140px">Krok</th>
+                          <th style="padding:8px 10px;text-align:center;font-weight:600;width:80px"
+                              title="Czy zadanie tworzy się automatycznie przy migracji leada">Standardowe</th>
+                          <th style="padding:8px 10px;text-align:left;font-weight:600;width:160px"
+                              title="User automatycznie przypisany. Krok 0 zawsze → handlowiec leada">Przypisany</th>
+                          <th style="padding:8px 10px;text-align:center;font-weight:600;width:70px"
+                              title="Ile dni od daty migracji ustawić jako termin (null = brak terminu)">Dni</th>
+                          <th style="padding:8px 10px;width:40px"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (tpl of getTemplates(field); track tpl.id; let idx = $index) {
+                          <tr style="border-bottom:1px solid var(--gray-100)" [style.background]="tpl.standard ? '#f0fdf4' : 'white'">
+                            <td style="padding:6px 10px">
+                              <input style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box"
+                                     [ngModel]="tpl.title"
+                                     (ngModelChange)="updateTemplate(field, idx, 'title', $event)">
+                            </td>
+                            <td style="padding:6px 10px">
+                              <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
+                                      [ngModel]="tpl.type"
+                                      (ngModelChange)="updateTemplate(field, idx, 'type', $event)">
+                                <option value="task">✅ Zadanie</option>
+                                <option value="call">📞 Telefon</option>
+                                <option value="email">📧 Email</option>
+                                <option value="meeting">🤝 Spotkanie</option>
+                                <option value="doc_sent">📄 Dokument</option>
+                                <option value="training">🎓 Szkolenie</option>
+                              </select>
+                            </td>
+                            <td style="padding:6px 10px">
+                              <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
+                                      [ngModel]="tpl.step"
+                                      (ngModelChange)="updateTemplate(field, idx, 'step', +$event)">
+                                <option [value]="0">📝 Podpisanie umowy</option>
+                                <option [value]="1">⚙️ Konfiguracja</option>
+                                <option [value]="2">🎓 Szkolenie</option>
+                                <option [value]="3">🚀 Uruchomienie</option>
+                              </select>
+                            </td>
+                            <td style="padding:6px 10px;text-align:center">
+                              <input type="checkbox"
+                                     [ngModel]="tpl.standard"
+                                     (ngModelChange)="updateTemplate(field, idx, 'standard', $event)"
+                                     title="Automatycznie tworzone przy migracji">
+                            </td>
+                            <td style="padding:6px 10px">
+                              @if (tpl.step === 0) {
+                                <span style="font-size:11px;color:#f97316;font-style:italic">← handlowiec leada</span>
+                              } @else {
+                                <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
+                                        [ngModel]="tpl.assignee"
+                                        (ngModelChange)="updateTemplate(field, idx, 'assignee', $event || null)">
+                                  <option [ngValue]="null">— brak —</option>
+                                  @for (u of allUsers(); track u.id) {
+                                    <option [value]="u.id">{{ u.display_name }}</option>
+                                  }
+                                </select>
+                              }
+                            </td>
+                            <td style="padding:6px 10px;text-align:center">
+                              <input type="number" min="0" max="365"
+                                     style="width:54px;border:1px solid var(--gray-200);border-radius:4px;padding:3px 6px;font-size:12px;text-align:center"
+                                     [ngModel]="tpl.days"
+                                     (ngModelChange)="updateTemplate(field, idx, 'days', $event === '' || $event === null ? null : +$event)"
+                                     placeholder="—">
+                            </td>
+                            <td style="padding:6px 10px;text-align:center">
+                              <button style="background:#fee2e2;border:none;border-radius:4px;padding:3px 7px;cursor:pointer;color:#991b1b;font-size:12px"
+                                      (click)="removeTemplate(field, idx)">✕</button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style="margin-top:8px;font-size:11px;color:var(--gray-400)">
+                    🟢 Zielone tło = zadanie standardowe (tworzone automatycznie przy migracji leada).
+                    Krok "Podpisanie umowy" zawsze przypisuje się do handlowca leada.
+                  </div>
+                  <button class="btn btn-g btn-sm" style="margin-top:8px"
+                          (click)="addTemplate(field)">+ Dodaj szablon</button>
+                }
+
+                @if (field.error) { <div class="field-err" style="margin-top:8px">{{ field.error }}</div> }
+              </div>
+            </div>
+          }
+
+          @if (crmDictFields().length === 0) {
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+              Brak szablonów. Uruchom migrację 0133.
+            </div>
+          }
+        }
+
       </div>
     </div>
   `,
@@ -477,6 +660,8 @@ export class SettingsComponent implements OnInit {
   activeTab = signal<Tab>('global');
 
   private http        = inject(HttpClient);
+  allUsers            = signal<{id:string;display_name:string}[]>([]);
+  private templateDrafts = new Map<string, any[]>();
 
   // ── Grupy użytkowników ────────────────────────────────────────────────────
   groups        = signal<any[]>([]);
@@ -521,6 +706,64 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  // ── Edytor szablonów onboardingowych ─────────────────────────────────────
+  getTemplates(field: any): any[] {
+    if (!this.templateDrafts.has(field.key)) {
+      try {
+        const raw = field.draft || field.value || '[]';
+        this.templateDrafts.set(field.key, JSON.parse(String(raw)));
+      } catch {
+        this.templateDrafts.set(field.key, []);
+      }
+    }
+    return this.templateDrafts.get(field.key)!;
+  }
+
+  onTemplatesChange(field: any): void {
+    const tpls = this.templateDrafts.get(field.key) || [];
+    field.draft = JSON.stringify(tpls);
+    field.dirty = true;
+    this.fields.update(f => [...f]);
+  }
+
+  updateTemplate(field: any, idx: number, prop: string, value: any): void {
+    const tpls = this.getTemplates(field);
+    if (tpls[idx]) {
+      tpls[idx] = { ...tpls[idx], [prop]: value };
+      this.templateDrafts.set(field.key, tpls);
+      field.draft = JSON.stringify(tpls);
+      field.dirty = true;
+      this.fields.update(f => [...f]);
+    }
+  }
+
+  addTemplate(field: any): void {
+    const tpls = this.getTemplates(field); // ensures cache exists
+    tpls.push({ id: 'tpl_' + Date.now(), title: '', type: 'task', step: 0, standard: false, assignee: null, days: null });
+    this.templateDrafts.set(field.key, [...tpls]); // update cache with new array
+    field.draft = JSON.stringify(tpls);
+    field.dirty = true;
+    this.fields.update(f => [...f]);
+  }
+
+  addLeadSource(field: any): void {
+    const items = this.getTemplates(field);
+    items.push({ value: '', label: '', group: null });
+    this.templateDrafts.set(field.key, [...items]);
+    field.draft = JSON.stringify(items);
+    field.dirty = true;
+    this.fields.update(f => [...f]);
+  }
+
+  removeTemplate(field: any, idx: number): void {
+    const tpls = this.getTemplates(field);
+    tpls.splice(idx, 1);
+    this.templateDrafts.set(field.key, [...tpls]);
+    field.draft = JSON.stringify(tpls);
+    field.dirty = true;
+    this.fields.update(f => [...f]);
+  }
+
   deleteGroup(g: any): void {
     if (g.member_count > 0 || g.document_count > 0) return;
     if (!confirm(`Usunąć grupę "${g.display_name}"?`)) return;
@@ -554,10 +797,16 @@ export class SettingsComponent implements OnInit {
     }));
   });
 
-  crmFields = computed(() => this.fields().filter(f => f.category === 'crm'));
-  docFields  = computed(() => this.fields().filter(f => DOC_DICT_KEYS.includes(f.key)));
+  crmFields     = computed(() => this.fields().filter(f => f.category === 'crm' && !CRM_DICT_KEYS.includes(f.key)));
+  docFields     = computed(() => this.fields().filter(f => DOC_DICT_KEYS.includes(f.key)));
+  crmDictFields = computed(() => this.fields().filter(f => CRM_DICT_KEYS.includes(f.key)));
 
   ngOnInit(): void {
+    // Załaduj listę userów dla edytora szablonów onboarding
+    this.http.get<any[]>(`${environment.apiUrl}/admin/users?limit=200`).subscribe({
+      next: r => this.allUsers.set((r as any)?.data || r),
+      error: () => {},
+    });
     this.settingsSvc.reload().then(() => {
       this.buildFields(this.settingsSvc.meta());
       this.loading.set(false);
@@ -565,6 +814,7 @@ export class SettingsComponent implements OnInit {
   }
 
   private buildFields(meta: AppSettingsMeta[]): void {
+    this.templateDrafts.clear(); // reset parsed cache on reload/save
     this.fields.set(meta.map(m => ({
       key:             m.key,
       label:           m.label,

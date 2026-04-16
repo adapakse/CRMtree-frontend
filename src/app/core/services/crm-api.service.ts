@@ -54,6 +54,7 @@ export interface Lead {
   document_count?: number;
   activities?: LeadActivity[];
   linked_documents?: LinkedDocument[];
+  extra_contacts?: LeadContact[];
   created_at: string;
   updated_at: string;
 }
@@ -215,6 +216,9 @@ export interface PartnerActivity {
 export interface OnboardingTask {
   id: number;
   partner_id: number;
+  partner_name?: string;
+  partner_nip?: string;
+  partner_step?: number;
   step: number;
   title: string;
   body: string | null;
@@ -222,6 +226,7 @@ export interface OnboardingTask {
   assigned_to: string | null;
   assigned_to_name: string | null;
   due_date: string | null;
+  due_time: string | null;
   done: boolean;
   done_at: string | null;
   done_by: string | null;
@@ -230,6 +235,34 @@ export interface OnboardingTask {
   created_at: string;
 }
 
+export interface OnboardingPartner {
+  id: number;
+  company: string;
+  nip: string | null;
+  onboarding_step: number;
+  status: string;
+  created_at: string;
+  manager_name: string | null;
+  task_count: number;
+  done_count: number;
+}
+
+export interface OnboardingTaskTemplate {
+  id: string;
+  title: string;
+  type: OnboardingTask['type'];
+  step: number;
+}
+
+
+export interface LeadContact {
+  id?: number;
+  lead_id?: number;
+  contact_name: string | null;
+  contact_title: string | null;
+  email: string | null;
+  phone: string | null;
+}
 
 export interface PartnerGroup {
   id: number;
@@ -561,6 +594,19 @@ export const PRODUCT_TYPE_ICONS: Record<ProductType, string> = {
 /** Źródła leadów — spójne z importem CSV (pole source/zrodlo) */
 /** Mapa etykiet dla kluczy źródeł — używana przy renderowaniu listy z app_settings */
 export const LEAD_SOURCE_LABELS: Record<string, string> = {
+  // Nowe wartości
+  'Własne':              'Własne',
+  'Cold_Call':           'Cold Call',
+  'Partner':             'Partner',
+  'Ajent':               'Agent',
+  'LinkedIn_Lead_Form':  'LinkedIn Lead Form',
+  'LinkedIn_in_mail':    'LinkedIn InMail',
+  'Alias_Hello':         'Alias Hello',
+  'Formularz_online':    'Formularz online',
+  'GoogleAds_AISearch':  'Google Ads AI Search',
+  'GoogleAds_PMax':      'Google Ads PMax',
+  'GoogleAds_SEA_Brand': 'Google Ads SEA Brand',
+  // Stare wartości (fallback dla istniejących danych)
   strona_www: 'Strona www',
   polecenie:  'Polecenie',
   cold_call:  'Cold call',
@@ -573,18 +619,25 @@ export const LEAD_SOURCE_LABELS: Record<string, string> = {
   inne:       'Inne',
 };
 
+export interface LeadSource {
+  value: string;
+  label: string;
+  group: string | null;
+}
+
 /** Domyślna lista źródeł — używana jako fallback gdy app_settings nie załadowane */
-export const LEAD_SOURCES: { value: string; label: string }[] = [
-  { value: 'strona_www',  label: 'Strona www' },
-  { value: 'polecenie',   label: 'Polecenie' },
-  { value: 'cold_call',   label: 'Cold call' },
-  { value: 'linkedin',    label: 'LinkedIn' },
-  { value: 'targi',       label: 'Targi / Wydarzenie' },
-  { value: 'partner',     label: 'Partner' },
-  { value: 'agent',       label: 'Agent' },
-  { value: 'kampania',    label: 'Kampania email' },
-  { value: 'inbound',     label: 'Inbound' },
-  { value: 'inne',        label: 'Inne' },
+export const LEAD_SOURCES: LeadSource[] = [
+  { value: 'Własne',             label: 'Własne',               group: null },
+  { value: 'Cold_Call',          label: 'Cold Call',            group: null },
+  { value: 'Partner',            label: 'Partner',              group: null },
+  { value: 'Ajent',              label: 'Agent',                group: null },
+  { value: 'LinkedIn_Lead_Form', label: 'LinkedIn Lead Form',   group: 'Marketing' },
+  { value: 'LinkedIn_in_mail',   label: 'LinkedIn InMail',      group: 'Marketing' },
+  { value: 'Alias_Hello',        label: 'Alias Hello',          group: 'Marketing' },
+  { value: 'Formularz_online',   label: 'Formularz online',     group: 'Marketing' },
+  { value: 'GoogleAds_AISearch', label: 'Google Ads AI Search', group: 'Marketing' },
+  { value: 'GoogleAds_PMax',     label: 'Google Ads PMax',      group: 'Marketing' },
+  { value: 'GoogleAds_SEA_Brand',label: 'Google Ads SEA Brand', group: 'Marketing' },
 ];
 
 // ─────────────────────────────────────────────────────────────────
@@ -832,8 +885,8 @@ export class CrmApiService {
 
 
   // ── Słownik Źródeł (z app_settings) ─────────────────────────
-  getLeadSources(): Observable<{ value: string; label: string }[]> {
-    return this.http.get<{ value: string; label: string }[]>(`${BASE}/leads/sources`);
+  getLeadSources(): Observable<LeadSource[]> {
+    return this.http.get<LeadSource[]>(`${BASE}/leads/sources`);
   }
 
   // ── Historia Leada ────────────────────────────────────────
@@ -850,6 +903,14 @@ export class CrmApiService {
   }
   unlinkLeadDocument(leadId: number, documentId: string): Observable<void> {
     return this.http.delete<void>(`${BASE}/leads/${leadId}/documents/${documentId}`);
+  }
+
+  // ── Dodatkowe kontakty leada ─────────────────────────────
+  getLeadContacts(leadId: number): Observable<LeadContact[]> {
+    return this.http.get<LeadContact[]>(`${BASE}/leads/${leadId}/contacts`);
+  }
+  saveLeadContacts(leadId: number, contacts: LeadContact[]): Observable<LeadContact[]> {
+    return this.http.post<LeadContact[]>(`${BASE}/leads/${leadId}/contacts`, { contacts });
   }
 
   // ── Konto testowe ───────────────────────────────────────
@@ -916,6 +977,15 @@ export class CrmApiService {
   // ── Onboarding Tasks ─────────────────────────────────────
   getOnboardingTasks(partnerId: number): Observable<OnboardingTask[]> {
     return this.http.get<OnboardingTask[]>(`${BASE}/partners/${partnerId}/onboarding-tasks`);
+  }
+
+  // ── Panel Onboarding — globalne widoki ──────────────────────────────────
+  getOnboardingPartners(params: Record<string,any> = {}): Observable<OnboardingPartner[]> {
+    return this.http.get<OnboardingPartner[]>(`${BASE}/partners/onboarding`, { params: this.toParams(params) });
+  }
+
+  getOnboardingAllTasks(params: Record<string,any> = {}): Observable<OnboardingTask[]> {
+    return this.http.get<OnboardingTask[]>(`${BASE}/partners/onboarding/tasks`, { params: this.toParams(params) });
   }
   createOnboardingTask(partnerId: number, data: Partial<OnboardingTask>): Observable<OnboardingTask> {
     return this.http.post<OnboardingTask>(`${BASE}/partners/${partnerId}/onboarding-tasks`, data);
