@@ -460,6 +460,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       (a, b) => stageOrder.indexOf(a.stage) - stageOrder.indexOf(b.stage)
     );
     return sorted.map(v => ({
+      stage: v.stage,
       label: (LEAD_STAGE_LABELS as Record<string,string>)[v.stage] || v.stage,
       days:  v.avg_days ?? 0,
       count: v.count,
@@ -609,7 +610,9 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       const color = pct > 80 ? '#EF4444' : pct > 60 ? '#F59E0B' : '#22C55E';
       const count = d.count ? `<span style="font-size:10.5px;color:#71717a;font-weight:400">&nbsp;(${d.count} lead.)</span>` : '';
       const row = document.createElement('div');
-      row.style.cssText = 'margin-bottom:10px';
+      row.style.cssText = 'margin-bottom:10px;cursor:pointer';
+      row.title = `Kliknij aby zobaczyć leady w etapie: ${d.label}`;
+      row.addEventListener('click', () => this.goToLeads({ stage: d.stage }, `Czas w etapie: ${d.label}`));
       row.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
           <span style="font-size:12px;color:#374151;font-weight:600">${d.label}${count}</span>

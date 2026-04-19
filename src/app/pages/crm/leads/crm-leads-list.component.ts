@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
-  CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, CrmUser, CalendarMeeting,
+  CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, CrmUser, CrmGroup, CalendarMeeting,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
@@ -118,7 +118,12 @@ const PROB_MAP: Record<LeadStage, number> = {
     </select>
     <select class="sel" [(ngModel)]="filterUser" (ngModelChange)="onRepFilterChange($event)" *ngIf="isManager">
       <option value="">Wszyscy handlowcy</option>
-      <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+      <optgroup label="── Handlowcy ──" *ngIf="crmUsers.length > 0">
+        <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+      </optgroup>
+      <optgroup label="── Grupy ──" *ngIf="crmGroups.length > 0">
+        <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">📂 {{ g.name }}</option>
+      </optgroup>
     </select>
     <button class="btn btn-g btn-sm" (click)="openTimeline()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -451,6 +456,28 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="fg">
           <label class="fl">Telefon</label>
           <input class="fi" [(ngModel)]="newForm.phone" placeholder="+48 600 000 000">
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <label class="fl" style="margin:0">Dodatkowe kontakty</label>
+            <button type="button" style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addNewExtraContact()">+ Dodaj kontakt</button>
+          </div>
+          @for (ec of newExtraContacts; track $index; let i = $index) {
+            <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
+              <button type="button" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeNewExtraContact(i)">✕</button>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                <div class="fg"><label class="fl">Imię i nazwisko</label><input class="fi" [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></div>
+                <div class="fg"><label class="fl">Stanowisko</label><input class="fi" [(ngModel)]="ec.contact_title" placeholder="CEO"></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div class="fg"><label class="fl">Email</label><input class="fi" type="email" [(ngModel)]="ec.email" placeholder="jan@firma.pl"></div>
+                <div class="fg"><label class="fl">Telefon</label><input class="fi" [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></div>
+              </div>
+            </div>
+          }
+          @if (newExtraContacts.length === 0) {
+            <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:8px 0">Brak dodatkowych kontaktów</div>
+          }
         </div>
         <div class="fg">
           <label class="fl" style="display:flex;align-items:center;gap:4px">NIP <span style="color:var(--orange)">*</span></label>
@@ -1165,6 +1192,7 @@ export class CrmLeadsListComponent implements OnInit {
   newForm: any = {};
   nipError = '';
   newFormErrors: string[] = [];
+  newExtraContacts: {contact_name:string, contact_title:string, email:string, phone:string}[] = [];
 
   private NEW_FULL_REQUIRED_STAGES = ['qualification','presentation','offer','negotiation','closed_won'];
 
@@ -1209,6 +1237,7 @@ export class CrmLeadsListComponent implements OnInit {
   }
 
   crmUsers: CrmUser[] = [];
+  crmGroups: CrmGroup[] = [];
 
   stats = { total: 0, hot: 0, pipeline: 0, won: 0, lost: 0 };
 
@@ -1269,6 +1298,12 @@ export class CrmLeadsListComponent implements OnInit {
       next: u => this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }),
       error: () => {},
     });
+    if (this.isManager) {
+      this.api.getCrmGroups().subscribe({
+        next: g => this.zone.run(() => { this.crmGroups = g; this.cdr.markForCheck(); }),
+        error: () => {},
+      });
+    }
   }
 
   get sortedLeads(): any[] {
@@ -1317,13 +1352,20 @@ export class CrmLeadsListComponent implements OnInit {
     } catch { }
   }
 
-  onRepFilterChange(userId: string): void {
-    const user = this.crmUsers.find(u => u.id === userId);
-    const displayName = user?.display_name || '';
-    this.persistRepName = userId ? displayName : '';
+  onRepFilterChange(filterVal: string): void {
+    let displayName = '';
+    if (filterVal.startsWith('__group__')) {
+      const groupId = filterVal.replace('__group__', '');
+      const group = this.crmGroups.find(g => g.id === groupId);
+      displayName = group ? `Grupa: ${group.name}` : '';
+    } else {
+      const user = this.crmUsers.find(u => u.id === filterVal);
+      displayName = user?.display_name || '';
+    }
+    this.persistRepName = filterVal ? displayName : '';
     try {
-      if (userId) sessionStorage.setItem(this.REP_FILTER_KEY, JSON.stringify({ userId, displayName }));
-      else        sessionStorage.removeItem(this.REP_FILTER_KEY);
+      if (filterVal) sessionStorage.setItem(this.REP_FILTER_KEY, JSON.stringify({ userId: filterVal, displayName }));
+      else           sessionStorage.removeItem(this.REP_FILTER_KEY);
     } catch { }
     this.load();
   }
@@ -1344,7 +1386,15 @@ export class CrmLeadsListComponent implements OnInit {
     } else if (this._sourceFilterValues.length > 1) {
       params['source'] = this._sourceFilterValues.join(',');
     }
-    if (this.filterUser)             params['assigned_to']     = this.filterUser;
+    if (this.filterUser) {
+      if (this.filterUser.startsWith('__group__')) {
+        const groupId = this.filterUser.replace('__group__', '');
+        const group = this.crmGroups.find(g => g.id === groupId);
+        if (group && group.user_ids.length > 0) params['assigned_to'] = group.user_ids.join(',');
+      } else {
+        params['assigned_to'] = this.filterUser;
+      }
+    }
     if (this.scopeFilter === 'mine') params['assigned_to']     = this.auth.user()?.id;
     if (this.search)                 params['search']          = this.search;
     // filterStage z raportu lub filterStageUI z toolbara
@@ -1418,11 +1468,20 @@ export class CrmLeadsListComponent implements OnInit {
     this.nipError = '';
     this.newForm       = { company:'', contact_name:'', contact_title:'', email:'', phone:'', nip:'PL',
                            value_pln: null, source:'', stage:'new', hot:false, notes:'', assigned_to:'', first_contact_date:'' };
-    this.newFormWebsite = '';
-    this.enrichPrompt   = false;
-    this.enrichResult   = null;
-    this.submitted      = false;
-    this.showNew        = true;
+    this.newFormWebsite   = '';
+    this.enrichPrompt     = false;
+    this.enrichResult     = null;
+    this.submitted        = false;
+    this.newExtraContacts = [];
+    this.showNew          = true;
+  }
+
+  addNewExtraContact() {
+    this.newExtraContacts = [...this.newExtraContacts, { contact_name:'', contact_title:'', email:'', phone:'' }];
+  }
+
+  removeNewExtraContact(i: number) {
+    this.newExtraContacts = this.newExtraContacts.filter((_, idx) => idx !== i);
   }
 
   onWebsiteChange() {
@@ -1501,6 +1560,10 @@ export class CrmLeadsListComponent implements OnInit {
         this.allLeads  = [lead, ...this.allLeads];
         this.total    += 1;
         this.calcStats();
+        const nonEmpty = this.newExtraContacts.filter(ec => ec.contact_name || ec.email || ec.phone);
+        if (nonEmpty.length > 0) {
+          this.api.saveLeadContacts(lead.id, nonEmpty).subscribe({ error: () => {} });
+        }
         this.showNew   = false;
         this.saving    = false;
         if ((lead as any).logo_url) this.loadLogoSas(lead);
