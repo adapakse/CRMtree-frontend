@@ -246,7 +246,8 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                     }
                   </div>
                   <div class="json-add-row">
-                    <input class="fi" style="flex:1" placeholder="Nowa wartość (kod, np. hotel)"
+                    <input class="fi" style="flex:1"
+                           [placeholder]="field.key === 'crm_lost_reasons' ? 'Nowa wartość (np. Wysoka cena)' : 'Nowa wartość (kod, np. hotel)'"
                            [(ngModel)]="jsonNewItem[field.key]"
                            (keydown.enter)="addJsonItem(field)">
                     <button class="btn btn-p" style="padding:6px 14px;font-size:12px"

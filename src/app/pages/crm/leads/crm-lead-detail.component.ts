@@ -35,7 +35,7 @@ import { AuthService } from '../../../core/auth/auth.service';
         ✉️ Email
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
-      <button class="hdr-btn hdr-btn-edit" (click)="openEdit()">✏️ Edytuj</button>
+      <button class="hdr-btn hdr-btn-edit" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj lead' : 'Brak uprawnień — handlowiec nie należy do Twojej grupy'">✏️ Edytuj</button>
       <button class="hdr-btn hdr-btn-test" *ngIf="!lead.converted_at" (click)="openTestAccountModal()" title="Załóż konto testowe w systemie zewnętrznym">
         🖥️ Konto testowe
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
@@ -303,7 +303,7 @@ import { AuthService } from '../../../core/auth/auth.service';
           <button *ngFor="let s of stageOptions" class="stage-btn"
                   [class.active]="lead.stage===s.key"
                   (click)="quickChangeStage(s.key)"
-                  [disabled]="lead.stage===s.key">
+                  [disabled]="lead.stage===s.key || !canEdit">
             <span class="stage-dot stage-dot-{{s.key}}"></span>
             {{s.label}}
             <span *ngIf="lead.stage===s.key" style="margin-left:auto;font-size:10px;opacity:.7">✓ aktualny</span>
@@ -341,7 +341,29 @@ import { AuthService } from '../../../core/auth/auth.service';
       <h3>✉️ Wyślij email</h3>
       <button class="close-btn" (click)="showEmailModal=false">✕</button>
     </div>
-    <div class="modal-body" style="gap:10px">
+
+    <!-- Gmail niepołączony — pokaż prompt -->
+    <div *ngIf="!gmailConnected" class="modal-body" style="gap:14px;text-align:center;padding:28px 24px">
+      <div style="font-size:36px">📧</div>
+      <div style="font-size:15px;font-weight:700;color:#18181b">Konto Gmail niepołączone</div>
+      <div style="font-size:13px;color:#6b7280;line-height:1.6">
+        Aby wysyłać i odbierać emaile bezpośrednio z CRM, połącz swoje konto Gmail.<br>
+        Każdy handlowiec łączy własną skrzynkę.
+      </div>
+      <a *ngIf="gmailAuthUrl" [href]="gmailAuthUrl" target="_blank"
+         style="display:inline-block;background:#f97316;color:white;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;text-decoration:none;margin-top:6px">
+        🔗 Połącz konto Gmail
+      </a>
+      <div *ngIf="!gmailAuthUrl" style="color:#9ca3af;font-size:12px">
+        Brak konfiguracji OAuth. Skontaktuj się z administratorem.
+      </div>
+    </div>
+
+    <!-- Formularz wysyłki -->
+    <div *ngIf="gmailConnected" class="modal-body" style="gap:10px">
+      <div style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
+        ✅ Wysyłam z: <strong>{{gmailEmail}}</strong>
+      </div>
       <!-- Do: -->
       <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
         Do
@@ -384,9 +406,10 @@ import { AuthService } from '../../../core/auth/auth.service';
       <!-- Error -->
       <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
     </div>
+
     <div class="modal-footer">
       <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
-      <button class="btn-primary" (click)="sendEmail()"
+      <button *ngIf="gmailConnected" class="btn-primary" (click)="sendEmail()"
               [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
         {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
       </button>
@@ -396,7 +419,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 
 <!-- Thread modal -->
 <div class="modal-overlay" *ngIf="showThreadModal" (click)="showThreadModal=false">
-  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%)">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(680px,100%)">
     <div class="modal-header">
       <h3>💬 Wątek email</h3>
       <button class="close-btn" (click)="showThreadModal=false">✕</button>
@@ -404,14 +427,23 @@ import { AuthService } from '../../../core/auth/auth.service';
     <div class="modal-body" style="gap:8px">
       <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;padding:20px">Ładowanie wątku…</div>
       <div *ngFor="let m of threadMessages"
-           style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;font-size:12px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+           style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
           <span style="font-weight:600;color:#374151">{{m.from}}</span>
           <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
         </div>
-        <div style="color:#6b7280;white-space:pre-line;line-height:1.5">{{m.snippet}}</div>
-        <div *ngIf="m.attachments?.length" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
-          <span *ngFor="let att of m.attachments" style="background:#f3f4f6;border-radius:8px;padding:2px 8px;font-size:10px;color:#6b7280">📎 {{att.filename}}</span>
+        <div style="color:#6b7280;font-size:11px;margin-bottom:6px">Do: {{m.to}}</div>
+        <div style="color:#374151;white-space:pre-line;line-height:1.5;max-height:200px;overflow-y:auto">{{m.snippet}}</div>
+        <!-- Załączniki z możliwością pobrania -->
+        <div *ngIf="m.attachments?.length" style="margin-top:8px;border-top:1px solid #f3f4f6;padding-top:8px;display:flex;flex-wrap:wrap;gap:6px">
+          <button *ngFor="let att of m.attachments"
+                  (click)="downloadAttachment(att, m.id)"
+                  [disabled]="downloadingAttachment===att.attachmentId"
+                  style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:3px 10px;font-size:11px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:4px">
+            <span *ngIf="downloadingAttachment!==att.attachmentId">📎 {{att.filename}}</span>
+            <span *ngIf="downloadingAttachment===att.attachmentId">⏳ Pobieranie…</span>
+            <span *ngIf="downloadingAttachment!==att.attachmentId" style="color:#9ca3af;font-size:10px">↓</span>
+          </button>
         </div>
       </div>
       <div *ngIf="!loadingThread&&threadMessages.length===0" style="text-align:center;color:#9ca3af;padding:16px">Brak wiadomości w wątku.</div>
@@ -438,7 +470,13 @@ import { AuthService } from '../../../core/auth/auth.service';
           <label>Etap<select [(ngModel)]="editForm.stage"><option *ngFor="let s of stageOptions" [value]="s.key">{{s.label}}</option></select></label>
         </div>
         <div class="edit-row" *ngIf="editForm.stage==='closed_lost'">
-          <label class="full" style="color:#991b1b">Powód przegranej *<input [(ngModel)]="editForm.lost_reason" placeholder="np. Cena, Konkurencja…" [style.border-color]="editForm.stage==='closed_lost'&&!editForm.lost_reason?'#ef4444':''"></label>
+          <label class="full" style="color:#991b1b">Powód przegranej *
+            <select [(ngModel)]="editForm.lost_reason"
+                    [style.border-color]="!editForm.lost_reason ? '#ef4444' : ''">
+              <option value="">— wybierz powód —</option>
+              <option *ngFor="let r of lostReasons" [value]="r">{{r}}</option>
+            </select>
+          </label>
         </div>
         <div class="edit-row"><label class="check-label"><input type="checkbox" [(ngModel)]="editForm.hot"> 🔥 Gorący lead</label></div>
       </div>
@@ -478,8 +516,33 @@ import { AuthService } from '../../../core/auth/auth.service';
                    [style.border-color]="requiresFullFields && !editForm.phone ? '#fca5a5' : ''">
           </label>
         </div>
+      </div>
+      <div class="edit-section">
+        <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Dodatkowe kontakty</span>
+          <button style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addExtraContact()">+ Dodaj kontakt</button>
+        </div>
+        @for (ec of extraContacts; track $index; let i = $index) {
+          <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
+            <button style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)">✕</button>
+            <div class="edit-row">
+              <label>Imię i nazwisko<input [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></label>
+              <label>Stanowisko<select [(ngModel)]="ec.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
+            </div>
+            <div class="edit-row">
+              <label>Email<input [(ngModel)]="ec.email" type="email" placeholder="jan@firma.pl"></label>
+              <label>Telefon<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
+            </div>
+          </div>
+        }
+        @if (extraContacts.length === 0) {
+          <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px">Brak dodatkowych kontaktów</div>
+        }
+      </div>
+      <div class="edit-section">
+        <div class="edit-section-title">NIP</div>
         <div class="edit-row">
-          <label><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">NIP <span style="color:#f97316">*</span></span>
+          <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">NIP <span style="color:#f97316">*</span></span>
             <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                    style="font-family:monospace"
                    (ngModelChange)="validateEditNip()"
@@ -528,29 +591,6 @@ import { AuthService } from '../../../core/auth/auth.service';
         <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…"></textarea>
       </div>
     </div>
-      <!-- Dodatkowe kontakty -->
-      <div class="edit-section">
-        <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
-          <span>Dodatkowe kontakty</span>
-          <button style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addExtraContact()">+ Dodaj kontakt</button>
-        </div>
-        @for (ec of extraContacts; track $index; let i = $index) {
-          <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
-            <button style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)">✕</button>
-            <div class="edit-row">
-              <label>Imię i nazwisko<input [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></label>
-              <label>Stanowisko<select [(ngModel)]="ec.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
-            </div>
-            <div class="edit-row">
-              <label>Email<input [(ngModel)]="ec.email" type="email" placeholder="jan@firma.pl"></label>
-              <label>Telefon<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
-            </div>
-          </div>
-        }
-        @if (extraContacts.length === 0) {
-          <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px">Brak dodatkowych kontaktów</div>
-        }
-      </div>
 
       <!-- Błędy walidacji -->
       @if (editErrors.length > 0) {
@@ -739,6 +779,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
     .hdr-btn { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:5px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; position:relative; }
     .hdr-btn:hover { background:#f9fafb; }
+    .hdr-btn:disabled { opacity:.45; cursor:not-allowed; pointer-events:auto; }
     .hdr-btn-edit { border-color:#d1d5db; }
     .hdr-btn-primary { background:#f97316; color:white; border-color:#f97316; }
     .hdr-btn-primary:hover { background:#ea6a0a; }
@@ -909,9 +950,10 @@ export class CrmLeadDetailComponent implements OnInit {
   }
 
   get editErrors(): string[] {
-    if (!this.requiresFullFields) return [];
     const f = this.editForm;
     const errs: string[] = [];
+    if (f.stage === 'closed_lost' && !f.lost_reason) errs.push('Powód przegranej');
+    if (!this.requiresFullFields) return errs;
     if (!f.website)            errs.push('Strona WWW');
     if (!f.contact_name)       errs.push('Imię i Nazwisko');
     if (!f.contact_title)      errs.push('Stanowisko');
@@ -965,6 +1007,11 @@ export class CrmLeadDetailComponent implements OnInit {
   sourceGroups(): string[] { return [...new Set(this.leadSources.filter(s => s.group).map(s => s.group!))]; }
   sourcesInGroup(g: string): LeadSource[] { return this.leadSources.filter(s => s.group === g); }
 
+  get lostReasons(): string[] {
+    try { return JSON.parse(String(this.settings.settings()['crm_lost_reasons'] || '[]')); }
+    catch { return []; }
+  }
+
   // Powiązane dokumenty
   linkedDocs: LinkedDocument[]  = [];
   showDocPicker = false;
@@ -983,12 +1030,16 @@ export class CrmLeadDetailComponent implements OnInit {
   mockCallActive  = false;
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
+  gmailConnected  = false;
+  gmailEmail      = '';
+  gmailAuthUrl    = '';
   showEmailModal  = false;
   sendingEmail    = false;
   emailError      = '';
   emailForm: any  = { recipientList: [] as string[], subject: '', body: '', threadId: '' };
   recipientQuery  = '';
   emailAttachments: File[] = [];
+  downloadingAttachment: string = '';  // attachmentId aktualnie pobieranego załącznika
 
   // Thread viewer
   showThreadModal = false;
@@ -1022,6 +1073,12 @@ export class CrmLeadDetailComponent implements OnInit {
     return u?.is_admin || u?.crm_role === 'sales_manager';
   }
 
+  get canEdit(): boolean {
+    if (!this.lead) return false;
+    // Backend zwraca can_edit; fallback true gdy brak pola (admin lub starszy response)
+    return this.lead.can_edit !== false;
+  }
+
   ngOnInit() {
     const rawId = this.id || this.route.snapshot.paramMap.get('id') || '';
     const numId = parseInt(rawId, 10);
@@ -1035,6 +1092,15 @@ export class CrmLeadDetailComponent implements OnInit {
     });
     this.api.getLeadSources().subscribe({
       next: sources => { this.zone.run(() => { this.leadSources = sources; this.cdr.markForCheck(); }); },
+      error: () => {},
+    });
+    // Sprawdź status połączenia Gmail
+    this.api.getGmailStatus().subscribe({
+      next: s => this.zone.run(() => {
+        this.gmailConnected = s.connected;
+        this.gmailEmail     = s.email || '';
+        this.cdr.markForCheck();
+      }),
       error: () => {},
     });
   }
@@ -1055,6 +1121,15 @@ export class CrmLeadDetailComponent implements OnInit {
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
   openEmailModal(prefillThreadId?: string): void {
+    if (!this.gmailConnected) {
+      // Gmail niepołączony — pobierz URL autoryzacji i pokaż prompt
+      this.api.getGmailAuthUrl().subscribe({
+        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
+        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailModal = true; this.cdr.markForCheck(); }),
+      });
+      this.emailForm = { recipientList: [], subject: '', body: '', threadId: prefillThreadId || '' };
+      return;
+    }
     this.emailForm = {
       recipientList: this.lead?.email ? [this.lead.email] : [],
       subject: '',
@@ -1066,6 +1141,23 @@ export class CrmLeadDetailComponent implements OnInit {
     this.emailError       = '';
     this.showEmailModal   = true;
     this.cdr.markForCheck();
+  }
+
+  downloadAttachment(att: { filename: string; mimeType: string; attachmentId: string }, messageId: string): void {
+    if (this.downloadingAttachment === att.attachmentId) return;
+    this.downloadingAttachment = att.attachmentId;
+    this.api.downloadGmailAttachment(messageId, att.attachmentId, att.filename, att.mimeType || 'application/octet-stream').subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        const a   = document.createElement('a');
+        a.href     = url;
+        a.download = att.filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.zone.run(() => { this.downloadingAttachment = ''; this.cdr.markForCheck(); });
+      },
+      error: () => this.zone.run(() => { this.downloadingAttachment = ''; this.cdr.markForCheck(); }),
+    });
   }
 
   addRecipient(): void {
@@ -1206,6 +1298,7 @@ export class CrmLeadDetailComponent implements OnInit {
       agent_email:  (this.lead as any).agent_email || '',
       agent_phone:  (this.lead as any).agent_phone || '',
       website:      (this.lead as any).website || '',
+      lost_reason:  this.lead.lost_reason || '',
     };
     this.editNipError = '';
     this.detailEnrichDone = false;
@@ -1567,6 +1660,11 @@ export class CrmLeadDetailComponent implements OnInit {
 
   quickChangeStage(stage: LeadStage): void {
     if (!this.lead || this.lead.stage === stage) return;
+    if (stage === 'closed_lost') {
+      this.openEdit();
+      this.editForm.stage = 'closed_lost';
+      return;
+    }
     this.api.updateLead(this.lead.id, { stage } as any).subscribe({
       next: updated => this.zone.run(() => {
         this.lead = { ...this.lead!, ...updated, activities: this.lead!.activities };

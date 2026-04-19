@@ -55,6 +55,7 @@ export interface Lead {
   activities?: LeadActivity[];
   linked_documents?: LinkedDocument[];
   extra_contacts?: LeadContact[];
+  can_edit?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -510,6 +511,13 @@ export interface CrmUser {
   crm_role: 'salesperson' | 'sales_manager' | null;
 }
 
+/** Grupa użytkowników CRM — do filtra handlowiec/grupa */
+export interface CrmGroup {
+  id: string;
+  name: string;
+  user_ids: string[];
+}
+
 /** Planowany budżet sprzedażowy */
 export interface SalesBudget {
   id: number;
@@ -660,6 +668,11 @@ export class CrmApiService {
   /** Zwraca aktywnych użytkowników z rolą CRM (salesperson + sales_manager) */
   getCrmUsers(): Observable<CrmUser[]> {
     return this.http.get<CrmUser[]>(`${BASE}/leads/users`);
+  }
+
+  /** Zwraca aktywne grupy CRM z listą user_ids — do filtra grup na liście leadów */
+  getCrmGroups(): Observable<CrmGroup[]> {
+    return this.http.get<CrmGroup[]>(`${BASE}/leads/groups`);
   }
 
   // ── Leads ────────────────────────────────────────────────
@@ -1018,6 +1031,18 @@ export class CrmApiService {
   }
   disconnectGmail(): Observable<{ ok: boolean }> {
     return this.http.delete<{ ok: boolean }>(`${BASE}/gmail/oauth/disconnect`);
+  }
+
+  /**
+   * Pobiera zawartość załącznika jako Blob do pobrania przez użytkownika.
+   * Backend serwuje z Azure Blob lub proxy przez Gmail API.
+   */
+  downloadGmailAttachment(messageId: string, attachmentId: string, filename: string, mime: string): Observable<Blob> {
+    const params = { filename, mime };
+    return this.http.get(
+      `${BASE}/gmail/attachment/${messageId}/${attachmentId}`,
+      { params, responseType: 'blob' },
+    );
   }
 
 }
