@@ -4,10 +4,10 @@ import { Component, OnInit, inject, ChangeDetectorRef, NgZone, signal, computed 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { CrmApiService, CalendarMeeting, CrmUser } from '../../../core/services/crm-api.service';
+import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
-type ViewMode = 'month' | 'week' | 'day';
+type ViewMode = 'month' | 'week' | 'day' | 'tasks';
 
 interface CalendarDay {
   date: Date;
@@ -34,20 +34,41 @@ interface CalendarDay {
     <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
   </select>
 
-  <!-- Nawigacja -->
-  <button class="nav-btn" (click)="prev()">‹</button>
-  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;min-width:200px;text-align:center">{{ periodLabel }}</span>
-  <button class="nav-btn" (click)="next()">›</button>
-  <button class="nav-btn" (click)="today()" style="font-size:12px;padding:5px 12px">Dziś</button>
+  <!-- Filtr typu aktywności (zadania) -->
+  <select class="ctl" *ngIf="view === 'tasks'" [(ngModel)]="filterActivityType" (ngModelChange)="loadTasks()">
+    <option value="">Wszystkie typy</option>
+    <option value="call">Połączenie</option>
+    <option value="meeting">Spotkanie</option>
+    <option value="note">Notatka</option>
+    <option value="doc_sent">Dokument</option>
+    <option value="training">Szkolenie</option>
+    <option value="qbr">QBR</option>
+    <option value="opportunity">Szansa</option>
+  </select>
+
+  <!-- Pokaż zamknięte (zadania) -->
+  <label *ngIf="view === 'tasks'" style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:#374151">
+    <input type="checkbox" [(ngModel)]="showClosedTasks" (ngModelChange)="loadTasks()">
+    pokaż zamknięte
+  </label>
+
+  <!-- Nawigacja (tylko dla widoków kalendarza) -->
+  <ng-container *ngIf="view !== 'tasks'">
+    <button class="nav-btn" (click)="prev()">‹</button>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;min-width:200px;text-align:center">{{ periodLabel }}</span>
+    <button class="nav-btn" (click)="next()">›</button>
+    <button class="nav-btn" (click)="today()" style="font-size:12px;padding:5px 12px">Dziś</button>
+  </ng-container>
 
   <!-- Przełącznik widoku -->
   <div class="view-switch">
+    <button [class.active]="view === 'tasks'" (click)="setView('tasks')">Zadania</button>
     <button [class.active]="view === 'day'"   (click)="setView('day')">Dzień</button>
     <button [class.active]="view === 'week'"  (click)="setView('week')">Tydzień</button>
     <button [class.active]="view === 'month'" (click)="setView('month')">Miesiąc</button>
   </div>
 
-  <button class="nav-btn" (click)="load()" style="font-size:12px">↻</button>
+  <button class="nav-btn" (click)="view === 'tasks' ? loadTasks() : load()" style="font-size:12px">↻</button>
 </div>
 
 <!-- CONTENT -->
@@ -132,6 +153,48 @@ interface CalendarDay {
             <div *ngIf="m.participants" class="de-meta">👥 {{ m.participants }}</div>
           </div>
           <div class="ds-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WIDOK ZADANIA ══ -->
+  <div *ngIf="view === 'tasks'" style="flex:1;overflow-y:auto;padding:16px">
+    <div *ngIf="tasksLoading" style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">Ładowanie zadań…</div>
+    <div *ngIf="!tasksLoading && !activities.length" style="text-align:center;padding:40px;color:#9ca3af;font-size:13px">Brak zadań do wyświetlenia.</div>
+    <div *ngFor="let t of activities" class="task-item"
+         [class.task-today]="t.activity_at && isTaskToday(t.activity_at)"
+         [class.task-overdue]="t.status !== 'closed' && t.activity_at && isTaskOverdue(t.activity_at)"
+         [class.task-closed]="t.status === 'closed'">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span class="task-type-icon">{{taskIcon(t.type)}}</span>
+            <strong style="font-size:13px;color:#18181b">{{t.title}}</strong>
+            <span class="task-status-badge task-st-{{t.status}}">{{taskStatusLabel(t.status)}}</span>
+            <span class="task-source-badge task-src-{{t.source_type}}">{{t.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
+          </div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:2px">
+            <a *ngIf="t.source_type === 'lead'"    [routerLink]="['/crm/leads', t.source_id]"    class="task-link">{{t.source_name}}</a>
+            <a *ngIf="t.source_type === 'partner'" [routerLink]="['/crm/partners', t.source_id]" class="task-link">{{t.source_name}}</a>
+            <span *ngIf="t.activity_at"> · {{t.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+            <span *ngIf="t.act_assigned_to_name"> → {{t.act_assigned_to_name}}</span>
+            <span *ngIf="!t.act_assigned_to_name && t.assigned_to_name"> → {{t.assigned_to_name}}</span>
+          </div>
+          <div *ngIf="t.body" style="font-size:12px;color:#6b7280;margin-top:3px;white-space:pre-line">{{t.body}}</div>
+          <div *ngIf="t.close_comment" style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px">💬 {{t.close_comment}}</div>
+          <!-- Formularz zamknięcia -->
+          <div *ngIf="closingTaskId === t.id" style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+            <textarea [(ngModel)]="taskCloseComment" placeholder="Komentarz zamknięcia *" rows="2"
+                      style="border:1px solid #d1d5db;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <button class="nav-btn" style="font-size:12px" (click)="cancelCloseTask()">Anuluj</button>
+              <button class="nav-btn" style="font-size:12px;background:#f97316;color:white;border-color:#f97316" (click)="confirmCloseTask(t)" [disabled]="!taskCloseComment.trim() || saving">{{saving ? '…' : 'Zamknij'}}</button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="closingTaskId !== t.id && t.status !== 'closed'" style="display:flex;gap:4px;flex-shrink:0">
+          <button class="nav-btn" style="font-size:11px;padding:3px 8px" (click)="startCloseTask(t)">✓ Zamknij</button>
         </div>
       </div>
     </div>
@@ -289,6 +352,21 @@ interface CalendarDay {
     .dp-btn-p { background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer }
     .dp-btn-p:disabled { opacity:.6 }
     .dp-btn-g { background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer }
+
+    /* Tasks view */
+    .task-item { border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px;background:white;border-left:4px solid #e5e7eb; }
+    .task-item.task-today { background:#eff6ff;border-left-color:#3b82f6; }
+    .task-item.task-overdue { background:#fef2f2;border-left-color:#dc2626; }
+    .task-item.task-closed { opacity:.6;background:#f9fafb; }
+    .task-status-badge { font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em; }
+    .task-st-new { background:#f3f4f6;color:#6b7280; }
+    .task-st-open { background:#dbeafe;color:#1d4ed8; }
+    .task-st-closed { background:#d1fae5;color:#065f46; }
+    .task-source-badge { font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px; }
+    .task-src-lead { background:#fff7ed;color:#c2410c; }
+    .task-src-partner { background:#f0fdf4;color:#166534; }
+    .task-link { color:#f97316;font-weight:600;text-decoration:none; }
+    .task-link:hover { text-decoration:underline; }
   `],
 })
 export class CrmCalendarComponent implements OnInit {
@@ -304,6 +382,14 @@ export class CrmCalendarComponent implements OnInit {
   filterRep = '';
   crmUsers: CrmUser[] = [];
   meetings: CalendarMeeting[] = [];
+
+  // Zadania
+  activities: ActivityTask[] = [];
+  tasksLoading = false;
+  showClosedTasks = false;
+  filterActivityType = '';
+  closingTaskId: number | null = null;
+  taskCloseComment = '';
 
   selectedMeeting: CalendarMeeting | null = null;
   editMode = false;
@@ -380,8 +466,79 @@ export class CrmCalendarComponent implements OnInit {
     this.load();
   }
   today(): void { this.currentDate = new Date(); this.load(); }
-  setView(v: ViewMode): void { this.view = v; this.load(); }
+  setView(v: ViewMode): void {
+    this.view = v;
+    if (v === 'tasks') { this.loadTasks(); } else { this.load(); }
+  }
+
+  loadTasks(): void {
+    this.tasksLoading = true;
+    this.cdr.markForCheck();
+    const p: any = { include_closed: this.showClosedTasks };
+    if (this.filterRep && this.isManager) p.assigned_to = this.filterRep;
+    if (this.filterActivityType) p.type = this.filterActivityType;
+    this.api.getActivityTasks(p).subscribe({
+      next: tasks => this.zone.run(() => {
+        this.activities = tasks;
+        this.tasksLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.tasksLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
   jumpToDate(d: Date): void { this.currentDate = new Date(d); }
+
+  startCloseTask(t: ActivityTask): void {
+    this.closingTaskId = t.id;
+    this.taskCloseComment = t.close_comment || '';
+  }
+
+  cancelCloseTask(): void {
+    this.closingTaskId = null;
+    this.taskCloseComment = '';
+  }
+
+  confirmCloseTask(t: ActivityTask): void {
+    if (!this.taskCloseComment.trim()) return;
+    this.saving = true;
+    this.cdr.markForCheck();
+    const updateCall = t.source_type === 'lead'
+      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'closed', close_comment: this.taskCloseComment })
+      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'closed', close_comment: this.taskCloseComment });
+    updateCall.subscribe({
+      next: () => this.zone.run(() => {
+        this.activities = this.activities.map(a => a.id === t.id && a.source_type === t.source_type
+          ? { ...a, status: 'closed' as const, close_comment: this.taskCloseComment }
+          : a
+        );
+        this.closingTaskId   = null;
+        this.taskCloseComment = '';
+        this.saving = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  taskIcon(type: string): string {
+    const icons: Record<string, string> = { call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊', opportunity:'💡' };
+    return icons[type] || '📌';
+  }
+
+  taskStatusLabel(s: string): string {
+    return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+  }
+
+  isTaskToday(activityAt: string): boolean {
+    const d = new Date(activityAt);
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+  }
+
+  isTaskOverdue(activityAt: string): boolean {
+    return new Date(activityAt) < new Date(new Date().toDateString());
+  }
 
   // ── Month grid ────────────────────────────────────────────
   get monthDays(): CalendarDay[] {

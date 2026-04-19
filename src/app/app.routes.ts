@@ -12,6 +12,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/callback.component').then(m => m.CallbackComponent),
   },
   {
+    path: 'crm/gmail/callback',
+    loadComponent: () => import('./pages/crm/gmail-callback/gmail-callback.component').then(m => m.GmailCallbackComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],

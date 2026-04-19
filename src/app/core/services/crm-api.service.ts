@@ -1,7 +1,8 @@
 // src/app/core/services/crm-api.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 // ─────────────────────────────────────────────────────────────────
@@ -66,18 +67,23 @@ export interface LeadActivity {
   type: 'call' | 'email' | 'meeting' | 'note' | 'doc_sent';
   title: string;
   body: string | null;
-  activity_at: string;
+  activity_at: string | null;
   duration_min: number | null;
   participants: string | null;
   meeting_location: string | null;
+  created_by: string | null;
   created_by_name: string | null;
+  assigned_to: string | null;
+  assigned_to_name: string | null;
+  status: 'new' | 'open' | 'closed';
+  close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
 }
 
 export interface CalendarMeeting {
   id: number;
-  type: 'meeting';
+  type: string;
   title: string;
   body: string | null;
   activity_at: string;
@@ -86,11 +92,39 @@ export interface CalendarMeeting {
   meeting_location: string | null;
   created_by_name: string | null;
   created_by: string;
+  status: 'new' | 'open' | 'closed';
+  close_comment: string | null;
   source_type: 'lead' | 'partner';
   source_id: number;
   source_name: string;
   assigned_to_name: string | null;
   assigned_to_id: string | null;
+  act_assigned_to_name: string | null;
+  act_assigned_to_id: string | null;
+}
+
+export interface ActivityTask {
+  id: number;
+  type: string;
+  title: string;
+  body: string | null;
+  activity_at: string | null;
+  duration_min: number | null;
+  participants: string | null;
+  meeting_location: string | null;
+  created_by: string | null;
+  created_by_name: string | null;
+  status: 'new' | 'open' | 'closed';
+  close_comment: string | null;
+  created_at: string;
+  updated_at: string;
+  source_type: 'lead' | 'partner';
+  source_id: number;
+  source_name: string;
+  assigned_to_name: string | null;
+  assigned_to_id: string | null;
+  act_assigned_to_name: string | null;
+  act_assigned_to_id: string | null;
 }
 
 
@@ -200,7 +234,7 @@ export interface PartnerActivity {
   type: 'call' | 'email' | 'meeting' | 'note' | 'doc_sent' | 'training' | 'qbr' | 'opportunity';
   title: string;
   body: string | null;
-  activity_at: string;
+  activity_at: string | null;
   duration_min: number | null;
   participants: string | null;
   meeting_location: string | null;
@@ -210,6 +244,10 @@ export interface PartnerActivity {
   opp_due_date: string | null;
   created_by: string | null;
   created_by_name: string | null;
+  assigned_to: string | null;
+  assigned_to_name: string | null;
+  status: 'new' | 'open' | 'closed';
+  close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
 }
@@ -961,6 +999,28 @@ export class CrmApiService {
     return this.http.get<CalendarMeeting[]>(`${BASE}/leads/calendar`, { params: this.toParams(p) });
   }
 
+  // ── Zadania (zakładka Zadania w kalendarzu) ───────────────────
+  getActivityTasks(p: { assigned_to?: string; type?: string; include_closed?: boolean } = {}): Observable<ActivityTask[]> {
+    const combined: { [k: string]: string } = {};
+    if (p.assigned_to) combined['assigned_to'] = p.assigned_to;
+    if (p.type) combined['type'] = p.type;
+    if (p.include_closed !== undefined) combined['include_closed'] = String(p.include_closed);
+
+    return combineLatest([
+      this.http.get<ActivityTask[]>(`${BASE}/leads/tasks`, { params: combined }),
+      this.http.get<ActivityTask[]>(`${BASE}/partners/tasks`, { params: combined }),
+    ]).pipe(
+      map(([leads, partners]) =>
+        [...leads, ...partners].sort((a, b) => {
+          if (!a.activity_at && !b.activity_at) return 0;
+          if (!a.activity_at) return 1;
+          if (!b.activity_at) return -1;
+          return new Date(a.activity_at).getTime() - new Date(b.activity_at).getTime();
+        })
+      )
+    );
+  }
+
   // ── Planowane Budżety Sprzedażowe ─────────────────────────
   getSalesBudgets(p: { user_id?: string; year?: number } = {}): Observable<SalesBudget[]> {
     return this.http.get<SalesBudget[]>(`${BASE}/budgets`, { params: this.toParams(p) });
@@ -1031,6 +1091,9 @@ export class CrmApiService {
   }
   disconnectGmail(): Observable<{ ok: boolean }> {
     return this.http.delete<{ ok: boolean }>(`${BASE}/gmail/oauth/disconnect`);
+  }
+  downloadGmailAttachment(messageId: string, attachmentId: string): Observable<Blob> {
+    return this.http.get(`${BASE}/gmail/attachment/${messageId}/${attachmentId}`, { responseType: 'blob' });
   }
 
   /**
