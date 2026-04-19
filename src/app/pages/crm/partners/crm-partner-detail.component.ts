@@ -1,5 +1,5 @@
 // src/app/pages/crm/partners/crm-partner-detail.component.ts
-import { Component, OnInit, inject, Input, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, Input, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -310,7 +310,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
             ✉️ Email
             <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
           </button>
-          <button class="btn-sm" (click)="showNewActivity = !showNewActivity">+ Dodaj</button>
+          <button class="btn-sm" (click)="openNewActivityForm()">+ Dodaj</button>
         </div>
       </div>
       <div class="new-activity-form" *ngIf="showNewActivity">
@@ -324,12 +324,20 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           <option value="opportunity">💡 Szansa</option>
         </select>
         <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
-        <ng-container *ngIf="actForm.type === 'meeting'">
+        <ng-container *ngIf="actForm.type !== 'email'">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
             <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
               Data i czas
               <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
             </label>
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Przypisz do
+              <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px"><option value="">— ja (domyślnie) —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>
+            </label>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="actForm.type === 'meeting'">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
             <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
               Czas trwania (min)
               <input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="np. 60" class="act-input" style="font-size:11px">
@@ -403,11 +411,16 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         </div>
       </div>
       <div class="activity-list">
-        <div *ngFor="let a of sortedActivities" class="act-item">
+        <div *ngFor="let a of sortedActivities" class="act-item" [class.act-closed]="a.status==='closed'" [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)" [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)">
           <span class="act-icon">{{actIcon(a.type)}}</span>
-          <div *ngIf="editingActId !== a.id">
-            <strong>{{a.title}}</strong>
-            <div class="act-meta">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · {{a.created_by_name}}</div>
+          <div *ngIf="editingActId !== a.id && closingActId !== a.id">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <strong>{{a.title}}</strong>
+              <span *ngIf="a.type!=='email'" class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
+            </div>
+            <div class="act-meta">
+              <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>{{a.created_by_name}}<span *ngIf="a.assigned_to_name" style="color:#f97316"> → {{a.assigned_to_name}}</span>
+            </div>
             <div *ngIf="a.meeting_location" class="act-text">📍 {{a.meeting_location}}</div>
             <div *ngIf="a.participants" class="act-text">👥 {{a.participants}}</div>
             <ng-container *ngIf="a.type === 'opportunity'">
@@ -418,6 +431,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
               </div>
             </ng-container>
             <div class="act-text" *ngIf="a.body">{{a.body}}</div>
+            <div *ngIf="a.close_comment" class="act-text" style="color:#6b7280;font-style:italic">💬 {{a.close_comment}}</div>
             <div *ngIf="a.type==='email' && a.gmail_thread_id" style="margin-top:4px;display:flex;gap:6px">
               <button class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">💬 Pokaż wątek</button>
               <button class="btn-sm primary" style="font-size:10px" (click)="replyToThread(a)">↩ Odpowiedz</button>
@@ -429,6 +443,15 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 <div style="font-weight:600;color:#374151">{{m.from}}</div>
                 <div style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</div>
                 <div style="margin-top:4px;color:#374151;white-space:pre-line">{{m.snippet}}</div>
+                <div *ngIf="m.attachments?.length" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px">
+                  <button *ngFor="let att of m.attachments"
+                          (click)="downloadAttachment(att, m.id)"
+                          [disabled]="downloadingAttachment===att.attachmentId"
+                          style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:2px 8px;font-size:10px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:3px">
+                    <span *ngIf="downloadingAttachment!==att.attachmentId">📎 {{att.filename}}</span>
+                    <span *ngIf="downloadingAttachment===att.attachmentId">⏳ {{att.filename}}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -443,15 +466,13 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
               <option value="opportunity">💡 Szansa</option>
             </select>
             <input [(ngModel)]="actEditForm.title" placeholder="Tytuł *" class="act-input">
-            <ng-container *ngIf="actEditForm.type === 'meeting'">
+            <ng-container *ngIf="actEditForm.type !== 'email'">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                  Data i czas<input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input" style="font-size:11px">
-                </label>
-                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                  Czas trwania (min)<input type="number" min="0" [(ngModel)]="actEditForm.duration_min" placeholder="60" class="act-input" style="font-size:11px">
-                </label>
+                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Data i czas<input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input" style="font-size:11px"></label>
+                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Przypisz do<select [(ngModel)]="actEditForm.assigned_to" class="act-sel" style="font-size:11px"><option value="">— ja (domyślnie) —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select></label>
               </div>
+            </ng-container>
+            <ng-container *ngIf="actEditForm.type === 'meeting'">
               <input [(ngModel)]="actEditForm.meeting_location" placeholder="Miejsce spotkania" class="act-input">
               <input [(ngModel)]="actEditForm.participants" placeholder="Uczestnicy (emaile oddzielone przecinkiem)" class="act-input">
             </ng-container>
@@ -483,7 +504,17 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
               </button>
             </div>
           </div>
-          <div class="act-controls" *ngIf="editingActId !== a.id && canEditActivity(a)">
+          <!-- Formularz zamknięcia -->
+          <div class="act-edit-form" *ngIf="closingActId === a.id">
+            <div style="font-size:12px;font-weight:600;color:#374151">Zamknij aktywność: {{a.title}}</div>
+            <textarea [(ngModel)]="closeComment" placeholder="Komentarz zamknięcia *" rows="2" class="act-input" style="font-size:12px"></textarea>
+            <div class="act-actions">
+              <button class="btn-sm" (click)="cancelClose()">Anuluj</button>
+              <button class="btn-sm primary" (click)="confirmCloseActivity(a)" [disabled]="!closeComment.trim() || savingActivity">{{savingActivity ? '…' : 'Zamknij'}}</button>
+            </div>
+          </div>
+          <div class="act-controls" *ngIf="editingActId !== a.id && closingActId !== a.id && canEditActivity(a)">
+            <button *ngIf="a.type!=='email' && a.status!=='closed'" class="act-ctrl-btn" (click)="startCloseActivity(a)" title="Zamknij">✓</button>
             <button class="act-ctrl-btn" (click)="startEditActivity(a)" title="Edytuj">✏️</button>
             <button class="act-ctrl-btn del" (click)="deleteActivity(a)" title="Usuń">🗑️</button>
           </div>
@@ -874,49 +905,76 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       <h3>✉️ Wyślij email</h3>
       <button class="close-btn" (click)="showEmailModal=false">✕</button>
     </div>
-    <div class="modal-body" style="gap:12px">
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Do
-        <div class="participant-chips">
-          <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">
-            {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
-          </span>
-          <input class="participant-input" [(ngModel)]="recipientQuery"
-                 (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
-                 placeholder="email@firma.pl" autocomplete="off">
-        </div>
-      </label>
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Temat
-        <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
-      </label>
-      <div *ngIf="emailForm.threadId" style="font-size:11px;color:#6b7280;background:#eff6ff;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
-        <span>📎 Odpowiedź w wątku</span>
-        <button (click)="emailForm.threadId=''" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:10px">✕ Usuń</button>
+
+    <!-- Gmail not connected prompt -->
+    <div *ngIf="!gmailConnected" class="modal-body" style="gap:16px;align-items:center;text-align:center;padding:32px 24px">
+      <div style="font-size:40px">📧</div>
+      <div style="font-size:15px;font-weight:700;color:#111827">Połącz konto Gmail</div>
+      <div style="font-size:13px;color:#6b7280;max-width:380px">
+        Aby wysyłać maile przez naszą aplikację, musisz połączyć swoje konto Gmail.
+        Po zalogowaniu wróć do tego widoku.
       </div>
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Treść
-        <textarea class="act-input" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
-      </label>
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Załączniki
-        <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280">
-      </label>
-      <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-        <span *ngFor="let f of emailAttachments; let i=index"
-              style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
-          📎 {{f.name}}
-          <button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
-        </span>
-      </div>
-      <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+      <a [href]="gmailAuthUrl" target="_blank" rel="noopener"
+         style="display:inline-block;background:#f97316;color:white;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;text-decoration:none;margin-top:4px">
+        🔗 Połącz Gmail
+      </a>
     </div>
-    <div class="modal-footer">
-      <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
-      <button class="btn-primary" (click)="sendEmail()"
-              [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
-        {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
-      </button>
+
+    <!-- Normal compose form -->
+    <ng-container *ngIf="gmailConnected">
+      <div class="modal-body" style="gap:12px">
+        <!-- Connected account info -->
+        <div style="font-size:11px;color:#6b7280;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:6px">
+          <span style="color:#16a34a">✓</span> Wysyłasz z: <strong>{{gmailEmail}}</strong>
+        </div>
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+          Do
+          <div class="participant-chips">
+            <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">
+              {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
+            </span>
+            <input class="participant-input" [(ngModel)]="recipientQuery"
+                   (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
+                   placeholder="email@firma.pl" autocomplete="off">
+          </div>
+        </label>
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+          Temat
+          <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
+        </label>
+        <div *ngIf="emailForm.threadId" style="font-size:11px;color:#6b7280;background:#eff6ff;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+          <span>📎 Odpowiedź w wątku</span>
+          <button (click)="emailForm.threadId=''" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:10px">✕ Usuń</button>
+        </div>
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+          Treść
+          <textarea class="act-input" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
+        </label>
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+          Załączniki
+          <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280">
+        </label>
+        <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+          <span *ngFor="let f of emailAttachments; let i=index"
+                style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
+            📎 {{f.name}}
+            <button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+          </span>
+        </div>
+        <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
+        <button class="btn-primary" (click)="sendEmail()"
+                [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
+          {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Footer for not-connected state -->
+    <div *ngIf="!gmailConnected" class="modal-footer">
+      <button class="btn-outline" (click)="showEmailModal=false">Zamknij</button>
     </div>
   </div>
 </div>
@@ -1017,7 +1075,14 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; }
     .act-actions { display:flex; gap:6px; justify-content:flex-end; }
     .activity-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
-    .act-item { display:flex; gap:10px; }
+    .act-item { display:flex; gap:10px; border-left:3px solid transparent; padding-left:6px; }
+    .act-item.act-today { border-left-color:#bfdbfe; background:#eff6ff; border-radius:6px; }
+    .act-item.act-overdue { border-left-color:#fca5a5; background:#fef2f2; border-radius:6px; }
+    .act-item.act-closed { opacity:.65; }
+    .act-status-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
+    .act-status-new { background:#f3f4f6; color:#6b7280; }
+    .act-status-open { background:#dbeafe; color:#1d4ed8; }
+    .act-status-closed { background:#d1fae5; color:#065f46; }
     .act-icon { font-size:18px; }
     .act-item strong { font-size:13px; }
     .act-meta { font-size:10px; color:#9ca3af; }
@@ -1064,7 +1129,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 5px; line-height:16px; display:inline-block; }
   `],
 })
-export class CrmPartnerDetailComponent implements OnInit {
+export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   @Input() id!: string;
   private route  = inject(ActivatedRoute);
   private zone   = inject(NgZone);
@@ -1136,9 +1201,11 @@ export class CrmPartnerDetailComponent implements OnInit {
     this.partnerNipEditError = '';
   }
   editForm: any  = {};
-  actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
-  actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '', opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
+  actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '' };
+  actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '', opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '' };
   editingActId: number | null = null;
+  closingActId: number | null = null;
+  closeComment = '';
   allSuggestions: { email: string; name: string }[] = [];
   filteredSuggestions: { email: string; name: string }[] = [];
   participantQuery = '';
@@ -1154,14 +1221,18 @@ export class CrmPartnerDetailComponent implements OnInit {
   private docSearchTimer: any;
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
-  showEmailModal  = false;
-  sendingEmail    = false;
-  emailError      = '';
-  emailForm: any  = { recipientList: [] as string[], subject: '', body: '', threadId: '' };
-  recipientQuery  = '';
+  showEmailModal      = false;
+  sendingEmail        = false;
+  emailError          = '';
+  emailForm: any      = { recipientList: [] as string[], subject: '', body: '', threadId: '' };
+  recipientQuery      = '';
   emailAttachments: File[] = [];
   threadMessages: any[] = [];
-  openThreadId    = '';
+  openThreadId        = '';
+  gmailConnected      = false;
+  gmailEmail          = '';
+  gmailAuthUrl        = '';
+  downloadingAttachment = '';
 
   get emailActivities(): any[] {
     return (this.partner?.activities || []).filter((a: any) => a.type === 'email');
@@ -1254,9 +1325,11 @@ export class CrmPartnerDetailComponent implements OnInit {
   }
 
   get sortedActivities(): any[] {
-    return [...(this.partner?.activities || [])].sort((a, b) =>
-      new Date(b.activity_at).getTime() - new Date(a.activity_at).getTime()
-    );
+    return [...(this.partner?.activities || [])].sort((a, b) => {
+      const ta = a.activity_at ? new Date(a.activity_at).getTime() : 0;
+      const tb = b.activity_at ? new Date(b.activity_at).getTime() : 0;
+      return tb - ta;
+    });
   }
 
   get activeOpps(): any[] {
@@ -1282,6 +1355,21 @@ export class CrmPartnerDetailComponent implements OnInit {
     return Math.round(((this.partner.active_users || 0) / this.partner.license_count) * 100);
   }
 
+  private _gmailMsgHandler = (ev: MessageEvent) => {
+    if (ev.origin !== window.location.origin) return;
+    if (ev.data?.type === 'gmail-oauth-result' && ev.data?.status === 'connected') {
+      this.api.getGmailStatus().subscribe({
+        next: s => this.zone.run(() => {
+          this.gmailConnected = s.connected;
+          this.gmailEmail     = s.email || '';
+          this.gmailAuthUrl   = '';
+          this.cdr.markForCheck();
+        }),
+        error: () => {},
+      });
+    }
+  };
+
   ngOnInit() {
     const rawId = this.id || this.route.snapshot.paramMap.get('id') || '';
     const numId = parseInt(rawId, 10);
@@ -1290,6 +1378,15 @@ export class CrmPartnerDetailComponent implements OnInit {
     this.loadLinkedDocs(numId);
     this.loadSuggestions(numId);
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
+    this.api.getGmailStatus().subscribe({
+      next: s => this.zone.run(() => { this.gmailConnected = s.connected; this.gmailEmail = s.email || ''; this.cdr.markForCheck(); }),
+      error: () => {},
+    });
+    window.addEventListener('message', this._gmailMsgHandler);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('message', this._gmailMsgHandler);
   }
 
   private loadSuggestions(partnerId: number): void {
@@ -1675,8 +1772,11 @@ export class CrmPartnerDetailComponent implements OnInit {
       title: this.actForm.title,
       body:  this.actForm.body || null,
     };
+    if (this.actForm.type !== 'email') {
+      payload.activity_at = this.actForm.activity_at || null;
+      payload.assigned_to = this.actForm.assigned_to || null;
+    }
     if (this.actForm.type === 'meeting') {
-      if (this.actForm.activity_at) payload.activity_at = this.actForm.activity_at;
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
       payload.participants = (this.actForm.participantList || []).join(', ') || null;
@@ -1693,7 +1793,7 @@ export class CrmPartnerDetailComponent implements OnInit {
           if (this.partner) {
             this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
           }
-          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '' };
+          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '' };
           this.participantQuery = '';
           this.showNewActivity  = false;
           this.savingActivity   = false;
@@ -1702,6 +1802,16 @@ export class CrmPartnerDetailComponent implements OnInit {
       },
       error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
     });
+  }
+
+  openNewActivityForm(): void {
+    this.showNewActivity = !this.showNewActivity;
+    if (this.showNewActivity && !this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
   }
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
@@ -1715,8 +1825,36 @@ export class CrmPartnerDetailComponent implements OnInit {
     this.recipientQuery   = '';
     this.emailAttachments = [];
     this.emailError       = '';
-    this.showEmailModal   = true;
+    if (!this.gmailConnected && !this.gmailAuthUrl) {
+      this.api.getGmailAuthUrl().subscribe({
+        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
+        error: () => {},
+      });
+    } else {
+      this.showEmailModal = true;
+    }
     this.cdr.markForCheck();
+  }
+
+  downloadAttachment(att: any, messageId: string): void {
+    if (this.downloadingAttachment === att.attachmentId) return;
+    this.downloadingAttachment = att.attachmentId;
+    this.cdr.markForCheck();
+    this.api.downloadGmailAttachment(messageId, att.attachmentId, att.filename, att.mimeType || 'application/octet-stream').subscribe({
+      next: blob => {
+        this.zone.run(() => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = att.filename;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+          this.downloadingAttachment = '';
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => this.zone.run(() => { this.downloadingAttachment = ''; this.cdr.markForCheck(); }),
+    });
   }
 
   addRecipient(): void {
@@ -1823,6 +1961,7 @@ export class CrmPartnerDetailComponent implements OnInit {
 
   startEditActivity(a: any): void {
     this.editingActId = a.id;
+    this.closingActId = null;
     this.actEditForm  = {
       type:             a.type,
       title:            a.title,
@@ -1835,11 +1974,65 @@ export class CrmPartnerDetailComponent implements OnInit {
       opp_currency:     a.opp_currency || 'PLN',
       opp_status:       a.opp_status || 'new',
       opp_due_date:     a.opp_due_date || '',
+      assigned_to:      a.assigned_to || '',
     };
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
   }
 
   cancelEditActivity(): void {
     this.editingActId = null;
+  }
+
+  startCloseActivity(a: any): void {
+    this.closingActId = a.id;
+    this.editingActId = null;
+    this.closeComment = a.close_comment || '';
+  }
+
+  cancelClose(): void {
+    this.closingActId = null;
+    this.closeComment = '';
+  }
+
+  confirmCloseActivity(a: any): void {
+    if (!this.closeComment.trim() || !this.partner) return;
+    this.savingActivity = true;
+    this.api.updatePartnerActivity(this.partner.id, a.id, { status: 'closed', close_comment: this.closeComment }).subscribe({
+      next: updated => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = {
+              ...this.partner,
+              activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
+            };
+          }
+          this.closingActId   = null;
+          this.closeComment   = '';
+          this.savingActivity = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  actStatusLabel(s: string): string {
+    return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+  }
+
+  isActOverdue(activityAt: string): boolean {
+    return new Date(activityAt) < new Date(new Date().toDateString());
+  }
+
+  isActToday(activityAt: string): boolean {
+    const d = new Date(activityAt);
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
   }
 
   saveEditActivity(a: any): void {
@@ -1850,9 +2043,12 @@ export class CrmPartnerDetailComponent implements OnInit {
       title: this.actEditForm.title,
       body:  this.actEditForm.body || null,
     };
+    if (this.actEditForm.type !== 'email') {
+      payload.activity_at = this.actEditForm.activity_at || null;
+      payload.assigned_to = this.actEditForm.assigned_to || null;
+    }
     if (this.actEditForm.type === 'meeting') {
-      if (this.actEditForm.activity_at)        payload.activity_at      = this.actEditForm.activity_at;
-      if (this.actEditForm.duration_min !== '') payload.duration_min     = +this.actEditForm.duration_min;
+      if (this.actEditForm.duration_min !== '') payload.duration_min = +this.actEditForm.duration_min;
       payload.meeting_location = this.actEditForm.meeting_location || null;
       payload.participants     = this.actEditForm.participants || null;
     }

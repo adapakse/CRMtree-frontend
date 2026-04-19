@@ -12,6 +12,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/callback.component').then(m => m.CallbackComponent),
   },
   {
+    path: 'crm/gmail/callback',
+    loadComponent: () => import('./pages/crm/gmail-callback/gmail-callback.component').then(m => m.GmailCallbackComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],
@@ -34,7 +38,7 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-        canActivate: [adminOrSalesManagerGuard],
+        canActivate: [adminGuard],
         loadComponent: () => import('./pages/users/users.component').then(m => m.UsersComponent),
       },
       {
@@ -86,7 +90,7 @@ export const routes: Routes = [
       },
       {
         path: 'crm/import',
-        canActivate: [crmGuard],
+        canActivate: [adminGuard],
         loadComponent: () => import('./pages/crm/import/crm-import.component').then(m => m.CrmImportComponent),
       },
       {
