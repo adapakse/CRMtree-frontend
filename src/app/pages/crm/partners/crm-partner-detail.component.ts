@@ -411,12 +411,12 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         </div>
       </div>
       <div class="activity-list">
-        <div *ngFor="let a of sortedActivities" class="act-item" [class.act-closed]="a.status==='closed'" [class.act-overdue]="a.status!=='closed' && a.activity_at && isOverdue(a.activity_at)" [class.act-today]="a.status!=='closed' && a.activity_at && isToday(a.activity_at)">
+        <div *ngFor="let a of sortedActivities" class="act-item" [class.act-closed]="a.status==='closed'" [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)" [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)">
           <span class="act-icon">{{actIcon(a.type)}}</span>
           <div *ngIf="editingActId !== a.id && closingActId !== a.id">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
               <strong>{{a.title}}</strong>
-              <span *ngIf="a.type!=='email'" class="act-status-badge act-status-{{a.status||'new'}}">{{statusLabel(a.status||'new')}}</span>
+              <span *ngIf="a.type!=='email'" class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
             </div>
             <div class="act-meta">
               <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>{{a.created_by_name}}<span *ngIf="a.assigned_to_name" style="color:#f97316"> → {{a.assigned_to_name}}</span>
@@ -1325,9 +1325,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   get sortedActivities(): any[] {
-    return [...(this.partner?.activities || [])].sort((a, b) =>
-      new Date(b.activity_at).getTime() - new Date(a.activity_at).getTime()
-    );
+    return [...(this.partner?.activities || [])].sort((a, b) => {
+      const ta = a.activity_at ? new Date(a.activity_at).getTime() : 0;
+      const tb = b.activity_at ? new Date(b.activity_at).getTime() : 0;
+      return tb - ta;
+    });
   }
 
   get activeOpps(): any[] {
@@ -1838,7 +1840,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.downloadingAttachment === att.attachmentId) return;
     this.downloadingAttachment = att.attachmentId;
     this.cdr.markForCheck();
-    this.api.downloadGmailAttachment(messageId, att.attachmentId).subscribe({
+    this.api.downloadGmailAttachment(messageId, att.attachmentId, att.filename, att.mimeType || 'application/octet-stream').subscribe({
       next: blob => {
         this.zone.run(() => {
           const url = URL.createObjectURL(blob);
@@ -2019,15 +2021,15 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  statusLabel(s: string): string {
+  actStatusLabel(s: string): string {
     return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
   }
 
-  isOverdue(activityAt: string): boolean {
+  isActOverdue(activityAt: string): boolean {
     return new Date(activityAt) < new Date(new Date().toDateString());
   }
 
-  isToday(activityAt: string): boolean {
+  isActToday(activityAt: string): boolean {
     const d = new Date(activityAt);
     const now = new Date();
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();

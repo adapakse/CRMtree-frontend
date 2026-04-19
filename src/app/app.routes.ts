@@ -38,7 +38,7 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-        canActivate: [adminOrSalesManagerGuard],
+        canActivate: [adminGuard],
         loadComponent: () => import('./pages/users/users.component').then(m => m.UsersComponent),
       },
       {
@@ -90,7 +90,7 @@ export const routes: Routes = [
       },
       {
         path: 'crm/import',
-        canActivate: [crmGuard],
+        canActivate: [adminGuard],
         loadComponent: () => import('./pages/crm/import/crm-import.component').then(m => m.CrmImportComponent),
       },
       {

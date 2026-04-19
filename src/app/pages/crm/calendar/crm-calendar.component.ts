@@ -4,7 +4,7 @@ import { Component, OnInit, inject, ChangeDetectorRef, NgZone, signal, computed 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser } from '../../../core/services/crm-api.service';
+import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser, CrmGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
 type ViewMode = 'month' | 'week' | 'day' | 'tasks';
@@ -29,9 +29,14 @@ interface CalendarDay {
   <span style="flex:1"></span>
 
   <!-- Filtr handlowca (manager) -->
-  <select class="ctl" *ngIf="isManager" [(ngModel)]="filterRep" (ngModelChange)="load()">
+  <select class="ctl" *ngIf="isManager" [(ngModel)]="filterRep" (ngModelChange)="onFilterRepChange()">
     <option value="">Wszyscy handlowcy</option>
-    <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+    <optgroup label="── Handlowcy ──" *ngIf="crmUsers.length > 0">
+      <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+    </optgroup>
+    <optgroup label="── Grupy ──" *ngIf="crmGroups.length > 0">
+      <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">📂 {{ g.name }}</option>
+    </optgroup>
   </select>
 
   <!-- Filtr typu aktywności (zadania) -->
@@ -165,26 +170,38 @@ interface CalendarDay {
     <div *ngFor="let t of activities" class="task-item"
          [class.task-today]="t.activity_at && isTaskToday(t.activity_at)"
          [class.task-overdue]="t.status !== 'closed' && t.activity_at && isTaskOverdue(t.activity_at)"
-         [class.task-closed]="t.status === 'closed'">
-      <div style="display:flex;align-items:flex-start;gap:10px">
-        <div style="flex:1;min-width:0">
+         [class.task-closed]="t.status === 'closed'"
+         [class.task-readonly]="isTaskReadOnly(t)"
+         (click)="openTask(t)" style="cursor:pointer">
+      <div style="display:flex;align-items:stretch;gap:0">
+        <!-- Kolumna daty (lewa) -->
+        <div class="task-date-col">
+          <ng-container *ngIf="t.activity_at; else noDate">
+            <span class="task-date-day">{{t.activity_at | date:'d'}}</span>
+            <span class="task-date-mon">{{t.activity_at | date:'MMM'}}</span>
+            <span class="task-date-time">{{t.activity_at | date:'HH:mm'}}</span>
+          </ng-container>
+          <ng-template #noDate><span class="task-date-none">brak daty</span></ng-template>
+        </div>
+        <!-- Treść zadania -->
+        <div style="flex:1;min-width:0;padding-left:12px">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span class="task-type-icon">{{taskIcon(t.type)}}</span>
             <strong style="font-size:13px;color:#18181b">{{t.title}}</strong>
             <span class="task-status-badge task-st-{{t.status}}">{{taskStatusLabel(t.status)}}</span>
             <span class="task-source-badge task-src-{{t.source_type}}">{{t.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
+            <span *ngIf="isTaskReadOnly(t)" style="font-size:9px;color:#9ca3af;font-style:italic">tylko odczyt</span>
           </div>
           <div style="font-size:11px;color:#9ca3af;margin-top:2px">
-            <a *ngIf="t.source_type === 'lead'"    [routerLink]="['/crm/leads', t.source_id]"    class="task-link">{{t.source_name}}</a>
-            <a *ngIf="t.source_type === 'partner'" [routerLink]="['/crm/partners', t.source_id]" class="task-link">{{t.source_name}}</a>
-            <span *ngIf="t.activity_at"> · {{t.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+            <a *ngIf="t.source_type === 'lead'"    [routerLink]="['/crm/leads', t.source_id]"    class="task-link" (click)="$event.stopPropagation()">{{t.source_name}}</a>
+            <a *ngIf="t.source_type === 'partner'" [routerLink]="['/crm/partners', t.source_id]" class="task-link" (click)="$event.stopPropagation()">{{t.source_name}}</a>
             <span *ngIf="t.act_assigned_to_name"> → {{t.act_assigned_to_name}}</span>
             <span *ngIf="!t.act_assigned_to_name && t.assigned_to_name"> → {{t.assigned_to_name}}</span>
           </div>
           <div *ngIf="t.body" style="font-size:12px;color:#6b7280;margin-top:3px;white-space:pre-line">{{t.body}}</div>
           <div *ngIf="t.close_comment" style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px">💬 {{t.close_comment}}</div>
           <!-- Formularz zamknięcia -->
-          <div *ngIf="closingTaskId === t.id" style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+          <div *ngIf="closingTaskId === t.id" style="margin-top:8px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
             <textarea [(ngModel)]="taskCloseComment" placeholder="Komentarz zamknięcia *" rows="2"
                       style="border:1px solid #d1d5db;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
             <div style="display:flex;gap:6px;justify-content:flex-end">
@@ -193,7 +210,8 @@ interface CalendarDay {
             </div>
           </div>
         </div>
-        <div *ngIf="closingTaskId !== t.id && t.status !== 'closed'" style="display:flex;gap:4px;flex-shrink:0">
+        <!-- Akcje -->
+        <div *ngIf="closingTaskId !== t.id && t.status !== 'closed' && !isTaskReadOnly(t)" style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;padding-left:8px" (click)="$event.stopPropagation()">
           <button class="nav-btn" style="font-size:11px;padding:3px 8px" (click)="startCloseTask(t)">✓ Zamknij</button>
         </div>
       </div>
@@ -258,6 +276,73 @@ interface CalendarDay {
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
         <button class="dp-btn-g" (click)="editMode = false">Anuluj</button>
         <button class="dp-btn-p" (click)="saveEdit()" [disabled]="saving">{{ saving ? '…' : 'Zapisz' }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL SZCZEGÓŁÓW ZADANIA ══ -->
+<div class="detail-overlay" *ngIf="selectedTask" (click)="closeTask()">
+  <div class="detail-panel" (click)="$event.stopPropagation()">
+    <div class="dp-header">
+      <span class="task-type-icon">{{taskIcon(selectedTask.type)}}</span>
+      <span class="task-status-badge task-st-{{selectedTask.status}}" style="margin-left:4px">{{taskStatusLabel(selectedTask.status)}}</span>
+      <span class="task-source-badge task-src-{{selectedTask.source_type}}" style="margin-left:4px">{{selectedTask.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
+      <span style="flex:1"></span>
+      <button class="dp-edit-btn" (click)="startEditTask()" *ngIf="!taskEditMode && canEditTask(selectedTask)">✏️ Edytuj</button>
+      <button class="dp-close" (click)="closeTask()">✕</button>
+    </div>
+
+    <!-- Widok -->
+    <div *ngIf="!taskEditMode" class="dp-body">
+      <div class="dp-title">{{selectedTask.title}}</div>
+      <div class="dp-source">
+        <a *ngIf="selectedTask.source_type === 'lead'"    [routerLink]="['/crm/leads',    selectedTask.source_id]" class="dp-link" (click)="closeTask()">{{selectedTask.source_name}}</a>
+        <a *ngIf="selectedTask.source_type === 'partner'" [routerLink]="['/crm/partners', selectedTask.source_id]" class="dp-link" (click)="closeTask()">{{selectedTask.source_name}}</a>
+      </div>
+      <div class="dp-row" *ngIf="selectedTask.activity_at"><span class="dp-lbl">📅 Data i czas</span><span>{{selectedTask.activity_at | date:'dd.MM.yyyy HH:mm'}}</span></div>
+      <div class="dp-row" *ngIf="selectedTask.body"><span class="dp-lbl">📝 Opis</span><span style="white-space:pre-line">{{selectedTask.body}}</span></div>
+      <div class="dp-row" *ngIf="selectedTask.created_by_name"><span class="dp-lbl">👤 Dodał</span><span>{{selectedTask.created_by_name}}</span></div>
+      <div class="dp-row" *ngIf="selectedTask.act_assigned_to_name || selectedTask.assigned_to_name"><span class="dp-lbl">🙋 Przypisano do</span><span>{{selectedTask.act_assigned_to_name || selectedTask.assigned_to_name}}</span></div>
+      <div class="dp-row" *ngIf="selectedTask.close_comment"><span class="dp-lbl">💬 Komentarz</span><span style="font-style:italic">{{selectedTask.close_comment}}</span></div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end" *ngIf="selectedTask.status !== 'closed' && canEditTask(selectedTask)">
+        <button class="dp-btn-p" (click)="startCloseTaskFromModal()">✓ Zamknij zadanie</button>
+      </div>
+      <!-- Inline close form in modal -->
+      <div *ngIf="closingTaskId === selectedTask.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+        <textarea [(ngModel)]="taskCloseComment" placeholder="Komentarz zamknięcia *" rows="3"
+                  style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
+        <div style="display:flex;gap:6px;justify-content:flex-end">
+          <button class="dp-btn-g" (click)="cancelCloseTask()">Anuluj</button>
+          <button class="dp-btn-p" (click)="confirmCloseTask(selectedTask)" [disabled]="!taskCloseComment.trim() || saving">{{saving ? '…' : 'Zamknij'}}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edycja -->
+    <div *ngIf="taskEditMode" class="dp-body">
+      <div class="ef-row">
+        <label class="ef-lbl">Tytuł *</label>
+        <input class="ef-input" [(ngModel)]="taskEditForm.title">
+      </div>
+      <div class="ef-row">
+        <label class="ef-lbl">Data i czas</label>
+        <input class="ef-input" type="datetime-local" [(ngModel)]="taskEditForm.activity_at">
+      </div>
+      <div class="ef-row">
+        <label class="ef-lbl">Opis</label>
+        <textarea class="ef-input" rows="3" [(ngModel)]="taskEditForm.body" style="resize:vertical"></textarea>
+      </div>
+      <div class="ef-row" *ngIf="crmUsers.length > 0">
+        <label class="ef-lbl">Przypisz do</label>
+        <select class="ef-input" [(ngModel)]="taskEditForm.assigned_to">
+          <option value="">— bez przypisania —</option>
+          <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button class="dp-btn-g" (click)="taskEditMode = false">Anuluj</button>
+        <button class="dp-btn-p" (click)="saveEditTask()" [disabled]="saving">{{saving ? '…' : 'Zapisz'}}</button>
       </div>
     </div>
   </div>
@@ -354,10 +439,17 @@ interface CalendarDay {
     .dp-btn-g { background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer }
 
     /* Tasks view */
-    .task-item { border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px;background:white;border-left:4px solid #e5e7eb; }
+    .task-item { border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px;background:white;border-left:4px solid #e5e7eb;transition:box-shadow .15s; }
+    .task-item:hover { box-shadow:0 2px 8px rgba(0,0,0,.07); }
     .task-item.task-today { background:#eff6ff;border-left-color:#3b82f6; }
     .task-item.task-overdue { background:#fef2f2;border-left-color:#dc2626; }
     .task-item.task-closed { opacity:.6;background:#f9fafb; }
+    .task-item.task-readonly { opacity:.55;background:#f9fafb;cursor:default; }
+    .task-date-col { display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;padding-right:12px;border-right:1px solid #e5e7eb;flex-shrink:0;text-align:center; }
+    .task-date-day { font-size:22px;font-weight:800;color:#18181b;line-height:1; }
+    .task-date-mon { font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-top:1px; }
+    .task-date-time { font-size:12px;font-weight:700;color:#f97316;margin-top:4px; }
+    .task-date-none { font-size:10px;color:#d1d5db;font-style:italic;text-align:center; }
     .task-status-badge { font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em; }
     .task-st-new { background:#f3f4f6;color:#6b7280; }
     .task-st-open { background:#dbeafe;color:#1d4ed8; }
@@ -381,6 +473,7 @@ export class CrmCalendarComponent implements OnInit {
   currentDate = new Date();
   filterRep = '';
   crmUsers: CrmUser[] = [];
+  crmGroups: CrmGroup[] = [];
   meetings: CalendarMeeting[] = [];
 
   // Zadania
@@ -394,6 +487,10 @@ export class CrmCalendarComponent implements OnInit {
   selectedMeeting: CalendarMeeting | null = null;
   editMode = false;
   editForm: any = {};
+
+  selectedTask: ActivityTask | null = null;
+  taskEditMode = false;
+  taskEditForm: any = {};
 
   readonly DAY_SHORT = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
   readonly dayNames  = ['Pn','Wt','Śr','Cz','Pt','Sb','Nd'];
@@ -416,6 +513,7 @@ export class CrmCalendarComponent implements OnInit {
   ngOnInit(): void {
     if (this.isManager) {
       this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
+      this.api.getCrmGroups().subscribe({ next: g => { this.crmGroups = g; this.cdr.markForCheck(); }, error: () => {} });
     }
     this.load();
   }
@@ -475,7 +573,15 @@ export class CrmCalendarComponent implements OnInit {
     this.tasksLoading = true;
     this.cdr.markForCheck();
     const p: any = { include_closed: this.showClosedTasks };
-    if (this.filterRep && this.isManager) p.assigned_to = this.filterRep;
+    if (this.filterRep && this.isManager) {
+      if (this.filterRep.startsWith('__group__')) {
+        const groupId = this.filterRep.replace('__group__', '');
+        const group = this.crmGroups.find(g => g.id === groupId);
+        if (group && group.user_ids.length > 0) p.assigned_to = group.user_ids.join(',');
+      } else {
+        p.assigned_to = this.filterRep;
+      }
+    }
     if (this.filterActivityType) p.type = this.filterActivityType;
     this.api.getActivityTasks(p).subscribe({
       next: tasks => this.zone.run(() => {
@@ -503,7 +609,7 @@ export class CrmCalendarComponent implements OnInit {
     if (!this.taskCloseComment.trim()) return;
     this.saving = true;
     this.cdr.markForCheck();
-    const updateCall = t.source_type === 'lead'
+    const updateCall: Observable<any> = t.source_type === 'lead'
       ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'closed', close_comment: this.taskCloseComment })
       : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'closed', close_comment: this.taskCloseComment });
     updateCall.subscribe({
@@ -512,7 +618,10 @@ export class CrmCalendarComponent implements OnInit {
           ? { ...a, status: 'closed' as const, close_comment: this.taskCloseComment }
           : a
         );
-        this.closingTaskId   = null;
+        if (this.selectedTask?.id === t.id && this.selectedTask?.source_type === t.source_type) {
+          this.selectedTask = { ...this.selectedTask, status: 'closed', close_comment: this.taskCloseComment };
+        }
+        this.closingTaskId    = null;
         this.taskCloseComment = '';
         this.saving = false;
         this.cdr.markForCheck();
@@ -538,6 +647,99 @@ export class CrmCalendarComponent implements OnInit {
 
   isTaskOverdue(activityAt: string): boolean {
     return new Date(activityAt) < new Date(new Date().toDateString());
+  }
+
+  openTask(t: ActivityTask): void {
+    this.selectedTask = t;
+    this.taskEditMode = false;
+    this.closingTaskId = null;
+    this.taskCloseComment = '';
+    this.cdr.markForCheck();
+  }
+
+  closeTask(): void {
+    this.selectedTask = null;
+    this.taskEditMode = false;
+    this.closingTaskId = null;
+    this.taskCloseComment = '';
+    this.cdr.markForCheck();
+  }
+
+  isTaskReadOnly(t: ActivityTask): boolean {
+    const u = this.auth.user();
+    if (!u) return true;
+    if (u.is_admin) return false;
+    if (t.created_by === u.id) return false;
+    // Efektywny przypisany użytkownik aktywności
+    const targetId = t.act_assigned_to_id || t.assigned_to_id;
+    if (!targetId || targetId === u.id) return false;
+    // Sprawdź uprawnienia do grupy CRM, do której należy ten user
+    const group = this.crmGroups.find(g => g.user_ids.includes(targetId));
+    if (!group) return false;
+    const role = u.roles?.find(r => r.group_id === group.id);
+    if (!role) return false;
+    return role.access_level !== 'full';
+  }
+
+  canEditTask(t: ActivityTask): boolean {
+    const u = this.auth.user();
+    if (!u) return false;
+    if (u.is_admin) return true;
+    if (t.created_by === u.id) return true;
+    return !this.isTaskReadOnly(t);
+  }
+
+  startEditTask(): void {
+    if (!this.selectedTask) return;
+    const t = this.selectedTask;
+    this.taskEditForm = {
+      title:       t.title,
+      body:        t.body || '',
+      activity_at: t.activity_at ? t.activity_at.substring(0, 16) : '',
+      assigned_to: t.act_assigned_to_id || '',
+    };
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
+    }
+    this.taskEditMode = true;
+  }
+
+  saveEditTask(): void {
+    if (!this.selectedTask || !this.taskEditForm.title) return;
+    this.saving = true;
+    const payload: any = {
+      title:       this.taskEditForm.title,
+      body:        this.taskEditForm.body || null,
+      activity_at: this.taskEditForm.activity_at || null,
+      assigned_to: this.taskEditForm.assigned_to || null,
+    };
+    const t = this.selectedTask;
+    const obs: Observable<any> = t.source_type === 'lead'
+      ? this.api.updateLeadActivity(t.source_id, t.id, payload)
+      : this.api.updatePartnerActivity(t.source_id, t.id, payload);
+    obs.subscribe({
+      next: (updated: any) => this.zone.run(() => {
+        this.activities = this.activities.map(a =>
+          a.id === t.id && a.source_type === t.source_type ? { ...a, ...updated } : a
+        );
+        this.selectedTask = { ...t, ...updated };
+        this.taskEditMode = false;
+        this.saving = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  startCloseTaskFromModal(): void {
+    if (!this.selectedTask) return;
+    this.closingTaskId = this.selectedTask.id;
+    this.taskCloseComment = this.selectedTask.close_comment || '';
+    this.cdr.markForCheck();
+  }
+
+  onFilterRepChange(): void {
+    if (this.view === 'tasks') this.loadTasks(); else this.load();
   }
 
   // ── Month grid ────────────────────────────────────────────

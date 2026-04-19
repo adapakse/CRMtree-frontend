@@ -1092,14 +1092,6 @@ export class CrmApiService {
   disconnectGmail(): Observable<{ ok: boolean }> {
     return this.http.delete<{ ok: boolean }>(`${BASE}/gmail/oauth/disconnect`);
   }
-  downloadGmailAttachment(messageId: string, attachmentId: string): Observable<Blob> {
-    return this.http.get(`${BASE}/gmail/attachment/${messageId}/${attachmentId}`, { responseType: 'blob' });
-  }
-
-  /**
-   * Pobiera zawartość załącznika jako Blob do pobrania przez użytkownika.
-   * Backend serwuje z Azure Blob lub proxy przez Gmail API.
-   */
   downloadGmailAttachment(messageId: string, attachmentId: string, filename: string, mime: string): Observable<Blob> {
     const params = { filename, mime };
     return this.http.get(
