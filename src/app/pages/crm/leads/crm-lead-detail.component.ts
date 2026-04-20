@@ -1,5 +1,5 @@
 // src/app/pages/crm/leads/crm-lead-detail.component.ts
-import { Component, OnInit, OnDestroy, inject, Input, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +21,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 
   <!-- HEADER -->
   <div style="height:56px;background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0">
-    <button style="background:none;border:none;color:#f97316;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
+    <button style="background:none;border:none;color:#f97316;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">�? Leady</button>
     <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
       <div *ngIf="lead.logo_url && logoSasUrl" style="width:34px;height:34px;border-radius:50%;background-size:cover;background-position:center;border:1px solid #e5e7eb;flex-shrink:0;background-color:#f9fafb"
            [style.background-image]="logoSasUrl"></div>
@@ -137,7 +137,7 @@ import { AuthService } from '../../../core/auth/auth.service';
           Aktywności
           <span *ngIf="lead.activities?.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{lead.activities!.length}}</span>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'">
+        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; markEmailsRead()">
           📧 Emaile
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
@@ -150,26 +150,38 @@ import { AuthService } from '../../../core/auth/auth.service';
       <!-- Aktywności tab -->
       <div *ngIf="midTab==='activities'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn-sm primary" (click)="showNewActivity=!showNewActivity">+ Dodaj aktywność</button>
+          <button class="btn-sm primary" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
 
         <!-- Nowa aktywność form -->
         <div *ngIf="showNewActivity" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
           <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
             <option value="call">📞 Połączenie</option>
-            <option value="email">📧 Email</option>
             <option value="meeting">🤝 Spotkanie</option>
             <option value="note">📝 Notatka</option>
             <option value="doc_sent">📄 Dokument</option>
           </select>
           <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
+          <!-- Data i przypisanie — dostępne dla wszystkich typów -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+              Data i godzina wykonania
+              <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:12px">
+            </label>
+            <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+              Przypisz do handlowca
+              <select [(ngModel)]="actForm.assigned_to" class="act-input" style="font-size:12px">
+                <option value="">— bez przypisania —</option>
+                <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+              </select>
+            </label>
+          </div>
           <ng-container *ngIf="actForm.type==='meeting'">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Data i czas<input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px"></label>
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Czas trwania (min)<input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label>
+              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">Czas trwania (min)<input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label>
+              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">Miejsce<input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A" class="act-input" style="font-size:11px"></label>
             </div>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Miejsce spotkania<input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A" class="act-input" style="font-size:11px"></label>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+            <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
               Uczestnicy
               <div class="participant-input-wrap">
                 <div class="participant-chips">
@@ -182,7 +194,7 @@ import { AuthService } from '../../../core/auth/auth.service';
               </div>
             </label>
           </ng-container>
-          <textarea [(ngModel)]="actForm.body" placeholder="Treść…" rows="2" class="act-input"></textarea>
+          <textarea [(ngModel)]="actForm.body" placeholder="Treść / notatki…" rows="2" class="act-input"></textarea>
           <div style="display:flex;gap:6px;justify-content:flex-end">
             <button class="btn-sm" (click)="showNewActivity=false">Anuluj</button>
             <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title||savingActivity">{{savingActivity?'…':'Zapisz'}}</button>
@@ -190,34 +202,26 @@ import { AuthService } from '../../../core/auth/auth.service';
         </div>
 
         <!-- Lista aktywności -->
-        <div *ngFor="let a of lead.activities||[]" class="act-item">
+        <div *ngFor="let a of (lead.activities||[]).filter(x => x.type !== 'email')" class="act-item"
+             [class.act-closed]="a.status==='closed'"
+             [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
+             [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
+             style="cursor:pointer" (click)="openActModal(a)">
           <span class="act-type-icon">{{actIcon(a.type)}}</span>
-          <div class="act-body" *ngIf="editingActId!==a.id">
-            <strong>{{a.title}}</strong>
-            <div class="act-meta">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · {{a.created_by_name}}</div>
-            <div *ngIf="a.meeting_location" class="act-text">📍 {{a.meeting_location}}</div>
-            <div *ngIf="a.participants" class="act-text">👥 {{a.participants}}</div>
-            <div class="act-text" *ngIf="a.body">{{a.body}}</div>
-            <!-- Link do wątku Gmail -->
-            <div *ngIf="a.type==='email' && a.gmail_thread_id" style="margin-top:4px">
-              <button class="btn-sm" style="font-size:10px;padding:2px 8px" (click)="openThread(a.gmail_thread_id)">
-                📧 Pokaż wątek
-              </button>
+          <div class="act-body">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <strong>{{actTypeName(a.type)}}: {{a.title}}</strong>
+              <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
             </div>
-          </div>
-          <div class="act-body act-edit-form" *ngIf="editingActId===a.id">
-            <select [(ngModel)]="actEditForm.type" class="act-sel"><option value="call">📞 Połączenie</option><option value="email">📧 Email</option><option value="meeting">🤝 Spotkanie</option><option value="note">📝 Notatka</option><option value="doc_sent">📄 Dokument</option></select>
-            <input [(ngModel)]="actEditForm.title" placeholder="Tytuł *" class="act-input">
-            <ng-container *ngIf="actEditForm.type==='meeting'"><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Data i czas<input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input" style="font-size:11px"></label><label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Czas trwania (min)<input type="number" min="0" [(ngModel)]="actEditForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label></div><input [(ngModel)]="actEditForm.meeting_location" placeholder="Miejsce spotkania" class="act-input"><input [(ngModel)]="actEditForm.participants" placeholder="Uczestnicy" class="act-input"></ng-container>
-            <textarea [(ngModel)]="actEditForm.body" placeholder="Treść…" rows="2" class="act-input"></textarea>
-            <div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-sm" (click)="cancelEditActivity()">Anuluj</button><button class="btn-sm primary" (click)="saveEditActivity(a)" [disabled]="!actEditForm.title||savingActivity">{{savingActivity?'…':'Zapisz'}}</button></div>
-          </div>
-          <div class="act-controls" *ngIf="editingActId!==a.id&&canEditActivity(a)">
-            <button class="act-ctrl-btn" (click)="startEditActivity(a)" title="Edytuj">✏️</button>
-            <button class="act-ctrl-btn del" (click)="deleteActivity(a)" title="Usuń">🗑️</button>
+            <div class="act-meta">
+              <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
+              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
+            </div>
+            <div class="act-text" *ngIf="a.body" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px">{{stripHtml(a.body)}}</div>
           </div>
         </div>
-        <div *ngIf="!(lead.activities?.length)" class="empty-act">Brak aktywności. Dodaj pierwszą powyżej.</div>
+        <div *ngIf="!(lead.activities?.filter(x => x.type !== 'email')?.length)" class="empty-act">Brak aktywności. Dodaj pierwszą powyżej.</div>
       </div>
 
       <!-- Emaile tab -->
@@ -231,8 +235,12 @@ import { AuthService } from '../../../core/auth/auth.service';
           <span class="act-type-icon">📧</span>
           <div class="act-body" style="flex:1">
             <strong>{{a.title}}</strong>
-            <div class="act-meta">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · {{a.created_by_name}}</div>
-            <div class="act-text" *ngIf="a.body" style="margin-top:4px;white-space:pre-line">{{a.body}}</div>
+            <div class="act-meta">
+              <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
+              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
+            </div>
+            <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
             <div style="margin-top:6px;display:flex;gap:6px">
               <button *ngIf="a.gmail_thread_id" class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">
                 💬 Pokaż wątek
@@ -244,10 +252,32 @@ import { AuthService } from '../../../core/auth/auth.service';
             <!-- Thread preview -->
             <div *ngIf="openThreadId===a.gmail_thread_id && threadMessages.length>0"
                  style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px">
-              <div *ngFor="let m of threadMessages" style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px">
-                <div style="font-weight:600;color:#374151">{{m.from}}</div>
-                <div style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</div>
-                <div style="margin-top:4px;color:#374151;white-space:pre-line">{{m.snippet}}</div>
+              <div *ngFor="let m of threadMessages"
+                   style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px;cursor:pointer"
+                   (click)="openMsgModal(m)">
+                <div style="display:flex;justify-content:space-between">
+                  <span style="font-weight:600;color:#374151">{{m.from}}</span>
+                  <span style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
+                </div>
+                <div style="color:#6b7280;font-size:10px">Do: {{m.to}}<span *ngIf="m.cc"> · DW: {{m.cc}}</span></div>
+                <div style="margin-top:4px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{m.snippet}}</div>
+                <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
+                     style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px" (click)="$event.stopPropagation()">
+                  <span *ngFor="let att of m.attachments" class="att-chip" style="background:#eff6ff;color:#1d4ed8">
+                    📎 {{att.filename}}
+                    <span class="att-chip-actions">
+                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
+                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
+                    </span>
+                  </span>
+                  <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:#f0fdf4;color:#166534">
+                    📎 {{att.filename}}
+                    <span class="att-chip-actions">
+                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
+                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
+                    </span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -256,7 +286,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 
       <!-- Historia tab -->
       <div *ngIf="midTab==='history'" style="flex:1;overflow-y:auto;padding:16px">
-        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">Ładowanie historii…</div>
+        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">�?adowanie historii…</div>
         <div *ngIf="!historyLoading && history.length===0" style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">Brak wpisów historii.</div>
         <div *ngFor="let h of history" class="hist-item">
           <div class="hist-dot" [style.background]="histColor(h.action)"></div>
@@ -332,7 +362,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 <div *ngIf="!lead&&!loading" style="padding:40px;text-align:center;color:#9ca3af">
   {{ loadError ? 'Błąd ładowania leada.' : 'Lead nie znaleziony.' }}
 </div>
-<div *ngIf="loading" style="padding:40px;text-align:center;color:#9ca3af">Ładowanie…</div>
+<div *ngIf="loading" style="padding:40px;text-align:center;color:#9ca3af">�?adowanie…</div>
 
 <!-- ── Gmail Compose Modal ─────────────────────────────────────────────────── -->
 <div class="modal-overlay" *ngIf="showEmailModal" (click)="showEmailModal=false">
@@ -350,10 +380,10 @@ import { AuthService } from '../../../core/auth/auth.service';
         Aby wysyłać i odbierać emaile bezpośrednio z CRM, połącz swoje konto Gmail.<br>
         Każdy handlowiec łączy własną skrzynkę.
       </div>
-      <a *ngIf="gmailAuthUrl" [href]="gmailAuthUrl" target="_blank"
-         style="display:inline-block;background:#f97316;color:white;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;text-decoration:none;margin-top:6px">
+      <button *ngIf="gmailAuthUrl" (click)="connectGmail()"
+         style="background:#f97316;color:white;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px">
         🔗 Połącz konto Gmail
-      </a>
+      </button>
       <div *ngIf="!gmailAuthUrl" style="color:#9ca3af;font-size:12px">
         Brak konfiguracji OAuth. Skontaktuj się z administratorem.
       </div>
@@ -372,8 +402,38 @@ import { AuthService } from '../../../core/auth/auth.service';
             {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
           </span>
           <input class="participant-input" [(ngModel)]="recipientQuery"
+                 (input)="onRecipientInput()"
                  (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
+                 (blur)="showRecipientSug=false"
                  placeholder="email@firma.pl" autocomplete="off">
+          <div *ngIf="showRecipientSug" class="suggest-dropdown">
+            <div *ngFor="let s of recipientSuggestions" class="suggest-item"
+                 (mousedown)="pickRecipientSug(s)">
+              <span style="font-weight:600">{{s.name||s.email}}</span>
+              <span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span>
+            </div>
+          </div>
+        </div>
+      </label>
+      <!-- DW (CC): -->
+      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        DW
+        <div class="participant-chips">
+          <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">
+            {{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button>
+          </span>
+          <input class="participant-input" [(ngModel)]="ccQuery"
+                 (input)="onCcInput()"
+                 (keydown.enter)="addCc()" (keydown.Tab)="addCc()"
+                 (blur)="showCcSug=false"
+                 placeholder="dw@firma.pl" autocomplete="off">
+          <div *ngIf="showCcSug" class="suggest-dropdown">
+            <div *ngFor="let s of ccSuggestions" class="suggest-item"
+                 (mousedown)="pickCcSug(s)">
+              <span style="font-weight:600">{{s.name||s.email}}</span>
+              <span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span>
+            </div>
+          </div>
         </div>
       </label>
       <!-- Temat -->
@@ -389,7 +449,10 @@ import { AuthService } from '../../../core/auth/auth.service';
       <!-- Treść -->
       <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
         Treść
-        <textarea class="act-input" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
+        <textarea class="act-input" id="email-body-textarea" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
+        <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
+          📋 Historia korespondencji zostanie automatycznie dołączona
+        </div>
       </label>
       <!-- Załączniki -->
       <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
@@ -410,7 +473,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     <div class="modal-footer">
       <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
       <button *ngIf="gmailConnected" class="btn-primary" (click)="sendEmail()"
-              [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
+              [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">
         {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
       </button>
     </div>
@@ -425,25 +488,36 @@ import { AuthService } from '../../../core/auth/auth.service';
       <button class="close-btn" (click)="showThreadModal=false">✕</button>
     </div>
     <div class="modal-body" style="gap:8px">
-      <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;padding:20px">Ładowanie wątku…</div>
+      <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;padding:20px">�?adowanie wątku…</div>
       <div *ngFor="let m of threadMessages"
-           style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:12px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+           style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:12px;cursor:pointer;transition:background .15s"
+           (click)="openMsgModal(m)"
+           (mouseenter)="$any($event.currentTarget).style.background='#f9fafb'"
+           (mouseleave)="$any($event.currentTarget).style.background='white'">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
           <span style="font-weight:600;color:#374151">{{m.from}}</span>
           <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
         </div>
-        <div style="color:#6b7280;font-size:11px;margin-bottom:6px">Do: {{m.to}}</div>
-        <div style="color:#374151;white-space:pre-line;line-height:1.5;max-height:200px;overflow-y:auto">{{m.snippet}}</div>
-        <!-- Załączniki z możliwością pobrania -->
-        <div *ngIf="m.attachments?.length" style="margin-top:8px;border-top:1px solid #f3f4f6;padding-top:8px;display:flex;flex-wrap:wrap;gap:6px">
-          <button *ngFor="let att of m.attachments"
-                  (click)="downloadAttachment(att, m.id)"
-                  [disabled]="downloadingAttachment===att.attachmentId"
-                  style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:3px 10px;font-size:11px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:4px">
-            <span *ngIf="downloadingAttachment!==att.attachmentId">📎 {{att.filename}}</span>
-            <span *ngIf="downloadingAttachment===att.attachmentId">⏳ Pobieranie…</span>
-            <span *ngIf="downloadingAttachment!==att.attachmentId" style="color:#9ca3af;font-size:10px">↓</span>
-          </button>
+        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">Do: {{m.to}}</div>
+        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">DW: {{m.cc}}</div>
+        <div style="color:#374151;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px">{{m.snippet}}</div>
+        <!-- Wszystkie załączniki (odebrane + wysłane) -->
+        <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
+             style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px" (click)="$event.stopPropagation()">
+          <span *ngFor="let att of m.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8">
+            📎 {{att.filename}}
+            <span class="att-chip-actions">
+              <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
+              <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
+            </span>
+          </span>
+          <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534">
+            📎 {{att.filename}}
+            <span class="att-chip-actions">
+              <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
+              <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
+            </span>
+          </span>
         </div>
       </div>
       <div *ngIf="!loadingThread&&threadMessages.length===0" style="text-align:center;color:#9ca3af;padding:16px">Brak wiadomości w wątku.</div>
@@ -451,6 +525,96 @@ import { AuthService } from '../../../core/auth/auth.service';
     <div class="modal-footer">
       <button class="btn-outline" (click)="showThreadModal=false">Zamknij</button>
       <button class="btn-primary" (click)="replyToCurrentThread()">↩ Odpowiedz</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message Detail Modal -->
+<div class="modal-overlay" *ngIf="showMsgModal" (click)="closeMsgModal()">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(720px,100%);max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-header">
+      <h3>📧 {{msgModalMsg?.subject}}</h3>
+      <button class="close-btn" (click)="closeMsgModal()">✕</button>
+    </div>
+    <div class="modal-body" style="gap:10px;overflow-y:auto;flex:1" *ngIf="msgModalMsg">
+      <!-- Metadane -->
+      <div style="background:#f9fafb;border-radius:8px;padding:12px;font-size:12px;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Od:</span><span style="color:#374151;font-weight:600">{{msgModalMsg.from}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Do:</span><span style="color:#374151">{{msgModalMsg.to}}</span></div>
+        <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">DW:</span><span style="color:#374151">{{msgModalMsg.cc}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Data:</span><span style="color:#374151">{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span></div>
+      </div>
+      <!-- Treść -->
+      <div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px;line-height:1.6;color:#374151;white-space:pre-line;max-height:320px;overflow-y:auto"
+           [innerHTML]="msgModalMsg.body || msgModalMsg.snippet"></div>
+      <!-- Załączniki -->
+      <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
+           style="display:flex;flex-wrap:wrap;gap:6px">
+        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;padding:4px 10px">
+          📎 {{att.filename}}
+          <span class="att-chip-actions">
+            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" title="Otwórz w przeglądarce">Podgląd</button>
+            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" title="Pobierz plik">Pobierz</button>
+          </span>
+        </span>
+        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:11px;padding:4px 10px">
+          📎 {{att.filename}}
+          <span class="att-chip-actions">
+            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" title="Otwórz w przeglądarce">Podgląd</button>
+            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" title="Pobierz plik">Pobierz</button>
+          </span>
+        </span>
+      </div>
+      <!-- Reply form -->
+      <div *ngIf="msgModalReply" style="border-top:1px solid #e5e7eb;padding-top:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;font-weight:700;color:#374151">↩ Odpowiedz</div>
+        <!-- Do -->
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+          Do
+          <div class="participant-chips">
+            <span *ngFor="let r of msgModalForm.recipientList; let i=index" class="participant-chip">
+              {{r}}<button (click)="msgModalForm.recipientList.splice(i,1)" type="button">✕</button>
+            </span>
+            <input class="participant-input" [(ngModel)]="msgModalRecipientQuery"
+                   (keydown.enter)="pushMsgRecipient()" (keydown.Tab)="pushMsgRecipient()"
+                   placeholder="email@firma.pl" autocomplete="off">
+          </div>
+        </label>
+        <!-- DW -->
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+          DW
+          <div class="participant-chips">
+            <span *ngFor="let r of msgModalForm.ccList; let i=index" class="participant-chip">
+              {{r}}<button (click)="msgModalForm.ccList.splice(i,1)" type="button">✕</button>
+            </span>
+            <input class="participant-input" [(ngModel)]="msgModalCcQuery"
+                   (keydown.enter)="pushMsgCc()" (keydown.Tab)="pushMsgCc()"
+                   placeholder="dw@firma.pl" autocomplete="off">
+          </div>
+        </label>
+        <!-- Temat -->
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+          Temat
+          <input class="act-input" [(ngModel)]="msgModalForm.subject" placeholder="Temat wiadomości">
+        </label>
+        <!-- Treść -->
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+          Treść
+          <textarea class="act-input" id="msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="5" placeholder="Treść odpowiedzi…"></textarea>
+          <div *ngIf="msgModalForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
+            📋 Historia korespondencji zostanie automatycznie dołączona
+          </div>
+        </label>
+        <div *ngIf="msgModalError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{msgModalError}}</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="closeMsgModal()">Zamknij</button>
+      <button *ngIf="!msgModalReply && gmailConnected" class="btn-outline" (click)="startMsgReply()">↩ Odpowiedz</button>
+      <button *ngIf="msgModalReply && gmailConnected" class="btn-primary" (click)="sendMsgReply()"
+              [disabled]="msgModalSending || !msgModalForm.recipientList?.length || !msgModalForm.subject">
+        {{msgModalSending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}
+      </button>
     </div>
   </div>
 </div>
@@ -774,6 +938,114 @@ import { AuthService } from '../../../core/auth/auth.service';
     </div>
   </div>
 </div>
+
+<!-- �?�? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI (Lead) �?�? -->
+<div *ngIf="selectedAct" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px" (click)="closeActModal()">
+  <div style="background:white;border-radius:14px;width:min(520px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;flex-direction:column" (click)="$event.stopPropagation()">
+    <!-- Nagłówek -->
+    <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1">
+      <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
+      <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
+      <span style="flex:1"></span>
+      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
+      <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
+    </div>
+    <!-- Widok -->
+    <div *ngIf="!actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">{{selectedAct.title}}</div>
+      <div *ngIf="selectedAct.activity_at" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📅 Data i czas</span>
+        <span>{{selectedAct.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+      </div>
+      <div *ngIf="selectedAct.assigned_to_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👤 Przypisano do</span>
+        <span>{{selectedAct.assigned_to_name}}</span>
+      </div>
+      <div *ngIf="selectedAct.created_by_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">✍️ Dodał</span>
+        <span>{{selectedAct.created_by_name}}</span>
+      </div>
+      <div *ngIf="selectedAct.meeting_location" style="display:flex;gap:12px;font-size:13px">
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📍 Miejsce</span>
+        <span>{{selectedAct.meeting_location}}</span>
+      </div>
+      <div *ngIf="selectedAct.participants" style="display:flex;gap:12px;font-size:13px">
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👥 Uczestnicy</span>
+        <span style="word-break:break-all">{{selectedAct.participants}}</span>
+      </div>
+      <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📝 Opis</span>
+        <span style="white-space:pre-line">{{selectedAct.body}}</span>
+      </div>
+      <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:13px">
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 Komentarz</span>
+        <span style="font-style:italic">{{selectedAct.close_comment}}</span>
+      </div>
+      <!-- Zamknij -->
+      <div *ngIf="!actModalClosing && selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
+        <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="startCloseActModal()">✓ Zamknij aktywność</button>
+      </div>
+      <div *ngIf="actModalClosing" style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        <textarea [(ngModel)]="actModalCloseComment" placeholder="Komentarz zamknięcia *" rows="3"
+                  style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
+        <div style="display:flex;gap:6px;justify-content:flex-end">
+          <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalClosing=false;actModalCloseComment=''">Anuluj</button>
+          <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="!actModalCloseComment.trim() || savingActivity">{{savingActivity ? '…' : 'Zamknij'}}</button>
+        </div>
+      </div>
+    </div>
+    <!-- Edycja -->
+    <div *ngIf="actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <label style="font-size:12px;font-weight:600;color:#374151">Typ</label>
+        <select [(ngModel)]="actEditForm.type" class="act-sel">
+          <option value="call">📞 Połączenie</option>
+          <option value="meeting">🤝 Spotkanie</option>
+          <option value="note">📝 Notatka</option>
+          <option value="doc_sent">📄 Dokument</option>
+          <option value="training">🎓 Szkolenie</option>
+          <option value="qbr">📊 QBR</option>
+          <option value="opportunity">💡 Szansa</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <label style="font-size:12px;font-weight:600;color:#374151">Tytuł <span style="color:#dc2626">*</span></label>
+        <input [(ngModel)]="actEditForm.title" class="act-input">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;font-weight:600;color:#374151">Data i godzina</label>
+          <input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;font-weight:600;color:#374151">Przypisz do handlowca</label>
+          <select [(ngModel)]="actEditForm.assigned_to" class="act-sel">
+            <option value="">— bez przypisania —</option>
+            <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+          </select>
+        </div>
+      </div>
+      <ng-container *ngIf="actEditForm.type === 'meeting'">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;font-weight:600;color:#374151">Miejsce spotkania</label>
+          <input [(ngModel)]="actEditForm.meeting_location" class="act-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;font-weight:600;color:#374151">Uczestnicy</label>
+          <input [(ngModel)]="actEditForm.participants" class="act-input" placeholder="emaile oddzielone przecinkiem">
+        </div>
+      </ng-container>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <label style="font-size:12px;font-weight:600;color:#374151">Opis / notatki</label>
+        <textarea [(ngModel)]="actEditForm.body" rows="4" class="act-input" style="resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
+        <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
+      </div>
+    </div>
+  </div>
+</div>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
@@ -824,8 +1096,16 @@ import { AuthService } from '../../../core/auth/auth.service';
     .comm-btn { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid #bbf7d0; border-radius:8px; background:white; cursor:pointer; width:100%; transition:background .15s; }
     .comm-btn:hover:not(:disabled) { background:#f0fdf4; }
     .comm-btn:disabled { opacity:.5; cursor:not-allowed; }
-    .act-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #f4f4f5; }
+    .act-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #f4f4f5; transition:background .1s; border-radius:6px; }
     .act-item:last-child { border-bottom:none; }
+    .act-item:hover { background:#fffbf7; }
+    .act-item.act-closed { opacity:.6; }
+    .act-item.act-overdue { border-left:3px solid #ef4444; padding-left:7px; }
+    .act-item.act-today { border-left:3px solid #f97316; padding-left:7px; }
+    .act-status-badge { font-size:10px; font-weight:700; padding:1px 7px; border-radius:9px; white-space:nowrap; }
+    .act-status-new { background:#f3f4f6; color:#374151; }
+    .act-status-open { background:#dbeafe; color:#1e40af; }
+    .act-status-closed { background:#dcfce7; color:#166534; }
     .act-type-icon { font-size:18px; flex-shrink:0; }
     .act-body { flex:1; }
     .act-body strong { font-size:12.5px; }
@@ -845,7 +1125,10 @@ import { AuthService } from '../../../core/auth/auth.service';
     .btn-sm:disabled { opacity:.6; cursor:not-allowed; }
     .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:20px 0; }
     .participant-input-wrap { position:relative; }
-    .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;min-height:32px;background:white; }
+    .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;min-height:32px;background:white;position:relative; }
+    .suggest-dropdown { position:absolute; background:white; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.1); z-index:100; min-width:240px; max-height:180px; overflow-y:auto; }
+    .suggest-item { padding:7px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; }
+    .suggest-item:hover { background:#f3f4f6; }
     .participant-chip { display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px; }
     .participant-chip button { background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px;padding:0;line-height:1; }
     .participant-input { border:none;outline:none;font-size:12px;min-width:100px;flex:1;font-family:inherit; }
@@ -881,9 +1164,47 @@ import { AuthService } from '../../../core/auth/auth.service';
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .check-label { flex-direction:row !important; align-items:center; gap:8px !important; font-size:13px !important; font-weight:400 !important; cursor:pointer; }
     .check-label input { width:auto; }
+    .att-chip { position:relative; display:inline-flex; align-items:center; gap:4px; border-radius:5px; padding:2px 7px; font-size:10px; cursor:default; user-select:none; }
+    .att-chip::after { content:''; position:absolute; top:100%; left:0; right:0; height:6px; }
+    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:white; border:1px solid #e5e7eb; border-radius:7px; box-shadow:0 3px 10px rgba(0,0,0,.13); padding:3px; gap:2px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
+    .att-chip:hover .att-chip-actions { display:flex; }
+    .att-chip-actions:hover { display:flex; }
+    .att-action-btn { background:none; border:none; cursor:pointer; padding:3px 10px; border-radius:5px; font-size:11px; white-space:nowrap; }
+    .att-action-btn:hover { background:#f3f4f6; }
+    .att-action-btn.dl { color:#1d4ed8; }
+    .att-action-btn.view { color:#374151; }
   `],
 })
-export class CrmLeadDetailComponent implements OnInit {
+export class CrmLeadDetailComponent implements OnInit, OnDestroy {
+  private gmailBc: BroadcastChannel | null = null;
+
+  private onGmailOauthResult(status: string): void {
+    if (status !== 'connected') return;
+    this.api.getGmailStatus().subscribe({
+      next: s => this.zone.run(() => {
+        this.gmailConnected = s.connected;
+        this.gmailEmail     = s.email || '';
+        this.gmailAuthUrl   = '';
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  // storage event — główny mechanizm (działa dla nowych kart i popupów przez redirecty)
+  private gmailStorageHandler = (e: StorageEvent) => {
+    if (e.key === 'gmail_oauth_connected' && e.newValue) {
+      localStorage.removeItem('gmail_oauth_connected');
+      this.onGmailOauthResult('connected');
+    }
+  };
+
+  private gmailMessageHandler = (e: MessageEvent) => {
+    if (e.origin !== window.location.origin) return;
+    if (e.data?.type === 'gmail-oauth-result') {
+      this.onGmailOauthResult(e.data.status);
+    }
+  };
   @Input() id!: string;
   private route    = inject(ActivatedRoute);
   private zone     = inject(NgZone);
@@ -991,9 +1312,14 @@ export class CrmLeadDetailComponent implements OnInit {
   }
   detailEnriching   = false;
   detailEnrichDone  = false;
-  actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[] };
-  actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '' };
+  actForm: any   = { type: 'note', title: '', body: '', activity_at: '', assigned_to: '', duration_min: null, meeting_location: '', participantList: [] as string[] };
+  actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', assigned_to: '', duration_min: null, meeting_location: '', participants: '' };
   editingActId: number | null = null;
+  // Modal aktywności
+  selectedAct: any = null;
+  actModalEditMode = false;
+  actModalClosing = false;
+  actModalCloseComment = '';
   allSuggestions: { email: string; name: string }[] = [];
   filteredSuggestions: { email: string; name: string }[] = [];
   participantQuery = '';
@@ -1036,10 +1362,27 @@ export class CrmLeadDetailComponent implements OnInit {
   showEmailModal  = false;
   sendingEmail    = false;
   emailError      = '';
-  emailForm: any  = { recipientList: [] as string[], subject: '', body: '', threadId: '' };
+  emailForm: any  = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
   recipientQuery  = '';
+  ccQuery         = '';
   emailAttachments: File[] = [];
   downloadingAttachment: string = '';  // attachmentId aktualnie pobieranego załącznika
+
+  // Email recipient autocomplete
+  recipientSuggestions: { email: string; name: string }[] = [];
+  ccSuggestions:        { email: string; name: string }[] = [];
+  showRecipientSug      = false;
+  showCcSug             = false;
+
+  // Message detail modal
+  showMsgModal    = false;
+  msgModalMsg: any = null;
+  msgModalReply   = false;
+  msgModalForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  msgModalRecipientQuery = '';
+  msgModalCcQuery        = '';
+  msgModalSending        = false;
+  msgModalError          = '';
 
   // Thread viewer
   showThreadModal = false;
@@ -1061,11 +1404,18 @@ export class CrmLeadDetailComponent implements OnInit {
   };
 
   get emailActivities(): any[] {
-    return (this.lead?.activities || []).filter(a => a.type === 'email');
+    const all = (this.lead?.activities || []).filter((a: any) => a.type === 'email');
+    const seen = new Set<string>();
+    return all.filter((a: any) => {
+      if (!a.gmail_thread_id) return true;
+      if (seen.has(a.gmail_thread_id)) return false;
+      seen.add(a.gmail_thread_id);
+      return true;
+    });
   }
 
   get emailActivityCount(): number {
-    return this.emailActivities.length;
+    return this.newEmailCount;
   }
 
   get isManager() {
@@ -1103,6 +1453,26 @@ export class CrmLeadDetailComponent implements OnInit {
       }),
       error: () => {},
     });
+    // BroadcastChannel — główny mechanizm (omija nullowanie window.opener przez Google COOP)
+    try {
+      this.gmailBc = new BroadcastChannel('gmail-oauth');
+      this.gmailBc.onmessage = (e) => {
+        if (e.data?.type === 'gmail-oauth-result') {
+          this.onGmailOauthResult(e.data.status);
+        }
+      };
+    } catch (_) {}
+    // storage event — główny mechanizm (nowa karta / popup przez redirecty)
+    window.addEventListener('storage', this.gmailStorageHandler);
+    // Fallback: BroadcastChannel
+    window.addEventListener('message', this.gmailMessageHandler);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('storage', this.gmailStorageHandler);
+    this.gmailBc?.close();
+    this.gmailBc = null;
+    window.removeEventListener('message', this.gmailMessageHandler);
   }
 
   loadLead(numId?: number) {
@@ -1120,6 +1490,42 @@ export class CrmLeadDetailComponent implements OnInit {
   }
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
+  connectGmail(): void {
+    if (!this.gmailAuthUrl) return;
+    console.log('[Gmail] connectGmail() — otwieranie popup, url:', this.gmailAuthUrl.slice(0, 60) + '...');
+    const popup = window.open(this.gmailAuthUrl, 'gmail-oauth', 'width=600,height=700,left=300,top=100');
+    console.log('[Gmail] popup ref:', popup, '| null?', popup === null);
+    if (!popup) {
+      console.warn('[Gmail] Popup zablokowany przez przeglądarkę!');
+      return;
+    }
+    // Polling: gdy popup zostanie zamknięty — odśwież status Gmail
+    const timer = setInterval(() => {
+      try {
+        console.log('[Gmail] polling — popup.closed =', popup.closed);
+        if (popup.closed) {
+          clearInterval(timer);
+          console.log('[Gmail] popup zamknięty → getGmailStatus()');
+          this.api.getGmailStatus().subscribe({
+            next: s => {
+              console.log('[Gmail] getGmailStatus() odpowiedź:', s);
+              this.zone.run(() => {
+                this.gmailConnected = s.connected;
+                this.gmailEmail     = s.email || '';
+                if (s.connected) this.gmailAuthUrl = '';
+                this.cdr.markForCheck();
+              });
+            },
+            error: (err) => { console.error('[Gmail] getGmailStatus() błąd:', err); },
+          });
+        }
+      } catch (e) {
+        console.error('[Gmail] polling error (cross-origin?):', e);
+        clearInterval(timer);
+      }
+    }, 500);
+  }
+
   openEmailModal(prefillThreadId?: string): void {
     if (!this.gmailConnected) {
       // Gmail niepołączony — pobierz URL autoryzacji i pokaż prompt
@@ -1127,16 +1533,21 @@ export class CrmLeadDetailComponent implements OnInit {
         next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
         error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailModal = true; this.cdr.markForCheck(); }),
       });
-      this.emailForm = { recipientList: [], subject: '', body: '', threadId: prefillThreadId || '' };
+      this.emailForm = { recipientList: [], ccList: [], subject: '', body: '', threadId: prefillThreadId || '', inReplyTo: '', references: '', quotedHtml: '' };
       return;
     }
     this.emailForm = {
       recipientList: this.lead?.email ? [this.lead.email] : [],
+      ccList: [],
       subject: '',
       body: '',
       threadId: prefillThreadId || '',
+      inReplyTo: '',
+      references: '',
+      quotedHtml: '',
     };
     this.recipientQuery   = '';
+    this.ccQuery          = '';
     this.emailAttachments = [];
     this.emailError       = '';
     this.showEmailModal   = true;
@@ -1167,7 +1578,68 @@ export class CrmLeadDetailComponent implements OnInit {
       this.emailForm.recipientList.push(val);
     }
     this.recipientQuery = '';
+    this.showRecipientSug = false;
     this.cdr.markForCheck();
+  }
+
+  onRecipientInput(): void {
+    const q = this.recipientQuery.toLowerCase();
+    if (q.length < 2) { this.showRecipientSug = false; return; }
+    this.recipientSuggestions = this.allSuggestions.filter(
+      s => (s.email.toLowerCase().includes(q) || (s.name||'').toLowerCase().includes(q))
+        && !this.emailForm.recipientList.includes(s.email)
+    ).slice(0, 6);
+    this.showRecipientSug = this.recipientSuggestions.length > 0;
+    this.cdr.markForCheck();
+  }
+
+  pickRecipientSug(s: { email: string; name: string }): void {
+    if (!this.emailForm.recipientList.includes(s.email)) {
+      this.emailForm.recipientList.push(s.email);
+    }
+    this.recipientQuery   = '';
+    this.showRecipientSug = false;
+    this.cdr.markForCheck();
+  }
+
+  addCc(): void {
+    const val = this.ccQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.emailForm.ccList.includes(val)) {
+      this.emailForm.ccList.push(val);
+    }
+    this.ccQuery  = '';
+    this.showCcSug = false;
+    this.cdr.markForCheck();
+  }
+
+  onCcInput(): void {
+    const q = this.ccQuery.toLowerCase();
+    if (q.length < 2) { this.showCcSug = false; return; }
+    this.ccSuggestions = this.allSuggestions.filter(
+      s => (s.email.toLowerCase().includes(q) || (s.name||'').toLowerCase().includes(q))
+        && !this.emailForm.ccList.includes(s.email)
+    ).slice(0, 6);
+    this.showCcSug = this.ccSuggestions.length > 0;
+    this.cdr.markForCheck();
+  }
+
+  pickCcSug(s: { email: string; name: string }): void {
+    if (!this.emailForm.ccList.includes(s.email)) {
+      this.emailForm.ccList.push(s.email);
+    }
+    this.ccQuery  = '';
+    this.showCcSug = false;
+    this.cdr.markForCheck();
+  }
+
+  /** Parsuje "Name <email>, email2" → ['email1', 'email2'] */
+  parseAddressList(header: string): string[] {
+    if (!header) return [];
+    return header.split(',').map((s: string) => {
+      const m = s.trim().match(/<([^>]+)>/);
+      return m ? m[1].trim().toLowerCase() : s.trim().toLowerCase();
+    }).filter((s: string) => s.includes('@'));
   }
 
   onAttachmentChange(event: Event): void {
@@ -1184,22 +1656,28 @@ export class CrmLeadDetailComponent implements OnInit {
   }
 
   sendEmail(): void {
+    this.addRecipient(); // dodaj email z pola input jeśli użytkownik nie wcisnął Enter
+    this.addCc();        // dodaj CC z pola input jeśli użytkownik nie wcisnął Enter
     if (!this.lead || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
     this.sendingEmail = true;
     this.emailError   = '';
 
     const fd = new FormData();
     fd.append('to', this.emailForm.recipientList.join(','));
+    if (this.emailForm.ccList?.length) fd.append('cc', this.emailForm.ccList.join(','));
     fd.append('subject', this.emailForm.subject);
-    fd.append('body', this.emailForm.body || '');
-    if (this.emailForm.threadId) fd.append('threadId', this.emailForm.threadId);
+    fd.append('body', (this.emailForm.body || '') + (this.emailForm.quotedHtml || ''));
+    if (this.emailForm.threadId)   fd.append('threadId',   this.emailForm.threadId);
+    if (this.emailForm.inReplyTo)  fd.append('inReplyTo',  this.emailForm.inReplyTo);
+    if (this.emailForm.references) fd.append('references', this.emailForm.references);
     this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
 
     this.api.sendLeadEmail(this.lead.id, fd).subscribe({
       next: (result: GmailSendResult) => {
         this.zone.run(() => {
-          // Dodaj aktywność email lokalnie (backend też ją stworzył — odśwież lub dodaj)
-          if (this.lead) {
+          const wasReply     = !!this.emailForm.threadId;
+          const replyThreadId = this.emailForm.threadId;
+          if (!wasReply && this.lead) {
             const newAct: any = {
               id: result.activityId,
               type: 'email',
@@ -1211,10 +1689,19 @@ export class CrmLeadDetailComponent implements OnInit {
               created_by_name: this.auth.user()?.display_name || null,
             };
             this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
+          } else if (replyThreadId && this.lead) {
+            this.api.getLeadEmailThread(this.lead.id, replyThreadId).subscribe({
+              next: msgs => this.zone.run(() => {
+                this.threadMessages = msgs;
+                this.openThreadId   = replyThreadId;
+                this.cdr.markForCheck();
+              }),
+              error: () => {},
+            });
           }
           this.sendingEmail   = false;
           this.showEmailModal = false;
-          this.midTab         = 'emails'; // przełącz na tab emaili
+          this.midTab         = 'emails';
           this.cdr.markForCheck();
         });
       },
@@ -1256,18 +1743,259 @@ export class CrmLeadDetailComponent implements OnInit {
   }
 
   replyToThread(a: any): void {
-    this.openEmailModal(a.gmail_thread_id);
-    const m = this.threadMessages[0];
-    if (m && !this.emailForm.subject) {
-      this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || a.title}`;
+    if (this.openThreadId === a.gmail_thread_id && this.threadMessages.length > 0) {
+      this._applyThreadReply(a.gmail_thread_id);
+    } else {
+      if (!this.lead) return;
+      this.openThreadId = a.gmail_thread_id;
+      this.api.getLeadEmailThread(this.lead.id, a.gmail_thread_id).subscribe({
+        next: msgs => this.zone.run(() => {
+          this.threadMessages = msgs;
+          this.cdr.markForCheck();
+          this._applyThreadReply(a.gmail_thread_id);
+        }),
+        error: () => this.zone.run(() => this._applyThreadReply(a.gmail_thread_id)),
+      });
     }
+  }
+
+  private _applyThreadReply(threadId: string): void {
+    const m = this.threadMessages[this.threadMessages.length - 1];
+    this.openEmailModal(threadId);
+    if (m) {
+      if (!this.emailForm.subject)
+        this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
+      const fromAddrs  = this.parseAddressList(m.from);
+      const toAddrs    = this.parseAddressList(m.to);
+      const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+      this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
+      if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
+      this.emailForm.inReplyTo  = m.messageIdHeader || '';
+      this.emailForm.references = this.buildReferences(this.threadMessages);
+      this.emailForm.body       = '';
+      this.emailForm.quotedHtml = this.buildQuotedBody(this.threadMessages);
+      this.focusEmailBodyTop();
+    }
+    this.cdr.markForCheck();
   }
 
   replyToCurrentThread(): void {
     this.showThreadModal = false;
-    const m = this.threadMessages[0];
+    const m = this.threadMessages[this.threadMessages.length - 1];
     this.openEmailModal(m?.threadId || '');
-    if (m) this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject}`;
+    if (m) {
+      this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
+      const toAddrs    = this.parseAddressList(m.to);
+      const fromAddrs  = this.parseAddressList(m.from);
+      const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+      this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
+      if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
+      this.emailForm.inReplyTo  = m.messageIdHeader || '';
+      this.emailForm.references = this.buildReferences(this.threadMessages);
+      this.emailForm.body       = '';
+      this.emailForm.quotedHtml = this.buildQuotedBody(this.threadMessages);
+      this.focusEmailBodyTop();
+    }
+  }
+
+  openMsgModal(m: any): void {
+    this.msgModalMsg    = m;
+    this.msgModalReply  = false;
+    this.msgModalError  = '';
+    this.msgModalSending = false;
+    this.showMsgModal   = true;
+    this.cdr.markForCheck();
+  }
+
+  closeMsgModal(): void {
+    this.showMsgModal   = false;
+    this.msgModalMsg    = null;
+    this.msgModalReply  = false;
+    this.cdr.markForCheck();
+  }
+
+  startMsgReply(): void {
+    const m = this.msgModalMsg;
+    if (!m) return;
+    const fromAddrs  = this.parseAddressList(m.from);
+    const toAddrs    = this.parseAddressList(m.to);
+    const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+    this.msgModalForm = {
+      subject:       m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`,
+      body:          '',
+      quotedHtml:    this.buildQuotedBody(this.threadMessages),
+      threadId:      m.threadId,
+      inReplyTo:     m.messageIdHeader || '',
+      references:    this.buildReferences(this.threadMessages),
+      recipientList: isReceived ? fromAddrs : toAddrs,
+      ccList:        m.cc ? this.parseAddressList(m.cc) : [],
+    };
+    this.msgModalRecipientQuery = '';
+    this.msgModalCcQuery        = '';
+    this.msgModalReply = true;
+    this.cdr.markForCheck();
+    this.focusEmailBodyTop('msg-reply-textarea');
+  }
+
+  sendMsgReply(): void {
+    // flush raw inputs
+    const rq = this.msgModalRecipientQuery.trim();
+    if (rq && rq.includes('@') && !this.msgModalForm.recipientList.includes(rq)) {
+      this.msgModalForm.recipientList.push(rq); this.msgModalRecipientQuery = '';
+    }
+    const cq = this.msgModalCcQuery.trim();
+    if (cq && cq.includes('@') && !this.msgModalForm.ccList.includes(cq)) {
+      this.msgModalForm.ccList.push(cq); this.msgModalCcQuery = '';
+    }
+    if (!this.lead || !this.msgModalForm.recipientList?.length || !this.msgModalForm.subject) return;
+    this.msgModalSending = true;
+    this.msgModalError   = '';
+    const fd = new FormData();
+    fd.append('to', this.msgModalForm.recipientList.join(','));
+    if (this.msgModalForm.ccList?.length) fd.append('cc', this.msgModalForm.ccList.join(','));
+    fd.append('subject', this.msgModalForm.subject);
+    fd.append('body',    (this.msgModalForm.body || '') + (this.msgModalForm.quotedHtml || ''));
+    if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId);
+    if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
+    if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
+    this.api.sendLeadEmail(this.lead.id, fd).subscribe({
+      next: (result: GmailSendResult) => {
+        this.zone.run(() => {
+          const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
+          this.msgModalSending = false;
+          this.msgModalReply   = false;
+          this.closeMsgModal();
+          if (replyThreadId && this.lead) {
+            this.api.getLeadEmailThread(this.lead.id, replyThreadId).subscribe({
+              next: msgs => this.zone.run(() => {
+                this.threadMessages = msgs;
+                this.openThreadId   = replyThreadId;
+                this.cdr.markForCheck();
+              }),
+              error: () => {},
+            });
+          }
+          this.cdr.markForCheck();
+        });
+      },
+      error: (err: any) => {
+        this.zone.run(() => {
+          this.msgModalError   = err?.error?.error || 'Błąd wysyłki';
+          this.msgModalSending = false;
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  viewAttachment(att: any, msgId: string): void {
+    const base = '/api/crm/gmail';
+    let url = '';
+    if (att.attachmentId) {
+      url = `${base}/attachment/${msgId}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    } else if (att.blobPath !== undefined) {
+      url = `${base}/sent-attachment/${msgId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    }
+    if (url) window.open(url, '_blank');
+  }
+
+  async downloadAtt(att: any, msgId: string): Promise<void> {
+    const base = '/api/crm/gmail';
+    let url = '';
+    if (att.attachmentId) {
+      url = `${base}/attachment/${msgId}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    } else if (att.blobPath !== undefined) {
+      url = `${base}/sent-attachment/${msgId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    }
+    if (!url) return;
+    try {
+      const resp = await fetch(url, { credentials: 'include' });
+      const blob = await resp.blob();
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = att.filename || 'attachment';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    } catch (e) { console.error('[downloadAtt]', e); }
+  }
+
+  markEmailsRead(): void {
+    if (!this.lead) return;
+    localStorage.setItem(`email_last_read_${this.lead.id}`, String(Date.now()));
+    this.cdr.markForCheck();
+  }
+
+  private buildQuotedBody(messages: any[]): string {
+    if (!messages?.length) return '';
+    // Pusta linia na wpisanie treści przez użytkownika — kursor ustawiamy tu programatycznie
+    const userArea = '';
+    const divider = '<br><hr style="border:none;border-top:2px solid #e5e7eb;margin:16px 0"><div style="font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Historia korespondencji</div>';
+    const quoted = messages.map((m: any) => {
+      const d = m.date ? new Date(m.date) : null;
+      const dateStr = d ? d.toLocaleString('pl-PL', {
+        day: '2-digit', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      }) : '';
+      const atts = [...(m.attachments || []), ...(m.sentAttachments || [])]
+        .map((a: any) => `📎 ${a.filename}`).join(' &nbsp;');
+      const bodyHtml = (m.body || (m.snippet ? m.snippet : '')).trim();
+      const meta = [
+        `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Od:</td><td style="font-size:11px"><strong>${m.from}</strong></td></tr>`,
+        m.to  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Do:</td><td style="font-size:11px">${m.to}</td></tr>`  : '',
+        m.cc  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">DW:</td><td style="font-size:11px">${m.cc}</td></tr>`  : '',
+        dateStr ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Data:</td><td style="font-size:11px">${dateStr}</td></tr>` : '',
+        m.subject ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Temat:</td><td style="font-size:11px">${m.subject}</td></tr>` : '',
+      ].filter(Boolean).join('');
+      return `<div style="border-left:3px solid #d1d5db;padding:8px 14px;margin:8px 0;background:#fafafa;border-radius:0 6px 6px 0">
+<table style="margin-bottom:8px;border-collapse:collapse">${meta}</table>
+<div style="color:#374151;font-size:13px;line-height:1.6">${bodyHtml}</div>${atts ? `<div style="margin-top:8px;font-size:11px;color:#6b7280;padding-top:6px;border-top:1px solid #f3f4f6">${atts}</div>` : ''}</div>`;
+    }).join('\n');
+    return userArea + divider + quoted;
+  }
+
+  private buildReferences(messages: any[]): string {
+    return (messages || []).map((m: any) => m.messageIdHeader).filter(Boolean).join(' ');
+  }
+
+  stripHtml(html: string): string {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  private focusEmailBodyTop(textareaId: string = 'email-body-textarea'): void {
+    // Przesuń kursor na początek pola treści (przed cytowaną korespondencją)
+    setTimeout(() => {
+      const el = document.getElementById(textareaId) as HTMLTextAreaElement | null;
+      if (el) { el.focus(); el.setSelectionRange(0, 0); el.scrollTop = 0; }
+    }, 50);
+  }
+
+  get newEmailCount(): number {
+    if (!this.lead) return 0;
+    const last = parseInt(localStorage.getItem(`email_last_read_${this.lead.id}`) || '0', 10);
+    return (this.lead.activities || []).filter(
+      (a: any) => a.type === 'email' && a.activity_at && new Date(a.activity_at).getTime() > last
+    ).length;
+  }
+
+  pushMsgRecipient(): void {
+    const v = this.msgModalRecipientQuery.trim();
+    if (v && v.includes('@') && !this.msgModalForm.recipientList.includes(v)) {
+      this.msgModalForm.recipientList.push(v);
+    }
+    this.msgModalRecipientQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  pushMsgCc(): void {
+    const v = this.msgModalCcQuery.trim();
+    if (v && v.includes('@') && !this.msgModalForm.ccList.includes(v)) {
+      this.msgModalForm.ccList.push(v);
+    }
+    this.msgModalCcQuery = '';
+    this.cdr.markForCheck();
   }
 
   // ── Reszta metod (bez zmian) ─────────────────────────────────────────────────
@@ -1411,9 +2139,136 @@ export class CrmLeadDetailComponent implements OnInit {
     });
   }
 
+  // ── Modal aktywności ────────────────────────────────────────────────────────
+  actTypeName(type: string): string {
+    const map: Record<string, string> = {
+      call: 'Połączenie', email: 'Email', meeting: 'Spotkanie', note: 'Notatka',
+      training: 'Szkolenie', qbr: 'QBR', doc_sent: 'Dokument', opportunity: 'Szansa',
+    };
+    return map[type] || type;
+  }
+
+  actStatusLabel(s: string): string {
+    return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+  }
+
+  isActOverdue(activityAt: string): boolean {
+    return new Date(activityAt) < new Date(new Date().toDateString());
+  }
+
+  isActToday(activityAt: string): boolean {
+    const d = new Date(activityAt);
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+  }
+
+  openActModal(a: any): void {
+    this.selectedAct          = a;
+    this.actModalEditMode     = false;
+    this.actModalClosing      = false;
+    this.actModalCloseComment = '';
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
+    this.cdr.markForCheck();
+  }
+
+  closeActModal(): void {
+    this.selectedAct          = null;
+    this.actModalEditMode     = false;
+    this.actModalClosing      = false;
+    this.actModalCloseComment = '';
+    this.cdr.markForCheck();
+  }
+
+  startEditActModal(): void {
+    const a = this.selectedAct;
+    if (!a) return;
+    this.actEditForm = {
+      type:             a.type,
+      title:            a.title,
+      body:             a.body || '',
+      activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      assigned_to:      a.assigned_to || '',
+      duration_min:     a.duration_min ?? '',
+      meeting_location: a.meeting_location || '',
+      participants:     a.participants || '',
+    };
+    this.actModalEditMode = true;
+    this.cdr.markForCheck();
+  }
+
+  startCloseActModal(): void {
+    this.actModalClosing      = true;
+    this.actModalCloseComment = this.selectedAct?.close_comment || '';
+    this.cdr.markForCheck();
+  }
+
+  confirmCloseActModal(): void {
+    const a = this.selectedAct;
+    if (!this.actModalCloseComment.trim() || !a || !this.lead) return;
+    this.savingActivity = true;
+    this.api.updateLeadActivity(this.lead.id, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
+      next: updated => {
+        this.zone.run(() => {
+          if (this.lead) {
+            this.lead = {
+              ...this.lead,
+              activities: (this.lead.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
+            };
+          }
+          this.selectedAct          = { ...a, ...updated };
+          this.actModalClosing      = false;
+          this.actModalCloseComment = '';
+          this.savingActivity       = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  saveEditActivityModal(): void {
+    const a = this.selectedAct;
+    if (!this.actEditForm.title || !a || !this.lead) return;
+    this.savingActivity = true;
+    const payload: any = {
+      type:        this.actEditForm.type,
+      title:       this.actEditForm.title,
+      body:        this.actEditForm.body || null,
+      activity_at: this.actEditForm.activity_at || null,
+      assigned_to: this.actEditForm.assigned_to || null,
+    };
+    if (this.actEditForm.type === 'meeting') {
+      if (this.actEditForm.duration_min !== '') payload.duration_min = +this.actEditForm.duration_min;
+      payload.meeting_location = this.actEditForm.meeting_location || null;
+      payload.participants     = this.actEditForm.participants || null;
+    }
+    this.api.updateLeadActivity(this.lead.id, a.id, payload).subscribe({
+      next: updated => {
+        this.zone.run(() => {
+          if (this.lead) {
+            this.lead = {
+              ...this.lead,
+              activities: (this.lead.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
+            };
+          }
+          this.selectedAct      = { ...a, ...updated };
+          this.actModalEditMode = false;
+          this.savingActivity   = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
   canEditActivity(a: any): boolean {
     const u = this.auth.user();
-    return u?.is_admin || u?.crm_role === 'sales_manager' || a.created_by === u?.id;
+    return u?.is_admin || u?.crm_role === 'sales_manager' || a.created_by === u?.id || a.assigned_to === u?.id;
   }
 
   startEditActivity(a: any): void {
@@ -1423,10 +2278,17 @@ export class CrmLeadDetailComponent implements OnInit {
       title:            a.title,
       body:             a.body || '',
       activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      assigned_to:      a.assigned_to || '',
       duration_min:     a.duration_min ?? '',
       meeting_location: a.meeting_location || '',
       participants:     a.participants || '',
     };
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
   }
 
   cancelEditActivity(): void { this.editingActId = null; }
@@ -1435,13 +2297,14 @@ export class CrmLeadDetailComponent implements OnInit {
     if (!this.actEditForm.title || !this.lead) return;
     this.savingActivity = true;
     const payload: any = {
-      type:  this.actEditForm.type,
-      title: this.actEditForm.title,
-      body:  this.actEditForm.body || null,
+      type:        this.actEditForm.type,
+      title:       this.actEditForm.title,
+      body:        this.actEditForm.body || null,
+      activity_at: this.actEditForm.activity_at || null,
+      assigned_to: this.actEditForm.assigned_to || null,
     };
     if (this.actEditForm.type === 'meeting') {
-      if (this.actEditForm.activity_at)      payload.activity_at      = this.actEditForm.activity_at;
-      if (this.actEditForm.duration_min !== '') payload.duration_min   = +this.actEditForm.duration_min;
+      if (this.actEditForm.duration_min !== '') payload.duration_min = +this.actEditForm.duration_min;
       payload.meeting_location = this.actEditForm.meeting_location || null;
       payload.participants     = this.actEditForm.participants || null;
     }
@@ -1534,16 +2397,35 @@ export class CrmLeadDetailComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  openNewActivityForm(): void {
+    if (this.showNewActivity) { this.showNewActivity = false; return; }
+    const currentUserId = this.auth.user()?.id || '';
+    this.actForm = {
+      type: 'note', title: '', body: '',
+      activity_at: '', assigned_to: currentUserId,
+      duration_min: null, meeting_location: '', participantList: [] as string[],
+    };
+    this.participantQuery = '';
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
+    this.showNewActivity = true;
+  }
+
   addActivity() {
     if (!this.actForm.title || !this.lead) return;
     this.savingActivity = true;
     const payload: any = {
-      type:  this.actForm.type,
-      title: this.actForm.title,
-      body:  this.actForm.body || null,
+      type:        this.actForm.type,
+      title:       this.actForm.title,
+      body:        this.actForm.body || null,
+      activity_at: this.actForm.activity_at || null,
+      assigned_to: this.actForm.assigned_to || null,
     };
     if (this.actForm.type === 'meeting') {
-      if (this.actForm.activity_at) payload.activity_at = this.actForm.activity_at;
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
       payload.participants = (this.actForm.participantList || []).join(', ') || null;
@@ -1554,7 +2436,7 @@ export class CrmLeadDetailComponent implements OnInit {
           if (this.lead) {
             this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
           }
-          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] };
+          this.actForm = { type: 'note', title: '', body: '', activity_at: '', assigned_to: '', duration_min: null, meeting_location: '', participantList: [] };
           this.participantQuery = '';
           this.showNewActivity  = false;
           this.savingActivity   = false;

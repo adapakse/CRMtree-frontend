@@ -15,7 +15,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
   template: `
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
-    <button class="back-btn" routerLink="/crm/partners">← Partnerzy</button>
+    <button class="back-btn" routerLink="/crm/partners">�? Partnerzy</button>
     <h1>{{partner.company}}</h1>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
@@ -306,7 +306,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       <div class="card-header">
         <h3>Aktywności</h3>
         <div style="display:flex;gap:6px;align-items:center">
-          <button class="btn-sm" (click)="openEmailModal()" [disabled]="!partner?.email" style="display:flex;align-items:center;gap:4px">
+          <button class="btn-sm" (click)="openEmailModal(); markEmailsRead()" [disabled]="!partner?.email" style="display:flex;align-items:center;gap:4px">
             ✉️ Email
             <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
           </button>
@@ -316,7 +316,6 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       <div class="new-activity-form" *ngIf="showNewActivity">
         <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
           <option value="call">📞 Połączenie</option>
-          <option value="email">📧 Email</option>
           <option value="meeting">🤝 Spotkanie</option>
           <option value="note">📝 Notatka</option>
           <option value="training">🎓 Szkolenie</option>
@@ -410,116 +409,227 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </button>
         </div>
       </div>
-      <div class="activity-list">
-        <div *ngFor="let a of sortedActivities" class="act-item" [class.act-closed]="a.status==='closed'" [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)" [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)">
-          <span class="act-icon">{{actIcon(a.type)}}</span>
-          <div *ngIf="editingActId !== a.id && closingActId !== a.id">
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-              <strong>{{a.title}}</strong>
-              <span *ngIf="a.type!=='email'" class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
-            </div>
+      <!-- Email activities -->
+      <div *ngIf="emailActivities.length>0" style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:6px">Emaile ({{emailActivities.length}})</div>
+        <div *ngFor="let a of emailActivities" class="act-item" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid #dbeafe">
+          <span class="act-icon">📧</span>
+          <div style="flex:1;min-width:0">
+            <strong>{{a.title}}</strong>
             <div class="act-meta">
-              <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>{{a.created_by_name}}<span *ngIf="a.assigned_to_name" style="color:#f97316"> → {{a.assigned_to_name}}</span>
+              <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
+              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
             </div>
-            <div *ngIf="a.meeting_location" class="act-text">📍 {{a.meeting_location}}</div>
-            <div *ngIf="a.participants" class="act-text">👥 {{a.participants}}</div>
-            <ng-container *ngIf="a.type === 'opportunity'">
-              <div class="act-text" style="display:flex;gap:8px;align-items:center">
-                <span class="opp-status-badge opp-st-{{a.opp_status}}">{{oppStatusLabel(a.opp_status)}}</span>
-                <span *ngIf="a.opp_value" style="font-weight:700;color:#f97316">{{a.opp_value | number:'1.0-0'}} {{a.opp_currency}}</span>
-                <span *ngIf="a.opp_due_date" style="color:#9ca3af">do {{a.opp_due_date | date:'dd.MM.yy'}}</span>
-              </div>
-            </ng-container>
-            <div class="act-text" *ngIf="a.body">{{a.body}}</div>
-            <div *ngIf="a.close_comment" class="act-text" style="color:#6b7280;font-style:italic">💬 {{a.close_comment}}</div>
-            <div *ngIf="a.type==='email' && a.gmail_thread_id" style="margin-top:4px;display:flex;gap:6px">
-              <button class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">💬 Pokaż wątek</button>
-              <button class="btn-sm primary" style="font-size:10px" (click)="replyToThread(a)">↩ Odpowiedz</button>
+            <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
+            <div style="margin-top:6px;display:flex;gap:6px">
+              <button *ngIf="a.gmail_thread_id" class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">
+                💬 Pokaż wątek
+              </button>
+              <button *ngIf="a.gmail_thread_id" class="btn-sm primary" style="font-size:10px" (click)="replyToThread(a)">
+                ↩ Odpowiedz
+              </button>
             </div>
             <!-- Thread preview -->
             <div *ngIf="openThreadId===a.gmail_thread_id && threadMessages.length>0"
                  style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px">
-              <div *ngFor="let m of threadMessages" style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px">
-                <div style="font-weight:600;color:#374151">{{m.from}}</div>
-                <div style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</div>
-                <div style="margin-top:4px;color:#374151;white-space:pre-line">{{m.snippet}}</div>
-                <div *ngIf="m.attachments?.length" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px">
-                  <button *ngFor="let att of m.attachments"
-                          (click)="downloadAttachment(att, m.id)"
-                          [disabled]="downloadingAttachment===att.attachmentId"
-                          style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:2px 8px;font-size:10px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:3px">
-                    <span *ngIf="downloadingAttachment!==att.attachmentId">📎 {{att.filename}}</span>
-                    <span *ngIf="downloadingAttachment===att.attachmentId">⏳ {{att.filename}}</span>
-                  </button>
+              <div *ngFor="let m of threadMessages"
+                   style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px;cursor:pointer"
+                   (click)="openMsgModal(m)">
+                <div style="display:flex;justify-content:space-between">
+                  <span style="font-weight:600;color:#374151">{{m.from}}</span>
+                  <span style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
+                </div>
+                <div style="color:#6b7280;font-size:10px">Do: {{m.to}}<span *ngIf="m.cc"> · DW: {{m.cc}}</span></div>
+                <div style="margin-top:4px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{m.snippet}}</div>
+                <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
+                     style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px" (click)="$event.stopPropagation()">
+                  <span *ngFor="let att of m.attachments" class="att-chip" style="background:#eff6ff;color:#1d4ed8">
+                    📎 {{att.filename}}
+                    <span class="att-chip-actions">
+                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m)" title="Otwórz w przeglądarce">Podgląd</button>
+                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m)" title="Pobierz plik">Pobierz</button>
+                    </span>
+                  </span>
+                  <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:#f0fdf4;color:#166534">
+                    📎 {{att.filename}}
+                    <span class="att-chip-actions">
+                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m)" title="Otwórz w przeglądarce">Podgląd</button>
+                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m)" title="Pobierz plik">Pobierz</button>
+                    </span>
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="act-edit-form" *ngIf="editingActId === a.id">
-            <select [(ngModel)]="actEditForm.type" class="act-sel">
-              <option value="call">📞 Połączenie</option>
-              <option value="email">📧 Email</option>
-              <option value="meeting">🤝 Spotkanie</option>
-              <option value="note">📝 Notatka</option>
-              <option value="training">🎓 Szkolenie</option>
-              <option value="qbr">📊 QBR</option>
-              <option value="opportunity">💡 Szansa</option>
-            </select>
-            <input [(ngModel)]="actEditForm.title" placeholder="Tytuł *" class="act-input">
-            <ng-container *ngIf="actEditForm.type !== 'email'">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Data i czas<input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input" style="font-size:11px"></label>
-                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">Przypisz do<select [(ngModel)]="actEditForm.assigned_to" class="act-sel" style="font-size:11px"><option value="">— ja (domyślnie) —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select></label>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="actEditForm.type === 'meeting'">
-              <input [(ngModel)]="actEditForm.meeting_location" placeholder="Miejsce spotkania" class="act-input">
-              <input [(ngModel)]="actEditForm.participants" placeholder="Uczestnicy (emaile oddzielone przecinkiem)" class="act-input">
-            </ng-container>
-            <ng-container *ngIf="actEditForm.type === 'opportunity'">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                  Status szansy
-                  <select [(ngModel)]="actEditForm.opp_status" class="act-input" style="font-size:11px">
-                    <option value="new">Nowa</option>
-                    <option value="in_progress">W trakcie</option>
-                    <option value="closed">Zamknięta</option>
-                  </select>
-                </label>
-                <input type="date" [(ngModel)]="actEditForm.opp_due_date" class="act-input" style="font-size:11px;align-self:flex-end">
-              </div>
-              <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
-                <input type="number" min="0" step="0.01" [(ngModel)]="actEditForm.opp_value" placeholder="Wartość" class="act-input">
-                <select [(ngModel)]="actEditForm.opp_currency" class="act-input">
-                  <option value="PLN">PLN</option><option value="EUR">EUR</option>
-                  <option value="USD">USD</option><option value="GBP">GBP</option>
-                </select>
-              </div>
-            </ng-container>
-            <textarea [(ngModel)]="actEditForm.body" placeholder="Treść…" rows="2" class="act-input"></textarea>
-            <div class="act-actions">
-              <button class="btn-sm" (click)="cancelEditActivity()">Anuluj</button>
-              <button class="btn-sm primary" (click)="saveEditActivity(a)" [disabled]="!actEditForm.title || savingActivity">
-                {{savingActivity ? '…' : 'Zapisz'}}
-              </button>
+        </div>
+      </div>
+      <div class="activity-list">
+        <div *ngFor="let a of sortedActivities" class="act-item"
+             [class.act-closed]="a.status==='closed'"
+             [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
+             [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
+             style="cursor:pointer" (click)="openActModal(a)">
+          <span class="act-icon">{{actIcon(a.type)}}</span>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <strong>{{actTypeName(a.type)}}: {{a.title}}</strong>
+              <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
             </div>
-          </div>
-          <!-- Formularz zamknięcia -->
-          <div class="act-edit-form" *ngIf="closingActId === a.id">
-            <div style="font-size:12px;font-weight:600;color:#374151">Zamknij aktywność: {{a.title}}</div>
-            <textarea [(ngModel)]="closeComment" placeholder="Komentarz zamknięcia *" rows="2" class="act-input" style="font-size:12px"></textarea>
-            <div class="act-actions">
-              <button class="btn-sm" (click)="cancelClose()">Anuluj</button>
-              <button class="btn-sm primary" (click)="confirmCloseActivity(a)" [disabled]="!closeComment.trim() || savingActivity">{{savingActivity ? '…' : 'Zamknij'}}</button>
+            <div class="act-meta">
+              <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>
+              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
             </div>
-          </div>
-          <div class="act-controls" *ngIf="editingActId !== a.id && closingActId !== a.id && canEditActivity(a)">
-            <button *ngIf="a.type!=='email' && a.status!=='closed'" class="act-ctrl-btn" (click)="startCloseActivity(a)" title="Zamknij">✓</button>
-            <button class="act-ctrl-btn" (click)="startEditActivity(a)" title="Edytuj">✏️</button>
-            <button class="act-ctrl-btn del" (click)="deleteActivity(a)" title="Usuń">🗑️</button>
+            <div *ngIf="a.body" class="act-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px">{{stripHtml(a.body)}}</div>
           </div>
         </div>
         <div class="empty-act" *ngIf="!sortedActivities.length">Brak aktywności.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- �?�? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI �?�? -->
+  <div *ngIf="selectedAct" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px" (click)="closeActModal()">
+    <div style="background:white;border-radius:14px;width:min(520px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;flex-direction:column" (click)="$event.stopPropagation()">
+      <!-- Nagłówek -->
+      <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1">
+        <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
+        <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
+        <span style="flex:1"></span>
+        <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
+        <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
+      </div>
+
+      <!-- Widok -->
+      <div *ngIf="!actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">{{selectedAct.title}}</div>
+        <div *ngIf="selectedAct.activity_at" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📅 Data i czas</span>
+          <span>{{selectedAct.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+        </div>
+        <div *ngIf="selectedAct.assigned_to_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👤 Przypisano do</span>
+          <span>{{selectedAct.assigned_to_name}}</span>
+        </div>
+        <div *ngIf="selectedAct.created_by_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">✍️ Dodał</span>
+          <span>{{selectedAct.created_by_name}}</span>
+        </div>
+        <div *ngIf="selectedAct.meeting_location" style="display:flex;gap:12px;font-size:13px">
+          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📍 Miejsce</span>
+          <span>{{selectedAct.meeting_location}}</span>
+        </div>
+        <div *ngIf="selectedAct.participants" style="display:flex;gap:12px;font-size:13px">
+          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👥 Uczestnicy</span>
+          <span style="word-break:break-all">{{selectedAct.participants}}</span>
+        </div>
+        <ng-container *ngIf="selectedAct.type === 'opportunity'">
+          <div style="display:flex;gap:12px;font-size:13px">
+            <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💡 Szansa</span>
+            <span class="opp-status-badge opp-st-{{selectedAct.opp_status}}">{{oppStatusLabel(selectedAct.opp_status)}}</span>
+            <span *ngIf="selectedAct.opp_value" style="font-weight:700;color:#f97316">{{selectedAct.opp_value | number:'1.0-0'}} {{selectedAct.opp_currency}}</span>
+          </div>
+        </ng-container>
+        <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
+          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📝 Opis</span>
+          <span style="white-space:pre-line">{{selectedAct.body}}</span>
+        </div>
+        <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:13px">
+          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 Komentarz</span>
+          <span style="font-style:italic">{{selectedAct.close_comment}}</span>
+        </div>
+        <!-- Zamknij -->
+        <div *ngIf="!actModalClosing && selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
+          <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="startCloseActModal()">✓ Zamknij aktywność</button>
+        </div>
+        <div *ngIf="actModalClosing" style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <textarea [(ngModel)]="actModalCloseComment" placeholder="Komentarz zamknięcia *" rows="3"
+                    style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalClosing=false;actModalCloseComment=''">Anuluj</button>
+            <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="!actModalCloseComment.trim() || savingActivity">{{savingActivity ? '…' : 'Zamknij'}}</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edycja -->
+      <div *ngIf="actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;font-weight:600;color:#374151">Typ</label>
+          <select [(ngModel)]="actEditForm.type" class="act-sel">
+            <option value="call">📞 Połączenie</option>
+            <option value="meeting">🤝 Spotkanie</option>
+            <option value="note">📝 Notatka</option>
+            <option value="training">🎓 Szkolenie</option>
+            <option value="qbr">📊 QBR</option>
+            <option value="opportunity">💡 Szansa</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;font-weight:600;color:#374151">Tytuł <span style="color:#dc2626">*</span></label>
+          <input [(ngModel)]="actEditForm.title" class="act-input">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:12px;font-weight:600;color:#374151">Data i godzina</label>
+            <input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:12px;font-weight:600;color:#374151">Przypisz do handlowca</label>
+            <select [(ngModel)]="actEditForm.assigned_to" class="act-sel">
+              <option value="">— bez przypisania —</option>
+              <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+            </select>
+          </div>
+        </div>
+        <ng-container *ngIf="actEditForm.type === 'meeting'">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:12px;font-weight:600;color:#374151">Miejsce spotkania</label>
+            <input [(ngModel)]="actEditForm.meeting_location" class="act-input">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:12px;font-weight:600;color:#374151">Uczestnicy</label>
+            <input [(ngModel)]="actEditForm.participants" class="act-input" placeholder="emaile oddzielone przecinkiem">
+          </div>
+        </ng-container>
+        <ng-container *ngIf="actEditForm.type === 'opportunity'">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <label style="font-size:12px;font-weight:600;color:#374151">Status szansy</label>
+              <select [(ngModel)]="actEditForm.opp_status" class="act-sel">
+                <option value="new">Nowa</option>
+                <option value="in_progress">W trakcie</option>
+                <option value="closed">Zamknięta</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <label style="font-size:12px;font-weight:600;color:#374151">Termin</label>
+              <input type="date" [(ngModel)]="actEditForm.opp_due_date" class="act-input">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <label style="font-size:12px;font-weight:600;color:#374151">Wartość</label>
+              <input type="number" min="0" step="0.01" [(ngModel)]="actEditForm.opp_value" class="act-input">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <label style="font-size:12px;font-weight:600;color:#374151">Waluta</label>
+              <select [(ngModel)]="actEditForm.opp_currency" class="act-sel">
+                <option value="PLN">PLN</option><option value="EUR">EUR</option>
+                <option value="USD">USD</option><option value="GBP">GBP</option>
+              </select>
+            </div>
+          </div>
+        </ng-container>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;font-weight:600;color:#374151">Opis / notatki</label>
+          <textarea [(ngModel)]="actEditForm.body" rows="4" class="act-input" style="resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+          <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
+          <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
+        </div>
       </div>
     </div>
   </div>
@@ -896,7 +1006,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
   </div>
 </div>
 <div *ngIf="!partner && !loading" class="not-found">{{ loadError ? 'Błąd ładowania.' : 'Partner nie znaleziony.' }}</div>
-<div *ngIf="loading" class="loading">Ładowanie…</div>
+<div *ngIf="loading" class="loading">�?adowanie…</div>
 
 <!-- ── Gmail Compose Modal ─────────────────────────────────────────────────── -->
 <div class="modal-overlay" *ngIf="showEmailModal" (click)="showEmailModal=false">
@@ -909,15 +1019,18 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     <!-- Gmail not connected prompt -->
     <div *ngIf="!gmailConnected" class="modal-body" style="gap:16px;align-items:center;text-align:center;padding:32px 24px">
       <div style="font-size:40px">📧</div>
-      <div style="font-size:15px;font-weight:700;color:#111827">Połącz konto Gmail</div>
+      <div style="font-size:15px;font-weight:700;color:#111827">Konto Gmail niepołączone</div>
       <div style="font-size:13px;color:#6b7280;max-width:380px">
-        Aby wysyłać maile przez naszą aplikację, musisz połączyć swoje konto Gmail.
-        Po zalogowaniu wróć do tego widoku.
+        Aby wysyłać i odbierać emaile bezpośrednio z CRM, połącz swoje konto Gmail.
+        Każdy handlowiec łączy własną skrzynkę.
       </div>
-      <a [href]="gmailAuthUrl" target="_blank" rel="noopener"
-         style="display:inline-block;background:#f97316;color:white;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;text-decoration:none;margin-top:4px">
-        🔗 Połącz Gmail
-      </a>
+      <button *ngIf="gmailAuthUrl" (click)="connectGmail()"
+         style="background:#f97316;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px">
+        🔗 Połącz konto Gmail
+      </button>
+      <div *ngIf="!gmailAuthUrl" style="color:#9ca3af;font-size:12px">
+        Brak konfiguracji OAuth. Skontaktuj się z administratorem.
+      </div>
     </div>
 
     <!-- Normal compose form -->
@@ -929,13 +1042,41 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         </div>
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           Do
-          <div class="participant-chips">
+          <div class="participant-chips" style="position:relative">
             <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">
               {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
             </span>
             <input class="participant-input" [(ngModel)]="recipientQuery"
                    (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
+                   (input)="onRecipientInput()" (blur)="showRecipientSug=false"
                    placeholder="email@firma.pl" autocomplete="off">
+            <div class="suggest-dropdown" *ngIf="showRecipientSug">
+              <div *ngFor="let s of recipientSuggestions" class="suggest-item"
+                   (mousedown)="pickRecipientSug(s)">
+                <span style="font-weight:600">{{s.name}}</span>
+                <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
+              </div>
+            </div>
+          </div>
+        </label>
+        <!-- DW (CC): -->
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+          DW
+          <div class="participant-chips" style="position:relative">
+            <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">
+              {{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button>
+            </span>
+            <input class="participant-input" [(ngModel)]="ccQuery"
+                   (keydown.enter)="addCc()" (keydown.Tab)="addCc()"
+                   (input)="onCcInput()" (blur)="showCcSug=false"
+                   placeholder="dw@firma.pl" autocomplete="off">
+            <div class="suggest-dropdown" *ngIf="showCcSug">
+              <div *ngFor="let s of ccSuggestions" class="suggest-item"
+                   (mousedown)="pickCcSug(s)">
+                <span style="font-weight:600">{{s.name}}</span>
+                <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
+              </div>
+            </div>
           </div>
         </label>
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
@@ -948,7 +1089,10 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         </div>
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           Treść
-          <textarea class="act-input" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
+          <textarea class="act-input" id="partner-email-body-textarea" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
+          <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
+            📋 Historia korespondencji zostanie automatycznie dołączona
+          </div>
         </label>
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           Załączniki
@@ -975,6 +1119,80 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     <!-- Footer for not-connected state -->
     <div *ngIf="!gmailConnected" class="modal-footer">
       <button class="btn-outline" (click)="showEmailModal=false">Zamknij</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Message detail modal ─────────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showMsgModal" (click)="closeMsgModal()">
+  <div class="modal-wide" (click)="$event.stopPropagation()" style="width:min(620px,100%);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column">
+    <div class="modal-header">
+      <h3>📧 {{msgModalMsg?.subject || 'Wiadomość'}}</h3>
+      <button class="close-btn" (click)="closeMsgModal()">✕</button>
+    </div>
+    <div class="modal-body" style="gap:10px" *ngIf="msgModalMsg && !msgModalReply">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12px">
+        <span style="color:#9ca3af">Od:</span><span>{{msgModalMsg.from}}</span>
+        <span style="color:#9ca3af">Do:</span><span>{{msgModalMsg.to}}</span>
+        <span *ngIf="msgModalMsg.cc" style="color:#9ca3af">DW:</span>
+        <span *ngIf="msgModalMsg.cc">{{msgModalMsg.cc}}</span>
+        <span style="color:#9ca3af">Data:</span><span>{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span>
+      </div>
+      <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;white-space:pre-line;color:#374151;max-height:320px;overflow-y:auto">
+        {{msgModalMsg.body || msgModalMsg.snippet}}
+      </div>
+      <!-- Attachments -->
+      <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
+           style="display:flex;flex-wrap:wrap;gap:4px">
+        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;padding:4px 10px">
+          📎 {{att.filename}}
+          <span class="att-chip-actions">
+            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" title="Otwórz w przeglądarce">Podgląd</button>
+            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg)" title="Pobierz plik">Pobierz</button>
+          </span>
+        </span>
+        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:11px;padding:4px 10px">
+          📎 {{att.filename}}
+          <span class="att-chip-actions">
+            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" title="Otwórz w przeglądarce">Podgląd</button>
+            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg)" title="Pobierz plik">Pobierz</button>
+          </span>
+        </span>
+      </div>
+    </div>
+    <!-- Reply form -->
+    <div class="modal-body" style="gap:10px" *ngIf="msgModalReply">
+      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">Odpowiedź</div>
+      <div class="participant-chips" style="position:relative">
+        <span *ngFor="let r of msgModalForm.recipientList; let i=index" class="participant-chip">
+          {{r}}<button (click)="msgModalForm.recipientList.splice(i,1)" type="button">✕</button>
+        </span>
+        <input class="participant-input" [(ngModel)]="msgModalRecipientQuery"
+               (keydown.enter)="pushMsgRecipient()"
+               placeholder="Do…" autocomplete="off">
+      </div>
+      <div class="participant-chips" style="position:relative">
+        <span *ngFor="let r of msgModalForm.ccList; let i=index" class="participant-chip">
+          {{r}}<button (click)="msgModalForm.ccList.splice(i,1)" type="button">✕</button>
+        </span>
+        <input class="participant-input" [(ngModel)]="msgModalCcQuery"
+               (keydown.enter)="pushMsgCc()"
+               placeholder="DW…" autocomplete="off">
+      </div>
+      <input class="act-input" [(ngModel)]="msgModalForm.subject" placeholder="Temat">
+      <textarea class="act-input" id="partner-msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="7" placeholder="Treść…"></textarea>
+      <div *ngIf="msgModalForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
+        📋 Historia korespondencji zostanie automatycznie dołączona
+      </div>
+      <div *ngIf="msgModalError" style="color:#ef4444;font-size:12px">⚠️ {{msgModalError}}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="closeMsgModal()">Zamknij</button>
+      <button *ngIf="!msgModalReply" class="btn-primary" (click)="startMsgReply()">↩ Odpowiedz</button>
+      <button *ngIf="msgModalReply" class="btn-primary" (click)="sendMsgReply()"
+              [disabled]="msgModalSending||!msgModalForm.recipientList?.length||!msgModalForm.subject">
+        {{msgModalSending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}
+      </button>
     </div>
   </div>
 </div>
@@ -1127,6 +1345,18 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .input-warn  { border-color:#f59e0b !important; background:#fffbeb; }
     .validation-msg { font-size:11px; color:#ef4444; margin-top:2px; }
     .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 5px; line-height:16px; display:inline-block; }
+    .suggest-dropdown { position:absolute;top:100%;left:0;right:0;z-index:300;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;margin-top:2px; }
+    .suggest-item { padding:7px 12px;font-size:12px;cursor:pointer; }
+    .suggest-item:hover { background:#f9fafb; }
+    .att-chip { position:relative; display:inline-flex; align-items:center; gap:4px; border-radius:5px; padding:2px 7px; font-size:10px; cursor:default; user-select:none; }
+    .att-chip::after { content:''; position:absolute; top:100%; left:0; right:0; height:6px; }
+    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:white; border:1px solid #e5e7eb; border-radius:7px; box-shadow:0 3px 10px rgba(0,0,0,.13); padding:3px; gap:2px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
+    .att-chip:hover .att-chip-actions { display:flex; }
+    .att-chip-actions:hover { display:flex; }
+    .att-action-btn { background:none; border:none; cursor:pointer; padding:3px 10px; border-radius:5px; font-size:11px; white-space:nowrap; }
+    .att-action-btn:hover { background:#f3f4f6; }
+    .att-action-btn.dl { color:#1d4ed8; }
+    .att-action-btn.view { color:#374151; }
   `],
 })
 export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
@@ -1187,6 +1417,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   savingActivity = false;
   showNewActivity = false;
   showEdit = false;
+  // Modal aktywności
+  selectedAct: any = null;
+  actModalEditMode = false;
+  actModalClosing = false;
+  actModalCloseComment = '';
   submitAttempted = false;
   partnerNipEditError = '';
 
@@ -1224,8 +1459,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   showEmailModal      = false;
   sendingEmail        = false;
   emailError          = '';
-  emailForm: any      = { recipientList: [] as string[], subject: '', body: '', threadId: '' };
+  emailForm: any      = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
   recipientQuery      = '';
+  ccQuery             = '';
   emailAttachments: File[] = [];
   threadMessages: any[] = [];
   openThreadId        = '';
@@ -1233,13 +1469,43 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   gmailEmail          = '';
   gmailAuthUrl        = '';
   downloadingAttachment = '';
+  recipientSuggestions: { email: string; name: string }[] = [];
+  ccSuggestions:        { email: string; name: string }[] = [];
+  showRecipientSug      = false;
+  showCcSug             = false;
+  showMsgModal    = false;
+  msgModalMsg: any = null;
+  msgModalReply   = false;
+  msgModalForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  msgModalRecipientQuery = '';
+  msgModalCcQuery        = '';
+  msgModalSending        = false;
+  msgModalError          = '';
 
   get emailActivities(): any[] {
-    return (this.partner?.activities || []).filter((a: any) => a.type === 'email');
+    const all = (this.partner?.activities || []).filter((a: any) => a.type === 'email');
+    const seen = new Set<string>();
+    return all.filter((a: any) => {
+      if (!a.gmail_thread_id) return true;
+      if (seen.has(a.gmail_thread_id)) return false;
+      seen.add(a.gmail_thread_id);
+      return true;
+    });
+  }
+
+  get newEmailCount(): number {
+    const key = `partner_email_last_read_${this.partner?.id}`;
+    const lastRead = localStorage.getItem(key);
+    if (!lastRead) return this.emailActivities.length;
+    const lastReadTime = new Date(lastRead).getTime();
+    return this.emailActivities.filter((a: any) => {
+      const t = a.activity_at ? new Date(a.activity_at).getTime() : 0;
+      return t > lastReadTime;
+    }).length;
   }
 
   get emailActivityCount(): number {
-    return this.emailActivities.length;
+    return this.newEmailCount;
   }
 
   onboardingSteps = ['Umowa podpisana', 'Konfiguracja systemu', 'Szkolenie użytkowników', 'Gotowy'];
@@ -1325,11 +1591,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   get sortedActivities(): any[] {
-    return [...(this.partner?.activities || [])].sort((a, b) => {
-      const ta = a.activity_at ? new Date(a.activity_at).getTime() : 0;
-      const tb = b.activity_at ? new Date(b.activity_at).getTime() : 0;
-      return tb - ta;
-    });
+    return [...(this.partner?.activities || [])]
+      .filter(a => a.type !== 'email')
+      .sort((a, b) => {
+        const ta = a.activity_at ? new Date(a.activity_at).getTime() : 0;
+        const tb = b.activity_at ? new Date(b.activity_at).getTime() : 0;
+        return tb - ta;
+      });
   }
 
   get activeOpps(): any[] {
@@ -1355,18 +1623,33 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return Math.round(((this.partner.active_users || 0) / this.partner.license_count) * 100);
   }
 
+  private gmailBc: BroadcastChannel | null = null;
+
+  private onGmailOauthResult(status: string): void {
+    if (status !== 'connected') return;
+    this.api.getGmailStatus().subscribe({
+      next: s => this.zone.run(() => {
+        this.gmailConnected = s.connected;
+        this.gmailEmail     = s.email || '';
+        this.gmailAuthUrl   = '';
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  // storage event — główny mechanizm (nowa karta / popup przez redirecty)
+  private gmailStorageHandler = (e: StorageEvent) => {
+    if (e.key === 'gmail_oauth_connected' && e.newValue) {
+      localStorage.removeItem('gmail_oauth_connected');
+      this.onGmailOauthResult('connected');
+    }
+  };
+
   private _gmailMsgHandler = (ev: MessageEvent) => {
     if (ev.origin !== window.location.origin) return;
-    if (ev.data?.type === 'gmail-oauth-result' && ev.data?.status === 'connected') {
-      this.api.getGmailStatus().subscribe({
-        next: s => this.zone.run(() => {
-          this.gmailConnected = s.connected;
-          this.gmailEmail     = s.email || '';
-          this.gmailAuthUrl   = '';
-          this.cdr.markForCheck();
-        }),
-        error: () => {},
-      });
+    if (ev.data?.type === 'gmail-oauth-result') {
+      this.onGmailOauthResult(ev.data.status);
     }
   };
 
@@ -1382,10 +1665,25 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       next: s => this.zone.run(() => { this.gmailConnected = s.connected; this.gmailEmail = s.email || ''; this.cdr.markForCheck(); }),
       error: () => {},
     });
+    // storage event — główny mechanizm
+    window.addEventListener('storage', this.gmailStorageHandler);
+    // Fallback: BroadcastChannel
+    try {
+      this.gmailBc = new BroadcastChannel('gmail-oauth');
+      this.gmailBc.onmessage = (e) => {
+        if (e.data?.type === 'gmail-oauth-result') {
+          this.onGmailOauthResult(e.data.status);
+        }
+      };
+    } catch (_) {}
+    // Fallback: postMessage
     window.addEventListener('message', this._gmailMsgHandler);
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('storage', this.gmailStorageHandler);
+    this.gmailBc?.close();
+    this.gmailBc = null;
     window.removeEventListener('message', this._gmailMsgHandler);
   }
 
@@ -1805,35 +2103,70 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   openNewActivityForm(): void {
-    this.showNewActivity = !this.showNewActivity;
-    if (this.showNewActivity && !this.crmUsers.length) {
+    if (this.showNewActivity) { this.showNewActivity = false; return; }
+    const currentUserId = this.auth.user()?.id || '';
+    this.actForm = {
+      type: 'note', title: '', body: '',
+      activity_at: '', assigned_to: currentUserId,
+      duration_min: null, meeting_location: '', participantList: [] as string[],
+      opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '',
+    };
+    this.participantQuery = '';
+    if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
         error: () => {},
       });
     }
+    this.showNewActivity = true;
   }
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
+  connectGmail(): void {
+    if (!this.gmailAuthUrl) return;
+    const popup = window.open(this.gmailAuthUrl, 'gmail-oauth', 'width=600,height=700,left=300,top=100');
+    if (!popup) return;
+    // Polling: gdy popup zostanie zamknięty — odśwież status Gmail
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        this.api.getGmailStatus().subscribe({
+          next: s => this.zone.run(() => {
+            this.gmailConnected = s.connected;
+            this.gmailEmail     = s.email || '';
+            if (s.connected) this.gmailAuthUrl = '';
+            this.cdr.markForCheck();
+          }),
+          error: () => {},
+        });
+      }
+    }, 500);
+  }
+
   openEmailModal(prefillThreadId?: string): void {
     this.emailForm = {
       recipientList: this.partner?.email ? [this.partner.email] : [],
+      ccList: [],
       subject: '',
       body: '',
       threadId: prefillThreadId || '',
+      inReplyTo: '',
+      references: '',
+      quotedHtml: '',
     };
     this.recipientQuery   = '';
+    this.ccQuery          = '';
     this.emailAttachments = [];
     this.emailError       = '';
     if (!this.gmailConnected && !this.gmailAuthUrl) {
       this.api.getGmailAuthUrl().subscribe({
         next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
-        error: () => {},
+        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailModal = true; this.cdr.markForCheck(); }),
       });
     } else {
       this.showEmailModal = true;
+      this.cdr.markForCheck();
     }
-    this.cdr.markForCheck();
   }
 
   downloadAttachment(att: any, messageId: string): void {
@@ -1859,12 +2192,73 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   addRecipient(): void {
     const val = this.recipientQuery.trim();
+    this.showRecipientSug = false;
     if (!val || !val.includes('@')) return;
     if (!this.emailForm.recipientList.includes(val)) {
       this.emailForm.recipientList.push(val);
     }
     this.recipientQuery = '';
     this.cdr.markForCheck();
+  }
+
+  onRecipientInput(): void {
+    const q = this.recipientQuery.toLowerCase();
+    if (!q) { this.showRecipientSug = false; return; }
+    this.recipientSuggestions = this.allSuggestions.filter(
+      s => !this.emailForm.recipientList.includes(s.email) &&
+           (s.email.toLowerCase().includes(q) || s.name.toLowerCase().includes(q))
+    ).slice(0, 8);
+    this.showRecipientSug = this.recipientSuggestions.length > 0;
+    this.cdr.markForCheck();
+  }
+
+  pickRecipientSug(s: { email: string; name: string }): void {
+    if (!this.emailForm.recipientList.includes(s.email)) {
+      this.emailForm.recipientList.push(s.email);
+    }
+    this.recipientQuery   = '';
+    this.showRecipientSug = false;
+    this.cdr.markForCheck();
+  }
+
+  addCc(): void {
+    const val = this.ccQuery.trim();
+    this.showCcSug = false;
+    if (!val || !val.includes('@')) return;
+    if (!this.emailForm.ccList.includes(val)) {
+      this.emailForm.ccList.push(val);
+    }
+    this.ccQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  onCcInput(): void {
+    const q = this.ccQuery.toLowerCase();
+    if (!q) { this.showCcSug = false; return; }
+    this.ccSuggestions = this.allSuggestions.filter(
+      s => !this.emailForm.ccList.includes(s.email) &&
+           (s.email.toLowerCase().includes(q) || s.name.toLowerCase().includes(q))
+    ).slice(0, 8);
+    this.showCcSug = this.ccSuggestions.length > 0;
+    this.cdr.markForCheck();
+  }
+
+  pickCcSug(s: { email: string; name: string }): void {
+    if (!this.emailForm.ccList.includes(s.email)) {
+      this.emailForm.ccList.push(s.email);
+    }
+    this.ccQuery   = '';
+    this.showCcSug = false;
+    this.cdr.markForCheck();
+  }
+
+  /** Parsuje "Name <email>, email2" → ['email1', 'email2'] */
+  parseAddressList(header: string): string[] {
+    if (!header) return [];
+    return header.split(',').map((s: string) => {
+      const m = s.trim().match(/<([^>]+)>/);
+      return m ? m[1].trim().toLowerCase() : s.trim().toLowerCase();
+    }).filter((s: string) => s.includes('@'));
   }
 
   onAttachmentChange(event: Event): void {
@@ -1879,20 +2273,27 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   sendEmail(): void {
+    this.addRecipient();
+    this.addCc();
     if (!this.partner || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
     this.sendingEmail = true;
     this.emailError   = '';
     const fd = new FormData();
     fd.append('to', this.emailForm.recipientList.join(','));
+    if (this.emailForm.ccList?.length) fd.append('cc', this.emailForm.ccList.join(','));
     fd.append('subject', this.emailForm.subject);
-    fd.append('body', this.emailForm.body || '');
-    if (this.emailForm.threadId) fd.append('threadId', this.emailForm.threadId);
+    fd.append('body', (this.emailForm.body || '') + (this.emailForm.quotedHtml || ''));
+    if (this.emailForm.threadId)   fd.append('threadId',   this.emailForm.threadId);
+    if (this.emailForm.inReplyTo)  fd.append('inReplyTo',  this.emailForm.inReplyTo);
+    if (this.emailForm.references) fd.append('references', this.emailForm.references);
     this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
 
     this.api.sendPartnerEmail(this.partner.id, fd).subscribe({
       next: (result: GmailSendResult) => {
         this.zone.run(() => {
-          if (this.partner) {
+          const wasReply      = !!this.emailForm.threadId;
+          const replyThreadId = this.emailForm.threadId;
+          if (!wasReply && this.partner) {
             const newAct: any = {
               id: result.activityId,
               type: 'email',
@@ -1904,6 +2305,15 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
               created_by_name: this.auth.user()?.display_name || null,
             };
             this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
+          } else if (replyThreadId && this.partner) {
+            this.api.getPartnerEmailThread(this.partner.id, replyThreadId).subscribe({
+              next: msgs => this.zone.run(() => {
+                this.threadMessages = msgs;
+                this.openThreadId   = replyThreadId;
+                this.cdr.markForCheck();
+              }),
+              error: () => {},
+            });
           }
           this.sendingEmail   = false;
           this.showEmailModal = false;
@@ -1933,8 +2343,219 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   replyToThread(a: any): void {
-    this.openEmailModal(a.gmail_thread_id);
-    this.emailForm.subject = a.title?.startsWith('Re:') ? a.title : `Re: ${a.title}`;
+    if (this.openThreadId === a.gmail_thread_id && this.threadMessages.length > 0) {
+      this._applyThreadReply(a.gmail_thread_id);
+    } else {
+      if (!this.partner) return;
+      this.openThreadId = a.gmail_thread_id;
+      this.api.getPartnerEmailThread(this.partner.id, a.gmail_thread_id).subscribe({
+        next: msgs => this.zone.run(() => {
+          this.threadMessages = msgs;
+          this.cdr.markForCheck();
+          this._applyThreadReply(a.gmail_thread_id);
+        }),
+        error: () => this.zone.run(() => this._applyThreadReply(a.gmail_thread_id)),
+      });
+    }
+  }
+
+  private _applyThreadReply(threadId: string): void {
+    const m = this.threadMessages[this.threadMessages.length - 1];
+    this.openEmailModal(threadId);
+    if (m) {
+      if (!this.emailForm.subject)
+        this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
+      const fromAddrs  = this.parseAddressList(m.from);
+      const toAddrs    = this.parseAddressList(m.to);
+      const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+      this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
+      if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
+      this.emailForm.inReplyTo  = m.messageIdHeader || '';
+      this.emailForm.references = this.buildReferences(this.threadMessages);
+      this.emailForm.body       = '';
+      this.emailForm.quotedHtml = this.buildQuotedBody(this.threadMessages);
+      this.focusEmailBodyTop();
+    }
+    this.cdr.markForCheck();
+  }
+
+  markEmailsRead(): void {
+    const key = `partner_email_last_read_${this.partner?.id}`;
+    localStorage.setItem(key, new Date().toISOString());
+    this.cdr.markForCheck();
+  }
+
+  private buildQuotedBody(messages: any[]): string {
+    if (!messages?.length) return '';
+    const divider = '<br><hr style="border:none;border-top:2px solid #e5e7eb;margin:16px 0"><div style="font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Historia korespondencji</div>';
+    const quoted = messages.map((m: any) => {
+      const d = m.date ? new Date(m.date) : null;
+      const dateStr = d ? d.toLocaleString('pl-PL', {
+        day: '2-digit', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      }) : '';
+      const atts = [...(m.attachments || []), ...(m.sentAttachments || [])]
+        .map((a: any) => `📎 ${a.filename}`).join(' &nbsp;');
+      const bodyHtml = (m.body || (m.snippet ? m.snippet : '')).trim();
+      const meta = [
+        `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Od:</td><td style="font-size:11px"><strong>${m.from}</strong></td></tr>`,
+        m.to  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Do:</td><td style="font-size:11px">${m.to}</td></tr>`  : '',
+        m.cc  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">DW:</td><td style="font-size:11px">${m.cc}</td></tr>`  : '',
+        dateStr ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Data:</td><td style="font-size:11px">${dateStr}</td></tr>` : '',
+        m.subject ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Temat:</td><td style="font-size:11px">${m.subject}</td></tr>` : '',
+      ].filter(Boolean).join('');
+      return `<div style="border-left:3px solid #d1d5db;padding:8px 14px;margin:8px 0;background:#fafafa;border-radius:0 6px 6px 0">
+<table style="margin-bottom:8px;border-collapse:collapse">${meta}</table>
+<div style="color:#374151;font-size:13px;line-height:1.6">${bodyHtml}</div>${atts ? `<div style="margin-top:8px;font-size:11px;color:#6b7280;padding-top:6px;border-top:1px solid #f3f4f6">${atts}</div>` : ''}</div>`;
+    }).join('\n');
+    return divider + quoted;
+  }
+
+  private buildReferences(messages: any[]): string {
+    return (messages || []).map((m: any) => m.messageIdHeader).filter(Boolean).join(' ');
+  }
+
+  stripHtml(html: string): string {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  private focusEmailBodyTop(textareaId: string = 'partner-email-body-textarea'): void {
+    setTimeout(() => {
+      const el = document.getElementById(textareaId) as HTMLTextAreaElement | null;
+      if (el) { el.focus(); el.setSelectionRange(0, 0); el.scrollTop = 0; }
+    }, 50);
+  }
+
+  openMsgModal(msg: any): void {
+    this.msgModalMsg    = msg;
+    this.msgModalReply  = false;
+    this.msgModalForm   = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[] };
+    this.msgModalRecipientQuery = '';
+    this.msgModalCcQuery        = '';
+    this.msgModalError  = '';
+    this.showMsgModal   = true;
+    this.cdr.markForCheck();
+  }
+
+  closeMsgModal(): void {
+    this.showMsgModal  = false;
+    this.msgModalMsg   = null;
+    this.msgModalReply = false;
+    this.cdr.markForCheck();
+  }
+
+  startMsgReply(): void {
+    const m = this.msgModalMsg;
+    if (!m) return;
+    const fromAddrs  = this.parseAddressList(m.from);
+    const toAddrs    = this.parseAddressList(m.to);
+    const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+    this.msgModalForm = {
+      subject:       m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`,
+      body:          '',
+      quotedHtml:    this.buildQuotedBody(this.threadMessages),
+      threadId:      m.threadId,
+      inReplyTo:     m.messageIdHeader || '',
+      references:    this.buildReferences(this.threadMessages),
+      recipientList: isReceived ? fromAddrs : toAddrs,
+      ccList:        m.cc ? this.parseAddressList(m.cc) : [],
+    };
+    this.msgModalRecipientQuery = '';
+    this.msgModalCcQuery        = '';
+    this.msgModalReply = true;
+    this.cdr.markForCheck();
+    this.focusEmailBodyTop('partner-msg-reply-textarea');
+  }
+
+  sendMsgReply(): void {
+    this.pushMsgRecipient();
+    this.pushMsgCc();
+    if (!this.partner || !this.msgModalForm.recipientList?.length || !this.msgModalForm.subject) return;
+    this.msgModalSending = true;
+    this.msgModalError   = '';
+    const fd = new FormData();
+    fd.append('to', this.msgModalForm.recipientList.join(','));
+    if (this.msgModalForm.ccList?.length) fd.append('cc', this.msgModalForm.ccList.join(','));
+    fd.append('subject', this.msgModalForm.subject);
+    fd.append('body', (this.msgModalForm.body || '') + (this.msgModalForm.quotedHtml || ''));
+    if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId || this.msgModalMsg?.threadId);
+    if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
+    if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
+    this.api.sendPartnerEmail(this.partner.id, fd).subscribe({
+      next: (result: GmailSendResult) => {
+        this.zone.run(() => {
+          const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
+          this.msgModalSending = false;
+          this.closeMsgModal();
+          if (replyThreadId && this.partner) {
+            this.api.getPartnerEmailThread(this.partner.id, replyThreadId).subscribe({
+              next: msgs => this.zone.run(() => {
+                this.threadMessages = msgs;
+                this.openThreadId   = replyThreadId;
+                this.cdr.markForCheck();
+              }),
+              error: () => {},
+            });
+          }
+          this.cdr.markForCheck();
+        });
+      },
+      error: (err: any) => {
+        this.zone.run(() => {
+          this.msgModalError   = err?.error?.error || 'Błąd wysyłki';
+          this.msgModalSending = false;
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  viewAttachment(att: any, msg: any): void {
+    const base = '/api/crm/gmail';
+    let url = '';
+    if (att.attachmentId) {
+      url = `${base}/attachment/${encodeURIComponent(msg.id)}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    } else if (att.blobPath !== undefined) {
+      url = `${base}/sent-attachment/${encodeURIComponent(msg.id)}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    }
+    if (url) window.open(url, '_blank');
+  }
+
+  async downloadAtt(att: any, msg: any): Promise<void> {
+    const base = '/api/crm/gmail';
+    let url = '';
+    if (att.attachmentId) {
+      url = `${base}/attachment/${encodeURIComponent(msg.id)}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    } else if (att.blobPath !== undefined) {
+      url = `${base}/sent-attachment/${encodeURIComponent(msg.id)}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
+    }
+    if (!url) return;
+    try {
+      const resp = await fetch(url, { credentials: 'include' });
+      const blob = await resp.blob();
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = att.filename || 'attachment';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    } catch (e) { console.error('[downloadAtt]', e); }
+  }
+
+  pushMsgRecipient(): void {
+    const val = this.msgModalRecipientQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.msgModalForm.recipientList.includes(val)) this.msgModalForm.recipientList.push(val);
+    this.msgModalRecipientQuery = '';
+  }
+
+  pushMsgCc(): void {
+    const val = this.msgModalCcQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.msgModalForm.ccList.includes(val)) this.msgModalForm.ccList.push(val);
+    this.msgModalCcQuery = '';
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1954,9 +2575,140 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return map[basis || 'nie_dotyczy'] ?? basis ?? '—';
   }
 
+  // ── Modal aktywności ────────────────────────────────────────────────────────
+  actTypeName(type: string): string {
+    const map: Record<string, string> = {
+      call:        'Połączenie',
+      email:       'Email',
+      meeting:     'Spotkanie',
+      note:        'Notatka',
+      training:    'Szkolenie',
+      qbr:         'QBR',
+      doc_sent:    'Dokument',
+      opportunity: 'Szansa',
+    };
+    return map[type] || type;
+  }
+
+  openActModal(a: any): void {
+    this.selectedAct          = a;
+    this.actModalEditMode     = false;
+    this.actModalClosing      = false;
+    this.actModalCloseComment = '';
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
+    this.cdr.markForCheck();
+  }
+
+  closeActModal(): void {
+    this.selectedAct          = null;
+    this.actModalEditMode     = false;
+    this.actModalClosing      = false;
+    this.actModalCloseComment = '';
+    this.cdr.markForCheck();
+  }
+
+  startEditActModal(): void {
+    const a = this.selectedAct;
+    if (!a) return;
+    this.actEditForm = {
+      type:             a.type,
+      title:            a.title,
+      body:             a.body || '',
+      activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      duration_min:     a.duration_min ?? '',
+      meeting_location: a.meeting_location || '',
+      participants:     a.participants || '',
+      opp_value:        a.opp_value ?? '',
+      opp_currency:     a.opp_currency || 'PLN',
+      opp_status:       a.opp_status || 'new',
+      opp_due_date:     a.opp_due_date || '',
+      assigned_to:      a.assigned_to || '',
+    };
+    this.actModalEditMode = true;
+    this.cdr.markForCheck();
+  }
+
+  startCloseActModal(): void {
+    this.actModalClosing      = true;
+    this.actModalCloseComment = this.selectedAct?.close_comment || '';
+    this.cdr.markForCheck();
+  }
+
+  confirmCloseActModal(): void {
+    const a = this.selectedAct;
+    if (!this.actModalCloseComment.trim() || !a || !this.partner) return;
+    this.savingActivity = true;
+    this.api.updatePartnerActivity(this.partner.id, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
+      next: updated => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = {
+              ...this.partner,
+              activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
+            };
+          }
+          this.selectedAct          = { ...a, ...updated };
+          this.actModalClosing      = false;
+          this.actModalCloseComment = '';
+          this.savingActivity       = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  saveEditActivityModal(): void {
+    const a = this.selectedAct;
+    if (!this.actEditForm.title || !a || !this.partner) return;
+    this.savingActivity = true;
+    const payload: any = {
+      type:  this.actEditForm.type,
+      title: this.actEditForm.title,
+      body:  this.actEditForm.body || null,
+    };
+    if (this.actEditForm.type !== 'email') {
+      payload.activity_at = this.actEditForm.activity_at || null;
+      payload.assigned_to = this.actEditForm.assigned_to || null;
+    }
+    if (this.actEditForm.type === 'meeting') {
+      if (this.actEditForm.duration_min !== '') payload.duration_min = +this.actEditForm.duration_min;
+      payload.meeting_location = this.actEditForm.meeting_location || null;
+      payload.participants     = this.actEditForm.participants || null;
+    }
+    if (this.actEditForm.type === 'opportunity') {
+      payload.opp_value    = this.actEditForm.opp_value != null && this.actEditForm.opp_value !== '' ? +this.actEditForm.opp_value : null;
+      payload.opp_currency = this.actEditForm.opp_currency || 'PLN';
+      payload.opp_status   = this.actEditForm.opp_status || 'new';
+      payload.opp_due_date = this.actEditForm.opp_due_date || null;
+    }
+    this.api.updatePartnerActivity(this.partner.id, a.id, payload).subscribe({
+      next: (updated: PartnerActivity) => {
+        this.zone.run(() => {
+          if (this.partner) {
+            this.partner = {
+              ...this.partner,
+              activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
+            };
+          }
+          this.selectedAct      = { ...a, ...updated };
+          this.actModalEditMode = false;
+          this.savingActivity   = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
   canEditActivity(a: any): boolean {
     const u = this.auth.user();
-    return u?.is_admin || u?.crm_role === 'sales_manager' || a.created_by === u?.id;
+    return !!(u?.is_admin || u?.crm_role === 'sales_manager' || a.created_by === u?.id || a.assigned_to === u?.id);
   }
 
   startEditActivity(a: any): void {

@@ -61,6 +61,9 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.industry"   class="pc-tag">🏭 {{p.industry}}</span>
         <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
       </div>
+      <div *ngIf="(p.email_count??0)>0" style="margin-top:4px">
+        <span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px">✉️ {{p.email_count}}</span>
+      </div>
       <div class="pc-financials">
         <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
         <span *ngIf="p.open_opp_count"
@@ -91,7 +94,10 @@ type SortDir = 'asc' | 'desc';
     <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px"
          (click)="goPartner(p.id)">
       <div class="td">
-        <span class="td-main">{{p.company}}</span>
+        <span class="td-main">{{p.company}}
+          <span *ngIf="(p.email_count??0)>0"
+                style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px">✉️ {{p.email_count}}</span>
+        </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
       </div>
       <div class="td"><span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span></div>
