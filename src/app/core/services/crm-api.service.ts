@@ -53,6 +53,7 @@ export interface Lead {
   converted_partner_company?: string | null;
   activity_count?: number;
   document_count?: number;
+  email_count?: number;
   activities?: LeadActivity[];
   linked_documents?: LinkedDocument[];
   extra_contacts?: LeadContact[];
@@ -220,6 +221,7 @@ export interface Partner {
   admin_email: string | null;
   open_opp_count?: number;
   open_opp_value?: number;
+  email_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];
@@ -1000,11 +1002,12 @@ export class CrmApiService {
   }
 
   // ── Zadania (zakładka Zadania w kalendarzu) ───────────────────
-  getActivityTasks(p: { assigned_to?: string; type?: string; include_closed?: boolean } = {}): Observable<ActivityTask[]> {
+  getActivityTasks(p: { assigned_to?: string; type?: string; include_closed?: boolean; include_no_date?: boolean } = {}): Observable<ActivityTask[]> {
     const combined: { [k: string]: string } = {};
     if (p.assigned_to) combined['assigned_to'] = p.assigned_to;
     if (p.type) combined['type'] = p.type;
     if (p.include_closed !== undefined) combined['include_closed'] = String(p.include_closed);
+    if (p.include_no_date !== undefined) combined['include_no_date'] = String(p.include_no_date);
 
     return combineLatest([
       this.http.get<ActivityTask[]>(`${BASE}/leads/tasks`, { params: combined }),

@@ -56,6 +56,11 @@ interface CalendarDay {
     <input type="checkbox" [(ngModel)]="showClosedTasks" (ngModelChange)="loadTasks()">
     pokaż zamknięte
   </label>
+  <!-- Pokaż bez daty (zadania) -->
+  <label *ngIf="view === 'tasks'" style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:#374151">
+    <input type="checkbox" [(ngModel)]="showNoDateTasks" (ngModelChange)="loadTasks()">
+    pokaż bez daty
+  </label>
 
   <!-- Nawigacja (tylko dla widoków kalendarza) -->
   <ng-container *ngIf="view !== 'tasks'">
@@ -67,7 +72,9 @@ interface CalendarDay {
 
   <!-- Przełącznik widoku -->
   <div class="view-switch">
-    <button [class.active]="view === 'tasks'" (click)="setView('tasks')">Zadania</button>
+    <button [class.active]="view === 'tasks'" [class.tasks-btn]="view !== 'tasks'" (click)="setView('tasks')">
+      Zadania<span *ngIf="myTasksCount > 0" class="tasks-badge">{{myTasksCount}}</span>
+    </button>
     <button [class.active]="view === 'day'"   (click)="setView('day')">Dzień</button>
     <button [class.active]="view === 'week'"  (click)="setView('week')">Tydzień</button>
     <button [class.active]="view === 'month'" (click)="setView('month')">Miesiąc</button>
@@ -186,8 +193,7 @@ interface CalendarDay {
         <!-- Treść zadania -->
         <div style="flex:1;min-width:0;padding-left:12px">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span class="task-type-icon">{{taskIcon(t.type)}}</span>
-            <strong style="font-size:13px;color:#18181b">{{t.title}}</strong>
+            <strong style="font-size:13px;color:#18181b"><span style="color:#6b7280;font-weight:500">{{taskTypeName(t.type)}}:</span> {{t.title}}</strong>
             <span class="task-status-badge task-st-{{t.status}}">{{taskStatusLabel(t.status)}}</span>
             <span class="task-source-badge task-src-{{t.source_type}}">{{t.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
             <span *ngIf="isTaskReadOnly(t)" style="font-size:9px;color:#9ca3af;font-style:italic">tylko odczyt</span>
@@ -285,7 +291,7 @@ interface CalendarDay {
 <div class="detail-overlay" *ngIf="selectedTask" (click)="closeTask()">
   <div class="detail-panel" (click)="$event.stopPropagation()">
     <div class="dp-header">
-      <span class="task-type-icon">{{taskIcon(selectedTask.type)}}</span>
+      <span style="font-size:12px;font-weight:600;color:#6b7280">{{taskTypeName(selectedTask.type)}}</span>
       <span class="task-status-badge task-st-{{selectedTask.status}}" style="margin-left:4px">{{taskStatusLabel(selectedTask.status)}}</span>
       <span class="task-source-badge task-src-{{selectedTask.source_type}}" style="margin-left:4px">{{selectedTask.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
       <span style="flex:1"></span>
@@ -321,28 +327,28 @@ interface CalendarDay {
 
     <!-- Edycja -->
     <div *ngIf="taskEditMode" class="dp-body">
-      <div class="ef-row">
-        <label class="ef-lbl">Tytuł *</label>
-        <input class="ef-input" [(ngModel)]="taskEditForm.title">
+      <div class="tf-row">
+        <label class="tf-lbl">Tytuł <span style="color:#dc2626">*</span></label>
+        <input class="ef-input" [(ngModel)]="taskEditForm.title" placeholder="Tytuł zadania">
       </div>
-      <div class="ef-row">
-        <label class="ef-lbl">Data i czas</label>
+      <div class="tf-row">
+        <label class="tf-lbl">Data i godzina wykonania</label>
         <input class="ef-input" type="datetime-local" [(ngModel)]="taskEditForm.activity_at">
       </div>
-      <div class="ef-row">
-        <label class="ef-lbl">Opis</label>
-        <textarea class="ef-input" rows="3" [(ngModel)]="taskEditForm.body" style="resize:vertical"></textarea>
+      <div class="tf-row">
+        <label class="tf-lbl">Opis / notatki</label>
+        <textarea class="ef-input" rows="4" [(ngModel)]="taskEditForm.body" style="resize:vertical" placeholder="Opis zadania..."></textarea>
       </div>
-      <div class="ef-row" *ngIf="crmUsers.length > 0">
-        <label class="ef-lbl">Przypisz do</label>
+      <div class="tf-row" *ngIf="crmUsers.length > 0">
+        <label class="tf-lbl">Przypisz do handlowca</label>
         <select class="ef-input" [(ngModel)]="taskEditForm.assigned_to">
           <option value="">— bez przypisania —</option>
           <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
         </select>
       </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
         <button class="dp-btn-g" (click)="taskEditMode = false">Anuluj</button>
-        <button class="dp-btn-p" (click)="saveEditTask()" [disabled]="saving">{{saving ? '…' : 'Zapisz'}}</button>
+        <button class="dp-btn-p" (click)="saveEditTask()" [disabled]="saving">{{saving ? '…' : 'Zapisz zmiany'}}</button>
       </div>
     </div>
   </div>
@@ -357,6 +363,8 @@ interface CalendarDay {
     .view-switch { display:flex;background:#f4f4f5;border-radius:8px;padding:2px;gap:2px }
     .view-switch button { background:none;border:none;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:500;color:#71717a;cursor:pointer;font-family:inherit }
     .view-switch button.active { background:white;color:#f97316;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08) }
+    .view-switch button.tasks-btn { color:#ea580c;font-weight:700 }
+    .tasks-badge { display:inline-flex;min-width:16px;height:16px;background:#dc2626;color:white;border-radius:10px;font-size:9px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;line-height:1;margin-left:4px;vertical-align:middle }
 
     /* Month */
     .month-grid { display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid #e4e4e7;border-top:1px solid #e4e4e7 }
@@ -422,7 +430,7 @@ interface CalendarDay {
     .dp-badge { font-size:12px;font-weight:700;padding:3px 10px;border-radius:10px }
     .dp-close { background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer;margin-left:4px }
     .dp-edit-btn { background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600 }
-    .dp-body { padding:18px 20px;display:flex;flex-direction:column;gap:10px }
+    .dp-body { padding:18px 20px;display:flex;flex-direction:column;gap:12px }
     .dp-title { font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b }
     .dp-source { font-size:13px;color:#f97316 }
     .dp-link { color:#f97316;font-weight:600;text-decoration:none }
@@ -432,6 +440,9 @@ interface CalendarDay {
     /* Edit form */
     .ef-row { display:flex;flex-direction:column;gap:4px }
     .ef-lbl { font-size:11px;font-weight:600;color:#6b7280 }
+    /* Task edit form — field labels above inputs (like Lead edit screen) */
+    .tf-row { display:flex;flex-direction:column;gap:5px }
+    .tf-lbl { font-size:12px;font-weight:600;color:#374151;letter-spacing:.01em }
     .ef-input { border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit;background:white }
     .ef-input:focus { border-color:#f97316 }
     .dp-btn-p { background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer }
@@ -480,6 +491,8 @@ export class CrmCalendarComponent implements OnInit {
   activities: ActivityTask[] = [];
   tasksLoading = false;
   showClosedTasks = false;
+  showNoDateTasks = false;
+  myTasksCount = 0;
   filterActivityType = '';
   closingTaskId: number | null = null;
   taskCloseComment = '';
@@ -515,7 +528,17 @@ export class CrmCalendarComponent implements OnInit {
       this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
       this.api.getCrmGroups().subscribe({ next: g => { this.crmGroups = g; this.cdr.markForCheck(); }, error: () => {} });
     }
+    this.loadTaskBadge();
     this.load();
+  }
+
+  loadTaskBadge(): void {
+    const u = this.auth.user();
+    if (!u) return;
+    this.api.getActivityTasks({ assigned_to: u.id, include_closed: false }).subscribe({
+      next: tasks => this.zone.run(() => { this.myTasksCount = tasks.filter(t => t.status === 'new').length; this.cdr.markForCheck(); }),
+      error: () => {},
+    });
   }
 
   load(): void {
@@ -572,7 +595,7 @@ export class CrmCalendarComponent implements OnInit {
   loadTasks(): void {
     this.tasksLoading = true;
     this.cdr.markForCheck();
-    const p: any = { include_closed: this.showClosedTasks };
+    const p: any = { include_closed: this.showClosedTasks, include_no_date: this.showNoDateTasks };
     if (this.filterRep && this.isManager) {
       if (this.filterRep.startsWith('__group__')) {
         const groupId = this.filterRep.replace('__group__', '');
@@ -630,9 +653,13 @@ export class CrmCalendarComponent implements OnInit {
     });
   }
 
-  taskIcon(type: string): string {
-    const icons: Record<string, string> = { call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊', opportunity:'💡' };
-    return icons[type] || '📌';
+  taskTypeName(type: string): string {
+    const names: Record<string, string> = {
+      call: 'Połączenie', email: 'Email', meeting: 'Spotkanie',
+      note: 'Notatka', doc_sent: 'Dokument', training: 'Szkolenie',
+      qbr: 'QBR', opportunity: 'Szansa',
+    };
+    return names[type] || type;
   }
 
   taskStatusLabel(s: string): string {
@@ -670,14 +697,14 @@ export class CrmCalendarComponent implements OnInit {
     if (!u) return true;
     if (u.is_admin) return false;
     if (t.created_by === u.id) return false;
-    // Efektywny przypisany użytkownik aktywności
+    // Efektywny przypisany użytkownik aktywności / leada
     const targetId = t.act_assigned_to_id || t.assigned_to_id;
     if (!targetId || targetId === u.id) return false;
-    // Sprawdź uprawnienia do grupy CRM, do której należy ten user
+    // User nie jest twórcą ani przypisanym — wymagana jest jawna uprawnienie "full" do grupy
     const group = this.crmGroups.find(g => g.user_ids.includes(targetId));
-    if (!group) return false;
+    if (!group) return true;   // brak grupy = brak uprawnień = tylko odczyt
     const role = u.roles?.find(r => r.group_id === group.id);
-    if (!role) return false;
+    if (!role) return true;    // brak roli w grupie = tylko odczyt
     return role.access_level !== 'full';
   }
 
@@ -701,6 +728,22 @@ export class CrmCalendarComponent implements OnInit {
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
     }
+    // Zmień status na 'open' jeśli zadanie jest nowe (item 3)
+    if (t.status === 'new') {
+      const obs: Observable<any> = t.source_type === 'lead'
+        ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'open' })
+        : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'open' });
+      obs.subscribe({
+        next: () => this.zone.run(() => {
+          this.activities = this.activities.map(a =>
+            a.id === t.id && a.source_type === t.source_type ? { ...a, status: 'open' as const } : a
+          );
+          this.selectedTask = { ...t, status: 'open' };
+          this.cdr.markForCheck();
+        }),
+        error: () => {},
+      });
+    }
     this.taskEditMode = true;
   }
 
@@ -719,10 +762,16 @@ export class CrmCalendarComponent implements OnInit {
       : this.api.updatePartnerActivity(t.source_id, t.id, payload);
     obs.subscribe({
       next: (updated: any) => this.zone.run(() => {
+        // Backend zwraca assigned_to/assigned_to_name — mapujemy na pola ActivityTask
+        const patch = {
+          ...updated,
+          act_assigned_to_id:   updated.assigned_to   ?? null,
+          act_assigned_to_name: updated.assigned_to_name ?? null,
+        };
         this.activities = this.activities.map(a =>
-          a.id === t.id && a.source_type === t.source_type ? { ...a, ...updated } : a
+          a.id === t.id && a.source_type === t.source_type ? { ...a, ...patch } : a
         );
-        this.selectedTask = { ...t, ...updated };
+        this.selectedTask = { ...t, ...patch };
         this.taskEditMode = false;
         this.saving = false;
         this.cdr.markForCheck();

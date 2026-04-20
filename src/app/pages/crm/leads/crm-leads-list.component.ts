@@ -178,6 +178,9 @@ const PROB_MAP: Record<LeadStage, number> = {
                 {{ initials(lead.assigned_to_name) }}
               </span>
             </div>
+            <div *ngIf="(lead.email_count??0)>0" style="display:flex;align-items:center;gap:3px;margin-top:2px">
+              <span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px">✉️ {{lead.email_count}}</span>
+            </div>
             <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
           </div>
           <div *ngIf="leadsFor(col.key).length===0" class="kol-empty">Brak leadów</div>
@@ -353,7 +356,10 @@ const PROB_MAP: Record<LeadStage, number> = {
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
-          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span></div>
+          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span>
+            <span *ngIf="(lead.email_count??0)>0"
+                  style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px">✉️ {{lead.email_count}}</span>
+          </div>
           <div style="font-size:11px;color:var(--gray-400)">{{ lead.contact_name }}</div>
           <div *ngIf="lead.converted_at" style="font-size:10px;color:#7C3AED;font-weight:600;margin-top:2px">
             ✦ Migrowany →
@@ -566,8 +572,8 @@ const PROB_MAP: Record<LeadStage, number> = {
           </svg>
         </div>
         <div>
-          <div class="tl-head-title">Kalendarz spotkań</div>
-          <div class="tl-head-sub">Aktywności typu spotkanie · chronologicznie</div>
+          <div class="tl-head-title">Kalendarz aktywności</div>
+          <div class="tl-head-sub">Aktywności z datą · chronologicznie</div>
         </div>
       </div>
       <button class="dp-close" style="font-size:18px;padding:4px" (click)="showTimeline=false; cdr.markForCheck()">✕</button>
@@ -650,7 +656,7 @@ const PROB_MAP: Record<LeadStage, number> = {
                 </span>
                 <span class="tl-item-company">{{ m.source_name }}</span>
               </div>
-              <div class="tl-item-title">{{ m.title }}</div>
+              <div class="tl-item-title"><span style="color:#6b7280;font-weight:500">{{tlTypeName(m.type)}}:</span> {{ m.title }}</div>
               <div class="tl-item-meta">
                 <span *ngIf="m.meeting_location" class="tl-item-loc">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -686,9 +692,9 @@ const PROB_MAP: Record<LeadStage, number> = {
 <div class="overlay" *ngIf="selectedMeeting" (click)="closeMeetingOnOverlay($event)" style="z-index:310">
   <div class="modal" (click)="$event.stopPropagation()" style="width:520px">
     <div class="modal-head">
-      <div class="modal-icon" style="background:#F0FDF4;font-size:18px">🤝</div>
+      <div class="modal-icon" style="background:#F0FDF4;font-size:18px">{{tlTypeIcon(selectedMeeting.type)}}</div>
       <div style="flex:1;min-width:0">
-        <div class="modal-title">{{ meetingEditMode ? 'Edycja spotkania' : 'Szczegóły spotkania' }}</div>
+        <div class="modal-title">{{ meetingEditMode ? 'Edycja aktywności' : 'Szczegóły aktywności' }}</div>
         <div style="font-size:12px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
           {{ selectedMeeting.source_type === 'lead' ? '📋 Lead' : '🤝 Partner' }} · {{ selectedMeeting.source_name }}
         </div>
@@ -786,7 +792,7 @@ const PROB_MAP: Record<LeadStage, number> = {
       <ng-container *ngIf="!meetingEditMode">
         <button class="btn btn-g" (click)="selectedMeeting=null; meetingEditMode=false; cdr.markForCheck()">Zamknij</button>
         <button class="btn btn-p" style="margin-left:auto" (click)="meetingEditMode=true; cdr.markForCheck()">
-          ✎ Edytuj spotkanie
+          ✎ Edytuj aktywność
         </button>
       </ng-container>
       <ng-container *ngIf="meetingEditMode">
@@ -1769,6 +1775,16 @@ export class CrmLeadsListComponent implements OnInit {
   stageLabel(s: LeadStage)     { return LEAD_STAGE_LABELS[s] || s; }
   srcLabel(val: string | null): string { if (!val) return ''; const f = this.leadSources.find(s => s.value === val) || LEAD_SOURCES.find(s => s.value === val); return f?.label ?? LEAD_SOURCE_LABELS[val] ?? val; }
   initials(name: string)       { return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
+  tlTypeName(type: string): string {
+    const map: Record<string,string> = {
+      call:'Połączenie', email:'Email', meeting:'Spotkanie', note:'Notatka',
+      training:'Szkolenie', qbr:'QBR', doc_sent:'Dokument', opportunity:'Szansa',
+    };
+    return map[type] || type;
+  }
+  tlTypeIcon(type: string): string {
+    return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
+  }
   trackById(_: number, l: Lead){ return l.id; }
   callPhone(p: string)         { window.location.href = `tel:${p}`; }
   mailTo(e: string)            { window.location.href = `mailto:${e}`; }

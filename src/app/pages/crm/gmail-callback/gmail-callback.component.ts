@@ -61,9 +61,24 @@ export class GmailCallbackComponent implements OnInit {
     this.status = this.route.snapshot.queryParamMap.get('status') ?? '';
     this.reason = this.route.snapshot.queryParamMap.get('reason') ?? '';
 
-    // Powiadom okno rodzica (CRM tab) — odświeży status Gmail bez przeładowania strony
+    if (this.status === 'connected') {
+      // localStorage storage-event — jedyna metoda działająca przez redirecty Google
+      // (storage event odpala się we WSZYSTKICH innych kartach/oknach tej samej domeny)
+      localStorage.setItem('gmail_oauth_connected', String(Date.now()));
+    }
+
+    // Fallback 1: BroadcastChannel
+    try {
+      const bc = new BroadcastChannel('gmail-oauth');
+      bc.postMessage({ type: 'gmail-oauth-result', status: this.status });
+      bc.close();
+    } catch (_) {}
+
+    // Fallback 2: postMessage (gdy opener nie jest nullowany przez COOP)
     if (window.opener) {
-      window.opener.postMessage({ type: 'gmail-oauth-result', status: this.status }, window.location.origin);
+      try {
+        window.opener.postMessage({ type: 'gmail-oauth-result', status: this.status }, window.location.origin);
+      } catch (_) {}
     }
   }
 
