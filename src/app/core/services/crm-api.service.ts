@@ -160,7 +160,6 @@ export interface AgentData {
 export interface Partner {
   id: number;
   company: string;
-  partner_number: string | null;
   nip: string | null;
   address: string | null;
   contact_name: string | null;
@@ -204,21 +203,38 @@ export interface Partner {
   agent_name: string | null;
   agent_email: string | null;
   agent_phone: string | null;
-  // Zadanie A: Dane dodatkowe
+  // ── DWH integracja ─────────────────────────────────────────────────────────
+  dwh_partner_id: number | null;
+  dwh_company_name: string | null;  // oficjalna nazwa firmy z DWH
+  dwh_nip: string | null;           // NIP z DWH
+  // Pola DWH-fillable: wartości scalone (COALESCE crm, dwh) — CRM ma pierwszeństwo
   subdomain: string | null;
   language: string | null;
   partner_currency: string | null;
   country: string | null;
-  // Zadanie B: Billing Address
   billing_address: string | null;
   billing_zip: string | null;
   billing_city: string | null;
   billing_country: string | null;
   billing_email_address: string | null;
-  // Zadanie C: Partner Admin
   admin_first_name: string | null;
   admin_last_name: string | null;
   admin_email: string | null;
+  // Flagi _from_dwh: true gdy wartość pochodzi z DWH (pole w CRM było puste)
+  // Używane do logiki read-only: pole jest zablokowane gdy not onboarding AND _from_dwh=true
+  subdomain_from_dwh: boolean;
+  language_from_dwh: boolean;
+  partner_currency_from_dwh: boolean;
+  country_from_dwh: boolean;
+  billing_address_from_dwh: boolean;
+  billing_zip_from_dwh: boolean;
+  billing_city_from_dwh: boolean;
+  billing_country_from_dwh: boolean;
+  billing_email_address_from_dwh: boolean;
+  admin_first_name_from_dwh: boolean;
+  admin_last_name_from_dwh: boolean;
+  admin_email_from_dwh: boolean;
+  // ──────────────────────────────────────────────────────────────────────────
   open_opp_count?: number;
   open_opp_value?: number;
   email_count?: number;
@@ -945,6 +961,11 @@ export class CrmApiService {
   // ── Historia Leada ────────────────────────────────────────
   getLeadHistory(leadId: number): Observable<LeadHistoryEntry[]> {
     return this.http.get<LeadHistoryEntry[]>(`${BASE}/leads/${leadId}/history`);
+  }
+
+  // ── Historia Partnera ─────────────────────────────────────
+  getPartnerHistory(partnerId: number): Observable<LeadHistoryEntry[]> {
+    return this.http.get<LeadHistoryEntry[]>(`${BASE}/partners/${partnerId}/history`);
   }
 
   // ── Dokumenty powiązane z Leadem ──────────────────────────

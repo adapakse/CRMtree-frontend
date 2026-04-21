@@ -16,7 +16,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
     <button class="back-btn" routerLink="/crm/partners">�? Partnerzy</button>
-    <h1>{{partner.company}}</h1>
+    <h1>{{(partner.dwh_partner_id ? (partner.dwh_company_name || partner.company) : partner.company)}}</h1>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
     <button class="btn-outline" (click)="openEdit()">✏️ Edytuj</button>
@@ -151,12 +151,13 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     <div class="info-card">
       <h3>Informacje</h3>
       <div class="info-grid">
-        <span class="lbl">Nr partnera</span>
+        <span class="lbl">Worktrips ID</span>
         <span>
-          <span *ngIf="partner.partner_number" style="font-family:monospace;font-weight:600;color:var(--orange)">{{partner.partner_number}}</span>
-          <span *ngIf="!partner.partner_number" style="color:var(--gray-400)">— nie ustawiono</span>
+          <span *ngIf="partner.dwh_partner_id" style="font-family:monospace;font-weight:600;color:var(--orange)">{{partner.dwh_partner_id}}</span>
+          <span *ngIf="!partner.dwh_partner_id" style="color:var(--gray-400)">— nie ustawiono</span>
         </span>
-        <span class="lbl">NIP</span><span>{{partner.nip || '—'}}</span>
+        <span class="lbl">NIP <span class="dwh-badge" *ngIf="partner.dwh_partner_id">DWH</span></span>
+        <span>{{(partner.dwh_partner_id ? partner.dwh_nip : partner.nip) || '—'}}</span>
         <span class="lbl">Branża</span><span>{{partner.industry || '—'}}</span>
         <span class="lbl">Opiekun</span><span>{{partner.manager_name || '—'}}</span>
         <span class="lbl">Umowa od</span><span>{{partner.contract_signed ? (partner.contract_signed | date:'dd.MM.yyyy') : '—'}}</span>
@@ -172,13 +173,19 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         </span>
       </div>
 
-      <!-- Partner Admin (Zadanie C) -->
-      <div class="info-subsection">
-        <div class="info-subsection-title">👤 Partner Admin</div>
+      <!-- Partner Admin -->
+      <div class="info-subsection" *ngIf="partner.admin_first_name || partner.admin_last_name || partner.admin_email || partner.dwh_partner_id">
+        <div class="info-subsection-title">
+          👤 Partner Admin
+          <span class="dwh-badge" *ngIf="partner.admin_first_name_from_dwh || partner.admin_last_name_from_dwh || partner.admin_email_from_dwh">DWH</span>
+        </div>
         <div class="info-grid">
-          <span class="lbl">Imię</span><span>{{partner.admin_first_name || '—'}}</span>
-          <span class="lbl">Nazwisko</span><span>{{partner.admin_last_name || '—'}}</span>
-          <span class="lbl">Email</span><span>{{partner.admin_email || '—'}}</span>
+          <span class="lbl">Imię <span class="dwh-badge" *ngIf="partner.admin_first_name_from_dwh">DWH</span></span>
+          <span>{{partner.admin_first_name || '—'}}</span>
+          <span class="lbl">Nazwisko <span class="dwh-badge" *ngIf="partner.admin_last_name_from_dwh">DWH</span></span>
+          <span>{{partner.admin_last_name || '—'}}</span>
+          <span class="lbl">Email <span class="dwh-badge" *ngIf="partner.admin_email_from_dwh">DWH</span></span>
+          <span>{{partner.admin_email || '—'}}</span>
         </div>
       </div>
 
@@ -193,15 +200,23 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         </div>
       </div>
 
-      <!-- Billing Address (Zadanie B) -->
-      <div class="info-subsection">
-        <div class="info-subsection-title">Billing Address</div>
+      <!-- Billing Address -->
+      <div class="info-subsection" *ngIf="partner.billing_address || partner.billing_zip || partner.billing_city || partner.billing_country || partner.billing_email_address || partner.dwh_partner_id">
+        <div class="info-subsection-title">
+          📍 Billing Address
+          <span class="dwh-badge" *ngIf="partner.billing_address_from_dwh || partner.billing_zip_from_dwh || partner.billing_city_from_dwh || partner.billing_country_from_dwh || partner.billing_email_address_from_dwh">DWH</span>
+        </div>
         <div class="info-grid">
-          <span class="lbl">Adres</span><span>{{partner.billing_address || '—'}}</span>
-          <span class="lbl">Kod pocztowy</span><span>{{partner.billing_zip || '—'}}</span>
-          <span class="lbl">Miasto</span><span>{{partner.billing_city || '—'}}</span>
-          <span class="lbl">Kraj</span><span>{{partner.billing_country || '—'}}</span>
-          <span class="lbl">Email</span><span>{{partner.billing_email_address || '—'}}</span>
+          <span class="lbl">Adres <span class="dwh-badge" *ngIf="partner.billing_address_from_dwh">DWH</span></span>
+          <span>{{partner.billing_address || '—'}}</span>
+          <span class="lbl">Kod pocztowy <span class="dwh-badge" *ngIf="partner.billing_zip_from_dwh">DWH</span></span>
+          <span>{{partner.billing_zip || '—'}}</span>
+          <span class="lbl">Miasto <span class="dwh-badge" *ngIf="partner.billing_city_from_dwh">DWH</span></span>
+          <span>{{partner.billing_city || '—'}}</span>
+          <span class="lbl">Kraj <span class="dwh-badge" *ngIf="partner.billing_country_from_dwh">DWH</span></span>
+          <span>{{partner.billing_country || '—'}}</span>
+          <span class="lbl">Email <span class="dwh-badge" *ngIf="partner.billing_email_address_from_dwh">DWH</span></span>
+          <span>{{partner.billing_email_address || '—'}}</span>
         </div>
       </div>
 
@@ -243,15 +258,27 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         <span class="lbl">Notatki</span><span class="notes">{{partner.notes || '—'}}</span>
       </div>
 
-      <!-- Dane dodatkowe (Zadanie A) -->
+      <!-- Dane dodatkowe — CRM + DWH -->
       <div class="info-subsection">
         <div class="info-subsection-title">⚙️ Dane dodatkowe</div>
         <div class="info-grid">
           <span class="lbl">% Online</span><span>{{partner.online_pct != null ? partner.online_pct + '%' : '—'}}</span>
-          <span class="lbl">Subdomena</span><span style="font-family:monospace">{{partner.subdomain || '—'}}</span>
-          <span class="lbl">Język</span><span>{{partner.language || '—'}}</span>
-          <span class="lbl">Waluta</span><span>{{partner.partner_currency || '—'}}</span>
-          <span class="lbl">Kraj</span><span>{{partner.country || '—'}}</span>
+          <ng-container *ngIf="partner.subdomain || partner.dwh_partner_id">
+            <span class="lbl">Subdomena <span class="dwh-badge" *ngIf="partner.subdomain_from_dwh">DWH</span></span>
+            <span style="font-family:monospace">{{partner.subdomain || '—'}}</span>
+          </ng-container>
+          <ng-container *ngIf="partner.language || partner.dwh_partner_id">
+            <span class="lbl">Język <span class="dwh-badge" *ngIf="partner.language_from_dwh">DWH</span></span>
+            <span>{{partner.language || '—'}}</span>
+          </ng-container>
+          <ng-container *ngIf="partner.partner_currency || partner.dwh_partner_id">
+            <span class="lbl">Waluta <span class="dwh-badge" *ngIf="partner.partner_currency_from_dwh">DWH</span></span>
+            <span>{{partner.partner_currency || '—'}}</span>
+          </ng-container>
+          <ng-container *ngIf="partner.country || partner.dwh_partner_id">
+            <span class="lbl">Kraj <span class="dwh-badge" *ngIf="partner.country_from_dwh">DWH</span></span>
+            <span>{{partner.country || '—'}}</span>
+          </ng-container>
         </div>
       </div>
 
@@ -303,115 +330,143 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     </div>
 
     <div class="activities-card">
-      <div class="card-header">
-        <h3>Aktywności</h3>
-        <div style="display:flex;gap:6px;align-items:center">
-          <button class="btn-sm" (click)="openEmailModal(); markEmailsRead()" [disabled]="!partner?.email" style="display:flex;align-items:center;gap:4px">
-            ✉️ Email
-            <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
-          </button>
-          <button class="btn-sm" (click)="openNewActivityForm()">+ Dodaj</button>
-        </div>
+      <!-- Pasek tabów -->
+      <div class="mid-tabs">
+        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">Aktywności</button>
+        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; markEmailsRead()">
+          📧 Maile
+          <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
+        </button>
+        <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history'; loadHistory()">Historia zmian</button>
+        <div style="flex:1"></div>
+        <button class="btn-sm" *ngIf="midTab==='activities'" (click)="openNewActivityForm()">+ Dodaj</button>
+        <button class="btn-sm" *ngIf="midTab==='emails'" (click)="openEmailModal()" [disabled]="!partner?.email">✉️ Wyślij</button>
       </div>
-      <div class="new-activity-form" *ngIf="showNewActivity">
-        <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
-          <option value="call">📞 Połączenie</option>
-          <option value="meeting">🤝 Spotkanie</option>
-          <option value="note">📝 Notatka</option>
-          <option value="training">🎓 Szkolenie</option>
-          <option value="qbr">📊 QBR</option>
-          <option value="opportunity">💡 Szansa</option>
-        </select>
-        <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
-        <ng-container *ngIf="actForm.type !== 'email'">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+
+      <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
+      <div *ngIf="midTab==='activities'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
+        <div class="new-activity-form" *ngIf="showNewActivity">
+          <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
+            <option value="call">📞 Połączenie</option>
+            <option value="meeting">🤝 Spotkanie</option>
+            <option value="note">📝 Notatka</option>
+            <option value="training">🎓 Szkolenie</option>
+            <option value="qbr">📊 QBR</option>
+            <option value="opportunity">💡 Szansa</option>
+          </select>
+          <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
+          <ng-container *ngIf="actForm.type !== 'email'">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                Data i czas
+                <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
+              </label>
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                Przypisz do
+                <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px"><option value="">— ja (domyślnie) —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>
+              </label>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="actForm.type === 'meeting'">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                Czas trwania (min)
+                <input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="np. 60" class="act-input" style="font-size:11px">
+              </label>
+            </div>
             <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Data i czas
-              <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
+              Miejsce spotkania
+              <input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A" class="act-input" style="font-size:11px">
             </label>
             <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Przypisz do
-              <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px"><option value="">— ja (domyślnie) —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>
-            </label>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="actForm.type === 'meeting'">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Czas trwania (min)
-              <input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="np. 60" class="act-input" style="font-size:11px">
-            </label>
-          </div>
-          <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-            Miejsce spotkania
-            <input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A" class="act-input" style="font-size:11px">
-          </label>
-          <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-            Uczestnicy (emaile)
-            <div class="participant-input-wrap">
-              <div class="participant-chips">
-                <span *ngFor="let e of actForm.participantList; let i = index" class="participant-chip">
-                  {{e}} <button (click)="removeParticipant(actForm, i)" type="button">✕</button>
-                </span>
-                <input class="participant-input" [(ngModel)]="participantQuery"
-                       (ngModelChange)="filterSuggestions()"
-                       (keydown.enter)="addParticipantFromInput(actForm)"
-                       (keydown.Tab)="addParticipantFromInput(actForm)"
-                       placeholder="Wpisz email lub imię…" autocomplete="off">
-              </div>
-              <div class="suggestions-dropdown" *ngIf="filteredSuggestions.length && participantQuery">
-                <div *ngFor="let s of filteredSuggestions" class="suggestion-item"
-                     (mousedown)="pickSuggestion(actForm, s)">
-                  <span style="font-weight:600">{{s.name}}</span>
-                  <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
+              Uczestnicy (emaile)
+              <div class="participant-input-wrap">
+                <div class="participant-chips">
+                  <span *ngFor="let e of actForm.participantList; let i = index" class="participant-chip">
+                    {{e}} <button (click)="removeParticipant(actForm, i)" type="button">✕</button>
+                  </span>
+                  <input class="participant-input" [(ngModel)]="participantQuery"
+                         (ngModelChange)="filterSuggestions()"
+                         (keydown.enter)="addParticipantFromInput(actForm)"
+                         (keydown.Tab)="addParticipantFromInput(actForm)"
+                         placeholder="Wpisz email lub imię…" autocomplete="off">
+                </div>
+                <div class="suggestions-dropdown" *ngIf="filteredSuggestions.length && participantQuery">
+                  <div *ngFor="let s of filteredSuggestions" class="suggestion-item"
+                       (mousedown)="pickSuggestion(actForm, s)">
+                    <span style="font-weight:600">{{s.name}}</span>
+                    <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
+                  </div>
                 </div>
               </div>
+            </label>
+          </ng-container>
+          <ng-container *ngIf="actForm.type === 'opportunity'">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                Status szansy
+                <select [(ngModel)]="actForm.opp_status" class="act-input" style="font-size:11px">
+                  <option value="new">Nowa</option>
+                  <option value="in_progress">W trakcie</option>
+                  <option value="closed">Zamknięta</option>
+                </select>
+              </label>
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                Termin
+                <input type="date" [(ngModel)]="actForm.opp_due_date" class="act-input" style="font-size:11px">
+              </label>
             </div>
-          </label>
-        </ng-container>
-        <!-- Szansa sprzedaży -->
-        <ng-container *ngIf="actForm.type === 'opportunity'">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Status szansy
-              <select [(ngModel)]="actForm.opp_status" class="act-input" style="font-size:11px">
-                <option value="new">Nowa</option>
-                <option value="in_progress">W trakcie</option>
-                <option value="closed">Zamknięta</option>
-              </select>
-            </label>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Termin
-              <input type="date" [(ngModel)]="actForm.opp_due_date" class="act-input" style="font-size:11px">
-            </label>
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                Wartość
+                <input type="number" min="0" step="0.01" [(ngModel)]="actForm.opp_value" placeholder="0.00" class="act-input" style="font-size:11px">
+              </label>
+              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+                Waluta
+                <select [(ngModel)]="actForm.opp_currency" class="act-input" style="font-size:11px">
+                  <option value="PLN">PLN</option>
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </label>
+            </div>
+          </ng-container>
+          <textarea [(ngModel)]="actForm.body" placeholder="Treść / opis…" rows="2" class="act-input"></textarea>
+          <div class="act-actions">
+            <button class="btn-sm" (click)="showNewActivity = false">Anuluj</button>
+            <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
+              {{savingActivity ? '…' : 'Zapisz'}}
+            </button>
           </div>
-          <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Wartość
-              <input type="number" min="0" step="0.01" [(ngModel)]="actForm.opp_value" placeholder="0.00" class="act-input" style="font-size:11px">
-            </label>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Waluta
-              <select [(ngModel)]="actForm.opp_currency" class="act-input" style="font-size:11px">
-                <option value="PLN">PLN</option>
-                <option value="EUR">EUR</option>
-                <option value="USD">USD</option>
-                <option value="GBP">GBP</option>
-              </select>
-            </label>
+        </div>
+        <div class="activity-list">
+          <div *ngFor="let a of sortedActivities" class="act-item"
+               [class.act-closed]="a.status==='closed'"
+               [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
+               [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
+               style="cursor:pointer" (click)="openActModal(a)">
+            <span class="act-icon">{{actIcon(a.type)}}</span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <strong>{{actTypeName(a.type)}}: {{a.title}}</strong>
+                <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
+              </div>
+              <div class="act-meta">
+                <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>
+                <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+                <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
+              </div>
+              <div *ngIf="a.body" class="act-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px">{{stripHtml(a.body)}}</div>
+            </div>
           </div>
-        </ng-container>
-        <textarea [(ngModel)]="actForm.body" placeholder="Treść / opis…" rows="2" class="act-input"></textarea>
-        <div class="act-actions">
-          <button class="btn-sm" (click)="showNewActivity = false">Anuluj</button>
-          <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
-            {{savingActivity ? '…' : 'Zapisz'}}
-          </button>
+          <div class="empty-act" *ngIf="!sortedActivities.length">Brak aktywności.</div>
         </div>
       </div>
-      <!-- Email activities -->
-      <div *ngIf="emailActivities.length>0" style="margin-bottom:12px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:6px">Emaile ({{emailActivities.length}})</div>
+
+      <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
+      <div *ngIf="midTab==='emails'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
+        <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „✉️ Wyślij".</div>
         <div *ngFor="let a of emailActivities" class="act-item" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid #dbeafe">
           <span class="act-icon">📧</span>
           <div style="flex:1;min-width:0">
@@ -419,7 +474,8 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
             <div class="act-meta">
               <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
               <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-              <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
+              <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
+              <span *ngIf="!a.assigned_to_name && !a.created_by_name" style="color:#ef4444">↩ Odpowiedź</span>
             </div>
             <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
             <div style="margin-top:6px;display:flex;gap:6px">
@@ -464,28 +520,25 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </div>
         </div>
       </div>
-      <div class="activity-list">
-        <div *ngFor="let a of sortedActivities" class="act-item"
-             [class.act-closed]="a.status==='closed'"
-             [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
-             [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
-             style="cursor:pointer" (click)="openActModal(a)">
-          <span class="act-icon">{{actIcon(a.type)}}</span>
+
+      <!-- ── Tab: Historia zmian ────────────────────────────────────────── -->
+      <div *ngIf="midTab==='history'" style="overflow-y:auto;flex:1;padding:12px">
+        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;padding:24px;font-size:13px">⏳ Ładowanie historii…</div>
+        <div *ngIf="!historyLoading && history.length===0 && historyLoaded" class="empty-act">Brak wpisów historii.</div>
+        <div *ngFor="let h of history" style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:12px">
+          <div style="flex-shrink:0;width:6px;border-radius:3px;background:#f3f4f6;margin-top:2px"></div>
           <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-              <strong>{{actTypeName(a.type)}}: {{a.title}}</strong>
-              <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
+            <div style="font-weight:600;color:#111827">{{histLabel(h)}}</div>
+            <div style="color:#9ca3af;font-size:11px;margin-top:2px">
+              <span *ngIf="h.user_name">{{h.user_name}}</span>
+              <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
+              <span *ngIf="!h.user_name && !h.user_email">System</span>
+              · {{h.created_at | date:'dd.MM.yyyy HH:mm'}}
             </div>
-            <div class="act-meta">
-              <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>
-              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-              <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
-            </div>
-            <div *ngIf="a.body" class="act-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px">{{stripHtml(a.body)}}</div>
           </div>
         </div>
-        <div class="empty-act" *ngIf="!sortedActivities.length">Brak aktywności.</div>
       </div>
+
     </div>
   </div>
 
@@ -701,46 +754,70 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </div>
           <div class="edit-row">
             <label>
-              Numer partnera
-              <input [(ngModel)]="editForm.partner_number" placeholder="np. P-0001"
-                     style="font-family:monospace">
-              <span style="font-size:10px;color:var(--gray-400);margin-top:2px;display:block">
-                Klucz łączący z danymi w systemie transakcyjnym
+              Worktrips Partner ID
+              <input [(ngModel)]="editForm.dwh_partner_id" type="number" placeholder="np. 42"
+                     style="font-family:monospace" [disabled]="!isManager">
+              <span style="font-size:10px;color:#7c3aed;margin-top:2px;display:block">
+                ID partnera w systemie transakcyjnym Worktrips<span *ngIf="!isManager"> · tylko menedżerowie mogą edytować</span>
               </span>
             </label>
-            <label>NIP <span style="color:#f97316">*</span>
+            <!-- NIP: edytowalny tylko dla partnerów bez DWH -->
+            <label *ngIf="!partner?.dwh_partner_id">
+              NIP <span style="color:#f97316">*</span>
               <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                      (ngModelChange)="validatePartnerNip()"
                      [style.border-color]="partnerNipEditError ? '#ef4444' : ''">
               <span *ngIf="partnerNipEditError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipEditError }}</span>
             </label>
-          </div>
-          <div class="edit-row">
-            <label class="full">Adres (informacyjny)<input [(ngModel)]="editForm.address" placeholder="ul. Przykładowa 1, 00-001 Warszawa"></label>
+            <label *ngIf="partner?.dwh_partner_id">
+              NIP <span class="dwh-badge">DWH</span>
+              <input [value]="partner?.dwh_nip || partner?.nip || ''" readonly
+                     style="background:#f8f8f8;color:#9ca3af;cursor:not-allowed;font-family:monospace">
+              <span style="font-size:10px;color:#7c3aed;margin-top:2px;display:block">Synchronizowane z DWH</span>
+            </label>
           </div>
         </div>
 
-        <!-- Partner Admin (Zadanie C) -->
+        <!-- Partner Admin -->
         <div class="edit-section">
-          <div class="edit-section-title">👤 Partner Admin *</div>
+          <div class="edit-section-title">👤 Partner Admin</div>
           <div class="edit-row">
-            <label>Imię *
-              <input [(ngModel)]="editForm.admin_first_name" placeholder="Jan"
-                     [class.input-warn]="submitAttempted && !editForm.admin_first_name">
-            </label>
-            <label>Nazwisko *
-              <input [(ngModel)]="editForm.admin_last_name" placeholder="Kowalski"
-                     [class.input-warn]="submitAttempted && !editForm.admin_last_name">
-            </label>
+            <!-- admin_first_name -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('admin_first_name')">
+              <label>Imię admina
+                <input [(ngModel)]="editForm.admin_first_name" placeholder="np. Jan">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('admin_first_name')" class="dwh-readonly-field">
+              <label>Imię admina <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.admin_first_name || '—'}}</span>
+            </div>
+            <!-- admin_last_name -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('admin_last_name')">
+              <label>Nazwisko admina
+                <input [(ngModel)]="editForm.admin_last_name" placeholder="np. Kowalski">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('admin_last_name')" class="dwh-readonly-field">
+              <label>Nazwisko admina <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.admin_last_name || '—'}}</span>
+            </div>
           </div>
           <div class="edit-row">
-            <label class="full">Email *
-              <input [(ngModel)]="editForm.admin_email" type="email" placeholder="admin@firma.pl"
-                     [class.input-warn]="submitAttempted && (!editForm.admin_email || !isValidEmail(editForm.admin_email))">
-            </label>
+            <!-- admin_email -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('admin_email')">
+              <label class="full">Email admina
+                <input [(ngModel)]="editForm.admin_email" type="email" placeholder="admin@firma.pl">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('admin_email')" class="dwh-readonly-field full">
+              <label>Email admina <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.admin_email || '—'}}</span>
+            </div>
           </div>
-          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.admin_first_name || !editForm.admin_last_name || !editForm.admin_email || !isValidEmail(editForm.admin_email))" style="color:#ef4444">
-            ⚠ Uzupełnij wszystkie pola Partner Admin (wymagane).
+          <div *ngIf="isDwhFieldReadOnly('admin_first_name') || isDwhFieldReadOnly('admin_last_name') || isDwhFieldReadOnly('admin_email')"
+               style="font-size:11px;color:#7c3aed;margin-top:4px">
+            🔒 Pola oznaczone DWH są synchronizowane z systemu transakcyjnego i nie mogą być edytowane.
           </div>
         </div>
 
@@ -798,44 +875,68 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </div>
         </div>
 
-        <!-- Billing Address (Zadanie B) -->
+        <!-- Billing Address -->
         <div class="edit-section">
-          <div class="edit-section-title">📍 Billing Address *</div>
+          <div class="edit-section-title">📍 Billing Address</div>
           <div class="edit-row">
-            <label class="full">Adres *
-              <input [(ngModel)]="editForm.billing_address" placeholder="ul. Przykładowa 1"
-                     maxlength="50"
-                     [class.input-warn]="submitAttempted && !editForm.billing_address">
-            </label>
+            <!-- billing_address -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('billing_address')">
+              <label class="full">Adres
+                <input [(ngModel)]="editForm.billing_address" placeholder="ul. Przykładowa 1">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('billing_address')" class="dwh-readonly-field full">
+              <label>Adres <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.billing_address || '—'}}</span>
+            </div>
           </div>
           <div class="edit-row">
-            <label>Kod pocztowy *
-              <input [(ngModel)]="editForm.billing_zip" placeholder="00-001"
-                     maxlength="10"
-                     [class.input-warn]="submitAttempted && !editForm.billing_zip">
-            </label>
-            <label>Miasto *
-              <input [(ngModel)]="editForm.billing_city" placeholder="Warszawa"
-                     maxlength="30"
-                     [class.input-warn]="submitAttempted && !editForm.billing_city">
-            </label>
+            <!-- billing_zip -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('billing_zip')">
+              <label>Kod pocztowy
+                <input [(ngModel)]="editForm.billing_zip" placeholder="00-000">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('billing_zip')" class="dwh-readonly-field">
+              <label>Kod pocztowy <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.billing_zip || '—'}}</span>
+            </div>
+            <!-- billing_city -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('billing_city')">
+              <label>Miasto
+                <input [(ngModel)]="editForm.billing_city" placeholder="Warszawa">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('billing_city')" class="dwh-readonly-field">
+              <label>Miasto <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.billing_city || '—'}}</span>
+            </div>
           </div>
           <div class="edit-row">
-            <label>Kraj *
-              <select [(ngModel)]="editForm.billing_country"
-                      [class.input-warn]="submitAttempted && !editForm.billing_country">
-                <option value="">— wybierz kraj —</option>
-                <option *ngFor="let c of countryOptions" [value]="c">{{c}}</option>
-              </select>
-            </label>
-            <label>Email rozliczeniowy *
-              <input [(ngModel)]="editForm.billing_email_address" type="email"
-                     placeholder="faktury@firma.pl" maxlength="255"
-                     [class.input-warn]="submitAttempted && (!editForm.billing_email_address || !isValidEmail(editForm.billing_email_address))">
-            </label>
+            <!-- billing_country -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('billing_country')">
+              <label>Kraj rozliczeniowy
+                <input [(ngModel)]="editForm.billing_country" placeholder="Polska">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('billing_country')" class="dwh-readonly-field">
+              <label>Kraj rozliczeniowy <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.billing_country || '—'}}</span>
+            </div>
+            <!-- billing_email_address -->
+            <ng-container *ngIf="!isDwhFieldReadOnly('billing_email_address')">
+              <label>Email rozliczeniowy
+                <input [(ngModel)]="editForm.billing_email_address" type="email" placeholder="billing@firma.pl">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('billing_email_address')" class="dwh-readonly-field">
+              <label>Email rozliczeniowy <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.billing_email_address || '—'}}</span>
+            </div>
           </div>
-          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_address || !editForm.billing_zip || !editForm.billing_city || !editForm.billing_country || !editForm.billing_email_address || !isValidEmail(editForm.billing_email_address))" style="color:#ef4444">
-            ⚠ Uzupełnij wszystkie pola Billing Address (wymagane).
+          <div *ngIf="isDwhFieldReadOnly('billing_address') || isDwhFieldReadOnly('billing_zip') || isDwhFieldReadOnly('billing_city') || isDwhFieldReadOnly('billing_country') || isDwhFieldReadOnly('billing_email_address')"
+               style="font-size:11px;color:#7c3aed;margin-top:4px">
+            🔒 Pola oznaczone DWH są synchronizowane z systemu transakcyjnego i nie mogą być edytowane.
           </div>
         </div>
 
@@ -927,9 +1028,9 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </div>
         </div>
 
-        <!-- Dane dodatkowe (Zadanie A) -->
+        <!-- Dane dodatkowe — % Online + DWH-fillable: subdomain, language, partner_currency, country -->
         <div class="edit-section">
-          <div class="edit-section-title">⚙️ Dane dodatkowe *</div>
+          <div class="edit-section-title">⚙️ Dane dodatkowe</div>
           <div class="edit-row">
             <label>% Online
               <select [(ngModel)]="editForm.online_pct">
@@ -947,44 +1048,59 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 <option value="100">100%</option>
               </select>
             </label>
-            <label>Subdomena *
-              <input [(ngModel)]="editForm.subdomain"
-                     placeholder="np. acme (3-30 znaków, a-z, 0-9)"
-                     maxlength="30"
-                     (input)="onSubdomainInput($event)"
-                     [class.input-warn]="submitAttempted && !isValidSubdomain(editForm.subdomain)">
-              <span style="font-size:10px;color:var(--gray-400);margin-top:2px;display:block">
-                Tylko małe litery (a-z) i cyfry (0-9), 3–30 znaków
-              </span>
-            </label>
           </div>
+          <!-- Subdomena -->
           <div class="edit-row">
-            <label>Język *
-              <select [(ngModel)]="editForm.language"
-                      [class.input-warn]="submitAttempted && !editForm.language">
-                <option value="">— wybierz język —</option>
-                <option *ngFor="let l of languageOptions" [value]="l">{{l}}</option>
-              </select>
-            </label>
-            <label>Waluta *
-              <select [(ngModel)]="editForm.partner_currency"
-                      [class.input-warn]="submitAttempted && !editForm.partner_currency">
-                <option value="">— wybierz walutę —</option>
-                <option *ngFor="let c of currencyOptions" [value]="c">{{c}}</option>
-              </select>
-            </label>
+            <ng-container *ngIf="!isDwhFieldReadOnly('subdomain')">
+              <label class="full">Subdomena
+                <input [(ngModel)]="editForm.subdomain" placeholder="np. acme" style="font-family:monospace">
+                <span style="font-size:10px;color:#9ca3af;margin-top:2px;display:block">Adres subdomeny w systemie (wypełniany przy zakładaniu konta testowego)</span>
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('subdomain')" class="dwh-readonly-field full">
+              <label>Subdomena <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value" style="font-family:monospace">{{partner?.subdomain || '—'}}</span>
+            </div>
           </div>
+          <!-- Język + Waluta -->
           <div class="edit-row">
-            <label>Kraj *
-              <select [(ngModel)]="editForm.country"
-                      [class.input-warn]="submitAttempted && !editForm.country">
-                <option value="">— wybierz kraj —</option>
-                <option *ngFor="let c of countryOptions" [value]="c">{{c}}</option>
-              </select>
-            </label>
+            <ng-container *ngIf="!isDwhFieldReadOnly('language')">
+              <label>Język
+                <input [(ngModel)]="editForm.language" placeholder="np. pl">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('language')" class="dwh-readonly-field">
+              <label>Język <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.language || '—'}}</span>
+            </div>
+            <ng-container *ngIf="!isDwhFieldReadOnly('partner_currency')">
+              <label>Waluta partnera
+                <select [(ngModel)]="editForm.partner_currency">
+                  <option value="">— brak —</option>
+                  <option *ngFor="let c of dictCurrencies" [value]="c">{{c}}</option>
+                </select>
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('partner_currency')" class="dwh-readonly-field">
+              <label>Waluta partnera <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.partner_currency || '—'}}</span>
+            </div>
           </div>
-          <div class="validation-msg" *ngIf="submitAttempted && (!isValidSubdomain(editForm.subdomain) || !editForm.language || !editForm.partner_currency || !editForm.country)" style="color:#ef4444">
-            ⚠ Uzupełnij wszystkie pola Dane dodatkowe (wymagane).
+          <!-- Kraj -->
+          <div class="edit-row">
+            <ng-container *ngIf="!isDwhFieldReadOnly('country')">
+              <label>Kraj
+                <input [(ngModel)]="editForm.country" placeholder="np. Polska">
+              </label>
+            </ng-container>
+            <div *ngIf="isDwhFieldReadOnly('country')" class="dwh-readonly-field">
+              <label>Kraj <span class="dwh-badge">DWH</span></label>
+              <span class="dwh-readonly-value">{{partner?.country || '—'}}</span>
+            </div>
+          </div>
+          <div *ngIf="isDwhFieldReadOnly('subdomain') || isDwhFieldReadOnly('language') || isDwhFieldReadOnly('partner_currency') || isDwhFieldReadOnly('country')"
+               style="font-size:11px;color:#7c3aed;margin-top:4px">
+            🔒 Pola oznaczone DWH są synchronizowane z systemu transakcyjnego i nie mogą być edytowane.
           </div>
         </div>
 
@@ -1264,8 +1380,13 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     /* Body */
     .detail-body { display:grid; grid-template-columns:320px 1fr; gap:16px; flex:1; overflow:hidden; min-height:0; }
     @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
-    .info-card, .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
+    .info-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
+    .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; min-height:0; display:flex; flex-direction:column; }
     .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
+    .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; }
+    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:12px 14px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:color .15s,border-color .15s; }
+    .tab-btn.active { color:#f97316; border-bottom-color:#f97316; }
+    .tab-btn:hover:not(.active) { color:#374151; }
     .info-grid { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; }
     .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; padding-top:2px; }
     .sub { color:#9ca3af; }
@@ -1288,7 +1409,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .card-header h3 { margin:0; }
     .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:3px 10px; cursor:pointer; }
     .btn-sm.primary { background:#f97316; color:white; border-color:#f97316; }
-    .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; display:flex; flex-direction:column; gap:7px; }
+    .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; margin-top:4px; display:flex; flex-direction:column; gap:7px; }
     .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
     .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; }
     .act-actions { display:flex; gap:6px; justify-content:flex-end; }
@@ -1341,6 +1462,11 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .edit-textarea:focus { border-color:#f97316; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid #f3f4f6; }
     .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#f97316; margin-bottom:8px; }
+    .dwh-badge { display:inline-block; background:#ede9fe; color:#7c3aed; font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
+    .dwh-readonly-field { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
+    .dwh-readonly-field.full { grid-column:1/-1; }
+    .dwh-readonly-field label { font-size:12px; font-weight:600; color:#374151; display:flex; align-items:center; gap:4px; }
+    .dwh-readonly-value { background:#faf5ff; border:1px solid #e9d5ff; border-radius:6px; padding:7px 10px; font-size:13px; color:#6b7280; cursor:not-allowed; }
     .input-error { border-color:#ef4444 !important; background:#fff5f5; }
     .input-warn  { border-color:#f59e0b !important; background:#fffbeb; }
     .validation-msg { font-size:11px; color:#ef4444; margin-top:2px; }
@@ -1417,6 +1543,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   savingActivity = false;
   showNewActivity = false;
   showEdit = false;
+
+  // ── Taby środkowej kolumny ───────────────────────────────────────────────────
+  midTab: 'activities' | 'emails' | 'history' = 'activities';
+  history: any[] = [];
+  historyLoaded  = false;
+  historyLoading = false;
   // Modal aktywności
   selectedAct: any = null;
   actModalEditMode = false;
@@ -1424,6 +1556,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   actModalCloseComment = '';
   submitAttempted = false;
   partnerNipEditError = '';
+
+  /**
+   * Zwraca true gdy pole powinno być zablokowane do edycji (read-only z DWH).
+   * Logika:
+   *  - Zawsze edytowalne gdy partner w statusie 'onboarding'
+   *  - Zawsze edytowalne gdy brak połączenia z DWH (dwh_partner_id = null)
+   *  - Read-only gdy partner aktywny/nieaktywny/churned AND DWH dostarczyło wartość (field_from_dwh = true)
+   */
+  isDwhFieldReadOnly(field: string): boolean {
+    if (!this.partner) return false;
+    if (this.partner.status === 'onboarding') return false;
+    if (!this.partner.dwh_partner_id) return false;
+    return !!(this.partner as any)[field + '_from_dwh'];
+  }
 
   validatePartnerNip(): void {
     const val = (this.editForm.nip || '').trim().toUpperCase();
@@ -1495,12 +1641,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   get newEmailCount(): number {
     const key = `partner_email_last_read_${this.partner?.id}`;
-    const lastRead = localStorage.getItem(key);
-    if (!lastRead) return this.emailActivities.length;
-    const lastReadTime = new Date(lastRead).getTime();
-    return this.emailActivities.filter((a: any) => {
+    const lastRead = parseInt(localStorage.getItem(key) || '0', 10);
+    // Liczymy tylko odpowiedzi przychodzące (created_by === null = zsynchronizowane z Gmaila)
+    return (this.partner?.activities || []).filter((a: any) => {
+      if (a.type !== 'email' || a.created_by !== null) return false;
       const t = a.activity_at ? new Date(a.activity_at).getTime() : 0;
-      return t > lastReadTime;
+      return t > lastRead;
     }).length;
   }
 
@@ -1712,10 +1858,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (!this.partner) return;
     this.editForm = {
       company:               this.partner.company,
-      partner_number:        this.partner.partner_number || '',
       status:                this.partner.status,
       nip:                   this.partner.nip || '',
-      address:               this.partner.address || '',
+      address:               (this.partner as any).address || '',
       industry:              this.partner.industry || '',
       contact_name:          this.partner.contact_name || '',
       contact_title:         this.partner.contact_title || '',
@@ -1729,35 +1874,35 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       credit_limit_currency: this.partner.credit_limit_currency || 'PLN',
       deposit_value:         this.partner.deposit_value ?? null,
       deposit_currency:      this.partner.deposit_currency || 'PLN',
-      deposit_date_in:       this.partner.deposit_date_in   ? this.partner.deposit_date_in.substring(0, 10)   : '',
-      deposit_date_out:      this.partner.deposit_date_out  ? this.partner.deposit_date_out.substring(0, 10)  : '',
+      deposit_date_in:       this.isoToDateInput(this.partner.deposit_date_in),
+      deposit_date_out:      this.isoToDateInput(this.partner.deposit_date_out),
       commission_value:      this.partner.commission_value ?? null,
       commission_basis:      this.partner.commission_basis || 'nie_dotyczy',
       manager_id:            this.partner.manager_id || '',
       group_id:              this.partner.group_id || '',
-      contract_signed:       this.partner.contract_signed  ? this.partner.contract_signed.substring(0, 10)   : '',
-      contract_expires:      this.partner.contract_expires ? this.partner.contract_expires.substring(0, 10)  : '',
+      contract_signed:       this.isoToDateInput(this.partner.contract_signed),
+      contract_expires:      this.isoToDateInput(this.partner.contract_expires),
       contract_value:        this.partner.contract_value ?? null,
       annual_turnover_currency: this.partner.annual_turnover_currency || 'PLN',
       online_pct:               this.partner.online_pct != null ? String(this.partner.online_pct) : '',
       active_users:          this.partner.active_users ?? null,
       tagsStr:               (this.partner.tags || []).join(', '),
       notes:                 this.partner.notes || '',
-      // Zadanie A
+      // DWH-fillable fields — inicjalizowane zawsze (edytowalne lub read-only zależnie od isDwhFieldReadOnly)
       subdomain:             this.partner.subdomain || '',
       language:              this.partner.language || '',
       partner_currency:      this.partner.partner_currency || '',
       country:               this.partner.country || '',
-      // Zadanie B
       billing_address:       this.partner.billing_address || '',
       billing_zip:           this.partner.billing_zip || '',
       billing_city:          this.partner.billing_city || '',
       billing_country:       this.partner.billing_country || '',
       billing_email_address: this.partner.billing_email_address || '',
-      // Zadanie C
       admin_first_name:      this.partner.admin_first_name || '',
       admin_last_name:       this.partner.admin_last_name || '',
       admin_email:           this.partner.admin_email || '',
+      // DWH Partner ID (edytowalny przez managerów)
+      dwh_partner_id:        this.partner.dwh_partner_id || '',
     };
     this.submitAttempted = false;
     // Zawsze ładuj listę użytkowników przy otwarciu (manager i salesperson)
@@ -1774,27 +1919,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.submitAttempted = true;
     if (!this.editForm.company) return;
     if (!this.partner) return;
-    this.validatePartnerNip();
-    if (this.partnerNipEditError) return;
 
-    // Walidacja nowych pól wymaganych
-    const subdomainOk = this.isValidSubdomain(this.editForm.subdomain);
-    const adminEmailOk = this.isValidEmail(this.editForm.admin_email);
-    const billingEmailOk = this.isValidEmail(this.editForm.billing_email_address);
-    const newFieldsOk = subdomainOk && adminEmailOk && billingEmailOk
-      && !!this.editForm.language && !!this.editForm.partner_currency && !!this.editForm.country
-      && !!this.editForm.admin_first_name && !!this.editForm.admin_last_name && !!this.editForm.admin_email
-      && !!this.editForm.billing_address && !!this.editForm.billing_zip
-      && !!this.editForm.billing_city && !!this.editForm.billing_country && !!this.editForm.billing_email_address;
-    if (!newFieldsOk) return;
+    const isDwhLinked = !!(this.partner as any)?.dwh_partner_id;
+    // Walidacja NIP tylko dla partnerów bez DWH
+    if (!isDwhLinked) {
+      this.validatePartnerNip();
+      if (this.partnerNipEditError) return;
+    }
 
     this.saving = true;
     const payload: Partial<Partner> = {
       company:               this.editForm.company,
-      partner_number:        this.editForm.partner_number || null,
       status:                this.editForm.status,
-      nip:                   this.editForm.nip ? this.editForm.nip.trim().toUpperCase() : null,
-      address:               this.editForm.address || null,
+      // NIP wysyłamy tylko dla partnerów bez DWH (dla DWH-linked NIP jest read-only kopią z DWH)
+      ...(isDwhLinked ? {} : { nip: this.editForm.nip ? this.editForm.nip.trim().toUpperCase() : null }),
       industry:              this.editForm.industry || null,
       contact_name:          this.editForm.contact_name || null,
       contact_title:         this.editForm.contact_title || null,
@@ -1822,36 +1960,48 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       active_users:          this.editForm.active_users != null && this.editForm.active_users !== '' ? +this.editForm.active_users : null,
       tags:                  this.editForm.tagsStr ? this.editForm.tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       notes:                 this.editForm.notes || null,
-      // Zadanie A
-      subdomain:             this.editForm.subdomain || null,
-      language:              this.editForm.language || null,
-      partner_currency:      this.editForm.partner_currency || null,
-      country:               this.editForm.country || null,
-      // Zadanie B
-      billing_address:       this.editForm.billing_address || null,
-      billing_zip:           this.editForm.billing_zip || null,
-      billing_city:          this.editForm.billing_city || null,
-      billing_country:       this.editForm.billing_country || null,
-      billing_email_address: this.editForm.billing_email_address || null,
-      // Zadanie C
-      admin_first_name:      this.editForm.admin_first_name || null,
-      admin_last_name:       this.editForm.admin_last_name || null,
-      admin_email:           this.editForm.admin_email || null,
+      // DWH Partner ID (tylko managerzy)
+      ...(this.isManager ? { dwh_partner_id: this.editForm.dwh_partner_id !== '' && this.editForm.dwh_partner_id != null ? +this.editForm.dwh_partner_id : null } : {}),
+      // DWH-fillable fields: wysyłamy tylko gdy pole NIE jest zablokowane przez DWH
+      // Zasada: jeśli isDwhFieldReadOnly → pomijamy (wartość pochodzi z DWH, nie zapisujemy nad nią)
+      ...(this.isDwhFieldReadOnly('subdomain')             ? {} : { subdomain:             this.editForm.subdomain             || null }),
+      ...(this.isDwhFieldReadOnly('language')              ? {} : { language:              this.editForm.language              || null }),
+      ...(this.isDwhFieldReadOnly('partner_currency')      ? {} : { partner_currency:      this.editForm.partner_currency      || null }),
+      ...(this.isDwhFieldReadOnly('country')               ? {} : { country:               this.editForm.country               || null }),
+      ...(this.isDwhFieldReadOnly('billing_address')       ? {} : { billing_address:       this.editForm.billing_address       || null }),
+      ...(this.isDwhFieldReadOnly('billing_zip')           ? {} : { billing_zip:           this.editForm.billing_zip           || null }),
+      ...(this.isDwhFieldReadOnly('billing_city')          ? {} : { billing_city:          this.editForm.billing_city          || null }),
+      ...(this.isDwhFieldReadOnly('billing_country')       ? {} : { billing_country:       this.editForm.billing_country       || null }),
+      ...(this.isDwhFieldReadOnly('billing_email_address') ? {} : { billing_email_address: this.editForm.billing_email_address || null }),
+      ...(this.isDwhFieldReadOnly('admin_first_name')      ? {} : { admin_first_name:      this.editForm.admin_first_name      || null }),
+      ...(this.isDwhFieldReadOnly('admin_last_name')       ? {} : { admin_last_name:       this.editForm.admin_last_name       || null }),
+      ...(this.isDwhFieldReadOnly('admin_email')           ? {} : { admin_email:           this.editForm.admin_email           || null }),
     };
-    this.api.updatePartner(this.partner.id, payload).subscribe({
-      next: updated => {
-        this.zone.run(() => {
-          this.partner = { ...this.partner!, ...updated, activities: this.partner!.activities };
-          // Zaktualizuj manager_name lokalnie
-          if (this.editForm.manager_id) {
-            const u = this.crmUsers.find(x => x.id === this.editForm.manager_id);
-            if (u) this.partner!.manager_name = u.display_name;
-          } else {
-            this.partner!.manager_name = null;
-          }
-          this.saving = false;
-          this.showEdit = false;
-          this.cdr.markForCheck();
+    const partnerId = this.partner.id;
+    this.api.updatePartner(partnerId, payload).subscribe({
+      next: () => {
+        // Przeładuj pełne dane partnera przez GET /:id (z COALESCE + _from_dwh flagami z DWH JOIN).
+        // Nie używamy wyniku PATCH bezpośrednio — nie zawiera pól DWH.
+        this.api.getPartner(partnerId).subscribe({
+          next: full => {
+            this.zone.run(() => {
+              this.partner = { ...full, activities: this.partner?.activities ?? full.activities };
+              this.saving = false;
+              this.showEdit = false;
+              this.historyLoaded = false;
+              if (this.midTab === 'history') this.loadHistory();
+              this.cdr.markForCheck();
+            });
+          },
+          error: () => {
+            // Fallback — chociaż odśwież stronę
+            this.zone.run(() => {
+              this.saving = false;
+              this.showEdit = false;
+              this.loadPartner(partnerId);
+              this.cdr.markForCheck();
+            });
+          },
         });
       },
       error: (err) => {
@@ -2317,6 +2467,18 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           }
           this.sendingEmail   = false;
           this.showEmailModal = false;
+          // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
+          if (this.partner) {
+            this.api.getPartner(this.partner.id).subscribe({
+              next: (fresh: any) => this.zone.run(() => {
+                if (this.partner) {
+                  (this.partner as any).extra_contacts = fresh.extra_contacts || [];
+                  this.cdr.markForCheck();
+                }
+              }),
+              error: () => {},
+            });
+          }
           this.cdr.markForCheck();
         });
       },
@@ -2381,8 +2543,83 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   markEmailsRead(): void {
     const key = `partner_email_last_read_${this.partner?.id}`;
-    localStorage.setItem(key, new Date().toISOString());
+    localStorage.setItem(key, String(Date.now()));
     this.cdr.markForCheck();
+  }
+
+  loadHistory(): void {
+    if (this.historyLoaded || !this.partner) return;
+    this.historyLoading = true;
+    this.cdr.markForCheck();
+    this.api.getPartnerHistory(this.partner.id).subscribe({
+      next: rows => this.zone.run(() => {
+        this.history = rows;
+        this.historyLoading = false;
+        this.historyLoaded  = true;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.historyLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  histLabel(h: any): string {
+    const a = h.action;
+    const after  = h.after_state  || {};
+    const before = h.before_state || {};
+    if (a === 'crm_partner_create')  return 'Partner utworzony';
+    if (a === 'crm_partner_delete')  return 'Partner usunięty';
+    if (a === 'crm_activity_create') return `Aktywność dodana: ${after.title || ''}`;
+    if (a === 'crm_activity_close')  return `Aktywność zamknięta: ${after.title || ''}`;
+    if (a === 'crm_activity_update') return `Aktywność zaktualizowana: ${after.title || ''}`;
+    if (a === 'crm_partner_update') {
+      if (after.activity_action === 'created') return `Aktywność dodana: ${after.title || ''}`;
+      if (after.activity_action === 'deleted') return `Aktywność usunięta: ${before.title || ''}`;
+      const changed = Object.keys(after).filter(k => k !== 'updated_at' && JSON.stringify(before[k]) !== JSON.stringify(after[k]));
+      if (changed.length === 1) {
+        const k = changed[0];
+        return `Zmieniono: ${this._partnerFieldLabel(k)} → ${this._formatHistVal(k, after[k])}`;
+      }
+      if (changed.length > 1) {
+        return `Zmieniono: ${changed.map(k => `${this._partnerFieldLabel(k)} → ${this._formatHistVal(k, after[k])}`).join('; ')}`;
+      }
+      return 'Zaktualizowano partnera';
+    }
+    return a.replace(/_/g, ' ');
+  }
+
+  private _partnerFieldLabel(key: string): string {
+    const MAP: Record<string, string> = {
+      company: 'Firma', status: 'Status', nip: 'NIP', contact_name: 'Kontakt',
+      email: 'Email', phone: 'Telefon', notes: 'Notatki', manager_id: 'Handlowiec',
+      billing_address: 'Adres', billing_city: 'Miasto', billing_country: 'Kraj',
+      subdomain: 'Subdomena', language: 'Język', partner_currency: 'Waluta',
+      dwh_partner_id: 'Worktrips Partner ID', contract_signed: 'Umowa od', contract_expires: 'Umowa do',
+      contract_value: 'Obrót', active_users: 'Aktywni użytkownicy', tags: 'Tagi',
+      industry: 'Branża', group_id: 'Grupa', commission_value: 'Prowizja',
+      credit_limit_value: 'Limit kredytowy', deposit_value: 'Depozyt',
+      contact_title: 'Stanowisko', billing_email: 'Email rozl.', billing_phone: 'Tel. rozl.',
+      online_pct: '% Online', country: 'Kraj', agent_name: 'Agent',
+    };
+    return MAP[key] || key;
+  }
+
+  /** Konwertuje ISO timestamp do YYYY-MM-DD w lokalnej strefie czasowej (browser = Warsaw).
+   *  Używane w openEdit() dla pól <input type="date"> — zapobiega błędowi UTC vs lokalny. */
+  private isoToDateInput(iso: string | null | undefined): string {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  private _formatHistVal(key: string, val: any): string {
+    if (val === null || val === undefined || val === '') return '(brak)';
+    if (typeof val === 'boolean') return val ? 'Tak' : 'Nie';
+    if (Array.isArray(val)) return val.length ? val.join(', ') : '(brak)';
+    if (key === 'status') return PARTNER_STATUS_LABELS[val as PartnerStatus] ?? val;
+    if (typeof val === 'string' && val.length > 60) return val.substring(0, 57) + '…';
+    return String(val);
   }
 
   private buildQuotedBody(messages: any[]): string {
@@ -2494,6 +2731,18 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
                 this.threadMessages = msgs;
                 this.openThreadId   = replyThreadId;
                 this.cdr.markForCheck();
+              }),
+              error: () => {},
+            });
+          }
+          // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
+          if (this.partner) {
+            this.api.getPartner(this.partner.id).subscribe({
+              next: (fresh: any) => this.zone.run(() => {
+                if (this.partner) {
+                  (this.partner as any).extra_contacts = fresh.extra_contacts || [];
+                  this.cdr.markForCheck();
+                }
               }),
               error: () => {},
             });

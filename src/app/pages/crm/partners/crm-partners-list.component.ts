@@ -52,7 +52,10 @@ type SortDir = 'asc' | 'desc';
   <div *ngIf="!loading && viewMode==='cards'" class="cards-grid">
     <div *ngFor="let p of partners" class="partner-card" (click)="goPartner(p.id)">
       <div class="pc-top">
-        <div class="pc-company">{{p.company}}</div>
+        <div class="pc-company">
+          {{p.dwh_company_name || p.company}}
+          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
+        </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
       </div>
       <div class="pc-contact" *ngIf="p.contact_name">{{p.contact_name}}<span *ngIf="p.contact_title"> · {{p.contact_title}}</span></div>
@@ -61,8 +64,8 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.industry"   class="pc-tag">🏭 {{p.industry}}</span>
         <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
       </div>
-      <div *ngIf="(p.email_count??0)>0" style="margin-top:4px">
-        <span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px">✉️ {{p.email_count}}</span>
+      <div *ngIf="hasUnreadReply(p)" style="margin-top:4px">
+        <span style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
       </div>
       <div class="pc-financials">
         <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
@@ -94,9 +97,10 @@ type SortDir = 'asc' | 'desc';
     <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px"
          (click)="goPartner(p.id)">
       <div class="td">
-        <span class="td-main">{{p.company}}
-          <span *ngIf="(p.email_count??0)>0"
-                style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px">✉️ {{p.email_count}}</span>
+        <span class="td-main">{{p.dwh_company_name || p.company}}
+          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
+          <span *ngIf="hasUnreadReply(p)"
+                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
         </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
       </div>
@@ -126,7 +130,7 @@ type SortDir = 'asc' | 'desc';
       <h3>Nowy partner</h3>
       <p class="hint">Możesz utworzyć partnera bez powiązanego leada.</p>
       <label>Firma *<input [(ngModel)]="newP.company" placeholder="Nazwa firmy"></label>
-      <label>NIP <span style="color:#f97316">*</span>
+      <label>NIP <span style="font-size:10px;color:#9ca3af">(opcjonalne — dla partnerów DWH wypełniane automatycznie)</span>
         <input [(ngModel)]="newP.nip" placeholder="PL1234567890" maxlength="14"
                (ngModelChange)="onPartnerNipChange()"
                [style.border-color]="partnerNipError ? '#ef4444' : ''">
@@ -145,7 +149,7 @@ type SortDir = 'asc' | 'desc';
       </label>
       <div class="panel-actions">
         <button class="btn-outline" (click)="showCreate=false">Anuluj</button>
-        <button class="btn-primary" (click)="createPartner()" [disabled]="!newP.company||!newP.nip||!!partnerNipError||saving">
+        <button class="btn-primary" (click)="createPartner()" [disabled]="!newP.company||!!partnerNipError||saving">
           {{saving?'Zapisywanie…':'Utwórz partnera'}}
         </button>
       </div>
@@ -347,6 +351,21 @@ export class CrmPartnersListComponent implements OnInit {
   onSearch() { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => { this.page = 1; this.reload(); }, 400); }
 
   goPartner(id: number) { this.router.navigate(['/crm/partners', id]); }
+
+  /** Zwraca true gdy są nieprzeczytane odpowiedzi od partnera. */
+  hasUnreadReply(p: any): boolean {
+    const count = (p.new_email_count ?? 0);
+    if (count === 0) return false;
+    const lastReply = p.last_reply_at ? new Date(p.last_reply_at).getTime() : 0;
+    if (!lastReply) return false;
+    const lastRead = parseInt(localStorage.getItem(`partner_email_last_read_${p.id}`) || '0', 10);
+    return lastReply > lastRead;
+  }
+
+  /** Liczba nieprzeczytanych odpowiedzi dla partnera. */
+  unreadReplyCount(p: any): number {
+    return this.hasUnreadReply(p) ? (p.new_email_count ?? 0) : 0;
+  }
   prevPage() { if (this.page > 1) { this.page--; this.reload(); } }
   nextPage() { if (this.page < this.totalPages) { this.page++; this.reload(); } }
 
@@ -357,9 +376,11 @@ export class CrmPartnersListComponent implements OnInit {
 
   createPartner() {
     if (!this.newP.company) return;
-    // Wyzwól walidację NIP przed sprawdzeniem
-    this.onPartnerNipChange();
-    if (!this.newP.nip || this.partnerNipError) return;
+    // Waliduj NIP tylko jeśli podano wartość
+    if (this.newP.nip && this.newP.nip !== 'PL') {
+      this.onPartnerNipChange();
+      if (this.partnerNipError) return;
+    }
     this.saving = true;
     this.api.createPartner(this.newP).subscribe({
       next: p => { this.saving = false; this.showCreate = false; this.newP = {}; this.router.navigate(['/crm/partners', p.id]); },

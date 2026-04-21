@@ -1300,15 +1300,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (cc === 'PL' && !/^\d{10}$/.test(digits)) { this.editNipError = 'Dla PL wymagane 10 cyfr po kodzie kraju'; return; }
     if (cc !== 'PL' && digits.length === 0) { this.editNipError = 'Podaj numer po kodzie kraju'; return; }
     this.editNipError = '';
-    // Załaduj dodatkowe kontakty
-    this.extraContacts = ((this.lead as any).extra_contacts || []).map((ec: any) => ({
-      id: ec.id,
-      contact_name:  ec.contact_name  || null,
-      contact_title: ec.contact_title || null,
-      email:         ec.email         || null,
-      phone:         ec.phone         || null,
-    }));
-    if (this.extraContacts.length === 0) this.addExtraContact(); // pusty wiersz na start
   }
   detailEnriching   = false;
   detailEnrichDone  = false;
@@ -1702,6 +1693,18 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.sendingEmail   = false;
           this.showEmailModal = false;
           this.midTab         = 'emails';
+          // Odśwież extra_contacts (autoSaveLeadContacts mogło dodać nowe)
+          if (this.lead) {
+            this.api.getLead(this.lead.id).subscribe({
+              next: (fresh: any) => this.zone.run(() => {
+                if (this.lead) {
+                  (this.lead as any).extra_contacts = fresh.extra_contacts || [];
+                  this.cdr.markForCheck();
+                }
+              }),
+              error: () => {},
+            });
+          }
           this.cdr.markForCheck();
         });
       },
@@ -1875,6 +1878,18 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
               error: () => {},
             });
           }
+          // Odśwież extra_contacts (autoSaveLeadContacts mogło dodać nowe)
+          if (this.lead) {
+            this.api.getLead(this.lead.id).subscribe({
+              next: (fresh: any) => this.zone.run(() => {
+                if (this.lead) {
+                  (this.lead as any).extra_contacts = fresh.extra_contacts || [];
+                  this.cdr.markForCheck();
+                }
+              }),
+              error: () => {},
+            });
+          }
           this.cdr.markForCheck();
         });
       },
@@ -1975,8 +1990,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   get newEmailCount(): number {
     if (!this.lead) return 0;
     const last = parseInt(localStorage.getItem(`email_last_read_${this.lead.id}`) || '0', 10);
+    // Liczymy tylko odpowiedzi przychodzące (created_by === null = zsynchronizowane z Gmaila)
     return (this.lead.activities || []).filter(
-      (a: any) => a.type === 'email' && a.activity_at && new Date(a.activity_at).getTime() > last
+      (a: any) => a.type === 'email' && a.created_by === null && a.activity_at && new Date(a.activity_at).getTime() > last
     ).length;
   }
 
@@ -2015,8 +2031,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       annual_turnover_currency: this.lead.annual_turnover_currency || 'PLN',
       online_pct:           this.lead.online_pct != null ? String(this.lead.online_pct) : '',
       probability:  this.lead.probability ?? null,
-      close_date:   this.lead.close_date || '',
-      first_contact_date: this.lead.first_contact_date ? String(this.lead.first_contact_date).slice(0,10) : '',
+      close_date:         this.isoToDateInput(this.lead.close_date),
+      first_contact_date: this.isoToDateInput(this.lead.first_contact_date),
       source:       this.lead.source || '',
       industry:     this.lead.industry || '',
       assigned_to:  this.lead.assigned_to || '',
@@ -2030,6 +2046,15 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     };
     this.editNipError = '';
     this.detailEnrichDone = false;
+    // Zawsze inicjalizuj extraContacts z aktualnych danych leada przy otwarciu formularza
+    this.extraContacts = ((this.lead as any).extra_contacts || []).map((ec: any) => ({
+      id:            ec.id,
+      contact_name:  ec.contact_name  || null,
+      contact_title: ec.contact_title || null,
+      email:         ec.email         || null,
+      phone:         ec.phone         || null,
+    }));
+    if (this.extraContacts.length === 0) this.addExtraContact();
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
@@ -2088,14 +2113,19 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           }
           // Zapisz dodatkowe kontakty (pomiń puste)
           const nonEmpty = this.extraContacts.filter(ec => !this.isContactEmpty(ec));
+          // Optymistycznie ustaw widok — bez czekania na odpowiedź backendu
+          (this.lead as any).extra_contacts = nonEmpty;
+          this.saving = false;
+          this.showEdit = false;
+          this.historyLoaded = false;
+          if (this.midTab === 'history') this.loadHistory();
+          if (updated.logo_url && !this.logoSasUrl) this.loadLogoSas();
+          this.cdr.markForCheck();
+          // Zapis do bazy — po odpowiedzi podmień na rekordy z ID z bazy
           this.api.saveLeadContacts(this.lead!.id, nonEmpty).subscribe({
             next: contacts => { (this.lead as any).extra_contacts = contacts; this.cdr.markForCheck(); },
             error: () => {},
           });
-          this.saving = false;
-          this.showEdit = false;
-          if (updated.logo_url && !this.logoSasUrl) this.loadLogoSas();
-          this.cdr.markForCheck();
         });
       },
       error: (err: any) => { this.zone.run(() => {
@@ -2499,8 +2529,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         return `Zmiana etapu: ${bl} → ${al}`;
       }
       const changed = Object.keys(after).filter(k => k !== 'updated_at' && JSON.stringify(before[k]) !== JSON.stringify(after[k]));
-      if (changed.length === 1) return `Zmieniono: ${this.fieldLabel(changed[0])}`;
-      if (changed.length > 1)  return `Zmieniono pola: ${changed.map(k => this.fieldLabel(k)).join(', ')}`;
+      if (changed.length === 1) {
+        const k = changed[0];
+        return `Zmieniono: ${this.fieldLabel(k)} → ${this._formatHistVal(k, after[k])}`;
+      }
+      if (changed.length > 1) {
+        return `Zmieniono: ${changed.map(k => `${this.fieldLabel(k)} → ${this._formatHistVal(k, after[k])}`).join('; ')}`;
+      }
       return 'Zaktualizowano lead';
     }
     return a.replace(/_/g, ' ');
@@ -2509,12 +2544,33 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private fieldLabel(key: string): string {
     const MAP: Record<string, string> = {
       company: 'Firma', stage: 'Etap', hot: 'Gorący', contact_name: 'Kontakt',
-      email: 'Email', phone: 'Telefon', value_pln: 'Wartość', source: 'Źródło',
+      email: 'Email', phone: 'Telefon', value_pln: 'Wartość PLN', source: 'Źródło',
       assigned_to: 'Handlowiec', close_date: 'Data zamk.', notes: 'Notatki',
-      probability: 'Szansa', industry: 'Branża', lost_reason: 'Powód przegranej',
+      probability: 'Szansa %', industry: 'Branża', lost_reason: 'Powód przegranej',
       agent_name: 'Agent', annual_turnover_currency: 'Waluta', tags: 'Tagi',
+      contact_title: 'Stanowisko', nip: 'NIP', website: 'Strona WWW',
+      online_pct: '% Online', first_contact_date: 'Pierwszy kontakt',
     };
     return MAP[key] || key;
+  }
+
+  /** Konwertuje ISO timestamp do YYYY-MM-DD w lokalnej strefie czasowej (browser = Warsaw).
+   *  Używane w openEdit() dla pól <input type="date"> — zapobiega błędowi UTC vs lokalny. */
+  private isoToDateInput(iso: string | null | undefined): string {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  private _formatHistVal(key: string, val: any): string {
+    if (val === null || val === undefined || val === '') return '(brak)';
+    if (typeof val === 'boolean') return val ? 'Tak' : 'Nie';
+    if (Array.isArray(val)) return val.length ? val.join(', ') : '(brak)';
+    if (key === 'stage') return (LEAD_STAGE_LABELS as any)[val] || val;
+    if (typeof val === 'string' && val.length > 60) return val.substring(0, 57) + '…';
+    return String(val);
   }
 
   histDetail(h: LeadHistoryEntry): string {

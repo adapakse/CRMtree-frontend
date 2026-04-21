@@ -178,8 +178,8 @@ const PROB_MAP: Record<LeadStage, number> = {
                 {{ initials(lead.assigned_to_name) }}
               </span>
             </div>
-            <div *ngIf="(lead.email_count??0)>0" style="display:flex;align-items:center;gap:3px;margin-top:2px">
-              <span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px">✉️ {{lead.email_count}}</span>
+            <div *ngIf="hasUnreadReply(lead)" style="display:flex;align-items:center;gap:3px;margin-top:2px">
+              <span style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
             </div>
             <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
           </div>
@@ -357,8 +357,8 @@ const PROB_MAP: Record<LeadStage, number> = {
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
           <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span>
-            <span *ngIf="(lead.email_count??0)>0"
-                  style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px">✉️ {{lead.email_count}}</span>
+            <span *ngIf="hasUnreadReply(lead)"
+                  style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
           </div>
           <div style="font-size:11px;color:var(--gray-400)">{{ lead.contact_name }}</div>
           <div *ngIf="lead.converted_at" style="font-size:10px;color:#7C3AED;font-weight:600;margin-top:2px">
@@ -1789,6 +1789,21 @@ export class CrmLeadsListComponent implements OnInit {
   callPhone(p: string)         { window.location.href = `tel:${p}`; }
   mailTo(e: string)            { window.location.href = `mailto:${e}`; }
   formatPLN(v: number)         { return v >= 1_000_000 ? (v/1_000_000).toFixed(1)+'M' : v >= 1000 ? Math.round(v/1000)+'k' : String(Math.round(v)); }
+
+  /** Zwraca true gdy są nieprzeczytane odpowiedzi (nowe emaile od leada od ostatniego otwarcia). */
+  hasUnreadReply(lead: any): boolean {
+    const count = (lead.new_email_count ?? 0);
+    if (count === 0) return false;
+    const lastReply = lead.last_reply_at ? new Date(lead.last_reply_at).getTime() : 0;
+    if (!lastReply) return false;
+    const lastRead = parseInt(localStorage.getItem(`email_last_read_${lead.id}`) || '0', 10);
+    return lastReply > lastRead;
+  }
+
+  /** Liczba nieprzeczytanych odpowiedzi dla leada. */
+  unreadReplyCount(lead: any): number {
+    return this.hasUnreadReply(lead) ? (lead.new_email_count ?? 0) : 0;
+  }
 
   srcTagCls(src: string) {
     const m: Record<string,string> = {
