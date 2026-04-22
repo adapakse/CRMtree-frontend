@@ -178,8 +178,9 @@ const PROB_MAP: Record<LeadStage, number> = {
                 {{ initials(lead.assigned_to_name) }}
               </span>
             </div>
-            <div *ngIf="hasUnreadReply(lead)" style="display:flex;align-items:center;gap:3px;margin-top:2px">
-              <span style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap">
+              <span *ngIf="lead.non_email_activity_count>0" style="background:#f3f4f6;color:#374151;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;line-height:16px">🗓 {{lead.non_email_activity_count}}</span>
+              <span *ngIf="hasUnreadReply(lead)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
             </div>
             <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
           </div>
@@ -357,6 +358,8 @@ const PROB_MAP: Record<LeadStage, number> = {
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
           <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span>
+            <span *ngIf="lead.non_email_activity_count>0"
+                  style="background:#f3f4f6;color:#374151;font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{lead.non_email_activity_count}}</span>
             <span *ngIf="hasUnreadReply(lead)"
                   style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
           </div>

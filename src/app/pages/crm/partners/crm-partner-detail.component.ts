@@ -15,7 +15,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
   template: `
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
-    <button class="back-btn" routerLink="/crm/partners">�? Partnerzy</button>
+    <button class="back-btn" routerLink="/crm/partners">← Partnerzy</button>
     <h1>{{(partner.dwh_partner_id ? (partner.dwh_company_name || partner.company) : partner.company)}}</h1>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
