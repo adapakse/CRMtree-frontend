@@ -21,7 +21,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 
   <!-- HEADER -->
   <div style="height:56px;background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0">
-    <button style="background:none;border:none;color:#f97316;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">�? Leady</button>
+    <button style="background:none;border:none;color:#f97316;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
     <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
       <div *ngIf="lead.logo_url && logoSasUrl" style="width:34px;height:34px;border-radius:50%;background-size:cover;background-position:center;border:1px solid #e5e7eb;flex-shrink:0;background-color:#f9fafb"
            [style.background-image]="logoSasUrl"></div>
@@ -135,7 +135,7 @@ import { AuthService } from '../../../core/auth/auth.service';
       <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0">
         <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">
           Aktywności
-          <span *ngIf="lead.activities?.length" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{lead.activities!.length}}</span>
+          <span *ngIf="nonEmailActivityCount>0" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{nonEmailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; markEmailsRead()">
           📧 Emaile
@@ -1407,6 +1407,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   get emailActivityCount(): number {
     return this.newEmailCount;
+  }
+
+  get nonEmailActivityCount(): number {
+    return (this.lead?.activities || []).filter(x => x.type !== 'email').length;
   }
 
   get isManager() {
