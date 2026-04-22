@@ -3,7 +3,7 @@ import { Component, OnInit, inject, NgZone, ChangeDetectorRef } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser, PartnerGroup } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
 type SortDir = 'asc' | 'desc';
@@ -37,7 +37,7 @@ type SortDir = 'asc' | 'desc';
     </select>
     <select class="sel" [(ngModel)]="filterGroup" (ngModelChange)="reload()">
       <option value="">Wszystkie grupy</option>
-      <option *ngFor="let g of partnerGroups" [value]="g.id">{{g.name}}</option>
+      <option *ngFor="let g of partnerGroupNames" [value]="g">{{g}}</option>
     </select>
     <select class="sel" [(ngModel)]="filterIndustry" (ngModelChange)="reload()">
       <option value="">Wszystkie branże</option>
@@ -244,7 +244,7 @@ export class CrmPartnersListComponent implements OnInit {
   viewMode: 'cards' | 'table' = 'cards';
   showCreate = false; saving = false;
   crmUsers: CrmUser[] = [];
-  partnerGroups: PartnerGroup[] = [];
+  partnerGroupNames: string[] = [];
   industries: string[] = [];
 
   // Sorting
@@ -309,7 +309,7 @@ export class CrmPartnersListComponent implements OnInit {
 
   ngOnInit() {
     this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
-    this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
+    this.api.getPartnerGroupNames().subscribe({ next: g => { this.zone.run(() => { this.partnerGroupNames = g; this.cdr.markForCheck(); }); }, error: () => {} });
     this.reload();
   }
 
@@ -319,7 +319,7 @@ export class CrmPartnersListComponent implements OnInit {
     if (this.search)         p.search     = this.search;
     if (this.filterStatus)   p.status     = this.filterStatus;
     if (this.filterManager && this.isManager) p.manager_id = this.filterManager;
-    if (this.filterGroup)    p.group_id   = +this.filterGroup;
+    if (this.filterGroup)    p.group_name = this.filterGroup;
     if (this.filterIndustry) p.industry   = this.filterIndustry;
     const u = this.auth.user();
     if (u && !u.is_admin && u.crm_role === 'salesperson') p.manager_id = u.id;

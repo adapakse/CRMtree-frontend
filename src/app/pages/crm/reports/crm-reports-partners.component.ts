@@ -41,6 +41,10 @@ function healthColor(engagement: number): string {
 <div id="topbar" style="height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
   <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">Partner Performance</span>
   <span style="flex:1"></span>
+  <select class="sel" [(ngModel)]="groupFilter" (ngModelChange)="load()">
+    <option value="">Wszystkie grupy</option>
+    <option *ngFor="let g of groupNames" [value]="g">{{ g }}</option>
+  </select>
   <select class="sel" [(ngModel)]="partnerFilter" (ngModelChange)="onPartnerFilterChange()">
     <option value="">Wszyscy partnerzy</option>
     <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
@@ -337,6 +341,8 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   persistRepName = '';
   private readonly REP_FILTER_KEY = 'crm_rep_filter';
   partnerFilter = '';
+  groupFilter   = '';
+  groupNames:  string[] = [];
   currentYear   = new Date().getFullYear();
 
   kpi:       PartnersReportKpi | null = null;
@@ -362,6 +368,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     if (this.isManager) {
       this.api.getCrmUsers().subscribe({ next: u => { this.crmUsers = u; this.cdr.markForCheck(); }, error: () => {} });
     }
+    this.api.getPartnerGroupNames().subscribe({ next: g => { this.groupNames = g; this.cdr.markForCheck(); }, error: () => {} });
     // Persistowany filtr handlowca
     try {
       const saved = sessionStorage.getItem(this.REP_FILTER_KEY);
@@ -408,6 +415,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     if (this.periodTo)    p.period_to    = this.periodTo;
     if (this.repFilter && this.isManager)     p.rep_id       = this.repFilter;
     if (this.partnerFilter)                   p.partner_name = this.partnerFilter;
+    if (this.groupFilter)                     p.group_name   = this.groupFilter;
 
     this.api.getPartnersReport(p).subscribe({
       next: (report: PartnersReport) => {
