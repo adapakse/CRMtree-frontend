@@ -831,6 +831,10 @@ export class CrmApiService {
   getGroups(): Observable<PartnerGroup[]> {
     return this.http.get<PartnerGroup[]>(`${BASE}/groups`);
   }
+  /** Zwraca listę unikalnych nazw grup partnerów (COALESCE DWH + lokalne) — do filtrów */
+  getPartnerGroupNames(): Observable<string[]> {
+    return this.http.get<string[]>(`${BASE}/partners/group-names`);
+  }
   getGroup(id: number): Observable<PartnerGroup> {
     return this.http.get<PartnerGroup>(`${BASE}/groups/${id}`);
   }
@@ -948,7 +952,7 @@ export class CrmApiService {
   }
 
   // ── Raport Partnerzy ──────────────────────────────────────────
-  getPartnersReport(p: { period_from?: string; period_to?: string; product_type?: string; rep_id?: string; partner_name?: string } = {}): Observable<PartnersReport> {
+  getPartnersReport(p: { period_from?: string; period_to?: string; product_type?: string; rep_id?: string; partner_name?: string; group_name?: string } = {}): Observable<PartnersReport> {
     return this.http.get<PartnersReport>(`${BASE}/sales-data/report`, { params: this.toParams(p) });
   }
 
