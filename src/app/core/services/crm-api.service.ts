@@ -52,6 +52,7 @@ export interface Lead {
   converted_partner_id?: number | null;
   converted_partner_company?: string | null;
   activity_count?: number;
+  non_email_activity_count?: number;
   document_count?: number;
   email_count?: number;
   activities?: LeadActivity[];
