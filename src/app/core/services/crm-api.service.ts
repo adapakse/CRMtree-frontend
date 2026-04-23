@@ -81,6 +81,7 @@ export interface LeadActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  is_read: boolean | null;
 }
 
 export interface CalendarMeeting {
@@ -239,6 +240,9 @@ export interface Partner {
   open_opp_count?: number;
   open_opp_value?: number;
   email_count?: number;
+  non_email_activity_count?: number;
+  new_email_count?: number;
+  last_reply_at?: string | null;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];
@@ -269,6 +273,7 @@ export interface PartnerActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  is_read: boolean;
 }
 
 export interface OnboardingTask {
@@ -823,6 +828,18 @@ export class CrmApiService {
   }
   deletePartnerActivity(partnerId: number, actId: number): Observable<void> {
     return this.http.delete<void>(`${BASE}/partners/${partnerId}/activities/${actId}`);
+  }
+  patchLeadActivityRead(leadId: number, actId: number, isRead: boolean): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${BASE}/leads/${leadId}/activities/${actId}/read`, { is_read: isRead });
+  }
+  patchPartnerActivityRead(partnerId: number, actId: number, isRead: boolean): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${BASE}/partners/${partnerId}/activities/${actId}/read`, { is_read: isRead });
+  }
+  patchEmailMessageRead(msgId: string, isRead: boolean): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${BASE}/gmail/messages/${msgId}/read`, { is_read: isRead });
+  }
+  debugProcessGmail(): Observable<any> {
+    return this.http.post<any>(`${BASE}/gmail/debug/process`, {});
   }
   getPartnerTransactions(partnerId: number): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(`${BASE}/partners/${partnerId}/transactions`);

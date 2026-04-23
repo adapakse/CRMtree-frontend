@@ -64,8 +64,9 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.industry"   class="pc-tag">🏭 {{p.industry}}</span>
         <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
       </div>
-      <div *ngIf="hasUnreadReply(p)" style="margin-top:4px">
-        <span style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
+      <div *ngIf="hasUnreadReply(p)||((p.non_email_activity_count??0)>0)" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+        <span *ngIf="hasUnreadReply(p)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
+        <span *ngIf="(p.non_email_activity_count??0)>0" style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
       </div>
       <div class="pc-financials">
         <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
@@ -101,6 +102,8 @@ type SortDir = 'asc' | 'desc';
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
           <span *ngIf="hasUnreadReply(p)"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
+          <span *ngIf="(p.non_email_activity_count??0)>0"
+                style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
         </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
       </div>
@@ -352,19 +355,12 @@ export class CrmPartnersListComponent implements OnInit {
 
   goPartner(id: number) { this.router.navigate(['/crm/partners', id]); }
 
-  /** Zwraca true gdy są nieprzeczytane odpowiedzi od partnera. */
   hasUnreadReply(p: any): boolean {
-    const count = (p.new_email_count ?? 0);
-    if (count === 0) return false;
-    const lastReply = p.last_reply_at ? new Date(p.last_reply_at).getTime() : 0;
-    if (!lastReply) return false;
-    const lastRead = parseInt(localStorage.getItem(`partner_email_last_read_${p.id}`) || '0', 10);
-    return lastReply > lastRead;
+    return (p.new_email_count ?? 0) > 0;
   }
 
-  /** Liczba nieprzeczytanych odpowiedzi dla partnera. */
   unreadReplyCount(p: any): number {
-    return this.hasUnreadReply(p) ? (p.new_email_count ?? 0) : 0;
+    return p.new_email_count ?? 0;
   }
   prevPage() { if (this.page > 1) { this.page--; this.reload(); } }
   nextPage() { if (this.page < this.totalPages) { this.page++; this.reload(); } }

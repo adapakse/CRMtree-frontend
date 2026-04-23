@@ -1793,19 +1793,12 @@ export class CrmLeadsListComponent implements OnInit {
   mailTo(e: string)            { window.location.href = `mailto:${e}`; }
   formatPLN(v: number)         { return v >= 1_000_000 ? (v/1_000_000).toFixed(1)+'M' : v >= 1000 ? Math.round(v/1000)+'k' : String(Math.round(v)); }
 
-  /** Zwraca true gdy są nieprzeczytane odpowiedzi (nowe emaile od leada od ostatniego otwarcia). */
   hasUnreadReply(lead: any): boolean {
-    const count = (lead.new_email_count ?? 0);
-    if (count === 0) return false;
-    const lastReply = lead.last_reply_at ? new Date(lead.last_reply_at).getTime() : 0;
-    if (!lastReply) return false;
-    const lastRead = parseInt(localStorage.getItem(`email_last_read_${lead.id}`) || '0', 10);
-    return lastReply > lastRead;
+    return (lead.new_email_count ?? 0) > 0;
   }
 
-  /** Liczba nieprzeczytanych odpowiedzi dla leada. */
   unreadReplyCount(lead: any): number {
-    return this.hasUnreadReply(lead) ? (lead.new_email_count ?? 0) : 0;
+    return lead.new_email_count ?? 0;
   }
 
   srcTagCls(src: string) {

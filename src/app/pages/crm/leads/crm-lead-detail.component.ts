@@ -11,11 +11,12 @@ import {
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 
 @Component({
   selector: 'wt-crm-lead-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden" *ngIf="lead">
 
@@ -135,9 +136,9 @@ import { AuthService } from '../../../core/auth/auth.service';
       <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0">
         <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">
           Aktywności
-          <span *ngIf="nonEmailActivityCount>0" style="background:#f3f4f6;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">{{nonEmailActivityCount}}</span>
+          <wt-activity-count-badge [activities]="lead.activities||[]"></wt-activity-count-badge>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; markEmailsRead()">
+        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
           📧 Emaile
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
@@ -226,60 +227,32 @@ import { AuthService } from '../../../core/auth/auth.service';
 
       <!-- Emaile tab -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
+          <button class="btn-sm" (click)="debugProcessGmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile przez Gmail API (debug)">
+            {{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe
+          </button>
           <button class="btn-sm primary" (click)="openEmailModal()">+ Nowy email</button>
         </div>
         <div *ngIf="emailActivities.length===0" class="empty-act">Brak wysłanych emaili.</div>
         <!-- Aktywności email -->
-        <div *ngFor="let a of emailActivities" class="act-item" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid #dbeafe">
+        <div *ngFor="let a of emailActivities"
+             class="act-item"
+             style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;"
+             [style.border-left]="selectedEmailActivity?.id===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'"
+             [style.background]="selectedEmailActivity?.id===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
+             (click)="selectEmailForPanel(a)">
           <span class="act-type-icon">📧</span>
           <div class="act-body" style="flex:1">
-            <strong>{{a.title}}</strong>
+            <div style="display:flex;align-items:center;gap:6px">
+              <strong style="flex:1">{{a.title}}</strong>
+              <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0" title="Nieprzeczytana"></span>
+            </div>
             <div class="act-meta">
               <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
               <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
               <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
             </div>
             <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
-            <div style="margin-top:6px;display:flex;gap:6px">
-              <button *ngIf="a.gmail_thread_id" class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">
-                💬 Pokaż wątek
-              </button>
-              <button *ngIf="a.gmail_thread_id" class="btn-sm primary" style="font-size:10px" (click)="replyToThread(a)">
-                ↩ Odpowiedz
-              </button>
-            </div>
-            <!-- Thread preview -->
-            <div *ngIf="openThreadId===a.gmail_thread_id && threadMessages.length>0"
-                 style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px">
-              <div *ngFor="let m of threadMessages"
-                   style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px;cursor:pointer"
-                   (click)="openMsgModal(m)">
-                <div style="display:flex;justify-content:space-between">
-                  <span style="font-weight:600;color:#374151">{{m.from}}</span>
-                  <span style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
-                </div>
-                <div style="color:#6b7280;font-size:10px">Do: {{m.to}}<span *ngIf="m.cc"> · DW: {{m.cc}}</span></div>
-                <div style="margin-top:4px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{m.snippet}}</div>
-                <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
-                     style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px" (click)="$event.stopPropagation()">
-                  <span *ngFor="let att of m.attachments" class="att-chip" style="background:#eff6ff;color:#1d4ed8">
-                    📎 {{att.filename}}
-                    <span class="att-chip-actions">
-                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
-                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
-                    </span>
-                  </span>
-                  <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:#f0fdf4;color:#166534">
-                    📎 {{att.filename}}
-                    <span class="att-chip-actions">
-                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
-                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -324,6 +297,49 @@ import { AuthService } from '../../../core/auth/auth.service';
           🔔 Symulacja połączenia z {{lead.phone}}…
           <button (click)="mockCallActive=false" style="background:none;border:none;cursor:pointer;color:#15803d;margin-left:8px;font-weight:700">Rozłącz</button>
         </div>
+      </div>
+
+      <!-- Email otwarty w panelu -->
+      <div *ngIf="selectedEmailActivity" style="background:white;border:1px solid #bfdbfe;border-radius:10px;padding:14px;position:relative">
+        <button (click)="selectedEmailActivity=null;panelThreadMessages=[]"
+                style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px;line-height:1">✕</button>
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px;padding-right:20px">📧 {{selectedEmailActivity.title}}</div>
+        <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">
+          {{selectedEmailActivity.activity_at|date:'dd.MM.yyyy HH:mm'}}
+          <span *ngIf="selectedEmailActivity.created_by_name"> · {{selectedEmailActivity.created_by_name}}</span>
+        </div>
+        <div *ngIf="panelLoadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
+        <div *ngFor="let m of panelThreadMessages"
+             style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;margin-bottom:6px;font-size:11px"
+             [style.border-left]="isMessageRead(m) ? '3px solid #e5e7eb' : '3px solid #ef4444'">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
+            <span style="font-weight:600;color:#374151;flex:1">{{m.from}}</span>
+            <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
+          </div>
+          <div style="color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;cursor:pointer"
+               (click)="openMsgModal(m)">{{m.snippet}}</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button (click)="openMsgModal(m)"
+                    style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">
+              Otwórz
+            </button>
+            <button (click)="toggleMsgRead(m)"
+                    style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
+                    [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
+                    [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
+                    [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
+              {{isMessageRead(m) ? '✓ Przeczytana' : '● Nieprzeczytana'}}
+            </button>
+          </div>
+        </div>
+        <div *ngIf="!panelLoadingThread && panelThreadMessages.length===0 && selectedEmailActivity.body"
+             style="font-size:11px;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-bottom:6px">
+          {{stripHtml(selectedEmailActivity.body)}}
+        </div>
+        <button *ngIf="selectedEmailActivity.gmail_thread_id" class="comm-btn" style="margin-top:6px"
+                (click)="replyToThread(selectedEmailActivity)">
+          <span>↩</span><div style="flex:1;text-align:left"><div style="font-size:12px;font-weight:600">Odpowiedz</div></div>
+        </button>
       </div>
 
       <!-- Status leada quick-change -->
@@ -1177,6 +1193,8 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private gmailBc: BroadcastChannel | null = null;
+  private emailPollInterval: any = null;
+  debugProcessing = false;
 
   private onGmailOauthResult(status: string): void {
     if (status !== 'connected') return;
@@ -1381,6 +1399,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   threadMessages: any[] = [];
   openThreadId    = '';
   private currentThreadActivity: any = null;
+  selectedEmailActivity: any = null;
+  panelThreadMessages: any[] = [];
+  panelLoadingThread = false;
 
   // ── Konto testowe ─────────────────────────────────────────────────────────
   showTestAccount       = false;
@@ -1395,23 +1416,27 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   };
 
   get emailActivities(): any[] {
-    const all = (this.lead?.activities || []).filter((a: any) => a.type === 'email');
-    const seen = new Set<string>();
-    return all.filter((a: any) => {
-      if (!a.gmail_thread_id) return true;
-      if (seen.has(a.gmail_thread_id)) return false;
-      seen.add(a.gmail_thread_id);
-      return true;
-    });
+    const all = (this.lead?.activities || [])
+      .filter((a: any) => a.type === 'email')
+      .sort((a: any, b: any) => (b.id || 0) - (a.id || 0));
+    const byThread = new Map<string, any>();
+    const noThread: any[] = [];
+    for (const a of all) {
+      if (!a.gmail_thread_id) { noThread.push(a); continue; }
+      if (!byThread.has(a.gmail_thread_id)) {
+        byThread.set(a.gmail_thread_id, { ...a });
+      } else {
+        // Jeśli którakolwiek aktywność w wątku jest nieprzeczytana — wątek jest nieprzeczytany
+        if (!a.is_read) byThread.get(a.gmail_thread_id).is_read = false;
+      }
+    }
+    return [...byThread.values(), ...noThread];
   }
 
   get emailActivityCount(): number {
     return this.newEmailCount;
   }
 
-  get nonEmailActivityCount(): number {
-    return (this.lead?.activities || []).filter(x => x.type !== 'email').length;
-  }
 
   get isManager() {
     const u = this.auth.user();
@@ -1468,6 +1493,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.gmailBc?.close();
     this.gmailBc = null;
     window.removeEventListener('message', this.gmailMessageHandler);
+    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
 
   loadLead(numId?: number) {
@@ -1476,11 +1502,57 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.loadError = false;
     this.lead = null;
+    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
     this.api.getLead(id).pipe(
       finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
     ).subscribe({
-      next: l  => { this.zone.run(() => { this.lead = l; this.historyLoaded = false; this.loadLogoSas(); this.cdr.markForCheck(); }); },
+      next: l  => {
+        this.zone.run(() => {
+          this.lead = l;
+          this.historyLoaded = false;
+          this.loadLogoSas();
+          this.cdr.markForCheck();
+          // Poll for new incoming emails every 30 s
+          this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
+        });
+      },
       error: () => { this.zone.run(() => { this.loadError = true; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  refreshEmailActivities(): void {
+    if (!this.lead) return;
+    this.api.getLead(this.lead.id).subscribe({
+      next: (fresh: any) => this.zone.run(() => {
+        if (!this.lead) return;
+        this.lead = { ...this.lead, activities: fresh.activities || [] };
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  debugProcessGmail(): void {
+    this.debugProcessing = true;
+    this.cdr.markForCheck();
+    this.api.debugProcessGmail().subscribe({
+      next: (result: any) => this.zone.run(() => {
+        this.debugProcessing = false;
+        console.log('[Debug] processGmail result:', result);
+        alert(
+          `historyId: ${result.historyId_before} → ${result.historyId_after}\n` +
+          `Nowe wiadomości: ${(result.messageIds_found || []).length}\n` +
+          `crm_email_message_reads (ostatnie 10): ${result.recent_message_reads?.length || 0} rekordów\n\n` +
+          `Sprawdź konsolę po szczegóły.`
+        );
+        this.refreshEmailActivities();
+        this.cdr.markForCheck();
+      }),
+      error: (e: any) => this.zone.run(() => {
+        this.debugProcessing = false;
+        alert('Błąd: ' + (e.error?.error || e.message));
+        this.cdr.markForCheck();
+      }),
     });
   }
 
@@ -1681,7 +1753,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
               gmail_thread_id: result.threadId,
               gmail_message_id: result.messageId,
               activity_at: new Date().toISOString(),
+              created_by: this.auth.user()?.id || null,
               created_by_name: this.auth.user()?.display_name || null,
+              is_read: true,
             };
             this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
           } else if (replyThreadId && this.lead) {
@@ -1811,7 +1885,74 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.msgModalError  = '';
     this.msgModalSending = false;
     this.showMsgModal   = true;
+    this.markMsgRead(m);
     this.cdr.markForCheck();
+  }
+
+  selectEmailForPanel(a: any): void {
+    if (!this.lead) return;
+    if (this.selectedEmailActivity?.id === a.id) {
+      this.selectedEmailActivity = null;
+      this.panelThreadMessages   = [];
+      this.cdr.markForCheck();
+      return;
+    }
+    this.selectedEmailActivity = a;
+    this.panelThreadMessages   = [];
+    this.panelLoadingThread    = true;
+    this.cdr.markForCheck();
+    // Wątek ma nieprzeczytane — oznacz jako przeczytany
+    if (!a.is_read) {
+      a.is_read = true;
+      this.api.patchLeadActivityRead(this.lead.id, a.id, true).subscribe({ error: () => {} });
+    }
+    if (a.gmail_thread_id) {
+      this.api.getLeadEmailThread(this.lead.id, a.gmail_thread_id).subscribe({
+        next: msgs => this.zone.run(() => {
+          this.panelThreadMessages = msgs;
+          this.panelLoadingThread  = false;
+          // Auto-mark all unread incoming messages in the thread
+          msgs.forEach((m: any) => {
+            if (m.is_read === false && m.created_by === null) {
+              m.is_read = true;
+              this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
+            }
+          });
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => { this.panelLoadingThread = false; this.cdr.markForCheck(); }),
+      });
+    } else {
+      this.panelLoadingThread = false;
+    }
+  }
+
+  isMessageRead(m: any): boolean {
+    return m.is_read !== false;
+  }
+
+  hasUnreadInActivity(a: any): boolean {
+    return !a.is_read;
+  }
+
+  markMsgRead(m: any): void {
+    if (!this.lead || m.is_read !== false || m.created_by !== null) return;
+    m.is_read = true;
+    this.cdr.markForCheck();
+    this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
+  }
+
+  toggleMsgRead(m: any): void {
+    if (!this.lead || m.created_by !== null) return;
+    const newVal = !m.is_read;
+    m.is_read = newVal;
+    this.cdr.markForCheck();
+    this.api.patchEmailMessageRead(m.id, newVal).subscribe({ error: () => {} });
+    // Jeśli oznaczamy jako nieprzeczytana — aktualizuj też aktywność wątku (badge)
+    if (!newVal && this.selectedEmailActivity) {
+      this.selectedEmailActivity.is_read = false;
+      this.api.patchLeadActivityRead(this.lead.id, this.selectedEmailActivity.id, false).subscribe({ error: () => {} });
+    }
   }
 
   closeMsgModal(): void {
@@ -1940,11 +2081,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     } catch (e) { console.error('[downloadAtt]', e); }
   }
 
-  markEmailsRead(): void {
-    if (!this.lead) return;
-    localStorage.setItem(`email_last_read_${this.lead.id}`, String(Date.now()));
-    this.cdr.markForCheck();
-  }
+  markEmailsRead(): void {}
 
   private buildQuotedBody(messages: any[]): string {
     if (!messages?.length) return '';
@@ -1993,10 +2130,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   get newEmailCount(): number {
     if (!this.lead) return 0;
-    const last = parseInt(localStorage.getItem(`email_last_read_${this.lead.id}`) || '0', 10);
-    // Liczymy tylko odpowiedzi przychodzące (created_by === null = zsynchronizowane z Gmaila)
     return (this.lead.activities || []).filter(
-      (a: any) => a.type === 'email' && a.created_by === null && a.activity_at && new Date(a.activity_at).getTime() > last
+      (a: any) => a.type === 'email' && !a.is_read
     ).length;
   }
 
