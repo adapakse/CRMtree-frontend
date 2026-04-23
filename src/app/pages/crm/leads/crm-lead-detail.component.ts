@@ -825,9 +825,18 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <!-- Status: konto już założone -->
       <div *ngIf="testAccount?.status==='created'" class="ta-status-ok">
         <span style="font-size:22px">✅</span>
-        <div>
+        <div style="flex:1">
           <div style="font-size:12px;font-weight:700;color:#15803d">Konto testowe założone</div>
-          <div style="font-size:12px;color:#16a34a;font-family:monospace;margin-top:2px">Nr: {{testAccount!.test_account_number}}</div>
+          <div style="font-size:12px;color:#16a34a;font-family:monospace;margin-top:2px">
+            Nr: {{testAccount!.test_account_number}}
+            <span *ngIf="testAccount!.htcd_partner_id" style="color:#6b7280"> · ID HTCD: {{testAccount!.htcd_partner_id}}</span>
+          </div>
+          <div *ngIf="testAccount!.price_list_url" style="margin-top:4px">
+            <a [href]="testAccount!.price_list_url" target="_blank"
+               style="font-size:11px;color:#2563eb;text-decoration:underline">
+              📋 Otwórz cennik w HTCD
+            </a>
+          </div>
           <div style="font-size:10px;color:#6b7280;margin-top:2px">Ten numer zostanie przekazany jako Nr. Partnera podczas migracji.</div>
         </div>
       </div>
