@@ -867,7 +867,11 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
           <label>Język *
             <select [(ngModel)]="taForm.language" [style.border-color]="taSubmitAttempt&&!taForm.language?'#ef4444':''">
               <option value="">— wybierz —</option>
-              <option *ngFor="let l of dictPartnerLanguages" [value]="l">{{l}}</option>
+              <option value="PL">Polski</option>
+              <option value="EN">Angielski</option>
+              <option value="DE">Niemiecki</option>
+              <option value="RU">Rosyjski</option>
+              <option value="RO">Rumuński</option>
             </select>
           </label>
         </div>
@@ -885,7 +889,16 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
           <label>Kraj *
             <select [(ngModel)]="taForm.country" [style.border-color]="taSubmitAttempt&&!taForm.country?'#ef4444':''">
               <option value="">— wybierz —</option>
-              <option *ngFor="let c of dictPartnerCountries" [value]="c">{{c}}</option>
+              <option value="PL">Polska</option>
+              <option value="DE">Niemcy</option>
+              <option value="FR">Francja</option>
+              <option value="GB">Wielka Brytania</option>
+              <option value="CZ">Czechy</option>
+              <option value="SK">Słowacja</option>
+              <option value="HU">Węgry</option>
+              <option value="RO">Rumunia</option>
+              <option value="UA">Ukraina</option>
+              <option value="RU">Rosja</option>
             </select>
           </label>
         </div>
@@ -911,7 +924,16 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
           <label>Kraj rozliczeniowy *
             <select [(ngModel)]="taForm.billing_country" [style.border-color]="taSubmitAttempt&&!taForm.billing_country?'#ef4444':''">
               <option value="">— wybierz —</option>
-              <option *ngFor="let c of dictPartnerCountries" [value]="c">{{c}}</option>
+              <option value="PL">Polska</option>
+              <option value="DE">Niemcy</option>
+              <option value="FR">Francja</option>
+              <option value="GB">Wielka Brytania</option>
+              <option value="CZ">Czechy</option>
+              <option value="SK">Słowacja</option>
+              <option value="HU">Węgry</option>
+              <option value="RO">Rumunia</option>
+              <option value="UA">Ukraina</option>
+              <option value="RU">Rosja</option>
             </select>
           </label>
           <label>Email rozliczeniowy *
