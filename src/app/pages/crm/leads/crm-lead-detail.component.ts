@@ -42,7 +42,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
         <span *ngIf="testAccount?.status==='error'"   class="ta-badge-err">!</span>
       </button>
-      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">→ Migruj na Partnera</button>
+      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">✓ Zakończ onboarding</button>
     </div>
   </div>
 
@@ -357,19 +357,16 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         </div>
       </div>
 
-      <!-- Konwersja -->
+      <!-- Onboarding -->
       <div *ngIf="!lead.converted_at" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">→ Migracja</div>
-        <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Przekształć lead w Partnera gdy jest gotowy do podpisania umowy.</div>
-        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">Migruj na Partnera →</button>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">✓ Zakończenie onboardingu</div>
+        <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Zakończ onboarding gdy konto w systemie zewnętrznym zostało założone. Partner pojawi się w Rejestrze Partnerów po synchronizacji z DWH.</div>
+        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">✓ Zakończ onboarding →</button>
       </div>
-      <div *ngIf="lead.converted_at" style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:#7C3AED;margin-bottom:4px">✦ Zmigrowany na Partnera</div>
-        <div style="font-size:11px;color:#9ca3af;margin-bottom:8px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
-        <a *ngIf="lead.converted_partner_id" [routerLink]="['/crm/onboarding']" [queryParams]="{partner: lead.converted_partner_id}"
-           style="display:block;text-align:center;background:#7C3AED;color:white;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;text-decoration:none">
-          Przejdź do Partnera →
-        </a>
+      <div *ngIf="lead.converted_at" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">✓ Onboarding zakończony</div>
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
+        <div style="font-size:11px;color:#6b7280">Partner pojawi się w Rejestrze Partnerów po synchronizacji z DWH.</div>
       </div>
     </div>
   </div>
@@ -972,16 +969,14 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
   </div>
 </div>
 
-<!-- Convert dialog -->
+<!-- Onboarding zakończenie dialog -->
 <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h3>Migruj lead na Partnera</h3>
-    <p>Firma <strong>{{lead?.company}}</strong> zostanie przeniesiona do rejestru partnerów. Lead pozostanie w rejestrze ze statusem <strong>Won</strong>.</p>
-    <label>Wartość kontraktu (PLN)<input [(ngModel)]="convertForm.contract_value" type="number" min="0"></label>
-    <label>Data podpisania<input [(ngModel)]="convertForm.contract_signed" type="date"></label>
+    <h3>Zakończ onboarding</h3>
+    <p>Potwierdź zakończenie onboardingu dla firmy <strong>{{lead?.company}}</strong>. Lead otrzyma status <strong>Onboardowany</strong>. Partner pojawi się w Rejestrze Partnerów po synchronizacji z DWH.</p>
     <div class="modal-actions">
       <button class="btn-outline" (click)="showConvert=false">Anuluj</button>
-      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'Migruj na Partnera →'}}</button>
+      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'✓ Zakończ onboarding'}}</button>
     </div>
   </div>
 </div>
@@ -2651,15 +2646,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (!this.lead) return;
     this.converting = true;
     this.api.convertLead(this.lead.id, this.convertForm).subscribe({
-      next: r => {
+      next: () => {
         this.converting = false;
         this.showConvert = false;
-        // Przeładuj leada — pokaże partner link i status Won
         this.lead = {
           ...this.lead!,
-          stage: 'closed_won' as any,
+          stage: 'onboarded' as any,
           converted_at: new Date().toISOString(),
-          converted_partner_id: r.partner.id,
         };
         this.cdr.markForCheck();
       },

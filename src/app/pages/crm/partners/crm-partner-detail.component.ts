@@ -359,7 +359,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history'; loadHistory()">Historia zmian</button>
         <div style="flex:1"></div>
         <button class="btn-sm" *ngIf="midTab==='activities'" (click)="openNewActivityForm()">+ Dodaj</button>
-        <button class="btn-sm" *ngIf="midTab==='emails'" (click)="openEmailModal()" [disabled]="!partner?.email">✉️ Wyślij</button>
+        <button class="btn-sm" *ngIf="midTab==='emails'" (click)="openEmailModal()">✉️ Wyślij</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
@@ -484,56 +484,74 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       </div>
 
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
-      <div *ngIf="midTab==='emails'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
-        <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „✉️ Wyślij".</div>
-        <div *ngFor="let a of emailActivities"
-             class="act-item"
-             style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer"
-             [style.border-left]="hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'"
-             [style.background]="hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
-             (click)="toggleThreadInline(a)">
-          <span class="act-icon">📧</span>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:6px">
-              <strong style="flex:1">{{a.title}}</strong>
-              <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0" title="Nieprzeczytana"></span>
-            </div>
-            <div class="act-meta">
-              <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
-              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-              <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
-              <span *ngIf="!a.assigned_to_name && !a.created_by_name" style="color:#ef4444">↩ Odpowiedź</span>
-            </div>
-            <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
-            <!-- Thread inline (po kliknięciu) -->
-            <div *ngIf="openThreadId===a.gmail_thread_id && (threadMessages.length>0 || loadingThread)"
-                 style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px"
-                 (click)="$event.stopPropagation()">
-              <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
-              <div *ngFor="let m of threadMessages"
-                   style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px"
-                   [style.border-left]="isMessageRead(m) ? '3px solid transparent' : '3px solid #ef4444'">
-                <div style="display:flex;justify-content:space-between;margin-bottom:4px;cursor:pointer" (click)="openMsgModal(m)">
-                  <span style="font-weight:600;color:#374151">{{m.from}}</span>
-                  <span style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM HH:mm'}}</span>
-                </div>
-                <div style="color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;cursor:pointer" (click)="openMsgModal(m)">{{m.snippet}}</div>
-                <div style="display:flex;gap:6px;align-items:center">
-                  <button (click)="openMsgModal(m)"
-                          style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">
-                    Otwórz
-                  </button>
-                  <button (click)="toggleMsgRead(m)"
-                          style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
-                          [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
-                          [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
-                          [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
-                    {{isMessageRead(m) ? '✓ Przeczytana' : '● Nieprzeczytana'}}
-                  </button>
-                </div>
+      <div *ngIf="midTab==='emails'" style="flex:1;display:flex;overflow:hidden">
+        <!-- Lista emaili -->
+        <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:0;min-width:0">
+          <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „✉️ Wyślij".</div>
+          <div *ngFor="let a of emailActivities"
+               class="act-item"
+               style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer"
+               [style.border-left]="selectedEmailActivity?.id===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'"
+               [style.background]="selectedEmailActivity?.id===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
+               (click)="selectEmailForPanel(a)">
+            <span class="act-icon">📧</span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px">
+                <strong style="flex:1">{{a.title}}</strong>
+                <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0" title="Nieprzeczytana"></span>
               </div>
-              <button *ngIf="a.gmail_thread_id" class="btn-sm primary" style="font-size:10px;margin-top:4px" (click)="replyToThread(a)">↩ Odpowiedz</button>
+              <div class="act-meta">
+                <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
+                <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+                <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
+                <span *ngIf="!a.assigned_to_name && !a.created_by_name" style="color:#ef4444">↩ Odpowiedź</span>
+              </div>
+              <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
             </div>
+          </div>
+        </div>
+        <!-- Panel prawy: wybrany wątek -->
+        <div *ngIf="selectedEmailActivity" style="width:300px;border-left:1px solid #e5e7eb;overflow-y:auto;padding:12px;flex-shrink:0">
+          <div style="background:white;border:1px solid #bfdbfe;border-radius:10px;padding:14px;position:relative">
+            <button (click)="selectedEmailActivity=null;panelThreadMessages=[]"
+                    style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px;line-height:1">✕</button>
+            <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px;padding-right:20px">📧 {{selectedEmailActivity.title}}</div>
+            <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">
+              {{selectedEmailActivity.activity_at|date:'dd.MM.yyyy HH:mm'}}
+              <span *ngIf="selectedEmailActivity.created_by_name"> · {{selectedEmailActivity.created_by_name}}</span>
+            </div>
+            <div *ngIf="panelLoadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
+            <div *ngFor="let m of panelThreadMessages"
+                 style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;margin-bottom:6px;font-size:11px"
+                 [style.border-left]="isMessageRead(m) ? '3px solid #e5e7eb' : '3px solid #ef4444'">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
+                <span style="font-weight:600;color:#374151;flex:1">{{m.from}}</span>
+                <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
+              </div>
+              <div style="color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;cursor:pointer"
+                   (click)="openMsgModal(m)">{{m.snippet}}</div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <button (click)="openMsgModal(m)"
+                        style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">
+                  Otwórz
+                </button>
+                <button (click)="toggleMsgRead(m)"
+                        style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
+                        [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
+                        [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
+                        [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
+                  {{isMessageRead(m) ? '✓ Przeczytana' : '● Nieprzeczytana'}}
+                </button>
+              </div>
+            </div>
+            <div *ngIf="!panelLoadingThread && panelThreadMessages.length===0 && selectedEmailActivity.body"
+                 style="font-size:11px;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-bottom:6px">
+              {{stripHtml(selectedEmailActivity.body)}}
+            </div>
+            <button *ngIf="selectedEmailActivity.gmail_thread_id" class="comm-btn" style="margin-top:6px"
+                    (click)="replyToThread(selectedEmailActivity)">
+              <span>↩</span><div style="flex:1;text-align:left"><div style="font-size:12px;font-weight:600">Odpowiedz</div></div>
+            </button>
           </div>
         </div>
       </div>
@@ -1243,7 +1261,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <div class="modal-footer">
         <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
         <button class="btn-primary" (click)="sendEmail()"
-                [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
+                [disabled]="sendingEmail||(!emailForm.recipientList?.length&&!recipientQuery?.trim())||!emailForm.subject">
           {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
         </button>
       </div>
@@ -1271,9 +1289,8 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <span *ngIf="msgModalMsg.cc">{{msgModalMsg.cc}}</span>
         <span style="color:#9ca3af">Data:</span><span>{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
-      <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;white-space:pre-line;color:#374151;max-height:320px;overflow-y:auto">
-        {{msgModalMsg.body || msgModalMsg.snippet}}
-      </div>
+      <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;color:#374151;max-height:320px;overflow-y:auto"
+           [innerHTML]="msgModalMsg.body || msgModalMsg.snippet"></div>
       <!-- Attachments -->
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:4px">
@@ -1577,13 +1594,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   /**
    * Zwraca true gdy pole powinno być zablokowane do edycji (read-only z DWH).
    * Logika:
-   *  - Zawsze edytowalne gdy partner w statusie 'onboarding'
    *  - Zawsze edytowalne gdy brak połączenia z DWH (dwh_partner_id = null)
-   *  - Read-only gdy partner aktywny/nieaktywny/churned AND DWH dostarczyło wartość (field_from_dwh = true)
+   *  - Read-only gdy DWH dostarczyło wartość (field_from_dwh = true) — niezależnie od statusu
    */
   isDwhFieldReadOnly(field: string): boolean {
     if (!this.partner) return false;
-    if (this.partner.status === 'onboarding') return false;
     if (!this.partner.dwh_partner_id) return false;
     return !!(this.partner as any)[field + '_from_dwh'];
   }
@@ -1629,6 +1644,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   threadMessages: any[] = [];
   loadingThread       = false;
   openThreadId        = '';
+  selectedEmailActivity: any = null;
+  panelThreadMessages: any[] = [];
+  panelLoadingThread  = false;
   gmailConnected      = false;
   gmailEmail          = '';
   gmailAuthUrl        = '';
@@ -2337,7 +2355,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   openEmailModal(prefillThreadId?: string): void {
     this.emailForm = {
-      recipientList: this.partner?.email ? [this.partner.email] : [],
+      recipientList: this.partner?.email ? [this.partner.email] : (this.partner?.billing_email_address ? [this.partner.billing_email_address] : []),
       ccList: [],
       subject: '',
       body: '',
@@ -2587,6 +2605,42 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   markEmailsRead(): void {}
 
+  selectEmailForPanel(a: any): void {
+    if (!this.partner) return;
+    if (this.selectedEmailActivity?.id === a.id) {
+      this.selectedEmailActivity = null;
+      this.panelThreadMessages   = [];
+      this.cdr.markForCheck();
+      return;
+    }
+    this.selectedEmailActivity = a;
+    this.panelThreadMessages   = [];
+    this.panelLoadingThread    = true;
+    this.cdr.markForCheck();
+    if (!a.is_read) {
+      a.is_read = true;
+      this.api.patchPartnerActivityRead(this.partner.id, a.id, true).subscribe({ error: () => {} });
+    }
+    if (a.gmail_thread_id) {
+      this.api.getPartnerEmailThread(this.partner.id, a.gmail_thread_id).subscribe({
+        next: msgs => this.zone.run(() => {
+          this.panelThreadMessages = msgs;
+          this.panelLoadingThread  = false;
+          msgs.forEach((m: any) => {
+            if (m.is_read === false && m.created_by === null) {
+              m.is_read = true;
+              this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
+            }
+          });
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => { this.panelLoadingThread = false; this.cdr.markForCheck(); }),
+      });
+    } else {
+      this.panelLoadingThread = false;
+    }
+  }
+
   toggleThreadInline(a: any): void {
     if (!this.partner || !a.gmail_thread_id) return;
     if (this.openThreadId === a.gmail_thread_id) {
@@ -2641,12 +2695,16 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.api.patchEmailMessageRead(m.id, newVal).subscribe({ error: () => {} });
     // Jeśli oznaczamy jako nieprzeczytana — aktualizuj też aktywność wątku (badge)
     if (!newVal) {
+      const currentThreadId = this.selectedEmailActivity?.gmail_thread_id || this.openThreadId;
       const threadAct = (this.partner.activities || []).find(
-        (a: any) => a.gmail_thread_id === this.openThreadId
+        (a: any) => a.gmail_thread_id === currentThreadId
       );
       if (threadAct) {
         threadAct.is_read = false;
         this.api.patchPartnerActivityRead(this.partner.id, threadAct.id, false).subscribe({ error: () => {} });
+      }
+      if (this.selectedEmailActivity?.gmail_thread_id === currentThreadId) {
+        this.selectedEmailActivity.is_read = false;
       }
     }
   }
