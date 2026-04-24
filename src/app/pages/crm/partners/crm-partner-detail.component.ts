@@ -18,6 +18,9 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
   <div class="detail-header">
     <button class="back-btn" routerLink="/crm/partners">← Partnerzy</button>
     <h1>{{(partner.dwh_partner_id ? (partner.dwh_company_name || partner.company) : partner.company)}}</h1>
+    <span *ngIf="partner.switched_to_prod_at" style="font-size:12px;color:var(--gray-500);margin-left:8px;align-self:center">
+      Aktywny od {{partner.switched_to_prod_at | date:'dd.MM.yyyy'}}
+    </span>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
     <button class="btn-outline" (click)="openEdit()">✏️ Edytuj</button>
@@ -257,6 +260,10 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
 
       <div class="info-grid" style="margin-top:10px">
         <span class="lbl">Notatki</span><span class="notes">{{partner.notes || '—'}}</span>
+        <ng-container *ngIf="partner.customer_service_note">
+          <span class="lbl">Notatka <span class="dwh-badge">DWH</span></span>
+          <span class="notes">{{partner.customer_service_note}}</span>
+        </ng-container>
       </div>
 
       <!-- Dane dodatkowe — CRM + DWH -->
@@ -276,9 +283,17 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
             <span class="lbl">Waluta <span class="dwh-badge" *ngIf="partner.partner_currency_from_dwh">DWH</span></span>
             <span>{{partner.partner_currency || '—'}}</span>
           </ng-container>
+          <ng-container *ngIf="partner.dwh_currency">
+            <span class="lbl">Waluta partnera <span class="dwh-badge">DWH</span></span>
+            <span>{{partner.dwh_currency}}</span>
+          </ng-container>
           <ng-container *ngIf="partner.country || partner.dwh_partner_id">
             <span class="lbl">Kraj <span class="dwh-badge" *ngIf="partner.country_from_dwh">DWH</span></span>
             <span>{{partner.country || '—'}}</span>
+          </ng-container>
+          <ng-container *ngIf="partner.max_debit != null">
+            <span class="lbl">Limit kredytowy <span class="dwh-badge">DWH</span></span>
+            <span>{{partner.max_debit | number:'1.2-2'}}</span>
           </ng-container>
         </div>
       </div>

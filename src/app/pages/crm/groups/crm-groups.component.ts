@@ -26,10 +26,12 @@ import { AuthService } from '../../../core/auth/auth.service';
       <div class="gc-header">
         <div class="gc-icon">🏢</div>
         <div class="gc-title">
-          <div class="gc-name">{{g.name}}</div>
+          <div class="gc-name">{{g.name}}
+            <span *ngIf="g.source==='dwh'" style="font-size:10px;font-weight:700;background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle">DWH</span>
+          </div>
           <div class="gc-industry" *ngIf="g.industry">{{g.industry}}</div>
         </div>
-        <div class="gc-actions" *ngIf="isManager" (click)="$event.stopPropagation()">
+        <div class="gc-actions" *ngIf="isManager && g.source !== 'dwh'" (click)="$event.stopPropagation()">
           <button class="icon-btn" (click)="editGroup(g)">✏️</button>
         </div>
       </div>
@@ -58,7 +60,8 @@ import { AuthService } from '../../../core/auth/auth.service';
           <div class="vp-sub" *ngIf="viewingGroup.industry">{{viewingGroup.industry}}</div>
         </div>
         <div class="vp-header-actions">
-          <button class="icon-btn" *ngIf="isManager" (click)="editGroup(viewingGroup)">✏️</button>
+          <span *ngIf="viewingGroup.source==='dwh'" style="font-size:10px;font-weight:700;background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:2px 8px;margin-right:4px">DWH</span>
+          <button class="icon-btn" *ngIf="isManager && viewingGroup.source !== 'dwh'" (click)="editGroup(viewingGroup)">✏️</button>
           <button class="close-btn" (click)="closeViewPanel()">✕</button>
         </div>
       </div>

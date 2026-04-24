@@ -328,12 +328,13 @@ export interface LeadContact {
 }
 
 export interface PartnerGroup {
-  id: number;
+  id: number | null;
   name: string;
   industry: string | null;
   description: string | null;
   manager_id: string | null;
   manager_name: string | null;
+  source?: 'crm' | 'dwh';
   partner_count: number;
   total_arr: number;
   partners: Partial<Partner>[];
