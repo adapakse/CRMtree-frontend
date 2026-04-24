@@ -236,6 +236,11 @@ export interface Partner {
   admin_first_name_from_dwh: boolean;
   admin_last_name_from_dwh: boolean;
   admin_email_from_dwh: boolean;
+  // Dodatkowe pola z DWH (tylko do odczytu)
+  dwh_currency: string | null;
+  max_debit: number | null;
+  customer_service_note: string | null;
+  switched_to_prod_at: string | null;
   // ──────────────────────────────────────────────────────────────────────────
   open_opp_count?: number;
   open_opp_value?: number;

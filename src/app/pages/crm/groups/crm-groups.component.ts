@@ -257,7 +257,7 @@ export class CrmGroupsComponent implements OnInit {
     this.saving = true;
     const data = { name: this.form.name, industry: this.form.industry || null, description: this.form.description || null };
     const obs = this.editingGroup
-      ? this.api.updateGroup(this.editingGroup.id, data)
+      ? this.api.updateGroup(this.editingGroup.id!, data)
       : this.api.createGroup(data);
     obs.subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; } });
   }
@@ -266,6 +266,6 @@ export class CrmGroupsComponent implements OnInit {
     if (!this.editingGroup) return;
     if (!confirm(`Usunąć grupę "${this.editingGroup.name}"? Partnerzy zostaną odłączeni.`)) return;
     this.saving = true;
-    this.api.deleteGroup(this.editingGroup.id).subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; } });
+    this.api.deleteGroup(this.editingGroup.id!).subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; } });
   }
 }
