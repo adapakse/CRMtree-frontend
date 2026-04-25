@@ -20,7 +20,7 @@ const KANBAN_STAGES: { key: LeadStage; label: string; dot: string }[] = [
 
 const PROB_MAP: Record<LeadStage, number> = {
   new: 10, qualification: 25, presentation: 50,
-  offer: 70, negotiation: 85, closed_won: 100, closed_lost: 0, onboarded: 100,
+  offer: 70, negotiation: 85, closed_won: 100, closed_lost: 0, onboarding: 100, onboarded: 100,
 };
 
 @Component({

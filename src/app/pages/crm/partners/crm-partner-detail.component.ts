@@ -2226,8 +2226,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   finishOnboarding(): void {
     if (!this.partner) return;
-    // Krok 3 = ostatni — backend sprawdzi wszystkie zadania i ustawi status=active
-    this.api.updateOnboardingStep(this.partner.id, 3).subscribe({
+    // Step 4 wyzwala isFinishing w backendzie → status='active', lead stage='onboarded'
+    this.api.updateOnboardingStep(this.partner.id, 4).subscribe({
       next: p => {
         this.zone.run(() => {
           if (this.partner) {

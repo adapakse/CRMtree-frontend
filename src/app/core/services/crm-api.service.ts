@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
 
 export type LeadStage =
   | 'new' | 'qualification' | 'presentation'
-  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost' | 'onboarded';
+  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost' | 'onboarding' | 'onboarded';
 
 export type PartnerStatus = 'onboarding' | 'active' | 'inactive' | 'churned';
 
@@ -632,6 +632,7 @@ export const LEAD_STAGE_LABELS: Record<LeadStage, string> = {
   negotiation:   'Negocjacje',
   closed_won:    'Wygrany',
   closed_lost:   'Przegrany',
+  onboarding:    'W onboardingu',
   onboarded:     'Onboardowany',
 };
 

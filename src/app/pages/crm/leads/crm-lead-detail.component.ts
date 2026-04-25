@@ -42,7 +42,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
         <span *ngIf="testAccount?.status==='error'"   class="ta-badge-err">!</span>
       </button>
-      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">✓ Zakończ onboarding</button>
+      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">🚀 Rozpocznij onboarding</button>
     </div>
   </div>
 
@@ -359,11 +359,17 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
 
       <!-- Onboarding -->
       <div *ngIf="!lead.converted_at" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">✓ Zakończenie onboardingu</div>
-        <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Zakończ onboarding gdy konto w systemie zewnętrznym zostało założone. Partner pojawi się w Rejestrze Partnerów po synchronizacji z DWH.</div>
-        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">✓ Zakończ onboarding →</button>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">🚀 Rozpocznij onboarding</div>
+        <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Podaj wartość kontraktu i datę podpisania umowy, aby przenieść leada do procesu wdrożenia.</div>
+        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">🚀 Rozpocznij onboarding →</button>
       </div>
-      <div *ngIf="lead.converted_at" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
+      <div *ngIf="lead.converted_at && lead.stage==='onboarding'" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px">⏳ W trakcie onboardingu</div>
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:6px">Rozpoczęto: {{lead.converted_at|date:'dd.MM.yyyy'}}</div>
+        <div style="font-size:11px;color:#6b7280;margin-bottom:8px">Lead jest w procesie wdrożenia. Szczegóły w sekcji Onboarding.</div>
+        <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none">→ Przejdź do Onboarding</a>
+      </div>
+      <div *ngIf="lead.stage==='onboarded'" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
         <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">✓ Onboarding zakończony</div>
         <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
         <div style="font-size:11px;color:#6b7280">Partner pojawi się w Rejestrze Partnerów po synchronizacji z DWH.</div>
@@ -969,14 +975,29 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
   </div>
 </div>
 
-<!-- Onboarding zakończenie dialog -->
+<!-- Rozpocznij onboarding dialog -->
 <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h3>Zakończ onboarding</h3>
-    <p>Potwierdź zakończenie onboardingu dla firmy <strong>{{lead?.company}}</strong>. Lead otrzyma status <strong>Onboardowany</strong>. Partner pojawi się w Rejestrze Partnerów po synchronizacji z DWH.</p>
+    <h3>🚀 Rozpocznij onboarding</h3>
+    <p style="margin-bottom:16px">Migracja leada <strong>{{lead?.company}}</strong> do procesu wdrożenia. Lead pojawi się w sekcji Onboarding. W Rejestrze Partnerów pojawi się po synchronizacji z DWH.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+        Wartość kontraktu (PLN)
+        <input type="number" min="0" step="1000"
+               [(ngModel)]="convertForm.contract_value"
+               placeholder="np. 50000"
+               style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
+      </label>
+      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+        Data podpisania umowy
+        <input type="date"
+               [(ngModel)]="convertForm.contract_signed"
+               style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
+      </label>
+    </div>
     <div class="modal-actions">
       <button class="btn-outline" (click)="showConvert=false">Anuluj</button>
-      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'✓ Zakończ onboarding'}}</button>
+      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'🚀 Rozpocznij onboarding'}}</button>
     </div>
   </div>
 </div>
@@ -2651,7 +2672,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.showConvert = false;
         this.lead = {
           ...this.lead!,
-          stage: 'onboarded' as any,
+          stage: 'onboarding' as any,
           converted_at: new Date().toISOString(),
         };
         this.cdr.markForCheck();
