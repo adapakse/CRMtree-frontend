@@ -525,7 +525,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
                  style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;margin-bottom:6px;font-size:11px"
                  [style.border-left]="isMessageRead(m) ? '3px solid #e5e7eb' : '3px solid #ef4444'">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
-                <span style="font-weight:600;color:#374151;flex:1">{{m.from}}</span>
+                <span [style.font-weight]="!isMessageRead(m) ? '700' : '600'" style="color:#374151;flex:1">{{m.from}}</span>
                 <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
               </div>
               <div style="color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;cursor:pointer"
@@ -1245,10 +1245,18 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
             📋 Historia korespondencji zostanie automatycznie dołączona
           </div>
         </label>
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           Załączniki
-          <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280">
-        </label>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+            <button *ngIf="gmailConnected && !driveNeedsReauth"
+                    (click)="openDrivePicker()" [disabled]="drivePickerLoading"
+                    style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+              <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
+              <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
+            </button>
+          </div>
+        </div>
         <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
           <span *ngFor="let f of emailAttachments; let i=index"
                 style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
@@ -1333,6 +1341,26 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <textarea class="act-input" id="partner-msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="7" placeholder="Treść…"></textarea>
       <div *ngIf="msgModalForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
         📋 Historia korespondencji zostanie automatycznie dołączona
+      </div>
+      <!-- Załączniki w odpowiedzi -->
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:12px;font-weight:600">Załączniki</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+          <button *ngIf="gmailConnected && !driveNeedsReauth"
+                  (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
+                  style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+            <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
+            <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
+          </button>
+        </div>
+        <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+          <span *ngFor="let f of msgModalAttachments; let i=index"
+                style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
+            📎 {{f.name}}
+            <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+          </span>
+        </div>
       </div>
       <div *ngIf="msgModalError" style="color:#ef4444;font-size:12px">⚠️ {{msgModalError}}</div>
     </div>
@@ -1561,6 +1589,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.editForm.subdomain = el.value;
   }
 
+  get attachmentsFolderUrl(): string { return this.settings.get('partner_attachments_folder_url') as string || this.settings.get('lead_attachments_folder_url') as string || ''; }
+
   private _dictArr(key: string, fallback: string[]): string[] {
     try {
       const v = this.settings.get(key);
@@ -1651,6 +1681,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   gmailEmail          = '';
   gmailAuthUrl        = '';
   downloadingAttachment = '';
+  drivePickerLoading  = false;
+  driveNeedsReauth    = false;
   recipientSuggestions: { email: string; name: string }[] = [];
   ccSuggestions:        { email: string; name: string }[] = [];
   showRecipientSug      = false;
@@ -1663,6 +1695,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   msgModalCcQuery        = '';
   msgModalSending        = false;
   msgModalError          = '';
+  msgModalAttachments: File[] = [];
 
   get emailActivities(): any[] {
     const all = (this.partner?.activities || [])
@@ -1708,8 +1741,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return u?.is_admin || u?.crm_role === 'sales_manager';
   }
 
+  get pid(): string | number { return this.partner?.crm_id || this.partner?.id || ''; }
+
   // ── Dokumenty powiązane ──────────────────────────────────────────
-  loadLinkedDocs(id: number): void {
+  loadLinkedDocs(id: number | string): void {
     this.api.getPartnerDocuments(id).subscribe({
       next: docs => this.zone.run(() => { this.linkedDocs = docs; this.cdr.markForCheck(); }),
       error: () => {},
@@ -1723,7 +1758,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   toggleLinkDoc(doc: any): void {
     if (!this.partner) return;
     if (this.isLinked(doc.id)) {
-      this.api.unlinkPartnerDocument(this.partner.id, doc.id).subscribe({
+      this.api.unlinkPartnerDocument(this.pid, doc.id).subscribe({
         next: () => this.zone.run(() => {
           this.linkedDocs = this.linkedDocs.filter(d => d.document_id !== doc.id);
           this.cdr.markForCheck();
@@ -1731,7 +1766,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
         error: () => {},
       });
     } else {
-      this.api.linkPartnerDocument(this.partner.id, doc.id).subscribe({
+      this.api.linkPartnerDocument(this.pid, doc.id).subscribe({
         next: linked => this.zone.run(() => {
           this.linkedDocs = [...this.linkedDocs, { ...linked, document_title: doc.name, doc_number: doc.doc_number, doc_type: doc.doc_type }];
           this.cdr.markForCheck();
@@ -1743,7 +1778,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   unlinkDoc(d: LinkedDocument): void {
     if (!this.partner || !confirm('Usunąć powiązanie z dokumentem?')) return;
-    this.api.unlinkPartnerDocument(this.partner.id, d.document_id).subscribe({
+    this.api.unlinkPartnerDocument(this.pid, d.document_id).subscribe({
       next: () => this.zone.run(() => {
         this.linkedDocs = this.linkedDocs.filter(x => x.document_id !== d.document_id);
         this.cdr.markForCheck();
@@ -1839,11 +1874,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const rawId = this.id || this.route.snapshot.paramMap.get('id') || '';
-    const numId = parseInt(rawId, 10);
-    if (!numId || isNaN(numId)) { this.loadError = true; return; }
-    this.loadPartner(numId);
-    this.loadLinkedDocs(numId);
-    this.loadSuggestions(numId);
+    if (!rawId) { this.loadError = true; return; }
+    this.loadPartner(rawId);
+    this.loadLinkedDocs(rawId);
+    this.loadSuggestions(rawId);
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getGmailStatus().subscribe({
       next: s => this.zone.run(() => { this.gmailConnected = s.connected; this.gmailEmail = s.email || ''; this.cdr.markForCheck(); }),
@@ -1872,16 +1906,16 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
 
-  private loadSuggestions(partnerId: number): void {
+  private loadSuggestions(partnerId: number | string): void {
     this.api.getContactSuggestions(undefined, partnerId).subscribe({
       next: s => { this.allSuggestions = s; },
       error: () => {},
     });
   }
 
-  loadPartner(numId?: number) {
-    const id = numId ?? parseInt(this.id, 10);
-    if (!id || isNaN(id)) return;
+  loadPartner(numId?: number | string) {
+    const id = numId ?? this.id;
+    if (!id) return;
     this.loading = true;
     this.loadError = false;
     this.partner = null;
@@ -1894,7 +1928,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.partner = p;
           this.activeStep = p.onboarding_step || 0;
           this.cdr.markForCheck();
-          if (p.status === 'onboarding') this.loadTasks(p.id);
+          if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
           this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
         });
       },
@@ -1904,7 +1938,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   refreshEmailActivities(): void {
     if (!this.partner) return;
-    this.api.getPartner(this.partner.id).subscribe({
+    this.api.getPartner(this.pid).subscribe({
       next: (fresh: any) => this.zone.run(() => {
         if (!this.partner) return;
         this.partner = { ...this.partner, activities: fresh.activities || [] };
@@ -2037,7 +2071,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       ...(this.isDwhFieldReadOnly('admin_last_name')       ? {} : { admin_last_name:       this.editForm.admin_last_name       || null }),
       ...(this.isDwhFieldReadOnly('admin_email')           ? {} : { admin_email:           this.editForm.admin_email           || null }),
     };
-    const partnerId = this.partner.id;
+    const partnerId = this.pid;
     this.api.updatePartner(partnerId, payload).subscribe({
       next: () => {
         // Przeładuj pełne dane partnera przez GET /:id (z COALESCE + _from_dwh flagami z DWH JOIN).
@@ -2075,7 +2109,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadTasks(partnerId: number): void {
+  loadTasks(partnerId: number | string): void {
     this.api.getOnboardingTasks(partnerId).subscribe({
       next: tasks => {
         this.zone.run(() => {
@@ -2138,7 +2172,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       assigned_to: this.taskForm.assigned_to || null,
       due_date:    this.taskForm.due_date || null,
     };
-    this.api.createOnboardingTask(this.partner.id, payload).subscribe({
+    this.api.createOnboardingTask(this.pid, payload).subscribe({
       next: task => {
         this.zone.run(() => {
           if (!this.tasksByStep[task.step]) this.tasksByStep[task.step] = [];
@@ -2182,7 +2216,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       assigned_to: this.taskEditForm.assigned_to || null,
       due_date:    this.taskEditForm.due_date || null,
     };
-    this.api.updateOnboardingTask(this.partner.id, t.id, payload).subscribe({
+    this.api.updateOnboardingTask(this.pid, t.id, payload).subscribe({
       next: updated => {
         this.zone.run(() => {
           this.tasksByStep[t.step] = this.tasksByStep[t.step].map(x => x.id === t.id ? updated : x);
@@ -2198,7 +2232,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   toggleTask(t: OnboardingTask): void {
     if (!this.partner) return;
-    this.api.updateOnboardingTask(this.partner.id, t.id, { done: !t.done }).subscribe({
+    this.api.updateOnboardingTask(this.pid, t.id, { done: !t.done }).subscribe({
       next: updated => {
         this.zone.run(() => {
           this.tasksByStep[t.step] = this.tasksByStep[t.step].map(x => x.id === t.id ? updated : x);
@@ -2212,7 +2246,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   deleteTask(t: OnboardingTask): void {
     if (!this.partner || !confirm(`Usunąć zadanie "${t.title}"?`)) return;
-    this.api.deleteOnboardingTask(this.partner.id, t.id).subscribe({
+    this.api.deleteOnboardingTask(this.pid, t.id).subscribe({
       next: () => {
         this.zone.run(() => {
           this.tasksByStep[t.step] = this.tasksByStep[t.step].filter(x => x.id !== t.id);
@@ -2227,7 +2261,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   finishOnboarding(): void {
     if (!this.partner) return;
     // Step 4 wyzwala isFinishing w backendzie → status='active', lead stage='onboarded'
-    this.api.updateOnboardingStep(this.partner.id, 4).subscribe({
+    this.api.updateOnboardingStep(this.pid, 4).subscribe({
       next: p => {
         this.zone.run(() => {
           if (this.partner) {
@@ -2249,7 +2283,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   advanceStep(step: number) {
     if (!this.partner) return;
-    this.api.updateOnboardingStep(this.partner.id, step).subscribe({
+    this.api.updateOnboardingStep(this.pid, step).subscribe({
       next: p => {
         this.zone.run(() => {
           if (this.partner) {
@@ -2295,7 +2329,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.opp_status   = this.actForm.opp_status || 'new';
       payload.opp_due_date = this.actForm.opp_due_date || null;
     }
-    this.api.createPartnerActivity(this.partner.id, payload).subscribe({
+    // Snapshot przed resetem formularza
+    const meetingSnap = this.actForm.type === 'meeting' ? { ...payload } : null;
+    this.api.createPartnerActivity(this.pid, payload).subscribe({
       next: newAct => {
         this.zone.run(() => {
           if (this.partner) {
@@ -2306,10 +2342,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.showNewActivity  = false;
           this.savingActivity   = false;
           this.cdr.markForCheck();
+          if (meetingSnap) this.openGoogleCalendarForMeeting(meetingSnap);
         });
       },
       error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
     });
+  }
+
+  openGoogleCalendarForMeeting(data: { title: string; activity_at?: string | null; duration_min?: number | null; body?: string | null; meeting_location?: string | null; participants?: string | null }): void {
+    if (!data.activity_at) return;
+    const pad    = (n: number) => String(n).padStart(2, '0');
+    const toGCal = (d: Date)  => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    const start  = new Date(data.activity_at);
+    const end    = new Date(start.getTime() + (data.duration_min || 60) * 60_000);
+    const params = new URLSearchParams({ action: 'TEMPLATE', text: data.title, dates: `${toGCal(start)}/${toGCal(end)}` });
+    if (data.body)             params.set('details',  data.body);
+    if (data.meeting_location) params.set('location', data.meeting_location);
+    if (data.participants)     params.set('add',      data.participants);
+    window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, '_blank');
   }
 
   openNewActivityForm(): void {
@@ -2482,6 +2532,108 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  openDrivePicker(target: 'compose' | 'reply' = 'compose'): void {
+    this.drivePickerLoading = true;
+    this.driveNeedsReauth   = false;
+    this.cdr.markForCheck();
+
+    Promise.all([
+      this.api.getDrivePickerConfig().toPromise(),
+      this.api.getDriveToken().toPromise(),
+    ]).then(([cfg, tok]) => {
+      if (!cfg || !tok) { this.drivePickerLoading = false; this.cdr.markForCheck(); return; }
+
+      if ((tok as any).needsReauth) {
+        this.drivePickerLoading = false;
+        this.driveNeedsReauth   = true;
+        this.cdr.markForCheck();
+        this.api.getGmailAuthUrl().subscribe({
+          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
+          error: () => {},
+        });
+        return;
+      }
+
+      const loadPicker = () => {
+        const gapi = (window as any).gapi;
+        gapi.load('picker', () => {
+          const google = (window as any).google;
+          const folderUrl = this.attachmentsFolderUrl;
+          const folderMatch = folderUrl.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+          const folderId    = folderMatch ? folderMatch[1] : null;
+
+          let view: any;
+          if (folderId) {
+            view = new google.picker.DocsView()
+              .setParent(folderId)
+              .setIncludeFolders(true);
+          } else {
+            view = new google.picker.DocsView()
+              .setIncludeFolders(true)
+              .setOwnedByMe(false);
+          }
+
+          const picker = new google.picker.PickerBuilder()
+            .addView(view)
+            .setOAuthToken(tok!.access_token)
+            .setDeveloperKey(cfg!.apiKey)
+            .setAppId(cfg!.appId)
+            .setTitle('Wybierz pliki do załączenia')
+            .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+            .setCallback((data: any) => {
+              if (data.action !== google.picker.Action.PICKED) return;
+              const docs: any[] = data.docs || [];
+              docs.forEach(doc => this.downloadDriveFileAsAttachment(doc, target));
+            })
+            .build();
+
+          this.drivePickerLoading = false;
+          this.cdr.markForCheck();
+          picker.setVisible(true);
+        });
+      };
+
+      if ((window as any).gapi) {
+        loadPicker();
+      } else {
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.onload = loadPicker;
+        script.onerror = () => { this.drivePickerLoading = false; this.cdr.markForCheck(); };
+        document.head.appendChild(script);
+      }
+    }).catch(() => {
+      this.drivePickerLoading = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private downloadDriveFileAsAttachment(
+    doc: { id: string; name: string; mimeType: string },
+    target: 'compose' | 'reply' = 'compose',
+  ): void {
+    this.api.downloadDriveFile(doc.id).subscribe({
+      next: blob => {
+        const file = new File([blob], doc.name, { type: blob.type || doc.mimeType || 'application/octet-stream' });
+        if (target === 'reply') {
+          this.msgModalAttachments = [...this.msgModalAttachments, file];
+        } else {
+          this.emailAttachments = [...this.emailAttachments, file];
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        const msg = err?.error?.error || err?.message || 'Błąd pobierania pliku z Drive';
+        if (target === 'reply') {
+          this.msgModalError = msg;
+        } else {
+          this.emailError = msg;
+        }
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
   sendEmail(): void {
     this.addRecipient();
     this.addCc();
@@ -2498,7 +2650,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.emailForm.references) fd.append('references', this.emailForm.references);
     this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
 
-    this.api.sendPartnerEmail(this.partner.id, fd).subscribe({
+    this.api.sendPartnerEmail(this.pid, fd).subscribe({
       next: (result: GmailSendResult) => {
         this.zone.run(() => {
           const wasReply      = !!this.emailForm.threadId;
@@ -2518,7 +2670,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
             };
             this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
           } else if (replyThreadId && this.partner) {
-            this.api.getPartnerEmailThread(this.partner.id, replyThreadId).subscribe({
+            this.api.getPartnerEmailThread(this.pid, replyThreadId).subscribe({
               next: msgs => this.zone.run(() => {
                 this.threadMessages = msgs;
                 this.openThreadId   = replyThreadId;
@@ -2531,7 +2683,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.showEmailModal = false;
           // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
           if (this.partner) {
-            this.api.getPartner(this.partner.id).subscribe({
+            this.api.getPartner(this.pid).subscribe({
               next: (fresh: any) => this.zone.run(() => {
                 if (this.partner) {
                   (this.partner as any).extra_contacts = fresh.extra_contacts || [];
@@ -2560,8 +2712,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       this.openThreadId = ''; this.threadMessages = []; this.cdr.markForCheck(); return;
     }
     this.openThreadId = threadId;
-    this.api.getPartnerEmailThread(this.partner.id, threadId).subscribe({
-      next: msgs => this.zone.run(() => { this.threadMessages = msgs; this.cdr.markForCheck(); }),
+    this.api.getPartnerEmailThread(this.pid, threadId).subscribe({
+      next: msgs => this.zone.run(() => {
+        this.threadMessages = msgs;
+        const act = (this.partner?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
+        if (act && !act.is_read) act.is_read = true;
+        this.cdr.markForCheck();
+      }),
       error: () => {},
     });
   }
@@ -2572,7 +2729,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     } else {
       if (!this.partner) return;
       this.openThreadId = a.gmail_thread_id;
-      this.api.getPartnerEmailThread(this.partner.id, a.gmail_thread_id).subscribe({
+      this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
         next: msgs => this.zone.run(() => {
           this.threadMessages = msgs;
           this.cdr.markForCheck();
@@ -2619,10 +2776,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     if (!a.is_read) {
       a.is_read = true;
-      this.api.patchPartnerActivityRead(this.partner.id, a.id, true).subscribe({ error: () => {} });
+      this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
     }
     if (a.gmail_thread_id) {
-      this.api.getPartnerEmailThread(this.partner.id, a.gmail_thread_id).subscribe({
+      this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
         next: msgs => this.zone.run(() => {
           this.panelThreadMessages = msgs;
           this.panelLoadingThread  = false;
@@ -2653,9 +2810,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     // Wątek ma nieprzeczytane — oznacz jako przeczytany
     if (!a.is_read) {
       a.is_read = true;
-      this.api.patchPartnerActivityRead(this.partner.id, a.id, true).subscribe({ error: () => {} });
+      this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
     }
-    this.api.getPartnerEmailThread(this.partner.id, a.gmail_thread_id).subscribe({
+    this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
       next: msgs => this.zone.run(() => {
         this.threadMessages = msgs;
         this.loadingThread = false;
@@ -2701,7 +2858,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       );
       if (threadAct) {
         threadAct.is_read = false;
-        this.api.patchPartnerActivityRead(this.partner.id, threadAct.id, false).subscribe({ error: () => {} });
+        this.api.patchPartnerActivityRead(this.pid, threadAct.id, false).subscribe({ error: () => {} });
       }
       if (this.selectedEmailActivity?.gmail_thread_id === currentThreadId) {
         this.selectedEmailActivity.is_read = false;
@@ -2713,7 +2870,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.historyLoaded || !this.partner) return;
     this.historyLoading = true;
     this.cdr.markForCheck();
-    this.api.getPartnerHistory(this.partner.id).subscribe({
+    this.api.getPartnerHistory(this.pid).subscribe({
       next: rows => this.zone.run(() => {
         this.history = rows;
         this.historyLoading = false;
@@ -2839,9 +2996,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   closeMsgModal(): void {
-    this.showMsgModal  = false;
-    this.msgModalMsg   = null;
-    this.msgModalReply = false;
+    this.showMsgModal        = false;
+    this.msgModalMsg         = null;
+    this.msgModalReply       = false;
+    this.msgModalAttachments = [];
     this.cdr.markForCheck();
   }
 
@@ -2863,9 +3021,21 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     };
     this.msgModalRecipientQuery = '';
     this.msgModalCcQuery        = '';
+    this.msgModalAttachments    = [];
     this.msgModalReply = true;
     this.cdr.markForCheck();
     this.focusEmailBodyTop('partner-msg-reply-textarea');
+  }
+
+  onMsgReplyAttachmentChange(event: Event): void {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) this.msgModalAttachments = [...this.msgModalAttachments, ...Array.from(files)];
+    this.cdr.markForCheck();
+  }
+
+  removeMsgReplyAttachment(i: number): void {
+    this.msgModalAttachments = this.msgModalAttachments.filter((_, idx) => idx !== i);
+    this.cdr.markForCheck();
   }
 
   sendMsgReply(): void {
@@ -2882,14 +3052,15 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId || this.msgModalMsg?.threadId);
     if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
     if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
-    this.api.sendPartnerEmail(this.partner.id, fd).subscribe({
+    this.msgModalAttachments.forEach(f => fd.append('attachments', f, f.name));
+    this.api.sendPartnerEmail(this.pid, fd).subscribe({
       next: (result: GmailSendResult) => {
         this.zone.run(() => {
           const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
           this.msgModalSending = false;
           this.closeMsgModal();
           if (replyThreadId && this.partner) {
-            this.api.getPartnerEmailThread(this.partner.id, replyThreadId).subscribe({
+            this.api.getPartnerEmailThread(this.pid, replyThreadId).subscribe({
               next: msgs => this.zone.run(() => {
                 this.threadMessages = msgs;
                 this.openThreadId   = replyThreadId;
@@ -2900,7 +3071,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           }
           // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
           if (this.partner) {
-            this.api.getPartner(this.partner.id).subscribe({
+            this.api.getPartner(this.pid).subscribe({
               next: (fresh: any) => this.zone.run(() => {
                 if (this.partner) {
                   (this.partner as any).extra_contacts = fresh.extra_contacts || [];
@@ -3055,7 +3226,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     const a = this.selectedAct;
     if (!this.actModalCloseComment.trim() || !a || !this.partner) return;
     this.savingActivity = true;
-    this.api.updatePartnerActivity(this.partner.id, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
       next: updated => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3099,7 +3270,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.opp_status   = this.actEditForm.opp_status || 'new';
       payload.opp_due_date = this.actEditForm.opp_due_date || null;
     }
-    this.api.updatePartnerActivity(this.partner.id, a.id, payload).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, payload).subscribe({
       next: (updated: PartnerActivity) => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3166,7 +3337,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   confirmCloseActivity(a: any): void {
     if (!this.closeComment.trim() || !this.partner) return;
     this.savingActivity = true;
-    this.api.updatePartnerActivity(this.partner.id, a.id, { status: 'closed', close_comment: this.closeComment }).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed', close_comment: this.closeComment }).subscribe({
       next: updated => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3222,7 +3393,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.opp_status   = this.actEditForm.opp_status || 'new';
       payload.opp_due_date = this.actEditForm.opp_due_date || null;
     }
-    this.api.updatePartnerActivity(this.partner.id, a.id, payload).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, payload).subscribe({
       next: (updated: PartnerActivity) => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3242,7 +3413,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   deleteActivity(a: any): void {
     if (!this.partner || !confirm(`Usunąć aktywność "${a.title}"?`)) return;
-    this.api.deletePartnerActivity(this.partner.id, a.id).subscribe({
+    this.api.deletePartnerActivity(this.pid, a.id).subscribe({
       next: () => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3271,7 +3442,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (!q) { this.filteredSuggestions = []; this.cdr.markForCheck(); return; }
     // Załaduj sugestie jeśli jeszcze nie załadowane
     if (!this.allSuggestions.length && this.partner?.id) {
-      this.api.getContactSuggestions(undefined, this.partner.id).subscribe({
+      this.api.getContactSuggestions(undefined, this.pid).subscribe({
         next: s => {
           this.allSuggestions = s;
           this._applyFilter(q);

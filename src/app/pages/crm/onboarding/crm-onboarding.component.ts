@@ -488,7 +488,7 @@ export class CrmOnboardingComponent implements OnInit {
   loadingPartners = signal(true);
   loadingTasks    = signal(false);
   saving          = signal(false);
-  launching       = signal<number | null>(null);
+  launching       = signal<string | null>(null);
 
   // Filters
   search        = signal('');
@@ -526,7 +526,7 @@ export class CrmOnboardingComponent implements OnInit {
         (p.nip || '').toLowerCase().includes(q)
       );
     }
-    if (fp) list = list.filter(p => p.id === +fp);
+    if (fp) list = list.filter(p => String(p.id) === String(fp));
     return list;
   });
 
@@ -534,7 +534,7 @@ export class CrmOnboardingComponent implements OnInit {
     let list = this.allTasks();
     const fp = this.filterPartner();
     const fu = this.filterUser();
-    if (fp) list = list.filter(t => t.partner_id === +fp);
+    if (fp) list = list.filter(t => String(t.partner_id) === String(fp));
     if (fu) list = list.filter(t => t.assigned_to === fu);
     return list;
   });
@@ -618,7 +618,7 @@ export class CrmOnboardingComponent implements OnInit {
     // Check query param for pre-selected partner (from partner migration)
     const pid = this.route.snapshot.queryParamMap.get('partner');
     if (pid) {
-      this.filterPartner.set(+pid);
+      this.filterPartner.set(pid);
       this.view = 'kanban';
     }
 
@@ -737,7 +737,7 @@ export class CrmOnboardingComponent implements OnInit {
       done:        this.taskForm.done,
     };
 
-    const partnerId = this.editingTask?.partner_id || +this.filterPartner();
+    const partnerId = this.editingTask?.partner_id || this.filterPartner();
     if (!partnerId) { this.saving.set(false); return; }
 
     const obs = this.editingTask

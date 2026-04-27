@@ -1,6 +1,6 @@
 // src/app/pages/crm/leads/crm-leads-list.component.ts
 import {
-  Component, OnInit, inject, ChangeDetectorRef, NgZone, ChangeDetectionStrategy,
+  Component, OnInit, OnDestroy, inject, ChangeDetectorRef, NgZone, ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
@@ -1139,7 +1139,7 @@ const PROB_MAP: Record<LeadStage, number> = {
     .meet-field-val { font-size:13px; color:var(--gray-800); font-weight:500; line-height:1.45; }
   `],
 })
-export class CrmLeadsListComponent implements OnInit {
+export class CrmLeadsListComponent implements OnInit, OnDestroy {
   private api    = inject(CrmApiService);
   private auth   = inject(AuthService);
   private zone   = inject(NgZone);
@@ -1313,6 +1313,14 @@ export class CrmLeadsListComponent implements OnInit {
         error: () => {},
       });
     }
+    // Auto-odśwież odznaki nowych emaili co 60 sekund
+    this.refreshInterval = setInterval(() => this.load(), 60_000);
+  }
+
+  private refreshInterval: any = null;
+
+  ngOnDestroy(): void {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
   }
 
   get sortedLeads(): any[] {

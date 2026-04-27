@@ -1,5 +1,5 @@
 // src/app/pages/crm/partners/crm-partners-list.component.ts
-import { Component, OnInit, inject, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -50,7 +50,7 @@ type SortDir = 'asc' | 'desc';
 
   <!-- ══ KARTY ══ -->
   <div *ngIf="!loading && viewMode==='cards'" class="cards-grid">
-    <div *ngFor="let p of partners" class="partner-card" (click)="goPartner(p.id)">
+    <div *ngFor="let p of partners" class="partner-card" (click)="goPartner(p.id, p.crm_uuid)">
       <div class="pc-top">
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
@@ -96,7 +96,7 @@ type SortDir = 'asc' | 'desc';
       <div class="th sortable" (click)="sortBy('contract_expires')">Umowa do <span class="si">{{sortIcon('contract_expires')}}</span></div>
     </div>
     <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px"
-         (click)="goPartner(p.id)">
+         (click)="goPartner(p.id, p.crm_uuid)">
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
@@ -230,7 +230,7 @@ type SortDir = 'asc' | 'desc';
     .panel-actions { display:flex; gap:8px; margin-top:8px; }
   `],
 })
-export class CrmPartnersListComponent implements OnInit {
+export class CrmPartnersListComponent implements OnInit, OnDestroy {
   private api    = inject(CrmApiService);
   private zone   = inject(NgZone);
   private cdr    = inject(ChangeDetectorRef);
@@ -314,6 +314,14 @@ export class CrmPartnersListComponent implements OnInit {
     this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getPartnerGroupNames().subscribe({ next: g => { this.zone.run(() => { this.partnerGroupNames = g; this.cdr.markForCheck(); }); }, error: () => {} });
     this.reload();
+    // Auto-odśwież odznaki nowych emaili co 60 sekund
+    this.refreshInterval = setInterval(() => this.reload(), 60_000);
+  }
+
+  private refreshInterval: any = null;
+
+  ngOnDestroy(): void {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
   }
 
   reload() {
@@ -353,7 +361,10 @@ export class CrmPartnersListComponent implements OnInit {
   private searchTimer: any;
   onSearch() { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => { this.page = 1; this.reload(); }, 400); }
 
-  goPartner(id: number) { this.router.navigate(['/crm/partners', id]); }
+  goPartner(id: number | null, crm_uuid?: string | null) {
+    const nav = crm_uuid ?? id;
+    if (nav != null) this.router.navigate(['/crm/partners', nav]);
+  }
 
   hasUnreadReply(p: any): boolean {
     return (p.new_email_count ?? 0) > 0;

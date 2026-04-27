@@ -474,10 +474,26 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         </div>
       </label>
       <!-- Załączniki -->
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Załączniki
-        <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280">
-      </label>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:12px;font-weight:600">Załączniki</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+          <button *ngIf="gmailConnected && !driveNeedsReauth"
+                  (click)="openDrivePicker()" [disabled]="drivePickerLoading"
+                  style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+            <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
+            <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
+          </button>
+        </div>
+        <div *ngIf="driveNeedsReauth"
+             style="background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:8px 12px;font-size:11px;color:#9a3412;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span>⚠️ Wymagane ponowne połączenie Gmail (nowe uprawnienia do Drive)</span>
+          <button *ngIf="gmailAuthUrl" (click)="connectGmail()"
+                  style="flex-shrink:0;font-size:11px;padding:3px 10px;border:1px solid #fb923c;border-radius:5px;background:#fff;color:#ea580c;cursor:pointer;white-space:nowrap">
+            Połącz ponownie
+          </button>
+        </div>
+      </div>
       <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
         <span *ngFor="let f of emailAttachments; let i=index"
               style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
@@ -509,12 +525,14 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
     <div class="modal-body" style="gap:8px">
       <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;padding:20px">�?adowanie wątku…</div>
       <div *ngFor="let m of threadMessages"
-           style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:12px;cursor:pointer;transition:background .15s"
+           [style.border]="!m.is_read && !m.created_by ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
+           [style.background]="!m.is_read && !m.created_by ? '#fffbeb' : 'white'"
+           style="border-radius:8px;padding:12px;font-size:12px;cursor:pointer;transition:background .15s"
            (click)="openMsgModal(m)"
            (mouseenter)="$any($event.currentTarget).style.background='#f9fafb'"
-           (mouseleave)="$any($event.currentTarget).style.background='white'">
+           (mouseleave)="$any($event.currentTarget).style.background=(!m.is_read && !m.created_by) ? '#fffbeb' : 'white'">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-weight:600;color:#374151">{{m.from}}</span>
+          <span [style.font-weight]="!m.is_read && !m.created_by ? '700' : '600'" style="color:#374151">{{m.from}}</span>
           <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
         </div>
         <div style="color:#6b7280;font-size:11px;margin-bottom:1px">Do: {{m.to}}</div>
@@ -624,6 +642,26 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
             📋 Historia korespondencji zostanie automatycznie dołączona
           </div>
         </label>
+        <!-- Załączniki w odpowiedzi -->
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:12px;font-weight:600">Załączniki</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+            <button *ngIf="gmailConnected && !driveNeedsReauth"
+                    (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
+                    style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+              <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
+              <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
+            </button>
+          </div>
+          <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+            <span *ngFor="let f of msgModalAttachments; let i=index"
+                  style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
+              📎 {{f.name}}
+              <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+            </span>
+          </div>
+        </div>
         <div *ngIf="msgModalError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{msgModalError}}</div>
       </div>
     </div>
@@ -1247,9 +1285,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (status !== 'connected') return;
     this.api.getGmailStatus().subscribe({
       next: s => this.zone.run(() => {
-        this.gmailConnected = s.connected;
-        this.gmailEmail     = s.email || '';
-        this.gmailAuthUrl   = '';
+        this.gmailConnected  = s.connected;
+        this.gmailEmail      = s.email || '';
+        this.gmailAuthUrl    = '';
+        if (s.connected) this.driveNeedsReauth = false;
         this.cdr.markForCheck();
       }),
       error: () => {},
@@ -1423,6 +1462,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   ccQuery         = '';
   emailAttachments: File[] = [];
   downloadingAttachment: string = '';  // attachmentId aktualnie pobieranego załącznika
+  drivePickerLoading  = false;
+  driveNeedsReauth    = false;
 
   // Email recipient autocomplete
   recipientSuggestions: { email: string; name: string }[] = [];
@@ -1439,6 +1480,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   msgModalCcQuery        = '';
   msgModalSending        = false;
   msgModalError          = '';
+  msgModalAttachments: File[] = [];
 
   // Thread viewer
   showThreadModal = false;
@@ -1484,6 +1526,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     return this.newEmailCount;
   }
 
+
+  get attachmentsFolderUrl(): string { return this.settings.get('lead_attachments_folder_url') as string || ''; }
 
   get isManager() {
     const u = this.auth.user();
@@ -1624,9 +1668,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
             next: s => {
               console.log('[Gmail] getGmailStatus() odpowiedź:', s);
               this.zone.run(() => {
-                this.gmailConnected = s.connected;
-                this.gmailEmail     = s.email || '';
-                if (s.connected) this.gmailAuthUrl = '';
+                this.gmailConnected  = s.connected;
+                this.gmailEmail      = s.email || '';
+                if (s.connected) { this.gmailAuthUrl = ''; this.driveNeedsReauth = false; }
                 this.cdr.markForCheck();
               });
             },
@@ -1769,6 +1813,114 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  openDrivePicker(target: 'compose' | 'reply' = 'compose'): void {
+    this.drivePickerLoading = true;
+    this.driveNeedsReauth   = false;
+    this.cdr.markForCheck();
+
+    // Pobierz config i token równolegle
+    Promise.all([
+      this.api.getDrivePickerConfig().toPromise(),
+      this.api.getDriveToken().toPromise(),
+    ]).then(([cfg, tok]) => {
+      if (!cfg || !tok) { this.drivePickerLoading = false; this.cdr.markForCheck(); return; }
+
+      // Backend wykrył brak scope drive.readonly — wymuś ponowne połączenie
+      if ((tok as any).needsReauth) {
+        this.drivePickerLoading = false;
+        this.driveNeedsReauth   = true;
+        this.cdr.markForCheck();
+        this.api.getGmailAuthUrl().subscribe({
+          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
+          error: () => {},
+        });
+        return;
+      }
+
+      const loadPicker = () => {
+        const gapi = (window as any).gapi;
+        gapi.load('picker', () => {
+          const google = (window as any).google;
+          const folderUrl = this.attachmentsFolderUrl;
+
+          // Wyciągnij folder ID z URL (format: .../folders/FOLDER_ID)
+          const folderMatch = folderUrl.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+          const folderId    = folderMatch ? folderMatch[1] : null;
+
+          let view: any;
+          if (folderId) {
+            view = new google.picker.DocsView()
+              .setParent(folderId)
+              .setIncludeFolders(true);
+          } else {
+            // "shared-with-me" lub inny URL — pokaż wszystkie pliki
+            view = new google.picker.DocsView()
+              .setIncludeFolders(true)
+              .setOwnedByMe(false);
+          }
+
+          const picker = new google.picker.PickerBuilder()
+            .addView(view)
+            .setOAuthToken(tok!.access_token)
+            .setDeveloperKey(cfg!.apiKey)
+            .setAppId(cfg!.appId)
+            .setTitle('Wybierz pliki do załączenia')
+            .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+            .setCallback((data: any) => {
+              if (data.action !== google.picker.Action.PICKED) return;
+              const docs: any[] = data.docs || [];
+              docs.forEach(doc => this.downloadDriveFileAsAttachment(doc, target));
+            })
+            .build();
+
+          this.drivePickerLoading = false;
+          this.cdr.markForCheck();
+          picker.setVisible(true);
+        });
+      };
+
+      // Załaduj GAPI jeśli jeszcze nie jest załadowany
+      if ((window as any).gapi) {
+        loadPicker();
+      } else {
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.onload = loadPicker;
+        script.onerror = () => { this.drivePickerLoading = false; this.cdr.markForCheck(); };
+        document.head.appendChild(script);
+      }
+    }).catch(() => {
+      this.drivePickerLoading = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private downloadDriveFileAsAttachment(
+    doc: { id: string; name: string; mimeType: string },
+    target: 'compose' | 'reply' = 'compose',
+  ): void {
+    this.api.downloadDriveFile(doc.id).subscribe({
+      next: blob => {
+        const file = new File([blob], doc.name, { type: blob.type || doc.mimeType || 'application/octet-stream' });
+        if (target === 'reply') {
+          this.msgModalAttachments = [...this.msgModalAttachments, file];
+        } else {
+          this.emailAttachments = [...this.emailAttachments, file];
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        const msg = err?.error?.error || err?.message || 'Błąd pobierania pliku z Drive';
+        if (target === 'reply') {
+          this.msgModalError = msg;
+        } else {
+          this.emailError = msg;
+        }
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
   sendEmail(): void {
     this.addRecipient(); // dodaj email z pola input jeśli użytkownik nie wcisnął Enter
     this.addCc();        // dodaj CC z pola input jeśli użytkownik nie wcisnął Enter
@@ -1853,7 +2005,14 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     }
     this.openThreadId = threadId;
     this.api.getLeadEmailThread(this.lead.id, threadId).subscribe({
-      next: msgs => this.zone.run(() => { this.threadMessages = msgs; this.cdr.markForCheck(); }),
+      next: msgs => this.zone.run(() => {
+        this.threadMessages = msgs;
+        // Synchronizuj lokalny stan is_read z odpowiedzią serwera
+        // (serwer oznacza wątek jako przeczytany po stronie DB)
+        const act = (this.lead?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
+        if (act && !act.is_read) act.is_read = true;
+        this.cdr.markForCheck();
+      }),
       error: () => {},
     });
   }
@@ -2003,9 +2162,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   closeMsgModal(): void {
-    this.showMsgModal   = false;
-    this.msgModalMsg    = null;
-    this.msgModalReply  = false;
+    this.showMsgModal        = false;
+    this.msgModalMsg         = null;
+    this.msgModalReply       = false;
+    this.msgModalAttachments = [];
     this.cdr.markForCheck();
   }
 
@@ -2027,9 +2187,21 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     };
     this.msgModalRecipientQuery = '';
     this.msgModalCcQuery        = '';
+    this.msgModalAttachments    = [];
     this.msgModalReply = true;
     this.cdr.markForCheck();
     this.focusEmailBodyTop('msg-reply-textarea');
+  }
+
+  onMsgReplyAttachmentChange(event: Event): void {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) this.msgModalAttachments = [...this.msgModalAttachments, ...Array.from(files)];
+    this.cdr.markForCheck();
+  }
+
+  removeMsgReplyAttachment(i: number): void {
+    this.msgModalAttachments = this.msgModalAttachments.filter((_, idx) => idx !== i);
+    this.cdr.markForCheck();
   }
 
   sendMsgReply(): void {
@@ -2053,6 +2225,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId);
     if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
     if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
+    this.msgModalAttachments.forEach(f => fd.append('attachments', f, f.name));
     this.api.sendLeadEmail(this.lead.id, fd).subscribe({
       next: (result: GmailSendResult) => {
         this.zone.run(() => {
@@ -2646,6 +2819,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       payload.meeting_location = this.actForm.meeting_location || null;
       payload.participants = (this.actForm.participantList || []).join(', ') || null;
     }
+    // Snapshot przed resetem formularza
+    const meetingSnap = this.actForm.type === 'meeting' ? { ...payload } : null;
     this.api.createLeadActivity(this.lead.id, payload).subscribe({
       next: newAct => {
         this.zone.run(() => {
@@ -2657,10 +2832,24 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.showNewActivity  = false;
           this.savingActivity   = false;
           this.cdr.markForCheck();
+          if (meetingSnap) this.openGoogleCalendarForMeeting(meetingSnap);
         });
       },
       error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
     });
+  }
+
+  openGoogleCalendarForMeeting(data: { title: string; activity_at?: string | null; duration_min?: number | null; body?: string | null; meeting_location?: string | null; participants?: string | null }): void {
+    if (!data.activity_at) return;
+    const pad   = (n: number) => String(n).padStart(2, '0');
+    const toGCal = (d: Date)  => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    const start  = new Date(data.activity_at);
+    const end    = new Date(start.getTime() + (data.duration_min || 60) * 60_000);
+    const params = new URLSearchParams({ action: 'TEMPLATE', text: data.title, dates: `${toGCal(start)}/${toGCal(end)}` });
+    if (data.body)             params.set('details',  data.body);
+    if (data.meeting_location) params.set('location', data.meeting_location);
+    if (data.participants)     params.set('add',      data.participants);
+    window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, '_blank');
   }
 
   convertLead() {

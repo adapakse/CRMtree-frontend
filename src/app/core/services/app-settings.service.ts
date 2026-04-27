@@ -20,6 +20,7 @@ export interface AppSettings {
   kanban_refresh_interval_sec:    number;
   default_page_size:              number;
   roles_preview_count:            number;
+  lead_attachments_folder_url:    string;
   [key: string]: number | boolean | string;
 }
 
@@ -29,6 +30,7 @@ const DEFAULTS: AppSettings = {
   kanban_refresh_interval_sec:    0,
   default_page_size:              50,
   roles_preview_count:            3,
+  lead_attachments_folder_url:    '',
 };
 
 @Injectable({ providedIn: 'root' })
