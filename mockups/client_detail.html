@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>x-CRM — Holiday Express</title>
+<link rel="stylesheet" href="_base.css">
+<style>
+.detail-layout{display:grid;grid-template-columns:270px 1fr 290px;flex:1;overflow:hidden;min-height:0}
+.det-panel{overflow-y:auto;padding:16px;border-left:1px solid var(--gray-200)}
+.det-panel:first-child{border-left:none}
+.info-s{margin-bottom:18px}
+.info-s-t{font-family:'Sora';font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--gray-100)}
+.ob-step-row{display:flex;gap:0;margin:12px 0}
+.ob-step{flex:1;text-align:center;position:relative}
+.ob-step::after{content:'';position:absolute;top:13px;right:-50%;width:100%;height:1.5px;background:var(--gray-200);z-index:0}
+.ob-step:last-child::after{display:none}
+.step-num{width:26px;height:26px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;position:relative;z-index:1}
+.step-done .step-num{background:#16A34A;color:white;border:2px solid #16A34A}
+.step-active .step-num{background:var(--orange);color:white;border:2px solid var(--orange)}
+.step-todo .step-num{background:white;color:var(--gray-400);border:2px solid var(--gray-300)}
+.step-lbl{font-size:10px;font-weight:600}
+.step-done .step-lbl{color:#16A34A}
+.step-active .step-lbl{color:var(--orange)}
+.step-todo .step-lbl{color:var(--gray-400)}
+.task-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--gray-100);align-items:flex-start;font-size:12.5px}
+.task-row:last-child{border-bottom:none}
+.task-title{font-weight:600;color:var(--gray-800)}
+.task-title.done{text-decoration:line-through;color:var(--gray-400)}
+.task-meta{font-size:11px;color:var(--gray-400);margin-top:1px}
+.dwh-box{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px}
+.dwh-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #D1FAE5;font-size:12.5px}
+.dwh-row:last-child{border-bottom:none}
+.dwh-lbl{color:#166534}
+.dwh-val{font-weight:700;color:#14532D;font-family:'Sora'}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <a class="s-logo" href="index.html"><div class="s-logo-icon">x</div><span class="s-logo-text">x<span>-CRM</span></span></a>
+  <div class="s-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</a>
+    <a class="nav-item" href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Dokumenty</a>
+    <a class="nav-item" href="workflow.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Workflow</a>
+    <div class="s-sep">CRM</div>
+    <a class="nav-item" href="leads_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Leady</a>
+    <a class="nav-item active" href="clients_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v8h4"/><path d="M18 9h2a2 2 0 012 2v9h-4"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="10" y1="10" x2="14" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Klienci</a>
+    <a class="nav-item" href="onboarding.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Onboarding</a>
+    <a class="nav-item" href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Raporty</a>
+    <a class="nav-item" href="calendar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Kalendarz</a>
+    <div class="s-sep">Email</div>
+    <a class="nav-item" href="email_compose.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Nowy email</a>
+    <a class="nav-item" href="email_thread.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Wątek email</a>
+    <div class="s-sep">Admin</div>
+    <a class="nav-item" href="admin_settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ustawienia</a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <span class="bc"><a href="clients_list.html">Klienci</a> &rsaquo; <b>Holiday Express</b></span>
+    <span class="badge b-orange" style="margin-left:6px"><span class="bdot"></span>Onboarding</span>
+    <div class="tsp"></div>
+    <button class="btn btn-g btn-sm" onclick="location.href='email_compose.html'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Email <span style="background:#DC2626;color:white;border-radius:8px;padding:1px 5px;font-size:10px;font-weight:700">1</span></button>
+    <button class="btn btn-g btn-sm">Edytuj</button>
+    <div class="u-pill"><div class="u-dot">AN</div>Anna Nowak</div>
+  </div>
+
+  <div class="detail-layout">
+    <!-- LEFT -->
+    <div class="det-panel">
+      <div class="info-s">
+        <div class="info-s-t">Kontakt</div>
+        <div class="ikv"><span class="lbl">Firma</span><span class="val" style="font-weight:700;font-size:13px">Holiday Express</span></div>
+        <div class="ikv"><span class="lbl">NIP</span><span class="val mono">521-344-22-11</span></div>
+        <div class="ikv"><span class="lbl">Adres</span><span class="val" style="font-size:12px">ul. Turystyczna 12<br>00-001 Warszawa</span></div>
+        <div class="ikv"><span class="lbl">Osoba</span><span class="val">Krzysztof Wróbel <span style="color:var(--gray-400)">· CEO</span></span></div>
+        <div class="ikv"><span class="lbl">Email</span><span class="val"><a href="#">k.wrobel@holidayexpress.pl</a></span></div>
+        <div class="ikv"><span class="lbl">Telefon</span><span class="val">+48 600 222 333</span></div>
+        <div class="ikv"><span class="lbl">Branża</span><span class="val">Turystyka</span></div>
+        <div class="ikv"><span class="lbl">Opiekun</span><span class="val">Anna Nowak</span></div>
+        <div class="ikv"><span class="lbl">Grupa</span><span class="val"><span class="badge b-gray">Polska Południe</span></span></div>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Umowa</div>
+        <div class="ikv"><span class="lbl">Podpisana</span><span class="val">15.04.2026</span></div>
+        <div class="ikv"><span class="lbl">Wygasa</span><span class="val">14.04.2027</span></div>
+        <div class="ikv"><span class="lbl">Wartość</span><span class="val" style="font-weight:700;color:#059669;font-family:'Sora'">620 000 PLN</span></div>
+        <div class="ikv"><span class="lbl">Licencje</span><span class="val">12</span></div>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Profil podróżny</div>
+        <div class="ikv"><span class="lbl">Online %</span><span class="val">80%</span></div>
+        <div class="ikv"><span class="lbl">Waluta</span><span class="val">PLN</span></div>
+        <div class="ikv"><span class="lbl">Języki</span><span class="val">PL, EN</span></div>
+        <div class="ikv"><span class="lbl">Kraje</span><span class="val">PL, DE, AT</span></div>
+        <div class="ikv"><span class="lbl">Produkty</span><span class="val" style="display:flex;gap:4px;flex-wrap:wrap"><span class="badge b-blue" style="font-size:10px">Hotel</span><span class="badge b-blue" style="font-size:10px">Lot</span><span class="badge b-blue" style="font-size:10px">Transfer</span></span></div>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="det-panel">
+      <!-- Onboarding progress -->
+      <div class="card" style="padding:14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:10px">Postęp onboardingu</div>
+        <div class="ob-step-row">
+          <div class="ob-step step-done"><div class="step-num">✓</div><div class="step-lbl">Umowa</div></div>
+          <div class="ob-step step-active"><div class="step-num">2</div><div class="step-lbl">Konfiguracja</div></div>
+          <div class="ob-step step-todo"><div class="step-num">3</div><div class="step-lbl">Szkolenie</div></div>
+          <div class="ob-step step-todo"><div class="step-num">4</div><div class="step-lbl">Uruchomienie</div></div>
+        </div>
+        <div class="pbar" style="margin:8px 0 6px"><div class="pbar-fill" style="width:35%"></div></div>
+        <div style="font-size:11.5px;color:var(--gray-400)">Krok 2 z 4 · 3 zadania otwarte · termin: 15.05.2026</div>
+        <div style="margin-top:12px">
+          <div class="task-row"><input type="checkbox" checked disabled><div><div class="task-title done">Podpisanie umowy klientskiej</div><div class="task-meta">Wykonano 15.04.2026 · Anna Nowak</div></div></div>
+          <div class="task-row"><input type="checkbox" checked disabled><div><div class="task-title done">Wysłanie umowy do weryfikacji prawnej</div><div class="task-meta">Wykonano 16.04.2026 · Anna Nowak</div></div></div>
+          <div class="task-row"><input type="checkbox"><div><div class="task-title">Konfiguracja konta w systemie</div><div class="task-meta">Termin: 30.04.2026 · Piotr Kowalski</div></div></div>
+          <div class="task-row"><input type="checkbox"><div><div class="task-title">Ustawienie integracji API</div><div class="task-meta">Termin: 05.05.2026 · Piotr Kowalski</div></div></div>
+          <div class="task-row"><input type="checkbox"><div><div class="task-title">Szkolenie administratorów klienta</div><div class="task-meta">Termin: 15.05.2026 · Anna Nowak</div></div></div>
+        </div>
+      </div>
+
+      <!-- Activities -->
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        <button class="btn btn-p btn-sm">Nowa aktywność</button>
+        <button class="btn btn-g btn-sm" onclick="location.href='email_compose.html'">Email</button>
+        <button class="btn btn-g btn-sm">Połączenie</button>
+      </div>
+      <ul class="tl">
+        <li class="tli">
+          <div class="tdot tdot-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px"><span class="tlt">Pytanie o konfigurację API</span><span class="badge b-yellow"><span class="bdot"></span>nieprzeczytane</span></div>
+            <div class="tlm">Email przychodzący · 26.04.2026 · <a href="email_thread.html" style="color:var(--orange)">wątek</a></div>
+          </div>
+        </li>
+        <li class="tli">
+          <div class="tdot tdot-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+          <div style="flex:1">
+            <div class="tlt">Wysłana dokumentacja techniczna</div>
+            <div class="tlm">Email wychodzący · 24.04.2026 · Piotr Kowalski</div>
+          </div>
+        </li>
+        <li class="tli">
+          <div class="tdot tdot-call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 012 1.18 2 2 0 014 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <div style="flex:1">
+            <div class="tlt">Call kick-off onboardingu</div>
+            <div class="tlm">45 min · 17.04.2026 · Anna Nowak</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- RIGHT: DWH + docs -->
+    <div class="det-panel">
+      <div class="info-s">
+        <div class="info-s-t">Dane sprzedażowe (DWH) <span style="font-weight:400;color:var(--gray-300);font-size:9px">tylko odczyt</span></div>
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:8px">Dane z systemu transakcyjnego · marzec 2026</div>
+        <div class="dwh-box">
+          <div class="dwh-row"><span class="dwh-lbl">Obrót brutto</span><span class="dwh-val">198 400 PLN</span></div>
+          <div class="dwh-row"><span class="dwh-lbl">Obrót netto</span><span class="dwh-val">162 000 PLN</span></div>
+          <div class="dwh-row"><span class="dwh-lbl">Prowizja</span><span class="dwh-val">16 200 PLN</span></div>
+          <div class="dwh-row"><span class="dwh-lbl">Marża</span><span class="dwh-val">18 400 PLN</span></div>
+          <div class="dwh-row"><span class="dwh-lbl">Transakcje</span><span class="dwh-val">247</span></div>
+          <div class="dwh-row"><span class="dwh-lbl">Pasażerowie</span><span class="dwh-val">891</span></div>
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:6px">Podział produktowy (marzec)</div>
+          <div style="font-size:12px;display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gray-600)">Loty</span><div style="display:flex;align-items:center;gap:8px"><div class="pbar" style="width:80px"><div class="pbar-fill" style="width:48%"></div></div><span style="font-family:'Sora';font-weight:700;font-size:12px">48%</span></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gray-600)">Hotele</span><div style="display:flex;align-items:center;gap:8px"><div class="pbar" style="width:80px"><div class="pbar-fill" style="width:31%"></div></div><span style="font-family:'Sora';font-weight:700;font-size:12px">31%</span></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gray-600)">Transfery</span><div style="display:flex;align-items:center;gap:8px"><div class="pbar" style="width:80px"><div class="pbar-fill" style="width:13%"></div></div><span style="font-family:'Sora';font-weight:700;font-size:12px">13%</span></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gray-600)">Wynajem aut</span><div style="display:flex;align-items:center;gap:8px"><div class="pbar" style="width:80px"><div class="pbar-fill" style="width:8%"></div></div><span style="font-family:'Sora';font-weight:700;font-size:12px">8%</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Powiązane dokumenty</div>
+        <div style="padding:7px 0;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px;font-size:12.5px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div><div style="font-weight:600;color:var(--gray-800)">Umowa kliencka 2026</div><div style="font-size:11px;color:var(--gray-400)"><span class="badge b-green" style="font-size:10px">Podpisana</span> · 15.04.2026</div></div>
+        </div>
+        <div style="padding:7px 0;display:flex;align-items:center;gap:8px;font-size:12.5px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div><div style="font-weight:600;color:var(--gray-800)">NDA — Holiday Express</div><div style="font-size:11px;color:var(--gray-400)"><span class="badge b-green" style="font-size:10px">Podpisana</span> · 10.04.2026</div></div>
+        </div>
+        <button class="btn btn-g btn-sm" style="width:100%;margin-top:8px;justify-content:center">Powiąż dokument</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

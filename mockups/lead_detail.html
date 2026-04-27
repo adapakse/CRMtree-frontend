@@ -1,0 +1,212 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>x-CRM — TechCorp Sp. z o.o.</title>
+<link rel="stylesheet" href="_base.css">
+<style>
+.detail-layout{display:grid;grid-template-columns:280px 1fr 300px;flex:1;overflow:hidden;min-height:0}
+.det-panel{overflow-y:auto;padding:16px;border-left:1px solid var(--gray-200)}
+.det-panel:first-child{border-left:none}
+.info-s{margin-bottom:18px}
+.info-s-t{font-family:'Sora';font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--gray-100)}
+.ctag{display:inline-flex;align-items:center;background:var(--gray-100);border-radius:12px;padding:3px 8px;font-size:11px;color:var(--gray-600);margin:2px;gap:4px}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <a class="s-logo" href="index.html"><div class="s-logo-icon">x</div><span class="s-logo-text">x<span>-CRM</span></span></a>
+  <div class="s-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</a>
+    <a class="nav-item" href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Dokumenty</a>
+    <a class="nav-item" href="workflow.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Workflow</a>
+    <div class="s-sep">CRM</div>
+    <a class="nav-item active" href="leads_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Leady</a>
+    <a class="nav-item" href="clients_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v8h4"/><path d="M18 9h2a2 2 0 012 2v9h-4"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="10" y1="10" x2="14" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Klienci</a>
+    <a class="nav-item" href="onboarding.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Onboarding</a>
+    <a class="nav-item" href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Raporty</a>
+    <a class="nav-item" href="calendar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Kalendarz</a>
+    <div class="s-sep">Email</div>
+    <a class="nav-item" href="email_compose.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Nowy email</a>
+    <a class="nav-item" href="email_thread.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Wątek email</a>
+    <div class="s-sep">Admin</div>
+    <a class="nav-item" href="admin_settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ustawienia</a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <span class="bc"><a href="leads_list.html">Leady</a> &rsaquo; <b>TechCorp Sp. z o.o.</b></span>
+    <span class="badge stage-offer" style="margin-left:6px">Oferta</span>
+    <span class="badge b-orange" style="margin-left:4px"><span class="bdot"></span>Gorący</span>
+    <div class="tsp"></div>
+    <button class="btn btn-g btn-sm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 012 1.18 2 2 0 014 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Zadzwoń</button>
+    <button class="btn btn-g btn-sm" onclick="location.href='email_compose.html'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Email <span style="background:#DC2626;color:white;border-radius:8px;padding:1px 5px;font-size:10px;font-weight:700">2</span></button>
+    <button class="btn btn-g btn-sm">Edytuj</button>
+    <button class="btn btn-p btn-sm">Rozpocznij onboarding</button>
+    <div class="u-pill"><div class="u-dot">AN</div>Anna Nowak</div>
+  </div>
+
+  <div class="detail-layout">
+
+    <!-- LEFT: Info -->
+    <div class="det-panel">
+      <div class="info-s">
+        <div class="info-s-t">Kontakt</div>
+        <div class="ikv"><span class="lbl">Firma</span><span class="val" style="font-weight:700;font-size:13px">TechCorp Sp. z o.o.</span></div>
+        <div class="ikv"><span class="lbl">Osoba</span><span class="val">Michał Nowicki <span style="color:var(--gray-400)">· CTO</span></span></div>
+        <div class="ikv"><span class="lbl">Email</span><span class="val"><a href="#">m.nowicki@techcorp.pl</a></span></div>
+        <div class="ikv"><span class="lbl">Telefon</span><span class="val"><a href="#">+48 500 123 456</a></span></div>
+        <div class="ikv"><span class="lbl">WWW</span><span class="val"><a href="#">techcorp.pl</a></span></div>
+        <div class="ikv"><span class="lbl">NIP</span><span class="val mono">527-283-11-44</span></div>
+        <div class="ikv"><span class="lbl">Branża</span><span class="val">IT / Technologia</span></div>
+        <div style="margin-top:8px">
+          <div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">Dodatkowe kontakty</div>
+          <span class="ctag">Anna Kowalska · Dyrektor</span>
+          <span class="ctag">Jan Witek · CFO</span>
+        </div>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Sprzedaż</div>
+        <div class="ikv"><span class="lbl">Etap</span><span class="val"><span class="badge stage-offer">Oferta</span></span></div>
+        <div class="ikv"><span class="lbl">Wartość</span><span class="val" style="font-weight:700;color:#059669;font-family:'Sora'">450 000 PLN</span></div>
+        <div class="ikv"><span class="lbl">Prawdop.</span><span class="val">60%</span></div>
+        <div class="ikv"><span class="lbl">Zamknięcie</span><span class="val">30.06.2026</span></div>
+        <div class="ikv"><span class="lbl">Handlowiec</span><span class="val">Anna Nowak</span></div>
+        <div class="ikv"><span class="lbl">Źródło</span><span class="val">LinkedIn</span></div>
+        <div class="ikv"><span class="lbl">1. kontakt</span><span class="val">12.01.2026</span></div>
+        <div class="ikv"><span class="lbl">Obrót (szac.)</span><span class="val">5 000 000 PLN/rok</span></div>
+        <div class="ikv"><span class="lbl">Online %</span><span class="val">65%</span></div>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Tagi</div>
+        <span class="badge b-blue">enterprise</span>
+        <span class="badge b-purple" style="margin-left:4px">priorytet</span>
+        <span class="badge b-gray" style="margin-left:4px">q2-2026</span>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Historia etapów</div>
+        <div style="font-size:12px;color:var(--gray-500)">
+          <div style="padding:4px 0;border-bottom:1px solid var(--gray-100)">Negocjacje → <strong style="color:var(--gray-800)">Oferta</strong> <span style="color:var(--gray-300)">·</span> 25.04.2026</div>
+          <div style="padding:4px 0;border-bottom:1px solid var(--gray-100)">Prezentacja → Negocjacje <span style="color:var(--gray-300)">·</span> 22.04.2026</div>
+          <div style="padding:4px 0">Lead utworzony <span style="color:var(--gray-300)">·</span> 12.01.2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: Activities -->
+    <div class="det-panel">
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn btn-p btn-sm">Nowa aktywność</button>
+        <button class="btn btn-g btn-sm" onclick="location.href='email_compose.html'">Email</button>
+        <button class="btn btn-g btn-sm">Połączenie</button>
+        <button class="btn btn-g btn-sm">Spotkanie</button>
+        <button class="btn btn-g btn-sm">Notatka</button>
+      </div>
+
+      <ul class="tl">
+        <li class="tli">
+          <div class="tdot tdot-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+              <span class="tlt">Odpowiedź na ofertę Enterprise</span>
+              <span class="badge b-yellow"><span class="bdot"></span>nieprzeczytane</span>
+            </div>
+            <div class="tlm">Email przychodzący · 27.04.2026, 14:32 · wątek: Oferta Q2</div>
+            <div style="font-size:12.5px;color:var(--gray-600);margin-top:5px;line-height:1.5">Dziękujemy za przesłaną ofertę. Mamy kilka pytań odnośnie warunków SLA i integracji z SAP…</div>
+            <div style="margin-top:8px"><a href="email_thread.html" class="btn btn-g btn-xs">Otwórz wątek</a></div>
+          </div>
+        </li>
+        <li class="tli">
+          <div class="tdot tdot-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+          <div style="flex:1">
+            <div class="tlt">Oferta Enterprise Q2 2026 wysłana</div>
+            <div class="tlm">Email wychodzący · 25.04.2026, 10:15 · Anna Nowak</div>
+            <div style="font-size:12.5px;color:var(--gray-600);margin-top:5px;line-height:1.5">Oferta PDF + warunki SLA. Termin odpowiedzi: koniec tygodnia.</div>
+          </div>
+        </li>
+        <li class="tli">
+          <div class="tdot tdot-task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div style="flex:1">
+            <div class="tlt">Spotkanie — prezentacja produktu</div>
+            <div class="tlm">Spotkanie · 22.04.2026, 11:00 · 90 min · Anna Nowak</div>
+            <div style="font-size:12.5px;color:var(--gray-600);margin-top:5px;line-height:1.5">Prezentacja modułów CRM i raportowania. Klient bardzo zainteresowany integracją DWH. Budżet potwierdzony.</div>
+          </div>
+        </li>
+        <li class="tli">
+          <div class="tdot tdot-call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 012 1.18 2 2 0 014 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <div style="flex:1">
+            <div class="tlt">Połączenie — omówienie wymagań</div>
+            <div class="tlm">18.04.2026, 09:30 · 35 min · Anna Nowak</div>
+            <div style="font-size:12.5px;color:var(--gray-600);margin-top:5px;line-height:1.5">Klient oczekuje integracji z SAP. Budżet: do 500k PLN rocznie. Wymaga dedykowanego SLA P1 &lt;1h.</div>
+          </div>
+        </li>
+        <li class="tli">
+          <div class="tdot tdot-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+          <div style="flex:1">
+            <div class="tlt">Notatka — pierwszy kontakt LinkedIn</div>
+            <div class="tlm">12.01.2026 · Anna Nowak</div>
+            <div style="font-size:12.5px;color:var(--gray-600);margin-top:5px;line-height:1.5">Lead pozyskany przez kampanię LinkedIn. CTO odpowiedział w ciągu 2 dni. Demo umówiono na luty.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- RIGHT: Docs + related -->
+    <div class="det-panel">
+      <div class="info-s">
+        <div class="info-s-t">Powiązane dokumenty</div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div>
+            <div style="font-size:12.5px;font-weight:600;color:var(--gray-800)">Oferta Enterprise Q2 2026</div>
+            <div style="font-size:11px;color:var(--gray-400)"><span class="badge b-yellow" style="font-size:10px">Wysłana</span> · 25.04.2026 · 245 KB</div>
+          </div>
+        </div>
+        <div style="padding:8px 0;display:flex;align-items:center;gap:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div>
+            <div style="font-size:12.5px;font-weight:600;color:var(--gray-800)">NDA — TechCorp</div>
+            <div style="font-size:11px;color:var(--gray-400)"><span class="badge b-green" style="font-size:10px">Podpisana</span> · 20.02.2026 · 74 KB</div>
+          </div>
+        </div>
+        <button class="btn btn-g btn-sm" style="width:100%;margin-top:8px;justify-content:center">Powiąż dokument</button>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Konto testowe</div>
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px">
+          <div style="font-size:12.5px;font-weight:600;color:#166534;margin-bottom:3px">Konto aktywne</div>
+          <div style="font-size:12px;color:var(--gray-600)">techcorp-demo.xcrmapp.pl</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:3px">Utworzone: 20.03.2026</div>
+        </div>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Zadania otwarte</div>
+        <div style="font-size:12.5px">
+          <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100)">
+            <input type="checkbox" style="margin-top:2px">
+            <div>
+              <div style="font-weight:600;color:var(--gray-800)">Odpowiedź na pytania SLA</div>
+              <div style="font-size:11px;color:var(--orange)">Termin: dziś · Anna Nowak</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0">
+            <input type="checkbox" style="margin-top:2px">
+            <div>
+              <div style="font-weight:600;color:var(--gray-800)">Follow-up po odpowiedzi</div>
+              <div style="font-size:11px;color:var(--gray-400)">Termin: 02.05.2026 · Anna Nowak</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-s">
+        <div class="info-s-t">Przypisanie</div>
+        <div class="ikv"><span class="lbl">Handlowiec</span><span class="val"><div class="u-pill" style="display:inline-flex;padding:2px 8px 2px 2px;font-size:11.5px"><div class="u-dot" style="width:22px;height:22px;font-size:9px">AN</div>Anna Nowak</div></span></div>
+        <div class="ikv"><span class="lbl">Grupa</span><span class="val"><span class="badge b-gray">Key Accounts</span></span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body></html>

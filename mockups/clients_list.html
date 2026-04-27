@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>x-CRM — Klienci</title>
+<link rel="stylesheet" href="_base.css">
+<style>
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.ccard{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px;cursor:pointer;transition:box-shadow .15s,border-color .15s;display:block;color:inherit;text-decoration:none;box-shadow:var(--shadow-sm)}
+.ccard:hover{box-shadow:var(--shadow);border-color:var(--orange-muted)}
+.cc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cc-logo{width:36px;height:36px;border-radius:8px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-family:'Sora';font-size:14px;font-weight:700;color:var(--gray-600);flex-shrink:0}
+.cc-name{font-weight:700;font-size:13px;color:var(--gray-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid var(--gray-50)}
+.cc-row:last-of-type{border-bottom:none}
+.cc-lbl{color:var(--gray-400)}
+.cc-val{font-weight:600;color:var(--gray-700)}
+.cc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--gray-100)}
+.ecnt{background:var(--orange);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:auto}
+.vtgl{display:flex;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden}
+.vtgl button{padding:5px 10px;border:none;background:white;cursor:pointer;font-size:12px;font-family:inherit;color:var(--gray-500);display:flex;align-items:center;gap:5px}
+.vtgl button.on{background:var(--orange);color:white}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <a class="s-logo" href="index.html"><div class="s-logo-icon">x</div><span class="s-logo-text">x<span>-CRM</span></span></a>
+  <div class="s-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</a>
+    <a class="nav-item" href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Dokumenty</a>
+    <a class="nav-item" href="workflow.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Workflow</a>
+    <div class="s-sep">CRM</div>
+    <a class="nav-item" href="leads_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Leady</a>
+    <a class="nav-item active" href="clients_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v8h4"/><path d="M18 9h2a2 2 0 012 2v9h-4"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="10" y1="10" x2="14" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Klienci</a>
+    <a class="nav-item" href="onboarding.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Onboarding</a>
+    <a class="nav-item" href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Raporty</a>
+    <a class="nav-item" href="calendar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Kalendarz</a>
+    <div class="s-sep">Email</div>
+    <a class="nav-item" href="email_compose.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Nowy email</a>
+    <a class="nav-item" href="email_thread.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Wątek email</a>
+    <div class="s-sep">Admin</div>
+    <a class="nav-item" href="admin_settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ustawienia</a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <span class="page-title">Klienci</span>
+    <div class="tsp"></div>
+    <div class="srch-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="srch" placeholder="Szukaj klienta…"></div>
+    <select class="fsel-sm"><option>Wszystkie statusy</option><option>Aktywny</option><option>Onboarding</option><option>Nieaktywny</option></select>
+    <select class="fsel-sm"><option>Wszyscy opiekunowie</option><option>Anna Nowak</option><option>Piotr Kowalski</option><option>Maria Wiśniewska</option></select>
+    <select class="fsel-sm"><option>Wszystkie grupy</option><option>Polska Północna</option><option>Polska Południe</option><option>Key Accounts</option></select>
+    <div class="vtgl">
+      <button class="on" id="btn-cards" onclick="showView('cards',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Karty</button>
+      <button id="btn-table" onclick="showView('table',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Tabela</button>
+    </div>
+    <button class="btn btn-p btn-sm">Nowy klient</button>
+    <div class="u-pill"><div class="u-dot">AN</div>Anna Nowak</div>
+  </div>
+  <div class="content">
+
+    <!-- Stats -->
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div class="kpi" style="flex:1;padding:12px 16px"><div class="kpi-lbl">Łącznie</div><div class="kpi-val">132</div></div>
+      <div class="kpi" style="flex:1;padding:12px 16px"><div class="kpi-lbl">Aktywni</div><div class="kpi-val" style="color:#16A34A">118</div></div>
+      <div class="kpi" style="flex:1;padding:12px 16px"><div class="kpi-lbl">Onboarding</div><div class="kpi-val" style="color:var(--orange)">9</div></div>
+      <div class="kpi" style="flex:1;padding:12px 16px"><div class="kpi-lbl">Nieaktywni</div><div class="kpi-val" style="color:var(--gray-400)">5</div></div>
+      <div class="kpi" style="flex:1;padding:12px 16px"><div class="kpi-lbl">Obrót (mies.)</div><div class="kpi-val" style="font-size:18px">4,2M PLN</div></div>
+    </div>
+
+    <!-- Cards view -->
+    <div id="view-cards" class="cards-grid">
+      <a href="client_detail.html" class="ccard">
+        <div class="cc-hdr"><div class="cc-logo">BK</div><div style="flex:1;min-width:0"><div class="cc-name">Biuro Kowalski</div><div style="margin-top:2px"><span class="badge b-green"><span class="bdot"></span>Aktywny</span></div></div><span class="ecnt">3</span></div>
+        <div class="cc-row"><span class="cc-lbl">Opiekun</span><span class="cc-val">Anna Nowak</span></div>
+        <div class="cc-row"><span class="cc-lbl">Branża</span><span class="cc-val">Turystyka</span></div>
+        <div class="cc-row"><span class="cc-lbl">Umowa do</span><span class="cc-val" style="color:#DC2626">31.07.2026</span></div>
+        <div class="cc-row"><span class="cc-lbl">Obrót roczny</span><span class="cc-val">2 400 000 PLN</span></div>
+        <div class="cc-foot"><span class="badge b-gray">Polska Północna</span><span style="font-size:11px;color:var(--gray-400)">online 70%</span></div>
+      </a>
+      <a href="client_detail.html" class="ccard">
+        <div class="cc-hdr"><div class="cc-logo">GT</div><div style="flex:1;min-width:0"><div class="cc-name">GlobalTravel SA</div><div style="margin-top:2px"><span class="badge b-green"><span class="bdot"></span>Aktywny</span></div></div></div>
+        <div class="cc-row"><span class="cc-lbl">Opiekun</span><span class="cc-val">Piotr Kowalski</span></div>
+        <div class="cc-row"><span class="cc-lbl">Branża</span><span class="cc-val">Turystyka</span></div>
+        <div class="cc-row"><span class="cc-lbl">Umowa do</span><span class="cc-val">31.12.2026</span></div>
+        <div class="cc-row"><span class="cc-lbl">Obrót roczny</span><span class="cc-val">8 200 000 PLN</span></div>
+        <div class="cc-foot"><span class="badge b-gray">Key Accounts</span><span style="font-size:11px;color:var(--gray-400)">online 55%</span></div>
+      </a>
+      <a href="client_detail.html" class="ccard">
+        <div class="cc-hdr"><div class="cc-logo">HE</div><div style="flex:1;min-width:0"><div class="cc-name">Holiday Express</div><div style="margin-top:2px"><span class="badge b-orange"><span class="bdot"></span>Onboarding</span></div></div><span class="ecnt">1</span></div>
+        <div class="cc-row"><span class="cc-lbl">Opiekun</span><span class="cc-val">Anna Nowak</span></div>
+        <div class="cc-row"><span class="cc-lbl">Branża</span><span class="cc-val">Turystyka</span></div>
+        <div class="cc-row"><span class="cc-lbl">Etap wb.</span><span class="cc-val">Konfiguracja (krok 1)</span></div>
+        <div class="cc-row"><span class="cc-lbl">Umowa od</span><span class="cc-val">15.04.2026</span></div>
+        <div class="cc-foot"><span class="badge b-gray">Polska Południe</span><span style="font-size:11px;color:var(--gray-400)">online 80%</span></div>
+      </a>
+      <a href="client_detail.html" class="ccard">
+        <div class="cc-hdr"><div class="cc-logo">VT</div><div style="flex:1;min-width:0"><div class="cc-name">Voyager Travel Sp. z o.o.</div><div style="margin-top:2px"><span class="badge b-green"><span class="bdot"></span>Aktywny</span></div></div></div>
+        <div class="cc-row"><span class="cc-lbl">Opiekun</span><span class="cc-val">Maria Wiśniewska</span></div>
+        <div class="cc-row"><span class="cc-lbl">Branża</span><span class="cc-val">Turystyka</span></div>
+        <div class="cc-row"><span class="cc-lbl">Umowa do</span><span class="cc-val">28.02.2027</span></div>
+        <div class="cc-row"><span class="cc-lbl">Obrót roczny</span><span class="cc-val">5 600 000 PLN</span></div>
+        <div class="cc-foot"><span class="badge b-gray">Polska Północna</span><span style="font-size:11px;color:var(--gray-400)">online 62%</span></div>
+      </a>
+      <a href="client_detail.html" class="ccard">
+        <div class="cc-hdr"><div class="cc-logo">TC</div><div style="flex:1;min-width:0"><div class="cc-name">TechCorp Sp. z o.o.</div><div style="margin-top:2px"><span class="badge b-orange"><span class="bdot"></span>Onboarding</span></div></div></div>
+        <div class="cc-row"><span class="cc-lbl">Opiekun</span><span class="cc-val">Anna Nowak</span></div>
+        <div class="cc-row"><span class="cc-lbl">Branża</span><span class="cc-val">IT</span></div>
+        <div class="cc-row"><span class="cc-lbl">Etap wb.</span><span class="cc-val">Umowa (krok 0)</span></div>
+        <div class="cc-row"><span class="cc-lbl">Umowa od</span><span class="cc-val">20.04.2026</span></div>
+        <div class="cc-foot"><span class="badge b-gray">Key Accounts</span><span style="font-size:11px;color:var(--gray-400)">online 90%</span></div>
+      </a>
+      <a href="client_detail.html" class="ccard" style="opacity:.55">
+        <div class="cc-hdr"><div class="cc-logo">QF</div><div style="flex:1;min-width:0"><div class="cc-name">QuickFly SA</div><div style="margin-top:2px"><span class="badge b-gray"><span class="bdot"></span>Nieaktywny</span></div></div></div>
+        <div class="cc-row"><span class="cc-lbl">Opiekun</span><span class="cc-val">Piotr Kowalski</span></div>
+        <div class="cc-row"><span class="cc-lbl">Branża</span><span class="cc-val">Transport</span></div>
+        <div class="cc-row"><span class="cc-lbl">Umowa do</span><span class="cc-val" style="color:#DC2626">31.12.2025</span></div>
+        <div class="cc-row"><span class="cc-lbl">Obrót roczny</span><span class="cc-val">—</span></div>
+        <div class="cc-foot"><span class="badge b-gray">Polska Południe</span><span style="font-size:11px;color:var(--gray-400)">online 40%</span></div>
+      </a>
+    </div>
+
+    <!-- Table view -->
+    <div id="view-table" style="display:none" class="tw">
+      <table>
+        <thead><tr><th>Firma</th><th>Status</th><th>Branża</th><th>Opiekun</th><th>Grupa</th><th>Obrót roczny</th><th>Umowa do</th><th>Email</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><a href="client_detail.html">Biuro Kowalski</a></td><td><span class="badge b-green"><span class="bdot"></span>Aktywny</span></td><td>Turystyka</td><td>Anna Nowak</td><td>Polska Północna</td><td style="font-family:'Sora';font-weight:600">2 400 000 PLN</td><td style="color:#DC2626;font-weight:600">31.07.2026</td><td><span style="background:var(--orange);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">3</span></td><td><button class="btn-ghost btn">···</button></td></tr>
+          <tr><td><a href="client_detail.html">GlobalTravel SA</a></td><td><span class="badge b-green"><span class="bdot"></span>Aktywny</span></td><td>Turystyka</td><td>Piotr Kowalski</td><td>Key Accounts</td><td style="font-family:'Sora';font-weight:600">8 200 000 PLN</td><td>31.12.2026</td><td></td><td><button class="btn-ghost btn">···</button></td></tr>
+          <tr><td><a href="client_detail.html">Holiday Express</a></td><td><span class="badge b-orange"><span class="bdot"></span>Onboarding</span></td><td>Turystyka</td><td>Anna Nowak</td><td>Polska Południe</td><td>—</td><td>—</td><td><span style="background:var(--orange);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">1</span></td><td><button class="btn-ghost btn">···</button></td></tr>
+          <tr><td><a href="client_detail.html">Voyager Travel Sp. z o.o.</a></td><td><span class="badge b-green"><span class="bdot"></span>Aktywny</span></td><td>Turystyka</td><td>Maria Wiśniewska</td><td>Polska Północna</td><td style="font-family:'Sora';font-weight:600">5 600 000 PLN</td><td>28.02.2027</td><td></td><td><button class="btn-ghost btn">···</button></td></tr>
+          <tr><td><a href="client_detail.html">TechCorp Sp. z o.o.</a></td><td><span class="badge b-orange"><span class="bdot"></span>Onboarding</span></td><td>IT</td><td>Anna Nowak</td><td>Key Accounts</td><td>—</td><td>—</td><td></td><td><button class="btn-ghost btn">···</button></td></tr>
+          <tr style="opacity:.55"><td>QuickFly SA</td><td><span class="badge b-gray"><span class="bdot"></span>Nieaktywny</span></td><td>Transport</td><td>Piotr Kowalski</td><td>Polska Południe</td><td>—</td><td style="color:#DC2626;font-weight:600">31.12.2025</td><td></td><td><button class="btn-ghost btn">···</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+function showView(v,btn){
+  document.getElementById('view-cards').style.display=v==='cards'?'grid':'none';
+  document.getElementById('view-table').style.display=v==='table'?'block':'none';
+  document.querySelectorAll('.vtgl button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+</script>
+</body></html>

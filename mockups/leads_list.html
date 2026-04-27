@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>x-CRM — Leady</title>
+<link rel="stylesheet" href="_base.css">
+<style>
+.stats-row{display:flex;gap:10px;margin-bottom:14px;flex-shrink:0}
+.stat-box{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 16px;box-shadow:var(--shadow-sm);flex:1;min-width:0}
+.stat-box .sv{font-family:'Sora';font-size:20px;font-weight:700;color:var(--gray-900)}
+.stat-box .sl{font-size:11px;color:var(--gray-400);margin-top:1px}
+.email-cnt{background:var(--orange);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.hot-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--orange);margin-right:3px}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <a class="s-logo" href="index.html"><div class="s-logo-icon">x</div><span class="s-logo-text">x<span>-CRM</span></span></a>
+  <div class="s-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</a>
+    <a class="nav-item" href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Dokumenty</a>
+    <a class="nav-item" href="workflow.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Workflow</a>
+    <div class="s-sep">CRM</div>
+    <a class="nav-item active" href="leads_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Leady</a>
+    <a class="nav-item" href="clients_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v8h4"/><path d="M18 9h2a2 2 0 012 2v9h-4"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="10" y1="10" x2="14" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Klienci</a>
+    <a class="nav-item" href="onboarding.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Onboarding</a>
+    <a class="nav-item" href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Raporty</a>
+    <a class="nav-item" href="calendar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Kalendarz</a>
+    <div class="s-sep">Email</div>
+    <a class="nav-item" href="email_compose.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Nowy email</a>
+    <a class="nav-item" href="email_thread.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Wątek email</a>
+    <div class="s-sep">Admin</div>
+    <a class="nav-item" href="admin_settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ustawienia</a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <span class="page-title">Leady</span>
+    <div class="tsp"></div>
+    <div class="srch-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="srch" placeholder="Szukaj firmy lub kontaktu…"></div>
+    <select class="fsel-sm"><option>Wszyscy handlowcy</option><option>Anna Nowak</option><option>Piotr Kowalski</option><option>Maria Wiśniewska</option></select>
+    <select class="fsel-sm"><option>Wszystkie źródła</option><option>Polecenie</option><option>LinkedIn</option><option>Strona WWW</option></select>
+    <button class="btn btn-g btn-sm">Import CSV</button>
+    <button class="btn btn-p btn-sm">Nowy lead</button>
+    <div class="u-pill"><div class="u-dot">AN</div>Anna Nowak</div>
+  </div>
+  <div class="content" style="display:flex;flex-direction:column;overflow:hidden;padding:16px;gap:12px">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-box"><div class="sv">47</div><div class="sl">Aktywne leady</div></div>
+      <div class="stat-box"><div class="sv" style="color:var(--orange)">8</div><div class="sl">Gorące</div></div>
+      <div class="stat-box"><div class="sv" style="font-size:17px">1 240 000 PLN</div><div class="sl">Pipeline łącznie</div></div>
+      <div class="stat-box"><div class="sv" style="color:#16A34A">6</div><div class="sl">Wygrane (QTD)</div></div>
+      <div class="stat-box"><div class="sv" style="color:#DC2626">3</div><div class="sl">Przegrane (QTD)</div></div>
+      <div class="stat-box"><div class="sv">38%</div><div class="sl">Win rate</div></div>
+    </div>
+
+    <!-- Kanban -->
+    <div class="kanban" style="flex:1;overflow-y:visible">
+
+      <div class="kb-col">
+        <div class="kb-head"><div class="kb-dot" style="background:var(--gray-300)"></div>Nowy<span class="kb-cnt">5</span></div>
+        <div class="kb-body">
+          <a href="lead_detail.html" class="lcard">
+            <div class="lcard-co">EduTravel Sp. z o.o.</div>
+            <div class="lcard-ct">Marek Zając · CEO</div>
+            <div class="lcard-val">45 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">10%</span><span class="lchip">IT</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:10%"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Anna Nowak</div>
+          </a>
+          <div class="lcard">
+            <div class="lcard-co"><span class="hot-dot"></span>MedTour Klinika</div>
+            <div class="lcard-ct">Jan Lewandowski · CFO</div>
+            <div class="lcard-val">120 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">15%</span><span class="lchip">Zdrowie</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:15%"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Piotr Kowalski</div>
+          </div>
+          <div class="lcard">
+            <div class="lcard-co">SkyLog Transport</div>
+            <div class="lcard-ct">Ewa Duda · Dyrektor</div>
+            <div class="lcard-val">80 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">10%</span><span class="lchip">Transport</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:10%"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Maria Wiśniewska</div>
+          </div>
+          <button class="kb-add">+ Dodaj</button>
+        </div>
+      </div>
+
+      <div class="kb-col">
+        <div class="kb-head"><div class="kb-dot" style="background:#60A5FA"></div>Kwalifikacja<span class="kb-cnt">4</span></div>
+        <div class="kb-body">
+          <div class="lcard">
+            <div class="lcard-co"><span class="hot-dot"></span>Nowe Horyzonty Sp. z o.o.</div>
+            <div class="lcard-ct">Agata Szymańska · Manager</div>
+            <div class="lcard-val">200 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">25%</span><span class="lchip">Turystyka</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:25%;background:#60A5FA"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Anna Nowak</div>
+          </div>
+          <div class="lcard">
+            <div class="lcard-co">RetailPro Polska</div>
+            <div class="lcard-ct">Tomasz Bąk · VP</div>
+            <div class="lcard-val">95 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">20%</span><span class="lchip">Handel</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:20%;background:#60A5FA"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Piotr Kowalski</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kb-col">
+        <div class="kb-head"><div class="kb-dot" style="background:#34D399"></div>Prezentacja<span class="kb-cnt">3</span></div>
+        <div class="kb-body">
+          <div class="lcard">
+            <div class="lcard-co"><span class="hot-dot"></span>GlobalTravel SA</div>
+            <div class="lcard-ct">Barbara Krawczyk · CEO</div>
+            <div class="lcard-val">350 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">40%</span><span class="lchip">Turystyka</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:40%;background:#34D399"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Anna Nowak</div>
+          </div>
+          <div class="lcard">
+            <div class="lcard-co">FinTravel Group</div>
+            <div class="lcard-ct">Robert Mazur · CFO</div>
+            <div class="lcard-val">180 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">35%</span><span class="lchip">Finanse</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:35%;background:#34D399"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Maria Wiśniewska</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kb-col">
+        <div class="kb-head"><div class="kb-dot" style="background:#FBBF24"></div>Oferta<span class="kb-cnt">4</span></div>
+        <div class="kb-body">
+          <div class="lcard">
+            <div style="display:flex;align-items:center;justify-content:space-between"><div class="lcard-co">Voyager Travel Sp. z o.o.</div><span class="email-cnt">2</span></div>
+            <div class="lcard-ct">Zofia Piotrowska · Owner</div>
+            <div class="lcard-val">280 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">55%</span><span class="lchip">Turystyka</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:55%;background:#FBBF24"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Piotr Kowalski</div>
+          </div>
+          <a href="lead_detail.html" class="lcard">
+            <div style="display:flex;align-items:center;justify-content:space-between"><div class="lcard-co"><span class="hot-dot"></span>TechCorp Sp. z o.o.</div><span class="email-cnt">1</span></div>
+            <div class="lcard-ct">Michał Nowicki · CTO</div>
+            <div class="lcard-val">450 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">60%</span><span class="lchip">IT</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:60%;background:#FBBF24"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Anna Nowak · 27.04.2026</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="kb-col">
+        <div class="kb-head"><div class="kb-dot" style="background:var(--orange)"></div>Negocjacje<span class="kb-cnt">2</span></div>
+        <div class="kb-body">
+          <div class="lcard">
+            <div class="lcard-co"><span class="hot-dot"></span>Holiday Express</div>
+            <div class="lcard-ct">Krzysztof Wróbel · CEO</div>
+            <div class="lcard-val">620 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">75%</span><span class="lchip">Turystyka</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:75%"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Anna Nowak</div>
+          </div>
+          <div class="lcard">
+            <div class="lcard-co">ProLogistics Intl</div>
+            <div class="lcard-ct">Sandra Jabłońska · COO</div>
+            <div class="lcard-val">190 000 PLN</div>
+            <div style="display:flex;gap:4px"><span class="lchip lchip-prob">70%</span><span class="lchip">Transport</span></div>
+            <div class="pbar" style="margin-top:6px"><div class="pbar-fill" style="width:70%"></div></div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Piotr Kowalski</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kb-col">
+        <div class="kb-head"><div class="kb-dot" style="background:#22C55E"></div>Wygrane<span class="kb-cnt">6</span></div>
+        <div class="kb-body">
+          <div class="lcard" style="border-left:3px solid #22C55E">
+            <div class="lcard-co">Biuro Kowalski</div>
+            <div class="lcard-ct">Adam Kowalski · Owner</div>
+            <div class="lcard-val" style="color:#16A34A">240 000 PLN</div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Zamknięto: 15.04.2026</div>
+          </div>
+          <div style="text-align:center;padding:8px;font-size:11.5px;color:var(--gray-400);cursor:pointer">+ 5 więcej</div>
+        </div>
+      </div>
+
+      <div class="kb-col">
+        <div class="kb-head"><div class="kb-dot" style="background:#F43F5E"></div>Przegrane<span class="kb-cnt">3</span></div>
+        <div class="kb-body">
+          <div class="lcard" style="border-left:3px solid #F43F5E;opacity:.7">
+            <div class="lcard-co">QuickFly SA</div>
+            <div class="lcard-ct" style="color:#DC2626">Powód: cena</div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Piotr Kowalski · 10.04.2026</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body></html>

@@ -510,50 +510,6 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
             </div>
           </div>
         </div>
-        <!-- Panel prawy: wybrany wątek -->
-        <div *ngIf="selectedEmailActivity" style="width:300px;border-left:1px solid #e5e7eb;overflow-y:auto;padding:12px;flex-shrink:0">
-          <div style="background:white;border:1px solid #bfdbfe;border-radius:10px;padding:14px;position:relative">
-            <button (click)="selectedEmailActivity=null;panelThreadMessages=[]"
-                    style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px;line-height:1">✕</button>
-            <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px;padding-right:20px">📧 {{selectedEmailActivity.title}}</div>
-            <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">
-              {{selectedEmailActivity.activity_at|date:'dd.MM.yyyy HH:mm'}}
-              <span *ngIf="selectedEmailActivity.created_by_name"> · {{selectedEmailActivity.created_by_name}}</span>
-            </div>
-            <div *ngIf="panelLoadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
-            <div *ngFor="let m of panelThreadMessages"
-                 style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;margin-bottom:6px;font-size:11px"
-                 [style.border-left]="isMessageRead(m) ? '3px solid #e5e7eb' : '3px solid #ef4444'">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
-                <span [style.font-weight]="!isMessageRead(m) ? '700' : '600'" style="color:#374151;flex:1">{{m.from}}</span>
-                <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
-              </div>
-              <div style="color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;cursor:pointer"
-                   (click)="openMsgModal(m)">{{m.snippet}}</div>
-              <div style="display:flex;gap:6px;align-items:center">
-                <button (click)="openMsgModal(m)"
-                        style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">
-                  Otwórz
-                </button>
-                <button (click)="toggleMsgRead(m)"
-                        style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
-                        [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
-                        [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
-                        [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
-                  {{isMessageRead(m) ? '✓ Przeczytana' : '● Nieprzeczytana'}}
-                </button>
-              </div>
-            </div>
-            <div *ngIf="!panelLoadingThread && panelThreadMessages.length===0 && selectedEmailActivity.body"
-                 style="font-size:11px;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-bottom:6px">
-              {{stripHtml(selectedEmailActivity.body)}}
-            </div>
-            <button *ngIf="selectedEmailActivity.gmail_thread_id" class="comm-btn" style="margin-top:6px"
-                    (click)="replyToThread(selectedEmailActivity)">
-              <span>↩</span><div style="flex:1;text-align:left"><div style="font-size:12px;font-weight:600">Odpowiedz</div></div>
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- ── Tab: Historia zmian ────────────────────────────────────────── -->
@@ -573,11 +529,99 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Right panel: DWH sales / email thread / products / docs -->
+    <div class="right-panel">
+
+      <!-- DWH: dane sprzedazowe -->
+      <div *ngIf="partner.dwh_partner_id" class="dwh-box">
+        <div class="dwh-box-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          Dane sprzedażowe DWH
+        </div>
+        <div *ngIf="salesDataLoading" style="text-align:center;color:rgba(255,255,255,.5);font-size:12px;padding:8px 0">Ładowanie…</div>
+        <div *ngIf="!salesDataLoading && !partnerSalesKpi" style="text-align:center;color:rgba(255,255,255,.4);font-size:12px;padding:8px 0">Brak danych sprzedażowych</div>
+        <div *ngIf="partnerSalesKpi" class="dwh-kpi-grid">
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.gross_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót brutto PLN</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.net_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót netto PLN</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.transactions_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Transakcje</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.pax_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">PAX</div></div>
+          <div class="dwh-kpi dwh-kpi-wide"><div class="dwh-kpi-val" style="color:#86efac">{{(partnerSalesKpi.revenue_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Przychód netto PLN</div></div>
+        </div>
+      </div>
+
+      <!-- Wybrany watek mailowy -->
+      <div *ngIf="selectedEmailActivity" class="panel-email-box">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+          <div class="panel-email-title">&#128140; {{selectedEmailActivity.title}}</div>
+          <button (click)="selectedEmailActivity=null;panelThreadMessages=[]" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:13px;line-height:1;flex-shrink:0">&#x2715;</button>
+        </div>
+        <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">
+          {{selectedEmailActivity.activity_at|date:'dd.MM.yyyy HH:mm'}}
+          <span *ngIf="selectedEmailActivity.created_by_name"> · {{selectedEmailActivity.created_by_name}}</span>
+        </div>
+        <div *ngIf="panelLoadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
+        <div *ngFor="let m of panelThreadMessages" class="panel-msg" [class.unread]="!isMessageRead(m)" [class.read]="isMessageRead(m)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
+            <span [style.font-weight]="!isMessageRead(m) ? '700' : '600'" style="color:#374151;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{m.from}}</span>
+            <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
+          </div>
+          <div style="color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;cursor:pointer" (click)="openMsgModal(m)">{{m.snippet}}</div>
+          <div style="display:flex;gap:6px">
+            <button (click)="openMsgModal(m)" style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">Otwórz</button>
+            <button (click)="toggleMsgRead(m)"
+                    style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
+                    [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
+                    [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
+                    [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
+              {{isMessageRead(m) ? 'Przeczytana' : 'Nieprzeczytana'}}
+            </button>
+          </div>
+        </div>
+        <div *ngIf="!panelLoadingThread && panelThreadMessages.length===0 && selectedEmailActivity.body"
+             style="font-size:11px;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-bottom:6px">
+          {{stripHtml(selectedEmailActivity.body)}}
+        </div>
+        <button *ngIf="selectedEmailActivity.gmail_thread_id" class="comm-btn" style="margin-top:6px" (click)="replyToThread(selectedEmailActivity)">
+          <span>&#x21a9;</span><div style="flex:1;text-align:left"><div style="font-size:12px;font-weight:600">Odpowiedz</div></div>
+        </button>
+      </div>
+
+      <!-- Podzial produktowy -->
+      <div *ngIf="partnerSalesProducts.length" class="prod-box">
+        <div class="prod-box-title">Podział produktowy</div>
+        <div *ngFor="let prod of partnerSalesProducts" class="prod-row">
+          <span class="prod-name" [title]="prod.product_type">{{prod.product_type}}</span>
+          <div class="prod-bar-wrap"><div class="prod-bar" [style.width.%]="((prod.gross_turnover_pln||0)/salesProductsMax)*100"></div></div>
+          <span class="prod-val">{{(prod.gross_turnover_pln||0)|number:'1.0-0'}}</span>
+        </div>
+      </div>
+
+      <!-- Powiazane dokumenty -->
+      <div class="docs-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">Dokumenty ({{linkedDocs.length}})</div>
+          <button class="btn-sm" (click)="showDocPicker=true" style="font-size:11px">+ Dodaj</button>
+        </div>
+        <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px 0">Brak powiązanych dokumentów</div>
+        <div *ngFor="let d of linkedDocs"
+             style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f9fafb;cursor:pointer"
+             (click)="openDocument(d)">
+          <span style="font-size:14px">&#x1F4C4;</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title || d.doc_number || ('Dokument #' + d.document_id)}}</div>
+            <div style="font-size:10px;color:#9ca3af"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span><span *ngIf="d.doc_type">{{d.doc_type}}</span></div>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:13px;padding:2px 4px;border-radius:4px"
+                  (click)="$event.stopPropagation(); unlinkDoc(d)">&#x2715;</button>
+        </div>
+      </div>
 
     </div>
   </div>
 
-  <!-- �?�? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI �?�? -->
+  <!-- ï¿½?ï¿½? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI �?�? -->
   <div *ngIf="selectedAct" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px" (click)="closeActModal()">
     <div style="background:white;border-radius:14px;width:min(520px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;flex-direction:column" (click)="$event.stopPropagation()">
       <!-- Nagłówek -->
@@ -1377,7 +1421,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
-    .detail-page { padding:20px; max-width:1000px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
+    .detail-page { padding:20px; max-width:1400px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
     .detail-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; flex-shrink:0; }
     .back-btn { background:none; border:none; color:#f97316; cursor:pointer; font-size:13px; }
     .detail-header h1 { font-size:22px; font-weight:800; margin:0; flex:1; }
@@ -1440,10 +1484,32 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
     .task-act-btn.del:hover { color:#ef4444; }
     .task-empty { font-size:12px; color:#9ca3af; text-align:center; padding:16px; }
     /* Body */
-    .detail-body { display:grid; grid-template-columns:320px 1fr; gap:16px; flex:1; overflow:hidden; min-height:0; }
+    .detail-body { display:grid; grid-template-columns:320px 1fr 290px; gap:16px; flex:1; overflow:hidden; min-height:0; }
+    @media(max-width:900px) { .detail-body{grid-template-columns:320px 1fr;} .right-panel{display:none} }
     @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
     .info-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
     .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; min-height:0; display:flex; flex-direction:column; }
+    .right-panel { display:flex; flex-direction:column; gap:12px; overflow-y:auto; min-height:0; }
+    .dwh-box { background:linear-gradient(135deg,#166534 0%,#14532d 100%); border-radius:12px; padding:16px; color:white; flex-shrink:0; }
+    .dwh-box-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:rgba(255,255,255,.6); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .dwh-kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .dwh-kpi { background:rgba(255,255,255,.1); border-radius:8px; padding:8px 10px; }
+    .dwh-kpi-val { font-size:16px; font-weight:800; color:white; line-height:1; }
+    .dwh-kpi-lbl { font-size:10px; color:rgba(255,255,255,.6); margin-top:3px; }
+    .dwh-kpi-wide { grid-column:span 2; }
+    .prod-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
+    .prod-box-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; }
+    .prod-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:11px; }
+    .prod-name { width:90px; color:#374151; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
+    .prod-bar-wrap { flex:1; background:#f3f4f6; border-radius:4px; height:6px; overflow:hidden; }
+    .prod-bar { height:100%; background:#f97316; border-radius:4px; transition:width .4s; }
+    .prod-val { width:64px; text-align:right; color:#9ca3af; flex-shrink:0; }
+    .panel-email-box { background:white; border:1px solid #bfdbfe; border-radius:12px; padding:14px; flex-shrink:0; }
+    .panel-email-title { font-size:11px; font-weight:700; color:#1d4ed8; margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
+    .panel-msg { border:1px solid #e5e7eb; border-radius:8px; padding:8px; margin-bottom:6px; font-size:11px; }
+    .panel-msg.unread { border-left:3px solid #ef4444; }
+    .panel-msg.read { border-left:3px solid #e5e7eb; }
+    .docs-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
     .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
     .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; }
     .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:12px 14px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:color .15s,border-color .15s; }
@@ -1677,6 +1743,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   selectedEmailActivity: any = null;
   panelThreadMessages: any[] = [];
   panelLoadingThread  = false;
+  // Sales data (DWH)
+  partnerSalesKpi: any = null;
+  partnerSalesProducts: any[] = [];
+  salesDataLoading = false;
   gmailConnected      = false;
   gmailEmail          = '';
   gmailAuthUrl        = '';
@@ -1906,6 +1976,25 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
 
+  private loadPartnerSalesData(p: any): void {
+    const name = p.dwh_company_name || p.company;
+    if (!name) return;
+    this.salesDataLoading = true;
+    this.api.getPartnersReport({ partner_name: name }).subscribe({
+      next: (r: any) => this.zone.run(() => {
+        this.partnerSalesKpi = r?.kpi ?? null;
+        this.partnerSalesProducts = r?.by_product ?? [];
+        this.salesDataLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.salesDataLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  get salesProductsMax(): number {
+    return Math.max(1, ...this.partnerSalesProducts.map((p: any) => p.gross_turnover_pln || 0));
+  }
+
   private loadSuggestions(partnerId: number | string): void {
     this.api.getContactSuggestions(undefined, partnerId).subscribe({
       next: s => { this.allSuggestions = s; },
@@ -1929,6 +2018,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.activeStep = p.onboarding_step || 0;
           this.cdr.markForCheck();
           if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
+          if (p.dwh_partner_id) this.loadPartnerSalesData(p);
           this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
         });
       },

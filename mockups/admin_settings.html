@@ -1,0 +1,330 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>x-CRM — Ustawienia</title>
+<link rel="stylesheet" href="_base.css">
+<style>
+.settings-layout{display:grid;grid-template-columns:210px 1fr;gap:14px;height:100%;overflow:hidden}
+/* Left nav */
+.sett-nav{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:8px;box-shadow:var(--shadow-sm);align-self:start}
+.sett-nav-sep{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);padding:10px 8px 4px}
+.sett-nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--gray-600);cursor:pointer;font-weight:400;transition:all .12s;text-decoration:none}
+.sett-nav-item svg{width:15px;height:15px;flex-shrink:0}
+.sett-nav-item:hover{background:var(--gray-50);color:var(--gray-800)}
+.sett-nav-item.active{background:var(--orange-pale);color:var(--orange-dark);font-weight:600}
+/* Right content */
+.sett-content{overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.sett-section{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)}
+.sett-section-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--gray-200)}
+.sett-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sett-icon svg{width:18px;height:18px}
+.sett-title{font-family:'Sora';font-size:14px;font-weight:700;color:var(--gray-900)}
+.sett-subtitle{font-size:12px;color:var(--gray-400);margin-top:1px}
+/* Integration status card */
+.int-card{border:1.5px solid var(--gray-200);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:border-color .12s}
+.int-card.connected{border-color:#BBF7D0;background:#F0FDF4}
+.int-card.error{border-color:#FECACA;background:#FFF1F2}
+.int-logo{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Sora';font-size:14px;font-weight:700}
+.int-info{flex:1}
+.int-name{font-weight:600;font-size:13px;color:var(--gray-900)}
+.int-detail{font-size:12px;color:var(--gray-400);margin-top:2px}
+.int-status{display:flex;align-items:center;gap:6px;font-size:12px;flex-shrink:0}
+/* Toggle switch */
+.toggle{position:relative;display:inline-block;width:36px;height:20px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--gray-300);border-radius:10px;transition:.2s;cursor:pointer}
+.toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s}
+.toggle input:checked + .toggle-slider{background:var(--orange)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(16px)}
+/* Params table */
+.param-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100)}
+.param-row:last-child{border-bottom:none}
+.param-name{flex:1;font-size:13px;color:var(--gray-800);font-weight:500}
+.param-desc{font-size:11.5px;color:var(--gray-400);flex:2}
+.param-val{min-width:140px}
+/* Users table */
+.user-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray-100)}
+.user-row:last-child{border-bottom:none}
+.u-ava{width:30px;height:30px;border-radius:50%;background:var(--orange);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Sora'}
+.user-info{flex:1}
+.user-nm{font-size:13px;font-weight:600;color:var(--gray-800)}
+.user-em{font-size:11.5px;color:var(--gray-400)}
+/* Dict table */
+.dict-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:12.5px}
+.dict-item:last-child{border-bottom:none}
+.dict-ord{font-family:'Sora';font-size:11px;color:var(--gray-400);width:20px;text-align:center}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <a class="s-logo" href="index.html">
+    <div class="s-logo-icon">x</div>
+    <span class="s-logo-text">x<span>-CRM</span></span>
+  </a>
+  <div class="s-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</a>
+    <a class="nav-item" href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Dokumenty</a>
+    <a class="nav-item" href="workflow.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Workflow</a>
+    <div class="s-sep">CRM</div>
+    <a class="nav-item" href="leads_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Leady</a>
+    <a class="nav-item" href="clients_list.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v8h4"/><path d="M18 9h2a2 2 0 012 2v9h-4"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="10" y1="10" x2="14" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Klienci</a>
+    <a class="nav-item" href="onboarding.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Onboarding</a>
+    <a class="nav-item" href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Raporty</a>
+    <a class="nav-item" href="calendar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Kalendarz</a>
+    <div class="s-sep">Email</div>
+    <a class="nav-item" href="email_compose.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Nowy email</a>
+    <a class="nav-item" href="email_thread.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Wątek email</a>
+    <div class="s-sep">Admin</div>
+    <a class="nav-item active" href="admin_settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ustawienia</a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <span class="page-title">Ustawienia systemu</span>
+    <div class="tsp"></div>
+    <span class="badge b-orange"><span class="bdot"></span>Admin</span>
+    <div class="u-pill"><div class="u-dot">AN</div>Anna Nowak</div>
+  </div>
+  <div class="content" style="overflow:hidden;display:flex;flex-direction:column">
+    <div class="settings-layout">
+
+      <!-- Left nav -->
+      <div class="sett-nav">
+        <div class="sett-nav-sep">Integracje</div>
+        <a class="sett-nav-item active" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+          Gmail / Google
+        </a>
+        <a class="sett-nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          Google Drive
+        </a>
+        <a class="sett-nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          DWH / Baza danych
+        </a>
+        <div class="sett-nav-sep">Administracja</div>
+        <a class="sett-nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Użytkownicy i role
+        </a>
+        <a class="sett-nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+          Parametry systemu
+        </a>
+        <a class="sett-nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Słowniki
+        </a>
+        <div class="sett-nav-sep">System</div>
+        <a class="sett-nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Ogólne
+        </a>
+        <a class="sett-nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Logi systemu
+        </a>
+      </div>
+
+      <!-- Right content -->
+      <div class="sett-content">
+
+        <!-- Gmail / Google integration -->
+        <div class="sett-section">
+          <div class="sett-section-head">
+            <div class="sett-icon" style="background:#FEF2F2;color:#DC2626"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+            <div>
+              <div class="sett-title">Integracja Gmail i Google</div>
+              <div class="sett-subtitle">Odbieranie emaili, wysyłka przez konto Gmail, synchronizacja kalendarza</div>
+            </div>
+            <div class="tsp"></div>
+            <span class="badge b-green"><span class="bdot"></span>Połączono</span>
+          </div>
+
+          <div class="int-card connected">
+            <div class="int-logo" style="background:#FECACA;color:#DC2626;font-size:11px">GM</div>
+            <div class="int-info">
+              <div class="int-name">Gmail — anna.nowak@worktrips.pl</div>
+              <div class="int-detail">Połączono przez OAuth 2.0 · Ostatnia synchronizacja: 27.04.2026 09:42</div>
+            </div>
+            <div class="int-status">
+              <span class="badge b-green"><span class="bdot"></span>Aktywny</span>
+              <button class="btn btn-g btn-xs">Odśwież</button>
+              <button class="btn btn-d btn-xs">Odłącz</button>
+            </div>
+          </div>
+
+          <div class="int-card connected">
+            <div class="int-logo" style="background:#DBEAFE;color:#1D4ED8;font-size:11px">GC</div>
+            <div class="int-info">
+              <div class="int-name">Google Calendar</div>
+              <div class="int-detail">Dwustronna synchronizacja · anna.nowak@worktrips.pl</div>
+            </div>
+            <div class="int-status">
+              <span class="badge b-green"><span class="bdot"></span>Aktywny</span>
+              <button class="btn btn-g btn-xs">Odśwież</button>
+            </div>
+          </div>
+
+          <div style="margin-top:14px">
+            <div class="sec-t" style="margin-top:0">Ustawienia emaili</div>
+            <div class="param-row">
+              <div class="param-name">Automatyczne wiązanie emaili z leadami</div>
+              <div class="param-desc">System automatycznie przypisuje emaili do leadów na podstawie domeny i adresu</div>
+              <div class="param-val"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            </div>
+            <div class="param-row">
+              <div class="param-name">Powiadomienia o nowych emailach</div>
+              <div class="param-desc">Wyślij powiadomienie push gdy lead odpowie na email</div>
+              <div class="param-val"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            </div>
+            <div class="param-row">
+              <div class="param-name">Subskrypcja Pub/Sub (Google)</div>
+              <div class="param-desc">ID subskrypcji do odbierania powiadomień w czasie rzeczywistym</div>
+              <div class="param-val"><input class="fi" value="projects/worktrips/subscriptions/crm-gmail" style="font-size:11.5px;font-family:monospace"></div>
+            </div>
+            <div class="param-row">
+              <div class="param-name">Etykieta Gmail do synchronizacji</div>
+              <div class="param-desc">Emaile z tą etykietą będą importowane do CRM</div>
+              <div class="param-val"><input class="fi" value="x-CRM" style="font-size:12px"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn btn-p">Zapisz zmiany</button>
+            <button class="btn btn-g">Anuluj</button>
+            <div class="tsp"></div>
+            <button class="btn btn-g btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>Historia synchronizacji</button>
+          </div>
+        </div>
+
+        <!-- DWH -->
+        <div class="sett-section">
+          <div class="sett-section-head">
+            <div class="sett-icon" style="background:#EFF6FF;color:#1D4ED8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+            <div>
+              <div class="sett-title">DWH / Hurtownia danych</div>
+              <div class="sett-subtitle">Połączenie z BigQuery — dane sprzedażowe partnerów i produktów</div>
+            </div>
+            <div class="tsp"></div>
+            <span class="badge b-green"><span class="bdot"></span>Połączono</span>
+          </div>
+
+          <div class="int-card connected">
+            <div class="int-logo" style="background:#DBEAFE;color:#1D4ED8;font-size:10px;font-weight:700">BQ</div>
+            <div class="int-info">
+              <div class="int-name">Google BigQuery — worktrips-dwh</div>
+              <div class="int-detail">Dataset: crm_prod · Ostatni import: 27.04.2026 06:00 · 132 partnerów</div>
+            </div>
+            <div class="int-status">
+              <span class="badge b-green"><span class="bdot"></span>Aktywny</span>
+              <button class="btn btn-g btn-xs">Test połączenia</button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="param-row">
+              <div class="param-name">Project ID</div>
+              <div class="param-desc">Google Cloud Project dla BigQuery</div>
+              <div class="param-val"><input class="fi" value="worktrips-dwh" style="font-size:12px;font-family:monospace"></div>
+            </div>
+            <div class="param-row">
+              <div class="param-name">Dataset</div>
+              <div class="param-desc">Nazwa datasetu z danymi sprzedażowymi</div>
+              <div class="param-val"><input class="fi" value="crm_prod" style="font-size:12px;font-family:monospace"></div>
+            </div>
+            <div class="param-row">
+              <div class="param-name">Tabela partnerów</div>
+              <div class="param-desc">Źródłowa tabela z danymi partnerów</div>
+              <div class="param-val"><input class="fi" value="partners_full_v2" style="font-size:12px;font-family:monospace"></div>
+            </div>
+            <div class="param-row">
+              <div class="param-name">Harmonogram importu</div>
+              <div class="param-desc">Częstotliwość automatycznej synchronizacji z DWH</div>
+              <div class="param-val"><select class="fsel-sm" style="width:100%"><option>Co 24h (6:00)</option><option>Co 12h</option><option>Co 6h</option><option>Ręcznie</option></select></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn btn-p">Zapisz</button>
+            <button class="btn btn-g">Uruchom import teraz</button>
+          </div>
+        </div>
+
+        <!-- Users -->
+        <div class="sett-section">
+          <div class="sett-section-head">
+            <div class="sett-icon" style="background:var(--orange-pale);color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div><div class="sett-title">Użytkownicy i role</div><div class="sett-subtitle">Zarządzaj dostępem do systemu CRM</div></div>
+            <div class="tsp"></div>
+            <button class="btn btn-p btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Dodaj użytkownika</button>
+          </div>
+          <div class="user-row">
+            <div class="u-ava">AN</div>
+            <div class="user-info"><div class="user-nm">Anna Nowak</div><div class="user-em">anna.nowak@worktrips.pl</div></div>
+            <span class="badge b-orange"><span class="bdot"></span>Admin</span>
+            <button class="btn btn-g btn-xs">Edytuj</button>
+          </div>
+          <div class="user-row">
+            <div class="u-ava" style="background:#3B82F6">PK</div>
+            <div class="user-info"><div class="user-nm">Piotr Kowalski</div><div class="user-em">p.kowalski@worktrips.pl</div></div>
+            <span class="badge b-blue"><span class="bdot"></span>Handlowiec</span>
+            <button class="btn btn-g btn-xs">Edytuj</button>
+          </div>
+          <div class="user-row">
+            <div class="u-ava" style="background:#A855F7">MW</div>
+            <div class="user-info"><div class="user-nm">Marta Wiśniewska</div><div class="user-em">m.wisniewska@worktrips.pl</div></div>
+            <span class="badge b-blue"><span class="bdot"></span>Handlowiec</span>
+            <button class="btn btn-g btn-xs">Edytuj</button>
+          </div>
+          <div class="user-row">
+            <div class="u-ava" style="background:#14B8A6">TK</div>
+            <div class="user-info"><div class="user-nm">Tomasz Kaczmarek</div><div class="user-em">t.kaczmarek@worktrips.pl</div></div>
+            <span class="badge b-gray"><span class="bdot"></span>Tylko odczyt</span>
+            <button class="btn btn-g btn-xs">Edytuj</button>
+          </div>
+        </div>
+
+        <!-- Dictionaries -->
+        <div class="sett-section">
+          <div class="sett-section-head">
+            <div class="sett-icon" style="background:#F5F3FF;color:#6B21A8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+            <div><div class="sett-title">Słowniki</div><div class="sett-subtitle">Etapy leadów, typy firm, źródła pozyskania</div></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+            <div>
+              <div class="sec-t" style="margin-top:0">Etapy leada</div>
+              <div class="dict-item"><span class="dict-ord">1</span><span style="flex:1;font-weight:500">Nowy</span><span class="badge stage-new" style="font-size:10px">●</span></div>
+              <div class="dict-item"><span class="dict-ord">2</span><span style="flex:1;font-weight:500">Kwalifikacja</span><span class="badge stage-qual" style="font-size:10px">●</span></div>
+              <div class="dict-item"><span class="dict-ord">3</span><span style="flex:1;font-weight:500">Prezentacja</span><span class="badge b-green" style="font-size:10px">●</span></div>
+              <div class="dict-item"><span class="dict-ord">4</span><span style="flex:1;font-weight:500">Oferta</span><span class="badge stage-offer" style="font-size:10px">●</span></div>
+              <div class="dict-item"><span class="dict-ord">5</span><span style="flex:1;font-weight:500">Negocjacje</span><span class="badge stage-neg" style="font-size:10px">●</span></div>
+              <div class="dict-item"><span class="dict-ord">6</span><span style="flex:1;font-weight:500">Wygrane</span><span class="badge stage-won" style="font-size:10px">●</span></div>
+              <div class="dict-item"><span class="dict-ord">7</span><span style="flex:1;font-weight:500">Przegrane</span><span class="badge stage-lost" style="font-size:10px">●</span></div>
+              <button class="kb-add" style="margin-top:6px">+ Dodaj etap</button>
+            </div>
+            <div>
+              <div class="sec-t" style="margin-top:0">Źródła pozyskania</div>
+              <div class="dict-item"><span class="dict-ord">1</span><span style="flex:1">Polecenie</span></div>
+              <div class="dict-item"><span class="dict-ord">2</span><span style="flex:1">Targi / Events</span></div>
+              <div class="dict-item"><span class="dict-ord">3</span><span style="flex:1">Cold calling</span></div>
+              <div class="dict-item"><span class="dict-ord">4</span><span style="flex:1">LinkedIn</span></div>
+              <div class="dict-item"><span class="dict-ord">5</span><span style="flex:1">Strona www</span></div>
+              <div class="dict-item"><span class="dict-ord">6</span><span style="flex:1">Partner handlowy</span></div>
+              <button class="kb-add" style="margin-top:6px">+ Dodaj źródło</button>
+            </div>
+            <div>
+              <div class="sec-t" style="margin-top:0">Typy firm</div>
+              <div class="dict-item"><span class="dict-ord">1</span><span style="flex:1">Biuro podróży</span></div>
+              <div class="dict-item"><span class="dict-ord">2</span><span style="flex:1">Korporacja</span></div>
+              <div class="dict-item"><span class="dict-ord">3</span><span style="flex:1">TMC</span></div>
+              <div class="dict-item"><span class="dict-ord">4</span><span style="flex:1">Online Travel Agency</span></div>
+              <div class="dict-item"><span class="dict-ord">5</span><span style="flex:1">Event agency</span></div>
+              <div class="dict-item"><span class="dict-ord">6</span><span style="flex:1">Inne</span></div>
+              <button class="kb-add" style="margin-top:6px">+ Dodaj typ</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>
