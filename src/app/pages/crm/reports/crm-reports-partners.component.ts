@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import {
   CrmApiService, PartnersReport, PartnersReportKpi,
   PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, CrmUser,
@@ -38,32 +38,34 @@ function healthColor(engagement: number): string {
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div id="topbar" style="height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">Partner Performance</span>
-  <span style="flex:1"></span>
-  <select class="sel" [(ngModel)]="groupFilter" (ngModelChange)="load()">
-    <option value="">Wszystkie grupy</option>
-    <option *ngFor="let g of groupNames" [value]="g">{{ g }}</option>
-  </select>
-  <select class="sel" [(ngModel)]="partnerFilter" (ngModelChange)="onPartnerFilterChange()">
-    <option value="">Wszyscy partnerzy</option>
-    <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
-  </select>
-  <select class="sel" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
-    <option value="1m">Bieżący miesiąc</option>
-    <option value="3m">Ostatnie 3 miesiące</option>
-    <option value="6m">Ostatnie 6 miesięcy</option>
-    <option value="12m">Ostatnie 12 miesięcy</option>
-    <option value="ytd">YTD {{ currentYear }}</option>
-  </select>
-  <select class="sel" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
-    <option value="">Wszyscy handlowcy</option>
-    <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
-  </select>
-  <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer" (click)="clearRepFilter()">
-    × {{ persistRepName }}
-  </button>
-  <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer" (click)="load()">{{ loading ? '…' : '↻ Odśwież' }}</button>
+<div id="topbar" style="min-height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 24px;flex-shrink:0">
+  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b;flex-shrink:0">Partner Performance</span>
+  <span style="flex:1;min-width:8px"></span>
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+    <select class="sel" style="max-width:150px" [(ngModel)]="groupFilter" (ngModelChange)="load()">
+      <option value="">Wszystkie grupy</option>
+      <option *ngFor="let g of groupNames" [value]="g">{{ g }}</option>
+    </select>
+    <select class="sel" style="max-width:190px" [(ngModel)]="partnerFilter" (ngModelChange)="onPartnerFilterChange()">
+      <option value="">Wszyscy partnerzy</option>
+      <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
+    </select>
+    <select class="sel" style="max-width:170px" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
+      <option value="1m">Bieżący miesiąc</option>
+      <option value="3m">Ostatnie 3 mies.</option>
+      <option value="6m">Ostatnie 6 mies.</option>
+      <option value="12m">Ostatnie 12 mies.</option>
+      <option value="ytd">YTD {{ currentYear }}</option>
+    </select>
+    <select class="sel" style="max-width:160px" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
+      <option value="">Wszyscy handlowcy</option>
+      <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+    </select>
+    <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap" (click)="clearRepFilter()">
+      × {{ persistRepName }}
+    </button>
+    <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer;white-space:nowrap;flex-shrink:0" (click)="load()">{{ loading ? '…' : '↻ Odśwież' }}</button>
+  </div>
 </div>
 
 <!-- CONTENT -->
@@ -81,29 +83,29 @@ function healthColor(engagement: number): string {
 
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
-    <div class="stat-card" style="border-top:3px solid #f26522">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #f26522" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#f26522;font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">Obrót brutto (PLN)</div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? '#16a34a' : '#dc2626'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }} vs poprzedni
       </div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #22C55E">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #22C55E" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#22C55E;font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">Przychód / Marża (PLN)</div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.margin_pct | number:'1.0-1' }}% marży</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #3B82F6">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #3B82F6" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#3B82F6;font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">Fees (PLN)</div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.fee_rate_pct | number:'1.0-1' }}% fee rate</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #A855F7">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #A855F7" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#A855F7;font-size:20px">{{ kpi.transactions_count | number }}</div>
       <div class="stat-lbl">Transakcje</div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.pax_count | number }} PAX</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #F59E0B">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #F59E0B" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#F59E0B;font-size:20px">{{ kpi.partners_count }}</div>
       <div class="stat-lbl">Aktywnych partnerów</div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '#16a34a' : '#dc2626'">
@@ -138,13 +140,17 @@ function healthColor(engagement: number): string {
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of topPartners" style="border-bottom:1px solid #f4f4f5;cursor:pointer" (mouseenter)="$any($event.currentTarget).style.background='#fafafa'" (mouseleave)="$any($event.currentTarget).style.background=''">
+            <tr *ngFor="let p of topPartners" style="border-bottom:1px solid #f4f4f5" class="tbl-row"
+                [style.cursor]="p.partner_id ? 'pointer' : 'default'"
+                (click)="p.partner_id && goToPartner(p.partner_id)"
+                (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+                (mouseleave)="$any($event.currentTarget).style.background=''"
+                [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
               <td style="padding:10px 14px">
                 <div style="display:flex;align-items:center;gap:8px">
                   <div [style.background]="avatarColor(p.partner_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(p.partner_name) }}</div>
                   <div>
-                    <a *ngIf="p.partner_id" [routerLink]="['/crm/partners', p.partner_id]" style="font-weight:600;color:#18181b;text-decoration:none">{{ p.partner_name }}</a>
-                    <span *ngIf="!p.partner_id" style="font-weight:600;color:#18181b">{{ p.partner_name }}</span>
+                    <span style="font-weight:600;color:#18181b">{{ p.partner_name }}</span>
                     <div *ngIf="p.partner_number" style="font-size:10.5px;color:#a1a1aa;font-family:monospace">{{ p.partner_number }}</div>
                   </div>
                 </div>
@@ -207,7 +213,11 @@ function healthColor(engagement: number): string {
     <!-- Handlowcy (manager) -->
     <div class="card" style="padding:18px" *ngIf="isManager">
       <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Wyniki handlowców</div>
-      <div *ngFor="let r of byRep" style="margin-bottom:12px">
+      <div *ngFor="let r of byRep" style="margin-bottom:12px;cursor:pointer;border-radius:8px;padding:6px 8px;transition:background .12s"
+           (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+           (mouseleave)="$any($event.currentTarget).style.background=''"
+           (click)="goToPartnersByRep(r.salesperson_id, r.salesperson_name)"
+           title="Kliknij aby zobaczyć partnerów tego handlowca">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <div [style.background]="avatarColor(r.salesperson_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(r.salesperson_name) }}</div>
           <div style="flex:1">
@@ -273,9 +283,14 @@ function healthColor(engagement: number): string {
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid #f4f4f5;cursor:pointer" (mouseenter)="$any($event.currentTarget).style.background='#fafafa'" (mouseleave)="$any($event.currentTarget).style.background=''">
+          <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid #f4f4f5"
+              [style.cursor]="p.partner_id ? 'pointer' : 'default'"
+              (click)="p.partner_id && goToPartner(p.partner_id)"
+              (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+              (mouseleave)="$any($event.currentTarget).style.background=''"
+              [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
             <td style="padding:9px 14px">
-              <a *ngIf="p.partner_id" [routerLink]="['/crm/partners', p.partner_id]" style="font-weight:600;color:#f26522;text-decoration:none">{{ p.partner_name }}</a>
+              <span *ngIf="p.partner_id" style="font-weight:600;color:#f26522">{{ p.partner_name }}</span>
               <span *ngIf="!p.partner_id" style="color:#71717a">{{ p.partner_name }}</span>
             </td>
             <td *ngIf="isManager" style="padding:9px 10px;color:#a1a1aa;font-size:12px">{{ p.salesperson_name || '—' }}</td>
@@ -315,7 +330,11 @@ function healthColor(engagement: number): string {
   styles: [`
     .sel { background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:6px 10px;font-size:12.5px;color:#3f3f46;outline:none;font-family:inherit;cursor:pointer }
     .sel:focus { border-color:#f26522 }
+    .btn-g { background:transparent;color:#52525b;border:1px solid #e4e4e7 }
+    .btn-g:hover { background:#fafafa }
     .stat-card { background:white;border:1px solid #e4e4e7;border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.08) }
+    .stat-clickable { cursor:pointer;transition:box-shadow .12s,border-color .12s,transform .1s }
+    .stat-clickable:hover { box-shadow:0 4px 12px rgba(0,0,0,.12);border-color:#f26522;transform:translateY(-1px) }
     .stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#18181b;margin-bottom:2px }
     .stat-lbl { font-size:12px;color:#a1a1aa;font-weight:500 }
     .stat-trend { font-size:11px;margin-top:6px;font-weight:600 }
@@ -328,10 +347,11 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
 
   readonly PROD_COLORS = ['#f26522','#3B82F6','#22C55E','#A855F7','#F59E0B','#06B6D4','#EC4899','#84CC16','#EF4444','#6B7280'];
 
-  private api  = inject(CrmApiService);
-  private auth = inject(AuthService);
-  private cdr  = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+  private api    = inject(CrmApiService);
+  private auth   = inject(AuthService);
+  private cdr    = inject(ChangeDetectorRef);
+  private zone   = inject(NgZone);
+  private router = inject(Router);
 
   loading       = false;
   periodPreset  = '12m';
@@ -463,6 +483,24 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
       lbl.textContent = d.period.substring(5, 7) + '/' + d.period.substring(2, 4);
       lb.appendChild(lbl);
     });
+  }
+
+  goToPartners(extra: Record<string, string> = {}): void {
+    const qp: any = { ...extra };
+    // Przekaż aktywne filtry raportu jako kontekst
+    if (this.repFilter && this.isManager) qp['manager_id'] = this.repFilter;
+    if (this.groupFilter)   qp['group']  = this.groupFilter;
+    if (this.partnerFilter) qp['search'] = this.partnerFilter;
+    this.router.navigate(['/crm/partners'], { queryParams: qp });
+  }
+
+  goToPartner(partnerId: number | string): void {
+    this.router.navigate(['/crm/partners', partnerId]);
+  }
+
+  goToPartnersByRep(salespersonId: string | null, salespersonName: string): void {
+    if (!salespersonId) return;
+    this.router.navigate(['/crm/partners'], { queryParams: { manager_id: salespersonId, label: 'Handlowiec: ' + salespersonName } });
   }
 
   barPct(val: number, max: number): number { return max > 0 ? Math.max(2, Math.round(val / max * 100)) : 0; }

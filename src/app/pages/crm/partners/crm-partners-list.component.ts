@@ -1,9 +1,9 @@
 // src/app/pages/crm/partners/crm-partners-list.component.ts
 import { Component, OnInit, OnDestroy, inject, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser, PartnersReportPartner } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
 type SortDir = 'asc' | 'desc';
@@ -43,7 +43,14 @@ type SortDir = 'asc' | 'desc';
       <option value="">Wszystkie branże</option>
       <option *ngFor="let i of industries" [value]="i">{{i}}</option>
     </select>
-    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry" (click)="clearFilters()">✕ Wyczyść</button>
+    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel" (click)="clearFilters()">✕ Wyczyść</button>
+  </div>
+
+  <!-- Banner filtru z raportu -->
+  <div *ngIf="reportFilterLabel" style="background:#fff7ed;border-bottom:1px solid #fed7aa;padding:6px 20px;font-size:12px;color:#9a3412;display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <span>📊</span>
+    <span>Filtr z raportu: <strong>{{reportFilterLabel}}</strong></span>
+    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:#9a3412;font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
   </div>
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#f97316,#fb923c)"></div>
@@ -75,6 +82,13 @@ type SortDir = 'asc' | 'desc';
           💡 {{p.open_opp_count}} szans<span *ngIf="+(p.open_opp_value||0)>0"> · {{p.open_opp_value|number:'1.0-0'}} PLN</span>
         </span>
       </div>
+      <ng-container *ngIf="partnerSales(p) as s">
+        <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="font-size:11px;font-weight:700;color:#f97316">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
+          <span style="font-size:11px;font-weight:600;color:#16a34a">▲ {{s.revenue_pln|number:'1.0-0'}} PLN marży</span>
+          <span style="font-size:9px;color:#9ca3af">YTD</span>
+        </div>
+      </ng-container>
       <div class="pc-onboarding" *ngIf="p.status==='onboarding'">
         <div class="onb-bar"><div class="onb-fill" [style.width.%]="(p.onboarding_step/3)*100"></div></div>
         <span class="onb-label">Krok {{p.onboarding_step}} / 3</span>
@@ -85,17 +99,18 @@ type SortDir = 'asc' | 'desc';
 
   <!-- ══ TABELA ══ -->
   <div *ngIf="!loading && viewMode==='table'" class="table-wrap">
-    <div class="tw-head" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px">
+    <div class="tw-head" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px">
       <div class="th sortable" (click)="sortBy('company')">Firma <span class="si">{{sortIcon('company')}}</span></div>
       <div class="th">Status</div>
       <div class="th sortable" (click)="sortBy('industry')">Branża <span class="si">{{sortIcon('industry')}}</span></div>
       <div class="th sortable" (click)="sortBy('group_name')">Grupa <span class="si">{{sortIcon('group_name')}}</span></div>
       <div class="th sortable" (click)="sortBy('manager_name')">Handlowiec <span class="si">{{sortIcon('manager_name')}}</span></div>
-      <div class="th sortable" (click)="sortBy('contract_value')">Obrót roczny <span class="si">{{sortIcon('contract_value')}}</span></div>
-      <div class="th sortable" (click)="sortBy('online_pct')">% Online <span class="si">{{sortIcon('online_pct')}}</span></div>
+      <div class="th sortable" (click)="sortBy('contract_value')">Obrót CRM <span class="si">{{sortIcon('contract_value')}}</span></div>
+      <div class="th" title="Obrót brutto YTD z DWH">DWH Obrót</div>
+      <div class="th" title="Marża YTD z DWH">DWH Marża</div>
       <div class="th sortable" (click)="sortBy('contract_expires')">Umowa do <span class="si">{{sortIcon('contract_expires')}}</span></div>
     </div>
-    <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px"
+    <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px"
          (click)="goPartner(p.id, p.crm_uuid)">
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
@@ -111,8 +126,15 @@ type SortDir = 'asc' | 'desc';
       <div class="td td-sm">{{p.industry||'—'}}</div>
       <div class="td td-sm">{{p.group_name||'—'}}</div>
       <div class="td td-sm">{{p.manager_name||'—'}}</div>
-      <div class="td" style="font-weight:700;color:#f97316;font-size:12px">{{p.contract_value?(p.contract_value|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
-      <div class="td td-sm" style="text-align:center">{{p.online_pct != null ? p.online_pct+'%' : '—'}}</div>
+      <div class="td" style="font-weight:600;color:#f97316;font-size:12px">{{p.contract_value?(p.contract_value|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
+      <ng-container *ngIf="partnerSales(p) as s; else noSales">
+        <div class="td" style="font-weight:700;color:#f97316;font-size:12px">{{s.gross_turnover_pln|number:'1.0-0'}}</div>
+        <div class="td" style="font-weight:600;color:#16a34a;font-size:12px">{{s.revenue_pln|number:'1.0-0'}}</div>
+      </ng-container>
+      <ng-template #noSales>
+        <div class="td td-sm" style="color:#d1d5db">—</div>
+        <div class="td td-sm" style="color:#d1d5db">—</div>
+      </ng-template>
       <div class="td td-sm" [class.expiring]="isExpiring(p.contract_expires)">
         {{p.contract_expires?(p.contract_expires|date:'dd.MM.yy'):'—'}}
       </div>
@@ -236,6 +258,7 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   private cdr    = inject(ChangeDetectorRef);
   private auth   = inject(AuthService);
   private router = inject(Router);
+  private route  = inject(ActivatedRoute);
 
   partners: Partner[] = [];
   total = 0; page = 1; pageSize = 50; loading = false;
@@ -244,11 +267,14 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   filterManager  = '';
   filterGroup    = '';
   filterIndustry = '';
+  reportFilterLabel = '';
   viewMode: 'cards' | 'table' = 'cards';
   showCreate = false; saving = false;
   crmUsers: CrmUser[] = [];
   partnerGroupNames: string[] = [];
   industries: string[] = [];
+  private salesMapById   = new Map<number, PartnersReportPartner>();
+  private salesMapByName = new Map<string, PartnersReportPartner>();
 
   // Sorting
   sortCol = 'company';
@@ -313,7 +339,14 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getPartnerGroupNames().subscribe({ next: g => { this.zone.run(() => { this.partnerGroupNames = g; this.cdr.markForCheck(); }); }, error: () => {} });
+    // Odczytaj query params z nawigacji z Raportu partnerów
+    const qp = this.route.snapshot.queryParamMap;
+    if (qp.get('manager_id')) this.filterManager = qp.get('manager_id')!;
+    if (qp.get('group'))      this.filterGroup   = qp.get('group')!;
+    if (qp.get('search'))     this.search        = qp.get('search')!;
+    this.reportFilterLabel = qp.get('label') || '';
     this.reload();
+    this.loadSalesData();
     // Auto-odśwież odznaki nowych emaili co 60 sekund
     this.refreshInterval = setInterval(() => this.reload(), 60_000);
   }
@@ -352,9 +385,39 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
     });
   }
 
+  private loadSalesData(): void {
+    const now = new Date();
+    const cur = now.toISOString().substring(0, 7);
+    const shift = (n: number) => { const d = new Date(now.getFullYear(), now.getMonth() + n, 1); return d.toISOString().substring(0, 7); };
+    this.api.getPartnersReport({ period_from: shift(-11), period_to: cur }).subscribe({
+      next: r => this.zone.run(() => {
+        const byId   = new Map<number, PartnersReportPartner>();
+        const byName = new Map<string, PartnersReportPartner>();
+        for (const row of r.by_partner ?? []) {
+          if (row.partner_id != null) byId.set(+row.partner_id, row);
+          if (row.partner_name)       byName.set(row.partner_name.trim().toLowerCase(), row);
+        }
+        this.salesMapById   = byId;
+        this.salesMapByName = byName;
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  partnerSales(p: Partner): PartnersReportPartner | undefined {
+    if (p.dwh_partner_id != null) {
+      const byId = this.salesMapById.get(+p.dwh_partner_id);
+      if (byId) return byId;
+    }
+    const name = (p.dwh_company_name || '').trim().toLowerCase();
+    return name ? this.salesMapByName.get(name) : undefined;
+  }
+
   clearFilters(): void {
     this.filterStatus = ''; this.filterManager = '';
     this.filterGroup = ''; this.filterIndustry = '';
+    this.reportFilterLabel = '';
     this.page = 1; this.reload();
   }
 

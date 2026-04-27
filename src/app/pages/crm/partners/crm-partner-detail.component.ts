@@ -9,6 +9,19 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 
+function getMonthRange(preset: string): { from: string; to: string } {
+  const now = new Date();
+  const cur = now.toISOString().substring(0, 7);
+  const shift = (n: number) => { const d = new Date(now.getFullYear(), now.getMonth() + n, 1); return d.toISOString().substring(0, 7); };
+  switch (preset) {
+    case '1m':  return { from: cur, to: cur };
+    case '3m':  return { from: shift(-3), to: cur };
+    case '6m':  return { from: shift(-6), to: cur };
+    case 'ytd': return { from: `${now.getFullYear()}-01`, to: cur };
+    default:    return { from: shift(-11), to: cur };
+  }
+}
+
 @Component({
   selector: 'wt-crm-partner-detail',
   standalone: true,
@@ -536,9 +549,19 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
 
       <!-- DWH: dane sprzedazowe -->
       <div *ngIf="partner.dwh_partner_id" class="dwh-box">
-        <div class="dwh-box-title">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-          Dane sprzedażowe DWH
+        <div class="dwh-box-title" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            Dane sprzedażowe DWH
+          </div>
+          <select [(ngModel)]="salesPeriod" (ngModelChange)="onSalesPeriodChange()"
+                  style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:6px;color:white;font-size:10px;padding:2px 5px;cursor:pointer;outline:none;max-width:110px">
+            <option value="1m" style="color:#374151">Bieżący mies.</option>
+            <option value="3m" style="color:#374151">Ostatnie 3 mies.</option>
+            <option value="6m" style="color:#374151">Ostatnie 6 mies.</option>
+            <option value="12m" style="color:#374151">Ostatnie 12 mies.</option>
+            <option value="ytd" style="color:#374151">YTD {{currentYear}}</option>
+          </select>
         </div>
         <div *ngIf="salesDataLoading" style="text-align:center;color:rgba(255,255,255,.5);font-size:12px;padding:8px 0">Ładowanie…</div>
         <div *ngIf="!salesDataLoading && !partnerSalesKpi" style="text-align:center;color:rgba(255,255,255,.4);font-size:12px;padding:8px 0">Brak danych sprzedażowych</div>
@@ -785,7 +808,10 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
              style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Brak wyników</div>
         <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
           <div *ngFor="let doc of docResults"
-               style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:background .1s"
+               style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;transition:background .1s"
+               [style.cursor]="doc._access==='read' ? 'default' : 'pointer'"
+               [style.opacity]="doc._access==='read' ? '0.55' : '1'"
+               [title]="doc._access==='read' ? 'Tylko odczyt — brak uprawnień do powiązania' : ''"
                [style.background]="isLinked(doc.id) ? '#f0fdf4' : 'white'"
                (click)="toggleLinkDoc(doc)">
             <span style="font-size:16px">📄</span>
@@ -796,9 +822,13 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
                 <span>{{doc.doc_type}}</span>
               </div>
             </div>
-            <span *ngIf="isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
-            <span *ngIf="!isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
+            <span *ngIf="doc._access==='read'" style="font-size:11px;color:#9ca3af">🔒 Odczyt</span>
+            <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
+            <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
           </div>
+        </div>
+        <div *ngIf="linkDocError" style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626">
+          ⚠ {{linkDocError}}
         </div>
       </div>
       <div class="modal-footer">
@@ -1724,6 +1754,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   // Powiązane dokumenty
   linkedDocs: LinkedDocument[] = [];
   showDocPicker = false;
+  linkDocError  = '';
   docSearch     = '';
   docResults: any[] = [];
   docSearching  = false;
@@ -1747,6 +1778,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   partnerSalesKpi: any = null;
   partnerSalesProducts: any[] = [];
   salesDataLoading = false;
+  salesPeriod = 'ytd';
+  readonly currentYear = new Date().getFullYear();
   gmailConnected      = false;
   gmailEmail          = '';
   gmailAuthUrl        = '';
@@ -1827,13 +1860,18 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   toggleLinkDoc(doc: any): void {
     if (!this.partner) return;
+    if (doc._access === 'read') return;
+    this.linkDocError = '';
     if (this.isLinked(doc.id)) {
       this.api.unlinkPartnerDocument(this.pid, doc.id).subscribe({
         next: () => this.zone.run(() => {
           this.linkedDocs = this.linkedDocs.filter(d => d.document_id !== doc.id);
           this.cdr.markForCheck();
         }),
-        error: () => {},
+        error: (err: any) => this.zone.run(() => {
+          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się usunąć powiązania.';
+          this.cdr.markForCheck();
+        }),
       });
     } else {
       this.api.linkPartnerDocument(this.pid, doc.id).subscribe({
@@ -1841,7 +1879,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.linkedDocs = [...this.linkedDocs, { ...linked, document_title: doc.name, doc_number: doc.doc_number, doc_type: doc.doc_type }];
           this.cdr.markForCheck();
         }),
-        error: () => {},
+        error: (err: any) => this.zone.run(() => {
+          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się powiązać dokumentu. Sprawdź czy masz wymagane uprawnienia.';
+          this.cdr.markForCheck();
+        }),
       });
     }
   }
@@ -1862,6 +1903,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   onDocSearch(): void {
+    this.linkDocError = '';
     clearTimeout(this.docSearchTimer);
     if (this.docSearch.length < 2) { this.docResults = []; this.cdr.markForCheck(); return; }
     this.docSearchTimer = setTimeout(() => {
@@ -1977,18 +2019,25 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   private loadPartnerSalesData(p: any): void {
-    const name = p.dwh_company_name || p.company;
-    if (!name) return;
+    if (!p.dwh_partner_id) return;
     this.salesDataLoading = true;
-    this.api.getPartnersReport({ partner_name: name }).subscribe({
+    this.cdr.markForCheck();
+    const { from, to } = getMonthRange(this.salesPeriod);
+    this.api.getPartnersReport({ partner_id: p.dwh_partner_id, period_from: from, period_to: to }).subscribe({
       next: (r: any) => this.zone.run(() => {
-        this.partnerSalesKpi = r?.kpi ?? null;
+        // by_partner[0] gives individual partner data; kpi is the aggregate for the filtered set
+        const row = r?.by_partner?.find((x: any) => x.partner_id === p.dwh_partner_id) ?? r?.by_partner?.[0] ?? r?.kpi ?? null;
+        this.partnerSalesKpi = row;
         this.partnerSalesProducts = r?.by_product ?? [];
         this.salesDataLoading = false;
         this.cdr.markForCheck();
       }),
       error: () => this.zone.run(() => { this.salesDataLoading = false; this.cdr.markForCheck(); }),
     });
+  }
+
+  onSalesPeriodChange(): void {
+    if (this.partner?.dwh_partner_id) this.loadPartnerSalesData(this.partner);
   }
 
   get salesProductsMax(): number {

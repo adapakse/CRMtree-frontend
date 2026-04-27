@@ -838,12 +838,22 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <div *ngIf="docSearching" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Wyszukuję…</div>
       <div *ngIf="!docSearching&&docResults.length===0&&docSearch.length>1" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Brak wyników</div>
       <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
-        <div *ngFor="let doc of docResults" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer" [style.background]="isLinked(doc.id)?'#f0fdf4':'white'" (click)="toggleLinkDoc(doc)">
+        <div *ngFor="let doc of docResults"
+             style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;transition:background .1s"
+             [style.cursor]="doc._access==='read' ? 'default' : 'pointer'"
+             [style.opacity]="doc._access==='read' ? '0.55' : '1'"
+             [title]="doc._access==='read' ? 'Tylko odczyt — brak uprawnień do powiązania' : ''"
+             [style.background]="isLinked(doc.id)?'#f0fdf4':'white'"
+             (click)="toggleLinkDoc(doc)">
           <span style="font-size:16px">📄</span>
           <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div><div style="font-size:10px;color:#9ca3af"><span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>{{doc.doc_type}}</div></div>
-          <span *ngIf="isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
-          <span *ngIf="!isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
+          <span *ngIf="doc._access==='read'" style="font-size:11px;color:#9ca3af">🔒 Odczyt</span>
+          <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
+          <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
         </div>
+      </div>
+      <div *ngIf="linkDocError" style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626">
+        ⚠ {{linkDocError}}
       </div>
     </div>
     <div class="modal-footer"><button class="btn-outline" (click)="showDocPicker=false">Zamknij</button></div>
@@ -1436,6 +1446,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   // Powiązane dokumenty
   linkedDocs: LinkedDocument[]  = [];
   showDocPicker = false;
+  linkDocError  = '';
   docSearch     = '';
   docResults: any[] = [];
   docSearching  = false;
@@ -3007,13 +3018,18 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   toggleLinkDoc(doc: any): void {
     if (!this.lead) return;
+    if (doc._access === 'read') return;
+    this.linkDocError = '';
     if (this.isLinked(doc.id)) {
       this.api.unlinkLeadDocument(this.lead.id, doc.id).subscribe({
         next: () => this.zone.run(() => {
           this.linkedDocs = this.linkedDocs.filter(d => d.document_id !== doc.id);
           this.cdr.markForCheck();
         }),
-        error: () => {},
+        error: (err: any) => this.zone.run(() => {
+          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się usunąć powiązania.';
+          this.cdr.markForCheck();
+        }),
       });
     } else {
       this.api.linkLeadDocument(this.lead.id, doc.id).subscribe({
@@ -3021,7 +3037,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.linkedDocs = [...this.linkedDocs, { ...linked, document_title: doc.name, doc_number: doc.doc_number, doc_type: doc.doc_type }];
           this.cdr.markForCheck();
         }),
-        error: () => {},
+        error: (err: any) => this.zone.run(() => {
+          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się powiązać dokumentu. Sprawdź czy masz wymagane uprawnienia.';
+          this.cdr.markForCheck();
+        }),
       });
     }
   }
@@ -3042,6 +3061,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   onDocSearch(): void {
+    this.linkDocError = '';
     clearTimeout(this.docSearchTimer);
     if (this.docSearch.length < 2) { this.docResults = []; this.cdr.markForCheck(); return; }
     this.docSearchTimer = setTimeout(() => {
