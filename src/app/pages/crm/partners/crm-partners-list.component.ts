@@ -1,9 +1,9 @@
 // src/app/pages/crm/partners/crm-partners-list.component.ts
-import { Component, OnInit, inject, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser, PartnersReportPartner } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
 type SortDir = 'asc' | 'desc';
@@ -19,6 +19,11 @@ type SortDir = 'asc' | 'desc';
   <div class="topbar">
     <h1>Rejestr Partnerów</h1>
     <span style="flex:1"></span>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;white-space:nowrap;margin-right:8px">
+      <input type="checkbox" style="width:auto;margin:0;cursor:pointer;accent-color:var(--orange)"
+             [(ngModel)]="onlyMine" (ngModelChange)="onOnlyMineChange()">
+      Tylko moje
+    </label>
     <button class="btn-view" [class.active]="viewMode==='cards'" (click)="viewMode='cards'">⊞ Karty</button>
     <button class="btn-view" [class.active]="viewMode==='table'" (click)="viewMode='table'">☰ Tabela</button>
     <button class="btn-primary" (click)="openCreateForm()">+ Nowy partner</button>
@@ -43,18 +48,30 @@ type SortDir = 'asc' | 'desc';
       <option value="">Wszystkie branże</option>
       <option *ngFor="let i of industries" [value]="i">{{i}}</option>
     </select>
-    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry" (click)="clearFilters()">✕ Wyczyść</button>
+    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()">✕ Wyczyść</button>
+  </div>
+
+  <!-- Banner filtru z raportu -->
+  <div *ngIf="reportFilterLabel" style="background:#fff7ed;border-bottom:1px solid #fed7aa;padding:6px 20px;font-size:12px;color:#9a3412;display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <span>📊</span>
+    <span>Filtr z raportu: <strong>{{reportFilterLabel}}</strong></span>
+    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:#9a3412;font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
   </div>
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#f97316,#fb923c)"></div>
 
   <!-- ══ KARTY ══ -->
   <div *ngIf="!loading && viewMode==='cards'" class="cards-grid">
-    <div *ngFor="let p of partners" class="partner-card" (click)="goPartner(p.id)">
+    <div *ngFor="let p of partners" class="partner-card" (click)="goPartner(p.id, p.crm_uuid)">
       <div class="pc-top">
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
+          <span *ngIf="(p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
+                title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
+                style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
       </div>
@@ -64,8 +81,9 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.industry"   class="pc-tag">🏭 {{p.industry}}</span>
         <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
       </div>
-      <div *ngIf="hasUnreadReply(p)" style="margin-top:4px">
-        <span style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
+      <div *ngIf="hasUnreadReply(p)||((p.non_email_activity_count??0)>0)" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+        <span *ngIf="hasUnreadReply(p)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
+        <span *ngIf="(p.non_email_activity_count??0)>0" style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
       </div>
       <div class="pc-financials">
         <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
@@ -74,6 +92,13 @@ type SortDir = 'asc' | 'desc';
           💡 {{p.open_opp_count}} szans<span *ngIf="+(p.open_opp_value||0)>0"> · {{p.open_opp_value|number:'1.0-0'}} PLN</span>
         </span>
       </div>
+      <ng-container *ngIf="partnerSales(p) as s">
+        <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="font-size:11px;font-weight:700;color:#f97316">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
+          <span style="font-size:11px;font-weight:600;color:#16a34a">▲ {{s.revenue_pln|number:'1.0-0'}} PLN marży</span>
+          <span style="font-size:9px;color:#9ca3af">YTD</span>
+        </div>
+      </ng-container>
       <div class="pc-onboarding" *ngIf="p.status==='onboarding'">
         <div class="onb-bar"><div class="onb-fill" [style.width.%]="(p.onboarding_step/3)*100"></div></div>
         <span class="onb-label">Krok {{p.onboarding_step}} / 3</span>
@@ -84,23 +109,31 @@ type SortDir = 'asc' | 'desc';
 
   <!-- ══ TABELA ══ -->
   <div *ngIf="!loading && viewMode==='table'" class="table-wrap">
-    <div class="tw-head" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px">
+    <div class="tw-head" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px">
       <div class="th sortable" (click)="sortBy('company')">Firma <span class="si">{{sortIcon('company')}}</span></div>
       <div class="th">Status</div>
       <div class="th sortable" (click)="sortBy('industry')">Branża <span class="si">{{sortIcon('industry')}}</span></div>
       <div class="th sortable" (click)="sortBy('group_name')">Grupa <span class="si">{{sortIcon('group_name')}}</span></div>
       <div class="th sortable" (click)="sortBy('manager_name')">Handlowiec <span class="si">{{sortIcon('manager_name')}}</span></div>
-      <div class="th sortable" (click)="sortBy('contract_value')">Obrót roczny <span class="si">{{sortIcon('contract_value')}}</span></div>
-      <div class="th sortable" (click)="sortBy('online_pct')">% Online <span class="si">{{sortIcon('online_pct')}}</span></div>
+      <div class="th sortable" (click)="sortBy('contract_value')">Obrót CRM <span class="si">{{sortIcon('contract_value')}}</span></div>
+      <div class="th" title="Obrót brutto YTD z DWH">DWH Obrót</div>
+      <div class="th" title="Marża YTD z DWH">DWH Marża</div>
       <div class="th sortable" (click)="sortBy('contract_expires')">Umowa do <span class="si">{{sortIcon('contract_expires')}}</span></div>
     </div>
-    <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 120px 130px 130px 120px 110px 90px 100px"
-         (click)="goPartner(p.id)">
+    <div *ngFor="let p of partners" class="tw-row" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px"
+         (click)="goPartner(p.id, p.crm_uuid)">
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
           <span *ngIf="hasUnreadReply(p)"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
+          <span *ngIf="(p.non_email_activity_count??0)>0"
+                style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
+          <span *ngIf="(p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
+                title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
+                style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
       </div>
@@ -108,8 +141,15 @@ type SortDir = 'asc' | 'desc';
       <div class="td td-sm">{{p.industry||'—'}}</div>
       <div class="td td-sm">{{p.group_name||'—'}}</div>
       <div class="td td-sm">{{p.manager_name||'—'}}</div>
-      <div class="td" style="font-weight:700;color:#f97316;font-size:12px">{{p.contract_value?(p.contract_value|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
-      <div class="td td-sm" style="text-align:center">{{p.online_pct != null ? p.online_pct+'%' : '—'}}</div>
+      <div class="td" style="font-weight:600;color:#f97316;font-size:12px">{{p.contract_value?(p.contract_value|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
+      <ng-container *ngIf="partnerSales(p) as s; else noSales">
+        <div class="td" style="font-weight:700;color:#f97316;font-size:12px">{{s.gross_turnover_pln|number:'1.0-0'}}</div>
+        <div class="td" style="font-weight:600;color:#16a34a;font-size:12px">{{s.revenue_pln|number:'1.0-0'}}</div>
+      </ng-container>
+      <ng-template #noSales>
+        <div class="td td-sm" style="color:#d1d5db">—</div>
+        <div class="td td-sm" style="color:#d1d5db">—</div>
+      </ng-template>
       <div class="td td-sm" [class.expiring]="isExpiring(p.contract_expires)">
         {{p.contract_expires?(p.contract_expires|date:'dd.MM.yy'):'—'}}
       </div>
@@ -227,12 +267,13 @@ type SortDir = 'asc' | 'desc';
     .panel-actions { display:flex; gap:8px; margin-top:8px; }
   `],
 })
-export class CrmPartnersListComponent implements OnInit {
+export class CrmPartnersListComponent implements OnInit, OnDestroy {
   private api    = inject(CrmApiService);
   private zone   = inject(NgZone);
   private cdr    = inject(ChangeDetectorRef);
   private auth   = inject(AuthService);
   private router = inject(Router);
+  private route  = inject(ActivatedRoute);
 
   partners: Partner[] = [];
   total = 0; page = 1; pageSize = 50; loading = false;
@@ -241,11 +282,15 @@ export class CrmPartnersListComponent implements OnInit {
   filterManager  = '';
   filterGroup    = '';
   filterIndustry = '';
+  reportFilterLabel = '';
+  onlyMine = false;
   viewMode: 'cards' | 'table' = 'cards';
   showCreate = false; saving = false;
   crmUsers: CrmUser[] = [];
   partnerGroupNames: string[] = [];
   industries: string[] = [];
+  private salesMapById   = new Map<number, PartnersReportPartner>();
+  private salesMapByName = new Map<string, PartnersReportPartner>();
 
   // Sorting
   sortCol = 'company';
@@ -279,23 +324,11 @@ export class CrmPartnersListComponent implements OnInit {
   get isManager() { const u = this.auth.user(); return !!(u?.is_admin || u?.crm_role === 'sales_manager'); }
   statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }
 
-  get sortedPartners(): Partner[] {
-    const col = this.sortCol;
-    const dir = this.sortDir;
-    return [...this.partners].sort((a, b) => {
-      let va: any = (a as any)[col] ?? '';
-      let vb: any = (b as any)[col] ?? '';
-      if (col === 'contract_value' || col === 'online_pct') { va = +(va || 0); vb = +(vb || 0); return dir === 'asc' ? va - vb : vb - va; }
-      if (col === 'contract_expires') { va = va ? new Date(va).getTime() : 0; vb = vb ? new Date(vb).getTime() : 0; return dir === 'asc' ? va - vb : vb - va; }
-      const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
-      return dir === 'asc' ? cmp : -cmp;
-    });
-  }
-
   sortBy(col: string): void {
     if (this.sortCol === col) { this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc'; }
     else { this.sortCol = col; this.sortDir = 'asc'; }
-    this.cdr.markForCheck();
+    this.page = 1;
+    this.reload();
   }
   sortIcon(col: string): string {
     if (this.sortCol !== col) return '↕';
@@ -310,19 +343,36 @@ export class CrmPartnersListComponent implements OnInit {
   ngOnInit() {
     this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getPartnerGroupNames().subscribe({ next: g => { this.zone.run(() => { this.partnerGroupNames = g; this.cdr.markForCheck(); }); }, error: () => {} });
+    // Odczytaj query params z nawigacji z Raportu partnerów
+    const qp = this.route.snapshot.queryParamMap;
+    if (qp.get('manager_id')) this.filterManager = qp.get('manager_id')!;
+    if (qp.get('group'))      this.filterGroup   = qp.get('group')!;
+    if (qp.get('search'))     this.search        = qp.get('search')!;
+    this.reportFilterLabel = qp.get('label') || '';
     this.reload();
+    this.loadSalesData();
+    // Auto-odśwież odznaki nowych emaili co 60 sekund
+    this.refreshInterval = setInterval(() => this.reload(), 60_000);
+  }
+
+  private refreshInterval: any = null;
+
+  ngOnDestroy(): void {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
   }
 
   reload() {
     this.loading = true;
-    const p: any = { page: this.page, limit: this.pageSize };
+    const p: any = { page: this.page, limit: this.pageSize, sort: this.sortCol, dir: this.sortDir };
     if (this.search)         p.search     = this.search;
     if (this.filterStatus)   p.status     = this.filterStatus;
-    if (this.filterManager && this.isManager) p.manager_id = this.filterManager;
     if (this.filterGroup)    p.group_name = this.filterGroup;
     if (this.filterIndustry) p.industry   = this.filterIndustry;
-    const u = this.auth.user();
-    if (u && !u.is_admin && u.crm_role === 'salesperson') p.manager_id = u.id;
+    if (this.onlyMine) {
+      p.manager_id = this.auth.user()?.id;
+    } else if (this.filterManager && this.isManager) {
+      p.manager_id = this.filterManager;
+    }
     this.api.getPartners(p).subscribe({
       next: r => {
         this.zone.run(() => {
@@ -341,30 +391,63 @@ export class CrmPartnersListComponent implements OnInit {
     });
   }
 
+  private loadSalesData(): void {
+    const now = new Date();
+    const cur = now.toISOString().substring(0, 7);
+    const shift = (n: number) => { const d = new Date(now.getFullYear(), now.getMonth() + n, 1); return d.toISOString().substring(0, 7); };
+    this.api.getPartnersReport({ period_from: shift(-11), period_to: cur }).subscribe({
+      next: r => this.zone.run(() => {
+        const byId   = new Map<number, PartnersReportPartner>();
+        const byName = new Map<string, PartnersReportPartner>();
+        for (const row of r.by_partner ?? []) {
+          if (row.partner_id != null) byId.set(+row.partner_id, row);
+          if (row.partner_name)       byName.set(row.partner_name.trim().toLowerCase(), row);
+        }
+        this.salesMapById   = byId;
+        this.salesMapByName = byName;
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
+  partnerSales(p: Partner): PartnersReportPartner | undefined {
+    if (p.dwh_partner_id != null) {
+      const byId = this.salesMapById.get(+p.dwh_partner_id);
+      if (byId) return byId;
+    }
+    const name = (p.dwh_company_name || '').trim().toLowerCase();
+    return name ? this.salesMapByName.get(name) : undefined;
+  }
+
   clearFilters(): void {
     this.filterStatus = ''; this.filterManager = '';
     this.filterGroup = ''; this.filterIndustry = '';
+    this.reportFilterLabel = ''; this.onlyMine = false;
     this.page = 1; this.reload();
   }
 
   private searchTimer: any;
   onSearch() { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => { this.page = 1; this.reload(); }, 400); }
+  onOnlyMineChange() { this.page = 1; this.reload(); }
 
-  goPartner(id: number) { this.router.navigate(['/crm/partners', id]); }
-
-  /** Zwraca true gdy są nieprzeczytane odpowiedzi od partnera. */
-  hasUnreadReply(p: any): boolean {
-    const count = (p.new_email_count ?? 0);
-    if (count === 0) return false;
-    const lastReply = p.last_reply_at ? new Date(p.last_reply_at).getTime() : 0;
-    if (!lastReply) return false;
-    const lastRead = parseInt(localStorage.getItem(`partner_email_last_read_${p.id}`) || '0', 10);
-    return lastReply > lastRead;
+  goPartner(id: number | null, crm_uuid?: string | null) {
+    const nav = crm_uuid ?? id;
+    if (nav != null) this.router.navigate(['/crm/partners', nav]);
   }
 
-  /** Liczba nieprzeczytanych odpowiedzi dla partnera. */
+  openPartnerDocs(p: Partner): void {
+    const id   = p.crm_uuid ?? String(p.id);
+    const name = p.dwh_company_name || p.company;
+    this.router.navigate(['/documents'], { queryParams: { partner_id: id, partner_name: name } });
+  }
+
+  hasUnreadReply(p: any): boolean {
+    return (p.new_email_count ?? 0) > 0;
+  }
+
   unreadReplyCount(p: any): number {
-    return this.hasUnreadReply(p) ? (p.new_email_count ?? 0) : 0;
+    return p.new_email_count ?? 0;
   }
   prevPage() { if (this.page > 1) { this.page--; this.reload(); } }
   nextPage() { if (this.page < this.totalPages) { this.page++; this.reload(); } }

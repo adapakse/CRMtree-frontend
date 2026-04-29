@@ -25,6 +25,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
       },
       {
+        path: 'my-settings',
+        loadComponent: () => import('./pages/my-settings/my-settings.component').then(m => m.MySettingsComponent),
+      },
+      {
         path: 'documents',
         loadComponent: () => import('./pages/documents/list/documents-list.component').then(m => m.DocumentsListComponent),
       },
@@ -38,7 +42,7 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-        canActivate: [adminGuard],
+        canActivate: [adminOrSalesManagerGuard],
         loadComponent: () => import('./pages/users/users.component').then(m => m.UsersComponent),
       },
       {

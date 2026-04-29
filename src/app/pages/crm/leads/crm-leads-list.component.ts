@@ -1,6 +1,6 @@
 // src/app/pages/crm/leads/crm-leads-list.component.ts
 import {
-  Component, OnInit, inject, ChangeDetectorRef, NgZone, ChangeDetectionStrategy,
+  Component, OnInit, OnDestroy, inject, ChangeDetectorRef, NgZone, ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
@@ -20,7 +20,7 @@ const KANBAN_STAGES: { key: LeadStage; label: string; dot: string }[] = [
 
 const PROB_MAP: Record<LeadStage, number> = {
   new: 10, qualification: 25, presentation: 50,
-  offer: 70, negotiation: 85, closed_won: 100, closed_lost: 0,
+  offer: 70, negotiation: 85, closed_won: 100, closed_lost: 0, onboarding: 100, onboarded: 100,
 };
 
 @Component({
@@ -53,7 +53,7 @@ const PROB_MAP: Record<LeadStage, number> = {
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-val">{{ stats.total }}</div>
-      <div class="stat-lbl">Wszystkich leadów</div>
+      <div class="stat-lbl">Okazji sprzedażowych</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:#F59E0B">{{ stats.hot }}</div>
@@ -161,7 +161,7 @@ const PROB_MAP: Record<LeadStage, number> = {
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.stage==='onboarded'" title="Onboarding zakończony — Partner aktywny" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 5px;margin-left:3px;font-weight:700;vertical-align:middle">✓ Partner</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
@@ -179,7 +179,7 @@ const PROB_MAP: Record<LeadStage, number> = {
               </span>
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap">
-              <span *ngIf="lead.non_email_activity_count>0" style="background:#f3f4f6;color:#374151;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;line-height:16px">🗓 {{lead.non_email_activity_count}}</span>
+              <span *ngIf="(lead.non_email_activity_count ?? 0) > 0" style="background:#f3f4f6;color:#374151;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;line-height:16px">🗓 {{lead.non_email_activity_count}}</span>
               <span *ngIf="hasUnreadReply(lead)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
             </div>
             <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
@@ -358,7 +358,7 @@ const PROB_MAP: Record<LeadStage, number> = {
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
           <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span>
-            <span *ngIf="lead.non_email_activity_count>0"
+            <span *ngIf="(lead.non_email_activity_count ?? 0) > 0"
                   style="background:#f3f4f6;color:#374151;font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{lead.non_email_activity_count}}</span>
             <span *ngIf="hasUnreadReply(lead)"
                   style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
@@ -454,7 +454,7 @@ const PROB_MAP: Record<LeadStage, number> = {
                  [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_name">
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:3px">Stanowisko <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:3px">Rola w firmie <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
           <input class="fi" [(ngModel)]="newForm.contact_title" placeholder="CEO"
                  [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_title">
         </div>
@@ -476,7 +476,7 @@ const PROB_MAP: Record<LeadStage, number> = {
               <button type="button" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeNewExtraContact(i)">✕</button>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
                 <div class="fg"><label class="fl">Imię i nazwisko</label><input class="fi" [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></div>
-                <div class="fg"><label class="fl">Stanowisko</label><input class="fi" [(ngModel)]="ec.contact_title" placeholder="CEO"></div>
+                <div class="fg"><label class="fl">Rola w firmie</label><input class="fi" [(ngModel)]="ec.contact_title" placeholder="CEO"></div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div class="fg"><label class="fl">Email</label><input class="fi" type="email" [(ngModel)]="ec.email" placeholder="jan@firma.pl"></div>
@@ -1139,7 +1139,7 @@ const PROB_MAP: Record<LeadStage, number> = {
     .meet-field-val { font-size:13px; color:var(--gray-800); font-weight:500; line-height:1.45; }
   `],
 })
-export class CrmLeadsListComponent implements OnInit {
+export class CrmLeadsListComponent implements OnInit, OnDestroy {
   private api    = inject(CrmApiService);
   private auth   = inject(AuthService);
   private zone   = inject(NgZone);
@@ -1192,9 +1192,10 @@ export class CrmLeadsListComponent implements OnInit {
   filterLostReason    = '';
   reportFilterLabel   = '';   // np. "Stage: Nowy" — widoczne jako chip nad listą
 
-  page       = 1;
-  totalPages = 1;
-  total      = 0;
+  page            = 1;
+  totalPages      = 1;
+  total           = 0;
+  totalQualified  = 0;
 
   showNew   = false;
   submitted = false;
@@ -1215,7 +1216,7 @@ export class CrmLeadsListComponent implements OnInit {
     const errs: string[] = [];
     if (!this.newFormWebsite)    errs.push('Strona WWW');
     if (!f.contact_name)         errs.push('Imię i Nazwisko');
-    if (!f.contact_title)        errs.push('Stanowisko');
+    if (!f.contact_title)        errs.push('Rola w firmie');
     if (!f.email)                errs.push('Email');
     if (!f.phone)                errs.push('Telefon');
     if (!f.value_pln && f.value_pln !== 0) errs.push('Obrót roczny');
@@ -1313,6 +1314,14 @@ export class CrmLeadsListComponent implements OnInit {
         error: () => {},
       });
     }
+    // Auto-odśwież odznaki nowych emaili co 60 sekund
+    this.refreshInterval = setInterval(() => this.load(), 60_000);
+  }
+
+  private refreshInterval: any = null;
+
+  ngOnDestroy(): void {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
   }
 
   get sortedLeads(): any[] {
@@ -1388,7 +1397,9 @@ export class CrmLeadsListComponent implements OnInit {
 
   load() {
     this.loading = true;
-    const params: any = { limit: 200 };
+    const activeStageFilter = this.filterStage || this.filterStageUI;
+    const isKanban = this.viewMode === 'kanban' && !activeStageFilter;
+    const params: any = { limit: isKanban ? 2000 : 200 };
     if (this.filterHot)              params['hot']             = true;
     if (this._sourceFilterValues.length === 1) {
       params['source'] = this._sourceFilterValues[0];
@@ -1404,20 +1415,19 @@ export class CrmLeadsListComponent implements OnInit {
         params['assigned_to'] = this.filterUser;
       }
     }
-    if (this.scopeFilter === 'mine') params['assigned_to']     = this.auth.user()?.id;
+    if (this.scopeFilter === 'mine') params['mine'] = true;
     if (this.search)                 params['search']          = this.search;
-    // filterStage z raportu lub filterStageUI z toolbara
-    const activeStage = this.filterStage || this.filterStageUI;
-    if (activeStage)                 params['stage']           = activeStage;
+    if (activeStageFilter)           params['stage']           = activeStageFilter;
     if (this.filterCloseDateFrom)    params['close_date_from'] = this.filterCloseDateFrom;
     if (this.filterCloseDateTo)      params['close_date_to']   = this.filterCloseDateTo;
     if (this.filterLostReason)       params['lost_reason']     = this.filterLostReason;
 
     this.api.getLeads(params).subscribe({
       next: res => this.zone.run(() => {
-        this.allLeads   = res.data;
-        this.total      = res.total;
-        this.totalPages = res.pages;
+        this.allLeads        = res.data;
+        this.total           = res.total;
+        this.totalQualified  = res.total_qualified ?? (res.total - (res.data as any[]).filter((l: any) => l.stage === 'new').length);
+        this.totalPages      = res.pages;
         this.calcStats();
         this.loading = false;
         this.cdr.markForCheck();
@@ -1431,9 +1441,9 @@ export class CrmLeadsListComponent implements OnInit {
   }
 
   calcStats() {
-    const active = this.allLeads.filter(l => !l.converted_at);
+    const active = this.allLeads.filter(l => !l.converted_at && l.stage !== 'new');
     this.stats = {
-      total:    this.total,
+      total:    this.totalQualified,
       hot:      active.filter(l => l.hot).length,
       pipeline: active.filter(l => !['closed_won','closed_lost'].includes(l.stage))
                       .reduce((s, l) => s + +(l.value_pln || 0), 0),
@@ -1793,19 +1803,12 @@ export class CrmLeadsListComponent implements OnInit {
   mailTo(e: string)            { window.location.href = `mailto:${e}`; }
   formatPLN(v: number)         { return v >= 1_000_000 ? (v/1_000_000).toFixed(1)+'M' : v >= 1000 ? Math.round(v/1000)+'k' : String(Math.round(v)); }
 
-  /** Zwraca true gdy są nieprzeczytane odpowiedzi (nowe emaile od leada od ostatniego otwarcia). */
   hasUnreadReply(lead: any): boolean {
-    const count = (lead.new_email_count ?? 0);
-    if (count === 0) return false;
-    const lastReply = lead.last_reply_at ? new Date(lead.last_reply_at).getTime() : 0;
-    if (!lastReply) return false;
-    const lastRead = parseInt(localStorage.getItem(`email_last_read_${lead.id}`) || '0', 10);
-    return lastReply > lastRead;
+    return (lead.new_email_count ?? 0) > 0;
   }
 
-  /** Liczba nieprzeczytanych odpowiedzi dla leada. */
   unreadReplyCount(lead: any): number {
-    return this.hasUnreadReply(lead) ? (lead.new_email_count ?? 0) : 0;
+    return lead.new_email_count ?? 0;
   }
 
   srcTagCls(src: string) {

@@ -7,19 +7,36 @@ import { finalize } from 'rxjs/operators';
 import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
+
+function getMonthRange(preset: string): { from: string; to: string } {
+  const now = new Date();
+  const cur = now.toISOString().substring(0, 7);
+  const shift = (n: number) => { const d = new Date(now.getFullYear(), now.getMonth() + n, 1); return d.toISOString().substring(0, 7); };
+  switch (preset) {
+    case '1m':  return { from: cur, to: cur };
+    case '3m':  return { from: shift(-3), to: cur };
+    case '6m':  return { from: shift(-6), to: cur };
+    case 'ytd': return { from: `${now.getFullYear()}-01`, to: cur };
+    default:    return { from: shift(-11), to: cur };
+  }
+}
 
 @Component({
   selector: 'wt-crm-partner-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent],
   template: `
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
     <button class="back-btn" routerLink="/crm/partners">← Partnerzy</button>
     <h1>{{(partner.dwh_partner_id ? (partner.dwh_company_name || partner.company) : partner.company)}}</h1>
+    <span *ngIf="partner.switched_to_prod_at" style="font-size:12px;color:var(--gray-500);margin-left:8px;align-self:center">
+      Aktywny od {{partner.switched_to_prod_at | date:'dd.MM.yyyy'}}
+    </span>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
-    <button class="btn-outline" (click)="openEdit()">✏️ Edytuj</button>
+    <button class="btn-outline" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj partnera' : 'Brak uprawnień do edycji tego partnera'">✏️ Edytuj</button>
   </div>
 
   <!-- Onboarding stepper + zadania -->
@@ -46,7 +63,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     <div class="step-tasks-panel">
       <div class="step-tasks-header">
         <span class="step-tasks-title">📋 Zadania: <strong>{{onboardingSteps[activeStep]}}</strong></span>
-        <button class="btn-sm" (click)="openAddTask()" style="font-size:12px">+ Dodaj zadanie</button>
+        <button class="btn-sm" *ngIf="canEdit" (click)="openAddTask()" style="font-size:12px">+ Dodaj zadanie</button>
         <button class="btn-sm"
                 *ngIf="partner.onboarding_step === activeStep && isManager && allTasksDone(activeStep) && activeStep < 3"
                 (click)="advanceStep(activeStep + 1)"
@@ -159,6 +176,15 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         <span class="lbl">NIP <span class="dwh-badge" *ngIf="partner.dwh_partner_id">DWH</span></span>
         <span>{{(partner.dwh_partner_id ? partner.dwh_nip : partner.nip) || '—'}}</span>
         <span class="lbl">Branża</span><span>{{partner.industry || '—'}}</span>
+        <span class="lbl">Strona WWW</span>
+        <span>
+          <a *ngIf="partner.website" [href]="partner.website" target="_blank" rel="noopener"
+             style="color:var(--orange);word-break:break-all">{{partner.website}}</a>
+          <span *ngIf="!partner.website">—</span>
+        </span>
+        <span class="lbl">Źródło</span><span>{{partner.source || '—'}}</span>
+        <span class="lbl">Pierwszy kontakt</span>
+        <span>{{partner.first_contact_date ? (partner.first_contact_date | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Opiekun</span><span>{{partner.manager_name || '—'}}</span>
         <span class="lbl">Umowa od</span><span>{{partner.contract_signed ? (partner.contract_signed | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Umowa do</span><span>{{partner.contract_expires ? (partner.contract_expires | date:'dd.MM.yyyy') : '—'}}</span>
@@ -194,7 +220,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         <div class="info-subsection-title">Kontakt do spraw umowy</div>
         <div class="info-grid">
           <span class="lbl">Imię i nazwisko</span><span>{{partner.contact_name || '—'}}</span>
-          <span class="lbl">Stanowisko</span><span>{{partner.contact_title || '—'}}</span>
+          <span class="lbl">Rola w firmie</span><span>{{partner.contact_title || '—'}}</span>
           <span class="lbl">Email</span><span>{{partner.email || '—'}}</span>
           <span class="lbl">Telefon</span><span>{{partner.phone || '—'}}</span>
         </div>
@@ -225,7 +251,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         <div class="info-subsection-title">Kontakt do spraw rozliczeń</div>
         <div class="info-grid">
           <span class="lbl">Imię i nazwisko</span><span>{{partner.billing_contact_name || '—'}}</span>
-          <span class="lbl">Stanowisko</span><span>{{partner.billing_contact_title || '—'}}</span>
+          <span class="lbl">Rola w firmie</span><span>{{partner.billing_contact_title || '—'}}</span>
           <span class="lbl">Email</span><span>{{partner.billing_email || '—'}}</span>
           <span class="lbl">Telefon</span><span>{{partner.billing_phone || '—'}}</span>
         </div>
@@ -256,6 +282,10 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 
       <div class="info-grid" style="margin-top:10px">
         <span class="lbl">Notatki</span><span class="notes">{{partner.notes || '—'}}</span>
+        <ng-container *ngIf="partner.customer_service_note">
+          <span class="lbl">Notatka <span class="dwh-badge">DWH</span></span>
+          <span class="notes dwh-note" [innerHTML]="partner.customer_service_note"></span>
+        </ng-container>
       </div>
 
       <!-- Dane dodatkowe — CRM + DWH -->
@@ -275,9 +305,17 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
             <span class="lbl">Waluta <span class="dwh-badge" *ngIf="partner.partner_currency_from_dwh">DWH</span></span>
             <span>{{partner.partner_currency || '—'}}</span>
           </ng-container>
+          <ng-container *ngIf="partner.dwh_currency">
+            <span class="lbl">Waluta partnera <span class="dwh-badge">DWH</span></span>
+            <span>{{partner.dwh_currency}}</span>
+          </ng-container>
           <ng-container *ngIf="partner.country || partner.dwh_partner_id">
             <span class="lbl">Kraj <span class="dwh-badge" *ngIf="partner.country_from_dwh">DWH</span></span>
             <span>{{partner.country || '—'}}</span>
+          </ng-container>
+          <ng-container *ngIf="partner.max_debit != null">
+            <span class="lbl">Limit kredytowy <span class="dwh-badge">DWH</span></span>
+            <span>{{partner.max_debit | number:'1.2-2'}}</span>
           </ng-container>
         </div>
       </div>
@@ -297,7 +335,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       <div class="info-subsection">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div class="info-subsection-title" style="margin-bottom:0">📎 Dokumenty ({{linkedDocs.length}})</div>
-          <button class="btn-sm" (click)="showDocPicker = true" style="font-size:11px">+ Dodaj</button>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker = true" style="font-size:11px">+ Dodaj</button>
         </div>
         <div *ngIf="linkedDocs.length === 0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px">Brak powiązanych dokumentów</div>
         <div *ngFor="let d of linkedDocs"
@@ -332,19 +370,22 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     <div class="activities-card">
       <!-- Pasek tabów -->
       <div class="mid-tabs">
-        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">Aktywności</button>
-        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; markEmailsRead()">
+        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">
+          Aktywności
+          <wt-activity-count-badge [activities]="partner.activities||[]"></wt-activity-count-badge>
+        </button>
+        <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
           📧 Maile
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history'; loadHistory()">Historia zmian</button>
-        <div style="flex:1"></div>
-        <button class="btn-sm" *ngIf="midTab==='activities'" (click)="openNewActivityForm()">+ Dodaj</button>
-        <button class="btn-sm" *ngIf="midTab==='emails'" (click)="openEmailModal()" [disabled]="!partner?.email">✉️ Wyślij</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
       <div *ngIf="midTab==='activities'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
+        <div *ngIf="canEdit" style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn-sm" (click)="openNewActivityForm()">+ Dodaj</button>
+        </div>
         <div class="new-activity-form" *ngIf="showNewActivity">
           <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
             <option value="call">📞 Połączenie</option>
@@ -465,57 +506,32 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       </div>
 
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
-      <div *ngIf="midTab==='emails'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
-        <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „✉️ Wyślij".</div>
-        <div *ngFor="let a of emailActivities" class="act-item" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid #dbeafe">
-          <span class="act-icon">📧</span>
-          <div style="flex:1;min-width:0">
-            <strong>{{a.title}}</strong>
-            <div class="act-meta">
-              <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
-              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-              <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
-              <span *ngIf="!a.assigned_to_name && !a.created_by_name" style="color:#ef4444">↩ Odpowiedź</span>
-            </div>
-            <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
-            <div style="margin-top:6px;display:flex;gap:6px">
-              <button *ngIf="a.gmail_thread_id" class="btn-sm" style="font-size:10px" (click)="openThread(a.gmail_thread_id)">
-                💬 Pokaż wątek
-              </button>
-              <button *ngIf="a.gmail_thread_id" class="btn-sm primary" style="font-size:10px" (click)="replyToThread(a)">
-                ↩ Odpowiedz
-              </button>
-            </div>
-            <!-- Thread preview -->
-            <div *ngIf="openThreadId===a.gmail_thread_id && threadMessages.length>0"
-                 style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px">
-              <div *ngFor="let m of threadMessages"
-                   style="background:#f9fafb;border-radius:6px;padding:8px;font-size:11px;cursor:pointer"
-                   (click)="openMsgModal(m)">
-                <div style="display:flex;justify-content:space-between">
-                  <span style="font-weight:600;color:#374151">{{m.from}}</span>
-                  <span style="color:#9ca3af;font-size:10px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
-                </div>
-                <div style="color:#6b7280;font-size:10px">Do: {{m.to}}<span *ngIf="m.cc"> · DW: {{m.cc}}</span></div>
-                <div style="margin-top:4px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{m.snippet}}</div>
-                <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
-                     style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px" (click)="$event.stopPropagation()">
-                  <span *ngFor="let att of m.attachments" class="att-chip" style="background:#eff6ff;color:#1d4ed8">
-                    📎 {{att.filename}}
-                    <span class="att-chip-actions">
-                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m)" title="Otwórz w przeglądarce">Podgląd</button>
-                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m)" title="Pobierz plik">Pobierz</button>
-                    </span>
-                  </span>
-                  <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:#f0fdf4;color:#166534">
-                    📎 {{att.filename}}
-                    <span class="att-chip-actions">
-                      <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m)" title="Otwórz w przeglądarce">Podgląd</button>
-                      <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m)" title="Pobierz plik">Pobierz</button>
-                    </span>
-                  </span>
-                </div>
+      <div *ngIf="midTab==='emails'" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+        <div *ngIf="canEdit" style="display:flex;justify-content:flex-end;padding:10px 12px 0;flex-shrink:0">
+          <button class="btn-sm" (click)="openEmailModal()">✉️ Wyślij</button>
+        </div>
+        <!-- Lista emaili -->
+        <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:0;min-width:0">
+          <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „✉️ Wyślij".</div>
+          <div *ngFor="let a of emailActivities"
+               class="act-item"
+               style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer"
+               [style.border-left]="selectedEmailActivity?.id===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'"
+               [style.background]="selectedEmailActivity?.id===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
+               (click)="selectEmailForPanel(a)">
+            <span class="act-icon">📧</span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px">
+                <strong style="flex:1">{{a.title}}</strong>
+                <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0" title="Nieprzeczytana"></span>
               </div>
+              <div class="act-meta">
+                <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
+                <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+                <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
+                <span *ngIf="!a.assigned_to_name && !a.created_by_name" style="color:#ef4444">↩ Odpowiedź</span>
+              </div>
+              <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
             </div>
           </div>
         </div>
@@ -538,11 +554,114 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Right panel: DWH sales / email thread / products / docs -->
+    <div class="right-panel">
+
+      <!-- DWH: dane sprzedazowe -->
+      <div *ngIf="partner.dwh_partner_id" class="dwh-box">
+        <div class="dwh-box-title" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            Dane sprzedażowe DWH
+          </div>
+          <select [(ngModel)]="salesPeriod" (ngModelChange)="onSalesPeriodChange()"
+                  style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:6px;color:white;font-size:10px;padding:2px 5px;cursor:pointer;outline:none;max-width:110px">
+            <option value="1m" style="color:#374151">Bieżący mies.</option>
+            <option value="3m" style="color:#374151">Ostatnie 3 mies.</option>
+            <option value="6m" style="color:#374151">Ostatnie 6 mies.</option>
+            <option value="12m" style="color:#374151">Ostatnie 12 mies.</option>
+            <option value="ytd" style="color:#374151">YTD {{currentYear}}</option>
+          </select>
+        </div>
+        <div *ngIf="salesDataLoading" style="text-align:center;color:rgba(255,255,255,.5);font-size:12px;padding:8px 0">Ładowanie…</div>
+        <div *ngIf="!salesDataLoading && !partnerSalesKpi" style="text-align:center;color:rgba(255,255,255,.4);font-size:12px;padding:8px 0">Brak danych sprzedażowych</div>
+        <div *ngIf="partnerSalesKpi" class="dwh-kpi-grid">
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.gross_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót brutto PLN</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.net_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót netto PLN</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.transactions_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Transakcje</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.pax_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">PAX</div></div>
+          <div class="dwh-kpi dwh-kpi-wide"><div class="dwh-kpi-val" style="color:#86efac">{{(partnerSalesKpi.revenue_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Przychód netto PLN</div></div>
+        </div>
+      </div>
+
+      <!-- Wybrany watek mailowy -->
+      <div *ngIf="selectedEmailActivity" class="panel-email-box">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+          <div class="panel-email-title">&#128140; {{selectedEmailActivity.title}}</div>
+          <button (click)="selectedEmailActivity=null;panelThreadMessages=[]" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:13px;line-height:1;flex-shrink:0">&#x2715;</button>
+        </div>
+        <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">
+          {{selectedEmailActivity.activity_at|date:'dd.MM.yyyy HH:mm'}}
+          <span *ngIf="selectedEmailActivity.created_by_name"> · {{selectedEmailActivity.created_by_name}}</span>
+        </div>
+        <div *ngIf="panelLoadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
+        <div *ngFor="let m of panelThreadMessages" class="panel-msg" [class.unread]="!isMessageRead(m)" [class.read]="isMessageRead(m)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
+            <span [style.font-weight]="!isMessageRead(m) ? '700' : '600'" style="color:#374151;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{m.from}}</span>
+            <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
+          </div>
+          <div style="color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;cursor:pointer" (click)="openMsgModal(m)">{{m.snippet}}</div>
+          <div style="display:flex;gap:6px">
+            <button (click)="openMsgModal(m)" style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">Otwórz</button>
+            <button (click)="toggleMsgRead(m)"
+                    style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
+                    [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
+                    [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
+                    [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
+              {{isMessageRead(m) ? 'Przeczytana' : 'Nieprzeczytana'}}
+            </button>
+          </div>
+        </div>
+        <div *ngIf="!panelLoadingThread && panelThreadMessages.length===0 && selectedEmailActivity.body"
+             style="font-size:11px;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-bottom:6px">
+          {{stripHtml(selectedEmailActivity.body)}}
+        </div>
+        <button *ngIf="selectedEmailActivity.gmail_thread_id" class="comm-btn" style="margin-top:6px" (click)="replyToThread(selectedEmailActivity)">
+          <span>&#x21a9;</span><div style="flex:1;text-align:left"><div style="font-size:12px;font-weight:600">Odpowiedz</div></div>
+        </button>
+      </div>
+
+      <!-- Podzial produktowy -->
+      <div *ngIf="partnerSalesProducts.length" class="prod-box">
+        <div class="prod-box-title">Podział produktowy</div>
+        <div *ngFor="let prod of partnerSalesProducts" class="prod-row">
+          <span class="prod-name" [title]="prod.product_type">{{prod.product_type}}</span>
+          <div class="prod-bar-wrap"><div class="prod-bar" [style.width.%]="((prod.gross_turnover_pln||0)/salesProductsMax)*100"></div></div>
+          <span class="prod-val">{{(prod.gross_turnover_pln||0)|number:'1.0-0'}}</span>
+        </div>
+      </div>
+
+      <!-- Powiazane dokumenty -->
+      <div class="docs-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">Dokumenty ({{linkedDocs.length}})</div>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:11px">+ Dodaj</button>
+        </div>
+        <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
+             style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#9a3412">
+          <span style="font-size:14px;color:#f97316">⚠️</span>
+          <span><strong>Brak powiązanej umowy.</strong> Dodaj dokument, aby potwierdzić współpracę z partnerem.</span>
+        </div>
+        <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px 0">Brak powiązanych dokumentów</div>
+        <div *ngFor="let d of linkedDocs"
+             style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f9fafb;cursor:pointer"
+             (click)="openDocument(d)">
+          <span style="font-size:14px">&#x1F4C4;</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title || d.doc_number || ('Dokument #' + d.document_id)}}</div>
+            <div style="font-size:10px;color:#9ca3af"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span><span *ngIf="d.doc_type">{{d.doc_type}}</span></div>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:13px;padding:2px 4px;border-radius:4px"
+                  (click)="$event.stopPropagation(); unlinkDoc(d)">&#x2715;</button>
+        </div>
+      </div>
 
     </div>
   </div>
 
-  <!-- �?�? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI �?�? -->
+  <!-- ï¿½?ï¿½? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI �?�? -->
   <div *ngIf="selectedAct" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px" (click)="closeActModal()">
     <div style="background:white;border-radius:14px;width:min(520px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;flex-direction:column" (click)="$event.stopPropagation()">
       <!-- Nagłówek -->
@@ -706,7 +825,10 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
              style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Brak wyników</div>
         <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
           <div *ngFor="let doc of docResults"
-               style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:background .1s"
+               style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;transition:background .1s"
+               [style.cursor]="doc._access==='read' ? 'default' : 'pointer'"
+               [style.opacity]="doc._access==='read' ? '0.55' : '1'"
+               [title]="doc._access==='read' ? 'Tylko odczyt — brak uprawnień do powiązania' : ''"
                [style.background]="isLinked(doc.id) ? '#f0fdf4' : 'white'"
                (click)="toggleLinkDoc(doc)">
             <span style="font-size:16px">📄</span>
@@ -717,9 +839,13 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 <span>{{doc.doc_type}}</span>
               </div>
             </div>
-            <span *ngIf="isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
-            <span *ngIf="!isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
+            <span *ngIf="doc._access==='read'" style="font-size:11px;color:#9ca3af">🔒 Odczyt</span>
+            <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
+            <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
           </div>
+        </div>
+        <div *ngIf="linkDocError" style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626">
+          ⚠ {{linkDocError}}
         </div>
       </div>
       <div class="modal-footer">
@@ -828,7 +954,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
               <input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"
                      [class.input-warn]="submitAttempted && !editForm.contact_name">
             </label>
-            <label>Stanowisko *
+            <label>Rola w firmie *
               <input [(ngModel)]="editForm.contact_title" placeholder="CEO"
                      [class.input-warn]="submitAttempted && !editForm.contact_title">
             </label>
@@ -855,7 +981,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
               <input [(ngModel)]="editForm.billing_contact_name" placeholder="Anna Nowak"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_name">
             </label>
-            <label>Stanowisko *
+            <label>Rola w firmie *
               <input [(ngModel)]="editForm.billing_contact_title" placeholder="Kierownik rozliczeń"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_title">
             </label>
@@ -1001,6 +1127,23 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 <option value="">— brak grupy —</option>
                 <option *ngFor="let g of partnerGroups" [value]="g.id">{{g.name}}</option>
               </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">🔍 Sprzedaż i źródło</div>
+          <div class="edit-row">
+            <label>Źródło
+              <input [(ngModel)]="editForm.source" placeholder="np. targi, polecenie, cold call">
+            </label>
+            <label>Pierwszy kontakt
+              <input [(ngModel)]="editForm.first_contact_date" type="date">
+            </label>
+          </div>
+          <div class="edit-row">
+            <label class="full">Strona WWW
+              <input [(ngModel)]="editForm.website" type="url" placeholder="https://firma.pl">
             </label>
           </div>
         </div>
@@ -1210,10 +1353,18 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
             📋 Historia korespondencji zostanie automatycznie dołączona
           </div>
         </label>
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           Załączniki
-          <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280">
-        </label>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+            <button *ngIf="gmailConnected && !driveNeedsReauth"
+                    (click)="openDrivePicker()" [disabled]="drivePickerLoading"
+                    style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+              <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
+              <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
+            </button>
+          </div>
+        </div>
         <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
           <span *ngFor="let f of emailAttachments; let i=index"
                 style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
@@ -1226,7 +1377,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       <div class="modal-footer">
         <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
         <button class="btn-primary" (click)="sendEmail()"
-                [disabled]="sendingEmail||!emailForm.recipientList?.length||!emailForm.subject">
+                [disabled]="sendingEmail||(!emailForm.recipientList?.length&&!recipientQuery?.trim())||!emailForm.subject">
           {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
         </button>
       </div>
@@ -1254,9 +1405,8 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
         <span *ngIf="msgModalMsg.cc">{{msgModalMsg.cc}}</span>
         <span style="color:#9ca3af">Data:</span><span>{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
-      <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;white-space:pre-line;color:#374151;max-height:320px;overflow-y:auto">
-        {{msgModalMsg.body || msgModalMsg.snippet}}
-      </div>
+      <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;color:#374151;max-height:320px;overflow-y:auto"
+           [innerHTML]="msgModalMsg.body || msgModalMsg.snippet"></div>
       <!-- Attachments -->
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:4px">
@@ -1300,6 +1450,26 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       <div *ngIf="msgModalForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
         📋 Historia korespondencji zostanie automatycznie dołączona
       </div>
+      <!-- Załączniki w odpowiedzi -->
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:12px;font-weight:600">Załączniki</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+          <button *ngIf="gmailConnected && !driveNeedsReauth"
+                  (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
+                  style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+            <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
+            <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
+          </button>
+        </div>
+        <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+          <span *ngFor="let f of msgModalAttachments; let i=index"
+                style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
+            📎 {{f.name}}
+            <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+          </span>
+        </div>
+      </div>
       <div *ngIf="msgModalError" style="color:#ef4444;font-size:12px">⚠️ {{msgModalError}}</div>
     </div>
     <div class="modal-footer">
@@ -1315,7 +1485,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
-    .detail-page { padding:20px; max-width:1000px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
+    .detail-page { padding:20px; max-width:1400px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
     .detail-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; flex-shrink:0; }
     .back-btn { background:none; border:none; color:#f97316; cursor:pointer; font-size:13px; }
     .detail-header h1 { font-size:22px; font-weight:800; margin:0; flex:1; }
@@ -1378,10 +1548,32 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .task-act-btn.del:hover { color:#ef4444; }
     .task-empty { font-size:12px; color:#9ca3af; text-align:center; padding:16px; }
     /* Body */
-    .detail-body { display:grid; grid-template-columns:320px 1fr; gap:16px; flex:1; overflow:hidden; min-height:0; }
+    .detail-body { display:grid; grid-template-columns:320px 1fr 290px; gap:16px; flex:1; overflow:hidden; min-height:0; }
+    @media(max-width:900px) { .detail-body{grid-template-columns:320px 1fr;} .right-panel{display:none} }
     @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
     .info-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
     .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; min-height:0; display:flex; flex-direction:column; }
+    .right-panel { display:flex; flex-direction:column; gap:12px; overflow-y:auto; min-height:0; }
+    .dwh-box { background:linear-gradient(135deg,#166534 0%,#14532d 100%); border-radius:12px; padding:16px; color:white; flex-shrink:0; }
+    .dwh-box-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:rgba(255,255,255,.6); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .dwh-kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .dwh-kpi { background:rgba(255,255,255,.1); border-radius:8px; padding:8px 10px; }
+    .dwh-kpi-val { font-size:16px; font-weight:800; color:white; line-height:1; }
+    .dwh-kpi-lbl { font-size:10px; color:rgba(255,255,255,.6); margin-top:3px; }
+    .dwh-kpi-wide { grid-column:span 2; }
+    .prod-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
+    .prod-box-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; }
+    .prod-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:11px; }
+    .prod-name { width:90px; color:#374151; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
+    .prod-bar-wrap { flex:1; background:#f3f4f6; border-radius:4px; height:6px; overflow:hidden; }
+    .prod-bar { height:100%; background:#f97316; border-radius:4px; transition:width .4s; }
+    .prod-val { width:64px; text-align:right; color:#9ca3af; flex-shrink:0; }
+    .panel-email-box { background:white; border:1px solid #bfdbfe; border-radius:12px; padding:14px; flex-shrink:0; }
+    .panel-email-title { font-size:11px; font-weight:700; color:#1d4ed8; margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
+    .panel-msg { border:1px solid #e5e7eb; border-radius:8px; padding:8px; margin-bottom:6px; font-size:11px; }
+    .panel-msg.unread { border-left:3px solid #ef4444; }
+    .panel-msg.read { border-left:3px solid #e5e7eb; }
+    .docs-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
     .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
     .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; }
     .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:12px 14px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:color .15s,border-color .15s; }
@@ -1392,6 +1584,12 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
     .sub { color:#9ca3af; }
     .accent { color:#f97316; font-weight:700; }
     .notes { white-space:pre-line; }
+    .dwh-note { white-space:normal; }
+    .dwh-note p { margin:4px 0; }
+    .dwh-note ul, .dwh-note ol { margin:4px 0 4px 18px; padding:0; }
+    .dwh-note li { margin-bottom:2px; }
+    .dwh-note strong, .dwh-note b { font-weight:700; }
+    .dwh-note a { color:#f97316; text-decoration:underline; }
     .opp-section { margin-top:16px; padding-top:12px; border-top:1px solid #f3f4f6; }
     .opp-section h4 { font-size:12px; font-weight:700; margin:0 0 8px; }
     .opp-item { font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
@@ -1527,6 +1725,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.editForm.subdomain = el.value;
   }
 
+  get attachmentsFolderUrl(): string { return this.settings.get('partner_attachments_folder_url') as string || this.settings.get('lead_attachments_folder_url') as string || ''; }
+
   private _dictArr(key: string, fallback: string[]): string[] {
     try {
       const v = this.settings.get(key);
@@ -1560,13 +1760,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   /**
    * Zwraca true gdy pole powinno być zablokowane do edycji (read-only z DWH).
    * Logika:
-   *  - Zawsze edytowalne gdy partner w statusie 'onboarding'
    *  - Zawsze edytowalne gdy brak połączenia z DWH (dwh_partner_id = null)
-   *  - Read-only gdy partner aktywny/nieaktywny/churned AND DWH dostarczyło wartość (field_from_dwh = true)
+   *  - Read-only gdy DWH dostarczyło wartość (field_from_dwh = true) — niezależnie od statusu
    */
   isDwhFieldReadOnly(field: string): boolean {
     if (!this.partner) return false;
-    if (this.partner.status === 'onboarding') return false;
     if (!this.partner.dwh_partner_id) return false;
     return !!(this.partner as any)[field + '_from_dwh'];
   }
@@ -1596,6 +1794,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   // Powiązane dokumenty
   linkedDocs: LinkedDocument[] = [];
   showDocPicker = false;
+  linkDocError  = '';
   docSearch     = '';
   docResults: any[] = [];
   docSearching  = false;
@@ -1610,11 +1809,23 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   ccQuery             = '';
   emailAttachments: File[] = [];
   threadMessages: any[] = [];
+  loadingThread       = false;
   openThreadId        = '';
+  selectedEmailActivity: any = null;
+  panelThreadMessages: any[] = [];
+  panelLoadingThread  = false;
+  // Sales data (DWH)
+  partnerSalesKpi: any = null;
+  partnerSalesProducts: any[] = [];
+  salesDataLoading = false;
+  salesPeriod = 'ytd';
+  readonly currentYear = new Date().getFullYear();
   gmailConnected      = false;
   gmailEmail          = '';
   gmailAuthUrl        = '';
   downloadingAttachment = '';
+  drivePickerLoading  = false;
+  driveNeedsReauth    = false;
   recipientSuggestions: { email: string; name: string }[] = [];
   ccSuggestions:        { email: string; name: string }[] = [];
   showRecipientSug      = false;
@@ -1627,27 +1838,29 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   msgModalCcQuery        = '';
   msgModalSending        = false;
   msgModalError          = '';
+  msgModalAttachments: File[] = [];
 
   get emailActivities(): any[] {
-    const all = (this.partner?.activities || []).filter((a: any) => a.type === 'email');
-    const seen = new Set<string>();
-    return all.filter((a: any) => {
-      if (!a.gmail_thread_id) return true;
-      if (seen.has(a.gmail_thread_id)) return false;
-      seen.add(a.gmail_thread_id);
-      return true;
-    });
+    const all = (this.partner?.activities || [])
+      .filter((a: any) => a.type === 'email')
+      .sort((a: any, b: any) => (b.id || 0) - (a.id || 0));
+    const byThread = new Map<string, any>();
+    const noThread: any[] = [];
+    for (const a of all) {
+      if (!a.gmail_thread_id) { noThread.push(a); continue; }
+      if (!byThread.has(a.gmail_thread_id)) {
+        byThread.set(a.gmail_thread_id, { ...a });
+      } else {
+        if (!a.is_read) byThread.get(a.gmail_thread_id).is_read = false;
+      }
+    }
+    return [...byThread.values(), ...noThread];
   }
 
   get newEmailCount(): number {
-    const key = `partner_email_last_read_${this.partner?.id}`;
-    const lastRead = parseInt(localStorage.getItem(key) || '0', 10);
-    // Liczymy tylko odpowiedzi przychodzące (created_by === null = zsynchronizowane z Gmaila)
-    return (this.partner?.activities || []).filter((a: any) => {
-      if (a.type !== 'email' || a.created_by !== null) return false;
-      const t = a.activity_at ? new Date(a.activity_at).getTime() : 0;
-      return t > lastRead;
-    }).length;
+    return (this.partner?.activities || []).filter(
+      (a: any) => a.type === 'email' && !a.is_read
+    ).length;
   }
 
   get emailActivityCount(): number {
@@ -1671,8 +1884,17 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return u?.is_admin || u?.crm_role === 'sales_manager';
   }
 
+  get canEdit(): boolean {
+    if (!this.partner) return false;
+    if (this.isManager) return true;
+    const u = this.auth.user();
+    return this.partner.manager_id === u?.id;
+  }
+
+  get pid(): string | number { return this.partner?.crm_id || this.partner?.id || ''; }
+
   // ── Dokumenty powiązane ──────────────────────────────────────────
-  loadLinkedDocs(id: number): void {
+  loadLinkedDocs(id: number | string): void {
     this.api.getPartnerDocuments(id).subscribe({
       next: docs => this.zone.run(() => { this.linkedDocs = docs; this.cdr.markForCheck(); }),
       error: () => {},
@@ -1685,28 +1907,36 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   toggleLinkDoc(doc: any): void {
     if (!this.partner) return;
+    if (doc._access === 'read') return;
+    this.linkDocError = '';
     if (this.isLinked(doc.id)) {
-      this.api.unlinkPartnerDocument(this.partner.id, doc.id).subscribe({
+      this.api.unlinkPartnerDocument(this.pid, doc.id).subscribe({
         next: () => this.zone.run(() => {
           this.linkedDocs = this.linkedDocs.filter(d => d.document_id !== doc.id);
           this.cdr.markForCheck();
         }),
-        error: () => {},
+        error: (err: any) => this.zone.run(() => {
+          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się usunąć powiązania.';
+          this.cdr.markForCheck();
+        }),
       });
     } else {
-      this.api.linkPartnerDocument(this.partner.id, doc.id).subscribe({
+      this.api.linkPartnerDocument(this.pid, doc.id).subscribe({
         next: linked => this.zone.run(() => {
           this.linkedDocs = [...this.linkedDocs, { ...linked, document_title: doc.name, doc_number: doc.doc_number, doc_type: doc.doc_type }];
           this.cdr.markForCheck();
         }),
-        error: () => {},
+        error: (err: any) => this.zone.run(() => {
+          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się powiązać dokumentu. Sprawdź czy masz wymagane uprawnienia.';
+          this.cdr.markForCheck();
+        }),
       });
     }
   }
 
   unlinkDoc(d: LinkedDocument): void {
     if (!this.partner || !confirm('Usunąć powiązanie z dokumentem?')) return;
-    this.api.unlinkPartnerDocument(this.partner.id, d.document_id).subscribe({
+    this.api.unlinkPartnerDocument(this.pid, d.document_id).subscribe({
       next: () => this.zone.run(() => {
         this.linkedDocs = this.linkedDocs.filter(x => x.document_id !== d.document_id);
         this.cdr.markForCheck();
@@ -1720,6 +1950,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   onDocSearch(): void {
+    this.linkDocError = '';
     clearTimeout(this.docSearchTimer);
     if (this.docSearch.length < 2) { this.docResults = []; this.cdr.markForCheck(); return; }
     this.docSearchTimer = setTimeout(() => {
@@ -1770,6 +2001,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   private gmailBc: BroadcastChannel | null = null;
+  private emailPollInterval: any = null;
 
   private onGmailOauthResult(status: string): void {
     if (status !== 'connected') return;
@@ -1801,11 +2033,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const rawId = this.id || this.route.snapshot.paramMap.get('id') || '';
-    const numId = parseInt(rawId, 10);
-    if (!numId || isNaN(numId)) { this.loadError = true; return; }
-    this.loadPartner(numId);
-    this.loadLinkedDocs(numId);
-    this.loadSuggestions(numId);
+    if (!rawId) { this.loadError = true; return; }
+    this.loadPartner(rawId);
+    this.loadLinkedDocs(rawId);
+    this.loadSuggestions(rawId);
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getGmailStatus().subscribe({
       next: s => this.zone.run(() => { this.gmailConnected = s.connected; this.gmailEmail = s.email || ''; this.cdr.markForCheck(); }),
@@ -1831,26 +2062,75 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.gmailBc?.close();
     this.gmailBc = null;
     window.removeEventListener('message', this._gmailMsgHandler);
+    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
 
-  private loadSuggestions(partnerId: number): void {
+  private loadPartnerSalesData(p: any): void {
+    if (!p.dwh_partner_id) return;
+    this.salesDataLoading = true;
+    this.cdr.markForCheck();
+    const { from, to } = getMonthRange(this.salesPeriod);
+    this.api.getPartnersReport({ partner_id: p.dwh_partner_id, period_from: from, period_to: to }).subscribe({
+      next: (r: any) => this.zone.run(() => {
+        // by_partner[0] gives individual partner data; kpi is the aggregate for the filtered set
+        const row = r?.by_partner?.find((x: any) => x.partner_id === p.dwh_partner_id) ?? r?.by_partner?.[0] ?? r?.kpi ?? null;
+        this.partnerSalesKpi = row;
+        this.partnerSalesProducts = r?.by_product ?? [];
+        this.salesDataLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.salesDataLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  onSalesPeriodChange(): void {
+    if (this.partner?.dwh_partner_id) this.loadPartnerSalesData(this.partner);
+  }
+
+  get salesProductsMax(): number {
+    return Math.max(1, ...this.partnerSalesProducts.map((p: any) => p.gross_turnover_pln || 0));
+  }
+
+  private loadSuggestions(partnerId: number | string): void {
     this.api.getContactSuggestions(undefined, partnerId).subscribe({
       next: s => { this.allSuggestions = s; },
       error: () => {},
     });
   }
 
-  loadPartner(numId?: number) {
-    const id = numId ?? parseInt(this.id, 10);
-    if (!id || isNaN(id)) return;
+  loadPartner(numId?: number | string) {
+    const id = numId ?? this.id;
+    if (!id) return;
     this.loading = true;
     this.loadError = false;
     this.partner = null;
+    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
     this.api.getPartner(id).pipe(
       finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
     ).subscribe({
-      next: p  => { this.zone.run(() => { this.partner = p; this.activeStep = p.onboarding_step || 0; this.cdr.markForCheck(); if (p.status === 'onboarding') this.loadTasks(p.id); }); },
+      next: p  => {
+        this.zone.run(() => {
+          this.partner = p;
+          this.activeStep = p.onboarding_step || 0;
+          this.cdr.markForCheck();
+          if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
+          if (p.dwh_partner_id) this.loadPartnerSalesData(p);
+          this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
+        });
+      },
       error: () => { this.zone.run(() => { this.loadError = true; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  refreshEmailActivities(): void {
+    if (!this.partner) return;
+    this.api.getPartner(this.pid).subscribe({
+      next: (fresh: any) => this.zone.run(() => {
+        if (!this.partner) return;
+        this.partner = { ...this.partner, activities: fresh.activities || [] };
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
     });
   }
 
@@ -1888,6 +2168,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       active_users:          this.partner.active_users ?? null,
       tagsStr:               (this.partner.tags || []).join(', '),
       notes:                 this.partner.notes || '',
+      website:               this.partner.website || '',
+      source:                this.partner.source || '',
+      first_contact_date:    this.isoToDateInput(this.partner.first_contact_date),
       // DWH-fillable fields — inicjalizowane zawsze (edytowalne lub read-only zależnie od isDwhFieldReadOnly)
       subdomain:             this.partner.subdomain || '',
       language:              this.partner.language || '',
@@ -1960,6 +2243,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       active_users:          this.editForm.active_users != null && this.editForm.active_users !== '' ? +this.editForm.active_users : null,
       tags:                  this.editForm.tagsStr ? this.editForm.tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       notes:                 this.editForm.notes || null,
+      website:               this.editForm.website || null,
+      source:                this.editForm.source || null,
+      first_contact_date:    this.editForm.first_contact_date || null,
       // DWH Partner ID (tylko managerzy)
       ...(this.isManager ? { dwh_partner_id: this.editForm.dwh_partner_id !== '' && this.editForm.dwh_partner_id != null ? +this.editForm.dwh_partner_id : null } : {}),
       // DWH-fillable fields: wysyłamy tylko gdy pole NIE jest zablokowane przez DWH
@@ -1977,7 +2263,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       ...(this.isDwhFieldReadOnly('admin_last_name')       ? {} : { admin_last_name:       this.editForm.admin_last_name       || null }),
       ...(this.isDwhFieldReadOnly('admin_email')           ? {} : { admin_email:           this.editForm.admin_email           || null }),
     };
-    const partnerId = this.partner.id;
+    const partnerId = this.pid;
     this.api.updatePartner(partnerId, payload).subscribe({
       next: () => {
         // Przeładuj pełne dane partnera przez GET /:id (z COALESCE + _from_dwh flagami z DWH JOIN).
@@ -2015,7 +2301,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadTasks(partnerId: number): void {
+  loadTasks(partnerId: number | string): void {
     this.api.getOnboardingTasks(partnerId).subscribe({
       next: tasks => {
         this.zone.run(() => {
@@ -2078,7 +2364,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       assigned_to: this.taskForm.assigned_to || null,
       due_date:    this.taskForm.due_date || null,
     };
-    this.api.createOnboardingTask(this.partner.id, payload).subscribe({
+    this.api.createOnboardingTask(this.pid, payload).subscribe({
       next: task => {
         this.zone.run(() => {
           if (!this.tasksByStep[task.step]) this.tasksByStep[task.step] = [];
@@ -2122,7 +2408,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       assigned_to: this.taskEditForm.assigned_to || null,
       due_date:    this.taskEditForm.due_date || null,
     };
-    this.api.updateOnboardingTask(this.partner.id, t.id, payload).subscribe({
+    this.api.updateOnboardingTask(this.pid, t.id, payload).subscribe({
       next: updated => {
         this.zone.run(() => {
           this.tasksByStep[t.step] = this.tasksByStep[t.step].map(x => x.id === t.id ? updated : x);
@@ -2138,7 +2424,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   toggleTask(t: OnboardingTask): void {
     if (!this.partner) return;
-    this.api.updateOnboardingTask(this.partner.id, t.id, { done: !t.done }).subscribe({
+    this.api.updateOnboardingTask(this.pid, t.id, { done: !t.done }).subscribe({
       next: updated => {
         this.zone.run(() => {
           this.tasksByStep[t.step] = this.tasksByStep[t.step].map(x => x.id === t.id ? updated : x);
@@ -2152,7 +2438,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   deleteTask(t: OnboardingTask): void {
     if (!this.partner || !confirm(`Usunąć zadanie "${t.title}"?`)) return;
-    this.api.deleteOnboardingTask(this.partner.id, t.id).subscribe({
+    this.api.deleteOnboardingTask(this.pid, t.id).subscribe({
       next: () => {
         this.zone.run(() => {
           this.tasksByStep[t.step] = this.tasksByStep[t.step].filter(x => x.id !== t.id);
@@ -2166,8 +2452,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   finishOnboarding(): void {
     if (!this.partner) return;
-    // Krok 3 = ostatni — backend sprawdzi wszystkie zadania i ustawi status=active
-    this.api.updateOnboardingStep(this.partner.id, 3).subscribe({
+    // Step 4 wyzwala isFinishing w backendzie → status='active', lead stage='onboarded'
+    this.api.updateOnboardingStep(this.pid, 4).subscribe({
       next: p => {
         this.zone.run(() => {
           if (this.partner) {
@@ -2189,7 +2475,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   advanceStep(step: number) {
     if (!this.partner) return;
-    this.api.updateOnboardingStep(this.partner.id, step).subscribe({
+    this.api.updateOnboardingStep(this.pid, step).subscribe({
       next: p => {
         this.zone.run(() => {
           if (this.partner) {
@@ -2235,7 +2521,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.opp_status   = this.actForm.opp_status || 'new';
       payload.opp_due_date = this.actForm.opp_due_date || null;
     }
-    this.api.createPartnerActivity(this.partner.id, payload).subscribe({
+    // Snapshot przed resetem formularza
+    const meetingSnap = this.actForm.type === 'meeting' ? { ...payload } : null;
+    this.api.createPartnerActivity(this.pid, payload).subscribe({
       next: newAct => {
         this.zone.run(() => {
           if (this.partner) {
@@ -2246,10 +2534,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.showNewActivity  = false;
           this.savingActivity   = false;
           this.cdr.markForCheck();
+          if (meetingSnap) this.openGoogleCalendarForMeeting(meetingSnap);
         });
       },
       error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
     });
+  }
+
+  openGoogleCalendarForMeeting(data: { title: string; activity_at?: string | null; duration_min?: number | null; body?: string | null; meeting_location?: string | null; participants?: string | null }): void {
+    if (!data.activity_at) return;
+    const pad    = (n: number) => String(n).padStart(2, '0');
+    const toGCal = (d: Date)  => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    const start  = new Date(data.activity_at);
+    const end    = new Date(start.getTime() + (data.duration_min || 60) * 60_000);
+    const params = new URLSearchParams({ action: 'TEMPLATE', text: data.title, dates: `${toGCal(start)}/${toGCal(end)}` });
+    if (data.body)             params.set('details',  data.body);
+    if (data.meeting_location) params.set('location', data.meeting_location);
+    if (data.participants)     params.set('add',      data.participants);
+    window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, '_blank');
   }
 
   openNewActivityForm(): void {
@@ -2295,7 +2597,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   openEmailModal(prefillThreadId?: string): void {
     this.emailForm = {
-      recipientList: this.partner?.email ? [this.partner.email] : [],
+      recipientList: this.partner?.email ? [this.partner.email] : (this.partner?.billing_email_address ? [this.partner.billing_email_address] : []),
       ccList: [],
       subject: '',
       body: '',
@@ -2422,6 +2724,108 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  openDrivePicker(target: 'compose' | 'reply' = 'compose'): void {
+    this.drivePickerLoading = true;
+    this.driveNeedsReauth   = false;
+    this.cdr.markForCheck();
+
+    Promise.all([
+      this.api.getDrivePickerConfig().toPromise(),
+      this.api.getDriveToken().toPromise(),
+    ]).then(([cfg, tok]) => {
+      if (!cfg || !tok) { this.drivePickerLoading = false; this.cdr.markForCheck(); return; }
+
+      if ((tok as any).needsReauth) {
+        this.drivePickerLoading = false;
+        this.driveNeedsReauth   = true;
+        this.cdr.markForCheck();
+        this.api.getGmailAuthUrl().subscribe({
+          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
+          error: () => {},
+        });
+        return;
+      }
+
+      const loadPicker = () => {
+        const gapi = (window as any).gapi;
+        gapi.load('picker', () => {
+          const google = (window as any).google;
+          const folderUrl = this.attachmentsFolderUrl;
+          const folderMatch = folderUrl.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+          const folderId    = folderMatch ? folderMatch[1] : null;
+
+          let view: any;
+          if (folderId) {
+            view = new google.picker.DocsView()
+              .setParent(folderId)
+              .setIncludeFolders(true);
+          } else {
+            view = new google.picker.DocsView()
+              .setIncludeFolders(true)
+              .setOwnedByMe(false);
+          }
+
+          const picker = new google.picker.PickerBuilder()
+            .addView(view)
+            .setOAuthToken(tok!.access_token)
+            .setDeveloperKey(cfg!.apiKey)
+            .setAppId(cfg!.appId)
+            .setTitle('Wybierz pliki do załączenia')
+            .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+            .setCallback((data: any) => {
+              if (data.action !== google.picker.Action.PICKED) return;
+              const docs: any[] = data.docs || [];
+              docs.forEach(doc => this.downloadDriveFileAsAttachment(doc, target));
+            })
+            .build();
+
+          this.drivePickerLoading = false;
+          this.cdr.markForCheck();
+          picker.setVisible(true);
+        });
+      };
+
+      if ((window as any).gapi) {
+        loadPicker();
+      } else {
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.onload = loadPicker;
+        script.onerror = () => { this.drivePickerLoading = false; this.cdr.markForCheck(); };
+        document.head.appendChild(script);
+      }
+    }).catch(() => {
+      this.drivePickerLoading = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private downloadDriveFileAsAttachment(
+    doc: { id: string; name: string; mimeType: string },
+    target: 'compose' | 'reply' = 'compose',
+  ): void {
+    this.api.downloadDriveFile(doc.id).subscribe({
+      next: blob => {
+        const file = new File([blob], doc.name, { type: blob.type || doc.mimeType || 'application/octet-stream' });
+        if (target === 'reply') {
+          this.msgModalAttachments = [...this.msgModalAttachments, file];
+        } else {
+          this.emailAttachments = [...this.emailAttachments, file];
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        const msg = err?.error?.error || err?.message || 'Błąd pobierania pliku z Drive';
+        if (target === 'reply') {
+          this.msgModalError = msg;
+        } else {
+          this.emailError = msg;
+        }
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
   sendEmail(): void {
     this.addRecipient();
     this.addCc();
@@ -2438,7 +2842,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.emailForm.references) fd.append('references', this.emailForm.references);
     this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
 
-    this.api.sendPartnerEmail(this.partner.id, fd).subscribe({
+    this.api.sendPartnerEmail(this.pid, fd).subscribe({
       next: (result: GmailSendResult) => {
         this.zone.run(() => {
           const wasReply      = !!this.emailForm.threadId;
@@ -2452,11 +2856,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
               gmail_thread_id: result.threadId,
               gmail_message_id: result.messageId,
               activity_at: new Date().toISOString(),
+              created_by: this.auth.user()?.id || null,
               created_by_name: this.auth.user()?.display_name || null,
+              is_read: true,
             };
             this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
           } else if (replyThreadId && this.partner) {
-            this.api.getPartnerEmailThread(this.partner.id, replyThreadId).subscribe({
+            this.api.getPartnerEmailThread(this.pid, replyThreadId).subscribe({
               next: msgs => this.zone.run(() => {
                 this.threadMessages = msgs;
                 this.openThreadId   = replyThreadId;
@@ -2469,7 +2875,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.showEmailModal = false;
           // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
           if (this.partner) {
-            this.api.getPartner(this.partner.id).subscribe({
+            this.api.getPartner(this.pid).subscribe({
               next: (fresh: any) => this.zone.run(() => {
                 if (this.partner) {
                   (this.partner as any).extra_contacts = fresh.extra_contacts || [];
@@ -2498,8 +2904,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       this.openThreadId = ''; this.threadMessages = []; this.cdr.markForCheck(); return;
     }
     this.openThreadId = threadId;
-    this.api.getPartnerEmailThread(this.partner.id, threadId).subscribe({
-      next: msgs => this.zone.run(() => { this.threadMessages = msgs; this.cdr.markForCheck(); }),
+    this.api.getPartnerEmailThread(this.pid, threadId).subscribe({
+      next: msgs => this.zone.run(() => {
+        this.threadMessages = msgs;
+        const act = (this.partner?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
+        if (act && !act.is_read) act.is_read = true;
+        this.cdr.markForCheck();
+      }),
       error: () => {},
     });
   }
@@ -2510,7 +2921,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     } else {
       if (!this.partner) return;
       this.openThreadId = a.gmail_thread_id;
-      this.api.getPartnerEmailThread(this.partner.id, a.gmail_thread_id).subscribe({
+      this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
         next: msgs => this.zone.run(() => {
           this.threadMessages = msgs;
           this.cdr.markForCheck();
@@ -2541,17 +2952,117 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  markEmailsRead(): void {
-    const key = `partner_email_last_read_${this.partner?.id}`;
-    localStorage.setItem(key, String(Date.now()));
+  markEmailsRead(): void {}
+
+  selectEmailForPanel(a: any): void {
+    if (!this.partner) return;
+    if (this.selectedEmailActivity?.id === a.id) {
+      this.selectedEmailActivity = null;
+      this.panelThreadMessages   = [];
+      this.cdr.markForCheck();
+      return;
+    }
+    this.selectedEmailActivity = a;
+    this.panelThreadMessages   = [];
+    this.panelLoadingThread    = true;
     this.cdr.markForCheck();
+    if (!a.is_read) {
+      a.is_read = true;
+      this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
+    }
+    if (a.gmail_thread_id) {
+      this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
+        next: msgs => this.zone.run(() => {
+          this.panelThreadMessages = msgs;
+          this.panelLoadingThread  = false;
+          msgs.forEach((m: any) => {
+            if (m.is_read === false && m.created_by === null) {
+              m.is_read = true;
+              this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
+            }
+          });
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => { this.panelLoadingThread = false; this.cdr.markForCheck(); }),
+      });
+    } else {
+      this.panelLoadingThread = false;
+    }
+  }
+
+  toggleThreadInline(a: any): void {
+    if (!this.partner || !a.gmail_thread_id) return;
+    if (this.openThreadId === a.gmail_thread_id) {
+      this.openThreadId = ''; this.threadMessages = []; this.cdr.markForCheck(); return;
+    }
+    this.openThreadId = a.gmail_thread_id;
+    this.threadMessages = [];
+    this.loadingThread = true;
+    this.cdr.markForCheck();
+    // Wątek ma nieprzeczytane — oznacz jako przeczytany
+    if (!a.is_read) {
+      a.is_read = true;
+      this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
+    }
+    this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
+      next: msgs => this.zone.run(() => {
+        this.threadMessages = msgs;
+        this.loadingThread = false;
+        // Auto-mark all unread incoming messages in the thread
+        msgs.forEach((m: any) => {
+          if (m.is_read === false && m.created_by === null) {
+            m.is_read = true;
+            this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
+          }
+        });
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.loadingThread = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  isMessageRead(m: any): boolean {
+    return m.is_read !== false;
+  }
+
+  hasUnreadInActivity(a: any): boolean {
+    return !a.is_read;
+  }
+
+  markMsgRead(m: any): void {
+    if (!this.partner || m.is_read !== false || m.created_by !== null) return;
+    m.is_read = true;
+    this.cdr.markForCheck();
+    this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
+  }
+
+  toggleMsgRead(m: any): void {
+    if (!this.partner || m.created_by !== null) return;
+    const newVal = !m.is_read;
+    m.is_read = newVal;
+    this.cdr.markForCheck();
+    this.api.patchEmailMessageRead(m.id, newVal).subscribe({ error: () => {} });
+    // Jeśli oznaczamy jako nieprzeczytana — aktualizuj też aktywność wątku (badge)
+    if (!newVal) {
+      const currentThreadId = this.selectedEmailActivity?.gmail_thread_id || this.openThreadId;
+      const threadAct = (this.partner.activities || []).find(
+        (a: any) => a.gmail_thread_id === currentThreadId
+      );
+      if (threadAct) {
+        threadAct.is_read = false;
+        this.api.patchPartnerActivityRead(this.pid, threadAct.id, false).subscribe({ error: () => {} });
+      }
+      if (this.selectedEmailActivity?.gmail_thread_id === currentThreadId) {
+        this.selectedEmailActivity.is_read = false;
+      }
+    }
   }
 
   loadHistory(): void {
     if (this.historyLoaded || !this.partner) return;
     this.historyLoading = true;
     this.cdr.markForCheck();
-    this.api.getPartnerHistory(this.partner.id).subscribe({
+    this.api.getPartnerHistory(this.pid).subscribe({
       next: rows => this.zone.run(() => {
         this.history = rows;
         this.historyLoading = false;
@@ -2597,7 +3108,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       contract_value: 'Obrót', active_users: 'Aktywni użytkownicy', tags: 'Tagi',
       industry: 'Branża', group_id: 'Grupa', commission_value: 'Prowizja',
       credit_limit_value: 'Limit kredytowy', deposit_value: 'Depozyt',
-      contact_title: 'Stanowisko', billing_email: 'Email rozl.', billing_phone: 'Tel. rozl.',
+      contact_title: 'Rola w firmie', billing_email: 'Email rozl.', billing_phone: 'Tel. rozl.',
       online_pct: '% Online', country: 'Kraj', agent_name: 'Agent',
     };
     return MAP[key] || key;
@@ -2672,13 +3183,15 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.msgModalCcQuery        = '';
     this.msgModalError  = '';
     this.showMsgModal   = true;
+    this.markMsgRead(msg);
     this.cdr.markForCheck();
   }
 
   closeMsgModal(): void {
-    this.showMsgModal  = false;
-    this.msgModalMsg   = null;
-    this.msgModalReply = false;
+    this.showMsgModal        = false;
+    this.msgModalMsg         = null;
+    this.msgModalReply       = false;
+    this.msgModalAttachments = [];
     this.cdr.markForCheck();
   }
 
@@ -2700,9 +3213,21 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     };
     this.msgModalRecipientQuery = '';
     this.msgModalCcQuery        = '';
+    this.msgModalAttachments    = [];
     this.msgModalReply = true;
     this.cdr.markForCheck();
     this.focusEmailBodyTop('partner-msg-reply-textarea');
+  }
+
+  onMsgReplyAttachmentChange(event: Event): void {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) this.msgModalAttachments = [...this.msgModalAttachments, ...Array.from(files)];
+    this.cdr.markForCheck();
+  }
+
+  removeMsgReplyAttachment(i: number): void {
+    this.msgModalAttachments = this.msgModalAttachments.filter((_, idx) => idx !== i);
+    this.cdr.markForCheck();
   }
 
   sendMsgReply(): void {
@@ -2719,14 +3244,15 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId || this.msgModalMsg?.threadId);
     if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
     if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
-    this.api.sendPartnerEmail(this.partner.id, fd).subscribe({
+    this.msgModalAttachments.forEach(f => fd.append('attachments', f, f.name));
+    this.api.sendPartnerEmail(this.pid, fd).subscribe({
       next: (result: GmailSendResult) => {
         this.zone.run(() => {
           const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
           this.msgModalSending = false;
           this.closeMsgModal();
           if (replyThreadId && this.partner) {
-            this.api.getPartnerEmailThread(this.partner.id, replyThreadId).subscribe({
+            this.api.getPartnerEmailThread(this.pid, replyThreadId).subscribe({
               next: msgs => this.zone.run(() => {
                 this.threadMessages = msgs;
                 this.openThreadId   = replyThreadId;
@@ -2737,7 +3263,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           }
           // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
           if (this.partner) {
-            this.api.getPartner(this.partner.id).subscribe({
+            this.api.getPartner(this.pid).subscribe({
               next: (fresh: any) => this.zone.run(() => {
                 if (this.partner) {
                   (this.partner as any).extra_contacts = fresh.extra_contacts || [];
@@ -2892,7 +3418,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     const a = this.selectedAct;
     if (!this.actModalCloseComment.trim() || !a || !this.partner) return;
     this.savingActivity = true;
-    this.api.updatePartnerActivity(this.partner.id, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
       next: updated => {
         this.zone.run(() => {
           if (this.partner) {
@@ -2936,7 +3462,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.opp_status   = this.actEditForm.opp_status || 'new';
       payload.opp_due_date = this.actEditForm.opp_due_date || null;
     }
-    this.api.updatePartnerActivity(this.partner.id, a.id, payload).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, payload).subscribe({
       next: (updated: PartnerActivity) => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3003,7 +3529,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   confirmCloseActivity(a: any): void {
     if (!this.closeComment.trim() || !this.partner) return;
     this.savingActivity = true;
-    this.api.updatePartnerActivity(this.partner.id, a.id, { status: 'closed', close_comment: this.closeComment }).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed', close_comment: this.closeComment }).subscribe({
       next: updated => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3059,7 +3585,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.opp_status   = this.actEditForm.opp_status || 'new';
       payload.opp_due_date = this.actEditForm.opp_due_date || null;
     }
-    this.api.updatePartnerActivity(this.partner.id, a.id, payload).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, payload).subscribe({
       next: (updated: PartnerActivity) => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3079,7 +3605,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   deleteActivity(a: any): void {
     if (!this.partner || !confirm(`Usunąć aktywność "${a.title}"?`)) return;
-    this.api.deletePartnerActivity(this.partner.id, a.id).subscribe({
+    this.api.deletePartnerActivity(this.pid, a.id).subscribe({
       next: () => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3108,7 +3634,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (!q) { this.filteredSuggestions = []; this.cdr.markForCheck(); return; }
     // Załaduj sugestie jeśli jeszcze nie załadowane
     if (!this.allSuggestions.length && this.partner?.id) {
-      this.api.getContactSuggestions(undefined, this.partner.id).subscribe({
+      this.api.getContactSuggestions(undefined, this.pid).subscribe({
         next: s => {
           this.allSuggestions = s;
           this._applyFilter(q);

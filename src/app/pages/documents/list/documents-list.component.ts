@@ -2,10 +2,12 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { DocumentService } from '../../../core/services/document.service';
 import { GroupService } from '../../../core/services/api.services';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { CrmApiService } from '../../../core/services/crm-api.service';
 import { Document, DocStatus, DocType, GroupProfile, ActiveTaskInfo } from '../../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent } from '../../../shared/components/badges.components';
 import { DOC_TYPE_MAP, triggerDownload, isExpiringSoon } from '../../../core/services/helpers';
@@ -49,6 +51,14 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       </button>
     </div>
 
+    @if (partnerFilterName) {
+      <div style="display:flex;align-items:center;gap:8px;background:#fff7ed;border-bottom:1px solid #fed7aa;padding:6px 20px;font-size:12px;color:#9a3412">
+        <span style="font-size:14px">🏢</span>
+        <span>Dokumenty partnera: <strong>{{partnerFilterName}}</strong></span>
+        <button (click)="clearPartnerFilter()" style="margin-left:auto;background:none;border:1px solid #fdba74;border-radius:6px;color:#9a3412;font-size:11px;padding:2px 8px;cursor:pointer">✕ Pokaż wszystkie</button>
+      </div>
+    }
+
     <div id="content">
       <!-- Toolbar -->
       <div class="toolbar">
@@ -68,6 +78,10 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
             <option [value]="t.key">{{ t.label }}</option>
           }
         </select>
+        <label class="chk-label">
+          <input type="checkbox" [(ngModel)]="noFilesFilter" (ngModelChange)="onNoFilesChange()">
+          Pokaż dokumenty bez załączonego skanu
+        </label>
       </div>
 
       <!-- Table -->
@@ -97,7 +111,12 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
                (click)="openDocument(doc)">
             <div class="td"><input type="checkbox" class="chk" (click)="$event.stopPropagation()"></div>
             <div class="td td-num">{{ doc.doc_number }}</div>
-            <div class="td td-n" [title]="doc.name">{{ doc.name }}</div>
+            <div class="td td-n-wrap">
+              <span class="td-n" [title]="doc.name">{{ doc.name }}</span>
+              @if (doc.doc_type === 'partner_agreement' && !doc.has_partner) {
+                <span class="no-partner-tri" title="Dokument nie powiązany z partnerem">⚠️</span>
+              }
+            </div>
             <div class="td"><wt-type-badge [type]="doc.doc_type" /></div>
             <div class="td"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
             <div class="td"><wt-gdpr-badge [gdpr]="doc.gdpr_type" /></div>
@@ -189,7 +208,9 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     .tr:last-child { border-bottom: none; }
     .tr:hover { background: var(--gray-50); }
     .td { padding: 10px 8px; font-size: 13px; color: var(--gray-700); overflow: hidden; }
+    .td-n-wrap { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
     .td-n { font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .no-partner-tri { font-size: 13px; color: #f97316; cursor: default; line-height: 1; width: fit-content; }
     .td-num { font-family: 'Sora', monospace; font-size: 11px; color: var(--gray-500); font-weight: 600; }
 
     /* ── Active Tasks column ── */
@@ -205,6 +226,14 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     .task-due.overdue { color: #DC2626; }
     .task-none { font-size: 12px; color: var(--gray-300); }
 
+    /* ── No-files checkbox ── */
+    .chk-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500; color: var(--gray-600);
+      cursor: pointer; white-space: nowrap;
+    }
+    .chk-label input { cursor: pointer; accent-color: var(--orange); }
+
     /* ── Task type badges ── */
     .tbadge { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
     .tbadge-sign    { background: #EDE9FE; color: #5B21B6; }
@@ -218,7 +247,11 @@ export class DocumentsListComponent implements OnInit {
   private groupSvc = inject(GroupService);
   private route    = inject(ActivatedRoute);
   private toast    = inject(ToastService);
+  private crmApi   = inject(CrmApiService);
   auth             = inject(AuthService);
+
+  partnerFilterId:   string | null = null;
+  partnerFilterName: string        = '';
 
   readonly grid  = GRID;
   statuses       = STATUSES;
@@ -241,10 +274,11 @@ export class DocumentsListComponent implements OnInit {
   totalPages     = signal(1);
 
   activeStatus: DocStatus | 'all' = 'all';
-  selectedGroup = '';
-  selectedType  = '';
-  searchQuery   = '';
-  openNew       = false;
+  selectedGroup  = '';
+  selectedType   = '';
+  searchQuery    = '';
+  noFilesFilter  = false;
+  openNew        = false;
   selectedDoc   = signal<Document | null>(null);
 
   sortCol = signal<string>('created_at');
@@ -303,23 +337,51 @@ export class DocumentsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.groupSvc.list().subscribe(g => this.groups.set(g));
-    this.loadDocuments();
+    const partnerId   = this.route.snapshot.queryParamMap.get('partner_id');
+    this.partnerFilterName = this.route.snapshot.queryParamMap.get('partner_name') ?? '';
+    if (partnerId) {
+      this.partnerFilterId = partnerId;
+      this.loadPartnerDocuments(partnerId);
+    } else {
+      this.loadDocuments();
+    }
     const openId = this.route.snapshot.queryParamMap.get('open');
     if (openId) this.docSvc.get(openId).subscribe(doc => this.selectedDoc.set(doc));
+  }
+
+  loadPartnerDocuments(partnerId: string): void {
+    this.loading.set(true);
+    this.crmApi.getPartnerDocuments(partnerId).subscribe({
+      next: linkedDocs => {
+        if (!linkedDocs.length) { this.documents.set([]); this.totalPages.set(1); this.loading.set(false); return; }
+        forkJoin(linkedDocs.map(ld => this.docSvc.get(ld.document_id))).subscribe({
+          next: docs => { this.documents.set(docs); this.totalPages.set(1); this.loading.set(false); },
+          error: () => this.loading.set(false),
+        });
+      },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  clearPartnerFilter(): void {
+    this.partnerFilterId   = null;
+    this.partnerFilterName = '';
+    this.loadDocuments();
   }
 
   loadDocuments(): void {
     this.loading.set(true);
     const col = this.sortCol();
     this.docSvc.list({
-      search:   this.searchQuery || undefined,
-      status:   this.activeStatus === 'all' ? undefined : this.activeStatus,
-      group_id: this.selectedGroup || undefined,
-      doc_type: (this.selectedType as any) || undefined,
-      page:     this.page(),
-      limit:    50,
-      sort:     BACKEND_SORT_COLS.has(col) ? col : 'created_at',
-      order:    BACKEND_SORT_COLS.has(col) ? this.sortDir() : 'desc',
+      search:    this.searchQuery || undefined,
+      status:    this.activeStatus === 'all' ? undefined : this.activeStatus,
+      group_id:  this.selectedGroup || undefined,
+      doc_type:  (this.selectedType as any) || undefined,
+      no_files:  this.noFilesFilter || undefined,
+      page:      this.page(),
+      limit:     50,
+      sort:      BACKEND_SORT_COLS.has(col) ? col : 'created_at',
+      order:     BACKEND_SORT_COLS.has(col) ? this.sortDir() : 'desc',
     }).subscribe({
       next: res => {
         this.documents.set(res.data);
@@ -332,6 +394,7 @@ export class DocumentsListComponent implements OnInit {
 
   setStatus(s: DocStatus | 'all'): void { this.activeStatus = s; this.page.set(1); this.loadDocuments(); }
   setPage(p: number): void { this.page.set(p); this.loadDocuments(); }
+  onNoFilesChange(): void { this.page.set(1); this.loadDocuments(); }
 
   onSearch(): void {
     if (this.searchTimer) clearTimeout(this.searchTimer);

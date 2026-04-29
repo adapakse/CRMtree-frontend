@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
 
 export type LeadStage =
   | 'new' | 'qualification' | 'presentation'
-  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost';
+  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost' | 'onboarding' | 'onboarded';
 
 export type PartnerStatus = 'onboarding' | 'active' | 'inactive' | 'churned';
 
@@ -52,6 +52,7 @@ export interface Lead {
   converted_partner_id?: number | null;
   converted_partner_company?: string | null;
   activity_count?: number;
+  non_email_activity_count?: number;
   document_count?: number;
   email_count?: number;
   activities?: LeadActivity[];
@@ -80,6 +81,7 @@ export interface LeadActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  is_read: boolean | null;
 }
 
 export interface CalendarMeeting {
@@ -158,7 +160,9 @@ export interface AgentData {
 }
 
 export interface Partner {
-  id: number;
+  id: number | null;
+  crm_uuid: string | null;
+  crm_id: string | null;
   company: string;
   nip: string | null;
   address: string | null;
@@ -203,6 +207,10 @@ export interface Partner {
   agent_name: string | null;
   agent_email: string | null;
   agent_phone: string | null;
+  website: string | null;
+  source: string | null;
+  first_contact_date: string | null;
+  logo_url: string | null;
   // ── DWH integracja ─────────────────────────────────────────────────────────
   dwh_partner_id: number | null;
   dwh_company_name: string | null;  // oficjalna nazwa firmy z DWH
@@ -234,10 +242,19 @@ export interface Partner {
   admin_first_name_from_dwh: boolean;
   admin_last_name_from_dwh: boolean;
   admin_email_from_dwh: boolean;
+  // Dodatkowe pola z DWH (tylko do odczytu)
+  dwh_currency: string | null;
+  max_debit: number | null;
+  customer_service_note: string | null;
+  switched_to_prod_at: string | null;
   // ──────────────────────────────────────────────────────────────────────────
   open_opp_count?: number;
   open_opp_value?: number;
   email_count?: number;
+  non_email_activity_count?: number;
+  new_email_count?: number;
+  last_reply_at?: string | null;
+  doc_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];
@@ -268,11 +285,12 @@ export interface PartnerActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  is_read: boolean;
 }
 
 export interface OnboardingTask {
   id: number;
-  partner_id: number;
+  partner_id: string;
   partner_name?: string;
   partner_nip?: string;
   partner_step?: number;
@@ -293,7 +311,7 @@ export interface OnboardingTask {
 }
 
 export interface OnboardingPartner {
-  id: number;
+  id: string;
   company: string;
   nip: string | null;
   onboarding_step: number;
@@ -322,12 +340,13 @@ export interface LeadContact {
 }
 
 export interface PartnerGroup {
-  id: number;
+  id: number | null;
   name: string;
   industry: string | null;
   description: string | null;
   manager_id: string | null;
   manager_name: string | null;
+  source?: 'crm' | 'dwh';
   partner_count: number;
   total_arr: number;
   partners: Partial<Partner>[];
@@ -554,6 +573,7 @@ export interface SalesImportLog {
 export interface PagedResponse<T> {
   data: T[];
   total: number;
+  total_qualified?: number;
   page: number;
   limit: number;
   pages: number;
@@ -620,6 +640,8 @@ export const LEAD_STAGE_LABELS: Record<LeadStage, string> = {
   negotiation:   'Negocjacje',
   closed_won:    'Wygrany',
   closed_lost:   'Przegrany',
+  onboarding:    'W onboardingu',
+  onboarded:     'Onboardowany',
 };
 
 export const PARTNER_STATUS_LABELS: Record<PartnerStatus, string> = {
@@ -796,16 +818,16 @@ export class CrmApiService {
   getPartners(params: Record<string, any> = {}): Observable<PagedResponse<Partner>> {
     return this.http.get<PagedResponse<Partner>>(`${BASE}/partners`, { params: this.toParams(params) });
   }
-  getPartner(id: number): Observable<Partner> {
+  getPartner(id: number | string): Observable<Partner> {
     return this.http.get<Partner>(`${BASE}/partners/${id}`);
   }
   createPartner(data: Partial<Partner>): Observable<Partner> {
     return this.http.post<Partner>(`${BASE}/partners`, data);
   }
-  updatePartner(id: number, data: Partial<Partner>): Observable<Partner> {
+  updatePartner(id: number | string, data: Partial<Partner>): Observable<Partner> {
     return this.http.patch<Partner>(`${BASE}/partners/${id}`, data);
   }
-  updateOnboardingStep(partnerId: number, step: number): Observable<Partner> {
+  updateOnboardingStep(partnerId: number | string, step: number): Observable<Partner> {
     return this.http.patch<Partner>(`${BASE}/partners/${partnerId}/onboarding`, { step });
   }
   deletePartner(id: number): Observable<void> {
@@ -814,14 +836,26 @@ export class CrmApiService {
   getPartnerActivities(partnerId: number): Observable<PartnerActivity[]> {
     return this.http.get<PartnerActivity[]>(`${BASE}/partners/${partnerId}/activities`);
   }
-  createPartnerActivity(partnerId: number, data: Partial<PartnerActivity>): Observable<PartnerActivity> {
+  createPartnerActivity(partnerId: number | string, data: Partial<PartnerActivity>): Observable<PartnerActivity> {
     return this.http.post<PartnerActivity>(`${BASE}/partners/${partnerId}/activities`, data);
   }
-  updatePartnerActivity(partnerId: number, actId: number, data: Partial<PartnerActivity>): Observable<PartnerActivity> {
+  updatePartnerActivity(partnerId: number | string, actId: number, data: Partial<PartnerActivity>): Observable<PartnerActivity> {
     return this.http.patch<PartnerActivity>(`${BASE}/partners/${partnerId}/activities/${actId}`, data);
   }
-  deletePartnerActivity(partnerId: number, actId: number): Observable<void> {
+  deletePartnerActivity(partnerId: number | string, actId: number): Observable<void> {
     return this.http.delete<void>(`${BASE}/partners/${partnerId}/activities/${actId}`);
+  }
+  patchLeadActivityRead(leadId: number, actId: number, isRead: boolean): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${BASE}/leads/${leadId}/activities/${actId}/read`, { is_read: isRead });
+  }
+  patchPartnerActivityRead(partnerId: number | string, actId: number, isRead: boolean): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${BASE}/partners/${partnerId}/activities/${actId}/read`, { is_read: isRead });
+  }
+  patchEmailMessageRead(msgId: string, isRead: boolean): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${BASE}/gmail/messages/${msgId}/read`, { is_read: isRead });
+  }
+  debugProcessGmail(): Observable<any> {
+    return this.http.post<any>(`${BASE}/gmail/debug/process`, {});
   }
   getPartnerTransactions(partnerId: number): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(`${BASE}/partners/${partnerId}/transactions`);
@@ -952,7 +986,7 @@ export class CrmApiService {
   }
 
   // ── Raport Partnerzy ──────────────────────────────────────────
-  getPartnersReport(p: { period_from?: string; period_to?: string; product_type?: string; rep_id?: string; partner_name?: string; group_name?: string } = {}): Observable<PartnersReport> {
+  getPartnersReport(p: { period_from?: string; period_to?: string; product_type?: string; rep_id?: string; partner_name?: string; group_name?: string; partner_id?: number } = {}): Observable<PartnersReport> {
     return this.http.get<PartnersReport>(`${BASE}/sales-data/report`, { params: this.toParams(p) });
   }
 
@@ -968,7 +1002,7 @@ export class CrmApiService {
   }
 
   // ── Historia Partnera ─────────────────────────────────────
-  getPartnerHistory(partnerId: number): Observable<LeadHistoryEntry[]> {
+  getPartnerHistory(partnerId: number | string): Observable<LeadHistoryEntry[]> {
     return this.http.get<LeadHistoryEntry[]>(`${BASE}/partners/${partnerId}/history`);
   }
 
@@ -1005,13 +1039,13 @@ export class CrmApiService {
   }
 
   // ── Dokumenty powiązane z Partnerem ───────────────────────
-  getPartnerDocuments(partnerId: number): Observable<LinkedDocument[]> {
+  getPartnerDocuments(partnerId: number | string): Observable<LinkedDocument[]> {
     return this.http.get<LinkedDocument[]>(`${BASE}/partners/${partnerId}/documents`);
   }
-  linkPartnerDocument(partnerId: number, documentId: string, docRole?: string): Observable<LinkedDocument> {
+  linkPartnerDocument(partnerId: number | string, documentId: string, docRole?: string): Observable<LinkedDocument> {
     return this.http.post<LinkedDocument>(`${BASE}/partners/${partnerId}/documents`, { document_id: documentId, doc_role: docRole });
   }
-  unlinkPartnerDocument(partnerId: number, documentId: string): Observable<void> {
+  unlinkPartnerDocument(partnerId: number | string, documentId: string): Observable<void> {
     return this.http.delete<void>(`${BASE}/partners/${partnerId}/documents/${documentId}`);
   }
 
@@ -1067,7 +1101,7 @@ export class CrmApiService {
   }
 
   // ── Podpowiedzi kontaktów do aktywności ──────────────────────
-  getContactSuggestions(leadId?: number, partnerId?: number): Observable<{ email: string; name: string }[]> {
+  getContactSuggestions(leadId?: number, partnerId?: number | string): Observable<{ email: string; name: string }[]> {
     const p: any = {};
     if (leadId)    p.lead_id    = leadId;
     if (partnerId) p.partner_id = partnerId;
@@ -1076,7 +1110,7 @@ export class CrmApiService {
 
 
   // ── Onboarding Tasks ─────────────────────────────────────
-  getOnboardingTasks(partnerId: number): Observable<OnboardingTask[]> {
+  getOnboardingTasks(partnerId: number | string): Observable<OnboardingTask[]> {
     return this.http.get<OnboardingTask[]>(`${BASE}/partners/${partnerId}/onboarding-tasks`);
   }
 
@@ -1088,13 +1122,13 @@ export class CrmApiService {
   getOnboardingAllTasks(params: Record<string,any> = {}): Observable<OnboardingTask[]> {
     return this.http.get<OnboardingTask[]>(`${BASE}/partners/onboarding/tasks`, { params: this.toParams(params) });
   }
-  createOnboardingTask(partnerId: number, data: Partial<OnboardingTask>): Observable<OnboardingTask> {
+  createOnboardingTask(partnerId: number | string, data: Partial<OnboardingTask>): Observable<OnboardingTask> {
     return this.http.post<OnboardingTask>(`${BASE}/partners/${partnerId}/onboarding-tasks`, data);
   }
-  updateOnboardingTask(partnerId: number, taskId: number, data: Partial<OnboardingTask>): Observable<OnboardingTask> {
+  updateOnboardingTask(partnerId: number | string, taskId: number, data: Partial<OnboardingTask>): Observable<OnboardingTask> {
     return this.http.patch<OnboardingTask>(`${BASE}/partners/${partnerId}/onboarding-tasks/${taskId}`, data);
   }
-  deleteOnboardingTask(partnerId: number, taskId: number): Observable<void> {
+  deleteOnboardingTask(partnerId: number | string, taskId: number): Observable<void> {
     return this.http.delete<void>(`${BASE}/partners/${partnerId}/onboarding-tasks/${taskId}`);
   }
 
@@ -1105,10 +1139,10 @@ export class CrmApiService {
   getLeadEmailThread(leadId: number, threadId: string): Observable<GmailMessage[]> {
     return this.http.get<GmailMessage[]>(`${BASE}/gmail/thread/lead/${leadId}/${threadId}`);
   }
-  sendPartnerEmail(partnerId: number, data: FormData): Observable<GmailSendResult> {
+  sendPartnerEmail(partnerId: number | string, data: FormData): Observable<GmailSendResult> {
     return this.http.post<GmailSendResult>(`${BASE}/gmail/send/partner/${partnerId}`, data);
   }
-  getPartnerEmailThread(partnerId: number, threadId: string): Observable<GmailMessage[]> {
+  getPartnerEmailThread(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
     return this.http.get<GmailMessage[]>(`${BASE}/gmail/thread/partner/${partnerId}/${threadId}`);
   }
   getGmailStatus(): Observable<{ connected: boolean; email?: string }> {
@@ -1126,6 +1160,17 @@ export class CrmApiService {
       `${BASE}/gmail/attachment/${messageId}/${attachmentId}`,
       { params, responseType: 'blob' },
     );
+  }
+
+  // ── Google Drive Picker ────────────────────────────────────────────────────
+  getDrivePickerConfig(): Observable<{ apiKey: string; clientId: string; appId: string }> {
+    return this.http.get<{ apiKey: string; clientId: string; appId: string }>(`${BASE}/gmail/drive-config`);
+  }
+  getDriveToken(): Observable<{ access_token: string }> {
+    return this.http.get<{ access_token: string }>(`${BASE}/gmail/drive-token`);
+  }
+  downloadDriveFile(fileId: string): Observable<Blob> {
+    return this.http.get(`${BASE}/gmail/drive/file/${fileId}`, { responseType: 'blob' });
   }
 
 }

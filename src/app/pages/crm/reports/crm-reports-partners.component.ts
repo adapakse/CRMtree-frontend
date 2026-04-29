@@ -5,23 +5,42 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import {
   CrmApiService, PartnersReport, PartnersReportKpi,
   PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, CrmUser,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
+
+function ym(d: Date): string { return d.toISOString().substring(0, 7); }
 
 function getMonthRange(preset: string): { from: string; to: string } {
   const now = new Date();
-  const cur = now.toISOString().substring(0, 7);
-  const shift = (n: number) => { const d = new Date(now.getFullYear(), now.getMonth() + n, 1); return d.toISOString().substring(0, 7); };
+  const cur = ym(now);
+  const shift = (n: number) => ym(new Date(now.getFullYear(), now.getMonth() + n, 1));
   switch (preset) {
-    case '1m':  return { from: cur, to: cur };
-    case '3m':  return { from: shift(-3), to: cur };
-    case '6m':  return { from: shift(-6), to: cur };
-    case 'ytd': return { from: `${now.getFullYear()}-01`, to: cur };
-    default:    return { from: shift(-11), to: cur };
+    case '1m':       return { from: cur, to: cur };
+    case '3m':       return { from: shift(-3), to: cur };
+    case '6m':       return { from: shift(-6), to: cur };
+    case 'ytd':      return { from: `${now.getFullYear()}-01`, to: cur };
+    case 'prev_1m': {
+      const d = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const m = ym(d); return { from: m, to: m };
+    }
+    case 'prev_q': {
+      const q = Math.ceil((now.getMonth() + 1) / 3);
+      let pq = q - 1, py = now.getFullYear();
+      if (pq === 0) { pq = 4; py--; }
+      const qsm = String((pq - 1) * 3 + 1).padStart(2, '0');
+      const qem = String(pq * 3).padStart(2, '0');
+      return { from: `${py}-${qsm}`, to: `${py}-${qem}` };
+    }
+    case 'prev_year': {
+      const py = now.getFullYear() - 1;
+      return { from: `${py}-01`, to: `${py}-12` };
+    }
+    default: return { from: shift(-11), to: cur };
   }
 }
 
@@ -33,37 +52,46 @@ function healthColor(engagement: number): string {
   selector: 'wt-crm-reports-partners',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TooltipComponent],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div id="topbar" style="height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">Partner Performance</span>
-  <span style="flex:1"></span>
-  <select class="sel" [(ngModel)]="groupFilter" (ngModelChange)="load()">
-    <option value="">Wszystkie grupy</option>
-    <option *ngFor="let g of groupNames" [value]="g">{{ g }}</option>
-  </select>
-  <select class="sel" [(ngModel)]="partnerFilter" (ngModelChange)="onPartnerFilterChange()">
-    <option value="">Wszyscy partnerzy</option>
-    <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
-  </select>
-  <select class="sel" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
-    <option value="1m">Bieżący miesiąc</option>
-    <option value="3m">Ostatnie 3 miesiące</option>
-    <option value="6m">Ostatnie 6 miesięcy</option>
-    <option value="12m">Ostatnie 12 miesięcy</option>
-    <option value="ytd">YTD {{ currentYear }}</option>
-  </select>
-  <select class="sel" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
-    <option value="">Wszyscy handlowcy</option>
-    <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
-  </select>
-  <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer" (click)="clearRepFilter()">
-    × {{ persistRepName }}
-  </button>
-  <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer" (click)="load()">{{ loading ? '…' : '↻ Odśwież' }}</button>
+<div id="topbar" style="min-height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 24px;flex-shrink:0">
+  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b;flex-shrink:0">Partner Performance</span>
+  <span style="flex:1;min-width:8px"></span>
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+    <select class="sel" style="max-width:150px" [(ngModel)]="groupFilter" (ngModelChange)="load()">
+      <option value="">Wszystkie grupy</option>
+      <option *ngFor="let g of groupNames" [value]="g">{{ g }}</option>
+    </select>
+    <select class="sel" style="max-width:190px" [(ngModel)]="partnerFilter" (ngModelChange)="onPartnerFilterChange()">
+      <option value="">Wszyscy partnerzy</option>
+      <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
+    </select>
+    <select class="sel" style="max-width:190px" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
+      <optgroup label="Bieżące">
+        <option value="1m">Bieżący miesiąc</option>
+        <option value="3m">Ostatnie 3 mies.</option>
+        <option value="6m">Ostatnie 6 mies.</option>
+        <option value="12m">Ostatnie 12 mies.</option>
+        <option value="ytd">YTD {{ currentYear }}</option>
+      </optgroup>
+      <optgroup label="Poprzednie">
+        <option value="prev_1m">Poprzedni miesiąc</option>
+        <option value="prev_q">Poprzedni kwartał</option>
+        <option value="prev_year">Poprzedni rok ({{ currentYear - 1 }})</option>
+      </optgroup>
+    </select>
+    <select class="sel" style="max-width:160px" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
+      <option value="">Wszyscy handlowcy</option>
+      <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+    </select>
+    <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap" (click)="clearRepFilter()">
+      × {{ persistRepName }}
+    </button>
+    <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer;white-space:nowrap;flex-shrink:0" (click)="load()">{{ loading ? '…' : '↻ Odśwież' }}</button>
+  </div>
 </div>
 
 <!-- CONTENT -->
@@ -81,31 +109,31 @@ function healthColor(engagement: number): string {
 
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
-    <div class="stat-card" style="border-top:3px solid #f26522">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #f26522" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#f26522;font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Obrót brutto (PLN)</div>
+      <div class="stat-lbl">Obrót brutto (PLN)<wt-tooltip key="crm.partners.kpi.gross_turnover"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? '#16a34a' : '#dc2626'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }} vs poprzedni
       </div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #22C55E">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #22C55E" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#22C55E;font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Przychód / Marża (PLN)</div>
+      <div class="stat-lbl">Przychód / Marża (PLN)<wt-tooltip key="crm.partners.kpi.revenue"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.margin_pct | number:'1.0-1' }}% marży</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #3B82F6">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #3B82F6" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#3B82F6;font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Fees (PLN)</div>
+      <div class="stat-lbl">Fees (PLN)<wt-tooltip key="crm.partners.kpi.fees"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.fee_rate_pct | number:'1.0-1' }}% fee rate</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #A855F7">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #A855F7" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#A855F7;font-size:20px">{{ kpi.transactions_count | number }}</div>
-      <div class="stat-lbl">Transakcje</div>
+      <div class="stat-lbl">Transakcje<wt-tooltip key="crm.partners.kpi.transactions"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.pax_count | number }} PAX</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #F59E0B">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #F59E0B" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#F59E0B;font-size:20px">{{ kpi.partners_count }}</div>
-      <div class="stat-lbl">Aktywnych partnerów</div>
+      <div class="stat-lbl">Aktywnych partnerów<wt-tooltip key="crm.partners.kpi.active_partners"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '#16a34a' : '#dc2626'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} trend przychodów
       </div>
@@ -134,17 +162,21 @@ function healthColor(engagement: number): string {
               <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Obrót brutto</th>
               <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Marża</th>
               <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Transakcje</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Health</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Health<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of topPartners" style="border-bottom:1px solid #f4f4f5;cursor:pointer" (mouseenter)="$any($event.currentTarget).style.background='#fafafa'" (mouseleave)="$any($event.currentTarget).style.background=''">
+            <tr *ngFor="let p of topPartners" style="border-bottom:1px solid #f4f4f5" class="tbl-row"
+                [style.cursor]="p.partner_id ? 'pointer' : 'default'"
+                (click)="p.partner_id && goToPartner(p.partner_id)"
+                (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+                (mouseleave)="$any($event.currentTarget).style.background=''"
+                [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
               <td style="padding:10px 14px">
                 <div style="display:flex;align-items:center;gap:8px">
                   <div [style.background]="avatarColor(p.partner_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(p.partner_name) }}</div>
                   <div>
-                    <a *ngIf="p.partner_id" [routerLink]="['/crm/partners', p.partner_id]" style="font-weight:600;color:#18181b;text-decoration:none">{{ p.partner_name }}</a>
-                    <span *ngIf="!p.partner_id" style="font-weight:600;color:#18181b">{{ p.partner_name }}</span>
+                    <span style="font-weight:600;color:#18181b">{{ p.partner_name }}</span>
                     <div *ngIf="p.partner_number" style="font-size:10.5px;color:#a1a1aa;font-family:monospace">{{ p.partner_number }}</div>
                   </div>
                 </div>
@@ -207,7 +239,11 @@ function healthColor(engagement: number): string {
     <!-- Handlowcy (manager) -->
     <div class="card" style="padding:18px" *ngIf="isManager">
       <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Wyniki handlowców</div>
-      <div *ngFor="let r of byRep" style="margin-bottom:12px">
+      <div *ngFor="let r of byRep" style="margin-bottom:12px;cursor:pointer;border-radius:8px;padding:6px 8px;transition:background .12s"
+           (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+           (mouseleave)="$any($event.currentTarget).style.background=''"
+           (click)="goToPartnersByRep(r.salesperson_id, r.salesperson_name)"
+           title="Kliknij aby zobaczyć partnerów tego handlowca">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <div [style.background]="avatarColor(r.salesperson_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(r.salesperson_name) }}</div>
           <div style="flex:1">
@@ -273,9 +309,14 @@ function healthColor(engagement: number): string {
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid #f4f4f5;cursor:pointer" (mouseenter)="$any($event.currentTarget).style.background='#fafafa'" (mouseleave)="$any($event.currentTarget).style.background=''">
+          <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid #f4f4f5"
+              [style.cursor]="p.partner_id ? 'pointer' : 'default'"
+              (click)="p.partner_id && goToPartner(p.partner_id)"
+              (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+              (mouseleave)="$any($event.currentTarget).style.background=''"
+              [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
             <td style="padding:9px 14px">
-              <a *ngIf="p.partner_id" [routerLink]="['/crm/partners', p.partner_id]" style="font-weight:600;color:#f26522;text-decoration:none">{{ p.partner_name }}</a>
+              <span *ngIf="p.partner_id" style="font-weight:600;color:#f26522">{{ p.partner_name }}</span>
               <span *ngIf="!p.partner_id" style="color:#71717a">{{ p.partner_name }}</span>
             </td>
             <td *ngIf="isManager" style="padding:9px 10px;color:#a1a1aa;font-size:12px">{{ p.salesperson_name || '—' }}</td>
@@ -315,7 +356,11 @@ function healthColor(engagement: number): string {
   styles: [`
     .sel { background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:6px 10px;font-size:12.5px;color:#3f3f46;outline:none;font-family:inherit;cursor:pointer }
     .sel:focus { border-color:#f26522 }
+    .btn-g { background:transparent;color:#52525b;border:1px solid #e4e4e7 }
+    .btn-g:hover { background:#fafafa }
     .stat-card { background:white;border:1px solid #e4e4e7;border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.08) }
+    .stat-clickable { cursor:pointer;transition:box-shadow .12s,border-color .12s,transform .1s }
+    .stat-clickable:hover { box-shadow:0 4px 12px rgba(0,0,0,.12);border-color:#f26522;transform:translateY(-1px) }
     .stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#18181b;margin-bottom:2px }
     .stat-lbl { font-size:12px;color:#a1a1aa;font-weight:500 }
     .stat-trend { font-size:11px;margin-top:6px;font-weight:600 }
@@ -328,10 +373,11 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
 
   readonly PROD_COLORS = ['#f26522','#3B82F6','#22C55E','#A855F7','#F59E0B','#06B6D4','#EC4899','#84CC16','#EF4444','#6B7280'];
 
-  private api  = inject(CrmApiService);
-  private auth = inject(AuthService);
-  private cdr  = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+  private api    = inject(CrmApiService);
+  private auth   = inject(AuthService);
+  private cdr    = inject(ChangeDetectorRef);
+  private zone   = inject(NgZone);
+  private router = inject(Router);
 
   loading       = false;
   periodPreset  = '12m';
@@ -340,6 +386,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   repFilter     = '';
   persistRepName = '';
   private readonly REP_FILTER_KEY = 'crm_rep_filter';
+  private loadSub: any = null;
   partnerFilter = '';
   groupFilter   = '';
   groupNames:  string[] = [];
@@ -408,8 +455,10 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   }
 
   load(): void {
+    this.loadSub?.unsubscribe();
     this.loading = true;
     this.chartsBuilt = false;
+    this.cdr.markForCheck();
     const p: any = {};
     if (this.periodFrom)  p.period_from  = this.periodFrom;
     if (this.periodTo)    p.period_to    = this.periodTo;
@@ -417,7 +466,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     if (this.partnerFilter)                   p.partner_name = this.partnerFilter;
     if (this.groupFilter)                     p.group_name   = this.groupFilter;
 
-    this.api.getPartnersReport(p).subscribe({
+    this.loadSub = this.api.getPartnersReport(p).subscribe({
       next: (report: PartnersReport) => {
         this.zone.run(() => {
           this.kpi       = report.kpi;
@@ -437,7 +486,6 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
 
   private buildCharts(): void {
     if (this.chartsBuilt) return;
-    this.chartsBuilt = true;
     this.buildRevenueChart();
   }
 
@@ -445,6 +493,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     const el = this.revenueEl?.nativeElement;
     const lb = this.revLabels?.nativeElement;
     if (!el || !lb) return;
+    this.chartsBuilt = true;
     el.innerHTML = ''; lb.innerHTML = '';
     if (!this.trend.length) return;
     const data = this.trend.slice(-12);
@@ -465,6 +514,24 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     });
   }
 
+  goToPartners(extra: Record<string, string> = {}): void {
+    const qp: any = { ...extra };
+    // Przekaż aktywne filtry raportu jako kontekst
+    if (this.repFilter && this.isManager) qp['manager_id'] = this.repFilter;
+    if (this.groupFilter)   qp['group']  = this.groupFilter;
+    if (this.partnerFilter) qp['search'] = this.partnerFilter;
+    this.router.navigate(['/crm/partners'], { queryParams: qp });
+  }
+
+  goToPartner(partnerId: number | string): void {
+    this.router.navigate(['/crm/partners', partnerId]);
+  }
+
+  goToPartnersByRep(salespersonId: string | null, salespersonName: string): void {
+    if (!salespersonId) return;
+    this.router.navigate(['/crm/partners'], { queryParams: { manager_id: salespersonId, label: 'Handlowiec: ' + salespersonName } });
+  }
+
   barPct(val: number, max: number): number { return max > 0 ? Math.max(2, Math.round(val / max * 100)) : 0; }
   calcMargin(gross: number, rev: number): string { return gross > 0 ? (rev / gross * 100).toFixed(1) : '0.0'; }
   calcMarginN(gross: number, rev: number): number { return gross > 0 ? rev / gross * 100 : 0; }
@@ -475,5 +542,5 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   productIcon(pt: string): string  { return (PRODUCT_TYPE_ICONS as Record<string,string>)[pt] || '📦'; }
   deltaLabel(a: number, b: number): string { if (!b) return '—'; return (Math.abs((a-b)/b*100)).toFixed(0) + '%'; }
   initials(name: string): string { return (name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase(); }
-  avatarColor(name: string): string { let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h},55%,48%)`; }
+  avatarColor(name: string): string { if (!name) return '#94A3B8'; let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h},55%,48%)`; }
 }
