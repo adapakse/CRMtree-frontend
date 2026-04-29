@@ -1,160 +1,47 @@
-@Library("sonar")_
-
 pipeline {
-    
-    agent any
-    parameters {
-        choice(name: "ENVIRONMENT", choices: ["HTCD", "PROD"], description: 'Środowisko docelowe')
-        choice(name: "NODEJS_VERSION", choices: ["~v22", "~v18"], description: "Wersja Node.js (nazwa narzędzia w Jenkins)")
+  agent any
+  environment {
+    ACR      = 'crmtreeregistry.azurecr.io'
+    ACR_USER = 'crmtreeregistry'
+    RG       = 'rg-crmtree-prod'
+    TAG      = "${env.BUILD_NUMBER}"
+  }
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
     }
-
-    environment {
-        BASTION_REGISTRY_URL          = credentials("BASTION_REGISTRY")
-        BASTION_NCA_REGISTRY_URL       = "registry.org.hotailors.com/hotailors/travel-platform/docs/worktripsdoc_front"
-        TEAMS_SUCCESS_WEBHOOK_URL      = credentials("TEAMS_SUCCESS_WEBHOOK_URL")
-        TEAMS_FAILURE_WEBHOOK_URL      = credentials("TEAMS_FAILURE_WEBHOOK_URL")
-        GITLAB_REGISTRY_ACCOUNT_CREDENTIAL_ID = credentials("GITLAB_REGISTRY_ACCOUNT_CREDENTIAL_ID")
-        BASTION_REGISTRY_ACCOUNT_CREDENTIAL_ID = credentials("BASTION_REGISTRY_ACCOUNT_CREDENTIAL_ID")
+    stage('Build') {
+      steps {
+        sh "docker build -t ${ACR}/crmtree-frontend:${TAG} ."
+      }
     }
-
-    stages {
-        stage("Inicjalizacja parametrów") {
-            steps {
-                script {
-                    env.NODEJS = params.NODEJS_VERSION ?: "~v22"
-                    echo "Node.js: ${env.NODEJS}"
-                }
-            }
+    stage('Push to ACR') {
+      steps {
+        withCredentials([string(credentialsId: 'CRMTREE_ACR_PASSWORD', variable: 'ACR_PASS')]) {
+          sh """
+            docker login ${ACR} -u ${ACR_USER} -p ${ACR_PASS}
+            docker push ${ACR}/crmtree-frontend:${TAG}
+          """
         }
-
-    stage("Skan repozytorium Trivy") {
-        steps {
-            script {
-                def workspace = pwd()
-                def cacheDir = "/media/BuildDrive/jenkins/trivy-cache"
-
-                sh "mkdir -p '${cacheDir}'"
-
-                echo "Workspace do skanowania: ${workspace}"
-                echo "Cache Trivy: ${cacheDir}"
-
-                sh """
-                    docker run --rm \
-                        -v "${workspace}":/project \
-                        -v "${cacheDir}":/root/.cache/trivy \
-                        aquasec/trivy:latest \
-                        repo /project \
-                        --exit-code 0 \
-                        --severity HIGH,CRITICAL \
-                        --no-progress \
-                        --scanners vuln,secret,config || true
-                """
-                }
-            }
-        }       
-
-
-        stage("Instalacja zależności") {
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    nodejs(nodeJSInstallationName: env.NODEJS) {
-                        sh "npm ci --prefer-offline --no-audit"
-                    }
-                }
-            }
-        }
-
-
-        // stage("Testy") {
-        //     steps {
-        //         nodejs(nodeJSInstallationName: env.NODEJS) {
-        //             sh "npm run test:cov-ci -- --maxWorkers=2"
-        //         }
-        //     }
-        // }
-
-        stage("Budowa obrazu Docker") {
-            steps {
-                script {
-
-                    docker.withRegistry(BASTION_REGISTRY_URL, BASTION_REGISTRY_ACCOUNT_CREDENTIAL_ID) {
-                        def image = docker.build("${BASTION_NCA_REGISTRY_URL}:${params.ENVIRONMENT}-${BUILD_NUMBER}",
-                            ".")
-                        env.BASTION_IMAGE = image.id
-                    }
-                }
-            }
-        }
-
-        stage("Skan Trivy obrazu") {
-            steps {
-                script {
-                    def imageToScan = "${BASTION_NCA_REGISTRY_URL}"
-                    def trivyCache = "/media/BuildDrive/jenkins/trivy-cache"
-
-                    sh "mkdir -p ${trivyCache}"
-
-                    echo "Skanowanie obrazu: ${imageToScan}"
-                    sh """
-                        docker run --rm \
-                            -v /var/run/docker.sock:/var/run/docker.sock \
-                            -v ${trivyCache}:/root/.cache/trivy \
-                            aquasec/trivy:latest \
-                            image --exit-code 0 --severity HIGH,CRITICAL \
-                            --no-progress \
-                            ${imageToScan} || true
-                    """
-                }
-            }
-        }
-
-        stage("Wysłanie obrazu do rejestru") {
-            steps {
-                script {
-                    docker.withRegistry(BASTION_REGISTRY_URL, BASTION_REGISTRY_ACCOUNT_CREDENTIAL_ID) {
-                        docker.image(env.BASTION_IMAGE).push()
-                    }
-                }
-            }
-        }
-
-        stage("Oczekiwanie na propagację w rejestrze") {
-            steps {
-                sleep 15
-            }
-        }
-
-        stage("Update tag") {
-            steps {
-                sshagent(credentials: [params.GIT_IDENTITY]) {
-                    script {
-                        def fileToEdit = params.ENVIRONMENT == "PROD" ? "values-prod.yaml" : "values-htcd.yaml"
-                        withEnv(["FILE_TO_EDIT=${fileToEdit}"]) {
-                            sh """
-                                git clone --branch master git@bastion.org.hotailors.com:worktrips-admin/kubernetes.git argo_commit_workspace
-                                cd argo_commit_workspace
-                                git checkout master
-                                git config pull.rebase false
-                                git pull
-                                cd docs_app
-                                sed -i "/^docs-front:/,/^[^ ]/ s/\\(tag: *\\).*/\\1\\"${params.ENVIRONMENT}-${BUILD_NUMBER}\\"/" "\$FILE_TO_EDIT"
-                                git add "\$FILE_TO_EDIT"
-                                git commit -m "bump image version for ${params.ENVIRONMENT} front"
-                                git push
-                            """
-                        }
-                    }
-                }
-            }
-        }
+      }
     }
-
-    post {
-        success {
-            office365ConnectorSend color: '#00CC00', message: "Build ${BUILD_NUMBER} zakończony sukcesem ✅", webhookUrl: TEAMS_SUCCESS_WEBHOOK_URL
+    stage('Deploy to Azure') {
+      steps {
+        withCredentials([azureServicePrincipal('CRMTREE_AZURE_SP')]) {
+          sh """
+            az login --service-principal \
+              -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+            az containerapp update \
+              --name crmtree-frontend \
+              --resource-group ${RG} \
+              --image ${ACR}/crmtree-frontend:${TAG}
+          """
         }
-        cleanup {
-            deleteDir()
-        }
+      }
     }
+  }
+  post {
+    success { echo "CRMtree frontend deploy ${TAG} — sukces" }
+    failure { echo "CRMtree frontend deploy ${TAG} — błąd" }
+  }
 }
