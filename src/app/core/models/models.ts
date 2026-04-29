@@ -120,6 +120,8 @@ export interface Document {
   /** Full active task details (list view) — includes assignee, assigner, due_date */
   active_task_details?: ActiveTaskInfo[];
   version_count?: number;
+  /** True if at least one CRM partner is linked to this document */
+  has_partner?: boolean;
   created_at: string;
   updated_at: string;
   _access?: AccessLevel;
@@ -165,6 +167,7 @@ export interface DocumentFilters {
   document_group_id?: string;
   expiry_before?: string;
   expiry_after?: string;
+  no_files?: boolean;
   page?: number;
   limit?: number;
   sort?: string;

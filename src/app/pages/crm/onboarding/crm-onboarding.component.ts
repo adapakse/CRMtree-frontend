@@ -60,16 +60,23 @@ const TYPE_LABELS: Record<string, string> = {
 
   <!-- ════ PARTNERS LIST ════ -->
   @if (view === 'partners') {
-    <div class="partners-grid">
-      @if (loadingPartners()) {
-        <div class="loading-state"><div class="spinner"></div></div>
-      } @else if (filteredPartners().length === 0) {
-        <div class="empty-state">
-          <div style="font-size:48px">🎉</div>
-          <div style="font-weight:600;margin-top:8px">Brak partnerów w procesie wdrożenia</div>
-          <div style="font-size:12px;color:var(--gray-400);margin-top:4px">Partnerzy trafiają tutaj po migracji z leada</div>
-        </div>
-      } @else {
+    <!-- sub-toolbar: view toggle -->
+    <div class="partners-toolbar">
+      <button class="btn-view" [class.active]="partnersView==='cards'" (click)="partnersView='cards'">⊞ Karty</button>
+      <button class="btn-view" [class.active]="partnersView==='table'" (click)="partnersView='table'">☰ Tabela</button>
+    </div>
+
+    @if (loadingPartners()) {
+      <div class="loading-state"><div class="spinner"></div></div>
+    } @else if (filteredPartners().length === 0) {
+      <div class="empty-state">
+        <div style="font-size:48px">🎉</div>
+        <div style="font-weight:600;margin-top:8px">Brak partnerów w procesie wdrożenia</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-top:4px">Partnerzy trafiają tutaj po migracji z leada</div>
+      </div>
+
+    } @else if (partnersView === 'cards') {
+      <div class="partners-grid">
         @for (p of filteredPartners(); track p.id) {
           <div class="partner-card" (click)="selectPartner(p)">
             <div class="pc-header">
@@ -80,7 +87,6 @@ const TYPE_LABELS: Record<string, string> = {
               </div>
               <span class="step-badge">Krok {{ p.onboarding_step + 1 }}/4</span>
             </div>
-            <!-- Progress bar -->
             <div class="pc-progress">
               @for (s of [0,1,2,3]; track s) {
                 <div class="pc-step" [class.done]="s < p.onboarding_step" [class.active]="s === p.onboarding_step">
@@ -89,37 +95,79 @@ const TYPE_LABELS: Record<string, string> = {
                 </div>
               }
             </div>
-            <!-- Task progress -->
             <div class="pc-tasks">
               <div class="pc-task-bar">
-                <div class="pc-task-fill"
-                     [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 0">
-                </div>
+                <div class="pc-task-fill" [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 0"></div>
               </div>
               <span class="pc-task-text">{{ p.done_count }}/{{ p.task_count }} zadań</span>
             </div>
-            @if (p.manager_name) {
-              <div class="pc-mgr">👤 {{ p.manager_name }}</div>
-            }
+            @if (p.manager_name) { <div class="pc-mgr">👤 {{ p.manager_name }}</div> }
             <div style="margin-top:10px;display:flex;justify-content:flex-end">
               <button class="launch-btn"
                       [class.launch-ready]="p.task_count > 0 && p.done_count === p.task_count"
                       [disabled]="p.task_count === 0 || p.done_count < p.task_count || launching() === p.id"
                       (click)="$event.stopPropagation(); launchPartner(p)"
                       [title]="p.task_count === 0 ? 'Brak zadań' : p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
-                @if (launching() === p.id) {
-                  ⏳ Uruchamianie…
-                } @else if (p.task_count > 0 && p.done_count === p.task_count) {
-                  🚀 Uruchomienie
-                } @else {
-                  🔒 Uruchomienie ({{ p.done_count }}/{{ p.task_count }})
-                }
+                @if (launching() === p.id) { ⏳ Uruchamianie…
+                } @else if (p.task_count > 0 && p.done_count === p.task_count) { 🚀 Uruchomienie
+                } @else { 🔒 Uruchomienie ({{ p.done_count }}/{{ p.task_count }}) }
               </button>
             </div>
           </div>
         }
-      }
-    </div>
+      </div>
+
+    } @else {
+      <!-- TABLE VIEW -->
+      <div class="pt-wrap">
+        <div class="pt-head">
+          <div class="pt-th sortable" (click)="sortPartnersBy('company')">Firma <span class="si">{{ partnerSortIcon('company') }}</span></div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('nip')">NIP <span class="si">{{ partnerSortIcon('nip') }}</span></div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('onboarding_step')">Krok <span class="si">{{ partnerSortIcon('onboarding_step') }}</span></div>
+          <div class="pt-th">Postęp zadań</div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('manager_name')">Handlowiec <span class="si">{{ partnerSortIcon('manager_name') }}</span></div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('created_at')">Dodano <span class="si">{{ partnerSortIcon('created_at') }}</span></div>
+          <div class="pt-th">Akcja</div>
+        </div>
+        @for (p of sortedPartners(); track p.id) {
+          <div class="pt-row" (click)="selectPartner(p)">
+            <!-- Firma -->
+            <div class="pt-td">
+              <span class="pt-company">{{ p.company }}</span>
+              @if (p.nip) { <span class="pt-nip">{{ p.nip }}</span> }
+            </div>
+            <!-- NIP (osobna kolumna) -->
+            <div class="pt-td pt-mono">{{ p.nip || '—' }}</div>
+            <!-- Krok -->
+            <div class="pt-td">
+              <span class="step-badge">{{ STEP_ICONS[p.onboarding_step] }} Krok {{ p.onboarding_step + 1 }}/4</span>
+              <span class="pt-step-name">{{ STEP_LABELS[p.onboarding_step] }}</span>
+            </div>
+            <!-- Postęp -->
+            <div class="pt-td pt-progress-cell">
+              <div class="pt-bar"><div class="pt-fill" [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 0"></div></div>
+              <span class="pt-prog-txt">{{ p.done_count }}/{{ p.task_count }}</span>
+            </div>
+            <!-- Handlowiec -->
+            <div class="pt-td">{{ p.manager_name || '—' }}</div>
+            <!-- Dodano -->
+            <div class="pt-td pt-date">{{ p.created_at | date:'dd.MM.yy' }}</div>
+            <!-- Akcja -->
+            <div class="pt-td" (click)="$event.stopPropagation()">
+              <button class="launch-btn"
+                      [class.launch-ready]="p.task_count > 0 && p.done_count === p.task_count"
+                      [disabled]="p.task_count === 0 || p.done_count < p.task_count || launching() === p.id"
+                      (click)="launchPartner(p)"
+                      [title]="p.task_count === 0 ? 'Brak zadań' : p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
+                @if (launching() === p.id) { ⏳
+                } @else if (p.task_count > 0 && p.done_count === p.task_count) { 🚀 Uruchom
+                } @else { 🔒 ({{ p.done_count }}/{{ p.task_count }}) }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
   }
 
   <!-- ════ KANBAN ════ -->
@@ -380,6 +428,32 @@ const TYPE_LABELS: Record<string, string> = {
     .launch-btn.launch-ready:hover { background:#ea6c0a }
     .launch-btn:disabled:not(.launch-ready) { opacity:.6 }
 
+    /* Partners sub-toolbar */
+    .partners-toolbar { display:flex;gap:6px;margin-bottom:12px }
+    .btn-view { background:none;border:1px solid var(--gray-200);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--gray-500) }
+    .btn-view.active { background:#fff7ed;border-color:#f97316;color:#f97316;font-weight:700 }
+
+    /* Partners table */
+    .pt-wrap { background:white;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden }
+    .pt-head { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;background:var(--gray-50);border-bottom:2px solid var(--gray-200);padding:0 12px }
+    .pt-th { padding:9px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);display:flex;align-items:center;gap:4px }
+    .pt-th.sortable { cursor:pointer;user-select:none }
+    .pt-th.sortable:hover { color:var(--gray-700) }
+    .si { font-size:10px;color:var(--gray-300) }
+    .pt-row { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;padding:0 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s }
+    .pt-row:last-child { border-bottom:none }
+    .pt-row:hover { background:#fffbf7 }
+    .pt-td { padding:10px 10px;font-size:13px;color:var(--gray-700);display:flex;flex-direction:column;justify-content:center;gap:2px }
+    .pt-company { font-weight:600;color:var(--gray-900) }
+    .pt-nip { font-size:10px;color:var(--gray-400);font-family:monospace;display:none }
+    .pt-mono { font-family:monospace;font-size:12px;color:var(--gray-500) }
+    .pt-step-name { font-size:10px;color:var(--gray-400) }
+    .pt-progress-cell { flex-direction:row !important;align-items:center;gap:8px }
+    .pt-bar { flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden }
+    .pt-fill { height:100%;background:#22c55e;border-radius:3px;transition:width .3s }
+    .pt-prog-txt { font-size:11px;color:var(--gray-500);white-space:nowrap }
+    .pt-date { font-size:12px;color:var(--gray-500) }
+
     /* Kanban */
     .kanban-wrap { display:flex;gap:12px;height:calc(100vh - 140px);overflow-x:auto }
     .kb-col { width:260px;flex-shrink:0;display:flex;flex-direction:column;background:var(--gray-50);border-radius:10px;overflow:hidden }
@@ -482,6 +556,9 @@ export class CrmOnboardingComponent implements OnInit {
 
   // ── State ──────────────────────────────────────────────────────────────────
   view: 'partners' | 'kanban' | 'timeline' | 'calendar' = 'partners';
+  partnersView: 'cards' | 'table' = 'cards';
+  partnerSortCol = signal('company');
+  partnerSortDir = signal<'asc' | 'desc'>('asc');
   partners        = signal<OnboardingPartner[]>([]);
   allTasks        = signal<OnboardingTask[]>([]);
   crmUsers: CrmUser[] = [];
@@ -538,6 +615,39 @@ export class CrmOnboardingComponent implements OnInit {
     if (fu) list = list.filter(t => t.assigned_to === fu);
     return list;
   });
+
+  sortedPartners = computed(() => {
+    const col = this.partnerSortCol();
+    const dir = this.partnerSortDir();
+    return [...this.filteredPartners()].sort((a, b) => {
+      let va: any = (a as any)[col] ?? '';
+      let vb: any = (b as any)[col] ?? '';
+      if (col === 'onboarding_step' || col === 'task_count' || col === 'done_count') {
+        return dir === 'asc' ? +va - +vb : +vb - +va;
+      }
+      if (col === 'created_at') {
+        return dir === 'asc'
+          ? new Date(va).getTime() - new Date(vb).getTime()
+          : new Date(vb).getTime() - new Date(va).getTime();
+      }
+      const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  });
+
+  sortPartnersBy(col: string): void {
+    if (this.partnerSortCol() === col) {
+      this.partnerSortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.partnerSortCol.set(col);
+      this.partnerSortDir.set('asc');
+    }
+  }
+
+  partnerSortIcon(col: string): string {
+    if (this.partnerSortCol() !== col) return '↕';
+    return this.partnerSortDir() === 'asc' ? '↑' : '↓';
+  }
 
   tasksForStep(step: number): OnboardingTask[] {
     return this.filteredTasks().filter(t => t.step === step);

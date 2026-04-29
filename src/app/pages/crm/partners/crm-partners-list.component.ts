@@ -67,7 +67,7 @@ type SortDir = 'asc' | 'desc';
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
-          <span *ngIf="p.crm_uuid && (p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="(p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
                 style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
@@ -120,7 +120,7 @@ type SortDir = 'asc' | 'desc';
       <div class="th" title="Marża YTD z DWH">DWH Marża</div>
       <div class="th sortable" (click)="sortBy('contract_expires')">Umowa do <span class="si">{{sortIcon('contract_expires')}}</span></div>
     </div>
-    <div *ngFor="let p of sortedPartners" class="tw-row" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px"
+    <div *ngFor="let p of partners" class="tw-row" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px"
          (click)="goPartner(p.id, p.crm_uuid)">
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
@@ -129,7 +129,7 @@ type SortDir = 'asc' | 'desc';
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
           <span *ngIf="(p.non_email_activity_count??0)>0"
                 style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
-          <span *ngIf="p.crm_uuid && (p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="(p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
                 style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
@@ -324,23 +324,11 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   get isManager() { const u = this.auth.user(); return !!(u?.is_admin || u?.crm_role === 'sales_manager'); }
   statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }
 
-  get sortedPartners(): Partner[] {
-    const col = this.sortCol;
-    const dir = this.sortDir;
-    return [...this.partners].sort((a, b) => {
-      let va: any = (a as any)[col] ?? '';
-      let vb: any = (b as any)[col] ?? '';
-      if (col === 'contract_value' || col === 'online_pct') { va = +(va || 0); vb = +(vb || 0); return dir === 'asc' ? va - vb : vb - va; }
-      if (col === 'contract_expires') { va = va ? new Date(va).getTime() : 0; vb = vb ? new Date(vb).getTime() : 0; return dir === 'asc' ? va - vb : vb - va; }
-      const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
-      return dir === 'asc' ? cmp : -cmp;
-    });
-  }
-
   sortBy(col: string): void {
     if (this.sortCol === col) { this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc'; }
     else { this.sortCol = col; this.sortDir = 'asc'; }
-    this.cdr.markForCheck();
+    this.page = 1;
+    this.reload();
   }
   sortIcon(col: string): string {
     if (this.sortCol !== col) return '↕';
@@ -375,7 +363,7 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
 
   reload() {
     this.loading = true;
-    const p: any = { page: this.page, limit: this.pageSize };
+    const p: any = { page: this.page, limit: this.pageSize, sort: this.sortCol, dir: this.sortDir };
     if (this.search)         p.search     = this.search;
     if (this.filterStatus)   p.status     = this.filterStatus;
     if (this.filterGroup)    p.group_name = this.filterGroup;

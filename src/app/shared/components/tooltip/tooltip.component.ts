@@ -7,9 +7,16 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (text()) {
-      <span class="tt-wrap" (mouseenter)="onEnter($event)">
+      <span class="tt-wrap" (mouseenter)="onEnter($event)" (mouseleave)="visible.set(false)">
         <span class="tt-icon">?</span>
-        <span class="tt-pop" [class.tt-below]="below()">{{ text() }}</span>
+        @if (visible()) {
+          <span class="tt-pop" [class.tt-below]="pos().below"
+                [style.top.px]="pos().top"
+                [style.left.px]="pos().left">
+            {{ text() }}
+            <span class="tt-arr" [class.tt-arr-below]="pos().below" [style.left.px]="pos().arrowLeft"></span>
+          </span>
+        }
       </span>
     }
   `,
@@ -25,9 +32,11 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       transition:background .15s, color .15s; user-select:none;
     }
     .tt-wrap:hover .tt-icon { background:#d1d5db; color:#374151; }
+
+    /* Popup — fixed so it's never clipped by overflow:hidden ancestors */
     .tt-pop {
-      display:none; position:absolute; z-index:9999;
-      bottom:calc(100% + 8px); top:auto; left:50%; transform:translateX(-50%);
+      position:fixed; z-index:10000;
+      transform:translateY(calc(-100% - 8px));
       background:#1f2937; color:#f9fafb;
       font-size:12px; font-weight:400; line-height:1.6;
       padding:10px 14px; border-radius:8px;
@@ -35,18 +44,22 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       box-shadow:0 4px 16px rgba(0,0,0,.25);
       pointer-events:none;
     }
-    .tt-pop::after {
-      content:''; position:absolute; top:100%; bottom:auto; left:50%; transform:translateX(-50%);
-      border:6px solid transparent; border-top-color:#1f2937;
-    }
     .tt-pop.tt-below {
-      bottom:auto; top:calc(100% + 8px);
+      transform:translateY(8px);
     }
-    .tt-pop.tt-below::after {
+
+    /* Arrow — separate element so left can be set dynamically */
+    .tt-arr {
+      position:absolute; width:0; height:0;
+      top:100%; transform:translateX(-50%);
+      border:6px solid transparent;
+      border-top-color:#1f2937;
+    }
+    .tt-arr.tt-arr-below {
       top:auto; bottom:100%;
-      border-top-color:transparent; border-bottom-color:#1f2937;
+      border-top-color:transparent;
+      border-bottom-color:#1f2937;
     }
-    .tt-wrap:hover .tt-pop { display:block; }
   `],
 })
 export class TooltipComponent {
@@ -54,7 +67,10 @@ export class TooltipComponent {
 
   private settings = inject(AppSettingsService);
 
-  protected below = signal(false);
+  protected visible = signal(false);
+  protected pos = signal<{ top: number; left: number; below: boolean; arrowLeft: number }>({
+    top: 0, left: 0, below: false, arrowLeft: 130,
+  });
 
   protected readonly text = computed(() => {
     const k = this.key();
@@ -63,8 +79,25 @@ export class TooltipComponent {
   });
 
   protected onEnter(event: MouseEvent): void {
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    // Show below when there's not enough room above (topbar 60px + tooltip ~120px + gap 8px)
-    this.below.set(rect.top < 160);
+    const wrap = event.currentTarget as HTMLElement;
+    const rect = wrap.getBoundingClientRect();
+    const W = 260;
+    const gap = 8;
+
+    const iconCenterX = rect.left + rect.width / 2;
+
+    // Center tooltip on icon, clamp to viewport with 8px margin
+    let left = iconCenterX - W / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - W - 8));
+
+    // Arrow points at icon regardless of horizontal shift
+    const arrowLeft = Math.max(14, Math.min(iconCenterX - left, W - 14));
+
+    // Show below when there's not enough room above (need ~160px + gap)
+    const below = rect.top < 168;
+    const top = below ? rect.bottom : rect.top;
+
+    this.pos.set({ top, left, below, arrowLeft });
+    this.visible.set(true);
   }
 }

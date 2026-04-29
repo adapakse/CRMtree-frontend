@@ -47,19 +47,19 @@ import { AuthService } from '../../core/auth/auth.service';
       <div class="tw">
         <div class="thead" style="grid-template-columns:40px 1fr 200px 1fr 110px 120px 80px">
           <div class="th"></div>
-          <div class="th">User</div>
-          <div class="th">Email</div>
+          <div class="th sortable" (click)="sortBy('display_name')">User <span class="si">{{ sortIcon('display_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('email')">Email <span class="si">{{ sortIcon('email') }}</span></div>
           <div class="th">Groups &amp; Roles</div>
-          <div class="th">CRM Role</div>
-          <div class="th">Last Login</div>
-          <div class="th">Status</div>
+          <div class="th sortable" (click)="sortBy('crm_role')">CRM Role <span class="si">{{ sortIcon('crm_role') }}</span></div>
+          <div class="th sortable" (click)="sortBy('last_login')">Last Login <span class="si">{{ sortIcon('last_login') }}</span></div>
+          <div class="th sortable" (click)="sortBy('is_active')">Status <span class="si">{{ sortIcon('is_active') }}</span></div>
         </div>
 
         @if (loading()) {
           <div class="loading-overlay"><div class="spinner"></div></div>
         }
 
-        @for (user of users(); track user.id) {
+        @for (user of sortedUsers(); track user.id) {
           <div class="tr" style="grid-template-columns:40px 1fr 200px 1fr 110px 120px 80px" (click)="openUser(user)">
             <div class="td"><wt-avatar [name]="user.display_name" [size]="28" /></div>
             <div class="td">
@@ -388,7 +388,10 @@ import { AuthService } from '../../core/auth/auth.service';
     .srch:focus { border-color:var(--orange);background:white; }
     #content { flex:1;overflow-y:auto;padding:24px; }
     .thead { display:grid;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:0 16px; }
-    .th { padding:10px 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);display:flex;align-items:center; }
+    .th { padding:10px 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);display:flex;align-items:center;gap:4px; }
+    .sortable { cursor:pointer;user-select:none; }
+    .sortable:hover { color:var(--gray-700); }
+    .si { font-size:10px;color:var(--gray-400); }
     .tr { display:grid;padding:0 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s;align-items:center; }
     .tr:hover { background:var(--gray-50); }
     .td { padding:11px 8px;font-size:13px;color:var(--gray-700);overflow:hidden; }
@@ -450,6 +453,37 @@ export class UsersComponent implements OnInit {
   search       = '';
   filterGroup  = '';
   filterActive = '';
+
+  sortCol = signal<string>('display_name');
+  sortDir = signal<'asc' | 'desc'>('asc');
+
+  sortedUsers = computed(() => {
+    const col = this.sortCol();
+    const dir = this.sortDir();
+    return [...this.users()].sort((a: any, b: any) => {
+      let av: any, bv: any;
+      switch (col) {
+        case 'display_name': av = a.display_name ?? ''; bv = b.display_name ?? ''; break;
+        case 'email':        av = a.email ?? '';        bv = b.email ?? ''; break;
+        case 'crm_role':     av = a.crm_role ?? '';     bv = b.crm_role ?? ''; break;
+        case 'last_login':   av = a.last_login_at ?? ''; bv = b.last_login_at ?? ''; break;
+        case 'is_active':    av = a.is_active ? 1 : 0;  bv = b.is_active ? 1 : 0; break;
+        default:             av = a.display_name ?? ''; bv = b.display_name ?? '';
+      }
+      const cmp = typeof av === 'string' ? av.localeCompare(bv, 'pl', { sensitivity: 'base' }) : av - bv;
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  });
+
+  sortBy(col: string): void {
+    if (this.sortCol() === col) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    else { this.sortCol.set(col); this.sortDir.set('asc'); }
+  }
+
+  sortIcon(col: string): string {
+    if (this.sortCol() !== col) return '↕';
+    return this.sortDir() === 'asc' ? '↑' : '↓';
+  }
 
   editFirst  = '';
   editLast   = '';

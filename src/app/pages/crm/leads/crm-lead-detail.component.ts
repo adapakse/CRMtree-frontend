@@ -149,6 +149,15 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
 
       <!-- STAGE STEPPER BAR -->
       <div style="background:white;border-bottom:1px solid #e5e7eb;padding:10px 12px;flex-shrink:0;display:flex;align-items:center;gap:8px">
+        <!-- Onboarding in progress: blue banner -->
+        <ng-container *ngIf="lead.stage==='onboarding'">
+          <span style="font-size:15px">⏳</span>
+          <span style="color:#1d4ed8;font-weight:700;font-size:13px">W trakcie onboardingu</span>
+          <span style="font-size:12px;color:#6b7280;margin-left:4px">— partner w procesie wdrożenia</span>
+          <span style="flex:1"></span>
+          <span style="font-size:11px;color:#9ca3af">Lead zablokowany do edycji</span>
+          <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ Panel Onboarding</a>
+        </ng-container>
         <!-- Onboarded: locked banner -->
         <ng-container *ngIf="lead.stage==='onboarded'">
           <span style="font-size:15px">✅</span>
@@ -166,7 +175,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
           <button *ngIf="canEdit" class="stage-arrow-btn" style="color:#15803d;border-color:#bbf7d0;font-size:12px;padding:4px 12px" (click)="quickChangeStage('new')">↩ Wróć do Nowego</button>
         </ng-container>
         <!-- Normal stepper mode -->
-        <ng-container *ngIf="lead.stage!=='closed_lost' && lead.stage!=='onboarded'">
+        <ng-container *ngIf="lead.stage!=='closed_lost' && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
           <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" title="Poprzedni etap">‹</button>
           <div style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
             <ng-container *ngFor="let s of orderedStageOptions; let last=last">
@@ -1685,7 +1694,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   get canEdit(): boolean {
     if (!this.lead) return false;
-    if (this.lead.stage === 'onboarded') return false;
+    if (this.lead.stage === 'onboarded' || this.lead.stage === 'onboarding') return false;
     return this.lead.can_edit !== false;
   }
 
