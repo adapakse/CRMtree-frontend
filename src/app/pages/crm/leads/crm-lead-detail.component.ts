@@ -31,18 +31,18 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
     <span class="stage-badge stage-{{lead.stage}}">{{stageLabel(lead.stage)}}</span>
     <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 Gorący</span>
     <div style="display:flex;gap:6px">
-      <button class="hdr-btn" *ngIf="lead.phone"  (click)="mockCall()"        title="Zadzwoń: {{lead.phone}}">📞</button>
-      <button class="hdr-btn" *ngIf="lead.email"  (click)="openEmailModal()"  title="Email: {{lead.email}}">
+      <button class="hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        title="Zadzwoń: {{lead.phone}}">📞</button>
+      <button class="hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailModal()"  title="Email: {{lead.email}}">
         ✉️ Email
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
       <button class="hdr-btn hdr-btn-edit" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj lead' : 'Brak uprawnień — handlowiec nie należy do Twojej grupy'">✏️ Edytuj</button>
-      <button class="hdr-btn hdr-btn-test" *ngIf="!lead.converted_at" (click)="openTestAccountModal()" title="Załóż konto testowe w systemie zewnętrznym">
+      <button class="hdr-btn hdr-btn-test" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" title="Załóż konto testowe w systemie zewnętrznym">
         🖥️ Konto testowe
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
         <span *ngIf="testAccount?.status==='error'"   class="ta-badge-err">!</span>
       </button>
-      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at" (click)="showConvert=true">🚀 Rozpocznij onboarding</button>
+      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at && canEdit" (click)="showConvert=true">🚀 Rozpocznij onboarding</button>
     </div>
   </div>
 
@@ -52,16 +52,26 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
     <!-- LEWA: Informacje -->
     <div style="border-right:1px solid #e5e7eb;overflow-y:auto;padding:16px">
 
-      <!-- Kontakt -->
+      <!-- Firma -->
       <div class="info-section">
+        <div class="info-section-title">Firma</div>
+        <div class="info-kv"><span class="lbl">Nazwa</span><span class="val fw">{{lead.company}}</span></div>
+        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">NIP</span><span class="val" style="font-family:monospace">{{lead.nip}}</span></div>
+        <div class="info-kv" *ngIf="lead.website">
+          <span class="lbl">WWW</span>
+          <span class="val"><a class="link" [href]="'https://'+lead.website" target="_blank">{{lead.website}}</a></span>
+        </div>
+        <div class="info-kv" *ngIf="lead.industry"><span class="lbl">Branża</span><span class="val">{{lead.industry}}</span></div>
+        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;font-size:11px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥 Gorący lead</div>
+      </div>
+
+      <!-- Główny kontakt -->
+      <div class="info-section" *ngIf="lead.contact_name || lead.email || lead.phone">
         <div class="info-section-title">Kontakt</div>
-        <div class="info-kv" *ngIf="lead.website"><span class="lbl">WWW</span><span class="val"><a class="link" [href]="'https://'+lead.website" target="_blank">{{lead.website}}</a></span></div>
-        <div class="info-kv"><span class="lbl">Firma</span><span class="val fw">{{lead.company}}</span></div>
-        <div class="info-kv" *ngIf="lead.contact_name"><span class="lbl">Osoba</span><span class="val">{{lead.contact_name}}<span style="color:#9ca3af" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span></div>
-        <!-- Dodatkowe kontakty -->
-        @for (ec of lead.extra_contacts || []; track ec.id) {
-          <div class="info-kv"><span class="lbl">Kontakt</span><span class="val">{{ec.contact_name || '—'}}<span style="color:#9ca3af" *ngIf="ec.contact_title"> · {{ec.contact_title}}</span><span *ngIf="ec.email" style="color:#6b7280;font-size:11px;display:block">{{ec.email}}</span><span *ngIf="ec.phone" style="color:#6b7280;font-size:11px">{{ec.phone}}</span></span></div>
-        }
+        <div class="info-kv" *ngIf="lead.contact_name">
+          <span class="lbl">Osoba</span>
+          <span class="val">{{lead.contact_name}}<span style="color:#9ca3af" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span>
+        </div>
         <div class="info-kv" *ngIf="lead.email">
           <span class="lbl">Email</span>
           <span class="val" style="display:flex;align-items:center;gap:4px">
@@ -73,15 +83,26 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
           <span class="lbl">Telefon</span>
           <span class="val">
             <a class="link" href="tel:{{lead.phone}}">{{lead.phone}}</a>
-            <button style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;opacity:.6" (click)="mockCall()" title="Zadzwoń">📞</button>
+            <button *ngIf="canEdit" style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;opacity:.6" (click)="mockCall()" title="Zadzwoń">📞</button>
           </span>
         </div>
-        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">NIP</span><span class="val" style="font-family:monospace">{{lead.nip}}</span></div>
-        <div class="info-kv" *ngIf="lead.industry"><span class="lbl">Branża</span><span class="val">{{lead.industry}}</span></div>
-        <div class="info-kv" *ngIf="lead.source"><span class="lbl">Źródło</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
       </div>
 
-      <!-- Dane Agenta -->
+      <!-- Dodatkowe kontakty -->
+      <div class="info-section" *ngIf="lead.extra_contacts?.length">
+        <div class="info-section-title">Dodatkowe kontakty</div>
+        @for (ec of lead.extra_contacts || []; track ec.id) {
+          <div style="padding:8px 0;border-bottom:1px solid #f3f4f6">
+            <div style="font-size:12px;font-weight:600;color:#374151">
+              {{ec.contact_name || '—'}}<span style="color:#9ca3af;font-weight:400" *ngIf="ec.contact_title"> · {{ec.contact_title}}</span>
+            </div>
+            <div *ngIf="ec.email" style="font-size:11px;color:#6b7280;margin-top:2px"><a class="link" href="mailto:{{ec.email}}">{{ec.email}}</a></div>
+            <div *ngIf="ec.phone" style="font-size:11px;color:#6b7280;margin-top:1px"><a class="link" href="tel:{{ec.phone}}">{{ec.phone}}</a></div>
+          </div>
+        }
+      </div>
+
+      <!-- Agent -->
       <div class="info-section" *ngIf="lead.agent_name || lead.agent_email || lead.agent_phone">
         <div class="info-section-title" style="color:#f97316">🤝 Agent</div>
         <div class="info-kv" *ngIf="lead.agent_name"><span class="lbl">Imię i nazwisko</span><span class="val fw">{{lead.agent_name}}</span></div>
@@ -92,21 +113,29 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <div class="info-kv" *ngIf="lead.agent_phone"><span class="lbl">Telefon</span><span class="val">{{lead.agent_phone}}</span></div>
       </div>
 
-      <!-- Pipeline -->
+      <!-- Sprzedaż -->
       <div class="info-section">
-        <div class="info-section-title">Pipeline</div>
-        <div class="info-kv"><span class="lbl">Wartość</span><span class="val" style="color:#f97316;font-family:'Sora',sans-serif;font-weight:700">{{(lead.value_pln||0)|number:'1.0-0'}} {{lead.annual_turnover_currency||'PLN'}}</span></div>
+        <div class="info-section-title">Sprzedaż</div>
         <div class="info-kv"><span class="lbl">Etap</span><span class="val"><span class="stage-badge stage-{{lead.stage}}" style="font-size:10px">{{stageLabel(lead.stage)}}</span></span></div>
+        <div class="info-kv" *ngIf="lead.stage==='closed_lost' && lead.lost_reason">
+          <span class="lbl">Powód przegranej</span>
+          <span class="val" style="color:#991b1b">{{lead.lost_reason}}</span>
+        </div>
         <div class="info-kv"><span class="lbl">Szansa</span><span class="val">{{lead.probability||0}}%</span></div>
+        <div class="info-kv" *ngIf="lead.value_pln">
+          <span class="lbl">Obrót roczny</span>
+          <span class="val" style="color:#f97316;font-family:'Sora',sans-serif;font-weight:700">{{lead.value_pln|number:'1.0-0'}} {{lead.annual_turnover_currency||'PLN'}}</span>
+        </div>
         <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">% Online</span><span class="val">{{lead.online_pct}}%</span></div>
-        <div class="info-kv" *ngIf="lead.first_contact_date"><span class="lbl">Pierwszy kont.</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
-        <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">Data zamkn.</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
+        <div class="info-kv" *ngIf="lead.source"><span class="lbl">Źródło</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
+        <div class="info-kv" *ngIf="lead.first_contact_date"><span class="lbl">Pierwszy kontakt</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
+        <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">Data zamknięcia</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
         <div class="info-kv" *ngIf="lead.assigned_to_name"><span class="lbl">Handlowiec</span><span class="val fw">{{lead.assigned_to_name}}</span></div>
       </div>
 
-      <!-- Tagi i notatki -->
+      <!-- Notatki i tagi -->
       <div class="info-section" *ngIf="lead.tags?.length || lead.notes">
-        <div class="info-section-title">Dodatkowe</div>
+        <div class="info-section-title">Notatki</div>
         <div *ngIf="lead.tags?.length" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
           <span *ngFor="let t of lead.tags" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px">{{t}}</span>
         </div>
@@ -117,7 +146,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <div class="info-section">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div class="info-section-title" style="margin-bottom:0">📎 Dokumenty ({{linkedDocs.length}})</div>
-          <button class="btn-sm" (click)="showDocPicker=true" style="font-size:10px">+ Dodaj</button>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:10px">+ Dodaj</button>
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">Brak</div>
         <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer" (click)="openDocument(d)" title="Otwórz dokument">
@@ -151,7 +180,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <!-- Aktywności tab -->
       <div *ngIf="midTab==='activities'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn-sm primary" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
+          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
 
         <!-- Nowa aktywność form -->
@@ -231,7 +260,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
           <button class="btn-sm" (click)="debugProcessGmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile przez Gmail API (debug)">
             {{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe
           </button>
-          <button class="btn-sm primary" (click)="openEmailModal()">+ Nowy email</button>
+          <button class="btn-sm primary" *ngIf="canEdit" (click)="openEmailModal()">+ Nowy email</button>
         </div>
         <div *ngIf="emailActivities.length===0" class="empty-act">Brak wysłanych emaili.</div>
         <!-- Aktywności email -->
@@ -278,14 +307,14 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <!-- Komunikacja -->
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:10px">📞 Komunikacja</div>
-        <button class="comm-btn" (click)="mockCall()" [disabled]="!lead.phone">
+        <button class="comm-btn" *ngIf="canEdit" (click)="mockCall()" [disabled]="!lead.phone">
           <span style="font-size:16px">📞</span>
           <div style="flex:1;text-align:left">
             <div style="font-size:12px;font-weight:600">Zadzwoń</div>
             <div style="font-size:10px;color:#9ca3af">{{lead.phone||'Brak numeru'}}</div>
           </div>
         </button>
-        <button class="comm-btn" (click)="openEmailModal()" [disabled]="!lead.email" style="margin-top:6px">
+        <button class="comm-btn" *ngIf="canEdit" (click)="openEmailModal()" [disabled]="!lead.email" style="margin-top:6px">
           <span style="font-size:16px">✉️</span>
           <div style="flex:1;text-align:left">
             <div style="font-size:12px;font-weight:600">Wyślij email</div>
@@ -358,7 +387,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       </div>
 
       <!-- Onboarding -->
-      <div *ngIf="!lead.converted_at" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
+      <div *ngIf="!lead.converted_at && canEdit" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">🚀 Rozpocznij onboarding</div>
         <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Podaj wartość kontraktu i datę podpisania umowy, aby przenieść leada do procesu wdrożenia.</div>
         <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">🚀 Rozpocznij onboarding →</button>
@@ -724,7 +753,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
             <input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"
                    [style.border-color]="requiresFullFields && !editForm.contact_name ? '#fca5a5' : ''">
           </label>
-          <label><span style="display:flex;align-items:center;gap:4px">Stanowisko <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span><select [(ngModel)]="editForm.contact_title"
+          <label><span style="display:flex;align-items:center;gap:4px">Rola w firmie <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span><select [(ngModel)]="editForm.contact_title"
                    [style.border-color]="requiresFullFields && !editForm.contact_title ? '#fca5a5' : ''"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
         </div>
         <div class="edit-row">
@@ -748,7 +777,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
             <button style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)">✕</button>
             <div class="edit-row">
               <label>Imię i nazwisko<input [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></label>
-              <label>Stanowisko<select [(ngModel)]="ec.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
+              <label>Rola w firmie<select [(ngModel)]="ec.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
             </div>
             <div class="edit-row">
               <label>Email<input [(ngModel)]="ec.email" type="email" placeholder="jan@firma.pl"></label>
@@ -1391,7 +1420,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (!this.requiresFullFields) return errs;
     if (!f.website)            errs.push('Strona WWW');
     if (!f.contact_name)       errs.push('Imię i Nazwisko');
-    if (!f.contact_title)      errs.push('Stanowisko');
+    if (!f.contact_title)      errs.push('Rola w firmie');
     if (!f.email)              errs.push('Email');
     if (!f.phone)              errs.push('Telefon');
     if (!f.value_pln && f.value_pln !== 0) errs.push('Obrót roczny');
@@ -2932,7 +2961,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       assigned_to: 'Handlowiec', close_date: 'Data zamk.', notes: 'Notatki',
       probability: 'Szansa %', industry: 'Branża', lost_reason: 'Powód przegranej',
       agent_name: 'Agent', annual_turnover_currency: 'Waluta', tags: 'Tagi',
-      contact_title: 'Stanowisko', nip: 'NIP', website: 'Strona WWW',
+      contact_title: 'Rola w firmie', nip: 'NIP', website: 'Strona WWW',
       online_pct: '% Online', first_contact_date: 'Pierwszy kontakt',
     };
     return MAP[key] || key;

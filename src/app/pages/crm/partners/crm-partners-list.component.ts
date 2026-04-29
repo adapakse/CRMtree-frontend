@@ -19,6 +19,11 @@ type SortDir = 'asc' | 'desc';
   <div class="topbar">
     <h1>Rejestr Partnerów</h1>
     <span style="flex:1"></span>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;white-space:nowrap;margin-right:8px">
+      <input type="checkbox" style="width:auto;margin:0;cursor:pointer;accent-color:var(--orange)"
+             [(ngModel)]="onlyMine" (ngModelChange)="onOnlyMineChange()">
+      Tylko moje
+    </label>
     <button class="btn-view" [class.active]="viewMode==='cards'" (click)="viewMode='cards'">⊞ Karty</button>
     <button class="btn-view" [class.active]="viewMode==='table'" (click)="viewMode='table'">☰ Tabela</button>
     <button class="btn-primary" (click)="openCreateForm()">+ Nowy partner</button>
@@ -43,7 +48,7 @@ type SortDir = 'asc' | 'desc';
       <option value="">Wszystkie branże</option>
       <option *ngFor="let i of industries" [value]="i">{{i}}</option>
     </select>
-    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel" (click)="clearFilters()">✕ Wyczyść</button>
+    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()">✕ Wyczyść</button>
   </div>
 
   <!-- Banner filtru z raportu -->
@@ -268,6 +273,7 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   filterGroup    = '';
   filterIndustry = '';
   reportFilterLabel = '';
+  onlyMine = false;
   viewMode: 'cards' | 'table' = 'cards';
   showCreate = false; saving = false;
   crmUsers: CrmUser[] = [];
@@ -362,11 +368,13 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
     const p: any = { page: this.page, limit: this.pageSize };
     if (this.search)         p.search     = this.search;
     if (this.filterStatus)   p.status     = this.filterStatus;
-    if (this.filterManager && this.isManager) p.manager_id = this.filterManager;
     if (this.filterGroup)    p.group_name = this.filterGroup;
     if (this.filterIndustry) p.industry   = this.filterIndustry;
-    const u = this.auth.user();
-    if (u && !u.is_admin && u.crm_role === 'salesperson') p.manager_id = u.id;
+    if (this.onlyMine) {
+      p.manager_id = this.auth.user()?.id;
+    } else if (this.filterManager && this.isManager) {
+      p.manager_id = this.filterManager;
+    }
     this.api.getPartners(p).subscribe({
       next: r => {
         this.zone.run(() => {
@@ -417,12 +425,13 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   clearFilters(): void {
     this.filterStatus = ''; this.filterManager = '';
     this.filterGroup = ''; this.filterIndustry = '';
-    this.reportFilterLabel = '';
+    this.reportFilterLabel = ''; this.onlyMine = false;
     this.page = 1; this.reload();
   }
 
   private searchTimer: any;
   onSearch() { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => { this.page = 1; this.reload(); }, 400); }
+  onOnlyMineChange() { this.page = 1; this.reload(); }
 
   goPartner(id: number | null, crm_uuid?: string | null) {
     const nav = crm_uuid ?? id;

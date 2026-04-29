@@ -12,16 +12,34 @@ import {
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
+function ym(d: Date): string { return d.toISOString().substring(0, 7); }
+
 function getMonthRange(preset: string): { from: string; to: string } {
   const now = new Date();
-  const cur = now.toISOString().substring(0, 7);
-  const shift = (n: number) => { const d = new Date(now.getFullYear(), now.getMonth() + n, 1); return d.toISOString().substring(0, 7); };
+  const cur = ym(now);
+  const shift = (n: number) => ym(new Date(now.getFullYear(), now.getMonth() + n, 1));
   switch (preset) {
-    case '1m':  return { from: cur, to: cur };
-    case '3m':  return { from: shift(-3), to: cur };
-    case '6m':  return { from: shift(-6), to: cur };
-    case 'ytd': return { from: `${now.getFullYear()}-01`, to: cur };
-    default:    return { from: shift(-11), to: cur };
+    case '1m':       return { from: cur, to: cur };
+    case '3m':       return { from: shift(-3), to: cur };
+    case '6m':       return { from: shift(-6), to: cur };
+    case 'ytd':      return { from: `${now.getFullYear()}-01`, to: cur };
+    case 'prev_1m': {
+      const d = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const m = ym(d); return { from: m, to: m };
+    }
+    case 'prev_q': {
+      const q = Math.ceil((now.getMonth() + 1) / 3);
+      let pq = q - 1, py = now.getFullYear();
+      if (pq === 0) { pq = 4; py--; }
+      const qsm = String((pq - 1) * 3 + 1).padStart(2, '0');
+      const qem = String(pq * 3).padStart(2, '0');
+      return { from: `${py}-${qsm}`, to: `${py}-${qem}` };
+    }
+    case 'prev_year': {
+      const py = now.getFullYear() - 1;
+      return { from: `${py}-01`, to: `${py}-12` };
+    }
+    default: return { from: shift(-11), to: cur };
   }
 }
 
@@ -50,12 +68,19 @@ function healthColor(engagement: number): string {
       <option value="">Wszyscy partnerzy</option>
       <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
     </select>
-    <select class="sel" style="max-width:170px" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
-      <option value="1m">Bieżący miesiąc</option>
-      <option value="3m">Ostatnie 3 mies.</option>
-      <option value="6m">Ostatnie 6 mies.</option>
-      <option value="12m">Ostatnie 12 mies.</option>
-      <option value="ytd">YTD {{ currentYear }}</option>
+    <select class="sel" style="max-width:190px" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
+      <optgroup label="Bieżące">
+        <option value="1m">Bieżący miesiąc</option>
+        <option value="3m">Ostatnie 3 mies.</option>
+        <option value="6m">Ostatnie 6 mies.</option>
+        <option value="12m">Ostatnie 12 mies.</option>
+        <option value="ytd">YTD {{ currentYear }}</option>
+      </optgroup>
+      <optgroup label="Poprzednie">
+        <option value="prev_1m">Poprzedni miesiąc</option>
+        <option value="prev_q">Poprzedni kwartał</option>
+        <option value="prev_year">Poprzedni rok ({{ currentYear - 1 }})</option>
+      </optgroup>
     </select>
     <select class="sel" style="max-width:160px" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
       <option value="">Wszyscy handlowcy</option>
@@ -360,6 +385,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   repFilter     = '';
   persistRepName = '';
   private readonly REP_FILTER_KEY = 'crm_rep_filter';
+  private loadSub: any = null;
   partnerFilter = '';
   groupFilter   = '';
   groupNames:  string[] = [];
@@ -428,8 +454,10 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   }
 
   load(): void {
+    this.loadSub?.unsubscribe();
     this.loading = true;
     this.chartsBuilt = false;
+    this.cdr.markForCheck();
     const p: any = {};
     if (this.periodFrom)  p.period_from  = this.periodFrom;
     if (this.periodTo)    p.period_to    = this.periodTo;
@@ -437,7 +465,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     if (this.partnerFilter)                   p.partner_name = this.partnerFilter;
     if (this.groupFilter)                     p.group_name   = this.groupFilter;
 
-    this.api.getPartnersReport(p).subscribe({
+    this.loadSub = this.api.getPartnersReport(p).subscribe({
       next: (report: PartnersReport) => {
         this.zone.run(() => {
           this.kpi       = report.kpi;
@@ -457,7 +485,6 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
 
   private buildCharts(): void {
     if (this.chartsBuilt) return;
-    this.chartsBuilt = true;
     this.buildRevenueChart();
   }
 
@@ -465,6 +492,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     const el = this.revenueEl?.nativeElement;
     const lb = this.revLabels?.nativeElement;
     if (!el || !lb) return;
+    this.chartsBuilt = true;
     el.innerHTML = ''; lb.innerHTML = '';
     if (!this.trend.length) return;
     const data = this.trend.slice(-12);
@@ -513,5 +541,5 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   productIcon(pt: string): string  { return (PRODUCT_TYPE_ICONS as Record<string,string>)[pt] || '📦'; }
   deltaLabel(a: number, b: number): string { if (!b) return '—'; return (Math.abs((a-b)/b*100)).toFixed(0) + '%'; }
   initials(name: string): string { return (name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase(); }
-  avatarColor(name: string): string { let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h},55%,48%)`; }
+  avatarColor(name: string): string { if (!name) return '#94A3B8'; let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h},55%,48%)`; }
 }

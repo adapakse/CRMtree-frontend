@@ -114,6 +114,14 @@ import { initials } from '../../core/services/helpers';
                 <span class="nav-label">Performance</span>
                 <span class="nav-tip">Performance</span>
               </a>
+
+              @if (isSalesManager() && !auth.isAdmin()) {
+                <a class="nav-item" routerLink="/users" routerLinkActive="active">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v1a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M4 22v-1a7 7 0 0 1 14 0v1"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg>
+                  <span class="nav-label">Budżety</span>
+                  <span class="nav-tip">Budżety handlowców</span>
+                </a>
+              }
             </div>
 
           }
@@ -159,6 +167,11 @@ import { initials } from '../../core/services/helpers';
 
         <!-- User card at bottom -->
         <div class="s-bottom">
+          <a class="nav-item settings-item" routerLink="/my-settings" routerLinkActive="active" style="margin-bottom:4px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span class="nav-label">Moje ustawienia</span>
+            <span class="nav-tip">Moje ustawienia</span>
+          </a>
           <div class="u-card" (click)="auth.logout()">
             <wt-avatar [name]="auth.user()?.display_name ?? ''" [size]="32" />
             <div class="u-info">

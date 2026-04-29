@@ -36,7 +36,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </span>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
-    <button class="btn-outline" (click)="openEdit()">✏️ Edytuj</button>
+    <button class="btn-outline" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj partnera' : 'Brak uprawnień do edycji tego partnera'">✏️ Edytuj</button>
   </div>
 
   <!-- Onboarding stepper + zadania -->
@@ -63,7 +63,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     <div class="step-tasks-panel">
       <div class="step-tasks-header">
         <span class="step-tasks-title">📋 Zadania: <strong>{{onboardingSteps[activeStep]}}</strong></span>
-        <button class="btn-sm" (click)="openAddTask()" style="font-size:12px">+ Dodaj zadanie</button>
+        <button class="btn-sm" *ngIf="canEdit" (click)="openAddTask()" style="font-size:12px">+ Dodaj zadanie</button>
         <button class="btn-sm"
                 *ngIf="partner.onboarding_step === activeStep && isManager && allTasksDone(activeStep) && activeStep < 3"
                 (click)="advanceStep(activeStep + 1)"
@@ -176,6 +176,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <span class="lbl">NIP <span class="dwh-badge" *ngIf="partner.dwh_partner_id">DWH</span></span>
         <span>{{(partner.dwh_partner_id ? partner.dwh_nip : partner.nip) || '—'}}</span>
         <span class="lbl">Branża</span><span>{{partner.industry || '—'}}</span>
+        <span class="lbl">Strona WWW</span>
+        <span>
+          <a *ngIf="partner.website" [href]="partner.website" target="_blank" rel="noopener"
+             style="color:var(--orange);word-break:break-all">{{partner.website}}</a>
+          <span *ngIf="!partner.website">—</span>
+        </span>
+        <span class="lbl">Źródło</span><span>{{partner.source || '—'}}</span>
+        <span class="lbl">Pierwszy kontakt</span>
+        <span>{{partner.first_contact_date ? (partner.first_contact_date | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Opiekun</span><span>{{partner.manager_name || '—'}}</span>
         <span class="lbl">Umowa od</span><span>{{partner.contract_signed ? (partner.contract_signed | date:'dd.MM.yyyy') : '—'}}</span>
         <span class="lbl">Umowa do</span><span>{{partner.contract_expires ? (partner.contract_expires | date:'dd.MM.yyyy') : '—'}}</span>
@@ -211,7 +220,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div class="info-subsection-title">Kontakt do spraw umowy</div>
         <div class="info-grid">
           <span class="lbl">Imię i nazwisko</span><span>{{partner.contact_name || '—'}}</span>
-          <span class="lbl">Stanowisko</span><span>{{partner.contact_title || '—'}}</span>
+          <span class="lbl">Rola w firmie</span><span>{{partner.contact_title || '—'}}</span>
           <span class="lbl">Email</span><span>{{partner.email || '—'}}</span>
           <span class="lbl">Telefon</span><span>{{partner.phone || '—'}}</span>
         </div>
@@ -242,7 +251,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div class="info-subsection-title">Kontakt do spraw rozliczeń</div>
         <div class="info-grid">
           <span class="lbl">Imię i nazwisko</span><span>{{partner.billing_contact_name || '—'}}</span>
-          <span class="lbl">Stanowisko</span><span>{{partner.billing_contact_title || '—'}}</span>
+          <span class="lbl">Rola w firmie</span><span>{{partner.billing_contact_title || '—'}}</span>
           <span class="lbl">Email</span><span>{{partner.billing_email || '—'}}</span>
           <span class="lbl">Telefon</span><span>{{partner.billing_phone || '—'}}</span>
         </div>
@@ -275,7 +284,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <span class="lbl">Notatki</span><span class="notes">{{partner.notes || '—'}}</span>
         <ng-container *ngIf="partner.customer_service_note">
           <span class="lbl">Notatka <span class="dwh-badge">DWH</span></span>
-          <span class="notes">{{partner.customer_service_note}}</span>
+          <span class="notes dwh-note" [innerHTML]="partner.customer_service_note"></span>
         </ng-container>
       </div>
 
@@ -326,7 +335,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div class="info-subsection">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div class="info-subsection-title" style="margin-bottom:0">📎 Dokumenty ({{linkedDocs.length}})</div>
-          <button class="btn-sm" (click)="showDocPicker = true" style="font-size:11px">+ Dodaj</button>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker = true" style="font-size:11px">+ Dodaj</button>
         </div>
         <div *ngIf="linkedDocs.length === 0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px">Brak powiązanych dokumentów</div>
         <div *ngFor="let d of linkedDocs"
@@ -370,13 +379,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history'; loadHistory()">Historia zmian</button>
-        <div style="flex:1"></div>
-        <button class="btn-sm" *ngIf="midTab==='activities'" (click)="openNewActivityForm()">+ Dodaj</button>
-        <button class="btn-sm" *ngIf="midTab==='emails'" (click)="openEmailModal()">✉️ Wyślij</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
       <div *ngIf="midTab==='activities'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
+        <div *ngIf="canEdit" style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn-sm" (click)="openNewActivityForm()">+ Dodaj</button>
+        </div>
         <div class="new-activity-form" *ngIf="showNewActivity">
           <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
             <option value="call">📞 Połączenie</option>
@@ -497,7 +506,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
 
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
-      <div *ngIf="midTab==='emails'" style="flex:1;display:flex;overflow:hidden">
+      <div *ngIf="midTab==='emails'" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+        <div *ngIf="canEdit" style="display:flex;justify-content:flex-end;padding:10px 12px 0;flex-shrink:0">
+          <button class="btn-sm" (click)="openEmailModal()">✉️ Wyślij</button>
+        </div>
         <!-- Lista emaili -->
         <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:0;min-width:0">
           <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „✉️ Wyślij".</div>
@@ -625,7 +637,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div class="docs-box">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">Dokumenty ({{linkedDocs.length}})</div>
-          <button class="btn-sm" (click)="showDocPicker=true" style="font-size:11px">+ Dodaj</button>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:11px">+ Dodaj</button>
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px 0">Brak powiązanych dokumentów</div>
         <div *ngFor="let d of linkedDocs"
@@ -937,7 +949,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"
                      [class.input-warn]="submitAttempted && !editForm.contact_name">
             </label>
-            <label>Stanowisko *
+            <label>Rola w firmie *
               <input [(ngModel)]="editForm.contact_title" placeholder="CEO"
                      [class.input-warn]="submitAttempted && !editForm.contact_title">
             </label>
@@ -964,7 +976,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <input [(ngModel)]="editForm.billing_contact_name" placeholder="Anna Nowak"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_name">
             </label>
-            <label>Stanowisko *
+            <label>Rola w firmie *
               <input [(ngModel)]="editForm.billing_contact_title" placeholder="Kierownik rozliczeń"
                      [class.input-warn]="submitAttempted && !editForm.billing_contact_title">
             </label>
@@ -1110,6 +1122,23 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <option value="">— brak grupy —</option>
                 <option *ngFor="let g of partnerGroups" [value]="g.id">{{g.name}}</option>
               </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="edit-section-title">🔍 Sprzedaż i źródło</div>
+          <div class="edit-row">
+            <label>Źródło
+              <input [(ngModel)]="editForm.source" placeholder="np. targi, polecenie, cold call">
+            </label>
+            <label>Pierwszy kontakt
+              <input [(ngModel)]="editForm.first_contact_date" type="date">
+            </label>
+          </div>
+          <div class="edit-row">
+            <label class="full">Strona WWW
+              <input [(ngModel)]="editForm.website" type="url" placeholder="https://firma.pl">
             </label>
           </div>
         </div>
@@ -1550,6 +1579,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .sub { color:#9ca3af; }
     .accent { color:#f97316; font-weight:700; }
     .notes { white-space:pre-line; }
+    .dwh-note { white-space:normal; }
+    .dwh-note p { margin:4px 0; }
+    .dwh-note ul, .dwh-note ol { margin:4px 0 4px 18px; padding:0; }
+    .dwh-note li { margin-bottom:2px; }
+    .dwh-note strong, .dwh-note b { font-weight:700; }
+    .dwh-note a { color:#f97316; text-decoration:underline; }
     .opp-section { margin-top:16px; padding-top:12px; border-top:1px solid #f3f4f6; }
     .opp-section h4 { font-size:12px; font-weight:700; margin:0 0 8px; }
     .opp-item { font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
@@ -1844,6 +1879,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return u?.is_admin || u?.crm_role === 'sales_manager';
   }
 
+  get canEdit(): boolean {
+    if (!this.partner) return false;
+    if (this.isManager) return true;
+    const u = this.auth.user();
+    return this.partner.manager_id === u?.id;
+  }
+
   get pid(): string | number { return this.partner?.crm_id || this.partner?.id || ''; }
 
   // ── Dokumenty powiązane ──────────────────────────────────────────
@@ -2121,6 +2163,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       active_users:          this.partner.active_users ?? null,
       tagsStr:               (this.partner.tags || []).join(', '),
       notes:                 this.partner.notes || '',
+      website:               this.partner.website || '',
+      source:                this.partner.source || '',
+      first_contact_date:    this.isoToDateInput(this.partner.first_contact_date),
       // DWH-fillable fields — inicjalizowane zawsze (edytowalne lub read-only zależnie od isDwhFieldReadOnly)
       subdomain:             this.partner.subdomain || '',
       language:              this.partner.language || '',
@@ -2193,6 +2238,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       active_users:          this.editForm.active_users != null && this.editForm.active_users !== '' ? +this.editForm.active_users : null,
       tags:                  this.editForm.tagsStr ? this.editForm.tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       notes:                 this.editForm.notes || null,
+      website:               this.editForm.website || null,
+      source:                this.editForm.source || null,
+      first_contact_date:    this.editForm.first_contact_date || null,
       // DWH Partner ID (tylko managerzy)
       ...(this.isManager ? { dwh_partner_id: this.editForm.dwh_partner_id !== '' && this.editForm.dwh_partner_id != null ? +this.editForm.dwh_partner_id : null } : {}),
       // DWH-fillable fields: wysyłamy tylko gdy pole NIE jest zablokowane przez DWH
@@ -3055,7 +3103,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       contract_value: 'Obrót', active_users: 'Aktywni użytkownicy', tags: 'Tagi',
       industry: 'Branża', group_id: 'Grupa', commission_value: 'Prowizja',
       credit_limit_value: 'Limit kredytowy', deposit_value: 'Depozyt',
-      contact_title: 'Stanowisko', billing_email: 'Email rozl.', billing_phone: 'Tel. rozl.',
+      contact_title: 'Rola w firmie', billing_email: 'Email rozl.', billing_phone: 'Tel. rozl.',
       online_pct: '% Online', country: 'Kraj', agent_name: 'Agent',
     };
     return MAP[key] || key;

@@ -22,10 +22,12 @@ import { AuthService } from '../../core/auth/auth.service';
         <input class="srch" type="search" placeholder="Search users…"
                [(ngModel)]="search" (ngModelChange)="onSearch()">
       </div>
-      <button class="btn btn-p" style="margin-left:8px" (click)="openNew()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New User
-      </button>
+      @if (isAdmin()) {
+        <button class="btn btn-p" style="margin-left:8px" (click)="openNew()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New User
+        </button>
+      }
     </div>
 
     <div id="content">
@@ -114,7 +116,7 @@ import { AuthService } from '../../core/auth/auth.service';
     </div>
 
     <!-- New User Modal -->
-    @if (showNew()) {
+    @if (isAdmin() && showNew()) {
       <div class="mol" (click)="showNew.set(false)">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
@@ -215,55 +217,57 @@ import { AuthService } from '../../core/auth/auth.service';
           </div>
 
           <div class="pb">
-            <div class="sec-title">Account Settings</div>
-            <div class="fgrid">
-              <div class="fg">
-                <label class="fl">First Name</label>
-                <input class="fi" [(ngModel)]="editFirst">
-              </div>
-              <div class="fg">
-                <label class="fl">Last Name</label>
-                <input class="fi" [(ngModel)]="editLast">
-              </div>
+            @if (isAdmin()) {
+              <div class="sec-title">Account Settings</div>
+              <div class="fgrid">
+                <div class="fg">
+                  <label class="fl">First Name</label>
+                  <input class="fi" [(ngModel)]="editFirst">
+                </div>
+                <div class="fg">
+                  <label class="fl">Last Name</label>
+                  <input class="fi" [(ngModel)]="editLast">
+                </div>
 
-              <!-- ★ Email edit -->
-              <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Email Address</label>
-                <input class="fi" type="email" [(ngModel)]="editEmail"
-                       [class.fi-err]="!!emailError"
-                       (ngModelChange)="emailError = ''">
-                @if (emailError) {
-                  <span class="ferr">{{ emailError }}</span>
-                }
-                <span style="font-size:11px;color:var(--gray-400);margin-top:2px;line-height:1.5">
-                  Zmiana e-maila wpływa na logowanie SAML — upewnij się, że adres odpowiada kontu Google Workspace.
-                </span>
-              </div>
+                <!-- ★ Email edit -->
+                <div class="fg" style="grid-column:1/-1">
+                  <label class="fl">Email Address</label>
+                  <input class="fi" type="email" [(ngModel)]="editEmail"
+                         [class.fi-err]="!!emailError"
+                         (ngModelChange)="emailError = ''">
+                  @if (emailError) {
+                    <span class="ferr">{{ emailError }}</span>
+                  }
+                  <span style="font-size:11px;color:var(--gray-400);margin-top:2px;line-height:1.5">
+                    Zmiana e-maila wpływa na logowanie SAML — upewnij się, że adres odpowiada kontu Google Workspace.
+                  </span>
+                </div>
 
-              <div class="fg">
-                <label class="fl">Status</label>
-                <select class="fsel" [(ngModel)]="editActive">
-                  <option [ngValue]="true">Active</option>
-                  <option [ngValue]="false">Inactive</option>
-                </select>
+                <div class="fg">
+                  <label class="fl">Status</label>
+                  <select class="fsel" [(ngModel)]="editActive">
+                    <option [ngValue]="true">Active</option>
+                    <option [ngValue]="false">Inactive</option>
+                  </select>
+                </div>
+                <div class="fg">
+                  <label class="fl">Admin Role</label>
+                  <select class="fsel" [(ngModel)]="editAdmin">
+                    <option [ngValue]="false">Regular User</option>
+                    <option [ngValue]="true">Administrator</option>
+                  </select>
+                </div>
+                <div class="fg" style="grid-column:1/-1">
+                  <label class="fl">Rola CRM</label>
+                  <select class="fsel" [(ngModel)]="editCrmRole">
+                    <option value="">Brak roli CRM</option>
+                    <option value="salesperson">Handlowiec (salesperson)</option>
+                    <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
+                  </select>
+                </div>
               </div>
-              <div class="fg">
-                <label class="fl">Admin Role</label>
-                <select class="fsel" [(ngModel)]="editAdmin">
-                  <option [ngValue]="false">Regular User</option>
-                  <option [ngValue]="true">Administrator</option>
-                </select>
-              </div>
-              <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Rola CRM</label>
-                <select class="fsel" [(ngModel)]="editCrmRole">
-                  <option value="">Brak roli CRM</option>
-                  <option value="salesperson">Handlowiec (salesperson)</option>
-                  <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Save Changes</button>
+              <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Save Changes</button>
+            }
 
             <!-- ── Planowane Budżety Sprzedażowe ──────────────────────────────────── -->
             @if (isSalesManager() && selected()!.crm_role === 'salesperson') {
@@ -335,34 +339,36 @@ import { AuthService } from '../../core/auth/auth.service';
             }
             <!-- ───────────────────────────────────────────────────────────────────────── -->
 
-            <div class="sec-title" style="margin-top:24px">Group Roles ({{ (selected()!.roles ?? []).length }})</div>
-            @for (role of selected()!.roles ?? []; track role.role_id) {
-              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
-                <wt-group-pill [name]="role.group_display ?? role.group_name" />
-                <span class="badge" [class]="role.access_level === 'full' ? 's-signed' : 's-new'">{{ role.access_level }}</span>
-                <span style="flex:1"></span>
-                <button class="btn btn-d btn-sm" (click)="removeRole(role.role_id)">Remove</button>
+            @if (isAdmin()) {
+              <div class="sec-title" style="margin-top:24px">Group Roles ({{ (selected()!.roles ?? []).length }})</div>
+              @for (role of selected()!.roles ?? []; track role.role_id) {
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+                  <wt-group-pill [name]="role.group_display ?? role.group_name" />
+                  <span class="badge" [class]="role.access_level === 'full' ? 's-signed' : 's-new'">{{ role.access_level }}</span>
+                  <span style="flex:1"></span>
+                  <button class="btn btn-d btn-sm" (click)="removeRole(role.role_id)">Remove</button>
+                </div>
+              }
+
+              <div class="sec-title" style="margin-top:20px">Assign New Role</div>
+              <div style="display:flex;gap:8px;align-items:flex-end">
+                <div class="fg" style="flex:1">
+                  <label class="fl">Group</label>
+                  <select class="fsel" [(ngModel)]="newRoleGroup">
+                    <option value="">Select group...</option>
+                    @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
+                  </select>
+                </div>
+                <div class="fg" style="width:120px">
+                  <label class="fl">Access</label>
+                  <select class="fsel" [(ngModel)]="newRoleAccess">
+                    <option value="read">Read</option>
+                    <option value="full">Full</option>
+                  </select>
+                </div>
+                <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">Assign</button>
               </div>
             }
-
-            <div class="sec-title" style="margin-top:20px">Assign New Role</div>
-            <div style="display:flex;gap:8px;align-items:flex-end">
-              <div class="fg" style="flex:1">
-                <label class="fl">Group</label>
-                <select class="fsel" [(ngModel)]="newRoleGroup">
-                  <option value="">Select group...</option>
-                  @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
-                </select>
-              </div>
-              <div class="fg" style="width:120px">
-                <label class="fl">Access</label>
-                <select class="fsel" [(ngModel)]="newRoleAccess">
-                  <option value="read">Read</option>
-                  <option value="full">Full</option>
-                </select>
-              </div>
-              <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">Assign</button>
-            </div>
           </div>
 
           <div class="pf">
@@ -428,6 +434,8 @@ export class UsersComponent implements OnInit {
     const u = this.auth.user();
     return !!(u?.is_admin || (u as any)?.crm_role === 'sales_manager');
   });
+
+  isAdmin = computed(() => !!this.auth.user()?.is_admin);
 
   users      = signal<User[]>([]);
   groups     = signal<GroupProfile[]>([]);

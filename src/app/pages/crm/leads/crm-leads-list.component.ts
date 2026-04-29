@@ -53,7 +53,7 @@ const PROB_MAP: Record<LeadStage, number> = {
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-val">{{ stats.total }}</div>
-      <div class="stat-lbl">Wszystkich leadów</div>
+      <div class="stat-lbl">Okazji sprzedażowych</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:#F59E0B">{{ stats.hot }}</div>
@@ -454,7 +454,7 @@ const PROB_MAP: Record<LeadStage, number> = {
                  [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_name">
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:3px">Stanowisko <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:3px">Rola w firmie <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
           <input class="fi" [(ngModel)]="newForm.contact_title" placeholder="CEO"
                  [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_title">
         </div>
@@ -476,7 +476,7 @@ const PROB_MAP: Record<LeadStage, number> = {
               <button type="button" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeNewExtraContact(i)">✕</button>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
                 <div class="fg"><label class="fl">Imię i nazwisko</label><input class="fi" [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></div>
-                <div class="fg"><label class="fl">Stanowisko</label><input class="fi" [(ngModel)]="ec.contact_title" placeholder="CEO"></div>
+                <div class="fg"><label class="fl">Rola w firmie</label><input class="fi" [(ngModel)]="ec.contact_title" placeholder="CEO"></div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div class="fg"><label class="fl">Email</label><input class="fi" type="email" [(ngModel)]="ec.email" placeholder="jan@firma.pl"></div>
@@ -1192,9 +1192,10 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   filterLostReason    = '';
   reportFilterLabel   = '';   // np. "Stage: Nowy" — widoczne jako chip nad listą
 
-  page       = 1;
-  totalPages = 1;
-  total      = 0;
+  page            = 1;
+  totalPages      = 1;
+  total           = 0;
+  totalQualified  = 0;
 
   showNew   = false;
   submitted = false;
@@ -1215,7 +1216,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     const errs: string[] = [];
     if (!this.newFormWebsite)    errs.push('Strona WWW');
     if (!f.contact_name)         errs.push('Imię i Nazwisko');
-    if (!f.contact_title)        errs.push('Stanowisko');
+    if (!f.contact_title)        errs.push('Rola w firmie');
     if (!f.email)                errs.push('Email');
     if (!f.phone)                errs.push('Telefon');
     if (!f.value_pln && f.value_pln !== 0) errs.push('Obrót roczny');
@@ -1396,7 +1397,9 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
   load() {
     this.loading = true;
-    const params: any = { limit: 200 };
+    const activeStageFilter = this.filterStage || this.filterStageUI;
+    const isKanban = this.viewMode === 'kanban' && !activeStageFilter;
+    const params: any = { limit: isKanban ? 2000 : 200 };
     if (this.filterHot)              params['hot']             = true;
     if (this._sourceFilterValues.length === 1) {
       params['source'] = this._sourceFilterValues[0];
@@ -1412,20 +1415,19 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
         params['assigned_to'] = this.filterUser;
       }
     }
-    if (this.scopeFilter === 'mine') params['assigned_to']     = this.auth.user()?.id;
+    if (this.scopeFilter === 'mine') params['mine'] = true;
     if (this.search)                 params['search']          = this.search;
-    // filterStage z raportu lub filterStageUI z toolbara
-    const activeStage = this.filterStage || this.filterStageUI;
-    if (activeStage)                 params['stage']           = activeStage;
+    if (activeStageFilter)           params['stage']           = activeStageFilter;
     if (this.filterCloseDateFrom)    params['close_date_from'] = this.filterCloseDateFrom;
     if (this.filterCloseDateTo)      params['close_date_to']   = this.filterCloseDateTo;
     if (this.filterLostReason)       params['lost_reason']     = this.filterLostReason;
 
     this.api.getLeads(params).subscribe({
       next: res => this.zone.run(() => {
-        this.allLeads   = res.data;
-        this.total      = res.total;
-        this.totalPages = res.pages;
+        this.allLeads        = res.data;
+        this.total           = res.total;
+        this.totalQualified  = res.total_qualified ?? (res.total - (res.data as any[]).filter((l: any) => l.stage === 'new').length);
+        this.totalPages      = res.pages;
         this.calcStats();
         this.loading = false;
         this.cdr.markForCheck();
@@ -1439,9 +1441,9 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   }
 
   calcStats() {
-    const active = this.allLeads.filter(l => !l.converted_at);
+    const active = this.allLeads.filter(l => !l.converted_at && l.stage !== 'new');
     this.stats = {
-      total:    this.total,
+      total:    this.totalQualified,
       hot:      active.filter(l => l.hot).length,
       pipeline: active.filter(l => !['closed_won','closed_lost'].includes(l.stage))
                       .reduce((s, l) => s + +(l.value_pln || 0), 0),

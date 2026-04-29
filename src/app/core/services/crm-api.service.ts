@@ -207,6 +207,10 @@ export interface Partner {
   agent_name: string | null;
   agent_email: string | null;
   agent_phone: string | null;
+  website: string | null;
+  source: string | null;
+  first_contact_date: string | null;
+  logo_url: string | null;
   // ── DWH integracja ─────────────────────────────────────────────────────────
   dwh_partner_id: number | null;
   dwh_company_name: string | null;  // oficjalna nazwa firmy z DWH
@@ -568,6 +572,7 @@ export interface SalesImportLog {
 export interface PagedResponse<T> {
   data: T[];
   total: number;
+  total_qualified?: number;
   page: number;
   limit: number;
   pages: number;
