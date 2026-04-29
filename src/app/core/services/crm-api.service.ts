@@ -254,6 +254,7 @@ export interface Partner {
   non_email_activity_count?: number;
   new_email_count?: number;
   last_reply_at?: string | null;
+  doc_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];

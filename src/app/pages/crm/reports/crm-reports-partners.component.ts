@@ -11,6 +11,7 @@ import {
   PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, CrmUser,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 
 function ym(d: Date): string { return d.toISOString().substring(0, 7); }
 
@@ -51,7 +52,7 @@ function healthColor(engagement: number): string {
   selector: 'wt-crm-reports-partners',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TooltipComponent],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
@@ -110,29 +111,29 @@ function healthColor(engagement: number): string {
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
     <div class="stat-card stat-clickable" style="border-top:3px solid #f26522" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#f26522;font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Obrót brutto (PLN)</div>
+      <div class="stat-lbl">Obrót brutto (PLN)<wt-tooltip key="crm.partners.kpi.gross_turnover"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? '#16a34a' : '#dc2626'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }} vs poprzedni
       </div>
     </div>
     <div class="stat-card stat-clickable" style="border-top:3px solid #22C55E" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#22C55E;font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Przychód / Marża (PLN)</div>
+      <div class="stat-lbl">Przychód / Marża (PLN)<wt-tooltip key="crm.partners.kpi.revenue"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.margin_pct | number:'1.0-1' }}% marży</div>
     </div>
     <div class="stat-card stat-clickable" style="border-top:3px solid #3B82F6" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#3B82F6;font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Fees (PLN)</div>
+      <div class="stat-lbl">Fees (PLN)<wt-tooltip key="crm.partners.kpi.fees"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.fee_rate_pct | number:'1.0-1' }}% fee rate</div>
     </div>
     <div class="stat-card stat-clickable" style="border-top:3px solid #A855F7" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#A855F7;font-size:20px">{{ kpi.transactions_count | number }}</div>
-      <div class="stat-lbl">Transakcje</div>
+      <div class="stat-lbl">Transakcje<wt-tooltip key="crm.partners.kpi.transactions"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.pax_count | number }} PAX</div>
     </div>
     <div class="stat-card stat-clickable" style="border-top:3px solid #F59E0B" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#F59E0B;font-size:20px">{{ kpi.partners_count }}</div>
-      <div class="stat-lbl">Aktywnych partnerów</div>
+      <div class="stat-lbl">Aktywnych partnerów<wt-tooltip key="crm.partners.kpi.active_partners"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '#16a34a' : '#dc2626'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} trend przychodów
       </div>
@@ -161,7 +162,7 @@ function healthColor(engagement: number): string {
               <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Obrót brutto</th>
               <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Marża</th>
               <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Transakcje</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Health</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Health<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
             </tr>
           </thead>
           <tbody>

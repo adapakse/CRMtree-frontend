@@ -142,26 +142,50 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <div *ngIf="lead.notes" style="font-size:12px;color:#6b7280;white-space:pre-line;line-height:1.5">{{lead.notes}}</div>
       </div>
 
-      <!-- Powiązane dokumenty -->
-      <div class="info-section">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="info-section-title" style="margin-bottom:0">📎 Dokumenty ({{linkedDocs.length}})</div>
-          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:10px">+ Dodaj</button>
-        </div>
-        <div *ngIf="linkedDocs.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">Brak</div>
-        <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer" (click)="openDocument(d)" title="Otwórz dokument">
-          <span style="font-size:13px">📄</span>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title||'#'+d.document_id}}</div>
-            <div style="font-size:10px;color:#9ca3af"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span>{{d.doc_type}}</div>
-          </div>
-          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:11px;padding:2px" (click)="$event.stopPropagation();unlinkDoc(d)">✕</button>
-        </div>
-      </div>
     </div>
 
     <!-- ŚRODEK: Aktywności (tabs: Aktywności | Historia) -->
     <div style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+
+      <!-- STAGE STEPPER BAR -->
+      <div style="background:white;border-bottom:1px solid #e5e7eb;padding:10px 12px;flex-shrink:0;display:flex;align-items:center;gap:8px">
+        <!-- Onboarded: locked banner -->
+        <ng-container *ngIf="lead.stage==='onboarded'">
+          <span style="font-size:15px">✅</span>
+          <span style="color:#15803d;font-weight:700;font-size:13px">Onboarding zakończony — Partner aktywny</span>
+          <span style="flex:1"></span>
+          <span style="font-size:11px;color:#9ca3af">Lead zablokowany do edycji</span>
+          <a routerLink="/crm/partners" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ Rejestr Partnerów</a>
+        </ng-container>
+        <!-- Closed lost: red banner mode -->
+        <ng-container *ngIf="lead.stage==='closed_lost'">
+          <span style="font-size:15px">⛔</span>
+          <span style="color:#dc2626;font-weight:700;font-size:13px">Przegrany</span>
+          <span *ngIf="lead.lost_reason" style="font-size:12px;color:#991b1b">· {{lead.lost_reason}}</span>
+          <span style="flex:1"></span>
+          <button *ngIf="canEdit" class="stage-arrow-btn" style="color:#15803d;border-color:#bbf7d0;font-size:12px;padding:4px 12px" (click)="quickChangeStage('new')">↩ Wróć do Nowego</button>
+        </ng-container>
+        <!-- Normal stepper mode -->
+        <ng-container *ngIf="lead.stage!=='closed_lost' && lead.stage!=='onboarded'">
+          <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" title="Poprzedni etap">‹</button>
+          <div style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
+            <ng-container *ngFor="let s of orderedStageOptions; let last=last">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div class="stepper-dot" [ngStyle]="stepperDotStyle(s.key)"
+                     (click)="isStageAllowed(s.key) && canEdit && quickChangeStage(s.key)"
+                     [style.cursor]="canEdit && isStageAllowed(s.key) ? 'pointer' : 'default'"
+                     [title]="s.label"></div>
+                <div class="stepper-label" [ngStyle]="stepperLabelStyle(s.key)">{{s.label}}</div>
+              </div>
+              <div *ngIf="!last" style="flex:0 0 8px;height:2px;margin-top:8px;border-radius:1px"
+                   [style.background]="isStageCompleted(s.key) ? '#22c55e' : '#d1d5db'"></div>
+            </ng-container>
+          </div>
+          <button class="stage-arrow-btn" [disabled]="!nextStage() || !canEdit" (click)="quickChangeStage(nextStage()!)" title="Następny etap">›</button>
+          <button *ngIf="canEdit && lead.stage!=='closed_won'" class="stage-arrow-btn" style="color:#dc2626;border-color:#fecaca;font-size:12px;padding:4px 8px" (click)="quickChangeStage('closed_lost')" title="Przegrany">⛔</button>
+        </ng-container>
+      </div>
+
       <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0">
         <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">
           Aktywności
@@ -371,18 +395,20 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         </button>
       </div>
 
-      <!-- Status leada quick-change -->
+      <!-- Powiązane dokumenty -->
       <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:10px">Etap sprzedaży</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <button *ngFor="let s of stageOptions" class="stage-btn"
-                  [class.active]="lead.stage===s.key"
-                  (click)="quickChangeStage(s.key)"
-                  [disabled]="lead.stage===s.key || !canEdit">
-            <span class="stage-dot stage-dot-{{s.key}}"></span>
-            {{s.label}}
-            <span *ngIf="lead.stage===s.key" style="margin-left:auto;font-size:10px;opacity:.7">✓ aktualny</span>
-          </button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af">📎 Dokumenty ({{linkedDocs.length}})</div>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:10px">+ Dodaj</button>
+        </div>
+        <div *ngIf="linkedDocs.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">Brak</div>
+        <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer" (click)="openDocument(d)" title="Otwórz dokument">
+          <span style="font-size:13px">📄</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title||'#'+d.document_id}}</div>
+            <div style="font-size:10px;color:#9ca3af"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span>{{d.doc_type}}</div>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:11px;padding:2px" (click)="$event.stopPropagation();unlinkDoc(d)">✕</button>
         </div>
       </div>
 
@@ -717,7 +743,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <div class="edit-section-title">Podstawowe</div>
         <div class="edit-row">
           <label>Nazwa firmy *<input [(ngModel)]="editForm.company" placeholder="Nazwa firmy" required></label>
-          <label>Etap<select [(ngModel)]="editForm.stage"><option *ngFor="let s of stageOptions" [value]="s.key">{{s.label}}</option></select></label>
+          <label>Etap<select [(ngModel)]="editForm.stage"><option *ngFor="let s of allowedStageOptions" [value]="s.key">{{s.label}}</option></select></label>
         </div>
         <div class="edit-row" *ngIf="editForm.stage==='closed_lost'">
           <label class="full" style="color:#991b1b">Powód przegranej *
@@ -1313,6 +1339,11 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
     .att-action-btn:hover { background:#f3f4f6; }
     .att-action-btn.dl { color:#1d4ed8; }
     .att-action-btn.view { color:#374151; }
+    .stage-arrow-btn { background:white;border:1px solid #e5e7eb;border-radius:6px;padding:5px 12px;font-size:18px;cursor:pointer;color:#374151;flex-shrink:0;line-height:1;transition:background .15s; }
+    .stage-arrow-btn:hover:not(:disabled) { background:#f9fafb; }
+    .stage-arrow-btn:disabled { opacity:.35;cursor:default; }
+    .stepper-dot { width:14px;height:14px;border-radius:50%;background:#d1d5db;border:2px solid #d1d5db;transition:background .2s,border-color .2s,transform .2s;flex-shrink:0; }
+    .stepper-label { font-size:9px;font-weight:500;color:#9ca3af;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;transition:color .2s; }
   `],
 })
 export class CrmLeadDetailComponent implements OnInit, OnDestroy {
@@ -1460,7 +1491,85 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   convertForm    = { contract_value: null as number | null, contract_signed: '' };
 
   crmUsers: CrmUser[] = [];
+  private readonly STAGE_SEQ = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won'];
+
+  private allowedNextStages(current: string): string[] {
+    if (current === 'closed_lost') return ['new'];
+    if (current === 'closed_won')  return ['negotiation'];
+    const idx = this.STAGE_SEQ.indexOf(current);
+    if (idx === -1) return [];
+    const result: string[] = [];
+    if (idx > 0) result.push(this.STAGE_SEQ[idx - 1]);
+    if (idx < this.STAGE_SEQ.length - 1) result.push(this.STAGE_SEQ[idx + 1]);
+    result.push('closed_lost');
+    return result;
+  }
+
+  isStageAllowed(targetStage: string): boolean {
+    const current = this.lead?.stage;
+    if (!current || current === targetStage) return false;
+    return this.allowedNextStages(current).includes(targetStage);
+  }
+
+  // Wszystkie etapy — do wizualnego paska postępu
   get stageOptions() { return this.dictStages.map(s => ({ key: s.value as LeadStage, label: s.label })); }
+
+  // Etapy w kolejności głównego lejka (bez closed_lost)
+  get orderedStageOptions() {
+    return this.STAGE_SEQ
+      .map(k => this.stageOptions.find(s => s.key === k))
+      .filter(Boolean) as { key: LeadStage; label: string }[];
+  }
+
+  prevStage(): LeadStage | null {
+    const cur = this.lead?.stage;
+    if (!cur) return null;
+    if (cur === 'closed_lost') return 'new';
+    if (cur === 'closed_won')  return 'negotiation' as LeadStage;
+    const idx = this.STAGE_SEQ.indexOf(cur);
+    return idx > 0 ? this.STAGE_SEQ[idx - 1] as LeadStage : null;
+  }
+
+  nextStage(): LeadStage | null {
+    const cur = this.lead?.stage;
+    if (!cur || cur === 'closed_lost' || cur === 'closed_won') return null;
+    const idx = this.STAGE_SEQ.indexOf(cur);
+    return (idx >= 0 && idx < this.STAGE_SEQ.length - 1) ? this.STAGE_SEQ[idx + 1] as LeadStage : null;
+  }
+
+  isStageCompleted(key: string): boolean {
+    const cur = this.lead?.stage;
+    if (!cur) return false;
+    const curIdx = this.STAGE_SEQ.indexOf(cur);
+    return this.STAGE_SEQ.indexOf(key) < curIdx;
+  }
+
+  stepperDotStyle(key: string): Record<string, string> {
+    const cur = this.lead?.stage;
+    if (key === cur) {
+      const color = key === 'closed_won' ? '#22c55e' : '#f26522';
+      return { background: color, borderColor: color, transform: 'scale(1.3)' };
+    }
+    if (this.isStageCompleted(key)) return { background: '#22c55e', borderColor: '#22c55e' };
+    return {};
+  }
+
+  stepperLabelStyle(key: string): Record<string, string> {
+    const cur = this.lead?.stage;
+    if (key === cur) return { color: key === 'closed_won' ? '#15803d' : '#f26522', fontWeight: '700' };
+    if (this.isStageCompleted(key)) return { color: '#15803d' };
+    return {};
+  }
+
+  // Tylko dozwolone przejścia — do dropdownu w formularzu edycji
+  get allowedStageOptions() {
+    const current = this.lead?.stage;
+    if (!current) return this.stageOptions;
+    const allowed = new Set([current, ...this.allowedNextStages(current)]);
+    return this.dictStages
+      .filter(s => allowed.has(s.value))
+      .map(s => ({ key: s.value as LeadStage, label: s.label }));
+  }
   leadSources: LeadSource[] = LEAD_SOURCES;
 
   sourcesWithoutGroup(): LeadSource[] { return this.leadSources.filter(s => !s.group); }
@@ -1576,7 +1685,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   get canEdit(): boolean {
     if (!this.lead) return false;
-    // Backend zwraca can_edit; fallback true gdy brak pola (admin lub starszy response)
+    if (this.lead.stage === 'onboarded') return false;
     return this.lead.can_edit !== false;
   }
 

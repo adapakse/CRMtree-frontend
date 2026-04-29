@@ -21,7 +21,47 @@ interface SettingField {
 }
 
 // Zakładki
-type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding';
+type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding' | 'tooltips';
+
+// Katalog tooltip-slotów: klucz techniczny → ekran + label (widoczne dla admina)
+const TOOLTIP_CATALOG: { key: string; screen: string; label: string }[] = [
+  // Partner Performance
+  { key: 'crm.partners.kpi.gross_turnover',  screen: 'Partner Performance', label: 'Obrót brutto (PLN)' },
+  { key: 'crm.partners.kpi.revenue',         screen: 'Partner Performance', label: 'Przychód / Marża (PLN)' },
+  { key: 'crm.partners.kpi.fees',            screen: 'Partner Performance', label: 'Fees (PLN)' },
+  { key: 'crm.partners.kpi.transactions',    screen: 'Partner Performance', label: 'Transakcje' },
+  { key: 'crm.partners.kpi.active_partners', screen: 'Partner Performance', label: 'Aktywnych partnerów' },
+  { key: 'crm.partners.scorecard.health',    screen: 'Partner Performance', label: 'Scorecard: Health' },
+  // Raporty sprzedaży – KPI
+  { key: 'crm.leads.kpi.pipeline',  screen: 'Raporty sprzedaży', label: 'KPI: Pipeline (PLN)' },
+  { key: 'crm.leads.kpi.won',       screen: 'Raporty sprzedaży', label: 'KPI: Zamknięte / Won (PLN)' },
+  { key: 'crm.leads.kpi.win_rate',  screen: 'Raporty sprzedaży', label: 'KPI: Win Rate' },
+  { key: 'crm.leads.kpi.avg_cycle', screen: 'Raporty sprzedaży', label: 'KPI: Avg. cykl sprzedaży' },
+  { key: 'crm.leads.kpi.budget',    screen: 'Raporty sprzedaży', label: 'KPI: Planowany budżet (PLN)' },
+  // Raporty sprzedaży – Lejek
+  { key: 'crm.leads.funnel.title',       screen: 'Raporty sprzedaży', label: 'Lejek sprzedażowy (tytuł)' },
+  { key: 'crm.leads.funnel.pct',         screen: 'Raporty sprzedaży', label: 'Lejek: % konwersji między etapami' },
+  { key: 'crm.leads.funnel.conversion',  screen: 'Raporty sprzedaży', label: 'Lejek: Konwersja do Wygranego' },
+  { key: 'crm.leads.funnel.avg_won',     screen: 'Raporty sprzedaży', label: 'Lejek: Avg. wartość wygranego' },
+  { key: 'crm.leads.funnel.active',      screen: 'Raporty sprzedaży', label: 'Lejek: Aktywne leady' },
+  { key: 'crm.leads.funnel.hot',         screen: 'Raporty sprzedaży', label: 'Lejek: Gorące leady' },
+  // Raporty sprzedaży – Trend miesięczny
+  { key: 'crm.leads.trend.title',        screen: 'Raporty sprzedaży', label: 'Trend miesięczny (tytuł)' },
+  // Raporty sprzedaży – Wyniki handlowców
+  { key: 'crm.leads.reps.title',         screen: 'Raporty sprzedaży', label: 'Wyniki handlowców (tytuł)' },
+  { key: 'crm.leads.reps.col.leads',     screen: 'Raporty sprzedaży', label: 'Handlowcy: kolumna Leady' },
+  { key: 'crm.leads.reps.col.pipeline',  screen: 'Raporty sprzedaży', label: 'Handlowcy: kolumna Pipeline' },
+  { key: 'crm.leads.reps.col.won',       screen: 'Raporty sprzedaży', label: 'Handlowcy: kolumna Won' },
+  { key: 'crm.leads.reps.col.win_rate',  screen: 'Raporty sprzedaży', label: 'Handlowcy: kolumna Win%' },
+  { key: 'crm.leads.reps.col.progress',  screen: 'Raporty sprzedaży', label: 'Handlowcy: kolumna Postęp' },
+  // Raporty sprzedaży – Źródła leadów
+  { key: 'crm.leads.sources.title',      screen: 'Raporty sprzedaży', label: 'Źródła leadów (tytuł)' },
+  { key: 'crm.leads.sources.quality',    screen: 'Raporty sprzedaży', label: 'Źródła: Jakość po źródle (win rate)' },
+  // Raporty sprzedaży – Czas w etapie
+  { key: 'crm.leads.velocity.title',     screen: 'Raporty sprzedaży', label: 'Czas w etapie – avg dni (tytuł)' },
+  // Raporty sprzedaży – Powody przegranej
+  { key: 'crm.leads.lost.title',         screen: 'Raporty sprzedaży', label: 'Powody przegranej (tytuł)' },
+];
 
 // Kategorie globalnej aplikacji
 const GLOBAL_CATEGORIES = ['documents', 'workflow', 'general'];
@@ -136,6 +176,9 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'onboarding'" (click)="activeTab.set('onboarding')">
             🚀 Szablony Onboarding
+          </button>
+          <button class="tab-btn" [class.active]="activeTab() === 'tooltips'" (click)="activeTab.set('tooltips')">
+            💬 Podpowiedzi
           </button>
         </div>
 
@@ -613,6 +656,130 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           }
         }
 
+        <!-- TAB: Podpowiedzi (Tooltips) -->
+        @if (activeTab() === 'tooltips') {
+
+          <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#5B21B6;display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">💬</span>
+            <div>
+              <strong>Podpowiedzi (Tooltips)</strong> — wybierz ekran i labelkę, wpisz tekst.
+              Ikona <strong style="font-family:sans-serif;background:#e5e7eb;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800">?</strong>
+              pojawi się automatycznie obok danej labelki gdy treść jest zdefiniowana.
+            </div>
+          </div>
+
+          <!-- Formularz dodawania nowego -->
+          <div class="card" style="padding:20px;margin-bottom:24px">
+            <div class="cat-title" style="margin-bottom:16px">+ Dodaj podpowiedź</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div>
+                <label class="field-label" style="display:block;margin-bottom:4px">Ekran <span style="color:#ef4444">*</span></label>
+                <select class="fsel" [(ngModel)]="newTipScreen" (ngModelChange)="onNewTipScreenChange()">
+                  <option value="">— wybierz ekran —</option>
+                  @for (s of catalogScreens; track s) {
+                    <option [value]="s">{{ s }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="field-label" style="display:block;margin-bottom:4px">Label <span style="color:#ef4444">*</span></label>
+                <select class="fsel" [(ngModel)]="newTipLabelKey" [disabled]="!newTipScreen">
+                  <option value="">— wybierz label —</option>
+                  @for (e of catalogForScreen; track e.key) {
+                    <option [value]="e.key" [disabled]="isAlreadyDefined(e.key)">
+                      {{ e.label }}{{ isAlreadyDefined(e.key) ? ' ✓' : '' }}
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom:12px">
+              <label class="field-label" style="display:block;margin-bottom:4px">Treść podpowiedzi <span style="color:#ef4444">*</span></label>
+              <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:72px"
+                        [(ngModel)]="newTipValue"
+                        placeholder="Tekst który zobaczy użytkownik po najechaniu na ikonę ?."></textarea>
+            </div>
+            @if (tipError()) {
+              <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626;margin-bottom:10px">⚠ {{ tipError() }}</div>
+            }
+            <button class="btn btn-p" style="padding:8px 20px"
+                    [disabled]="tipSaving() || !newTipLabelKey || !newTipValue.trim()"
+                    (click)="addTooltip()">
+              {{ tipSaving() ? 'Zapisywanie…' : '+ Dodaj podpowiedź' }}
+            </button>
+          </div>
+
+          <!-- Lista istniejących, pogrupowana po ekranach -->
+          @if (tooltipFields().length === 0) {
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+              Brak zdefiniowanych podpowiedzi. Dodaj pierwszą powyżej.
+            </div>
+          }
+
+          @for (screen of catalogScreens; track screen) {
+            @if (tooltipFieldsForScreen(screen).length > 0) {
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin:20px 0 8px;padding-left:2px">
+                {{ screen }}
+              </div>
+              @for (t of tooltipFieldsForScreen(screen); track t.key) {
+                <div class="card" style="margin-bottom:10px;overflow:hidden">
+                  <div class="cat-header" style="padding:10px 18px;display:flex;align-items:center;gap:10px">
+                    <span class="cat-title" style="font-size:13px;font-weight:600">{{ catalogEntry(t.key)?.label }}</span>
+                    <code style="font-size:10px;font-family:monospace;color:#a78bfa;background:#f3f0ff;padding:1px 6px;border-radius:4px">{{ t.key }}</code>
+                    <span style="flex:1"></span>
+                    @if (t.updated_by_name) {
+                      <span class="field-meta">{{ t.updated_by_name }} · {{ t.updated_at | date:'dd.MM.yy HH:mm' }}</span>
+                    }
+                    <button style="background:#fee2e2;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;color:#991b1b;font-size:12px;flex-shrink:0"
+                            (click)="deleteTooltip(t.key)">🗑 Usuń</button>
+                  </div>
+                  <div style="padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+                    <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:13px"
+                              [(ngModel)]="tipDrafts[t.key]"
+                              (ngModelChange)="tipDirty[t.key] = true"></textarea>
+                    <button class="btn btn-p" style="padding:7px 16px;font-size:12px;white-space:nowrap"
+                            [disabled]="!tipDirty[t.key] || tipSaving()"
+                            (click)="saveTooltip(t.key, tipDrafts[t.key])">
+                      💾 Zapisz
+                    </button>
+                  </div>
+                </div>
+              }
+            }
+          }
+
+          <!-- Klucze spoza katalogu (legacy / ręcznie dodane wcześniej) -->
+          @if (uncategorizedTooltips().length > 0) {
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin:20px 0 8px;padding-left:2px">
+              Inne
+            </div>
+            @for (t of uncategorizedTooltips(); track t.key) {
+              <div class="card" style="margin-bottom:10px;overflow:hidden">
+                <div class="cat-header" style="padding:10px 18px;display:flex;align-items:center;gap:10px">
+                  <code style="font-size:11px;font-family:monospace;color:#7c3aed;background:#f3f0ff;padding:2px 8px;border-radius:4px">{{ t.key }}</code>
+                  <span class="cat-title" style="font-size:12px;color:var(--gray-600);font-weight:500">{{ t.label }}</span>
+                  <span style="flex:1"></span>
+                  @if (t.updated_by_name) {
+                    <span class="field-meta">{{ t.updated_by_name }} · {{ t.updated_at | date:'dd.MM.yy HH:mm' }}</span>
+                  }
+                  <button style="background:#fee2e2;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;color:#991b1b;font-size:12px;flex-shrink:0"
+                          (click)="deleteTooltip(t.key)">🗑 Usuń</button>
+                </div>
+                <div style="padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+                  <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:13px"
+                            [(ngModel)]="tipDrafts[t.key]"
+                            (ngModelChange)="tipDirty[t.key] = true"></textarea>
+                  <button class="btn btn-p" style="padding:7px 16px;font-size:12px;white-space:nowrap"
+                          [disabled]="!tipDirty[t.key] || tipSaving()"
+                          (click)="saveTooltip(t.key, tipDrafts[t.key])">
+                    💾 Zapisz
+                  </button>
+                </div>
+              </div>
+            }
+          }
+        }
+
       </div>
     </div>
   `,
@@ -801,6 +968,43 @@ export class SettingsComponent implements OnInit {
   crmFields     = computed(() => this.fields().filter(f => f.category === 'crm' && !CRM_DICT_KEYS.includes(f.key)));
   docFields     = computed(() => this.fields().filter(f => DOC_DICT_KEYS.includes(f.key)));
   crmDictFields = computed(() => this.fields().filter(f => CRM_DICT_KEYS.includes(f.key)));
+  tooltipFields = computed(() => this.fields().filter(f => f.category === 'tooltip').sort((a, b) => a.key.localeCompare(b.key)));
+
+  // ── Tooltips CRUD ─────────────────────────────────────────────────────────
+  newTipScreen   = '';
+  newTipLabelKey = '';
+  newTipValue    = '';
+  tipSaving      = signal(false);
+  tipError       = signal('');
+  tipDrafts:     Record<string, string> = {};
+  tipDirty:      Record<string, boolean> = {};
+
+  get catalogScreens(): string[] { return [...new Set(TOOLTIP_CATALOG.map(e => e.screen))]; }
+  get catalogForScreen(): { key: string; screen: string; label: string }[] {
+    return TOOLTIP_CATALOG.filter(e => e.screen === this.newTipScreen);
+  }
+
+  tooltipFieldsForScreen(screen: string): SettingField[] {
+    const keys = new Set(TOOLTIP_CATALOG.filter(e => e.screen === screen).map(e => e.key));
+    return this.tooltipFields().filter(f => keys.has(f.key));
+  }
+
+  uncategorizedTooltips = computed(() => {
+    const catalogKeys = new Set(TOOLTIP_CATALOG.map(e => e.key));
+    return this.tooltipFields().filter(f => !catalogKeys.has(f.key));
+  });
+
+  catalogEntry(key: string): { screen: string; label: string } | undefined {
+    return TOOLTIP_CATALOG.find(e => e.key === key);
+  }
+
+  isAlreadyDefined(key: string): boolean {
+    return this.tooltipFields().some(t => t.key === key);
+  }
+
+  onNewTipScreenChange(): void {
+    this.newTipLabelKey = '';
+  }
 
   ngOnInit(): void {
     // Załaduj listę userów dla edytora szablonów onboarding
@@ -815,7 +1019,7 @@ export class SettingsComponent implements OnInit {
   }
 
   private buildFields(meta: AppSettingsMeta[]): void {
-    this.templateDrafts.clear(); // reset parsed cache on reload/save
+    this.templateDrafts.clear();
     this.fields.set(meta.map(m => ({
       key:             m.key,
       label:           m.label,
@@ -828,9 +1032,61 @@ export class SettingsComponent implements OnInit {
       dirty:           false,
       error:           '',
     })));
-    // init jsonNewItem map
     this.jsonNewItem = {};
     for (const m of meta) if (m.value_type === 'json') this.jsonNewItem[m.key] = '';
+
+    // Sync tooltip drafts (preserve dirty edits)
+    this.tipDrafts = {};
+    this.tipDirty  = {};
+    for (const m of meta.filter(x => x.category === 'tooltip')) {
+      this.tipDrafts[m.key] = m.value ?? '';
+    }
+  }
+
+  addTooltip(): void {
+    const key   = this.newTipLabelKey;
+    const value = this.newTipValue.trim();
+    if (!key)   { this.tipError.set('Wybierz ekran i label'); return; }
+    if (!value) { this.tipError.set('Treść podpowiedzi jest wymagana'); return; }
+    const entry = this.catalogEntry(key);
+    const label = entry ? `${entry.screen} › ${entry.label}` : key;
+    this.tipError.set('');
+    this.tipSaving.set(true);
+    this.http.post(`${environment.apiUrl}/admin/settings/tooltips`, { key, label, value }).subscribe({
+      next: () => {
+        this.newTipScreen = ''; this.newTipLabelKey = ''; this.newTipValue = '';
+        this.tipSaving.set(false);
+        this.toast.success(`Tooltip dodany`);
+        this.settingsSvc.reload().then(() => this.buildFields(this.settingsSvc.meta()));
+      },
+      error: err => { this.tipError.set(err?.error?.error ?? 'Błąd zapisu'); this.tipSaving.set(false); },
+    });
+  }
+
+  saveTooltip(key: string, value: string): void {
+    const f = this.tooltipFields().find(t => t.key === key);
+    if (!f) return;
+    this.tipSaving.set(true);
+    this.http.post(`${environment.apiUrl}/admin/settings/tooltips`, { key, label: f.label, value: value.trim() }).subscribe({
+      next: () => {
+        this.tipDirty[key] = false;
+        this.tipSaving.set(false);
+        this.toast.success(`Tooltip "${key}" zapisany`);
+        this.settingsSvc.reload().then(() => this.buildFields(this.settingsSvc.meta()));
+      },
+      error: err => { this.toast.error(err?.error?.error ?? 'Błąd zapisu'); this.tipSaving.set(false); },
+    });
+  }
+
+  deleteTooltip(key: string): void {
+    if (!confirm(`Usunąć tooltip "${key}"?`)) return;
+    this.http.delete(`${environment.apiUrl}/admin/settings/tooltips/${encodeURIComponent(key)}`).subscribe({
+      next: () => {
+        this.toast.success(`Tooltip "${key}" usunięty`);
+        this.settingsSvc.reload().then(() => this.buildFields(this.settingsSvc.meta()));
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Błąd usuwania'),
+    });
   }
 
   onFieldChange(field: SettingField): void {

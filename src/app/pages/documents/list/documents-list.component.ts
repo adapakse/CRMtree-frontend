@@ -2,10 +2,12 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { DocumentService } from '../../../core/services/document.service';
 import { GroupService } from '../../../core/services/api.services';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { CrmApiService } from '../../../core/services/crm-api.service';
 import { Document, DocStatus, DocType, GroupProfile, ActiveTaskInfo } from '../../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent } from '../../../shared/components/badges.components';
 import { DOC_TYPE_MAP, triggerDownload, isExpiringSoon } from '../../../core/services/helpers';
@@ -48,6 +50,14 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
         New Document
       </button>
     </div>
+
+    @if (partnerFilterName) {
+      <div style="display:flex;align-items:center;gap:8px;background:#fff7ed;border-bottom:1px solid #fed7aa;padding:6px 20px;font-size:12px;color:#9a3412">
+        <span style="font-size:14px">🏢</span>
+        <span>Dokumenty partnera: <strong>{{partnerFilterName}}</strong></span>
+        <button (click)="clearPartnerFilter()" style="margin-left:auto;background:none;border:1px solid #fdba74;border-radius:6px;color:#9a3412;font-size:11px;padding:2px 8px;cursor:pointer">✕ Pokaż wszystkie</button>
+      </div>
+    }
 
     <div id="content">
       <!-- Toolbar -->
@@ -218,7 +228,11 @@ export class DocumentsListComponent implements OnInit {
   private groupSvc = inject(GroupService);
   private route    = inject(ActivatedRoute);
   private toast    = inject(ToastService);
+  private crmApi   = inject(CrmApiService);
   auth             = inject(AuthService);
+
+  partnerFilterId:   string | null = null;
+  partnerFilterName: string        = '';
 
   readonly grid  = GRID;
   statuses       = STATUSES;
@@ -303,9 +317,36 @@ export class DocumentsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.groupSvc.list().subscribe(g => this.groups.set(g));
-    this.loadDocuments();
+    const partnerId   = this.route.snapshot.queryParamMap.get('partner_id');
+    this.partnerFilterName = this.route.snapshot.queryParamMap.get('partner_name') ?? '';
+    if (partnerId) {
+      this.partnerFilterId = partnerId;
+      this.loadPartnerDocuments(partnerId);
+    } else {
+      this.loadDocuments();
+    }
     const openId = this.route.snapshot.queryParamMap.get('open');
     if (openId) this.docSvc.get(openId).subscribe(doc => this.selectedDoc.set(doc));
+  }
+
+  loadPartnerDocuments(partnerId: string): void {
+    this.loading.set(true);
+    this.crmApi.getPartnerDocuments(partnerId).subscribe({
+      next: linkedDocs => {
+        if (!linkedDocs.length) { this.documents.set([]); this.totalPages.set(1); this.loading.set(false); return; }
+        forkJoin(linkedDocs.map(ld => this.docSvc.get(ld.document_id))).subscribe({
+          next: docs => { this.documents.set(docs); this.totalPages.set(1); this.loading.set(false); },
+          error: () => this.loading.set(false),
+        });
+      },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  clearPartnerFilter(): void {
+    this.partnerFilterId   = null;
+    this.partnerFilterName = '';
+    this.loadDocuments();
   }
 
   loadDocuments(): void {

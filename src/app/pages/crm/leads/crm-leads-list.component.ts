@@ -161,7 +161,7 @@ const PROB_MAP: Record<LeadStage, number> = {
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.stage==='onboarded'" title="Onboarding zakończony — Partner aktywny" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 5px;margin-left:3px;font-weight:700;vertical-align:middle">✓ Partner</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>

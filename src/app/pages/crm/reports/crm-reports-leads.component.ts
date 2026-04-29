@@ -11,6 +11,7 @@ import {
   LEAD_STAGE_LABELS, LEAD_SOURCES, LEAD_SOURCE_LABELS, CrmUser,
 } from '../../../core/services/crm-api.service';
 import { Router } from '@angular/router';
+import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 
@@ -51,7 +52,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
   selector: 'wt-crm-reports-leads',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TooltipComponent],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
@@ -99,7 +100,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
       <div class="stat-val" style="color:#f26522;cursor:pointer"
            (click)="goToLeads({}, 'Pipeline – wszystkie aktywne')"
            title="Kliknij aby zobaczyć leady">{{ kpi.pipeline_value | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Pipeline (PLN)</div>
+      <div class="stat-lbl">Pipeline (PLN)<wt-tooltip key="crm.leads.kpi.pipeline"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="kpi.active > 0" style="color:#16a34a">↑ {{ kpi.active }} aktywnych</div>
       <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e4e4e7;cursor:pointer"
            (click)="goToLeads({close_date_from: dateFrom, close_date_to: periodEnd}, 'Planowane do dowiezienia w okresie')"
@@ -114,7 +115,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
       <div class="stat-val" style="color:#22C55E;cursor:pointer"
            (click)="goToLeads({stage: 'closed_won'}, 'Zamknięte / Won')"
            title="Kliknij aby zobaczyć wygrane leady">{{ kpi.won_value | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Zamknięte / Won (PLN)</div>
+      <div class="stat-lbl">Zamknięte / Won (PLN)<wt-tooltip key="crm.leads.kpi.won"></wt-tooltip></div>
       <div class="stat-trend" style="color:#16a34a">↑ {{ kpi.won }} kontraktów</div>
       <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e4e4e7">
         <div style="font-size:10px;color:#a1a1aa;font-weight:500;cursor:pointer"
@@ -133,16 +134,16 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     </div>
     <div class="stat-card" style="border-top:3px solid #3B82F6">
       <div class="stat-val">{{ kpi.win_rate || 0 }}%</div>
-      <div class="stat-lbl">Win Rate</div>
+      <div class="stat-lbl">Win Rate<wt-tooltip key="crm.leads.kpi.win_rate"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ kpi.won }} / {{ kpi.won + kpi.lost }}</div>
     </div>
     <div class="stat-card" style="border-top:3px solid #A855F7">
       <div class="stat-val">{{ kpi.avg_cycle_days ? kpi.avg_cycle_days + ' dni' : '—' }}</div>
-      <div class="stat-lbl">Avg. cykl sprzedaży</div>
+      <div class="stat-lbl">Avg. cykl sprzedaży<wt-tooltip key="crm.leads.kpi.avg_cycle"></wt-tooltip></div>
     </div>
     <div class="stat-card" style="border-top:3px solid #7C3AED">
       <div class="stat-val" style="color:#7C3AED">{{ budgetTotal | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Planowany budżet (PLN)</div>
+      <div class="stat-lbl">Planowany budżet (PLN)<wt-tooltip key="crm.leads.kpi.budget"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="budgetTotal > 0 && kpi.won_value > 0" [style.color]="kpi.won_value >= budgetTotal ? '#16a34a' : '#dc2626'">
         {{ kpi.won_value >= budgetTotal ? '✓' : '' }} {{ (kpi.won_value / budgetTotal * 100) | number:'1.0-0' }}% realizacji
       </div>
@@ -156,25 +157,25 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     <!-- Lejek sprzedażowy -->
     <div class="card" style="padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Lejek sprzedażowy</div>
-        <span style="font-size:11px;color:#a1a1aa">Liczba leadów i wartość PLN</span>
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Lejek sprzedażowy<wt-tooltip key="crm.leads.funnel.title"></wt-tooltip></div>
+        <span style="font-size:11px;color:#a1a1aa">Liczba leadów i wartość PLN<wt-tooltip key="crm.leads.funnel.pct"></wt-tooltip></span>
       </div>
       <div #funnelEl></div>
       <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
         <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">Konwersja do Wygranego</div>
+          <div style="color:#a1a1aa;margin-bottom:2px">Konwersja do Wygranego<wt-tooltip key="crm.leads.funnel.conversion"></wt-tooltip></div>
           <div style="font-weight:700;color:#18181b;font-family:'Sora',sans-serif">{{ kpi.win_rate || 0 }}%</div>
         </div>
         <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">Avg. wartość wygranego</div>
+          <div style="color:#a1a1aa;margin-bottom:2px">Avg. wartość wygranego<wt-tooltip key="crm.leads.funnel.avg_won"></wt-tooltip></div>
           <div style="font-weight:700;color:#18181b;font-family:'Sora',sans-serif">{{ kpi.won > 0 ? ((kpi.won_value / kpi.won) | number:'1.0-0') : '—' }} PLN</div>
         </div>
         <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">Aktywne leady</div>
+          <div style="color:#a1a1aa;margin-bottom:2px">Aktywne leady<wt-tooltip key="crm.leads.funnel.active"></wt-tooltip></div>
           <div style="font-weight:700;color:#18181b;font-family:'Sora',sans-serif">{{ kpi.active }}</div>
         </div>
         <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">Gorących 🔥</div>
+          <div style="color:#a1a1aa;margin-bottom:2px">Gorących 🔥<wt-tooltip key="crm.leads.funnel.hot"></wt-tooltip></div>
           <div style="font-weight:700;color:#f26522;font-family:'Sora',sans-serif">{{ kpi.hot }}</div>
         </div>
       </div>
@@ -183,7 +184,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     <!-- Przychody miesięczne (bar chart) -->
     <div class="card" style="padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Trend miesięczny</div>
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Trend miesięczny<wt-tooltip key="crm.leads.trend.title"></wt-tooltip></div>
         <div style="display:flex;gap:10px;font-size:11px;color:#a1a1aa">
           <span style="display:flex;align-items:center;gap:4px">
             <span style="width:10px;height:10px;background:#f26522;border-radius:2px;display:inline-block"></span>Wygrane
@@ -203,16 +204,16 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 
     <!-- Tabela handlowców -->
     <div class="card" style="padding:20px" *ngIf="isManager">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Wyniki handlowców</div>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Wyniki handlowców<wt-tooltip key="crm.leads.reps.title"></wt-tooltip></div>
       <table style="width:100%;border-collapse:collapse;font-size:12.5px">
         <thead>
           <tr style="border-bottom:1px solid #e4e4e7">
             <th style="text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Handlowiec</th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Leady</th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Pipeline</th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Won</th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Win%</th>
-            <th style="padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Postęp</th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Leady<wt-tooltip key="crm.leads.reps.col.leads"></wt-tooltip></th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Pipeline<wt-tooltip key="crm.leads.reps.col.pipeline"></wt-tooltip></th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Won<wt-tooltip key="crm.leads.reps.col.won"></wt-tooltip></th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Win%<wt-tooltip key="crm.leads.reps.col.win_rate"></wt-tooltip></th>
+            <th style="padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">Postęp<wt-tooltip key="crm.leads.reps.col.progress"></wt-tooltip></th>
           </tr>
         </thead>
         <tbody>
@@ -245,7 +246,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 
     <!-- Źródła leadów (donut) -->
     <div class="card" style="padding:20px">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Źródła leadów</div>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Źródła leadów<wt-tooltip key="crm.leads.sources.title"></wt-tooltip></div>
       <div style="display:flex;align-items:center;gap:20px">
         <svg width="120" height="120" viewBox="0 0 120 120" #donutSvg>
           <circle cx="60" cy="60" r="44" fill="none" stroke="#F4F4F5" stroke-width="18"/>
@@ -253,7 +254,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
         <div #donutLegend style="flex:1;display:flex;flex-direction:column;gap:8px;font-size:12px"></div>
       </div>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e4e4e7">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;color:#a1a1aa;letter-spacing:.5px;margin-bottom:8px">Jakość po źródle (win rate)</div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;color:#a1a1aa;letter-spacing:.5px;margin-bottom:8px">Jakość po źródle (win rate)<wt-tooltip key="crm.leads.sources.quality"></wt-tooltip></div>
         <div style="display:flex;flex-direction:column;gap:5px;font-size:12px">
           <div *ngFor="let s of topSourcesWin" style="display:flex;justify-content:space-between">
             <span>{{ s.label }}</span>
@@ -269,14 +270,14 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 
     <!-- Czas w etapie -->
     <div class="card" style="padding:20px">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:16px">Czas w etapie (avg dni)</div>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:16px">Czas w etapie (avg dni)<wt-tooltip key="crm.leads.velocity.title"></wt-tooltip></div>
       <div #velocityEl style="display:flex;flex-direction:column;gap:10px"></div>
       <div *ngIf="!velocityData.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">Brak danych</div>
     </div>
 
     <!-- Powody przegranej -->
     <div class="card" style="padding:20px">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:16px">Powody przegranej</div>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:16px">Powody przegranej<wt-tooltip key="crm.leads.lost.title"></wt-tooltip></div>
       <div #lostEl style="display:flex;flex-direction:column;gap:10px"></div>
       <div *ngIf="!lostReasons.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:12px">Brak przegranych leadów</div>
       <div *ngIf="lostReasons.length" style="margin-top:16px;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;color:#9a3412">
@@ -481,10 +482,17 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     const el = this.funnelEl?.nativeElement;
     if (!el) return;
     el.innerHTML = '';
-    const active = this.funnel.filter(f => !['closed_won','closed_lost'].includes(f.stage));
-    const all    = [...active, ...this.funnel.filter(f => ['closed_won','closed_lost'].includes(f.stage))];
-    if (!all.length) { el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">Brak danych</div>'; return; }
-    const maxVal = Math.max(...all.map(d => d.value), 1);
+
+    // Onboarding wydzielone poza główny lejek — liczymy tylko aktywny onboarding, nie zakończony
+    const onbRows  = this.funnel.filter(f => f.stage === 'onboarding');
+    const mainRows = this.funnel.filter(f => !['onboarding','onboarded'].includes(f.stage));
+    const active   = mainRows.filter(f => !['closed_won','closed_lost'].includes(f.stage));
+    const all      = [...active, ...mainRows.filter(f => ['closed_won','closed_lost'].includes(f.stage))];
+    const onbCount = onbRows.reduce((s, d) => s + d.count, 0);
+    const onbValue = onbRows.reduce((s, d) => s + parseFloat(d.value), 0);
+
+    if (!all.length && !onbCount) { el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">Brak danych</div>'; return; }
+    const maxVal = Math.max(...all.map(d => d.value), onbValue, 1);
     const colors: Record<string,string> = { new:'#94A3B8',qualification:'#F59E0B',presentation:'#3B82F6',offer:'#A855F7',negotiation:'#F97316',closed_won:'#22C55E',closed_lost:'#EF4444' };
     all.forEach((d, i) => {
       const pct = Math.round(d.value / maxVal * 100);
@@ -496,8 +504,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       const sep = i === active.length - 1 && active.length < all.length
         ? '<div style="height:1px;background:#f4f4f5;margin:4px 0"></div>' : '';
       const row = document.createElement('div');
-      row.style.cssText = 'margin-bottom:6px';
-      row.style.cursor = 'pointer';
+      row.style.cssText = 'margin-bottom:6px;cursor:pointer';
       row.title = `Kliknij aby zobaczyć leady w etapie: ${label}`;
       row.addEventListener('click', () => this.goToLeads({ stage: d.stage }, `Lejek: ${label}`));
       row.innerHTML = `${sep}<div style="display:flex;align-items:center;gap:8px">
@@ -512,6 +519,31 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
         </div>${conv}</div>`;
       el.appendChild(row);
     });
+
+    // Pasek "W onboardingu" — łączy onboarding + onboarded, prowadzi do sekcji Onboarding
+    if (onbCount > 0) {
+      const pct = Math.round(onbValue / maxVal * 100);
+      const sep = document.createElement('div');
+      sep.style.cssText = 'height:1px;background:#f4f4f5;margin:6px 0 6px 0';
+      el.appendChild(sep);
+      const row = document.createElement('div');
+      row.style.cssText = 'margin-bottom:6px;cursor:pointer';
+      row.title = 'Kliknij aby przejść do sekcji Onboarding';
+      row.addEventListener('click', () => this.router.navigate(['/crm/onboarding']));
+      row.innerHTML = `<div style="display:flex;align-items:center;gap:8px">
+        <div style="width:88px;font-size:11.5px;color:#0891b2;text-align:right;flex-shrink:0;font-weight:600">W onboardingu</div>
+        <div style="flex:1;position:relative;height:26px">
+          <div style="position:absolute;inset:0;background:#f4f4f5;border-radius:4px"></div>
+          <div style="position:absolute;top:0;left:0;width:${pct}%;height:100%;background:#06B6D4;border-radius:4px;opacity:.85"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 8px">
+            <span style="font-size:10.5px;font-weight:700;color:#374151">${onbCount} lead.</span>
+            <span style="font-size:10.5px;font-weight:600;color:#374151;margin-left:auto">${(onbValue/1000).toFixed(0)}k PLN</span>
+          </div>
+        </div>
+        <div style="width:34px;text-align:center;font-size:12px;color:#0891b2;flex-shrink:0">→</div>
+      </div>`;
+      el.appendChild(row);
+    }
   }
 
   private buildBarChart(): void {
@@ -521,15 +553,15 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     el.innerHTML = ''; labels.innerHTML = '';
     if (!this.monthly.length) { el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:40px 0;width:100%">Brak danych</div>'; return; }
     const data = this.monthly.slice(-12);
-    const maxVal = Math.max(...data.map(d => Math.max(d.new_leads, d.won)), 1);
+    const maxVal = Math.max(...data.map(d => Math.max(d.active_leads, d.won)), 1);
     data.forEach(d => {
-      const wonH  = d.won       ? Math.max(4, Math.round(d.won       / maxVal * 140)) : 0;
-      const newH  = Math.max(4, Math.round(d.new_leads / maxVal * 140));
+      const wonH    = d.won          ? Math.max(4, Math.round(d.won          / maxVal * 140)) : 0;
+      const activeH = d.active_leads ? Math.max(4, Math.round(d.active_leads / maxVal * 140)) : 0;
       const col   = document.createElement('div');
       col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:2px';
       col.innerHTML = `
         <div style="width:100%;display:flex;gap:2px;align-items:flex-end;justify-content:center">
-          <div style="flex:1;height:${newH}px;background:#BFDBFE;border-radius:3px 3px 0 0" title="Nowe: ${d.new_leads}"></div>
+          ${d.active_leads ? `<div style="flex:1;height:${activeH}px;background:#BFDBFE;border-radius:3px 3px 0 0" title="Aktywne (Kwalifikacja–Negocjacje): ${d.active_leads}"></div>` : '<div style="flex:1"></div>'}
           ${d.won ? `<div style="flex:1;height:${wonH}px;background:#f26522;border-radius:3px 3px 0 0" title="Won: ${d.won}"></div>` : '<div style="flex:1"></div>'}
         </div>
         ${d.won ? `<div style="font-size:9px;color:#f26522;font-weight:700">${d.won}</div>` : '<div style="height:14px"></div>'}`;

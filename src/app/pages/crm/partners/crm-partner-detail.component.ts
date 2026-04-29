@@ -639,6 +639,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">Dokumenty ({{linkedDocs.length}})</div>
           <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:11px">+ Dodaj</button>
         </div>
+        <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
+             style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#9a3412">
+          <span style="font-size:14px;color:#f97316">⚠️</span>
+          <span><strong>Brak powiązanej umowy.</strong> Dodaj dokument, aby potwierdzić współpracę z partnerem.</span>
+        </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px 0">Brak powiązanych dokumentów</div>
         <div *ngFor="let d of linkedDocs"
              style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f9fafb;cursor:pointer"

@@ -67,6 +67,11 @@ type SortDir = 'asc' | 'desc';
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
+          <span *ngIf="p.crm_uuid && (p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
+                title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
+                style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
       </div>
@@ -124,6 +129,11 @@ type SortDir = 'asc' | 'desc';
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
           <span *ngIf="(p.non_email_activity_count??0)>0"
                 style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
+          <span *ngIf="p.crm_uuid && (p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
+                title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
+                style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
       </div>
@@ -436,6 +446,12 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   goPartner(id: number | null, crm_uuid?: string | null) {
     const nav = crm_uuid ?? id;
     if (nav != null) this.router.navigate(['/crm/partners', nav]);
+  }
+
+  openPartnerDocs(p: Partner): void {
+    const id   = p.crm_uuid ?? String(p.id);
+    const name = p.dwh_company_name || p.company;
+    this.router.navigate(['/documents'], { queryParams: { partner_id: id, partner_name: name } });
   }
 
   hasUnreadReply(p: any): boolean {
