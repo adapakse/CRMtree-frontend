@@ -138,7 +138,7 @@ import { environment } from '../../../../environments/environment';
                     }
                   </select>
                 } @else {
-                  <input class="fi" [(ngModel)]="draft.entity1" placeholder="np. WorkTrips Sp. z o.o.">
+                  <input class="fi" [(ngModel)]="draft.entity1" placeholder="np. CRMtree Sp. z o.o.">
                 }
                 } @else {
                   <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.entity1 || '—' }}</div>
@@ -530,7 +530,7 @@ import { environment } from '../../../../environments/environment';
           <div style="padding:20px 24px">
             <div class="fg" style="margin-bottom:14px">
               <label class="fl">Signatories (comma-separated emails) <span class="req">*</span></label>
-              <textarea class="fta" style="min-height:60px" placeholder="anna@worktrips.com, partner@example.com" [(ngModel)]="signusEmails"></textarea>
+              <textarea class="fta" style="min-height:60px" placeholder="anna@firma.com, partner@example.com" [(ngModel)]="signusEmails"></textarea>
             </div>
             <div style="background:var(--gray-50);border-radius:8px;padding:12px;font-size:12px;color:var(--gray-500)">
               ℹ The document will be sent to Signus API. Each signatory will receive an email. Signed versions are automatically archived.

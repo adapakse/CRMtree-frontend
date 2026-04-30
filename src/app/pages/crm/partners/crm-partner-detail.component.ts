@@ -168,7 +168,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     <div class="info-card">
       <h3>Informacje</h3>
       <div class="info-grid">
-        <span class="lbl">Worktrips ID</span>
+        <span class="lbl">CRMtree ID</span>
         <span>
           <span *ngIf="partner.dwh_partner_id" style="font-family:monospace;font-weight:600;color:var(--orange)">{{partner.dwh_partner_id}}</span>
           <span *ngIf="!partner.dwh_partner_id" style="color:var(--gray-400)">— nie ustawiono</span>
@@ -880,11 +880,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
           <div class="edit-row">
             <label>
-              Worktrips Partner ID
+              CRMtree Partner ID
               <input [(ngModel)]="editForm.dwh_partner_id" type="number" placeholder="np. 42"
                      style="font-family:monospace" [disabled]="!isManager">
               <span style="font-size:10px;color:#7c3aed;margin-top:2px;display:block">
-                ID partnera w systemie transakcyjnym Worktrips<span *ngIf="!isManager"> · tylko menedżerowie mogą edytować</span>
+                ID partnera w systemie transakcyjnym<span *ngIf="!isManager"> · tylko menedżerowie mogą edytować</span>
               </span>
             </label>
             <!-- NIP: edytowalny tylko dla partnerów bez DWH -->
@@ -3104,7 +3104,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       email: 'Email', phone: 'Telefon', notes: 'Notatki', manager_id: 'Handlowiec',
       billing_address: 'Adres', billing_city: 'Miasto', billing_country: 'Kraj',
       subdomain: 'Subdomena', language: 'Język', partner_currency: 'Waluta',
-      dwh_partner_id: 'Worktrips Partner ID', contract_signed: 'Umowa od', contract_expires: 'Umowa do',
+      dwh_partner_id: 'CRMtree Partner ID', contract_signed: 'Umowa od', contract_expires: 'Umowa do',
       contract_value: 'Obrót', active_users: 'Aktywni użytkownicy', tags: 'Tagi',
       industry: 'Branża', group_id: 'Grupa', commission_value: 'Prowizja',
       credit_limit_value: 'Limit kredytowy', deposit_value: 'Depozyt',

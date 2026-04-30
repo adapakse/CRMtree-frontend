@@ -50,7 +50,7 @@ const ACTION_ICONS: Record<string, string> = {
         </div>
         <div class="fg" style="min-width:160px">
           <label class="fl">User email</label>
-          <input class="fi" type="text" [(ngModel)]="filters.user_email" (blur)="load()" placeholder="user@worktrips.com" style="padding:5px 8px">
+          <input class="fi" type="text" [(ngModel)]="filters.user_email" (blur)="load()" placeholder="user@firma.com" style="padding:5px 8px">
         </div>
         <div style="margin-top:auto">
           <button class="btn btn-g btn-sm" (click)="clearFilters()">Clear filters</button>

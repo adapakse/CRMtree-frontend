@@ -47,7 +47,11 @@ export class AuthService {
     sessionStorage.setItem(ACCESS_KEY,  accessToken);
     sessionStorage.setItem(REFRESH_KEY, refreshToken);
     this.loadCurrentUser().subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: (user) => {
+        const dest = (user.crm_role === 'salesperson' || user.crm_role === 'sales_manager')
+          ? '/crm/dashboard' : '/dashboard';
+        this.router.navigate([dest]);
+      },
       error: () => this.logout(),
     });
   }
