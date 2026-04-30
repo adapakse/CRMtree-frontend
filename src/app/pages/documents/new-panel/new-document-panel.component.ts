@@ -98,7 +98,7 @@ import { AppSettingsService } from '@core/services/app-settings.service';
                   }
                 </select>
               } @else {
-                <input class="fi" placeholder="np. WorkTrips Sp. z o.o." [(ngModel)]="entity1">
+                <input class="fi" placeholder="np. CRMtree Sp. z o.o." [(ngModel)]="entity1">
               }
             </div>
             <div class="fg">

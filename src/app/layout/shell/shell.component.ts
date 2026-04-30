@@ -20,9 +20,37 @@ import { initials } from '../../core/services/helpers';
         <!-- Logo -->
         <div class="s-logo">
           <div class="s-logo-icon">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+            <svg viewBox="0 0 100 82" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M50 82 Q50 70 50 58" stroke-width="5"/>
+              <path d="M50 58 Q45 50 34 43" stroke-width="3.5"/>
+              <path d="M50 58 Q55 50 66 43" stroke-width="3.5"/>
+              <path d="M34 43 Q20 37 9 35" stroke-width="2.5"/>
+              <path d="M34 43 Q27 34 23 25" stroke-width="2.2"/>
+              <path d="M34 43 Q31 35 29 27" stroke-width="2"/>
+              <path d="M66 43 Q80 37 91 35" stroke-width="2.5"/>
+              <path d="M66 43 Q73 34 77 25" stroke-width="2.2"/>
+              <path d="M66 43 Q69 35 71 27" stroke-width="2"/>
+              <path d="M9 35 Q3 30 1 27" stroke-width="1.6"/>
+              <path d="M9 35 Q7 27 7 22" stroke-width="1.5"/>
+              <path d="M23 25 Q19 19 17 14" stroke-width="1.5"/>
+              <path d="M23 25 Q23 17 23 13" stroke-width="1.3"/>
+              <path d="M91 35 Q97 30 99 27" stroke-width="1.6"/>
+              <path d="M91 35 Q93 27 93 22" stroke-width="1.5"/>
+              <path d="M77 25 Q81 19 83 14" stroke-width="1.5"/>
+              <path d="M77 25 Q77 17 77 13" stroke-width="1.3"/>
+              <path d="M50 56 Q46 47 40 40" stroke-width="2"/>
+              <path d="M50 56 Q54 47 60 40" stroke-width="2"/>
+              <path d="M50 52 Q50 42 50 34" stroke-width="2.2"/>
+              <path d="M50 34 Q46 26 43 20" stroke-width="1.6"/>
+              <path d="M50 34 Q54 26 57 20" stroke-width="1.6"/>
+              <path d="M50 34 Q50 24 50 19" stroke-width="1.4"/>
+              <path d="M43 20 Q41 15 39 12" stroke-width="1.2"/>
+              <path d="M57 20 Q59 15 61 12" stroke-width="1.2"/>
+              <path d="M50 19 Q48 13 47 10" stroke-width="1.1"/>
+              <path d="M50 19 Q52 13 53 10" stroke-width="1.1"/>
+            </svg>
           </div>
-          <span class="s-logo-text">worktrips<span>.doc</span></span>
+          <span class="s-logo-text">CRM<span>tree</span></span>
         </div>
 
         <!-- Toggle button — always visible -->
@@ -67,6 +95,12 @@ import { initials } from '../../core/services/helpers';
             <div class="nav-sep"></div>
             <div class="s-sec">
               <div class="s-lbl">CRM</div>
+
+              <a class="nav-item" routerLink="/crm/dashboard" routerLinkActive="active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span class="nav-label">Dashboard</span>
+                <span class="nav-tip">Dashboard</span>
+              </a>
 
               <a class="nav-item" routerLink="/crm/leads" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -196,7 +230,7 @@ import { initials } from '../../core/services/helpers';
     /* ── Sidebar shell ───────────────────────────────────────────────── */
     #sidebar {
       width: 256px;
-      background: var(--gray-900);
+      background: #1F2933;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -221,12 +255,12 @@ import { initials } from '../../core/services/helpers';
       white-space: nowrap;
     }
     .s-logo-icon {
-      width: 32px; height: 32px;
-      background: var(--orange); border-radius: 8px;
+      width: 38px; height: 32px;
+      background: transparent;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-    .s-logo-icon svg { width: 18px; height: 18px; fill: white; }
+    .s-logo-icon svg { width: 38px; height: 32px; }
     .s-logo-text {
       font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: white;
       transition: opacity .15s;
@@ -303,7 +337,7 @@ import { initials } from '../../core/services/helpers';
       transition: background .12s, color .12s, padding .22s, justify-content .22s;
     }
     .nav-item:hover { background: rgba(255,255,255,.07); color: var(--gray-200); }
-    .nav-item.active { background: rgba(242,101,34,.16); color: var(--orange-light); font-weight: 500; }
+    .nav-item.active { background: rgba(59,170,93,.16); color: var(--orange-light); font-weight: 500; }
     .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
 
     /* Collapsed: center the icon */

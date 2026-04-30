@@ -707,7 +707,7 @@ export class CrmReportsComponent implements OnInit {
     active.forEach(l => { if (l.source) srcCount[l.source] = (srcCount[l.source]||0)+1; });
     const srcTotal = Object.values(srcCount).reduce((s, n) => s + n, 0) || 1;
     const srcColors: Record<string,string> = {
-      targi:'#F26522', polecenie:'#22C55E', strona_www:'#3B82F6',
+      targi:'#3BAA5D', polecenie:'#22C55E', strona_www:'#3B82F6',
       cold_call:'#A855F7', linkedin:'#F59E0B', partner:'#10B981',
       kampania:'#6366F1', inbound:'#14B8A6', inne:'#94A3B8',
     };
@@ -726,7 +726,7 @@ export class CrmReportsComponent implements OnInit {
       }));
     if (this.sources.length === 0) {
       this.sources = [
-        {label:'Targi',pct:35,color:'#F26522'},
+        {label:'Targi',pct:35,color:'#3BAA5D'},
         {label:'Polecenia',pct:28,color:'#22C55E'},
         {label:'Strona www',pct:20,color:'#3B82F6'},
         {label:'Cold outreach',pct:12,color:'#A855F7'},

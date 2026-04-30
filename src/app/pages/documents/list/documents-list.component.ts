@@ -196,7 +196,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     .srch-wrap { position: relative; display: flex; align-items: center; }
     .srch-wrap svg { position: absolute; left: 10px; width: 15px; height: 15px; color: var(--gray-400); pointer-events: none; }
     .srch { background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px; padding: 7px 14px 7px 34px; font-size: 13px; color: var(--gray-800); width: 260px; outline: none; font-family: inherit; }
-    .srch:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(242,101,34,.1); background: white; }
+    .srch:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(59,170,93,.1); background: white; }
     #content { flex: 1; overflow-y: auto; padding: 24px; }
     .toolbar { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
     .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }

@@ -63,6 +63,11 @@ export const routes: Routes = [
 
       // ── CRM ──────────────────────────────────────────────────────────────
       {
+        path: 'crm/dashboard',
+        canActivate: [crmGuard],
+        loadComponent: () => import('./pages/crm/sales-dashboard/crm-sales-dashboard.component').then(m => m.CrmSalesDashboardComponent),
+      },
+      {
         path: 'crm/leads',
         canActivate: [crmGuard],
         loadComponent: () => import('./pages/crm/leads/crm-leads-list.component').then(m => m.CrmLeadsListComponent),

@@ -13,13 +13,13 @@ import { AuthService } from '../../core/auth/auth.service';
             <div class="login-logo-icon">
               <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
             </div>
-            <div class="login-logo-text">worktrips<span>.doc</span></div>
+            <div class="login-logo-text">CRM<span>tree</span></div>
           </div>
-          <div class="login-sub">Document Management System</div>
+          <div class="login-sub">Platforma CRM</div>
         </div>
         <div class="login-body">
           <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px;text-align:center;line-height:1.6">
-            Sign in with your <strong>@worktrips.com</strong> Google Workspace account to access the platform.
+            Zaloguj się kontem Google Workspace swojej organizacji.
           </p>
           <button class="lbtn" (click)="login()" [disabled]="loading">
             @if (loading) {
@@ -30,7 +30,7 @@ import { AuthService } from '../../core/auth/auth.service';
               Sign in with Google Workspace SSO
             }
           </button>
-          <div class="login-note">🔒 Secured via <b>SAML 2.0</b> · GCP Workspace @worktrips.com</div>
+          <div class="login-note">🔒 Logowanie przez <b>SAML 2.0</b> · Google Workspace</div>
         </div>
       </div>
     </div>

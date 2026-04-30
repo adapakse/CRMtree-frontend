@@ -146,7 +146,7 @@ import { AuthService } from '../../core/auth/auth.service';
               </div>
               <div class="fg" style="grid-column:1/-1">
                 <label class="fl">Email Address <span style="color:var(--orange)">*</span></label>
-                <input class="fi" type="email" [(ngModel)]="newEmail" placeholder="anna.kowalska@worktrips.com" [class.fi-err]="submitted && !newEmail">
+                <input class="fi" type="email" [(ngModel)]="newEmail" placeholder="anna.kowalska@firma.com" [class.fi-err]="submitted && !newEmail">
                 @if (submitted && !newEmail) { <span class="ferr">Required</span> }
               </div>
               <div class="fg">
