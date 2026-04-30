@@ -1299,6 +1299,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     this.filterLostReason    = qp.get('lost_reason')     || '';
     if (qp.get('hot') === 'true') this.filterHot = true;
     this.reportFilterLabel   = qp.get('label')           || '';
+    if (qp.get('view') === 'table') this.viewMode = 'table';
 
     // Załaduj persistowany filtr handlowca (sessionStorage) — tylko jeśli nie ma query param
     if (!this.filterUser) this.loadPersistRepFilter();

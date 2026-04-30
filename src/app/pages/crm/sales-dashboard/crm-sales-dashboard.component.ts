@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { CrmApiService, ActivityTask, Lead } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 
 interface PipelineRow {
   stage: string;
@@ -18,7 +19,7 @@ interface PipelineRow {
 @Component({
   selector: 'wt-crm-sales-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <div class="crm-dash" *ngIf="!loading; else loadingTpl">
@@ -43,7 +44,7 @@ interface PipelineRow {
   <!-- ── KPI ── -->
   <div class="kpi-row">
 
-    <div class="kpi-card clickable" (click)="goToLeads({ label: 'Nowe kontakty' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ stage: 'new', label: 'Nowe kontakty' })">
       <div class="kpi-icon" style="background:#E6F4EA">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -53,7 +54,7 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe kontakty</div>
+        <div class="kpi-label">Nowe kontakty <wt-tooltip key="crm.sales.kpi.new_contacts"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiNewLeads }}</div>
         <div class="kpi-trend" *ngIf="kpiNewLeadsChange !== null"
              [class.pos]="kpiNewLeadsChange >= 0" [class.neg]="kpiNewLeadsChange < 0">
@@ -63,7 +64,7 @@ interface PipelineRow {
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ label: 'Nowe firmy' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ stage: 'new', label: 'Nowe firmy' })">
       <div class="kpi-icon" style="background:#DBEAFE">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" width="22" height="22">
           <rect x="2" y="7" width="20" height="14" rx="2"/>
@@ -71,7 +72,7 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe firmy</div>
+        <div class="kpi-label">Nowe firmy <wt-tooltip key="crm.sales.kpi.new_companies"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiNewCompanies }}</div>
         <div class="kpi-trend" *ngIf="kpiNewCompaniesChange !== null"
              [class.pos]="kpiNewCompaniesChange >= 0" [class.neg]="kpiNewCompaniesChange < 0">
@@ -81,7 +82,7 @@ interface PipelineRow {
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ label: 'Pipeline aktywny' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ label: 'Szanse aktywne w pipeline' })">
       <div class="kpi-icon" style="background:#EDE9FE">
         <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" width="22" height="22">
           <line x1="12" y1="1" x2="12" y2="23"/>
@@ -89,7 +90,7 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe szanse</div>
+        <div class="kpi-label">Nowe szanse <wt-tooltip key="crm.sales.kpi.new_leads"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiActiveLeads }}</div>
         <div class="kpi-trend pos" *ngIf="kpiActiveLeads > 0">
           <span>w pipeline</span>
@@ -104,7 +105,7 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Wartość szans</div>
+        <div class="kpi-label">Wartość szans <wt-tooltip key="crm.sales.kpi.pipeline_value"></wt-tooltip></div>
         <div class="kpi-value kpi-value-sm">{{ fmtValue(kpiPipelineValue) }}</div>
         <div class="kpi-trend pos" *ngIf="chartChangePercent !== null && chartChangePercent > 0">
           ↑ {{ chartChangePercent }}% <span>vs poprzedni miesiąc</span>
@@ -120,7 +121,7 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Wygrane szanse</div>
+        <div class="kpi-label">Wygrane szanse <wt-tooltip key="crm.sales.kpi.won"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiWonCount }}</div>
         <div class="kpi-trend pos" *ngIf="kpiWonCount > 0">
           <span>w tym miesiącu</span>
@@ -136,7 +137,7 @@ interface PipelineRow {
     <!-- Pipeline -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">Pipeline sprzedaży</span>
+        <span class="panel-title">Pipeline sprzedaży <wt-tooltip key="crm.sales.pipeline"></wt-tooltip></span>
         <select class="mini-sel" [(ngModel)]="pipelineMode" (ngModelChange)="onPipelineModeChange()">
           <option value="value">Wartość</option>
           <option value="count">Ilość</option>
@@ -167,7 +168,7 @@ interface PipelineRow {
     <!-- Wykres sprzedaży -->
     <div class="panel chart-panel">
       <div class="panel-head">
-        <span class="panel-title">Wyniki sprzedażowe</span>
+        <span class="panel-title">Wyniki sprzedażowe <wt-tooltip key="crm.sales.chart"></wt-tooltip></span>
         <select class="mini-sel" [(ngModel)]="chartPeriod" (ngModelChange)="onChartPeriodChange()">
           <option value="7d">Tydzień</option>
           <option value="30d">Miesiąc</option>
@@ -208,7 +209,7 @@ interface PipelineRow {
     <!-- Zadania na dziś -->
     <div class="panel tasks-panel">
       <div class="panel-head">
-        <span class="panel-title">Zadania na dziś</span>
+        <span class="panel-title">Zadania na dziś <wt-tooltip key="crm.sales.tasks"></wt-tooltip></span>
         <span class="count-badge" *ngIf="todayTasks.length">{{ todayTasks.length }}</span>
         <a routerLink="/crm/calendar" class="icon-btn" title="Kalendarz">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
@@ -219,21 +220,31 @@ interface PipelineRow {
       </div>
 
       <div class="task-list" *ngIf="todayTasks.length; else emptyTasks">
-        <div class="task-item" *ngFor="let t of todayTasks; trackBy: trackById"
-             [class.task-done]="t.status === 'closed'">
-          <label class="task-check" (click)="$event.stopPropagation(); toggleTask(t)">
-            <span class="check-box" [class.checked]="t.status === 'closed'">
-              <svg *ngIf="t.status === 'closed'" viewBox="0 0 24 24" fill="none"
-                   stroke="white" stroke-width="3" width="11" height="11">
-                <polyline points="20,6 9,17 4,12"/>
-              </svg>
-            </span>
-          </label>
-          <div class="task-body clickable" (click)="goToTaskSource(t)">
-            <div class="task-title">{{ t.title }}</div>
-            <div class="task-sub">{{ t.source_name }}</div>
+        <div *ngFor="let t of todayTasks; trackBy: trackById">
+          <div class="task-item" [class.task-done]="t.status === 'closed'">
+            <label class="task-check" (click)="$event.stopPropagation(); toggleTask(t)">
+              <span class="check-box" [class.checked]="t.status === 'closed'">
+                <svg *ngIf="t.status === 'closed'" viewBox="0 0 24 24" fill="none"
+                     stroke="white" stroke-width="3" width="11" height="11">
+                  <polyline points="20,6 9,17 4,12"/>
+                </svg>
+              </span>
+            </label>
+            <div class="task-body clickable" (click)="goToTaskSource(t)">
+              <div class="task-title">{{ t.title }}</div>
+              <div class="task-sub">{{ t.source_name }}</div>
+            </div>
+            <span class="task-time" [class.task-overdue]="isOverdue(t)">{{ taskTime(t) }}</span>
           </div>
-          <span class="task-time" [class.task-overdue]="isOverdue(t)">{{ taskTime(t) }}</span>
+          <div *ngIf="closingTask?.id === t.id" class="task-close-form" (click)="$event.stopPropagation()">
+            <textarea class="task-close-ta" [(ngModel)]="taskCloseComment"
+                      placeholder="Komentarz zamknięcia *" rows="2" autoFocus></textarea>
+            <div class="task-close-btns">
+              <button class="task-close-cancel" (click)="cancelCloseTask()">Anuluj</button>
+              <button class="task-close-confirm" [disabled]="!taskCloseComment.trim()"
+                      (click)="confirmCloseTaskDash()">Zamknij</button>
+            </div>
+          </div>
         </div>
       </div>
       <ng-template #emptyTasks>
@@ -251,7 +262,7 @@ interface PipelineRow {
     <!-- Tabela szans -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">Najnowsze szanse</span>
+        <span class="panel-title">Najnowsze szanse <wt-tooltip key="crm.sales.recent_leads"></wt-tooltip></span>
       </div>
 
       <table class="leads-table" *ngIf="recentLeads.length; else emptyLeads">
@@ -306,7 +317,7 @@ interface PipelineRow {
     <!-- Feed aktywności -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">Ostatnia aktywność</span>
+        <span class="panel-title">Ostatnia aktywność <wt-tooltip key="crm.sales.activity"></wt-tooltip></span>
       </div>
 
       <div class="activity-feed" *ngIf="recentActivities.length; else emptyAct">
@@ -455,6 +466,17 @@ interface PipelineRow {
     .leads-table tr.clickable:hover td { background: #F9FAFB; }
     .leads-table tr.clickable:hover .lead-link { color: var(--orange, #3BAA5D); }
 
+    /* Task close form */
+    .task-close-form { padding: 6px 0 8px 28px; display: flex; flex-direction: column; gap: 6px; }
+    .task-close-ta { width: 100%; border: 1px solid #D1D5DB; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; outline: none; }
+    .task-close-ta:focus { border-color: var(--orange, #3BAA5D); box-shadow: 0 0 0 2px rgba(59,170,93,.1); }
+    .task-close-btns { display: flex; gap: 6px; justify-content: flex-end; }
+    .task-close-cancel { background: white; border: 1px solid #E5E7EB; border-radius: 6px; padding: 4px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .task-close-cancel:hover { background: #F9FAFB; }
+    .task-close-confirm { background: var(--orange, #3BAA5D); color: white; border: none; border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .task-close-confirm:disabled { background: #D1D5DB; cursor: not-allowed; }
+    .task-close-confirm:not(:disabled):hover { background: #2F8F4D; }
+
     /* Loading */
     .dash-loading { display: flex; align-items: center; justify-content: center; height: 50vh; }
   `],
@@ -492,6 +514,9 @@ export class CrmSalesDashboardComponent implements OnInit {
   todayTasks:       ActivityTask[] = [];
   recentLeads:      Lead[] = [];
   recentActivities: any[]  = [];
+
+  closingTask:       ActivityTask | null = null;
+  taskCloseComment = '';
 
   private allLeads: Lead[] = [];
 
@@ -667,13 +692,52 @@ export class CrmSalesDashboardComponent implements OnInit {
   }
 
   toggleTask(task: ActivityTask) {
-    const next = task.status === 'closed' ? 'open' : 'closed';
-    const prev = task.status;
-    task.status = next as any;
-    const call: Observable<any> = task.source_type === 'lead'
-      ? this.api.updateLeadActivity(task.source_id, task.id, { status: next as any })
-      : this.api.updatePartnerActivity(task.source_id, task.id, { status: next as any });
-    call.subscribe({ error: () => { task.status = prev; this.cdr.markForCheck(); } });
+    if (task.status === 'closed') {
+      const prev = task.status;
+      task.status = 'open';
+      const call: Observable<any> = task.source_type === 'lead'
+        ? this.api.updateLeadActivity(task.source_id, task.id, { status: 'open' })
+        : this.api.updatePartnerActivity(task.source_id, task.id, { status: 'open' });
+      call.subscribe({ error: () => { task.status = prev; this.cdr.markForCheck(); } });
+    } else {
+      this.closingTask = task;
+      this.taskCloseComment = '';
+    }
+    this.cdr.markForCheck();
+  }
+
+  cancelCloseTask() {
+    this.closingTask = null;
+    this.taskCloseComment = '';
+    this.cdr.markForCheck();
+  }
+
+  confirmCloseTaskDash() {
+    const t = this.closingTask;
+    if (!t || !this.taskCloseComment.trim()) return;
+    const comment = this.taskCloseComment.trim();
+    const stamp = new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const newBody = t.body?.trim() ? `[Zamknięto ${stamp}]: ${comment}\n\n${t.body}` : `[Zamknięto ${stamp}]: ${comment}`;
+    const prev = t.status;
+    t.status = 'closed';
+    const call: Observable<any> = t.source_type === 'lead'
+      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody })
+      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody });
+    call.subscribe({
+      next: () => {
+        t.close_comment = comment;
+        t.body = newBody;
+        this.closingTask = null;
+        this.taskCloseComment = '';
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        t.status = prev;
+        this.closingTask = null;
+        this.taskCloseComment = '';
+        this.cdr.markForCheck();
+      },
+    });
     this.cdr.markForCheck();
   }
 
@@ -731,7 +795,7 @@ export class CrmSalesDashboardComponent implements OnInit {
   }
 
   goToLeads(queryParams: Record<string, string> = {}) {
-    this.router.navigate(['/crm/leads'], { queryParams });
+    this.router.navigate(['/crm/leads'], { queryParams: { view: 'table', ...queryParams } });
   }
 
   goToLead(id: number) {
