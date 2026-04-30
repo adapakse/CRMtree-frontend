@@ -586,7 +586,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
 
     const data = this.bySource.slice(0, 5);
     const total = data.reduce((s, d) => s + d.count, 0) || 1;
-    const colors = ['#F26522','#22C55E','#3B82F6','#A855F7','#F59E0B'];
+    const colors = ['#3BAA5D','#22C55E','#3B82F6','#A855F7','#F59E0B'];
     const r = 44, cx = 60, cy = 60;
     let angle = -Math.PI / 2;
     data.forEach((d, i) => {

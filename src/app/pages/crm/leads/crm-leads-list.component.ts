@@ -852,8 +852,8 @@ const PROB_MAP: Record<LeadStage, number> = {
     .kol-empty { font-size:11px; color:var(--gray-300); text-align:center; padding:16px 8px; border:1.5px dashed var(--gray-200); border-radius:8px; }
 
     .lead-card { background:white; border:1px solid var(--gray-200); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all .15s; }
-    .lead-card:hover { border-color:#fbd0b6; box-shadow:0 4px 12px rgba(242,101,34,.1); transform:translateY(-1px); }
-    .lead-card.selected { border-color:var(--orange); box-shadow:0 0 0 2px rgba(242,101,34,.15); }
+    .lead-card:hover { border-color:#a8d9b6; box-shadow:0 4px 12px rgba(59,170,93,.1); transform:translateY(-1px); }
+    .lead-card.selected { border-color:var(--orange); box-shadow:0 0 0 2px rgba(59,170,93,.15); }
     .logo-circle { display:inline-block;width:22px;height:22px;border-radius:50%;background-size:cover;background-position:center;background-repeat:no-repeat;flex-shrink:0;border:1px solid var(--gray-200);background-color:#f9fafb; }
     .lead-company { font-size:12.5px; font-weight:700; color:var(--gray-900); margin-bottom:2px; display:flex; align-items:center; gap:3px; }
     .lead-contact { font-size:11px; color:var(--gray-500); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

@@ -7,11 +7,11 @@
 
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
-  --orange:        #F26522;
-  --orange-light:  #FF8A4C;
-  --orange-dark:   #D4521A;
-  --orange-pale:   #FFF0E8;
-  --orange-muted:  #FFD9C4;
+  --orange:        #3BAA5D;
+  --orange-light:  #4DC671;
+  --orange-dark:   #2F8F4D;
+  --orange-pale:   #E6F4EA;
+  --orange-muted:  #A8D9B6;
   --gray-50:       #FAFAFA;
   --gray-100:      #F4F4F5;
   --gray-200:      #E4E4E7;
@@ -160,7 +160,7 @@ router-outlet + * {
   width: 100%;
   &:focus {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(242,101,34,.1);
+    box-shadow: 0 0 0 3px rgba(59,170,93,.1);
     background: white;
   }
 }
