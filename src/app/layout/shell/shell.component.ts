@@ -19,38 +19,7 @@ import { initials } from '../../core/services/helpers';
 
         <!-- Logo -->
         <div class="s-logo">
-          <div class="s-logo-icon">
-            <svg viewBox="0 0 100 82" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M50 82 Q50 70 50 58" stroke-width="5"/>
-              <path d="M50 58 Q45 50 34 43" stroke-width="3.5"/>
-              <path d="M50 58 Q55 50 66 43" stroke-width="3.5"/>
-              <path d="M34 43 Q20 37 9 35" stroke-width="2.5"/>
-              <path d="M34 43 Q27 34 23 25" stroke-width="2.2"/>
-              <path d="M34 43 Q31 35 29 27" stroke-width="2"/>
-              <path d="M66 43 Q80 37 91 35" stroke-width="2.5"/>
-              <path d="M66 43 Q73 34 77 25" stroke-width="2.2"/>
-              <path d="M66 43 Q69 35 71 27" stroke-width="2"/>
-              <path d="M9 35 Q3 30 1 27" stroke-width="1.6"/>
-              <path d="M9 35 Q7 27 7 22" stroke-width="1.5"/>
-              <path d="M23 25 Q19 19 17 14" stroke-width="1.5"/>
-              <path d="M23 25 Q23 17 23 13" stroke-width="1.3"/>
-              <path d="M91 35 Q97 30 99 27" stroke-width="1.6"/>
-              <path d="M91 35 Q93 27 93 22" stroke-width="1.5"/>
-              <path d="M77 25 Q81 19 83 14" stroke-width="1.5"/>
-              <path d="M77 25 Q77 17 77 13" stroke-width="1.3"/>
-              <path d="M50 56 Q46 47 40 40" stroke-width="2"/>
-              <path d="M50 56 Q54 47 60 40" stroke-width="2"/>
-              <path d="M50 52 Q50 42 50 34" stroke-width="2.2"/>
-              <path d="M50 34 Q46 26 43 20" stroke-width="1.6"/>
-              <path d="M50 34 Q54 26 57 20" stroke-width="1.6"/>
-              <path d="M50 34 Q50 24 50 19" stroke-width="1.4"/>
-              <path d="M43 20 Q41 15 39 12" stroke-width="1.2"/>
-              <path d="M57 20 Q59 15 61 12" stroke-width="1.2"/>
-              <path d="M50 19 Q48 13 47 10" stroke-width="1.1"/>
-              <path d="M50 19 Q52 13 53 10" stroke-width="1.1"/>
-            </svg>
-          </div>
-          <span class="s-logo-text">CRM<span>tree</span></span>
+          <img class="s-logo-img" src="assets/crmtree-logo.png" alt="CRMtree">
         </div>
 
         <!-- Toggle button — always visible -->
@@ -230,7 +199,7 @@ import { initials } from '../../core/services/helpers';
     /* ── Sidebar shell ───────────────────────────────────────────────── */
     #sidebar {
       width: 256px;
-      background: #1F2933;
+      background: #292A2D;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -244,29 +213,29 @@ import { initials } from '../../core/services/helpers';
 
     /* ── Logo ────────────────────────────────────────────────────────── */
     .s-logo {
-      height: 56px;
+      height: 89px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 0 16px;
+      justify-content: center;
+      padding: 0 12px;
       border-bottom: 1px solid rgba(255,255,255,.07);
       flex-shrink: 0;
-      overflow: hidden;            /* clip logo text when collapsing */
-      white-space: nowrap;
+      overflow: hidden;
     }
-    .s-logo-icon {
-      width: 38px; height: 32px;
-      background: transparent;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+    .s-logo-img {
+      height: 74px;
+      width: auto;
+      object-fit: contain;
+      transition: height .22s, width .22s;
     }
-    .s-logo-icon svg { width: 38px; height: 32px; }
-    .s-logo-text {
-      font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: white;
-      transition: opacity .15s;
+    /* collapsed: show just the tree crop (upper-center of image) */
+    #sidebar.collapsed .s-logo { padding: 0 8px; }
+    #sidebar.collapsed .s-logo-img {
+      height: 55px;
+      width: 55px;
+      object-fit: cover;
+      object-position: 50% 38%;
     }
-    .s-logo-text span { color: var(--orange); }
-    #sidebar.collapsed .s-logo-text { opacity: 0; }
 
     /* ── Toggle button ───────────────────────────────────────────────── */
     .toggle-btn {

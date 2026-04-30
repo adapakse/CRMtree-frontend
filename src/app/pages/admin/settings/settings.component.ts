@@ -61,6 +61,18 @@ const TOOLTIP_CATALOG: { key: string; screen: string; label: string }[] = [
   { key: 'crm.leads.velocity.title',     screen: 'Raporty sprzedaży', label: 'Czas w etapie – avg dni (tytuł)' },
   // Raporty sprzedaży – Powody przegranej
   { key: 'crm.leads.lost.title',         screen: 'Raporty sprzedaży', label: 'Powody przegranej (tytuł)' },
+  // Sales Dashboard – KPI
+  { key: 'crm.sales.kpi.new_contacts',   screen: 'Sales Dashboard', label: 'KPI: Nowe kontakty' },
+  { key: 'crm.sales.kpi.new_companies',  screen: 'Sales Dashboard', label: 'KPI: Nowe firmy' },
+  { key: 'crm.sales.kpi.new_leads',      screen: 'Sales Dashboard', label: 'KPI: Nowe szanse (aktywny pipeline)' },
+  { key: 'crm.sales.kpi.pipeline_value', screen: 'Sales Dashboard', label: 'KPI: Wartość szans (pipeline)' },
+  { key: 'crm.sales.kpi.won',            screen: 'Sales Dashboard', label: 'KPI: Wygrane szanse' },
+  // Sales Dashboard – Panele
+  { key: 'crm.sales.pipeline',           screen: 'Sales Dashboard', label: 'Panel: Pipeline sprzedaży' },
+  { key: 'crm.sales.chart',              screen: 'Sales Dashboard', label: 'Panel: Wyniki sprzedażowe (wykres)' },
+  { key: 'crm.sales.tasks',              screen: 'Sales Dashboard', label: 'Panel: Zadania na dziś' },
+  { key: 'crm.sales.recent_leads',       screen: 'Sales Dashboard', label: 'Panel: Najnowsze szanse (tabela)' },
+  { key: 'crm.sales.activity',           screen: 'Sales Dashboard', label: 'Panel: Ostatnia aktywność' },
 ];
 
 // Kategorie globalnej aplikacji

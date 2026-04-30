@@ -9,12 +9,7 @@ import { AuthService } from '../../core/auth/auth.service';
     <div id="login-screen">
       <div class="login-card">
         <div class="login-top">
-          <div class="login-logo-row">
-            <div class="login-logo-icon">
-              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
-            </div>
-            <div class="login-logo-text">CRM<span>tree</span></div>
-          </div>
+          <img class="login-logo-img" src="assets/crmtree-logo.png" alt="CRMtree">
           <div class="login-sub">Platforma CRM</div>
         </div>
         <div class="login-body">
@@ -38,13 +33,9 @@ import { AuthService } from '../../core/auth/auth.service';
   styles: [`
     #login-screen { position: fixed; inset: 0; background: var(--gray-900); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
     .login-card { background: white; border-radius: 16px; width: 440px; overflow: hidden; box-shadow: var(--shadow-lg); }
-    .login-top { background: linear-gradient(135deg,#1a1a2e 0%,#2d1a0e 100%); padding: 32px; text-align: center; }
-    .login-logo-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
-    .login-logo-icon { width: 40px; height: 40px; background: var(--orange); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-    .login-logo-icon svg { width: 22px; height: 22px; fill: white; }
-    .login-logo-text { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700; color: white; }
-    .login-logo-text span { color: var(--orange); }
-    .login-sub { font-size: 13px; color: #888; margin-top: 4px; }
+    .login-top { background: #292A2D; padding: 24px 32px 20px; text-align: center; }
+    .login-logo-img { width: 374px; height: auto; display: block; margin: 0 auto 4px; }
+    .login-sub { font-size: 13px; color: #888; margin-top: 0; }
     .login-body { padding: 28px 32px 32px; }
     .lbtn { width: 100%; background: var(--orange); color: white; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .lbtn:hover { background: var(--orange-dark); }

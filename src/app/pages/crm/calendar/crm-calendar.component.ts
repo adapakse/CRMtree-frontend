@@ -311,8 +311,9 @@ interface CalendarDay {
       <div class="dp-row" *ngIf="selectedTask.created_by_name"><span class="dp-lbl">👤 Dodał</span><span>{{selectedTask.created_by_name}}</span></div>
       <div class="dp-row" *ngIf="selectedTask.act_assigned_to_name || selectedTask.assigned_to_name"><span class="dp-lbl">🙋 Przypisano do</span><span>{{selectedTask.act_assigned_to_name || selectedTask.assigned_to_name}}</span></div>
       <div class="dp-row" *ngIf="selectedTask.close_comment"><span class="dp-lbl">💬 Komentarz</span><span style="font-style:italic">{{selectedTask.close_comment}}</span></div>
-      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end" *ngIf="selectedTask.status !== 'closed' && canEditTask(selectedTask)">
-        <button class="dp-btn-p" (click)="startCloseTaskFromModal()">✓ Zamknij zadanie</button>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end" *ngIf="canEditTask(selectedTask)">
+        <button class="dp-btn-p" *ngIf="selectedTask.status !== 'closed'" (click)="startCloseTaskFromModal()">✓ Zamknij zadanie</button>
+        <button class="dp-btn-g" *ngIf="selectedTask.status === 'closed'" (click)="reopenTask(selectedTask)" [disabled]="saving">↩ Wznów zadanie</button>
       </div>
       <!-- Inline close form in modal -->
       <div *ngIf="closingTaskId === selectedTask.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
@@ -348,6 +349,7 @@ interface CalendarDay {
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
         <button class="dp-btn-g" (click)="taskEditMode = false">Anuluj</button>
+        <button class="dp-btn-g" *ngIf="selectedTask?.status === 'closed'" (click)="reopenTask(selectedTask!)" [disabled]="saving">↩ Wznów</button>
         <button class="dp-btn-p" (click)="saveEditTask()" [disabled]="saving">{{saving ? '…' : 'Zapisz zmiany'}}</button>
       </div>
     </div>
@@ -632,20 +634,45 @@ export class CrmCalendarComponent implements OnInit {
     if (!this.taskCloseComment.trim()) return;
     this.saving = true;
     this.cdr.markForCheck();
+    const comment = this.taskCloseComment.trim();
+    const stamp = new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const newBody = t.body?.trim() ? `[Zamknięto ${stamp}]: ${comment}\n\n${t.body}` : `[Zamknięto ${stamp}]: ${comment}`;
     const updateCall: Observable<any> = t.source_type === 'lead'
-      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'closed', close_comment: this.taskCloseComment })
-      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'closed', close_comment: this.taskCloseComment });
+      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody })
+      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody });
     updateCall.subscribe({
       next: () => this.zone.run(() => {
         this.activities = this.activities.map(a => a.id === t.id && a.source_type === t.source_type
-          ? { ...a, status: 'closed' as const, close_comment: this.taskCloseComment }
+          ? { ...a, status: 'closed' as const, close_comment: comment, body: newBody }
           : a
         );
         if (this.selectedTask?.id === t.id && this.selectedTask?.source_type === t.source_type) {
-          this.selectedTask = { ...this.selectedTask, status: 'closed', close_comment: this.taskCloseComment };
+          this.selectedTask = { ...this.selectedTask, status: 'closed', close_comment: comment, body: newBody };
         }
         this.closingTaskId    = null;
         this.taskCloseComment = '';
+        this.saving = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  reopenTask(t: ActivityTask): void {
+    this.saving = true;
+    this.cdr.markForCheck();
+    const call: Observable<any> = t.source_type === 'lead'
+      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'open' })
+      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'open' });
+    call.subscribe({
+      next: () => this.zone.run(() => {
+        this.activities = this.activities.map(a =>
+          a.id === t.id && a.source_type === t.source_type ? { ...a, status: 'open' as const } : a
+        );
+        if (this.selectedTask?.id === t.id) {
+          this.selectedTask = { ...this.selectedTask, status: 'open' };
+        }
+        this.taskEditMode = false;
         this.saving = false;
         this.cdr.markForCheck();
       }),

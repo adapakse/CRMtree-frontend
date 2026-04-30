@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { AppSettingsService } from '../../core/services/app-settings.service';
 
 @Component({
   selector: 'wt-callback',
@@ -13,14 +14,16 @@ import { AuthService } from '../../core/auth/auth.service';
   `,
 })
 export class CallbackComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private auth  = inject(AuthService);
+  private route    = inject(ActivatedRoute);
+  private auth     = inject(AuthService);
+  private settings = inject(AppSettingsService);
 
   ngOnInit(): void {
     const access_token  = this.route.snapshot.queryParamMap.get('access_token')  ?? '';
     const refresh_token = this.route.snapshot.queryParamMap.get('refresh_token') ?? '';
     if (access_token && refresh_token) {
       this.auth.handleCallback(access_token, refresh_token);
+      this.settings.reload();
     } else {
       this.auth.logout();
     }
