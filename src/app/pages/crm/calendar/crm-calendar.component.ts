@@ -638,8 +638,8 @@ export class CrmCalendarComponent implements OnInit {
     const stamp = new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const newBody = t.body?.trim() ? `[Zamknięto ${stamp}]: ${comment}\n\n${t.body}` : `[Zamknięto ${stamp}]: ${comment}`;
     const updateCall: Observable<any> = t.source_type === 'lead'
-      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody })
-      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody });
+      ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody })
+      : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody });
     updateCall.subscribe({
       next: () => this.zone.run(() => {
         this.activities = this.activities.map(a => a.id === t.id && a.source_type === t.source_type
@@ -662,8 +662,8 @@ export class CrmCalendarComponent implements OnInit {
     this.saving = true;
     this.cdr.markForCheck();
     const call: Observable<any> = t.source_type === 'lead'
-      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'open' })
-      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'open' });
+      ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'open' })
+      : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'open' });
     call.subscribe({
       next: () => this.zone.run(() => {
         this.activities = this.activities.map(a =>
@@ -758,8 +758,8 @@ export class CrmCalendarComponent implements OnInit {
     // Zmień status na 'open' jeśli zadanie jest nowe (item 3)
     if (t.status === 'new') {
       const obs: Observable<any> = t.source_type === 'lead'
-        ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'open' })
-        : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'open' });
+        ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'open' })
+        : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'open' });
       obs.subscribe({
         next: () => this.zone.run(() => {
           this.activities = this.activities.map(a =>
@@ -785,8 +785,8 @@ export class CrmCalendarComponent implements OnInit {
     };
     const t = this.selectedTask;
     const obs: Observable<any> = t.source_type === 'lead'
-      ? this.api.updateLeadActivity(t.source_id, t.id, payload)
-      : this.api.updatePartnerActivity(t.source_id, t.id, payload);
+      ? this.api.updateLeadActivity(+t.source_id, t.id, payload)
+      : this.api.updatePartnerActivity(+t.source_id, t.id, payload);
     obs.subscribe({
       next: (updated: any) => this.zone.run(() => {
         // Backend zwraca assigned_to/assigned_to_name — mapujemy na pola ActivityTask

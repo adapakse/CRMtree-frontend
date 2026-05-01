@@ -219,6 +219,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
         <!-- Nowa aktywność form -->
         <div *ngIf="showNewActivity" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
           <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
+            <option value="task">✅ Zadanie</option>
             <option value="call">📞 Połączenie</option>
             <option value="meeting">🤝 Spotkanie</option>
             <option value="note">📝 Notatka</option>
@@ -1174,6 +1175,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <div style="display:flex;flex-direction:column;gap:5px">
         <label style="font-size:12px;font-weight:600;color:#374151">Typ</label>
         <select [(ngModel)]="actEditForm.type" class="act-sel">
+          <option value="task">✅ Zadanie</option>
           <option value="call">📞 Połączenie</option>
           <option value="meeting">🤝 Spotkanie</option>
           <option value="note">📝 Notatka</option>
@@ -2689,7 +2691,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   // ── Modal aktywności ────────────────────────────────────────────────────────
   actTypeName(type: string): string {
     const map: Record<string, string> = {
-      call: 'Połączenie', email: 'Email', meeting: 'Spotkanie', note: 'Notatka',
+      task: 'Zadanie', call: 'Połączenie', email: 'Email', meeting: 'Spotkanie', note: 'Notatka',
       training: 'Szkolenie', qbr: 'QBR', doc_sent: 'Dokument', opportunity: 'Szansa',
     };
     return map[type] || type;
@@ -3233,7 +3235,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   stageLabel(s: LeadStage) { return LEAD_STAGE_LABELS[s] || s; }
   actIcon(type: string) {
-    return { call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] || '💬';
+    return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] || '💬';
   }
 
   // ── Konto testowe ────────────────────────────────────────────────────────────

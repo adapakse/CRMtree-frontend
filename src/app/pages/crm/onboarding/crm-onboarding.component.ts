@@ -691,6 +691,11 @@ export class CrmOnboardingComponent implements OnInit {
       taskMap.get(key)!.push(t);
     }
 
+    const localKey = (dt: Date) => {
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
+    };
+
     const today    = new Date(); today.setHours(0,0,0,0);
     const firstDay = new Date(this.calYear(), this.calMonth(), 1);
     const lastDay  = new Date(this.calYear(), this.calMonth() + 1, 0);
@@ -703,13 +708,13 @@ export class CrmOnboardingComponent implements OnInit {
     // Prev month fill
     for (let i = startDow - 1; i >= 0; i--) {
       const d = new Date(firstDay); d.setDate(d.getDate() - i - 1);
-      const key = d.toISOString().slice(0,10);
+      const key = localKey(d);
       cells.push({ key, day: d.getDate(), inMonth: false, isToday: false, tasks: taskMap.get(key) || [] });
     }
     // Current month
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const date   = new Date(this.calYear(), this.calMonth(), d);
-      const key    = date.toISOString().slice(0,10);
+      const key    = localKey(date);
       const isToday = date.getTime() === today.getTime();
       cells.push({ key, day: d, inMonth: true, isToday, tasks: taskMap.get(key) || [] });
     }
@@ -717,7 +722,7 @@ export class CrmOnboardingComponent implements OnInit {
     const remaining = 42 - cells.length;
     for (let i = 1; i <= remaining; i++) {
       const d = new Date(lastDay); d.setDate(d.getDate() + i);
-      const key = d.toISOString().slice(0,10);
+      const key = localKey(d);
       cells.push({ key, day: d.getDate(), inMonth: false, isToday: false, tasks: taskMap.get(key) || [] });
     }
     return cells;

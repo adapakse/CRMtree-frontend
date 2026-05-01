@@ -107,6 +107,7 @@ export interface CalendarMeeting {
 }
 
 export interface ActivityTask {
+  uid?: string;
   id: number;
   type: string;
   title: string;
@@ -121,8 +122,8 @@ export interface ActivityTask {
   close_comment: string | null;
   created_at: string;
   updated_at: string;
-  source_type: 'lead' | 'partner';
-  source_id: number;
+  source_type: 'lead' | 'partner' | 'onboarding' | 'document';
+  source_id: number | string;
   source_name: string;
   assigned_to_name: string | null;
   assigned_to_id: string | null;
@@ -1058,6 +1059,11 @@ export class CrmApiService {
   // ── Kalendarz ────────────────────────────────────────────────
   getCalendarMeetings(p: { date_from?: string; date_to?: string; assigned_to?: string } = {}): Observable<CalendarMeeting[]> {
     return this.http.get<CalendarMeeting[]>(`${BASE}/leads/calendar`, { params: this.toParams(p) });
+  }
+
+  // ── Unified task feed (dashboard) ─────────────────────────────
+  getCrmTasks(): Observable<ActivityTask[]> {
+    return this.http.get<ActivityTask[]>(`${BASE}/dashboard/tasks`);
   }
 
   // ── Zadania (zakładka Zadania w kalendarzu) ───────────────────
