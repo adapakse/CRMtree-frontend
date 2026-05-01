@@ -236,7 +236,7 @@ interface PipelineRow {
             </div>
             <span class="task-time" [class.task-overdue]="isOverdue(t)">{{ taskTime(t) }}</span>
           </div>
-          <div *ngIf="closingTask?.id === t.id" class="task-close-form" (click)="$event.stopPropagation()">
+          <div *ngIf="closingTask?.uid === t.uid" class="task-close-form" (click)="$event.stopPropagation()">
             <textarea class="task-close-ta" [(ngModel)]="taskCloseComment"
                       placeholder="Komentarz zamknięcia *" rows="2" autoFocus></textarea>
             <div class="task-close-btns">
@@ -409,8 +409,9 @@ interface PipelineRow {
 
     /* Tasks */
     .tasks-panel { }
-    .task-list { display: flex; flex-direction: column; flex: 1; }
-    .task-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #F9FAFB; }
+    .task-list { display: flex; flex-direction: column; height: 288px; overflow-y: auto; overflow-x: hidden; flex-shrink: 0; scrollbar-width: none; }
+    .task-list::-webkit-scrollbar { display: none; }
+    .task-item { display: flex; align-items: center; gap: 10px; height: 48px; box-sizing: border-box; border-bottom: 1px solid #F9FAFB; flex-shrink: 0; overflow: hidden; }
     .task-item:last-child { border-bottom: none; }
     .task-done .task-title { text-decoration: line-through; color: #9CA3AF; }
     .task-check { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
@@ -544,7 +545,7 @@ export class CrmSalesDashboardComponent implements OnInit {
     forkJoin({
       dashboard: this.api.getDashboard(),
       leads:     this.api.getLeads({ limit: 100, page: 1 }),
-      tasks:     this.api.getActivityTasks({ include_closed: false, include_no_date: false }),
+      tasks:     this.api.getCrmTasks(),
     }).subscribe({
       next: ({ dashboard, leads, tasks }) => {
         this.allLeads = (leads as any).data || [];
@@ -635,7 +636,8 @@ export class CrmSalesDashboardComponent implements OnInit {
     const tmrw  = new Date(today); tmrw.setDate(today.getDate() + 1);
     this.todayTasks = tasks
       .filter(t => { if (!t.activity_at) return false; const d = new Date(t.activity_at); return d >= today && d < tmrw; })
-      .sort((a, b) => new Date(a.activity_at!).getTime() - new Date(b.activity_at!).getTime());
+      .sort((a, b) => new Date(a.activity_at!).getTime() - new Date(b.activity_at!).getTime())
+      .slice(0, 6);
   }
 
   private processActivities(activities: any[]) {
@@ -692,12 +694,13 @@ export class CrmSalesDashboardComponent implements OnInit {
   }
 
   toggleTask(task: ActivityTask) {
+    if (task.source_type !== 'lead' && task.source_type !== 'partner') return;
     if (task.status === 'closed') {
       const prev = task.status;
       task.status = 'open';
       const call: Observable<any> = task.source_type === 'lead'
-        ? this.api.updateLeadActivity(task.source_id, task.id, { status: 'open' })
-        : this.api.updatePartnerActivity(task.source_id, task.id, { status: 'open' });
+        ? this.api.updateLeadActivity(+task.source_id, task.id, { status: 'open' })
+        : this.api.updatePartnerActivity(+task.source_id, task.id, { status: 'open' });
       call.subscribe({ error: () => { task.status = prev; this.cdr.markForCheck(); } });
     } else {
       this.closingTask = task;
@@ -715,14 +718,15 @@ export class CrmSalesDashboardComponent implements OnInit {
   confirmCloseTaskDash() {
     const t = this.closingTask;
     if (!t || !this.taskCloseComment.trim()) return;
+    if (t.source_type !== 'lead' && t.source_type !== 'partner') return;
     const comment = this.taskCloseComment.trim();
     const stamp = new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const newBody = t.body?.trim() ? `[Zamknięto ${stamp}]: ${comment}\n\n${t.body}` : `[Zamknięto ${stamp}]: ${comment}`;
     const prev = t.status;
     t.status = 'closed';
     const call: Observable<any> = t.source_type === 'lead'
-      ? this.api.updateLeadActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody })
-      : this.api.updatePartnerActivity(t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody });
+      ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody })
+      : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody });
     call.subscribe({
       next: () => {
         t.close_comment = comment;
@@ -747,14 +751,13 @@ export class CrmSalesDashboardComponent implements OnInit {
 
   fmtValue(v: number): string {
     if (!v) return '0 zł';
-    if (v >= 1_000_000) return (v / 1_000_000).toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' mln zł';
-    if (v >= 1_000)     return Math.round(v / 1_000).toLocaleString('pl-PL') + ' tys. zł';
+    if (v >= 1_000) return Math.round(v / 1_000).toLocaleString('pl-PL') + ' tys. zł';
     return v.toLocaleString('pl-PL') + ' zł';
   }
 
   fmtValueShort(v: number): string {
     if (!v) return '0 zł';
-    if (v >= 1_000_000) return (v / 1_000_000).toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' mln zł';
+    if (v >= 1_000) return Math.round(v / 1_000).toLocaleString('pl-PL') + ' tys. zł';
     return Math.round(v).toLocaleString('pl-PL') + ' zł';
   }
 
@@ -775,11 +778,11 @@ export class CrmSalesDashboardComponent implements OnInit {
   }
 
   actIcon(type: string): string {
-    return ({ call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊' } as Record<string,string>)[type] || '💬';
+    return ({ task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊' } as Record<string,string>)[type] || '💬';
   }
 
   actBg(type: string): string {
-    return ({ call:'#DCFCE7', email:'#DBEAFE', meeting:'#EDE9FE', note:'#FEF3C7', doc_sent:'#CFFAFE', training:'#F3E8FF' } as Record<string,string>)[type] || '#F3F4F6';
+    return ({ task:'#D1FAE5', call:'#DCFCE7', email:'#DBEAFE', meeting:'#EDE9FE', note:'#FEF3C7', doc_sent:'#CFFAFE', training:'#F3E8FF' } as Record<string,string>)[type] || '#F3F4F6';
   }
 
   stageLabel(stage: string): string {
@@ -795,7 +798,7 @@ export class CrmSalesDashboardComponent implements OnInit {
   }
 
   goToLeads(queryParams: Record<string, string> = {}) {
-    this.router.navigate(['/crm/leads'], { queryParams: { view: 'table', ...queryParams } });
+    this.router.navigate(['/crm/leads'], { queryParams: { view: 'table', mine: 'true', ...queryParams } });
   }
 
   goToLead(id: number) {
@@ -807,18 +810,37 @@ export class CrmSalesDashboardComponent implements OnInit {
   }
 
   goToSource(a: any) {
-    if (a.source_type === 'lead')    this.router.navigate(['/crm/leads',    a.source_id]);
-    if (a.source_type === 'partner') this.router.navigate(['/crm/partners', a.source_id]);
+    if (a.source_type === 'lead')       this.router.navigate(['/crm/leads',    a.source_id]);
+    if (a.source_type === 'partner')    this.router.navigate(['/crm/partners', a.source_id]);
+    if (a.source_type === 'onboarding') this.router.navigate(['/crm/onboarding'], { queryParams: { partner: a.source_id } });
+    if (a.source_type === 'document')   this.router.navigate(['/documents', a.source_id]);
   }
 
   goToTaskSource(t: ActivityTask) {
-    if (t.source_type === 'lead')    this.router.navigate(['/crm/leads',    t.source_id]);
-    if (t.source_type === 'partner') this.router.navigate(['/crm/partners', t.source_id]);
+    if (t.source_type === 'lead')       this.router.navigate(['/crm/leads',    t.source_id]);
+    if (t.source_type === 'partner')    this.router.navigate(['/crm/partners', t.source_id]);
+    if (t.source_type === 'onboarding') this.router.navigate(['/crm/onboarding'], { queryParams: { partner: t.source_id } });
+    if (t.source_type === 'document')   this.router.navigate(['/documents', t.source_id]);
   }
 
   goToPipelineStage(row: PipelineRow) {
     this.router.navigate(['/crm/leads'], { queryParams: { stage: row.stage, label: row.label } });
   }
 
-  trackById(_: number, item: { id: number }) { return item.id; }
+  trackById(_: number, item: { uid?: string; id?: any }) { return item.uid ?? item.id; }
+
+  actTypeName(type: string): string {
+    return ({ call:'Połączenie', email:'← Email', meeting:'Spotkanie',
+              note:'Notatka', training:'Szkolenie', qbr:'QBR',
+              doc_sent:'Dokument', task:'Zadanie' } as Record<string,string>)[type] || type;
+  }
+
+  actStatusLabel(s: string): string {
+    return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+  }
+
+  stripHtml(html: string): string {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
 }
