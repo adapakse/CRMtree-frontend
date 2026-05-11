@@ -34,7 +34,27 @@ interface TenantUser {
   last_login_at?: string | null;
 }
 
-type EditTab = 'settings' | 'features' | 'users';
+interface EmailProvider {
+  id: string;
+  provider: 'gmail' | 'outlook';
+  client_id: string;
+  redirect_uri: string | null;
+  extra_config: Record<string, string>;
+  is_enabled: boolean;
+  client_secret_configured: boolean;
+  updated_at: string;
+}
+
+interface GmailForm {
+  client_id: string; client_secret: string; redirect_uri: string;
+  pubsub_topic: string; pubsub_subscription: string; is_enabled: boolean;
+}
+interface OutlookForm {
+  client_id: string; client_secret: string; azure_tenant_id: string;
+  redirect_uri: string; is_enabled: boolean;
+}
+
+type EditTab = 'settings' | 'features' | 'users' | 'email';
 
 @Component({
   selector: 'app-tenants',
@@ -120,10 +140,11 @@ type EditTab = 'settings' | 'features' | 'users';
                         <div class="tabs">
                           <button class="tab" [class.active]="editTab() === 'settings'" (click)="editTab.set('settings')">Ustawienia</button>
                           <button class="tab" [class.active]="editTab() === 'features'"  (click)="editTab.set('features')">Moduły</button>
-                          <button class="tab" [class.active]="editTab() === 'users'"     (click)="openUsersTab(t.id)">
+                          <button class="tab" [class.active]="editTab() === 'users'"  (click)="openUsersTab(t.id)">
                             Użytkownicy
                             @if (tenantUsers().length > 0) { <span class="tab-badge">{{ tenantUsers().length }}</span> }
                           </button>
+                          <button class="tab" [class.active]="editTab() === 'email'" (click)="openEmailTab(t.id)">Email</button>
                         </div>
 
                         <!-- Tab: Settings -->
@@ -184,6 +205,136 @@ type EditTab = 'settings' | 'features' | 'users';
                                 {{ saving() ? 'Zapisuję...' : 'Zapisz moduły' }}
                               </button>
                             </div>
+                          </div>
+                        }
+
+                        <!-- Tab: Email -->
+                        @if (editTab() === 'email') {
+                          <div class="tab-body">
+                            @if (emailLoading()) {
+                              <div class="state-msg">Ładowanie...</div>
+                            } @else {
+
+                              <!-- Gmail -->
+                              <div class="provider-card">
+                                <div class="provider-header">
+                                  <div class="provider-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
+                                    <span>Gmail / Google Workspace</span>
+                                  </div>
+                                  @if (gmailProvider()) {
+                                    <span class="badge badge-on">Skonfigurowany</span>
+                                  } @else {
+                                    <span class="badge badge-off">Nieskonfigurowany</span>
+                                  }
+                                </div>
+                                @if (gmailProvider()) {
+                                  <div class="provider-meta">
+                                    Client ID: <code>{{ gmailProvider()!.client_id }}</code>
+                                    · zaktualizowany {{ gmailProvider()!.updated_at | date:'dd.MM.yyyy' }}
+                                  </div>
+                                }
+                                <div class="provider-form">
+                                  <div class="edit-grid">
+                                    <div class="field">
+                                      <label>Client ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="gmailForm.client_id" placeholder="123456789.apps.googleusercontent.com">
+                                    </div>
+                                    <div class="field">
+                                      <label>Client Secret {{ gmailProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
+                                      <input [(ngModel)]="gmailForm.client_secret" type="password" placeholder="{{ gmailProvider() ? '••••••••' : 'GOCSPX-...' }}">
+                                    </div>
+                                    <div class="field">
+                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <input [(ngModel)]="gmailForm.redirect_uri" placeholder="https://app.example.com/api/crm/gmail/oauth/callback">
+                                    </div>
+                                    <div class="field">
+                                      <label>Pub/Sub Topic <span class="hint-inline">(opcjonalne)</span></label>
+                                      <input [(ngModel)]="gmailForm.pubsub_topic" placeholder="projects/my-project/topics/gmail-push">
+                                    </div>
+                                    <div class="field">
+                                      <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne)</span></label>
+                                      <input [(ngModel)]="gmailForm.pubsub_subscription" placeholder="projects/my-project/subscriptions/gmail-sub">
+                                    </div>
+                                    <div class="field field-check">
+                                      <label class="check-label">
+                                        <input type="checkbox" [(ngModel)]="gmailForm.is_enabled">
+                                        Aktywny
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div class="provider-actions">
+                                    @if (gmailProvider()) {
+                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'gmail')">Usuń</button>
+                                    }
+                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider())"
+                                            (click)="saveEmailProvider(t.id, 'gmail')">
+                                      {{ saving() ? 'Zapisuję...' : (gmailProvider() ? 'Aktualizuj' : 'Zapisz') }}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <!-- Outlook -->
+                              <div class="provider-card">
+                                <div class="provider-header">
+                                  <div class="provider-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
+                                    <span>Outlook / Microsoft 365</span>
+                                  </div>
+                                  @if (outlookProvider()) {
+                                    <span class="badge badge-on">Skonfigurowany</span>
+                                  } @else {
+                                    <span class="badge badge-off">Nieskonfigurowany</span>
+                                  }
+                                </div>
+                                @if (outlookProvider()) {
+                                  <div class="provider-meta">
+                                    Client ID: <code>{{ outlookProvider()!.client_id }}</code>
+                                    · zaktualizowany {{ outlookProvider()!.updated_at | date:'dd.MM.yyyy' }}
+                                  </div>
+                                }
+                                <div class="provider-form">
+                                  <div class="edit-grid">
+                                    <div class="field">
+                                      <label>Client ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="outlookForm.client_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                    </div>
+                                    <div class="field">
+                                      <label>Client Secret {{ outlookProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
+                                      <input [(ngModel)]="outlookForm.client_secret" type="password" placeholder="{{ outlookProvider() ? '••••••••' : 'secret~...' }}">
+                                    </div>
+                                    <div class="field">
+                                      <label>Azure Tenant ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="outlookForm.azure_tenant_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                    </div>
+                                    <div class="field">
+                                      <label>Redirect URI <span class="hint-inline">(opcjonalne)</span></label>
+                                      <input [(ngModel)]="outlookForm.redirect_uri" placeholder="https://app.example.com/api/crm/outlook/oauth/callback">
+                                    </div>
+                                    <div class="field field-check">
+                                      <label class="check-label">
+                                        <input type="checkbox" [(ngModel)]="outlookForm.is_enabled">
+                                        Aktywny
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div class="provider-actions">
+                                    @if (outlookProvider()) {
+                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'outlook')">Usuń</button>
+                                    }
+                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id"
+                                            (click)="saveEmailProvider(t.id, 'outlook')">
+                                      {{ saving() ? 'Zapisuję...' : (outlookProvider() ? 'Aktualizuj' : 'Zapisz') }}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="panel-footer">
+                                <button class="btn-secondary" (click)="cancelEdit()">Zamknij</button>
+                              </div>
+                            }
                           </div>
                         }
 
@@ -543,7 +694,34 @@ type EditTab = 'settings' | 'features' | 'users';
     .btn-reinit:hover:not(:disabled) { background: #d97706; }
     .btn-reinit:disabled { opacity: .55; cursor: not-allowed; }
 
+    /* Email providers tab */
+    .provider-card {
+      background: white; border: 1px solid var(--gray-200); border-radius: 8px;
+      margin-bottom: 12px; overflow: hidden;
+    }
+    .provider-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+    }
+    .provider-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 600; color: var(--gray-800);
+    }
+    .provider-title svg { width: 16px; height: 16px; color: var(--gray-500); }
+    .provider-meta { padding: 8px 16px; font-size: 12px; color: var(--gray-500); border-bottom: 1px solid var(--gray-100); }
+    .provider-meta code { background: var(--gray-100); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+    .provider-form { padding: 14px 16px 16px; }
+    .provider-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+    .btn-danger-sm {
+      padding: 6px 12px; background: #fee2e2; color: #dc2626;
+      border: 1px solid #fca5a5; border-radius: 6px; font-size: 12.5px; cursor: pointer;
+      transition: background .12s;
+    }
+    .btn-danger-sm:hover:not(:disabled) { background: #fecaca; }
+    .btn-danger-sm:disabled { opacity: .55; cursor: not-allowed; }
+
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
+    .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
     .req  { color: #dc2626; }
     .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #1e40af; }
     .temp-pass-box {
@@ -569,6 +747,11 @@ export class TenantsComponent implements OnInit {
   tenantUsers  = signal<TenantUser[]>([]);
   usersLoading = signal(false);
 
+  emailProviders  = signal<EmailProvider[]>([]);
+  emailLoading    = signal(false);
+  gmailProvider   = signal<EmailProvider | null>(null);
+  outlookProvider = signal<EmailProvider | null>(null);
+
   showCreate        = signal(false);
   showAddUser       = signal(false);
   addUserTenantId   = signal<string | null>(null);
@@ -579,6 +762,8 @@ export class TenantsComponent implements OnInit {
 
   createForm = { name: '', slug: '', email_domain: '', dwh_schema_prefix: '' };
   addUserForm = { email: '', first_name: '', last_name: '', is_admin: true };
+  gmailForm:   GmailForm   = this.emptyGmailForm();
+  outlookForm: OutlookForm = this.emptyOutlookForm();
 
   editDraft: {
     name: string; email_domain: string; dwh_schema_prefix: string; is_active: boolean;
@@ -757,6 +942,98 @@ export class TenantsComponent implements OnInit {
       error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd impersonacji'); },
     });
   }
+
+  // ── Email providers tab ──────────────────────────────────────────
+  openEmailTab(id: string): void {
+    this.editTab.set('email');
+    this.emailLoading.set(true);
+    this.http.get<EmailProvider[]>(`${API}/admin/tenants/${id}/email-providers`).subscribe({
+      next: providers => {
+        this.emailProviders.set(providers);
+        const gmail   = providers.find(p => p.provider === 'gmail')   ?? null;
+        const outlook = providers.find(p => p.provider === 'outlook') ?? null;
+        this.gmailProvider.set(gmail);
+        this.outlookProvider.set(outlook);
+        this.gmailForm   = gmail   ? this.providerToGmailForm(gmail)   : this.emptyGmailForm();
+        this.outlookForm = outlook ? this.providerToOutlookForm(outlook) : this.emptyOutlookForm();
+        this.emailLoading.set(false);
+      },
+      error: () => { this.toast.error('Błąd ładowania konfiguracji email'); this.emailLoading.set(false); },
+    });
+  }
+
+  saveEmailProvider(tenantId: string, provider: 'gmail' | 'outlook'): void {
+    this.saving.set(true);
+    const body = provider === 'gmail'
+      ? {
+          client_id:    this.gmailForm.client_id,
+          client_secret: this.gmailForm.client_secret || undefined,
+          redirect_uri:  this.gmailForm.redirect_uri  || undefined,
+          extra_config: {
+            ...(this.gmailForm.pubsub_topic        ? { pubsub_topic:        this.gmailForm.pubsub_topic }        : {}),
+            ...(this.gmailForm.pubsub_subscription ? { pubsub_subscription: this.gmailForm.pubsub_subscription } : {}),
+          },
+          is_enabled: this.gmailForm.is_enabled,
+        }
+      : {
+          client_id:    this.outlookForm.client_id,
+          client_secret: this.outlookForm.client_secret || undefined,
+          redirect_uri:  this.outlookForm.redirect_uri  || undefined,
+          extra_config: this.outlookForm.azure_tenant_id
+            ? { azure_tenant_id: this.outlookForm.azure_tenant_id }
+            : {},
+          is_enabled: this.outlookForm.is_enabled,
+        };
+
+    this.http.put<EmailProvider>(`${API}/admin/tenants/${tenantId}/email-providers/${provider}`, body).subscribe({
+      next: saved => {
+        if (provider === 'gmail') {
+          this.gmailProvider.set(saved);
+          this.gmailForm.client_secret = '';
+        } else {
+          this.outlookProvider.set(saved);
+          this.outlookForm.client_secret = '';
+        }
+        this.saving.set(false);
+        this.toast.success(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} zapisany`);
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu'); },
+    });
+  }
+
+  deleteEmailProvider(tenantId: string, provider: 'gmail' | 'outlook'): void {
+    if (!confirm(`Usunąć konfigurację ${provider === 'gmail' ? 'Gmail' : 'Outlook'}?`)) return;
+    this.saving.set(true);
+    this.http.delete(`${API}/admin/tenants/${tenantId}/email-providers/${provider}`).subscribe({
+      next: () => {
+        if (provider === 'gmail') { this.gmailProvider.set(null); this.gmailForm = this.emptyGmailForm(); }
+        else                      { this.outlookProvider.set(null); this.outlookForm = this.emptyOutlookForm(); }
+        this.saving.set(false);
+        this.toast.success(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} usunięty`);
+      },
+      error: () => { this.saving.set(false); this.toast.error('Błąd usuwania'); },
+    });
+  }
+
+  private providerToGmailForm(p: EmailProvider): GmailForm {
+    return {
+      client_id: p.client_id, client_secret: '',
+      redirect_uri: p.redirect_uri ?? '',
+      pubsub_topic:        p.extra_config?.['pubsub_topic']        ?? '',
+      pubsub_subscription: p.extra_config?.['pubsub_subscription'] ?? '',
+      is_enabled: p.is_enabled,
+    };
+  }
+  private providerToOutlookForm(p: EmailProvider): OutlookForm {
+    return {
+      client_id: p.client_id, client_secret: '',
+      azure_tenant_id: p.extra_config?.['azure_tenant_id'] ?? '',
+      redirect_uri: p.redirect_uri ?? '',
+      is_enabled: p.is_enabled,
+    };
+  }
+  private emptyGmailForm():   GmailForm   { return { client_id: '', client_secret: '', redirect_uri: '', pubsub_topic: '', pubsub_subscription: '', is_enabled: true }; }
+  private emptyOutlookForm(): OutlookForm { return { client_id: '', client_secret: '', azure_tenant_id: '', redirect_uri: '', is_enabled: true }; }
 
   private emptyDraft() {
     return {
