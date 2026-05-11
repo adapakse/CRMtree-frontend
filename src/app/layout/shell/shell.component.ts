@@ -414,7 +414,7 @@ import { initials } from '../../core/services/helpers';
     #sidebar.collapsed .u-card { gap: 0; justify-content: center; }
 
     /* ── Main area ───────────────────────────────────────────────────── */
-    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+    #main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; min-width: 0; }
   `],
 })
 export class ShellComponent implements OnInit {
