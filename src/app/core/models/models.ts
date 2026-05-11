@@ -15,10 +15,35 @@ export interface User {
   display_name: string;
   is_admin: boolean;
   is_active: boolean;
+  is_super_admin?: boolean;
+  tenant_id?: string | null;
   crm_role?: 'salesperson' | 'sales_manager' | null;
   last_login_at?: string;
   created_at?: string;
   roles?: UserRole[];
+}
+
+// ── Tenant ────────────────────────────────────────────────
+export type CrmFeature = 'documents' | 'leads' | 'sales_reports' | 'onboarding' | 'partner_registry' | 'dwh_integration' | 'performance';
+
+export interface TenantFeature {
+  feature: CrmFeature;
+  is_enabled: boolean;
+}
+
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  email_domain?: string | null;
+  dwh_schema_prefix?: string | null;
+  is_active: boolean;
+  user_count?: number;
+  total_users?: number;
+  features?: TenantFeature[];
+  auth_configs?: { provider: string; is_enabled: boolean }[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuthTokens {

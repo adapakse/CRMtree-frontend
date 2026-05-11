@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard } from './core/auth/guards';
+import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard } from './core/auth/guards';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -59,6 +59,11 @@ export const routes: Routes = [
         path: 'admin/data',
         canActivate: [adminGuard],
         loadComponent: () => import('./pages/admin/data-management/data-management.component').then(m => m.DataManagementComponent),
+      },
+      {
+        path: 'admin/tenants',
+        canActivate: [superAdminGuard],
+        loadComponent: () => import('./pages/admin/tenants/tenants.component').then(m => m.TenantsComponent),
       },
 
       // ── CRM ──────────────────────────────────────────────────────────────

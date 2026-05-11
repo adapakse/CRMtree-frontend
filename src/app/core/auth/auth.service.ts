@@ -15,9 +15,10 @@ export class AuthService {
   // Reactive state
   private _user = signal<User | null>(null);
   readonly user  = this._user.asReadonly();
-  readonly isLoggedIn  = computed(() => this._user() !== null);
-  readonly isAdmin     = computed(() => this._user()?.is_admin ?? false);
-  readonly isCrmUser   = computed(() =>
+  readonly isLoggedIn    = computed(() => this._user() !== null);
+  readonly isAdmin       = computed(() => this._user()?.is_admin ?? false);
+  readonly isSuperAdmin  = computed(() => this._user()?.is_super_admin ?? false);
+  readonly isCrmUser     = computed(() =>
     this._user()?.is_admin === true ||
     this._user()?.crm_role === 'salesperson' ||
     this._user()?.crm_role === 'sales_manager'
