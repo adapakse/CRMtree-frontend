@@ -9,6 +9,7 @@ import {
   CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, CrmUser, CrmGroup, CalendarMeeting,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 const KANBAN_STAGES: { key: LeadStage; label: string; dot: string }[] = [
   { key: 'new',           label: 'Nowy',        dot: '#94A3B8' },
@@ -455,8 +456,11 @@ const PROB_MAP: Record<LeadStage, number> = {
         </div>
         <div class="fg">
           <label class="fl" style="display:flex;align-items:center;gap:3px">Rola w firmie <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
-          <input class="fi" [(ngModel)]="newForm.contact_title" placeholder="CEO"
-                 [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_title">
+          <select class="fi" [(ngModel)]="newForm.contact_title"
+                  [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_title">
+            <option value="">— wybierz —</option>
+            <option *ngFor="let t of dictTitles" [value]="t">{{ t }}</option>
+          </select>
         </div>
         <div class="fg">
           <label class="fl">Email</label>
@@ -476,7 +480,12 @@ const PROB_MAP: Record<LeadStage, number> = {
               <button type="button" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeNewExtraContact(i)">✕</button>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
                 <div class="fg"><label class="fl">Imię i nazwisko</label><input class="fi" [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></div>
-                <div class="fg"><label class="fl">Rola w firmie</label><input class="fi" [(ngModel)]="ec.contact_title" placeholder="CEO"></div>
+                <div class="fg"><label class="fl">Rola w firmie</label>
+                  <select class="fi" [(ngModel)]="ec.contact_title">
+                    <option value="">— wybierz —</option>
+                    <option *ngFor="let t of dictTitles" [value]="t">{{ t }}</option>
+                  </select>
+                </div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div class="fg"><label class="fl">Email</label><input class="fi" type="email" [(ngModel)]="ec.email" placeholder="jan@firma.pl"></div>
@@ -1140,8 +1149,18 @@ const PROB_MAP: Record<LeadStage, number> = {
   `],
 })
 export class CrmLeadsListComponent implements OnInit, OnDestroy {
-  private api    = inject(CrmApiService);
-  private auth   = inject(AuthService);
+  private api      = inject(CrmApiService);
+  private auth     = inject(AuthService);
+  private settings = inject(AppSettingsService);
+
+  get dictTitles(): string[] {
+    try {
+      const v = this.settings.get('crm_contact_titles' as any);
+      if (Array.isArray(v)) return v;
+      if (typeof v === 'string') return JSON.parse(v);
+    } catch (_) {}
+    return ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other'];
+  }
   private zone   = inject(NgZone);
   readonly cdr   = inject(ChangeDetectorRef);
   private router = inject(Router);
