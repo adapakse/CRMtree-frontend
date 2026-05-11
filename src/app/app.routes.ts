@@ -12,6 +12,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/callback.component').then(m => m.CallbackComponent),
   },
   {
+    path: 'change-password',
+    loadComponent: () => import('./pages/login/change-password.component').then(m => m.ChangePasswordComponent),
+  },
+  {
     path: 'crm/gmail/callback',
     loadComponent: () => import('./pages/crm/gmail-callback/gmail-callback.component').then(m => m.GmailCallbackComponent),
   },

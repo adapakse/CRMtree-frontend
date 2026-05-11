@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError, lastValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { User, AuthTokens } from '../models/models';
+import { User, AuthTokens, CrmFeature } from '../models/models';
 
 const ACCESS_KEY  = 'wt_access';
 const REFRESH_KEY = 'wt_refresh';
@@ -15,18 +15,31 @@ export class AuthService {
   // Reactive state
   private _user = signal<User | null>(null);
   readonly user  = this._user.asReadonly();
-  readonly isLoggedIn    = computed(() => this._user() !== null);
-  readonly isAdmin       = computed(() => this._user()?.is_admin ?? false);
-  readonly isSuperAdmin  = computed(() => this._user()?.is_super_admin ?? false);
-  readonly isCrmUser     = computed(() =>
+  readonly isLoggedIn         = computed(() => this._user() !== null);
+  readonly isAdmin            = computed(() => this._user()?.is_admin ?? false);
+  readonly isSuperAdmin       = computed(() => this._user()?.is_super_admin ?? false);
+  readonly mustChangePassword = computed(() => this._user()?.must_change_password ?? false);
+  readonly isCrmUser          = computed(() =>
     this._user()?.is_admin === true ||
     this._user()?.crm_role === 'salesperson' ||
     this._user()?.crm_role === 'sales_manager'
   );
 
   /** Synchroniczny dostęp do bieżącego użytkownika (dla guardów i komponentów CRM) */
-  get currentUser(): User | null {
-    return this._user();
+  get currentUser(): User | null { return this._user(); }
+
+  hasFeature(feature: CrmFeature): boolean {
+    const features = this._user()?.tenant_features;
+    if (!features) return true; // gold / brak danych → wszystko włączone
+    return features[feature] === true;
+  }
+
+  loginWithPassword(email: string, password: string): Observable<{ access_token: string; refresh_token: string; must_change_password?: boolean }> {
+    return this.http.post<any>(`${this.api}/auth/login`, { email, password });
+  }
+
+  changePassword(current_password: string | null, new_password: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.api}/auth/change-password`, { current_password, new_password });
   }
 
   constructor(private http: HttpClient, private router: Router) {}

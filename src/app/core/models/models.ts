@@ -17,6 +17,8 @@ export interface User {
   is_active: boolean;
   is_super_admin?: boolean;
   tenant_id?: string | null;
+  must_change_password?: boolean;
+  tenant_features?: Partial<Record<CrmFeature, boolean>>;
   crm_role?: 'salesperson' | 'sales_manager' | null;
   last_login_at?: string;
   created_at?: string;
