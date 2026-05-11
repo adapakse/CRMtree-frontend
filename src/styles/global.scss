@@ -50,16 +50,8 @@ router-outlet + * {
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
-}
-
-/* ── Router outlet — routed components fill #main ─────── */
-router-outlet + * {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ── Typography ────────────────────────────────────────── */
