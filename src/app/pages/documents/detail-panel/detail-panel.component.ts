@@ -1088,10 +1088,28 @@ export class DetailPanelComponent implements OnChanges {
 
   confirmSignus(): void {
     const signatories = this.signusEmails.split(',').map(e => ({ email: e.trim() })).filter(s => s.email);
-    this.docSvc.initiateSigning(this.doc.id, signatories).subscribe(res => {
-      this.signusOpen = false;
-      this.toast.success('Document sent to Signus — redirecting…');
-      setTimeout(() => window.open(res.redirectUrl, '_blank'), 800);
+    this.docSvc.initiateSigning(this.doc.id, signatories).subscribe({
+      next: (res: any) => {
+        this.signusOpen = false;
+        if (res.training) {
+          this.toast.success('Dokument wysłany do podpisu (symulacja). Podpisana wersja pojawi się za ~10 sekund.');
+          const docId = this.doc.id;
+          setTimeout(() => {
+            this.docSvc.get(docId).subscribe(d => {
+              this.doc = { ...d, _access: this.doc._access };
+              this.reloadHistory();
+              this.cdr.markForCheck();
+              this.updated.emit(this.doc);
+            });
+          }, 12_000);
+        } else {
+          this.toast.success('Document sent to Signus — redirecting…');
+          setTimeout(() => window.open(res.redirectUrl, '_blank'), 800);
+        }
+      },
+      error: (err: any) => {
+        this.toast.error(err?.error?.error || 'Błąd wysyłania do Signusa');
+      },
     });
   }
 }

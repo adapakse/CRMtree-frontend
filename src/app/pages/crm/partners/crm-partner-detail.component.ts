@@ -1276,7 +1276,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
 
     <!-- Gmail not connected prompt -->
-    <div *ngIf="!gmailConnected" class="modal-body" style="gap:16px;align-items:center;text-align:center;padding:32px 24px">
+    <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" class="modal-body" style="gap:16px;align-items:center;text-align:center;padding:32px 24px">
       <div style="font-size:40px">📧</div>
       <div style="font-size:15px;font-weight:700;color:#111827">Konto Gmail niepołączone</div>
       <div style="font-size:13px;color:#6b7280;max-width:380px">
@@ -1293,11 +1293,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
 
     <!-- Normal compose form -->
-    <ng-container *ngIf="gmailConnected">
+    <ng-container *ngIf="gmailConnected || settings.settings().crm_training_mode">
       <div class="modal-body" style="gap:12px">
         <!-- Connected account info -->
-        <div style="font-size:11px;color:#6b7280;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:6px">
+        <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:6px">
           <span style="color:#16a34a">✓</span> Wysyłasz z: <strong>{{gmailEmail}}</strong>
+        </div>
+        <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
+          🎓 Tryb szkoleniowy — mail nie zostanie wysłany, po 45s pojawi się symulowana odpowiedź
         </div>
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           Do
@@ -1384,7 +1387,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </ng-container>
 
     <!-- Footer for not-connected state -->
-    <div *ngIf="!gmailConnected" class="modal-footer">
+    <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" class="modal-footer">
       <button class="btn-outline" (click)="showEmailModal=false">Zamknij</button>
     </div>
   </div>
@@ -1691,7 +1694,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private api    = inject(CrmApiService);
   private auth     = inject(AuthService);
   private router   = inject(Router);
-  private settings = inject(AppSettingsService);
+  protected settings = inject(AppSettingsService);
 
   // Słowniki z app_settings
   get dictStatuses():  string[] { return this._dictArr('crm_partner_statuses', ['onboarding','active','inactive','churned']); }
@@ -2610,7 +2613,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.ccQuery          = '';
     this.emailAttachments = [];
     this.emailError       = '';
-    if (!this.gmailConnected && !this.gmailAuthUrl) {
+    if (!this.gmailConnected && !this.gmailAuthUrl && !this.settings.settings().crm_training_mode) {
       this.api.getGmailAuthUrl().subscribe({
         next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
         error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailModal = true; this.cdr.markForCheck(); }),
@@ -2884,6 +2887,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
               }),
               error: () => {},
             });
+          }
+          if (this.settings.settings().crm_training_mode) {
+            setTimeout(() => this.refreshEmailActivities(), 47_000);
           }
           this.cdr.markForCheck();
         });

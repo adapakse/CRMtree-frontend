@@ -12,11 +12,12 @@ import {
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
+import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
 
 @Component({
   selector: 'wt-crm-lead-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden" *ngIf="lead">
 
@@ -456,8 +457,8 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
       <button class="close-btn" (click)="showEmailModal=false">✕</button>
     </div>
 
-    <!-- Gmail niepołączony — pokaż prompt -->
-    <div *ngIf="!gmailConnected" class="modal-body" style="gap:14px;text-align:center;padding:28px 24px">
+    <!-- Gmail niepołączony — pokaż prompt (ukryty w trybie szkoleniowym) -->
+    <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" class="modal-body" style="gap:14px;text-align:center;padding:28px 24px">
       <div style="font-size:36px">📧</div>
       <div style="font-size:15px;font-weight:700;color:#18181b">Konto Gmail niepołączone</div>
       <div style="font-size:13px;color:#6b7280;line-height:1.6">
@@ -474,9 +475,12 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
     </div>
 
     <!-- Formularz wysyłki -->
-    <div *ngIf="gmailConnected" class="modal-body" style="gap:10px">
-      <div style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
+    <div *ngIf="gmailConnected || settings.settings().crm_training_mode" class="modal-body" style="gap:10px">
+      <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
         ✅ Wysyłam z: <strong>{{gmailEmail}}</strong>
+      </div>
+      <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
+        🎓 Tryb szkoleniowy — mail nie zostanie wysłany, po 45s pojawi się symulowana odpowiedź
       </div>
       <!-- Do: -->
       <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
@@ -572,7 +576,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
 
     <div class="modal-footer">
       <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
-      <button *ngIf="gmailConnected" class="btn-primary" (click)="sendEmail()"
+      <button *ngIf="gmailConnected || settings.settings().crm_training_mode" class="btn-primary" (click)="sendEmail()"
               [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">
         {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
       </button>
@@ -1223,6 +1227,15 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
     </div>
   </div>
 </div>
+
+<!-- Symulator połączenia telefonicznego (tryb szkoleniowy) -->
+<wt-phone-call-simulator
+  *ngIf="phoneSimulatorActive && lead"
+  [leadId]="lead.id"
+  [phoneNumber]="lead.phone || ''"
+  [contactName]="lead.contact_name || ''"
+  (closed)="onPhoneSimulatorClosed()">
+</wt-phone-call-simulator>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
@@ -1397,7 +1410,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private auth     = inject(AuthService);
   private router   = inject(Router);
   private cdr      = inject(ChangeDetectorRef);
-  private settings = inject(AppSettingsService);
+  protected settings = inject(AppSettingsService);
   logoSasUrl       = '';
 
   // Słowniki z app_settings
@@ -1608,7 +1621,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private historyLoaded = false;
 
   // Mock komunikacja
-  mockCallActive  = false;
+  mockCallActive      = false;
+  phoneSimulatorActive = false;
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
   gmailConnected  = false;
@@ -1845,7 +1859,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   openEmailModal(prefillThreadId?: string): void {
-    if (!this.gmailConnected) {
+    if (!this.gmailConnected && !this.settings.settings().crm_training_mode) {
       // Gmail niepołączony — pobierz URL autoryzacji i pokaż prompt
       this.api.getGmailAuthUrl().subscribe({
         next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
@@ -2141,6 +2155,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
               }),
               error: () => {},
             });
+          }
+          if (this.settings.settings().crm_training_mode) {
+            setTimeout(() => this.refreshEmailActivities(), 47_000);
           }
           this.cdr.markForCheck();
         });
@@ -3124,9 +3141,20 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   mockCall(): void {
     if (!this.lead?.phone) return;
+    if (this.settings.settings().crm_training_mode) {
+      this.phoneSimulatorActive = true;
+      this.cdr.markForCheck();
+      return;
+    }
     this.mockCallActive = true;
     this.cdr.markForCheck();
     setTimeout(() => { this.mockCallActive = false; this.cdr.markForCheck(); }, 5000);
+  }
+
+  onPhoneSimulatorClosed(): void {
+    this.phoneSimulatorActive = false;
+    this.refreshEmailActivities();
+    this.cdr.markForCheck();
   }
 
   quickChangeStage(stage: LeadStage): void {
