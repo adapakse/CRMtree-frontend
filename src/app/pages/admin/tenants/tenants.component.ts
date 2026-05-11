@@ -149,6 +149,15 @@ type EditTab = 'settings' | 'features' | 'users';
                                 </label>
                               </div>
                             </div>
+                            <div class="reinit-box">
+                              <div class="reinit-desc">
+                                <strong>Inicjalizacja z Gold</strong>
+                                <span>Kopiuje app_settings, group_profiles i feature flags z tenanta crmtree-gold. Istniejące ustawienia są nadpisywane.</span>
+                              </div>
+                              <button class="btn-reinit" [disabled]="saving()" (click)="reinit(t.id)">
+                                {{ saving() ? 'Kopiuję...' : '↺ Reinit z Gold' }}
+                              </button>
+                            </div>
                             <div class="panel-footer">
                               <button class="btn-secondary" (click)="cancelEdit()">Anuluj</button>
                               <button class="btn-primary" [disabled]="saving()" (click)="saveSettings(t.id)">
@@ -518,6 +527,22 @@ type EditTab = 'settings' | 'features' | 'users';
       padding: 14px 22px 18px; border-top: 1px solid var(--gray-200);
     }
 
+    .reinit-box {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;
+      padding: 12px 16px; margin-bottom: 16px;
+    }
+    .reinit-desc { display: flex; flex-direction: column; gap: 2px; font-size: 13px; }
+    .reinit-desc strong { color: var(--gray-800); }
+    .reinit-desc span { color: var(--gray-500); font-size: 12px; }
+    .btn-reinit {
+      white-space: nowrap; padding: 7px 14px; background: #f59e0b; color: white;
+      border: none; border-radius: 7px; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: background .12s; flex-shrink: 0;
+    }
+    .btn-reinit:hover:not(:disabled) { background: #d97706; }
+    .btn-reinit:disabled { opacity: .55; cursor: not-allowed; }
+
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .req  { color: #dc2626; }
     .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #1e40af; }
@@ -590,6 +615,18 @@ export class TenantsComponent implements OnInit {
   }
 
   cancelEdit(): void { this.expandedId.set(null); }
+
+  reinit(id: string): void {
+    if (!confirm('Skopiować app_settings, group_profiles i feature flags z crmtree-gold do tego tenanta? Istniejące ustawienia zostaną nadpisane.')) return;
+    this.saving.set(true);
+    this.http.post<{ settings_upserted: number; groups_inserted: number }>(`${API}/admin/tenants/${id}/reinit`, {}).subscribe({
+      next: result => {
+        this.saving.set(false);
+        this.toast.success(`Reinit zakończony — ${result.settings_upserted} ustawień, ${result.groups_inserted} grup`);
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd reinit'); },
+    });
+  }
 
   saveSettings(id: string): void {
     this.saving.set(true);
