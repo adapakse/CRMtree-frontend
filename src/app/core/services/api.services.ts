@@ -73,6 +73,10 @@ export class UserService {
   removeRole(userId: string, roleId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${userId}/roles/${roleId}`);
   }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
+  }
 }
 
 // ── Workflow ──────────────────────────────────────────────
