@@ -267,6 +267,24 @@ import { AuthService } from '../../core/auth/auth.service';
                 </div>
               </div>
               <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Save Changes</button>
+
+              <div class="sec-title" style="margin-top:24px">Hasło do logowania</div>
+              <div class="fgrid">
+                <div class="fg">
+                  <label class="fl">Nowe hasło</label>
+                  <input class="fi" type="password" [(ngModel)]="newPasswordVal" placeholder="Min. 8 znaków"
+                         [class.fi-err]="passwordError">
+                </div>
+                <div class="fg">
+                  <label class="fl">Powtórz hasło</label>
+                  <input class="fi" type="password" [(ngModel)]="newPasswordConfirm" placeholder="Min. 8 znaków"
+                         [class.fi-err]="passwordError">
+                </div>
+              </div>
+              @if (passwordError) { <span class="ferr">{{ passwordError }}</span> }
+              <button class="btn btn-p btn-sm" style="margin-top:4px" [disabled]="passwordSaving()" (click)="setPassword()">
+                {{ passwordSaving() ? 'Zapisywanie…' : 'Ustaw hasło' }}
+              </button>
             }
 
             <!-- ── Planowane Budżety Sprzedażowe ──────────────────────────────────── -->
@@ -497,6 +515,11 @@ export class UsersComponent implements OnInit {
   editCrmRole: string = '';   // ★ rola CRM
   emailError = '';        // ★ walidacja inline
 
+  newPasswordVal     = '';
+  newPasswordConfirm = '';
+  passwordError      = '';
+  passwordSaving     = signal(false);
+
   newRoleGroup  = '';
   newRoleAccess: 'read' | 'full' = 'read';
 
@@ -678,6 +701,27 @@ export class UsersComponent implements OnInit {
     });
   }
 
+  setPassword(): void {
+    const u = this.selected();
+    if (!u) return;
+    this.passwordError = '';
+    if (this.newPasswordVal.length < 8) { this.passwordError = 'Hasło musi mieć minimum 8 znaków'; return; }
+    if (this.newPasswordVal !== this.newPasswordConfirm) { this.passwordError = 'Hasła nie są identyczne'; return; }
+    this.passwordSaving.set(true);
+    this.userSvc.setPassword(u.id, this.newPasswordVal).subscribe({
+      next: () => {
+        this.passwordSaving.set(false);
+        this.newPasswordVal = '';
+        this.newPasswordConfirm = '';
+        this.toast.success('Hasło zostało ustawione');
+      },
+      error: err => {
+        this.passwordSaving.set(false);
+        this.passwordError = err?.error?.error ?? 'Błąd zapisu hasła';
+      },
+    });
+  }
+
   openUser(user: User): void {
     this.userSvc.get(user.id).subscribe({
       next: u => {
@@ -688,7 +732,10 @@ export class UsersComponent implements OnInit {
         this.editActive  = u.is_active;
         this.editAdmin   = u.is_admin;
         this.editCrmRole = (u as any).crm_role ?? '';
-        this.emailError    = '';
+        this.emailError        = '';
+        this.newPasswordVal    = '';
+        this.newPasswordConfirm = '';
+        this.passwordError     = '';
         this.newRoleGroup  = '';
         this.newRoleAccess = 'read';
         if (this.isSalesManager() && (u as any).crm_role === 'salesperson') {
