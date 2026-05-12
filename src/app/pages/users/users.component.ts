@@ -373,6 +373,9 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <div class="pf">
             <button class="btn btn-g" (click)="selected.set(null)">Close</button>
+            @if (isAdmin() && selected()!.id !== currentUserId()) {
+              <button class="btn btn-d" style="margin-left:auto" (click)="deleteUser()">Delete User</button>
+            }
           </div>
         </div>
       </div>
@@ -439,6 +442,7 @@ export class UsersComponent implements OnInit {
   });
 
   isAdmin = computed(() => !!this.auth.user()?.is_admin);
+  currentUserId = computed(() => this.auth.user()?.id ?? '');
 
   users      = signal<User[]>([]);
   groups     = signal<GroupProfile[]>([]);
@@ -675,22 +679,39 @@ export class UsersComponent implements OnInit {
   }
 
   openUser(user: User): void {
-    this.userSvc.get(user.id).subscribe(u => {
-      this.selected.set(u);
-      this.editFirst   = u.first_name;
-      this.editLast    = u.last_name;
-      this.editEmail   = u.email;
-      this.editActive  = u.is_active;
-      this.editAdmin   = u.is_admin;
-      this.editCrmRole = (u as any).crm_role ?? '';
-      this.emailError    = '';
-      this.newRoleGroup  = '';
-      this.newRoleAccess = 'read';
-      // Załaduj budżety jeśli Sales Manager otwiera handlowca
-      if (this.isSalesManager() && (u as any).crm_role === 'salesperson') {
-        this._budgetDraft = {}; this.budgetDirty = false;
-        this.loadBudgets();
-      }
+    this.userSvc.get(user.id).subscribe({
+      next: u => {
+        this.selected.set(u);
+        this.editFirst   = u.first_name;
+        this.editLast    = u.last_name;
+        this.editEmail   = u.email;
+        this.editActive  = u.is_active;
+        this.editAdmin   = u.is_admin;
+        this.editCrmRole = (u as any).crm_role ?? '';
+        this.emailError    = '';
+        this.newRoleGroup  = '';
+        this.newRoleAccess = 'read';
+        if (this.isSalesManager() && (u as any).crm_role === 'salesperson') {
+          this._budgetDraft = {}; this.budgetDirty = false;
+          this.loadBudgets();
+        }
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Failed to load user'),
+    });
+  }
+
+  deleteUser(): void {
+    const u = this.selected();
+    if (!u) return;
+    if (!confirm(`Delete user ${u.display_name} (${u.email})? This cannot be undone.`)) return;
+    this.userSvc.delete(u.id).subscribe({
+      next: () => {
+        this.users.update(list => list.filter(x => x.id !== u.id));
+        this.total.update(n => n - 1);
+        this.selected.set(null);
+        this.toast.success('User deleted');
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Failed to delete user'),
     });
   }
 
