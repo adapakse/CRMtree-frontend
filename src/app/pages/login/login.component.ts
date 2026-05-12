@@ -18,16 +18,18 @@ type Tab = 'sso' | 'password';
           <div class="login-sub">Platforma CRM</div>
         </div>
 
-        <!-- Tabs -->
-        <div class="l-tabs">
-          <button class="l-tab" [class.active]="tab() === 'sso'"      (click)="tab.set('sso')">Google Workspace SSO</button>
-          <button class="l-tab" [class.active]="tab() === 'password'" (click)="tab.set('password')">Email i hasło</button>
-        </div>
+        <!-- Tabs — SSO widoczne tylko na domenach developerskich -->
+        @if (isDevDomain) {
+          <div class="l-tabs">
+            <button class="l-tab" [class.active]="tab() === 'sso'"      (click)="tab.set('sso')">Google Workspace SSO</button>
+            <button class="l-tab" [class.active]="tab() === 'password'" (click)="tab.set('password')">Email i hasło</button>
+          </div>
+        }
 
         <div class="login-body">
 
-          <!-- SSO tab -->
-          @if (tab() === 'sso') {
+          <!-- SSO tab — tylko dev -->
+          @if (isDevDomain && tab() === 'sso') {
             <p class="login-hint">Zaloguj się kontem Google Workspace swojej organizacji.</p>
             <button class="lbtn" (click)="loginSso()" [disabled]="loading()">
               @if (loading()) {
@@ -41,7 +43,7 @@ type Tab = 'sso' | 'password';
           }
 
           <!-- Password tab -->
-          @if (tab() === 'password') {
+          @if (!isDevDomain || tab() === 'password') {
             <form (ngSubmit)="loginPassword()" #f="ngForm">
               <div class="field">
                 <label>Email</label>
@@ -116,7 +118,9 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
   private route  = inject(ActivatedRoute);
 
-  tab      = signal<Tab>('sso');
+  readonly isDevDomain = window.location.hostname !== 'app.crmtree.pl';
+
+  tab      = signal<Tab>(window.location.hostname === 'app.crmtree.pl' ? 'password' : 'sso');
   loading  = signal(false);
   showPass = signal(false);
   errorMsg = signal('');
