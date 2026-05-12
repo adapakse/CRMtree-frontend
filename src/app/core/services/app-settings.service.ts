@@ -21,6 +21,7 @@ export interface AppSettings {
   default_page_size:              number;
   roles_preview_count:            number;
   lead_attachments_folder_url:    string;
+  crm_training_mode:              boolean;
   [key: string]: number | boolean | string;
 }
 
@@ -31,6 +32,7 @@ const DEFAULTS: AppSettings = {
   default_page_size:              50,
   roles_preview_count:            3,
   lead_attachments_folder_url:    '',
+  crm_training_mode:              false,
 };
 
 @Injectable({ providedIn: 'root' })

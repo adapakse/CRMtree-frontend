@@ -893,6 +893,9 @@ export class CrmApiService {
   getRenewals(): Observable<any[]> {
     return this.http.get<any[]>(`${BASE}/dashboard/renewals`);
   }
+  getDashboardActivities(offset = 0, limit = 20): Observable<any[]> {
+    return this.http.get<any[]>(`${BASE}/dashboard/activities`, { params: { offset: String(offset), limit: String(limit) } });
+  }
 
   // ── Transactions ──────────────────────────────────────────
   getTransactions(params: Record<string, any> = {}): Observable<PagedResponse<Transaction>> {

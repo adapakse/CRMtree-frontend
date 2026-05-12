@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { CrmApiService, ActivityTask, Lead } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 
 interface PipelineRow {
@@ -318,9 +319,11 @@ interface PipelineRow {
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">Ostatnia aktywność <wt-tooltip key="crm.sales.activity"></wt-tooltip></span>
+        <button class="panel-refresh-btn" (click)="refreshActivities()" title="Odśwież">↺</button>
       </div>
 
-      <div class="activity-feed" *ngIf="recentActivities.length; else emptyAct">
+      <div class="activity-feed" *ngIf="recentActivities.length; else emptyAct"
+           (scroll)="onActivityScroll($event)">
         <div class="act-item clickable" *ngFor="let a of recentActivities" (click)="goToSource(a)">
           <div class="act-icon-wrap" [style.background]="actBg(a.type)">
             {{ actIcon(a.type) }}
@@ -331,10 +334,14 @@ interface PipelineRow {
           </div>
           <span class="act-time">{{ actTime(a) }}</span>
         </div>
+        <div *ngIf="activitiesLoading" class="act-loading">
+          <div class="act-spinner"></div>
+        </div>
+        <div *ngIf="!activitiesHasMore && recentActivities.length > 0" class="act-end">
+          Wszystkie aktywności załadowane
+        </div>
       </div>
       <ng-template #emptyAct><div class="empty-msg">Brak aktywności</div></ng-template>
-
-      <a routerLink="/crm/leads" class="panel-link">Zobacz pełną aktywność →</a>
     </div>
 
   </div>
@@ -375,6 +382,8 @@ interface PipelineRow {
     .panel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
     .panel-title { font-size: 14px; font-weight: 700; color: #1F2937; flex: 1; }
     .mini-sel { border: 1px solid #E5E7EB; border-radius: 7px; padding: 5px 10px; font-size: 12px; color: #374151; outline: none; cursor: pointer; background: white; }
+    .panel-refresh-btn { background: none; border: none; cursor: pointer; color: #9CA3AF; font-size: 16px; padding: 2px 4px; border-radius: 4px; line-height: 1; transition: color .15s; }
+    .panel-refresh-btn:hover { color: #3BAA5D; }
     .count-badge { background: var(--orange, #3BAA5D); color: white; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 2px 8px; }
     .icon-btn { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 1px solid #E5E7EB; border-radius: 6px; color: #6B7280; text-decoration: none; }
     .icon-btn:hover { background: #F9FAFB; color: var(--orange, #3BAA5D); }
@@ -450,13 +459,20 @@ interface PipelineRow {
     .prob-label { font-size: 11.5px; color: #6B7280; min-width: 30px; }
 
     /* Activity */
-    .activity-feed { display: flex; flex-direction: column; gap: 14px; flex: 1; }
-    .act-item { display: flex; align-items: flex-start; gap: 12px; }
+    .activity-feed { display: flex; flex-direction: column; gap: 14px; height: 300px; overflow-y: auto; overflow-x: hidden; flex-shrink: 0; scrollbar-width: thin; scrollbar-color: #E5E7EB transparent; }
+    .activity-feed::-webkit-scrollbar { width: 4px; }
+    .activity-feed::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
+    .activity-feed::-webkit-scrollbar-track { background: transparent; }
+    .act-item { display: flex; align-items: flex-start; gap: 12px; flex-shrink: 0; min-width: 0; }
     .act-icon-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
-    .act-body { flex: 1; min-width: 0; }
-    .act-title { font-size: 13px; font-weight: 600; color: #1F2937; }
-    .act-sub { font-size: 11.5px; color: #9CA3AF; margin-top: 2px; }
+    .act-body { flex: 1; min-width: 0; overflow: hidden; }
+    .act-title { font-size: 13px; font-weight: 600; color: #1F2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .act-sub { font-size: 11.5px; color: #9CA3AF; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .act-time { font-size: 11.5px; color: #9CA3AF; flex-shrink: 0; }
+    .act-loading { display: flex; justify-content: center; padding: 10px 0; flex-shrink: 0; }
+    .act-spinner { width: 16px; height: 16px; border: 2px solid #E5E7EB; border-top-color: #3BAA5D; border-radius: 50%; animation: spin .7s linear infinite; }
+    .act-end { font-size: 11px; color: #D1D5DB; text-align: center; padding: 8px 0; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Clickable */
     .clickable { cursor: pointer; }
@@ -482,11 +498,14 @@ interface PipelineRow {
     .dash-loading { display: flex; align-items: center; justify-content: center; height: 50vh; }
   `],
 })
-export class CrmSalesDashboardComponent implements OnInit {
-  private api    = inject(CrmApiService);
-  private auth   = inject(AuthService);
-  private cdr    = inject(ChangeDetectorRef);
-  private router = inject(Router);
+export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
+  private api      = inject(CrmApiService);
+  private auth     = inject(AuthService);
+  private cdr      = inject(ChangeDetectorRef);
+  private router   = inject(Router);
+  private settings = inject(AppSettingsService);
+
+  private trainingRefreshInterval: ReturnType<typeof setInterval> | null = null;
 
   loading = true;
 
@@ -515,6 +534,10 @@ export class CrmSalesDashboardComponent implements OnInit {
   todayTasks:       ActivityTask[] = [];
   recentLeads:      Lead[] = [];
   recentActivities: any[]  = [];
+
+  activitiesOffset  = 0;
+  activitiesLoading = false;
+  activitiesHasMore = true;
 
   closingTask:       ActivityTask | null = null;
   taskCloseComment = '';
@@ -551,13 +574,69 @@ export class CrmSalesDashboardComponent implements OnInit {
         this.allLeads = (leads as any).data || [];
         this.processPipeline(dashboard.pipeline || []);
         this.processLeads(this.allLeads);
-        this.processActivities(dashboard.recent_activities || []);
         this.processTasks(tasks);
         this.loading = false;
         this.cdr.markForCheck();
       },
       error: () => {
         this.loading = false;
+        this.cdr.markForCheck();
+      },
+    });
+    this.refreshActivities();
+    this.trainingRefreshInterval = setInterval(() => {
+      if (this.settings.settings().crm_training_mode) {
+        this.api.getCrmTasks().subscribe({ next: tasks => { this.processTasks(tasks); this.cdr.markForCheck(); } });
+        this.refreshActivities();
+      }
+    }, 30_000);
+  }
+
+  ngOnDestroy() {
+    if (this.trainingRefreshInterval) clearInterval(this.trainingRefreshInterval);
+  }
+
+  refreshActivities() {
+    this.activitiesOffset  = 0;
+    this.activitiesHasMore = true;
+    this.activitiesLoading = true;
+    this.cdr.markForCheck();
+    this.api.getDashboardActivities(0, 20).subscribe({
+      next: rows => {
+        this.recentActivities  = rows;
+        this.activitiesOffset  = rows.length;
+        this.activitiesHasMore = rows.length === 20;
+        this.activitiesLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.activitiesLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  onActivityScroll(event: Event) {
+    const el = event.target as HTMLElement;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 120) {
+      this.loadMoreActivities();
+    }
+  }
+
+  loadMoreActivities() {
+    if (this.activitiesLoading || !this.activitiesHasMore) return;
+    this.activitiesLoading = true;
+    this.cdr.markForCheck();
+    this.api.getDashboardActivities(this.activitiesOffset, 20).subscribe({
+      next: rows => {
+        this.recentActivities  = [...this.recentActivities, ...rows];
+        this.activitiesOffset += rows.length;
+        this.activitiesHasMore = rows.length === 20;
+        this.activitiesLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.activitiesLoading = false;
         this.cdr.markForCheck();
       },
     });
@@ -640,9 +719,6 @@ export class CrmSalesDashboardComponent implements OnInit {
       .slice(0, 6);
   }
 
-  private processActivities(activities: any[]) {
-    this.recentActivities = activities.slice(0, 6);
-  }
 
   private buildChart(leads: Lead[], period: string) {
     const DAYS  = period === '7d' ? 7 : period === '90d' ? 90 : 30;
