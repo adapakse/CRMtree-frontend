@@ -74,6 +74,10 @@ export class UserService {
     return this.http.delete<void>(`${this.base}/${userId}/roles/${roleId}`);
   }
 
+  setPassword(id: string, password: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.base}/${id}/set-password`, { password });
+  }
+
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
