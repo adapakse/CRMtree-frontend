@@ -468,10 +468,10 @@ interface PipelineRow {
         <span class="count-badge" *ngIf="churnCriticalCount > 0">{{ churnCriticalCount }}</span>
       </div>
       <div *ngIf="churnLoading" class="empty-msg">Ładowanie…</div>
-      <div *ngIf="!churnLoading && churnWidgetRows.length === 0" class="empty-msg">Brak ryzyka churn</div>
-      <div *ngIf="!churnLoading && churnWidgetRows.length > 0"
+      <div *ngIf="!churnLoading && churnRows.length === 0" class="empty-msg">Brak ryzyka churn</div>
+      <div *ngIf="!churnLoading && churnRows.length > 0"
            style="display:flex;flex-direction:column;gap:6px;flex:1">
-        <div *ngFor="let p of churnWidgetRows"
+        <div *ngFor="let p of churnRows.slice(0, 5)"
              (click)="goToPartner(p.partner_id)"
              style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 8px;border-radius:8px;transition:background .12s"
              (mouseenter)="$any($event.currentTarget).style.background='#F9FAFB'"
@@ -724,15 +724,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     return this.churnRows.filter(r => r.risk_level === 'critical').length;
   }
 
-  get churnWidgetRows(): ChurnPartner[] {
-    const userId = this.auth.user()?.id;
-    const mine = userId
-      ? this.churnRows.filter(r => r.salesperson_id === userId || r.manager_id === userId)
-      : this.churnRows;
-    return mine.slice(0, 5);
-  }
-
-  // KPI
+// KPI
   kpiNewLeads          = 0;
   kpiNewLeadsChange:   number | null = null;
   kpiNewCompanies      = 0;
