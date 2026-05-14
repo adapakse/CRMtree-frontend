@@ -2142,7 +2142,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return Math.max(1, ...this.partnerSalesProducts.map((p: any) => p.gross_turnover_pln || 0));
   }
 
-  private loadChurnData(partnerId: number): void {
+  private loadChurnData(partnerId: string): void {
     this.churnLoading = true;
     this.churnData = null;
     this.cdr.markForCheck();

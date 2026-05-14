@@ -1208,7 +1208,7 @@ export class CrmApiService {
   }
 
   // ── Churn Analytics ───────────────────────────────────────────────────────
-  getChurnData(params: { partner_name?: string; salesperson_id?: string; risk_level?: string; partner_id?: number } = {}): Observable<{ rows: ChurnPartner[]; settings: ChurnSettings }> {
+  getChurnData(params: { partner_name?: string; salesperson_id?: string; risk_level?: string; partner_id?: string } = {}): Observable<{ rows: ChurnPartner[]; settings: ChurnSettings }> {
     return this.http.get<{ rows: ChurnPartner[]; settings: ChurnSettings }>(`${BASE}/churn`, { params: this.toParams(params) });
   }
   generateChurnTasks(): Observable<{ created: number; skipped: number; total: number; errors?: any[] }> {
