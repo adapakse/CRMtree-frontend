@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import {
   CrmApiService, PartnersReport, PartnersReportKpi,
-  PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, CrmUser,
+  PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, CrmUser, ChurnPartner,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
@@ -288,6 +288,41 @@ function healthColor(engagement: number): string {
     </div>
   </div>
 
+  <!-- ROW CHURN: Widget ryzyka churn -->
+  <div class="card" style="padding:18px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;flex:1">Ryzyko Churn partnerów</span>
+      <span *ngIf="churnRows.filter(r => r.risk_level === 'critical').length > 0"
+            style="background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px">
+        {{ churnRows.filter(r => r.risk_level === 'critical').length }} krytyczne
+      </span>
+    </div>
+    <div *ngIf="churnLoading" style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">Ładowanie…</div>
+    <div *ngIf="!churnLoading && churnRows.length === 0"
+         style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">Brak partnerów z ryzykiem churn</div>
+    <div *ngIf="!churnLoading && churnRows.length > 0" style="display:flex;flex-direction:column;gap:6px">
+      <div *ngFor="let p of churnRows.slice(0, 5)"
+           (click)="goToPartner(p.partner_id)"
+           style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;transition:background .12s"
+           (mouseenter)="$any($event.currentTarget).style.background='#fafafa'"
+           (mouseleave)="$any($event.currentTarget).style.background=''">
+        <span [style.background]="p.risk_level === 'critical' ? '#FEE2E2' : p.risk_level === 'high' ? '#FED7AA' : p.risk_level === 'medium' ? '#FEF3C7' : '#DBEAFE'"
+              [style.color]="p.risk_level === 'critical' ? '#991B1B' : p.risk_level === 'high' ? '#9A3412' : p.risk_level === 'medium' ? '#92400E' : '#1E40AF'"
+              style="font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px;white-space:nowrap;flex-shrink:0">
+          {{ churnRiskLabel(p.risk_level) }}
+        </span>
+        <span style="flex:1;font-size:13px;font-weight:600;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
+        <span style="font-size:12px;font-weight:700;color:#52525b;flex-shrink:0">{{ p.total_score }} pkt</span>
+        <span style="font-size:11px;color:#a1a1aa;flex-shrink:0">{{ p.days_since_order }}d</span>
+      </div>
+    </div>
+    <a routerLink="/crm/dashboard" style="display:block;margin-top:14px;font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none"
+       (mouseenter)="$any($event.currentTarget).style.textDecoration='underline'"
+       (mouseleave)="$any($event.currentTarget).style.textDecoration='none'">
+      Pokaż wszystkich partnerów z ryzykiem churn →
+    </a>
+  </div>
+
   <!-- ROW 4: Pełna tabela partnerów -->
   <div class="card" style="padding:0;overflow:hidden">
     <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
@@ -399,6 +434,8 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   byProduct: any[] = [];
   byRep:     any[] = [];
   crmUsers:  CrmUser[] = [];
+  churnRows:   ChurnPartner[] = [];
+  churnLoading = false;
 
   private chartsBuilt = false;
 
@@ -426,6 +463,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
       }
     } catch { }
     this.onPresetChange();
+    this.loadChurnWidget();
   }
 
   onRepFilterChange(userId: string): void {
@@ -444,6 +482,26 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     this.persistRepName = '';
     try { sessionStorage.removeItem(this.REP_FILTER_KEY); } catch { }
     this.load();
+  }
+
+  loadChurnWidget(): void {
+    this.churnLoading = true;
+    this.cdr.markForCheck();
+    this.api.getChurnData().subscribe({
+      next: ({ rows }) => {
+        this.churnRows    = rows;
+        this.churnLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.churnLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  churnRiskLabel(level: string): string {
+    return ({ critical: 'Krytyczne', high: 'Wysokie', medium: 'Średnie', low: 'Niskie' } as Record<string, string>)[level] || level;
   }
 
   ngAfterViewInit(): void {}

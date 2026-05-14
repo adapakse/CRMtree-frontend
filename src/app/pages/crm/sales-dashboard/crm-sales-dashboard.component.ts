@@ -461,6 +461,30 @@ interface PipelineRow {
       <ng-template #emptyAct><div class="empty-msg">Brak aktywności</div></ng-template>
     </div>
 
+    <!-- Widget: Ryzyko Churn -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Ryzyko Churn</span>
+        <span class="count-badge" *ngIf="churnCriticalCount > 0">{{ churnCriticalCount }}</span>
+      </div>
+      <div *ngIf="churnLoading" class="empty-msg">Ładowanie…</div>
+      <div *ngIf="!churnLoading && churnRows.length === 0" class="empty-msg">Brak ryzyka churn</div>
+      <div *ngIf="!churnLoading && churnRows.length > 0"
+           style="display:flex;flex-direction:column;gap:6px;flex:1">
+        <div *ngFor="let p of churnRows.slice(0, 5)"
+             (click)="goToPartner(p.partner_id)"
+             style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 8px;border-radius:8px;transition:background .12s"
+             (mouseenter)="$any($event.currentTarget).style.background='#F9FAFB'"
+             (mouseleave)="$any($event.currentTarget).style.background=''">
+          <span class="churn-badge" [class]="'risk-badge-' + p.risk_level">{{ riskLabel(p.risk_level) }}</span>
+          <span style="flex:1;font-size:13px;font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
+          <span style="font-size:12px;font-weight:700;color:#6B7280;flex-shrink:0">{{ p.total_score }} pkt</span>
+        </div>
+      </div>
+      <button class="panel-link" style="background:none;border:none;cursor:pointer;font-family:inherit;width:100%;text-align:left;padding:0"
+              (click)="activeTab = 'churn'">Pokaż wszystkich partnerów z ryzykiem churn →</button>
+    </div>
+
   </div>
 
   </ng-container><!-- end dashboard tab -->
@@ -494,7 +518,7 @@ interface PipelineRow {
 
     /* Grid layout */
     .mid-row { display: grid; grid-template-columns: 1fr 1.05fr 0.85fr; gap: 16px; }
-    .bot-row { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; }
+    .bot-row { display: grid; grid-template-columns: 1.7fr 1fr 1fr; gap: 16px; }
 
     /* Panel */
     .panel { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; }
@@ -774,6 +798,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
       },
     });
     this.refreshActivities();
+    this.loadChurn();
     this.trainingRefreshInterval = setInterval(() => {
       if (this.settings.settings().crm_training_mode) {
         this.api.getCrmTasks().subscribe({ next: tasks => { this.processTasks(tasks); this.cdr.markForCheck(); } });
