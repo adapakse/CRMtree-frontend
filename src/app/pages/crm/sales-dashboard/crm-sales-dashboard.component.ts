@@ -1173,7 +1173,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/crm/leads', id]);
   }
 
-  goToPartner(id: number) {
+  goToPartner(id: string | number) {
     this.router.navigate(['/crm/partners', id]);
   }
 
