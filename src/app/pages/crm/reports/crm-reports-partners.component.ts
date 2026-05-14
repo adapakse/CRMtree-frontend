@@ -316,7 +316,8 @@ function healthColor(engagement: number): string {
         <span style="font-size:11px;color:#a1a1aa;flex-shrink:0">{{ p.days_since_order }}d</span>
       </div>
     </div>
-    <a routerLink="/crm/dashboard" style="display:block;margin-top:14px;font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none"
+    <a routerLink="/crm/dashboard" [queryParams]="{tab: 'churn'}"
+       style="display:block;margin-top:14px;font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none"
        (mouseenter)="$any($event.currentTarget).style.textDecoration='underline'"
        (mouseleave)="$any($event.currentTarget).style.textDecoration='none'">
       Pokaż wszystkich partnerów z ryzykiem churn →

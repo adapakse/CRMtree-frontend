@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { CrmApiService, ActivityTask, Lead, ChurnPartner, ChurnSettings } from '../../../core/services/crm-api.service';
@@ -468,10 +468,10 @@ interface PipelineRow {
         <span class="count-badge" *ngIf="churnCriticalCount > 0">{{ churnCriticalCount }}</span>
       </div>
       <div *ngIf="churnLoading" class="empty-msg">Ładowanie…</div>
-      <div *ngIf="!churnLoading && churnRows.length === 0" class="empty-msg">Brak ryzyka churn</div>
-      <div *ngIf="!churnLoading && churnRows.length > 0"
+      <div *ngIf="!churnLoading && churnWidgetRows.length === 0" class="empty-msg">Brak ryzyka churn</div>
+      <div *ngIf="!churnLoading && churnWidgetRows.length > 0"
            style="display:flex;flex-direction:column;gap:6px;flex:1">
-        <div *ngFor="let p of churnRows.slice(0, 5)"
+        <div *ngFor="let p of churnWidgetRows"
              (click)="goToPartner(p.partner_id)"
              style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 8px;border-radius:8px;transition:background .12s"
              (mouseenter)="$any($event.currentTarget).style.background='#F9FAFB'"
@@ -692,6 +692,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   private auth     = inject(AuthService);
   private cdr      = inject(ChangeDetectorRef);
   private router   = inject(Router);
+  private route    = inject(ActivatedRoute);
   private settings = inject(AppSettingsService);
 
   private trainingRefreshInterval: ReturnType<typeof setInterval> | null = null;
@@ -721,6 +722,14 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
 
   get churnCriticalCount(): number {
     return this.churnRows.filter(r => r.risk_level === 'critical').length;
+  }
+
+  get churnWidgetRows(): ChurnPartner[] {
+    const userId = this.auth.user()?.id;
+    const mine = userId
+      ? this.churnRows.filter(r => r.salesperson_id === userId || r.manager_id === userId)
+      : this.churnRows;
+    return mine.slice(0, 5);
   }
 
   // KPI
@@ -779,6 +788,12 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.route.queryParams.subscribe(p => {
+      if (p['tab'] === 'churn') {
+        this.activeTab = 'churn';
+        this.cdr.markForCheck();
+      }
+    });
     forkJoin({
       dashboard: this.api.getDashboard(),
       leads:     this.api.getLeads({ limit: 100, page: 1 }),
