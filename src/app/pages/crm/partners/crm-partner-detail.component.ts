@@ -2183,7 +2183,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.activeStep = p.onboarding_step || 0;
           this.cdr.markForCheck();
           if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
-          if (p.dwh_partner_id) { this.loadPartnerSalesData(p); this.loadChurnData(p.id!); }
+          if (p.dwh_partner_id) { this.loadPartnerSalesData(p); this.loadChurnData(String(p.id!)); }
           this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
         });
       },

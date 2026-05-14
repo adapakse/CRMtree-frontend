@@ -612,7 +612,7 @@ export interface SalesBudget {
 // ── Gmail ─────────────────────────────────────────────────────────────────────
 
 export interface ChurnPartner {
-  partner_id:       number;
+  partner_id:       string;
   company:          string;
   display_name:     string;
   manager_id:       string;
