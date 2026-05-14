@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
-import { CrmApiService, ActivityTask, Lead } from '../../../core/services/crm-api.service';
+import { CrmApiService, ActivityTask, Lead, ChurnPartner, ChurnSettings } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
@@ -24,6 +24,123 @@ interface PipelineRow {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <div class="crm-dash" *ngIf="!loading; else loadingTpl">
+
+  <!-- ── TABS ── -->
+  <div class="dash-tabs">
+    <button class="dash-tab" [class.active]="activeTab === 'dashboard'" (click)="activeTab = 'dashboard'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      Dashboard
+    </button>
+    <button class="dash-tab" [class.active]="activeTab === 'churn'"
+            (click)="activeTab = 'churn'; loadChurn()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/>
+        <polyline points="16,7 22,7 22,13"/>
+      </svg>
+      Ryzyko Churn
+      <span class="tab-badge-red" *ngIf="churnCriticalCount > 0">{{ churnCriticalCount }}</span>
+    </button>
+  </div>
+
+  <!-- ── CHURN TAB ── -->
+  <ng-container *ngIf="activeTab === 'churn'">
+    <div class="churn-section">
+
+      <!-- Filtry -->
+      <div class="churn-filters">
+        <input class="churn-filter-inp" [(ngModel)]="churnFilterName"
+               (ngModelChange)="onChurnFilter()" placeholder="Szukaj partnera…"/>
+        <select class="churn-filter-sel" [(ngModel)]="churnFilterRisk" (ngModelChange)="onChurnFilter()">
+          <option value="">Wszystkie poziomy</option>
+          <option value="critical">Krytyczne</option>
+          <option value="high">Wysokie</option>
+          <option value="medium">Średnie</option>
+          <option value="low">Niskie</option>
+        </select>
+        <select class="churn-filter-sel" *ngIf="isCrmManager"
+                [(ngModel)]="churnFilterSalesperson" (ngModelChange)="onChurnFilter()">
+          <option value="">Wszyscy handlowcy</option>
+          <option *ngFor="let u of churnSalespersons" [value]="u.id">{{ u.name }}</option>
+        </select>
+        <div class="churn-filter-spacer"></div>
+        <button class="churn-gen-btn" *ngIf="isCrmManager"
+                [disabled]="churnGenerating"
+                (click)="generateChurnTasks()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          {{ churnGenerating ? 'Generowanie…' : 'Generuj zadania' }}
+        </button>
+      </div>
+
+      <!-- Wynik generowania -->
+      <div class="churn-gen-result" *ngIf="churnGenResult">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+          <polyline points="20,6 9,17 4,12"/>
+        </svg>
+        Utworzono {{ churnGenResult.created }} zadań,
+        pominięto {{ churnGenResult.skipped }} (już istnieją).
+        <button class="churn-gen-close" (click)="churnGenResult = null">✕</button>
+      </div>
+
+      <!-- Lista -->
+      <div class="churn-list" *ngIf="!churnLoading; else churnLoadingTpl">
+        <div class="churn-empty" *ngIf="churnFiltered.length === 0">
+          Brak partnerów z ryzykiem churn spełniających kryteria filtrów.
+        </div>
+
+        <div class="churn-item" *ngFor="let p of churnFiltered" (click)="goToPartner(p.partner_id)">
+          <div class="churn-risk-bar" [class]="'risk-' + p.risk_level"></div>
+
+          <div class="churn-main">
+            <div class="churn-name">{{ p.display_name }}</div>
+            <div class="churn-meta" *ngIf="p.salesperson_name">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              {{ p.salesperson_name }}
+            </div>
+          </div>
+
+          <div class="churn-stats">
+            <div class="churn-stat" *ngIf="p.days_since_order !== null">
+              <span class="churn-stat-val">{{ p.days_since_order }}</span>
+              <span class="churn-stat-lbl">dni bez zamówienia</span>
+            </div>
+            <div class="churn-stat" *ngIf="p.sales_drop_pct > 0">
+              <span class="churn-stat-val churn-drop">−{{ p.sales_drop_pct }}%</span>
+              <span class="churn-stat-lbl">spadek M-2→M-1</span>
+            </div>
+          </div>
+
+          <div class="churn-score-wrap">
+            <div class="churn-badge" [class]="'risk-badge-' + p.risk_level">
+              {{ riskLabel(p.risk_level) }}
+            </div>
+            <div class="churn-score">{{ p.total_score }} pkt</div>
+          </div>
+
+          <svg class="churn-chevron" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" width="14" height="14">
+            <polyline points="9,18 15,12 9,6"/>
+          </svg>
+        </div>
+      </div>
+
+      <ng-template #churnLoadingTpl>
+        <div class="churn-loading"><div class="spinner"></div></div>
+      </ng-template>
+    </div>
+  </ng-container>
+
+  <!-- ── DASHBOARD TAB ── -->
+  <ng-container *ngIf="activeTab === 'dashboard'">
 
   <!-- ── HEADER ── -->
   <div class="dash-top">
@@ -345,6 +462,8 @@ interface PipelineRow {
     </div>
 
   </div>
+
+  </ng-container><!-- end dashboard tab -->
 </div>
 
 <ng-template #loadingTpl>
@@ -496,6 +615,52 @@ interface PipelineRow {
 
     /* Loading */
     .dash-loading { display: flex; align-items: center; justify-content: center; height: 50vh; }
+
+    /* Tabs */
+    .dash-tabs { display: flex; gap: 4px; border-bottom: 1px solid #E5E7EB; padding-bottom: 0; margin-bottom: 4px; }
+    .dash-tab { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border: none; background: none; font-size: 13.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: 0; transition: color .15s; }
+    .dash-tab:hover { color: #374151; }
+    .dash-tab.active { color: var(--orange, #3BAA5D); border-bottom-color: var(--orange, #3BAA5D); }
+    .tab-badge-red { background: #EF4444; color: white; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; }
+
+    /* Churn Section */
+    .churn-section { display: flex; flex-direction: column; gap: 14px; }
+    .churn-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .churn-filter-inp { border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-family: inherit; outline: none; min-width: 200px; }
+    .churn-filter-inp:focus { border-color: var(--orange, #3BAA5D); box-shadow: 0 0 0 2px rgba(59,170,93,.1); }
+    .churn-filter-sel { border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer; background: white; }
+    .churn-filter-spacer { flex: 1; }
+    .churn-gen-btn { display: flex; align-items: center; gap: 6px; background: var(--orange, #3BAA5D); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background .15s; white-space: nowrap; }
+    .churn-gen-btn:hover:not(:disabled) { background: var(--orange-dark, #2F8F4D); }
+    .churn-gen-btn:disabled { background: #D1D5DB; cursor: not-allowed; }
+    .churn-gen-result { display: flex; align-items: center; gap: 8px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #166534; }
+    .churn-gen-close { background: none; border: none; cursor: pointer; color: #166534; font-size: 14px; padding: 0 0 0 8px; margin-left: auto; }
+    .churn-list { display: flex; flex-direction: column; gap: 8px; }
+    .churn-empty { text-align: center; color: #9CA3AF; font-size: 13.5px; padding: 40px 0; }
+    .churn-loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
+    .churn-item { display: flex; align-items: center; gap: 14px; background: white; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 18px 14px 0; cursor: pointer; transition: box-shadow .15s, border-color .15s; overflow: hidden; }
+    .churn-item:hover { border-color: #D1D5DB; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .churn-risk-bar { width: 4px; height: 56px; border-radius: 0 2px 2px 0; flex-shrink: 0; }
+    .risk-critical .churn-risk-bar, .churn-risk-bar.risk-critical { background: #EF4444; }
+    .risk-high     .churn-risk-bar, .churn-risk-bar.risk-high     { background: #F97316; }
+    .risk-medium   .churn-risk-bar, .churn-risk-bar.risk-medium   { background: #F59E0B; }
+    .risk-low      .churn-risk-bar, .churn-risk-bar.risk-low      { background: #3B82F6; }
+    .churn-main { flex: 1; min-width: 0; }
+    .churn-name { font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .churn-meta { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #9CA3AF; margin-top: 3px; }
+    .churn-stats { display: flex; gap: 20px; flex-shrink: 0; }
+    .churn-stat { display: flex; flex-direction: column; align-items: flex-end; }
+    .churn-stat-val { font-size: 16px; font-weight: 700; color: #111827; }
+    .churn-drop { color: #EF4444; }
+    .churn-stat-lbl { font-size: 10.5px; color: #9CA3AF; white-space: nowrap; }
+    .churn-score-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 90px; flex-shrink: 0; }
+    .churn-badge { padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+    .risk-badge-critical { background: #FEE2E2; color: #991B1B; }
+    .risk-badge-high     { background: #FED7AA; color: #9A3412; }
+    .risk-badge-medium   { background: #FEF3C7; color: #92400E; }
+    .risk-badge-low      { background: #DBEAFE; color: #1E40AF; }
+    .churn-score { font-size: 11.5px; color: #6B7280; }
+    .churn-chevron { color: #D1D5DB; flex-shrink: 0; }
   `],
 })
 export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
@@ -508,6 +673,31 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   private trainingRefreshInterval: ReturnType<typeof setInterval> | null = null;
 
   loading = true;
+
+  // Tabs
+  activeTab: 'dashboard' | 'churn' = 'dashboard';
+
+  // Churn
+  churnRows:       ChurnPartner[] = [];
+  churnFiltered:   ChurnPartner[] = [];
+  churnSettings:   ChurnSettings | null = null;
+  churnLoading     = false;
+  churnLoaded      = false;
+  churnFilterName  = '';
+  churnFilterRisk  = '';
+  churnFilterSalesperson = '';
+  churnGenerating  = false;
+  churnGenResult:  { created: number; skipped: number; total: number } | null = null;
+  churnSalespersons: { id: string; name: string }[] = [];
+
+  get isCrmManager(): boolean {
+    const u = this.auth.user();
+    return !!(u?.is_admin || (u as any)?.crm_role === 'sales_manager');
+  }
+
+  get churnCriticalCount(): number {
+    return this.churnRows.filter(r => r.risk_level === 'critical').length;
+  }
 
   // KPI
   kpiNewLeads          = 0;
@@ -640,6 +830,83 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  loadChurn() {
+    if (this.churnLoaded) return;
+    this.churnLoading = true;
+    this.cdr.markForCheck();
+    this.api.getChurnData().subscribe({
+      next: ({ rows, settings }) => {
+        this.churnRows     = rows;
+        this.churnSettings = settings;
+        this.churnLoaded   = true;
+        this.buildChurnSalespersons();
+        this.applyChurnFilters();
+        this.churnLoading  = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.churnLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  private buildChurnSalespersons() {
+    const seen = new Map<string, string>();
+    for (const r of this.churnRows) {
+      if (r.salesperson_id && r.salesperson_name && !seen.has(r.salesperson_id)) {
+        seen.set(r.salesperson_id, r.salesperson_name);
+      }
+    }
+    this.churnSalespersons = [...seen.entries()].map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+  }
+
+  onChurnFilter() {
+    this.applyChurnFilters();
+    this.cdr.markForCheck();
+  }
+
+  private applyChurnFilters() {
+    let rows = this.churnRows;
+    if (this.churnFilterName.trim()) {
+      const q = this.churnFilterName.trim().toLowerCase();
+      rows = rows.filter(r => r.display_name.toLowerCase().includes(q));
+    }
+    if (this.churnFilterRisk) {
+      rows = rows.filter(r => r.risk_level === this.churnFilterRisk);
+    }
+    if (this.churnFilterSalesperson) {
+      rows = rows.filter(r => r.salesperson_id === this.churnFilterSalesperson);
+    }
+    this.churnFiltered = rows;
+  }
+
+  generateChurnTasks() {
+    if (this.churnGenerating) return;
+    this.churnGenerating = true;
+    this.churnGenResult  = null;
+    this.cdr.markForCheck();
+    this.api.generateChurnTasks().subscribe({
+      next: result => {
+        this.churnGenerating = false;
+        this.churnGenResult  = result;
+        // Odśwież listę
+        this.churnLoaded = false;
+        this.loadChurn();
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.churnGenerating = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  riskLabel(level: string): string {
+    return ({ critical: 'Krytyczne', high: 'Wysokie', medium: 'Średnie', low: 'Niskie' } as Record<string,string>)[level] || level;
   }
 
   private processPipeline(raw: any[]) {

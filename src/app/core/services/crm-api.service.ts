@@ -611,6 +611,42 @@ export interface SalesBudget {
 
 // ── Gmail ─────────────────────────────────────────────────────────────────────
 
+export interface ChurnPartner {
+  partner_id:       number;
+  company:          string;
+  display_name:     string;
+  manager_id:       string;
+  salesperson_id:   string;
+  salesperson_name: string;
+  last_date:        string | null;
+  days_since_order: number | null;
+  sales_m1:         number;
+  sales_m2:         number;
+  sales_drop_pct:   number;
+  days_score:       number;
+  sales_score:      number;
+  total_score:      number;
+  risk_level:       'critical' | 'high' | 'medium' | 'low';
+}
+
+export interface ChurnSettings {
+  days_t1_min:   number;
+  days_t1_max:   number;
+  days_t1_pts:   number;
+  days_t2_min:   number;
+  days_t2_max:   number;
+  days_t2_pts:   number;
+  days_t3_pts:   number;
+  sales_t1_pct:  number;
+  sales_t2_pct:  number;
+  sales_t1_pts:  number;
+  sales_t2_pts:  number;
+  risk_critical: number;
+  risk_high:     number;
+  risk_medium:   number;
+  risk_low:      number;
+}
+
 export interface GmailMessage {
   id: string;
   threadId: string;
@@ -1169,6 +1205,14 @@ export class CrmApiService {
       `${BASE}/gmail/attachment/${messageId}/${attachmentId}`,
       { params, responseType: 'blob' },
     );
+  }
+
+  // ── Churn Analytics ───────────────────────────────────────────────────────
+  getChurnData(params: { partner_name?: string; salesperson_id?: string; risk_level?: string; partner_id?: number } = {}): Observable<{ rows: ChurnPartner[]; settings: ChurnSettings }> {
+    return this.http.get<{ rows: ChurnPartner[]; settings: ChurnSettings }>(`${BASE}/churn`, { params: this.toParams(params) });
+  }
+  generateChurnTasks(): Observable<{ created: number; skipped: number; total: number; errors?: any[] }> {
+    return this.http.post<{ created: number; skipped: number; total: number; errors?: any[] }>(`${BASE}/churn/generate`, {});
   }
 
   // ── Google Drive Picker ────────────────────────────────────────────────────
