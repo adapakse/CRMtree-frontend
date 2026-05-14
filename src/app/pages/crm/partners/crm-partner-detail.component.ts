@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, ChurnPartner } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
@@ -583,6 +583,35 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.transactions_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Transakcje</div></div>
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.pax_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">PAX</div></div>
           <div class="dwh-kpi dwh-kpi-wide"><div class="dwh-kpi-val" style="color:#86efac">{{(partnerSalesKpi.revenue_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Przychód netto PLN</div></div>
+        </div>
+      </div>
+
+      <!-- Churn risk widget -->
+      <div *ngIf="partner.dwh_partner_id" class="churn-widget">
+        <div class="churn-widget-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+          Ryzyko Churn
+        </div>
+        <div *ngIf="churnLoading" class="churn-widget-loading">Ładowanie…</div>
+        <div *ngIf="!churnLoading && !churnData" class="churn-widget-ok">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><polyline points="20,6 9,17 4,12"/></svg>
+          Brak ryzyka odejścia
+        </div>
+        <div *ngIf="!churnLoading && churnData" class="churn-widget-body">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span class="churn-badge-inline risk-badge-{{churnData.risk_level}}">{{churnRiskLabel(churnData.risk_level)}}</span>
+            <span class="churn-widget-score">{{churnData.total_score}} pkt</span>
+          </div>
+          <div class="churn-widget-rows">
+            <div *ngIf="churnData.days_since_order !== null" class="churn-widget-row">
+              <span class="cwrow-lbl">Dni bez zamówienia</span>
+              <span class="cwrow-val">{{churnData.days_since_order}}</span>
+            </div>
+            <div *ngIf="churnData.sales_drop_pct > 0" class="churn-widget-row">
+              <span class="cwrow-lbl">Spadek M-2→M-1</span>
+              <span class="cwrow-val cwrow-drop">−{{churnData.sales_drop_pct}}%</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1571,6 +1600,22 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .prod-bar-wrap { flex:1; background:#f3f4f6; border-radius:4px; height:6px; overflow:hidden; }
     .prod-bar { height:100%; background:#f97316; border-radius:4px; transition:width .4s; }
     .prod-val { width:64px; text-align:right; color:#9ca3af; flex-shrink:0; }
+    .churn-widget { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
+    .churn-widget-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+    .churn-widget-loading { font-size:12px; color:#9ca3af; text-align:center; padding:4px 0; }
+    .churn-widget-ok { display:flex; align-items:center; gap:6px; font-size:12px; color:#16a34a; font-weight:600; }
+    .churn-widget-body { display:flex; flex-direction:column; gap:8px; }
+    .churn-widget-score { font-size:11px; color:#6b7280; }
+    .churn-widget-rows { display:flex; flex-direction:column; gap:4px; border-top:1px solid #f3f4f6; padding-top:8px; }
+    .churn-widget-row { display:flex; justify-content:space-between; align-items:center; }
+    .cwrow-lbl { font-size:12px; color:#6b7280; }
+    .cwrow-val { font-size:13px; font-weight:700; color:#111827; }
+    .cwrow-drop { color:#ef4444; }
+    .churn-badge-inline { padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; }
+    .risk-badge-critical { background:#fee2e2; color:#991b1b; }
+    .risk-badge-high     { background:#fed7aa; color:#9a3412; }
+    .risk-badge-medium   { background:#fef3c7; color:#92400e; }
+    .risk-badge-low      { background:#dbeafe; color:#1e40af; }
     .panel-email-box { background:white; border:1px solid #bfdbfe; border-radius:12px; padding:14px; flex-shrink:0; }
     .panel-email-title { font-size:11px; font-weight:700; color:#1d4ed8; margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
     .panel-msg { border:1px solid #e5e7eb; border-radius:8px; padding:8px; margin-bottom:6px; font-size:11px; }
@@ -1822,6 +1867,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   partnerSalesProducts: any[] = [];
   salesDataLoading = false;
   salesPeriod = 'ytd';
+  // Churn risk
+  churnData: ChurnPartner | null = null;
+  churnLoading = false;
   readonly currentYear = new Date().getFullYear();
   gmailConnected      = false;
   gmailEmail          = '';
@@ -2094,6 +2142,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return Math.max(1, ...this.partnerSalesProducts.map((p: any) => p.gross_turnover_pln || 0));
   }
 
+  private loadChurnData(partnerId: number): void {
+    this.churnLoading = true;
+    this.churnData = null;
+    this.cdr.markForCheck();
+    this.api.getChurnData({ partner_id: partnerId }).subscribe({
+      next: ({ rows }) => this.zone.run(() => {
+        this.churnData = rows[0] ?? null;
+        this.churnLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.churnLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  churnRiskLabel(level: string): string {
+    return ({ critical: 'Krytyczne', high: 'Wysokie', medium: 'Średnie', low: 'Niskie' } as Record<string, string>)[level] || level;
+  }
+
   private loadSuggestions(partnerId: number | string): void {
     this.api.getContactSuggestions(undefined, partnerId).subscribe({
       next: s => { this.allSuggestions = s; },
@@ -2117,7 +2183,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.activeStep = p.onboarding_step || 0;
           this.cdr.markForCheck();
           if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
-          if (p.dwh_partner_id) this.loadPartnerSalesData(p);
+          if (p.dwh_partner_id) { this.loadPartnerSalesData(p); this.loadChurnData(p.id!); }
           this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
         });
       },
