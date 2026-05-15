@@ -390,6 +390,22 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                       </td>
                     </tr>
                   }
+                  @if (churnTimeField()) {
+                    <tr style="background:#fafafa">
+                      <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">Harmonogram</td>
+                    </tr>
+                    <tr style="border-top:1px solid var(--gray-100)">
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ churnTimeField()!.label }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ churnTimeField()!.description }}</td>
+                      <td style="padding:9px 16px;text-align:right">
+                        <input class="fi" type="text" placeholder="HH:MM"
+                               style="width:76px;text-align:center;padding:5px 8px;font-size:12.5px"
+                               [(ngModel)]="churnTimeField()!.draft"
+                               (ngModelChange)="onFieldChange(churnTimeField()!)"
+                               [class.fi-err]="!!churnTimeField()!.error">
+                      </td>
+                    </tr>
+                  }
                 </tbody>
               </table>
             </div>
@@ -1110,6 +1126,7 @@ export class SettingsComponent implements OnInit {
   churnDayFields   = computed(() => this.churnFields().filter(f => f.key.startsWith('churn_days')));
   churnSalesFields = computed(() => this.churnFields().filter(f => f.key.startsWith('churn_sales')));
   churnRiskFields  = computed(() => this.churnFields().filter(f => f.key.startsWith('churn_risk')));
+  churnTimeField   = computed(() => this.fields().find(f => f.key === 'churn_daily_run_time'));
 
   healthFields      = computed(() => this.fields().filter(f => f.key.startsWith('health_')));
   healthActFields   = computed(() => this.healthFields().filter(f => f.key.startsWith('health_act')));

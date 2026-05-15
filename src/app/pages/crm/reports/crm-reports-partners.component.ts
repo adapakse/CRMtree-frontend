@@ -145,19 +145,13 @@ function healthColor(engagement: number): string {
 
     <!-- Partner scorecard table -->
     <div class="card" style="padding:0;overflow:hidden">
-      <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:10px">
+      <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Scorecard Partnerów</div>
-        <div style="display:flex;gap:6px;font-size:11px;flex:1">
+        <div style="display:flex;gap:6px;font-size:11px">
           <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>dobrze</span>
           <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>średnio</span>
           <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>słabo</span>
         </div>
-        <button *ngIf="isManager"
-                style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:600;color:#166534;cursor:pointer;white-space:nowrap"
-                [disabled]="scoringComputing"
-                (click)="computeScores()">
-          {{ scoringComputing ? 'Przeliczanie…' : '⟳ Przelicz scoring' }}
-        </button>
       </div>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
@@ -456,9 +450,8 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   byProduct: any[] = [];
   byRep:     any[] = [];
   crmUsers:  CrmUser[] = [];
-  churnRows:    ChurnPartner[] = [];
-  churnLoading  = false;
-  scoringComputing = false;
+  churnRows:   ChurnPartner[] = [];
+  churnLoading = false;
 
   private chartsBuilt = false;
 
@@ -507,19 +500,6 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     this.persistRepName = '';
     try { sessionStorage.removeItem(this.REP_FILTER_KEY); } catch { }
     this.load();
-  }
-
-  computeScores(): void {
-    this.scoringComputing = true;
-    this.cdr.markForCheck();
-    this.api.computeScores().subscribe({
-      next: (r) => {
-        this.scoringComputing = false;
-        this.load();
-        this.cdr.markForCheck();
-      },
-      error: () => { this.scoringComputing = false; this.cdr.markForCheck(); },
-    });
   }
 
   loadChurnWidget(): void {
