@@ -482,7 +482,7 @@ export interface PartnersReportKpi {
   transactions_count: number; pax_count: number; margin_pct: number; fee_rate_pct: number; partners_count: number;
 }
 export interface PartnersReportTrend   { period: string; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number; }
-export interface PartnersReportPartner { partner_name: string; partner_number: string | null; partner_id: number | null; salesperson_name: string | null; salesperson_id: string | null; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; }
+export interface PartnersReportPartner { partner_name: string; partner_number: string | null; partner_id: string | null; dwh_partner_id: number | null; salesperson_name: string | null; salesperson_id: string | null; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; activity_score: number; growth_score: number; health_score: number; health_level: 'good' | 'warning' | 'risk'; }
 export interface PartnersReportProduct { product_type: string; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; }
 export interface PartnersReportByRep   { salesperson_name: string; salesperson_id: string | null; partners_count: number; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; }
 export interface PartnersReport {

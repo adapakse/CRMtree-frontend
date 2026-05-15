@@ -332,6 +332,130 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
               </div>
             </div>
           }
+
+          <!-- Algorytm Churn -->
+          @if (churnFields().length > 0) {
+            <div class="card" style="margin-bottom:16px;overflow:hidden">
+              <div class="cat-header" style="padding:12px 20px">
+                <span class="cat-title" style="font-size:13px">📉 Algorytm Churn — parametry punktacji</span>
+                @if (churnFields().some(f => f.dirty)) {
+                  <span class="field-dirty" style="margin-left:auto">● Zmienione</span>
+                }
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+                <thead>
+                  <tr style="background:var(--gray-50)">
+                    <th style="padding:8px 20px;text-align:left;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)">Parametr</th>
+                    <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)">Opis</th>
+                    <th style="padding:8px 16px;text-align:right;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200);width:110px">Wartość</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="background:#fafafa">
+                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">Brak zamówień (dni)</td>
+                  </tr>
+                  @for (f of churnDayFields(); track f.key) {
+                    <tr style="border-top:1px solid var(--gray-100)">
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                               [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
+                      </td>
+                    </tr>
+                  }
+                  <tr style="background:#fafafa">
+                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">Spadek sprzedaży (M-2→M-1)</td>
+                  </tr>
+                  @for (f of churnSalesFields(); track f.key) {
+                    <tr style="border-top:1px solid var(--gray-100)">
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                               [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
+                      </td>
+                    </tr>
+                  }
+                  <tr style="background:#fafafa">
+                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">Progi ryzyka (punkty)</td>
+                  </tr>
+                  @for (f of churnRiskFields(); track f.key) {
+                    <tr style="border-top:1px solid var(--gray-100)">
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                               [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <!-- Algorytm Health Score -->
+          @if (healthFields().length > 0) {
+            <div class="card" style="margin-bottom:16px;overflow:hidden">
+              <div class="cat-header" style="padding:12px 20px">
+                <span class="cat-title" style="font-size:13px">💚 Health Score — parametry punktacji</span>
+                @if (healthFields().some(f => f.dirty)) {
+                  <span class="field-dirty" style="margin-left:auto">● Zmienione</span>
+                }
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+                <thead>
+                  <tr style="background:var(--gray-50)">
+                    <th style="padding:8px 20px;text-align:left;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)">Parametr</th>
+                    <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)">Opis</th>
+                    <th style="padding:8px 16px;text-align:right;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200);width:110px">Wartość</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="background:#fafafa">
+                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">Aktywność (ostatnie 20 dni)</td>
+                  </tr>
+                  @for (f of healthActFields(); track f.key) {
+                    <tr style="border-top:1px solid var(--gray-100)">
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                               [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
+                      </td>
+                    </tr>
+                  }
+                  <tr style="background:#fafafa">
+                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">Wzrost przychodów (M-2→M-1)</td>
+                  </tr>
+                  @for (f of healthRevFields(); track f.key) {
+                    <tr style="border-top:1px solid var(--gray-100)">
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                               [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
+                      </td>
+                    </tr>
+                  }
+                  <tr style="background:#fafafa">
+                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">Progi Health Level (punkty)</td>
+                  </tr>
+                  @for (f of healthLevelFields(); track f.key) {
+                    <tr style="border-top:1px solid var(--gray-100)">
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                               [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         }
 
         <!-- TAB: Słowniki dokumentów -->
@@ -977,10 +1101,20 @@ export class SettingsComponent implements OnInit {
     }));
   });
 
-  crmFields     = computed(() => this.fields().filter(f => f.category === 'crm' && !CRM_DICT_KEYS.includes(f.key)));
+  crmFields     = computed(() => this.fields().filter(f => f.category === 'crm' && !CRM_DICT_KEYS.includes(f.key) && !f.key.startsWith('churn_') && !f.key.startsWith('health_')));
   docFields     = computed(() => this.fields().filter(f => DOC_DICT_KEYS.includes(f.key)));
   crmDictFields = computed(() => this.fields().filter(f => CRM_DICT_KEYS.includes(f.key)));
   tooltipFields = computed(() => this.fields().filter(f => f.category === 'tooltip').sort((a, b) => a.key.localeCompare(b.key)));
+
+  churnFields      = computed(() => this.fields().filter(f => f.key.startsWith('churn_')));
+  churnDayFields   = computed(() => this.churnFields().filter(f => f.key.startsWith('churn_days')));
+  churnSalesFields = computed(() => this.churnFields().filter(f => f.key.startsWith('churn_sales')));
+  churnRiskFields  = computed(() => this.churnFields().filter(f => f.key.startsWith('churn_risk')));
+
+  healthFields      = computed(() => this.fields().filter(f => f.key.startsWith('health_')));
+  healthActFields   = computed(() => this.healthFields().filter(f => f.key.startsWith('health_act')));
+  healthRevFields   = computed(() => this.healthFields().filter(f => f.key.startsWith('health_rev')));
+  healthLevelFields = computed(() => this.healthFields().filter(f => f.key.startsWith('health_good') || f.key.startsWith('health_warn')));
 
   // ── Tooltips CRUD ─────────────────────────────────────────────────────────
   newTipScreen   = '';

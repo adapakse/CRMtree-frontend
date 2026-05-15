@@ -148,9 +148,9 @@ function healthColor(engagement: number): string {
       <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Scorecard Partnerów</div>
         <div style="display:flex;gap:6px;font-size:11px">
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#22C55E;display:inline-block"></span>Zdrowy</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#F59E0B;display:inline-block"></span>Uwaga</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#EF4444;display:inline-block"></span>Ryzyko</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>Zdrowy ≥61pkt</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>Uwaga ≥21pkt</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>Ryzyko &lt;21pkt</span>
         </div>
       </div>
       <div style="overflow-x:auto">
@@ -190,7 +190,16 @@ function healthColor(engagement: number): string {
                 <div style="font-size:10px;margin-top:2px" [style.color]="marginColor(p.gross_turnover_pln, p.revenue_pln)">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</div>
               </td>
               <td style="padding:10px;text-align:center;font-weight:600;color:#3f3f46">{{ p.transactions_count | number }}</td>
-              <td style="padding:10px;text-align:center"><span style="display:inline-block;width:12px;height:12px;border-radius:50%" [style.background]="healthDot(p.gross_turnover_pln)"></span></td>
+              <td style="padding:8px 10px;text-align:center">
+                <div style="display:inline-flex;flex-direction:column;align-items:center;gap:2px">
+                  <span [style.background]="healthBg(p.health_level)"
+                        [style.color]="healthColor(p.health_level)"
+                        style="font-size:10.5px;font-weight:700;border-radius:10px;padding:2px 8px;white-space:nowrap">
+                    {{ healthLabel(p.health_level) }}
+                  </span>
+                  <span style="font-size:10px;color:#a1a1aa">{{ p.health_score }} pkt</span>
+                </div>
+              </td>
             </tr>
             <tr *ngIf="!topPartners.length">
               <td [attr.colspan]="isManager ? 6 : 5" style="text-align:center;padding:20px;color:#a1a1aa;font-size:12px">Brak danych partnerów</td>
@@ -596,7 +605,15 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   calcMarginN(gross: number, rev: number): number { return gross > 0 ? rev / gross * 100 : 0; }
   marginPct(gross: number, rev: number): number { return Math.min(100, Math.max(0, this.calcMarginN(gross, rev) * 5)); }
   marginColor(gross: number, rev: number): string { const m = this.calcMarginN(gross, rev); return m >= 15 ? '#22C55E' : m >= 8 ? '#F59E0B' : '#EF4444'; }
-  healthDot(gross: number): string { return gross > 500000 ? '#22C55E' : gross > 100000 ? '#F59E0B' : '#EF4444'; }
+  healthColor(level: 'good' | 'warning' | 'risk' | string): string {
+    return level === 'good' ? '#22C55E' : level === 'warning' ? '#F59E0B' : '#EF4444';
+  }
+  healthBg(level: 'good' | 'warning' | 'risk' | string): string {
+    return level === 'good' ? '#F0FDF4' : level === 'warning' ? '#FFFBEB' : '#FEF2F2';
+  }
+  healthLabel(level: 'good' | 'warning' | 'risk' | string): string {
+    return level === 'good' ? 'Zdrowy' : level === 'warning' ? 'Uwaga' : 'Ryzyko';
+  }
   productLabel(pt: string): string { return (PRODUCT_TYPE_LABELS as Record<string,string>)[pt] || pt; }
   productIcon(pt: string): string  { return (PRODUCT_TYPE_ICONS as Record<string,string>)[pt] || '📦'; }
   deltaLabel(a: number, b: number): string { if (!b) return '—'; return (Math.abs((a-b)/b*100)).toFixed(0) + '%'; }
