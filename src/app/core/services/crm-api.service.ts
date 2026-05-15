@@ -1214,6 +1214,9 @@ export class CrmApiService {
   generateChurnTasks(): Observable<{ created: number; skipped: number; total: number; errors?: any[] }> {
     return this.http.post<{ created: number; skipped: number; total: number; errors?: any[] }>(`${BASE}/churn/generate`, {});
   }
+  computeScores(): Observable<{ computed: number; message?: string }> {
+    return this.http.post<{ computed: number; message?: string }>(`${BASE}/churn/compute`, {});
+  }
 
   // ── Google Drive Picker ────────────────────────────────────────────────────
   getDrivePickerConfig(): Observable<{ apiKey: string; clientId: string; appId: string }> {

@@ -145,13 +145,19 @@ function healthColor(engagement: number): string {
 
     <!-- Partner scorecard table -->
     <div class="card" style="padding:0;overflow:hidden">
-      <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
+      <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:10px">
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Scorecard Partnerów</div>
-        <div style="display:flex;gap:6px;font-size:11px">
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>Zdrowy ≥61pkt</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>Uwaga ≥21pkt</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>Ryzyko &lt;21pkt</span>
+        <div style="display:flex;gap:6px;font-size:11px;flex:1">
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>dobrze</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>średnio</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>słabo</span>
         </div>
+        <button *ngIf="isManager"
+                style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:600;color:#166534;cursor:pointer;white-space:nowrap"
+                [disabled]="scoringComputing"
+                (click)="computeScores()">
+          {{ scoringComputing ? 'Przeliczanie…' : '⟳ Przelicz scoring' }}
+        </button>
       </div>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
@@ -191,14 +197,11 @@ function healthColor(engagement: number): string {
               </td>
               <td style="padding:10px;text-align:center;font-weight:600;color:#3f3f46">{{ p.transactions_count | number }}</td>
               <td style="padding:8px 10px;text-align:center">
-                <div style="display:inline-flex;flex-direction:column;align-items:center;gap:2px">
-                  <span [style.background]="healthBg(p.health_level)"
-                        [style.color]="healthColor(p.health_level)"
-                        style="font-size:10.5px;font-weight:700;border-radius:10px;padding:2px 8px;white-space:nowrap">
-                    {{ healthLabel(p.health_level) }}
-                  </span>
-                  <span style="font-size:10px;color:#a1a1aa">{{ p.health_score }} pkt</span>
-                </div>
+                <span [style.background]="healthBg(p.health_level)"
+                      [style.color]="healthColor(p.health_level)"
+                      style="font-size:11px;font-weight:700;border-radius:10px;padding:3px 10px;white-space:nowrap;display:inline-block">
+                  {{ p.health_score }} pkt
+                </span>
               </td>
             </tr>
             <tr *ngIf="!topPartners.length">
@@ -351,6 +354,7 @@ function healthColor(engagement: number): string {
             <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Przychód</th>
             <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Marża</th>
             <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Trans.</th>
+            <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Health</th>
           </tr>
         </thead>
         <tbody>
@@ -373,9 +377,16 @@ function healthColor(engagement: number): string {
               <span [style.background]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#dcfce7' : '#f4f4f5'" [style.color]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#166534' : '#71717a'" style="border-radius:4px;padding:1px 6px;font-size:11px">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</span>
             </td>
             <td style="padding:9px 10px;text-align:right;color:#71717a">{{ p.transactions_count }}</td>
+            <td style="padding:9px 10px;text-align:center">
+              <span [style.background]="healthBg(p.health_level)"
+                    [style.color]="healthColor(p.health_level)"
+                    style="font-size:11px;font-weight:700;border-radius:10px;padding:2px 9px;white-space:nowrap;display:inline-block">
+                {{ p.health_score }} pkt
+              </span>
+            </td>
           </tr>
           <tr *ngIf="!filteredByPartner.length">
-            <td [attr.colspan]="isManager ? 8 : 7" style="text-align:center;padding:24px;color:#a1a1aa;font-size:12px">Brak danych dla wybranego okresu</td>
+            <td [attr.colspan]="isManager ? 9 : 8" style="text-align:center;padding:24px;color:#a1a1aa;font-size:12px">Brak danych dla wybranego okresu</td>
           </tr>
         </tbody>
         <tfoot *ngIf="kpi && filteredByPartner.length">
@@ -388,6 +399,7 @@ function healthColor(engagement: number): string {
             <td style="padding:9px 10px;text-align:right;color:#22C55E">{{ kpi.revenue_pln | number:'1.0-0' }}</td>
             <td style="padding:9px 10px;text-align:right">{{ kpi.margin_pct | number:'1.0-1' }}%</td>
             <td style="padding:9px 10px;text-align:right">{{ kpi.transactions_count | number }}</td>
+            <td></td>
           </tr>
         </tfoot>
       </table>
@@ -444,13 +456,16 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   byProduct: any[] = [];
   byRep:     any[] = [];
   crmUsers:  CrmUser[] = [];
-  churnRows:   ChurnPartner[] = [];
-  churnLoading = false;
+  churnRows:    ChurnPartner[] = [];
+  churnLoading  = false;
+  scoringComputing = false;
 
   private chartsBuilt = false;
 
   get isManager() { const u = this.auth.user(); return u?.is_admin || u?.crm_role === 'sales_manager'; }
-  get topPartners() { return this.filteredByPartner.slice(0, 8); }
+  get topPartners() {
+    return [...this.filteredByPartner].sort((a, b) => (b.health_score ?? 0) - (a.health_score ?? 0)).slice(0, 8);
+  }
   get partnerNames() { return [...new Set(this.byPartner.map(p => p.partner_name))]; }
 
   /** Backend filtruje dane — getter jest już tylko aliasem */
@@ -492,6 +507,19 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     this.persistRepName = '';
     try { sessionStorage.removeItem(this.REP_FILTER_KEY); } catch { }
     this.load();
+  }
+
+  computeScores(): void {
+    this.scoringComputing = true;
+    this.cdr.markForCheck();
+    this.api.computeScores().subscribe({
+      next: (r) => {
+        this.scoringComputing = false;
+        this.load();
+        this.cdr.markForCheck();
+      },
+      error: () => { this.scoringComputing = false; this.cdr.markForCheck(); },
+    });
   }
 
   loadChurnWidget(): void {
