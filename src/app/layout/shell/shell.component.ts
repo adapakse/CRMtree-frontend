@@ -221,7 +221,7 @@ import { initials } from '../../core/services/helpers';
 
     /* ── Sidebar shell ───────────────────────────────────────────────── */
     #sidebar {
-      width: 256px;
+      width: 230px;
       background: #292A2D;
       display: flex;
       flex-direction: column;

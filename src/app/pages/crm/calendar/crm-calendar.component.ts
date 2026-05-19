@@ -1,6 +1,6 @@
 // src/app/pages/crm/calendar/crm-calendar.component.ts
 import { Observable } from 'rxjs';
-import { Component, OnInit, inject, ChangeDetectorRef, NgZone, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -42,6 +42,7 @@ interface CalendarDay {
   <!-- Filtr typu aktywności (zadania) -->
   <select class="ctl" *ngIf="view === 'tasks'" [(ngModel)]="filterActivityType" (ngModelChange)="loadTasks()">
     <option value="">Wszystkie typy</option>
+    <option value="task">Zadanie</option>
     <option value="call">Połączenie</option>
     <option value="meeting">Spotkanie</option>
     <option value="note">Notatka</option>
@@ -85,7 +86,7 @@ interface CalendarDay {
 
 <!-- CONTENT -->
 <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
-  <div *ngIf="loading" style="height:3px;background:#f97316;flex-shrink:0"></div>
+  <div *ngIf="loading" style="height:3px;background:#3BAA5D;flex-shrink:0"></div>
 
   <!-- ══ WIDOK MIESIĄCA ══ -->
   <div *ngIf="view === 'month'" style="flex:1;overflow:auto;padding:0">
@@ -172,16 +173,49 @@ interface CalendarDay {
 
   <!-- ══ WIDOK ZADANIA ══ -->
   <div *ngIf="view === 'tasks'" style="flex:1;overflow-y:auto;padding:16px">
+
+    <!-- Toolbar: masowe zamykanie -->
+    <div *ngIf="!tasksLoading && activities.length" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#6b7280">{{activities.length}} aktywności</span>
+      <span style="flex:1"></span>
+      <ng-container *ngIf="!bulkSelectMode">
+        <button class="nav-btn" style="font-size:11px;padding:4px 12px" (click)="enterBulkSelect()">
+          ☑ Zaznacz wszystkie przeterminowane zadania
+        </button>
+      </ng-container>
+      <ng-container *ngIf="bulkSelectMode">
+        <span style="font-size:12px;color:#374151;font-weight:600">{{selectedTaskKeys.size}} zaznaczonych</span>
+        <button class="nav-btn" style="font-size:11px;padding:4px 14px;background:#3BAA5D;color:white;border-color:#3BAA5D"
+                (click)="bulkClose()" [disabled]="!selectedTaskKeys.size || saving">
+          {{saving ? '…' : 'Zamknij zaznaczone zadania'}}
+        </button>
+        <button class="nav-btn" style="font-size:11px;padding:4px 12px" (click)="exitBulkSelect()">Anuluj</button>
+      </ng-container>
+    </div>
+
     <div *ngIf="tasksLoading" style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">Ładowanie zadań…</div>
     <div *ngIf="!tasksLoading && !activities.length" style="text-align:center;padding:40px;color:#9ca3af;font-size:13px">Brak zadań do wyświetlenia.</div>
+
     <div *ngFor="let t of activities" class="task-item"
          [class.task-today]="t.activity_at && isTaskToday(t.activity_at)"
          [class.task-overdue]="t.status !== 'closed' && t.activity_at && isTaskOverdue(t.activity_at)"
          [class.task-closed]="t.status === 'closed'"
          [class.task-readonly]="isTaskReadOnly(t)"
-         (click)="openTask(t)" style="cursor:pointer">
+         [class.task-expanded]="isExpanded(t)"
+         (click)="onTaskClick(t)" style="cursor:pointer">
+
+      <!-- Główny wiersz -->
       <div style="display:flex;align-items:stretch;gap:0">
-        <!-- Kolumna daty (lewa) -->
+        <!-- Checkbox (tryb masowy, tylko dla zadań) -->
+        <div *ngIf="bulkSelectMode && t.type==='task'"
+             style="display:flex;align-items:center;padding-right:10px;flex-shrink:0"
+             (click)="$event.stopPropagation()">
+          <input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:#3BAA5D"
+                 [checked]="selectedTaskKeys.has(taskKey(t))"
+                 (change)="toggleTaskSelect(t)">
+        </div>
+
+        <!-- Kolumna daty -->
         <div class="task-date-col">
           <ng-container *ngIf="t.activity_at; else noDate">
             <span class="task-date-day">{{t.activity_at | date:'d'}}</span>
@@ -190,10 +224,13 @@ interface CalendarDay {
           </ng-container>
           <ng-template #noDate><span class="task-date-none">brak daty</span></ng-template>
         </div>
-        <!-- Treść zadania -->
+
+        <!-- Treść -->
         <div style="flex:1;min-width:0;padding-left:12px">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <strong style="font-size:13px;color:#18181b"><span style="color:#6b7280;font-weight:500">{{taskTypeName(t.type)}}:</span> {{t.title}}</strong>
+            <strong style="font-size:13px;color:#18181b">
+              <span style="color:#6b7280;font-weight:500">{{taskTypeName(t.type)}}:</span> {{t.title}}
+            </strong>
             <span class="task-status-badge task-st-{{t.status}}">{{taskStatusLabel(t.status)}}</span>
             <span class="task-source-badge task-src-{{t.source_type}}">{{t.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
             <span *ngIf="isTaskReadOnly(t)" style="font-size:9px;color:#9ca3af;font-style:italic">tylko odczyt</span>
@@ -204,21 +241,56 @@ interface CalendarDay {
             <span *ngIf="t.act_assigned_to_name"> → {{t.act_assigned_to_name}}</span>
             <span *ngIf="!t.act_assigned_to_name && t.assigned_to_name"> → {{t.assigned_to_name}}</span>
           </div>
-          <div *ngIf="t.body" style="font-size:12px;color:#6b7280;margin-top:3px;white-space:pre-line">{{t.body}}</div>
-          <div *ngIf="t.close_comment" style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px">💬 {{t.close_comment}}</div>
-          <!-- Formularz zamknięcia -->
-          <div *ngIf="closingTaskId === t.id" style="margin-top:8px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
-            <textarea [(ngModel)]="taskCloseComment" placeholder="Komentarz zamknięcia *" rows="2"
-                      style="border:1px solid #d1d5db;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
-            <div style="display:flex;gap:6px;justify-content:flex-end">
-              <button class="nav-btn" style="font-size:12px" (click)="cancelCloseTask()">Anuluj</button>
-              <button class="nav-btn" style="font-size:12px;background:#f97316;color:white;border-color:#f97316" (click)="confirmCloseTask(t)" [disabled]="!taskCloseComment.trim() || saving">{{saving ? '…' : 'Zamknij'}}</button>
-            </div>
+          <div *ngIf="t.body && !isExpanded(t)"
+               style="font-size:12px;color:#6b7280;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:600px">
+            {{stripHtml(t.body)}}
+          </div>
+          <span *ngIf="isExpanded(t)" style="font-size:11px;color:#3BAA5D;margin-top:2px;display:block">✎ tryb edycji</span>
+        </div>
+
+        <!-- Przyciski akcji (tylko dla zadań) -->
+        <div *ngIf="t.type === 'task' && !isTaskReadOnly(t)"
+             style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;padding-left:8px"
+             (click)="$event.stopPropagation()">
+          <button *ngIf="t.status !== 'closed'" class="nav-btn"
+                  style="font-size:11px;padding:3px 10px;white-space:nowrap"
+                  (click)="closeTaskDirect(t)" [disabled]="saving">✓ Zamknij</button>
+          <button *ngIf="t.status === 'closed'" class="nav-btn"
+                  style="font-size:11px;padding:3px 10px;white-space:nowrap;color:#3BAA5D;border-color:#3BAA5D"
+                  (click)="reopenTaskDirect(t)" [disabled]="saving">↩ Ponownie aktywuj</button>
+        </div>
+      </div>
+
+      <!-- Formularz edycji (inline) -->
+      <div *ngIf="isExpanded(t)"
+           style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb;display:flex;flex-direction:column;gap:8px"
+           (click)="$event.stopPropagation()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <label style="font-size:11px;font-weight:600;color:#374151">Tytuł *</label>
+            <input [(ngModel)]="inlineEditForm.title" class="ef-input" placeholder="Tytuł…">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <label style="font-size:11px;font-weight:600;color:#374151">Data i godzina</label>
+            <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="ef-input">
           </div>
         </div>
-        <!-- Akcje -->
-        <div *ngIf="closingTaskId !== t.id && t.status !== 'closed' && !isTaskReadOnly(t)" style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;padding-left:8px" (click)="$event.stopPropagation()">
-          <button class="nav-btn" style="font-size:11px;padding:3px 8px" (click)="startCloseTask(t)">✓ Zamknij</button>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;font-weight:600;color:#374151">Opis / notatki</label>
+          <textarea [(ngModel)]="inlineEditForm.body" rows="2" class="ef-input" style="resize:vertical" placeholder="Opis…"></textarea>
+        </div>
+        <div *ngIf="crmUsers.length" style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;font-weight:600;color:#374151">Przypisz do</label>
+          <select [(ngModel)]="inlineEditForm.assigned_to" class="ef-input">
+            <option value="">— bez przypisania —</option>
+            <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="dp-btn-g" (click)="cancelInlineEdit()">Anuluj</button>
+          <button class="dp-btn-p" (click)="saveInlineEdit(t)" [disabled]="!inlineEditForm.title?.trim() || saving">
+            {{saving ? '…' : 'Zapisz'}}
+          </button>
         </div>
       </div>
     </div>
@@ -286,86 +358,18 @@ interface CalendarDay {
     </div>
   </div>
 </div>
-
-<!-- ══ PANEL SZCZEGÓŁÓW ZADANIA ══ -->
-<div class="detail-overlay" *ngIf="selectedTask" (click)="closeTask()">
-  <div class="detail-panel" (click)="$event.stopPropagation()">
-    <div class="dp-header">
-      <span style="font-size:12px;font-weight:600;color:#6b7280">{{taskTypeName(selectedTask.type)}}</span>
-      <span class="task-status-badge task-st-{{selectedTask.status}}" style="margin-left:4px">{{taskStatusLabel(selectedTask.status)}}</span>
-      <span class="task-source-badge task-src-{{selectedTask.source_type}}" style="margin-left:4px">{{selectedTask.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
-      <span style="flex:1"></span>
-      <button class="dp-edit-btn" (click)="startEditTask()" *ngIf="!taskEditMode && canEditTask(selectedTask)">✏️ Edytuj</button>
-      <button class="dp-close" (click)="closeTask()">✕</button>
-    </div>
-
-    <!-- Widok -->
-    <div *ngIf="!taskEditMode" class="dp-body">
-      <div class="dp-title">{{selectedTask.title}}</div>
-      <div class="dp-source">
-        <a *ngIf="selectedTask.source_type === 'lead'"    [routerLink]="['/crm/leads',    selectedTask.source_id]" class="dp-link" (click)="closeTask()">{{selectedTask.source_name}}</a>
-        <a *ngIf="selectedTask.source_type === 'partner'" [routerLink]="['/crm/partners', selectedTask.source_id]" class="dp-link" (click)="closeTask()">{{selectedTask.source_name}}</a>
-      </div>
-      <div class="dp-row" *ngIf="selectedTask.activity_at"><span class="dp-lbl">📅 Data i czas</span><span>{{selectedTask.activity_at | date:'dd.MM.yyyy HH:mm'}}</span></div>
-      <div class="dp-row" *ngIf="selectedTask.body"><span class="dp-lbl">📝 Opis</span><span style="white-space:pre-line">{{selectedTask.body}}</span></div>
-      <div class="dp-row" *ngIf="selectedTask.created_by_name"><span class="dp-lbl">👤 Dodał</span><span>{{selectedTask.created_by_name}}</span></div>
-      <div class="dp-row" *ngIf="selectedTask.act_assigned_to_name || selectedTask.assigned_to_name"><span class="dp-lbl">🙋 Przypisano do</span><span>{{selectedTask.act_assigned_to_name || selectedTask.assigned_to_name}}</span></div>
-      <div class="dp-row" *ngIf="selectedTask.close_comment"><span class="dp-lbl">💬 Komentarz</span><span style="font-style:italic">{{selectedTask.close_comment}}</span></div>
-      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end" *ngIf="canEditTask(selectedTask)">
-        <button class="dp-btn-p" *ngIf="selectedTask.status !== 'closed'" (click)="startCloseTaskFromModal()">✓ Zamknij zadanie</button>
-        <button class="dp-btn-g" *ngIf="selectedTask.status === 'closed'" (click)="reopenTask(selectedTask)" [disabled]="saving">↩ Wznów zadanie</button>
-      </div>
-      <!-- Inline close form in modal -->
-      <div *ngIf="closingTaskId === selectedTask.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
-        <textarea [(ngModel)]="taskCloseComment" placeholder="Komentarz zamknięcia *" rows="3"
-                  style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
-        <div style="display:flex;gap:6px;justify-content:flex-end">
-          <button class="dp-btn-g" (click)="cancelCloseTask()">Anuluj</button>
-          <button class="dp-btn-p" (click)="confirmCloseTask(selectedTask)" [disabled]="!taskCloseComment.trim() || saving">{{saving ? '…' : 'Zamknij'}}</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Edycja -->
-    <div *ngIf="taskEditMode" class="dp-body">
-      <div class="tf-row">
-        <label class="tf-lbl">Tytuł <span style="color:#dc2626">*</span></label>
-        <input class="ef-input" [(ngModel)]="taskEditForm.title" placeholder="Tytuł zadania">
-      </div>
-      <div class="tf-row">
-        <label class="tf-lbl">Data i godzina wykonania</label>
-        <input class="ef-input" type="datetime-local" [(ngModel)]="taskEditForm.activity_at">
-      </div>
-      <div class="tf-row">
-        <label class="tf-lbl">Opis / notatki</label>
-        <textarea class="ef-input" rows="4" [(ngModel)]="taskEditForm.body" style="resize:vertical" placeholder="Opis zadania..."></textarea>
-      </div>
-      <div class="tf-row" *ngIf="crmUsers.length > 0">
-        <label class="tf-lbl">Przypisz do handlowca</label>
-        <select class="ef-input" [(ngModel)]="taskEditForm.assigned_to">
-          <option value="">— bez przypisania —</option>
-          <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-        <button class="dp-btn-g" (click)="taskEditMode = false">Anuluj</button>
-        <button class="dp-btn-g" *ngIf="selectedTask?.status === 'closed'" (click)="reopenTask(selectedTask!)" [disabled]="saving">↩ Wznów</button>
-        <button class="dp-btn-p" (click)="saveEditTask()" [disabled]="saving">{{saving ? '…' : 'Zapisz zmiany'}}</button>
-      </div>
-    </div>
-  </div>
-</div>
   `,
   styles: [`
     :host { display:flex;flex-direction:column;height:100%;overflow:hidden; }
     .ctl { background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:5px 10px;font-size:12px;outline:none;cursor:pointer;font-family:inherit }
-    .ctl:focus { border-color:#f97316 }
+    .ctl:focus { border-color:#3BAA5D }
     .nav-btn { background:white;border:1px solid #e4e4e7;border-radius:8px;padding:5px 10px;font-size:15px;cursor:pointer;transition:background .1s }
     .nav-btn:hover { background:#f9fafb }
+    .nav-btn:disabled { opacity:.5;cursor:not-allowed }
     .view-switch { display:flex;background:#f4f4f5;border-radius:8px;padding:2px;gap:2px }
     .view-switch button { background:none;border:none;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:500;color:#71717a;cursor:pointer;font-family:inherit }
-    .view-switch button.active { background:white;color:#f97316;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08) }
-    .view-switch button.tasks-btn { color:#ea580c;font-weight:700 }
+    .view-switch button.active { background:white;color:#3BAA5D;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08) }
+    .view-switch button.tasks-btn { color:#2F8F4D;font-weight:700 }
     .tasks-badge { display:inline-flex;min-width:16px;height:16px;background:#dc2626;color:white;border-radius:10px;font-size:9px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;line-height:1;margin-left:4px;vertical-align:middle }
 
     /* Month */
@@ -373,34 +377,34 @@ interface CalendarDay {
     .month-dayname { padding:6px;font-size:11px;font-weight:700;text-transform:uppercase;color:#a1a1aa;text-align:center;border-right:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;background:#fafafa }
     .month-cell { min-height:100px;padding:6px;border-right:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;background:white;vertical-align:top }
     .month-cell.other-month { background:#fafafa }
-    .month-cell.today { background:#fff7ed }
+    .month-cell.today { background:#E6F4EA }
     .day-num { font-size:12px;font-weight:700;color:#18181b;margin-bottom:4px }
-    .month-cell.today .day-num { width:22px;height:22px;background:#f97316;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center }
+    .month-cell.today .day-num { width:22px;height:22px;background:#3BAA5D;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center }
     .month-cell.other-month .day-num { color:#d1d5db }
     .day-events { display:flex;flex-direction:column;gap:2px }
     .event-chip { display:flex;gap:4px;align-items:center;border-radius:4px;padding:2px 5px;font-size:10px;cursor:pointer;overflow:hidden }
     .lead-chip { background:#eff6ff;color:#1d4ed8 }
-    .partner-chip { background:#fff7ed;color:#c2410c }
+    .partner-chip { background:#E6F4EA;color:#166534 }
     .event-chip:hover { opacity:.8 }
     .event-time { font-weight:700;flex-shrink:0 }
     .event-title { overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
     .event-more { font-size:10px;color:#a1a1aa;cursor:pointer;padding:1px 4px }
-    .event-more:hover { color:#f97316 }
+    .event-more:hover { color:#3BAA5D }
 
     /* Week */
     .week-grid { display:grid;grid-template-columns:50px repeat(7,1fr);border-left:1px solid #e4e4e7 }
     .wh-time { background:#fafafa;border-right:1px solid #e4e4e7;border-bottom:2px solid #e4e4e7 }
     .wh-day { padding:6px;text-align:center;border-right:1px solid #e4e4e7;border-bottom:2px solid #e4e4e7;background:#fafafa }
-    .wh-day.today { background:#fff7ed }
+    .wh-day.today { background:#E6F4EA }
     .wh-dayname { font-size:10px;font-weight:700;color:#a1a1aa;text-transform:uppercase }
     .wh-daynum { font-size:18px;font-weight:700;color:#18181b;margin-top:2px }
-    .today-circle { width:32px;height:32px;background:#f97316;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:15px }
+    .today-circle { width:32px;height:32px;background:#3BAA5D;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:15px }
     .wt-hour { padding:8px 4px;font-size:10px;color:#a1a1aa;text-align:right;border-right:1px solid #e4e4e7;border-bottom:1px solid #f4f4f5;min-height:60px;background:#fafafa }
     .wt-cell { border-right:1px solid #e4e4e7;border-bottom:1px solid #f4f4f5;min-height:60px;padding:2px;position:relative }
-    .wt-cell.today-col { background:#fffbf5 }
+    .wt-cell.today-col { background:#f0fdf4 }
     .week-event { border-radius:6px;padding:4px 7px;margin-bottom:2px;cursor:pointer;font-size:11px }
     .lead-event { background:#eff6ff;border-left:3px solid #3b82f6 }
-    .partner-event { background:#fff7ed;border-left:3px solid #f97316 }
+    .partner-event { background:#E6F4EA;border-left:3px solid #3BAA5D }
     .week-event:hover { opacity:.85 }
     .we-time { font-weight:700;font-size:10px }
     .we-title { font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
@@ -414,41 +418,37 @@ interface CalendarDay {
     .ds-line { position:absolute;bottom:0;left:0;right:0;height:1px;background:#f4f4f5 }
     .day-event { border-radius:8px;padding:8px 12px;cursor:pointer }
     .day-event.lead-event { background:#eff6ff;border-left:4px solid #3b82f6 }
-    .day-event.partner-event { background:#fff7ed;border-left:4px solid #f97316 }
+    .day-event.partner-event { background:#E6F4EA;border-left:4px solid #3BAA5D }
     .day-event:hover { opacity:.85 }
     .de-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:2px }
     .de-time { font-size:11px;font-weight:700;color:#374151 }
     .de-badge { font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px }
     .lead-badge { background:#dbeafe;color:#1d4ed8 }
-    .partner-badge { background:#ffedd5;color:#c2410c }
+    .partner-badge { background:#E6F4EA;color:#166534 }
     .de-title { font-size:13px;font-weight:700;color:#18181b }
     .de-source { font-size:11px;color:#71717a;margin-top:1px }
     .de-meta { font-size:11px;color:#6b7280;margin-top:3px }
 
-    /* Detail panel */
+    /* Detail panel (meetings) */
     .detail-overlay { position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px }
     .detail-panel { background:white;border-radius:14px;width:min(480px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;flex-direction:column }
     .dp-header { padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1 }
     .dp-badge { font-size:12px;font-weight:700;padding:3px 10px;border-radius:10px }
     .dp-close { background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer;margin-left:4px }
-    .dp-edit-btn { background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600 }
+    .dp-edit-btn { background:#E6F4EA;border:1px solid #a7d7b5;color:#166534;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600 }
     .dp-body { padding:18px 20px;display:flex;flex-direction:column;gap:12px }
     .dp-title { font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b }
-    .dp-source { font-size:13px;color:#f97316 }
-    .dp-link { color:#f97316;font-weight:600;text-decoration:none }
+    .dp-source { font-size:13px;color:#3BAA5D }
+    .dp-link { color:#3BAA5D;font-weight:600;text-decoration:none }
     .dp-link:hover { text-decoration:underline }
     .dp-row { display:flex;gap:12px;font-size:13px;align-items:flex-start }
     .dp-lbl { color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0 }
-    /* Edit form */
     .ef-row { display:flex;flex-direction:column;gap:4px }
     .ef-lbl { font-size:11px;font-weight:600;color:#6b7280 }
-    /* Task edit form — field labels above inputs (like Lead edit screen) */
-    .tf-row { display:flex;flex-direction:column;gap:5px }
-    .tf-lbl { font-size:12px;font-weight:600;color:#374151;letter-spacing:.01em }
-    .ef-input { border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit;background:white }
-    .ef-input:focus { border-color:#f97316 }
-    .dp-btn-p { background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer }
-    .dp-btn-p:disabled { opacity:.6 }
+    .ef-input { border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit;background:white;width:100%;box-sizing:border-box }
+    .ef-input:focus { border-color:#3BAA5D }
+    .dp-btn-p { background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer }
+    .dp-btn-p:disabled { opacity:.6;cursor:not-allowed }
     .dp-btn-g { background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer }
 
     /* Tasks view */
@@ -458,10 +458,11 @@ interface CalendarDay {
     .task-item.task-overdue { background:#fef2f2;border-left-color:#dc2626; }
     .task-item.task-closed { opacity:.6;background:#f9fafb; }
     .task-item.task-readonly { opacity:.55;background:#f9fafb;cursor:default; }
+    .task-item.task-expanded { border-left-color:#3BAA5D;box-shadow:0 2px 12px rgba(59,170,93,.12); }
     .task-date-col { display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;padding-right:12px;border-right:1px solid #e5e7eb;flex-shrink:0;text-align:center; }
     .task-date-day { font-size:22px;font-weight:800;color:#18181b;line-height:1; }
     .task-date-mon { font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-top:1px; }
-    .task-date-time { font-size:12px;font-weight:700;color:#f97316;margin-top:4px; }
+    .task-date-time { font-size:12px;font-weight:700;color:#3BAA5D;margin-top:4px; }
     .task-date-none { font-size:10px;color:#d1d5db;font-style:italic;text-align:center; }
     .task-status-badge { font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em; }
     .task-st-new { background:#f3f4f6;color:#6b7280; }
@@ -470,7 +471,7 @@ interface CalendarDay {
     .task-source-badge { font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px; }
     .task-src-lead { background:#fff7ed;color:#c2410c; }
     .task-src-partner { background:#f0fdf4;color:#166534; }
-    .task-link { color:#f97316;font-weight:600;text-decoration:none; }
+    .task-link { color:#3BAA5D;font-weight:600;text-decoration:none; }
     .task-link:hover { text-decoration:underline; }
   `],
 })
@@ -489,27 +490,30 @@ export class CrmCalendarComponent implements OnInit {
   crmGroups: CrmGroup[] = [];
   meetings: CalendarMeeting[] = [];
 
-  // Zadania
+  // Aktywności (widok zadania)
   activities: ActivityTask[] = [];
   tasksLoading = false;
   showClosedTasks = false;
   showNoDateTasks = false;
   myTasksCount = 0;
   filterActivityType = '';
-  closingTaskId: number | null = null;
-  taskCloseComment = '';
 
+  // Inline edit
+  expandedTaskKey: string | null = null;
+  inlineEditForm: any = {};
+
+  // Masowe zamykanie
+  bulkSelectMode = false;
+  selectedTaskKeys = new Set<string>();
+
+  // Spotkanie modal
   selectedMeeting: CalendarMeeting | null = null;
   editMode = false;
   editForm: any = {};
 
-  selectedTask: ActivityTask | null = null;
-  taskEditMode = false;
-  taskEditForm: any = {};
-
   readonly DAY_SHORT = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
   readonly dayNames  = ['Pn','Wt','Śr','Cz','Pt','Sb','Nd'];
-  readonly hours     = Array.from({ length: 16 }, (_, i) => i + 7); // 7–22
+  readonly hours     = Array.from({ length: 16 }, (_, i) => i + 7);
 
   get isManager() { const u = this.auth.user(); return u?.is_admin || u?.crm_role === 'sales_manager'; }
 
@@ -556,46 +560,37 @@ export class CrmCalendarComponent implements OnInit {
 
   private getDateRange(): { from: string; to: string } {
     const d = this.currentDate;
-    if (this.view === 'day') {
-      const s = this.fmt(d);
-      return { from: s, to: s };
-    }
+    if (this.view === 'day') { const s = this.fmt(d); return { from: s, to: s }; }
     if (this.view === 'week') {
       const start = this.weekStart(d);
       const end   = new Date(start); end.setDate(end.getDate() + 6);
       return { from: this.fmt(start), to: this.fmt(end) };
     }
-    // month — load full grid (prev/next month days included)
     const start = new Date(d.getFullYear(), d.getMonth(), 1);
     const end   = new Date(d.getFullYear(), d.getMonth() + 1, 0);
     return { from: this.fmt(new Date(start.getFullYear(), start.getMonth(), start.getDate() - start.getDay() + 1)), to: this.fmt(new Date(end.getFullYear(), end.getMonth(), end.getDate() + (7 - end.getDay()))) };
   }
 
-  // ── Navigation ────────────────────────────────────────────
   prev(): void {
     const d = new Date(this.currentDate);
     if (this.view === 'day')   d.setDate(d.getDate() - 1);
     if (this.view === 'week')  d.setDate(d.getDate() - 7);
     if (this.view === 'month') d.setMonth(d.getMonth() - 1);
-    this.currentDate = d;
-    this.load();
+    this.currentDate = d; this.load();
   }
   next(): void {
     const d = new Date(this.currentDate);
     if (this.view === 'day')   d.setDate(d.getDate() + 1);
     if (this.view === 'week')  d.setDate(d.getDate() + 7);
     if (this.view === 'month') d.setMonth(d.getMonth() + 1);
-    this.currentDate = d;
-    this.load();
+    this.currentDate = d; this.load();
   }
   today(): void { this.currentDate = new Date(); this.load(); }
-  setView(v: ViewMode): void {
-    this.view = v;
-    if (v === 'tasks') { this.loadTasks(); } else { this.load(); }
-  }
+  setView(v: ViewMode): void { this.view = v; if (v === 'tasks') { this.loadTasks(); } else { this.load(); } }
 
   loadTasks(): void {
     this.tasksLoading = true;
+    this.expandedTaskKey = null;
     this.cdr.markForCheck();
     const p: any = { include_closed: this.showClosedTasks, include_no_date: this.showNoDateTasks };
     if (this.filterRep && this.isManager) {
@@ -609,80 +604,178 @@ export class CrmCalendarComponent implements OnInit {
     }
     if (this.filterActivityType) p.type = this.filterActivityType;
     this.api.getActivityTasks(p).subscribe({
-      next: tasks => this.zone.run(() => {
-        this.activities = tasks;
-        this.tasksLoading = false;
-        this.cdr.markForCheck();
-      }),
+      next: tasks => this.zone.run(() => { this.activities = tasks; this.tasksLoading = false; this.cdr.markForCheck(); }),
       error: () => this.zone.run(() => { this.tasksLoading = false; this.cdr.markForCheck(); }),
     });
   }
 
   jumpToDate(d: Date): void { this.currentDate = new Date(d); }
 
-  startCloseTask(t: ActivityTask): void {
-    this.closingTaskId = t.id;
-    this.taskCloseComment = t.close_comment || '';
-  }
+  // ── Klucz zadania ─────────────────────────────────────────
+  taskKey(t: ActivityTask): string { return `${t.id}_${t.source_type}`; }
+  isExpanded(t: ActivityTask): boolean { return this.expandedTaskKey === this.taskKey(t); }
 
-  cancelCloseTask(): void {
-    this.closingTaskId = null;
-    this.taskCloseComment = '';
-  }
+  // ── Inline edit ───────────────────────────────────────────
+  onTaskClick(t: ActivityTask): void {
+    if (isTaskReadOnly(this, t)) return;
+    const key = this.taskKey(t);
 
-  confirmCloseTask(t: ActivityTask): void {
-    if (!this.taskCloseComment.trim()) return;
-    this.saving = true;
+    // Kliknięcie na już otwarte zadanie — zamknij
+    if (this.expandedTaskKey === key) {
+      this.expandedTaskKey = null;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // Jeśli edytujemy inne zadanie — auto-zapisz
+    if (this.expandedTaskKey) {
+      const current = this.activities.find(a => this.taskKey(a) === this.expandedTaskKey);
+      if (current && this.inlineEditForm.title?.trim()) {
+        this.saveInlineEdit(current, true);
+      }
+    }
+
+    // Otwórz nowe zadanie
+    this.expandedTaskKey = key;
+    this.inlineEditForm = {
+      title:       t.title,
+      body:        t.body || '',
+      activity_at: t.activity_at ? this.toLocalDT(t.activity_at) : '',
+      assigned_to: t.act_assigned_to_id || '',
+    };
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({ next: u => this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }), error: () => {} });
+    }
     this.cdr.markForCheck();
-    const comment = this.taskCloseComment.trim();
-    const stamp = new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const newBody = t.body?.trim() ? `[Zamknięto ${stamp}]: ${comment}\n\n${t.body}` : `[Zamknięto ${stamp}]: ${comment}`;
-    const updateCall: Observable<any> = t.source_type === 'lead'
-      ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody })
-      : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'closed', close_comment: comment, body: newBody });
-    updateCall.subscribe({
-      next: () => this.zone.run(() => {
-        this.activities = this.activities.map(a => a.id === t.id && a.source_type === t.source_type
-          ? { ...a, status: 'closed' as const, close_comment: comment, body: newBody }
-          : a
+  }
+
+  cancelInlineEdit(): void { this.expandedTaskKey = null; this.cdr.markForCheck(); }
+
+  saveInlineEdit(t: ActivityTask, silent = false): void {
+    if (!this.inlineEditForm.title?.trim()) return;
+    if (!silent) { this.saving = true; this.cdr.markForCheck(); }
+    const payload: any = {
+      title:       this.inlineEditForm.title.trim(),
+      body:        this.inlineEditForm.body || null,
+      activity_at: this.inlineEditForm.activity_at ? new Date(this.inlineEditForm.activity_at).toISOString() : null,
+      assigned_to: this.inlineEditForm.assigned_to || null,
+    };
+    const obs: Observable<any> = t.source_type === 'lead'
+      ? this.api.updateLeadActivity(+t.source_id, t.id, payload)
+      : this.api.updatePartnerActivity(+t.source_id, t.id, payload);
+    obs.subscribe({
+      next: (updated: any) => this.zone.run(() => {
+        const patch = { ...updated, act_assigned_to_id: updated.assigned_to ?? null, act_assigned_to_name: updated.assigned_to_name ?? null };
+        this.activities = this.activities.map(a =>
+          a.id === t.id && a.source_type === t.source_type ? { ...a, ...patch } : a
         );
-        if (this.selectedTask?.id === t.id && this.selectedTask?.source_type === t.source_type) {
-          this.selectedTask = { ...this.selectedTask, status: 'closed', close_comment: comment, body: newBody };
-        }
-        this.closingTaskId    = null;
-        this.taskCloseComment = '';
-        this.saving = false;
+        if (!silent) { this.expandedTaskKey = null; this.saving = false; }
         this.cdr.markForCheck();
       }),
-      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
+      error: () => this.zone.run(() => { if (!silent) this.saving = false; this.cdr.markForCheck(); }),
     });
   }
 
-  reopenTask(t: ActivityTask): void {
-    this.saving = true;
-    this.cdr.markForCheck();
-    const call: Observable<any> = t.source_type === 'lead'
+  // ── Zamykanie / wznawianie zadań ──────────────────────────
+  closeTaskDirect(t: ActivityTask): void {
+    const prevStatus = t.status;
+    // Optimistic update – działa synchronicznie w obrębie obsługi kliknięcia
+    this.activities = this.activities.map(a =>
+      a.id === t.id && a.source_type === t.source_type ? { ...a, status: 'closed' as const } : a
+    );
+    const obs: Observable<any> = t.source_type === 'lead'
+      ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'closed' })
+      : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'closed' });
+    obs.subscribe({
+      next: () => {},
+      error: () => this.zone.run(() => {
+        this.activities = this.activities.map(a =>
+          a.id === t.id && a.source_type === t.source_type ? { ...a, status: prevStatus } : a
+        );
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  reopenTaskDirect(t: ActivityTask): void {
+    const prevStatus = t.status;
+    // Optimistic update
+    this.activities = this.activities.map(a =>
+      a.id === t.id && a.source_type === t.source_type ? { ...a, status: 'open' as const } : a
+    );
+    const obs: Observable<any> = t.source_type === 'lead'
       ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'open' })
       : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'open' });
-    call.subscribe({
-      next: () => this.zone.run(() => {
+    obs.subscribe({
+      next: () => {},
+      error: () => this.zone.run(() => {
         this.activities = this.activities.map(a =>
-          a.id === t.id && a.source_type === t.source_type ? { ...a, status: 'open' as const } : a
+          a.id === t.id && a.source_type === t.source_type ? { ...a, status: prevStatus } : a
         );
-        if (this.selectedTask?.id === t.id) {
-          this.selectedTask = { ...this.selectedTask, status: 'open' };
-        }
-        this.taskEditMode = false;
-        this.saving = false;
         this.cdr.markForCheck();
       }),
-      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
     });
   }
 
+  // ── Masowe zamykanie ──────────────────────────────────────
+  enterBulkSelect(): void {
+    this.bulkSelectMode = true;
+    this.selectedTaskKeys = new Set(
+      this.activities
+        .filter(t => t.type === 'task' && t.status !== 'closed' && t.activity_at && this.isTaskOverdue(t.activity_at))
+        .map(t => this.taskKey(t))
+    );
+    this.cdr.markForCheck();
+  }
+
+  exitBulkSelect(): void {
+    this.bulkSelectMode = false;
+    this.selectedTaskKeys = new Set();
+    this.cdr.markForCheck();
+  }
+
+  toggleTaskSelect(t: ActivityTask): void {
+    const key = this.taskKey(t);
+    if (this.selectedTaskKeys.has(key)) this.selectedTaskKeys.delete(key);
+    else this.selectedTaskKeys.add(key);
+    this.cdr.markForCheck();
+  }
+
+  bulkClose(): void {
+    if (!this.selectedTaskKeys.size) return;
+    this.saving = true;
+    this.cdr.markForCheck();
+    const toClose = this.activities.filter(t => this.selectedTaskKeys.has(this.taskKey(t)));
+    let remaining = toClose.length;
+    const done = () => {
+      remaining--;
+      if (remaining === 0) {
+        this.saving = false;
+        this.bulkSelectMode = false;
+        this.selectedTaskKeys = new Set();
+        this.cdr.markForCheck();
+      }
+    };
+    for (const t of toClose) {
+      const obs: Observable<any> = t.source_type === 'lead'
+        ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'closed' })
+        : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'closed' });
+      obs.subscribe({
+        next: () => this.zone.run(() => {
+          this.activities = this.activities.map(a =>
+            a.id === t.id && a.source_type === t.source_type ? { ...a, status: 'closed' as const } : a
+          );
+          done();
+        }),
+        error: () => this.zone.run(() => done()),
+      });
+    }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
   taskTypeName(type: string): string {
     const names: Record<string, string> = {
-      call: 'Połączenie', email: 'Email', meeting: 'Spotkanie',
+      task: 'Zadanie', call: 'Połączenie', email: 'Email', meeting: 'Spotkanie',
       note: 'Notatka', doc_sent: 'Dokument', training: 'Szkolenie',
       qbr: 'QBR', opportunity: 'Szansa',
     };
@@ -694,8 +787,7 @@ export class CrmCalendarComponent implements OnInit {
   }
 
   isTaskToday(activityAt: string): boolean {
-    const d = new Date(activityAt);
-    const now = new Date();
+    const d = new Date(activityAt), now = new Date();
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
   }
 
@@ -703,35 +795,17 @@ export class CrmCalendarComponent implements OnInit {
     return new Date(activityAt) < new Date(new Date().toDateString());
   }
 
-  openTask(t: ActivityTask): void {
-    this.selectedTask = t;
-    this.taskEditMode = false;
-    this.closingTaskId = null;
-    this.taskCloseComment = '';
-    this.cdr.markForCheck();
-  }
-
-  closeTask(): void {
-    this.selectedTask = null;
-    this.taskEditMode = false;
-    this.closingTaskId = null;
-    this.taskCloseComment = '';
-    this.cdr.markForCheck();
-  }
-
   isTaskReadOnly(t: ActivityTask): boolean {
     const u = this.auth.user();
     if (!u) return true;
     if (u.is_admin) return false;
     if (t.created_by === u.id) return false;
-    // Efektywny przypisany użytkownik aktywności / leada
     const targetId = t.act_assigned_to_id || t.assigned_to_id;
     if (!targetId || targetId === u.id) return false;
-    // User nie jest twórcą ani przypisanym — wymagana jest jawna uprawnienie "full" do grupy
     const group = this.crmGroups.find(g => g.user_ids.includes(targetId));
-    if (!group) return true;   // brak grupy = brak uprawnień = tylko odczyt
+    if (!group) return true;
     const role = u.roles?.find(r => r.group_id === group.id);
-    if (!role) return true;    // brak roli w grupie = tylko odczyt
+    if (!role) return true;
     return role.access_level !== 'full';
   }
 
@@ -743,75 +817,16 @@ export class CrmCalendarComponent implements OnInit {
     return !this.isTaskReadOnly(t);
   }
 
-  startEditTask(): void {
-    if (!this.selectedTask) return;
-    const t = this.selectedTask;
-    this.taskEditForm = {
-      title:       t.title,
-      body:        t.body || '',
-      activity_at: t.activity_at ? t.activity_at.substring(0, 16) : '',
-      assigned_to: t.act_assigned_to_id || '',
-    };
-    if (!this.crmUsers.length) {
-      this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
-    }
-    // Zmień status na 'open' jeśli zadanie jest nowe (item 3)
-    if (t.status === 'new') {
-      const obs: Observable<any> = t.source_type === 'lead'
-        ? this.api.updateLeadActivity(+t.source_id, t.id, { status: 'open' })
-        : this.api.updatePartnerActivity(+t.source_id, t.id, { status: 'open' });
-      obs.subscribe({
-        next: () => this.zone.run(() => {
-          this.activities = this.activities.map(a =>
-            a.id === t.id && a.source_type === t.source_type ? { ...a, status: 'open' as const } : a
-          );
-          this.selectedTask = { ...t, status: 'open' };
-          this.cdr.markForCheck();
-        }),
-        error: () => {},
-      });
-    }
-    this.taskEditMode = true;
+  stripHtml(html: string): string {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
-  saveEditTask(): void {
-    if (!this.selectedTask || !this.taskEditForm.title) return;
-    this.saving = true;
-    const payload: any = {
-      title:       this.taskEditForm.title,
-      body:        this.taskEditForm.body || null,
-      activity_at: this.taskEditForm.activity_at || null,
-      assigned_to: this.taskEditForm.assigned_to || null,
-    };
-    const t = this.selectedTask;
-    const obs: Observable<any> = t.source_type === 'lead'
-      ? this.api.updateLeadActivity(+t.source_id, t.id, payload)
-      : this.api.updatePartnerActivity(+t.source_id, t.id, payload);
-    obs.subscribe({
-      next: (updated: any) => this.zone.run(() => {
-        // Backend zwraca assigned_to/assigned_to_name — mapujemy na pola ActivityTask
-        const patch = {
-          ...updated,
-          act_assigned_to_id:   updated.assigned_to   ?? null,
-          act_assigned_to_name: updated.assigned_to_name ?? null,
-        };
-        this.activities = this.activities.map(a =>
-          a.id === t.id && a.source_type === t.source_type ? { ...a, ...patch } : a
-        );
-        this.selectedTask = { ...t, ...patch };
-        this.taskEditMode = false;
-        this.saving = false;
-        this.cdr.markForCheck();
-      }),
-      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
-    });
-  }
-
-  startCloseTaskFromModal(): void {
-    if (!this.selectedTask) return;
-    this.closingTaskId = this.selectedTask.id;
-    this.taskCloseComment = this.selectedTask.close_comment || '';
-    this.cdr.markForCheck();
+  private toLocalDT(utcIso: string): string {
+    if (!utcIso) return '';
+    const d = new Date(utcIso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
   onFilterRepChange(): void {
@@ -823,26 +838,18 @@ export class CrmCalendarComponent implements OnInit {
     const d = this.currentDate;
     const first = new Date(d.getFullYear(), d.getMonth(), 1);
     const today = new Date(); today.setHours(0,0,0,0);
-    // Start from Monday
     let start = new Date(first);
-    const dow = (first.getDay() + 6) % 7; // 0=Mon
+    const dow = (first.getDay() + 6) % 7;
     start.setDate(start.getDate() - dow);
-
     const days: CalendarDay[] = [];
     for (let i = 0; i < 42; i++) {
       const date = new Date(start); date.setDate(start.getDate() + i);
       const dt = new Date(date); dt.setHours(0,0,0,0);
-      days.push({
-        date,
-        isCurrentMonth: date.getMonth() === d.getMonth(),
-        isToday: dt.getTime() === today.getTime(),
-        meetings: this.meetingsOnDay(date),
-      });
+      days.push({ date, isCurrentMonth: date.getMonth() === d.getMonth(), isToday: dt.getTime() === today.getTime(), meetings: this.meetingsOnDay(date) });
     }
     return days;
   }
 
-  // ── Week grid ─────────────────────────────────────────────
   get weekDays(): CalendarDay[] {
     const start = this.weekStart(this.currentDate);
     const today = new Date(); today.setHours(0,0,0,0);
@@ -864,21 +871,12 @@ export class CrmCalendarComponent implements OnInit {
     return this.meetings.filter(m => this.localDateStr(new Date(m.activity_at)) === d)
       .sort((a, b) => a.activity_at.localeCompare(b.activity_at));
   }
-
-  // Returns YYYY-MM-DD in local timezone (not UTC)
   private localDateStr(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
 
-  // ── Detail / Edit ─────────────────────────────────────────
-  openMeeting(m: CalendarMeeting): void {
-    this.selectedMeeting = m;
-    this.editMode = false;
-    this.cdr.markForCheck();
-  }
+  // ── Meeting detail / edit ─────────────────────────────────
+  openMeeting(m: CalendarMeeting): void { this.selectedMeeting = m; this.editMode = false; this.cdr.markForCheck(); }
   closeMeeting(): void { this.selectedMeeting = null; this.editMode = false; this.cdr.markForCheck(); }
 
   canEdit(m: CalendarMeeting): boolean {
@@ -890,12 +888,11 @@ export class CrmCalendarComponent implements OnInit {
     if (!this.selectedMeeting) return;
     const m = this.selectedMeeting;
     this.editForm = {
-      title:            m.title,
-      body:             m.body || '',
-      activity_at:      m.activity_at ? m.activity_at.substring(0, 16) : '',
-      duration_min:     m.duration_min ?? '',
+      title: m.title, body: m.body || '',
+      activity_at: m.activity_at ? this.toLocalDT(m.activity_at) : '',
+      duration_min: m.duration_min ?? '',
       meeting_location: m.meeting_location || '',
-      participants:     m.participants || '',
+      participants: m.participants || '',
     };
     this.editMode = true;
   }
@@ -906,7 +903,7 @@ export class CrmCalendarComponent implements OnInit {
     const payload: any = {
       title:            this.editForm.title,
       body:             this.editForm.body || null,
-      activity_at:      this.editForm.activity_at || undefined,
+      activity_at:      this.editForm.activity_at ? new Date(this.editForm.activity_at).toISOString() : undefined,
       duration_min:     this.editForm.duration_min !== '' ? +this.editForm.duration_min : null,
       meeting_location: this.editForm.meeting_location || null,
       participants:     this.editForm.participants || null,
@@ -915,33 +912,27 @@ export class CrmCalendarComponent implements OnInit {
     const obs: Observable<any> = m.source_type === 'lead'
       ? this.api.updateLeadActivity(m.source_id, m.id, payload)
       : this.api.updatePartnerActivity(m.source_id, m.id, payload);
-
     obs.subscribe({
-      next: (updated: any) => {
-        this.zone.run(() => {
-          // Update local meetings array
-          const idx = this.meetings.findIndex(x => x.id === m.id && x.source_type === m.source_type);
-          if (idx >= 0) this.meetings[idx] = { ...this.meetings[idx], ...payload };
-          this.selectedMeeting = { ...m, ...payload };
-          this.editMode = false;
-          this.saving   = false;
-          this.cdr.markForCheck();
-        });
-      },
-      error: () => { this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }); },
+      next: () => this.zone.run(() => {
+        const idx = this.meetings.findIndex(x => x.id === m.id && x.source_type === m.source_type);
+        if (idx >= 0) this.meetings[idx] = { ...this.meetings[idx], ...payload };
+        this.selectedMeeting = { ...m, ...payload };
+        this.editMode = false; this.saving = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
     });
   }
 
-  // ── Helpers ───────────────────────────────────────────────
   private weekStart(d: Date): Date {
     const s = new Date(d);
-    const dow = (d.getDay() + 6) % 7; // Mon=0
-    s.setDate(d.getDate() - dow);
-    s.setHours(0, 0, 0, 0);
+    const dow = (d.getDay() + 6) % 7;
+    s.setDate(d.getDate() - dow); s.setHours(0, 0, 0, 0);
     return s;
   }
-  // Returns YYYY-MM-DD in local timezone for API queries
-  private fmt(d: Date): string {
-    return this.localDateStr(d);
-  }
+  private fmt(d: Date): string { return this.localDateStr(d); }
+}
+
+function isTaskReadOnly(self: CrmCalendarComponent, t: ActivityTask): boolean {
+  return self.isTaskReadOnly(t);
 }

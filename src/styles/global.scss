@@ -446,3 +446,39 @@ input[type="checkbox"] {
   min-height: 0;
 }
 .mo > div:last-child { flex-shrink: 0; }
+
+/* ── Quill rich text editor ─────────────────────────────── */
+quill-editor { display: block; }
+
+.ql-toolbar.ql-snow {
+  border: 1px solid #e5e7eb !important;
+  border-bottom: none !important;
+  border-radius: 6px 6px 0 0 !important;
+  padding: 4px 8px;
+  background: #f9fafb;
+}
+.ql-container.ql-snow {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0 0 6px 6px !important;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  height: auto !important;
+}
+.ql-editor {
+  min-height: 88px;
+  max-height: 340px;
+  overflow-y: auto;
+  line-height: 1.55;
+  padding: 8px 10px;
+  height: auto !important;
+  box-sizing: border-box;
+}
+.ql-editor.ql-blank::before {
+  font-style: normal !important;
+  color: #9ca3af !important;
+}
+quill-editor:focus-within .ql-toolbar.ql-snow,
+quill-editor:focus-within .ql-container.ql-snow {
+  border-color: #3BAA5D !important;
+}
+.ql-snow .ql-tooltip { display: none !important; }

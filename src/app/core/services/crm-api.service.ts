@@ -498,6 +498,22 @@ export interface PartnersReport {
 
 
 
+// ── Zgody marketingowe ───────────────────────────────────────────────────────
+export interface ConsentType {
+  key: string;
+  label: string;
+  description: string;
+}
+
+export interface ConsentValue {
+  consent_key: string;
+  label: string;
+  description: string;
+  value: 'no_data' | 'granted' | 'denied';
+  updated_by_name: string | null;
+  updated_at: string | null;
+}
+
 export interface SalesSummaryRow {
   period: string;
   gross_turnover_pln: number;
@@ -1030,6 +1046,23 @@ export class CrmApiService {
     return this.http.get<PartnersReport>(`${BASE}/sales-data/report`, { params: this.toParams(p) });
   }
 
+
+  // ── Zgody marketingowe ────────────────────────────────────────
+  getConsentTypes(): Observable<ConsentType[]> {
+    return this.http.get<ConsentType[]>(`${BASE}/consents/types`);
+  }
+  getLeadConsents(leadId: number): Observable<ConsentValue[]> {
+    return this.http.get<ConsentValue[]>(`${BASE}/consents/leads/${leadId}`);
+  }
+  saveLeadConsents(leadId: number, items: { key: string; value: string }[]): Observable<ConsentValue[]> {
+    return this.http.put<ConsentValue[]>(`${BASE}/consents/leads/${leadId}`, items);
+  }
+  getPartnerConsents(partnerId: string): Observable<ConsentValue[]> {
+    return this.http.get<ConsentValue[]>(`${BASE}/consents/partners/${partnerId}`);
+  }
+  savePartnerConsents(partnerId: string, items: { key: string; value: string }[]): Observable<ConsentValue[]> {
+    return this.http.put<ConsentValue[]>(`${BASE}/consents/partners/${partnerId}`, items);
+  }
 
   // ── Słownik Źródeł (z app_settings) ─────────────────────────
   getLeadSources(): Observable<LeadSource[]> {

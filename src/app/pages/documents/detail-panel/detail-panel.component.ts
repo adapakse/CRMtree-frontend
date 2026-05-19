@@ -9,13 +9,14 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent } from '../../../shared/components/badges.components';
+import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 import { DOC_TYPE_MAP, fileSizeLabel, triggerDownload } from '../../../core/services/helpers';
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent],
   template: `
     <div class="overlay open" (click)="onOverlayClick($event)">
       <div class="panel" (click)="$event.stopPropagation()">
@@ -35,7 +36,9 @@ import { environment } from '../../../../environments/environment';
         <div style="padding:16px 24px 0">
           <div class="tabs">
             @for (t of tabs; track t.id) {
-              <button class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">{{ t.label }}</button>
+              <button class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">
+                {{ t.label }}<wt-tooltip [key]="t.tooltip"></wt-tooltip>
+              </button>
             }
           </div>
         </div>
@@ -277,25 +280,36 @@ import { environment } from '../../../../environments/environment';
             }
           }
 
-          <!-- PDF PREVIEW -->
+          <!-- DOKUMENT GŁÓWNY -->
           @if (activeTab === 'preview') {
             @if (doc.blob_name) {
-              <div style="background:var(--gray-100);border-radius:8px;overflow:hidden;height:600px;position:relative">
-                @if (previewLoading()) {
-                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--gray-100)">
-                    <div class="spinner"></div>
+              @if (!isPdf) {
+                <div class="empty-state">
+                  <div class="empty-icon">📄</div>
+                  <div class="empty-title">Brak podglądu</div>
+                  <div style="font-size:12.5px;color:var(--gray-400);margin-top:6px;text-align:center;max-width:320px">
+                    Brak podglądu dla formatu innego niż PDF.<br>Pobierz plik na dysk w celu podglądu.
                   </div>
-                }
-                @if (previewError()) {
-                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-500)">
-                    <span style="font-size:32px">⚠️</span>
-                    <span style="font-size:13px">{{ previewError() }}</span>
-                  </div>
-                }
-                @if (previewBlobUrl()) {
-                  <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" title="PDF Preview"></iframe>
-                }
-              </div>
+                  <button class="btn btn-g" style="margin-top:14px" (click)="downloadDoc()">⬇ Pobierz plik</button>
+                </div>
+              } @else {
+                <div style="background:var(--gray-100);border-radius:8px;overflow:hidden;height:600px;position:relative">
+                  @if (previewLoading()) {
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--gray-100)">
+                      <div class="spinner"></div>
+                    </div>
+                  }
+                  @if (previewError()) {
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-500)">
+                      <span style="font-size:32px">⚠️</span>
+                      <span style="font-size:13px">{{ previewError() }}</span>
+                    </div>
+                  }
+                  @if (previewBlobUrl()) {
+                    <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" title="PDF Preview"></iframe>
+                  }
+                </div>
+              }
             } @else {
               <div class="empty-state">
                 <div class="empty-icon">📎</div>
@@ -505,13 +519,13 @@ import { environment } from '../../../../environments/environment';
           @if (doc._access === 'full' && doc.blob_name) {
             <button class="btn btn-g" (click)="downloadDoc()">⬇ Download</button>
           }
-          @if (doc._access === 'full') {
+          @if (doc._access === 'full' && activeTab === 'overview') {
             <button class="btn btn-d" (click)="deleteDoc()">🗑 Delete</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
             <button class="btn btn-p" (click)="saveDoc()">💾 Save</button>
           }
-          <button class="btn btn-g" (click)="close.emit()">Cancel</button>
+          <button class="btn btn-g" (click)="close.emit()">Zamknij</button>
         </div>
       </div>
     </div>
@@ -537,7 +551,7 @@ import { environment } from '../../../../environments/environment';
             </div>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
-            <button class="btn btn-g" (click)="signusOpen = false">Cancel</button>
+            <button class="btn btn-g" (click)="signusOpen = false">Zamknij</button>
             <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">Send to Signus →</button>
           </div>
         </div>
@@ -685,18 +699,22 @@ export class DetailPanelComponent implements OnChanges {
   get activeTab(): string { return this._activeTab; }
   set activeTab(v: string) {
     this._activeTab = v;
-    if (v === 'preview'     && this.doc?.blob_name) this.loadPreview();
+    if (v === 'preview'     && this.doc?.blob_name && this.isPdf) this.loadPreview();
     if (v === 'attachments') this.loadAttachments();
     if (v === 'history')     this.loadHistory();
   }
   tabs = [
-    { id: 'overview',  label: 'Overview' },
-    { id: 'preview',   label: 'PDF Preview' },
-    { id: 'versions',  label: 'Versions' },
-    { id: 'history',   label: 'History' },
-    { id: 'attachments',  label: 'Attachments' },
-    { id: 'workflow',  label: 'Workflow' },
+    { id: 'overview',    label: 'Overview',        tooltip: 'docs.tab.overview' },
+    { id: 'preview',     label: 'Dokument główny', tooltip: 'docs.tab.preview' },
+    { id: 'versions',    label: 'Versions',        tooltip: 'docs.tab.versions' },
+    { id: 'history',     label: 'History',         tooltip: 'docs.tab.history' },
+    { id: 'attachments', label: 'Attachments',     tooltip: 'docs.tab.attachments' },
+    { id: 'workflow',    label: 'Workflow',         tooltip: 'docs.tab.workflow' },
   ];
+
+  get isPdf(): boolean {
+    return (this.doc?.blob_name ?? '').toLowerCase().endsWith('.pdf');
+  }
 
   newTagKey   = '';
   newTagValue = '';

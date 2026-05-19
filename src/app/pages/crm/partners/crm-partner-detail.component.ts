@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, ChurnPartner } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, ChurnPartner, ConsentValue } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
+import { QuillModule } from 'ngx-quill';
 
 function getMonthRange(preset: string): { from: string; to: string } {
   const now = new Date();
@@ -25,7 +26,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
 @Component({
   selector: 'wt-crm-partner-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule],
   template: `
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
@@ -164,9 +165,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
   </div>
 
-  <div class="detail-body">
-    <div class="info-card">
-      <h3>Informacje</h3>
+  <div class="detail-body" [class.left-collapsed]="leftCollapsed">
+    <div class="info-card" [class.is-collapsed]="leftCollapsed">
+      <div class="left-panel-hdr">
+        <h3 *ngIf="!leftCollapsed" style="margin:0;font-size:13px;font-weight:700;color:#374151">Informacje</h3>
+        <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed?'Rozwiń panel':'Zwiń panel'">{{leftCollapsed?'›':'‹'}}</button>
+      </div>
+      <ng-container *ngIf="!leftCollapsed">
       <div class="info-grid">
         <span class="lbl">CRMtree ID</span>
         <span>
@@ -365,49 +370,85 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span class="opp-due" *ngIf="o.opp_due_date">do {{o.opp_due_date | date:'dd.MM.yy'}}</span>
         </div>
       </div>
+      </ng-container>
     </div>
 
     <div class="activities-card">
       <!-- Pasek tabów -->
       <div class="mid-tabs">
-        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">
-          Aktywności
+        <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
+          Wszystkie
           <wt-activity-count-badge [activities]="partner.activities||[]"></wt-activity-count-badge>
         </button>
+        <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">📝 Notatki</button>
+        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">📞 Połączenia</button>
+        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">🤝 Spotkania</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
           📧 Maile
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history'; loadHistory()">Historia zmian</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
-      <div *ngIf="midTab==='activities'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
-        <div *ngIf="canEdit" style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn-sm" (click)="openNewActivityForm()">+ Dodaj</button>
+      <div *ngIf="midTab!=='emails'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
         <div class="new-activity-form" *ngIf="showNewActivity">
-          <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
-            <option value="call">📞 Połączenie</option>
-            <option value="meeting">🤝 Spotkanie</option>
-            <option value="note">📝 Notatka</option>
-            <option value="training">🎓 Szkolenie</option>
-            <option value="qbr">📊 QBR</option>
-            <option value="opportunity">💡 Szansa</option>
-          </select>
-          <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
-          <ng-container *ngIf="actForm.type !== 'email'">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Data i czas
-                <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
-              </label>
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Przypisz do
-                <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px"><option value="">— ja (domyślnie) —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>
-              </label>
+          <!-- Typ + tytuł -->
+          <div style="display:grid;grid-template-columns:140px 1fr;gap:6px">
+            <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
+              <option *ngFor="let t of actTypeOptions" [value]="t.value">{{t.label}}</option>
+            </select>
+            <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" placeholder="Temat spotkania *" class="act-input">
+            <ng-container *ngIf="actForm.type!=='meeting'">
+              <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
+            </ng-container>
+          </div>
+          <!-- Termin z presetami -->
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <button *ngFor="let p of computedDueDatePresets" type="button"
+                      (click)="selectDueDatePreset(p.value)"
+                      style="font-size:11px;padding:2px 8px;border-radius:12px;border:1px solid;cursor:pointer;transition:all .12s"
+                      [style.background]="actDueDatePreset===p.value ? '#3BAA5D' : 'white'"
+                      [style.color]="actDueDatePreset===p.value ? 'white' : '#6b7280'"
+                      [style.border-color]="actDueDatePreset===p.value ? '#3BAA5D' : '#e5e7eb'">
+                {{p.label}}
+              </button>
+              <button *ngIf="actDueDatePreset" type="button" (click)="clearDueDate()"
+                      style="font-size:11px;padding:2px 6px;border-radius:12px;border:1px solid #e5e7eb;background:white;color:#9ca3af;cursor:pointer">✕</button>
             </div>
-          </ng-container>
+            <div *ngIf="actDueDatePreset" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:11px;color:#9ca3af">Godzina:</span>
+              <button *ngFor="let h of ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00']" type="button"
+                      (click)="setActDueDateHour(h)"
+                      style="font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid;cursor:pointer;transition:all .12s"
+                      [style.background]="actDueDateHour===h ? '#3BAA5D' : 'white'"
+                      [style.color]="actDueDateHour===h ? 'white' : '#6b7280'"
+                      [style.border-color]="actDueDateHour===h ? '#3BAA5D' : '#e5e7eb'">{{h}}</button>
+            </div>
+            <input *ngIf="!actDueDatePreset" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
+            <div *ngIf="actDueDateSelectedLabel" style="font-size:11px;color:#3BAA5D;font-weight:600">📅 {{actDueDateSelectedLabel}}</div>
+          </div>
+          <!-- Przypisz + przypomnienie -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Przypisz do
+              <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px">
+                <option value="">— ja (domyślnie) —</option>
+                <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+              </select>
+            </label>
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Przypomnienie
+              <select [(ngModel)]="actReminderType" class="act-sel" style="font-size:11px">
+                <option value="">— brak —</option>
+                <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
+              </select>
+            </label>
+          </div>
+          <!-- Spotkanie: miejsce + uczestnicy -->
           <ng-container *ngIf="actForm.type === 'meeting'">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
               <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
@@ -442,38 +483,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
             </label>
           </ng-container>
-          <ng-container *ngIf="actForm.type === 'opportunity'">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Status szansy
-                <select [(ngModel)]="actForm.opp_status" class="act-input" style="font-size:11px">
-                  <option value="new">Nowa</option>
-                  <option value="in_progress">W trakcie</option>
-                  <option value="closed">Zamknięta</option>
-                </select>
-              </label>
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Termin
-                <input type="date" [(ngModel)]="actForm.opp_due_date" class="act-input" style="font-size:11px">
-              </label>
-            </div>
-            <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Wartość
-                <input type="number" min="0" step="0.01" [(ngModel)]="actForm.opp_value" placeholder="0.00" class="act-input" style="font-size:11px">
-              </label>
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Waluta
-                <select [(ngModel)]="actForm.opp_currency" class="act-input" style="font-size:11px">
-                  <option value="PLN">PLN</option>
-                  <option value="EUR">EUR</option>
-                  <option value="USD">USD</option>
-                  <option value="GBP">GBP</option>
-                </select>
-              </label>
-            </div>
-          </ng-container>
-          <textarea [(ngModel)]="actForm.body" placeholder="Treść / opis…" rows="2" class="act-input"></textarea>
+          <!-- Treść Quill -->
+          <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules"
+                        style="background:white" placeholder="Treść / opis…"></quill-editor>
           <div class="act-actions">
             <button class="btn-sm" (click)="showNewActivity = false">Anuluj</button>
             <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
@@ -481,28 +493,39 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </button>
           </div>
         </div>
-        <div class="activity-list">
-          <div *ngFor="let a of sortedActivities" class="act-item"
-               [class.act-closed]="a.status==='closed'"
-               [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
-               [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
-               style="cursor:pointer" (click)="openActModal(a)">
-            <span class="act-icon">{{actIcon(a.type)}}</span>
-            <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                <strong>{{actTypeName(a.type)}}: {{a.title}}</strong>
-                <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
-              </div>
-              <div class="act-meta">
-                <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>
-                <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-                <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
-              </div>
-              <div *ngIf="a.body" class="act-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px">{{stripHtml(a.body)}}</div>
+        <!-- Karty aktywności -->
+        <div *ngFor="let a of filteredActivities" class="act-card"
+             [class.act-closed]="a.status==='closed'"
+             [class.act-card-expanded]="isActExpanded(a.id)"
+             [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
+             (click)="toggleActExpand(a.id)">
+          <div class="act-card-header">
+            <span style="font-size:18px;flex-shrink:0">{{actIcon(a.type)}}</span>
+            <div class="act-card-meta">
+              <span class="act-card-title">{{a.title}}</span>
+              <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+            </div>
+            <div class="act-card-controls" (click)="$event.stopPropagation()">
+              <button class="act-ctrl-btn" (click)="openActModal(a)" title="Szczegóły">↗</button>
+              <button *ngIf="canEditActivity(a)" class="act-ctrl-btn" (click)="startInlineEdit(a)" title="Edytuj">✏️</button>
             </div>
           </div>
-          <div class="empty-act" *ngIf="!sortedActivities.length">Brak aktywności.</div>
+          <div *ngIf="a.body && !isActExpanded(a.id)" class="act-body-clamp" [innerHTML]="a.body"></div>
+          <div *ngIf="a.body && isActExpanded(a.id)" style="font-size:12px;color:#374151;margin-top:6px" [innerHTML]="a.body"></div>
+          <!-- Inline edit -->
+          <div *ngIf="inlineEditActId===a.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
+            <input [(ngModel)]="inlineEditForm.title" class="act-input" placeholder="Tytuł *">
+            <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" style="background:white" placeholder="Treść…"></quill-editor>
+            <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <button class="btn-sm" (click)="cancelInlineEdit()">Anuluj</button>
+              <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="!inlineEditForm.title||savingActivity">{{savingActivity?'…':'Zapisz'}}</button>
+            </div>
+          </div>
         </div>
+        <div class="empty-act" *ngIf="!filteredActivities.length">Brak aktywności.</div>
       </div>
 
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
@@ -537,23 +560,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
       </div>
 
-      <!-- ── Tab: Historia zmian ────────────────────────────────────────── -->
-      <div *ngIf="midTab==='history'" style="overflow-y:auto;flex:1;padding:12px">
-        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;padding:24px;font-size:13px">⏳ Ładowanie historii…</div>
-        <div *ngIf="!historyLoading && history.length===0 && historyLoaded" class="empty-act">Brak wpisów historii.</div>
-        <div *ngFor="let h of history" style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:12px">
-          <div style="flex-shrink:0;width:6px;border-radius:3px;background:#f3f4f6;margin-top:2px"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600;color:#111827">{{histLabel(h)}}</div>
-            <div style="color:#9ca3af;font-size:11px;margin-top:2px">
-              <span *ngIf="h.user_name">{{h.user_name}}</span>
-              <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
-              <span *ngIf="!h.user_name && !h.user_email">System</span>
-              · {{h.created_at | date:'dd.MM.yyyy HH:mm'}}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Right panel: DWH sales / email thread / products / docs -->
@@ -662,6 +668,27 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
       </div>
 
+      <!-- Historia zmian mini-widget -->
+      <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">🕐 Historia zmian</div>
+          <button *ngIf="history.length" class="btn-sm" (click)="showHistoryModal=true">Pokaż wszystko</button>
+        </div>
+        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:6px">Ładowanie…</div>
+        <div *ngIf="!historyLoading && history.length===0 && historyLoaded" style="font-size:12px;color:#9ca3af;text-align:center;padding:6px">Brak wpisów.</div>
+        <div *ngFor="let h of history.slice(0,10)" class="hist-item">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#111827">{{histLabel(h)}}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:1px">
+              <span *ngIf="h.user_name">{{h.user_name}}</span>
+              <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
+              <span *ngIf="!h.user_name && !h.user_email">System</span>
+              · {{h.created_at | date:'dd.MM HH:mm'}}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Powiazane dokumenty -->
       <div class="docs-box">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -669,8 +696,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:11px">+ Dodaj</button>
         </div>
         <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
-             style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#9a3412">
-          <span style="font-size:14px;color:#f97316">⚠️</span>
+             style="display:flex;align-items:center;gap:6px;background:#E6F4EA;border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#166534">
+          <span style="font-size:14px;color:#3BAA5D">⚠️</span>
           <span><strong>Brak powiązanej umowy.</strong> Dodaj dokument, aby potwierdzić współpracę z partnerem.</span>
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px 0">Brak powiązanych dokumentów</div>
@@ -687,6 +714,50 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
       </div>
 
+      <!-- Zgody marketingowe -->
+      <div class="docs-box" style="margin-top:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">✅ Zgody marketingowe</div>
+        </div>
+        <div *ngIf="consentLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px 0">Ładowanie…</div>
+        <div *ngFor="let ct of consents" style="margin-bottom:12px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:5px">
+            <div style="font-size:11.5px;font-weight:600;color:#374151;line-height:1.4;flex:1">{{ct.label}}</div>
+            <button (click)="toggleConsentExpand(ct.consent_key)"
+                    style="background:none;border:none;cursor:pointer;font-size:10px;color:#9ca3af;white-space:nowrap;padding:0;flex-shrink:0;line-height:1.8">
+              {{expandedConsent===ct.consent_key ? '▲ zwiń' : '▾ szczegóły'}}
+            </button>
+          </div>
+          <div *ngIf="expandedConsent===ct.consent_key"
+               style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:6px;padding:8px 10px;margin-bottom:7px;line-height:1.55;border-left:3px solid #e5e7eb">
+            {{ct.description}}
+            <div *ngIf="ct.updated_at" style="margin-top:5px;font-size:10px;color:#9ca3af">
+              Ostatnia zmiana: {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
+              <span *ngIf="ct.updated_by_name"> · {{ct.updated_by_name}}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button *ngFor="let v of consentOptions"
+                    (click)="canEdit && setConsentDraft(ct.consent_key, v.val)"
+                    [style.background]="consentDraft[ct.consent_key]===v.val ? v.bg : '#f9fafb'"
+                    [style.color]="consentDraft[ct.consent_key]===v.val ? 'white' : '#6b7280'"
+                    [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : '#e5e7eb')"
+                    [style.cursor]="canEdit ? 'pointer' : 'default'"
+                    style="flex:1;font-size:10.5px;font-weight:600;padding:5px 2px;border-radius:6px;transition:all .12s;text-align:center;line-height:1.3">
+              {{v.label}}
+            </button>
+          </div>
+        </div>
+        <button *ngIf="canEdit && consents.length" (click)="saveConsents()"
+                [disabled]="savingConsents || !consentsDirty"
+                style="width:100%;margin-top:2px;font-size:12px;padding:7px;border-radius:8px;font-weight:600;border:none;transition:background .15s"
+                [style.background]="consentsDirty ? '#3BAA5D' : '#f4f4f5'"
+                [style.color]="consentsDirty ? 'white' : '#a1a1aa'"
+                [style.cursor]="consentsDirty ? 'pointer' : 'default'">
+          {{savingConsents ? 'Zapisuję…' : consentsDirty ? '💾 Zapisz zgody' : '✓ Zapisano'}}
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -698,7 +769,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
         <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
         <span style="flex:1"></span>
-        <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
+        <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#E6F4EA;border:1px solid #a7d7b5;color:#166534;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
         <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
       </div>
 
@@ -729,7 +800,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div style="display:flex;gap:12px;font-size:13px">
             <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💡 Szansa</span>
             <span class="opp-status-badge opp-st-{{selectedAct.opp_status}}">{{oppStatusLabel(selectedAct.opp_status)}}</span>
-            <span *ngIf="selectedAct.opp_value" style="font-weight:700;color:#f97316">{{selectedAct.opp_value | number:'1.0-0'}} {{selectedAct.opp_currency}}</span>
+            <span *ngIf="selectedAct.opp_value" style="font-weight:700;color:#3BAA5D">{{selectedAct.opp_value | number:'1.0-0'}} {{selectedAct.opp_currency}}</span>
           </div>
         </ng-container>
         <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
@@ -740,17 +811,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 Komentarz</span>
           <span style="font-style:italic">{{selectedAct.close_comment}}</span>
         </div>
-        <!-- Zamknij -->
-        <div *ngIf="!actModalClosing && selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
-          <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="startCloseActModal()">✓ Zamknij aktywność</button>
-        </div>
-        <div *ngIf="actModalClosing" style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-          <textarea [(ngModel)]="actModalCloseComment" placeholder="Komentarz zamknięcia *" rows="3"
-                    style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
-          <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalClosing=false;actModalCloseComment=''">Anuluj</button>
-            <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="!actModalCloseComment.trim() || savingActivity">{{savingActivity ? '…' : 'Zamknij'}}</button>
-          </div>
+        <!-- Zamknij — bez komentarza -->
+        <div *ngIf="selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
+          <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="savingActivity">{{savingActivity ? '…' : '✓ Zamknij aktywność'}}</button>
         </div>
       </div>
 
@@ -829,8 +892,33 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
           <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
-          <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
+          <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historia zmian — modal -->
+  <div *ngIf="showHistoryModal" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px" (click)="showHistoryModal=false">
+    <div style="background:white;border-radius:14px;width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.15)" (click)="$event.stopPropagation()">
+      <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1">
+        <span style="font-size:14px;font-weight:700;color:#111827">🕐 Historia zmian</span>
+        <input [(ngModel)]="historySearch" placeholder="Szukaj…" style="flex:1;border:1px solid #e5e7eb;border-radius:6px;padding:5px 10px;font-size:12px;outline:none">
+        <button (click)="showHistoryModal=false" style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer">✕</button>
+      </div>
+      <div style="overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:0">
+        <div *ngFor="let h of filteredHistory" class="hist-item">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#111827">{{histLabel(h)}}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:1px">
+              <span *ngIf="h.user_name">{{h.user_name}}</span>
+              <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
+              <span *ngIf="!h.user_name && !h.user_email">System</span>
+              · {{h.created_at | date:'dd.MM.yyyy HH:mm'}}
+            </div>
+          </div>
+        </div>
+        <div *ngIf="filteredHistory.length===0" style="text-align:center;color:#9ca3af;font-size:13px;padding:24px">Brak wyników.</div>
       </div>
     </div>
   </div>
@@ -1313,7 +1401,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         Każdy handlowiec łączy własną skrzynkę.
       </div>
       <button *ngIf="gmailAuthUrl" (click)="connectGmail()"
-         style="background:#f97316;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px">
+         style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px">
         🔗 Połącz konto Gmail
       </button>
       <div *ngIf="!gmailAuthUrl" style="color:#9ca3af;font-size:12px">
@@ -1519,14 +1607,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
     .detail-page { padding:20px; max-width:1400px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
     .detail-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; flex-shrink:0; }
-    .back-btn { background:none; border:none; color:#f97316; cursor:pointer; font-size:13px; }
+    .back-btn { background:none; border:none; color:#3BAA5D; cursor:pointer; font-size:13px; }
     .detail-header h1 { font-size:22px; font-weight:800; margin:0; flex:1; }
     .pbadge { padding:3px 10px; border-radius:10px; font-size:12px; font-weight:700; }
     .pbadge-active{background:#dcfce7;color:#166534} .pbadge-onboarding{background:#dbeafe;color:#1e40af}
     .pbadge-inactive{background:#f3f4f6;color:#374151} .pbadge-churned{background:#fee2e2;color:#991b1b}
     .group-badge { background:#f3f4f6; border-radius:8px; padding:3px 10px; font-size:11px; }
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary { background:#3BAA5D; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
     .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
     /* Onboarding */
     /* Onboarding panel */
@@ -1535,10 +1623,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .step { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative; padding-bottom:12px; }
     .step:not(:last-child)::after { content:''; position:absolute; top:14px; left:calc(50% + 16px); right:0; height:2px; background:#e5e7eb; }
     .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid #e5e7eb; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:white; position:relative; z-index:1; transition:all .2s; }
-    .step.done .step-circle { background:#f97316; border-color:#f97316; color:white; }
-    .step.current .step-circle { border-color:#f97316; color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.15); }
+    .step.done .step-circle { background:#3BAA5D; border-color:#3BAA5D; color:white; }
+    .step.current .step-circle { border-color:#3BAA5D; color:#3BAA5D; box-shadow:0 0 0 3px rgba(59,170,93,.15); }
     .step-label { font-size:10px; color:#9ca3af; text-align:center; }
-    .step.current .step-label { color:#f97316; font-weight:700; }
+    .step.current .step-label { color:#3BAA5D; font-weight:700; }
     .step.done .step-label { color:#6b7280; }
     .step-tasks-count { font-size:10px; font-weight:700; padding:1px 5px; border-radius:8px; background:#f3f4f6; color:#6b7280; }
     .step-tasks-count .all-done { color:#22c55e; }
@@ -1551,9 +1639,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:7px; }
     .task-form-row { display:flex; gap:7px; align-items:center; }
     .tf-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; background:white; outline:none; font-family:inherit; }
-    .tf-sel:focus { border-color:#f97316; }
+    .tf-sel:focus { border-color:#3BAA5D; }
     .tf-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; outline:none; }
-    .tf-input:focus { border-color:#f97316; }
+    .tf-input:focus { border-color:#3BAA5D; }
     .tf-textarea { resize:vertical; width:100%; box-sizing:border-box; }
     .task-form-actions { display:flex; gap:6px; justify-content:flex-end; }
     /* Task list */
@@ -1564,7 +1652,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-item.task-done .task-title { text-decoration:line-through; color:#9ca3af; }
     .task-check { width:22px; height:22px; border-radius:50%; border:2px solid #d1d5db; background:white; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer; flex-shrink:0; font-weight:700; transition:all .15s; }
     .task-item.task-done .task-check { background:#22c55e; border-color:#22c55e; color:white; }
-    .task-check:hover { border-color:#f97316; }
+    .task-check:hover { border-color:#3BAA5D; }
     .task-body { flex:1; min-width:0; }
     .task-title { font-size:12.5px; font-weight:600; color:#111827; display:flex; align-items:center; gap:5px; }
     .task-type-icon { font-size:13px; }
@@ -1580,9 +1668,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-act-btn.del:hover { color:#ef4444; }
     .task-empty { font-size:12px; color:#9ca3af; text-align:center; padding:16px; }
     /* Body */
-    .detail-body { display:grid; grid-template-columns:320px 1fr 290px; gap:16px; flex:1; overflow:hidden; min-height:0; }
-    @media(max-width:900px) { .detail-body{grid-template-columns:320px 1fr;} .right-panel{display:none} }
+    .detail-body { display:grid; grid-template-columns:260px 1fr 260px; gap:16px; flex:1; overflow:hidden; min-height:0; }
+    .detail-body.left-collapsed { grid-template-columns:32px 1fr 260px; }
+    @media(max-width:900px) { .detail-body{grid-template-columns:260px 1fr;} .detail-body.left-collapsed{grid-template-columns:32px 1fr;} .right-panel{display:none} }
     @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
+    /* Left panel collapse */
+    .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink:0; }
+    .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid #e5e7eb; background:white; cursor:pointer; font-size:15px; line-height:1; color:#9ca3af; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
+    .panel-collapse-btn:hover { background:#E6F4EA; color:#3BAA5D; border-color:#a7d7b5; }
+    .info-card.is-collapsed { padding:10px 4px; overflow:hidden; align-items:center; display:flex; flex-direction:column; }
     .info-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
     .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; min-height:0; display:flex; flex-direction:column; }
     .right-panel { display:flex; flex-direction:column; gap:12px; overflow-y:auto; min-height:0; }
@@ -1598,7 +1692,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .prod-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:11px; }
     .prod-name { width:90px; color:#374151; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
     .prod-bar-wrap { flex:1; background:#f3f4f6; border-radius:4px; height:6px; overflow:hidden; }
-    .prod-bar { height:100%; background:#f97316; border-radius:4px; transition:width .4s; }
+    .prod-bar { height:100%; background:#3BAA5D; border-radius:4px; transition:width .4s; }
     .prod-val { width:64px; text-align:right; color:#9ca3af; flex-shrink:0; }
     .churn-widget { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
     .churn-widget-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
@@ -1625,24 +1719,24 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
     .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; }
     .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:12px 14px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:color .15s,border-color .15s; }
-    .tab-btn.active { color:#f97316; border-bottom-color:#f97316; }
+    .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; }
     .tab-btn:hover:not(.active) { color:#374151; }
     .info-grid { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; }
     .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; padding-top:2px; }
     .sub { color:#9ca3af; }
-    .accent { color:#f97316; font-weight:700; }
+    .accent { color:#3BAA5D; font-weight:700; }
     .notes { white-space:pre-line; }
     .dwh-note { white-space:normal; }
     .dwh-note p { margin:4px 0; }
     .dwh-note ul, .dwh-note ol { margin:4px 0 4px 18px; padding:0; }
     .dwh-note li { margin-bottom:2px; }
     .dwh-note strong, .dwh-note b { font-weight:700; }
-    .dwh-note a { color:#f97316; text-decoration:underline; }
+    .dwh-note a { color:#3BAA5D; text-decoration:underline; }
     .opp-section { margin-top:16px; padding-top:12px; border-top:1px solid #f3f4f6; }
     .opp-section h4 { font-size:12px; font-weight:700; margin:0 0 8px; }
     .opp-item { font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .opp-title { flex:1; font-weight:600; }
-    .opp-value { font-weight:700; color:#f97316; }
+    .opp-value { font-weight:700; color:#3BAA5D; }
     .opp-due { color:#9ca3af; font-size:11px; }
     .opp-status-badge { font-size:10px; font-weight:700; padding:1px 7px; border-radius:8px; white-space:nowrap; }
     .opp-st-new { background:#dbeafe; color:#1e40af; }
@@ -1650,18 +1744,18 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .opp-st-closed { background:#f3f4f6; color:#6b7280; }
     .opp-type { font-size:10px; font-weight:700; padding:1px 6px; border-radius:6px; background:#f3f4f6; margin-right:4px; }
     .opp-type.upsell { background:#fef3c7; color:#92400e; }
-    .opp-value { color:#f97316; font-weight:700; }
+    .opp-value { color:#3BAA5D; font-weight:700; }
     .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
     .card-header h3 { margin:0; }
     .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:3px 10px; cursor:pointer; }
-    .btn-sm.primary { background:#f97316; color:white; border-color:#f97316; }
+    .btn-sm.primary { background:#3BAA5D; color:white; border-color:#3BAA5D; }
     .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; margin-top:4px; display:flex; flex-direction:column; gap:7px; }
     .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
     .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; }
     .act-actions { display:flex; gap:6px; justify-content:flex-end; }
     .activity-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
     .act-item { display:flex; gap:10px; border-left:3px solid transparent; padding-left:6px; }
-    .act-item.act-today { border-left-color:#bfdbfe; background:#eff6ff; border-radius:6px; }
+    .act-item.act-today { border-left-color:#3BAA5D; background:#E6F4EA; border-radius:6px; }
     .act-item.act-overdue { border-left-color:#fca5a5; background:#fef2f2; border-radius:6px; }
     .act-item.act-closed { opacity:.65; }
     .act-status-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
@@ -1703,11 +1797,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .edit-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .edit-row label.full { grid-column:1/-1; }
     .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
-    .edit-row label input:focus, .edit-row label select:focus { border-color:#f97316; }
+    .edit-row label input:focus, .edit-row label select:focus { border-color:#3BAA5D; }
     .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
-    .edit-textarea:focus { border-color:#f97316; }
+    .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid #f3f4f6; }
-    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#f97316; margin-bottom:8px; }
+    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#3BAA5D; margin-bottom:8px; }
     .dwh-badge { display:inline-block; background:#ede9fe; color:#7c3aed; font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
     .dwh-readonly-field { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .dwh-readonly-field.full { grid-column:1/-1; }
@@ -1729,6 +1823,21 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .att-action-btn:hover { background:#f3f4f6; }
     .att-action-btn.dl { color:#1d4ed8; }
     .att-action-btn.view { color:#374151; }
+    .act-input:focus { border-color:#3BAA5D; outline:none; }
+    .act-card { border:1px solid #e5e7eb; border-radius:10px; padding:12px 14px; background:white; cursor:pointer; transition:box-shadow .15s; position:relative; }
+    .act-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    .act-card.act-card-expanded { border-color:#3BAA5D; }
+    .act-card-header { display:flex; align-items:flex-start; gap:8px; }
+    .act-card-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; min-width:0; }
+    .act-card-title { font-size:13px; font-weight:600; color:#111827; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .act-body-clamp { font-size:12px; color:#6b7280; margin-top:6px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:11px; color:#9ca3af; padding:2px 0; margin-top:4px; }
+    .act-expand-btn:hover { color:#3BAA5D; }
+    .act-card-controls { display:flex; gap:4px; align-items:center; flex-shrink:0; }
+    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:13px; padding:3px 5px; border-radius:5px; color:#9ca3af; line-height:1; }
+    .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
+    .act-ctrl-btn.del:hover { color:#ef4444; }
+    .hist-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid #f3f4f6; font-size:12px; }
   `],
 })
 export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
@@ -1792,16 +1901,108 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   showNewActivity = false;
   showEdit = false;
 
+  // ── Layout ──────────────────────────────────────────────────────────────────
+  leftCollapsed = false;
+  toggleLeftPanel(): void { this.leftCollapsed = !this.leftCollapsed; this.cdr.markForCheck(); }
+
+  // ── Zgody marketingowe ────────────────────────────────────────────────────
+  consents:        ConsentValue[] = [];
+  consentDraft:    Record<string, string> = {};
+  expandedConsent: string | null = null;
+  consentLoading   = false;
+  savingConsents   = false;
+
+  readonly consentOptions = [
+    { val: 'no_data', label: 'Brak danych', bg: '#9ca3af' },
+    { val: 'granted', label: 'Zgoda',       bg: '#22c55e' },
+    { val: 'denied',  label: 'Brak zgody',  bg: '#ef4444' },
+  ];
+
+  get consentsDirty(): boolean {
+    return this.consents.some(c => this.consentDraft[c.consent_key] !== c.value);
+  }
+
+  loadConsents(partnerId: string): void {
+    this.consentLoading = true;
+    this.cdr.markForCheck();
+    this.api.getPartnerConsents(partnerId).subscribe({
+      next: cv => {
+        this.zone.run(() => {
+          this.consents     = cv;
+          this.consentDraft = Object.fromEntries(cv.map(c => [c.consent_key, c.value]));
+          this.consentLoading = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.consentLoading = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  toggleConsentExpand(key: string): void {
+    this.expandedConsent = this.expandedConsent === key ? null : key;
+    this.cdr.markForCheck();
+  }
+
+  setConsentDraft(key: string, value: string): void {
+    this.consentDraft = { ...this.consentDraft, [key]: value };
+    this.cdr.markForCheck();
+  }
+
+  saveConsents(): void {
+    if (!this.partner || this.savingConsents || !this.consentsDirty) return;
+    const pid = this.partner.crm_uuid;
+    if (!pid) return;
+    this.savingConsents = true;
+    this.cdr.markForCheck();
+    const items = Object.entries(this.consentDraft).map(([key, value]) => ({ key, value }));
+    this.api.savePartnerConsents(pid, items).subscribe({
+      next: cv => {
+        this.zone.run(() => {
+          this.consents     = cv;
+          this.consentDraft = Object.fromEntries(cv.map(c => [c.consent_key, c.value]));
+          this.savingConsents = false;
+          this.historyLoaded  = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingConsents = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
-  midTab: 'activities' | 'emails' | 'history' = 'activities';
+  midTab: 'all' | 'notes' | 'calls' | 'meetings' | 'emails' = 'all';
   history: any[] = [];
   historyLoaded  = false;
   historyLoading = false;
+  showHistoryModal = false;
+  historySearch    = '';
+  // Inline edit aktywności
+  expandedActIds   = new Set<number>();
+  inlineEditActId: number | null = null;
+  inlineEditForm: any = {};
+  actDueDatePreset = '';
+  actDueDateHour   = '09:00';
+  actDueDateOpen   = false;
+  actReminderType  = '';
+  actReminderAt    = '';
+  readonly reminderOptions = [
+    { value: '15m', label: '15 min przed' },
+    { value: '30m', label: '30 min przed' },
+    { value: '1h',  label: '1 godz. przed' },
+    { value: '1d',  label: '1 dzień przed' },
+  ];
+  readonly quillModules = { toolbar: [['bold','italic','underline'],['bullet','list'],[{ list:'ordered' }],['link']] };
+  readonly actTypeOptions = [
+    { value: 'call',        label: '📞 Połączenie' },
+    { value: 'meeting',     label: '🤝 Spotkanie' },
+    { value: 'note',        label: '📝 Notatka' },
+    { value: 'training',    label: '🎓 Szkolenie' },
+    { value: 'qbr',         label: '📊 QBR' },
+    { value: 'opportunity', label: '💡 Szansa' },
+  ];
   // Modal aktywności
   selectedAct: any = null;
   actModalEditMode = false;
-  actModalClosing = false;
-  actModalCloseComment = '';
   submitAttempted = false;
   partnerNipEditError = '';
 
@@ -2028,6 +2229,152 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  get filteredActivities(): any[] {
+    const all = this.sortedActivities;
+    switch (this.midTab) {
+      case 'notes':    return all.filter(a => a.type === 'note' || a.type === 'training' || a.type === 'qbr' || a.type === 'opportunity');
+      case 'calls':    return all.filter(a => a.type === 'call');
+      case 'meetings': return all.filter(a => a.type === 'meeting');
+      default:         return all;
+    }
+  }
+
+  get filteredHistory(): any[] {
+    if (!this.historySearch.trim()) return this.history;
+    const q = this.historySearch.toLowerCase();
+    return this.history.filter(h =>
+      (this.histLabel(h) || '').toLowerCase().includes(q) ||
+      (h.user_name || '').toLowerCase().includes(q)
+    );
+  }
+
+  get computedDueDatePresets(): { value: string; label: string }[] {
+    const now = new Date();
+    const toDay = (d: Date) => `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`;
+    const addDays = (n: number) => { const d = new Date(now); d.setDate(d.getDate() + n); return d; };
+    const nextBd = (from: Date) => {
+      let d = new Date(from); d.setDate(d.getDate() + 1);
+      while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+      return d;
+    };
+    const today = now; const tomorrow = addDays(1);
+    const bd1 = nextBd(now); const bd2 = nextBd(bd1); const bd3 = nextBd(bd2);
+    return [
+      { value: 'today',    label: `Dziś (${toDay(today)})` },
+      { value: 'tomorrow', label: `Jutro (${toDay(tomorrow)})` },
+      { value: 'bd1',      label: `1 BD (${toDay(bd1)})` },
+      { value: 'bd2',      label: `2 BD (${toDay(bd2)})` },
+      { value: 'bd3',      label: `3 BD (${toDay(bd3)})` },
+    ];
+  }
+
+  get actDueDateSelectedLabel(): string {
+    if (!this.actForm.activity_at) return '';
+    const d = new Date(this.actForm.activity_at);
+    return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  }
+
+  isActExpanded(id: number): boolean { return this.expandedActIds.has(id); }
+  toggleActExpand(id: number): void {
+    if (this.expandedActIds.has(id)) this.expandedActIds.delete(id);
+    else this.expandedActIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  startInlineEdit(a: any): void {
+    this.inlineEditActId = a.id;
+    this.inlineEditForm  = {
+      title: a.title, body: a.body || '',
+      activity_at: a.activity_at ? this.toLocalDT(a.activity_at) : '',
+    };
+    this.expandedActIds.add(a.id);
+    this.cdr.markForCheck();
+  }
+
+  cancelInlineEdit(): void { this.inlineEditActId = null; this.cdr.markForCheck(); }
+
+  saveInlineEdit(a: any): void {
+    if (!this.inlineEditForm.title || !this.partner) return;
+    this.savingActivity = true;
+    this.api.updatePartnerActivity(this.pid, a.id, {
+      title:       this.inlineEditForm.title,
+      body:        this.inlineEditForm.body || null,
+      activity_at: this.toUtcISO(this.inlineEditForm.activity_at),
+    }).subscribe({
+      next: updated => this.zone.run(() => {
+        if (this.partner)
+          this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
+        this.inlineEditActId = null;
+        this.savingActivity  = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  closeActivity(a: any): void {
+    if (!this.partner) return;
+    this.savingActivity = true;
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed' }).subscribe({
+      next: updated => this.zone.run(() => {
+        if (this.partner)
+          this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
+        this.savingActivity = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  selectDueDatePreset(preset: string): void {
+    this.actDueDatePreset = preset;
+    this.applyDueDatePreset();
+  }
+
+  applyDueDatePreset(): void {
+    const now = new Date();
+    const addDays = (n: number) => { const d = new Date(now); d.setDate(d.getDate() + n); return d; };
+    const nextBd = (from: Date) => {
+      let d = new Date(from); d.setDate(d.getDate() + 1);
+      while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+      return d;
+    };
+    const targets: Record<string, Date> = {
+      today: now, tomorrow: addDays(1),
+      bd1: nextBd(now), bd2: nextBd(nextBd(now)), bd3: nextBd(nextBd(nextBd(now))),
+    };
+    const t = targets[this.actDueDatePreset];
+    if (!t) return;
+    const [h, m] = this.actDueDateHour.split(':').map(Number);
+    t.setHours(h, m, 0, 0);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    this.actForm.activity_at = `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}T${pad(h)}:${pad(m)}`;
+    this.cdr.markForCheck();
+  }
+
+  setActDueDateHour(h: string): void {
+    this.actDueDateHour = h;
+    if (this.actDueDatePreset) this.applyDueDatePreset();
+  }
+
+  clearDueDate(): void {
+    this.actDueDatePreset = '';
+    this.actForm.activity_at = '';
+    this.cdr.markForCheck();
+  }
+
+  private toLocalDT(utcIso: string): string {
+    if (!utcIso) return '';
+    const d = new Date(utcIso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  private toUtcISO(local: string): string | null {
+    if (!local) return null;
+    return new Date(local).toISOString();
+  }
+
   get activeOpps(): any[] {
     return (this.partner?.all_opportunities || [])
       .filter((o: any) => o.opp_status !== 'closed')
@@ -2184,6 +2531,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
           if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
           if (p.dwh_partner_id) { this.loadPartnerSalesData(p); this.loadChurnData(String(p.id!)); }
+          if (p.crm_uuid) this.loadConsents(p.crm_uuid);
+          this.loadHistory();
           this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
         });
       },
@@ -2344,7 +2693,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
               this.saving = false;
               this.showEdit = false;
               this.historyLoaded = false;
-              if (this.midTab === 'history') this.loadHistory();
+              this.loadHistory();
               this.cdr.markForCheck();
             });
           },
@@ -2576,7 +2925,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       body:  this.actForm.body || null,
     };
     if (this.actForm.type !== 'email') {
-      payload.activity_at = this.actForm.activity_at || null;
+      payload.activity_at = this.toUtcISO(this.actForm.activity_at);
       payload.assigned_to = this.actForm.assigned_to || null;
     }
     if (this.actForm.type === 'meeting') {
@@ -2626,12 +2975,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   openNewActivityForm(): void {
     if (this.showNewActivity) { this.showNewActivity = false; return; }
     const currentUserId = this.auth.user()?.id || '';
+    const typeMap: Record<string, string> = {
+      all: 'note', notes: 'note', calls: 'call', meetings: 'meeting', emails: 'note',
+    };
     this.actForm = {
-      type: 'note', title: '', body: '',
+      type: typeMap[this.midTab] ?? 'note', title: '', body: '',
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
       opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '',
     };
+    this.actDueDatePreset = '';
+    this.actDueDateHour   = '09:00';
+    this.actDueDateOpen   = false;
+    this.actReminderType  = '';
+    this.actReminderAt    = '';
     this.participantQuery = '';
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
@@ -3151,6 +3508,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     const before = h.before_state || {};
     if (a === 'crm_partner_create')  return 'Partner utworzony';
     if (a === 'crm_partner_delete')  return 'Partner usunięty';
+    if (a === 'crm_partner_consent_update') {
+      const m = h.metadata || {};
+      const lbl = m.consent_label || after.consent_key || '';
+      return `✅ Zgoda „${lbl}": ${before.label || before.value || '—'} → ${after.label || after.value || '—'}`;
+    }
     if (a === 'crm_activity_create') return `Aktywność dodana: ${after.title || ''}`;
     if (a === 'crm_activity_close')  return `Aktywność zamknięta: ${after.title || ''}`;
     if (a === 'crm_activity_update') return `Aktywność zaktualizowana: ${after.title || ''}`;
@@ -3438,10 +3800,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   openActModal(a: any): void {
-    this.selectedAct          = a;
-    this.actModalEditMode     = false;
-    this.actModalClosing      = false;
-    this.actModalCloseComment = '';
+    this.selectedAct      = a;
+    this.actModalEditMode = false;
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
@@ -3452,10 +3812,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   closeActModal(): void {
-    this.selectedAct          = null;
-    this.actModalEditMode     = false;
-    this.actModalClosing      = false;
-    this.actModalCloseComment = '';
+    this.selectedAct      = null;
+    this.actModalEditMode = false;
     this.cdr.markForCheck();
   }
 
@@ -3466,7 +3824,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       type:             a.type,
       title:            a.title,
       body:             a.body || '',
-      activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      activity_at:      a.activity_at ? this.toLocalDT(a.activity_at) : '',
       duration_min:     a.duration_min ?? '',
       meeting_location: a.meeting_location || '',
       participants:     a.participants || '',
@@ -3480,17 +3838,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  startCloseActModal(): void {
-    this.actModalClosing      = true;
-    this.actModalCloseComment = this.selectedAct?.close_comment || '';
-    this.cdr.markForCheck();
-  }
-
   confirmCloseActModal(): void {
     const a = this.selectedAct;
-    if (!this.actModalCloseComment.trim() || !a || !this.partner) return;
+    if (!a || !this.partner) return;
     this.savingActivity = true;
-    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed' }).subscribe({
       next: updated => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3499,10 +3851,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
               activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
             };
           }
-          this.selectedAct          = { ...a, ...updated };
-          this.actModalClosing      = false;
-          this.actModalCloseComment = '';
-          this.savingActivity       = false;
+          this.selectedAct    = { ...a, ...updated };
+          this.savingActivity = false;
           this.cdr.markForCheck();
         });
       },
@@ -3520,7 +3870,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       body:  this.actEditForm.body || null,
     };
     if (this.actEditForm.type !== 'email') {
-      payload.activity_at = this.actEditForm.activity_at || null;
+      payload.activity_at = this.toUtcISO(this.actEditForm.activity_at);
       payload.assigned_to = this.actEditForm.assigned_to || null;
     }
     if (this.actEditForm.type === 'meeting') {
@@ -3565,7 +3915,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       type:             a.type,
       title:            a.title,
       body:             a.body || '',
-      activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      activity_at:      a.activity_at ? this.toLocalDT(a.activity_at) : '',
       duration_min:     a.duration_min ?? '',
       meeting_location: a.meeting_location || '',
       participants:     a.participants || '',
@@ -3643,7 +3993,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       body:  this.actEditForm.body || null,
     };
     if (this.actEditForm.type !== 'email') {
-      payload.activity_at = this.actEditForm.activity_at || null;
+      payload.activity_at = this.toUtcISO(this.actEditForm.activity_at);
       payload.assigned_to = this.actEditForm.assigned_to || null;
     }
     if (this.actEditForm.type === 'meeting') {
