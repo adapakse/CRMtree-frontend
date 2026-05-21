@@ -1,5 +1,6 @@
 // src/app/pages/crm/leads/crm-lead-detail.component.ts
 import { Component, OnInit, OnDestroy, Input, inject, ChangeDetectorRef, NgZone } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -34,7 +35,7 @@ import { QuillModule } from 'ngx-quill';
     <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 Gorący</span>
     <div style="display:flex;gap:6px">
       <button class="hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        title="Zadzwoń: {{lead.phone}}">📞</button>
-      <button class="hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailModal()"  title="Email: {{lead.email}}">
+      <button class="hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  title="Email: {{lead.email}}">
         ✉️ Email
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
@@ -83,7 +84,7 @@ import { QuillModule } from 'ngx-quill';
           <span class="lbl">Email</span>
           <span class="val" style="display:flex;align-items:center;gap:4px">
             <a class="link" href="mailto:{{lead.email}}">{{lead.email}}</a>
-            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailModal()" title="Wyślij przez Gmail">✉️</button>
+            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" title="Wyślij przez Gmail">✉️</button>
           </span>
         </div>
         <div class="info-kv" *ngIf="lead.phone">
@@ -423,31 +424,135 @@ import { QuillModule } from 'ngx-quill';
       <!-- Emaile tab -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
-          <button class="btn-sm" (click)="debugProcessGmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile przez Gmail API (debug)">
-            {{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe
-          </button>
-          <button class="btn-sm primary" *ngIf="canEdit" (click)="openEmailModal()">+ Nowy email</button>
+          <button class="btn-sm" (click)="debugProcessGmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile przez Gmail API (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
+          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" (click)="openEmailCompose()">+ Nowy email</button>
         </div>
+
+        <!-- INLINE COMPOSE -->
+        <div *ngIf="showEmailCompose" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ Nowy email</div>
+            <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
+          </div>
+          <!-- Gmail niepołączony -->
+          <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" style="text-align:center;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="font-size:32px">📧</div>
+            <div style="font-size:14px;font-weight:700;color:#18181b">Konto Gmail niepołączone</div>
+            <div style="font-size:12px;color:#6b7280">Aby wysyłać emaile bezpośrednio z CRM, połącz swoje konto Gmail.</div>
+            <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">🔗 Połącz konto Gmail</button>
+          </div>
+          <!-- Gmail połączony — formularz -->
+          <ng-container *ngIf="gmailConnected || settings.settings().crm_training_mode">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;flex:1;min-width:0">✅ Wysyłam z: <strong>{{gmailEmail}}</strong></div>
+              <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;flex:1;min-width:0">🎓 Tryb szkoleniowy</div>
+              <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
+                      style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
+                <option value="">— brak szablonu —</option>
+                <option *ngFor="let t of emailTemplates" [value]="t.id">{{t.name}}</option>
+              </select>
+            </div>
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+              <div class="participant-chips">
+                <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
+                <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" placeholder="email@firma.pl" autocomplete="off">
+                <div *ngIf="showRecipientSug" class="suggest-dropdown">
+                  <div *ngFor="let s of recipientSuggestions" class="suggest-item" (mousedown)="pickRecipientSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
+                </div>
+              </div>
+            </label>
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+              <div class="participant-chips">
+                <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button></span>
+                <input class="participant-input" [(ngModel)]="ccQuery" (input)="onCcInput()" (keydown.enter)="addCc()" (keydown.Tab)="addCc()" (blur)="showCcSug=false" placeholder="dw@firma.pl" autocomplete="off">
+                <div *ngIf="showCcSug" class="suggest-dropdown">
+                  <div *ngFor="let s of ccSuggestions" class="suggest-item" (mousedown)="pickCcSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
+                </div>
+              </div>
+            </label>
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
+              <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
+            </label>
+            <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" placeholder="Treść wiadomości…" style="display:block" theme="snow"></quill-editor>
+            <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
+              <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
+            </div>
+            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <span>⚠️ Wymagane ponowne połączenie Gmail</span>
+              <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="font-size:11px;padding:3px 10px;border:1px solid #fb923c;border-radius:5px;background:#fff;color:#ea580c;cursor:pointer">Połącz ponownie</button>
+            </div>
+            <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+              <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+            </div>
+            <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <button class="btn-sm" (click)="showEmailCompose=false">Anuluj</button>
+              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}</button>
+            </div>
+          </ng-container>
+        </div>
+
         <div *ngIf="emailActivities.length===0" class="empty-act">Brak wysłanych emaili.</div>
-        <!-- Aktywności email -->
-        <div *ngFor="let a of emailActivities"
-             class="act-item"
-             style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;"
-             [style.border-left]="selectedEmailActivity?.id===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'"
-             [style.background]="selectedEmailActivity?.id===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
-             (click)="selectEmailForPanel(a)">
-          <span class="act-type-icon">📧</span>
-          <div class="act-body" style="flex:1">
-            <div style="display:flex;align-items:center;gap:6px">
-              <strong style="flex:1">{{a.title}}</strong>
-              <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0" title="Nieprzeczytana"></span>
+
+        <!-- Email cards — expand/collapse inline -->
+        <div *ngFor="let a of emailActivities; trackBy: trackEmailActivity" style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;background:white"
+             [style.border-left]="expandedEmailId===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'">
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
+               [style.background]="expandedEmailId===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
+               (click)="toggleEmailExpand(a)">
+            <span style="font-size:16px;flex-shrink:0">📧</span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px">
+                <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
+                <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
+              </div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:1px">
+                <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
+                <span *ngIf="a.created_by_name"> · {{a.created_by_name}}</span>
+              </div>
             </div>
-            <div class="act-meta">
-              <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
-              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-              <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
+            <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
+          </div>
+          <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            <!-- Inline reply form -->
+            <div *ngIf="showReplyInline" style="border:1px solid #dbeafe;border-radius:8px;padding:12px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:11px;font-weight:700;color:#1d4ed8">↩ Odpowiedz</div>
+              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+                <div class="participant-chips">
+                  <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
+                  <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" placeholder="email@firma.pl" autocomplete="off">
+                </div>
+              </label>
+              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+                <div class="participant-chips">
+                  <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
+                  <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" placeholder="dw@firma.pl" autocomplete="off">
+                </div>
+              </label>
+              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
+                <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
+              </label>
+              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" placeholder="Treść odpowiedzi…" style="display:block" theme="snow"></quill-editor>
+              <div *ngIf="inlineReplyForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
+                <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Drive'}}</button>
+              </div>
+              <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+              </div>
+              <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{inlineReplyError}}</div>
+              <div style="display:flex;gap:6px;justify-content:flex-end">
+                <button class="btn-sm" (click)="cancelInlineReply()">Anuluj</button>
+                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.recipientList?.length || !inlineReplyForm.subject">{{inlineReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}</button>
+              </div>
             </div>
-            <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
+            <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
+              <button *ngIf="a.gmail_thread_id && gmailConnected && canEdit" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
+            </div>
           </div>
         </div>
       </div>
@@ -467,7 +572,7 @@ import { QuillModule } from 'ngx-quill';
             <div style="font-size:10px;color:#9ca3af">{{lead.phone||'Brak numeru'}}</div>
           </div>
         </button>
-        <button class="comm-btn" *ngIf="canEdit" (click)="openEmailModal()" [disabled]="!lead.email" style="margin-top:6px">
+        <button class="comm-btn" *ngIf="canEdit" (click)="openEmailCompose()" [disabled]="!lead.email" style="margin-top:6px">
           <span style="font-size:16px">✉️</span>
           <div style="flex:1;text-align:left">
             <div style="font-size:12px;font-weight:600">Wyślij email</div>
@@ -479,49 +584,6 @@ import { QuillModule } from 'ngx-quill';
           🔔 Symulacja połączenia z {{lead.phone}}…
           <button (click)="mockCallActive=false" style="background:none;border:none;cursor:pointer;color:#15803d;margin-left:8px;font-weight:700">Rozłącz</button>
         </div>
-      </div>
-
-      <!-- Email otwarty w panelu -->
-      <div *ngIf="selectedEmailActivity" style="background:white;border:1px solid #bfdbfe;border-radius:10px;padding:14px;position:relative">
-        <button (click)="selectedEmailActivity=null;panelThreadMessages=[]"
-                style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px;line-height:1">✕</button>
-        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px;padding-right:20px">📧 {{selectedEmailActivity.title}}</div>
-        <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">
-          {{selectedEmailActivity.activity_at|date:'dd.MM.yyyy HH:mm'}}
-          <span *ngIf="selectedEmailActivity.created_by_name"> · {{selectedEmailActivity.created_by_name}}</span>
-        </div>
-        <div *ngIf="panelLoadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
-        <div *ngFor="let m of panelThreadMessages"
-             style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;margin-bottom:6px;font-size:11px"
-             [style.border-left]="isMessageRead(m) ? '3px solid #e5e7eb' : '3px solid #ef4444'">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
-            <span style="font-weight:600;color:#374151;flex:1">{{m.from}}</span>
-            <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
-          </div>
-          <div style="color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;cursor:pointer"
-               (click)="openMsgModal(m)">{{m.snippet}}</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <button (click)="openMsgModal(m)"
-                    style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">
-              Otwórz
-            </button>
-            <button (click)="toggleMsgRead(m)"
-                    style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
-                    [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
-                    [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
-                    [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
-              {{isMessageRead(m) ? '✓ Przeczytana' : '● Nieprzeczytana'}}
-            </button>
-          </div>
-        </div>
-        <div *ngIf="!panelLoadingThread && panelThreadMessages.length===0 && selectedEmailActivity.body"
-             style="font-size:11px;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-bottom:6px">
-          {{stripHtml(selectedEmailActivity.body)}}
-        </div>
-        <button *ngIf="selectedEmailActivity.gmail_thread_id" class="comm-btn" style="margin-top:6px"
-                (click)="replyToThread(selectedEmailActivity)">
-          <span>↩</span><div style="flex:1;text-align:left"><div style="font-size:12px;font-weight:600">Odpowiedz</div></div>
-        </button>
       </div>
 
       <!-- Powiązane dokumenty -->
@@ -604,141 +666,6 @@ import { QuillModule } from 'ngx-quill';
         </div>
       </div>
       <div *ngIf="!filteredHistory.length" style="text-align:center;color:#9ca3af;font-size:12px;padding:20px">Brak wyników.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Gmail Compose Modal ─────────────────────────────────────────────────── -->
-<div class="modal-overlay" *ngIf="showEmailModal" (click)="showEmailModal=false">
-  <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(580px,100%)">
-    <div class="modal-header">
-      <h3>✉️ Wyślij email</h3>
-      <button class="close-btn" (click)="showEmailModal=false">✕</button>
-    </div>
-
-    <!-- Gmail niepołączony — pokaż prompt (ukryty w trybie szkoleniowym) -->
-    <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" class="modal-body" style="gap:14px;text-align:center;padding:28px 24px">
-      <div style="font-size:36px">📧</div>
-      <div style="font-size:15px;font-weight:700;color:#18181b">Konto Gmail niepołączone</div>
-      <div style="font-size:13px;color:#6b7280;line-height:1.6">
-        Aby wysyłać i odbierać emaile bezpośrednio z CRM, połącz swoje konto Gmail.<br>
-        Każdy handlowiec łączy własną skrzynkę.
-      </div>
-      <button *ngIf="gmailAuthUrl" (click)="connectGmail()"
-         style="background:#f97316;color:white;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px">
-        🔗 Połącz konto Gmail
-      </button>
-      <div *ngIf="!gmailAuthUrl" style="color:#9ca3af;font-size:12px">
-        Brak konfiguracji OAuth. Skontaktuj się z administratorem.
-      </div>
-    </div>
-
-    <!-- Formularz wysyłki -->
-    <div *ngIf="gmailConnected || settings.settings().crm_training_mode" class="modal-body" style="gap:10px">
-      <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
-        ✅ Wysyłam z: <strong>{{gmailEmail}}</strong>
-      </div>
-      <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
-        🎓 Tryb szkoleniowy — mail nie zostanie wysłany, po 45s pojawi się symulowana odpowiedź
-      </div>
-      <!-- Do: -->
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Do
-        <div class="participant-chips">
-          <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">
-            {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
-          </span>
-          <input class="participant-input" [(ngModel)]="recipientQuery"
-                 (input)="onRecipientInput()"
-                 (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
-                 (blur)="showRecipientSug=false"
-                 placeholder="email@firma.pl" autocomplete="off">
-          <div *ngIf="showRecipientSug" class="suggest-dropdown">
-            <div *ngFor="let s of recipientSuggestions" class="suggest-item"
-                 (mousedown)="pickRecipientSug(s)">
-              <span style="font-weight:600">{{s.name||s.email}}</span>
-              <span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span>
-            </div>
-          </div>
-        </div>
-      </label>
-      <!-- DW (CC): -->
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        DW
-        <div class="participant-chips">
-          <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">
-            {{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button>
-          </span>
-          <input class="participant-input" [(ngModel)]="ccQuery"
-                 (input)="onCcInput()"
-                 (keydown.enter)="addCc()" (keydown.Tab)="addCc()"
-                 (blur)="showCcSug=false"
-                 placeholder="dw@firma.pl" autocomplete="off">
-          <div *ngIf="showCcSug" class="suggest-dropdown">
-            <div *ngFor="let s of ccSuggestions" class="suggest-item"
-                 (mousedown)="pickCcSug(s)">
-              <span style="font-weight:600">{{s.name||s.email}}</span>
-              <span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span>
-            </div>
-          </div>
-        </div>
-      </label>
-      <!-- Temat -->
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Temat
-        <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
-      </label>
-      <!-- Thread reply info -->
-      <div *ngIf="emailForm.threadId" style="font-size:11px;color:#6b7280;background:#eff6ff;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
-        <span>📎 Odpowiedź w wątku</span>
-        <button (click)="emailForm.threadId=''" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:10px">✕ Usuń</button>
-      </div>
-      <!-- Treść -->
-      <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-        Treść
-        <textarea class="act-input" id="email-body-textarea" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
-        <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
-          📋 Historia korespondencji zostanie automatycznie dołączona
-        </div>
-      </label>
-      <!-- Załączniki -->
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <span style="font-size:12px;font-weight:600">Załączniki</span>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
-          <button *ngIf="gmailConnected && !driveNeedsReauth"
-                  (click)="openDrivePicker()" [disabled]="drivePickerLoading"
-                  style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
-            <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
-            <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
-          </button>
-        </div>
-        <div *ngIf="driveNeedsReauth"
-             style="background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:8px 12px;font-size:11px;color:#9a3412;display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <span>⚠️ Wymagane ponowne połączenie Gmail (nowe uprawnienia do Drive)</span>
-          <button *ngIf="gmailAuthUrl" (click)="connectGmail()"
-                  style="flex-shrink:0;font-size:11px;padding:3px 10px;border:1px solid #fb923c;border-radius:5px;background:#fff;color:#ea580c;cursor:pointer;white-space:nowrap">
-            Połącz ponownie
-          </button>
-        </div>
-      </div>
-      <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-        <span *ngFor="let f of emailAttachments; let i=index"
-              style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
-          📎 {{f.name}}
-          <button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
-        </span>
-      </div>
-      <!-- Error -->
-      <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
-      <button *ngIf="gmailConnected || settings.settings().crm_training_mode" class="btn-primary" (click)="sendEmail()"
-              [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">
-        {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
-      </button>
     </div>
   </div>
 </div>
@@ -1583,6 +1510,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private auth     = inject(AuthService);
   private router   = inject(Router);
   private cdr      = inject(ChangeDetectorRef);
+  private sanitizer = inject(DomSanitizer);
   protected settings = inject(AppSettingsService);
   logoSasUrl       = '';
 
@@ -2058,14 +1986,24 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   gmailConnected  = false;
   gmailEmail      = '';
   gmailAuthUrl    = '';
-  showEmailModal  = false;
+  showEmailModal  = false;  // kept for backward compat but unused
+  showEmailCompose = false;
+  expandedEmailId: number | null = null;
+  showReplyInline  = false;
+  inlineReplyForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  inlineReplyRecipientQuery = '';
+  inlineReplyCcQuery        = '';
+  inlineReplySending        = false;
+  inlineReplyError          = '';
+  inlineReplyAttachments: File[] = [];
   sendingEmail    = false;
   emailError      = '';
   emailForm: any  = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
   recipientQuery  = '';
   ccQuery         = '';
   emailAttachments: File[] = [];
-  downloadingAttachment: string = '';  // attachmentId aktualnie pobieranego załącznika
+  emailTemplates: any[] = [];
+  downloadingAttachment: string = '';
   drivePickerLoading  = false;
   driveNeedsReauth    = false;
 
@@ -2115,15 +2053,28 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     const byThread = new Map<string, any>();
     const noThread: any[] = [];
     for (const a of all) {
-      if (!a.gmail_thread_id) { noThread.push(a); continue; }
+      if (!a.gmail_thread_id) {
+        noThread.push({ ...a, safeBody: this.safeHtml(a.body || '') });
+        continue;
+      }
       if (!byThread.has(a.gmail_thread_id)) {
-        byThread.set(a.gmail_thread_id, { ...a });
+        byThread.set(a.gmail_thread_id, { ...a, safeBody: this.safeHtml(a.body || '') });
       } else {
-        // Jeśli którakolwiek aktywność w wątku jest nieprzeczytana — wątek jest nieprzeczytany
         if (!a.is_read) byThread.get(a.gmail_thread_id).is_read = false;
       }
     }
     return [...byThread.values(), ...noThread];
+  }
+
+  trackEmailActivity(_: number, a: any): any { return a.gmail_thread_id || a.id; }
+
+  private _safeHtmlCache = new Map<string, SafeHtml>();
+  safeHtml(html: string): SafeHtml {
+    const key = html || '';
+    if (!this._safeHtmlCache.has(key)) {
+      this._safeHtmlCache.set(key, this.sanitizer.bypassSecurityTrustHtml(key));
+    }
+    return this._safeHtmlCache.get(key)!;
   }
 
   get emailActivityCount(): number {
@@ -2290,12 +2241,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-  openEmailModal(prefillThreadId?: string): void {
+  openEmailCompose(prefillThreadId?: string): void {
     if (!this.gmailConnected && !this.settings.settings().crm_training_mode) {
-      // Gmail niepołączony — pobierz URL autoryzacji i pokaż prompt
       this.api.getGmailAuthUrl().subscribe({
-        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
-        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailModal = true; this.cdr.markForCheck(); }),
+        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailCompose = true; this.cdr.markForCheck(); }),
+        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailCompose = true; this.cdr.markForCheck(); }),
       });
       this.emailForm = { recipientList: [], ccList: [], subject: '', body: '', threadId: prefillThreadId || '', inReplyTo: '', references: '', quotedHtml: '' };
       return;
@@ -2314,7 +2264,25 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.ccQuery          = '';
     this.emailAttachments = [];
     this.emailError       = '';
-    this.showEmailModal   = true;
+    this.showEmailCompose = true;
+    this.midTab = 'emails';
+    this.loadEmailTemplates();
+    this.cdr.markForCheck();
+  }
+
+  openEmailModal(prefillThreadId?: string): void { this.openEmailCompose(prefillThreadId); }
+
+  loadEmailTemplates(): void {
+    this.api.getEmailTemplates().subscribe({
+      next: t => { this.emailTemplates = t; this.cdr.markForCheck(); },
+      error: () => {},
+    });
+  }
+
+  applyEmailTemplate(t: any): void {
+    if (!t) return;
+    this.emailForm.subject = t.name;
+    this.emailForm.body    = t.body;
     this.cdr.markForCheck();
   }
 
@@ -2574,7 +2542,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
             });
           }
           this.sendingEmail   = false;
-          this.showEmailModal = false;
+          this.showEmailCompose = false;
           this.midTab         = 'emails';
           // Odśwież extra_contacts (autoSaveLeadContacts mogło dodać nowe)
           if (this.lead) {
@@ -2704,43 +2672,115 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  selectEmailForPanel(a: any): void {
+  toggleEmailExpand(a: any): void {
     if (!this.lead) return;
-    if (this.selectedEmailActivity?.id === a.id) {
-      this.selectedEmailActivity = null;
-      this.panelThreadMessages   = [];
+    if (this.expandedEmailId === a.id) {
+      this.expandedEmailId = null;
+      this.showReplyInline = false;
       this.cdr.markForCheck();
       return;
     }
-    this.selectedEmailActivity = a;
-    this.panelThreadMessages   = [];
-    this.panelLoadingThread    = true;
+    this.expandedEmailId = a.id;
+    this.showReplyInline = false;
     this.cdr.markForCheck();
-    // Wątek ma nieprzeczytane — oznacz jako przeczytany
     if (!a.is_read) {
       a.is_read = true;
       this.api.patchLeadActivityRead(this.lead.id, a.id, true).subscribe({ error: () => {} });
     }
-    if (a.gmail_thread_id) {
-      this.api.getLeadEmailThread(this.lead.id, a.gmail_thread_id).subscribe({
-        next: msgs => this.zone.run(() => {
-          this.panelThreadMessages = msgs;
-          this.panelLoadingThread  = false;
-          // Auto-mark all unread incoming messages in the thread
-          msgs.forEach((m: any) => {
-            if (m.is_read === false && m.created_by === null) {
-              m.is_read = true;
-              this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
-            }
-          });
-          this.cdr.markForCheck();
-        }),
-        error: () => this.zone.run(() => { this.panelLoadingThread = false; this.cdr.markForCheck(); }),
-      });
-    } else {
-      this.panelLoadingThread = false;
-    }
   }
+
+  startInlineReply(a: any): void {
+    if (!this.lead) return;
+    const subj = (a.title || '');
+    this.inlineReplyForm = {
+      subject:       subj.startsWith('Re:') ? subj : `Re: ${subj}`,
+      body:          '',
+      recipientList: this.lead.email ? [this.lead.email] : [],
+      ccList:        [],
+      threadId:      a.gmail_thread_id || '',
+      inReplyTo:     '',
+      references:    '',
+      quotedHtml:    '',
+    };
+    this.inlineReplyRecipientQuery = '';
+    this.inlineReplyCcQuery        = '';
+    this.inlineReplySending        = false;
+    this.inlineReplyError          = '';
+    this.inlineReplyAttachments    = [];
+    this.showReplyInline           = true;
+    this.cdr.markForCheck();
+  }
+
+  cancelInlineReply(): void {
+    this.showReplyInline = false;
+    this.inlineReplyForm = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+    this.cdr.markForCheck();
+  }
+
+  addInlineReplyRecipient(): void {
+    const val = this.inlineReplyRecipientQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.inlineReplyForm.recipientList.includes(val)) this.inlineReplyForm.recipientList.push(val);
+    this.inlineReplyRecipientQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  addInlineReplyCc(): void {
+    const val = this.inlineReplyCcQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.inlineReplyForm.ccList.includes(val)) this.inlineReplyForm.ccList.push(val);
+    this.inlineReplyCcQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  onInlineReplyAttachmentChange(event: Event): void {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) this.inlineReplyAttachments = [...this.inlineReplyAttachments, ...Array.from(files)];
+    this.cdr.markForCheck();
+  }
+
+  removeInlineReplyAttachment(i: number): void {
+    this.inlineReplyAttachments.splice(i, 1);
+    this.cdr.markForCheck();
+  }
+
+  sendInlineReply(): void {
+    this.addInlineReplyRecipient();
+    this.addInlineReplyCc();
+    if (!this.lead || !this.inlineReplyForm.recipientList?.length || !this.inlineReplyForm.subject) return;
+    this.inlineReplySending = true;
+    this.inlineReplyError   = '';
+    this.cdr.markForCheck();
+
+    const fd = new FormData();
+    fd.append('to', this.inlineReplyForm.recipientList.join(','));
+    if (this.inlineReplyForm.ccList?.length) fd.append('cc', this.inlineReplyForm.ccList.join(','));
+    fd.append('subject', this.inlineReplyForm.subject);
+    fd.append('body', (this.inlineReplyForm.body || '') + (this.inlineReplyForm.quotedHtml || ''));
+    if (this.inlineReplyForm.threadId)   fd.append('threadId',   this.inlineReplyForm.threadId);
+    if (this.inlineReplyForm.inReplyTo)  fd.append('inReplyTo',  this.inlineReplyForm.inReplyTo);
+    if (this.inlineReplyForm.references) fd.append('references', this.inlineReplyForm.references);
+    this.inlineReplyAttachments.forEach(f => fd.append('attachments', f, f.name));
+
+    this.api.sendLeadEmail(this.lead.id, fd).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.inlineReplySending = false;
+          this.showReplyInline    = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: (err: any) => {
+        this.zone.run(() => {
+          this.inlineReplyError   = err?.error?.error || 'Błąd wysyłki';
+          this.inlineReplySending = false;
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  selectEmailForPanel(a: any): void { this.toggleEmailExpand(a); }
 
   isMessageRead(m: any): boolean {
     return m.is_read !== false;
@@ -2763,11 +2803,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     m.is_read = newVal;
     this.cdr.markForCheck();
     this.api.patchEmailMessageRead(m.id, newVal).subscribe({ error: () => {} });
-    // Jeśli oznaczamy jako nieprzeczytana — aktualizuj też aktywność wątku (badge)
-    if (!newVal && this.selectedEmailActivity) {
-      this.selectedEmailActivity.is_read = false;
-      this.api.patchLeadActivityRead(this.lead.id, this.selectedEmailActivity.id, false).subscribe({ error: () => {} });
-    }
   }
 
   closeMsgModal(): void {
