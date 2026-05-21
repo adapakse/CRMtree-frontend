@@ -99,7 +99,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
             <span style="font-size:8.5px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">NEW</span>
           </div>
           <div class="th sortable" (click)="sortBy('expiration_date')">Expiry <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
-          <div class="th sortable" (click)="sortBy('owner_name')">Owner <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('owner_name')">Właściciel <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
         </div>
 
         @if (loading()) {

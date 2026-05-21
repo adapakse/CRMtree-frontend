@@ -274,7 +274,7 @@ import { QuillModule } from 'ngx-quill';
           <input [(ngModel)]="actForm.title"
                  [placeholder]="actForm.type==='meeting' ? 'Tytuł spotkania *' : 'Tytuł *'"
                  class="act-input">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:start">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;align-items:start">
             <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Termin
               <div style="position:relative">
                 <div *ngIf="actDueDateOpen" style="position:fixed;inset:0;z-index:99" (click)="actDueDateOpen=false"></div>
@@ -319,6 +319,15 @@ import { QuillModule } from 'ngx-quill';
                 <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
               </select>
             </label>
+            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Priorytet
+              <select [(ngModel)]="actForm.priority" class="act-input" style="font-size:11px">
+                <option value="">— brak —</option>
+                <option value="asap">ASAP</option>
+                <option value="important">Ważne</option>
+                <option value="medium">Średnie</option>
+                <option value="low">Niskie</option>
+              </select>
+            </label>
           </div>
           <ng-container *ngIf="actForm.type==='meeting'">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
@@ -358,6 +367,7 @@ import { QuillModule } from 'ngx-quill';
               <span style="font-size:16px">{{actIcon(a.type)}}</span>
               <span style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9ca3af;letter-spacing:.4px">{{actTypeName(a.type)}}</span>
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
+              <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
             </div>
             <div style="font-size:12.5px;font-weight:600;color:#111827;margin-bottom:2px">{{a.title}}</div>
@@ -1448,6 +1458,11 @@ import { QuillModule } from 'ngx-quill';
     .act-status-new { background:#f3f4f6; color:#374151; }
     .act-status-open { background:#dbeafe; color:#1e40af; }
     .act-status-closed { background:#dcfce7; color:#166534; }
+    .priority-badge { font-size:9px; font-weight:700; padding:1px 6px; border-radius:4px; white-space:nowrap; text-transform:uppercase; }
+    .priority-asap { background:#fee2e2; color:#991b1b; }
+    .priority-important { background:#ffedd5; color:#c2410c; }
+    .priority-medium { background:#fef9c3; color:#854d0e; }
+    .priority-low { background:#dbeafe; color:#1e40af; }
     .act-type-icon { font-size:18px; flex-shrink:0; }
     .act-body { flex:1; }
     .act-body strong { font-size:12.5px; }
@@ -3122,6 +3137,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  priorityLabel(p: string): string {
+    const map: Record<string, string> = { asap: 'ASAP', important: 'Ważne', medium: 'Średnie', low: 'Niskie' };
+    return map[p] ?? p;
+  }
+
   // ── Modal aktywności ────────────────────────────────────────────────────────
   actTypeName(type: string): string {
     const map: Record<string, string> = {
@@ -3395,6 +3415,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       type: typeMap[this.midTab] ?? 'task', title: '', body: '',
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
+      priority: '',
     };
     this.actDueDatePreset = '';
     this.actDueDateHour   = '09:00';
@@ -3421,6 +3442,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       activity_at: this.toUtcISO(this.actForm.activity_at),
       assigned_to: this.actForm.assigned_to || null,
     };
+    if (this.actForm.type === 'task' && this.actForm.priority) payload.priority = this.actForm.priority;
     if (this.actForm.type === 'meeting') {
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
@@ -3434,7 +3456,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           if (this.lead) {
             this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
           }
-          this.actForm = { type: 'note', title: '', body: '', activity_at: '', assigned_to: '', duration_min: null, meeting_location: '', participantList: [] };
+          this.actForm = { type: 'note', title: '', body: '', activity_at: '', assigned_to: '', duration_min: null, meeting_location: '', participantList: [], priority: '' };
           this.participantQuery = '';
           this.showNewActivity  = false;
           this.savingActivity   = false;

@@ -436,8 +436,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <input *ngIf="!actDueDatePreset" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
             <div *ngIf="actDueDateSelectedLabel" style="font-size:11px;color:#3BAA5D;font-weight:600">📅 {{actDueDateSelectedLabel}}</div>
           </div>
-          <!-- Przypisz + przypomnienie -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <!-- Przypisz + przypomnienie + priorytet -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
             <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
               Przypisz do
               <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px">
@@ -450,6 +450,16 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <select [(ngModel)]="actReminderType" class="act-sel" style="font-size:11px">
                 <option value="">— brak —</option>
                 <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
+              </select>
+            </label>
+            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Priorytet
+              <select [(ngModel)]="actForm.priority" class="act-sel" style="font-size:11px">
+                <option value="">— brak —</option>
+                <option value="asap">ASAP</option>
+                <option value="important">Ważne</option>
+                <option value="medium">Średnie</option>
+                <option value="low">Niskie</option>
               </select>
             </label>
           </div>
@@ -509,6 +519,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <div class="act-card-meta">
               <span class="act-card-title">{{a.title}}</span>
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
+              <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span style="font-size:11px;color:#9ca3af" *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
               <span style="font-size:11px;color:#9ca3af" *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
             </div>
@@ -1772,6 +1783,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-status-new { background:#f3f4f6; color:#6b7280; }
     .act-status-open { background:#dbeafe; color:#1d4ed8; }
     .act-status-closed { background:#d1fae5; color:#065f46; }
+    .priority-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
+    .priority-asap { background:#fee2e2; color:#991b1b; }
+    .priority-important { background:#ffedd5; color:#c2410c; }
+    .priority-medium { background:#fef9c3; color:#854d0e; }
+    .priority-low { background:#dbeafe; color:#1e40af; }
     .act-icon { font-size:18px; }
     .act-item strong { font-size:13px; }
     .act-meta { font-size:10px; color:#9ca3af; }
@@ -2941,6 +2957,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.activity_at = this.toUtcISO(this.actForm.activity_at);
       payload.assigned_to = this.actForm.assigned_to || null;
     }
+    if (this.actForm.type === 'task' && this.actForm.priority) payload.priority = this.actForm.priority;
     if (this.actForm.type === 'meeting') {
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
@@ -2960,7 +2977,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           if (this.partner) {
             this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
           }
-          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '' };
+          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '', priority: '' };
           this.participantQuery = '';
           this.showNewActivity  = false;
           this.savingActivity   = false;
@@ -2996,6 +3013,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
       opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '',
+      priority: '',
     };
     this.actDueDatePreset = '';
     this.actDueDateHour   = '09:00';
@@ -3813,6 +3831,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       nie_dotyczy:    'Nie dotyczy',
     };
     return map[basis || 'nie_dotyczy'] ?? basis ?? '—';
+  }
+
+  priorityLabel(p: string): string {
+    const map: Record<string, string> = { asap: 'ASAP', important: 'Ważne', medium: 'Średnie', low: 'Niskie' };
+    return map[p] ?? p;
   }
 
   // ── Modal aktywności ────────────────────────────────────────────────────────

@@ -52,6 +52,15 @@ interface CalendarDay {
     <option value="opportunity">Szansa</option>
   </select>
 
+  <!-- Filtr priorytetu (zadania) -->
+  <select class="ctl" *ngIf="view === 'tasks'" [(ngModel)]="filterPriority" (ngModelChange)="loadTasks()">
+    <option value="">Wszystkie priorytety</option>
+    <option value="asap">ASAP</option>
+    <option value="important">Ważne</option>
+    <option value="medium">Średnie</option>
+    <option value="low">Niskie</option>
+  </select>
+
   <!-- Pokaż zamknięte (zadania) -->
   <label *ngIf="view === 'tasks'" style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:#374151">
     <input type="checkbox" [(ngModel)]="showClosedTasks" (ngModelChange)="loadTasks()">
@@ -497,6 +506,7 @@ export class CrmCalendarComponent implements OnInit {
   showNoDateTasks = false;
   myTasksCount = 0;
   filterActivityType = '';
+  filterPriority = '';
 
   // Inline edit
   expandedTaskKey: string | null = null;
@@ -603,6 +613,7 @@ export class CrmCalendarComponent implements OnInit {
       }
     }
     if (this.filterActivityType) p.type = this.filterActivityType;
+    if (this.filterPriority) p.priority = this.filterPriority;
     this.api.getActivityTasks(p).subscribe({
       next: tasks => this.zone.run(() => { this.activities = tasks; this.tasksLoading = false; this.cdr.markForCheck(); }),
       error: () => this.zone.run(() => { this.tasksLoading = false; this.cdr.markForCheck(); }),

@@ -58,6 +58,21 @@ const TYPE_LABELS: Record<string, string> = {
 
 <div id="content">
 
+  <!-- Launch success banner -->
+  @if (launchResult()) {
+    <div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+      <span style="font-size:22px">🎉</span>
+      <div style="flex:1">
+        <div style="font-weight:700;color:#166534;font-size:14px">{{ launchResult()!.company }} — uruchomiony!</div>
+        <div style="font-size:12px;color:#4ade80;margin-top:2px">Partner przeniesiony do Rejestru Partnerów i jest teraz aktywny.</div>
+      </div>
+      <a [routerLink]="['/crm/partners', launchResult()!.id]" style="background:#3BAA5D;color:white;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none">
+        → Profil partnera
+      </a>
+      <button (click)="launchResult.set(null)" style="background:none;border:none;color:#166534;font-size:18px;cursor:pointer;line-height:1">✕</button>
+    </div>
+  }
+
   <!-- ════ PARTNERS LIST ════ -->
   @if (view === 'partners') {
     <!-- sub-toolbar: view toggle -->
@@ -97,19 +112,25 @@ const TYPE_LABELS: Record<string, string> = {
             </div>
             <div class="pc-tasks">
               <div class="pc-task-bar">
-                <div class="pc-task-fill" [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 0"></div>
+                <div class="pc-task-fill" [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 100"></div>
               </div>
-              <span class="pc-task-text">{{ p.done_count }}/{{ p.task_count }} zadań</span>
+              <span class="pc-task-text">{{ p.task_count === 0 ? 'Brak zadań' : (p.done_count + '/' + p.task_count + ' zadań') }}</span>
             </div>
             @if (p.manager_name) { <div class="pc-mgr">👤 {{ p.manager_name }}</div> }
-            <div style="margin-top:10px;display:flex;justify-content:flex-end">
+            <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
+              @if (p.lead_id) {
+                <a [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()"
+                   style="font-size:11px;color:#3b82f6;font-weight:600;text-decoration:none;border:1px solid #bfdbfe;border-radius:6px;padding:3px 8px;background:#eff6ff">
+                  🎯 Dane leada
+                </a>
+              }
               <button class="launch-btn"
-                      [class.launch-ready]="p.task_count > 0 && p.done_count === p.task_count"
-                      [disabled]="p.task_count === 0 || p.done_count < p.task_count || launching() === p.id"
+                      [class.launch-ready]="p.done_count >= p.task_count"
+                      [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="$event.stopPropagation(); launchPartner(p)"
-                      [title]="p.task_count === 0 ? 'Brak zadań' : p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
+                      [title]="p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
                 @if (launching() === p.id) { ⏳ Uruchamianie…
-                } @else if (p.task_count > 0 && p.done_count === p.task_count) { 🚀 Uruchomienie
+                } @else if (p.done_count >= p.task_count) { 🚀 Uruchomienie
                 } @else { 🔒 Uruchomienie ({{ p.done_count }}/{{ p.task_count }}) }
               </button>
             </div>
@@ -145,8 +166,8 @@ const TYPE_LABELS: Record<string, string> = {
             </div>
             <!-- Postęp -->
             <div class="pt-td pt-progress-cell">
-              <div class="pt-bar"><div class="pt-fill" [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 0"></div></div>
-              <span class="pt-prog-txt">{{ p.done_count }}/{{ p.task_count }}</span>
+              <div class="pt-bar"><div class="pt-fill" [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 100"></div></div>
+              <span class="pt-prog-txt">{{ p.task_count === 0 ? '—' : (p.done_count + '/' + p.task_count) }}</span>
             </div>
             <!-- Handlowiec -->
             <div class="pt-td">{{ p.manager_name || '—' }}</div>
@@ -155,12 +176,12 @@ const TYPE_LABELS: Record<string, string> = {
             <!-- Akcja -->
             <div class="pt-td" (click)="$event.stopPropagation()">
               <button class="launch-btn"
-                      [class.launch-ready]="p.task_count > 0 && p.done_count === p.task_count"
-                      [disabled]="p.task_count === 0 || p.done_count < p.task_count || launching() === p.id"
+                      [class.launch-ready]="p.done_count >= p.task_count"
+                      [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="launchPartner(p)"
-                      [title]="p.task_count === 0 ? 'Brak zadań' : p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
+                      [title]="p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
                 @if (launching() === p.id) { ⏳
-                } @else if (p.task_count > 0 && p.done_count === p.task_count) { 🚀 Uruchom
+                } @else if (p.done_count >= p.task_count) { 🚀 Uruchom
                 } @else { 🔒 ({{ p.done_count }}/{{ p.task_count }}) }
               </button>
             </div>
@@ -566,6 +587,7 @@ export class CrmOnboardingComponent implements OnInit {
   loadingTasks    = signal(false);
   saving          = signal(false);
   launching       = signal<string | null>(null);
+  launchResult    = signal<{ company: string; id: string } | null>(null);
 
   // Filters
   search        = signal('');
@@ -881,13 +903,13 @@ export class CrmOnboardingComponent implements OnInit {
   }
 
   launchPartner(p: OnboardingPartner): void {
-    if (p.task_count === 0 || p.done_count < p.task_count) return;
+    if (p.done_count < p.task_count) return;
     if (!confirm(`Uruchomić partnera "${p.company}"? Partner zostanie przeniesiony do statusu Aktywny i będzie widoczny w Rejestrze Partnerów.`)) return;
     this.launching.set(p.id);
     this.api.updatePartner(p.id, { status: 'active' } as any).subscribe({
       next: () => this.zone.run(() => {
         this.launching.set(null);
-        this.toast.success(`${p.company} jest teraz aktywnym partnerem 🎉`);
+        this.launchResult.set({ company: p.company, id: p.id });
         this.loadPartners();
         this.loadTasks();
       }),

@@ -337,6 +337,7 @@ export interface OnboardingPartner {
   manager_name: string | null;
   task_count: number;
   done_count: number;
+  lead_id?: string | null;
 }
 
 export interface OnboardingTaskTemplate {
@@ -1134,6 +1135,17 @@ export class CrmApiService {
     admin_first_name: string; admin_last_name: string; admin_email: string;
   }): Observable<any> {
     return this.http.post<any>(`${BASE}/leads/${leadId}/test-account`, data);
+  }
+
+  // ── Powiązania dokument ↔ partner ──────────────────────────
+  getDocumentLinkedPartners(docId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${BASE}/documents/${docId}/partners`);
+  }
+  linkDocumentPartner(docId: string, partnerId: number | string): Observable<any> {
+    return this.http.post<any>(`${BASE}/documents/${docId}/partners`, { partner_id: partnerId });
+  }
+  unlinkDocumentPartner(docId: string, partnerId: number | string): Observable<void> {
+    return this.http.delete<void>(`${BASE}/documents/${docId}/partners/${partnerId}`);
   }
 
   // ── Dokumenty powiązane z Partnerem ───────────────────────
