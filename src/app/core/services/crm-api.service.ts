@@ -82,6 +82,10 @@ export interface LeadActivity {
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
   is_read: boolean | null;
+  priority?: string | null;
+  reminder_type?: string | null;
+  reminder_at?: string | null;
+  reminder_sent?: boolean | null;
 }
 
 export interface CalendarMeeting {
@@ -260,6 +264,14 @@ export interface Partner {
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];
   all_opportunities?: PartnerActivity[];
+  // ── Churn & Health Score ────────────────────────────────────────────────────
+  churn_score?: number | null;
+  churn_risk?: string | null;
+  churn_analyzed_at?: string | null;
+  churn_days_since_order?: number | null;
+  churn_sales_drop_pct?: number | null;
+  health_score?: number | null;
+  health_level?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -287,6 +299,10 @@ export interface PartnerActivity {
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
   is_read: boolean;
+  priority?: string | null;
+  reminder_type?: string | null;
+  reminder_at?: string | null;
+  reminder_sent?: boolean | null;
 }
 
 export interface OnboardingTask {
@@ -626,6 +642,15 @@ export interface SalesBudget {
 }
 
 // ── Gmail ─────────────────────────────────────────────────────────────────────
+
+export interface EmailTemplate {
+  id: string;
+  user_id: string;
+  name: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface ChurnPartner {
   partner_id:       string;
@@ -1249,6 +1274,20 @@ export class CrmApiService {
   }
   computeScores(): Observable<{ computed: number; message?: string }> {
     return this.http.post<{ computed: number; message?: string }>(`${BASE}/churn/compute`, {});
+  }
+
+  // ── Szablony emaili użytkownika ───────────────────────────────────────────
+  getEmailTemplates(): Observable<EmailTemplate[]> {
+    return this.http.get<EmailTemplate[]>(`${environment.apiUrl}/profile/email-templates`);
+  }
+  createEmailTemplate(data: { name: string; body: string }): Observable<EmailTemplate> {
+    return this.http.post<EmailTemplate>(`${environment.apiUrl}/profile/email-templates`, data);
+  }
+  updateEmailTemplate(id: string, data: { name: string; body: string }): Observable<EmailTemplate> {
+    return this.http.put<EmailTemplate>(`${environment.apiUrl}/profile/email-templates/${id}`, data);
+  }
+  deleteEmailTemplate(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/profile/email-templates/${id}`);
   }
 
   // ── Google Drive Picker ────────────────────────────────────────────────────

@@ -154,7 +154,7 @@ const STAGE_COLORS: Record<string, string> = {
       <div class="stat-card" style="border-top:3px solid #64748B">
         <div class="stat-val">{{ extKpi.transactions | number }}</div>
         <div class="stat-lbl">Transakcji</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.pax | number }} pasażerów</div>
+        <div class="stat-trend" style="color:#64748B">{{ extKpi.pax | number }} produktów</div>
       </div>
     </div>
 

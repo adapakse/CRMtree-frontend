@@ -245,7 +245,7 @@ import { QuillModule } from 'ngx-quill';
         </ng-container>
       </div>
 
-      <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0;overflow-x:auto">
+      <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0;flex-wrap:wrap">
         <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
           Wszystkie
           <wt-activity-count-badge [activities]="lead.activities||[]"></wt-activity-count-badge>
@@ -253,7 +253,7 @@ import { QuillModule } from 'ngx-quill';
         <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">Zadania</button>
         <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">Notatki</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
-          📧 Emaile
+          Emaile
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
@@ -1409,8 +1409,8 @@ import { QuillModule } from 'ngx-quill';
     .val.fw { font-weight:600; color:#18181b; }
     .link { color:#f97316; text-decoration:none; }
     .link:hover { text-decoration:underline; }
-    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; padding:12px 16px; font-size:12.5px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; }
-    .tab-btn.active { color:#f97316; border-bottom-color:#f97316; }
+    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; padding:10px 14px; font-size:12.5px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; border-radius:6px 6px 0 0; transition:all .15s; }
+    .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
     .tab-btn:hover:not(.active) { color:#374151; }
     .stage-badge { padding:2px 9px; border-radius:10px; font-size:11px; font-weight:700; }
     .stage-new{background:#f3f4f6;color:#374151} .stage-qualification{background:#dbeafe;color:#1e40af}
@@ -1801,12 +1801,14 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   actReminderAt    = '';
 
   readonly reminderOptions = [
-    { value: '',           label: 'Brak przypomnienia' },
-    { value: 'at_due',    label: 'W terminie zadania'  },
-    { value: '1d_before', label: '1 dzień przed'       },
-    { value: '2d_before', label: '2 dni przed'         },
-    { value: '3d_before', label: '3 dni przed'         },
-    { value: 'custom',    label: 'Własna data…'        },
+    { value: '',           label: 'Brak przypomnienia'  },
+    { value: '30m_before', label: '30 min przed'        },
+    { value: '1h_before',  label: '1 godz. przed'       },
+    { value: 'at_due',     label: 'W terminie zadania'  },
+    { value: '1d_before',  label: '1 dzień przed'       },
+    { value: '2d_before',  label: '2 dni przed'         },
+    { value: '3d_before',  label: '3 dni przed'         },
+    { value: 'custom',     label: 'Własna data…'        },
   ];
 
   readonly quillModules = {
@@ -3328,6 +3330,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (this.actForm.type !== 'meeting') {
       this.actForm.participantList = [];
       this.participantQuery = '';
+    }
+    if (this.actForm.type === 'note' && !this.actDueDatePreset) {
+      this.actDueDatePreset = 'today';
+      const now = new Date();
+      this.actDueDateHour = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     }
     this.cdr.markForCheck();
   }

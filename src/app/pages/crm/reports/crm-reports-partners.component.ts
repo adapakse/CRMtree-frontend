@@ -129,7 +129,7 @@ function healthColor(engagement: number): string {
     <div class="stat-card stat-clickable" style="border-top:3px solid #A855F7" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#A855F7;font-size:20px">{{ kpi.transactions_count | number }}</div>
       <div class="stat-lbl">Transakcje<wt-tooltip key="crm.partners.kpi.transactions"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ kpi.pax_count | number }} PAX</div>
+      <div class="stat-trend" style="color:#a1a1aa">{{ kpi.pax_count | number }} Produkty</div>
     </div>
     <div class="stat-card stat-clickable" style="border-top:3px solid #F59E0B" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
       <div class="stat-val" style="color:#F59E0B;font-size:20px">{{ kpi.partners_count }}</div>
@@ -288,7 +288,7 @@ function healthColor(engagement: number): string {
           <div style="display:flex;justify-content:space-between"><span style="color:#71717a">% marży</span><span style="font-weight:700">{{ kpi.margin_pct | number:'1.0-1' }}%</span></div>
           <div style="display:flex;justify-content:space-between"><span style="color:#71717a">Fee rate</span><span style="font-weight:700">{{ kpi.fee_rate_pct | number:'1.0-1' }}%</span></div>
           <div style="display:flex;justify-content:space-between"><span style="color:#71717a">Transakcje</span><span style="font-weight:700">{{ kpi.transactions_count | number }}</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">PAX</span><span style="font-weight:700">{{ kpi.pax_count | number }}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">Produkty</span><span style="font-weight:700">{{ kpi.pax_count | number }}</span></div>
         </div>
       </div>
     </div>

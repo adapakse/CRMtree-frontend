@@ -37,6 +37,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </span>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
+    <span *ngIf="partner.churn_risk && partner.churn_risk !== 'none'"
+          class="churn-hdr-badge churn-hdr-{{partner.churn_risk}}"
+          [title]="churnBadgeTitle(partner)">
+      🔥 Churn: {{churnLabel(partner.churn_risk)}}
+    </span>
     <button class="btn-outline" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj partnera' : 'Brak uprawnień do edycji tego partnera'">✏️ Edytuj</button>
   </div>
 
@@ -380,11 +385,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
           Wszystkie
           <wt-activity-count-badge [activities]="partner.activities||[]"></wt-activity-count-badge>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">📝 Notatki</button>
-        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">📞 Połączenia</button>
-        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">🤝 Spotkania</button>
+        <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">Notatki</button>
+        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
+        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
-          📧 Maile
+          Maile
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
       </div>
@@ -587,7 +592,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.gross_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót brutto PLN</div></div>
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.net_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót netto PLN</div></div>
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.transactions_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Transakcje</div></div>
-          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.pax_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">PAX</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.pax_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Produkty</div></div>
           <div class="dwh-kpi dwh-kpi-wide"><div class="dwh-kpi-val" style="color:#86efac">{{(partnerSalesKpi.revenue_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Przychód netto PLN</div></div>
         </div>
       </div>
@@ -1717,9 +1722,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .panel-msg.read { border-left:3px solid #e5e7eb; }
     .docs-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
     .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
-    .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; }
-    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:12px 14px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:color .15s,border-color .15s; }
-    .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; }
+    .churn-hdr-badge { padding:3px 10px; border-radius:10px; font-size:11px; font-weight:700; }
+    .churn-hdr-critical { background:#fee2e2; color:#991b1b; }
+    .churn-hdr-high { background:#ffedd5; color:#c2410c; }
+    .churn-hdr-medium { background:#fef9c3; color:#854d0e; }
+    .churn-hdr-low { background:#dbeafe; color:#1e40af; }
+    .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; flex-wrap:wrap; }
+    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:10px 12px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:all .15s; border-radius:6px 6px 0 0; }
+    .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
     .tab-btn:hover:not(.active) { color:#374151; }
     .info-grid { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; }
     .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; padding-top:2px; }
@@ -1986,10 +1996,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   actReminderType  = '';
   actReminderAt    = '';
   readonly reminderOptions = [
-    { value: '15m', label: '15 min przed' },
-    { value: '30m', label: '30 min przed' },
-    { value: '1h',  label: '1 godz. przed' },
-    { value: '1d',  label: '1 dzień przed' },
+    { value: '30m_before', label: '30 min przed' },
+    { value: '1h_before',  label: '1 godz. przed' },
+    { value: 'at_due',     label: 'W terminie zadania' },
+    { value: '1d_before',  label: '1 dzień przed' },
+    { value: '2d_before',  label: '2 dni przed' },
+    { value: '3d_before',  label: '3 dni przed' },
+    { value: 'custom',     label: 'Własna data…' },
   ];
   readonly quillModules = { toolbar: [['bold','italic','underline'],['bullet','list'],[{ list:'ordered' }],['link']] };
   readonly actTypeOptions = [
@@ -3771,6 +3784,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   statusLabelStr(s: string): string { return PARTNER_STATUS_LABELS[s as PartnerStatus] || s; }
   statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }
+
+  churnLabel(risk: string | null | undefined): string {
+    switch (risk) {
+      case 'critical': return 'Krytyczne';
+      case 'high':     return 'Wysokie';
+      case 'medium':   return 'Średnie';
+      case 'low':      return 'Niskie';
+      default:         return '';
+    }
+  }
+
+  churnBadgeTitle(p: any): string {
+    const parts: string[] = [];
+    if (p.churn_analyzed_at) parts.push(`Analiza: ${new Date(p.churn_analyzed_at).toLocaleDateString('pl-PL')}`);
+    if (p.churn_days_since_order != null) parts.push(`Dni bez zam.: ${p.churn_days_since_order}`);
+    if (p.churn_sales_drop_pct != null) parts.push(`Spadek sprzedaży: ${p.churn_sales_drop_pct}%`);
+    return parts.join(' · ');
+  }
   actIcon(type: string) {
     return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
   }
@@ -4047,6 +4078,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.actForm.type !== 'meeting') {
       this.actForm.participantList = [];
       this.participantQuery = '';
+    }
+    if (this.actForm.type === 'note' && !this.actDueDatePreset) {
+      this.actDueDatePreset = 'today';
+      const now = new Date();
+      this.actDueDateHour = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     }
     this.cdr.markForCheck();
   }
