@@ -4,8 +4,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, ChurnPartner, ConsentValue } from '../../../core/services/crm-api.service';
+import { finalize, catchError } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, ChurnPartner, ConsentValue, ConsentType } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
@@ -386,6 +387,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           Wszystkie
           <wt-activity-count-badge [activities]="partner.activities||[]"></wt-activity-count-badge>
         </button>
+        <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">Zadania</button>
         <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">Notatki</button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
         <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
@@ -531,6 +533,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
           <div *ngIf="a.body && !isActExpanded(a.id)" class="act-body-clamp" [innerHTML]="a.body"></div>
           <div *ngIf="a.body && isActExpanded(a.id)" style="font-size:12px;color:#374151;margin-top:6px" [innerHTML]="a.body"></div>
+          <div *ngIf="canEdit && a.type==='task' && inlineEditActId!==a.id" class="task-actions-row" (click)="$event.stopPropagation()">
+            <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ Zamknij zadanie</button>
+            <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ Otwórz ponownie</button>
+          </div>
           <!-- Inline edit -->
           <div *ngIf="inlineEditActId===a.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
             <input [(ngModel)]="inlineEditForm.title" class="act-input" placeholder="Tytuł *">
@@ -1798,9 +1804,16 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-expand-btn { background:none; border:none; cursor:pointer; font-size:11px; color:#9ca3af; padding:2px 0; margin-top:4px; }
     .act-expand-btn:hover { color:#3BAA5D; }
     .act-card-controls { display:flex; gap:4px; align-items:center; flex-shrink:0; }
-    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:13px; padding:3px 5px; border-radius:5px; color:#9ca3af; line-height:1; }
+    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 6px; border-radius:5px; color:#9ca3af; line-height:1; }
     .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
     .act-ctrl-btn.del:hover { color:#ef4444; }
+    .task-actions-row { display:flex; gap:6px; margin-top:8px; }
+    .btn-task-close { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-close:hover:not(:disabled) { background:#dcfce7; border-color:#86efac; }
+    .btn-task-close:disabled { opacity:.5; cursor:default; }
+    .btn-task-reopen { background:#f3f4f6; border:1px solid #d1d5db; color:#374151; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-reopen:hover:not(:disabled) { background:#e5e7eb; }
+    .btn-task-reopen:disabled { opacity:.5; cursor:default; }
     .hist-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid #f3f4f6; font-size:12px; }
   `],
 })
@@ -1890,11 +1903,25 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   loadConsents(partnerId: string): void {
     this.consentLoading = true;
     this.cdr.markForCheck();
-    this.api.getPartnerConsents(partnerId).subscribe({
-      next: cv => {
+    forkJoin([
+      this.api.getConsentTypes(),
+      this.api.getPartnerConsents(partnerId).pipe(catchError(() => of([] as ConsentValue[]))),
+    ]).subscribe({
+      next: ([types, values]) => {
         this.zone.run(() => {
-          this.consents     = cv;
-          this.consentDraft = Object.fromEntries(cv.map(c => [c.consent_key, c.value]));
+          const valueMap = new Map(values.map(v => [v.consent_key, v]));
+          this.consents = types.map((t: ConsentType) => {
+            const stored = valueMap.get(t.key);
+            return {
+              consent_key:      t.key,
+              label:            t.label,
+              description:      t.description,
+              value:            stored?.value ?? 'no_data',
+              updated_at:       stored?.updated_at,
+              updated_by_name:  stored?.updated_by_name,
+            } as ConsentValue;
+          });
+          this.consentDraft = Object.fromEntries(this.consents.map(c => [c.consent_key, c.value]));
           this.consentLoading = false;
           this.cdr.markForCheck();
         });
@@ -1915,8 +1942,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   saveConsents(): void {
     if (!this.partner || this.savingConsents || !this.consentsDirty) return;
-    const pid = this.partner.crm_uuid;
-    if (!pid) return;
+    const pid = this.partner.crm_uuid || String(this.partner.id!);
     this.savingConsents = true;
     this.cdr.markForCheck();
     const items = Object.entries(this.consentDraft).map(([key, value]) => ({ key, value }));
@@ -1935,7 +1961,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
-  midTab: 'all' | 'notes' | 'calls' | 'meetings' | 'emails' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' = 'all';
   history: any[] = [];
   historyLoaded  = false;
   historyLoading = false;
@@ -2222,6 +2248,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   get filteredActivities(): any[] {
     const all = this.sortedActivities;
     switch (this.midTab) {
+      case 'tasks':    return all.filter(a => a.type === 'task');
       case 'notes':    return all.filter(a => a.type === 'note' || a.type === 'training' || a.type === 'qbr' || a.type === 'opportunity');
       case 'calls':    return all.filter(a => a.type === 'call');
       case 'meetings': return all.filter(a => a.type === 'meeting');
@@ -2303,9 +2330,25 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   closeActivity(a: any): void {
-    if (!this.partner) return;
+    if (!this.partner || this.savingActivity) return;
     this.savingActivity = true;
+    this.cdr.markForCheck();
     this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed' }).subscribe({
+      next: updated => this.zone.run(() => {
+        if (this.partner)
+          this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
+        this.savingActivity = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  reopenActivity(a: any): void {
+    if (!this.partner || this.savingActivity) return;
+    this.savingActivity = true;
+    this.cdr.markForCheck();
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'new' }).subscribe({
       next: updated => this.zone.run(() => {
         if (this.partner)
           this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
@@ -2426,6 +2469,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.loadLinkedDocs(rawId);
     this.loadSuggestions(rawId);
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
+    this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getGmailStatus().subscribe({
       next: s => this.zone.run(() => { this.gmailConnected = s.connected; this.gmailEmail = s.email || ''; this.cdr.markForCheck(); }),
       error: () => {},
@@ -2521,7 +2565,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
           if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
           if (p.dwh_partner_id) { this.loadPartnerSalesData(p); this.loadChurnData(String(p.id!)); }
-          if (p.crm_uuid) this.loadConsents(p.crm_uuid);
+          this.loadConsents(p.crm_uuid || String(p.id!));
           this.loadHistory();
           this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
         });
@@ -2967,21 +3011,27 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.showNewActivity) { this.showNewActivity = false; return; }
     const currentUserId = this.auth.user()?.id || '';
     const typeMap: Record<string, string> = {
-      all: 'note', notes: 'note', calls: 'call', meetings: 'meeting', emails: 'note',
+      all: 'task', tasks: 'task', notes: 'note', calls: 'call', meetings: 'meeting', emails: 'note',
     };
+    const actType = typeMap[this.midTab] ?? 'task';
     this.actForm = {
-      type: typeMap[this.midTab] ?? 'note', title: '', body: '',
+      type: actType, title: '', body: '',
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
       opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '',
       priority: '',
     };
-    this.actDueDatePreset = '';
     this.actDueDateHour   = '09:00';
     this.actDueDateOpen   = false;
     this.actReminderType  = '';
     this.actReminderAt    = '';
     this.participantQuery = '';
+    if (actType === 'task') {
+      this.actDueDatePreset = 'today';
+      this.applyDueDatePreset();
+    } else {
+      this.actDueDatePreset = '';
+    }
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
