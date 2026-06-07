@@ -133,6 +133,7 @@ export interface ActivityTask {
   assigned_to_id: string | null;
   act_assigned_to_name: string | null;
   act_assigned_to_id: string | null;
+  priority?: string | null;
 }
 
 
@@ -265,6 +266,7 @@ export interface Partner {
   open_opportunities?: Opportunity[];
   all_opportunities?: PartnerActivity[];
   // ── Churn & Health Score ────────────────────────────────────────────────────
+  churn_exempt?: boolean;
   churn_score?: number | null;
   churn_risk?: string | null;
   churn_analyzed_at?: string | null;
@@ -482,15 +484,23 @@ export interface LeadsReportByRep    { rep_name: string; rep_id: string; total: 
 export interface LeadsReportBySource { source: string; count: number; won_count: number; won_value: number; }
 export interface LeadsReportLostReason { reason: string; count: number; }
 export interface LeadsReportStageVelocity { stage: string; count: number; avg_days: number; }
+export interface LeadsReportActivityByRep {
+  rep_name: string;
+  rep_id:   string;
+  type:     string;
+  source:   string;
+  count:    number;
+}
 
 export interface LeadsReport {
-  kpi: LeadsReportKpi;
-  funnel: LeadsReportFunnel[];
-  monthly: LeadsReportMonthly[];
-  by_rep: LeadsReportByRep[];
-  by_source: LeadsReportBySource[];
-  lost_reasons: LeadsReportLostReason[];
-  stage_velocity: LeadsReportStageVelocity[];
+  kpi:              LeadsReportKpi;
+  funnel:           LeadsReportFunnel[];
+  monthly:          LeadsReportMonthly[];
+  by_rep:           LeadsReportByRep[];
+  by_source:        LeadsReportBySource[];
+  lost_reasons:     LeadsReportLostReason[];
+  stage_velocity:   LeadsReportStageVelocity[];
+  activity_by_rep?: LeadsReportActivityByRep[];
 }
 
 // ── Raporty Partnerzy ────────────────────────────────────────────────────────
@@ -804,6 +814,18 @@ export const LEAD_SOURCES: LeadSource[] = [
   { value: 'GoogleAds_PMax',     label: 'Google Ads PMax',      group: 'Marketing' },
   { value: 'GoogleAds_SEA_Brand',label: 'Google Ads SEA Brand', group: 'Marketing' },
 ];
+
+export interface AnalyticsPeriod {
+  kpi:        { gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number; margin_pct: number; partners_count: number };
+  trend:      { period: string; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+  by_partner: { partner_name: string; partner_id: string|null; dwh_partner_id: number|null; salesperson_name: string|null; group_name: string|null; industry: string|null; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+  by_product: { product_type: string; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+  by_rep:     { salesperson_name: string; salesperson_id: string|null; partners_count: number; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+}
+export interface PartnersAnalytics {
+  a: AnalyticsPeriod;
+  b: AnalyticsPeriod | null;
+}
 
 // ─────────────────────────────────────────────────────────────────
 // Service
@@ -1275,6 +1297,15 @@ export class CrmApiService {
       `${BASE}/gmail/attachment/${messageId}/${attachmentId}`,
       { params, responseType: 'blob' },
     );
+  }
+
+  // ── Partners Analytics (DWH) ─────────────────────────────────────────────
+  getPartnersAnalytics(p: {
+    period_from?: string; period_to?: string;
+    compare_from?: string; compare_to?: string;
+    rep_id?: string; service_category?: string;
+  } = {}): Observable<PartnersAnalytics> {
+    return this.http.get<PartnersAnalytics>(`${BASE}/sales-data/analytics`, { params: this.toParams(p) });
   }
 
   // ── Churn Analytics ───────────────────────────────────────────────────────

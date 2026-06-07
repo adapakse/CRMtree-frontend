@@ -117,6 +117,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/crm/partners/crm-partners-list.component').then(m => m.CrmPartnersListComponent),
       },
       {
+        path: 'crm/partners/analytics',
+        canActivate: [crmGuard],
+        loadComponent: () => import('./pages/crm/reports/crm-partners-analytics.component').then(m => m.CrmPartnersAnalyticsComponent),
+      },
+      {
         path: 'crm/partners/:id',
         canActivate: [crmGuard],
         loadComponent: () => import('./pages/crm/partners/crm-partner-detail.component').then(m => m.CrmPartnerDetailComponent),

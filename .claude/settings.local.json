@@ -2,7 +2,25 @@
   "permissions": {
     "allow": [
       "Bash(grep -E \"\\\\.\\(ts|tsx|js\\)$\")",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(xargs grep -l \"churn\\\\|dormant\")",
+      "Bash(grep -v \"= null\\\\|= \\\\[\\\\]\\\\|= false\\\\|private\\\\|: any\\\\|\\\\[\\\\]$\")",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object -ExpandProperty FullName | Sort-Object)",
+      "Bash(node seed_crmtest1.js)",
+      "Bash(Get-Service -Name Jenkins)",
+      "Bash(sc query *)",
+      "Bash(docker exec jenkins-crmtree *)",
+      "PowerShell(docker exec jenkins-crmtree *)",
+      "PowerShell(docker exec *)",
+      "PowerShell(docker stop jenkins-crmtree; docker commit jenkins-crmtree jenkins-crmtree-img 2>&1)",
+      "PowerShell(docker rm jenkins-crmtree; docker run -d --name jenkins-crmtree --dns 8.8.8.8 --dns 8.8.4.4 -p 8090:8080 -p 50001:50000 -v jenkins_crmtree_home:/var/jenkins_home -v /run/host-services/docker.proxy.sock:/var/run/docker.sock --restart unless-stopped jenkins-crmtree-img 2>&1)",
+      "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\\\\routes\\\\crm-sales-data.js' | Select-Object -Last 50\")",
+      "Bash(Get-Content \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\\\\routes\\\\crm-sales-data.js\")",
+      "Bash(Measure-Object -Line)",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\\\\routes\\\\crm-sales-data.js\" | Measure-Object -Line\\).Lines)"
     ]
   }
 }

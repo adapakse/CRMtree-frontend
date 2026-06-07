@@ -75,7 +75,7 @@ type SortDir = 'asc' | 'desc';
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
       </div>
-      <div *ngIf="p.churn_risk && p.churn_risk !== 'none'" class="churn-badge churn-{{p.churn_risk}}">
+      <div *ngIf="p.churn_risk && p.churn_risk !== 'none' && !p.churn_exempt" class="churn-badge churn-{{p.churn_risk}}">
         🔥 Ryzyko churn: {{churnLabel(p.churn_risk)}}
         <span *ngIf="p.churn_score != null"> · {{p.churn_score}} pkt</span>
       </div>
@@ -156,11 +156,11 @@ type SortDir = 'asc' | 'desc';
         <div class="td td-sm" style="color:#d1d5db">—</div>
       </ng-template>
       <div class="td">
-        <span *ngIf="p.churn_risk && p.churn_risk !== 'none'"
+        <span *ngIf="p.churn_risk && p.churn_risk !== 'none' && !p.churn_exempt"
               class="churn-badge churn-{{p.churn_risk}}">
           {{churnLabel(p.churn_risk)}}
         </span>
-        <span *ngIf="!p.churn_risk || p.churn_risk === 'none'" style="color:#d1d5db;font-size:12px">—</span>
+        <span *ngIf="!p.churn_risk || p.churn_risk === 'none' || p.churn_exempt" style="color:#d1d5db;font-size:12px">—</span>
       </div>
       <div class="td td-sm" [class.expiring]="isExpiring(p.contract_expires)">
         {{p.contract_expires?(p.contract_expires|date:'dd.MM.yy'):'—'}}

@@ -356,7 +356,7 @@ import { QuillModule } from 'ngx-quill';
         </div>
 
         <!-- Activity cards -->
-        <div *ngFor="let a of filteredActivities" class="act-card"
+        <div *ngFor="let a of filteredActivities; trackBy: trackActivity" class="act-card"
              [class.act-card-closed]="a.status==='closed'"
              [class.act-card-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
              [class.act-card-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
@@ -382,8 +382,11 @@ import { QuillModule } from 'ngx-quill';
                 {{isActExpanded(a.id) ? '▲ Zwiń' : '▼ Rozwiń'}}
               </button>
             </div>
+            <div *ngIf="canEdit && a.type==='task'" class="task-actions-row" (click)="$event.stopPropagation()">
+              <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ Zamknij zadanie</button>
+              <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ Otwórz ponownie</button>
+            </div>
             <div class="act-card-controls">
-              <button *ngIf="canEdit && a.status!=='closed' && a.type==='task'" class="act-ctrl-btn" (click)="$event.stopPropagation(); closeActivity(a)" title="Zamknij zadanie">✓</button>
               <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" title="Usuń">🗑️</button>
             </div>
           </ng-container>
@@ -1398,9 +1401,16 @@ import { QuillModule } from 'ngx-quill';
     .act-edit-form { display:flex; flex-direction:column; gap:6px; }
     .act-controls { display:flex; gap:4px; align-self:flex-start; opacity:0; transition:opacity .15s; }
     .act-item:hover .act-controls { opacity:1; }
-    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 4px; border-radius:4px; color:#9ca3af; }
+    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 6px; border-radius:4px; color:#9ca3af; }
     .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
     .act-ctrl-btn.del:hover { color:#ef4444; }
+    .task-actions-row { display:flex; gap:6px; margin-top:8px; }
+    .btn-task-close { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-close:hover:not(:disabled) { background:#dcfce7; border-color:#86efac; }
+    .btn-task-close:disabled { opacity:.5; cursor:default; }
+    .btn-task-reopen { background:#f3f4f6; border:1px solid #d1d5db; color:#374151; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-reopen:hover:not(:disabled) { background:#e5e7eb; }
+    .btn-task-reopen:disabled { opacity:.5; cursor:default; }
     .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
     .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; outline:none; }
     .act-input:focus { border-color:#3BAA5D; }
@@ -1891,6 +1901,25 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  reopenActivity(a: any): void {
+    if (!this.lead || this.savingActivity) return;
+    this.savingActivity = true;
+    this.cdr.markForCheck();
+    this.api.updateLeadActivity(this.lead.id, a.id, { status: 'new' }).subscribe({
+      next: updated => this.zone.run(() => {
+        if (this.lead) {
+          this.lead = {
+            ...this.lead,
+            activities: (this.lead.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
+          };
+        }
+        this.savingActivity = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }),
+    });
+  }
+
   selectDueDatePreset(value: string): void {
     this.actDueDateOpen   = false;
     this.actDueDatePreset = value;
@@ -2067,6 +2096,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   trackEmailActivity(_: number, a: any): any { return a.gmail_thread_id || a.id; }
+  trackActivity(_: number, a: any): number { return a.id; }
 
   private _safeHtmlCache = new Map<string, SafeHtml>();
   safeHtml(html: string): SafeHtml {
@@ -2105,6 +2135,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.loadConsents(numId);
     this.api.getContactSuggestions(numId).subscribe({
       next: s => { this.allSuggestions = s; },
+      error: () => {},
+    });
+    this.api.getCrmUsers().subscribe({
+      next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
       error: () => {},
     });
     this.api.getLeadSources().subscribe({
@@ -2170,6 +2204,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   refreshEmailActivities(): void {
     if (!this.lead) return;
+    if (this.inlineEditActId !== null || this.showNewActivity) return;
     this.api.getLead(this.lead.id).subscribe({
       next: (fresh: any) => this.zone.run(() => {
         if (!this.lead) return;
@@ -3446,18 +3481,24 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       all: 'task', tasks: 'task', notes: 'note',
       calls: 'call', meetings: 'meeting', emails: 'note',
     };
+    const actType = typeMap[this.midTab] ?? 'task';
     this.actForm = {
-      type: typeMap[this.midTab] ?? 'task', title: '', body: '',
+      type: actType, title: '', body: '',
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
       priority: '',
     };
-    this.actDueDatePreset = '';
     this.actDueDateHour   = '09:00';
     this.actDueDateOpen   = false;
     this.actReminderType  = '';
     this.actReminderAt    = '';
     this.participantQuery = '';
+    if (actType === 'task') {
+      this.actDueDatePreset = 'today';
+      this.applyDueDatePreset();
+    } else {
+      this.actDueDatePreset = '';
+    }
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },

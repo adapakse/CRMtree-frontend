@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
-  CrmApiService, LeadsReport, LeadsReportKpi, LeadsReportStageVelocity,
+  CrmApiService, LeadsReport, LeadsReportKpi, LeadsReportStageVelocity, LeadsReportActivityByRep,
   LEAD_STAGE_LABELS, LEAD_SOURCES, LEAD_SOURCE_LABELS, CrmUser,
 } from '../../../core/services/crm-api.service';
 import { Router } from '@angular/router';
@@ -199,11 +199,11 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     </div>
   </div>
 
-  <!-- ROW 2: Handlowcy + Donut -->
-  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;margin-bottom:20px">
+  <!-- ROW 2: Handlowcy + Aktywność -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px" *ngIf="isManager">
 
     <!-- Tabela handlowców -->
-    <div class="card" style="padding:20px" *ngIf="isManager">
+    <div class="card" style="padding:20px">
       <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Wyniki handlowców<wt-tooltip key="crm.leads.reps.title"></wt-tooltip></div>
       <table style="width:100%;border-collapse:collapse;font-size:12.5px">
         <thead>
@@ -244,7 +244,32 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
       </table>
     </div>
 
-    <!-- Źródła leadów (donut) -->
+    <!-- Aktywność handlowców -->
+    <div class="card" style="padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Aktywność handlowców</div>
+        <div style="display:flex;gap:3px">
+          <button class="act-src-btn" [class.act-src-active]="activitySource==='all'"     (click)="setActivitySource('all')">Wszystkie</button>
+          <button class="act-src-btn" [class.act-src-active]="activitySource==='lead'"    (click)="setActivitySource('lead')">Leady</button>
+          <button class="act-src-btn" [class.act-src-active]="activitySource==='partner'" (click)="setActivitySource('partner')">Partnerzy</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px">
+        <button *ngFor="let t of ACTIVITY_TYPES" class="act-type-btn"
+          [style.border-color]="activityTypeFilter.includes(t.key) ? t.color : '#e4e4e7'"
+          [style.opacity]="activityTypeFilter.includes(t.key) ? '1' : '0.4'"
+          (click)="toggleActivityType(t.key)">
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0"
+                [style.background]="t.color"></span>
+          {{ t.label }}
+        </button>
+      </div>
+      <div #activityEl></div>
+    </div>
+  </div>
+
+  <!-- ROW 2b: Źródła leadów (donut) — dla wszystkich -->
+  <div style="display:grid;grid-template-columns:1fr;gap:20px;margin-bottom:20px">
     <div class="card" style="padding:20px">
       <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Źródła leadów<wt-tooltip key="crm.leads.sources.title"></wt-tooltip></div>
       <div style="display:flex;align-items:center;gap:20px">
@@ -309,7 +334,8 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   @ViewChild('donutSvg', { static: false }) donutSvg!: ElementRef;
   @ViewChild('donutLegend',{static:false}) donutLegend!:ElementRef;
   @ViewChild('velocityEl',{static:false}) velocityEl!:ElementRef;
-  @ViewChild('lostEl',   { static: false }) lostEl!:   ElementRef;
+  @ViewChild('lostEl',     { static: false }) lostEl!:     ElementRef;
+  @ViewChild('activityEl', { static: false }) activityEl!: ElementRef;
 
   private api    = inject(CrmApiService);
   private auth   = inject(AuthService);
@@ -337,6 +363,17 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   velocityData:any[] = [];
   stageVelocity: LeadsReportStageVelocity[] = [];
   crmUsers:    CrmUser[] = [];
+
+  activityByRep:    LeadsReportActivityByRep[] = [];
+  activitySource:   'all' | 'lead' | 'partner' = 'all';
+  readonly ACTIVITY_TYPES = [
+    { key: 'call',    label: 'Połączenia', color: '#3B82F6' },
+    { key: 'meeting', label: 'Spotkania',  color: '#22C55E' },
+    { key: 'email',   label: 'Maile',      color: '#3BAA5D' },
+    { key: 'task',    label: 'Zadania',    color: '#A855F7' },
+    { key: 'note',    label: 'Notatki',    color: '#F59E0B' },
+  ];
+  activityTypeFilter: string[] = ['call', 'meeting', 'email', 'task', 'note'];
 
   private chartsBuilt = false;
 
@@ -438,6 +475,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
           this.bySource    = report.by_source || [];
           this.lostReasons = report.lost_reasons || [];
           this.stageVelocity = report.stage_velocity || [];
+          this.activityByRep = report.activity_by_rep || [];
           this.velocityData = this.buildVelocityData();
           this.loading     = false;
           this.cdr.markForCheck();
@@ -476,6 +514,126 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     this.buildDonut();
     this.buildVelocity();
     this.buildLostBars();
+    this.buildActivityChart();
+  }
+
+  setActivitySource(src: 'all' | 'lead' | 'partner'): void {
+    this.activitySource = src;
+    this.cdr.markForCheck();
+    this.buildActivityChart();
+  }
+
+  toggleActivityType(key: string): void {
+    const active = this.activityTypeFilter.includes(key);
+    if (active && this.activityTypeFilter.length === 1) {
+      this.activityTypeFilter = this.ACTIVITY_TYPES.map(t => t.key);
+    } else if (active) {
+      this.activityTypeFilter = this.activityTypeFilter.filter(k => k !== key);
+    } else {
+      this.activityTypeFilter = [...this.activityTypeFilter, key];
+    }
+    this.cdr.markForCheck();
+    this.buildActivityChart();
+  }
+
+  private buildActivityChart(): void {
+    const el = this.activityEl?.nativeElement;
+    if (!el) return;
+    el.innerHTML = '';
+
+    const srcData = this.activitySource === 'all'
+      ? this.activityByRep
+      : this.activityByRep.filter((r: any) => r.source === this.activitySource);
+    const allTypesSelected = this.activityTypeFilter.length === this.ACTIVITY_TYPES.length;
+    const data = allTypesSelected
+      ? srcData
+      : srcData.filter((r: any) => this.activityTypeFilter.includes(r.type));
+
+    if (!data?.length) {
+      el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:32px 0">Brak danych aktywności</div>';
+      return;
+    }
+
+    const TYPE_COLORS: Record<string, string> = {
+      call: '#3B82F6', meeting: '#22C55E', email: '#3BAA5D', task: '#A855F7', note: '#F59E0B',
+    };
+    const TYPE_LABELS: Record<string, string> = {
+      call: 'Połączenia', meeting: 'Spotkania', email: 'Maile', task: 'Zadania', note: 'Notatki',
+    };
+    const TYPE_ORDER = ['call', 'meeting', 'email', 'task', 'note'];
+
+    const repMap = new Map<string, { rep_name: string; types: Record<string, number>; total: number }>();
+    for (const row of data) {
+      const key = row.rep_id ?? row.rep_name;
+      if (!repMap.has(key)) repMap.set(key, { rep_name: row.rep_name, types: {}, total: 0 });
+      const entry = repMap.get(key)!;
+      entry.types[row.type] = (entry.types[row.type] || 0) + (row.count || 0);
+      entry.total += (row.count || 0);
+    }
+
+    const reps = Array.from(repMap.values()).sort((a, b) => b.total - a.total);
+    const typesPresent = TYPE_ORDER.filter(t => reps.some(r => r.types[t]));
+    if (!typesPresent.length) {
+      el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:32px 0">Brak danych aktywności</div>';
+      return;
+    }
+    const maxTotal = reps[0].total || 1;
+
+    const legendDiv = document.createElement('div');
+    legendDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px 10px;margin-bottom:12px;font-size:11px';
+    typesPresent.forEach(t => {
+      const item = document.createElement('span');
+      item.style.cssText = 'display:flex;align-items:center;gap:4px;color:#52525b';
+      item.innerHTML = `<span style="width:8px;height:8px;background:${TYPE_COLORS[t]};border-radius:2px;display:inline-block;flex-shrink:0"></span>${TYPE_LABELS[t] || t}`;
+      legendDiv.appendChild(item);
+    });
+    el.appendChild(legendDiv);
+
+    const rowsDiv = document.createElement('div');
+    rowsDiv.style.cssText = 'display:flex;flex-direction:column;gap:5px';
+
+    reps.forEach(rep => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px';
+
+      const parts = rep.rep_name.split(' ').filter(Boolean);
+      const shortName = parts.length >= 2
+        ? parts[0] + ' ' + parts[parts.length - 1][0] + '.'
+        : rep.rep_name;
+
+      const nameEl = document.createElement('div');
+      nameEl.style.cssText = 'width:90px;font-size:11.5px;color:#374151;font-weight:600;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      nameEl.title       = rep.rep_name;
+      nameEl.textContent = shortName;
+
+      const barOuter = document.createElement('div');
+      barOuter.style.cssText = 'flex:1;background:#f4f4f5;border-radius:4px;height:18px;overflow:hidden';
+
+      const widthPct = Math.max(2, Math.round(rep.total / maxTotal * 100));
+      const barInner = document.createElement('div');
+      barInner.style.cssText = `width:${widthPct}%;height:100%;display:flex`;
+
+      typesPresent.forEach(t => {
+        const val = rep.types[t] || 0;
+        if (!val) return;
+        const seg = document.createElement('div');
+        seg.style.cssText = `flex:${val};height:100%;background:${TYPE_COLORS[t]};opacity:.88`;
+        seg.title = `${TYPE_LABELS[t] || t}: ${val}`;
+        barInner.appendChild(seg);
+      });
+      barOuter.appendChild(barInner);
+
+      const totalEl = document.createElement('div');
+      totalEl.style.cssText = 'width:24px;font-size:11px;font-weight:700;color:#374151;text-align:right;flex-shrink:0';
+      totalEl.textContent = String(rep.total);
+
+      row.appendChild(nameEl);
+      row.appendChild(barOuter);
+      row.appendChild(totalEl);
+      rowsDiv.appendChild(row);
+    });
+
+    el.appendChild(rowsDiv);
   }
 
   private buildFunnel(): void {

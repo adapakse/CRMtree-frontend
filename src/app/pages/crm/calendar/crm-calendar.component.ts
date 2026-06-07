@@ -241,6 +241,7 @@ interface CalendarDay {
               <span style="color:#6b7280;font-weight:500">{{taskTypeName(t.type)}}:</span> {{t.title}}
             </strong>
             <span class="task-status-badge task-st-{{t.status}}">{{taskStatusLabel(t.status)}}</span>
+            <span *ngIf="t.priority" class="priority-badge priority-{{t.priority}}">{{priorityLabel(t.priority)}}</span>
             <span class="task-source-badge task-src-{{t.source_type}}">{{t.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
             <span *ngIf="isTaskReadOnly(t)" style="font-size:9px;color:#9ca3af;font-style:italic">tylko odczyt</span>
           </div>
@@ -480,6 +481,11 @@ interface CalendarDay {
     .task-source-badge { font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px; }
     .task-src-lead { background:#fff7ed;color:#c2410c; }
     .task-src-partner { background:#f0fdf4;color:#166534; }
+    .priority-badge { font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em; }
+    .priority-asap { background:#fee2e2;color:#991b1b; }
+    .priority-important { background:#ffedd5;color:#c2410c; }
+    .priority-medium { background:#fef9c3;color:#854d0e; }
+    .priority-low { background:#dbeafe;color:#1e40af; }
     .task-link { color:#3BAA5D;font-weight:600;text-decoration:none; }
     .task-link:hover { text-decoration:underline; }
   `],
@@ -795,6 +801,11 @@ export class CrmCalendarComponent implements OnInit {
 
   taskStatusLabel(s: string): string {
     return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+  }
+
+  priorityLabel(p: string): string {
+    const map: Record<string, string> = { asap: 'ASAP', important: 'Ważne', medium: 'Średnie', low: 'Niskie' };
+    return map[p] ?? p;
   }
 
   isTaskToday(activityAt: string): boolean {
