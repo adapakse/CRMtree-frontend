@@ -75,6 +75,10 @@ type SortDir = 'asc' | 'desc';
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
       </div>
+      <div *ngIf="p.churn_risk && p.churn_risk !== 'none' && !p.churn_exempt" class="churn-badge churn-{{p.churn_risk}}">
+        🔥 Ryzyko churn: {{churnLabel(p.churn_risk)}}
+        <span *ngIf="p.churn_score != null"> · {{p.churn_score}} pkt</span>
+      </div>
       <div class="pc-contact" *ngIf="p.contact_name">{{p.contact_name}}<span *ngIf="p.contact_title"> · {{p.contact_title}}</span></div>
       <div class="pc-meta">
         <span *ngIf="p.group_name" class="pc-tag">🏢 {{p.group_name}}</span>
@@ -109,7 +113,7 @@ type SortDir = 'asc' | 'desc';
 
   <!-- ══ TABELA ══ -->
   <div *ngIf="!loading && viewMode==='table'" class="table-wrap">
-    <div class="tw-head" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px">
+    <div class="tw-head" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 90px 95px">
       <div class="th sortable" (click)="sortBy('company')">Firma <span class="si">{{sortIcon('company')}}</span></div>
       <div class="th">Status</div>
       <div class="th sortable" (click)="sortBy('industry')">Branża <span class="si">{{sortIcon('industry')}}</span></div>
@@ -118,9 +122,10 @@ type SortDir = 'asc' | 'desc';
       <div class="th sortable" (click)="sortBy('contract_value')">Obrót CRM <span class="si">{{sortIcon('contract_value')}}</span></div>
       <div class="th" title="Obrót brutto YTD z DWH">DWH Obrót</div>
       <div class="th" title="Marża YTD z DWH">DWH Marża</div>
+      <div class="th" title="Ryzyko churn">Churn</div>
       <div class="th sortable" (click)="sortBy('contract_expires')">Umowa do <span class="si">{{sortIcon('contract_expires')}}</span></div>
     </div>
-    <div *ngFor="let p of partners" class="tw-row" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 95px"
+    <div *ngFor="let p of partners" class="tw-row" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 90px 95px"
          (click)="goPartner(p.id, p.crm_uuid)">
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
@@ -150,6 +155,13 @@ type SortDir = 'asc' | 'desc';
         <div class="td td-sm" style="color:#d1d5db">—</div>
         <div class="td td-sm" style="color:#d1d5db">—</div>
       </ng-template>
+      <div class="td">
+        <span *ngIf="p.churn_risk && p.churn_risk !== 'none' && !p.churn_exempt"
+              class="churn-badge churn-{{p.churn_risk}}">
+          {{churnLabel(p.churn_risk)}}
+        </span>
+        <span *ngIf="!p.churn_risk || p.churn_risk === 'none' || p.churn_exempt" style="color:#d1d5db;font-size:12px">—</span>
+      </div>
       <div class="td td-sm" [class.expiring]="isExpiring(p.contract_expires)">
         {{p.contract_expires?(p.contract_expires|date:'dd.MM.yy'):'—'}}
       </div>
@@ -257,6 +269,12 @@ type SortDir = 'asc' | 'desc';
     .pager { display:flex; justify-content:center; gap:12px; align-items:center; padding:12px; flex-shrink:0; }
     .pager button { border:1px solid #e5e7eb; background:white; border-radius:6px; padding:4px 12px; cursor:pointer; }
     .pager button:disabled { opacity:.4; }
+    /* Churn badges */
+    .churn-badge { display:inline-flex; align-items:center; padding:1px 7px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; margin-top:3px; }
+    .churn-critical { background:#fee2e2; color:#991b1b; }
+    .churn-high { background:#ffedd5; color:#c2410c; }
+    .churn-medium { background:#fef9c3; color:#854d0e; }
+    .churn-low { background:#dbeafe; color:#1e40af; }
     /* Side panel */
     .side-panel { position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:100; display:flex; justify-content:flex-end; }
     .side-panel-inner { background:white; width:360px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; }
@@ -395,7 +413,7 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
     const now = new Date();
     const cur = now.toISOString().substring(0, 7);
     const shift = (n: number) => { const d = new Date(now.getFullYear(), now.getMonth() + n, 1); return d.toISOString().substring(0, 7); };
-    this.api.getPartnersReport({ period_from: shift(-11), period_to: cur }).subscribe({
+    this.api.getPartnersReport({ period_from: `${now.getFullYear()}-01`, period_to: cur }).subscribe({
       next: r => this.zone.run(() => {
         const byId   = new Map<number, PartnersReportPartner>();
         const byName = new Map<string, PartnersReportPartner>();
@@ -418,6 +436,16 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
     }
     const name = (p.dwh_company_name || '').trim().toLowerCase();
     return name ? this.salesMapByName.get(name) : undefined;
+  }
+
+  churnLabel(risk: string | null | undefined): string {
+    switch (risk) {
+      case 'critical': return 'Krytyczne';
+      case 'high':     return 'Wysokie';
+      case 'medium':   return 'Średnie';
+      case 'low':      return 'Niskie';
+      default:         return '';
+    }
   }
 
   clearFilters(): void {

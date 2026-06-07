@@ -9,13 +9,15 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent } from '../../../shared/components/badges.components';
+import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 import { DOC_TYPE_MAP, fileSizeLabel, triggerDownload } from '../../../core/services/helpers';
 import { environment } from '../../../../environments/environment';
+import { CrmApiService } from '../../../core/services/crm-api.service';
 
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent],
   template: `
     <div class="overlay open" (click)="onOverlayClick($event)">
       <div class="panel" (click)="$event.stopPropagation()">
@@ -35,7 +37,9 @@ import { environment } from '../../../../environments/environment';
         <div style="padding:16px 24px 0">
           <div class="tabs">
             @for (t of tabs; track t.id) {
-              <button class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">{{ t.label }}</button>
+              <button class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">
+                {{ t.label }}<wt-tooltip [key]="t.tooltip"></wt-tooltip>
+              </button>
             }
           </div>
         </div>
@@ -233,13 +237,12 @@ import { environment } from '../../../../environments/environment';
             </div>
 
             <!-- Tags -->
-            <div class="sec-title" style="margin-top:20px">Tags</div>
+            <div class="sec-title" style="margin-top:20px">Tagi</div>
             @if (tags.length > 0) {
               <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:13px">
                 <thead>
                   <tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
-                    <th style="text-align:left;padding:6px 10px;font-weight:600;color:var(--gray-500);font-size:11px;text-transform:uppercase;width:40%">Key</th>
-                    <th style="text-align:left;padding:6px 10px;font-weight:600;color:var(--gray-500);font-size:11px;text-transform:uppercase">Value</th>
+                    <th style="text-align:left;padding:6px 10px;font-weight:600;color:var(--gray-500);font-size:11px;text-transform:uppercase">Klucz</th>
                     @if (doc._access === 'full') {
                       <th style="width:36px"></th>
                     }
@@ -249,7 +252,6 @@ import { environment } from '../../../../environments/environment';
                   @for (tag of tags; track tag.id) {
                     <tr style="border-bottom:1px solid var(--gray-100)">
                       <td style="padding:7px 10px;color:var(--gray-700);font-weight:600">{{ tag.key }}</td>
-                      <td style="padding:7px 10px;color:var(--gray-700)">{{ tag.value }}</td>
                       @if (doc._access === 'full') {
                         <td style="padding:7px 6px;text-align:center">
                           <span style="cursor:pointer;color:var(--gray-400);font-size:16px;line-height:1" (click)="deleteTag(tag.id)">&times;</span>
@@ -260,14 +262,55 @@ import { environment } from '../../../../environments/environment';
                 </tbody>
               </table>
             } @else {
-              <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:12px">No tags yet.</div>
+              <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:12px">Brak tagów.</div>
             }
             @if (doc._access === 'full') {
               <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-                <input class="fi" style="flex:1;min-width:0;padding:6px 10px;font-size:13px" placeholder="Key (np. contract_id)" [(ngModel)]="newTagKey">
-                <input class="fi" style="flex:1;min-width:0;padding:6px 10px;font-size:13px" placeholder="Value (np. 2024/ABC/001)" [(ngModel)]="newTagValue">
-                <button class="btn btn-g btn-sm" style="white-space:nowrap" (click)="addTag()">+ Add Tag</button>
+                <input class="fi" style="flex:1;min-width:0;padding:6px 10px;font-size:13px" placeholder="Klucz (np. contract_id)" [(ngModel)]="newTagKey">
+                <button class="btn btn-g btn-sm" style="white-space:nowrap" (click)="addTag()">+ Dodaj tag</button>
               </div>
+            }
+
+            <!-- Powiązani Partnerzy -->
+            <div class="sec-title" style="margin-top:20px">Powiązani Partnerzy</div>
+            @if (linkedPartnersLoading) {
+              <div style="font-size:12px;color:var(--gray-400)">Ładowanie…</div>
+            } @else {
+              @if (linkedPartners().length > 0) {
+                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+                  @for (p of linkedPartners(); track p.id) {
+                    <div style="display:flex;align-items:center;gap:8px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px">
+                      <span style="font-size:14px">🤝</span>
+                      <span style="font-size:13px;font-weight:600;flex:1">{{ p.company }}</span>
+                      @if (doc._access === 'full') {
+                        <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:14px;line-height:1" (click)="unlinkPartner(p)" title="Odepnij">✕</button>
+                      }
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:8px">Brak powiązanych partnerów.</div>
+              }
+              @if (doc._access === 'full') {
+                <div style="position:relative;margin-bottom:12px">
+                  <input class="fi" style="width:100%;box-sizing:border-box;padding:6px 10px;font-size:13px"
+                         placeholder="Szukaj partnera po nazwie…"
+                         [(ngModel)]="partnerSearch"
+                         (ngModelChange)="onPartnerSearch($event)"
+                         (blur)="hidePartnerDropdown()">
+                  @if (partnerDropdown().length > 0) {
+                    <div style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px">
+                      @for (p of partnerDropdown(); track p.id) {
+                        <div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--gray-100)"
+                             (mousedown)="linkPartner(p)">
+                          <div style="font-weight:500;font-size:13px">{{ p.company }}</div>
+                          @if (p.nip) { <div style="font-size:11px;color:var(--gray-400)">NIP: {{ p.nip }}</div> }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
             }
 
             @if (doc.document_group_name) {
@@ -277,25 +320,36 @@ import { environment } from '../../../../environments/environment';
             }
           }
 
-          <!-- PDF PREVIEW -->
+          <!-- DOKUMENT GŁÓWNY -->
           @if (activeTab === 'preview') {
             @if (doc.blob_name) {
-              <div style="background:var(--gray-100);border-radius:8px;overflow:hidden;height:600px;position:relative">
-                @if (previewLoading()) {
-                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--gray-100)">
-                    <div class="spinner"></div>
+              @if (!isPdf) {
+                <div class="empty-state">
+                  <div class="empty-icon">📄</div>
+                  <div class="empty-title">Brak podglądu</div>
+                  <div style="font-size:12.5px;color:var(--gray-400);margin-top:6px;text-align:center;max-width:320px">
+                    Brak podglądu dla formatu innego niż PDF.<br>Pobierz plik na dysk w celu podglądu.
                   </div>
-                }
-                @if (previewError()) {
-                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-500)">
-                    <span style="font-size:32px">⚠️</span>
-                    <span style="font-size:13px">{{ previewError() }}</span>
-                  </div>
-                }
-                @if (previewBlobUrl()) {
-                  <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" title="PDF Preview"></iframe>
-                }
-              </div>
+                  <button class="btn btn-g" style="margin-top:14px" (click)="downloadDoc()">⬇ Pobierz plik</button>
+                </div>
+              } @else {
+                <div style="background:var(--gray-100);border-radius:8px;overflow:hidden;height:600px;position:relative">
+                  @if (previewLoading()) {
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--gray-100)">
+                      <div class="spinner"></div>
+                    </div>
+                  }
+                  @if (previewError()) {
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-500)">
+                      <span style="font-size:32px">⚠️</span>
+                      <span style="font-size:13px">{{ previewError() }}</span>
+                    </div>
+                  }
+                  @if (previewBlobUrl()) {
+                    <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" title="PDF Preview"></iframe>
+                  }
+                </div>
+              }
             } @else {
               <div class="empty-state">
                 <div class="empty-icon">📎</div>
@@ -505,13 +559,13 @@ import { environment } from '../../../../environments/environment';
           @if (doc._access === 'full' && doc.blob_name) {
             <button class="btn btn-g" (click)="downloadDoc()">⬇ Download</button>
           }
-          @if (doc._access === 'full') {
+          @if (doc._access === 'full' && activeTab === 'overview') {
             <button class="btn btn-d" (click)="deleteDoc()">🗑 Delete</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
             <button class="btn btn-p" (click)="saveDoc()">💾 Save</button>
           }
-          <button class="btn btn-g" (click)="close.emit()">Cancel</button>
+          <button class="btn btn-g" (click)="close.emit()">Zamknij</button>
         </div>
       </div>
     </div>
@@ -537,7 +591,7 @@ import { environment } from '../../../../environments/environment';
             </div>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
-            <button class="btn btn-g" (click)="signusOpen = false">Cancel</button>
+            <button class="btn btn-g" (click)="signusOpen = false">Zamknij</button>
             <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">Send to Signus →</button>
           </div>
         </div>
@@ -580,6 +634,7 @@ export class DetailPanelComponent implements OnChanges {
   private sanitizer   = inject(DomSanitizer);
   private cdr         = inject(ChangeDetectorRef);
   private settingsSvc = inject(AppSettingsService);
+  private crmApi      = inject(CrmApiService);
   auth                = inject(AuthService);
 
   get entity1Options(): string[] {
@@ -685,22 +740,33 @@ export class DetailPanelComponent implements OnChanges {
   get activeTab(): string { return this._activeTab; }
   set activeTab(v: string) {
     this._activeTab = v;
-    if (v === 'preview'     && this.doc?.blob_name) this.loadPreview();
+    if (v === 'overview')    this.loadLinkedPartners();
+    if (v === 'preview'     && this.doc?.blob_name && this.isPdf) this.loadPreview();
     if (v === 'attachments') this.loadAttachments();
     if (v === 'history')     this.loadHistory();
   }
   tabs = [
-    { id: 'overview',  label: 'Overview' },
-    { id: 'preview',   label: 'PDF Preview' },
-    { id: 'versions',  label: 'Versions' },
-    { id: 'history',   label: 'History' },
-    { id: 'attachments',  label: 'Attachments' },
-    { id: 'workflow',  label: 'Workflow' },
+    { id: 'overview',    label: 'Szczegóły',       tooltip: 'docs.tab.overview' },
+    { id: 'preview',     label: 'Dokument główny', tooltip: 'docs.tab.preview' },
+    { id: 'versions',    label: 'Wersje',          tooltip: 'docs.tab.versions' },
+    { id: 'history',     label: 'Historia',        tooltip: 'docs.tab.history' },
+    { id: 'attachments', label: 'Załączniki',      tooltip: 'docs.tab.attachments' },
+    { id: 'workflow',    label: 'Workflow',         tooltip: 'docs.tab.workflow' },
   ];
 
+  get isPdf(): boolean {
+    return (this.doc?.blob_name ?? '').toLowerCase().endsWith('.pdf');
+  }
+
   newTagKey   = '';
-  newTagValue = '';
   signusOpen  = false;
+
+  // ── Powiązani Partnerzy ─────────────────────────────────────────────────────
+  linkedPartners      = signal<any[]>([]);
+  linkedPartnersLoading = false;
+  partnerSearch        = '';
+  partnerDropdown      = signal<any[]>([]);
+  private partnerSearchTimer: ReturnType<typeof setTimeout> | null = null;
   signusEmails = '';
 
   wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
@@ -824,6 +890,9 @@ export class DetailPanelComponent implements OnChanges {
 
     this.doc = { ...this.document };
     this.ownerSearch = this.document.owner_name ?? '';
+    this.linkedPartners.set([]);
+    this.partnerSearch = '';
+    this.partnerDropdown.set([]);
     this.initDraft();
     this.activeTab = 'overview';
     this.cdr.markForCheck();
@@ -848,12 +917,12 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   addTag(): void {
-    if (!this.newTagKey.trim() || !this.newTagValue.trim()) return;
-    this.docSvc.addTag(this.doc.id, this.newTagKey.trim(), this.newTagValue.trim()).subscribe(tag => {
+    if (!this.newTagKey.trim()) return;
+    this.docSvc.addTag(this.doc.id, this.newTagKey.trim(), '').subscribe(tag => {
       this.doc = { ...this.doc, tags: [...(this.doc.tags ?? []), tag] };
-      this.newTagKey = ''; this.newTagValue = '';
+      this.newTagKey = '';
       this.cdr.markForCheck();
-      this.toast.success('Tag added');
+      this.toast.success('Tag dodany');
     });
   }
 
@@ -1017,6 +1086,55 @@ export class DetailPanelComponent implements OnChanges {
 
   hideOwnerDropdown(): void {
     setTimeout(() => this.ownerDropdown.set([]), 200);
+  }
+
+  onOwnerFocus(): void {
+    if (!this.ownerSearch && this.ownerDropdown().length === 0) {
+      this.userSvc.search('').subscribe(users => this.ownerDropdown.set(users.slice(0, 20)));
+    }
+  }
+
+  loadLinkedPartners(): void {
+    this.linkedPartnersLoading = true;
+    this.crmApi.getDocumentLinkedPartners(this.doc.id).subscribe({
+      next: list => { this.linkedPartners.set(list); this.linkedPartnersLoading = false; this.cdr.markForCheck(); },
+      error: () => { this.linkedPartnersLoading = false; this.cdr.markForCheck(); },
+    });
+  }
+
+  onPartnerSearch(q: string): void {
+    if (!q || q.length < 2) { this.partnerDropdown.set([]); return; }
+    if (this.partnerSearchTimer) clearTimeout(this.partnerSearchTimer);
+    this.partnerSearchTimer = setTimeout(() => {
+      this.crmApi.getPartners({ search: q, limit: 10 }).subscribe(res => {
+        this.partnerDropdown.set(res.data ?? []);
+        this.cdr.markForCheck();
+      });
+    }, 300);
+  }
+
+  hidePartnerDropdown(): void {
+    setTimeout(() => this.partnerDropdown.set([]), 200);
+  }
+
+  linkPartner(p: any): void {
+    this.crmApi.linkDocumentPartner(this.doc.id, p.id).subscribe({
+      next: () => {
+        this.partnerSearch = '';
+        this.partnerDropdown.set([]);
+        this.loadLinkedPartners();
+        this.toast.success(`Powiązano z ${p.company}`);
+      },
+      error: () => this.toast.error('Błąd powiązania z partnerem'),
+    });
+  }
+
+  unlinkPartner(p: any): void {
+    if (!confirm(`Odpiąć partnera "${p.company}"?`)) return;
+    this.crmApi.unlinkDocumentPartner(this.doc.id, p.id).subscribe({
+      next: () => { this.loadLinkedPartners(); this.toast.success('Odpięto partnera'); },
+      error: () => this.toast.error('Błąd odpinania partnera'),
+    });
   }
 
   onExpDateModeChange(): void {

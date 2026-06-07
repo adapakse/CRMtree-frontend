@@ -82,6 +82,10 @@ export interface LeadActivity {
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
   is_read: boolean | null;
+  priority?: string | null;
+  reminder_type?: string | null;
+  reminder_at?: string | null;
+  reminder_sent?: boolean | null;
 }
 
 export interface CalendarMeeting {
@@ -129,6 +133,7 @@ export interface ActivityTask {
   assigned_to_id: string | null;
   act_assigned_to_name: string | null;
   act_assigned_to_id: string | null;
+  priority?: string | null;
 }
 
 
@@ -260,6 +265,15 @@ export interface Partner {
   activities?: PartnerActivity[];
   open_opportunities?: Opportunity[];
   all_opportunities?: PartnerActivity[];
+  // ── Churn & Health Score ────────────────────────────────────────────────────
+  churn_exempt?: boolean;
+  churn_score?: number | null;
+  churn_risk?: string | null;
+  churn_analyzed_at?: string | null;
+  churn_days_since_order?: number | null;
+  churn_sales_drop_pct?: number | null;
+  health_score?: number | null;
+  health_level?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -287,6 +301,10 @@ export interface PartnerActivity {
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
   is_read: boolean;
+  priority?: string | null;
+  reminder_type?: string | null;
+  reminder_at?: string | null;
+  reminder_sent?: boolean | null;
 }
 
 export interface OnboardingTask {
@@ -321,6 +339,7 @@ export interface OnboardingPartner {
   manager_name: string | null;
   task_count: number;
   done_count: number;
+  lead_id?: string | null;
 }
 
 export interface OnboardingTaskTemplate {
@@ -465,15 +484,23 @@ export interface LeadsReportByRep    { rep_name: string; rep_id: string; total: 
 export interface LeadsReportBySource { source: string; count: number; won_count: number; won_value: number; }
 export interface LeadsReportLostReason { reason: string; count: number; }
 export interface LeadsReportStageVelocity { stage: string; count: number; avg_days: number; }
+export interface LeadsReportActivityByRep {
+  rep_name: string;
+  rep_id:   string;
+  type:     string;
+  source:   string;
+  count:    number;
+}
 
 export interface LeadsReport {
-  kpi: LeadsReportKpi;
-  funnel: LeadsReportFunnel[];
-  monthly: LeadsReportMonthly[];
-  by_rep: LeadsReportByRep[];
-  by_source: LeadsReportBySource[];
-  lost_reasons: LeadsReportLostReason[];
-  stage_velocity: LeadsReportStageVelocity[];
+  kpi:              LeadsReportKpi;
+  funnel:           LeadsReportFunnel[];
+  monthly:          LeadsReportMonthly[];
+  by_rep:           LeadsReportByRep[];
+  by_source:        LeadsReportBySource[];
+  lost_reasons:     LeadsReportLostReason[];
+  stage_velocity:   LeadsReportStageVelocity[];
+  activity_by_rep?: LeadsReportActivityByRep[];
 }
 
 // ── Raporty Partnerzy ────────────────────────────────────────────────────────
@@ -482,7 +509,7 @@ export interface PartnersReportKpi {
   transactions_count: number; pax_count: number; margin_pct: number; fee_rate_pct: number; partners_count: number;
 }
 export interface PartnersReportTrend   { period: string; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number; }
-export interface PartnersReportPartner { partner_name: string; partner_number: string | null; partner_id: number | null; salesperson_name: string | null; salesperson_id: string | null; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; }
+export interface PartnersReportPartner { partner_name: string; partner_number: string | null; partner_id: string | null; dwh_partner_id: number | null; salesperson_name: string | null; salesperson_id: string | null; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; activity_score: number; growth_score: number; health_score: number; health_level: 'good' | 'warning' | 'risk'; }
 export interface PartnersReportProduct { product_type: string; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; }
 export interface PartnersReportByRep   { salesperson_name: string; salesperson_id: string | null; partners_count: number; gross_turnover_pln: number; net_turnover_pln: number; fees_pln: number; revenue_pln: number; transactions_count: number; pax_count: number; }
 export interface PartnersReport {
@@ -497,6 +524,22 @@ export interface PartnersReport {
 }
 
 
+
+// ── Zgody marketingowe ───────────────────────────────────────────────────────
+export interface ConsentType {
+  key: string;
+  label: string;
+  description: string;
+}
+
+export interface ConsentValue {
+  consent_key: string;
+  label: string;
+  description: string;
+  value: 'no_data' | 'granted' | 'denied';
+  updated_by_name: string | null;
+  updated_at: string | null;
+}
 
 export interface SalesSummaryRow {
   period: string;
@@ -610,6 +653,51 @@ export interface SalesBudget {
 }
 
 // ── Gmail ─────────────────────────────────────────────────────────────────────
+
+export interface EmailTemplate {
+  id: string;
+  user_id: string;
+  name: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChurnPartner {
+  partner_id:       string;
+  company:          string;
+  display_name:     string;
+  manager_id:       string;
+  salesperson_id:   string;
+  salesperson_name: string;
+  last_date:        string | null;
+  days_since_order: number | null;
+  sales_m1:         number;
+  sales_m2:         number;
+  sales_drop_pct:   number;
+  days_score:       number;
+  sales_score:      number;
+  total_score:      number;
+  risk_level:       'critical' | 'high' | 'medium' | 'low';
+}
+
+export interface ChurnSettings {
+  days_t1_min:   number;
+  days_t1_max:   number;
+  days_t1_pts:   number;
+  days_t2_min:   number;
+  days_t2_max:   number;
+  days_t2_pts:   number;
+  days_t3_pts:   number;
+  sales_t1_pct:  number;
+  sales_t2_pct:  number;
+  sales_t1_pts:  number;
+  sales_t2_pts:  number;
+  risk_critical: number;
+  risk_high:     number;
+  risk_medium:   number;
+  risk_low:      number;
+}
 
 export interface GmailMessage {
   id: string;
@@ -726,6 +814,18 @@ export const LEAD_SOURCES: LeadSource[] = [
   { value: 'GoogleAds_PMax',     label: 'Google Ads PMax',      group: 'Marketing' },
   { value: 'GoogleAds_SEA_Brand',label: 'Google Ads SEA Brand', group: 'Marketing' },
 ];
+
+export interface AnalyticsPeriod {
+  kpi:        { gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number; margin_pct: number; partners_count: number };
+  trend:      { period: string; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+  by_partner: { partner_name: string; partner_id: string|null; dwh_partner_id: number|null; salesperson_name: string|null; group_name: string|null; industry: string|null; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+  by_product: { product_type: string; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+  by_rep:     { salesperson_name: string; salesperson_id: string|null; partners_count: number; gross_turnover_pln: number; net_turnover_pln: number; revenue_pln: number; transactions_count: number }[];
+}
+export interface PartnersAnalytics {
+  a: AnalyticsPeriod;
+  b: AnalyticsPeriod | null;
+}
 
 // ─────────────────────────────────────────────────────────────────
 // Service
@@ -995,6 +1095,23 @@ export class CrmApiService {
   }
 
 
+  // ── Zgody marketingowe ────────────────────────────────────────
+  getConsentTypes(): Observable<ConsentType[]> {
+    return this.http.get<ConsentType[]>(`${BASE}/consents/types`);
+  }
+  getLeadConsents(leadId: number): Observable<ConsentValue[]> {
+    return this.http.get<ConsentValue[]>(`${BASE}/consents/leads/${leadId}`);
+  }
+  saveLeadConsents(leadId: number, items: { key: string; value: string }[]): Observable<ConsentValue[]> {
+    return this.http.put<ConsentValue[]>(`${BASE}/consents/leads/${leadId}`, items);
+  }
+  getPartnerConsents(partnerId: string): Observable<ConsentValue[]> {
+    return this.http.get<ConsentValue[]>(`${BASE}/consents/partners/${partnerId}`);
+  }
+  savePartnerConsents(partnerId: string, items: { key: string; value: string }[]): Observable<ConsentValue[]> {
+    return this.http.put<ConsentValue[]>(`${BASE}/consents/partners/${partnerId}`, items);
+  }
+
   // ── Słownik Źródeł (z app_settings) ─────────────────────────
   getLeadSources(): Observable<LeadSource[]> {
     return this.http.get<LeadSource[]>(`${BASE}/leads/sources`);
@@ -1040,6 +1157,17 @@ export class CrmApiService {
     admin_first_name: string; admin_last_name: string; admin_email: string;
   }): Observable<any> {
     return this.http.post<any>(`${BASE}/leads/${leadId}/test-account`, data);
+  }
+
+  // ── Powiązania dokument ↔ partner ──────────────────────────
+  getDocumentLinkedPartners(docId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${BASE}/documents/${docId}/partners`);
+  }
+  linkDocumentPartner(docId: string, partnerId: number | string): Observable<any> {
+    return this.http.post<any>(`${BASE}/documents/${docId}/partners`, { partner_id: partnerId });
+  }
+  unlinkDocumentPartner(docId: string, partnerId: number | string): Observable<void> {
+    return this.http.delete<void>(`${BASE}/documents/${docId}/partners/${partnerId}`);
   }
 
   // ── Dokumenty powiązane z Partnerem ───────────────────────
@@ -1169,6 +1297,40 @@ export class CrmApiService {
       `${BASE}/gmail/attachment/${messageId}/${attachmentId}`,
       { params, responseType: 'blob' },
     );
+  }
+
+  // ── Partners Analytics (DWH) ─────────────────────────────────────────────
+  getPartnersAnalytics(p: {
+    period_from?: string; period_to?: string;
+    compare_from?: string; compare_to?: string;
+    rep_id?: string; service_category?: string;
+  } = {}): Observable<PartnersAnalytics> {
+    return this.http.get<PartnersAnalytics>(`${BASE}/sales-data/analytics`, { params: this.toParams(p) });
+  }
+
+  // ── Churn Analytics ───────────────────────────────────────────────────────
+  getChurnData(params: { partner_name?: string; salesperson_id?: string; risk_level?: string; partner_id?: string } = {}): Observable<{ rows: ChurnPartner[]; settings: ChurnSettings }> {
+    return this.http.get<{ rows: ChurnPartner[]; settings: ChurnSettings }>(`${BASE}/churn`, { params: this.toParams(params) });
+  }
+  generateChurnTasks(): Observable<{ created: number; skipped: number; total: number; errors?: any[] }> {
+    return this.http.post<{ created: number; skipped: number; total: number; errors?: any[] }>(`${BASE}/churn/generate`, {});
+  }
+  computeScores(): Observable<{ computed: number; message?: string }> {
+    return this.http.post<{ computed: number; message?: string }>(`${BASE}/churn/compute`, {});
+  }
+
+  // ── Szablony emaili użytkownika ───────────────────────────────────────────
+  getEmailTemplates(): Observable<EmailTemplate[]> {
+    return this.http.get<EmailTemplate[]>(`${environment.apiUrl}/profile/email-templates`);
+  }
+  createEmailTemplate(data: { name: string; body: string }): Observable<EmailTemplate> {
+    return this.http.post<EmailTemplate>(`${environment.apiUrl}/profile/email-templates`, data);
+  }
+  updateEmailTemplate(id: string, data: { name: string; body: string }): Observable<EmailTemplate> {
+    return this.http.put<EmailTemplate>(`${environment.apiUrl}/profile/email-templates/${id}`, data);
+  }
+  deleteEmailTemplate(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/profile/email-templates/${id}`);
   }
 
   // ── Google Drive Picker ────────────────────────────────────────────────────

@@ -1,13 +1,16 @@
 // src/app/pages/crm/partners/crm-partner-detail.component.ts
 import { Component, OnInit, OnDestroy, inject, Input, ChangeDetectorRef, NgZone } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult } from '../../../core/services/crm-api.service';
+import { finalize, catchError } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, ChurnPartner, ConsentValue, ConsentType } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
+import { QuillModule } from 'ngx-quill';
 
 function getMonthRange(preset: string): { from: string; to: string } {
   const now = new Date();
@@ -25,7 +28,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
 @Component({
   selector: 'wt-crm-partner-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule],
   template: `
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
@@ -36,6 +39,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </span>
     <span class="pbadge pbadge-{{partner.status}}">{{statusLabel(partner.status)}}</span>
     <span class="group-badge" *ngIf="partner.group_name">🏢 {{partner.group_name}}</span>
+    <span *ngIf="partner.churn_risk && partner.churn_risk !== 'none'"
+          class="churn-hdr-badge churn-hdr-{{partner.churn_risk}}"
+          [title]="churnBadgeTitle(partner)">
+      🔥 Churn: {{churnLabel(partner.churn_risk)}}
+    </span>
     <button class="btn-outline" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj partnera' : 'Brak uprawnień do edycji tego partnera'">✏️ Edytuj</button>
   </div>
 
@@ -164,9 +172,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
   </div>
 
-  <div class="detail-body">
-    <div class="info-card">
-      <h3>Informacje</h3>
+  <div class="detail-body" [class.left-collapsed]="leftCollapsed">
+    <div class="info-card" [class.is-collapsed]="leftCollapsed">
+      <div class="left-panel-hdr">
+        <h3 *ngIf="!leftCollapsed" style="margin:0;font-size:13px;font-weight:700;color:#374151">Informacje</h3>
+        <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed?'Rozwiń panel':'Zwiń panel'">{{leftCollapsed?'›':'‹'}}</button>
+      </div>
+      <ng-container *ngIf="!leftCollapsed">
       <div class="info-grid">
         <span class="lbl">CRMtree ID</span>
         <span>
@@ -365,49 +377,96 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span class="opp-due" *ngIf="o.opp_due_date">do {{o.opp_due_date | date:'dd.MM.yy'}}</span>
         </div>
       </div>
+      </ng-container>
     </div>
 
     <div class="activities-card">
       <!-- Pasek tabów -->
       <div class="mid-tabs">
-        <button class="tab-btn" [class.active]="midTab==='activities'" (click)="midTab='activities'">
-          Aktywności
+        <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
+          Wszystkie
           <wt-activity-count-badge [activities]="partner.activities||[]"></wt-activity-count-badge>
         </button>
+        <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">Zadania</button>
+        <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">Notatki</button>
+        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
+        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
-          📧 Maile
+          Maile
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='history'" (click)="midTab='history'; loadHistory()">Historia zmian</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
-      <div *ngIf="midTab==='activities'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:0">
-        <div *ngIf="canEdit" style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn-sm" (click)="openNewActivityForm()">+ Dodaj</button>
+      <div *ngIf="midTab!=='emails'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
         <div class="new-activity-form" *ngIf="showNewActivity">
-          <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
-            <option value="call">📞 Połączenie</option>
-            <option value="meeting">🤝 Spotkanie</option>
-            <option value="note">📝 Notatka</option>
-            <option value="training">🎓 Szkolenie</option>
-            <option value="qbr">📊 QBR</option>
-            <option value="opportunity">💡 Szansa</option>
-          </select>
-          <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
-          <ng-container *ngIf="actForm.type !== 'email'">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Data i czas
-                <input type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
-              </label>
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Przypisz do
-                <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px"><option value="">— ja (domyślnie) —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>
-              </label>
+          <!-- Typ + tytuł -->
+          <div style="display:grid;grid-template-columns:140px 1fr;gap:6px">
+            <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
+              <option *ngFor="let t of actTypeOptions" [value]="t.value">{{t.label}}</option>
+            </select>
+            <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" placeholder="Temat spotkania *" class="act-input">
+            <ng-container *ngIf="actForm.type!=='meeting'">
+              <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
+            </ng-container>
+          </div>
+          <!-- Termin z presetami -->
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <button *ngFor="let p of computedDueDatePresets" type="button"
+                      (click)="selectDueDatePreset(p.value)"
+                      style="font-size:11px;padding:2px 8px;border-radius:12px;border:1px solid;cursor:pointer;transition:all .12s"
+                      [style.background]="actDueDatePreset===p.value ? '#3BAA5D' : 'white'"
+                      [style.color]="actDueDatePreset===p.value ? 'white' : '#6b7280'"
+                      [style.border-color]="actDueDatePreset===p.value ? '#3BAA5D' : '#e5e7eb'">
+                {{p.label}}
+              </button>
+              <button *ngIf="actDueDatePreset" type="button" (click)="clearDueDate()"
+                      style="font-size:11px;padding:2px 6px;border-radius:12px;border:1px solid #e5e7eb;background:white;color:#9ca3af;cursor:pointer">✕</button>
             </div>
-          </ng-container>
+            <div *ngIf="actDueDatePreset" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:11px;color:#9ca3af">Godzina:</span>
+              <button *ngFor="let h of ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00']" type="button"
+                      (click)="setActDueDateHour(h)"
+                      style="font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid;cursor:pointer;transition:all .12s"
+                      [style.background]="actDueDateHour===h ? '#3BAA5D' : 'white'"
+                      [style.color]="actDueDateHour===h ? 'white' : '#6b7280'"
+                      [style.border-color]="actDueDateHour===h ? '#3BAA5D' : '#e5e7eb'">{{h}}</button>
+            </div>
+            <input *ngIf="!actDueDatePreset" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
+            <div *ngIf="actDueDateSelectedLabel" style="font-size:11px;color:#3BAA5D;font-weight:600">📅 {{actDueDateSelectedLabel}}</div>
+          </div>
+          <!-- Przypisz + przypomnienie + priorytet -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Przypisz do
+              <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px">
+                <option value="">— ja (domyślnie) —</option>
+                <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+              </select>
+            </label>
+            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Przypomnienie
+              <select [(ngModel)]="actReminderType" class="act-sel" style="font-size:11px">
+                <option value="">— brak —</option>
+                <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
+              </select>
+            </label>
+            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              Priorytet
+              <select [(ngModel)]="actForm.priority" class="act-sel" style="font-size:11px">
+                <option value="">— brak —</option>
+                <option value="asap">ASAP</option>
+                <option value="important">Ważne</option>
+                <option value="medium">Średnie</option>
+                <option value="low">Niskie</option>
+              </select>
+            </label>
+          </div>
+          <!-- Spotkanie: miejsce + uczestnicy -->
           <ng-container *ngIf="actForm.type === 'meeting'">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
               <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
@@ -442,38 +501,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
             </label>
           </ng-container>
-          <ng-container *ngIf="actForm.type === 'opportunity'">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Status szansy
-                <select [(ngModel)]="actForm.opp_status" class="act-input" style="font-size:11px">
-                  <option value="new">Nowa</option>
-                  <option value="in_progress">W trakcie</option>
-                  <option value="closed">Zamknięta</option>
-                </select>
-              </label>
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Termin
-                <input type="date" [(ngModel)]="actForm.opp_due_date" class="act-input" style="font-size:11px">
-              </label>
-            </div>
-            <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Wartość
-                <input type="number" min="0" step="0.01" [(ngModel)]="actForm.opp_value" placeholder="0.00" class="act-input" style="font-size:11px">
-              </label>
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-                Waluta
-                <select [(ngModel)]="actForm.opp_currency" class="act-input" style="font-size:11px">
-                  <option value="PLN">PLN</option>
-                  <option value="EUR">EUR</option>
-                  <option value="USD">USD</option>
-                  <option value="GBP">GBP</option>
-                </select>
-              </label>
-            </div>
-          </ng-container>
-          <textarea [(ngModel)]="actForm.body" placeholder="Treść / opis…" rows="2" class="act-input"></textarea>
+          <!-- Treść Quill -->
+          <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules"
+                        style="background:white" placeholder="Treść / opis…"></quill-editor>
           <div class="act-actions">
             <button class="btn-sm" (click)="showNewActivity = false">Anuluj</button>
             <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
@@ -481,79 +511,178 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </button>
           </div>
         </div>
-        <div class="activity-list">
-          <div *ngFor="let a of sortedActivities" class="act-item"
-               [class.act-closed]="a.status==='closed'"
-               [class.act-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
-               [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
-               style="cursor:pointer" (click)="openActModal(a)">
-            <span class="act-icon">{{actIcon(a.type)}}</span>
-            <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                <strong>{{actTypeName(a.type)}}: {{a.title}}</strong>
-                <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
-              </div>
-              <div class="act-meta">
-                <span *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}} · </span>
-                <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-                <span *ngIf="!a.assigned_to_name">{{a.created_by_name}}</span>
-              </div>
-              <div *ngIf="a.body" class="act-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px">{{stripHtml(a.body)}}</div>
+        <!-- Karty aktywności -->
+        <div *ngFor="let a of filteredActivities" class="act-card"
+             [class.act-closed]="a.status==='closed'"
+             [class.act-card-expanded]="isActExpanded(a.id)"
+             [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
+             (click)="toggleActExpand(a.id)">
+          <div class="act-card-header">
+            <span style="font-size:18px;flex-shrink:0">{{actIcon(a.type)}}</span>
+            <div class="act-card-meta">
+              <span class="act-card-title">{{a.title}}</span>
+              <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
+              <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+            </div>
+            <div class="act-card-controls" (click)="$event.stopPropagation()">
+              <button class="act-ctrl-btn" (click)="openActModal(a)" title="Szczegóły">↗</button>
+              <button *ngIf="canEditActivity(a)" class="act-ctrl-btn" (click)="startInlineEdit(a)" title="Edytuj">✏️</button>
             </div>
           </div>
-          <div class="empty-act" *ngIf="!sortedActivities.length">Brak aktywności.</div>
+          <div *ngIf="a.body && !isActExpanded(a.id)" class="act-body-clamp" [innerHTML]="a.body"></div>
+          <div *ngIf="a.body && isActExpanded(a.id)" style="font-size:12px;color:#374151;margin-top:6px" [innerHTML]="a.body"></div>
+          <div *ngIf="canEdit && a.type==='task' && inlineEditActId!==a.id" class="task-actions-row" (click)="$event.stopPropagation()">
+            <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ Zamknij zadanie</button>
+            <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ Otwórz ponownie</button>
+          </div>
+          <!-- Inline edit -->
+          <div *ngIf="inlineEditActId===a.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
+            <input [(ngModel)]="inlineEditForm.title" class="act-input" placeholder="Tytuł *">
+            <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" style="background:white" placeholder="Treść…"></quill-editor>
+            <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <button class="btn-sm" (click)="cancelInlineEdit()">Anuluj</button>
+              <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="!inlineEditForm.title||savingActivity">{{savingActivity?'…':'Zapisz'}}</button>
+            </div>
+          </div>
         </div>
+        <div class="empty-act" *ngIf="!filteredActivities.length">Brak aktywności.</div>
       </div>
 
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
-      <div *ngIf="midTab==='emails'" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-        <div *ngIf="canEdit" style="display:flex;justify-content:flex-end;padding:10px 12px 0;flex-shrink:0">
-          <button class="btn-sm" (click)="openEmailModal()">✉️ Wyślij</button>
+      <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+        <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
+          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" (click)="openEmailCompose()">+ Nowy email</button>
         </div>
-        <!-- Lista emaili -->
-        <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:0;min-width:0">
-          <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „✉️ Wyślij".</div>
-          <div *ngFor="let a of emailActivities"
-               class="act-item"
-               style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer"
-               [style.border-left]="selectedEmailActivity?.id===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'"
-               [style.background]="selectedEmailActivity?.id===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
-               (click)="selectEmailForPanel(a)">
-            <span class="act-icon">📧</span>
+
+        <!-- INLINE COMPOSE -->
+        <div *ngIf="showEmailCompose" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ Nowy email</div>
+            <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
+          </div>
+          <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" style="text-align:center;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="font-size:32px">📧</div>
+            <div style="font-size:14px;font-weight:700;color:#18181b">Konto Gmail niepołączone</div>
+            <div style="font-size:12px;color:#6b7280">Aby wysyłać emaile bezpośrednio z CRM, połącz swoje konto Gmail.</div>
+            <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">🔗 Połącz konto Gmail</button>
+          </div>
+          <ng-container *ngIf="gmailConnected || settings.settings().crm_training_mode">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;flex:1;min-width:0">✅ Wysyłam z: <strong>{{gmailEmail}}</strong></div>
+              <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;flex:1;min-width:0">🎓 Tryb szkoleniowy</div>
+              <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
+                      style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
+                <option value="">— brak szablonu —</option>
+                <option *ngFor="let t of emailTemplates" [value]="t.id">{{t.name}}</option>
+              </select>
+            </div>
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+              <div class="participant-chips">
+                <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
+                <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" placeholder="email@firma.pl" autocomplete="off">
+                <div *ngIf="showRecipientSug" class="suggest-dropdown">
+                  <div *ngFor="let s of recipientSuggestions" class="suggest-item" (mousedown)="pickRecipientSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
+                </div>
+              </div>
+            </label>
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+              <div class="participant-chips">
+                <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button></span>
+                <input class="participant-input" [(ngModel)]="ccQuery" (input)="onCcInput()" (keydown.enter)="addCc()" (keydown.Tab)="addCc()" (blur)="showCcSug=false" placeholder="dw@firma.pl" autocomplete="off">
+                <div *ngIf="showCcSug" class="suggest-dropdown">
+                  <div *ngFor="let s of ccSuggestions" class="suggest-item" (mousedown)="pickCcSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
+                </div>
+              </div>
+            </label>
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
+              <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
+            </label>
+            <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" placeholder="Treść wiadomości…" style="display:block" theme="snow"></quill-editor>
+            <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
+              <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
+            </div>
+            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <span>⚠️ Wymagane ponowne połączenie Gmail</span>
+              <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="font-size:11px;padding:3px 10px;border:1px solid #fb923c;border-radius:5px;background:#fff;color:#ea580c;cursor:pointer">Połącz ponownie</button>
+            </div>
+            <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+              <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+            </div>
+            <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <button class="btn-sm" (click)="showEmailCompose=false">Anuluj</button>
+              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}</button>
+            </div>
+          </ng-container>
+        </div>
+
+        <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „+ Nowy email".</div>
+
+        <!-- Email cards — expand/collapse inline -->
+        <div *ngFor="let a of emailActivities" style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;background:white"
+             [style.border-left]="expandedEmailId===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'">
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
+               [style.background]="expandedEmailId===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
+               (click)="toggleEmailExpand(a)">
+            <span style="font-size:16px;flex-shrink:0">📧</span>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px">
-                <strong style="flex:1">{{a.title}}</strong>
-                <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0" title="Nieprzeczytana"></span>
+                <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
+                <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
               </div>
-              <div class="act-meta">
-                <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}} · </span>
-                <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
-                <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
-                <span *ngIf="!a.assigned_to_name && !a.created_by_name" style="color:#ef4444">↩ Odpowiedź</span>
+              <div style="font-size:10px;color:#9ca3af;margin-top:1px">
+                <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
+                <span *ngIf="a.created_by_name"> · {{a.created_by_name}}</span>
+                <span *ngIf="!a.created_by_name && !a.assigned_to_name" style="color:#ef4444"> ↩ Odpowiedź</span>
               </div>
-              <div class="act-text" *ngIf="a.body" style="margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{stripHtml(a.body)}}</div>
+            </div>
+            <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
+          </div>
+          <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            <div *ngIf="showReplyInline" style="border:1px solid #dbeafe;border-radius:8px;padding:12px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:11px;font-weight:700;color:#1d4ed8">↩ Odpowiedz</div>
+              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+                <div class="participant-chips">
+                  <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
+                  <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" placeholder="email@firma.pl" autocomplete="off">
+                </div>
+              </label>
+              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+                <div class="participant-chips">
+                  <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
+                  <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" placeholder="dw@firma.pl" autocomplete="off">
+                </div>
+              </label>
+              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
+                <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
+              </label>
+              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" placeholder="Treść odpowiedzi…" style="display:block" theme="snow"></quill-editor>
+              <div *ngIf="inlineReplyForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
+              </div>
+              <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
+                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+              </div>
+              <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{inlineReplyError}}</div>
+              <div style="display:flex;gap:6px;justify-content:flex-end">
+                <button class="btn-sm" (click)="cancelInlineReply()">Anuluj</button>
+                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.recipientList?.length || !inlineReplyForm.subject">{{inlineReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}</button>
+              </div>
+            </div>
+            <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
+              <button *ngIf="a.gmail_thread_id && gmailConnected && canEdit" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── Tab: Historia zmian ────────────────────────────────────────── -->
-      <div *ngIf="midTab==='history'" style="overflow-y:auto;flex:1;padding:12px">
-        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;padding:24px;font-size:13px">⏳ Ładowanie historii…</div>
-        <div *ngIf="!historyLoading && history.length===0 && historyLoaded" class="empty-act">Brak wpisów historii.</div>
-        <div *ngFor="let h of history" style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:12px">
-          <div style="flex-shrink:0;width:6px;border-radius:3px;background:#f3f4f6;margin-top:2px"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600;color:#111827">{{histLabel(h)}}</div>
-            <div style="color:#9ca3af;font-size:11px;margin-top:2px">
-              <span *ngIf="h.user_name">{{h.user_name}}</span>
-              <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
-              <span *ngIf="!h.user_name && !h.user_email">System</span>
-              · {{h.created_at | date:'dd.MM.yyyy HH:mm'}}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Right panel: DWH sales / email thread / products / docs -->
@@ -581,46 +710,38 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.gross_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót brutto PLN</div></div>
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.net_turnover_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Obrót netto PLN</div></div>
           <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.transactions_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Transakcje</div></div>
-          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.pax_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">PAX</div></div>
+          <div class="dwh-kpi"><div class="dwh-kpi-val">{{(partnerSalesKpi.pax_count||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Produkty</div></div>
           <div class="dwh-kpi dwh-kpi-wide"><div class="dwh-kpi-val" style="color:#86efac">{{(partnerSalesKpi.revenue_pln||0)|number:'1.0-0'}}</div><div class="dwh-kpi-lbl">Przychód netto PLN</div></div>
         </div>
       </div>
 
-      <!-- Wybrany watek mailowy -->
-      <div *ngIf="selectedEmailActivity" class="panel-email-box">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
-          <div class="panel-email-title">&#128140; {{selectedEmailActivity.title}}</div>
-          <button (click)="selectedEmailActivity=null;panelThreadMessages=[]" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:13px;line-height:1;flex-shrink:0">&#x2715;</button>
+      <!-- Churn risk widget -->
+      <div *ngIf="partner.dwh_partner_id" class="churn-widget">
+        <div class="churn-widget-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+          Ryzyko Churn
         </div>
-        <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">
-          {{selectedEmailActivity.activity_at|date:'dd.MM.yyyy HH:mm'}}
-          <span *ngIf="selectedEmailActivity.created_by_name"> · {{selectedEmailActivity.created_by_name}}</span>
+        <div *ngIf="churnLoading" class="churn-widget-loading">Ładowanie…</div>
+        <div *ngIf="!churnLoading && !churnData" class="churn-widget-ok">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><polyline points="20,6 9,17 4,12"/></svg>
+          Brak ryzyka odejścia
         </div>
-        <div *ngIf="panelLoadingThread" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie wątku…</div>
-        <div *ngFor="let m of panelThreadMessages" class="panel-msg" [class.unread]="!isMessageRead(m)" [class.read]="isMessageRead(m)">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-bottom:4px">
-            <span [style.font-weight]="!isMessageRead(m) ? '700' : '600'" style="color:#374151;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{m.from}}</span>
-            <span style="color:#9ca3af;font-size:10px;white-space:nowrap">{{m.date|date:'dd.MM HH:mm'}}</span>
+        <div *ngIf="!churnLoading && churnData" class="churn-widget-body">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span class="churn-badge-inline risk-badge-{{churnData.risk_level}}">{{churnRiskLabel(churnData.risk_level)}}</span>
+            <span class="churn-widget-score">{{churnData.total_score}} pkt</span>
           </div>
-          <div style="color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;cursor:pointer" (click)="openMsgModal(m)">{{m.snippet}}</div>
-          <div style="display:flex;gap:6px">
-            <button (click)="openMsgModal(m)" style="font-size:10px;padding:2px 8px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;color:#374151">Otwórz</button>
-            <button (click)="toggleMsgRead(m)"
-                    style="font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;border:1px solid"
-                    [style.background]="isMessageRead(m) ? '#f3f4f6' : '#fef2f2'"
-                    [style.border-color]="isMessageRead(m) ? '#e5e7eb' : '#fecaca'"
-                    [style.color]="isMessageRead(m) ? '#6b7280' : '#dc2626'">
-              {{isMessageRead(m) ? 'Przeczytana' : 'Nieprzeczytana'}}
-            </button>
+          <div class="churn-widget-rows">
+            <div *ngIf="churnData.days_since_order !== null" class="churn-widget-row">
+              <span class="cwrow-lbl">Dni bez zamówienia</span>
+              <span class="cwrow-val">{{churnData.days_since_order}}</span>
+            </div>
+            <div *ngIf="churnData.sales_drop_pct > 0" class="churn-widget-row">
+              <span class="cwrow-lbl">Spadek M-2→M-1</span>
+              <span class="cwrow-val cwrow-drop">−{{churnData.sales_drop_pct}}%</span>
+            </div>
           </div>
         </div>
-        <div *ngIf="!panelLoadingThread && panelThreadMessages.length===0 && selectedEmailActivity.body"
-             style="font-size:11px;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-bottom:6px">
-          {{stripHtml(selectedEmailActivity.body)}}
-        </div>
-        <button *ngIf="selectedEmailActivity.gmail_thread_id" class="comm-btn" style="margin-top:6px" (click)="replyToThread(selectedEmailActivity)">
-          <span>&#x21a9;</span><div style="flex:1;text-align:left"><div style="font-size:12px;font-weight:600">Odpowiedz</div></div>
-        </button>
       </div>
 
       <!-- Podzial produktowy -->
@@ -633,6 +754,27 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
       </div>
 
+      <!-- Historia zmian mini-widget -->
+      <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">🕐 Historia zmian</div>
+          <button *ngIf="history.length" class="btn-sm" (click)="showHistoryModal=true">Pokaż wszystko</button>
+        </div>
+        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:6px">Ładowanie…</div>
+        <div *ngIf="!historyLoading && history.length===0 && historyLoaded" style="font-size:12px;color:#9ca3af;text-align:center;padding:6px">Brak wpisów.</div>
+        <div *ngFor="let h of history.slice(0,10)" class="hist-item">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#111827">{{histLabel(h)}}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:1px">
+              <span *ngIf="h.user_name">{{h.user_name}}</span>
+              <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
+              <span *ngIf="!h.user_name && !h.user_email">System</span>
+              · {{h.created_at | date:'dd.MM HH:mm'}}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Powiazane dokumenty -->
       <div class="docs-box">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -640,8 +782,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:11px">+ Dodaj</button>
         </div>
         <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
-             style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#9a3412">
-          <span style="font-size:14px;color:#f97316">⚠️</span>
+             style="display:flex;align-items:center;gap:6px;background:#E6F4EA;border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#166534">
+          <span style="font-size:14px;color:#3BAA5D">⚠️</span>
           <span><strong>Brak powiązanej umowy.</strong> Dodaj dokument, aby potwierdzić współpracę z partnerem.</span>
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px 0">Brak powiązanych dokumentów</div>
@@ -658,6 +800,50 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
       </div>
 
+      <!-- Zgody marketingowe -->
+      <div class="docs-box" style="margin-top:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">✅ Zgody marketingowe</div>
+        </div>
+        <div *ngIf="consentLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px 0">Ładowanie…</div>
+        <div *ngFor="let ct of consents" style="margin-bottom:12px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:5px">
+            <div style="font-size:11.5px;font-weight:600;color:#374151;line-height:1.4;flex:1">{{ct.label}}</div>
+            <button (click)="toggleConsentExpand(ct.consent_key)"
+                    style="background:none;border:none;cursor:pointer;font-size:10px;color:#9ca3af;white-space:nowrap;padding:0;flex-shrink:0;line-height:1.8">
+              {{expandedConsent===ct.consent_key ? '▲ zwiń' : '▾ szczegóły'}}
+            </button>
+          </div>
+          <div *ngIf="expandedConsent===ct.consent_key"
+               style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:6px;padding:8px 10px;margin-bottom:7px;line-height:1.55;border-left:3px solid #e5e7eb">
+            {{ct.description}}
+            <div *ngIf="ct.updated_at" style="margin-top:5px;font-size:10px;color:#9ca3af">
+              Ostatnia zmiana: {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
+              <span *ngIf="ct.updated_by_name"> · {{ct.updated_by_name}}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button *ngFor="let v of consentOptions"
+                    (click)="canEdit && setConsentDraft(ct.consent_key, v.val)"
+                    [style.background]="consentDraft[ct.consent_key]===v.val ? v.bg : '#f9fafb'"
+                    [style.color]="consentDraft[ct.consent_key]===v.val ? 'white' : '#6b7280'"
+                    [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : '#e5e7eb')"
+                    [style.cursor]="canEdit ? 'pointer' : 'default'"
+                    style="flex:1;font-size:10.5px;font-weight:600;padding:5px 2px;border-radius:6px;transition:all .12s;text-align:center;line-height:1.3">
+              {{v.label}}
+            </button>
+          </div>
+        </div>
+        <button *ngIf="canEdit && consents.length" (click)="saveConsents()"
+                [disabled]="savingConsents || !consentsDirty"
+                style="width:100%;margin-top:2px;font-size:12px;padding:7px;border-radius:8px;font-weight:600;border:none;transition:background .15s"
+                [style.background]="consentsDirty ? '#3BAA5D' : '#f4f4f5'"
+                [style.color]="consentsDirty ? 'white' : '#a1a1aa'"
+                [style.cursor]="consentsDirty ? 'pointer' : 'default'">
+          {{savingConsents ? 'Zapisuję…' : consentsDirty ? '💾 Zapisz zgody' : '✓ Zapisano'}}
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -669,7 +855,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
         <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
         <span style="flex:1"></span>
-        <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
+        <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#E6F4EA;border:1px solid #a7d7b5;color:#166534;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
         <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
       </div>
 
@@ -700,7 +886,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div style="display:flex;gap:12px;font-size:13px">
             <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💡 Szansa</span>
             <span class="opp-status-badge opp-st-{{selectedAct.opp_status}}">{{oppStatusLabel(selectedAct.opp_status)}}</span>
-            <span *ngIf="selectedAct.opp_value" style="font-weight:700;color:#f97316">{{selectedAct.opp_value | number:'1.0-0'}} {{selectedAct.opp_currency}}</span>
+            <span *ngIf="selectedAct.opp_value" style="font-weight:700;color:#3BAA5D">{{selectedAct.opp_value | number:'1.0-0'}} {{selectedAct.opp_currency}}</span>
           </div>
         </ng-container>
         <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
@@ -711,17 +897,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 Komentarz</span>
           <span style="font-style:italic">{{selectedAct.close_comment}}</span>
         </div>
-        <!-- Zamknij -->
-        <div *ngIf="!actModalClosing && selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
-          <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="startCloseActModal()">✓ Zamknij aktywność</button>
-        </div>
-        <div *ngIf="actModalClosing" style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-          <textarea [(ngModel)]="actModalCloseComment" placeholder="Komentarz zamknięcia *" rows="3"
-                    style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;width:100%;box-sizing:border-box"></textarea>
-          <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalClosing=false;actModalCloseComment=''">Anuluj</button>
-            <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="!actModalCloseComment.trim() || savingActivity">{{savingActivity ? '…' : 'Zamknij'}}</button>
-          </div>
+        <!-- Zamknij — bez komentarza -->
+        <div *ngIf="selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
+          <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="savingActivity">{{savingActivity ? '…' : '✓ Zamknij aktywność'}}</button>
         </div>
       </div>
 
@@ -800,8 +978,33 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
           <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
-          <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
+          <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historia zmian — modal -->
+  <div *ngIf="showHistoryModal" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px" (click)="showHistoryModal=false">
+    <div style="background:white;border-radius:14px;width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.15)" (click)="$event.stopPropagation()">
+      <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1">
+        <span style="font-size:14px;font-weight:700;color:#111827">🕐 Historia zmian</span>
+        <input [(ngModel)]="historySearch" placeholder="Szukaj…" style="flex:1;border:1px solid #e5e7eb;border-radius:6px;padding:5px 10px;font-size:12px;outline:none">
+        <button (click)="showHistoryModal=false" style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer">✕</button>
+      </div>
+      <div style="overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:0">
+        <div *ngFor="let h of filteredHistory" class="hist-item">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#111827">{{histLabel(h)}}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:1px">
+              <span *ngIf="h.user_name">{{h.user_name}}</span>
+              <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
+              <span *ngIf="!h.user_name && !h.user_email">System</span>
+              · {{h.created_at | date:'dd.MM.yyyy HH:mm'}}
+            </div>
+          </div>
+        </div>
+        <div *ngIf="filteredHistory.length===0" style="text-align:center;color:#9ca3af;font-size:13px;padding:24px">Brak wyników.</div>
       </div>
     </div>
   </div>
@@ -1267,132 +1470,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
 <div *ngIf="!partner && !loading" class="not-found">{{ loadError ? 'Błąd ładowania.' : 'Partner nie znaleziony.' }}</div>
 <div *ngIf="loading" class="loading">�?adowanie…</div>
 
-<!-- ── Gmail Compose Modal ─────────────────────────────────────────────────── -->
-<div class="modal-overlay" *ngIf="showEmailModal" (click)="showEmailModal=false">
-  <div class="modal-wide" (click)="$event.stopPropagation()" style="width:min(580px,100%);background:white;border-radius:14px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column">
-    <div class="modal-header">
-      <h3>✉️ Wyślij email</h3>
-      <button class="close-btn" (click)="showEmailModal=false">✕</button>
-    </div>
-
-    <!-- Gmail not connected prompt -->
-    <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" class="modal-body" style="gap:16px;align-items:center;text-align:center;padding:32px 24px">
-      <div style="font-size:40px">📧</div>
-      <div style="font-size:15px;font-weight:700;color:#111827">Konto Gmail niepołączone</div>
-      <div style="font-size:13px;color:#6b7280;max-width:380px">
-        Aby wysyłać i odbierać emaile bezpośrednio z CRM, połącz swoje konto Gmail.
-        Każdy handlowiec łączy własną skrzynkę.
-      </div>
-      <button *ngIf="gmailAuthUrl" (click)="connectGmail()"
-         style="background:#f97316;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px">
-        🔗 Połącz konto Gmail
-      </button>
-      <div *ngIf="!gmailAuthUrl" style="color:#9ca3af;font-size:12px">
-        Brak konfiguracji OAuth. Skontaktuj się z administratorem.
-      </div>
-    </div>
-
-    <!-- Normal compose form -->
-    <ng-container *ngIf="gmailConnected || settings.settings().crm_training_mode">
-      <div class="modal-body" style="gap:12px">
-        <!-- Connected account info -->
-        <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:6px">
-          <span style="color:#16a34a">✓</span> Wysyłasz z: <strong>{{gmailEmail}}</strong>
-        </div>
-        <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:6px">
-          🎓 Tryb szkoleniowy — mail nie zostanie wysłany, po 45s pojawi się symulowana odpowiedź
-        </div>
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-          Do
-          <div class="participant-chips" style="position:relative">
-            <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">
-              {{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button>
-            </span>
-            <input class="participant-input" [(ngModel)]="recipientQuery"
-                   (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()"
-                   (input)="onRecipientInput()" (blur)="showRecipientSug=false"
-                   placeholder="email@firma.pl" autocomplete="off">
-            <div class="suggest-dropdown" *ngIf="showRecipientSug">
-              <div *ngFor="let s of recipientSuggestions" class="suggest-item"
-                   (mousedown)="pickRecipientSug(s)">
-                <span style="font-weight:600">{{s.name}}</span>
-                <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
-              </div>
-            </div>
-          </div>
-        </label>
-        <!-- DW (CC): -->
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-          DW
-          <div class="participant-chips" style="position:relative">
-            <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">
-              {{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button>
-            </span>
-            <input class="participant-input" [(ngModel)]="ccQuery"
-                   (keydown.enter)="addCc()" (keydown.Tab)="addCc()"
-                   (input)="onCcInput()" (blur)="showCcSug=false"
-                   placeholder="dw@firma.pl" autocomplete="off">
-            <div class="suggest-dropdown" *ngIf="showCcSug">
-              <div *ngFor="let s of ccSuggestions" class="suggest-item"
-                   (mousedown)="pickCcSug(s)">
-                <span style="font-weight:600">{{s.name}}</span>
-                <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
-              </div>
-            </div>
-          </div>
-        </label>
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-          Temat
-          <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
-        </label>
-        <div *ngIf="emailForm.threadId" style="font-size:11px;color:#6b7280;background:#eff6ff;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
-          <span>📎 Odpowiedź w wątku</span>
-          <button (click)="emailForm.threadId=''" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:10px">✕ Usuń</button>
-        </div>
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-          Treść
-          <textarea class="act-input" id="partner-email-body-textarea" [(ngModel)]="emailForm.body" rows="7" placeholder="Treść wiadomości…"></textarea>
-          <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
-            📋 Historia korespondencji zostanie automatycznie dołączona
-          </div>
-        </label>
-        <div style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
-          Załączniki
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
-            <button *ngIf="gmailConnected && !driveNeedsReauth"
-                    (click)="openDrivePicker()" [disabled]="drivePickerLoading"
-                    style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
-              <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
-              <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
-            </button>
-          </div>
-        </div>
-        <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-          <span *ngFor="let f of emailAttachments; let i=index"
-                style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
-            📎 {{f.name}}
-            <button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
-          </span>
-        </div>
-        <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-outline" (click)="showEmailModal=false">Anuluj</button>
-        <button class="btn-primary" (click)="sendEmail()"
-                [disabled]="sendingEmail||(!emailForm.recipientList?.length&&!recipientQuery?.trim())||!emailForm.subject">
-          {{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}
-        </button>
-      </div>
-    </ng-container>
-
-    <!-- Footer for not-connected state -->
-    <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" class="modal-footer">
-      <button class="btn-outline" (click)="showEmailModal=false">Zamknij</button>
-    </div>
-  </div>
-</div>
-
 <!-- ── Message detail modal ─────────────────────────────────────────────────── -->
 <div class="modal-overlay" *ngIf="showMsgModal" (click)="closeMsgModal()">
   <div class="modal-wide" (click)="$event.stopPropagation()" style="width:min(620px,100%);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column">
@@ -1490,14 +1567,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
     .detail-page { padding:20px; max-width:1400px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
     .detail-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; flex-shrink:0; }
-    .back-btn { background:none; border:none; color:#f97316; cursor:pointer; font-size:13px; }
+    .back-btn { background:none; border:none; color:#3BAA5D; cursor:pointer; font-size:13px; }
     .detail-header h1 { font-size:22px; font-weight:800; margin:0; flex:1; }
     .pbadge { padding:3px 10px; border-radius:10px; font-size:12px; font-weight:700; }
     .pbadge-active{background:#dcfce7;color:#166534} .pbadge-onboarding{background:#dbeafe;color:#1e40af}
     .pbadge-inactive{background:#f3f4f6;color:#374151} .pbadge-churned{background:#fee2e2;color:#991b1b}
     .group-badge { background:#f3f4f6; border-radius:8px; padding:3px 10px; font-size:11px; }
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary { background:#3BAA5D; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
     .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
     /* Onboarding */
     /* Onboarding panel */
@@ -1506,10 +1583,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .step { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative; padding-bottom:12px; }
     .step:not(:last-child)::after { content:''; position:absolute; top:14px; left:calc(50% + 16px); right:0; height:2px; background:#e5e7eb; }
     .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid #e5e7eb; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:white; position:relative; z-index:1; transition:all .2s; }
-    .step.done .step-circle { background:#f97316; border-color:#f97316; color:white; }
-    .step.current .step-circle { border-color:#f97316; color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.15); }
+    .step.done .step-circle { background:#3BAA5D; border-color:#3BAA5D; color:white; }
+    .step.current .step-circle { border-color:#3BAA5D; color:#3BAA5D; box-shadow:0 0 0 3px rgba(59,170,93,.15); }
     .step-label { font-size:10px; color:#9ca3af; text-align:center; }
-    .step.current .step-label { color:#f97316; font-weight:700; }
+    .step.current .step-label { color:#3BAA5D; font-weight:700; }
     .step.done .step-label { color:#6b7280; }
     .step-tasks-count { font-size:10px; font-weight:700; padding:1px 5px; border-radius:8px; background:#f3f4f6; color:#6b7280; }
     .step-tasks-count .all-done { color:#22c55e; }
@@ -1522,9 +1599,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:7px; }
     .task-form-row { display:flex; gap:7px; align-items:center; }
     .tf-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; background:white; outline:none; font-family:inherit; }
-    .tf-sel:focus { border-color:#f97316; }
+    .tf-sel:focus { border-color:#3BAA5D; }
     .tf-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; outline:none; }
-    .tf-input:focus { border-color:#f97316; }
+    .tf-input:focus { border-color:#3BAA5D; }
     .tf-textarea { resize:vertical; width:100%; box-sizing:border-box; }
     .task-form-actions { display:flex; gap:6px; justify-content:flex-end; }
     /* Task list */
@@ -1535,7 +1612,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-item.task-done .task-title { text-decoration:line-through; color:#9ca3af; }
     .task-check { width:22px; height:22px; border-radius:50%; border:2px solid #d1d5db; background:white; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer; flex-shrink:0; font-weight:700; transition:all .15s; }
     .task-item.task-done .task-check { background:#22c55e; border-color:#22c55e; color:white; }
-    .task-check:hover { border-color:#f97316; }
+    .task-check:hover { border-color:#3BAA5D; }
     .task-body { flex:1; min-width:0; }
     .task-title { font-size:12.5px; font-weight:600; color:#111827; display:flex; align-items:center; gap:5px; }
     .task-type-icon { font-size:13px; }
@@ -1551,9 +1628,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-act-btn.del:hover { color:#ef4444; }
     .task-empty { font-size:12px; color:#9ca3af; text-align:center; padding:16px; }
     /* Body */
-    .detail-body { display:grid; grid-template-columns:320px 1fr 290px; gap:16px; flex:1; overflow:hidden; min-height:0; }
-    @media(max-width:900px) { .detail-body{grid-template-columns:320px 1fr;} .right-panel{display:none} }
+    .detail-body { display:grid; grid-template-columns:260px 1fr 260px; gap:16px; flex:1; overflow:hidden; min-height:0; }
+    .detail-body.left-collapsed { grid-template-columns:32px 1fr 260px; }
+    @media(max-width:900px) { .detail-body{grid-template-columns:260px 1fr;} .detail-body.left-collapsed{grid-template-columns:32px 1fr;} .right-panel{display:none} }
     @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
+    /* Left panel collapse */
+    .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink:0; }
+    .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid #e5e7eb; background:white; cursor:pointer; font-size:15px; line-height:1; color:#9ca3af; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
+    .panel-collapse-btn:hover { background:#E6F4EA; color:#3BAA5D; border-color:#a7d7b5; }
+    .info-card.is-collapsed { padding:10px 4px; overflow:hidden; align-items:center; display:flex; flex-direction:column; }
     .info-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
     .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; min-height:0; display:flex; flex-direction:column; }
     .right-panel { display:flex; flex-direction:column; gap:12px; overflow-y:auto; min-height:0; }
@@ -1569,8 +1652,24 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .prod-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:11px; }
     .prod-name { width:90px; color:#374151; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
     .prod-bar-wrap { flex:1; background:#f3f4f6; border-radius:4px; height:6px; overflow:hidden; }
-    .prod-bar { height:100%; background:#f97316; border-radius:4px; transition:width .4s; }
+    .prod-bar { height:100%; background:#3BAA5D; border-radius:4px; transition:width .4s; }
     .prod-val { width:64px; text-align:right; color:#9ca3af; flex-shrink:0; }
+    .churn-widget { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
+    .churn-widget-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+    .churn-widget-loading { font-size:12px; color:#9ca3af; text-align:center; padding:4px 0; }
+    .churn-widget-ok { display:flex; align-items:center; gap:6px; font-size:12px; color:#16a34a; font-weight:600; }
+    .churn-widget-body { display:flex; flex-direction:column; gap:8px; }
+    .churn-widget-score { font-size:11px; color:#6b7280; }
+    .churn-widget-rows { display:flex; flex-direction:column; gap:4px; border-top:1px solid #f3f4f6; padding-top:8px; }
+    .churn-widget-row { display:flex; justify-content:space-between; align-items:center; }
+    .cwrow-lbl { font-size:12px; color:#6b7280; }
+    .cwrow-val { font-size:13px; font-weight:700; color:#111827; }
+    .cwrow-drop { color:#ef4444; }
+    .churn-badge-inline { padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; }
+    .risk-badge-critical { background:#fee2e2; color:#991b1b; }
+    .risk-badge-high     { background:#fed7aa; color:#9a3412; }
+    .risk-badge-medium   { background:#fef3c7; color:#92400e; }
+    .risk-badge-low      { background:#dbeafe; color:#1e40af; }
     .panel-email-box { background:white; border:1px solid #bfdbfe; border-radius:12px; padding:14px; flex-shrink:0; }
     .panel-email-title { font-size:11px; font-weight:700; color:#1d4ed8; margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
     .panel-msg { border:1px solid #e5e7eb; border-radius:8px; padding:8px; margin-bottom:6px; font-size:11px; }
@@ -1578,26 +1677,31 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .panel-msg.read { border-left:3px solid #e5e7eb; }
     .docs-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
     .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
-    .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; }
-    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:12px 14px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:color .15s,border-color .15s; }
-    .tab-btn.active { color:#f97316; border-bottom-color:#f97316; }
+    .churn-hdr-badge { padding:3px 10px; border-radius:10px; font-size:11px; font-weight:700; }
+    .churn-hdr-critical { background:#fee2e2; color:#991b1b; }
+    .churn-hdr-high { background:#ffedd5; color:#c2410c; }
+    .churn-hdr-medium { background:#fef9c3; color:#854d0e; }
+    .churn-hdr-low { background:#dbeafe; color:#1e40af; }
+    .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; flex-wrap:wrap; }
+    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:10px 12px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:all .15s; border-radius:6px 6px 0 0; }
+    .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
     .tab-btn:hover:not(.active) { color:#374151; }
     .info-grid { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; }
     .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; padding-top:2px; }
     .sub { color:#9ca3af; }
-    .accent { color:#f97316; font-weight:700; }
+    .accent { color:#3BAA5D; font-weight:700; }
     .notes { white-space:pre-line; }
     .dwh-note { white-space:normal; }
     .dwh-note p { margin:4px 0; }
     .dwh-note ul, .dwh-note ol { margin:4px 0 4px 18px; padding:0; }
     .dwh-note li { margin-bottom:2px; }
     .dwh-note strong, .dwh-note b { font-weight:700; }
-    .dwh-note a { color:#f97316; text-decoration:underline; }
+    .dwh-note a { color:#3BAA5D; text-decoration:underline; }
     .opp-section { margin-top:16px; padding-top:12px; border-top:1px solid #f3f4f6; }
     .opp-section h4 { font-size:12px; font-weight:700; margin:0 0 8px; }
     .opp-item { font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .opp-title { flex:1; font-weight:600; }
-    .opp-value { font-weight:700; color:#f97316; }
+    .opp-value { font-weight:700; color:#3BAA5D; }
     .opp-due { color:#9ca3af; font-size:11px; }
     .opp-status-badge { font-size:10px; font-weight:700; padding:1px 7px; border-radius:8px; white-space:nowrap; }
     .opp-st-new { background:#dbeafe; color:#1e40af; }
@@ -1605,24 +1709,29 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .opp-st-closed { background:#f3f4f6; color:#6b7280; }
     .opp-type { font-size:10px; font-weight:700; padding:1px 6px; border-radius:6px; background:#f3f4f6; margin-right:4px; }
     .opp-type.upsell { background:#fef3c7; color:#92400e; }
-    .opp-value { color:#f97316; font-weight:700; }
+    .opp-value { color:#3BAA5D; font-weight:700; }
     .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
     .card-header h3 { margin:0; }
     .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:3px 10px; cursor:pointer; }
-    .btn-sm.primary { background:#f97316; color:white; border-color:#f97316; }
+    .btn-sm.primary { background:#3BAA5D; color:white; border-color:#3BAA5D; }
     .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; margin-top:4px; display:flex; flex-direction:column; gap:7px; }
     .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
     .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; }
     .act-actions { display:flex; gap:6px; justify-content:flex-end; }
     .activity-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
     .act-item { display:flex; gap:10px; border-left:3px solid transparent; padding-left:6px; }
-    .act-item.act-today { border-left-color:#bfdbfe; background:#eff6ff; border-radius:6px; }
+    .act-item.act-today { border-left-color:#3BAA5D; background:#E6F4EA; border-radius:6px; }
     .act-item.act-overdue { border-left-color:#fca5a5; background:#fef2f2; border-radius:6px; }
     .act-item.act-closed { opacity:.65; }
     .act-status-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
     .act-status-new { background:#f3f4f6; color:#6b7280; }
     .act-status-open { background:#dbeafe; color:#1d4ed8; }
     .act-status-closed { background:#d1fae5; color:#065f46; }
+    .priority-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
+    .priority-asap { background:#fee2e2; color:#991b1b; }
+    .priority-important { background:#ffedd5; color:#c2410c; }
+    .priority-medium { background:#fef9c3; color:#854d0e; }
+    .priority-low { background:#dbeafe; color:#1e40af; }
     .act-icon { font-size:18px; }
     .act-item strong { font-size:13px; }
     .act-meta { font-size:10px; color:#9ca3af; }
@@ -1658,11 +1767,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .edit-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .edit-row label.full { grid-column:1/-1; }
     .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
-    .edit-row label input:focus, .edit-row label select:focus { border-color:#f97316; }
+    .edit-row label input:focus, .edit-row label select:focus { border-color:#3BAA5D; }
     .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
-    .edit-textarea:focus { border-color:#f97316; }
+    .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid #f3f4f6; }
-    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#f97316; margin-bottom:8px; }
+    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#3BAA5D; margin-bottom:8px; }
     .dwh-badge { display:inline-block; background:#ede9fe; color:#7c3aed; font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
     .dwh-readonly-field { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .dwh-readonly-field.full { grid-column:1/-1; }
@@ -1684,6 +1793,28 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .att-action-btn:hover { background:#f3f4f6; }
     .att-action-btn.dl { color:#1d4ed8; }
     .att-action-btn.view { color:#374151; }
+    .act-input:focus { border-color:#3BAA5D; outline:none; }
+    .act-card { border:1px solid #e5e7eb; border-radius:10px; padding:12px 14px; background:white; cursor:pointer; transition:box-shadow .15s; position:relative; }
+    .act-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    .act-card.act-card-expanded { border-color:#3BAA5D; }
+    .act-card-header { display:flex; align-items:flex-start; gap:8px; }
+    .act-card-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; min-width:0; }
+    .act-card-title { font-size:13px; font-weight:600; color:#111827; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .act-body-clamp { font-size:12px; color:#6b7280; margin-top:6px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:11px; color:#9ca3af; padding:2px 0; margin-top:4px; }
+    .act-expand-btn:hover { color:#3BAA5D; }
+    .act-card-controls { display:flex; gap:4px; align-items:center; flex-shrink:0; }
+    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 6px; border-radius:5px; color:#9ca3af; line-height:1; }
+    .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
+    .act-ctrl-btn.del:hover { color:#ef4444; }
+    .task-actions-row { display:flex; gap:6px; margin-top:8px; }
+    .btn-task-close { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-close:hover:not(:disabled) { background:#dcfce7; border-color:#86efac; }
+    .btn-task-close:disabled { opacity:.5; cursor:default; }
+    .btn-task-reopen { background:#f3f4f6; border:1px solid #d1d5db; color:#374151; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-reopen:hover:not(:disabled) { background:#e5e7eb; }
+    .btn-task-reopen:disabled { opacity:.5; cursor:default; }
+    .hist-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid #f3f4f6; font-size:12px; }
   `],
 })
 export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
@@ -1694,6 +1825,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private api    = inject(CrmApiService);
   private auth     = inject(AuthService);
   private router   = inject(Router);
+  private sanitizer = inject(DomSanitizer);
   protected settings = inject(AppSettingsService);
 
   // Słowniki z app_settings
@@ -1747,16 +1879,124 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   showNewActivity = false;
   showEdit = false;
 
+  // ── Layout ──────────────────────────────────────────────────────────────────
+  leftCollapsed = false;
+  toggleLeftPanel(): void { this.leftCollapsed = !this.leftCollapsed; this.cdr.markForCheck(); }
+
+  // ── Zgody marketingowe ────────────────────────────────────────────────────
+  consents:        ConsentValue[] = [];
+  consentDraft:    Record<string, string> = {};
+  expandedConsent: string | null = null;
+  consentLoading   = false;
+  savingConsents   = false;
+
+  readonly consentOptions = [
+    { val: 'no_data', label: 'Brak danych', bg: '#9ca3af' },
+    { val: 'granted', label: 'Zgoda',       bg: '#22c55e' },
+    { val: 'denied',  label: 'Brak zgody',  bg: '#ef4444' },
+  ];
+
+  get consentsDirty(): boolean {
+    return this.consents.some(c => this.consentDraft[c.consent_key] !== c.value);
+  }
+
+  loadConsents(partnerId: string): void {
+    this.consentLoading = true;
+    this.cdr.markForCheck();
+    forkJoin([
+      this.api.getConsentTypes(),
+      this.api.getPartnerConsents(partnerId).pipe(catchError(() => of([] as ConsentValue[]))),
+    ]).subscribe({
+      next: ([types, values]) => {
+        this.zone.run(() => {
+          const valueMap = new Map(values.map(v => [v.consent_key, v]));
+          this.consents = types.map((t: ConsentType) => {
+            const stored = valueMap.get(t.key);
+            return {
+              consent_key:      t.key,
+              label:            t.label,
+              description:      t.description,
+              value:            stored?.value ?? 'no_data',
+              updated_at:       stored?.updated_at,
+              updated_by_name:  stored?.updated_by_name,
+            } as ConsentValue;
+          });
+          this.consentDraft = Object.fromEntries(this.consents.map(c => [c.consent_key, c.value]));
+          this.consentLoading = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.consentLoading = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
+  toggleConsentExpand(key: string): void {
+    this.expandedConsent = this.expandedConsent === key ? null : key;
+    this.cdr.markForCheck();
+  }
+
+  setConsentDraft(key: string, value: string): void {
+    this.consentDraft = { ...this.consentDraft, [key]: value };
+    this.cdr.markForCheck();
+  }
+
+  saveConsents(): void {
+    if (!this.partner || this.savingConsents || !this.consentsDirty) return;
+    const pid = this.partner.crm_uuid || String(this.partner.id!);
+    this.savingConsents = true;
+    this.cdr.markForCheck();
+    const items = Object.entries(this.consentDraft).map(([key, value]) => ({ key, value }));
+    this.api.savePartnerConsents(pid, items).subscribe({
+      next: cv => {
+        this.zone.run(() => {
+          this.consents     = cv;
+          this.consentDraft = Object.fromEntries(cv.map(c => [c.consent_key, c.value]));
+          this.savingConsents = false;
+          this.historyLoaded  = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => { this.zone.run(() => { this.savingConsents = false; this.cdr.markForCheck(); }); },
+    });
+  }
+
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
-  midTab: 'activities' | 'emails' | 'history' = 'activities';
+  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' = 'all';
   history: any[] = [];
   historyLoaded  = false;
   historyLoading = false;
+  showHistoryModal = false;
+  historySearch    = '';
+  // Inline edit aktywności
+  expandedActIds   = new Set<number>();
+  inlineEditActId: number | null = null;
+  inlineEditForm: any = {};
+  actDueDatePreset = '';
+  actDueDateHour   = '09:00';
+  actDueDateOpen   = false;
+  actReminderType  = '';
+  actReminderAt    = '';
+  readonly reminderOptions = [
+    { value: '30m_before', label: '30 min przed' },
+    { value: '1h_before',  label: '1 godz. przed' },
+    { value: 'at_due',     label: 'W terminie zadania' },
+    { value: '1d_before',  label: '1 dzień przed' },
+    { value: '2d_before',  label: '2 dni przed' },
+    { value: '3d_before',  label: '3 dni przed' },
+    { value: 'custom',     label: 'Własna data…' },
+  ];
+  readonly quillModules = { toolbar: [['bold','italic','underline'],['bullet','list'],[{ list:'ordered' }],['link']] };
+  readonly actTypeOptions = [
+    { value: 'call',        label: '📞 Połączenie' },
+    { value: 'meeting',     label: '🤝 Spotkanie' },
+    { value: 'note',        label: '📝 Notatka' },
+    { value: 'training',    label: '🎓 Szkolenie' },
+    { value: 'qbr',         label: '📊 QBR' },
+    { value: 'opportunity', label: '💡 Szansa' },
+  ];
   // Modal aktywności
   selectedAct: any = null;
   actModalEditMode = false;
-  actModalClosing = false;
-  actModalCloseComment = '';
   submitAttempted = false;
   partnerNipEditError = '';
 
@@ -1804,13 +2044,23 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private docSearchTimer: any;
 
   // ── Gmail ────────────────────────────────────────────────────────────────────
-  showEmailModal      = false;
+  showEmailModal      = false;  // kept for compat
+  showEmailCompose    = false;
+  expandedEmailId: number | null = null;
+  showReplyInline     = false;
+  inlineReplyForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  inlineReplyRecipientQuery = '';
+  inlineReplyCcQuery        = '';
+  inlineReplySending        = false;
+  inlineReplyError          = '';
+  inlineReplyAttachments: File[] = [];
   sendingEmail        = false;
   emailError          = '';
   emailForm: any      = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
   recipientQuery      = '';
   ccQuery             = '';
   emailAttachments: File[] = [];
+  emailTemplates: any[] = [];
   threadMessages: any[] = [];
   loadingThread       = false;
   openThreadId        = '';
@@ -1822,6 +2072,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   partnerSalesProducts: any[] = [];
   salesDataLoading = false;
   salesPeriod = 'ytd';
+  // Churn risk
+  churnData: ChurnPartner | null = null;
+  churnLoading = false;
   readonly currentYear = new Date().getFullYear();
   gmailConnected      = false;
   gmailEmail          = '';
@@ -1850,14 +2103,26 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     const byThread = new Map<string, any>();
     const noThread: any[] = [];
     for (const a of all) {
-      if (!a.gmail_thread_id) { noThread.push(a); continue; }
+      if (!a.gmail_thread_id) {
+        noThread.push({ ...a, safeBody: this.safeHtml(a.body || '') });
+        continue;
+      }
       if (!byThread.has(a.gmail_thread_id)) {
-        byThread.set(a.gmail_thread_id, { ...a });
+        byThread.set(a.gmail_thread_id, { ...a, safeBody: this.safeHtml(a.body || '') });
       } else {
         if (!a.is_read) byThread.get(a.gmail_thread_id).is_read = false;
       }
     }
     return [...byThread.values(), ...noThread];
+  }
+
+  private _safeHtmlCache = new Map<string, SafeHtml>();
+  safeHtml(html: string): SafeHtml {
+    const key = html || '';
+    if (!this._safeHtmlCache.has(key)) {
+      this._safeHtmlCache.set(key, this.sanitizer.bypassSecurityTrustHtml(key));
+    }
+    return this._safeHtmlCache.get(key)!;
   }
 
   get newEmailCount(): number {
@@ -1980,6 +2245,169 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  get filteredActivities(): any[] {
+    const all = this.sortedActivities;
+    switch (this.midTab) {
+      case 'tasks':    return all.filter(a => a.type === 'task');
+      case 'notes':    return all.filter(a => a.type === 'note' || a.type === 'training' || a.type === 'qbr' || a.type === 'opportunity');
+      case 'calls':    return all.filter(a => a.type === 'call');
+      case 'meetings': return all.filter(a => a.type === 'meeting');
+      default:         return all;
+    }
+  }
+
+  get filteredHistory(): any[] {
+    if (!this.historySearch.trim()) return this.history;
+    const q = this.historySearch.toLowerCase();
+    return this.history.filter(h =>
+      (this.histLabel(h) || '').toLowerCase().includes(q) ||
+      (h.user_name || '').toLowerCase().includes(q)
+    );
+  }
+
+  get computedDueDatePresets(): { value: string; label: string }[] {
+    const now = new Date();
+    const toDay = (d: Date) => `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`;
+    const addDays = (n: number) => { const d = new Date(now); d.setDate(d.getDate() + n); return d; };
+    const nextBd = (from: Date) => {
+      let d = new Date(from); d.setDate(d.getDate() + 1);
+      while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+      return d;
+    };
+    const today = now; const tomorrow = addDays(1);
+    const bd1 = nextBd(now); const bd2 = nextBd(bd1); const bd3 = nextBd(bd2);
+    return [
+      { value: 'today',    label: `Dziś (${toDay(today)})` },
+      { value: 'tomorrow', label: `Jutro (${toDay(tomorrow)})` },
+      { value: 'bd1',      label: `1 BD (${toDay(bd1)})` },
+      { value: 'bd2',      label: `2 BD (${toDay(bd2)})` },
+      { value: 'bd3',      label: `3 BD (${toDay(bd3)})` },
+    ];
+  }
+
+  get actDueDateSelectedLabel(): string {
+    if (!this.actForm.activity_at) return '';
+    const d = new Date(this.actForm.activity_at);
+    return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  }
+
+  isActExpanded(id: number): boolean { return this.expandedActIds.has(id); }
+  toggleActExpand(id: number): void {
+    if (this.expandedActIds.has(id)) this.expandedActIds.delete(id);
+    else this.expandedActIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  startInlineEdit(a: any): void {
+    this.inlineEditActId = a.id;
+    this.inlineEditForm  = {
+      title: a.title, body: a.body || '',
+      activity_at: a.activity_at ? this.toLocalDT(a.activity_at) : '',
+    };
+    this.expandedActIds.add(a.id);
+    this.cdr.markForCheck();
+  }
+
+  cancelInlineEdit(): void { this.inlineEditActId = null; this.cdr.markForCheck(); }
+
+  saveInlineEdit(a: any): void {
+    if (!this.inlineEditForm.title || !this.partner) return;
+    this.savingActivity = true;
+    this.api.updatePartnerActivity(this.pid, a.id, {
+      title:       this.inlineEditForm.title,
+      body:        this.inlineEditForm.body || null,
+      activity_at: this.toUtcISO(this.inlineEditForm.activity_at),
+    }).subscribe({
+      next: updated => this.zone.run(() => {
+        if (this.partner)
+          this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
+        this.inlineEditActId = null;
+        this.savingActivity  = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  closeActivity(a: any): void {
+    if (!this.partner || this.savingActivity) return;
+    this.savingActivity = true;
+    this.cdr.markForCheck();
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed' }).subscribe({
+      next: updated => this.zone.run(() => {
+        if (this.partner)
+          this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
+        this.savingActivity = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  reopenActivity(a: any): void {
+    if (!this.partner || this.savingActivity) return;
+    this.savingActivity = true;
+    this.cdr.markForCheck();
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'new' }).subscribe({
+      next: updated => this.zone.run(() => {
+        if (this.partner)
+          this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
+        this.savingActivity = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  selectDueDatePreset(preset: string): void {
+    this.actDueDatePreset = preset;
+    this.applyDueDatePreset();
+  }
+
+  applyDueDatePreset(): void {
+    const now = new Date();
+    const addDays = (n: number) => { const d = new Date(now); d.setDate(d.getDate() + n); return d; };
+    const nextBd = (from: Date) => {
+      let d = new Date(from); d.setDate(d.getDate() + 1);
+      while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+      return d;
+    };
+    const targets: Record<string, Date> = {
+      today: now, tomorrow: addDays(1),
+      bd1: nextBd(now), bd2: nextBd(nextBd(now)), bd3: nextBd(nextBd(nextBd(now))),
+    };
+    const t = targets[this.actDueDatePreset];
+    if (!t) return;
+    const [h, m] = this.actDueDateHour.split(':').map(Number);
+    t.setHours(h, m, 0, 0);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    this.actForm.activity_at = `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}T${pad(h)}:${pad(m)}`;
+    this.cdr.markForCheck();
+  }
+
+  setActDueDateHour(h: string): void {
+    this.actDueDateHour = h;
+    if (this.actDueDatePreset) this.applyDueDatePreset();
+  }
+
+  clearDueDate(): void {
+    this.actDueDatePreset = '';
+    this.actForm.activity_at = '';
+    this.cdr.markForCheck();
+  }
+
+  private toLocalDT(utcIso: string): string {
+    if (!utcIso) return '';
+    const d = new Date(utcIso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  private toUtcISO(local: string): string | null {
+    if (!local) return null;
+    return new Date(local).toISOString();
+  }
+
   get activeOpps(): any[] {
     return (this.partner?.all_opportunities || [])
       .filter((o: any) => o.opp_status !== 'closed')
@@ -2041,6 +2469,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.loadLinkedDocs(rawId);
     this.loadSuggestions(rawId);
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
+    this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getGmailStatus().subscribe({
       next: s => this.zone.run(() => { this.gmailConnected = s.connected; this.gmailEmail = s.email || ''; this.cdr.markForCheck(); }),
       error: () => {},
@@ -2094,6 +2523,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return Math.max(1, ...this.partnerSalesProducts.map((p: any) => p.gross_turnover_pln || 0));
   }
 
+  private loadChurnData(partnerId: string): void {
+    this.churnLoading = true;
+    this.churnData = null;
+    this.cdr.markForCheck();
+    this.api.getChurnData({ partner_id: partnerId }).subscribe({
+      next: ({ rows }) => this.zone.run(() => {
+        this.churnData = rows[0] ?? null;
+        this.churnLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => { this.churnLoading = false; this.cdr.markForCheck(); }),
+    });
+  }
+
+  churnRiskLabel(level: string): string {
+    return ({ critical: 'Krytyczne', high: 'Wysokie', medium: 'Średnie', low: 'Niskie' } as Record<string, string>)[level] || level;
+  }
+
   private loadSuggestions(partnerId: number | string): void {
     this.api.getContactSuggestions(undefined, partnerId).subscribe({
       next: s => { this.allSuggestions = s; },
@@ -2117,7 +2564,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.activeStep = p.onboarding_step || 0;
           this.cdr.markForCheck();
           if (p.status === 'onboarding') this.loadTasks(p.crm_id || p.id!);
-          if (p.dwh_partner_id) this.loadPartnerSalesData(p);
+          if (p.dwh_partner_id) { this.loadPartnerSalesData(p); this.loadChurnData(String(p.id!)); }
+          this.loadConsents(p.crm_uuid || String(p.id!));
+          this.loadHistory();
           this.emailPollInterval = setInterval(() => this.refreshEmailActivities(), 30_000);
         });
       },
@@ -2278,7 +2727,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
               this.saving = false;
               this.showEdit = false;
               this.historyLoaded = false;
-              if (this.midTab === 'history') this.loadHistory();
+              this.loadHistory();
               this.cdr.markForCheck();
             });
           },
@@ -2510,9 +2959,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       body:  this.actForm.body || null,
     };
     if (this.actForm.type !== 'email') {
-      payload.activity_at = this.actForm.activity_at || null;
+      payload.activity_at = this.toUtcISO(this.actForm.activity_at);
       payload.assigned_to = this.actForm.assigned_to || null;
     }
+    if (this.actForm.type === 'task' && this.actForm.priority) payload.priority = this.actForm.priority;
     if (this.actForm.type === 'meeting') {
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
@@ -2532,7 +2982,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           if (this.partner) {
             this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
           }
-          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '' };
+          this.actForm = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '', priority: '' };
           this.participantQuery = '';
           this.showNewActivity  = false;
           this.savingActivity   = false;
@@ -2560,13 +3010,28 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   openNewActivityForm(): void {
     if (this.showNewActivity) { this.showNewActivity = false; return; }
     const currentUserId = this.auth.user()?.id || '';
+    const typeMap: Record<string, string> = {
+      all: 'task', tasks: 'task', notes: 'note', calls: 'call', meetings: 'meeting', emails: 'note',
+    };
+    const actType = typeMap[this.midTab] ?? 'task';
     this.actForm = {
-      type: 'note', title: '', body: '',
+      type: actType, title: '', body: '',
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
       opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '',
+      priority: '',
     };
+    this.actDueDateHour   = '09:00';
+    this.actDueDateOpen   = false;
+    this.actReminderType  = '';
+    this.actReminderAt    = '';
     this.participantQuery = '';
+    if (actType === 'task') {
+      this.actDueDatePreset = 'today';
+      this.applyDueDatePreset();
+    } else {
+      this.actDueDatePreset = '';
+    }
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
@@ -2598,7 +3063,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-  openEmailModal(prefillThreadId?: string): void {
+  openEmailCompose(prefillThreadId?: string): void {
     this.emailForm = {
       recipientList: this.partner?.email ? [this.partner.email] : (this.partner?.billing_email_address ? [this.partner.billing_email_address] : []),
       ccList: [],
@@ -2615,13 +3080,31 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.emailError       = '';
     if (!this.gmailConnected && !this.gmailAuthUrl && !this.settings.settings().crm_training_mode) {
       this.api.getGmailAuthUrl().subscribe({
-        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailModal = true; this.cdr.markForCheck(); }),
-        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailModal = true; this.cdr.markForCheck(); }),
+        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailCompose = true; this.cdr.markForCheck(); }),
+        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailCompose = true; this.cdr.markForCheck(); }),
       });
     } else {
-      this.showEmailModal = true;
+      this.showEmailCompose = true;
+      this.midTab = 'emails';
+      this.loadEmailTemplates();
       this.cdr.markForCheck();
     }
+  }
+
+  openEmailModal(prefillThreadId?: string): void { this.openEmailCompose(prefillThreadId); }
+
+  loadEmailTemplates(): void {
+    this.api.getEmailTemplates().subscribe({
+      next: t => { this.emailTemplates = t; this.cdr.markForCheck(); },
+      error: () => {},
+    });
+  }
+
+  applyEmailTemplate(t: any): void {
+    if (!t) return;
+    this.emailForm.subject = t.name;
+    this.emailForm.body    = t.body;
+    this.cdr.markForCheck();
   }
 
   downloadAttachment(att: any, messageId: string): void {
@@ -2875,7 +3358,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
             });
           }
           this.sendingEmail   = false;
-          this.showEmailModal = false;
+          this.showEmailCompose = false;
           // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
           if (this.partner) {
             this.api.getPartner(this.pid).subscribe({
@@ -2960,41 +3443,115 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   markEmailsRead(): void {}
 
-  selectEmailForPanel(a: any): void {
+  toggleEmailExpand(a: any): void {
     if (!this.partner) return;
-    if (this.selectedEmailActivity?.id === a.id) {
-      this.selectedEmailActivity = null;
-      this.panelThreadMessages   = [];
+    if (this.expandedEmailId === a.id) {
+      this.expandedEmailId = null;
+      this.showReplyInline = false;
       this.cdr.markForCheck();
       return;
     }
-    this.selectedEmailActivity = a;
-    this.panelThreadMessages   = [];
-    this.panelLoadingThread    = true;
+    this.expandedEmailId = a.id;
+    this.showReplyInline = false;
     this.cdr.markForCheck();
     if (!a.is_read) {
       a.is_read = true;
       this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
     }
-    if (a.gmail_thread_id) {
-      this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
-        next: msgs => this.zone.run(() => {
-          this.panelThreadMessages = msgs;
-          this.panelLoadingThread  = false;
-          msgs.forEach((m: any) => {
-            if (m.is_read === false && m.created_by === null) {
-              m.is_read = true;
-              this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
-            }
-          });
-          this.cdr.markForCheck();
-        }),
-        error: () => this.zone.run(() => { this.panelLoadingThread = false; this.cdr.markForCheck(); }),
-      });
-    } else {
-      this.panelLoadingThread = false;
-    }
   }
+
+  startInlineReply(a: any): void {
+    if (!this.partner) return;
+    const subj = (a.title || '');
+    this.inlineReplyForm = {
+      subject:       subj.startsWith('Re:') ? subj : `Re: ${subj}`,
+      body:          '',
+      recipientList: this.partner.email ? [this.partner.email] : [],
+      ccList:        [],
+      threadId:      a.gmail_thread_id || '',
+      inReplyTo:     '',
+      references:    '',
+      quotedHtml:    '',
+    };
+    this.inlineReplyRecipientQuery = '';
+    this.inlineReplyCcQuery        = '';
+    this.inlineReplySending        = false;
+    this.inlineReplyError          = '';
+    this.inlineReplyAttachments    = [];
+    this.showReplyInline           = true;
+    this.cdr.markForCheck();
+  }
+
+  cancelInlineReply(): void {
+    this.showReplyInline = false;
+    this.inlineReplyForm = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+    this.cdr.markForCheck();
+  }
+
+  addInlineReplyRecipient(): void {
+    const val = this.inlineReplyRecipientQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.inlineReplyForm.recipientList.includes(val)) this.inlineReplyForm.recipientList.push(val);
+    this.inlineReplyRecipientQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  addInlineReplyCc(): void {
+    const val = this.inlineReplyCcQuery.trim();
+    if (!val || !val.includes('@')) return;
+    if (!this.inlineReplyForm.ccList.includes(val)) this.inlineReplyForm.ccList.push(val);
+    this.inlineReplyCcQuery = '';
+    this.cdr.markForCheck();
+  }
+
+  onInlineReplyAttachmentChange(event: Event): void {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) this.inlineReplyAttachments = [...this.inlineReplyAttachments, ...Array.from(files)];
+    this.cdr.markForCheck();
+  }
+
+  removeInlineReplyAttachment(i: number): void {
+    this.inlineReplyAttachments.splice(i, 1);
+    this.cdr.markForCheck();
+  }
+
+  sendInlineReply(): void {
+    this.addInlineReplyRecipient();
+    this.addInlineReplyCc();
+    if (!this.partner || !this.inlineReplyForm.recipientList?.length || !this.inlineReplyForm.subject) return;
+    this.inlineReplySending = true;
+    this.inlineReplyError   = '';
+    this.cdr.markForCheck();
+
+    const fd = new FormData();
+    fd.append('to', this.inlineReplyForm.recipientList.join(','));
+    if (this.inlineReplyForm.ccList?.length) fd.append('cc', this.inlineReplyForm.ccList.join(','));
+    fd.append('subject', this.inlineReplyForm.subject);
+    fd.append('body', (this.inlineReplyForm.body || '') + (this.inlineReplyForm.quotedHtml || ''));
+    if (this.inlineReplyForm.threadId)   fd.append('threadId',   this.inlineReplyForm.threadId);
+    if (this.inlineReplyForm.inReplyTo)  fd.append('inReplyTo',  this.inlineReplyForm.inReplyTo);
+    if (this.inlineReplyForm.references) fd.append('references', this.inlineReplyForm.references);
+    this.inlineReplyAttachments.forEach(f => fd.append('attachments', f, f.name));
+
+    this.api.sendPartnerEmail(this.pid, fd).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.inlineReplySending = false;
+          this.showReplyInline    = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: (err: any) => {
+        this.zone.run(() => {
+          this.inlineReplyError   = err?.error?.error || 'Błąd wysyłki';
+          this.inlineReplySending = false;
+          this.cdr.markForCheck();
+        });
+      },
+    });
+  }
+
+  selectEmailForPanel(a: any): void { this.toggleEmailExpand(a); }
 
   toggleThreadInline(a: any): void {
     if (!this.partner || !a.gmail_thread_id) return;
@@ -3048,20 +3605,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     m.is_read = newVal;
     this.cdr.markForCheck();
     this.api.patchEmailMessageRead(m.id, newVal).subscribe({ error: () => {} });
-    // Jeśli oznaczamy jako nieprzeczytana — aktualizuj też aktywność wątku (badge)
-    if (!newVal) {
-      const currentThreadId = this.selectedEmailActivity?.gmail_thread_id || this.openThreadId;
-      const threadAct = (this.partner.activities || []).find(
-        (a: any) => a.gmail_thread_id === currentThreadId
-      );
-      if (threadAct) {
-        threadAct.is_read = false;
-        this.api.patchPartnerActivityRead(this.pid, threadAct.id, false).subscribe({ error: () => {} });
-      }
-      if (this.selectedEmailActivity?.gmail_thread_id === currentThreadId) {
-        this.selectedEmailActivity.is_read = false;
-      }
-    }
   }
 
   loadHistory(): void {
@@ -3085,6 +3628,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     const before = h.before_state || {};
     if (a === 'crm_partner_create')  return 'Partner utworzony';
     if (a === 'crm_partner_delete')  return 'Partner usunięty';
+    if (a === 'crm_partner_consent_update') {
+      const m = h.metadata || {};
+      const lbl = m.consent_label || after.consent_key || '';
+      return `✅ Zgoda „${lbl}": ${before.label || before.value || '—'} → ${after.label || after.value || '—'}`;
+    }
     if (a === 'crm_activity_create') return `Aktywność dodana: ${after.title || ''}`;
     if (a === 'crm_activity_close')  return `Aktywność zamknięta: ${after.title || ''}`;
     if (a === 'crm_activity_update') return `Aktywność zaktualizowana: ${after.title || ''}`;
@@ -3343,6 +3891,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   statusLabelStr(s: string): string { return PARTNER_STATUS_LABELS[s as PartnerStatus] || s; }
   statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }
+
+  churnLabel(risk: string | null | undefined): string {
+    switch (risk) {
+      case 'critical': return 'Krytyczne';
+      case 'high':     return 'Wysokie';
+      case 'medium':   return 'Średnie';
+      case 'low':      return 'Niskie';
+      default:         return '';
+    }
+  }
+
+  churnBadgeTitle(p: any): string {
+    const parts: string[] = [];
+    if (p.churn_analyzed_at) parts.push(`Analiza: ${new Date(p.churn_analyzed_at).toLocaleDateString('pl-PL')}`);
+    if (p.churn_days_since_order != null) parts.push(`Dni bez zam.: ${p.churn_days_since_order}`);
+    if (p.churn_sales_drop_pct != null) parts.push(`Spadek sprzedaży: ${p.churn_sales_drop_pct}%`);
+    return parts.join(' · ');
+  }
   actIcon(type: string) {
     return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
   }
@@ -3354,6 +3920,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       nie_dotyczy:    'Nie dotyczy',
     };
     return map[basis || 'nie_dotyczy'] ?? basis ?? '—';
+  }
+
+  priorityLabel(p: string): string {
+    const map: Record<string, string> = { asap: 'ASAP', important: 'Ważne', medium: 'Średnie', low: 'Niskie' };
+    return map[p] ?? p;
   }
 
   // ── Modal aktywności ────────────────────────────────────────────────────────
@@ -3372,10 +3943,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   openActModal(a: any): void {
-    this.selectedAct          = a;
-    this.actModalEditMode     = false;
-    this.actModalClosing      = false;
-    this.actModalCloseComment = '';
+    this.selectedAct      = a;
+    this.actModalEditMode = false;
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
         next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
@@ -3386,10 +3955,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   closeActModal(): void {
-    this.selectedAct          = null;
-    this.actModalEditMode     = false;
-    this.actModalClosing      = false;
-    this.actModalCloseComment = '';
+    this.selectedAct      = null;
+    this.actModalEditMode = false;
     this.cdr.markForCheck();
   }
 
@@ -3400,7 +3967,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       type:             a.type,
       title:            a.title,
       body:             a.body || '',
-      activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      activity_at:      a.activity_at ? this.toLocalDT(a.activity_at) : '',
       duration_min:     a.duration_min ?? '',
       meeting_location: a.meeting_location || '',
       participants:     a.participants || '',
@@ -3414,17 +3981,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  startCloseActModal(): void {
-    this.actModalClosing      = true;
-    this.actModalCloseComment = this.selectedAct?.close_comment || '';
-    this.cdr.markForCheck();
-  }
-
   confirmCloseActModal(): void {
     const a = this.selectedAct;
-    if (!this.actModalCloseComment.trim() || !a || !this.partner) return;
+    if (!a || !this.partner) return;
     this.savingActivity = true;
-    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed', close_comment: this.actModalCloseComment }).subscribe({
+    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed' }).subscribe({
       next: updated => {
         this.zone.run(() => {
           if (this.partner) {
@@ -3433,10 +3994,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
               activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
             };
           }
-          this.selectedAct          = { ...a, ...updated };
-          this.actModalClosing      = false;
-          this.actModalCloseComment = '';
-          this.savingActivity       = false;
+          this.selectedAct    = { ...a, ...updated };
+          this.savingActivity = false;
           this.cdr.markForCheck();
         });
       },
@@ -3454,7 +4013,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       body:  this.actEditForm.body || null,
     };
     if (this.actEditForm.type !== 'email') {
-      payload.activity_at = this.actEditForm.activity_at || null;
+      payload.activity_at = this.toUtcISO(this.actEditForm.activity_at);
       payload.assigned_to = this.actEditForm.assigned_to || null;
     }
     if (this.actEditForm.type === 'meeting') {
@@ -3499,7 +4058,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       type:             a.type,
       title:            a.title,
       body:             a.body || '',
-      activity_at:      a.activity_at ? a.activity_at.substring(0, 16) : '',
+      activity_at:      a.activity_at ? this.toLocalDT(a.activity_at) : '',
       duration_min:     a.duration_min ?? '',
       meeting_location: a.meeting_location || '',
       participants:     a.participants || '',
@@ -3577,7 +4136,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       body:  this.actEditForm.body || null,
     };
     if (this.actEditForm.type !== 'email') {
-      payload.activity_at = this.actEditForm.activity_at || null;
+      payload.activity_at = this.toUtcISO(this.actEditForm.activity_at);
       payload.assigned_to = this.actEditForm.assigned_to || null;
     }
     if (this.actEditForm.type === 'meeting') {
@@ -3631,6 +4190,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.actForm.type !== 'meeting') {
       this.actForm.participantList = [];
       this.participantQuery = '';
+    }
+    if (this.actForm.type === 'note' && !this.actDueDatePreset) {
+      this.actDueDatePreset = 'today';
+      const now = new Date();
+      this.actDueDateHour = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     }
     this.cdr.markForCheck();
   }
