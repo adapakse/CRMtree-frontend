@@ -20,7 +20,20 @@
       "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\\\\routes\\\\crm-sales-data.js' | Select-Object -Last 50\")",
       "Bash(Get-Content \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\\\\routes\\\\crm-sales-data.js\")",
       "Bash(Measure-Object -Line)",
-      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\\\\routes\\\\crm-sales-data.js\" | Measure-Object -Line\\).Lines)"
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\src\\\\routes\\\\crm-sales-data.js\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(docker network ls *)",
+      "PowerShell(Test-NetConnection *)",
+      "PowerShell(wsl --status 2>&1)",
+      "PowerShell(docker restart jenkins-crmtree *)",
+      "PowerShell(Get-DnsClientServerAddress *)",
+      "PowerShell(docker pull node:20-alpine *)",
+      "PowerShell(git *)",
+      "PowerShell([System.Net.Dns]::GetHostAddresses\\(\"login.microsoftonline.com\"\\) | Select-Object -ExpandProperty IPAddressToString)",
+      "PowerShell([System.Net.Dns]::GetHostAddresses\\(\"management.azure.com\"\\) | Select-Object -ExpandProperty IPAddressToString)",
+      "PowerShell([System.Net.Dns]::GetHostAddresses\\(\"github.com\"\\) | Select-Object -ExpandProperty IPAddressToString)",
+      "PowerShell(head *)",
+      "PowerShell(docker run *)",
+      "PowerShell(docker stop jenkins-crmtree; docker rm jenkins-crmtree)"
     ]
   }
 }
