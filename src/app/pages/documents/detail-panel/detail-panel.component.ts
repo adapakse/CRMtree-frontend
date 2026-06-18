@@ -979,11 +979,17 @@ export class DetailPanelComponent implements OnChanges {
   uploadAttachment(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe(att => {
-      this.attachments.update(list => [...list, att]);
-      this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment added: ${file.name}`, date: new Date().toISOString()}, ...evts]);
-      this.toast.success('Attachment uploaded');
-      this.reloadHistory();
+    this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe({
+      next: att => {
+        this.attachments.update(list => [...list, att]);
+        this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment added: ${file.name}`, date: new Date().toISOString()}, ...evts]);
+        this.toast.success('Attachment uploaded');
+        this.reloadHistory();
+      },
+      error: err => {
+        const msg = err?.error?.error || err?.message || 'Błąd uploadu załącznika';
+        this.toast.error(msg);
+      },
     });
   }
 
@@ -991,12 +997,18 @@ export class DetailPanelComponent implements OnChanges {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? file.name;
-    this.docSvc.uploadAttachmentVersion(this.doc.id, attId, file).subscribe(() => {
-      this.toast.success('New version uploaded');
-      this.reloadHistory();
-      this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment new version: ${attName}`, date: new Date().toISOString()}, ...evts]);
-      this.attachmentsLoaded = false;
-      this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
+    this.docSvc.uploadAttachmentVersion(this.doc.id, attId, file).subscribe({
+      next: () => {
+        this.toast.success('New version uploaded');
+        this.reloadHistory();
+        this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment new version: ${attName}`, date: new Date().toISOString()}, ...evts]);
+        this.attachmentsLoaded = false;
+        this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
+      },
+      error: err => {
+        const msg = err?.error?.error || err?.message || 'Błąd uploadu nowej wersji';
+        this.toast.error(msg);
+      },
     });
   }
 
