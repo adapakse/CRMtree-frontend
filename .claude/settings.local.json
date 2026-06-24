@@ -33,7 +33,10 @@
       "PowerShell([System.Net.Dns]::GetHostAddresses\\(\"github.com\"\\) | Select-Object -ExpandProperty IPAddressToString)",
       "PowerShell(head *)",
       "PowerShell(docker run *)",
-      "PowerShell(docker stop jenkins-crmtree; docker rm jenkins-crmtree)"
+      "PowerShell(docker stop jenkins-crmtree; docker rm jenkins-crmtree)",
+      "WebFetch(domain:www.crmtree.pl)",
+      "WebFetch(domain:crmtree.pl)",
+      "PowerShell(python \"C:\\\\Users\\\\Adam\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Adam-Documents-crmtree-frontend\\\\853df636-882c-4aad-9fda-47f72dcdc277\\\\scratchpad\\\\gen_contracts.py\")"
     ]
   }
 }
