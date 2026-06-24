@@ -162,7 +162,7 @@ interface PipelineRow {
   <!-- ── KPI ── -->
   <div class="kpi-row">
 
-    <div class="kpi-card clickable" (click)="goToLeads({ stage: 'new', label: 'Nowe kontakty' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: 'Nowe leady – bieżący tydzień' })">
       <div class="kpi-icon" style="background:#E6F4EA">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -172,7 +172,7 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe kontakty <wt-tooltip key="crm.sales.kpi.new_contacts"></wt-tooltip></div>
+        <div class="kpi-label">Nowe leady <wt-tooltip key="crm.sales.kpi.new_contacts"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiNewLeads }}</div>
         <div class="kpi-trend" *ngIf="kpiNewLeadsChange !== null"
              [class.pos]="kpiNewLeadsChange >= 0" [class.neg]="kpiNewLeadsChange < 0">
@@ -182,19 +182,19 @@ interface PipelineRow {
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ stage: 'new', label: 'Nowe firmy' })">
-      <div class="kpi-icon" style="background:#DBEAFE">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" width="22" height="22">
-          <rect x="2" y="7" width="20" height="14" rx="2"/>
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: 'Nowe leady – bieżący tydzień' })">
+      <div class="kpi-icon" style="background:#E6F4EA">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe firmy <wt-tooltip key="crm.sales.kpi.new_companies"></wt-tooltip></div>
-        <div class="kpi-value">{{ kpiNewCompanies }}</div>
-        <div class="kpi-trend" *ngIf="kpiNewCompaniesChange !== null"
-             [class.pos]="kpiNewCompaniesChange >= 0" [class.neg]="kpiNewCompaniesChange < 0">
-          {{ kpiNewCompaniesChange >= 0 ? '↑' : '↓' }} {{ kpiNewCompaniesChange | number:'1.0-0' }}%
+        <div class="kpi-label">Nowe leady wartość <wt-tooltip key="crm.sales.kpi.new_leads_value"></wt-tooltip></div>
+        <div class="kpi-value kpi-value-sm">{{ fmtValue(kpiNewLeadsValue) }}</div>
+        <div class="kpi-trend" *ngIf="kpiNewLeadsValueChange !== null"
+             [class.pos]="kpiNewLeadsValueChange >= 0" [class.neg]="kpiNewLeadsValueChange < 0">
+          {{ kpiNewLeadsValueChange >= 0 ? '↑' : '↓' }} {{ kpiNewLeadsValueChange | number:'1.0-0' }}%
           <span>vs poprzedni tydzień</span>
         </div>
       </div>
@@ -725,13 +725,16 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
 // KPI
-  kpiNewLeads          = 0;
-  kpiNewLeadsChange:   number | null = null;
-  kpiNewCompanies      = 0;
-  kpiNewCompaniesChange: number | null = null;
-  kpiActiveLeads       = 0;
-  kpiPipelineValue     = 0;
-  kpiWonCount          = 0;
+  kpiNewLeads           = 0;
+  kpiNewLeadsChange:    number | null = null;
+  kpiNewLeadsValue      = 0;
+  kpiNewLeadsValueChange: number | null = null;
+  kpiActiveLeads        = 0;
+  kpiPipelineValue      = 0;
+  kpiWonCount           = 0;
+
+  weekNavStart = '';
+  weekNavEnd   = '';
 
   // Pipeline
   pipelineMode: 'value' | 'count' = 'value';
@@ -788,7 +791,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     });
     forkJoin({
       dashboard: this.api.getDashboard(),
-      leads:     this.api.getLeads({ limit: 100, page: 1 }),
+      leads:     this.api.getLeads({ limit: 500, page: 1 }),
       tasks:     this.api.getCrmTasks(),
     }).subscribe({
       next: ({ dashboard, leads, tasks }) => {
@@ -987,10 +990,20 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     const thisMon = new Date(now);
     thisMon.setDate(now.getDate() - day + 1);
     thisMon.setHours(0, 0, 0, 0);
+    const thisSun = new Date(thisMon);
+    thisSun.setDate(thisMon.getDate() + 6);
+    thisSun.setHours(23, 59, 59, 999);
     const lastMon = new Date(thisMon);
     lastMon.setDate(thisMon.getDate() - 7);
 
-    const thisW = leads.filter(l => new Date(l.created_at) >= thisMon);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    this.weekNavStart = `${thisMon.getFullYear()}-${pad(thisMon.getMonth()+1)}-${pad(thisMon.getDate())}`;
+    this.weekNavEnd   = `${thisSun.getFullYear()}-${pad(thisSun.getMonth()+1)}-${pad(thisSun.getDate())}`;
+
+    const thisW = leads.filter(l => {
+      const d = new Date(l.created_at);
+      return d >= thisMon && d <= thisSun;
+    });
     const lastW = leads.filter(l => {
       const d = new Date(l.created_at);
       return d >= lastMon && d < thisMon;
@@ -1000,11 +1013,11 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     this.kpiNewLeadsChange = lastW.length > 0
       ? Math.round((thisW.length - lastW.length) / lastW.length * 100) : null;
 
-    const thisCo = new Set(thisW.map(l => l.company?.toLowerCase() || '')).size;
-    const lastCo = new Set(lastW.map(l => l.company?.toLowerCase() || '')).size;
-    this.kpiNewCompanies       = thisCo;
-    this.kpiNewCompaniesChange = lastCo > 0
-      ? Math.round((thisCo - lastCo) / lastCo * 100) : null;
+    const thisWValue = thisW.reduce((s, l) => s + (l.value_pln || 0), 0);
+    const lastWValue = lastW.reduce((s, l) => s + (l.value_pln || 0), 0);
+    this.kpiNewLeadsValue       = thisWValue;
+    this.kpiNewLeadsValueChange = lastWValue > 0
+      ? Math.round((thisWValue - lastWValue) / lastWValue * 100) : null;
 
     this.buildChart(leads, this.chartPeriod);
   }
