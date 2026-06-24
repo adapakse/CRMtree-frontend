@@ -1208,6 +1208,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   filterStage        = '';
   filterCloseDateFrom = '';
   filterCloseDateTo   = '';
+  filterCreatedFrom   = '';
+  filterCreatedTo     = '';
   filterLostReason    = '';
   reportFilterLabel   = '';   // np. "Stage: Nowy" — widoczne jako chip nad listą
 
@@ -1315,6 +1317,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     this.filterUser          = qp.get('assigned_to')     || '';
     this.filterCloseDateFrom = qp.get('close_date_from') || '';
     this.filterCloseDateTo   = qp.get('close_date_to')   || '';
+    this.filterCreatedFrom   = qp.get('created_from')    || '';
+    this.filterCreatedTo     = qp.get('created_to')      || '';
     this.filterLostReason    = qp.get('lost_reason')     || '';
     if (qp.get('hot') === 'true') this.filterHot = true;
     this.reportFilterLabel   = qp.get('label')           || '';
@@ -1370,6 +1374,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
   clearReportFilter(): void {
     this.filterStage = ''; this.filterStageUI = ''; this.filterCloseDateFrom = ''; this.filterCloseDateTo = '';
+    this.filterCreatedFrom = ''; this.filterCreatedTo = '';
     this.filterLostReason = ''; this.reportFilterLabel = '';
     this.load();
   }
@@ -1441,6 +1446,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     if (activeStageFilter)           params['stage']           = activeStageFilter;
     if (this.filterCloseDateFrom)    params['close_date_from'] = this.filterCloseDateFrom;
     if (this.filterCloseDateTo)      params['close_date_to']   = this.filterCloseDateTo;
+    if (this.filterCreatedFrom)      params['created_from']    = this.filterCreatedFrom;
+    if (this.filterCreatedTo)        params['created_to']      = this.filterCreatedTo;
     if (this.filterLostReason)       params['lost_reason']     = this.filterLostReason;
 
     this.api.getLeads(params).subscribe({
