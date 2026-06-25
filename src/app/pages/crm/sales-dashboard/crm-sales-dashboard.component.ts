@@ -1013,8 +1013,8 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     this.kpiNewLeadsChange = lastW.length > 0
       ? Math.round((thisW.length - lastW.length) / lastW.length * 100) : null;
 
-    const thisWValue = thisW.reduce((s, l) => s + (l.value_pln || 0), 0);
-    const lastWValue = lastW.reduce((s, l) => s + (l.value_pln || 0), 0);
+    const thisWValue = thisW.filter(l => l.close_date).reduce((s, l) => s + Number(l.value_pln || 0), 0);
+    const lastWValue = lastW.filter(l => l.close_date).reduce((s, l) => s + Number(l.value_pln || 0), 0);
     this.kpiNewLeadsValue       = thisWValue;
     this.kpiNewLeadsValueChange = lastWValue > 0
       ? Math.round((thisWValue - lastWValue) / lastWValue * 100) : null;
@@ -1038,9 +1038,10 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     const daily = new Map<number, number>();
 
     leads.forEach(l => {
-      if (!l.value_pln || !l.created_at) return;
-      const da = Math.floor((today.getTime() - new Date(l.created_at).getTime()) / 86_400_000);
-      if (da >= 0 && da < DAYS) daily.set(DAYS - 1 - da, (daily.get(DAYS - 1 - da) || 0) + l.value_pln);
+      const val = Number(l.value_pln);
+      if (!val || !l.close_date) return;
+      const da = Math.floor((today.getTime() - new Date(l.close_date).getTime()) / 86_400_000);
+      if (da >= 0 && da < DAYS) daily.set(DAYS - 1 - da, (daily.get(DAYS - 1 - da) || 0) + val);
     });
 
     let cum = 0;
@@ -1050,9 +1051,10 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
 
     let prev = 0;
     leads.forEach(l => {
-      if (!l.value_pln || !l.created_at) return;
-      const da = Math.floor((today.getTime() - new Date(l.created_at).getTime()) / 86_400_000);
-      if (da >= DAYS && da < DAYS * 2) prev += l.value_pln;
+      const val = Number(l.value_pln);
+      if (!val || !l.close_date) return;
+      const da = Math.floor((today.getTime() - new Date(l.close_date).getTime()) / 86_400_000);
+      if (da >= DAYS && da < DAYS * 2) prev += val;
     });
     this.chartPrevValue = prev;
 
