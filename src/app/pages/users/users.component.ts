@@ -71,7 +71,7 @@ import { AuthService } from '../../core/auth/auth.service';
               <div style="display:flex;flex-wrap:wrap;gap:4px">
                 @for (role of rolesPreview(user); track role.role_id) {
                   <span class="pill" [class]="groupCls(role.group_name)" style="font-size:10px">
-                    {{ role.group_display ?? role.group_name }}
+                    {{ role.group_display || role.group_name }}
                     <span style="opacity:.7">{{ role.access_level }}</span>
                   </span>
                 }
@@ -361,7 +361,7 @@ import { AuthService } from '../../core/auth/auth.service';
               <div class="sec-title" style="margin-top:24px">Group Roles ({{ (selected()!.roles ?? []).length }})</div>
               @for (role of selected()!.roles ?? []; track role.role_id) {
                 <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
-                  <wt-group-pill [name]="role.group_display ?? role.group_name" />
+                  <wt-group-pill [name]="role.group_display || role.group_name" />
                   <span class="badge" [class]="role.access_level === 'full' ? 's-signed' : 's-new'">{{ role.access_level }}</span>
                   <span style="flex:1"></span>
                   <button class="btn btn-d btn-sm" (click)="removeRole(role.role_id)">Remove</button>
