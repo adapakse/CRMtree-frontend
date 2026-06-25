@@ -1,0 +1,40 @@
+name: Build & Deploy Frontend
+
+on:
+  push:
+    branches: [master]
+
+env:
+  ACR:      crmtreeregistry.azurecr.io
+  ACR_USER: crmtreeregistry
+  APP_NAME: crmtree-frontend
+  RG:       rg-crmtree-prod
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.ACR }}/${{ env.APP_NAME }}:${{ github.run_number }} .
+
+      - name: Push to ACR
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | \
+            docker login ${{ env.ACR }} -u ${{ env.ACR_USER }} --password-stdin
+          docker push ${{ env.ACR }}/${{ env.APP_NAME }}:${{ github.run_number }}
+
+      - name: Deploy to Azure Container App
+        run: |
+          az login --service-principal \
+            -u ${{ secrets.AZURE_CLIENT_ID }} \
+            -p ${{ secrets.AZURE_CLIENT_SECRET }} \
+            --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          az containerapp update \
+            --name ${{ env.APP_NAME }} \
+            --resource-group ${{ env.RG }} \
+            --image ${{ env.ACR }}/${{ env.APP_NAME }}:${{ github.run_number }}
