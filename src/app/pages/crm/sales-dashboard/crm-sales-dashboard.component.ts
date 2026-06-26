@@ -182,7 +182,7 @@ interface PipelineRow {
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: 'Nowe leady – bieżący tydzień' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: 'Nowe leady – wartość bieżący tydzień' })">
       <div class="kpi-icon" style="background:#E6F4EA">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
           <line x1="12" y1="1" x2="12" y2="23"/>
@@ -1000,11 +1000,15 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     this.weekNavStart = `${thisMon.getFullYear()}-${pad(thisMon.getMonth()+1)}-${pad(thisMon.getDate())}`;
     this.weekNavEnd   = `${thisSun.getFullYear()}-${pad(thisSun.getMonth()+1)}-${pad(thisSun.getDate())}`;
 
-    const thisW = leads.filter(l => {
+    // KPI 1 & 2: only leads assigned to the logged-in user, created this/last week
+    const userId  = this.auth.user()?.id;
+    const myLeads = userId ? leads.filter(l => l.assigned_to === userId) : leads;
+
+    const thisW = myLeads.filter(l => {
       const d = new Date(l.created_at);
       return d >= thisMon && d <= thisSun;
     });
-    const lastW = leads.filter(l => {
+    const lastW = myLeads.filter(l => {
       const d = new Date(l.created_at);
       return d >= lastMon && d < thisMon;
     });
@@ -1013,8 +1017,8 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     this.kpiNewLeadsChange = lastW.length > 0
       ? Math.round((thisW.length - lastW.length) / lastW.length * 100) : null;
 
-    const thisWValue = thisW.filter(l => l.close_date).reduce((s, l) => s + Number(l.value_pln || 0), 0);
-    const lastWValue = lastW.filter(l => l.close_date).reduce((s, l) => s + Number(l.value_pln || 0), 0);
+    const thisWValue = thisW.reduce((s, l) => s + Number(l.value_pln || 0), 0);
+    const lastWValue = lastW.reduce((s, l) => s + Number(l.value_pln || 0), 0);
     this.kpiNewLeadsValue       = thisWValue;
     this.kpiNewLeadsValueChange = lastWValue > 0
       ? Math.round((thisWValue - lastWValue) / lastWValue * 100) : null;
