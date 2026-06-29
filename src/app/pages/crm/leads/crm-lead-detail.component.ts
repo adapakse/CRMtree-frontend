@@ -519,7 +519,28 @@ import { QuillModule } from 'ngx-quill';
             <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
           </div>
           <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
-            <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            <ng-container *ngIf="a.gmail_thread_id; else singleBody">
+              <div *ngIf="loadingThread" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie wątku…</div>
+              <div *ngFor="let m of threadMessages"
+                   [style.background]="m.created_by ? 'white' : '#fffbeb'"
+                   [style.border]="m.created_by ? '1px solid #e5e7eb' : '1px solid #fbbf24'"
+                   style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                  <span style="font-weight:600">{{m.from}}</span>
+                  <span>{{m.date | date:'dd.MM.yyyy HH:mm'}}</span>
+                </div>
+                <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
+                <ng-container *ngIf="m.cleanBody && m.body !== m.cleanBody">
+                  <button (click)="m._showQuote = !m._showQuote" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
+                    {{m._showQuote ? '▲ Ukryj cytowaną historię' : '▾ Pokaż cytowaną historię'}}
+                  </button>
+                  <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.body"></div>
+                </ng-container>
+              </div>
+            </ng-container>
+            <ng-template #singleBody>
+              <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            </ng-template>
             <!-- Inline reply form -->
             <div *ngIf="showReplyInline" style="border:1px solid #dbeafe;border-radius:8px;padding:12px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
               <div style="font-size:11px;font-weight:700;color:#1d4ed8">↩ Odpowiedz</div>
@@ -2616,16 +2637,21 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       return;
     }
     this.openThreadId = threadId;
+    this.loadingThread = true;
     this.api.getLeadEmailThread(this.lead.id, threadId).subscribe({
       next: msgs => this.zone.run(() => {
+        if (this.openThreadId !== threadId) return;
         this.threadMessages = msgs;
-        // Synchronizuj lokalny stan is_read z odpowiedzią serwera
-        // (serwer oznacza wątek jako przeczytany po stronie DB)
+        this.loadingThread = false;
         const act = (this.lead?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
         if (act && !act.is_read) act.is_read = true;
         this.cdr.markForCheck();
       }),
-      error: () => {},
+      error: () => this.zone.run(() => {
+        if (this.openThreadId !== threadId) return;
+        this.loadingThread = false;
+        this.cdr.markForCheck();
+      }),
     });
   }
 
@@ -2712,15 +2738,24 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (this.expandedEmailId === a.id) {
       this.expandedEmailId = null;
       this.showReplyInline = false;
+      this.openThreadId   = '';
+      this.threadMessages = [];
+      this.loadingThread  = false;
       this.cdr.markForCheck();
       return;
     }
     this.expandedEmailId = a.id;
     this.showReplyInline = false;
+    this.openThreadId    = '';
+    this.threadMessages  = [];
+    this.loadingThread   = false;
     this.cdr.markForCheck();
     if (!a.is_read) {
       a.is_read = true;
       this.api.patchLeadActivityRead(this.lead.id, a.id, true).subscribe({ error: () => {} });
+    }
+    if (a.gmail_thread_id) {
+      this.openThread(a.gmail_thread_id);
     }
   }
 
