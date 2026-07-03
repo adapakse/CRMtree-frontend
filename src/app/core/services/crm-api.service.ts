@@ -81,6 +81,7 @@ export interface LeadActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  email_provider: 'gmail' | 'outlook' | 'zoho' | null;
   is_read: boolean | null;
   priority?: string | null;
   reminder_type?: string | null;
@@ -300,6 +301,7 @@ export interface PartnerActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  email_provider: 'gmail' | 'outlook' | 'zoho' | null;
   is_read: boolean;
   priority?: string | null;
   reminder_type?: string | null;
@@ -1297,6 +1299,58 @@ export class CrmApiService {
       `${BASE}/gmail/attachment/${messageId}/${attachmentId}`,
       { params, responseType: 'blob' },
     );
+  }
+
+  // ── Outlook ───────────────────────────────────────────────────────────────
+  sendLeadEmailOutlook(leadId: number, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; references?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/outlook/send/lead/${leadId}`, data);
+  }
+  getLeadEmailThreadOutlook(leadId: number, conversationId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/outlook/thread/lead/${leadId}/${conversationId}`);
+  }
+  sendPartnerEmailOutlook(partnerId: number | string, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; references?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/outlook/send/partner/${partnerId}`, data);
+  }
+  getPartnerEmailThreadOutlook(partnerId: number | string, conversationId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/outlook/thread/partner/${partnerId}/${conversationId}`);
+  }
+  getOutlookStatus(): Observable<{ connected: boolean; email?: string }> {
+    return this.http.get<{ connected: boolean; email?: string }>(`${BASE}/outlook/status`);
+  }
+  getOutlookAuthUrl(): Observable<{ url: string }> {
+    return this.http.get<{ url: string }>(`${BASE}/outlook/oauth/url`);
+  }
+  disconnectOutlook(): Observable<{ ok: boolean }> {
+    return this.http.delete<{ ok: boolean }>(`${BASE}/outlook/oauth/disconnect`);
+  }
+  debugProcessOutlook(): Observable<any> {
+    return this.http.post<any>(`${BASE}/outlook/debug/process`, {});
+  }
+
+  // ── Zoho Mail ─────────────────────────────────────────────────────────────
+  sendLeadEmailZoho(leadId: number, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; threadId?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/zoho/send/lead/${leadId}`, data);
+  }
+  getLeadEmailThreadZoho(leadId: number, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/zoho/thread/lead/${leadId}/${threadId}`);
+  }
+  sendPartnerEmailZoho(partnerId: number | string, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; threadId?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/zoho/send/partner/${partnerId}`, data);
+  }
+  getPartnerEmailThreadZoho(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/zoho/thread/partner/${partnerId}/${threadId}`);
+  }
+  getZohoStatus(): Observable<{ connected: boolean; email?: string }> {
+    return this.http.get<{ connected: boolean; email?: string }>(`${BASE}/zoho/status`);
+  }
+  getZohoAuthUrl(): Observable<{ url: string }> {
+    return this.http.get<{ url: string }>(`${BASE}/zoho/oauth/url`);
+  }
+  disconnectZoho(): Observable<{ ok: boolean }> {
+    return this.http.delete<{ ok: boolean }>(`${BASE}/zoho/oauth/disconnect`);
+  }
+  debugProcessZoho(): Observable<any> {
+    return this.http.post<any>(`${BASE}/zoho/debug/process`, {});
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────

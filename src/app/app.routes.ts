@@ -20,6 +20,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/crm/gmail-callback/gmail-callback.component').then(m => m.GmailCallbackComponent),
   },
   {
+    path: 'crm/outlook/callback',
+    loadComponent: () => import('./pages/crm/outlook-callback/outlook-callback.component').then(m => m.OutlookCallbackComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],
