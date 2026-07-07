@@ -134,6 +134,14 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                           <line x1="15" y1="12" x2="3" y2="12"/>
                         </svg>
                       </button>
+                      <button class="btn-icon btn-danger-icon" (click)="openDeleteTenant(t); $event.stopPropagation()" title="Usuń tenant">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3,6 5,6 21,6"/>
+                          <path d="M19,6v14a2,2 0 0 1-2,2H7a2,2 0 0 1-2-2V6m3,0V4a2,2 0 0 1 2,-2h4a2,2 0 0 1 2,2v2"/>
+                          <line x1="10" y1="11" x2="10" y2="17"/>
+                          <line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -196,15 +204,6 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                               </div>
                               <button class="btn-reinit" [disabled]="saving()" (click)="reinit(t.id)">
                                 {{ saving() ? 'Kopiuję...' : '↺ Reinit z Gold' }}
-                              </button>
-                            </div>
-                            <div class="danger-zone">
-                              <div class="danger-zone-desc">
-                                <strong>Strefa niebezpieczna</strong>
-                                <span>Usunięcie ukryje tenant ze standardowej listy i natychmiast zablokuje dostęp jego użytkownikom. Dane, tokeny skrzynek i konfiguracje pozostają w bazie — to nie jest trwałe kasowanie.</span>
-                              </div>
-                              <button class="btn-danger" [disabled]="saving()" (click)="openDeleteTenant(t)">
-                                🗑 Usuń tenant
                               </button>
                             </div>
                             <div class="panel-footer">
@@ -713,14 +712,10 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
               tokeny przestaną działać przy kolejnym żądaniu. Dane, tokeny skrzynek i konfiguracje
               <strong>pozostają w bazie</strong> — to nie jest trwałe kasowanie.
             </p>
-            <label class="delete-confirm-field">
-              Wpisz nazwę lub slug tenanta, aby potwierdzić
-              <input [(ngModel)]="deleteConfirmText" [placeholder]="deleteTarget()!.name" autocomplete="off">
-            </label>
           </div>
           <div class="modal-footer">
             <button class="btn-secondary" (click)="cancelDeleteTenant()">Anuluj</button>
-            <button class="btn-danger" [disabled]="saving() || !canConfirmDelete()" (click)="confirmDeleteTenant()">
+            <button class="btn-danger" [disabled]="saving()" (click)="confirmDeleteTenant()">
               {{ saving() ? 'Usuwam...' : 'Usuń tenant' }}
             </button>
           </div>
@@ -777,6 +772,8 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
     .btn-icon:hover { background: var(--gray-100); color: var(--gray-700); }
     .btn-icon svg { width: 15px; height: 15px; transition: transform .2s; }
     .btn-icon.btn-imp:hover { background: #eff6ff; color: #2563eb; }
+    .btn-icon.btn-danger-icon { color: #dc2626; }
+    .btn-icon.btn-danger-icon:hover { background: #fee2e2; color: #b91c1c; }
 
     /* Edit panel */
     .edit-panel { background: var(--orange-pale); }
@@ -890,19 +887,6 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
     .btn-reinit:hover:not(:disabled) { background: #d97706; }
     .btn-reinit:disabled { opacity: .55; cursor: not-allowed; }
 
-    .danger-zone {
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
-      padding: 12px 16px; margin-bottom: 16px;
-    }
-    .danger-zone-desc { display: flex; flex-direction: column; gap: 2px; font-size: 13px; }
-    .danger-zone-desc strong { color: #991b1b; }
-    .danger-zone-desc span { color: var(--gray-500); font-size: 12px; }
-    .delete-confirm-field { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--gray-700); }
-    .delete-confirm-field input {
-      font-weight: 400; padding: 8px 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 13.5px;
-    }
-
     /* Email providers tab */
     .provider-card {
       background: white; border: 1px solid var(--gray-200); border-radius: 8px;
@@ -1002,7 +986,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
   addUserTenantId   = signal<string | null>(null);
   impersonateTarget = signal<Tenant | null>(null);
   deleteTarget       = signal<Tenant | null>(null);
-  deleteConfirmText  = '';
 
   tempPassword  = signal<string | null>(null);
   tempUserEmail = signal<string>('');
@@ -1229,34 +1212,21 @@ export class TenantsComponent implements OnInit, OnDestroy {
   // the tenant just disappears from the standard list and its users are
   // locked out (see requireAuth / routes/auth.js on the backend). ─────────
   openDeleteTenant(t: Tenant): void {
-    this.deleteConfirmText = '';
     this.deleteTarget.set(t);
   }
   cancelDeleteTenant(): void {
     this.deleteTarget.set(null);
-    this.deleteConfirmText = '';
-  }
-
-  // Requires typing the exact tenant name or slug — a plain confirm() isn't
-  // enough friction for a destructive, hard-to-notice-by-accident action.
-  canConfirmDelete(): boolean {
-    const t = this.deleteTarget();
-    if (!t) return false;
-    const v = this.deleteConfirmText.trim().toLowerCase();
-    if (!v) return false;
-    return v === t.name.trim().toLowerCase() || v === t.slug.trim().toLowerCase();
   }
 
   confirmDeleteTenant(): void {
     const t = this.deleteTarget();
-    if (!t || !this.canConfirmDelete()) return;
+    if (!t) return;
     this.saving.set(true);
     this.http.delete(`${API}/admin/tenants/${t.id}`).subscribe({
       next: () => {
         this.tenants.update(ts => ts.filter(x => x.id !== t.id));
         this.saving.set(false);
         this.deleteTarget.set(null);
-        this.deleteConfirmText = '';
         this.cancelEdit();
         this.toast.success(`Tenant „${t.name}” usunięty — dane pozostają w bazie, dostęp został zablokowany.`);
       },
