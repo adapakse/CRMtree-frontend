@@ -44,6 +44,10 @@ export interface Tenant {
   total_users?: number;
   features?: TenantFeature[];
   auth_configs?: { provider: string; is_enabled: boolean }[];
+  active_email_provider?: 'gmail' | 'outlook' | 'zoho' | null;
+  crm_training_mode?: boolean;
+  deleted_at?: string | null;
+  deleted_by?: string | null;
   created_at: string;
   updated_at: string;
 }

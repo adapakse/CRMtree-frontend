@@ -5,17 +5,19 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize, catchError, map } from 'rxjs/operators';
-import { forkJoin, of, Observable } from 'rxjs';
+import { of } from 'rxjs';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
   LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
-  GmailSendResult, ConsentValue,
+  GmailSendResult, ConsentValue, EmailStatus,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
 import { formatAddressDisplay, countExtraAddresses } from '../../../shared/utils/email-address.util';
+import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
+import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { QuillModule } from 'ngx-quill';
 
 @Component({
@@ -86,7 +88,7 @@ import { QuillModule } from 'ngx-quill';
           <span class="lbl">Email</span>
           <span class="val" style="display:flex;align-items:center;gap:4px">
             <a class="link" href="mailto:{{lead.email}}">{{lead.email}}</a>
-            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" title="Wyślij przez Gmail">✉️</button>
+            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" title="Wyślij email">✉️</button>
           </span>
         </div>
         <div class="info-kv" *ngIf="lead.phone">
@@ -431,10 +433,10 @@ import { QuillModule } from 'ngx-quill';
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
           <ng-container *ngIf="settings.settings().crm_training_mode">
-            <button class="btn-sm" (click)="debugProcessGmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile przez Gmail API (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
+            <button class="btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
           </ng-container>
-          <ng-container *ngIf="!settings.settings().crm_training_mode && (gmailConnected || outlookConnected || zohoConnected)">
-            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile we wszystkich połączonych skrzynkach">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
+          <ng-container *ngIf="!settings.settings().crm_training_mode && emailConnected">
+            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
             <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
           </ng-container>
           <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" (click)="openEmailCompose()">+ Nowy email</button>
@@ -446,105 +448,27 @@ import { QuillModule } from 'ngx-quill';
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ Nowy email</div>
             <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false; includeHistoryCompose=false">✕</button>
           </div>
-          <!-- Provider row — always visible when compose is open -->
+          <!-- Provider row — always visible when compose is open. The company mailbox is
+               connected/changed/disconnected only by a superadmin from Tenant → Email;
+               this only shows the tenant's single active provider's connection state. -->
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <ng-container *ngIf="!settings.settings().crm_training_mode">
-            <!-- overlay — closes any open provider menu on outside click -->
-            <div *ngIf="showGmailMenu || showOutlookMenu || showZohoMenu"
-                 (click)="showGmailMenu=false;showOutlookMenu=false;showZohoMenu=false"
-                 style="position:fixed;inset:0;z-index:99"></div>
-            <!-- Gmail + Outlook share equal width on wide screens, stack on narrow -->
             <div style="display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0;align-items:stretch">
-              <!-- Gmail tile -->
-              <ng-container *ngIf="gmailConnected">
-                <div class="provider-slot" style="position:relative;display:flex">
-                  <div (click)="selectedProvider='gmail';showGmailMenu=false"
-                       [style.border]="selectedProvider==='gmail' ? '2px solid #3BAA5D' : '2px solid #e5e7eb'"
-                       [style.background]="selectedProvider==='gmail' ? '#dcfce7' : '#f0fdf4'"
-                       style="display:flex;align-items:center;width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;cursor:pointer;transition:all .15s">
-                    <span style="flex:1;min-width:0;padding:5px 8px 5px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-                          [title]="gmailEmail">✅ Gmail · <strong>{{gmailEmail}}</strong></span>
-                    <button (click)="$event.stopPropagation();showGmailMenu=!showGmailMenu;showOutlookMenu=false"
-                            [attr.aria-expanded]="showGmailMenu"
-                            [style.border-left]="selectedProvider==='gmail' ? '1px solid #3BAA5D' : '1px solid #e5e7eb'"
-                            aria-label="Opcje konta Gmail"
-                            title="Opcje konta Gmail"
-                            style="border:none;background:none;cursor:pointer;padding:6px 12px;color:#6b7280;font-size:15px;line-height:1;align-self:stretch;display:flex;align-items:center;flex-shrink:0">⋮</button>
-                  </div>
-                  <div *ngIf="showGmailMenu"
-                       style="position:absolute;top:calc(100% + 4px);left:0;z-index:100;background:#fff;border:1px solid #e5e7eb;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);min-width:140px;overflow:hidden">
-                    <button (click)="changeAccountGmail();showGmailMenu=false"
-                            style="display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;color:#374151;white-space:nowrap">Zmień konto</button>
-                    <button (click)="disconnectGmail();showGmailMenu=false"
-                            style="display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;color:#ef4444;white-space:nowrap">Odłącz konto</button>
-                  </div>
-                </div>
-              </ng-container>
-              <button *ngIf="!gmailConnected && gmailAuthUrl && !settings.settings().crm_training_mode"
-                      (click)="connectGmail()"
-                      class="provider-slot" style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center">🔗 Połącz Gmail</button>
-              <!-- Outlook tile -->
-              <ng-container *ngIf="outlookConnected">
-                <div class="provider-slot" style="position:relative;display:flex">
-                  <div (click)="selectedProvider='outlook';showOutlookMenu=false"
-                       [style.border]="selectedProvider==='outlook' ? '2px solid #0078d4' : '2px solid #e5e7eb'"
-                       [style.background]="selectedProvider==='outlook' ? '#dbeafe' : '#eff6ff'"
-                       style="display:flex;align-items:center;width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;cursor:pointer;transition:all .15s">
-                    <span style="flex:1;min-width:0;padding:5px 8px 5px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-                          [title]="outlookEmail">✅ Outlook · <strong>{{outlookEmail}}</strong></span>
-                    <button (click)="$event.stopPropagation();showOutlookMenu=!showOutlookMenu;showGmailMenu=false"
-                            [attr.aria-expanded]="showOutlookMenu"
-                            [style.border-left]="selectedProvider==='outlook' ? '1px solid #0078d4' : '1px solid #e5e7eb'"
-                            aria-label="Opcje konta Outlook"
-                            title="Opcje konta Outlook"
-                            style="border:none;background:none;cursor:pointer;padding:6px 12px;color:#6b7280;font-size:15px;line-height:1;align-self:stretch;display:flex;align-items:center;flex-shrink:0">⋮</button>
-                  </div>
-                  <div *ngIf="showOutlookMenu"
-                       style="position:absolute;top:calc(100% + 4px);left:0;z-index:100;background:#fff;border:1px solid #e5e7eb;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);min-width:140px;overflow:hidden">
-                    <button (click)="changeAccountOutlook();showOutlookMenu=false"
-                            style="display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;color:#374151;white-space:nowrap">Zmień konto</button>
-                    <button (click)="disconnectOutlook();showOutlookMenu=false"
-                            style="display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;color:#ef4444;white-space:nowrap">Odłącz konto</button>
-                  </div>
-                </div>
-              </ng-container>
-              <button *ngIf="!outlookConnected && outlookAuthUrl && !settings.settings().crm_training_mode"
-                      (click)="connectOutlook()"
-                      class="provider-slot" style="background:#0078d4;color:white;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center">🔗 Połącz Outlook</button>
-              <!-- Zoho tile -->
-              <ng-container *ngIf="zohoConnected">
-                <div class="provider-slot" style="position:relative;display:flex">
-                  <div (click)="selectedProvider='zoho';showZohoMenu=false"
-                       [style.border]="selectedProvider==='zoho' ? '2px solid #E42527' : '2px solid #e5e7eb'"
-                       [style.background]="selectedProvider==='zoho' ? '#fde8e8' : '#fef2f2'"
-                       style="display:flex;align-items:center;width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;cursor:pointer;transition:all .15s">
-                    <span style="flex:1;min-width:0;padding:5px 8px 5px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-                          [title]="zohoEmail">✅ Zoho · <strong>{{zohoEmail}}</strong></span>
-                    <button (click)="$event.stopPropagation();showZohoMenu=!showZohoMenu;showGmailMenu=false;showOutlookMenu=false"
-                            [attr.aria-expanded]="showZohoMenu"
-                            [style.border-left]="selectedProvider==='zoho' ? '1px solid #E42527' : '1px solid #e5e7eb'"
-                            aria-label="Opcje konta Zoho"
-                            title="Opcje konta Zoho"
-                            style="border:none;background:none;cursor:pointer;padding:6px 12px;color:#6b7280;font-size:15px;line-height:1;align-self:stretch;display:flex;align-items:center;flex-shrink:0">⋮</button>
-                  </div>
-                  <div *ngIf="showZohoMenu"
-                       style="position:absolute;top:calc(100% + 4px);left:0;z-index:100;background:#fff;border:1px solid #e5e7eb;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);min-width:140px;overflow:hidden">
-                    <button (click)="changeAccountZoho();showZohoMenu=false"
-                            style="display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;color:#374151;white-space:nowrap">Zmień konto</button>
-                    <button (click)="disconnectZoho();showZohoMenu=false"
-                            style="display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;color:#ef4444;white-space:nowrap">Odłącz konto</button>
-                  </div>
-                </div>
-              </ng-container>
-              <button *ngIf="!zohoConnected && zohoAuthUrl && !settings.settings().crm_training_mode"
-                      (click)="connectZoho()"
-                      class="provider-slot" style="background:#E42527;color:white;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center">🔗 Połącz Zoho</button>
+              <div *ngIf="emailConnected"
+                   [style.border]="'1.5px solid ' + emailProviderColor"
+                   [style.background]="emailProviderBg"
+                   style="display:inline-flex;align-items:center;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden">
+                <span style="min-width:0;padding:4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                      [title]="emailAddress">Od: <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
+              </div>
+              <div *ngIf="!emailConnected && emailProviderKey" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">Skrzynka firmowa nie jest jeszcze podłączona — skontaktuj się z administratorem.</div>
+              <div *ngIf="!emailProviderKey" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.</div>
             </div>
             </ng-container>
             <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 Tryb szkoleniowy</div>
           </div>
-          <!-- Email form — shown when any provider connected or training mode -->
-          <ng-container *ngIf="gmailConnected || outlookConnected || zohoConnected || settings.settings().crm_training_mode">
+          <!-- Email form — shown when connected or training mode -->
+          <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
                       style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
@@ -579,11 +503,10 @@ import { QuillModule } from 'ngx-quill';
             </label>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-              <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
             </div>
-            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
-              <span>⚠️ Wymagane ponowne połączenie Gmail</span>
-              <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="font-size:11px;padding:3px 10px;border:1px solid #fb923c;border-radius:5px;background:#fff;color:#ea580c;cursor:pointer">Połącz ponownie</button>
+            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px">
+              ⚠️ Wymagane ponowne połączenie skrzynki Gmail — skontaktuj się z administratorem.
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
               <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
@@ -633,11 +556,11 @@ import { QuillModule } from 'ngx-quill';
                   <span>{{m.date | date:'dd.MM.yyyy HH:mm'}}</span>
                 </div>
                 <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
-                <ng-container *ngIf="m.cleanBody && m.body !== m.cleanBody">
+                <ng-container *ngIf="m.quotedBody">
                   <button (click)="m._showQuote = !m._showQuote" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
                     {{m._showQuote ? '▲ Ukryj cytowaną historię' : '▾ Pokaż cytowaną historię'}}
                   </button>
-                  <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.body"></div>
+                  <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
                 </ng-container>
               </div>
             </ng-container>
@@ -681,7 +604,7 @@ import { QuillModule } from 'ngx-quill';
               <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" placeholder="Treść odpowiedzi…" style="display:block" theme="snow"></quill-editor>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-                <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Drive'}}</button>
+                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Drive'}}</button>
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
                 <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
@@ -693,7 +616,7 @@ import { QuillModule } from 'ngx-quill';
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
-              <button *ngIf="a.gmail_thread_id && canEdit && ((a.email_provider !== 'outlook' && a.email_provider !== 'zoho' && gmailConnected) || (a.email_provider === 'outlook' && outlookConnected) || (a.email_provider === 'zoho' && zohoConnected))" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
+              <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
             </div>
           </div>
         </div>
@@ -951,7 +874,7 @@ import { QuillModule } from 'ngx-quill';
           <span style="font-size:12px;font-weight:600">Załączniki</span>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
-            <button *ngIf="gmailConnected && !driveNeedsReauth"
+            <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
                     (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
                     style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
               <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
@@ -971,8 +894,8 @@ import { QuillModule } from 'ngx-quill';
     </div>
     <div class="modal-footer">
       <button class="btn-outline" (click)="closeMsgModal()">Zamknij</button>
-      <button *ngIf="!msgModalReply && (gmailConnected || outlookConnected || zohoConnected)" class="btn-outline" (click)="startMsgReply()">↩ Odpowiedz</button>
-      <button *ngIf="msgModalReply && (gmailConnected || outlookConnected || zohoConnected)" class="btn-primary" (click)="sendMsgReply()"
+      <button *ngIf="!msgModalReply && emailConnected" class="btn-outline" (click)="startMsgReply()">↩ Odpowiedz</button>
+      <button *ngIf="msgModalReply && emailConnected" class="btn-primary" (click)="sendMsgReply()"
               [disabled]="msgModalSending || !msgModalForm.recipientList?.length || !msgModalForm.subject">
         {{msgModalSending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}
       </button>
@@ -1624,17 +1547,14 @@ import { QuillModule } from 'ngx-quill';
     .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid #e5e7eb; background:white; cursor:pointer; font-size:15px; line-height:1; color:#9ca3af; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
     .panel-collapse-btn:hover { background:#E6F4EA; color:#3BAA5D; border-color:#a7d7b5; }
     .left-panel-collapsed { overflow:hidden; }
-    .provider-slot { flex: 0 0 auto; }
-    @media (max-width: 640px) { .provider-slot { width: 100%; } }
   `],
 })
 export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private gmailBc: BroadcastChannel | null = null;
   private outlookBc: BroadcastChannel | null = null;
+  private zohoBc: BroadcastChannel | null = null;
   private emailPollInterval: any = null;
   debugProcessing = false;
-  debugProcessingOutlook = false;
-  debugProcessingZoho = false;
   syncingAll  = false;
   syncResult  = '';
   showReplyDetails       = false;
@@ -1642,53 +1562,34 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   includeHistoryInline   = false;
   includeHistoryModal    = false;
 
-  private onGmailOauthResult(status: string): void {
+  // Any of the 3 OAuth callback pages (gmail/outlook/zoho) reports back here —
+  // whichever one fired is, by construction, the tenant's active provider, so
+  // we just refresh the unified status instead of tracking 3 separate flags.
+  private onEmailOauthResult(status: string): void {
     if (status !== 'connected') return;
-    this.api.getGmailStatus().subscribe({
-      next: s => this.zone.run(() => {
-        this.gmailConnected  = s.connected;
-        this.gmailEmail      = s.email || '';
-        this.gmailAuthUrl    = '';
-        if (s.connected) this.driveNeedsReauth = false;
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
-  }
-
-  private onOutlookOauthResult(status: string): void {
-    if (status !== 'connected') return;
-    this.api.getOutlookStatus().subscribe({
-      next: s => this.zone.run(() => {
-        this.outlookConnected = s.connected;
-        this.outlookEmail     = s.email || '';
-        this.outlookAuthUrl   = '';
-        if (s.connected) this.selectedProvider = 'outlook';
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
+    this.loadEmailStatus(() => { this.driveNeedsReauth = false; });
   }
 
   // storage event — główny mechanizm (działa dla nowych kart i popupów przez redirecty)
   private gmailStorageHandler = (e: StorageEvent) => {
     if (e.key === 'gmail_oauth_connected' && e.newValue) {
       localStorage.removeItem('gmail_oauth_connected');
-      this.onGmailOauthResult('connected');
+      this.onEmailOauthResult('connected');
     }
     if (e.key === 'outlook_oauth_connected' && e.newValue) {
       localStorage.removeItem('outlook_oauth_connected');
-      this.onOutlookOauthResult('connected');
+      this.onEmailOauthResult('connected');
+    }
+    if (e.key === 'zoho_oauth_connected' && e.newValue) {
+      localStorage.removeItem('zoho_oauth_connected');
+      this.onEmailOauthResult('connected');
     }
   };
 
   private gmailMessageHandler = (e: MessageEvent) => {
     if (e.origin !== window.location.origin) return;
-    if (e.data?.type === 'gmail-oauth-result') {
-      this.onGmailOauthResult(e.data.status);
-    }
-    if (e.data?.type === 'outlook-oauth-result') {
-      this.onOutlookOauthResult(e.data.status);
+    if (e.data?.type === 'gmail-oauth-result' || e.data?.type === 'outlook-oauth-result' || e.data?.type === 'zoho-oauth-result') {
+      this.onEmailOauthResult(e.data.status);
     }
   };
   @Input() id!: string;
@@ -2189,22 +2090,25 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   mockCallActive      = false;
   phoneSimulatorActive = false;
 
-  // ── Gmail ────────────────────────────────────────────────────────────────────
-  gmailConnected  = false;
-  gmailEmail      = '';
-  gmailAuthUrl    = '';
-  // ── Outlook ──────────────────────────────────────────────────────────────────
-  outlookConnected  = false;
-  outlookEmail      = '';
-  outlookAuthUrl    = '';
-  // ── Zoho ─────────────────────────────────────────────────────────────────────
-  zohoConnected  = false;
-  zohoEmail      = '';
-  zohoAuthUrl    = '';
-  selectedProvider: 'gmail' | 'outlook' | 'zoho' = 'gmail';
-  showGmailMenu   = false;
-  showOutlookMenu = false;
-  showZohoMenu    = false;
+  // ── Email — tenant's single active provider and shared company mailbox.
+  // Connect/change/disconnect only happens from Tenant → Email (superadmin) —
+  // this view is read-only with respect to the mailbox connection itself.
+  emailStatus: EmailStatus | null = null;
+  emailAddress = '';
+
+  get emailProviderKey(): EmailProviderKey | null { return this.emailStatus?.provider ?? null; }
+  get emailConnected(): boolean { return !!this.emailStatus?.connected; }
+  get emailProviderLabel(): string { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].label : ''; }
+  get emailProviderColor(): string { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].color : '#9ca3af'; }
+  get emailProviderBg(): string    { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].bg    : '#f9fafb'; }
+
+  // A stored activity can carry an email_provider from a provider the tenant
+  // no longer has active (e.g. after a super admin switch) — replying must
+  // stay on the currently active, connected provider only.
+  canReplyToActivity(a: any): boolean {
+    return this.emailConnected && (a.email_provider || 'gmail') === this.emailProviderKey;
+  }
+
   showEmailModal  = false;  // kept for backward compat but unused
   showEmailCompose = false;
   expandedEmailId: number | null = null;
@@ -2335,46 +2239,25 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       next: sources => { this.zone.run(() => { this.leadSources = sources; this.cdr.markForCheck(); }); },
       error: () => {},
     });
-    // Check Gmail and Outlook connection status in parallel
-    this.api.getGmailStatus().subscribe({
-      next: s => this.zone.run(() => {
-        this.gmailConnected = s.connected;
-        this.gmailEmail     = s.email || '';
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
-    this.api.getOutlookStatus().subscribe({
-      next: s => this.zone.run(() => {
-        this.outlookConnected = s.connected;
-        this.outlookEmail     = s.email || '';
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
-    this.api.getZohoStatus().subscribe({
-      next: s => this.zone.run(() => {
-        this.zohoConnected = s.connected;
-        this.zohoEmail     = s.email || '';
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
+    // Tenant's single active email provider — resolved server-side, never chosen here.
+    this.loadEmailStatus();
     // BroadcastChannel — primary mechanism (bypasses window.opener nulling by Google COOP)
     try {
       this.gmailBc = new BroadcastChannel('gmail-oauth');
       this.gmailBc.onmessage = (e) => {
-        if (e.data?.type === 'gmail-oauth-result') {
-          this.onGmailOauthResult(e.data.status);
-        }
+        if (e.data?.type === 'gmail-oauth-result') this.onEmailOauthResult(e.data.status);
       };
     } catch (_) {}
     try {
       this.outlookBc = new BroadcastChannel('outlook-oauth');
       this.outlookBc.onmessage = (e) => {
-        if (e.data?.type === 'outlook-oauth-result') {
-          this.onOutlookOauthResult(e.data.status);
-        }
+        if (e.data?.type === 'outlook-oauth-result') this.onEmailOauthResult(e.data.status);
+      };
+    } catch (_) {}
+    try {
+      this.zohoBc = new BroadcastChannel('zoho-oauth');
+      this.zohoBc.onmessage = (e) => {
+        if (e.data?.type === 'zoho-oauth-result') this.onEmailOauthResult(e.data.status);
       };
     } catch (_) {}
     // storage event — primary mechanism (new tab / popup via redirects)
@@ -2383,12 +2266,26 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     window.addEventListener('message', this.gmailMessageHandler);
   }
 
+  loadEmailStatus(onDone?: () => void): void {
+    this.api.getEmailStatus().subscribe({
+      next: s => this.zone.run(() => {
+        this.emailStatus  = s;
+        this.emailAddress = s.email || '';
+        onDone?.();
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
+
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.gmailStorageHandler);
     this.gmailBc?.close();
     this.gmailBc = null;
     this.outlookBc?.close();
     this.outlookBc = null;
+    this.zohoBc?.close();
+    this.zohoBc = null;
     window.removeEventListener('message', this.gmailMessageHandler);
     if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
@@ -2431,197 +2328,39 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  debugProcessGmail(): void {
+  debugProcessEmail(): void {
     this.debugProcessing = true;
     this.cdr.markForCheck();
-    this.api.debugProcessGmail().subscribe({
+    this.api.debugProcessEmail().subscribe({
       next: (result: any) => this.zone.run(() => {
         this.debugProcessing = false;
-        console.log('[Debug] processGmail result:', result);
-        alert(
-          `historyId: ${result.historyId_before} → ${result.historyId_after}\n` +
-          `Nowe wiadomości: ${(result.messageIds_found || []).length}\n` +
-          `crm_email_message_reads (ostatnie 10): ${result.recent_message_reads?.length || 0} rekordów\n\n` +
-          `Sprawdź konsolę po szczegóły.`
-        );
+        console.log('[Debug] processEmail result:', result);
+        alert(`Nowe wiadomości: ${result.newMessages_found ?? 0}`);
         this.refreshEmailActivities();
         this.cdr.markForCheck();
       }),
       error: (e: any) => this.zone.run(() => {
         this.debugProcessing = false;
         alert('Błąd: ' + (e.error?.error || e.message));
-        this.cdr.markForCheck();
-      }),
-    });
-  }
-
-  // ── Outlook ──────────────────────────────────────────────────────────────────
-  connectOutlook(): void {
-    if (!this.outlookAuthUrl) return;
-    const popup = window.open(this.outlookAuthUrl, 'outlook-oauth', 'width=600,height=700,left=300,top=100');
-    if (!popup) return;
-    const timer = setInterval(() => {
-      try {
-        if (popup.closed) {
-          clearInterval(timer);
-          this.api.getOutlookStatus().subscribe({
-            next: s => this.zone.run(() => {
-              this.outlookConnected = s.connected;
-              this.outlookEmail     = s.email || '';
-              if (s.connected) { this.outlookAuthUrl = ''; this.selectedProvider = 'outlook'; }
-              this.cdr.markForCheck();
-            }),
-            error: () => {},
-          });
-        }
-      } catch (e) { clearInterval(timer); }
-    }, 500);
-  }
-
-  debugProcessOutlook(): void {
-    this.debugProcessingOutlook = true;
-    this.cdr.markForCheck();
-    this.api.debugProcessOutlook().subscribe({
-      next: (result: any) => this.zone.run(() => {
-        this.debugProcessingOutlook = false;
-        console.log('[Debug] processOutlook result:', result);
-        alert(
-          (result.note ? result.note + '\n\n' : '') +
-          `Nowe wiadomości: ${result.newMessages_found ?? 0}\n` +
-          `deltaLink zainicjowany: ${result.deltaLink_initialized ? 'TAK' : 'NIE'}`
-        );
-        this.refreshEmailActivities();
-        this.cdr.markForCheck();
-      }),
-      error: (e: any) => this.zone.run(() => {
-        this.debugProcessingOutlook = false;
-        alert('Błąd: ' + (e.error?.error || e.message));
-        this.cdr.markForCheck();
-      }),
-    });
-  }
-
-  // ── Zoho ─────────────────────────────────────────────────────────────────────
-  connectZoho(): void {
-    if (!this.zohoAuthUrl) return;
-    const popup = window.open(this.zohoAuthUrl, 'zoho-oauth', 'width=600,height=700,left=300,top=100');
-    if (!popup) return;
-    const timer = setInterval(() => {
-      try {
-        if (popup.closed) {
-          clearInterval(timer);
-          this.api.getZohoStatus().subscribe({
-            next: s => this.zone.run(() => {
-              this.zohoConnected = s.connected;
-              this.zohoEmail     = s.email || '';
-              if (s.connected) { this.zohoAuthUrl = ''; this.selectedProvider = 'zoho'; }
-              this.cdr.markForCheck();
-            }),
-            error: () => {},
-          });
-        }
-      } catch (e) { clearInterval(timer); }
-    }, 500);
-  }
-
-  changeAccountZoho(): void {
-    this.api.getZohoAuthUrl().subscribe({
-      next: r => this.zone.run(() => {
-        const popup = window.open(r.url, 'zoho-oauth', 'width=600,height=700,left=300,top=100');
-        if (!popup) return;
-        const timer = setInterval(() => {
-          try {
-            if (popup.closed) {
-              clearInterval(timer);
-              this.api.getZohoStatus().subscribe({
-                next: s => this.zone.run(() => {
-                  this.zohoConnected = s.connected;
-                  this.zohoEmail     = s.email || '';
-                  if (s.connected) { this.zohoAuthUrl = ''; this.selectedProvider = 'zoho'; }
-                  this.cdr.markForCheck();
-                }),
-                error: () => {},
-              });
-            }
-          } catch (e) { clearInterval(timer); }
-        }, 500);
-      }),
-      error: () => {},
-    });
-  }
-
-  disconnectZoho(): void {
-    if (!confirm(`Odłączyć konto Zoho (${this.zohoEmail})?\nHistoria e-maili w CRM pozostanie bez zmian.`)) return;
-    this.api.disconnectZoho().subscribe({
-      next: () => this.zone.run(() => {
-        this.zohoConnected = false;
-        this.zohoEmail     = '';
-        if (this.selectedProvider === 'zoho') {
-          this.selectedProvider = this.gmailConnected ? 'gmail' : this.outlookConnected ? 'outlook' : 'gmail';
-        }
-        this.api.getZohoAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.zohoAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
-  }
-
-  debugProcessZoho(): void {
-    this.debugProcessingZoho = true;
-    this.cdr.markForCheck();
-    this.api.debugProcessZoho().subscribe({
-      next: (result: any) => this.zone.run(() => {
-        this.debugProcessingZoho = false;
-        alert(`Nowe wiadomości Zoho: ${result.newMessages_found ?? 0}`);
-        this.refreshEmailActivities();
-        this.cdr.markForCheck();
-      }),
-      error: (e: any) => this.zone.run(() => {
-        this.debugProcessingZoho = false;
-        alert('Błąd Zoho: ' + (e.error?.error || e.message));
         this.cdr.markForCheck();
       }),
     });
   }
 
   checkNewEmails(): void {
-    if (this.syncingAll) return;
+    if (this.syncingAll || !this.emailConnected) return;
     this.syncingAll = true;
     this.syncResult = '';
     this.cdr.markForCheck();
 
-    const parts: Observable<string>[] = [];
-    if (this.gmailConnected) {
-      parts.push(this.api.debugProcessGmail().pipe(
-        map((r: any) => r?.recovered ? `Gmail: odzyskano synchronizację, ${r?.newMessages_found ?? 0}` : `Gmail: ${r?.newMessages_found ?? 0}`),
-        catchError(() => of('Gmail: błąd synchronizacji')),
-      ));
-    }
-    if (this.outlookConnected) {
-      parts.push(this.api.debugProcessOutlook().pipe(
-        map((r: any) => `Outlook: ${r?.newMessages_found ?? 0}`),
-        catchError(() => of('Outlook: błąd synchronizacji')),
-      ));
-    }
-    if (this.zohoConnected) {
-      parts.push(this.api.debugProcessZoho().pipe(
-        map((r: any) => `Zoho: ${r?.newMessages_found ?? 0}`),
-        catchError(() => of('Zoho: błąd synchronizacji')),
-      ));
-    }
-
-    if (!parts.length) {
-      this.syncingAll = false;
-      this.cdr.markForCheck();
-      return;
-    }
-
-    forkJoin(parts).subscribe({
-      next: labels => this.zone.run(() => {
-        this.syncResult = labels.join(' · ');
+    this.api.debugProcessEmail().pipe(
+      map((r: any) => r?.recovered
+        ? `${this.emailProviderLabel}: odzyskano synchronizację, ${r?.newMessages_found ?? 0}`
+        : `${this.emailProviderLabel}: ${r?.newMessages_found ?? 0}`),
+      catchError(() => of(`${this.emailProviderLabel}: błąd synchronizacji`)),
+    ).subscribe({
+      next: label => this.zone.run(() => {
+        this.syncResult = label;
         this.syncingAll = false;
         this.refreshEmailActivities();
         this.cdr.markForCheck();
@@ -2633,157 +2372,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Gmail ─────────────────────────────────────────────────────────────────────
-  connectGmail(): void {
-    if (!this.gmailAuthUrl) return;
-    console.log('[Gmail] connectGmail() — otwieranie popup, url:', this.gmailAuthUrl.slice(0, 60) + '...');
-    const popup = window.open(this.gmailAuthUrl, 'gmail-oauth', 'width=600,height=700,left=300,top=100');
-    console.log('[Gmail] popup ref:', popup, '| null?', popup === null);
-    if (!popup) {
-      console.warn('[Gmail] Popup zablokowany przez przeglądarkę!');
-      return;
-    }
-    // Polling: gdy popup zostanie zamknięty — odśwież status Gmail
-    const timer = setInterval(() => {
-      try {
-        console.log('[Gmail] polling — popup.closed =', popup.closed);
-        if (popup.closed) {
-          clearInterval(timer);
-          console.log('[Gmail] popup zamknięty → getGmailStatus()');
-          this.api.getGmailStatus().subscribe({
-            next: s => {
-              console.log('[Gmail] getGmailStatus() odpowiedź:', s);
-              this.zone.run(() => {
-                this.gmailConnected  = s.connected;
-                this.gmailEmail      = s.email || '';
-                if (s.connected) { this.gmailAuthUrl = ''; this.driveNeedsReauth = false; }
-                this.cdr.markForCheck();
-              });
-            },
-            error: (err) => { console.error('[Gmail] getGmailStatus() błąd:', err); },
-          });
-        }
-      } catch (e) {
-        console.error('[Gmail] polling error (cross-origin?):', e);
-        clearInterval(timer);
-      }
-    }, 500);
-  }
-
-  changeAccountGmail(): void {
-    this.api.getGmailAuthUrl().subscribe({
-      next: r => this.zone.run(() => {
-        const popup = window.open(r.url, 'gmail-oauth', 'width=600,height=700,left=300,top=100');
-        if (!popup) return;
-        const timer = setInterval(() => {
-          try {
-            if (popup.closed) {
-              clearInterval(timer);
-              this.api.getGmailStatus().subscribe({
-                next: s => this.zone.run(() => {
-                  this.gmailConnected = s.connected;
-                  this.gmailEmail     = s.email || '';
-                  if (s.connected) { this.gmailAuthUrl = ''; this.driveNeedsReauth = false; this.selectedProvider = 'gmail'; }
-                  this.cdr.markForCheck();
-                }),
-                error: () => {},
-              });
-            }
-          } catch (e) { clearInterval(timer); }
-        }, 500);
-      }),
-      error: () => {},
-    });
-  }
-
-  disconnectGmail(): void {
-    if (!confirm(`Odłączyć konto Gmail (${this.gmailEmail})?\nHistoria e-maili w CRM pozostanie bez zmian.`)) return;
-    this.api.disconnectGmail().subscribe({
-      next: () => this.zone.run(() => {
-        this.gmailConnected = false;
-        this.gmailEmail     = '';
-        if (this.selectedProvider === 'gmail') {
-          this.selectedProvider = this.outlookConnected ? 'outlook' : 'gmail';
-        }
-        this.api.getGmailAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
-  }
-
-  changeAccountOutlook(): void {
-    this.api.getOutlookAuthUrl().subscribe({
-      next: r => this.zone.run(() => {
-        const popup = window.open(r.url, 'outlook-oauth', 'width=600,height=700,left=300,top=100');
-        if (!popup) return;
-        const timer = setInterval(() => {
-          try {
-            if (popup.closed) {
-              clearInterval(timer);
-              this.api.getOutlookStatus().subscribe({
-                next: s => this.zone.run(() => {
-                  this.outlookConnected = s.connected;
-                  this.outlookEmail     = s.email || '';
-                  if (s.connected) { this.outlookAuthUrl = ''; this.selectedProvider = 'outlook'; }
-                  this.cdr.markForCheck();
-                }),
-                error: () => {},
-              });
-            }
-          } catch (e) { clearInterval(timer); }
-        }, 500);
-      }),
-      error: () => {},
-    });
-  }
-
-  disconnectOutlook(): void {
-    if (!confirm(`Odłączyć konto Outlook (${this.outlookEmail})?\nHistoria e-maili w CRM pozostanie bez zmian.`)) return;
-    this.api.disconnectOutlook().subscribe({
-      next: () => this.zone.run(() => {
-        this.outlookConnected = false;
-        this.outlookEmail     = '';
-        if (this.selectedProvider === 'outlook') {
-          this.selectedProvider = this.gmailConnected ? 'gmail' : 'gmail';
-        }
-        this.api.getOutlookAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.outlookAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
-  }
-
   openEmailCompose(prefillThreadId?: string): void {
     const training_mode = this.settings.settings().crm_training_mode;
-    if (!training_mode) {
-      if (!this.gmailConnected) {
-        this.api.getGmailAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
-      }
-      if (!this.outlookConnected) {
-        this.api.getOutlookAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.outlookAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
-      }
-      if (!this.zohoConnected) {
-        this.api.getZohoAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.zohoAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
-      }
-    }
-    this.selectedProvider = this.gmailConnected ? 'gmail' : this.outlookConnected ? 'outlook' : this.zohoConnected ? 'zoho' : 'gmail';
-    if (!this.gmailConnected && !this.outlookConnected && !this.zohoConnected && !training_mode) {
+    if (!this.emailConnected && !training_mode) {
       this.emailForm = { recipientList: [], ccList: [], subject: '', body: '', threadId: prefillThreadId || '', inReplyTo: '', references: '', quotedHtml: '' };
       this.showEmailCompose = true;
       return;
@@ -2945,15 +2536,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     ]).then(([cfg, tok]) => {
       if (!cfg || !tok) { this.drivePickerLoading = false; this.cdr.markForCheck(); return; }
 
-      // Backend wykrył brak scope drive.readonly — wymuś ponowne połączenie
+      // Backend wykrył brak scope drive.readonly — skrzynkę firmową musi ponownie połączyć administrator
       if ((tok as any).needsReauth) {
         this.drivePickerLoading = false;
         this.driveNeedsReauth   = true;
         this.cdr.markForCheck();
-        this.api.getGmailAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
         return;
       }
 
@@ -3048,10 +2635,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.sendingEmail = true;
     this.emailError   = '';
 
-    const useOutlook = this.selectedProvider === 'outlook' && this.outlookConnected && !this.settings.settings().crm_training_mode;
-    const useZoho    = this.selectedProvider === 'zoho'    && this.zohoConnected    && !this.settings.settings().crm_training_mode;
+    // Provider is whatever the tenant has active — never chosen in this form.
+    const provider = this.emailProviderKey || 'gmail';
 
-    const onSuccess = (result: GmailSendResult, provider: 'gmail' | 'outlook' | 'zoho') => {
+    const onSuccess = (result: GmailSendResult) => {
       this.zone.run(() => {
         const wasReply      = !!this.emailForm.threadId;
         const replyThreadId = this.emailForm.threadId;
@@ -3071,12 +2658,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           };
           this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
         } else if (replyThreadId && this.lead) {
-          const threadObs = provider === 'outlook'
-            ? this.api.getLeadEmailThreadOutlook(this.lead.id, replyThreadId)
-            : provider === 'zoho'
-              ? this.api.getLeadEmailThreadZoho(this.lead.id, replyThreadId)
-              : this.api.getLeadEmailThread(this.lead.id, replyThreadId);
-          threadObs.subscribe({
+          this.getLeadThreadObs(replyThreadId).subscribe({
             next: msgs => this.zone.run(() => {
               this.threadMessages = msgs;
               this.openThreadId   = replyThreadId;
@@ -3115,47 +2697,16 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       });
     };
 
-    if (useOutlook) {
-      const payload = {
-        to:         this.emailForm.recipientList.join(','),
-        cc:         this.emailForm.ccList?.join(',') || undefined,
-        subject:    this.emailForm.subject,
-        body:       (this.emailForm.body || '') + (this.includeHistoryCompose ? this.emailForm.quotedHtml || '' : ''),
-        inReplyTo:  this.emailForm.inReplyTo || undefined,
-        references: this.emailForm.references || undefined,
-      };
-      this.api.sendLeadEmailOutlook(this.lead.id, payload).subscribe({
-        next: r => onSuccess(r, 'outlook'),
-        error: onError,
-      });
-    } else if (useZoho) {
-      const payload = {
-        to:        this.emailForm.recipientList.join(','),
-        cc:        this.emailForm.ccList?.join(',') || undefined,
-        subject:   this.emailForm.subject,
-        body:      (this.emailForm.body || '') + (this.includeHistoryCompose ? this.emailForm.quotedHtml || '' : ''),
-        inReplyTo: this.emailForm.inReplyTo || undefined,
-        threadId:  this.emailForm.threadId  || undefined,
-      };
-      this.api.sendLeadEmailZoho(this.lead.id, payload).subscribe({
-        next: r => onSuccess(r, 'zoho'),
-        error: onError,
-      });
-    } else {
-      const fd = new FormData();
-      fd.append('to', this.emailForm.recipientList.join(','));
-      if (this.emailForm.ccList?.length) fd.append('cc', this.emailForm.ccList.join(','));
-      fd.append('subject', this.emailForm.subject);
-      fd.append('body', (this.emailForm.body || '') + (this.includeHistoryCompose ? this.emailForm.quotedHtml || '' : ''));
-      if (this.emailForm.threadId)   fd.append('threadId',   this.emailForm.threadId);
-      if (this.emailForm.inReplyTo)  fd.append('inReplyTo',  this.emailForm.inReplyTo);
-      if (this.emailForm.references) fd.append('references', this.emailForm.references);
-      this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
-      this.api.sendLeadEmail(this.lead.id, fd).subscribe({
-        next: r => onSuccess(r, 'gmail'),
-        error: onError,
-      });
-    }
+    const fd = new FormData();
+    fd.append('to', this.emailForm.recipientList.join(','));
+    if (this.emailForm.ccList?.length) fd.append('cc', this.emailForm.ccList.join(','));
+    fd.append('subject', this.emailForm.subject);
+    fd.append('body', trimEdgeEmptyHtml(this.emailForm.body || '') + (this.includeHistoryCompose ? this.emailForm.quotedHtml || '' : ''));
+    if (this.emailForm.threadId)   fd.append('threadId',   this.emailForm.threadId);
+    if (this.emailForm.inReplyTo)  fd.append('inReplyTo',  this.emailForm.inReplyTo);
+    if (this.emailForm.references) fd.append('references', this.emailForm.references);
+    this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
+    this.api.sendLeadEmailUnified(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
   }
 
   private getLeadThreadObs(threadId: string) {
@@ -3229,7 +2780,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
       const fromAddrs    = this.parseAddressList(m.from);
       const toAddrs      = this.parseAddressList(m.to);
-      const activeEmail  = this.outlookConnected && !this.gmailConnected ? this.outlookEmail : this.gmailEmail;
+      const activeEmail  = this.emailAddress;
       const isReceived   = fromAddrs.length > 0 && fromAddrs[0] !== activeEmail;
       this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
       if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
@@ -3250,7 +2801,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
       const toAddrs    = this.parseAddressList(m.to);
       const fromAddrs  = this.parseAddressList(m.from);
-      const activeEmail = this.outlookConnected && !this.gmailConnected ? this.outlookEmail : this.gmailEmail;
+      const activeEmail = this.emailAddress;
       const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== activeEmail;
       this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
       if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
@@ -3300,9 +2851,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   startInlineReply(a: any): void {
     if (!this.lead) return;
-    const isOutlook = a.email_provider === 'outlook';
-    const isZoho    = a.email_provider === 'zoho';
-    const activeEmail = isZoho ? this.zohoEmail : isOutlook ? this.outlookEmail : this.gmailEmail;
+    const activeEmail = this.emailAddress;
 
     // Determine recipient and inReplyTo from last thread message if available
     const lastMsg = this.threadMessages.length > 0
@@ -3404,41 +2953,17 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
 
-    if (this.inlineReplyForm.emailProvider === 'outlook') {
-      this.api.sendLeadEmailOutlook(this.lead.id, {
-        to:         this.inlineReplyForm.recipientList.join(','),
-        cc:         this.inlineReplyForm.ccList?.join(',') || undefined,
-        subject:    this.inlineReplyForm.subject,
-        body:       (this.inlineReplyForm.body || '') + (this.includeHistoryInline ? this.inlineReplyForm.quotedHtml || '' : ''),
-        inReplyTo:  this.inlineReplyForm.inReplyTo  || undefined,
-        references: this.inlineReplyForm.references || undefined,
-      }).subscribe({ next: onSuccess, error: onError });
-      return;
-    }
-
-    if (this.inlineReplyForm.emailProvider === 'zoho') {
-      this.api.sendLeadEmailZoho(this.lead.id, {
-        to:        this.inlineReplyForm.recipientList.join(','),
-        cc:        this.inlineReplyForm.ccList?.join(',') || undefined,
-        subject:   this.inlineReplyForm.subject,
-        body:      (this.inlineReplyForm.body || '') + (this.includeHistoryInline ? this.inlineReplyForm.quotedHtml || '' : ''),
-        inReplyTo: this.inlineReplyForm.inReplyTo || undefined,
-        threadId:  this.inlineReplyForm.threadId  || undefined,
-      }).subscribe({ next: onSuccess, error: onError });
-      return;
-    }
-
     const fd = new FormData();
     fd.append('to', this.inlineReplyForm.recipientList.join(','));
     if (this.inlineReplyForm.ccList?.length) fd.append('cc', this.inlineReplyForm.ccList.join(','));
     fd.append('subject', this.inlineReplyForm.subject);
-    fd.append('body', (this.inlineReplyForm.body || '') + (this.includeHistoryInline ? this.inlineReplyForm.quotedHtml || '' : ''));
+    fd.append('body', trimEdgeEmptyHtml(this.inlineReplyForm.body || '') + (this.includeHistoryInline ? this.inlineReplyForm.quotedHtml || '' : ''));
     if (this.inlineReplyForm.threadId)   fd.append('threadId',   this.inlineReplyForm.threadId);
     if (this.inlineReplyForm.inReplyTo)  fd.append('inReplyTo',  this.inlineReplyForm.inReplyTo);
     if (this.inlineReplyForm.references) fd.append('references', this.inlineReplyForm.references);
     this.inlineReplyAttachments.forEach(f => fd.append('attachments', f, f.name));
 
-    this.api.sendLeadEmail(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
+    this.api.sendLeadEmailUnified(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
   }
 
   selectEmailForPanel(a: any): void { this.toggleEmailExpand(a); }
@@ -3478,10 +3003,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   startMsgReply(): void {
     const m = this.msgModalMsg;
     if (!m) return;
-    const act         = (this.lead?.activities || []).find((a: any) => a.gmail_thread_id === this.openThreadId && a.type === 'email');
-    const isOutlook   = act?.email_provider === 'outlook';
-    const isZoho      = act?.email_provider === 'zoho';
-    const activeEmail = isOutlook ? this.outlookEmail : isZoho ? this.zohoEmail : this.gmailEmail;
+    const activeEmail = this.emailAddress;
     const fromAddrs   = this.parseAddressList(m.from);
     const toAddrs     = this.parseAddressList(m.to);
     const isReceived  = fromAddrs.length > 0 && fromAddrs[0] !== activeEmail;
@@ -3494,7 +3016,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       references:    this.buildReferences(this.threadMessages),
       recipientList: isReceived ? fromAddrs : toAddrs,
       ccList:        m.cc ? this.parseAddressList(m.cc) : [],
-      emailProvider: isOutlook ? 'outlook' : isZoho ? 'zoho' : 'gmail',
     };
     this.msgModalRecipientQuery = '';
     this.msgModalCcQuery        = '';
@@ -3564,30 +3085,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
 
-    if (this.msgModalForm.emailProvider === 'outlook') {
-      this.api.sendLeadEmailOutlook(this.lead.id, {
-        to:         this.msgModalForm.recipientList.join(','),
-        cc:         this.msgModalForm.ccList?.join(',') || undefined,
-        subject:    this.msgModalForm.subject,
-        body:       (this.msgModalForm.body || '') + (this.includeHistoryModal ? this.msgModalForm.quotedHtml || '' : ''),
-        inReplyTo:  this.msgModalForm.inReplyTo  || undefined,
-        references: this.msgModalForm.references || undefined,
-      }).subscribe({ next: onSuccess, error: onError });
-      return;
-    }
-
-    if (this.msgModalForm.emailProvider === 'zoho') {
-      this.api.sendLeadEmailZoho(this.lead.id, {
-        to:        this.msgModalForm.recipientList.join(','),
-        cc:        this.msgModalForm.ccList?.join(',') || undefined,
-        subject:   this.msgModalForm.subject,
-        body:      (this.msgModalForm.body || '') + (this.includeHistoryModal ? this.msgModalForm.quotedHtml || '' : ''),
-        inReplyTo: this.msgModalForm.inReplyTo || undefined,
-        threadId:  this.msgModalForm.threadId  || undefined,
-      }).subscribe({ next: onSuccess, error: onError });
-      return;
-    }
-
     const fd = new FormData();
     fd.append('to', this.msgModalForm.recipientList.join(','));
     if (this.msgModalForm.ccList?.length) fd.append('cc', this.msgModalForm.ccList.join(','));
@@ -3597,7 +3094,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
     if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
     this.msgModalAttachments.forEach(f => fd.append('attachments', f, f.name));
-    this.api.sendLeadEmail(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
+    this.api.sendLeadEmailUnified(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
   }
 
   viewAttachment(att: any, msgId: string): void {
