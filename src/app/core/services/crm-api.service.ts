@@ -719,6 +719,15 @@ export interface GmailSendResult {
   activityId: number;
 }
 
+// Status of the tenant's single active email provider — never a per-user choice.
+export interface EmailStatus {
+  provider: 'gmail' | 'outlook' | 'zoho' | null;
+  training: boolean;
+  configured: boolean;
+  connected: boolean;
+  email?: string;
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Stałe
 // ─────────────────────────────────────────────────────────────────
@@ -1284,15 +1293,6 @@ export class CrmApiService {
   getPartnerEmailThread(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
     return this.http.get<GmailMessage[]>(`${BASE}/gmail/thread/partner/${partnerId}/${threadId}`);
   }
-  getGmailStatus(): Observable<{ connected: boolean; email?: string }> {
-    return this.http.get<{ connected: boolean; email?: string }>(`${BASE}/gmail/status`);
-  }
-  getGmailAuthUrl(): Observable<{ url: string }> {
-    return this.http.get<{ url: string }>(`${BASE}/gmail/oauth/url`);
-  }
-  disconnectGmail(): Observable<{ ok: boolean }> {
-    return this.http.delete<{ ok: boolean }>(`${BASE}/gmail/oauth/disconnect`);
-  }
   downloadGmailAttachment(messageId: string, attachmentId: string, filename: string, mime: string): Observable<Blob> {
     const params = { filename, mime };
     return this.http.get(
@@ -1314,15 +1314,6 @@ export class CrmApiService {
   getPartnerEmailThreadOutlook(partnerId: number | string, conversationId: string): Observable<GmailMessage[]> {
     return this.http.get<GmailMessage[]>(`${BASE}/outlook/thread/partner/${partnerId}/${conversationId}`);
   }
-  getOutlookStatus(): Observable<{ connected: boolean; email?: string }> {
-    return this.http.get<{ connected: boolean; email?: string }>(`${BASE}/outlook/status`);
-  }
-  getOutlookAuthUrl(): Observable<{ url: string }> {
-    return this.http.get<{ url: string }>(`${BASE}/outlook/oauth/url`);
-  }
-  disconnectOutlook(): Observable<{ ok: boolean }> {
-    return this.http.delete<{ ok: boolean }>(`${BASE}/outlook/oauth/disconnect`);
-  }
   debugProcessOutlook(): Observable<any> {
     return this.http.post<any>(`${BASE}/outlook/debug/process`, {});
   }
@@ -1340,17 +1331,33 @@ export class CrmApiService {
   getPartnerEmailThreadZoho(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
     return this.http.get<GmailMessage[]>(`${BASE}/zoho/thread/partner/${partnerId}/${threadId}`);
   }
-  getZohoStatus(): Observable<{ connected: boolean; email?: string }> {
-    return this.http.get<{ connected: boolean; email?: string }>(`${BASE}/zoho/status`);
-  }
-  getZohoAuthUrl(): Observable<{ url: string }> {
-    return this.http.get<{ url: string }>(`${BASE}/zoho/oauth/url`);
-  }
-  disconnectZoho(): Observable<{ ok: boolean }> {
-    return this.http.delete<{ ok: boolean }>(`${BASE}/zoho/oauth/disconnect`);
-  }
   debugProcessZoho(): Observable<any> {
     return this.http.post<any>(`${BASE}/zoho/debug/process`, {});
+  }
+
+  // ── Unified CRM email API ──────────────────────────────────────────────────
+  // The ONLY email endpoints the UI should call. The active provider (gmail /
+  // outlook / zoho / none) is resolved server-side from the tenant's config —
+  // this component never chooses or switches a provider.
+  // Company mailbox is connected/changed/disconnected only by a superadmin from
+  // Tenant → Email — there is no regular-user connect/disconnect endpoint.
+  getEmailStatus(): Observable<EmailStatus> {
+    return this.http.get<EmailStatus>(`${BASE}/email/status`);
+  }
+  sendLeadEmailUnified(leadId: number, data: FormData): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/email/send/lead/${leadId}`, data);
+  }
+  getLeadEmailThreadUnified(leadId: number, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/email/thread/lead/${leadId}/${threadId}`);
+  }
+  sendPartnerEmailUnified(partnerId: number | string, data: FormData): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/email/send/partner/${partnerId}`, data);
+  }
+  getPartnerEmailThreadUnified(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/email/thread/partner/${partnerId}/${threadId}`);
+  }
+  debugProcessEmail(): Observable<any> {
+    return this.http.post<any>(`${BASE}/email/debug/process`, {});
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────
