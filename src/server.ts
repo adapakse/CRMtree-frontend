@@ -12,7 +12,21 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const API_UPSTREAM = process.env['API_UPSTREAM'] || 'http://127.0.0.1:3001';
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+// Azure Container Apps ingress sits directly in front of this container and adds
+// x-forwarded-* headers — without trusting them, Angular silently deopts to CSR
+// (no crash, just loses SSR/SEO on every request behind the platform's own proxy).
+// Azure also sends a non-standard "x-forwarded-path" (Angular only knows
+// "x-forwarded-prefix"), so the standard headers alone aren't enough — list it explicitly.
+const angularApp = new AngularNodeAppEngine({
+  trustProxyHeaders: [
+    'x-forwarded-for',
+    'x-forwarded-host',
+    'x-forwarded-port',
+    'x-forwarded-proto',
+    'x-forwarded-prefix',
+    'x-forwarded-path',
+  ],
+});
 
 /**
  * Reverse-proxy /api/* to the backend — replaces the role nginx used to play
