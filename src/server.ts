@@ -1,0 +1,99 @@
+import {
+  AngularNodeAppEngine,
+  createNodeRequestHandler,
+  isMainModule,
+  writeResponseToNodeResponse,
+} from '@angular/ssr/node';
+import express from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { join } from 'node:path';
+
+const browserDistFolder = join(import.meta.dirname, '../browser');
+const API_UPSTREAM = process.env['API_UPSTREAM'] || 'http://127.0.0.1:3001';
+
+const app = express();
+const angularApp = new AngularNodeAppEngine();
+
+/**
+ * Reverse-proxy /api/* to the backend — replaces the role nginx used to play
+ * in the old static-nginx Docker image (see Dockerfile).
+ */
+app.use('/api', createProxyMiddleware({
+  target: API_UPSTREAM,
+  changeOrigin: true,
+  // Express strips the '/api' mount prefix before the middleware sees req.url — add it back.
+  pathRewrite: (path) => `/api${path}`,
+}));
+
+/**
+ * sitemap.xml / robots.txt — built from the backend's published blog posts.
+ */
+app.get('/sitemap.xml', async (req, res) => {
+  const baseUrl = 'https://crmtree.pl';
+  const staticPaths = ['/', '/blog', '/polityka-prywatnosci', '/regulamin'];
+  let slugs: string[] = [];
+  try {
+    const r = await fetch(`${API_UPSTREAM}/api/public/blog?locale=pl`);
+    if (r.ok) {
+      const posts = (await r.json()) as { slug: string }[];
+      slugs = posts.map((p) => p.slug);
+    }
+  } catch {
+    // Sitemap still works with just the static paths if the backend is unreachable.
+  }
+  const urls = [...staticPaths, ...slugs.map((s) => `/blog/${s}`)]
+    .map((path) => `  <url><loc>${baseUrl}${path}</loc></url>`)
+    .join('\n');
+  res.type('application/xml').send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`,
+  );
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(
+    ['User-agent: *', 'Disallow: /dashboard', 'Disallow: /crm/', 'Disallow: /admin/', `Sitemap: https://crmtree.pl/sitemap.xml`].join('\n'),
+  );
+});
+
+/**
+ * Serve static files from /browser
+ */
+app.use(
+  express.static(browserDistFolder, {
+    maxAge: '1y',
+    index: false,
+    redirect: false,
+  }),
+);
+
+/**
+ * Handle all other requests by rendering the Angular application.
+ */
+app.use((req, res, next) => {
+  angularApp
+    .handle(req)
+    .then((response) =>
+      response ? writeResponseToNodeResponse(response, res) : next(),
+    )
+    .catch(next);
+});
+
+/**
+ * Start the server if this module is the main entry point, or it is ran via PM2.
+ * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
+ */
+if (isMainModule(import.meta.url) || process.env['pm_id']) {
+  const port = process.env['PORT'] || 4000;
+  app.listen(port, (error) => {
+    if (error) {
+      throw error;
+    }
+
+    console.log(`Node Express server listening on http://localhost:${port}`);
+  });
+}
+
+/**
+ * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
+ */
+export const reqHandler = createNodeRequestHandler(app);

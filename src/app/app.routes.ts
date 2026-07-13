@@ -1,8 +1,36 @@
 import { Routes } from '@angular/router';
-import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard } from './core/auth/guards';
+import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard, publicRootGuard } from './core/auth/guards';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  // ── Public, SSR-rendered marketing surface (Faza 0 — SEO fundament) ──────
+  {
+    path: '',
+    loadComponent: () => import('./layout/public-layout/public-layout.component').then(m => m.PublicLayoutComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        canActivate: [publicRootGuard],
+        loadComponent: () => import('./pages/public/home/home.component').then(m => m.HomeComponent),
+      },
+      {
+        path: 'blog',
+        loadComponent: () => import('./pages/public/blog/blog-list.component').then(m => m.BlogListComponent),
+      },
+      {
+        path: 'blog/:slug',
+        loadComponent: () => import('./pages/public/blog/blog-detail.component').then(m => m.BlogDetailComponent),
+      },
+      {
+        path: 'polityka-prywatnosci',
+        loadComponent: () => import('./pages/public/legal/privacy-policy.component').then(m => m.PrivacyPolicyComponent),
+      },
+      {
+        path: 'regulamin',
+        loadComponent: () => import('./pages/public/legal/terms.component').then(m => m.TermsComponent),
+      },
+    ],
+  },
   {
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),

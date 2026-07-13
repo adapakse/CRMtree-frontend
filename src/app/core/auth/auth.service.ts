@@ -1,4 +1,5 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError, lastValueFrom } from 'rxjs';
@@ -99,11 +100,16 @@ export class AuthService {
   }
 
   // ── Token accessors ────────────────────────────────────
+  // sessionStorage doesn't exist during SSR — server-side renders are always anonymous.
+  private readonly platformId = inject(PLATFORM_ID);
+
   getAccessToken(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
     return sessionStorage.getItem(ACCESS_KEY);
   }
 
   private getRefreshToken(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
     return sessionStorage.getItem(REFRESH_KEY);
   }
 }

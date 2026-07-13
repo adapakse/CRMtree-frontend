@@ -70,4 +70,16 @@ export const superAdminGuard: CanActivateFn = () => {
   return false;
 };
 
+// Root ('') is the public marketing home for anonymous visitors (SSR-rendered for SEO),
+// but a logged-in user landing on '/' should still go straight to their dashboard.
+export const publicRootGuard: CanActivateFn = () => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+  if (auth.getAccessToken()) {
+    router.navigate(['/dashboard']);
+    return false;
+  }
+  return true;
+};
+
 
