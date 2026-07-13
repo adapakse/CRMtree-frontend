@@ -17,11 +17,12 @@ const FEATURE_LABELS: Record<CrmFeature, string> = {
   partner_registry: 'Rejestr Partnerów',
   dwh_integration:  'DWH Integration',
   performance:      'Performance',
+  seo_bot:          'SEObot',
 };
 
 const ALL_FEATURES: CrmFeature[] = [
   'documents', 'leads', 'sales_reports', 'onboarding',
-  'partner_registry', 'dwh_integration', 'performance',
+  'partner_registry', 'dwh_integration', 'performance', 'seo_bot',
 ];
 
 interface TenantUser {

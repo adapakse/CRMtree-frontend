@@ -164,6 +164,11 @@ export const routes: Routes = [
         canActivate: [crmGuard],
         loadComponent: () => import('./pages/crm/onboarding/crm-onboarding.component').then(m => m.CrmOnboardingComponent),
       },
+      {
+        path: 'crm/seo',
+        canActivate: [crmGuard],
+        loadComponent: () => import('./pages/crm/seo/crm-seo.component').then(m => m.CrmSeoComponent),
+      },
       // ─────────────────────────────────────────────────────────────────────
     ],
   },
