@@ -7,7 +7,7 @@ import { AppSettingsService } from '../../core/services/app-settings.service';
   selector: 'wt-callback',
   standalone: true,
   template: `
-    <div style="position:fixed;inset:0;background:var(--gray-900);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:white">
+    <div style="position:fixed;top:var(--test-banner-height, 0px);right:0;bottom:0;left:0;background:var(--gray-900);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:white">
       <div class="spinner" style="width:40px;height:40px;border-width:3px"></div>
       <p style="font-size:14px;color:var(--gray-400)">Signing you in…</p>
     </div>

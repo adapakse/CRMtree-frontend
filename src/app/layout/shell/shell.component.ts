@@ -233,7 +233,7 @@ import { initials } from '../../core/services/helpers';
   `,
   styles: [`
     /* ── Layout ─────────────────────────────────────────────────────── */
-    .app-wrap { display: flex; height: 100vh; overflow: hidden; }
+    .app-wrap { display: flex; height: calc(100vh - var(--test-banner-height, 0px)); overflow: hidden; }
 
     /* ── Sidebar shell ───────────────────────────────────────────────── */
     #sidebar {

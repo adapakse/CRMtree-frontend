@@ -10,6 +10,9 @@ import { join } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 const API_UPSTREAM = process.env['API_UPSTREAM'] || 'http://127.0.0.1:3001';
+// Set to 'test' on non-production Container Apps (int, previews) via env var override;
+// the Dockerfile bakes in 'production' as the default for the real prod image.
+const APP_ENV = process.env['APP_ENV'] || 'production';
 
 const app = express();
 // Azure Container Apps ingress sits directly in front of this container and adds
@@ -61,6 +64,15 @@ app.get('/sitemap.xml', async (req, res) => {
   res.type('application/xml').send(
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`,
   );
+});
+
+/**
+ * Lets the browser bundle read the runtime APP_ENV env var — Angular's compiled
+ * client bundle has no access to process.env, so this is the only way it can
+ * tell int/preview apart from real production (both use the same build output).
+ */
+app.get('/env-config.json', (req, res) => {
+  res.type('application/json').send(JSON.stringify({ appEnv: APP_ENV }));
 });
 
 app.get('/robots.txt', (req, res) => {

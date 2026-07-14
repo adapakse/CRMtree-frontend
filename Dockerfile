@@ -12,6 +12,7 @@ FROM node:20-alpine
 WORKDIR /app
 COPY --from=build /app/dist/crmtree-frontend ./dist/crmtree-frontend
 ENV API_UPSTREAM=https://api.crmtree.pl
+ENV APP_ENV=production
 ENV PORT=80
 EXPOSE 80
 CMD ["node", "dist/crmtree-frontend/server/server.mjs"]
