@@ -1,7 +1,8 @@
 # CRMtree Frontend
 
 ## Projekt
-Angular 17+ SPA — moduł CRM dla biur podróży korporacyjnych.
+Angular 17+ SPA — generyczny CRM dla przedsiębiorstw różnych branż, skupiony na
+dynamicznej pracy handlowców oraz zarządzaniu lejkiem sprzedażowym, upsellem i cross-sellem.
 Katalog: `C:\Users\Adam\Documents\crmtree-frontend`
 
 ## Stack

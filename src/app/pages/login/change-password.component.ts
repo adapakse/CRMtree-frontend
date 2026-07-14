@@ -40,7 +40,7 @@ import { AuthService } from '../../core/auth/auth.service';
     </div>
   `,
   styles: [`
-    #login-screen { position:fixed; inset:0; background:var(--gray-900); display:flex; align-items:center; justify-content:center; }
+    #login-screen { position:fixed; top:var(--test-banner-height, 0px); right:0; bottom:0; left:0; background:var(--gray-900); display:flex; align-items:center; justify-content:center; }
     .login-card { background:white; border-radius:16px; width:420px; max-width:95vw; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.4); }
     .login-top { background:#292A2D; padding:24px 32px 20px; text-align:center; }
     .login-logo-img { width:340px; max-width:100%; height:auto; display:block; margin:0 auto 4px; }
