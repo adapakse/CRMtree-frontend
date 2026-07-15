@@ -11,6 +11,7 @@ export interface BlogPostSummary {
   category: string | null;
   header_image_url: string | null;
   published_at: string;
+  reading_minutes: number;
 }
 
 export interface BlogPost extends BlogPostSummary {

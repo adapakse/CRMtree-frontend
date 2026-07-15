@@ -35,7 +35,11 @@ import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie
     </div>
   `,
   styles: [`
-    .public-shell { display:flex; flex-direction:column; min-height:100vh; }
+    .public-shell {
+      display:flex; flex-direction:column;
+      height:calc(100vh - var(--test-banner-height, 0px));
+      overflow-y:auto; overflow-x:hidden;
+    }
     .public-header {
       display:flex; align-items:center; justify-content:space-between;
       padding:1rem 2rem; border-bottom:1px solid var(--gray-200);
