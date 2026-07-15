@@ -740,7 +740,21 @@ export interface WhatsappStatus {
 
 export interface WhatsappSendResult {
   messageId: string | null;
-  activityId: number;
+  id: string;
+}
+
+// One message in a lead's/partner's WhatsApp conversation — read from the
+// whatsapp_messages table (real per-message model, not a generic activity
+// log). direction is always 'outgoing' until the webhook/incoming step lands.
+export interface WhatsappHistoryEntry {
+  id: string;
+  created_at: string;
+  direction: 'incoming' | 'outgoing';
+  from_phone: string;
+  to_phone: string;
+  message: string | null;
+  status: string;
+  created_by_name: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1389,6 +1403,12 @@ export class CrmApiService {
   }
   sendPartnerWhatsapp(partnerId: number | string, message: string, toPhone?: string): Observable<WhatsappSendResult> {
     return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
+  }
+  getLeadWhatsappHistory(leadId: number): Observable<WhatsappHistoryEntry[]> {
+    return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/lead/${leadId}`);
+  }
+  getPartnerWhatsappHistory(partnerId: number | string): Observable<WhatsappHistoryEntry[]> {
+    return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/partner/${partnerId}`);
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────

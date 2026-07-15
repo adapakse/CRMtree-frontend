@@ -9,7 +9,7 @@ import { of } from 'rxjs';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
   LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
-  GmailSendResult, ConsentValue, EmailStatus,
+  GmailSendResult, ConsentValue, EmailStatus, WhatsappHistoryEntry,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -661,6 +661,24 @@ import { QuillModule } from 'ngx-quill';
                     (click)="sendWhatsapp()">
               {{ whatsappSending ? 'Wysyłanie...' : 'Wyślij WhatsApp' }}
             </button>
+          </div>
+        </div>
+
+        <!-- Historia WhatsApp — real conversation model (whatsapp_messages), not an activity log -->
+        <div *ngIf="whatsappConfigured===true">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:4px">Historia WhatsApp</div>
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:8px">Na razie widoczne są wiadomości wysłane z CRM. Odpowiedzi klienta pojawią się po podpięciu webhooka.</div>
+
+          <div *ngIf="whatsappHistoryLoading" class="empty-act">Ładowanie historii...</div>
+          <div *ngIf="!whatsappHistoryLoading && whatsappHistory.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
+
+          <div *ngFor="let h of whatsappHistory" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;background:white">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+              <span *ngIf="h.direction==='outgoing'"><span style="font-size:10px;color:#9ca3af">Do:&nbsp;</span><span style="font-weight:600">{{formatWhatsappHistoryPhone(h.to_phone)}}</span></span>
+              <span *ngIf="h.direction==='incoming'"><span style="font-size:10px;color:#9ca3af">Od:&nbsp;</span><span style="font-weight:600">{{formatWhatsappHistoryPhone(h.from_phone)}}</span></span>
+              <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+            </div>
+            <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-top:6px;white-space:pre-wrap">{{h.message}}</div>
           </div>
         </div>
       </div>
@@ -2127,6 +2145,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   whatsappSending = false;
   whatsappError: string | null = null;
   whatsappSuccess = false;
+  // Real conversation history (whatsapp_messages table), not an activity log.
+  whatsappHistory: WhatsappHistoryEntry[] = [];
+  whatsappHistoryLoading = false;
 
   get whatsappFromDisplay(): string {
     return this.whatsappDisplayNumber ? formatPhoneDisplay(this.whatsappDisplayNumber) : 'skonfigurowany numer';
@@ -2136,6 +2157,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   // type a full international number. Doesn't block typing, only sending.
   get whatsappToPhoneMissingCountryCode(): boolean {
     return requiresCountryCode(this.whatsappToPhone);
+  }
+
+  formatWhatsappHistoryPhone(raw: string | null): string {
+    return raw ? formatPhoneDisplay(raw) : '—';
   }
 
   history: LeadHistoryEntry[] = [];
@@ -2402,6 +2427,23 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         }),
       });
     }
+    this.loadWhatsappHistory();
+  }
+
+  loadWhatsappHistory(): void {
+    if (!this.lead) return;
+    this.whatsappHistoryLoading = true;
+    this.api.getLeadWhatsappHistory(this.lead.id).subscribe({
+      next: history => this.zone.run(() => {
+        this.whatsappHistory        = history;
+        this.whatsappHistoryLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => {
+        this.whatsappHistoryLoading = false;
+        this.cdr.markForCheck();
+      }),
+    });
   }
 
   // Reformats on blur, not on every keystroke, so typing/pasting doesn't
@@ -2424,6 +2466,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.whatsappSuccess = true;
         this.whatsappMessage = '';
         this.cdr.markForCheck();
+        this.loadWhatsappHistory();
       }),
       error: (err: any) => this.zone.run(() => {
         this.whatsappSending = false;
