@@ -728,6 +728,21 @@ export interface EmailStatus {
   email?: string;
 }
 
+// Whether the tenant has a WhatsApp Business number configured — resolved
+// server-side (tenant_whatsapp_config); the CRM user never sees the config
+// itself (no access_token/app_secret/webhook_verify_token/waba_id/phone_number_id),
+// only whether it's configured/enabled and the display number for context.
+export interface WhatsappStatus {
+  configured: boolean;
+  enabled: boolean;
+  display_phone_number: string | null;
+}
+
+export interface WhatsappSendResult {
+  messageId: string | null;
+  activityId: number;
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Stałe
 // ─────────────────────────────────────────────────────────────────
@@ -1358,6 +1373,22 @@ export class CrmApiService {
   }
   debugProcessEmail(): Observable<any> {
     return this.http.post<any>(`${BASE}/email/debug/process`, {});
+  }
+
+  // ── WhatsApp (step 2: outbound send only, no webhook/inbound yet) ──────────
+  // Same contract as email: configuration is tenant-wide and superadmin-only
+  // (Tenant → WhatsApp) — this component only checks status and sends.
+  getWhatsappStatus(): Observable<WhatsappStatus> {
+    return this.http.get<WhatsappStatus>(`${BASE}/whatsapp/status`);
+  }
+  // toPhone: optional per-send override of the recipient number — used only
+  // for this one message, never written back to the lead's/partner's own
+  // phone field.
+  sendLeadWhatsapp(leadId: number, message: string, toPhone?: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/lead/${leadId}`, { message, to_phone: toPhone || undefined });
+  }
+  sendPartnerWhatsapp(partnerId: number | string, message: string, toPhone?: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────

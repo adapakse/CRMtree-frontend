@@ -17,6 +17,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
 import { formatAddressDisplay, countExtraAddresses } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
+import { formatPhoneDisplay, requiresCountryCode } from '../../../shared/utils/phone-format.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { QuillModule } from 'ngx-quill';
 
@@ -261,7 +262,7 @@ import { QuillModule } from 'ngx-quill';
           Emaile
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="midTab='whatsapp'">WhatsApp</button>
+        <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
         <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
       </div>
@@ -622,11 +623,46 @@ import { QuillModule } from 'ngx-quill';
         </div>
       </div>
 
-      <!-- WhatsApp tab (placeholder) -->
-      <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-        <div style="font-size:32px">💬</div>
-        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-        <div style="font-size:13px;color:#9ca3af">Integracja WhatsApp — wkrótce</div>
+      <!-- WhatsApp tab -->
+      <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div *ngIf="whatsappConfigured===null" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
+
+        <div *ngIf="whatsappConfigured===false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+          <div style="font-size:32px">💬</div>
+          <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
+          <div style="font-size:13px;color:#9ca3af;text-align:center">WhatsApp nie jest skonfigurowany dla tej organizacji.</div>
+        </div>
+
+        <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 Nowa wiadomość WhatsApp</div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:#f0fdf4;border-radius:6px;overflow:hidden">
+              <span style="padding:4px 10px;font-size:11px;color:#374151">Od: <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
+            </div>
+          </div>
+
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+            <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
+                   placeholder="+48 502 345 678">
+          </label>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">Podaj numer z kierunkowym kraju, np. +48 502 345 678.</div>
+
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Treść wiadomości
+            <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
+                      placeholder="Treść wiadomości..."></textarea>
+          </label>
+
+          <div *ngIf="whatsappError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" style="color:#16a34a;font-size:12px;background:#f0fdf4;border-radius:6px;padding:6px 10px">✅ Wiadomość wysłana.</div>
+
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !whatsappMessage.trim() || whatsappToPhoneMissingCountryCode || whatsappSending"
+                    (click)="sendWhatsapp()">
+              {{ whatsappSending ? 'Wysyłanie...' : 'Wyślij WhatsApp' }}
+            </button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -2080,6 +2116,28 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   // Historia
   midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'calls' | 'meetings' = 'all';
+
+  // WhatsApp tab (step 2: outbound send only). Status is resolved server-side
+  // from the tenant's config — this component never sees/chooses it, only
+  // whether it's configured or not.
+  whatsappConfigured: boolean | null = null;
+  whatsappDisplayNumber: string | null = null;
+  whatsappToPhone = '';
+  whatsappMessage = '';
+  whatsappSending = false;
+  whatsappError: string | null = null;
+  whatsappSuccess = false;
+
+  get whatsappFromDisplay(): string {
+    return this.whatsappDisplayNumber ? formatPhoneDisplay(this.whatsappDisplayNumber) : 'skonfigurowany numer';
+  }
+
+  // No country is ever assumed (CRMtree is multi-country) — the user must
+  // type a full international number. Doesn't block typing, only sending.
+  get whatsappToPhoneMissingCountryCode(): boolean {
+    return requiresCountryCode(this.whatsappToPhone);
+  }
+
   history: LeadHistoryEntry[] = [];
   historyLoading = false;
   showHistoryModal = false;
@@ -2325,6 +2383,53 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }),
       error: () => {},
+    });
+  }
+
+  openWhatsappTab(): void {
+    this.midTab = 'whatsapp';
+    if (this.whatsappConfigured === null) {
+      this.whatsappToPhone = formatPhoneDisplay(this.lead?.phone);
+      this.api.getWhatsappStatus().subscribe({
+        next: status => this.zone.run(() => {
+          this.whatsappConfigured      = status.configured && status.enabled;
+          this.whatsappDisplayNumber   = status.display_phone_number;
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => {
+          this.whatsappConfigured = false;
+          this.cdr.markForCheck();
+        }),
+      });
+    }
+  }
+
+  // Reformats on blur, not on every keystroke, so typing/pasting doesn't
+  // fight the cursor position. Purely a display convenience — the value
+  // is still only used for this one send, never saved to the lead.
+  onWhatsappToPhoneBlur(): void {
+    this.whatsappToPhone = formatPhoneDisplay(this.whatsappToPhone);
+  }
+
+  sendWhatsapp(): void {
+    if (!this.lead || !this.whatsappToPhone.trim() || !this.whatsappMessage.trim()) return;
+    if (this.whatsappToPhoneMissingCountryCode) return;
+    this.whatsappSending = true;
+    this.whatsappError   = null;
+    this.whatsappSuccess = false;
+    this.cdr.markForCheck();
+    this.api.sendLeadWhatsapp(this.lead.id, this.whatsappMessage.trim(), this.whatsappToPhone.trim()).subscribe({
+      next: () => this.zone.run(() => {
+        this.whatsappSending = false;
+        this.whatsappSuccess = true;
+        this.whatsappMessage = '';
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.whatsappSending = false;
+        this.whatsappError   = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        this.cdr.markForCheck();
+      }),
     });
   }
 
