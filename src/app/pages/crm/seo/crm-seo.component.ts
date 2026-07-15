@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus } from '../../../core/services/crm-seo.service';
+import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 
 const STATUS_LABELS: Record<SeoContentStatus, string> = {
@@ -22,14 +22,37 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     <div class="seo-page">
       <header class="seo-header">
         <h1>SEObot — redakcja treści</h1>
-        <div class="gsc-status">
-          @if (gsc()?.connected) {
-            <span class="gsc-badge gsc-connected">Search Console: połączony ({{ gsc()?.site_url }})</span>
-          } @else {
-            <button type="button" class="btn-accent" (click)="connectGsc()">Połącz Search Console</button>
-          }
+        <div class="header-actions">
+          <button type="button" class="btn-ghost" (click)="showStrategy.set(!showStrategy())">
+            Strategia treści ({{ pillars().length }} filarów)
+          </button>
+          <button type="button" class="btn-accent" (click)="generate()" [disabled]="generating()">
+            @if (generating()) { Generuję… (może potrwać kilka minut) } @else { Generuj nowy artykuł }
+          </button>
+          <div class="gsc-status">
+            @if (gsc()?.connected) {
+              <span class="gsc-badge gsc-connected">Search Console: połączony ({{ gsc()?.site_url }})</span>
+            } @else {
+              <button type="button" class="btn-ghost" (click)="connectGsc()">Połącz Search Console</button>
+            }
+          </div>
         </div>
       </header>
+
+      @if (showStrategy()) {
+        <div class="pillar-grid">
+          @for (p of pillars(); track p.id) {
+            <div class="pillar-card">
+              <div class="pillar-card-top">
+                <span class="pillar-name">{{ p.name }}</span>
+                <span class="pillar-count">{{ p.article_count }} art.</span>
+              </div>
+              <p class="pillar-desc">{{ p.description }}</p>
+              <span class="pillar-theme">{{ p.target_keyword_theme }}</span>
+            </div>
+          }
+        </div>
+      }
 
       <div class="status-tabs">
         @for (s of statusFilters; track s.value) {
@@ -84,8 +107,16 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .seo-page { padding: 1.5rem; max-width: 1200px; }
     .seo-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 1rem; }
     .seo-header h1 { font-size: 1.4rem; margin: 0; }
+    .header-actions { display:flex; align-items:center; gap: 0.75rem; }
     .gsc-badge { font-size: 0.82rem; padding: 0.4rem 0.8rem; border-radius: var(--radius); }
     .gsc-connected { background: var(--orange-pale); color: var(--orange-dark); }
+    .pillar-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
+    .pillar-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: #fff; }
+    .pillar-card-top { display:flex; align-items:center; justify-content:space-between; gap: 0.5rem; }
+    .pillar-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
+    .pillar-count { font-size: 0.72rem; color: var(--gray-500); white-space: nowrap; }
+    .pillar-desc { font-size: 0.78rem; color: var(--gray-600); margin: 0.35rem 0 0; line-height: 1.4; }
+    .pillar-theme { display:inline-block; margin-top: 0.5rem; font-size: 0.7rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.15rem 0.55rem; }
     .status-tabs { display:flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
     .tab { border: 1px solid var(--gray-200); background: #fff; border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.82rem; cursor: pointer; }
     .tab.active { background: var(--orange); color: #fff; border-color: var(--orange); }
@@ -132,7 +163,10 @@ export class CrmSeoComponent implements OnInit {
   readonly items = signal<SeoContentSummary[]>([]);
   readonly detail = signal<SeoContent | null>(null);
   readonly gsc = signal<GscStatus | null>(null);
+  readonly pillars = signal<SeoPillar[]>([]);
+  readonly showStrategy = signal(false);
   readonly statusFilter = signal<SeoContentStatus | ''>('');
+  readonly generating = signal(false);
 
   readonly selected = computed(() => this.detail());
 
@@ -143,6 +177,7 @@ export class CrmSeoComponent implements OnInit {
   ngOnInit(): void {
     this.loadList();
     this.seoService.gscStatus().subscribe((s) => this.gsc.set(s));
+    this.seoService.pillars().subscribe((p) => this.pillars.set(p));
   }
 
   statusLabel(status: SeoContentStatus): string {
@@ -189,6 +224,20 @@ export class CrmSeoComponent implements OnInit {
     this.seoService.reject(id).subscribe({
       next: () => { this.toast.info('Wpis odrzucony, wrócił do szkiców.'); this.detail.set(null); this.loadList(); },
       error: () => this.toast.error('Nie udało się odrzucić wpisu.'),
+    });
+  }
+
+  generate(): void {
+    if (this.generating()) return;
+    this.generating.set(true);
+    this.seoService.generate().subscribe({
+      next: () => {
+        this.toast.success('Nowy artykuł wygenerowany i czeka na akceptację.');
+        this.generating.set(false);
+        this.loadList();
+        this.seoService.pillars().subscribe((p) => this.pillars.set(p));
+      },
+      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się wygenerować artykułu.'); this.generating.set(false); },
     });
   }
 

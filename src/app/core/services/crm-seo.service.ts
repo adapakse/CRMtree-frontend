@@ -32,6 +32,15 @@ export interface GscStatus {
   connected_at?: string;
 }
 
+export interface SeoPillar {
+  id: number;
+  name: string;
+  description: string;
+  target_keyword_theme: string;
+  priority: number;
+  article_count: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CrmSeoService {
   private http = inject(HttpClient);
@@ -51,12 +60,20 @@ export class CrmSeoService {
     return this.http.patch<SeoContent>(`${this.api}/content/${id}`, patch);
   }
 
+  generate(): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/generate`, {});
+  }
+
   approve(id: number): Observable<SeoContent> {
     return this.http.post<SeoContent>(`${this.api}/content/${id}/approve`, {});
   }
 
   reject(id: number, note?: string): Observable<SeoContent> {
     return this.http.post<SeoContent>(`${this.api}/content/${id}/reject`, { note });
+  }
+
+  pillars(): Observable<SeoPillar[]> {
+    return this.http.get<SeoPillar[]>(`${this.api}/pillars`);
   }
 
   gscStatus(): Observable<GscStatus> {
