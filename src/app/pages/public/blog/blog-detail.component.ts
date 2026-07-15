@@ -47,6 +47,9 @@ function renderBodyHtml(body: string): string {
         <span class="post-category">{{ p.category }}</span>
         <h1>{{ p.title }}</h1>
         <time>{{ p.published_at | date:'longDate':'':'pl' }}</time>
+        @if (p.header_image_url) {
+          <img class="post-hero-image" [src]="p.header_image_url" alt="">
+        }
         <div [innerHTML]="bodyHtml()"></div>
       </article>
     } @else if (notFound()) {
@@ -64,6 +67,7 @@ function renderBodyHtml(body: string): string {
     }
     .blog-post h1 { font-size:1.9rem; margin:0.4rem 0 0.4rem; line-height:1.25; }
     .blog-post time { color:var(--gray-500); font-size:0.85rem; }
+    .post-hero-image { width:100%; max-height:360px; object-fit:cover; border-radius:var(--radius); margin-top:1.4rem; }
     .blog-post p { margin:1.2rem 0 0; line-height:1.7; color:var(--gray-800); }
     .blog-post h2 { font-size:1.4rem; margin:2rem 0 0.6rem; line-height:1.3; }
     .blog-post h3 { font-size:1.15rem; margin:1.6rem 0 0.5rem; line-height:1.3; }

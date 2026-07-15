@@ -81,6 +81,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
 
         <div class="seo-detail">
           @if (detail(); as d) {
+            @if (d.header_image_url) {
+              <img class="header-image" [src]="d.header_image_url" alt="">
+            }
             <h2>
               <input class="title-input" [(ngModel)]="editTitle" [disabled]="!isEditable(d.status)">
             </h2>
@@ -138,6 +141,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .status-pill[data-status="in_review"], .status-pill[data-status="needs_update"] { background: #FEF3C7; color: #92400E; }
     .status-pill[data-status="draft"] { background: var(--gray-100); color: var(--gray-600); }
     .seo-detail { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; }
+    .header-image { width: 100%; max-height: 240px; object-fit: cover; border-radius: var(--radius); margin-bottom: 0.9rem; }
     .title-input { width: 100%; font-size: 1.1rem; font-weight: 700; border: none; padding: 0; }
     .meta-input, .body-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; margin-top: 0.6rem; font-family: inherit; }
     .detail-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }

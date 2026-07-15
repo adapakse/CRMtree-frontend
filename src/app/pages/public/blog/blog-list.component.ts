@@ -17,6 +17,9 @@ import { SeoService } from '../../../core/services/seo.service';
       <div class="posts">
         @for (post of posts(); track post.id) {
           <a class="post-card" [routerLink]="['/blog', post.slug]">
+            @if (post.header_image_url) {
+              <img class="post-image" [src]="post.header_image_url" alt="" loading="lazy">
+            }
             <span class="post-category">{{ post.category }}</span>
             <h2>{{ post.title }}</h2>
             <p>{{ post.meta_description }}</p>
@@ -36,6 +39,7 @@ import { SeoService } from '../../../core/services/seo.service';
       transition:border-color .15s;
     }
     .post-card:hover { border-color:var(--orange); }
+    .post-image { width:100%; height:160px; object-fit:cover; border-radius:calc(var(--radius) - 4px); margin-bottom:0.9rem; }
     .post-category {
       font-size:0.72rem; text-transform:uppercase; letter-spacing:.05em;
       color:var(--orange-dark); font-weight:700;

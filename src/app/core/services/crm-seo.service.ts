@@ -24,6 +24,7 @@ export interface SeoContentSummary {
 export interface SeoContent extends SeoContentSummary {
   body: string;
   meta_description: string | null;
+  header_image_url: string | null;
 }
 
 export interface GscStatus {
