@@ -12,7 +12,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { formatAddressDisplay, countExtraAddresses } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
-import { formatPhoneDisplay, requiresCountryCode } from '../../../shared/utils/phone-format.util';
+import { formatPhoneDisplay, requiresCountryCode, isLikelyDemoPhone } from '../../../shared/utils/phone-format.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { QuillModule } from 'ngx-quill';
 
@@ -764,9 +764,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
           <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
-                   placeholder="+48 502 345 678">
+                   placeholder="+48 123 123 123">
           </label>
-          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">Podaj numer z kierunkowym kraju, np. +48 502 345 678.</div>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">Podaj numer z kierunkowym kraju, np. +48 123 123 123.</div>
 
           <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Treść wiadomości
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
@@ -784,21 +784,66 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
         </div>
 
-        <!-- Historia WhatsApp — real conversation model (whatsapp_messages), not an activity log -->
-        <div *ngIf="whatsappConfigured===true">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:4px">Historia WhatsApp</div>
-          <div style="font-size:11px;color:#9ca3af;margin-bottom:8px">Na razie widoczne są wiadomości wysłane z CRM. Odpowiedzi klienta pojawią się po podpięciu webhooka.</div>
-
-          <div *ngIf="whatsappHistoryLoading" class="empty-act">Ładowanie historii...</div>
-          <div *ngIf="!whatsappHistoryLoading && whatsappHistory.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
-
-          <div *ngFor="let h of whatsappHistory" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;background:white">
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
-              <span *ngIf="h.direction==='outgoing'"><span style="font-size:10px;color:#9ca3af">Do:&nbsp;</span><span style="font-weight:600">{{formatWhatsappHistoryPhone(h.to_phone)}}</span></span>
-              <span *ngIf="h.direction==='incoming'"><span style="font-size:10px;color:#9ca3af">Od:&nbsp;</span><span style="font-weight:600">{{formatWhatsappHistoryPhone(h.from_phone)}}</span></span>
-              <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+        <!-- Historia WhatsApp — same thread-card skeleton as the email cards above -->
+        <div *ngIf="whatsappConfigured===true" style="border:1px solid #e5e7eb;border-radius:10px;background:white"
+             [style.border-left]="whatsappThreadExpanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
+               [style.background]="whatsappThreadExpanded ? '#eff6ff' : 'white'"
+               (click)="whatsappThreadExpanded = !whatsappThreadExpanded">
+            <span style="font-size:16px;flex-shrink:0">💬</span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px">
+                <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rozmowa WhatsApp</strong>
+              </div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:1px">
+                WhatsApp<span *ngIf="whatsappHistory.length"> · ostatnia wiadomość: {{whatsappHistory[whatsappHistory.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+              </div>
             </div>
-            <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;margin-top:6px;white-space:pre-wrap">{{h.message}}</div>
+            <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{whatsappThreadExpanded ? '▲' : '▾'}}</span>
+          </div>
+
+          <div *ngIf="whatsappThreadExpanded" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div *ngIf="whatsappHistoryLoading" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie historii…</div>
+            <div *ngIf="!whatsappHistoryLoading && whatsappHistory.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
+
+            <div *ngFor="let h of whatsappHistory"
+                 [style.background]="h.direction==='incoming' ? '#fffbeb' : 'white'"
+                 [style.border]="h.direction==='incoming' ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
+                 style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                <span style="display:flex;align-items:center;gap:4px">
+                  <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? 'Do:' : 'Od:'}}</span>
+                  <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
+                </span>
+                <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+              </div>
+              <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap">
+                <div [class.wa-body-clamp]="!isWhatsappExpanded(h.id)">{{h.message}}</div>
+              </div>
+              <button *ngIf="h.message && h.message.length > 200" class="wa-expand-btn" (click)="toggleWhatsappExpand(h.id)">
+                {{isWhatsappExpanded(h.id) ? '▲ Zwiń' : '▼ Rozwiń'}}
+              </button>
+            </div>
+
+            <ng-container *ngIf="whatsappHistory.length>0">
+              <div *ngIf="!showWhatsappReplyInline" style="display:flex;gap:6px">
+                <button class="btn-sm" (click)="startWhatsappReply()">↩ Odpowiedz</button>
+              </div>
+
+              <div *ngIf="showWhatsappReplyInline" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:11px;color:#374151"><strong>↩ Odpowiadasz przez WhatsApp</strong></div>
+                <div style="font-size:11px;color:#6b7280">Do: {{formatWhatsappHistoryPhone(whatsappReplyToPhone)}}</div>
+                <textarea class="act-input" [(ngModel)]="whatsappReplyMessage" [disabled]="whatsappReplySending" rows="3"
+                          placeholder="Treść odpowiedzi..."></textarea>
+                <div *ngIf="whatsappReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{whatsappReplyError}}</div>
+                <div style="display:flex;gap:6px;justify-content:flex-end">
+                  <button class="btn-sm" (click)="cancelWhatsappReply()">Anuluj</button>
+                  <button class="btn-sm primary" [disabled]="whatsappReplySending || !whatsappReplyMessage.trim()" (click)="sendWhatsappReply()">
+                    {{ whatsappReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź' }}
+                  </button>
+                </div>
+              </div>
+            </ng-container>
           </div>
         </div>
       </div>
@@ -1872,6 +1917,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .suggestion-item { padding:7px 12px;font-size:12px;cursor:pointer; }
     .suggestion-item:hover { background:#f9fafb; }
     .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:16px; }
+    .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10.5px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
     .loading, .not-found { padding:40px; text-align:center; color:#9ca3af; }
     /* Modal */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
@@ -2062,8 +2109,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   openWhatsappTab(): void {
     this.midTab = 'whatsapp';
+    this.showWhatsappReplyInline = false;
     if (this.whatsappConfigured === null) {
-      this.whatsappToPhone = formatPhoneDisplay(this.partner?.phone);
+      // Prefill only with the partner's own real phone — never a placeholder/demo
+      // example, even if a seed record was ever created with one as literal data.
+      const partnerPhone = this.partner?.phone;
+      this.whatsappToPhone = isLikelyDemoPhone(partnerPhone) ? '' : formatPhoneDisplay(partnerPhone);
       this.api.getWhatsappStatus().subscribe({
         next: status => this.zone.run(() => {
           this.whatsappConfigured    = status.configured && status.enabled;
@@ -2174,6 +2225,83 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   formatWhatsappHistoryPhone(raw: string | null): string {
     return raw ? formatPhoneDisplay(raw) : '—';
+  }
+
+  // Per-message expand/collapse for long WhatsApp bodies, same "clamp + Rozwiń/Zwiń"
+  // interaction as the generic activity cards — kept as its own Set (ids are
+  // whatsapp_messages UUIDs, not the numeric activity ids expandedActIds holds).
+  whatsappExpandedIds = new Set<string>();
+  isWhatsappExpanded(id: string): boolean { return this.whatsappExpandedIds.has(id); }
+  toggleWhatsappExpand(id: string): void {
+    if (this.whatsappExpandedIds.has(id)) this.whatsappExpandedIds.delete(id);
+    else this.whatsappExpandedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  // Whole-thread collapse, same mechanism as expandedEmailId — defaults open
+  // since (unlike the email tab) there's exactly one WhatsApp conversation
+  // per partner, so collapsing it by default would hide the one thing this
+  // section exists to show.
+  whatsappThreadExpanded = true;
+
+  // "↩ Odpowiedz" reply composer — same inline-reply pattern as the email
+  // thread's showReplyInline, but scoped to WhatsApp's own state so it never
+  // interacts with the main "new message" form above.
+  showWhatsappReplyInline = false;
+  whatsappReplyMessage = '';
+  whatsappReplySending = false;
+  whatsappReplyError: string | null = null;
+
+  // Reply target: the other side of the most recent message in the
+  // conversation — from_phone if it was incoming, to_phone if outgoing.
+  // Falls back to the main form's current "Do" value if the history is
+  // somehow empty; sendWhatsappReply() blocks sending if this is still null.
+  get whatsappReplyToPhone(): string | null {
+    const last = this.whatsappHistory[this.whatsappHistory.length - 1];
+    if (last) {
+      const candidate = last.direction === 'incoming' ? last.from_phone : last.to_phone;
+      if (candidate) return candidate;
+    }
+    return this.whatsappToPhone || null;
+  }
+
+  startWhatsappReply(): void {
+    this.whatsappReplyMessage = '';
+    this.whatsappReplyError   = null;
+    this.showWhatsappReplyInline = true;
+  }
+
+  cancelWhatsappReply(): void {
+    this.showWhatsappReplyInline = false;
+    this.whatsappReplyMessage    = '';
+    this.whatsappReplyError      = null;
+  }
+
+  sendWhatsappReply(): void {
+    if (!this.partner || !this.whatsappReplyMessage.trim()) return;
+    const toPhone = this.whatsappReplyToPhone;
+    if (!toPhone) {
+      this.whatsappReplyError = 'Nie udało się ustalić numeru odbiorcy odpowiedzi.';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.whatsappReplySending = true;
+    this.whatsappReplyError   = null;
+    this.cdr.markForCheck();
+    this.api.sendPartnerWhatsapp(this.pid, this.whatsappReplyMessage.trim(), toPhone).subscribe({
+      next: () => this.zone.run(() => {
+        this.whatsappReplySending    = false;
+        this.whatsappReplyMessage    = '';
+        this.showWhatsappReplyInline = false;
+        this.cdr.markForCheck();
+        this.loadWhatsappHistory();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.whatsappReplySending = false;
+        this.whatsappReplyError  = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        this.cdr.markForCheck();
+      }),
+    });
   }
 
   history: any[] = [];
