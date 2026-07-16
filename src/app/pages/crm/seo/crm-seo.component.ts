@@ -84,6 +84,13 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
             @if (d.header_image_url) {
               <img class="header-image" [src]="d.header_image_url" alt="">
             }
+            <div class="image-controls">
+              <input class="image-url-input" [(ngModel)]="editImageUrl" placeholder="URL zdjęcia nagłówkowego">
+              <button type="button" class="btn-ghost btn-sm" (click)="saveImageUrl(d.id)">Zapisz zdjęcie</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="rerollImage(d.id)" [disabled]="rerolling()">
+                @if (rerolling()) { Losuję… } @else { Losuj inne z Pexels }
+              </button>
+            </div>
             <h2>
               <input class="title-input" [(ngModel)]="editTitle" [disabled]="!isEditable(d.status)">
             </h2>
@@ -142,6 +149,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .status-pill[data-status="draft"] { background: var(--gray-100); color: var(--gray-600); }
     .seo-detail { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; }
     .header-image { width: 100%; max-height: 240px; object-fit: cover; border-radius: var(--radius); margin-bottom: 0.9rem; }
+    .image-controls { display: flex; gap: 0.5rem; margin-bottom: 0.9rem; }
+    .image-url-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
+    .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .title-input { width: 100%; font-size: 1.1rem; font-weight: 700; border: none; padding: 0; }
     .meta-input, .body-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; margin-top: 0.6rem; font-family: inherit; }
     .detail-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
@@ -171,12 +181,14 @@ export class CrmSeoComponent implements OnInit {
   readonly showStrategy = signal(false);
   readonly statusFilter = signal<SeoContentStatus | ''>('');
   readonly generating = signal(false);
+  readonly rerolling = signal(false);
 
   readonly selected = computed(() => this.detail());
 
   editTitle = '';
   editMeta = '';
   editBody = '';
+  editImageUrl = '';
 
   ngOnInit(): void {
     this.loadList();
@@ -207,13 +219,40 @@ export class CrmSeoComponent implements OnInit {
       this.editTitle = d.title;
       this.editMeta = d.meta_description ?? '';
       this.editBody = d.body;
+      this.editImageUrl = d.header_image_url ?? '';
     });
   }
 
   saveEdits(id: number): void {
-    this.seoService.update(id, { title: this.editTitle, meta_description: this.editMeta, body: this.editBody }).subscribe({
-      next: () => { this.toast.success('Zapisano zmiany.'); this.loadList(); },
+    this.seoService.update(id, {
+      title: this.editTitle,
+      meta_description: this.editMeta,
+      body: this.editBody,
+      header_image_url: this.editImageUrl || null,
+    }).subscribe({
+      next: (d) => { this.toast.success('Zapisano zmiany.'); this.detail.set(d); this.loadList(); },
       error: () => this.toast.error('Nie udało się zapisać zmian.'),
+    });
+  }
+
+  saveImageUrl(id: number): void {
+    this.seoService.update(id, { header_image_url: this.editImageUrl || null }).subscribe({
+      next: (d) => { this.toast.success('Zapisano zdjęcie.'); this.detail.set(d); this.loadList(); },
+      error: () => this.toast.error('Nie udało się zapisać zdjęcia.'),
+    });
+  }
+
+  rerollImage(id: number): void {
+    if (this.rerolling()) return;
+    this.rerolling.set(true);
+    this.seoService.rerollImage(id).subscribe({
+      next: (d) => {
+        this.toast.success('Wylosowano nowe zdjęcie.');
+        this.detail.set(d);
+        this.editImageUrl = d.header_image_url ?? '';
+        this.rerolling.set(false);
+      },
+      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się wylosować zdjęcia.'); this.rerolling.set(false); },
     });
   }
 

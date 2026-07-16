@@ -57,12 +57,16 @@ export class CrmSeoService {
     return this.http.get<SeoContent>(`${this.api}/content/${id}`);
   }
 
-  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description'>>): Observable<SeoContent> {
+  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description' | 'header_image_url'>>): Observable<SeoContent> {
     return this.http.patch<SeoContent>(`${this.api}/content/${id}`, patch);
   }
 
   generate(): Observable<SeoContent> {
     return this.http.post<SeoContent>(`${this.api}/content/generate`, {});
+  }
+
+  rerollImage(id: number): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/reroll-image`, {});
   }
 
   approve(id: number): Observable<SeoContent> {
