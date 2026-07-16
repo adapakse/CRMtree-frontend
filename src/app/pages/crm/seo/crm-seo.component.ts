@@ -105,6 +105,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
                 <button type="button" class="btn-reject" (click)="reject(d.id)">Odrzuć</button>
                 <button type="button" class="btn-accent" (click)="approve(d.id)">Zatwierdź i opublikuj</button>
               }
+              @if (d.status === 'published') {
+                <button type="button" class="btn-reject" (click)="unpublish(d.id)">Wycofaj do szkicu</button>
+              }
             </div>
           } @else {
             <p class="empty">Wybierz wpis z listy.</p>
@@ -267,6 +270,13 @@ export class CrmSeoComponent implements OnInit {
     this.seoService.reject(id).subscribe({
       next: () => { this.toast.info('Wpis odrzucony, wrócił do szkiców.'); this.detail.set(null); this.loadList(); },
       error: () => this.toast.error('Nie udało się odrzucić wpisu.'),
+    });
+  }
+
+  unpublish(id: number): void {
+    this.seoService.unpublish(id).subscribe({
+      next: () => { this.toast.info('Wpis wycofany do szkiców.'); this.detail.set(null); this.loadList(); },
+      error: () => this.toast.error('Nie udało się wycofać wpisu.'),
     });
   }
 
