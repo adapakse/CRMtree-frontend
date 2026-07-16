@@ -103,6 +103,8 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               }
               @if (d.status === 'in_review' || d.status === 'needs_update') {
                 <button type="button" class="btn-reject" (click)="reject(d.id)">Odrzuć</button>
+              }
+              @if (d.status === 'draft' || d.status === 'in_review' || d.status === 'needs_update') {
                 <button type="button" class="btn-accent" (click)="approve(d.id)">Zatwierdź i opublikuj</button>
               }
               @if (d.status === 'published') {
