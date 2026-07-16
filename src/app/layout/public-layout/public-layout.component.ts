@@ -11,7 +11,7 @@ import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie
     <div class="public-shell">
       <header class="public-header">
         <a routerLink="/" class="public-logo">
-          <img src="assets/crmtree-logo.png" alt="CRMtree" height="28">
+          <img src="assets/crmtree-logo-reverse.png" alt="CRMtree">
         </a>
         <nav class="public-nav">
           <a routerLink="/blog">Blog</a>
@@ -42,9 +42,9 @@ import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie
     }
     .public-header {
       display:flex; align-items:center; justify-content:space-between;
-      padding:1rem 2rem; border-bottom:1px solid var(--gray-200);
+      padding:0.75rem 2rem; border-bottom:1px solid var(--gray-200);
     }
-    .public-logo img { display:block; }
+    .public-logo img { display:block; height:90px; width:auto; }
     .public-nav { display:flex; align-items:center; gap:1.5rem; }
     .public-nav a { color:var(--gray-700); text-decoration:none; font-size:0.95rem; }
     .public-nav a:hover { color:var(--orange); }
