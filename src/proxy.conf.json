@@ -3,6 +3,8 @@
     "target": "http://127.0.0.1:3001",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "timeout": 600000,
+    "proxyTimeout": 600000
   }
 }
