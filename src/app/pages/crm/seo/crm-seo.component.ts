@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar } from '../../../core/services/crm-seo.service';
+import { DatePipe } from '@angular/common';
+import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoInternalLink } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 
@@ -18,7 +19,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, SeoStrategyPanelComponent],
+  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent],
   template: `
     <div class="seo-page">
       <header class="seo-header">
@@ -101,6 +102,27 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
             <textarea class="meta-input" [(ngModel)]="editMeta" [disabled]="!isEditable(d.status)" rows="2" placeholder="Meta description"></textarea>
             <textarea class="body-input" [(ngModel)]="editBody" [disabled]="!isEditable(d.status)" rows="14"></textarea>
 
+            @if (internalLinks().length > 0) {
+              <div class="internal-links-row">
+                <span class="internal-links-label">Linki wewnętrzne:</span>
+                @for (link of internalLinks(); track link.id) {
+                  <span class="internal-link-chip">{{ link.to_title }}</span>
+                }
+              </div>
+            }
+
+            @if (isEditable(d.status)) {
+              <div class="schedule-row">
+                <label for="scheduleInput">Zaplanuj publikację na:</label>
+                <input id="scheduleInput" type="datetime-local" [(ngModel)]="editScheduledAt" (change)="saveScheduledAt(d.id)">
+                @if (editScheduledAt) {
+                  <button type="button" class="btn-ghost btn-sm" (click)="clearSchedule(d.id)">Usuń termin</button>
+                }
+              </div>
+            } @else if (d.status === 'scheduled' && d.scheduled_at) {
+              <p class="schedule-note">Zaplanowano publikację: {{ d.scheduled_at | date:'d MMMM y, HH:mm':'':'pl' }}</p>
+            }
+
             <div class="detail-actions">
               @if (isEditable(d.status)) {
                 <button type="button" class="btn-ghost" (click)="saveEdits(d.id)">Zapisz zmiany</button>
@@ -108,8 +130,13 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               @if (d.status === 'in_review' || d.status === 'needs_update') {
                 <button type="button" class="btn-reject" (click)="reject(d.id)">Odrzuć</button>
               }
+              @if (d.status === 'scheduled') {
+                <button type="button" class="btn-reject" (click)="unpublish(d.id)">Anuluj harmonogram</button>
+              }
               @if (d.status === 'draft' || d.status === 'in_review' || d.status === 'needs_update') {
-                <button type="button" class="btn-accent" (click)="approve(d.id)">Zatwierdź i opublikuj</button>
+                <button type="button" class="btn-accent" (click)="approve(d.id)">
+                  @if (editScheduledAt) { Zatwierdź i zaplanuj } @else { Zatwierdź i opublikuj }
+                </button>
               }
               @if (d.status === 'published') {
                 <button type="button" class="btn-reject" (click)="unpublish(d.id)">Wycofaj do szkicu</button>
@@ -163,6 +190,12 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .title-input { width: 100%; font-size: 1.1rem; font-weight: 700; border: none; padding: 0; }
     .meta-input, .body-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; margin-top: 0.6rem; font-family: inherit; }
+    .internal-links-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .internal-links-label { font-size: 0.78rem; color: var(--gray-500); }
+    .internal-link-chip { font-size: 0.75rem; background: var(--gray-100); color: var(--gray-700); border-radius: 999px; padding: 0.15rem 0.6rem; }
+    .schedule-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.9rem; font-size: 0.85rem; color: var(--gray-700); }
+    .schedule-row input { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
+    .schedule-note { font-size: 0.82rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 8px; padding: 0.5rem 0.75rem; margin-top: 0.9rem; }
     .detail-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
     .btn-ghost, .btn-accent, .btn-reject { border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-weight: 600; cursor: pointer; font-size: 0.88rem; }
     .btn-ghost { background: var(--gray-100); color: var(--gray-800); }
@@ -179,6 +212,7 @@ export class CrmSeoComponent implements OnInit {
     { value: '', label: 'Wszystkie' },
     { value: 'in_review', label: 'Do akceptacji' },
     { value: 'needs_update', label: 'Do odświeżenia' },
+    { value: 'scheduled', label: 'Zaplanowane' },
     { value: 'published', label: 'Opublikowane' },
     { value: 'draft', label: 'Szkice' },
   ];
@@ -192,6 +226,7 @@ export class CrmSeoComponent implements OnInit {
   readonly generating = signal(false);
   readonly rerolling = signal(false);
   readonly syncingGsc = signal(false);
+  readonly internalLinks = signal<SeoInternalLink[]>([]);
 
   readonly selected = computed(() => this.detail());
 
@@ -199,6 +234,7 @@ export class CrmSeoComponent implements OnInit {
   editMeta = '';
   editBody = '';
   editImageUrl = '';
+  editScheduledAt = '';
 
   ngOnInit(): void {
     this.loadList();
@@ -230,7 +266,16 @@ export class CrmSeoComponent implements OnInit {
       this.editMeta = d.meta_description ?? '';
       this.editBody = d.body;
       this.editImageUrl = d.header_image_url ?? '';
+      // datetime-local expects "YYYY-MM-DDTHH:mm" in local time, not an ISO string with seconds/zone.
+      this.editScheduledAt = d.scheduled_at ? this.toDatetimeLocal(d.scheduled_at) : '';
     });
+    this.seoService.internalLinks(id).subscribe((links) => this.internalLinks.set(links));
+  }
+
+  private toDatetimeLocal(iso: string): string {
+    const d = new Date(iso);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
   saveEdits(id: number): void {
@@ -252,6 +297,19 @@ export class CrmSeoComponent implements OnInit {
     });
   }
 
+  saveScheduledAt(id: number): void {
+    const iso = this.editScheduledAt ? new Date(this.editScheduledAt).toISOString() : null;
+    this.seoService.update(id, { scheduled_at: iso }).subscribe({
+      next: (d) => { this.toast.success('Zapisano termin publikacji.'); this.detail.set(d); this.loadList(); },
+      error: () => this.toast.error('Nie udało się zapisać terminu.'),
+    });
+  }
+
+  clearSchedule(id: number): void {
+    this.editScheduledAt = '';
+    this.saveScheduledAt(id);
+  }
+
   rerollImage(id: number): void {
     if (this.rerolling()) return;
     this.rerolling.set(true);
@@ -268,7 +326,11 @@ export class CrmSeoComponent implements OnInit {
 
   approve(id: number): void {
     this.seoService.approve(id).subscribe({
-      next: () => { this.toast.success('Wpis opublikowany.'); this.detail.set(null); this.loadList(); },
+      next: (d) => {
+        this.toast.success(d.status === 'scheduled' ? 'Zaplanowano publikację.' : 'Wpis opublikowany.');
+        this.detail.set(null);
+        this.loadList();
+      },
       error: () => this.toast.error('Nie udało się zatwierdzić wpisu.'),
     });
   }

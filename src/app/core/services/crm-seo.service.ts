@@ -52,6 +52,26 @@ export interface SeoCompetitor {
   created_at: string;
 }
 
+export interface SeoInternalLink {
+  id: number;
+  status: string;
+  to_content_id: number;
+  to_title: string;
+  to_slug: string;
+}
+
+export interface SeoBacklink {
+  id: number;
+  status: 'suggested' | 'accepted' | 'rejected';
+  tenant_id: string;
+  partner_tenant_id: string;
+  created_at: string;
+  from_title: string;
+  from_slug: string;
+  to_title: string;
+  to_slug: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CrmSeoService {
   private http = inject(HttpClient);
@@ -67,7 +87,7 @@ export class CrmSeoService {
     return this.http.get<SeoContent>(`${this.api}/content/${id}`);
   }
 
-  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description' | 'header_image_url'>>): Observable<SeoContent> {
+  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description' | 'header_image_url' | 'scheduled_at'>>): Observable<SeoContent> {
     return this.http.patch<SeoContent>(`${this.api}/content/${id}`, patch);
   }
 
@@ -117,5 +137,33 @@ export class CrmSeoService {
 
   deleteCompetitor(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/competitors/${id}`);
+  }
+
+  internalLinks(id: number): Observable<SeoInternalLink[]> {
+    return this.http.get<SeoInternalLink[]>(`${this.api}/content/${id}/internal-links`);
+  }
+
+  backlinks(): Observable<SeoBacklink[]> {
+    return this.http.get<SeoBacklink[]>(`${this.api}/backlinks`);
+  }
+
+  backlinksOptIn(): Observable<{ opt_in: boolean }> {
+    return this.http.get<{ opt_in: boolean }>(`${this.api}/backlinks/opt-in`);
+  }
+
+  setBacklinksOptIn(optIn: boolean): Observable<{ opt_in: boolean }> {
+    return this.http.post<{ opt_in: boolean }>(`${this.api}/backlinks/opt-in`, { opt_in: optIn });
+  }
+
+  findBacklinkCandidates(): Observable<SeoBacklink[]> {
+    return this.http.post<SeoBacklink[]>(`${this.api}/backlinks/find-candidates`, {});
+  }
+
+  acceptBacklink(id: number): Observable<SeoBacklink> {
+    return this.http.post<SeoBacklink>(`${this.api}/backlinks/${id}/accept`, {});
+  }
+
+  rejectBacklink(id: number): Observable<SeoBacklink> {
+    return this.http.post<SeoBacklink>(`${this.api}/backlinks/${id}/reject`, {});
   }
 }
