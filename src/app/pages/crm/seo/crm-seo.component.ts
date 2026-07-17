@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } 
 import { FormsModule } from '@angular/forms';
 import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 
 const STATUS_LABELS: Record<SeoContentStatus, string> = {
   draft: 'Szkic',
@@ -17,7 +18,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  imports: [FormsModule, SeoStrategyPanelComponent],
   template: `
     <div class="seo-page">
       <header class="seo-header">
@@ -32,6 +33,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
           <div class="gsc-status">
             @if (gsc()?.connected) {
               <span class="gsc-badge gsc-connected">Search Console: połączony ({{ gsc()?.site_url }})</span>
+              <button type="button" class="btn-ghost btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
+                @if (syncingGsc()) { Synchronizuję… } @else { Synchronizuj teraz }
+              </button>
             } @else {
               <button type="button" class="btn-ghost" (click)="connectGsc()">Połącz Search Console</button>
             }
@@ -40,18 +44,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
       </header>
 
       @if (showStrategy()) {
-        <div class="pillar-grid">
-          @for (p of pillars(); track p.id) {
-            <div class="pillar-card">
-              <div class="pillar-card-top">
-                <span class="pillar-name">{{ p.name }}</span>
-                <span class="pillar-count">{{ p.article_count }} art.</span>
-              </div>
-              <p class="pillar-desc">{{ p.description }}</p>
-              <span class="pillar-theme">{{ p.target_keyword_theme }}</span>
-            </div>
-          }
-        </div>
+        <wt-seo-strategy-panel [pillars]="pillars()" />
       }
 
       <div class="status-tabs">
@@ -75,6 +68,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               <span class="status-pill" [attr.data-status]="item.status">{{ statusLabel(item.status) }}</span>
               <span class="row-title">{{ item.title }}</span>
               <span class="row-locale">{{ item.locale }}</span>
+              @if (item.impressions_28d > 0 || item.clicks_28d > 0) {
+                <span class="row-metrics">{{ item.impressions_28d }} wyśw. · {{ item.clicks_28d }} kliknięć (28 dni)</span>
+              }
             </button>
           }
         </div>
@@ -83,6 +79,14 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
           @if (detail(); as d) {
             @if (d.header_image_url) {
               <img class="header-image" [src]="d.header_image_url" alt="">
+            }
+            @if (d.impressions_28d > 0 || d.clicks_28d > 0) {
+              <div class="metrics-row">
+                <span>{{ d.impressions_28d }} wyświetleń</span>
+                <span>{{ d.clicks_28d }} kliknięć</span>
+                @if (d.avg_position_28d) { <span>śr. pozycja {{ d.avg_position_28d }}</span> }
+                <span class="metrics-note">(ostatnie 28 dni, dane Search Console)</span>
+              </div>
             }
             <div class="image-controls">
               <input class="image-url-input" [(ngModel)]="editImageUrl" placeholder="URL zdjęcia nagłówkowego">
@@ -125,13 +129,6 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .header-actions { display:flex; align-items:center; gap: 0.75rem; }
     .gsc-badge { font-size: 0.82rem; padding: 0.4rem 0.8rem; border-radius: var(--radius); }
     .gsc-connected { background: var(--orange-pale); color: var(--orange-dark); }
-    .pillar-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
-    .pillar-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: #fff; }
-    .pillar-card-top { display:flex; align-items:center; justify-content:space-between; gap: 0.5rem; }
-    .pillar-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
-    .pillar-count { font-size: 0.72rem; color: var(--gray-500); white-space: nowrap; }
-    .pillar-desc { font-size: 0.78rem; color: var(--gray-600); margin: 0.35rem 0 0; line-height: 1.4; }
-    .pillar-theme { display:inline-block; margin-top: 0.5rem; font-size: 0.7rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.15rem 0.55rem; }
     .status-tabs { display:flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
     .tab { border: 1px solid var(--gray-200); background: #fff; border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.82rem; cursor: pointer; }
     .tab.active { background: var(--orange); color: #fff; border-color: var(--orange); }
@@ -145,6 +142,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .content-row.selected { border-color: var(--orange); background: var(--orange-pale); }
     .row-title { font-size: 0.9rem; font-weight: 600; color: var(--gray-900); }
     .row-locale { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; }
+    .row-metrics { font-size: 0.72rem; color: var(--gray-500); }
     .status-pill {
       font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
       padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
@@ -154,6 +152,12 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .status-pill[data-status="draft"] { background: var(--gray-100); color: var(--gray-600); }
     .seo-detail { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; }
     .header-image { width: 100%; max-height: 240px; object-fit: cover; border-radius: var(--radius); margin-bottom: 0.9rem; }
+    .metrics-row {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      font-size: 0.82rem; color: var(--gray-700); font-weight: 600;
+      background: var(--gray-50); border-radius: 8px; padding: 0.5rem 0.75rem; margin-bottom: 0.9rem;
+    }
+    .metrics-note { font-weight: 400; color: var(--gray-500); font-size: 0.72rem; }
     .image-controls { display: flex; gap: 0.5rem; margin-bottom: 0.9rem; }
     .image-url-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
     .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
@@ -187,6 +191,7 @@ export class CrmSeoComponent implements OnInit {
   readonly statusFilter = signal<SeoContentStatus | ''>('');
   readonly generating = signal(false);
   readonly rerolling = signal(false);
+  readonly syncingGsc = signal(false);
 
   readonly selected = computed(() => this.detail());
 
@@ -298,5 +303,19 @@ export class CrmSeoComponent implements OnInit {
 
   connectGsc(): void {
     this.seoService.gscAuthUrl().subscribe((res) => window.location.assign(res.url));
+  }
+
+  syncGsc(): void {
+    if (this.syncingGsc()) return;
+    this.syncingGsc.set(true);
+    this.seoService.gscSync().subscribe({
+      next: () => {
+        this.toast.success('Metryki Search Console zsynchronizowane.');
+        this.syncingGsc.set(false);
+        this.loadList();
+        if (this.detail()) this.select(this.detail()!.id);
+      },
+      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się zsynchronizować metryk.'); this.syncingGsc.set(false); },
+    });
   }
 }

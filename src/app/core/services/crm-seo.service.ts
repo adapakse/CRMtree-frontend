@@ -19,6 +19,9 @@ export interface SeoContentSummary {
   reviewed_by: string | null;
   created_at: string;
   updated_at: string;
+  clicks_28d: number;
+  impressions_28d: number;
+  avg_position_28d: number | null;
 }
 
 export interface SeoContent extends SeoContentSummary {
@@ -40,6 +43,13 @@ export interface SeoPillar {
   target_keyword_theme: string;
   priority: number;
   article_count: number;
+}
+
+export interface SeoCompetitor {
+  id: number;
+  url: string;
+  notes: string | null;
+  created_at: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -91,5 +101,21 @@ export class CrmSeoService {
 
   gscAuthUrl(): Observable<{ url: string }> {
     return this.http.get<{ url: string }>(`${this.api}/gsc/oauth/url`);
+  }
+
+  gscSync(): Observable<{ synced: boolean }> {
+    return this.http.post<{ synced: boolean }>(`${this.api}/gsc/sync`, {});
+  }
+
+  competitors(): Observable<SeoCompetitor[]> {
+    return this.http.get<SeoCompetitor[]>(`${this.api}/competitors`);
+  }
+
+  addCompetitor(url: string, notes?: string): Observable<SeoCompetitor> {
+    return this.http.post<SeoCompetitor>(`${this.api}/competitors`, { url, notes });
+  }
+
+  deleteCompetitor(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/competitors/${id}`);
   }
 }
