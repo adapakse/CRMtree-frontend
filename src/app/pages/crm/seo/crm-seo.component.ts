@@ -142,6 +142,27 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
                 <button type="button" class="btn-reject" (click)="unpublish(d.id)">Wycofaj do szkicu</button>
               }
             </div>
+
+            @if (d.status === 'published' || d.status === 'scheduled' || d.social_post_linkedin) {
+              <div class="social-box">
+                <h3>Post na LinkedIn</h3>
+                @if (d.social_post_linkedin) {
+                  <textarea class="social-textarea" [(ngModel)]="editSocialPost" rows="6"></textarea>
+                  <div class="social-actions">
+                    <button type="button" class="btn-ghost btn-sm" (click)="saveSocialPost(d.id)">Zapisz</button>
+                    <button type="button" class="btn-ghost btn-sm" (click)="copySocialPost()">Kopiuj</button>
+                    <button type="button" class="btn-ghost btn-sm" (click)="regenerateSocialPost(d.id)" [disabled]="generatingSocial()">
+                      @if (generatingSocial()) { Generuję… } @else { Wygeneruj ponownie }
+                    </button>
+                  </div>
+                } @else {
+                  <p class="empty">
+                    @if (generatingSocial()) { Generuję post… } @else { Brak posta. }
+                  </p>
+                  <button type="button" class="btn-ghost btn-sm" (click)="regenerateSocialPost(d.id)" [disabled]="generatingSocial()">Wygeneruj</button>
+                }
+              </div>
+            }
           } @else {
             <p class="empty">Wybierz wpis z listy.</p>
           }
@@ -196,6 +217,10 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .schedule-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.9rem; font-size: 0.85rem; color: var(--gray-700); }
     .schedule-row input { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
     .schedule-note { font-size: 0.82rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 8px; padding: 0.5rem 0.75rem; margin-top: 0.9rem; }
+    .social-box { border-top: 1px solid var(--gray-200); margin-top: 1.25rem; padding-top: 1rem; }
+    .social-box h3 { font-size: 0.9rem; margin: 0 0 0.6rem; color: var(--gray-800); }
+    .social-textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; font-family: inherit; font-size: 0.85rem; }
+    .social-actions { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
     .detail-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
     .btn-ghost, .btn-accent, .btn-reject { border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-weight: 600; cursor: pointer; font-size: 0.88rem; }
     .btn-ghost { background: var(--gray-100); color: var(--gray-800); }
@@ -227,6 +252,7 @@ export class CrmSeoComponent implements OnInit {
   readonly rerolling = signal(false);
   readonly syncingGsc = signal(false);
   readonly internalLinks = signal<SeoInternalLink[]>([]);
+  readonly generatingSocial = signal(false);
 
   readonly selected = computed(() => this.detail());
 
@@ -235,6 +261,7 @@ export class CrmSeoComponent implements OnInit {
   editBody = '';
   editImageUrl = '';
   editScheduledAt = '';
+  editSocialPost = '';
 
   ngOnInit(): void {
     this.loadList();
@@ -268,6 +295,7 @@ export class CrmSeoComponent implements OnInit {
       this.editImageUrl = d.header_image_url ?? '';
       // datetime-local expects "YYYY-MM-DDTHH:mm" in local time, not an ISO string with seconds/zone.
       this.editScheduledAt = d.scheduled_at ? this.toDatetimeLocal(d.scheduled_at) : '';
+      this.editSocialPost = d.social_post_linkedin ?? '';
     });
     this.seoService.internalLinks(id).subscribe((links) => this.internalLinks.set(links));
   }
@@ -378,6 +406,34 @@ export class CrmSeoComponent implements OnInit {
         if (this.detail()) this.select(this.detail()!.id);
       },
       error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się zsynchronizować metryk.'); this.syncingGsc.set(false); },
+    });
+  }
+
+  saveSocialPost(id: number): void {
+    this.seoService.update(id, { social_post_linkedin: this.editSocialPost }).subscribe({
+      next: (d) => { this.toast.success('Zapisano post.'); this.detail.set(d); },
+      error: () => this.toast.error('Nie udało się zapisać posta.'),
+    });
+  }
+
+  copySocialPost(): void {
+    navigator.clipboard.writeText(this.editSocialPost).then(
+      () => this.toast.success('Skopiowano do schowka.'),
+      () => this.toast.error('Nie udało się skopiować.'),
+    );
+  }
+
+  regenerateSocialPost(id: number): void {
+    if (this.generatingSocial()) return;
+    this.generatingSocial.set(true);
+    this.seoService.generateSocialPost(id).subscribe({
+      next: (d) => {
+        this.toast.success('Wygenerowano post.');
+        this.detail.set(d);
+        this.editSocialPost = d.social_post_linkedin ?? '';
+        this.generatingSocial.set(false);
+      },
+      error: () => { this.toast.error('Nie udało się wygenerować posta.'); this.generatingSocial.set(false); },
     });
   }
 }
