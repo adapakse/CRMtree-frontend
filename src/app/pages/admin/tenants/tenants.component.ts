@@ -229,7 +229,7 @@ function cleanSecretForPayload(value: string | null | undefined): string | undef
                               <label class="check-label">
                                 <input type="checkbox" [checked]="trainingMode()" [disabled]="saving()"
                                        (change)="setTrainingMode(t.id, !trainingMode())">
-                                {{ trainingMode() ? 'Włączony' : 'Wyłączony' }}
+                                Włączony
                               </label>
                             </div>
                             <div class="reinit-box">
