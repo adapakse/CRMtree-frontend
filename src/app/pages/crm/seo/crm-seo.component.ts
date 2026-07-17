@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoInternalLink } from '../../../core/services/crm-seo.service';
+import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoInternalLink, SocialPost, SocialPlatform } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
+import { SeoSocialChannelsComponent } from './seo-social-channels.component';
 
 const STATUS_LABELS: Record<SeoContentStatus, string> = {
   draft: 'Szkic',
@@ -19,7 +20,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent],
+  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent],
   template: `
     <div class="seo-page">
       <header class="seo-header">
@@ -28,6 +29,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
           <button type="button" class="btn-ghost" (click)="showStrategy.set(!showStrategy())">
             Strategia treści ({{ pillars().length }} filarów)
           </button>
+          <button type="button" class="btn-ghost" (click)="showChannels.set(!showChannels())">Kanały social</button>
           <button type="button" class="btn-accent" (click)="generate()" [disabled]="generating()">
             @if (generating()) { Generuję… (może potrwać kilka minut) } @else { Generuj nowy artykuł }
           </button>
@@ -46,6 +48,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
 
       @if (showStrategy()) {
         <wt-seo-strategy-panel [pillars]="pillars()" />
+      }
+      @if (showChannels()) {
+        <wt-seo-social-channels />
       }
 
       <div class="status-tabs">
@@ -143,23 +148,35 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               }
             </div>
 
-            @if (d.status === 'published' || d.status === 'scheduled' || d.social_post_linkedin) {
+            @if (d.status === 'published' || d.status === 'scheduled' || socialPosts().length > 0) {
               <div class="social-box">
-                <h3>Post na LinkedIn</h3>
-                @if (d.social_post_linkedin) {
-                  <textarea class="social-textarea" [(ngModel)]="editSocialPost" rows="6"></textarea>
-                  <div class="social-actions">
-                    <button type="button" class="btn-ghost btn-sm" (click)="saveSocialPost(d.id)">Zapisz</button>
-                    <button type="button" class="btn-ghost btn-sm" (click)="copySocialPost()">Kopiuj</button>
-                    <button type="button" class="btn-ghost btn-sm" (click)="regenerateSocialPost(d.id)" [disabled]="generatingSocial()">
-                      @if (generatingSocial()) { Generuję… } @else { Wygeneruj ponownie }
-                    </button>
+                <h3>Publikacja social</h3>
+                @if (socialPosts().length === 0) {
+                  <p class="empty">Brak podłączonych kanałów — połącz je w "Kanały social" u góry.</p>
+                }
+                @for (post of socialPosts(); track post.platform) {
+                  <div class="social-platform">
+                    <div class="social-platform-head">
+                      <span class="social-platform-name">{{ platformLabel(post.platform) }}</span>
+                      <span class="social-status" [attr.data-status]="post.status">{{ socialStatusLabel(post.status) }}</span>
+                      @if (post.remote_url) {
+                        <a [href]="post.remote_url" target="_blank" rel="noopener" class="social-view-link">Zobacz post</a>
+                      }
+                    </div>
+                    @if (post.status === 'failed' && post.error_message) {
+                      <p class="social-error">{{ post.error_message }}</p>
+                    }
+                    <textarea class="social-textarea" [ngModel]="post.body" (ngModelChange)="setSocialBody(post.platform, $event)" rows="4"></textarea>
+                    <div class="social-actions">
+                      <button type="button" class="btn-ghost btn-sm" (click)="saveSocialPost(d.id, post.platform)">Zapisz</button>
+                      <button type="button" class="btn-ghost btn-sm" (click)="copySocialBody(post.body)">Kopiuj</button>
+                      @if (post.status === 'failed' || post.status === 'draft') {
+                        <button type="button" class="btn-ghost btn-sm" (click)="retrySocialPost(d.id, post.platform)" [disabled]="retryingSocial().has(post.platform)">
+                          @if (retryingSocial().has(post.platform)) { Publikuję… } @else { Publikuj / spróbuj ponownie }
+                        </button>
+                      }
+                    </div>
                   </div>
-                } @else {
-                  <p class="empty">
-                    @if (generatingSocial()) { Generuję post… } @else { Brak posta. }
-                  </p>
-                  <button type="button" class="btn-ghost btn-sm" (click)="regenerateSocialPost(d.id)" [disabled]="generatingSocial()">Wygeneruj</button>
                 }
               </div>
             }
@@ -218,8 +235,21 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .schedule-row input { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
     .schedule-note { font-size: 0.82rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 8px; padding: 0.5rem 0.75rem; margin-top: 0.9rem; }
     .social-box { border-top: 1px solid var(--gray-200); margin-top: 1.25rem; padding-top: 1rem; }
-    .social-box h3 { font-size: 0.9rem; margin: 0 0 0.6rem; color: var(--gray-800); }
-    .social-textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; font-family: inherit; font-size: 0.85rem; }
+    .social-box h3 { font-size: 0.9rem; margin: 0 0 0.9rem; color: var(--gray-800); }
+    .social-platform { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.85rem 0.95rem; margin-bottom: 0.75rem; background: var(--gray-50); }
+    .social-platform:last-child { margin-bottom: 0; }
+    .social-platform-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+    .social-platform-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
+    .social-status {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+      padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
+    }
+    .social-status[data-status="published"] { background: var(--orange-pale); color: var(--orange-dark); }
+    .social-status[data-status="failed"] { background: #FEE2E2; color: #991B1B; }
+    .social-status[data-status="queued"] { background: #FEF3C7; color: #92400E; }
+    .social-view-link { font-size: 0.78rem; color: var(--orange-dark); margin-left: auto; }
+    .social-error { font-size: 0.78rem; color: #991B1B; margin: 0 0 0.5rem; }
+    .social-textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; font-family: inherit; font-size: 0.85rem; background: #fff; }
     .social-actions { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
     .detail-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
     .btn-ghost, .btn-accent, .btn-reject { border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-weight: 600; cursor: pointer; font-size: 0.88rem; }
@@ -247,12 +277,14 @@ export class CrmSeoComponent implements OnInit {
   readonly gsc = signal<GscStatus | null>(null);
   readonly pillars = signal<SeoPillar[]>([]);
   readonly showStrategy = signal(false);
+  readonly showChannels = signal(false);
   readonly statusFilter = signal<SeoContentStatus | ''>('');
   readonly generating = signal(false);
   readonly rerolling = signal(false);
   readonly syncingGsc = signal(false);
   readonly internalLinks = signal<SeoInternalLink[]>([]);
-  readonly generatingSocial = signal(false);
+  readonly socialPosts = signal<SocialPost[]>([]);
+  readonly retryingSocial = signal<Set<SocialPlatform>>(new Set());
 
   readonly selected = computed(() => this.detail());
 
@@ -261,7 +293,6 @@ export class CrmSeoComponent implements OnInit {
   editBody = '';
   editImageUrl = '';
   editScheduledAt = '';
-  editSocialPost = '';
 
   ngOnInit(): void {
     this.loadList();
@@ -295,9 +326,9 @@ export class CrmSeoComponent implements OnInit {
       this.editImageUrl = d.header_image_url ?? '';
       // datetime-local expects "YYYY-MM-DDTHH:mm" in local time, not an ISO string with seconds/zone.
       this.editScheduledAt = d.scheduled_at ? this.toDatetimeLocal(d.scheduled_at) : '';
-      this.editSocialPost = d.social_post_linkedin ?? '';
     });
     this.seoService.internalLinks(id).subscribe((links) => this.internalLinks.set(links));
+    this.seoService.articleSocialPosts(id).subscribe((posts) => this.socialPosts.set(posts));
   }
 
   private toDatetimeLocal(iso: string): string {
@@ -409,31 +440,48 @@ export class CrmSeoComponent implements OnInit {
     });
   }
 
-  saveSocialPost(id: number): void {
-    this.seoService.update(id, { social_post_linkedin: this.editSocialPost }).subscribe({
-      next: (d) => { this.toast.success('Zapisano post.'); this.detail.set(d); },
+  platformLabel(platform: SocialPlatform): string {
+    return { linkedin: 'LinkedIn', facebook: 'Facebook', instagram: 'Instagram' }[platform];
+  }
+
+  socialStatusLabel(status: SocialPost['status']): string {
+    return { draft: 'Szkic', queued: 'Publikuję…', published: 'Opublikowany', failed: 'Błąd' }[status];
+  }
+
+  setSocialBody(platform: SocialPlatform, body: string): void {
+    this.socialPosts.update((posts) => posts.map((p) => (p.platform === platform ? { ...p, body } : p)));
+  }
+
+  saveSocialPost(id: number, platform: SocialPlatform): void {
+    const post = this.socialPosts().find((p) => p.platform === platform);
+    if (!post?.body) return;
+    this.seoService.updateSocialPost(id, platform, post.body).subscribe({
+      next: () => this.toast.success('Zapisano post.'),
       error: () => this.toast.error('Nie udało się zapisać posta.'),
     });
   }
 
-  copySocialPost(): void {
-    navigator.clipboard.writeText(this.editSocialPost).then(
+  copySocialBody(body: string | null): void {
+    if (!body) return;
+    navigator.clipboard.writeText(body).then(
       () => this.toast.success('Skopiowano do schowka.'),
       () => this.toast.error('Nie udało się skopiować.'),
     );
   }
 
-  regenerateSocialPost(id: number): void {
-    if (this.generatingSocial()) return;
-    this.generatingSocial.set(true);
-    this.seoService.generateSocialPost(id).subscribe({
-      next: (d) => {
-        this.toast.success('Wygenerowano post.');
-        this.detail.set(d);
-        this.editSocialPost = d.social_post_linkedin ?? '';
-        this.generatingSocial.set(false);
+  retrySocialPost(id: number, platform: SocialPlatform): void {
+    if (this.retryingSocial().has(platform)) return;
+    this.retryingSocial.update((s) => new Set(s).add(platform));
+    this.seoService.retrySocialPost(id, platform).subscribe({
+      next: (post) => {
+        this.toast.success(post.status === 'published' ? 'Opublikowano.' : 'Nie udało się opublikować — sprawdź błąd.');
+        this.socialPosts.update((posts) => posts.map((p) => (p.platform === platform ? post : p)));
+        this.retryingSocial.update((s) => { const n = new Set(s); n.delete(platform); return n; });
       },
-      error: () => { this.toast.error('Nie udało się wygenerować posta.'); this.generatingSocial.set(false); },
+      error: () => {
+        this.toast.error('Nie udało się opublikować.');
+        this.retryingSocial.update((s) => { const n = new Set(s); n.delete(platform); return n; });
+      },
     });
   }
 }

@@ -28,7 +28,6 @@ export interface SeoContent extends SeoContentSummary {
   body: string;
   meta_description: string | null;
   header_image_url: string | null;
-  social_post_linkedin: string | null;
 }
 
 export interface GscStatus {
@@ -73,6 +72,23 @@ export interface SeoBacklink {
   to_slug: string;
 }
 
+export type SocialPlatform = 'linkedin' | 'facebook' | 'instagram';
+
+export interface SocialAccount {
+  platform: SocialPlatform;
+  account_name: string | null;
+  connected_at: string;
+}
+
+export interface SocialPost {
+  platform: SocialPlatform;
+  status: 'draft' | 'queued' | 'published' | 'failed';
+  body: string | null;
+  remote_url: string | null;
+  error_message: string | null;
+  published_at: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CrmSeoService {
   private http = inject(HttpClient);
@@ -88,7 +104,7 @@ export class CrmSeoService {
     return this.http.get<SeoContent>(`${this.api}/content/${id}`);
   }
 
-  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description' | 'header_image_url' | 'scheduled_at' | 'social_post_linkedin'>>): Observable<SeoContent> {
+  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description' | 'header_image_url' | 'scheduled_at'>>): Observable<SeoContent> {
     return this.http.patch<SeoContent>(`${this.api}/content/${id}`, patch);
   }
 
@@ -168,7 +184,31 @@ export class CrmSeoService {
     return this.http.post<SeoBacklink>(`${this.api}/backlinks/${id}/reject`, {});
   }
 
-  generateSocialPost(id: number): Observable<SeoContent> {
-    return this.http.post<SeoContent>(`${this.api}/content/${id}/social-post/generate`, {});
+  socialAccounts(): Observable<SocialAccount[]> {
+    return this.http.get<SocialAccount[]>(`${this.api}/social/accounts`);
+  }
+
+  disconnectSocialAccount(platform: SocialPlatform): Observable<void> {
+    return this.http.delete<void>(`${this.api}/social/accounts/${platform}`);
+  }
+
+  linkedinAuthUrl(): Observable<{ url: string }> {
+    return this.http.get<{ url: string }>(`${this.api}/social/linkedin/oauth/url`);
+  }
+
+  facebookAuthUrl(): Observable<{ url: string }> {
+    return this.http.get<{ url: string }>(`${this.api}/social/facebook/oauth/url`);
+  }
+
+  articleSocialPosts(id: number): Observable<SocialPost[]> {
+    return this.http.get<SocialPost[]>(`${this.api}/content/${id}/social-posts`);
+  }
+
+  updateSocialPost(id: number, platform: SocialPlatform, body: string): Observable<SocialPost> {
+    return this.http.patch<SocialPost>(`${this.api}/content/${id}/social-posts/${platform}`, { body });
+  }
+
+  retrySocialPost(id: number, platform: SocialPlatform): Observable<SocialPost> {
+    return this.http.post<SocialPost>(`${this.api}/content/${id}/social-posts/${platform}/retry`, {});
   }
 }
