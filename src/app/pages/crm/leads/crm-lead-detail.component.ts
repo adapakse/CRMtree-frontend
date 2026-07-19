@@ -261,13 +261,12 @@ import { QuillModule } from 'ngx-quill';
           Emaile
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="midTab='whatsapp'">WhatsApp</button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
         <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
       </div>
 
       <!-- Aktywności tabs (all/tasks/notes/calls/meetings) -->
-      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+      <div *ngIf="midTab!=='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
@@ -620,13 +619,6 @@ import { QuillModule } from 'ngx-quill';
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- WhatsApp tab (placeholder) -->
-      <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-        <div style="font-size:32px">💬</div>
-        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-        <div style="font-size:13px;color:#9ca3af">Integracja WhatsApp — wkrótce</div>
       </div>
 
     </div>
@@ -2079,7 +2071,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   toggleLeftPanel(): void { this.leftCollapsed = !this.leftCollapsed; this.cdr.markForCheck(); }
 
   // Historia
-  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'calls' | 'meetings' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'calls' | 'meetings' = 'all';
   history: LeadHistoryEntry[] = [];
   historyLoading = false;
   showHistoryModal = false;

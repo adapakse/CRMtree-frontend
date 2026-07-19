@@ -398,11 +398,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
           Maile
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="midTab='whatsapp'">WhatsApp</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
-      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div *ngIf="midTab!=='emails'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:flex-end">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
@@ -740,13 +739,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- WhatsApp tab (placeholder) -->
-      <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-        <div style="font-size:32px">💬</div>
-        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-        <div style="font-size:13px;color:#9ca3af">Integracja WhatsApp — wkrótce</div>
       </div>
 
     </div>
@@ -2027,7 +2019,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
-  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' = 'all';
   history: any[] = [];
   historyLoaded  = false;
   historyLoading = false;
