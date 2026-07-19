@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -195,7 +195,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                               <label class="check-label">
                                 <input type="checkbox" [checked]="trainingMode()" [disabled]="saving()"
                                        (change)="setTrainingMode(t.id, !trainingMode())">
-                                {{ trainingMode() ? 'Włączony' : 'Wyłączony' }}
+                                Włączony
                               </label>
                             </div>
                             <div class="reinit-box">
@@ -289,15 +289,15 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                       <input [(ngModel)]="gmailForm.client_secret" type="password" placeholder="{{ gmailProvider() ? '••••••••' : 'GOCSPX-...' }}">
                                     </div>
                                     <div class="field">
-                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <label>Redirect URI <span class="req">*</span></label>
                                       <input [(ngModel)]="gmailForm.redirect_uri" placeholder="https://app.example.com/api/crm/gmail/oauth/callback">
                                     </div>
                                     <div class="field">
-                                      <label>Pub/Sub Topic <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Pub/Sub Topic <span class="req">*</span></label>
                                       <input [(ngModel)]="gmailForm.pubsub_topic" placeholder="projects/my-project/topics/gmail-push">
                                     </div>
                                     <div class="field">
-                                      <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne — obecnie nieużywane)</span></label>
                                       <input [(ngModel)]="gmailForm.pubsub_subscription" placeholder="projects/my-project/subscriptions/gmail-sub">
                                     </div>
                                   </div>
@@ -305,36 +305,12 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                     @if (gmailProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'gmail')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider())"
+                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider()) || !gmailForm.redirect_uri || !gmailForm.pubsub_topic"
                                             (click)="saveEmailProvider(t.id, 'gmail')">
                                       {{ saving() ? 'Zapisuję...' : (gmailProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
                                 </div>
-                                @if (activeProvider() === 'gmail') {
-                                  <div class="mailbox-section">
-                                    <div class="mailbox-section-left">
-                                      <div class="mailbox-section-title">Firmowa skrzynka wysyłkowa</div>
-                                      @if (mailboxLoading()) {
-                                        <div class="mailbox-section-status is-muted">Sprawdzanie statusu...</div>
-                                      } @else if (mailboxStatus()?.connected) {
-                                        <div class="mailbox-section-status is-connected">Podłączono: {{ mailboxStatus()!.email }}</div>
-                                      } @else {
-                                        <div class="mailbox-section-status is-disconnected">Niepodłączona</div>
-                                      }
-                                    </div>
-                                    @if (!mailboxLoading()) {
-                                      <div class="mailbox-section-actions">
-                                        @if (mailboxStatus()?.connected) {
-                                          <button class="btn-secondary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Zmień skrzynkę</button>
-                                          <button class="btn-danger-sm" [disabled]="mailboxActionBusy()" (click)="disconnectMailbox(t.id)">Odłącz skrzynkę</button>
-                                        } @else {
-                                          <button class="btn-primary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Połącz skrzynkę firmową</button>
-                                        }
-                                      </div>
-                                    }
-                                  </div>
-                                }
                               </div>
 
                               <!-- Outlook -->
@@ -378,7 +354,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                       <input [(ngModel)]="outlookForm.azure_tenant_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
                                     </div>
                                     <div class="field">
-                                      <label>Redirect URI <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Redirect URI <span class="req">*</span></label>
                                       <input [(ngModel)]="outlookForm.redirect_uri" placeholder="https://app.example.com/api/crm/outlook/oauth/callback">
                                     </div>
                                   </div>
@@ -386,36 +362,12 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                     @if (outlookProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'outlook')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id"
+                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id || !outlookForm.redirect_uri"
                                             (click)="saveEmailProvider(t.id, 'outlook')">
                                       {{ saving() ? 'Zapisuję...' : (outlookProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
                                 </div>
-                                @if (activeProvider() === 'outlook') {
-                                  <div class="mailbox-section">
-                                    <div class="mailbox-section-left">
-                                      <div class="mailbox-section-title">Firmowa skrzynka wysyłkowa</div>
-                                      @if (mailboxLoading()) {
-                                        <div class="mailbox-section-status is-muted">Sprawdzanie statusu...</div>
-                                      } @else if (mailboxStatus()?.connected) {
-                                        <div class="mailbox-section-status is-connected">Podłączono: {{ mailboxStatus()!.email }}</div>
-                                      } @else {
-                                        <div class="mailbox-section-status is-disconnected">Niepodłączona</div>
-                                      }
-                                    </div>
-                                    @if (!mailboxLoading()) {
-                                      <div class="mailbox-section-actions">
-                                        @if (mailboxStatus()?.connected) {
-                                          <button class="btn-secondary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Zmień skrzynkę</button>
-                                          <button class="btn-danger-sm" [disabled]="mailboxActionBusy()" (click)="disconnectMailbox(t.id)">Odłącz skrzynkę</button>
-                                        } @else {
-                                          <button class="btn-primary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Połącz skrzynkę firmową</button>
-                                        }
-                                      </div>
-                                    }
-                                  </div>
-                                }
                               </div>
 
                               <!-- Zoho -->
@@ -455,7 +407,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                       <input [(ngModel)]="zohoForm.client_secret" type="password" placeholder="{{ zohoProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}">
                                     </div>
                                     <div class="field">
-                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <label>Redirect URI <span class="req">*</span></label>
                                       <input [(ngModel)]="zohoForm.redirect_uri" placeholder="https://app.example.com/api/crm/zoho/oauth/callback">
                                     </div>
                                   </div>
@@ -463,36 +415,12 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                     @if (zohoProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'zoho')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !zohoForm.client_id || (!zohoForm.client_secret && !zohoProvider())"
+                                    <button class="btn-primary" [disabled]="saving() || !zohoForm.client_id || (!zohoForm.client_secret && !zohoProvider()) || !zohoForm.redirect_uri"
                                             (click)="saveEmailProvider(t.id, 'zoho')">
                                       {{ saving() ? 'Zapisuję...' : (zohoProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
                                 </div>
-                                @if (activeProvider() === 'zoho') {
-                                  <div class="mailbox-section">
-                                    <div class="mailbox-section-left">
-                                      <div class="mailbox-section-title">Firmowa skrzynka wysyłkowa</div>
-                                      @if (mailboxLoading()) {
-                                        <div class="mailbox-section-status is-muted">Sprawdzanie statusu...</div>
-                                      } @else if (mailboxStatus()?.connected) {
-                                        <div class="mailbox-section-status is-connected">Podłączono: {{ mailboxStatus()!.email }}</div>
-                                      } @else {
-                                        <div class="mailbox-section-status is-disconnected">Niepodłączona</div>
-                                      }
-                                    </div>
-                                    @if (!mailboxLoading()) {
-                                      <div class="mailbox-section-actions">
-                                        @if (mailboxStatus()?.connected) {
-                                          <button class="btn-secondary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Zmień skrzynkę</button>
-                                          <button class="btn-danger-sm" [disabled]="mailboxActionBusy()" (click)="disconnectMailbox(t.id)">Odłącz skrzynkę</button>
-                                        } @else {
-                                          <button class="btn-primary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Połącz skrzynkę firmową</button>
-                                        }
-                                      </div>
-                                    }
-                                  </div>
-                                }
                               </div>
 
                               <div class="panel-footer">
@@ -926,20 +854,6 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
     }
     .radio-option.disabled { color: var(--gray-400); cursor: not-allowed; }
 
-    /* Shared company mailbox connect/change/disconnect — second step inside the
-       active provider's card, visually separated from the Client ID/Secret form. */
-    .mailbox-section {
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
-      gap: 16px; padding: 16px; border-top: 1px solid var(--gray-200);
-    }
-    .mailbox-section-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .mailbox-section-title { font-size: 13px; font-weight: 600; color: var(--gray-800); }
-    .mailbox-section-status { font-size: 12.5px; }
-    .mailbox-section-status.is-muted        { color: var(--gray-400); }
-    .mailbox-section-status.is-disconnected { color: var(--gray-500); }
-    .mailbox-section-status.is-connected    { color: #16a34a; font-weight: 500; }
-    .mailbox-section-actions { display: flex; gap: 8px; flex-shrink: 0; }
-
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
     .req  { color: #dc2626; }
@@ -951,7 +865,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
     }
   `],
 })
-export class TenantsComponent implements OnInit, OnDestroy {
+export class TenantsComponent implements OnInit {
   private http  = inject(HttpClient);
   private toast = inject(ToastService);
   auth = inject(AuthService);
@@ -976,12 +890,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
 
   trainingMode = signal(false);
 
-  mailboxStatus     = signal<{ connected: boolean; email?: string } | null>(null);
-  mailboxLoading    = signal(false);
-  mailboxActionBusy = signal(false);
-  private emailTabTenantId: string | null = null;
-  private oauthChannels: BroadcastChannel[] = [];
-
   showCreate        = signal(false);
   showAddUser       = signal(false);
   addUserTenantId   = signal<string | null>(null);
@@ -1004,37 +912,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.load();
-    this.setupMailboxOAuthListeners();
-  }
-
-  ngOnDestroy(): void {
-    this.oauthChannels.forEach(bc => bc.close());
-    window.removeEventListener('storage', this.onMailboxOAuthStorageEvent);
-  }
-
-  // The OAuth callback pages (gmail/outlook/zoho-callback.component.ts) broadcast
-  // completion via BroadcastChannel + a localStorage write — the same mechanism
-  // lead/partner detail views used to listen to. Here we refresh the active
-  // provider card's mailbox status instead, only while the Email tab is open.
-  private setupMailboxOAuthListeners(): void {
-    for (const name of ['gmail-oauth', 'outlook-oauth', 'zoho-oauth']) {
-      try {
-        const bc = new BroadcastChannel(name);
-        bc.onmessage = () => this.refreshMailboxAfterOAuth();
-        this.oauthChannels.push(bc);
-      } catch (_) {}
-    }
-    window.addEventListener('storage', this.onMailboxOAuthStorageEvent);
-  }
-
-  private onMailboxOAuthStorageEvent = (e: StorageEvent): void => {
-    if (e.key && e.key.endsWith('_oauth_connected')) this.refreshMailboxAfterOAuth();
-  };
-
-  private refreshMailboxAfterOAuth(): void {
-    if (this.editTab() === 'email' && this.emailTabTenantId) {
-      this.loadMailboxStatus(this.emailTabTenantId);
-    }
   }
 
   load(): void {
@@ -1239,11 +1116,8 @@ export class TenantsComponent implements OnInit, OnDestroy {
   openEmailTab(id: string): void {
     this.editTab.set('email');
     this.emailLoading.set(true);
-    this.emailTabTenantId = id;
     const tenant = this.tenants().find(t => t.id === id);
     this.activeProvider.set(tenant?.active_email_provider ?? null);
-    this.mailboxStatus.set(null);
-    this.loadMailboxStatus(id);
     this.http.get<EmailProvider[]>(`${API}/admin/tenants/${id}/email-providers`).subscribe({
       next: providers => {
         this.emailProviders.set(providers);
@@ -1336,7 +1210,7 @@ export class TenantsComponent implements OnInit, OnDestroy {
         else if (provider === 'outlook') { this.outlookProvider.set(null); this.outlookForm = this.emptyOutlookForm(); }
         else                              { this.zohoProvider.set(null);   this.zohoForm = this.emptyZohoForm(); }
         // Deleting the active provider's config deactivates it tenant-wide (mirrors backend).
-        if (this.activeProvider() === provider) { this.activeProvider.set(null); this.mailboxStatus.set(null); }
+        if (this.activeProvider() === provider) { this.activeProvider.set(null); }
         this.tenants.update(ts => ts.map(t => t.id === tenantId
           ? { ...t, active_email_provider: this.activeProvider() }
           : t
@@ -1361,8 +1235,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
           ? { ...t, active_email_provider: result.active_email_provider }
           : t
         ));
-        this.mailboxStatus.set(null);
-        this.loadMailboxStatus(tenantId);
         this.saving.set(false);
         this.toast.success(provider
           ? `Aktywny provider: ${TenantsComponent.PROVIDER_LABELS[provider]}`
@@ -1390,52 +1262,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
         this.toast.success(result.crm_training_mode ? 'Tryb szkoleniowy włączony' : 'Tryb szkoleniowy wyłączony');
       },
       error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu trybu szkoleniowego'); },
-    });
-  }
-
-  // ── Company mailbox connect/change/disconnect (superadmin only) ──────────
-  // Delegates to the tenant-scoped, superadmin-gated provider routes
-  // (crm-gmail.js/crm-outlook.js/crm-zoho.js), never the per-user ones.
-  loadMailboxStatus(tenantId: string): void {
-    const provider = this.activeProvider();
-    if (!provider) { this.mailboxStatus.set(null); return; }
-    this.mailboxLoading.set(true);
-    this.http.get<{ connected: boolean; email?: string }>(
-      `${API}/crm/${provider}/status`, { params: { tenantId } },
-    ).subscribe({
-      next: status => { this.mailboxStatus.set(status); this.mailboxLoading.set(false); },
-      error: () => { this.mailboxStatus.set(null); this.mailboxLoading.set(false); },
-    });
-  }
-
-  connectMailbox(tenantId: string): void {
-    const provider = this.activeProvider();
-    if (!provider) return;
-    this.mailboxActionBusy.set(true);
-    this.http.get<{ url: string }>(`${API}/crm/${provider}/oauth/url`, { params: { tenantId } }).subscribe({
-      next: ({ url }) => {
-        this.mailboxActionBusy.set(false);
-        window.open(url, 'mailbox-oauth', 'width=520,height=650');
-      },
-      error: err => {
-        this.mailboxActionBusy.set(false);
-        this.toast.error(err?.error?.error ?? 'Błąd generowania adresu autoryzacji');
-      },
-    });
-  }
-
-  disconnectMailbox(tenantId: string): void {
-    const provider = this.activeProvider();
-    if (!provider) return;
-    if (!confirm('Odłączyć skrzynkę firmową? Wysyłka i odbiór poczty przestaną działać do czasu ponownego podłączenia.')) return;
-    this.mailboxActionBusy.set(true);
-    this.http.delete(`${API}/crm/${provider}/oauth/disconnect`, { params: { tenantId } }).subscribe({
-      next: () => {
-        this.mailboxActionBusy.set(false);
-        this.mailboxStatus.set({ connected: false });
-        this.toast.success('Skrzynka odłączona');
-      },
-      error: () => { this.mailboxActionBusy.set(false); this.toast.error('Błąd odłączania skrzynki'); },
     });
   }
 

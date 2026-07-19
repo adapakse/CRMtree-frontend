@@ -32,8 +32,8 @@ import { CommonModule } from '@angular/common';
       <div style="font-size:14px;color:#6b7280;margin-bottom:8px;line-height:1.6">
         Nie udało się połączyć konta Gmail.
       </div>
-      <div *ngIf="reason" style="font-size:12px;color:#9ca3af;background:#f3f4f6;border-radius:6px;padding:6px 12px;margin-bottom:24px;font-family:monospace">
-        {{reason}}
+      <div *ngIf="reasonLabel" style="font-size:13px;color:#374151;background:#f3f4f6;border-radius:6px;padding:8px 12px;margin-bottom:24px;line-height:1.5">
+        {{reasonLabel}}
       </div>
       <button (click)="close()"
               style="background:#6b7280;color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:600;cursor:pointer">
@@ -54,12 +54,18 @@ import { CommonModule } from '@angular/common';
 export class GmailCallbackComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
+  private static readonly REASON_LABELS: Record<string, string> = {
+    email_already_connected: 'To konto Google jest już połączone z innym użytkownikiem CRM. Użyj innego konta Google albo skontaktuj się z administratorem.',
+  };
+
   status = '';
   reason = '';
+  reasonLabel = '';
 
   ngOnInit(): void {
     this.status = this.route.snapshot.queryParamMap.get('status') ?? '';
     this.reason = this.route.snapshot.queryParamMap.get('reason') ?? '';
+    this.reasonLabel = GmailCallbackComponent.REASON_LABELS[this.reason] ?? this.reason;
 
     if (this.status === 'connected') {
       // localStorage storage-event — jedyna metoda działająca przez redirecty Google
