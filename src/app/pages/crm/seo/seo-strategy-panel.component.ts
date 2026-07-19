@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CrmSeoService, SeoPillar, SeoCompetitor, SeoBacklink } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -12,14 +12,51 @@ import { ToastService } from '../../../core/services/toast.service';
     <div class="pillar-grid">
       @for (p of pillars; track p.id) {
         <div class="pillar-card">
-          <div class="pillar-card-top">
-            <span class="pillar-name">{{ p.name }}</span>
-            <span class="pillar-count">{{ p.article_count }} art.</span>
-          </div>
-          <p class="pillar-desc">{{ p.description }}</p>
-          <span class="pillar-theme">{{ p.target_keyword_theme }}</span>
+          @if (editingId() === p.id) {
+            <label class="field-label">Nazwa</label>
+            <input class="field-input" [(ngModel)]="editName">
+            <label class="field-label">Opis</label>
+            <textarea class="field-input" rows="3" [(ngModel)]="editDescription"></textarea>
+            <label class="field-label">Motyw słów kluczowych</label>
+            <input class="field-input" [(ngModel)]="editTheme">
+            <div class="pillar-edit-actions">
+              <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(p.id)" [disabled]="!editName.trim() || savingEdit()">
+                @if (savingEdit()) { Zapisuję… } @else { Zapisz }
+              </button>
+              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">Anuluj</button>
+            </div>
+          } @else {
+            <div class="pillar-card-top">
+              <span class="pillar-name">{{ p.name }}</span>
+              <span class="pillar-count">{{ p.article_count }} art.</span>
+            </div>
+            <p class="pillar-desc">{{ p.description }}</p>
+            <span class="pillar-theme">{{ p.target_keyword_theme }}</span>
+            <div class="pillar-card-actions">
+              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(p)">Edytuj</button>
+              <button type="button" class="btn-remove" (click)="removePillar(p.id)" aria-label="Usuń filar">&times;</button>
+            </div>
+          }
         </div>
       }
+      <div class="pillar-card pillar-card-new">
+        @if (addingPillar()) {
+          <label class="field-label">Nazwa</label>
+          <input class="field-input" [(ngModel)]="newPillarName" placeholder="np. Zarządzanie flotą jachtów">
+          <label class="field-label">Opis</label>
+          <textarea class="field-input" rows="3" [(ngModel)]="newPillarDescription" placeholder="O czym mają być artykuły w tym filarze"></textarea>
+          <label class="field-label">Motyw słów kluczowych</label>
+          <input class="field-input" [(ngModel)]="newPillarTheme" placeholder="np. czarter jachtów, marina">
+          <div class="pillar-edit-actions">
+            <button type="button" class="btn-ghost btn-sm" (click)="addPillar()" [disabled]="!newPillarName.trim() || savingNewPillar()">
+              @if (savingNewPillar()) { Dodaję… } @else { Dodaj filar }
+            </button>
+            <button type="button" class="btn-ghost btn-sm" (click)="addingPillar.set(false)">Anuluj</button>
+          </div>
+        } @else {
+          <button type="button" class="btn-add-pillar" (click)="addingPillar.set(true)">+ Dodaj własny filar</button>
+        }
+      </div>
     </div>
 
     <div class="competitors-box">
@@ -86,6 +123,17 @@ import { ToastService } from '../../../core/services/toast.service';
     .pillar-count { font-size: 0.72rem; color: var(--gray-500); white-space: nowrap; }
     .pillar-desc { font-size: 0.78rem; color: var(--gray-600); margin: 0.35rem 0 0; line-height: 1.4; }
     .pillar-theme { display:inline-block; margin-top: 0.5rem; font-size: 0.7rem; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.15rem 0.55rem; }
+    .pillar-card-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; margin-top: 0.6rem; }
+    .pillar-edit-actions { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+    .pillar-card .field-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--gray-700); margin: 0.45rem 0 0.2rem; }
+    .pillar-card .field-label:first-child { margin-top: 0; }
+    .pillar-card .field-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.55rem; font-family: inherit; font-size: 0.8rem; }
+    .pillar-card-new { display: flex; flex-direction: column; justify-content: center; border-style: dashed; }
+    .btn-add-pillar {
+      border: none; background: transparent; color: var(--gray-500); font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; padding: 1rem 0; width: 100%; text-align: center;
+    }
+    .btn-add-pillar:hover { color: var(--orange-dark); }
 
     .competitors-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; margin-bottom: 1.25rem; }
     .competitors-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
@@ -129,6 +177,7 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class SeoStrategyPanelComponent implements OnInit {
   @Input() pillars: SeoPillar[] = [];
+  @Output() pillarsChanged = new EventEmitter<void>();
 
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
@@ -139,6 +188,18 @@ export class SeoStrategyPanelComponent implements OnInit {
   readonly findingCandidates = signal(false);
   newUrl = '';
   newNotes = '';
+
+  readonly editingId = signal<number | null>(null);
+  readonly savingEdit = signal(false);
+  editName = '';
+  editDescription = '';
+  editTheme = '';
+
+  readonly addingPillar = signal(false);
+  readonly savingNewPillar = signal(false);
+  newPillarName = '';
+  newPillarDescription = '';
+  newPillarTheme = '';
 
   private readonly statusLabels: Record<string, string> = { suggested: 'Sugerowany', accepted: 'Zaakceptowany', rejected: 'Odrzucony' };
 
@@ -213,6 +274,67 @@ export class SeoStrategyPanelComponent implements OnInit {
     this.seoService.rejectBacklink(id).subscribe({
       next: () => { this.toast.info('Backlink odrzucony.'); this.loadBacklinks(); },
       error: () => this.toast.error('Nie udało się odrzucić.'),
+    });
+  }
+
+  startEdit(p: SeoPillar): void {
+    this.editingId.set(p.id);
+    this.editName = p.name;
+    this.editDescription = p.description;
+    this.editTheme = p.target_keyword_theme;
+  }
+
+  cancelEdit(): void {
+    this.editingId.set(null);
+  }
+
+  saveEdit(id: number): void {
+    const name = this.editName.trim();
+    if (!name) return;
+    this.savingEdit.set(true);
+    this.seoService.updatePillar(id, {
+      name,
+      description: this.editDescription.trim(),
+      target_keyword_theme: this.editTheme.trim(),
+    }).subscribe({
+      next: () => {
+        this.savingEdit.set(false);
+        this.editingId.set(null);
+        this.toast.success('Filar zaktualizowany.');
+        this.pillarsChanged.emit();
+      },
+      error: (err) => {
+        this.savingEdit.set(false);
+        this.toast.error(err?.error?.error ?? 'Nie udało się zapisać filaru.');
+      },
+    });
+  }
+
+  removePillar(id: number): void {
+    this.seoService.deletePillar(id).subscribe({
+      next: () => { this.toast.info('Filar usunięty.'); this.pillarsChanged.emit(); },
+      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć filaru.'),
+    });
+  }
+
+  addPillar(): void {
+    const name = this.newPillarName.trim();
+    if (!name) return;
+    this.savingNewPillar.set(true);
+    this.seoService.addPillar(name, this.newPillarDescription.trim(), this.newPillarTheme.trim()).subscribe({
+      next: () => {
+        this.savingNewPillar.set(false);
+        this.addingPillar.set(false);
+        this.newPillarName = '';
+        this.newPillarDescription = '';
+        this.newPillarTheme = '';
+        this.toast.success('Filar dodany.');
+        this.pillarsChanged.emit();
+      },
+      error: (err) => {
+        this.savingNewPillar.set(false);
+        this.toast.error(err?.error?.error ?? 'Nie udało się dodać filaru.');
+      },
     });
   }
 }

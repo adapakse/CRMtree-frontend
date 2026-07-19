@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CrmSeoService, SocialAccount, SocialPlatform } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -6,12 +7,14 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
   linkedin: 'LinkedIn',
   facebook: 'Facebook',
   instagram: 'Instagram',
+  wordpress: 'WordPress',
 };
 
 @Component({
   selector: 'wt-seo-social-channels',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule],
   template: `
     <div class="channels-box">
       <h3>Kanały social</h3>
@@ -46,6 +49,28 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
             <span class="channel-hint">Połącz się automatycznie po podłączeniu Facebooka, jeśli strona ma powiązane konto Instagram Business.</span>
           }
         </div>
+        <div class="channel-row wp-row">
+          <span class="channel-name">WordPress</span>
+          @if (isConnected('wordpress')) {
+            <span class="channel-connected">Połączony{{ accountName('wordpress') ? ' — ' + accountName('wordpress') : '' }}</span>
+            <button type="button" class="btn-ghost btn-sm" (click)="disconnect('wordpress')">Rozłącz</button>
+          } @else {
+            <span class="channel-hint">Publikacja artykułu w całości na własnej stronie WordPress klienta (Application Password).</span>
+          }
+        </div>
+        @if (!isConnected('wordpress')) {
+          <div class="wp-form">
+            <label class="field-label">Adres strony</label>
+            <input class="field-input" [(ngModel)]="wpSiteUrl" placeholder="https://twoja-strona.pl">
+            <label class="field-label">Nazwa użytkownika</label>
+            <input class="field-input" [(ngModel)]="wpUsername" placeholder="np. admin">
+            <label class="field-label">Hasło aplikacji</label>
+            <input class="field-input" type="password" [(ngModel)]="wpAppPassword" placeholder="wygenerowane w WP: Użytkownicy → Profil → Hasła aplikacji">
+            <button type="button" class="btn-ghost btn-sm" (click)="connectWordpress()" [disabled]="connectingWp() || !wpSiteUrl || !wpUsername || !wpAppPassword">
+              @if (connectingWp()) { Łączenie… } @else { Połącz WordPress }
+            </button>
+          </div>
+        }
       </div>
     </div>
   `,
@@ -62,7 +87,16 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
     .channel-connected { font-size: 0.82rem; color: var(--orange-dark); flex: 1; }
     .channel-hint { font-size: 0.78rem; color: var(--gray-500); flex: 1; }
     .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
+    .btn-ghost:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.8rem; white-space: nowrap; }
+    .wp-row { align-items: flex-start; }
+    .wp-form {
+      display: flex; flex-direction: column; gap: 0.3rem;
+      padding: 0.7rem 0.7rem 0.9rem; border: 1px dashed var(--gray-200); border-radius: 8px;
+    }
+    .field-label { font-size: 0.75rem; font-weight: 600; color: var(--gray-700); margin-top: 0.35rem; }
+    .field-input { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.65rem; font-family: inherit; font-size: 0.85rem; }
+    .wp-form .btn-sm { align-self: flex-start; margin-top: 0.6rem; }
   `],
 })
 export class SeoSocialChannelsComponent implements OnInit {
@@ -70,6 +104,11 @@ export class SeoSocialChannelsComponent implements OnInit {
   private toast = inject(ToastService);
 
   readonly accounts = signal<SocialAccount[]>([]);
+  readonly connectingWp = signal(false);
+
+  wpSiteUrl = '';
+  wpUsername = '';
+  wpAppPassword = '';
 
   ngOnInit(): void {
     this.load();
@@ -96,6 +135,24 @@ export class SeoSocialChannelsComponent implements OnInit {
     this.seoService.disconnectSocialAccount(platform).subscribe({
       next: () => { this.toast.info(`${PLATFORM_LABELS[platform]} rozłączony.`); this.load(); },
       error: () => this.toast.error('Nie udało się rozłączyć.'),
+    });
+  }
+
+  connectWordpress(): void {
+    this.connectingWp.set(true);
+    this.seoService.connectWordpress(this.wpSiteUrl, this.wpUsername, this.wpAppPassword).subscribe({
+      next: () => {
+        this.connectingWp.set(false);
+        this.toast.success('WordPress połączony.');
+        this.wpSiteUrl = '';
+        this.wpUsername = '';
+        this.wpAppPassword = '';
+        this.load();
+      },
+      error: (err) => {
+        this.connectingWp.set(false);
+        this.toast.error(err?.error?.error ?? 'Nie udało się połączyć z WordPress.');
+      },
     });
   }
 }

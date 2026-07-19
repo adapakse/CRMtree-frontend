@@ -72,7 +72,7 @@ export interface SeoBacklink {
   to_slug: string;
 }
 
-export type SocialPlatform = 'linkedin' | 'facebook' | 'instagram';
+export type SocialPlatform = 'linkedin' | 'facebook' | 'instagram' | 'wordpress';
 
 export interface SocialAccount {
   platform: SocialPlatform;
@@ -87,6 +87,11 @@ export interface SocialPost {
   remote_url: string | null;
   error_message: string | null;
   published_at: string | null;
+}
+
+export interface TenantSettings {
+  business_description: string | null;
+  industry_vertical: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -130,6 +135,18 @@ export class CrmSeoService {
 
   pillars(): Observable<SeoPillar[]> {
     return this.http.get<SeoPillar[]>(`${this.api}/pillars`);
+  }
+
+  addPillar(name: string, description: string, targetKeywordTheme: string): Observable<SeoPillar> {
+    return this.http.post<SeoPillar>(`${this.api}/pillars`, { name, description, target_keyword_theme: targetKeywordTheme });
+  }
+
+  updatePillar(id: number, patch: Partial<Pick<SeoPillar, 'name' | 'description' | 'target_keyword_theme'>>): Observable<SeoPillar> {
+    return this.http.patch<SeoPillar>(`${this.api}/pillars/${id}`, patch);
+  }
+
+  deletePillar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/pillars/${id}`);
   }
 
   gscStatus(): Observable<GscStatus> {
@@ -210,5 +227,25 @@ export class CrmSeoService {
 
   retrySocialPost(id: number, platform: SocialPlatform): Observable<SocialPost> {
     return this.http.post<SocialPost>(`${this.api}/content/${id}/social-posts/${platform}/retry`, {});
+  }
+
+  connectWordpress(siteUrl: string, username: string, appPassword: string): Observable<{ connected: boolean }> {
+    return this.http.post<{ connected: boolean }>(`${this.api}/social/wordpress/connect`, { site_url: siteUrl, username, app_password: appPassword });
+  }
+
+  tenantSettings(): Observable<TenantSettings> {
+    return this.http.get<TenantSettings>(`${this.api}/tenant-settings`);
+  }
+
+  updateTenantSettings(patch: Partial<TenantSettings>): Observable<TenantSettings> {
+    return this.http.patch<TenantSettings>(`${this.api}/tenant-settings`, patch);
+  }
+
+  wordpressPublishMode(): Observable<{ wordpress_publish_mode: 'draft' | 'publish' }> {
+    return this.http.get<{ wordpress_publish_mode: 'draft' | 'publish' }>(`${this.api}/tenant-settings/wordpress-publish-mode`);
+  }
+
+  setWordpressPublishMode(mode: 'draft' | 'publish'): Observable<{ wordpress_publish_mode: 'draft' | 'publish' }> {
+    return this.http.patch<{ wordpress_publish_mode: 'draft' | 'publish' }>(`${this.api}/tenant-settings/wordpress-publish-mode`, { wordpress_publish_mode: mode });
   }
 }

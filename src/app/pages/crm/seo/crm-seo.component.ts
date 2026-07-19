@@ -5,6 +5,7 @@ import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStat
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 import { SeoSocialChannelsComponent } from './seo-social-channels.component';
+import { SeoTenantSettingsComponent } from './seo-tenant-settings.component';
 
 const STATUS_LABELS: Record<SeoContentStatus, string> = {
   draft: 'Szkic',
@@ -20,7 +21,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent],
+  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent],
   template: `
     <div class="seo-page">
       <header class="seo-header">
@@ -30,6 +31,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
             Strategia treści ({{ pillars().length }} filarów)
           </button>
           <button type="button" class="btn-ghost" (click)="showChannels.set(!showChannels())">Kanały social</button>
+          <button type="button" class="btn-ghost" (click)="showSettings.set(!showSettings())">Ustawienia</button>
           <button type="button" class="btn-accent" (click)="generate()" [disabled]="generating()">
             @if (generating()) { Generuję… (może potrwać kilka minut) } @else { Generuj nowy artykuł }
           </button>
@@ -47,10 +49,13 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
       </header>
 
       @if (showStrategy()) {
-        <wt-seo-strategy-panel [pillars]="pillars()" />
+        <wt-seo-strategy-panel [pillars]="pillars()" (pillarsChanged)="loadPillars()" />
       }
       @if (showChannels()) {
         <wt-seo-social-channels />
+      }
+      @if (showSettings()) {
+        <wt-seo-tenant-settings />
       }
 
       <div class="status-tabs">
@@ -278,6 +283,7 @@ export class CrmSeoComponent implements OnInit {
   readonly pillars = signal<SeoPillar[]>([]);
   readonly showStrategy = signal(false);
   readonly showChannels = signal(false);
+  readonly showSettings = signal(false);
   readonly statusFilter = signal<SeoContentStatus | ''>('');
   readonly generating = signal(false);
   readonly rerolling = signal(false);
@@ -297,6 +303,10 @@ export class CrmSeoComponent implements OnInit {
   ngOnInit(): void {
     this.loadList();
     this.seoService.gscStatus().subscribe((s) => this.gsc.set(s));
+    this.loadPillars();
+  }
+
+  loadPillars(): void {
     this.seoService.pillars().subscribe((p) => this.pillars.set(p));
   }
 
@@ -416,7 +426,7 @@ export class CrmSeoComponent implements OnInit {
         this.toast.success('Nowy artykuł wygenerowany i czeka na akceptację.');
         this.generating.set(false);
         this.loadList();
-        this.seoService.pillars().subscribe((p) => this.pillars.set(p));
+        this.loadPillars();
       },
       error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się wygenerować artykułu.'); this.generating.set(false); },
     });
@@ -441,7 +451,7 @@ export class CrmSeoComponent implements OnInit {
   }
 
   platformLabel(platform: SocialPlatform): string {
-    return { linkedin: 'LinkedIn', facebook: 'Facebook', instagram: 'Instagram' }[platform];
+    return { linkedin: 'LinkedIn', facebook: 'Facebook', instagram: 'Instagram', wordpress: 'WordPress' }[platform];
   }
 
   socialStatusLabel(status: SocialPost['status']): string {
