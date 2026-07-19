@@ -10,7 +10,7 @@ import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
-import { formatAddressDisplay, countExtraAddresses, isSameMailboxAddress } from '../../../shared/utils/email-address.util';
+import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
@@ -1538,10 +1538,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
     <div class="modal-body" style="gap:10px" *ngIf="msgModalMsg && !msgModalReply">
       <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12px">
-        <span style="color:#9ca3af">Od:</span><span>{{msgModalMsg.from}}</span>
-        <span style="color:#9ca3af">Do:</span><span>{{msgModalMsg.to}}</span>
+        <span style="color:#9ca3af">Od:</span><span>{{firstAddressDisplay(msgModalMsg.from)}}</span>
+        <span style="color:#9ca3af">Do:</span><span>{{decodeAddress(msgModalMsg.to)}}</span>
         <span *ngIf="msgModalMsg.cc" style="color:#9ca3af">DW:</span>
-        <span *ngIf="msgModalMsg.cc">{{msgModalMsg.cc}}</span>
+        <span *ngIf="msgModalMsg.cc">{{decodeAddress(msgModalMsg.cc)}}</span>
         <span style="color:#9ca3af">Data:</span><span>{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
       <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;color:#374151;max-height:320px;overflow-y:auto"
@@ -3307,7 +3307,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   /** Parsuje "Name <email>, email2" → ['email1', 'email2'] */
   parseAddressList(header: string): string[] {
     if (!header) return [];
-    return header.split(',').map((s: string) => {
+    return decodeAddressEntities(header).split(',').map((s: string) => {
       const m = s.trim().match(/<([^>]+)>/);
       return m ? m[1].trim().toLowerCase() : s.trim().toLowerCase();
     }).filter((s: string) => s.includes('@'));
@@ -3319,6 +3319,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   extraAddressCount(addrStr: string): number {
     return countExtraAddresses(addrStr);
+  }
+
+  decodeAddress(addrStr: string): string {
+    return formatAddressListDisplay(addrStr);
   }
 
   onAttachmentChange(event: Event): void {

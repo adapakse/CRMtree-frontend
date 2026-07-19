@@ -15,7 +15,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
-import { formatAddressDisplay, countExtraAddresses, isSameMailboxAddress } from '../../../shared/utils/email-address.util';
+import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
@@ -752,11 +752,11 @@ import { QuillModule } from 'ngx-quill';
            (mouseenter)="$any($event.currentTarget).style.background='#f9fafb'"
            (mouseleave)="$any($event.currentTarget).style.background=(!m.is_read && !m.created_by) ? '#fffbeb' : 'white'">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span [style.font-weight]="!m.is_read && !m.created_by ? '700' : '600'" style="color:#374151">{{m.from}}</span>
+          <span [style.font-weight]="!m.is_read && !m.created_by ? '700' : '600'" style="color:#374151">{{firstAddressDisplay(m.from)}}</span>
           <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
         </div>
-        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">Do: {{m.to}}</div>
-        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">DW: {{m.cc}}</div>
+        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">Do: {{decodeAddress(m.to)}}</div>
+        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">DW: {{decodeAddress(m.cc)}}</div>
         <div style="color:#374151;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px">{{m.snippet}}</div>
         <!-- Wszystkie załączniki (odebrane + wysłane) -->
         <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
@@ -797,9 +797,9 @@ import { QuillModule } from 'ngx-quill';
     <div class="modal-body" style="gap:10px;overflow-y:auto;flex:1" *ngIf="msgModalMsg">
       <!-- Metadane -->
       <div style="background:#f9fafb;border-radius:8px;padding:12px;font-size:12px;display:flex;flex-direction:column;gap:4px">
-        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Od:</span><span style="color:#374151;font-weight:600">{{msgModalMsg.from}}</span></div>
-        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Do:</span><span style="color:#374151">{{msgModalMsg.to}}</span></div>
-        <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">DW:</span><span style="color:#374151">{{msgModalMsg.cc}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Od:</span><span style="color:#374151;font-weight:600">{{firstAddressDisplay(msgModalMsg.from)}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Do:</span><span style="color:#374151">{{decodeAddress(msgModalMsg.to)}}</span></div>
+        <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">DW:</span><span style="color:#374151">{{decodeAddress(msgModalMsg.cc)}}</span></div>
         <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Data:</span><span style="color:#374151">{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span></div>
       </div>
       <!-- Treść -->
@@ -2479,7 +2479,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   /** Parsuje "Name <email>, email2" → ['email1', 'email2'] */
   parseAddressList(header: string): string[] {
     if (!header) return [];
-    return header.split(',').map((s: string) => {
+    return decodeAddressEntities(header).split(',').map((s: string) => {
       const m = s.trim().match(/<([^>]+)>/);
       return m ? m[1].trim().toLowerCase() : s.trim().toLowerCase();
     }).filter((s: string) => s.includes('@'));
@@ -2491,6 +2491,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   extraAddressCount(addrStr: string): number {
     return countExtraAddresses(addrStr);
+  }
+
+  decodeAddress(addrStr: string): string {
+    return formatAddressListDisplay(addrStr);
   }
 
   onAttachmentChange(event: Event): void {
