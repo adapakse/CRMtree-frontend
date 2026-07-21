@@ -647,15 +647,21 @@ interface WhatsappConvUiState {
           </button>
         </div>
 
-        <div *ngIf="whatsappConfigured===null" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
+        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
 
-        <div *ngIf="whatsappConfigured===false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+        <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania —
+             inaczej ten ekran zasłaniałby konwersacje sprzed przeniesienia numeru do
+             innego usera (historia jest widoczna niezależnie od whatsappConfigured,
+             zgodnie z uprawnieniami egzekwowanymi już po stronie backendu). -->
+        <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
           <div style="font-size:32px">💬</div>
           <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
           <div style="font-size:13px;color:#9ca3af;text-align:center">Nie masz podłączonego numeru WhatsApp.</div>
           <a routerLink="/my-settings" style="font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none">→ Podłącz numer w Moje ustawienia</a>
         </div>
 
+        <!-- Kompozycja i odpowiedzi zawsze wymagają WŁASNEGO podłączonego numeru — to
+             jedyna część zakładki nadal gated za whatsappConfigured. -->
         <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 Nowa wiadomość WhatsApp</div>
 
@@ -687,8 +693,11 @@ interface WhatsappConvUiState {
           </div>
         </div>
 
-        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa -->
-        <ng-container *ngIf="whatsappConfigured===true">
+        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa. Widoczne
+             niezależnie od whatsappConfigured (kto AKTUALNIE ma podłączony numer nie
+             decyduje o dostępie do HISTORII — backend już filtruje wg uprawnień CRM,
+             patrz ownerVisibilityClause w crm-whatsapp.js). -->
+        <ng-container *ngIf="whatsappConfigured===true || whatsappHistoryLoading || whatsappConversations.length>0">
           <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie historii…</div>
           <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
 
