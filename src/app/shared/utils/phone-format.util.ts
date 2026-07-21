@@ -8,6 +8,16 @@
 // "+48" (or any other prefix) on its own. A leading "+" is kept only if the
 // user typed one. See requiresCountryCode() for the "did the user actually
 // include a country code" check used to gate sending.
+// Digits-only form used to group/match the same phone number regardless of
+// spacing/formatting — e.g. WhatsApp conversation grouping, where the same
+// number can come back formatted differently between an outgoing send
+// ("+48 739 210 704", user-typed) and an incoming webhook payload
+// ("+48739210704", from Meta). Never used for what's actually sent to the
+// backend — see formatPhoneDisplay/requiresCountryCode for that.
+export function normalizePhoneDigits(raw: string | null | undefined): string {
+  return String(raw || '').replace(/\D/g, '');
+}
+
 export function formatPhoneDisplay(raw: string | null | undefined): string {
   if (!raw) return '';
   const trimmed = raw.trim();
