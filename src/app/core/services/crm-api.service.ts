@@ -740,6 +740,73 @@ export interface EmailStatus {
   email?: string;
 }
 
+// Whether the CURRENT USER has their own WhatsApp Business number connected —
+// resolved server-side (whatsapp_configs, keyed by user_id). Used in the
+// lead/partner WhatsApp tab to decide whether the viewer can compose.
+export interface WhatsappStatus {
+  configured: boolean;
+  enabled: boolean;
+  display_phone_number: string | null;
+}
+
+// Full self-service config for the logged-in user (My Settings). Secrets are
+// never round-tripped in plaintext except webhook_verify_token, which the
+// CRM itself generated and the user must read back to paste into their own
+// Meta app's webhook config.
+export interface MyWhatsappConfig {
+  configured: boolean;
+  id?: string;
+  waba_id?: string;
+  phone_number_id?: string;
+  display_phone_number?: string | null;
+  is_enabled?: boolean;
+  access_token_configured?: boolean;
+  app_secret_configured?: boolean;
+  webhook_verify_token?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface MyWhatsappConfigInput {
+  waba_id: string;
+  phone_number_id: string;
+  display_phone_number?: string;
+  access_token?: string;
+  app_secret?: string;
+  is_enabled?: boolean;
+}
+
+// Read-only directory of connected numbers in a tenant — shown to tenant
+// admins/managers (My Settings-adjacent governance view) and to the super
+// admin (Tenant management), never with secrets.
+export interface WhatsappDirectoryEntry {
+  user_id: string;
+  user_name: string;
+  email: string;
+  display_phone_number: string | null;
+  is_enabled: boolean;
+  updated_at: string;
+}
+
+export interface WhatsappSendResult {
+  messageId: string | null;
+  id: string;
+}
+
+// One message in a lead's/partner's WhatsApp conversation — read from the
+// whatsapp_messages table (real per-message model, not a generic activity
+// log). direction is always 'outgoing' until the webhook/incoming step lands.
+export interface WhatsappHistoryEntry {
+  id: string;
+  created_at: string;
+  direction: 'incoming' | 'outgoing';
+  from_phone: string;
+  to_phone: string;
+  message: string | null;
+  status: string;
+  created_by_name: string | null;
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Stałe
 // ─────────────────────────────────────────────────────────────────
@@ -1359,6 +1426,41 @@ export class CrmApiService {
   }
   debugProcessEmail(): Observable<any> {
     return this.http.post<any>(`${BASE}/email/debug/process`, {});
+  }
+
+  // ── WhatsApp ─────────────────────────────────────────────────────────────
+  // Each CRM user connects their own WhatsApp Business number in My Settings
+  // (getMyWhatsappConfig/saveMyWhatsappConfig/deleteMyWhatsappConfig) — there
+  // is no tenant-wide or admin-managed number.
+  getMyWhatsappConfig(): Observable<MyWhatsappConfig> {
+    return this.http.get<MyWhatsappConfig>(`${BASE}/whatsapp/my-config`);
+  }
+  saveMyWhatsappConfig(data: MyWhatsappConfigInput): Observable<MyWhatsappConfig> {
+    return this.http.put<MyWhatsappConfig>(`${BASE}/whatsapp/my-config`, data);
+  }
+  deleteMyWhatsappConfig(): Observable<void> {
+    return this.http.delete<void>(`${BASE}/whatsapp/my-config`);
+  }
+  getWhatsappTenantDirectory(): Observable<WhatsappDirectoryEntry[]> {
+    return this.http.get<WhatsappDirectoryEntry[]>(`${BASE}/whatsapp/tenant-directory`);
+  }
+  getWhatsappStatus(): Observable<WhatsappStatus> {
+    return this.http.get<WhatsappStatus>(`${BASE}/whatsapp/status`);
+  }
+  // toPhone: optional per-send override of the recipient number — used only
+  // for this one message, never written back to the lead's/partner's own
+  // phone field.
+  sendLeadWhatsapp(leadId: number, message: string, toPhone?: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/lead/${leadId}`, { message, to_phone: toPhone || undefined });
+  }
+  sendPartnerWhatsapp(partnerId: number | string, message: string, toPhone?: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
+  }
+  getLeadWhatsappHistory(leadId: number): Observable<WhatsappHistoryEntry[]> {
+    return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/lead/${leadId}`);
+  }
+  getPartnerWhatsappHistory(partnerId: number | string): Observable<WhatsappHistoryEntry[]> {
+    return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/partner/${partnerId}`);
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────

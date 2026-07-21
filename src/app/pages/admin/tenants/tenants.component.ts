@@ -18,11 +18,12 @@ const FEATURE_LABELS: Record<CrmFeature, string> = {
   dwh_integration:  'DWH Integration',
   performance:      'Performance',
   seo_bot:          'SEObot',
+  whatsapp:         'WhatsApp',
 };
 
 const ALL_FEATURES: CrmFeature[] = [
   'documents', 'leads', 'sales_reports', 'onboarding',
-  'partner_registry', 'dwh_integration', 'performance', 'seo_bot',
+  'partner_registry', 'dwh_integration', 'performance', 'seo_bot', 'whatsapp',
 ];
 
 interface TenantUser {
@@ -61,7 +62,18 @@ interface ZohoForm {
   redirect_uri: string;
 }
 
-type EditTab = 'settings' | 'features' | 'users' | 'email';
+// Read-only — WhatsApp numbers are connected by each user in their own My
+// Settings, never configured here. This is oversight only.
+interface WhatsappDirectoryRow {
+  user_id: string;
+  user_name: string;
+  email: string;
+  display_phone_number: string | null;
+  is_enabled: boolean;
+  updated_at: string;
+}
+
+type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
 
 @Component({
   selector: 'app-tenants',
@@ -162,6 +174,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                             @if (tenantUsers().length > 0) { <span class="tab-badge">{{ tenantUsers().length }}</span> }
                           </button>
                           <button class="tab" [class.active]="editTab() === 'email'" (click)="openEmailTab(t.id)">Email</button>
+                          <button class="tab" [class.active]="editTab() === 'whatsapp'" (click)="openWhatsappTab(t.id)">WhatsApp</button>
                         </div>
 
                         <!-- Tab: Settings -->
@@ -367,6 +380,108 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                       {{ saving() ? 'Zapisuję...' : (outlookProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
+                                </div>
+                              </div>
+
+                              <!-- Zoho -->
+                              <div class="provider-card">
+                                <div class="provider-header">
+                                  <div class="provider-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
+                                    <span>Zoho Mail</span>
+                                  </div>
+                                  <div class="provider-header-right">
+                                    @if (zohoProvider()) {
+                                      <span class="badge badge-on">Skonfigurowany</span>
+                                    } @else {
+                                      <span class="badge badge-off">Nieskonfigurowany</span>
+                                    }
+                                    <label class="radio-option" [class.disabled]="!zohoProvider()">
+                                      <input type="radio" name="active-provider-{{t.id}}" [checked]="activeProvider() === 'zoho'"
+                                             [disabled]="!zohoProvider()" (change)="setActiveProvider(t.id, 'zoho')">
+                                      Używaj tego providera
+                                    </label>
+                                  </div>
+                                </div>
+                                @if (zohoProvider()) {
+                                  <div class="provider-meta">
+                                    Client ID: <code>{{ zohoProvider()!.client_id }}</code>
+                                    · zaktualizowany {{ zohoProvider()!.updated_at | date:'dd.MM.yyyy' }}
+                                  </div>
+                                }
+                                <div class="provider-form">
+                                  <div class="edit-grid">
+                                    <div class="field">
+                                      <label>Client ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="zohoForm.client_id" placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+                                    </div>
+                                    <div class="field">
+                                      <label>Client Secret {{ zohoProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
+                                      <input [(ngModel)]="zohoForm.client_secret" type="password" placeholder="{{ zohoProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}">
+                                    </div>
+                                    <div class="field">
+                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <input [(ngModel)]="zohoForm.redirect_uri" placeholder="https://app.example.com/api/crm/zoho/oauth/callback">
+                                    </div>
+                                  </div>
+                                  <div class="provider-actions">
+                                    @if (zohoProvider()) {
+                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'zoho')">Usuń</button>
+                                    }
+                                    <button class="btn-primary" [disabled]="saving() || !zohoForm.client_id || (!zohoForm.client_secret && !zohoProvider())"
+                                            (click)="saveEmailProvider(t.id, 'zoho')">
+                                      {{ saving() ? 'Zapisuję...' : (zohoProvider() ? 'Aktualizuj' : 'Zapisz') }}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="panel-footer">
+                                <button class="btn-secondary" (click)="cancelEdit()">Zamknij</button>
+                              </div>
+                            }
+                          </div>
+                        }
+
+                        <!-- Tab: WhatsApp (read-only oversight — numbers are connected by each user in My Settings) -->
+                        @if (editTab() === 'whatsapp') {
+                          <div class="tab-body">
+                            @if (whatsappLoading()) {
+                              <div class="state-msg">Ładowanie...</div>
+                            } @else {
+
+                              <div class="provider-card">
+                                <div class="provider-header">
+                                  <div class="provider-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                    <span>WhatsApp Business</span>
+                                  </div>
+                                </div>
+                                <div class="provider-meta">
+                                  Każdy użytkownik podłącza własny numer WhatsApp Business w swoich „Moje ustawienia" —
+                                  nie da się tego skonfigurować z tego miejsca. Poniżej lista podłączonych numerów w tym tenancie (tylko podgląd).
+                                </div>
+                                <div class="provider-form">
+                                  @if (whatsappDirectory().length === 0) {
+                                    <div class="state-msg">Nikt w tym tenancie nie ma jeszcze podłączonego numeru WhatsApp.</div>
+                                  } @else {
+                                    @for (row of whatsappDirectory(); track row.user_id) {
+                                      <div class="edit-grid" style="grid-template-columns: 2fr 1fr auto; align-items:center; margin-bottom:8px">
+                                        <div>
+                                          <strong>{{ row.user_name }}</strong>
+                                          <div class="hint-inline">{{ row.email }}</div>
+                                        </div>
+                                        <div>{{ row.display_phone_number || '—' }}</div>
+                                        <div>
+                                          @if (row.is_enabled) {
+                                            <span class="badge badge-on">Aktywny</span>
+                                          } @else {
+                                            <span class="badge badge-off">Wyłączony</span>
+                                          }
+                                        </div>
+                                      </div>
+                                    }
+                                  }
                                 </div>
                               </div>
 
@@ -888,6 +1003,9 @@ export class TenantsComponent implements OnInit {
   zohoProvider    = signal<EmailProvider | null>(null);
   activeProvider  = signal<EmailProviderKey | null>(null);
 
+  whatsappDirectory = signal<WhatsappDirectoryRow[]>([]);
+  whatsappLoading   = signal(false);
+
   trainingMode = signal(false);
 
   showCreate        = signal(false);
@@ -1262,6 +1380,21 @@ export class TenantsComponent implements OnInit {
         this.toast.success(result.crm_training_mode ? 'Tryb szkoleniowy włączony' : 'Tryb szkoleniowy wyłączony');
       },
       error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu trybu szkoleniowego'); },
+    });
+  }
+
+  // ── WhatsApp tab (superadmin — read-only oversight) ────────────────────────
+  // Numbers are connected per-user in My Settings, never here — this just
+  // lists who in the tenant has one connected.
+  openWhatsappTab(id: string): void {
+    this.editTab.set('whatsapp');
+    this.whatsappLoading.set(true);
+    this.http.get<WhatsappDirectoryRow[]>(`${API}/admin/tenants/${id}/whatsapp-users`).subscribe({
+      next: rows => {
+        this.whatsappDirectory.set(rows);
+        this.whatsappLoading.set(false);
+      },
+      error: () => { this.toast.error('Błąd ładowania listy numerów WhatsApp'); this.whatsappLoading.set(false); },
     });
   }
 
