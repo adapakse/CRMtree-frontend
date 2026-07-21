@@ -485,59 +485,6 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                 </div>
                               </div>
 
-                              <!-- Zoho -->
-                              <div class="provider-card">
-                                <div class="provider-header">
-                                  <div class="provider-title">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
-                                    <span>Zoho Mail</span>
-                                  </div>
-                                  <div class="provider-header-right">
-                                    @if (zohoProvider()) {
-                                      <span class="badge badge-on">Skonfigurowany</span>
-                                    } @else {
-                                      <span class="badge badge-off">Nieskonfigurowany</span>
-                                    }
-                                    <label class="radio-option" [class.disabled]="!zohoProvider()">
-                                      <input type="radio" name="active-provider-{{t.id}}" [checked]="activeProvider() === 'zoho'"
-                                             [disabled]="!zohoProvider()" (change)="setActiveProvider(t.id, 'zoho')">
-                                      Używaj tego providera
-                                    </label>
-                                  </div>
-                                </div>
-                                @if (zohoProvider()) {
-                                  <div class="provider-meta">
-                                    Client ID: <code>{{ zohoProvider()!.client_id }}</code>
-                                    · zaktualizowany {{ zohoProvider()!.updated_at | date:'dd.MM.yyyy' }}
-                                  </div>
-                                }
-                                <div class="provider-form">
-                                  <div class="edit-grid">
-                                    <div class="field">
-                                      <label>Client ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="zohoForm.client_id" placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
-                                    </div>
-                                    <div class="field">
-                                      <label>Client Secret {{ zohoProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
-                                      <input [(ngModel)]="zohoForm.client_secret" type="password" placeholder="{{ zohoProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}">
-                                    </div>
-                                    <div class="field">
-                                      <label>Redirect URI <span class="req">*</span></label>
-                                      <input [(ngModel)]="zohoForm.redirect_uri" placeholder="https://app.example.com/api/crm/zoho/oauth/callback">
-                                    </div>
-                                  </div>
-                                  <div class="provider-actions">
-                                    @if (zohoProvider()) {
-                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'zoho')">Usuń</button>
-                                    }
-                                    <button class="btn-primary" [disabled]="saving() || !zohoForm.client_id || (!zohoForm.client_secret && !zohoProvider()) || !zohoForm.redirect_uri"
-                                            (click)="saveEmailProvider(t.id, 'zoho')">
-                                      {{ saving() ? 'Zapisuję...' : (zohoProvider() ? 'Aktualizuj' : 'Zapisz') }}
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-
                               <div class="panel-footer">
                                 <button class="btn-secondary" (click)="cancelEdit()">Zamknij</button>
                               </div>

@@ -17,7 +17,7 @@ import { ActivityCountBadgeComponent } from '../../../shared/components/activity
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
 import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
-import { formatPhoneDisplay, requiresCountryCode, isLikelyDemoPhone, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
+import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { QuillModule } from 'ngx-quill';
@@ -2562,10 +2562,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.midTab = 'whatsapp';
     this.whatsappConvState.forEach(s => { s.replyOpen = false; });
     if (this.whatsappConfigured === null) {
-      // Prefill only with the lead's own real phone — never a placeholder/demo
-      // example, even if a seed record was ever created with one as literal data.
-      const leadPhone = this.lead?.phone;
-      this.whatsappToPhone = isLikelyDemoPhone(leadPhone) ? '' : formatPhoneDisplay(leadPhone);
+      // Always starts empty — the example number is shown only via the
+      // input's placeholder, never prefilled as an editable value, even
+      // when the lead has a real phone on file.
+      this.whatsappToPhone = '';
       this.api.getWhatsappStatus().subscribe({
         next: status => this.zone.run(() => {
           this.whatsappConfigured      = status.configured && status.enabled;

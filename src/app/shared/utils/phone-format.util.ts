@@ -56,14 +56,3 @@ export function requiresCountryCode(raw: string | null | undefined): boolean {
   const trimmed = (raw || '').trim();
   return trimmed.length > 0 && !trimmed.startsWith('+');
 }
-
-// Exact digit match against the example numbers used as placeholders in the
-// WhatsApp "Do" field (e.g. "+48 123 123 123", "+48 502 345 678") — guards
-// against ever prefilling the compose form's model with one of our own demo
-// examples if a seed/demo record was ever created with one as literal data.
-// Never used to reject a real, unrelated customer number.
-const DEMO_PHONE_DIGITS = new Set(['48123123123', '48502345678']);
-export function isLikelyDemoPhone(raw: string | null | undefined): boolean {
-  const digits = String(raw || '').replace(/\D/g, '');
-  return digits.length > 0 && DEMO_PHONE_DIGITS.has(digits);
-}
