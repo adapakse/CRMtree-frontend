@@ -18,11 +18,12 @@ const FEATURE_LABELS: Record<CrmFeature, string> = {
   dwh_integration:  'DWH Integration',
   performance:      'Performance',
   seo_bot:          'SEObot',
+  whatsapp:         'WhatsApp',
 };
 
 const ALL_FEATURES: CrmFeature[] = [
   'documents', 'leads', 'sales_reports', 'onboarding',
-  'partner_registry', 'dwh_integration', 'performance', 'seo_bot',
+  'partner_registry', 'dwh_integration', 'performance', 'seo_bot', 'whatsapp',
 ];
 
 interface TenantUser {
@@ -61,40 +62,18 @@ interface ZohoForm {
   redirect_uri: string;
 }
 
-interface WhatsappConfig {
-  id: string;
-  waba_id: string;
-  phone_number_id: string;
+// Read-only — WhatsApp numbers are connected by each user in their own My
+// Settings, never configured here. This is oversight only.
+interface WhatsappDirectoryRow {
+  user_id: string;
+  user_name: string;
+  email: string;
   display_phone_number: string | null;
   is_enabled: boolean;
-  configured: boolean;
-  access_token_configured: boolean;
-  app_secret_configured: boolean;
-  webhook_verify_token_configured: boolean;
-  updated_at?: string;
-}
-
-interface WhatsappForm {
-  waba_id: string; phone_number_id: string; display_phone_number: string;
-  access_token: string; app_secret: string; webhook_verify_token: string;
-  is_enabled: boolean;
+  updated_at: string;
 }
 
 type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
-
-// Guard for the WhatsApp secret fields (Access Token, App Secret, Webhook
-// Verify Token): a masked placeholder (e.g. "********", "••••••••",
-// "●●●●●●", "······") must never reach the backend as if it were a real new
-// value, even if some future UI change accidentally binds it to the model.
-// Trims first, then treats an empty or mask-only string as "no new value" —
-// the caller drops the key so the backend keeps the saved secret.
-function cleanSecretForPayload(value: string | null | undefined): string | undefined {
-  if (!value) return undefined;
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-  if (/^[*•●·]+$/.test(trimmed)) return undefined;
-  return trimmed;
-}
 
 @Component({
   selector: 'app-tenants',
@@ -536,7 +515,7 @@ function cleanSecretForPayload(value: string | null | undefined): string | undef
                           </div>
                         }
 
-                        <!-- Tab: WhatsApp -->
+                        <!-- Tab: WhatsApp (read-only oversight — numbers are connected by each user in My Settings) -->
                         @if (editTab() === 'whatsapp') {
                           <div class="tab-body">
                             @if (whatsappLoading()) {
@@ -549,68 +528,32 @@ function cleanSecretForPayload(value: string | null | undefined): string | undef
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                                     <span>WhatsApp Business</span>
                                   </div>
-                                  <div class="provider-header-right">
-                                    @if (whatsappConfig()) {
-                                      <span class="badge badge-on">Skonfigurowany</span>
-                                    } @else {
-                                      <span class="badge badge-off">Nieskonfigurowany</span>
-                                    }
-                                  </div>
                                 </div>
-                                @if (whatsappConfig()) {
-                                  <div class="provider-meta">
-                                    Phone Number ID: <code>{{ whatsappConfig()!.phone_number_id }}</code>
-                                    · zaktualizowany {{ whatsappConfig()!.updated_at | date:'dd.MM.yyyy' }}
-                                  </div>
-                                }
+                                <div class="provider-meta">
+                                  Każdy użytkownik podłącza własny numer WhatsApp Business w swoich „Moje ustawienia" —
+                                  nie da się tego skonfigurować z tego miejsca. Poniżej lista podłączonych numerów w tym tenancie (tylko podgląd).
+                                </div>
                                 <div class="provider-form">
-                                  <div class="edit-grid">
-                                    <div class="field">
-                                      <label>WABA ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="whatsappForm.waba_id" placeholder="123456789012345">
-                                    </div>
-                                    <div class="field">
-                                      <label>Phone Number ID <span class="req">*</span></label>
-                                      <input [(ngModel)]="whatsappForm.phone_number_id" placeholder="987654321098765">
-                                    </div>
-                                    <div class="field">
-                                      <label>Display phone number <span class="hint-inline">(opcjonalne, informacyjne)</span></label>
-                                      <input [(ngModel)]="whatsappForm.display_phone_number" placeholder="+48 123 456 789">
-                                    </div>
-                                    <div class="field">
-                                      <label>Access Token <span class="req">*</span></label>
-                                      <input [(ngModel)]="whatsappForm.access_token" type="password"
-                                             placeholder="{{ whatsappConfig()?.access_token_configured ? '••••••••••••' : 'EAAG...' }}">
-                                    </div>
-                                    <div class="field">
-                                      <label>App Secret {{ whatsappConfig()?.app_secret_configured ? '' : '(opcjonalne)' }}</label>
-                                      <input [(ngModel)]="whatsappForm.app_secret" type="password"
-                                             placeholder="{{ whatsappConfig()?.app_secret_configured ? '••••••••••••' : '' }}">
-                                    </div>
-                                    <div class="field">
-                                      <label>Webhook Verify Token <span class="req">*</span></label>
-                                      <input [(ngModel)]="whatsappForm.webhook_verify_token" type="password"
-                                             placeholder="{{ whatsappConfig()?.webhook_verify_token_configured ? '••••••••••••' : 'np. losowy ciąg znaków' }}">
-                                    </div>
-                                    <div class="field field-check">
-                                      <label class="check-label">
-                                        <input type="checkbox" [(ngModel)]="whatsappForm.is_enabled">
-                                        Aktywny
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div class="provider-actions">
-                                    @if (whatsappConfig()) {
-                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteWhatsappConfig(t.id)">Usuń</button>
+                                  @if (whatsappDirectory().length === 0) {
+                                    <div class="state-msg">Nikt w tym tenancie nie ma jeszcze podłączonego numeru WhatsApp.</div>
+                                  } @else {
+                                    @for (row of whatsappDirectory(); track row.user_id) {
+                                      <div class="edit-grid" style="grid-template-columns: 2fr 1fr auto; align-items:center; margin-bottom:8px">
+                                        <div>
+                                          <strong>{{ row.user_name }}</strong>
+                                          <div class="hint-inline">{{ row.email }}</div>
+                                        </div>
+                                        <div>{{ row.display_phone_number || '—' }}</div>
+                                        <div>
+                                          @if (row.is_enabled) {
+                                            <span class="badge badge-on">Aktywny</span>
+                                          } @else {
+                                            <span class="badge badge-off">Wyłączony</span>
+                                          }
+                                        </div>
+                                      </div>
                                     }
-                                    <button class="btn-primary"
-                                            [disabled]="saving() || !whatsappForm.waba_id || !whatsappForm.phone_number_id
-                                                        || (!whatsappForm.access_token && !whatsappConfig()?.access_token_configured)
-                                                        || (!whatsappForm.webhook_verify_token && !whatsappConfig()?.webhook_verify_token_configured)"
-                                            (click)="saveWhatsappConfig(t.id)">
-                                      {{ saving() ? 'Zapisuję...' : (whatsappConfig() ? 'Aktualizuj' : 'Zapisz') }}
-                                    </button>
-                                  </div>
+                                  }
                                 </div>
                               </div>
 
@@ -1093,8 +1036,8 @@ export class TenantsComponent implements OnInit, OnDestroy {
   zohoProvider    = signal<EmailProvider | null>(null);
   activeProvider  = signal<EmailProviderKey | null>(null);
 
-  whatsappConfig  = signal<WhatsappConfig | null>(null);
-  whatsappLoading = signal(false);
+  whatsappDirectory = signal<WhatsappDirectoryRow[]>([]);
+  whatsappLoading   = signal(false);
 
   trainingMode = signal(false);
 
@@ -1118,7 +1061,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
   gmailForm:   GmailForm   = this.emptyGmailForm();
   outlookForm: OutlookForm = this.emptyOutlookForm();
   zohoForm:    ZohoForm    = this.emptyZohoForm();
-  whatsappForm: WhatsappForm = this.emptyWhatsappForm();
 
   editDraft: {
     name: string; email_domain: string; dwh_schema_prefix: string; is_active: boolean;
@@ -1516,75 +1458,19 @@ export class TenantsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── WhatsApp Business config tab (superadmin only) ────────────────────────
-  // Configuration-only for now — no sending, no webhooks, no lead/partner
-  // integration. Mirrors the email-provider secret contract: GET never
-  // returns secret values, only *_configured booleans; PUT keeps the
-  // previously saved encrypted secret when its field is left blank.
+  // ── WhatsApp tab (superadmin — read-only oversight) ────────────────────────
+  // Numbers are connected per-user in My Settings, never here — this just
+  // lists who in the tenant has one connected.
   openWhatsappTab(id: string): void {
     this.editTab.set('whatsapp');
     this.whatsappLoading.set(true);
-    this.http.get<WhatsappConfig>(`${API}/admin/tenants/${id}/whatsapp-config`).subscribe({
-      next: cfg => {
-        this.whatsappConfig.set(cfg.configured ? cfg : null);
-        this.whatsappForm = cfg.configured ? this.configToWhatsappForm(cfg) : this.emptyWhatsappForm();
+    this.http.get<WhatsappDirectoryRow[]>(`${API}/admin/tenants/${id}/whatsapp-users`).subscribe({
+      next: rows => {
+        this.whatsappDirectory.set(rows);
         this.whatsappLoading.set(false);
       },
-      error: () => { this.toast.error('Błąd ładowania konfiguracji WhatsApp'); this.whatsappLoading.set(false); },
+      error: () => { this.toast.error('Błąd ładowania listy numerów WhatsApp'); this.whatsappLoading.set(false); },
     });
-  }
-
-  saveWhatsappConfig(tenantId: string): void {
-    this.saving.set(true);
-    const body = {
-      waba_id:              this.whatsappForm.waba_id,
-      phone_number_id:      this.whatsappForm.phone_number_id,
-      display_phone_number: this.whatsappForm.display_phone_number || undefined,
-      access_token:         cleanSecretForPayload(this.whatsappForm.access_token),
-      app_secret:           cleanSecretForPayload(this.whatsappForm.app_secret),
-      webhook_verify_token: cleanSecretForPayload(this.whatsappForm.webhook_verify_token),
-      is_enabled:           this.whatsappForm.is_enabled,
-    };
-    this.http.put<WhatsappConfig>(`${API}/admin/tenants/${tenantId}/whatsapp-config`, body).subscribe({
-      next: saved => {
-        this.whatsappConfig.set(saved);
-        this.whatsappForm.access_token = '';
-        this.whatsappForm.app_secret = '';
-        this.whatsappForm.webhook_verify_token = '';
-        this.saving.set(false);
-        this.toast.success('WhatsApp zapisany');
-      },
-      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu'); },
-    });
-  }
-
-  deleteWhatsappConfig(tenantId: string): void {
-    if (!confirm('Usunąć konfigurację WhatsApp?')) return;
-    this.saving.set(true);
-    this.http.delete(`${API}/admin/tenants/${tenantId}/whatsapp-config`).subscribe({
-      next: () => {
-        this.whatsappConfig.set(null);
-        this.whatsappForm = this.emptyWhatsappForm();
-        this.saving.set(false);
-        this.toast.success('WhatsApp usunięty');
-      },
-      error: () => { this.saving.set(false); this.toast.error('Błąd usuwania'); },
-    });
-  }
-
-  private configToWhatsappForm(cfg: WhatsappConfig): WhatsappForm {
-    return {
-      waba_id: cfg.waba_id, phone_number_id: cfg.phone_number_id,
-      display_phone_number: cfg.display_phone_number ?? '',
-      access_token: '', app_secret: '', webhook_verify_token: '',
-      is_enabled: cfg.is_enabled,
-    };
-  }
-  private emptyWhatsappForm(): WhatsappForm {
-    return {
-      waba_id: '', phone_number_id: '', display_phone_number: '',
-      access_token: '', app_secret: '', webhook_verify_token: '', is_enabled: true,
-    };
   }
 
   // ── Company mailbox connect/change/disconnect (superadmin only) ──────────
