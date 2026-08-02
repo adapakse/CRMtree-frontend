@@ -18,11 +18,12 @@ const FEATURE_LABELS: Record<CrmFeature, string> = {
   dwh_integration:  'DWH Integration',
   performance:      'Performance',
   seo_bot:          'SEObot',
+  whatsapp:         'WhatsApp',
 };
 
 const ALL_FEATURES: CrmFeature[] = [
   'documents', 'leads', 'sales_reports', 'onboarding',
-  'partner_registry', 'dwh_integration', 'performance', 'seo_bot',
+  'partner_registry', 'dwh_integration', 'performance', 'seo_bot', 'whatsapp',
 ];
 
 interface TenantUser {
@@ -35,9 +36,11 @@ interface TenantUser {
   last_login_at?: string | null;
 }
 
+type EmailProviderKey = 'gmail' | 'outlook' | 'zoho';
+
 interface EmailProvider {
   id: string;
-  provider: 'gmail' | 'outlook';
+  provider: EmailProviderKey;
   client_id: string;
   redirect_uri: string | null;
   extra_config: Record<string, string>;
@@ -48,14 +51,29 @@ interface EmailProvider {
 
 interface GmailForm {
   client_id: string; client_secret: string; redirect_uri: string;
-  pubsub_topic: string; pubsub_subscription: string; is_enabled: boolean;
+  pubsub_topic: string; pubsub_subscription: string;
 }
 interface OutlookForm {
   client_id: string; client_secret: string; azure_tenant_id: string;
-  redirect_uri: string; is_enabled: boolean;
+  redirect_uri: string;
+}
+interface ZohoForm {
+  client_id: string; client_secret: string;
+  redirect_uri: string;
 }
 
-type EditTab = 'settings' | 'features' | 'users' | 'email';
+// Read-only — WhatsApp numbers are connected by each user in their own My
+// Settings, never configured here. This is oversight only.
+interface WhatsappDirectoryRow {
+  user_id: string;
+  user_name: string;
+  email: string;
+  display_phone_number: string | null;
+  is_enabled: boolean;
+  updated_at: string;
+}
+
+type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
 
 @Component({
   selector: 'app-tenants',
@@ -114,20 +132,30 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                       }
                     </div>
                   </td>
-                  <td class="td-actions">
-                    <button class="btn-icon" (click)="toggleExpand(t)" title="Edytuj / Użytkownicy">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                           [style.transform]="expandedId() === t.id ? 'rotate(180deg)' : 'rotate(0)'">
-                        <polyline points="6,9 12,15 18,9"/>
-                      </svg>
-                    </button>
-                    <button class="btn-icon btn-imp" (click)="impersonate(t)" title="Impersonuj admina">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                        <polyline points="10,17 15,12 10,7"/>
-                        <line x1="15" y1="12" x2="3" y2="12"/>
-                      </svg>
-                    </button>
+                  <td>
+                    <div class="td-actions">
+                      <button class="btn-icon" (click)="toggleExpand(t)" title="Edytuj / Użytkownicy">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             [style.transform]="expandedId() === t.id ? 'rotate(180deg)' : 'rotate(0)'">
+                          <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                      </button>
+                      <button class="btn-icon btn-imp" (click)="impersonate(t)" title="Impersonuj admina">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                          <polyline points="10,17 15,12 10,7"/>
+                          <line x1="15" y1="12" x2="3" y2="12"/>
+                        </svg>
+                      </button>
+                      <button class="btn-icon btn-danger-icon" (click)="openDeleteTenant(t); $event.stopPropagation()" title="Usuń tenant">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3,6 5,6 21,6"/>
+                          <path d="M19,6v14a2,2 0 0 1-2,2H7a2,2 0 0 1-2-2V6m3,0V4a2,2 0 0 1 2,-2h4a2,2 0 0 1 2,2v2"/>
+                          <line x1="10" y1="11" x2="10" y2="17"/>
+                          <line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
 
@@ -146,6 +174,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                             @if (tenantUsers().length > 0) { <span class="tab-badge">{{ tenantUsers().length }}</span> }
                           </button>
                           <button class="tab" [class.active]="editTab() === 'email'" (click)="openEmailTab(t.id)">Email</button>
+                          <button class="tab" [class.active]="editTab() === 'whatsapp'" (click)="openWhatsappTab(t.id)">WhatsApp</button>
                         </div>
 
                         <!-- Tab: Settings -->
@@ -170,6 +199,17 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                   Aktywny
                                 </label>
                               </div>
+                            </div>
+                            <div class="reinit-box">
+                              <div class="reinit-desc">
+                                <strong>Tryb szkoleniowy</strong>
+                                <span>Gdy włączony, ten tenant widzi symulowaną wysyłkę maili i połączeń zamiast realnego Outlook/Gmail/Zoho. Dotyczy wyłącznie tego tenanta.</span>
+                              </div>
+                              <label class="check-label">
+                                <input type="checkbox" [checked]="trainingMode()" [disabled]="saving()"
+                                       (change)="setTrainingMode(t.id, !trainingMode())">
+                                Włączony
+                              </label>
                             </div>
                             <div class="reinit-box">
                               <div class="reinit-desc">
@@ -216,6 +256,15 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                               <div class="state-msg">Ładowanie...</div>
                             } @else {
 
+                              <div class="email-tab-toolbar">
+                                <span class="email-tab-toolbar-label">Aktywny dostawca:</span>
+                                <label class="radio-option">
+                                  <input type="radio" name="active-provider-{{t.id}}" [checked]="!activeProvider()"
+                                         (change)="setActiveProvider(t.id, null)">
+                                  Brak konfiguracji
+                                </label>
+                              </div>
+
                               <!-- Gmail -->
                               <div class="provider-card">
                                 <div class="provider-header">
@@ -223,11 +272,18 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
                                     <span>Gmail / Google Workspace</span>
                                   </div>
-                                  @if (gmailProvider()) {
-                                    <span class="badge badge-on">Skonfigurowany</span>
-                                  } @else {
-                                    <span class="badge badge-off">Nieskonfigurowany</span>
-                                  }
+                                  <div class="provider-header-right">
+                                    @if (gmailProvider()) {
+                                      <span class="badge badge-on">Skonfigurowany</span>
+                                    } @else {
+                                      <span class="badge badge-off">Nieskonfigurowany</span>
+                                    }
+                                    <label class="radio-option" [class.disabled]="!gmailProvider()">
+                                      <input type="radio" name="active-provider-{{t.id}}" [checked]="activeProvider() === 'gmail'"
+                                             [disabled]="!gmailProvider()" (change)="setActiveProvider(t.id, 'gmail')">
+                                      Używaj tego providera
+                                    </label>
+                                  </div>
                                 </div>
                                 @if (gmailProvider()) {
                                   <div class="provider-meta">
@@ -246,29 +302,23 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                       <input [(ngModel)]="gmailForm.client_secret" type="password" placeholder="{{ gmailProvider() ? '••••••••' : 'GOCSPX-...' }}">
                                     </div>
                                     <div class="field">
-                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <label>Redirect URI <span class="req">*</span></label>
                                       <input [(ngModel)]="gmailForm.redirect_uri" placeholder="https://app.example.com/api/crm/gmail/oauth/callback">
                                     </div>
                                     <div class="field">
-                                      <label>Pub/Sub Topic <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Pub/Sub Topic <span class="req">*</span></label>
                                       <input [(ngModel)]="gmailForm.pubsub_topic" placeholder="projects/my-project/topics/gmail-push">
                                     </div>
                                     <div class="field">
-                                      <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne — obecnie nieużywane)</span></label>
                                       <input [(ngModel)]="gmailForm.pubsub_subscription" placeholder="projects/my-project/subscriptions/gmail-sub">
-                                    </div>
-                                    <div class="field field-check">
-                                      <label class="check-label">
-                                        <input type="checkbox" [(ngModel)]="gmailForm.is_enabled">
-                                        Aktywny
-                                      </label>
                                     </div>
                                   </div>
                                   <div class="provider-actions">
                                     @if (gmailProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'gmail')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider())"
+                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider()) || !gmailForm.redirect_uri || !gmailForm.pubsub_topic"
                                             (click)="saveEmailProvider(t.id, 'gmail')">
                                       {{ saving() ? 'Zapisuję...' : (gmailProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
@@ -283,11 +333,18 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
                                     <span>Outlook / Microsoft 365</span>
                                   </div>
-                                  @if (outlookProvider()) {
-                                    <span class="badge badge-on">Skonfigurowany</span>
-                                  } @else {
-                                    <span class="badge badge-off">Nieskonfigurowany</span>
-                                  }
+                                  <div class="provider-header-right">
+                                    @if (outlookProvider()) {
+                                      <span class="badge badge-on">Skonfigurowany</span>
+                                    } @else {
+                                      <span class="badge badge-off">Nieskonfigurowany</span>
+                                    }
+                                    <label class="radio-option" [class.disabled]="!outlookProvider()">
+                                      <input type="radio" name="active-provider-{{t.id}}" [checked]="activeProvider() === 'outlook'"
+                                             [disabled]="!outlookProvider()" (change)="setActiveProvider(t.id, 'outlook')">
+                                      Używaj tego providera
+                                    </label>
+                                  </div>
                                 </div>
                                 @if (outlookProvider()) {
                                   <div class="provider-meta">
@@ -310,25 +367,121 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
                                       <input [(ngModel)]="outlookForm.azure_tenant_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
                                     </div>
                                     <div class="field">
-                                      <label>Redirect URI <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Redirect URI <span class="req">*</span></label>
                                       <input [(ngModel)]="outlookForm.redirect_uri" placeholder="https://app.example.com/api/crm/outlook/oauth/callback">
-                                    </div>
-                                    <div class="field field-check">
-                                      <label class="check-label">
-                                        <input type="checkbox" [(ngModel)]="outlookForm.is_enabled">
-                                        Aktywny
-                                      </label>
                                     </div>
                                   </div>
                                   <div class="provider-actions">
                                     @if (outlookProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'outlook')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id"
+                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id || !outlookForm.redirect_uri"
                                             (click)="saveEmailProvider(t.id, 'outlook')">
                                       {{ saving() ? 'Zapisuję...' : (outlookProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
+                                </div>
+                              </div>
+
+                              <!-- Zoho -->
+                              <div class="provider-card">
+                                <div class="provider-header">
+                                  <div class="provider-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
+                                    <span>Zoho Mail</span>
+                                  </div>
+                                  <div class="provider-header-right">
+                                    @if (zohoProvider()) {
+                                      <span class="badge badge-on">Skonfigurowany</span>
+                                    } @else {
+                                      <span class="badge badge-off">Nieskonfigurowany</span>
+                                    }
+                                    <label class="radio-option" [class.disabled]="!zohoProvider()">
+                                      <input type="radio" name="active-provider-{{t.id}}" [checked]="activeProvider() === 'zoho'"
+                                             [disabled]="!zohoProvider()" (change)="setActiveProvider(t.id, 'zoho')">
+                                      Używaj tego providera
+                                    </label>
+                                  </div>
+                                </div>
+                                @if (zohoProvider()) {
+                                  <div class="provider-meta">
+                                    Client ID: <code>{{ zohoProvider()!.client_id }}</code>
+                                    · zaktualizowany {{ zohoProvider()!.updated_at | date:'dd.MM.yyyy' }}
+                                  </div>
+                                }
+                                <div class="provider-form">
+                                  <div class="edit-grid">
+                                    <div class="field">
+                                      <label>Client ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="zohoForm.client_id" placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+                                    </div>
+                                    <div class="field">
+                                      <label>Client Secret {{ zohoProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
+                                      <input [(ngModel)]="zohoForm.client_secret" type="password" placeholder="{{ zohoProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}">
+                                    </div>
+                                    <div class="field">
+                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <input [(ngModel)]="zohoForm.redirect_uri" placeholder="https://app.example.com/api/crm/zoho/oauth/callback">
+                                    </div>
+                                  </div>
+                                  <div class="provider-actions">
+                                    @if (zohoProvider()) {
+                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'zoho')">Usuń</button>
+                                    }
+                                    <button class="btn-primary" [disabled]="saving() || !zohoForm.client_id || (!zohoForm.client_secret && !zohoProvider())"
+                                            (click)="saveEmailProvider(t.id, 'zoho')">
+                                      {{ saving() ? 'Zapisuję...' : (zohoProvider() ? 'Aktualizuj' : 'Zapisz') }}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="panel-footer">
+                                <button class="btn-secondary" (click)="cancelEdit()">Zamknij</button>
+                              </div>
+                            }
+                          </div>
+                        }
+
+                        <!-- Tab: WhatsApp (read-only oversight — numbers are connected by each user in My Settings) -->
+                        @if (editTab() === 'whatsapp') {
+                          <div class="tab-body">
+                            @if (whatsappLoading()) {
+                              <div class="state-msg">Ładowanie...</div>
+                            } @else {
+
+                              <div class="provider-card">
+                                <div class="provider-header">
+                                  <div class="provider-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                    <span>WhatsApp Business</span>
+                                  </div>
+                                </div>
+                                <div class="provider-meta">
+                                  Każdy użytkownik podłącza własny numer WhatsApp Business w swoich „Moje ustawienia" —
+                                  nie da się tego skonfigurować z tego miejsca. Poniżej lista podłączonych numerów w tym tenancie (tylko podgląd).
+                                </div>
+                                <div class="provider-form">
+                                  @if (whatsappDirectory().length === 0) {
+                                    <div class="state-msg">Nikt w tym tenancie nie ma jeszcze podłączonego numeru WhatsApp.</div>
+                                  } @else {
+                                    @for (row of whatsappDirectory(); track row.user_id) {
+                                      <div class="edit-grid" style="grid-template-columns: 2fr 1fr auto; align-items:center; margin-bottom:8px">
+                                        <div>
+                                          <strong>{{ row.user_name }}</strong>
+                                          <div class="hint-inline">{{ row.email }}</div>
+                                        </div>
+                                        <div>{{ row.display_phone_number || '—' }}</div>
+                                        <div>
+                                          @if (row.is_enabled) {
+                                            <span class="badge badge-on">Aktywny</span>
+                                          } @else {
+                                            <span class="badge badge-off">Wyłączony</span>
+                                          }
+                                        </div>
+                                      </div>
+                                    }
+                                  }
                                 </div>
                               </div>
 
@@ -532,6 +685,34 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
         </div>
       </div>
     }
+
+    <!-- Delete tenant confirm -->
+    @if (deleteTarget()) {
+      <div class="modal-backdrop" (click)="cancelDeleteTenant()">
+        <div class="modal modal-sm" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Usuń tenant</h2>
+            <button class="btn-icon" (click)="cancelDeleteTenant()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Usuwasz tenant <strong>{{ deleteTarget()!.name }}</strong> (<code>{{ deleteTarget()!.slug }}</code>).</p>
+            <p class="hint">
+              Tenant zniknie ze standardowej listy. Jego użytkownicy nie będą mogli się zalogować, a już wydane
+              tokeny przestaną działać przy kolejnym żądaniu. Dane, tokeny skrzynek i konfiguracje
+              <strong>pozostają w bazie</strong> — to nie jest trwałe kasowanie.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="cancelDeleteTenant()">Anuluj</button>
+            <button class="btn-danger" [disabled]="saving()" (click)="confirmDeleteTenant()">
+              {{ saving() ? 'Usuwam...' : 'Usuń tenant' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .page { padding: 28px 32px; max-width: 1400px; }
@@ -582,6 +763,8 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
     .btn-icon:hover { background: var(--gray-100); color: var(--gray-700); }
     .btn-icon svg { width: 15px; height: 15px; transition: transform .2s; }
     .btn-icon.btn-imp:hover { background: #eff6ff; color: #2563eb; }
+    .btn-icon.btn-danger-icon { color: #dc2626; }
+    .btn-icon.btn-danger-icon:hover { background: #fee2e2; color: #b91c1c; }
 
     /* Edit panel */
     .edit-panel { background: var(--orange-pale); }
@@ -704,6 +887,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
       display: flex; align-items: center; justify-content: space-between;
       padding: 12px 16px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
     }
+    .provider-header-right { display: flex; align-items: center; gap: 12px; }
     .provider-title {
       display: flex; align-items: center; gap: 8px;
       font-size: 14px; font-weight: 600; color: var(--gray-800);
@@ -720,6 +904,17 @@ type EditTab = 'settings' | 'features' | 'users' | 'email';
     }
     .btn-danger-sm:hover:not(:disabled) { background: #fecaca; }
     .btn-danger-sm:disabled { opacity: .55; cursor: not-allowed; }
+
+    /* Active email provider — small radio in each card header + toolbar "none" option */
+    .email-tab-toolbar {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    }
+    .email-tab-toolbar-label { font-size: 12.5px; font-weight: 600; color: var(--gray-600); }
+    .radio-option {
+      display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gray-700);
+      cursor: pointer; user-select: none;
+    }
+    .radio-option.disabled { color: var(--gray-400); cursor: not-allowed; }
 
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
@@ -752,11 +947,19 @@ export class TenantsComponent implements OnInit {
   emailLoading    = signal(false);
   gmailProvider   = signal<EmailProvider | null>(null);
   outlookProvider = signal<EmailProvider | null>(null);
+  zohoProvider    = signal<EmailProvider | null>(null);
+  activeProvider  = signal<EmailProviderKey | null>(null);
+
+  whatsappDirectory = signal<WhatsappDirectoryRow[]>([]);
+  whatsappLoading   = signal(false);
+
+  trainingMode = signal(false);
 
   showCreate        = signal(false);
   showAddUser       = signal(false);
   addUserTenantId   = signal<string | null>(null);
   impersonateTarget = signal<Tenant | null>(null);
+  deleteTarget       = signal<Tenant | null>(null);
 
   tempPassword  = signal<string | null>(null);
   tempUserEmail = signal<string>('');
@@ -765,13 +968,16 @@ export class TenantsComponent implements OnInit {
   addUserForm = { email: '', first_name: '', last_name: '', is_admin: true };
   gmailForm:   GmailForm   = this.emptyGmailForm();
   outlookForm: OutlookForm = this.emptyOutlookForm();
+  zohoForm:    ZohoForm    = this.emptyZohoForm();
 
   editDraft: {
     name: string; email_domain: string; dwh_schema_prefix: string; is_active: boolean;
     features: Record<CrmFeature, boolean>;
   } = this.emptyDraft();
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
   load(): void {
     this.loading.set(true);
@@ -795,6 +1001,7 @@ export class TenantsComponent implements OnInit {
       name: t.name, email_domain: t.email_domain ?? '', dwh_schema_prefix: t.dwh_schema_prefix ?? '',
       is_active: t.is_active, features: featMap,
     };
+    this.trainingMode.set(t.crm_training_mode ?? false);
     this.editTab.set('settings');
     this.tenantUsers.set([]);
     this.expandedId.set(t.id);
@@ -944,75 +1151,197 @@ export class TenantsComponent implements OnInit {
     });
   }
 
+  // ── Delete tenant (soft delete) — data/tokens/config stay in the DB;
+  // the tenant just disappears from the standard list and its users are
+  // locked out (see requireAuth / routes/auth.js on the backend). ─────────
+  openDeleteTenant(t: Tenant): void {
+    this.deleteTarget.set(t);
+  }
+  cancelDeleteTenant(): void {
+    this.deleteTarget.set(null);
+  }
+
+  confirmDeleteTenant(): void {
+    const t = this.deleteTarget();
+    if (!t) return;
+    this.saving.set(true);
+    this.http.delete(`${API}/admin/tenants/${t.id}`).subscribe({
+      next: () => {
+        this.tenants.update(ts => ts.filter(x => x.id !== t.id));
+        this.saving.set(false);
+        this.deleteTarget.set(null);
+        this.cancelEdit();
+        this.toast.success(`Tenant „${t.name}” usunięty — dane pozostają w bazie, dostęp został zablokowany.`);
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd usuwania tenanta'); },
+    });
+  }
+
   // ── Email providers tab ──────────────────────────────────────────
   openEmailTab(id: string): void {
     this.editTab.set('email');
     this.emailLoading.set(true);
+    const tenant = this.tenants().find(t => t.id === id);
+    this.activeProvider.set(tenant?.active_email_provider ?? null);
     this.http.get<EmailProvider[]>(`${API}/admin/tenants/${id}/email-providers`).subscribe({
       next: providers => {
         this.emailProviders.set(providers);
         const gmail   = providers.find(p => p.provider === 'gmail')   ?? null;
         const outlook = providers.find(p => p.provider === 'outlook') ?? null;
+        const zoho    = providers.find(p => p.provider === 'zoho')    ?? null;
         this.gmailProvider.set(gmail);
         this.outlookProvider.set(outlook);
-        this.gmailForm   = gmail   ? this.providerToGmailForm(gmail)   : this.emptyGmailForm();
+        this.zohoProvider.set(zoho);
+        this.gmailForm   = gmail   ? this.providerToGmailForm(gmail)     : this.emptyGmailForm();
         this.outlookForm = outlook ? this.providerToOutlookForm(outlook) : this.emptyOutlookForm();
+        this.zohoForm    = zoho    ? this.providerToZohoForm(zoho)       : this.emptyZohoForm();
         this.emailLoading.set(false);
       },
       error: () => { this.toast.error('Błąd ładowania konfiguracji email'); this.emailLoading.set(false); },
     });
   }
 
-  saveEmailProvider(tenantId: string, provider: 'gmail' | 'outlook'): void {
-    this.saving.set(true);
-    const body = provider === 'gmail'
-      ? {
-          client_id:    this.gmailForm.client_id,
-          client_secret: this.gmailForm.client_secret || undefined,
-          redirect_uri:  this.gmailForm.redirect_uri  || undefined,
-          extra_config: {
-            ...(this.gmailForm.pubsub_topic        ? { pubsub_topic:        this.gmailForm.pubsub_topic }        : {}),
-            ...(this.gmailForm.pubsub_subscription ? { pubsub_subscription: this.gmailForm.pubsub_subscription } : {}),
-          },
-          is_enabled: this.gmailForm.is_enabled,
-        }
-      : {
-          client_id:    this.outlookForm.client_id,
-          client_secret: this.outlookForm.client_secret || undefined,
-          redirect_uri:  this.outlookForm.redirect_uri  || undefined,
-          extra_config: this.outlookForm.azure_tenant_id
-            ? { azure_tenant_id: this.outlookForm.azure_tenant_id }
-            : {},
-          is_enabled: this.outlookForm.is_enabled,
-        };
+  private static readonly PROVIDER_LABELS: Record<EmailProviderKey, string> = {
+    gmail: 'Gmail', outlook: 'Outlook', zoho: 'Zoho',
+  };
 
-    this.http.put<EmailProvider>(`${API}/admin/tenants/${tenantId}/email-providers/${provider}`, body).subscribe({
+  saveEmailProvider(tenantId: string, provider: EmailProviderKey): void {
+    this.saving.set(true);
+    let body: any;
+    if (provider === 'gmail') {
+      body = {
+        client_id:    this.gmailForm.client_id,
+        client_secret: this.gmailForm.client_secret || undefined,
+        redirect_uri:  this.gmailForm.redirect_uri  || undefined,
+        extra_config: {
+          ...(this.gmailForm.pubsub_topic        ? { pubsub_topic:        this.gmailForm.pubsub_topic }        : {}),
+          ...(this.gmailForm.pubsub_subscription ? { pubsub_subscription: this.gmailForm.pubsub_subscription } : {}),
+        },
+        // Whether this saved config is "the one used" is entirely decided by
+        // active_email_provider (see setActiveProvider) — a saved config is
+        // always enabled.
+        is_enabled: true,
+      };
+    } else if (provider === 'outlook') {
+      body = {
+        client_id:    this.outlookForm.client_id,
+        client_secret: this.outlookForm.client_secret || undefined,
+        redirect_uri:  this.outlookForm.redirect_uri  || undefined,
+        extra_config: this.outlookForm.azure_tenant_id
+          ? { azure_tenant_id: this.outlookForm.azure_tenant_id }
+          : {},
+        is_enabled: true,
+      };
+    } else {
+      body = {
+        client_id:    this.zohoForm.client_id,
+        client_secret: this.zohoForm.client_secret || undefined,
+        redirect_uri:  this.zohoForm.redirect_uri  || undefined,
+        extra_config: {},
+        is_enabled: true,
+      };
+    }
+
+    this.http.put<EmailProvider & { active_email_provider: EmailProviderKey | null }>(
+      `${API}/admin/tenants/${tenantId}/email-providers/${provider}`, body,
+    ).subscribe({
       next: saved => {
-        if (provider === 'gmail') {
-          this.gmailProvider.set(saved);
-          this.gmailForm.client_secret = '';
-        } else {
-          this.outlookProvider.set(saved);
-          this.outlookForm.client_secret = '';
-        }
+        if (provider === 'gmail')        { this.gmailProvider.set(saved);   this.gmailForm.client_secret = ''; }
+        else if (provider === 'outlook') { this.outlookProvider.set(saved); this.outlookForm.client_secret = ''; }
+        else                              { this.zohoProvider.set(saved);   this.zohoForm.client_secret = ''; }
+
+        // Backend auto-activates this provider when the tenant had none yet —
+        // reflect that here so the header radio updates without a page reload.
+        // If the tenant already had a different active provider, this is a no-op.
+        this.activeProvider.set(saved.active_email_provider);
+        this.tenants.update(ts => ts.map(t => t.id === tenantId
+          ? { ...t, active_email_provider: saved.active_email_provider }
+          : t
+        ));
+
         this.saving.set(false);
-        this.toast.success(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} zapisany`);
+        this.toast.success(`${TenantsComponent.PROVIDER_LABELS[provider]} zapisany`);
       },
       error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu'); },
     });
   }
 
-  deleteEmailProvider(tenantId: string, provider: 'gmail' | 'outlook'): void {
-    if (!confirm(`Usunąć konfigurację ${provider === 'gmail' ? 'Gmail' : 'Outlook'}?`)) return;
+  deleteEmailProvider(tenantId: string, provider: EmailProviderKey): void {
+    if (!confirm(`Usunąć konfigurację ${TenantsComponent.PROVIDER_LABELS[provider]}?`)) return;
     this.saving.set(true);
     this.http.delete(`${API}/admin/tenants/${tenantId}/email-providers/${provider}`).subscribe({
       next: () => {
-        if (provider === 'gmail') { this.gmailProvider.set(null); this.gmailForm = this.emptyGmailForm(); }
-        else                      { this.outlookProvider.set(null); this.outlookForm = this.emptyOutlookForm(); }
+        if (provider === 'gmail')        { this.gmailProvider.set(null);   this.gmailForm = this.emptyGmailForm(); }
+        else if (provider === 'outlook') { this.outlookProvider.set(null); this.outlookForm = this.emptyOutlookForm(); }
+        else                              { this.zohoProvider.set(null);   this.zohoForm = this.emptyZohoForm(); }
+        // Deleting the active provider's config deactivates it tenant-wide (mirrors backend).
+        if (this.activeProvider() === provider) { this.activeProvider.set(null); }
+        this.tenants.update(ts => ts.map(t => t.id === tenantId
+          ? { ...t, active_email_provider: this.activeProvider() }
+          : t
+        ));
         this.saving.set(false);
-        this.toast.success(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} usunięty`);
+        this.toast.success(`${TenantsComponent.PROVIDER_LABELS[provider]} usunięty`);
       },
       error: () => { this.saving.set(false); this.toast.error('Błąd usuwania'); },
+    });
+  }
+
+  // Sets the tenant's single active email provider. CRM users never see or
+  // choose this — it's exclusively a super-admin setting from this panel.
+  setActiveProvider(tenantId: string, provider: EmailProviderKey | null): void {
+    this.saving.set(true);
+    this.http.put<{ id: string; active_email_provider: EmailProviderKey | null }>(
+      `${API}/admin/tenants/${tenantId}/active-provider`, { provider },
+    ).subscribe({
+      next: result => {
+        this.activeProvider.set(result.active_email_provider);
+        this.tenants.update(ts => ts.map(t => t.id === tenantId
+          ? { ...t, active_email_provider: result.active_email_provider }
+          : t
+        ));
+        this.saving.set(false);
+        this.toast.success(provider
+          ? `Aktywny provider: ${TenantsComponent.PROVIDER_LABELS[provider]}`
+          : 'Aktywny provider wyczyszczony');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu aktywnego providera'); },
+    });
+  }
+
+  // Sets crm_training_mode for the currently-open tenant only (never the
+  // calling super admin's own tenant). Saves immediately so the affected
+  // tenant's users see the switch (demo ↔ real Outlook/Gmail/Zoho) right away.
+  setTrainingMode(tenantId: string, enabled: boolean): void {
+    this.saving.set(true);
+    this.http.put<{ id: string; crm_training_mode: boolean }>(
+      `${API}/admin/tenants/${tenantId}/training-mode`, { enabled },
+    ).subscribe({
+      next: result => {
+        this.trainingMode.set(result.crm_training_mode);
+        this.tenants.update(ts => ts.map(t => t.id === tenantId
+          ? { ...t, crm_training_mode: result.crm_training_mode }
+          : t
+        ));
+        this.saving.set(false);
+        this.toast.success(result.crm_training_mode ? 'Tryb szkoleniowy włączony' : 'Tryb szkoleniowy wyłączony');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu trybu szkoleniowego'); },
+    });
+  }
+
+  // ── WhatsApp tab (superadmin — read-only oversight) ────────────────────────
+  // Numbers are connected per-user in My Settings, never here — this just
+  // lists who in the tenant has one connected.
+  openWhatsappTab(id: string): void {
+    this.editTab.set('whatsapp');
+    this.whatsappLoading.set(true);
+    this.http.get<WhatsappDirectoryRow[]>(`${API}/admin/tenants/${id}/whatsapp-users`).subscribe({
+      next: rows => {
+        this.whatsappDirectory.set(rows);
+        this.whatsappLoading.set(false);
+      },
+      error: () => { this.toast.error('Błąd ładowania listy numerów WhatsApp'); this.whatsappLoading.set(false); },
     });
   }
 
@@ -1022,7 +1351,6 @@ export class TenantsComponent implements OnInit {
       redirect_uri: p.redirect_uri ?? '',
       pubsub_topic:        p.extra_config?.['pubsub_topic']        ?? '',
       pubsub_subscription: p.extra_config?.['pubsub_subscription'] ?? '',
-      is_enabled: p.is_enabled,
     };
   }
   private providerToOutlookForm(p: EmailProvider): OutlookForm {
@@ -1030,11 +1358,17 @@ export class TenantsComponent implements OnInit {
       client_id: p.client_id, client_secret: '',
       azure_tenant_id: p.extra_config?.['azure_tenant_id'] ?? '',
       redirect_uri: p.redirect_uri ?? '',
-      is_enabled: p.is_enabled,
     };
   }
-  private emptyGmailForm():   GmailForm   { return { client_id: '', client_secret: '', redirect_uri: '', pubsub_topic: '', pubsub_subscription: '', is_enabled: true }; }
-  private emptyOutlookForm(): OutlookForm { return { client_id: '', client_secret: '', azure_tenant_id: '', redirect_uri: '', is_enabled: true }; }
+  private providerToZohoForm(p: EmailProvider): ZohoForm {
+    return {
+      client_id: p.client_id, client_secret: '',
+      redirect_uri: p.redirect_uri ?? '',
+    };
+  }
+  private emptyGmailForm():   GmailForm   { return { client_id: '', client_secret: '', redirect_uri: '', pubsub_topic: '', pubsub_subscription: '' }; }
+  private emptyOutlookForm(): OutlookForm { return { client_id: '', client_secret: '', azure_tenant_id: '', redirect_uri: '' }; }
+  private emptyZohoForm():    ZohoForm    { return { client_id: '', client_secret: '', redirect_uri: '' }; }
 
   private emptyDraft() {
     return {

@@ -4,22 +4,44 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { finalize, catchError, map } from 'rxjs/operators';
+import { of, Subscription } from 'rxjs';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
   LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
-  GmailSendResult, ConsentValue,
+  GmailSendResult, ConsentValue, EmailStatus, GmailThreadResponse, WhatsappHistoryEntry,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
+import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
+import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
+import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
+import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
+import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { QuillModule } from 'ngx-quill';
+
+// One WhatsApp conversation = all messages with a single counterpart phone
+// number. Numbers are never merged into each other's history.
+interface WhatsappConversation {
+  phone: string;
+  messages: WhatsappHistoryEntry[];
+}
+
+interface WhatsappConvUiState {
+  expanded: boolean;
+  replyOpen: boolean;
+  replyMessage: string;
+  replySending: boolean;
+  replyError: string | null;
+}
 
 @Component({
   selector: 'wt-crm-lead-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule],
+  providers: [EmailOauthListenerService],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden" *ngIf="lead">
 
@@ -84,7 +106,7 @@ import { QuillModule } from 'ngx-quill';
           <span class="lbl">Email</span>
           <span class="val" style="display:flex;align-items:center;gap:4px">
             <a class="link" href="mailto:{{lead.email}}">{{lead.email}}</a>
-            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" title="Wyślij przez Gmail">✉️</button>
+            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" title="Wyślij email">✉️</button>
           </span>
         </div>
         <div class="info-kv" *ngIf="lead.phone">
@@ -257,12 +279,13 @@ import { QuillModule } from 'ngx-quill';
           Emaile
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
+        <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
         <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
       </div>
 
       <!-- Aktywności tabs (all/tasks/notes/calls/meetings) -->
-      <div *ngIf="midTab!=='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
@@ -427,8 +450,14 @@ import { QuillModule } from 'ngx-quill';
       <!-- Emaile tab -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
-          <button class="btn-sm" (click)="debugProcessGmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile przez Gmail API (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
-          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" (click)="openEmailCompose()">+ Nowy email</button>
+          <ng-container *ngIf="settings.settings().crm_training_mode">
+            <button class="btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
+          </ng-container>
+          <ng-container *ngIf="!settings.settings().crm_training_mode && emailConnected">
+            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
+            <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
+          </ng-container>
+          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ Łączenie z Google…' : '+ Nowy email'}}</button>
         </div>
 
         <!-- INLINE COMPOSE -->
@@ -437,18 +466,29 @@ import { QuillModule } from 'ngx-quill';
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ Nowy email</div>
             <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
-          <!-- Gmail niepołączony -->
-          <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" style="text-align:center;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center">
-            <div style="font-size:32px">📧</div>
-            <div style="font-size:14px;font-weight:700;color:#18181b">Konto Gmail niepołączone</div>
-            <div style="font-size:12px;color:#6b7280">Aby wysyłać emaile bezpośrednio z CRM, połącz swoje konto Gmail.</div>
-            <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">🔗 Połącz konto Gmail</button>
+          <!-- Provider row — always visible when compose is open. Every user connects
+               their OWN mailbox (triggered from "Nowy email"); this shows which
+               account is currently connected, or that the tenant hasn't chosen a
+               provider yet. -->
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <ng-container *ngIf="!settings.settings().crm_training_mode">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0;align-items:stretch">
+              <div *ngIf="emailConnected"
+                   [style.border]="'1.5px solid ' + emailProviderColor"
+                   [style.background]="emailProviderBg"
+                   style="display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;padding-right:8px">
+                <span style="min-width:0;padding:4px 0 4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                      [title]="emailAddress">Od: <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
+                <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">Rozłącz</button>
+              </div>
+              <div *ngIf="!emailProviderKey" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.</div>
+            </div>
+            </ng-container>
+            <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 Tryb szkoleniowy</div>
           </div>
-          <!-- Gmail połączony — formularz -->
-          <ng-container *ngIf="gmailConnected || settings.settings().crm_training_mode">
+          <!-- Email form — shown when connected or training mode -->
+          <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;flex:1;min-width:0">✅ Wysyłam z: <strong>{{gmailEmail}}</strong></div>
-              <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;flex:1;min-width:0">🎓 Tryb szkoleniowy</div>
               <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
                       style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
                 <option value="">— brak szablonu —</option>
@@ -477,14 +517,12 @@ import { QuillModule } from 'ngx-quill';
               <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" placeholder="Treść wiadomości…" style="display:block" theme="snow"></quill-editor>
-            <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-              <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
             </div>
-            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
-              <span>⚠️ Wymagane ponowne połączenie Gmail</span>
-              <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="font-size:11px;padding:3px 10px;border:1px solid #fb923c;border-radius:5px;background:#fff;color:#ea580c;cursor:pointer">Połącz ponownie</button>
+            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px">
+              ⚠️ Wymagane ponowne połączenie skrzynki Gmail — skontaktuj się z administratorem.
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
               <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
@@ -497,7 +535,7 @@ import { QuillModule } from 'ngx-quill';
           </ng-container>
         </div>
 
-        <div *ngIf="emailActivities.length===0" class="empty-act">Brak wysłanych emaili.</div>
+        <div *ngIf="emailActivities.length===0" class="empty-act">{{ emailStatus?.configured===false ? 'Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.' : 'Brak wysłanych emaili.' }}</div>
 
         <!-- Email cards — expand/collapse inline -->
         <div *ngFor="let a of emailActivities; trackBy: trackEmailActivity" style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;background:white"
@@ -519,30 +557,68 @@ import { QuillModule } from 'ngx-quill';
             <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
           </div>
           <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
-            <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            <ng-container *ngIf="a.gmail_thread_id && !settings.settings().crm_training_mode; else singleBody">
+              <div *ngIf="loadingThread" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie wątku…</div>
+              <div *ngIf="!loadingThread && threadUnavailableReason" style="font-size:12px;color:#92400e;background:#fef3c7;border-radius:6px;padding:8px 10px">{{threadUnavailableReason}}</div>
+              <div *ngFor="let m of threadMessages"
+                   [style.background]="m.created_by ? 'white' : '#fffbeb'"
+                   [style.border]="m.created_by ? '1px solid #e5e7eb' : '1px solid #fbbf24'"
+                   style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                  <span style="display:flex;align-items:center;gap:4px">
+                    <span style="font-size:10px;color:#9ca3af">{{m.created_by ? 'Do:' : 'Od:'}}</span>
+                    <span style="font-weight:600">{{m.created_by ? firstAddressDisplay(m.to) : firstAddressDisplay(m.from)}}</span>
+                    <span *ngIf="m.created_by && extraAddressCount(m.to) > 0" style="font-size:10px;color:#9ca3af">+{{extraAddressCount(m.to)}}</span>
+                  </span>
+                  <span>{{m.date | date:'dd.MM.yyyy HH:mm'}}</span>
+                </div>
+                <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
+                <ng-container *ngIf="m.quotedBody">
+                  <button (click)="m._showQuote = !m._showQuote" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
+                    {{m._showQuote ? '▲ Ukryj cytowaną historię' : '▾ Pokaż cytowaną historię'}}
+                  </button>
+                  <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
+                </ng-container>
+              </div>
+            </ng-container>
+            <ng-template #singleBody>
+              <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            </ng-template>
             <!-- Inline reply form -->
             <div *ngIf="showReplyInline" style="border:1px solid #dbeafe;border-radius:8px;padding:12px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
-              <div style="font-size:11px;font-weight:700;color:#1d4ed8">↩ Odpowiedz</div>
-              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
-                <div class="participant-chips">
-                  <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
-                  <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" placeholder="email@firma.pl" autocomplete="off">
+              <!-- Compact header -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <div style="font-size:11px;color:#374151;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                  ↩ <strong>Odpowiadasz do:</strong> {{inlineReplyForm.recipientList[0] || '—'}}
+                  <span style="color:#9ca3af"> · </span>{{inlineReplyForm.subject}}
                 </div>
-              </label>
-              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
-                <div class="participant-chips">
-                  <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
-                  <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" placeholder="dw@firma.pl" autocomplete="off">
-                </div>
-              </label>
-              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
-                <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
-              </label>
+                <button (click)="showReplyDetails=!showReplyDetails"
+                        style="flex-shrink:0;background:none;border:1px solid #d1d5db;border-radius:5px;color:#6b7280;font-size:10px;padding:2px 7px;cursor:pointer">
+                  {{showReplyDetails ? '▲ Ukryj' : '▾ Szczegóły'}}
+                </button>
+              </div>
+              <!-- Collapsible fields -->
+              <ng-container *ngIf="showReplyDetails">
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+                  <div class="participant-chips">
+                    <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
+                    <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" placeholder="email@firma.pl" autocomplete="off">
+                  </div>
+                </label>
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+                  <div class="participant-chips">
+                    <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
+                    <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" placeholder="dw@firma.pl" autocomplete="off">
+                  </div>
+                </label>
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
+                  <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
+                </label>
+              </ng-container>
               <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" placeholder="Treść odpowiedzi…" style="display:block" theme="snow"></quill-editor>
-              <div *ngIf="inlineReplyForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-                <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Drive'}}</button>
+                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Drive'}}</button>
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
                 <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
@@ -550,14 +626,140 @@ import { QuillModule } from 'ngx-quill';
               <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
                 <button class="btn-sm" (click)="cancelInlineReply()">Anuluj</button>
-                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.recipientList?.length || !inlineReplyForm.subject">{{inlineReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}</button>
+                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}</button>
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
-              <button *ngIf="a.gmail_thread_id && gmailConnected && canEdit" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
+              <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)"
+                      [title]="threadCanReply ? '' : ('Wątek należy do ' + (threadOwnerEmail || 'innego użytkownika') + ' — wyślesz nową wiadomość ze swojego konta')">
+                {{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}
+              </button>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- WhatsApp tab -->
+      <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div *ngIf="whatsappConfigured===true" style="display:flex;justify-content:flex-end;gap:6px">
+          <button class="btn-sm" [disabled]="whatsappHistoryLoading" (click)="loadWhatsappHistory()" title="Odśwież historię WhatsApp — odbiór przez webhook nie zawsze jest natychmiastowy">
+            {{ whatsappHistoryLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
+          </button>
+        </div>
+
+        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
+
+        <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania —
+             inaczej ten ekran zasłaniałby konwersacje sprzed przeniesienia numeru do
+             innego usera (historia jest widoczna niezależnie od whatsappConfigured,
+             zgodnie z uprawnieniami egzekwowanymi już po stronie backendu). -->
+        <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+          <div style="font-size:32px">💬</div>
+          <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
+          <div style="font-size:13px;color:#9ca3af;text-align:center">Nie masz podłączonego numeru WhatsApp.</div>
+          <a routerLink="/my-settings" style="font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none">→ Podłącz numer w Moje ustawienia</a>
+        </div>
+
+        <!-- Kompozycja i odpowiedzi zawsze wymagają WŁASNEGO podłączonego numeru — to
+             jedyna część zakładki nadal gated za whatsappConfigured. -->
+        <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 Nowa wiadomość WhatsApp</div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:#f0fdf4;border-radius:6px;overflow:hidden">
+              <span style="padding:4px 10px;font-size:11px;color:#374151">Od: <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
+            </div>
+          </div>
+
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+            <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
+                   placeholder="+48 123 123 123">
+          </label>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">Podaj numer z kierunkowym kraju, np. +48 123 123 123.</div>
+
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Treść wiadomości
+            <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
+                      placeholder="Treść wiadomości..."></textarea>
+          </label>
+
+          <div *ngIf="whatsappError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" style="color:#16a34a;font-size:12px;background:#f0fdf4;border-radius:6px;padding:6px 10px">✅ Wiadomość wysłana.</div>
+
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !whatsappMessage.trim() || whatsappToPhoneMissingCountryCode || whatsappSending"
+                    (click)="sendWhatsapp()">
+              {{ whatsappSending ? 'Wysyłanie...' : 'Wyślij WhatsApp' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa. Widoczne
+             niezależnie od whatsappConfigured (kto AKTUALNIE ma podłączony numer nie
+             decyduje o dostępie do HISTORII — backend już filtruje wg uprawnień CRM,
+             patrz ownerVisibilityClause w crm-whatsapp.js). -->
+        <ng-container *ngIf="whatsappConfigured===true || whatsappHistoryLoading || whatsappConversations.length>0">
+          <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie historii…</div>
+          <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
+
+          <div *ngFor="let conv of whatsappConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white"
+               [style.border-left]="getWhatsappConvState(conv.phone).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
+                 [style.background]="getWhatsappConvState(conv.phone).expanded ? '#eff6ff' : 'white'"
+                 (click)="toggleWhatsappConvExpanded(conv.phone)">
+              <span style="font-size:16px;flex-shrink:0">💬</span>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rozmowa WhatsApp</strong>
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:1px">
+                  {{formatWhatsappHistoryPhone(conv.phone)}} · ostatnia wiadomość: {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
+                </div>
+              </div>
+              <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getWhatsappConvState(conv.phone).expanded ? '▲' : '▾'}}</span>
+            </div>
+
+            <div *ngIf="getWhatsappConvState(conv.phone).expanded" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
+              <div *ngFor="let h of conv.messages"
+                   [style.background]="h.direction==='incoming' ? '#fffbeb' : 'white'"
+                   [style.border]="h.direction==='incoming' ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
+                   style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                  <span style="display:flex;align-items:center;gap:4px">
+                    <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? 'Do:' : 'Od:'}}</span>
+                    <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
+                  </span>
+                  <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+                </div>
+                <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap">
+                  <div [class.wa-body-clamp]="!isWhatsappExpanded(h.id)">{{h.message}}</div>
+                </div>
+                <button *ngIf="h.message && h.message.length > 200" class="wa-expand-btn" (click)="toggleWhatsappExpand(h.id)">
+                  {{isWhatsappExpanded(h.id) ? '▲ Zwiń' : '▼ Rozwiń'}}
+                </button>
+              </div>
+
+              <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:6px">
+                <button class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ Odpowiedz</button>
+              </div>
+
+              <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:11px;color:#374151"><strong>↩ Odpowiadasz przez WhatsApp</strong></div>
+                <div style="font-size:11px;color:#6b7280">Do: {{formatWhatsappHistoryPhone(conv.phone)}}</div>
+                <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
+                          (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
+                          [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
+                          placeholder="Treść odpowiedzi..."></textarea>
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                <div style="display:flex;gap:6px;justify-content:flex-end">
+                  <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">Anuluj</button>
+                  <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
+                    {{ getWhatsappConvState(conv.phone).replySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
 
     </div>
@@ -690,11 +892,11 @@ import { QuillModule } from 'ngx-quill';
            (mouseenter)="$any($event.currentTarget).style.background='#f9fafb'"
            (mouseleave)="$any($event.currentTarget).style.background=(!m.is_read && !m.created_by) ? '#fffbeb' : 'white'">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span [style.font-weight]="!m.is_read && !m.created_by ? '700' : '600'" style="color:#374151">{{m.from}}</span>
+          <span [style.font-weight]="!m.is_read && !m.created_by ? '700' : '600'" style="color:#374151">{{firstAddressDisplay(m.from)}}</span>
           <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
         </div>
-        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">Do: {{m.to}}</div>
-        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">DW: {{m.cc}}</div>
+        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">Do: {{decodeAddress(m.to)}}</div>
+        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">DW: {{decodeAddress(m.cc)}}</div>
         <div style="color:#374151;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px">{{m.snippet}}</div>
         <!-- Wszystkie załączniki (odebrane + wysłane) -->
         <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
@@ -715,11 +917,12 @@ import { QuillModule } from 'ngx-quill';
           </span>
         </div>
       </div>
-      <div *ngIf="!loadingThread&&threadMessages.length===0" style="text-align:center;color:#9ca3af;padding:16px">Brak wiadomości w wątku.</div>
+      <div *ngIf="!loadingThread&&threadMessages.length===0&&!threadUnavailableReason" style="text-align:center;color:#9ca3af;padding:16px">Brak wiadomości w wątku.</div>
+      <div *ngIf="!loadingThread&&threadUnavailableReason" style="text-align:center;color:#92400e;background:#fef3c7;border-radius:6px;padding:12px;font-size:12px">{{threadUnavailableReason}}</div>
     </div>
     <div class="modal-footer">
       <button class="btn-outline" (click)="showThreadModal=false">Zamknij</button>
-      <button class="btn-primary" (click)="replyToCurrentThread()">↩ Odpowiedz</button>
+      <button class="btn-primary" (click)="replyToCurrentThread()" [title]="threadCanReply ? '' : ('Wątek należy do ' + (threadOwnerEmail || 'innego użytkownika') + ' — wyślesz nową wiadomość ze swojego konta')">{{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}</button>
     </div>
   </div>
 </div>
@@ -734,9 +937,9 @@ import { QuillModule } from 'ngx-quill';
     <div class="modal-body" style="gap:10px;overflow-y:auto;flex:1" *ngIf="msgModalMsg">
       <!-- Metadane -->
       <div style="background:#f9fafb;border-radius:8px;padding:12px;font-size:12px;display:flex;flex-direction:column;gap:4px">
-        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Od:</span><span style="color:#374151;font-weight:600">{{msgModalMsg.from}}</span></div>
-        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Do:</span><span style="color:#374151">{{msgModalMsg.to}}</span></div>
-        <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">DW:</span><span style="color:#374151">{{msgModalMsg.cc}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Od:</span><span style="color:#374151;font-weight:600">{{firstAddressDisplay(msgModalMsg.from)}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Do:</span><span style="color:#374151">{{decodeAddress(msgModalMsg.to)}}</span></div>
+        <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">DW:</span><span style="color:#374151">{{decodeAddress(msgModalMsg.cc)}}</span></div>
         <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Data:</span><span style="color:#374151">{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span></div>
       </div>
       <!-- Treść -->
@@ -796,16 +999,13 @@ import { QuillModule } from 'ngx-quill';
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
           Treść
           <textarea class="act-input" id="msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="5" placeholder="Treść odpowiedzi…"></textarea>
-          <div *ngIf="msgModalForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
-            📋 Historia korespondencji zostanie automatycznie dołączona
-          </div>
         </label>
         <!-- Załączniki w odpowiedzi -->
         <div style="display:flex;flex-direction:column;gap:4px">
           <span style="font-size:12px;font-weight:600">Załączniki</span>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
-            <button *ngIf="gmailConnected && !driveNeedsReauth"
+            <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
                     (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
                     style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
               <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
@@ -825,8 +1025,8 @@ import { QuillModule } from 'ngx-quill';
     </div>
     <div class="modal-footer">
       <button class="btn-outline" (click)="closeMsgModal()">Zamknij</button>
-      <button *ngIf="!msgModalReply && gmailConnected" class="btn-outline" (click)="startMsgReply()">↩ Odpowiedz</button>
-      <button *ngIf="msgModalReply && gmailConnected" class="btn-primary" (click)="sendMsgReply()"
+      <button *ngIf="!msgModalReply && emailConnected" class="btn-outline" (click)="startMsgReply()">{{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}</button>
+      <button *ngIf="msgModalReply && emailConnected" class="btn-primary" (click)="sendMsgReply()"
               [disabled]="msgModalSending || !msgModalForm.recipientList?.length || !msgModalForm.subject">
         {{msgModalSending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}
       </button>
@@ -1418,6 +1618,8 @@ import { QuillModule } from 'ngx-quill';
     .btn-sm.primary { background:#3BAA5D; color:white; border-color:#3BAA5D; }
     .btn-sm:disabled { opacity:.6; cursor:not-allowed; }
     .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:20px 0; }
+    .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10.5px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
     .participant-input-wrap { position:relative; }
     .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;min-height:32px;background:white;position:relative; }
     .suggest-dropdown { position:absolute; background:white; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.1); z-index:100; min-width:240px; max-height:180px; overflow-y:auto; }
@@ -1481,38 +1683,30 @@ import { QuillModule } from 'ngx-quill';
   `],
 })
 export class CrmLeadDetailComponent implements OnInit, OnDestroy {
-  private gmailBc: BroadcastChannel | null = null;
   private emailPollInterval: any = null;
+  private emailOauthSub: Subscription | null = null;
   debugProcessing = false;
+  syncingAll  = false;
+  syncResult  = '';
+  showReplyDetails       = false;
 
-  private onGmailOauthResult(status: string): void {
-    if (status !== 'connected') return;
-    this.api.getGmailStatus().subscribe({
-      next: s => this.zone.run(() => {
-        this.gmailConnected  = s.connected;
-        this.gmailEmail      = s.email || '';
-        this.gmailAuthUrl    = '';
-        if (s.connected) this.driveNeedsReauth = false;
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
+  // Whichever provider's OAuth callback page reports back here is, by
+  // construction, the tenant's active provider, so we just refresh the
+  // unified status instead of tracking per-provider flags. If a "Nowy email"
+  // click triggered the connect popup, resume opening compose once connected.
+  private onEmailOauthResult(status: string): void {
+    this.connectingEmail = false;
+    if (status !== 'connected') { this.pendingEmailComposeThreadId = null; return; }
+    this.loadEmailStatus(() => {
+      this.driveNeedsReauth = false;
+      if (this.pendingEmailComposeThreadId !== null) {
+        const threadId = this.pendingEmailComposeThreadId || undefined;
+        this.pendingEmailComposeThreadId = null;
+        this.openEmailCompose(threadId);
+      }
     });
   }
 
-  // storage event — główny mechanizm (działa dla nowych kart i popupów przez redirecty)
-  private gmailStorageHandler = (e: StorageEvent) => {
-    if (e.key === 'gmail_oauth_connected' && e.newValue) {
-      localStorage.removeItem('gmail_oauth_connected');
-      this.onGmailOauthResult('connected');
-    }
-  };
-
-  private gmailMessageHandler = (e: MessageEvent) => {
-    if (e.origin !== window.location.origin) return;
-    if (e.data?.type === 'gmail-oauth-result') {
-      this.onGmailOauthResult(e.data.status);
-    }
-  };
   @Input() id!: string;
   private route    = inject(ActivatedRoute);
   private zone     = inject(NgZone);
@@ -1521,6 +1715,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private router   = inject(Router);
   private cdr      = inject(ChangeDetectorRef);
   private sanitizer = inject(DomSanitizer);
+  private emailOauthListener = inject(EmailOauthListenerService);
   protected settings = inject(AppSettingsService);
   logoSasUrl       = '';
 
@@ -2000,7 +2195,149 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   toggleLeftPanel(): void { this.leftCollapsed = !this.leftCollapsed; this.cdr.markForCheck(); }
 
   // Historia
-  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'calls' | 'meetings' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'calls' | 'meetings' = 'all';
+
+  // WhatsApp tab — status reflects the CURRENT USER's own connected number
+  // (whatsapp_configs, keyed by user_id), not a tenant-wide setting. Two
+  // salespeople on the same lead can see different `whatsappConfigured`
+  // values depending on whether each has connected their own number.
+  whatsappConfigured: boolean | null = null;
+  whatsappDisplayNumber: string | null = null;
+  whatsappToPhone = '';
+  whatsappMessage = '';
+  whatsappSending = false;
+  whatsappError: string | null = null;
+  whatsappSuccess = false;
+  // Real conversation history (whatsapp_messages table), not an activity log —
+  // grouped by counterpart phone number: each number is its own conversation,
+  // never merged. A new conversation is only ever started via "Nowa wiadomość
+  // WhatsApp" above; there is no "add participant to this thread" action.
+  whatsappConversations: WhatsappConversation[] = [];
+  whatsappHistoryLoading = false;
+  private whatsappConvState = new Map<string, WhatsappConvUiState>();
+
+  get whatsappFromDisplay(): string {
+    return this.whatsappDisplayNumber ? formatPhoneDisplay(this.whatsappDisplayNumber) : 'skonfigurowany numer';
+  }
+
+  // No country is ever assumed (CRMtree is multi-country) — the user must
+  // type a full international number. Doesn't block typing, only sending.
+  get whatsappToPhoneMissingCountryCode(): boolean {
+    return requiresCountryCode(this.whatsappToPhone);
+  }
+
+  formatWhatsappHistoryPhone(raw: string | null): string {
+    return raw ? formatPhoneDisplay(raw) : '—';
+  }
+
+  // Per-message expand/collapse for long WhatsApp bodies, same "clamp + Rozwiń/Zwiń"
+  // interaction as the generic activity cards — kept as its own Set (ids are
+  // whatsapp_messages UUIDs, not the numeric activity ids expandedActIds holds).
+  whatsappExpandedIds = new Set<string>();
+  isWhatsappExpanded(id: string): boolean { return this.whatsappExpandedIds.has(id); }
+  toggleWhatsappExpand(id: string): void {
+    if (this.whatsappExpandedIds.has(id)) this.whatsappExpandedIds.delete(id);
+    else this.whatsappExpandedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  // Per-conversation UI state (expand/collapse, inline reply), keyed by the
+  // counterpart phone number's DIGITS ONLY, not the raw string — the same
+  // number can be stored differently between an outgoing send ("+48 739 210
+  // 704", user-typed) and an incoming webhook payload ("+48739210704", from
+  // Meta), and the state must stay stable regardless of which formatting a
+  // given conversation's representative phone happens to carry. Entries are
+  // created once, in groupWhatsappConversations(), for every phone the
+  // history contains — the getter below only ever reads, never lazily
+  // creates, so it stays safe to call from the template.
+  getWhatsappConvState(phone: string): WhatsappConvUiState {
+    return this.whatsappConvState.get(normalizePhoneDigits(phone))!;
+  }
+
+  toggleWhatsappConvExpanded(phone: string): void {
+    this.getWhatsappConvState(phone).expanded = !this.getWhatsappConvState(phone).expanded;
+    this.cdr.markForCheck();
+  }
+
+  setWhatsappConvReplyMessage(phone: string, value: string): void {
+    this.getWhatsappConvState(phone).replyMessage = value;
+  }
+
+  startWhatsappConvReply(phone: string): void {
+    const s = this.getWhatsappConvState(phone);
+    s.replyMessage = '';
+    s.replyError   = null;
+    s.replyOpen    = true;
+  }
+
+  cancelWhatsappConvReply(phone: string): void {
+    const s = this.getWhatsappConvState(phone);
+    s.replyOpen    = false;
+    s.replyMessage = '';
+    s.replyError   = null;
+  }
+
+  sendWhatsappConvReply(phone: string): void {
+    if (!this.lead) return;
+    const s = this.getWhatsappConvState(phone);
+    if (!s.replyMessage.trim()) return;
+    s.replySending = true;
+    s.replyError   = null;
+    this.cdr.markForCheck();
+    this.api.sendLeadWhatsapp(this.lead.id, s.replyMessage.trim(), phone).subscribe({
+      next: () => this.zone.run(() => {
+        s.replySending = false;
+        s.replyMessage = '';
+        s.replyOpen    = false;
+        this.cdr.markForCheck();
+        this.loadWhatsappHistory();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        s.replySending = false;
+        s.replyError   = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  // Splits the flat history into one conversation per counterpart phone
+  // number, most recently active first. Grouped by digits-only, not the raw
+  // stored string — outgoing sends store the user-typed format ("+48 739 210
+  // 704") while incoming webhook messages store Meta's digit-only format
+  // ("+48739210704"); grouping by the raw string treated those as two
+  // different numbers and split one real conversation into two cards. Ensures
+  // UI state exists for every phone found; on the very first load (state map
+  // still empty) expands only the most recent conversation, matching the old
+  // single-thread default of opening the one thing this section exists to show.
+  private groupWhatsappConversations(history: WhatsappHistoryEntry[]): WhatsappConversation[] {
+    const order: string[] = []; // digits-only keys, in first-seen order
+    const byDigits = new Map<string, WhatsappConversation>();
+    for (const h of history) {
+      const rawPhone = h.direction === 'outgoing' ? h.to_phone : h.from_phone;
+      const digits   = normalizePhoneDigits(rawPhone);
+      let conv = byDigits.get(digits);
+      if (!conv) { conv = { phone: rawPhone, messages: [] }; byDigits.set(digits, conv); order.push(digits); }
+      conv.phone = rawPhone; // keep the most recent message's formatting as the representative
+      conv.messages.push(h);
+    }
+    order.sort((a, b) => {
+      const aMsgs = byDigits.get(a)!.messages, bMsgs = byDigits.get(b)!.messages;
+      return new Date(bMsgs[bMsgs.length - 1].created_at).getTime() - new Date(aMsgs[aMsgs.length - 1].created_at).getTime();
+    });
+
+    const isFirstLoad = this.whatsappConvState.size === 0;
+    const conversations = order.map(digits => byDigits.get(digits)!);
+    for (const digits of order) {
+      if (!this.whatsappConvState.has(digits)) {
+        this.whatsappConvState.set(digits, { expanded: false, replyOpen: false, replyMessage: '', replySending: false, replyError: null });
+      }
+    }
+    if (isFirstLoad && order.length) {
+      this.whatsappConvState.get(order[0])!.expanded = true;
+    }
+    return conversations;
+  }
+
   history: LeadHistoryEntry[] = [];
   historyLoading = false;
   showHistoryModal = false;
@@ -2011,15 +2348,32 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   mockCallActive      = false;
   phoneSimulatorActive = false;
 
-  // ── Gmail ────────────────────────────────────────────────────────────────────
-  gmailConnected  = false;
-  gmailEmail      = '';
-  gmailAuthUrl    = '';
+  // ── Email — tenant chooses the active provider; each user connects their
+  // OWN mailbox for it, triggered inline from "Nowy email" below.
+  emailStatus: EmailStatus | null = null;
+  emailAddress = '';
+  connectingEmail = false;
+  // '' = new email pending connect, a threadId = reply pending connect, null = no pending intent
+  private pendingEmailComposeThreadId: string | null = null;
+
+  get emailProviderKey(): EmailProviderKey | null { return this.emailStatus?.provider ?? null; }
+  get emailConnected(): boolean { return !!this.emailStatus?.connected; }
+  get emailProviderLabel(): string { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].label : ''; }
+  get emailProviderColor(): string { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].color : '#9ca3af'; }
+  get emailProviderBg(): string    { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].bg    : '#f9fafb'; }
+
+  // A stored activity can carry an email_provider from a provider the tenant
+  // no longer has active (e.g. after a super admin switch) — replying must
+  // stay on the currently active, connected provider only.
+  canReplyToActivity(a: any): boolean {
+    return this.emailConnected && (a.email_provider || 'gmail') === this.emailProviderKey;
+  }
+
   showEmailModal  = false;  // kept for backward compat but unused
   showEmailCompose = false;
   expandedEmailId: number | null = null;
   showReplyInline  = false;
-  inlineReplyForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  inlineReplyForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '' };
   inlineReplyRecipientQuery = '';
   inlineReplyCcQuery        = '';
   inlineReplySending        = false;
@@ -2027,7 +2381,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   inlineReplyAttachments: File[] = [];
   sendingEmail    = false;
   emailError      = '';
-  emailForm: any  = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  emailForm: any  = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '' };
   recipientQuery  = '';
   ccQuery         = '';
   emailAttachments: File[] = [];
@@ -2046,7 +2400,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   showMsgModal    = false;
   msgModalMsg: any = null;
   msgModalReply   = false;
-  msgModalForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  msgModalForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '' };
   msgModalRecipientQuery = '';
   msgModalCcQuery        = '';
   msgModalSending        = false;
@@ -2057,6 +2411,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   showThreadModal = false;
   loadingThread   = false;
   threadMessages: any[] = [];
+  // Whether the CURRENT user owns the open thread's mailbox (only the owner
+  // can reply in-thread — Gmail threads live in one Google account). Defaults
+  // true so training mode / non-Gmail providers (still shared in Phase 1) work
+  // as before.
+  threadCanReply = true;
+  threadOwnerEmail: string | null = null;
+  threadUnavailableReason: string | null = null;
   openThreadId    = '';
   private currentThreadActivity: any = null;
   selectedEmailActivity: any = null;
@@ -2145,35 +2506,26 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       next: sources => { this.zone.run(() => { this.leadSources = sources; this.cdr.markForCheck(); }); },
       error: () => {},
     });
-    // Sprawdź status połączenia Gmail
-    this.api.getGmailStatus().subscribe({
+    // Tenant's active email provider is resolved server-side; each user's own
+    // mailbox connection is triggered inline from "Nowy email" (openEmailCompose).
+    this.loadEmailStatus();
+    this.emailOauthSub = this.emailOauthListener.result$.subscribe(status => this.onEmailOauthResult(status));
+  }
+
+  loadEmailStatus(onDone?: () => void): void {
+    this.api.getEmailStatus().subscribe({
       next: s => this.zone.run(() => {
-        this.gmailConnected = s.connected;
-        this.gmailEmail     = s.email || '';
+        this.emailStatus  = s;
+        this.emailAddress = s.email || '';
+        onDone?.();
         this.cdr.markForCheck();
       }),
       error: () => {},
     });
-    // BroadcastChannel — główny mechanizm (omija nullowanie window.opener przez Google COOP)
-    try {
-      this.gmailBc = new BroadcastChannel('gmail-oauth');
-      this.gmailBc.onmessage = (e) => {
-        if (e.data?.type === 'gmail-oauth-result') {
-          this.onGmailOauthResult(e.data.status);
-        }
-      };
-    } catch (_) {}
-    // storage event — główny mechanizm (nowa karta / popup przez redirecty)
-    window.addEventListener('storage', this.gmailStorageHandler);
-    // Fallback: BroadcastChannel
-    window.addEventListener('message', this.gmailMessageHandler);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('storage', this.gmailStorageHandler);
-    this.gmailBc?.close();
-    this.gmailBc = null;
-    window.removeEventListener('message', this.gmailMessageHandler);
+    this.emailOauthSub?.unsubscribe();
     if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
 
@@ -2215,19 +2567,83 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  debugProcessGmail(): void {
+  openWhatsappTab(): void {
+    this.midTab = 'whatsapp';
+    this.whatsappConvState.forEach(s => { s.replyOpen = false; });
+    if (this.whatsappConfigured === null) {
+      // Always starts empty — the example number is shown only via the
+      // input's placeholder, never prefilled as an editable value, even
+      // when the lead has a real phone on file.
+      this.whatsappToPhone = '';
+      this.api.getWhatsappStatus().subscribe({
+        next: status => this.zone.run(() => {
+          this.whatsappConfigured      = status.configured && status.enabled;
+          this.whatsappDisplayNumber   = status.display_phone_number;
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => {
+          this.whatsappConfigured = false;
+          this.cdr.markForCheck();
+        }),
+      });
+    }
+    this.loadWhatsappHistory();
+  }
+
+  loadWhatsappHistory(): void {
+    if (!this.lead) return;
+    this.whatsappHistoryLoading = true;
+    this.api.getLeadWhatsappHistory(this.lead.id).subscribe({
+      next: history => this.zone.run(() => {
+        this.whatsappConversations  = this.groupWhatsappConversations(history);
+        this.whatsappHistoryLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => {
+        this.whatsappHistoryLoading = false;
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  // Reformats on blur, not on every keystroke, so typing/pasting doesn't
+  // fight the cursor position. Purely a display convenience — the value
+  // is still only used for this one send, never saved to the lead.
+  onWhatsappToPhoneBlur(): void {
+    this.whatsappToPhone = formatPhoneDisplay(this.whatsappToPhone);
+  }
+
+  sendWhatsapp(): void {
+    if (!this.lead || !this.whatsappToPhone.trim() || !this.whatsappMessage.trim()) return;
+    if (this.whatsappToPhoneMissingCountryCode) return;
+    this.whatsappSending = true;
+    this.whatsappError   = null;
+    this.whatsappSuccess = false;
+    this.cdr.markForCheck();
+    this.api.sendLeadWhatsapp(this.lead.id, this.whatsappMessage.trim(), this.whatsappToPhone.trim()).subscribe({
+      next: () => this.zone.run(() => {
+        this.whatsappSending = false;
+        this.whatsappSuccess = true;
+        this.whatsappMessage = '';
+        this.cdr.markForCheck();
+        this.loadWhatsappHistory();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.whatsappSending = false;
+        this.whatsappError   = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  debugProcessEmail(): void {
     this.debugProcessing = true;
     this.cdr.markForCheck();
-    this.api.debugProcessGmail().subscribe({
+    this.api.debugProcessEmail().subscribe({
       next: (result: any) => this.zone.run(() => {
         this.debugProcessing = false;
-        console.log('[Debug] processGmail result:', result);
-        alert(
-          `historyId: ${result.historyId_before} → ${result.historyId_after}\n` +
-          `Nowe wiadomości: ${(result.messageIds_found || []).length}\n` +
-          `crm_email_message_reads (ostatnie 10): ${result.recent_message_reads?.length || 0} rekordów\n\n` +
-          `Sprawdź konsolę po szczegóły.`
-        );
+        console.log('[Debug] processEmail result:', result);
+        alert(`Nowe wiadomości: ${result.newMessages_found ?? 0}`);
         this.refreshEmailActivities();
         this.cdr.markForCheck();
       }),
@@ -2239,50 +2655,50 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Gmail ────────────────────────────────────────────────────────────────────
-  connectGmail(): void {
-    if (!this.gmailAuthUrl) return;
-    console.log('[Gmail] connectGmail() — otwieranie popup, url:', this.gmailAuthUrl.slice(0, 60) + '...');
-    const popup = window.open(this.gmailAuthUrl, 'gmail-oauth', 'width=600,height=700,left=300,top=100');
-    console.log('[Gmail] popup ref:', popup, '| null?', popup === null);
-    if (!popup) {
-      console.warn('[Gmail] Popup zablokowany przez przeglądarkę!');
-      return;
-    }
-    // Polling: gdy popup zostanie zamknięty — odśwież status Gmail
-    const timer = setInterval(() => {
-      try {
-        console.log('[Gmail] polling — popup.closed =', popup.closed);
-        if (popup.closed) {
-          clearInterval(timer);
-          console.log('[Gmail] popup zamknięty → getGmailStatus()');
-          this.api.getGmailStatus().subscribe({
-            next: s => {
-              console.log('[Gmail] getGmailStatus() odpowiedź:', s);
-              this.zone.run(() => {
-                this.gmailConnected  = s.connected;
-                this.gmailEmail      = s.email || '';
-                if (s.connected) { this.gmailAuthUrl = ''; this.driveNeedsReauth = false; }
-                this.cdr.markForCheck();
-              });
-            },
-            error: (err) => { console.error('[Gmail] getGmailStatus() błąd:', err); },
-          });
-        }
-      } catch (e) {
-        console.error('[Gmail] polling error (cross-origin?):', e);
-        clearInterval(timer);
-      }
-    }, 500);
+  checkNewEmails(): void {
+    if (this.syncingAll || !this.emailConnected) return;
+    this.syncingAll = true;
+    this.syncResult = '';
+    this.cdr.markForCheck();
+
+    this.api.debugProcessEmail().pipe(
+      map((r: any) => r?.recovered
+        ? `${this.emailProviderLabel}: odzyskano synchronizację, ${r?.newMessages_found ?? 0}`
+        : `${this.emailProviderLabel}: ${r?.newMessages_found ?? 0}`),
+      catchError(() => of(`${this.emailProviderLabel}: błąd synchronizacji`)),
+    ).subscribe({
+      next: label => this.zone.run(() => {
+        this.syncResult = label;
+        this.syncingAll = false;
+        this.refreshEmailActivities();
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => {
+        this.syncingAll = false;
+        this.cdr.markForCheck();
+      }),
+    });
   }
 
   openEmailCompose(prefillThreadId?: string): void {
-    if (!this.gmailConnected && !this.settings.settings().crm_training_mode) {
-      this.api.getGmailAuthUrl().subscribe({
-        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailCompose = true; this.cdr.markForCheck(); }),
-        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailCompose = true; this.cdr.markForCheck(); }),
+    const training_mode = this.settings.settings().crm_training_mode;
+    if (!this.emailConnected && !training_mode) {
+      if (!this.emailProviderKey) {
+        // No provider configured for this tenant at all — nothing to connect to.
+        this.emailForm = { recipientList: [], ccList: [], subject: '', body: '', threadId: prefillThreadId || '', inReplyTo: '', references: '' };
+        this.showEmailCompose = true;
+        return;
+      }
+      this.pendingEmailComposeThreadId = prefillThreadId ?? '';
+      this.connectingEmail = true;
+      this.api.getMyEmailOauthUrl().subscribe({
+        next: ({ url }) => window.open(url, 'mailbox-oauth', 'width=520,height=650'),
+        error: () => this.zone.run(() => {
+          this.connectingEmail = false;
+          this.pendingEmailComposeThreadId = null;
+          this.cdr.markForCheck();
+        }),
       });
-      this.emailForm = { recipientList: [], ccList: [], subject: '', body: '', threadId: prefillThreadId || '', inReplyTo: '', references: '', quotedHtml: '' };
       return;
     }
     this.emailForm = {
@@ -2293,7 +2709,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       threadId: prefillThreadId || '',
       inReplyTo: '',
       references: '',
-      quotedHtml: '',
     };
     this.recipientQuery   = '';
     this.ccQuery          = '';
@@ -2306,6 +2721,20 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   openEmailModal(prefillThreadId?: string): void { this.openEmailCompose(prefillThreadId); }
+
+  disconnectEmail(): void {
+    if (!confirm('Rozłączyć swoje konto pocztowe? Aby dalej wysyłać maile, będziesz musiał połączyć je ponownie.')) return;
+    this.api.disconnectMyEmail().subscribe({
+      next: () => this.zone.run(() => {
+        this.emailStatus     = null;
+        this.emailAddress    = '';
+        this.showEmailCompose = false;
+        this.loadEmailStatus();
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
 
   loadEmailTemplates(): void {
     this.api.getEmailTemplates().subscribe({
@@ -2403,10 +2832,22 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   /** Parsuje "Name <email>, email2" → ['email1', 'email2'] */
   parseAddressList(header: string): string[] {
     if (!header) return [];
-    return header.split(',').map((s: string) => {
+    return decodeAddressEntities(header).split(',').map((s: string) => {
       const m = s.trim().match(/<([^>]+)>/);
       return m ? m[1].trim().toLowerCase() : s.trim().toLowerCase();
     }).filter((s: string) => s.includes('@'));
+  }
+
+  firstAddressDisplay(addrStr: string): string {
+    return formatAddressDisplay(addrStr);
+  }
+
+  extraAddressCount(addrStr: string): number {
+    return countExtraAddresses(addrStr);
+  }
+
+  decodeAddress(addrStr: string): string {
+    return formatAddressListDisplay(addrStr);
   }
 
   onAttachmentChange(event: Event): void {
@@ -2434,15 +2875,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     ]).then(([cfg, tok]) => {
       if (!cfg || !tok) { this.drivePickerLoading = false; this.cdr.markForCheck(); return; }
 
-      // Backend wykrył brak scope drive.readonly — wymuś ponowne połączenie
+      // Backend wykrył brak scope drive.readonly — skrzynkę firmową musi ponownie połączyć administrator
       if ((tok as any).needsReauth) {
         this.drivePickerLoading = false;
         this.driveNeedsReauth   = true;
         this.cdr.markForCheck();
-        this.api.getGmailAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
         return;
       }
 
@@ -2531,80 +2968,105 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   sendEmail(): void {
-    this.addRecipient(); // dodaj email z pola input jeśli użytkownik nie wcisnął Enter
-    this.addCc();        // dodaj CC z pola input jeśli użytkownik nie wcisnął Enter
+    this.addRecipient();
+    this.addCc();
     if (!this.lead || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
     this.sendingEmail = true;
     this.emailError   = '';
+
+    // Provider is whatever the tenant has active — never chosen in this form.
+    const provider = this.emailProviderKey || 'gmail';
+
+    const onSuccess = (result: GmailSendResult) => {
+      this.zone.run(() => {
+        const wasReply      = !!this.emailForm.threadId;
+        const replyThreadId = this.emailForm.threadId;
+        if (!wasReply && this.lead) {
+          const newAct: any = {
+            id: result.activityId,
+            type: 'email',
+            title: this.emailForm.subject,
+            body: this.emailForm.body,
+            gmail_thread_id:  result.threadId,
+            gmail_message_id: result.messageId,
+            email_provider:   provider,
+            activity_at: new Date().toISOString(),
+            created_by: this.auth.user()?.id || null,
+            created_by_name: this.auth.user()?.display_name || null,
+            is_read: true,
+          };
+          this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
+        } else if (replyThreadId && this.lead) {
+          this.getLeadThreadObs(replyThreadId).subscribe({
+            next: res => this.zone.run(() => {
+              this.threadMessages  = res.messages;
+              this.threadCanReply  = res.canReply;
+              this.threadOwnerEmail = res.ownerEmail;
+              this.openThreadId    = replyThreadId;
+              // Keep the card expanded under the newly-created activity's id —
+              // emailActivities groups by gmail_thread_id and always shows the
+              // highest-id row as the card's representative, so once
+              // lead.activities refreshes (poller, tab switch, "Sprawdź nowe")
+              // the card would otherwise collapse under the stale old id.
+              this.expandedEmailId = result.activityId;
+              this.cdr.markForCheck();
+            }),
+            error: () => {},
+          });
+        }
+        this.sendingEmail          = false;
+        this.showEmailCompose      = false;
+        this.midTab                = 'emails';
+        if (this.lead) {
+          this.api.getLead(this.lead.id).subscribe({
+            next: (fresh: any) => this.zone.run(() => {
+              if (this.lead) {
+                (this.lead as any).extra_contacts = fresh.extra_contacts || [];
+                this.cdr.markForCheck();
+              }
+            }),
+            error: () => {},
+          });
+        }
+        if (this.settings.settings().crm_training_mode) {
+          setTimeout(() => this.refreshEmailActivities(), 47_000);
+        }
+        this.cdr.markForCheck();
+      });
+    };
+
+    const onError = (err: any) => {
+      this.zone.run(() => {
+        this.emailError   = err?.error?.error || 'Błąd wysyłki emaila';
+        this.sendingEmail = false;
+        this.cdr.markForCheck();
+      });
+    };
 
     const fd = new FormData();
     fd.append('to', this.emailForm.recipientList.join(','));
     if (this.emailForm.ccList?.length) fd.append('cc', this.emailForm.ccList.join(','));
     fd.append('subject', this.emailForm.subject);
-    fd.append('body', (this.emailForm.body || '') + (this.emailForm.quotedHtml || ''));
+    fd.append('body', trimEdgeEmptyHtml(this.emailForm.body || ''));
     if (this.emailForm.threadId)   fd.append('threadId',   this.emailForm.threadId);
     if (this.emailForm.inReplyTo)  fd.append('inReplyTo',  this.emailForm.inReplyTo);
     if (this.emailForm.references) fd.append('references', this.emailForm.references);
     this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
+    this.api.sendLeadEmailUnified(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
+  }
 
-    this.api.sendLeadEmail(this.lead.id, fd).subscribe({
-      next: (result: GmailSendResult) => {
-        this.zone.run(() => {
-          const wasReply     = !!this.emailForm.threadId;
-          const replyThreadId = this.emailForm.threadId;
-          if (!wasReply && this.lead) {
-            const newAct: any = {
-              id: result.activityId,
-              type: 'email',
-              title: this.emailForm.subject,
-              body: this.emailForm.body,
-              gmail_thread_id: result.threadId,
-              gmail_message_id: result.messageId,
-              activity_at: new Date().toISOString(),
-              created_by: this.auth.user()?.id || null,
-              created_by_name: this.auth.user()?.display_name || null,
-              is_read: true,
-            };
-            this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
-          } else if (replyThreadId && this.lead) {
-            this.api.getLeadEmailThread(this.lead.id, replyThreadId).subscribe({
-              next: msgs => this.zone.run(() => {
-                this.threadMessages = msgs;
-                this.openThreadId   = replyThreadId;
-                this.cdr.markForCheck();
-              }),
-              error: () => {},
-            });
-          }
-          this.sendingEmail   = false;
-          this.showEmailCompose = false;
-          this.midTab         = 'emails';
-          // Odśwież extra_contacts (autoSaveLeadContacts mogło dodać nowe)
-          if (this.lead) {
-            this.api.getLead(this.lead.id).subscribe({
-              next: (fresh: any) => this.zone.run(() => {
-                if (this.lead) {
-                  (this.lead as any).extra_contacts = fresh.extra_contacts || [];
-                  this.cdr.markForCheck();
-                }
-              }),
-              error: () => {},
-            });
-          }
-          if (this.settings.settings().crm_training_mode) {
-            setTimeout(() => this.refreshEmailActivities(), 47_000);
-          }
-          this.cdr.markForCheck();
-        });
-      },
-      error: (err: any) => {
-        this.zone.run(() => {
-          this.emailError   = err?.error?.error || 'Błąd wysyłki emaila';
-          this.sendingEmail = false;
-          this.cdr.markForCheck();
-        });
-      },
-    });
+  // Normalizes to GmailThreadResponse regardless of provider. All three
+  // providers are per-user (same ownership model as Gmail) — every
+  // provider's endpoint returns the wrapper shape natively.
+  private getLeadThreadObs(threadId: string) {
+    const act = (this.lead?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
+    if (act?.email_provider === 'outlook') {
+      return this.api.getLeadEmailThreadOutlook(this.lead!.id, threadId);
+    }
+    if (act?.email_provider === 'zoho') {
+      return this.api.getLeadEmailThreadZoho(this.lead!.id, threadId);
+    }
+    return this.api.getLeadEmailThread(this.lead!.id, threadId);
   }
 
   openThread(threadId: string): void {
@@ -2616,16 +3078,24 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       return;
     }
     this.openThreadId = threadId;
-    this.api.getLeadEmailThread(this.lead.id, threadId).subscribe({
-      next: msgs => this.zone.run(() => {
-        this.threadMessages = msgs;
-        // Synchronizuj lokalny stan is_read z odpowiedzią serwera
-        // (serwer oznacza wątek jako przeczytany po stronie DB)
+    this.loadingThread = true;
+    this.getLeadThreadObs(threadId).subscribe({
+      next: res => this.zone.run(() => {
+        if (this.openThreadId !== threadId) return;
+        this.threadMessages = res.messages;
+        this.threadCanReply = res.canReply;
+        this.threadOwnerEmail = res.ownerEmail;
+        this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
+        this.loadingThread = false;
         const act = (this.lead?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
         if (act && !act.is_read) act.is_read = true;
         this.cdr.markForCheck();
       }),
-      error: () => {},
+      error: () => this.zone.run(() => {
+        if (this.openThreadId !== threadId) return;
+        this.loadingThread = false;
+        this.cdr.markForCheck();
+      }),
     });
   }
 
@@ -2635,8 +3105,15 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.loadingThread   = true;
     this.threadMessages  = [];
     this.cdr.markForCheck();
-    this.api.getLeadEmailThread(this.lead.id, threadId).subscribe({
-      next: msgs => this.zone.run(() => { this.threadMessages = msgs; this.loadingThread = false; this.cdr.markForCheck(); }),
+    this.getLeadThreadObs(threadId).subscribe({
+      next: res => this.zone.run(() => {
+        this.threadMessages = res.messages;
+        this.threadCanReply = res.canReply;
+        this.threadOwnerEmail = res.ownerEmail;
+        this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
+        this.loadingThread = false;
+        this.cdr.markForCheck();
+      }),
       error: () => this.zone.run(() => { this.loadingThread = false; this.cdr.markForCheck(); }),
     });
   }
@@ -2647,9 +3124,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     } else {
       if (!this.lead) return;
       this.openThreadId = a.gmail_thread_id;
-      this.api.getLeadEmailThread(this.lead.id, a.gmail_thread_id).subscribe({
-        next: msgs => this.zone.run(() => {
-          this.threadMessages = msgs;
+      this.getLeadThreadObs(a.gmail_thread_id).subscribe({
+        next: res => this.zone.run(() => {
+          this.threadMessages = res.messages;
+          this.threadCanReply = res.canReply;
+          this.threadOwnerEmail = res.ownerEmail;
           this.cdr.markForCheck();
           this._applyThreadReply(a.gmail_thread_id);
         }),
@@ -2659,20 +3138,32 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   private _applyThreadReply(threadId: string): void {
+    // Not the thread's owner — open compose prefilled with the same
+    // recipient, but as a brand-new email from the current user's own
+    // account (no threadId/inReplyTo/references tying it to a thread they
+    // don't own; Gmail threads live in one Google account).
+    const canReplyInThread = this.threadCanReply;
     const m = this.threadMessages[this.threadMessages.length - 1];
-    this.openEmailModal(threadId);
+    this.openEmailModal(canReplyInThread ? threadId : undefined);
+    if (!canReplyInThread) {
+      this.emailError = this.threadOwnerEmail
+        ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Poniższy e-mail zostanie wysłany jako nowa wiadomość z Twojego konta.`
+        : 'Nie możesz odpowiadać w tym wątku. Poniższy e-mail zostanie wysłany jako nowa wiadomość z Twojego konta.';
+    }
     if (m) {
       if (!this.emailForm.subject)
         this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
-      const fromAddrs  = this.parseAddressList(m.from);
-      const toAddrs    = this.parseAddressList(m.to);
-      const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+      const fromAddrs    = this.parseAddressList(m.from);
+      const toAddrs      = this.parseAddressList(m.to);
+      const activeEmail  = this.emailAddress;
+      const isReceived   = fromAddrs.length > 0 && !isSameMailboxAddress(fromAddrs[0], activeEmail);
       this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
       if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
-      this.emailForm.inReplyTo  = m.messageIdHeader || '';
-      this.emailForm.references = this.buildReferences(this.threadMessages);
-      this.emailForm.body       = '';
-      this.emailForm.quotedHtml = this.buildQuotedBody(this.threadMessages);
+      if (canReplyInThread) {
+        this.emailForm.inReplyTo  = m.messageIdHeader || '';
+        this.emailForm.references = this.buildReferences(this.threadMessages);
+      }
+      this.emailForm.body = '';
       this.focusEmailBodyTop();
     }
     this.cdr.markForCheck();
@@ -2681,20 +3172,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   replyToCurrentThread(): void {
     this.showThreadModal = false;
     const m = this.threadMessages[this.threadMessages.length - 1];
-    this.openEmailModal(m?.threadId || '');
-    if (m) {
-      this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
-      const toAddrs    = this.parseAddressList(m.to);
-      const fromAddrs  = this.parseAddressList(m.from);
-      const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
-      this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
-      if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
-      this.emailForm.inReplyTo  = m.messageIdHeader || '';
-      this.emailForm.references = this.buildReferences(this.threadMessages);
-      this.emailForm.body       = '';
-      this.emailForm.quotedHtml = this.buildQuotedBody(this.threadMessages);
-      this.focusEmailBodyTop();
-    }
+    this._applyThreadReply(m?.threadId || '');
   }
 
   openMsgModal(m: any): void {
@@ -2712,43 +3190,87 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (this.expandedEmailId === a.id) {
       this.expandedEmailId = null;
       this.showReplyInline = false;
+      this.openThreadId   = '';
+      this.threadMessages = [];
+      this.loadingThread  = false;
       this.cdr.markForCheck();
       return;
     }
     this.expandedEmailId = a.id;
     this.showReplyInline = false;
+    this.openThreadId    = '';
+    this.threadMessages  = [];
+    this.loadingThread   = false;
     this.cdr.markForCheck();
     if (!a.is_read) {
       a.is_read = true;
       this.api.patchLeadActivityRead(this.lead.id, a.id, true).subscribe({ error: () => {} });
     }
+    if (a.gmail_thread_id && !this.settings.settings().crm_training_mode) {
+      this.openThread(a.gmail_thread_id);
+    }
   }
 
   startInlineReply(a: any): void {
     if (!this.lead) return;
-    const subj = (a.title || '');
+    const activeEmail = this.emailAddress;
+
+    // Determine recipient and inReplyTo from last thread message if available
+    const lastMsg = this.threadMessages.length > 0
+      ? this.threadMessages[this.threadMessages.length - 1]
+      : null;
+
+    let replyRecipients: string[];
+    let replySubject: string;
+    let replyInReplyTo = '';
+
+    if (lastMsg) {
+      const fromAddrs = this.parseAddressList(lastMsg.from || '');
+      const toAddrs   = this.parseAddressList(lastMsg.to   || '');
+      // Incoming when the sender is not the CRM user's mailbox
+      const isIncoming = fromAddrs.length > 0 && !isSameMailboxAddress(fromAddrs[0], activeEmail);
+      replyRecipients  = isIncoming ? fromAddrs : toAddrs;
+      replySubject     = lastMsg.subject?.startsWith('Re:') ? lastMsg.subject : `Re: ${lastMsg.subject || a.title || ''}`;
+      replyInReplyTo   = lastMsg.messageIdHeader || '';
+    } else {
+      const subj      = a.title || '';
+      replySubject    = subj.startsWith('Re:') ? subj : `Re: ${subj}`;
+      replyRecipients = this.lead.email ? [this.lead.email] : [];
+    }
+
+    // Not the thread's owner — this must go out as a brand-new email from the
+    // current user's own account, not a reply tied to a thread they don't own
+    // (Gmail threads live in one Google account).
+    const canReplyInThread = this.threadCanReply;
+
     this.inlineReplyForm = {
-      subject:       subj.startsWith('Re:') ? subj : `Re: ${subj}`,
+      subject:       replySubject,
       body:          '',
-      recipientList: this.lead.email ? [this.lead.email] : [],
+      recipientList: replyRecipients,
       ccList:        [],
-      threadId:      a.gmail_thread_id || '',
-      inReplyTo:     '',
-      references:    '',
-      quotedHtml:    '',
+      threadId:      canReplyInThread ? (a.gmail_thread_id || '') : '',
+      inReplyTo:     canReplyInThread ? replyInReplyTo : '',
+      references:    canReplyInThread && lastMsg ? this.buildReferences(this.threadMessages) : '',
+      emailProvider: a.email_provider || 'gmail',
     };
     this.inlineReplyRecipientQuery = '';
     this.inlineReplyCcQuery        = '';
     this.inlineReplySending        = false;
-    this.inlineReplyError          = '';
+    this.inlineReplyError          = canReplyInThread ? '' : (this.threadOwnerEmail
+      ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.`
+      : 'Nie możesz odpowiadać w tym wątku. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.');
     this.inlineReplyAttachments    = [];
+    // Recipient/CC/subject must be immediately visible and editable on reply
+    // — not hidden behind the "Szczegóły" toggle.
+    this.showReplyDetails          = true;
     this.showReplyInline           = true;
     this.cdr.markForCheck();
   }
 
   cancelInlineReply(): void {
-    this.showReplyInline = false;
-    this.inlineReplyForm = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+    this.showReplyInline      = false;
+    this.showReplyDetails     = false;
+    this.inlineReplyForm      = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '' };
     this.cdr.markForCheck();
   }
 
@@ -2782,37 +3304,50 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   sendInlineReply(): void {
     this.addInlineReplyRecipient();
     this.addInlineReplyCc();
-    if (!this.lead || !this.inlineReplyForm.recipientList?.length || !this.inlineReplyForm.subject) return;
+    if (!this.lead || !this.inlineReplyForm.recipientList?.length || !this.inlineReplyForm.subject || !this.inlineReplyForm.body?.trim()) return;
     this.inlineReplySending = true;
     this.inlineReplyError   = '';
     this.cdr.markForCheck();
+
+    const onSuccess = (result: GmailSendResult) => this.zone.run(() => {
+      const replyThreadId = this.inlineReplyForm.threadId;
+      this.inlineReplySending  = false;
+      this.showReplyInline     = false;
+      this.showReplyDetails    = false;
+      if (replyThreadId && this.lead) {
+        this.getLeadThreadObs(replyThreadId).subscribe({
+          next: res => this.zone.run(() => {
+            this.threadMessages   = res.messages;
+            this.threadCanReply   = res.canReply;
+            this.threadOwnerEmail = res.ownerEmail;
+            this.openThreadId     = replyThreadId;
+            // See sendEmail()'s reply branch — keeps the card expanded under
+            // the new activity's id instead of the now-stale previous one.
+            this.expandedEmailId  = result.activityId;
+            this.cdr.markForCheck();
+          }),
+          error: () => {},
+        });
+      }
+      this.cdr.markForCheck();
+    });
+    const onError = (err: any) => this.zone.run(() => {
+      this.inlineReplyError   = err?.error?.error || 'Błąd wysyłki';
+      this.inlineReplySending = false;
+      this.cdr.markForCheck();
+    });
 
     const fd = new FormData();
     fd.append('to', this.inlineReplyForm.recipientList.join(','));
     if (this.inlineReplyForm.ccList?.length) fd.append('cc', this.inlineReplyForm.ccList.join(','));
     fd.append('subject', this.inlineReplyForm.subject);
-    fd.append('body', (this.inlineReplyForm.body || '') + (this.inlineReplyForm.quotedHtml || ''));
+    fd.append('body', trimEdgeEmptyHtml(this.inlineReplyForm.body || ''));
     if (this.inlineReplyForm.threadId)   fd.append('threadId',   this.inlineReplyForm.threadId);
     if (this.inlineReplyForm.inReplyTo)  fd.append('inReplyTo',  this.inlineReplyForm.inReplyTo);
     if (this.inlineReplyForm.references) fd.append('references', this.inlineReplyForm.references);
     this.inlineReplyAttachments.forEach(f => fd.append('attachments', f, f.name));
 
-    this.api.sendLeadEmail(this.lead.id, fd).subscribe({
-      next: () => {
-        this.zone.run(() => {
-          this.inlineReplySending = false;
-          this.showReplyInline    = false;
-          this.cdr.markForCheck();
-        });
-      },
-      error: (err: any) => {
-        this.zone.run(() => {
-          this.inlineReplyError   = err?.error?.error || 'Błąd wysyłki';
-          this.inlineReplySending = false;
-          this.cdr.markForCheck();
-        });
-      },
-    });
+    this.api.sendLeadEmailUnified(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
   }
 
   selectEmailForPanel(a: any): void { this.toggleEmailExpand(a); }
@@ -2851,16 +3386,19 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   startMsgReply(): void {
     const m = this.msgModalMsg;
     if (!m) return;
-    const fromAddrs  = this.parseAddressList(m.from);
-    const toAddrs    = this.parseAddressList(m.to);
-    const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+    const activeEmail = this.emailAddress;
+    const fromAddrs   = this.parseAddressList(m.from);
+    const toAddrs     = this.parseAddressList(m.to);
+    const isReceived  = fromAddrs.length > 0 && !isSameMailboxAddress(fromAddrs[0], activeEmail);
+    // Not the thread's owner — send as a brand-new email from the current
+    // user's own account, not a reply tied to a thread they don't own.
+    const canReplyInThread = this.threadCanReply;
     this.msgModalForm = {
       subject:       m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`,
       body:          '',
-      quotedHtml:    this.buildQuotedBody(this.threadMessages),
-      threadId:      m.threadId,
-      inReplyTo:     m.messageIdHeader || '',
-      references:    this.buildReferences(this.threadMessages),
+      threadId:      canReplyInThread ? m.threadId : '',
+      inReplyTo:     canReplyInThread ? (m.messageIdHeader || '') : '',
+      references:    canReplyInThread ? this.buildReferences(this.threadMessages) : '',
       recipientList: isReceived ? fromAddrs : toAddrs,
       ccList:        m.cc ? this.parseAddressList(m.cc) : [],
     };
@@ -2868,6 +3406,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.msgModalCcQuery        = '';
     this.msgModalAttachments    = [];
     this.msgModalReply = true;
+    this.msgModalError = canReplyInThread ? '' : (this.threadOwnerEmail
+      ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.`
+      : 'Nie możesz odpowiadać w tym wątku. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.');
     this.cdr.markForCheck();
     this.focusEmailBodyTop('msg-reply-textarea');
   }
@@ -2896,59 +3437,60 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (!this.lead || !this.msgModalForm.recipientList?.length || !this.msgModalForm.subject) return;
     this.msgModalSending = true;
     this.msgModalError   = '';
+
+    const onSuccess = (result: GmailSendResult) => this.zone.run(() => {
+      const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
+      this.msgModalSending = false;
+      this.msgModalReply   = false;
+      this.closeMsgModal();
+      if (replyThreadId && this.lead) {
+        this.getLeadThreadObs(replyThreadId).subscribe({
+          next: res => this.zone.run(() => {
+            this.threadMessages  = res.messages;
+            this.threadCanReply  = res.canReply;
+            this.threadOwnerEmail = res.ownerEmail;
+            this.openThreadId    = replyThreadId;
+            // See sendEmail()'s reply branch — keeps the card expanded under
+            // the new activity's id instead of the now-stale previous one.
+            this.expandedEmailId = result.activityId;
+            this.cdr.markForCheck();
+          }),
+          error: () => {},
+        });
+      }
+      if (this.lead) {
+        this.api.getLead(this.lead.id).subscribe({
+          next: (fresh: any) => this.zone.run(() => {
+            if (this.lead) {
+              (this.lead as any).extra_contacts = fresh.extra_contacts || [];
+              this.cdr.markForCheck();
+            }
+          }),
+          error: () => {},
+        });
+      }
+      this.cdr.markForCheck();
+    });
+    const onError = (err: any) => this.zone.run(() => {
+      this.msgModalError   = err?.error?.error || 'Błąd wysyłki';
+      this.msgModalSending = false;
+      this.cdr.markForCheck();
+    });
+
     const fd = new FormData();
     fd.append('to', this.msgModalForm.recipientList.join(','));
     if (this.msgModalForm.ccList?.length) fd.append('cc', this.msgModalForm.ccList.join(','));
     fd.append('subject', this.msgModalForm.subject);
-    fd.append('body',    (this.msgModalForm.body || '') + (this.msgModalForm.quotedHtml || ''));
+    fd.append('body',    (this.msgModalForm.body || ''));
     if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId);
     if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
     if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
     this.msgModalAttachments.forEach(f => fd.append('attachments', f, f.name));
-    this.api.sendLeadEmail(this.lead.id, fd).subscribe({
-      next: (result: GmailSendResult) => {
-        this.zone.run(() => {
-          const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
-          this.msgModalSending = false;
-          this.msgModalReply   = false;
-          this.closeMsgModal();
-          if (replyThreadId && this.lead) {
-            this.api.getLeadEmailThread(this.lead.id, replyThreadId).subscribe({
-              next: msgs => this.zone.run(() => {
-                this.threadMessages = msgs;
-                this.openThreadId   = replyThreadId;
-                this.cdr.markForCheck();
-              }),
-              error: () => {},
-            });
-          }
-          // Odśwież extra_contacts (autoSaveLeadContacts mogło dodać nowe)
-          if (this.lead) {
-            this.api.getLead(this.lead.id).subscribe({
-              next: (fresh: any) => this.zone.run(() => {
-                if (this.lead) {
-                  (this.lead as any).extra_contacts = fresh.extra_contacts || [];
-                  this.cdr.markForCheck();
-                }
-              }),
-              error: () => {},
-            });
-          }
-          this.cdr.markForCheck();
-        });
-      },
-      error: (err: any) => {
-        this.zone.run(() => {
-          this.msgModalError   = err?.error?.error || 'Błąd wysyłki';
-          this.msgModalSending = false;
-          this.cdr.markForCheck();
-        });
-      },
-    });
+    this.api.sendLeadEmailUnified(this.lead.id, fd).subscribe({ next: onSuccess, error: onError });
   }
 
   viewAttachment(att: any, msgId: string): void {
-    const base = '/api/crm/gmail';
+    const base = `/api/crm/${this.emailProviderKey || 'gmail'}`;
     let url = '';
     if (att.attachmentId) {
       url = `${base}/attachment/${msgId}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
@@ -2959,7 +3501,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   async downloadAtt(att: any, msgId: string): Promise<void> {
-    const base = '/api/crm/gmail';
+    const base = `/api/crm/${this.emailProviderKey || 'gmail'}`;
     let url = '';
     if (att.attachmentId) {
       url = `${base}/attachment/${msgId}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
@@ -2982,33 +3524,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   markEmailsRead(): void {}
 
-  private buildQuotedBody(messages: any[]): string {
-    if (!messages?.length) return '';
-    // Pusta linia na wpisanie treści przez użytkownika — kursor ustawiamy tu programatycznie
-    const userArea = '';
-    const divider = '<br><hr style="border:none;border-top:2px solid #e5e7eb;margin:16px 0"><div style="font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Historia korespondencji</div>';
-    const quoted = messages.map((m: any) => {
-      const d = m.date ? new Date(m.date) : null;
-      const dateStr = d ? d.toLocaleString('pl-PL', {
-        day: '2-digit', month: 'long', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      }) : '';
-      const atts = [...(m.attachments || []), ...(m.sentAttachments || [])]
-        .map((a: any) => `📎 ${a.filename}`).join(' &nbsp;');
-      const bodyHtml = (m.body || (m.snippet ? m.snippet : '')).trim();
-      const meta = [
-        `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Od:</td><td style="font-size:11px"><strong>${m.from}</strong></td></tr>`,
-        m.to  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Do:</td><td style="font-size:11px">${m.to}</td></tr>`  : '',
-        m.cc  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">DW:</td><td style="font-size:11px">${m.cc}</td></tr>`  : '',
-        dateStr ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Data:</td><td style="font-size:11px">${dateStr}</td></tr>` : '',
-        m.subject ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Temat:</td><td style="font-size:11px">${m.subject}</td></tr>` : '',
-      ].filter(Boolean).join('');
-      return `<div style="border-left:3px solid #d1d5db;padding:8px 14px;margin:8px 0;background:#fafafa;border-radius:0 6px 6px 0">
-<table style="margin-bottom:8px;border-collapse:collapse">${meta}</table>
-<div style="color:#374151;font-size:13px;line-height:1.6">${bodyHtml}</div>${atts ? `<div style="margin-top:8px;font-size:11px;color:#6b7280;padding-top:6px;border-top:1px solid #f3f4f6">${atts}</div>` : ''}</div>`;
-    }).join('\n');
-    return userArea + divider + quoted;
-  }
 
   private buildReferences(messages: any[]): string {
     return (messages || []).map((m: any) => m.messageIdHeader).filter(Boolean).join(' ');
