@@ -70,12 +70,17 @@ interface ZohoForm {
 // One shared company WhatsApp Business number per tenant, configured here by
 // a super admin — never per-user. webhook_verify_token is only ever present
 // once configured (the CRM generates it on first save).
+// display_phone_number/verified_name/code_verification_status are always
+// fetched from Meta server-side on save — never editable, never sent by
+// this form — see whatsappService.upsertTenantConfig on the backend.
 interface WhatsappConfig {
   configured: boolean;
   id?: string;
   waba_id?: string;
   phone_number_id?: string;
   display_phone_number?: string | null;
+  verified_name?: string | null;
+  code_verification_status?: string | null;
   is_enabled?: boolean;
   access_token_configured?: boolean;
   app_secret_configured?: boolean;
@@ -84,7 +89,7 @@ interface WhatsappConfig {
 }
 
 interface WhatsappConfigForm {
-  waba_id: string; phone_number_id: string; display_phone_number: string;
+  waba_id: string; phone_number_id: string;
   access_token: string; app_secret: string; is_enabled: boolean;
 }
 
@@ -481,8 +486,18 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                 </div>
                                 @if (whatsappConfig()?.configured) {
                                   <div class="provider-meta">
-                                    Phone Number ID: <code>{{ whatsappConfig()!.phone_number_id }}</code>
+                                    Numer: <strong>{{ whatsappConfig()!.display_phone_number }}</strong>
+                                    @if (whatsappConfig()!.verified_name) { · {{ whatsappConfig()!.verified_name }} }
+                                    @if (whatsappConfig()!.code_verification_status === 'VERIFIED') {
+                                      <span class="badge badge-on">VERIFIED</span>
+                                    } @else {
+                                      <span class="badge badge-off">{{ whatsappConfig()!.code_verification_status || 'NIEZWERYFIKOWANY' }}</span>
+                                    }
+                                    <br>Phone Number ID: <code>{{ whatsappConfig()!.phone_number_id }}</code>
                                     · zaktualizowany {{ whatsappConfig()!.updated_at | date:'dd.MM.yyyy' }}
+                                    <div class="hint-inline" style="margin-top:4px">
+                                      Numer, nazwa i status weryfikacji pochodzą bezpośrednio z Meta (pobierane przy każdym zapisie) — nie da się ich wpisać ręcznie.
+                                    </div>
                                   </div>
                                 }
                                 <div class="provider-form">
@@ -494,10 +509,6 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                     <div class="field">
                                       <label>Phone Number ID <span class="req">*</span></label>
                                       <input [(ngModel)]="whatsappForm.phone_number_id" placeholder="987654321098765">
-                                    </div>
-                                    <div class="field">
-                                      <label>Numer widoczny dla klientów <span class="hint-inline">(opcjonalne)</span></label>
-                                      <input [(ngModel)]="whatsappForm.display_phone_number" placeholder="+48 500 100 200">
                                     </div>
                                     <div class="field">
                                       <label>Access Token {{ whatsappConfig()?.access_token_configured ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
@@ -1405,7 +1416,6 @@ export class TenantsComponent implements OnInit {
           ? {
               waba_id: cfg.waba_id || '',
               phone_number_id: cfg.phone_number_id || '',
-              display_phone_number: cfg.display_phone_number || '',
               access_token: '',
               app_secret: '',
               is_enabled: cfg.is_enabled !== false,
@@ -1422,7 +1432,6 @@ export class TenantsComponent implements OnInit {
     const body = {
       waba_id: this.whatsappForm.waba_id,
       phone_number_id: this.whatsappForm.phone_number_id,
-      display_phone_number: this.whatsappForm.display_phone_number || undefined,
       access_token: this.whatsappForm.access_token || undefined,
       app_secret: this.whatsappForm.app_secret || undefined,
       is_enabled: this.whatsappForm.is_enabled,
@@ -1485,7 +1494,7 @@ export class TenantsComponent implements OnInit {
   private emptyOutlookForm(): OutlookForm { return { client_id: '', client_secret: '', azure_tenant_id: '', redirect_uri: '' }; }
   private emptyZohoForm():    ZohoForm    { return { client_id: '', client_secret: '', redirect_uri: '' }; }
   private emptyWhatsappForm(): WhatsappConfigForm {
-    return { waba_id: '', phone_number_id: '', display_phone_number: '', access_token: '', app_secret: '', is_enabled: true };
+    return { waba_id: '', phone_number_id: '', access_token: '', app_secret: '', is_enabled: true };
   }
 
   private emptyDraft() {
