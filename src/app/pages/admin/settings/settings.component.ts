@@ -6,7 +6,6 @@ import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { environment } from '../../../../environments/environment';
-import { CrmApiService, WhatsappDirectoryEntry } from '../../../core/services/crm-api.service';
 
 interface SettingField {
   key: string;
@@ -178,7 +177,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           <button class="tab-btn" [class.active]="activeTab() === 'global'" (click)="activeTab.set('global')">
             ⚙️ Parametry globalne
           </button>
-          <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm'); loadWhatsappDirectory()">
+          <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm')">
             💼 Parametry biznesowe CRM
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
@@ -275,34 +274,6 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
             <div>
               <strong>Parametry biznesowe CRM</strong> — słowniki i progi używane przez moduł CRM.
               Listy edytuj przez dodawanie / usuwanie elementów. Zmiany wchodzą w życie po zapisie.
-            </div>
-          </div>
-
-          <!-- WhatsApp — podłączone numery w tenancie (tylko do odczytu; każdy user łączy swój numer w Moje ustawienia) -->
-          <div class="card" style="margin-bottom:20px;overflow:hidden">
-            <div class="cat-header" style="padding:12px 20px">
-              <span class="cat-title" style="font-size:13px">💬 WhatsApp — podłączone numery</span>
-            </div>
-            <div style="padding:14px 20px">
-              <div class="field-desc" style="margin-bottom:12px">
-                Każdy użytkownik podłącza własny numer WhatsApp Business w swoich „Moje ustawienia" — admin nie konfiguruje numerów,
-                widzi tylko kto ma podłączony numer i historię jego konwersacji.
-              </div>
-              @if (whatsappDirectoryLoading()) {
-                <div style="color:var(--gray-400);font-size:12px">Ładowanie…</div>
-              } @else if (whatsappDirectory().length === 0) {
-                <div style="color:var(--gray-400);font-size:12px">Nikt w tym tenancie nie ma jeszcze podłączonego numeru WhatsApp.</div>
-              } @else {
-                @for (row of whatsappDirectory(); track row.user_id) {
-                  <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
-                    <span style="font-size:13px;font-weight:600;color:var(--gray-900);flex:1">{{ row.user_name }}</span>
-                    <span style="font-size:12px;color:var(--gray-500)">{{ row.display_phone_number || '—' }}</span>
-                    @if (!row.is_enabled) {
-                      <span style="font-size:10px;font-weight:700;color:#b45309;background:#FEF3C7;padding:1px 8px;border-radius:10px">Wyłączony</span>
-                    }
-                  </div>
-                }
-              }
             </div>
           </div>
 
@@ -1009,7 +980,6 @@ export class SettingsComponent implements OnInit {
   activeTab = signal<Tab>('global');
 
   private http        = inject(HttpClient);
-  private api         = inject(CrmApiService);
   allUsers            = signal<{id:string;display_name:string}[]>([]);
   private templateDrafts = new Map<string, any[]>();
 
@@ -1020,24 +990,6 @@ export class SettingsComponent implements OnInit {
   groupError    = signal('');
   newGroup      = { name: '', display_name: '', description: '', has_owner_restriction: false };
   private groupsLoaded = false;
-
-  // ── WhatsApp — podłączone numery w tenancie (widok tylko do odczytu) ──────
-  whatsappDirectory        = signal<WhatsappDirectoryEntry[]>([]);
-  whatsappDirectoryLoading = signal(false);
-  private whatsappDirectoryLoaded = false;
-
-  loadWhatsappDirectory(): void {
-    if (this.whatsappDirectoryLoaded) return;
-    this.whatsappDirectoryLoading.set(true);
-    this.api.getWhatsappTenantDirectory().subscribe({
-      next: rows => {
-        this.whatsappDirectory.set(rows);
-        this.whatsappDirectoryLoading.set(false);
-        this.whatsappDirectoryLoaded = true;
-      },
-      error: () => this.whatsappDirectoryLoading.set(false),
-    });
-  }
 
   loadGroups(): void {
     if (this.groupsLoaded) return;

@@ -52,29 +52,30 @@ Backend musi działać na porcie 3001.
 Zobacz też `CRMtree-backend/CLAUDE.md` — architektura, model per-user, webhook, wymagane
 pola konfiguracji po stronie Meta.
 
-### Model: per-user, NIE per-tenant — nie cofaj tej decyzji
+### Model: per-tenant, NIE per-user — decyzja biznesowa 2026-08-03, nie cofaj bez pytania
 
-Każdy CRM user ma własną konfigurację WhatsApp (`MyWhatsappConfig`, `crm-api.service.ts`).
-Panel admina (Tenants / Ustawienia) **nie ma** formularza do wpisywania WABA ID/Phone
-Number ID/tokenów — tylko podgląd tylko-do-odczytu i włącznik feature flagi. Jeśli ktoś
-prosi o dodanie z powrotem takiego formularza w adminie, to prawdopodobnie próba cofnięcia
-świadomej decyzji architektonicznej — dopytaj, zanim to zrobisz.
+Jeden wspólny firmowy numer WhatsApp Business per tenant, konfigurowany przez super
+admina w Panel admina → Tenants → zakładka „WhatsApp" (`tenants.component.ts`). Wcześniej
+(do 2026-08-03) każdy CRM user łączył własny numer w Moje ustawienia — wycofane, bo
+WhatsApp Business blokuje jednoczesne prywatne/firmowe użycie tego samego numeru telefonu
+(user tracił dostęp do własnej prywatnej historii). Zobacz też `CRMtree-backend/CLAUDE.md`
+— pełna architektura, webhook, wymagane pola konfiguracji po stronie Meta. Jeśli ktoś
+prosi o przywrócenie self-service podłączania numeru w Moje ustawienia, to prawdopodobnie
+próba cofnięcia tej decyzji — dopytaj, zanim to zrobisz.
 
 ### Gdzie w UI
 
-- **User łączy własny numer**: Moje ustawienia → sekcja „Mój numer WhatsApp" —
-  `src/app/pages/my-settings/my-settings.component.ts`. Pola: WABA ID, Phone Number ID,
-  numer widoczny dla klientów (opcjonalny), Access Token, App Secret. Po zapisaniu CRM
-  generuje i pokazuje Webhook Verify Token (z ikoną kopiowania, `@lucide/angular` →
-  `LucideCopy`) do wklejenia w konfiguracji webhooka w Meta App.
-- **Superadmin włącza/wyłącza moduł per tenant**: Panel admina → Tenants → zakładka
-  „Moduły" — `src/app/pages/admin/tenants/tenants.component.ts`. Ten sam widok pokazuje
-  tylko-do-odczytu listę podłączonych numerów w tenancie.
-- **Tenant admin** widzi tę samą listę tylko-do-odczytu w Ustawienia → Parametry biznesowe
-  CRM — `src/app/pages/admin/settings/settings.component.ts`.
+- **Superadmin konfiguruje numer tenanta i włącza/wyłącza moduł**: Panel admina → Tenants →
+  zakładka „WhatsApp" — `src/app/pages/admin/tenants/tenants.component.ts`. Pola: WABA ID,
+  Phone Number ID, numer widoczny dla klientów (opcjonalny), Access Token, App Secret. Po
+  zapisaniu CRM generuje i pokazuje Webhook Verify Token (przycisk „Pokaż"/„Kopiuj") do
+  wklejenia w konfiguracji webhooka w Meta App.
+- **Tenant admin** widzi tylko włącznik feature flagi w Ustawienia → Parametry biznesowe
+  CRM — `src/app/pages/admin/settings/settings.component.ts` — nie konfiguruje numeru.
 - **Wysyłka/odbiór**: zakładka „WhatsApp" na karcie leada/partnera —
   `crm-lead-detail.component.ts` / `crm-partner-detail.component.ts` (ta sama logika w obu
-  plikach, osobne komponenty — sprawdzaj oba przy zmianach).
+  plikach, osobne komponenty — sprawdzaj oba przy zmianach). Widoczność jest tenant-wide —
+  każdy CRM user w tenancie widzi te same konwersacje, bo numer jest wspólny.
 
 ### Jeden numer rozmówcy = jedna karta konwersacji
 

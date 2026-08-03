@@ -769,19 +769,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
         <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
 
-        <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania —
-             inaczej ten ekran zasłaniałby konwersacje sprzed przeniesienia numeru do
-             innego usera (historia jest widoczna niezależnie od whatsappConfigured,
-             zgodnie z uprawnieniami egzekwowanymi już po stronie backendu). -->
+        <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania. -->
         <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
           <div style="font-size:32px">💬</div>
           <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-          <div style="font-size:13px;color:#9ca3af;text-align:center">Nie masz podłączonego numeru WhatsApp.</div>
-          <a routerLink="/my-settings" style="font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none">→ Podłącz numer w Moje ustawienia</a>
+          <div style="font-size:13px;color:#9ca3af;text-align:center">WhatsApp nie jest skonfigurowany dla tego tenanta. Skontaktuj się z administratorem.</div>
         </div>
 
-        <!-- Kompozycja i odpowiedzi zawsze wymagają WŁASNEGO podłączonego numeru — to
-             jedyna część zakładki nadal gated za whatsappConfigured. -->
         <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 Nowa wiadomość WhatsApp</div>
 
@@ -813,10 +807,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
         </div>
 
-        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa. Widoczne
-             niezależnie od whatsappConfigured (kto AKTUALNIE ma podłączony numer nie
-             decyduje o dostępie do HISTORII — backend już filtruje wg uprawnień CRM,
-             patrz ownerVisibilityClause w crm-whatsapp.js). -->
+        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa, wspólny dla
+             całego tenanta. -->
         <ng-container *ngIf="whatsappConfigured===true || whatsappHistoryLoading || whatsappConversations.length>0">
           <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie historii…</div>
           <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
@@ -2231,8 +2223,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
   midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' = 'all';
 
-  // WhatsApp tab — status reflects the CURRENT USER's own connected number
-  // (whatsapp_configs, keyed by user_id), not a tenant-wide setting.
+  // WhatsApp tab — status reflects the tenant's one shared WhatsApp Business
+  // number (tenant_whatsapp_config), configured by a super admin.
   whatsappConfigured: boolean | null = null;
   whatsappDisplayNumber: string | null = null;
   whatsappToPhone = '';

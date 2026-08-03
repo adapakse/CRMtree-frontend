@@ -740,52 +740,13 @@ export interface EmailStatus {
   email?: string;
 }
 
-// Whether the CURRENT USER has their own WhatsApp Business number connected —
-// resolved server-side (whatsapp_configs, keyed by user_id). Used in the
-// lead/partner WhatsApp tab to decide whether the viewer can compose.
+// Whether the tenant has its shared WhatsApp Business number connected —
+// resolved server-side (tenant_whatsapp_config). Used in the lead/partner
+// WhatsApp tab to decide whether the viewer can compose.
 export interface WhatsappStatus {
   configured: boolean;
   enabled: boolean;
   display_phone_number: string | null;
-}
-
-// Full self-service config for the logged-in user (My Settings). Secrets are
-// never round-tripped in plaintext except webhook_verify_token, which the
-// CRM itself generated and the user must read back to paste into their own
-// Meta app's webhook config.
-export interface MyWhatsappConfig {
-  configured: boolean;
-  id?: string;
-  waba_id?: string;
-  phone_number_id?: string;
-  display_phone_number?: string | null;
-  is_enabled?: boolean;
-  access_token_configured?: boolean;
-  app_secret_configured?: boolean;
-  webhook_verify_token?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface MyWhatsappConfigInput {
-  waba_id: string;
-  phone_number_id: string;
-  display_phone_number?: string;
-  access_token?: string;
-  app_secret?: string;
-  is_enabled?: boolean;
-}
-
-// Read-only directory of connected numbers in a tenant — shown to tenant
-// admins/managers (My Settings-adjacent governance view) and to the super
-// admin (Tenant management), never with secrets.
-export interface WhatsappDirectoryEntry {
-  user_id: string;
-  user_name: string;
-  email: string;
-  display_phone_number: string | null;
-  is_enabled: boolean;
-  updated_at: string;
 }
 
 export interface WhatsappSendResult {
@@ -1429,21 +1390,10 @@ export class CrmApiService {
   }
 
   // ── WhatsApp ─────────────────────────────────────────────────────────────
-  // Each CRM user connects their own WhatsApp Business number in My Settings
-  // (getMyWhatsappConfig/saveMyWhatsappConfig/deleteMyWhatsappConfig) — there
-  // is no tenant-wide or admin-managed number.
-  getMyWhatsappConfig(): Observable<MyWhatsappConfig> {
-    return this.http.get<MyWhatsappConfig>(`${BASE}/whatsapp/my-config`);
-  }
-  saveMyWhatsappConfig(data: MyWhatsappConfigInput): Observable<MyWhatsappConfig> {
-    return this.http.put<MyWhatsappConfig>(`${BASE}/whatsapp/my-config`, data);
-  }
-  deleteMyWhatsappConfig(): Observable<void> {
-    return this.http.delete<void>(`${BASE}/whatsapp/my-config`);
-  }
-  getWhatsappTenantDirectory(): Observable<WhatsappDirectoryEntry[]> {
-    return this.http.get<WhatsappDirectoryEntry[]>(`${BASE}/whatsapp/tenant-directory`);
-  }
+  // One shared company WhatsApp Business number per tenant, configured by a
+  // super admin in Tenant management — never per-user. Config CRUD itself
+  // lives in the super admin panel (tenants.component.ts calls
+  // admin/tenants/:id/whatsapp-config directly), not here.
   getWhatsappStatus(): Observable<WhatsappStatus> {
     return this.http.get<WhatsappStatus>(`${BASE}/whatsapp/status`);
   }
