@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { Tenant, TenantFeature, CrmFeature } from '../../../core/models/models';
+import { Tenant, TenantFeature, CrmFeature, BillingPlan, BillingCycle } from '../../../core/models/models';
 import { environment } from '../../../../environments/environment';
 
 const API = environment.apiUrl;
@@ -93,7 +93,9 @@ interface WhatsappConfigForm {
   access_token: string; app_secret: string; is_enabled: boolean;
 }
 
-type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
+type EditTab = 'settings' | 'features' | 'plan' | 'users' | 'email' | 'whatsapp';
+
+const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięczny', annual: 'Roczny' };
 
 @Component({
   selector: 'app-tenants',
@@ -189,6 +191,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                         <div class="tabs">
                           <button class="tab" [class.active]="editTab() === 'settings'" (click)="editTab.set('settings')">Ustawienia</button>
                           <button class="tab" [class.active]="editTab() === 'features'"  (click)="editTab.set('features')">Moduły</button>
+                          <button class="tab" [class.active]="editTab() === 'plan'" (click)="openPlanTab(t)">Plan</button>
                           <button class="tab" [class.active]="editTab() === 'users'"  (click)="openUsersTab(t.id)">
                             Użytkownicy
                             @if (tenantUsers().length > 0) { <span class="tab-badge">{{ tenantUsers().length }}</span> }
@@ -266,6 +269,50 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                 {{ saving() ? 'Zapisuję...' : 'Zapisz moduły' }}
                               </button>
                             </div>
+                          </div>
+                        }
+
+                        <!-- Tab: Plan -->
+                        @if (editTab() === 'plan') {
+                          <div class="tab-body">
+                            @if (billingPlansLoading()) {
+                              <div class="state-msg">Ładowanie...</div>
+                            } @else {
+                              <div class="edit-grid">
+                                <div class="field">
+                                  <label>Plan</label>
+                                  <select [(ngModel)]="subscriptionDraft.planId">
+                                    @for (p of billingPlans(); track p.id) {
+                                      <option [value]="p.id">{{ p.name }}</option>
+                                    }
+                                  </select>
+                                </div>
+                                <div class="field">
+                                  <label>Cykl rozliczeniowy</label>
+                                  <select [(ngModel)]="subscriptionDraft.billingCycle">
+                                    <option value="monthly">Miesięczny</option>
+                                    <option value="annual">Roczny</option>
+                                  </select>
+                                </div>
+                              </div>
+                              @if (selectedPlanIsCustomPricing()) {
+                                <div class="state-msg">Plan Professional ma wycenę indywidualną — nie jest naliczany automatycznie przez batch rozliczeniowy.</div>
+                              }
+                              @if (t.subscription) {
+                                <div class="td-muted">
+                                  Obecny plan: {{ t.subscription.plan_name }} · {{ billingCycleLabel(t.subscription.billing_cycle) }}
+                                  · od {{ t.subscription.started_at | date:'dd.MM.yyyy' }}
+                                </div>
+                              } @else {
+                                <div class="td-muted">Ten tenant nie ma jeszcze przypisanego planu.</div>
+                              }
+                              <div class="panel-footer">
+                                <button class="btn-secondary" (click)="cancelEdit()">Anuluj</button>
+                                <button class="btn-primary" [disabled]="saving() || !subscriptionDraft.planId" (click)="saveSubscription(t.id)">
+                                  {{ saving() ? 'Zapisuję...' : 'Zapisz plan' }}
+                                </button>
+                              </div>
+                            }
                           </div>
                         }
 
@@ -862,7 +909,11 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
       width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
       border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
     }
-    .field input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field select {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+    }
     .field-check { display: flex; align-items: flex-end; padding-bottom: 2px; }
     .check-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); cursor: pointer; }
 
@@ -1027,6 +1078,10 @@ export class TenantsComponent implements OnInit {
 
   trainingMode = signal(false);
 
+  billingPlans        = signal<BillingPlan[]>([]);
+  billingPlansLoading = signal(false);
+  subscriptionDraft: { planId: string; billingCycle: BillingCycle } = { planId: '', billingCycle: 'monthly' };
+
   showCreate        = signal(false);
   showAddUser       = signal(false);
   addUserTenantId   = signal<string | null>(null);
@@ -1122,6 +1177,49 @@ export class TenantsComponent implements OnInit {
         this.toast.success('Moduły zapisane');
       },
       error: () => { this.saving.set(false); this.toast.error('Błąd zapisu modułów'); },
+    });
+  }
+
+  // ── Plan tab ─────────────────────────────────────────────────
+  billingCycleLabel(c: BillingCycle): string { return BILLING_CYCLE_LABELS[c] ?? c; }
+
+  selectedPlanIsCustomPricing(): boolean {
+    return this.billingPlans().find(p => p.id === this.subscriptionDraft.planId)?.is_custom_pricing ?? false;
+  }
+
+  openPlanTab(t: Tenant): void {
+    this.editTab.set('plan');
+    this.subscriptionDraft = {
+      planId: t.subscription?.plan_id ?? '',
+      billingCycle: t.subscription?.billing_cycle ?? 'monthly',
+    };
+    if (this.billingPlans().length > 0) return;
+    this.billingPlansLoading.set(true);
+    this.http.get<BillingPlan[]>(`${API}/admin/billing/plans`).subscribe({
+      next: plans => {
+        this.billingPlans.set(plans);
+        this.billingPlansLoading.set(false);
+        if (!this.subscriptionDraft.planId && plans.length) this.subscriptionDraft.planId = plans[0].id;
+      },
+      error: () => { this.toast.error('Błąd ładowania planów'); this.billingPlansLoading.set(false); },
+    });
+  }
+
+  saveSubscription(id: string): void {
+    this.saving.set(true);
+    this.http.put<{ plan_id: string; billing_cycle: BillingCycle; started_at: string }>(
+      `${API}/admin/tenants/${id}/subscription`,
+      { planId: this.subscriptionDraft.planId, billingCycle: this.subscriptionDraft.billingCycle }
+    ).subscribe({
+      next: sub => {
+        const plan = this.billingPlans().find(p => p.id === sub.plan_id);
+        this.tenants.update(ts => ts.map(t => t.id === id
+          ? { ...t, subscription: { ...sub, plan_code: plan?.code ?? '', plan_name: plan?.name ?? '' } }
+          : t));
+        this.saving.set(false);
+        this.toast.success('Plan zapisany');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu planu'); },
     });
   }
 

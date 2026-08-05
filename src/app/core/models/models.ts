@@ -46,10 +46,51 @@ export interface Tenant {
   auth_configs?: { provider: string; is_enabled: boolean }[];
   active_email_provider?: 'gmail' | 'outlook' | 'zoho' | null;
   crm_training_mode?: boolean;
+  subscription?: TenantSubscription | null;
   deleted_at?: string | null;
   deleted_by?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// ── Billing ───────────────────────────────────────────────
+export type BillingCycle = 'monthly' | 'annual';
+
+export interface BillingPlan {
+  id: string;
+  code: 'lite' | 'standard' | 'professional';
+  name: string;
+  price_monthly_eur: string | null;
+  price_annual_eur: string | null;
+  is_custom_pricing: boolean;
+  is_active: boolean;
+}
+
+export interface TenantSubscription {
+  plan_id: string;
+  plan_code: string;
+  plan_name: string;
+  billing_cycle: BillingCycle;
+  started_at: string;
+}
+
+export interface Invoice {
+  id: string;
+  invoice_number: string;
+  billing_cycle: BillingCycle;
+  period_start: string;
+  period_end: string;
+  active_user_count: number;
+  unit_price_eur: string;
+  total_amount_eur: string;
+  currency: string;
+  status: 'issued' | 'void';
+  pdf_blob_path: string | null;
+  generated_at: string;
+  tenant_id: string;
+  tenant_name: string;
+  plan_code: string;
+  plan_name: string;
 }
 
 export interface AuthTokens {

@@ -105,6 +105,11 @@ export const routes: Routes = [
         canActivate: [superAdminGuard],
         loadComponent: () => import('./pages/admin/tenants/tenants.component').then(m => m.TenantsComponent),
       },
+      {
+        path: 'admin/billing',
+        canActivate: [superAdminGuard],
+        loadComponent: () => import('./pages/admin/billing/billing.component').then(m => m.BillingComponent),
+      },
 
       // ── CRM ──────────────────────────────────────────────────────────────
       {
