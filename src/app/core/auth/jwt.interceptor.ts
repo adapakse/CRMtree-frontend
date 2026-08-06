@@ -28,6 +28,15 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
           })
         );
       }
+      // Session belongs to a different tenant than the one this subdomain
+      // resolves to (see backend middleware/auth.js TENANT_HOST_MISMATCH) —
+      // the SPA route /login the user is stuck on is on the wrong host, so a
+      // hard redirect to the universal fallback host is required, not a
+      // router.navigate.
+      if (err.status === 403 && err.error?.code === 'TENANT_HOST_MISMATCH') {
+        auth.logout();
+        window.location.href = 'https://app.crmtree.pl/login?error=tenant_host_mismatch';
+      }
       return throwError(() => err);
     })
   );

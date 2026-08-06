@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, effect } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
+import { EnvironmentBannerService } from '../../core/services/environment-banner.service';
+import { TenantContextService } from '../../core/services/tenant-context.service';
 
 type Tab = 'sso' | 'password';
 
@@ -15,11 +17,14 @@ type Tab = 'sso' | 'password';
 
         <div class="login-top">
           <img class="login-logo-img" src="assets/crmtree-logo.png" alt="CRMtree">
-          <div class="login-sub">Platforma CRM</div>
+          <div class="login-sub">{{ tenantContext.tenantName() || 'Platforma CRM' }}</div>
+          @if (tenantContext.isUnknownTenantHost()) {
+            <div class="login-tenant-warning">Nie rozpoznano organizacji pod tym adresem.</div>
+          }
         </div>
 
         <!-- Tabs — SSO widoczne tylko na domenach developerskich -->
-        @if (isDevDomain) {
+        @if (isDevDomain()) {
           <div class="l-tabs">
             <button class="l-tab" [class.active]="tab() === 'sso'"      (click)="tab.set('sso')">Google Workspace SSO</button>
             <button class="l-tab" [class.active]="tab() === 'password'" (click)="tab.set('password')">Email i hasło</button>
@@ -29,7 +34,7 @@ type Tab = 'sso' | 'password';
         <div class="login-body">
 
           <!-- SSO tab — tylko dev -->
-          @if (isDevDomain && tab() === 'sso') {
+          @if (isDevDomain() && tab() === 'sso') {
             <p class="login-hint">Zaloguj się kontem Google Workspace swojej organizacji.</p>
             <button class="lbtn" (click)="loginSso()" [disabled]="loading()">
               @if (loading()) {
@@ -43,7 +48,7 @@ type Tab = 'sso' | 'password';
           }
 
           <!-- Password tab -->
-          @if (!isDevDomain || tab() === 'password') {
+          @if (!isDevDomain() || tab() === 'password') {
             <form (ngSubmit)="loginPassword()" #f="ngForm">
               <div class="field">
                 <label>Email</label>
@@ -77,6 +82,7 @@ type Tab = 'sso' | 'password';
     .login-top { background:#292A2D; padding:24px 32px 20px; text-align:center; }
     .login-logo-img { width:340px; max-width:100%; height:auto; display:block; margin:0 auto 4px; }
     .login-sub { font-size:13px; color:#888; }
+    .login-tenant-warning { font-size:11px; color:#f59e0b; margin-top:4px; }
 
     .l-tabs { display:flex; border-bottom:1px solid var(--gray-200); }
     .l-tab {
@@ -114,13 +120,19 @@ type Tab = 'sso' | 'password';
   `],
 })
 export class LoginComponent implements OnInit {
-  private auth   = inject(AuthService);
-  private router = inject(Router);
-  private route  = inject(ActivatedRoute);
+  private auth      = inject(AuthService);
+  private router    = inject(Router);
+  private route     = inject(ActivatedRoute);
+  private envBanner = inject(EnvironmentBannerService);
+  readonly tenantContext = inject(TenantContextService);
 
-  readonly isDevDomain = window.location.hostname !== 'app.crmtree.pl';
+  // Non-prod deploys (int/preview) show the SSO tab; real production only
+  // shows password login. Driven by APP_ENV via EnvironmentBannerService,
+  // NOT by hostname — a tenant subdomain (acme.crmtree.pl) is still real
+  // production and must not be treated as a dev domain.
+  readonly isDevDomain = this.envBanner.isTestEnvironment;
 
-  tab      = signal<Tab>(window.location.hostname === 'app.crmtree.pl' ? 'password' : 'sso');
+  tab      = signal<Tab>('password');
   loading  = signal(false);
   showPass = signal(false);
   errorMsg = signal('');
@@ -128,10 +140,19 @@ export class LoginComponent implements OnInit {
   email    = '';
   password = '';
 
+  // isDevDomain() resolves asynchronously (fetches /env-config.json) — once it
+  // turns out to be a non-prod deploy, default the tab to SSO, matching the
+  // old synchronous hostname-based default. Runs once; never fights a
+  // manual tab click afterwards since isDevDomain() doesn't flip back.
+  private readonly selectSsoTabOnDevDomain = effect(() => {
+    if (this.isDevDomain()) this.tab.set('sso');
+  });
+
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) { this.router.navigate(['/dashboard']); return; }
     const err = this.route.snapshot.queryParamMap.get('error');
     if (err === 'saml_failed') this.errorMsg.set('Logowanie SSO nie powiodło się. Spróbuj ponownie.');
+    if (err === 'tenant_host_mismatch') this.errorMsg.set('To konto nie należy do organizacji pod tym adresem. Zaloguj się ponownie.');
   }
 
   loginSso(): void {

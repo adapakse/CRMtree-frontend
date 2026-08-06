@@ -40,6 +40,20 @@ app.use('/api', createProxyMiddleware({
   changeOrigin: true,
   // Express strips the '/api' mount prefix before the middleware sees req.url — add it back.
   pathRewrite: (path) => `/api${path}`,
+  on: {
+    proxyReq: (proxyReq, req) => {
+      // changeOrigin above rewrites the outbound Host header to match
+      // API_UPSTREAM (api.crmtree.pl) — the backend would otherwise never
+      // learn which tenant subdomain the browser actually used. Forward it
+      // separately so the backend's tenant-subdomain isolation guard
+      // (middleware/auth.js) can read it. x-forwarded-host (set by Azure's
+      // own ingress in front of *this* container, already trusted above for
+      // Angular SSR rendering) is the real external host; req.headers.host
+      // is the local-dev fallback when there's no ingress in front.
+      const host = (req.headers['x-forwarded-host'] as string) || req.headers.host;
+      if (host) proxyReq.setHeader('x-crm-tenant-host', host);
+    },
+  },
 }));
 
 /**
