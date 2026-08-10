@@ -103,6 +103,12 @@ export interface SocialPost {
 export interface TenantSettings {
   business_description: string | null;
   industry_vertical: string | null;
+  seo_gsc_site_url: string | null;
+}
+
+export interface TenantSettingsResponse extends TenantSettings {
+  /** Read-only — the connected WordPress site's URL, used only as a prefill suggestion. */
+  wordpress_site_url: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -260,8 +266,8 @@ export class CrmSeoService {
     return this.http.post<{ connected: boolean }>(`${this.api}/social/wordpress/connect`, { site_url: siteUrl, username, app_password: appPassword });
   }
 
-  tenantSettings(): Observable<TenantSettings> {
-    return this.http.get<TenantSettings>(`${this.api}/tenant-settings`);
+  tenantSettings(): Observable<TenantSettingsResponse> {
+    return this.http.get<TenantSettingsResponse>(`${this.api}/tenant-settings`);
   }
 
   updateTenantSettings(patch: Partial<TenantSettings>): Observable<TenantSettings> {

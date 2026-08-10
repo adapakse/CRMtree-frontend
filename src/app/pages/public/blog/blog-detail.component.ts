@@ -2,8 +2,10 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, inject, signal } 
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DomSanitizer, Meta, SafeHtml } from '@angular/platform-browser';
+import { LucideCopy } from '@lucide/angular';
 import { PublicBlogService, BlogPost } from '../../../core/services/public-blog.service';
-import { SeoService } from '../../../core/services/seo.service';
+import { SeoService, SITE_URL } from '../../../core/services/seo.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 // Body is stored as a small, fixed markdown subset (## / ### headings, "- " lists,
 // **bold**, [text](url) links) — see CRMtree-backend's seoContentService.renderBody.
@@ -41,7 +43,7 @@ function renderBodyHtml(body: string): string {
   selector: 'wt-blog-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, LucideCopy],
   template: `
     @if (post(); as p) {
       <article class="blog-post">
@@ -53,6 +55,23 @@ function renderBodyHtml(body: string): string {
             <time>{{ p.published_at | date:'d MMMM y':'':'pl' }}</time>
             <span class="meta-dot">·</span>
             <span>{{ p.reading_minutes }} min czytania</span>
+          </div>
+
+          <div class="share-row">
+            <span class="share-label">Udostępnij:</span>
+            <a class="share-btn share-linkedin" [href]="linkedinShareUrl(p)" target="_blank" rel="noopener noreferrer" title="Udostępnij na LinkedIn" aria-label="Udostępnij na LinkedIn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
+              </svg>
+            </a>
+            <a class="share-btn share-facebook" [href]="facebookShareUrl(p)" target="_blank" rel="noopener noreferrer" title="Udostępnij na Facebooku" aria-label="Udostępnij na Facebooku">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.732-.011c-.9 0-1.658.166-2.264.502a2.567 2.567 0 0 0-.933.933c-.435.774-.635 1.706-.635 3.088v1.058h4.318l-.652 3.667h-3.666V23.691h-3.667z"/>
+              </svg>
+            </a>
+            <button type="button" class="share-btn share-copy" (click)="copyLink(p)" title="Kopiuj link" aria-label="Kopiuj link">
+              <svg lucideCopy [size]="16"></svg>
+            </button>
           </div>
         </div>
 
@@ -118,6 +137,18 @@ function renderBodyHtml(body: string): string {
     .post-meta { display:flex; align-items:center; gap:0.4rem; font-size:0.85rem; color:var(--gray-500); }
     .meta-dot { color:var(--gray-300); }
 
+    .share-row { display:flex; align-items:center; gap:0.5rem; margin-top:0.9rem; }
+    .share-label { font-size:0.78rem; color:var(--gray-500); margin-right:0.1rem; }
+    .share-btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:32px; height:32px; border-radius:50%; border:none; cursor:pointer;
+      color:#fff; flex-shrink:0; transition:opacity .15s ease;
+    }
+    .share-btn:hover { opacity:0.85; }
+    .share-linkedin { background:#0A66C2; }
+    .share-facebook { background:#1877F2; }
+    .share-copy { background:var(--gray-100); color:var(--gray-700); }
+
     .hero-wrap { max-width:920px; margin:2rem auto 0; padding:0 1.5rem; }
     .post-hero-image { width:100%; max-height:420px; object-fit:cover; border-radius:var(--radius); display:block; }
 
@@ -161,6 +192,7 @@ export class BlogDetailComponent implements OnChanges {
   private seo = inject(SeoService);
   private metaService = inject(Meta);
   private sanitizer = inject(DomSanitizer);
+  private toast = inject(ToastService);
 
   readonly post = signal<BlogPost | null>(null);
   readonly notFound = signal(false);
@@ -208,5 +240,24 @@ export class BlogDetailComponent implements OnChanges {
         });
       },
     });
+  }
+
+  private articleUrl(post: BlogPost): string {
+    return `${SITE_URL}/blog/${post.slug}`;
+  }
+
+  linkedinShareUrl(post: BlogPost): string {
+    return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(this.articleUrl(post))}`;
+  }
+
+  facebookShareUrl(post: BlogPost): string {
+    return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.articleUrl(post))}`;
+  }
+
+  copyLink(post: BlogPost): void {
+    navigator.clipboard.writeText(this.articleUrl(post)).then(
+      () => this.toast.success('Link skopiowany.'),
+      () => this.toast.error('Nie udało się skopiować linku.'),
+    );
   }
 }
