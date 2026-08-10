@@ -10,7 +10,7 @@ import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie
   template: `
     <div class="public-shell">
       <header class="public-header">
-        <a routerLink="/" class="public-logo">
+        <a href="https://crmtree.pl/" class="public-logo">
           <img src="assets/crmtree-logo-reverse.png" alt="CRMtree">
         </a>
         <nav class="public-nav">
