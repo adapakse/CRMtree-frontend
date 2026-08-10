@@ -17,7 +17,6 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
   imports: [FormsModule],
   template: `
     <div class="channels-box">
-      <h3>Kanały social</h3>
       <p class="hint">
         Zatwierdzenie artykułu publikuje go równocześnie na podłączonych kanałach — jednym kliknięciem.
         Instagram łączy się automatycznie razem z Facebookiem (to samo konto Meta).
@@ -75,8 +74,7 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
     </div>
   `,
   styles: [`
-    .channels-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; margin-bottom: 1.25rem; }
-    .channels-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
+    .channels-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.9rem; }
     .channels-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .channel-row {

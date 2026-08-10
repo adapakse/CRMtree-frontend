@@ -28,14 +28,14 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
       <header class="seo-header">
         <h1>SEObot — redakcja treści</h1>
         <div class="header-actions">
-          <button type="button" class="btn-ghost" (click)="showStrategy.set(!showStrategy())">
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showStrategy()" (click)="showStrategy.set(!showStrategy())">
             Strategia treści ({{ pillars().length }} filarów)
           </button>
-          <button type="button" class="btn-ghost" (click)="showAuthors.set(!showAuthors())">
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showAuthors()" (click)="showAuthors.set(!showAuthors())">
             Autorzy ({{ authors().length }})
           </button>
-          <button type="button" class="btn-ghost" (click)="showChannels.set(!showChannels())">Kanały social</button>
-          <button type="button" class="btn-ghost" (click)="showSettings.set(!showSettings())">Ustawienia</button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showChannels()" (click)="showChannels.set(!showChannels())">Kanały social</button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showSettings()" (click)="showSettings.set(!showSettings())">Ustawienia</button>
           <button type="button" class="btn-accent" (click)="generate()" [disabled]="generating()">
             @if (generating()) { Generuję… (może potrwać kilka minut) } @else { Generuj nowy artykuł }
           </button>
@@ -53,31 +53,47 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
       </header>
 
       @if (showStrategy()) {
-        <wt-seo-strategy-panel [pillars]="pillars()" (pillarsChanged)="loadPillars()" />
+        <section class="seo-section">
+          <h2 class="section-title">Strategia treści</h2>
+          <wt-seo-strategy-panel [pillars]="pillars()" (pillarsChanged)="loadPillars()" />
+        </section>
       }
       @if (showAuthors()) {
-        <wt-seo-authors-panel (authorsChanged)="loadAuthors()" />
+        <section class="seo-section">
+          <h2 class="section-title">Autorzy</h2>
+          <wt-seo-authors-panel (authorsChanged)="loadAuthors()" />
+        </section>
       }
       @if (showChannels()) {
-        <wt-seo-social-channels />
+        <section class="seo-section">
+          <h2 class="section-title">Kanały social</h2>
+          <wt-seo-social-channels />
+        </section>
       }
       @if (showSettings()) {
-        <wt-seo-tenant-settings />
+        <section class="seo-section">
+          <h2 class="section-title">Ustawienia</h2>
+          <wt-seo-tenant-settings />
+        </section>
       }
 
-      <div class="status-tabs">
-        @for (s of statusFilters; track s.value) {
-          <button
-            type="button"
-            class="tab"
-            [class.active]="statusFilter() === s.value"
-            (click)="setStatusFilter(s.value)"
-          >{{ s.label }}</button>
-        }
-      </div>
+      <!-- Filters + article list/editor are one main part of the page —
+           kept in a single wrapper so they get one uniform gap from whatever
+           is above them, regardless of how many sections happen to be open. -->
+      <div class="article-list-section">
+        <div class="status-tabs">
+          @for (s of statusFilters; track s.value) {
+            <button
+              type="button"
+              class="tab"
+              [class.active]="statusFilter() === s.value"
+              (click)="setStatusFilter(s.value)"
+            >{{ s.label }}</button>
+          }
+        </div>
 
-      <div class="seo-layout">
-        <div class="seo-list">
+        <div class="seo-layout">
+          <div class="seo-list">
           @if (items().length === 0) {
             <p class="empty">Brak wpisów w tym stanie.</p>
           }
@@ -206,13 +222,19 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
             <p class="empty">Wybierz wpis z listy.</p>
           }
         </div>
+        </div>
       </div>
     </div>
   `,
   styles: [`
-    .seo-page { padding: 1.5rem; max-width: 1200px; }
-    .seo-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 1rem; }
+    /* Single source of truth for the ~24px gap between this page's main parts —
+       header, each open section, and the filters+list block below them — no
+       matter which combination of sections happens to be open. Nothing here
+       carries its own margin-bottom; the gap owns all of that spacing. */
+    .seo-page { padding: 1.5rem; max-width: 1200px; display: flex; flex-direction: column; gap: 1.5rem; }
+    .seo-header { display:flex; align-items:center; justify-content:space-between; }
     .seo-header h1 { font-size: 1.4rem; margin: 0; }
+    .section-title { font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin: 0 0 0.75rem; }
     .header-actions { display:flex; align-items:center; gap: 0.75rem; }
     .gsc-badge { font-size: 0.82rem; padding: 0.4rem 0.8rem; border-radius: var(--radius); }
     .gsc-connected { background: var(--orange-pale); color: var(--orange-dark); }
@@ -281,6 +303,12 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .btn-ghost { background: var(--gray-100); color: var(--gray-800); }
     .btn-accent { background: var(--orange); color: #fff; }
     .btn-reject { background: #FEE2E2; color: #991B1B; }
+    /* Section toggles up top — open/active state is a border + faint tint, never
+       a full green fill (that's reserved for the "Generuj nowy artykuł" CTA).
+       Border is always reserved (transparent when inactive) so toggling doesn't
+       shift the button's size. Several toggles can be active at once. */
+    .section-toggle { border: 1.5px solid transparent; padding: calc(0.55rem - 1.5px) calc(1.1rem - 1.5px); }
+    .section-toggle.active { border-color: var(--orange); background: var(--orange-pale); color: var(--orange-dark); }
     .empty { color: var(--gray-500); padding: 1rem 0; }
   `],
 })
