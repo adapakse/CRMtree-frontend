@@ -47,6 +47,7 @@ export interface Tenant {
   active_email_provider?: 'gmail' | 'outlook' | 'zoho' | null;
   crm_training_mode?: boolean;
   subscription?: TenantSubscription | null;
+  billing_details?: TenantBillingDetails | null;
   deleted_at?: string | null;
   deleted_by?: string | null;
   created_at: string;
@@ -71,7 +72,16 @@ export interface TenantSubscription {
   plan_code: string;
   plan_name: string;
   billing_cycle: BillingCycle;
+  custom_price_eur: string | null;
   started_at: string;
+  // When the CURRENT plan started (tenant_subscription_history.effective_from
+  // of the open row) — not the same as started_at, which anchors the
+  // tenant's original subscription and never changes on a plan change.
+  plan_started_at: string;
+  // Billing's own "subscription ended" state — independent from
+  // tenants.is_active. Non-null: the calendar period it falls into is still
+  // billed in full, nothing after it. Cleared by reassigning a plan.
+  cancelled_at: string | null;
 }
 
 export interface Invoice {
@@ -80,17 +90,44 @@ export interface Invoice {
   billing_cycle: BillingCycle;
   period_start: string;
   period_end: string;
+  due_date: string;
   active_user_count: number;
   unit_price_eur: string;
-  total_amount_eur: string;
+  total_amount_eur: string; // net (przed VAT)
+  vat_rate: string;
+  vat_amount_eur: string;
   currency: string;
   status: 'issued' | 'void';
+  void_reason: string | null;
+  voided_at: string | null;
   pdf_blob_path: string | null;
   generated_at: string;
   tenant_id: string;
   tenant_name: string;
   plan_code: string;
   plan_name: string;
+}
+
+// Legal buyer data for a tenant's invoices — separate from Tenant.name,
+// which is just the CRM display name.
+export interface TenantBillingDetails {
+  company_name: string | null;
+  nip: string | null;
+  street: string | null;
+  postal_code: string | null;
+  city: string | null;
+  country: string | null;
+  invoice_email: string | null;
+}
+
+// CRMtree's own legal/seller data — platform-wide singleton, filled in by a
+// superadmin in the Rozliczenia page. Never hardcoded/invented.
+export interface SellerConfig {
+  company_name: string | null;
+  nip: string | null;
+  address: string | null;
+  bank_account_number: string | null;
+  payment_term_days: number;
 }
 
 export interface AuthTokens {

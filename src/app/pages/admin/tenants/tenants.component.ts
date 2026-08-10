@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { Tenant, TenantFeature, CrmFeature, BillingPlan, BillingCycle } from '../../../core/models/models';
+import { Tenant, TenantFeature, CrmFeature, BillingPlan, BillingCycle, TenantSubscription, TenantBillingDetails } from '../../../core/models/models';
 import { environment } from '../../../../environments/environment';
 
 const API = environment.apiUrl;
@@ -93,9 +93,19 @@ interface WhatsappConfigForm {
   access_token: string; app_secret: string; is_enabled: boolean;
 }
 
-type EditTab = 'settings' | 'features' | 'plan' | 'users' | 'email' | 'whatsapp';
+type EditTab = 'settings' | 'features' | 'plan' | 'billing' | 'users' | 'email' | 'whatsapp';
+
+interface PlanChangeConfirmData {
+  tenantId: string;
+  tenantName: string;
+  before: { planName: string; cycle: string; price: string | null };
+  after: { planName: string; cycle: string; price: string | null };
+}
 
 const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięczny', annual: 'Roczny' };
+
+// Display order on the pricing page — not alphabetical (API returns plans ordered by code).
+const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, professional: 2 };
 
 @Component({
   selector: 'app-tenants',
@@ -192,6 +202,7 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
                           <button class="tab" [class.active]="editTab() === 'settings'" (click)="editTab.set('settings')">Ustawienia</button>
                           <button class="tab" [class.active]="editTab() === 'features'"  (click)="editTab.set('features')">Moduły</button>
                           <button class="tab" [class.active]="editTab() === 'plan'" (click)="openPlanTab(t)">Plan</button>
+                          <button class="tab" [class.active]="editTab() === 'billing'" (click)="openBillingDetailsTab(t)">Dane rozliczeniowe</button>
                           <button class="tab" [class.active]="editTab() === 'users'"  (click)="openUsersTab(t.id)">
                             Użytkownicy
                             @if (tenantUsers().length > 0) { <span class="tab-badge">{{ tenantUsers().length }}</span> }
@@ -281,7 +292,7 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
                               <div class="edit-grid">
                                 <div class="field">
                                   <label>Plan</label>
-                                  <select [(ngModel)]="subscriptionDraft.planId">
+                                  <select [(ngModel)]="subscriptionDraft.planId" (ngModelChange)="onPlanChange()">
                                     @for (p of billingPlans(); track p.id) {
                                       <option [value]="p.id">{{ p.name }}</option>
                                     }
@@ -289,27 +300,122 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
                                 </div>
                                 <div class="field">
                                   <label>Cykl rozliczeniowy</label>
-                                  <select [(ngModel)]="subscriptionDraft.billingCycle">
+                                  <select [(ngModel)]="subscriptionDraft.billingCycle" (ngModelChange)="onBillingCycleChange()">
                                     <option value="monthly">Miesięczny</option>
                                     <option value="annual">Roczny</option>
                                   </select>
                                 </div>
+                                @if (selectedPlanIsCustomPricing()) {
+                                  <div class="field">
+                                    <label>Kwota za okres rozliczeniowy (EUR)</label>
+                                    <input type="number" min="0.01" step="0.01"
+                                      placeholder="np. 5000.00"
+                                      [(ngModel)]="subscriptionDraft.customPriceEur">
+                                  </div>
+                                }
                               </div>
                               @if (selectedPlanIsCustomPricing()) {
-                                <div class="state-msg">Plan Professional ma wycenę indywidualną — nie jest naliczany automatycznie przez batch rozliczeniowy.</div>
+                                <div class="state-msg">Plan Professional wymaga indywidualnej kwoty — batch wygeneruje fakturę na tę kwotę zgodnie z wybranym cyklem (nie jest mnożona przez liczbę użytkowników).</div>
                               }
                               @if (t.subscription) {
                                 <div class="td-muted">
                                   Obecny plan: {{ t.subscription.plan_name }} · {{ billingCycleLabel(t.subscription.billing_cycle) }}
-                                  · od {{ t.subscription.started_at | date:'dd.MM.yyyy' }}
+                                  @if (t.subscription.custom_price_eur) {
+                                    · {{ t.subscription.custom_price_eur }} EUR
+                                  }
+                                  @if (t.subscription.plan_started_at) {
+                                    · od {{ t.subscription.plan_started_at | date:'dd.MM.yyyy' }}
+                                  }
                                 </div>
                               } @else {
-                                <div class="td-muted">Ten tenant nie ma jeszcze przypisanego planu.</div>
+                                <div class="td-muted">Ten tenant nie ma przypisanego planu.</div>
+                              }
+                              @if (t.subscription?.cancelled_at) {
+                                <div class="billing-hint billing-hint-warn">
+                                  <span>
+                                    Subskrypcja zakończona {{ t.subscription!.cancelled_at | date:'dd.MM.yyyy HH:mm' }} —
+                                    bieżący okres rozliczeniowy zostanie jeszcze zafakturowany w całości (bez proracji),
+                                    kolejne już nie.
+                                  </span>
+                                  <button class="btn-secondary" [disabled]="saving()" (click)="reactivateSubscription(t)">Cofnij rezygnację</button>
+                                </div>
+                              } @else if (t.subscription) {
+                                <div class="billing-hint">
+                                  <button class="btn-secondary" [disabled]="saving()" (click)="cancelSubscription(t)">Zakończ subskrypcję</button>
+                                </div>
+                              }
+                              @if (t.subscription) {
+                                @if (isBillingDetailsComplete(t)) {
+                                  <div class="billing-hint billing-hint-ok">
+                                    <span>✓ Dane rozliczeniowe: kompletne</span>
+                                    <button class="btn-secondary" (click)="openBillingDetailsTab(t)">Edytuj dane rozliczeniowe →</button>
+                                  </div>
+                                } @else {
+                                  <div class="billing-hint billing-hint-warn">
+                                    <span>Ten tenant nie ma jeszcze kompletnych danych rozliczeniowych. Uzupełnij je w zakładce Dane rozliczeniowe.</span>
+                                    <button class="btn-secondary" (click)="openBillingDetailsTab(t)">Uzupełnij dane rozliczeniowe →</button>
+                                  </div>
+                                }
                               }
                               <div class="panel-footer">
-                                <button class="btn-secondary" (click)="cancelEdit()">Anuluj</button>
-                                <button class="btn-primary" [disabled]="saving() || !subscriptionDraft.planId" (click)="saveSubscription(t.id)">
+                                <button class="btn-secondary" [disabled]="isPlanDraftUnchanged(t)" (click)="cancelPlanEdit(t)">Anuluj</button>
+                                <button class="btn-primary"
+                                  [disabled]="saving() || !subscriptionDraft.planId || (selectedPlanIsCustomPricing() && !subscriptionDraft.customPriceEur)"
+                                  (click)="openPlanChangeConfirm(t)">
                                   {{ saving() ? 'Zapisuję...' : 'Zapisz plan' }}
+                                </button>
+                              </div>
+                            }
+                          </div>
+                        }
+
+                        <!-- Tab: Billing details -->
+                        @if (editTab() === 'billing') {
+                          <div class="tab-body">
+                            @if (billingDetailsLoading()) {
+                              <div class="state-msg">Ładowanie...</div>
+                            } @else {
+                              <div class="state-msg">
+                                Dane prawne nabywcy na fakturach tego tenanta — niezależne od nazwy w CRM
+                                ({{ t.name }}), którą widzą jego użytkownicy.
+                              </div>
+                              <div class="edit-grid">
+                                <div class="field">
+                                  <label>Nazwa firmy (do faktury)</label>
+                                  <input [(ngModel)]="billingDetailsDraft.company_name" placeholder="np. Acme Sp. z o.o.">
+                                </div>
+                                <div class="field">
+                                  <label>NIP</label>
+                                  <input [(ngModel)]="billingDetailsDraft.nip" placeholder="np. 1234567890">
+                                </div>
+                                <div class="field">
+                                  <label>Ulica i numer</label>
+                                  <input [(ngModel)]="billingDetailsDraft.street" placeholder="ul. Przykładowa 1">
+                                </div>
+                                <div class="field">
+                                  <label>Kod pocztowy</label>
+                                  <input [(ngModel)]="billingDetailsDraft.postal_code" placeholder="00-001">
+                                </div>
+                                <div class="field">
+                                  <label>Miasto</label>
+                                  <input [(ngModel)]="billingDetailsDraft.city" placeholder="Warszawa">
+                                </div>
+                                <div class="field">
+                                  <label>Kraj</label>
+                                  <input [(ngModel)]="billingDetailsDraft.country" placeholder="Polska">
+                                </div>
+                                <div class="field">
+                                  <label>E-mail do faktur</label>
+                                  <input type="email" [(ngModel)]="billingDetailsDraft.invoice_email" placeholder="ksiegowosc@klient.pl">
+                                </div>
+                              </div>
+                              <div class="panel-footer">
+                                <button class="btn-secondary" [disabled]="isBillingDetailsDraftUnchanged(t)" (click)="cancelBillingDetailsEdit(t)">Anuluj</button>
+                                @if (t.billing_details) {
+                                  <button class="btn-danger" [disabled]="saving()" (click)="openDeleteBillingDetails(t)">Usuń dane rozliczeniowe</button>
+                                }
+                                <button class="btn-primary" [disabled]="saving()" (click)="saveBillingDetails(t.id)">
+                                  {{ saving() ? 'Zapisuję...' : 'Zapisz dane rozliczeniowe' }}
                                 </button>
                               </div>
                             }
@@ -804,6 +910,46 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
       </div>
     }
 
+    <!-- Plan change confirm -->
+    @if (planChangeConfirm()) {
+      <div class="modal-backdrop" (click)="cancelPlanChangeConfirm()">
+        <div class="modal modal-sm" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Potwierdź zmianę planu</h2>
+            <button class="btn-icon" (click)="cancelPlanChangeConfirm()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Zmieniasz plan tenanta <strong>{{ planChangeConfirm()!.tenantName }}</strong>:</p>
+            <div class="plan-diff">
+              <div class="plan-diff-col">
+                <span class="plan-diff-label">Obecnie</span>
+                <span>{{ planChangeConfirm()!.before.planName }} · {{ planChangeConfirm()!.before.cycle }}</span>
+                @if (planChangeConfirm()!.before.price) { <span>{{ planChangeConfirm()!.before.price }} EUR</span> }
+              </div>
+              <span class="plan-diff-arrow">→</span>
+              <div class="plan-diff-col">
+                <span class="plan-diff-label">Nowo</span>
+                <span>{{ planChangeConfirm()!.after.planName }} · {{ planChangeConfirm()!.after.cycle }}</span>
+                @if (planChangeConfirm()!.after.price) { <span>{{ planChangeConfirm()!.after.price }} EUR</span> }
+              </div>
+            </div>
+            <p class="hint">
+              Zmiana wpływa wyłącznie na przyszłe rozliczenia — już wystawione faktury pozostają niezmienione
+              (batch zawsze fakturuje plan/cenę zapisane w historii dla danego okresu).
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="cancelPlanChangeConfirm()">Anuluj</button>
+            <button class="btn-primary" [disabled]="saving()" (click)="confirmPlanChange()">
+              {{ saving() ? 'Zapisuję...' : 'Potwierdź zmianę' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Delete tenant confirm -->
     @if (deleteTarget()) {
       <div class="modal-backdrop" (click)="cancelDeleteTenant()">
@@ -831,6 +977,35 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
         </div>
       </div>
     }
+
+    <!-- Delete billing details confirm -->
+    @if (deleteBillingDetailsTarget()) {
+      <div class="modal-backdrop" (click)="cancelDeleteBillingDetails()">
+        <div class="modal modal-sm" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Usuń dane rozliczeniowe</h2>
+            <button class="btn-icon" (click)="cancelDeleteBillingDetails()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Usuwasz dane rozliczeniowe nabywcy dla tenanta <strong>{{ deleteBillingDetailsTarget()!.name }}</strong>.</p>
+            <p class="hint">
+              To nie wpłynie na dane zapisane na już wystawionych fakturach — każda faktura zachowuje własną,
+              zamrożoną kopię danych nabywcy z momentu wystawienia. Usunięty zostanie tylko bieżący
+              formularz — kolejne faktury tego tenanta znów będą pokazywać baner „dokument roboczy”, dopóki
+              dane nie zostaną uzupełnione ponownie.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="cancelDeleteBillingDetails()">Anuluj</button>
+            <button class="btn-danger" [disabled]="saving()" (click)="confirmDeleteBillingDetails()">
+              {{ saving() ? 'Usuwam...' : 'Usuń dane rozliczeniowe' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .page { padding: 28px 32px; max-width: 1400px; }
@@ -843,6 +1018,13 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
     .page-sub   { font-size: 13px; color: var(--gray-500); margin: 0; }
 
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
+    .billing-hint {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 13px;
+    }
+    .billing-hint-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .billing-hint-ok   { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+    .billing-hint .btn-secondary { flex-shrink: 0; padding: 6px 12px; font-size: 12.5px; }
 
     /* Table */
     .table-wrap { overflow-x: auto; }
@@ -979,6 +1161,13 @@ const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięcz
     .modal-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
     .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
     .modal-body p { margin: 0; font-size: 14px; color: var(--gray-700); }
+    .plan-diff {
+      display: flex; align-items: center; gap: 12px; background: var(--gray-50);
+      border: 1px solid var(--gray-200); border-radius: 8px; padding: 12px 14px;
+    }
+    .plan-diff-col { display: flex; flex-direction: column; gap: 2px; font-size: 13px; flex: 1; }
+    .plan-diff-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); }
+    .plan-diff-arrow { color: var(--gray-400); font-size: 16px; }
     .modal-footer {
       display: flex; gap: 8px; justify-content: flex-end;
       padding: 14px 22px 18px; border-top: 1px solid var(--gray-200);
@@ -1080,13 +1269,20 @@ export class TenantsComponent implements OnInit {
 
   billingPlans        = signal<BillingPlan[]>([]);
   billingPlansLoading = signal(false);
-  subscriptionDraft: { planId: string; billingCycle: BillingCycle } = { planId: '', billingCycle: 'monthly' };
+  subscriptionDraft: { planId: string; billingCycle: BillingCycle; customPriceEur: number | null } =
+    { planId: '', billingCycle: 'monthly', customPriceEur: null };
 
   showCreate        = signal(false);
   showAddUser       = signal(false);
   addUserTenantId   = signal<string | null>(null);
   impersonateTarget = signal<Tenant | null>(null);
   deleteTarget       = signal<Tenant | null>(null);
+  planChangeConfirm  = signal<PlanChangeConfirmData | null>(null);
+
+  billingDetailsLoading = signal(false);
+  billingDetailsDraft: { company_name: string; nip: string; street: string; postal_code: string; city: string; country: string; invoice_email: string } =
+    { company_name: '', nip: '', street: '', postal_code: '', city: '', country: '', invoice_email: '' };
+  deleteBillingDetailsTarget = signal<Tenant | null>(null);
 
   tempPassword  = signal<string | null>(null);
   tempUserEmail = signal<string>('');
@@ -1187,29 +1383,85 @@ export class TenantsComponent implements OnInit {
     return this.billingPlans().find(p => p.id === this.subscriptionDraft.planId)?.is_custom_pricing ?? false;
   }
 
+  onPlanChange(): void {
+    // Switching away from a custom-pricing plan clears the quote — it's
+    // meaningless for Lite/Standard and the backend would discard it anyway,
+    // but leaving it in the draft would confuse a later switch back.
+    if (!this.selectedPlanIsCustomPricing()) this.subscriptionDraft.customPriceEur = null;
+  }
+
+  // Professional's custom_price_eur is a single amount for whichever cycle is
+  // currently active — it does NOT auto-convert between monthly/annual, so
+  // leaving a stale monthly quote in the draft after switching to annual (or
+  // vice versa) risks saving an annual subscription at a monthly price.
+  // Clearing it forces the admin to re-enter the amount for the new cycle.
+  onBillingCycleChange(): void {
+    this.subscriptionDraft.customPriceEur = null;
+  }
+
+  // Form pre-fill only when the tenant has no subscription row yet — never written to the
+  // backend on its own, just what the "Plan" tab shows until the admin hits "Zapisz plan".
+  private defaultPlanId(): string {
+    return this.billingPlans().find(p => p.code === 'lite')?.id ?? this.billingPlans()[0]?.id ?? '';
+  }
+
+  private applyPlanDraft(sub: TenantSubscription | null): void {
+    this.subscriptionDraft = sub
+      ? { planId: sub.plan_id, billingCycle: sub.billing_cycle, customPriceEur: sub.custom_price_eur ? Number(sub.custom_price_eur) : null }
+      : { planId: this.defaultPlanId(), billingCycle: 'monthly', customPriceEur: null };
+  }
+
   openPlanTab(t: Tenant): void {
     this.editTab.set('plan');
-    this.subscriptionDraft = {
-      planId: t.subscription?.plan_id ?? '',
-      billingCycle: t.subscription?.billing_cycle ?? 'monthly',
-    };
-    if (this.billingPlans().length > 0) return;
     this.billingPlansLoading.set(true);
-    this.http.get<BillingPlan[]>(`${API}/admin/billing/plans`).subscribe({
-      next: plans => {
-        this.billingPlans.set(plans);
-        this.billingPlansLoading.set(false);
-        if (!this.subscriptionDraft.planId && plans.length) this.subscriptionDraft.planId = plans[0].id;
+    // The tenant list (GET /admin/tenants) doesn't carry `subscription` — re-fetch the
+    // single-tenant detail so the form reflects what's actually saved, not stale list data.
+    this.http.get<Tenant>(`${API}/admin/tenants/${t.id}`).subscribe({
+      next: fresh => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id ? { ...x, subscription: fresh.subscription, billing_details: fresh.billing_details } : x));
+        this.applyPlanDraft(fresh.subscription ?? null);
+        if (this.billingPlans().length > 0) { this.billingPlansLoading.set(false); return; }
+        this.http.get<BillingPlan[]>(`${API}/admin/billing/plans`).subscribe({
+          next: plans => {
+            const sorted = [...plans].sort((a, b) =>
+              (PLAN_DISPLAY_ORDER[a.code] ?? 99) - (PLAN_DISPLAY_ORDER[b.code] ?? 99));
+            this.billingPlans.set(sorted);
+            this.billingPlansLoading.set(false);
+            if (!fresh.subscription) this.applyPlanDraft(null);
+          },
+          error: () => { this.toast.error('Błąd ładowania planów'); this.billingPlansLoading.set(false); },
+        });
       },
-      error: () => { this.toast.error('Błąd ładowania planów'); this.billingPlansLoading.set(false); },
+      error: () => { this.toast.error('Błąd ładowania danych tenanta'); this.billingPlansLoading.set(false); },
     });
+  }
+
+  // Reverts unsaved edits to the last-saved subscription — unlike cancelEdit(), it must
+  // NOT collapse the tenant panel, since this button sits next to "Zapisz plan" and reads
+  // as "discard form changes", not "close panel".
+  cancelPlanEdit(t: Tenant): void {
+    this.applyPlanDraft(t.subscription ?? null);
+  }
+
+  isPlanDraftUnchanged(t: Tenant): boolean {
+    const sub = t.subscription;
+    const savedPlanId = sub ? sub.plan_id : this.defaultPlanId();
+    const savedCycle: BillingCycle = sub ? sub.billing_cycle : 'monthly';
+    const savedCustomPrice = sub?.custom_price_eur ? Number(sub.custom_price_eur) : null;
+    return this.subscriptionDraft.planId === savedPlanId
+      && this.subscriptionDraft.billingCycle === savedCycle
+      && this.subscriptionDraft.customPriceEur === savedCustomPrice;
   }
 
   saveSubscription(id: string): void {
     this.saving.set(true);
-    this.http.put<{ plan_id: string; billing_cycle: BillingCycle; started_at: string }>(
+    this.http.put<{ plan_id: string; billing_cycle: BillingCycle; custom_price_eur: string | null; started_at: string; plan_started_at: string; cancelled_at: string | null }>(
       `${API}/admin/tenants/${id}/subscription`,
-      { planId: this.subscriptionDraft.planId, billingCycle: this.subscriptionDraft.billingCycle }
+      {
+        planId: this.subscriptionDraft.planId,
+        billingCycle: this.subscriptionDraft.billingCycle,
+        customPriceEur: this.subscriptionDraft.customPriceEur,
+      }
     ).subscribe({
       next: sub => {
         const plan = this.billingPlans().find(p => p.id === sub.plan_id);
@@ -1220,6 +1472,160 @@ export class TenantsComponent implements OnInit {
         this.toast.success('Plan zapisany');
       },
       error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu planu'); },
+    });
+  }
+
+  // Superadmin guardrail: plan/cycle/price changes only ever affect future
+  // billing (already-issued invoices are frozen from tenant_subscription_history),
+  // but that's exactly the kind of thing that's easy to click by accident —
+  // show the before/after and require a second click before saving.
+  openPlanChangeConfirm(t: Tenant): void {
+    const draftPlan = this.billingPlans().find(p => p.id === this.subscriptionDraft.planId);
+    const sub = t.subscription;
+    this.planChangeConfirm.set({
+      tenantId: t.id,
+      tenantName: t.name,
+      before: sub
+        ? { planName: sub.plan_name, cycle: this.billingCycleLabel(sub.billing_cycle), price: sub.custom_price_eur }
+        : { planName: 'brak planu', cycle: '—', price: null },
+      after: {
+        planName: draftPlan?.name ?? '—',
+        cycle: this.billingCycleLabel(this.subscriptionDraft.billingCycle),
+        price: this.subscriptionDraft.customPriceEur != null ? String(this.subscriptionDraft.customPriceEur) : null,
+      },
+    });
+  }
+  cancelPlanChangeConfirm(): void { this.planChangeConfirm.set(null); }
+  confirmPlanChange(): void {
+    const c = this.planChangeConfirm();
+    if (!c) return;
+    this.planChangeConfirm.set(null);
+    this.saveSubscription(c.tenantId);
+  }
+
+  // Ends the subscription (tenant_subscriptions.cancelled_at) — billing's own
+  // record, independent from tenants.is_active. The already-running/closed
+  // billing period is still invoiced in full once it ends; nothing after it.
+  cancelSubscription(t: Tenant): void {
+    if (!confirm(`Zakończyć subskrypcję tenanta „${t.name}"? Bieżący okres rozliczeniowy zostanie jeszcze zafakturowany w całości (bez proracji) po jego zakończeniu — kolejne już nie, do czasu ponownego przypisania planu lub cofnięcia rezygnacji.`)) return;
+    this.saving.set(true);
+    this.http.put<{ cancelled_at: string }>(`${API}/admin/tenants/${t.id}/subscription/cancel`, {}).subscribe({
+      next: res => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id && x.subscription
+          ? { ...x, subscription: { ...x.subscription, cancelled_at: res.cancelled_at } }
+          : x));
+        this.saving.set(false);
+        this.toast.success('Subskrypcja zakończona');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd kończenia subskrypcji'); },
+    });
+  }
+
+  reactivateSubscription(t: Tenant): void {
+    this.saving.set(true);
+    this.http.delete(`${API}/admin/tenants/${t.id}/subscription/cancel`).subscribe({
+      next: () => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id && x.subscription
+          ? { ...x, subscription: { ...x.subscription, cancelled_at: null } }
+          : x));
+        this.saving.set(false);
+        this.toast.success('Rezygnacja cofnięta');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd cofania rezygnacji'); },
+    });
+  }
+
+  // ── Billing details tab (legal buyer data for invoices) ────────
+  openBillingDetailsTab(t: Tenant): void {
+    this.editTab.set('billing');
+    this.billingDetailsLoading.set(true);
+    // Same reasoning as openPlanTab: the tenant list doesn't carry billing_details.
+    this.http.get<Tenant>(`${API}/admin/tenants/${t.id}`).subscribe({
+      next: fresh => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id ? { ...x, billing_details: fresh.billing_details } : x));
+        this.applyBillingDetailsDraft(fresh.billing_details ?? null);
+        this.billingDetailsLoading.set(false);
+      },
+      error: () => { this.toast.error('Błąd ładowania danych rozliczeniowych'); this.billingDetailsLoading.set(false); },
+    });
+  }
+
+  private applyBillingDetailsDraft(details: TenantBillingDetails | null): void {
+    this.billingDetailsDraft = {
+      company_name: details?.company_name ?? '',
+      nip: details?.nip ?? '',
+      street: details?.street ?? '',
+      postal_code: details?.postal_code ?? '',
+      city: details?.city ?? '',
+      country: details?.country ?? '',
+      invoice_email: details?.invoice_email ?? '',
+    };
+  }
+
+  // Reverts unsaved form edits to whatever is currently saved in the
+  // database — never deletes anything. Deleting the saved record is a
+  // separate, explicit destructive action (openDeleteBillingDetails below).
+  cancelBillingDetailsEdit(t: Tenant): void {
+    this.applyBillingDetailsDraft(t.billing_details ?? null);
+  }
+
+  isBillingDetailsDraftUnchanged(t: Tenant): boolean {
+    const d = t.billing_details;
+    return this.billingDetailsDraft.company_name === (d?.company_name ?? '')
+      && this.billingDetailsDraft.nip === (d?.nip ?? '')
+      && this.billingDetailsDraft.street === (d?.street ?? '')
+      && this.billingDetailsDraft.postal_code === (d?.postal_code ?? '')
+      && this.billingDetailsDraft.city === (d?.city ?? '')
+      && this.billingDetailsDraft.country === (d?.country ?? '')
+      && this.billingDetailsDraft.invoice_email === (d?.invoice_email ?? '');
+  }
+
+  // True once every field a complete invoice needs is filled in — mirrors
+  // isInvoiceComplete() in invoicePdfService.js (backend is the source of
+  // truth for what actually gates the PDF banner; this is only used here to
+  // drive the non-blocking hint in the Plan tab).
+  isBillingDetailsComplete(t: Tenant): boolean {
+    const d = t.billing_details;
+    return !!(d?.company_name && d?.nip && d?.street && d?.postal_code && d?.city && d?.country && d?.invoice_email);
+  }
+
+  saveBillingDetails(id: string): void {
+    this.saving.set(true);
+    this.http.put<TenantBillingDetails>(`${API}/admin/tenants/${id}/billing-details`, {
+      company_name: this.billingDetailsDraft.company_name || null,
+      nip: this.billingDetailsDraft.nip || null,
+      street: this.billingDetailsDraft.street || null,
+      postal_code: this.billingDetailsDraft.postal_code || null,
+      city: this.billingDetailsDraft.city || null,
+      country: this.billingDetailsDraft.country || null,
+      invoice_email: this.billingDetailsDraft.invoice_email || null,
+    }).subscribe({
+      next: details => {
+        this.tenants.update(ts => ts.map(t => t.id === id ? { ...t, billing_details: details } : t));
+        this.saving.set(false);
+        this.toast.success('Dane rozliczeniowe zapisane');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu danych rozliczeniowych'); },
+    });
+  }
+
+  // ── Delete billing details (destructive, separate from Anuluj) ─
+  openDeleteBillingDetails(t: Tenant): void { this.deleteBillingDetailsTarget.set(t); }
+  cancelDeleteBillingDetails(): void { this.deleteBillingDetailsTarget.set(null); }
+
+  confirmDeleteBillingDetails(): void {
+    const t = this.deleteBillingDetailsTarget();
+    if (!t) return;
+    this.saving.set(true);
+    this.http.delete(`${API}/admin/tenants/${t.id}/billing-details`).subscribe({
+      next: () => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id ? { ...x, billing_details: null } : x));
+        this.applyBillingDetailsDraft(null);
+        this.saving.set(false);
+        this.deleteBillingDetailsTarget.set(null);
+        this.toast.success('Dane rozliczeniowe usunięte — już wystawione faktury pozostają bez zmian.');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd usuwania danych rozliczeniowych'); },
     });
   }
 
