@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "worktrips-doc-frontend": {
+    "crmtree-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": { "standalone": true, "style": "scss", "changeDetection": "OnPush" }
@@ -15,16 +15,38 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-  "outputPath": "dist/crmtree-frontend",
-  "index": "src/index.html",
-  "browser": "src/main.ts",
-  "polyfills": ["zone.js"],
-  "tsConfig": "tsconfig.app.json",
-  "assets": ["src/favicon.ico", "src/assets"],
-  "styles": ["src/styles/global.scss", "node_modules/quill/dist/quill.snow.css"],
-  "scripts": [],
-  "sourceMap": true
-},
+            "outputPath": "dist/crmtree-frontend",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles/global.scss",
+              "node_modules/quill/dist/quill.snow.css"
+            ],
+            "scripts": [],
+            "sourceMap": true,
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "security": {
+              "allowedHosts": [
+                "crmtree.pl",
+                "www.crmtree.pl",
+                "crmtree-frontend.salmonsmoke-415d1384.polandcentral.azurecontainerapps.io",
+                "crmtree-frontend-int.salmonsmoke-415d1384.polandcentral.azurecontainerapps.io",
+                "localhost"
+              ]
+            },
+            "ssr": {
+              "entry": "src/server.ts"
+            }
+          },
           "configurations": {
             "production": {
               "budgets": [
@@ -56,14 +78,14 @@
       "builder": "@angular-devkit/build-angular:dev-server",
       "options": {
         "proxyConfig": "src/proxy.conf.json",
-        "allowedHosts": ["docs.htcd.pl","docs.worktrips.com"]
+        "allowedHosts": ["localhost"]
       },
       "configurations": {
         "production": {
-          "buildTarget": "worktrips-doc-frontend:build:production"
+          "buildTarget": "crmtree-frontend:build:production"
         },
         "development": {
-          "buildTarget": "worktrips-doc-frontend:build:development"
+          "buildTarget": "crmtree-frontend:build:development"
         }
       },
       "defaultConfiguration": "development"

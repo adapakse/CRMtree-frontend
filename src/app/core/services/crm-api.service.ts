@@ -81,6 +81,7 @@ export interface LeadActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  email_provider: 'gmail' | 'outlook' | 'zoho' | null;
   is_read: boolean | null;
   priority?: string | null;
   reminder_type?: string | null;
@@ -300,6 +301,7 @@ export interface PartnerActivity {
   close_comment: string | null;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  email_provider: 'gmail' | 'outlook' | 'zoho' | null;
   is_read: boolean;
   priority?: string | null;
   reminder_type?: string | null;
@@ -715,6 +717,82 @@ export interface GmailSendResult {
   messageId: string;
   threadId: string;
   activityId: number;
+}
+
+// Status of the tenant's single active email provider — never a per-user choice.
+export interface EmailStatus {
+  provider: 'gmail' | 'outlook' | 'zoho' | null;
+  training: boolean;
+  configured: boolean;
+  connected: boolean;
+  email?: string;
+}
+
+// Whether the CURRENT USER has their own WhatsApp Business number connected —
+// resolved server-side (whatsapp_configs, keyed by user_id). Used in the
+// lead/partner WhatsApp tab to decide whether the viewer can compose.
+export interface WhatsappStatus {
+  configured: boolean;
+  enabled: boolean;
+  display_phone_number: string | null;
+}
+
+// Full self-service config for the logged-in user (My Settings). Secrets are
+// never round-tripped in plaintext except webhook_verify_token, which the
+// CRM itself generated and the user must read back to paste into their own
+// Meta app's webhook config.
+export interface MyWhatsappConfig {
+  configured: boolean;
+  id?: string;
+  waba_id?: string;
+  phone_number_id?: string;
+  display_phone_number?: string | null;
+  is_enabled?: boolean;
+  access_token_configured?: boolean;
+  app_secret_configured?: boolean;
+  webhook_verify_token?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface MyWhatsappConfigInput {
+  waba_id: string;
+  phone_number_id: string;
+  display_phone_number?: string;
+  access_token?: string;
+  app_secret?: string;
+  is_enabled?: boolean;
+}
+
+// Read-only directory of connected numbers in a tenant — shown to tenant
+// admins/managers (My Settings-adjacent governance view) and to the super
+// admin (Tenant management), never with secrets.
+export interface WhatsappDirectoryEntry {
+  user_id: string;
+  user_name: string;
+  email: string;
+  display_phone_number: string | null;
+  is_enabled: boolean;
+  updated_at: string;
+}
+
+export interface WhatsappSendResult {
+  messageId: string | null;
+  id: string;
+}
+
+// One message in a lead's/partner's WhatsApp conversation — read from the
+// whatsapp_messages table (real per-message model, not a generic activity
+// log). direction is always 'outgoing' until the webhook/incoming step lands.
+export interface WhatsappHistoryEntry {
+  id: string;
+  created_at: string;
+  direction: 'incoming' | 'outgoing';
+  from_phone: string;
+  to_phone: string;
+  message: string | null;
+  status: string;
+  created_by_name: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1282,21 +1360,106 @@ export class CrmApiService {
   getPartnerEmailThread(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
     return this.http.get<GmailMessage[]>(`${BASE}/gmail/thread/partner/${partnerId}/${threadId}`);
   }
-  getGmailStatus(): Observable<{ connected: boolean; email?: string }> {
-    return this.http.get<{ connected: boolean; email?: string }>(`${BASE}/gmail/status`);
-  }
-  getGmailAuthUrl(): Observable<{ url: string }> {
-    return this.http.get<{ url: string }>(`${BASE}/gmail/oauth/url`);
-  }
-  disconnectGmail(): Observable<{ ok: boolean }> {
-    return this.http.delete<{ ok: boolean }>(`${BASE}/gmail/oauth/disconnect`);
-  }
   downloadGmailAttachment(messageId: string, attachmentId: string, filename: string, mime: string): Observable<Blob> {
     const params = { filename, mime };
     return this.http.get(
       `${BASE}/gmail/attachment/${messageId}/${attachmentId}`,
       { params, responseType: 'blob' },
     );
+  }
+
+  // ── Outlook ───────────────────────────────────────────────────────────────
+  sendLeadEmailOutlook(leadId: number, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; references?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/outlook/send/lead/${leadId}`, data);
+  }
+  getLeadEmailThreadOutlook(leadId: number, conversationId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/outlook/thread/lead/${leadId}/${conversationId}`);
+  }
+  sendPartnerEmailOutlook(partnerId: number | string, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; references?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/outlook/send/partner/${partnerId}`, data);
+  }
+  getPartnerEmailThreadOutlook(partnerId: number | string, conversationId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/outlook/thread/partner/${partnerId}/${conversationId}`);
+  }
+  debugProcessOutlook(): Observable<any> {
+    return this.http.post<any>(`${BASE}/outlook/debug/process`, {});
+  }
+
+  // ── Zoho Mail ─────────────────────────────────────────────────────────────
+  sendLeadEmailZoho(leadId: number, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; threadId?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/zoho/send/lead/${leadId}`, data);
+  }
+  getLeadEmailThreadZoho(leadId: number, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/zoho/thread/lead/${leadId}/${threadId}`);
+  }
+  sendPartnerEmailZoho(partnerId: number | string, data: { to: string; cc?: string; subject: string; body: string; inReplyTo?: string; threadId?: string }): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/zoho/send/partner/${partnerId}`, data);
+  }
+  getPartnerEmailThreadZoho(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/zoho/thread/partner/${partnerId}/${threadId}`);
+  }
+  debugProcessZoho(): Observable<any> {
+    return this.http.post<any>(`${BASE}/zoho/debug/process`, {});
+  }
+
+  // ── Unified CRM email API ──────────────────────────────────────────────────
+  // The ONLY email endpoints the UI should call. The active provider (gmail /
+  // outlook / zoho / none) is resolved server-side from the tenant's config —
+  // this component never chooses or switches a provider.
+  // Company mailbox is connected/changed/disconnected only by a superadmin from
+  // Tenant → Email — there is no regular-user connect/disconnect endpoint.
+  getEmailStatus(): Observable<EmailStatus> {
+    return this.http.get<EmailStatus>(`${BASE}/email/status`);
+  }
+  sendLeadEmailUnified(leadId: number, data: FormData): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/email/send/lead/${leadId}`, data);
+  }
+  getLeadEmailThreadUnified(leadId: number, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/email/thread/lead/${leadId}/${threadId}`);
+  }
+  sendPartnerEmailUnified(partnerId: number | string, data: FormData): Observable<GmailSendResult> {
+    return this.http.post<GmailSendResult>(`${BASE}/email/send/partner/${partnerId}`, data);
+  }
+  getPartnerEmailThreadUnified(partnerId: number | string, threadId: string): Observable<GmailMessage[]> {
+    return this.http.get<GmailMessage[]>(`${BASE}/email/thread/partner/${partnerId}/${threadId}`);
+  }
+  debugProcessEmail(): Observable<any> {
+    return this.http.post<any>(`${BASE}/email/debug/process`, {});
+  }
+
+  // ── WhatsApp ─────────────────────────────────────────────────────────────
+  // Each CRM user connects their own WhatsApp Business number in My Settings
+  // (getMyWhatsappConfig/saveMyWhatsappConfig/deleteMyWhatsappConfig) — there
+  // is no tenant-wide or admin-managed number.
+  getMyWhatsappConfig(): Observable<MyWhatsappConfig> {
+    return this.http.get<MyWhatsappConfig>(`${BASE}/whatsapp/my-config`);
+  }
+  saveMyWhatsappConfig(data: MyWhatsappConfigInput): Observable<MyWhatsappConfig> {
+    return this.http.put<MyWhatsappConfig>(`${BASE}/whatsapp/my-config`, data);
+  }
+  deleteMyWhatsappConfig(): Observable<void> {
+    return this.http.delete<void>(`${BASE}/whatsapp/my-config`);
+  }
+  getWhatsappTenantDirectory(): Observable<WhatsappDirectoryEntry[]> {
+    return this.http.get<WhatsappDirectoryEntry[]>(`${BASE}/whatsapp/tenant-directory`);
+  }
+  getWhatsappStatus(): Observable<WhatsappStatus> {
+    return this.http.get<WhatsappStatus>(`${BASE}/whatsapp/status`);
+  }
+  // toPhone: optional per-send override of the recipient number — used only
+  // for this one message, never written back to the lead's/partner's own
+  // phone field.
+  sendLeadWhatsapp(leadId: number, message: string, toPhone?: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/lead/${leadId}`, { message, to_phone: toPhone || undefined });
+  }
+  sendPartnerWhatsapp(partnerId: number | string, message: string, toPhone?: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
+  }
+  getLeadWhatsappHistory(leadId: number): Observable<WhatsappHistoryEntry[]> {
+    return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/lead/${leadId}`);
+  }
+  getPartnerWhatsappHistory(partnerId: number | string): Observable<WhatsappHistoryEntry[]> {
+    return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/partner/${partnerId}`);
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────

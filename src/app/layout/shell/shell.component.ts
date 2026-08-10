@@ -107,6 +107,14 @@ import { initials } from '../../core/services/helpers';
                   </a>
                 }
 
+                @if (auth.hasFeature('seo_bot')) {
+                  <a class="nav-item" routerLink="/crm/seo" routerLinkActive="active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <span class="nav-label">SEObot</span>
+                    <span class="nav-tip">SEObot</span>
+                  </a>
+                }
+
                 @if (auth.hasFeature('partner_registry')) {
                   <a class="nav-item" routerLink="/crm/partners" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -225,7 +233,7 @@ import { initials } from '../../core/services/helpers';
   `,
   styles: [`
     /* ── Layout ─────────────────────────────────────────────────────── */
-    .app-wrap { display: flex; height: 100vh; overflow: hidden; }
+    .app-wrap { display: flex; height: calc(100vh - var(--test-banner-height, 0px)); overflow: hidden; }
 
     /* ── Sidebar shell ───────────────────────────────────────────────── */
     #sidebar {

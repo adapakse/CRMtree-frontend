@@ -4,13 +4,32 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize, catchError } from 'rxjs/operators';
+import { finalize, catchError, map } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, ChurnPartner, ConsentValue, ConsentType } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, WhatsappHistoryEntry } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
+import { formatAddressDisplay, countExtraAddresses } from '../../../shared/utils/email-address.util';
+import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
+import { formatPhoneDisplay, requiresCountryCode, isLikelyDemoPhone, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
+import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { QuillModule } from 'ngx-quill';
+
+// One WhatsApp conversation = all messages with a single counterpart phone
+// number. Numbers are never merged into each other's history.
+interface WhatsappConversation {
+  phone: string;
+  messages: WhatsappHistoryEntry[];
+}
+
+interface WhatsappConvUiState {
+  expanded: boolean;
+  replyOpen: boolean;
+  replyMessage: string;
+  replySending: boolean;
+  replyError: string | null;
+}
 
 function getMonthRange(preset: string): { from: string; to: string } {
   const now = new Date();
@@ -395,10 +414,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
           Maile
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
+        <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
-      <div *ngIf="midTab!=='emails'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:flex-end">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
@@ -554,6 +574,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
+          <ng-container *ngIf="emailConnected">
+            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
+            <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
+          </ng-container>
           <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" (click)="openEmailCompose()">+ Nowy email</button>
         </div>
 
@@ -561,18 +585,28 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div *ngIf="showEmailCompose" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ Nowy email</div>
-            <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
+            <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false; includeHistoryCompose=false">✕</button>
           </div>
-          <div *ngIf="!gmailConnected && !settings.settings().crm_training_mode" style="text-align:center;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center">
-            <div style="font-size:32px">📧</div>
-            <div style="font-size:14px;font-weight:700;color:#18181b">Konto Gmail niepołączone</div>
-            <div style="font-size:12px;color:#6b7280">Aby wysyłać emaile bezpośrednio z CRM, połącz swoje konto Gmail.</div>
-            <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">🔗 Połącz konto Gmail</button>
+          <!-- Provider row — always visible when compose is open. The company mailbox is
+               connected/changed/disconnected only by a superadmin from Tenant → Email;
+               this only shows the tenant's single active provider's connection state. -->
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0;align-items:stretch">
+              <div *ngIf="emailConnected"
+                   [style.border]="'1.5px solid ' + emailProviderColor"
+                   [style.background]="emailProviderBg"
+                   style="display:inline-flex;align-items:center;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden">
+                <span style="min-width:0;padding:4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                      [title]="emailAddress">Od: <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
+              </div>
+              <div *ngIf="!emailConnected && emailProviderKey && !settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">Skrzynka firmowa nie jest jeszcze podłączona — skontaktuj się z administratorem.</div>
+              <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.</div>
+            </div>
+            <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 Tryb szkoleniowy</div>
           </div>
-          <ng-container *ngIf="gmailConnected || settings.settings().crm_training_mode">
+          <!-- Email form — shown when connected or training mode -->
+          <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <div *ngIf="gmailConnected" style="font-size:11px;color:#6b7280;background:#f0fdf4;border-radius:6px;padding:5px 10px;flex:1;min-width:0">✅ Wysyłam z: <strong>{{gmailEmail}}</strong></div>
-              <div *ngIf="!gmailConnected && settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px;flex:1;min-width:0">🎓 Tryb szkoleniowy</div>
               <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
                       style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
                 <option value="">— brak szablonu —</option>
@@ -601,21 +635,22 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" placeholder="Treść wiadomości…" style="display:block" theme="snow"></quill-editor>
-            <div *ngIf="emailForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
+            <label *ngIf="emailForm.quotedHtml" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer">
+              <input type="checkbox" [(ngModel)]="includeHistoryCompose"> Dołącz historię korespondencji
+            </label>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-              <button *ngIf="gmailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
             </div>
-            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
-              <span>⚠️ Wymagane ponowne połączenie Gmail</span>
-              <button *ngIf="gmailAuthUrl" (click)="connectGmail()" style="font-size:11px;padding:3px 10px;border:1px solid #fb923c;border-radius:5px;background:#fff;color:#ea580c;cursor:pointer">Połącz ponownie</button>
+            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px">
+              ⚠️ Wymagane ponowne połączenie skrzynki Gmail — skontaktuj się z administratorem.
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
               <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
             </div>
             <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
-              <button class="btn-sm" (click)="showEmailCompose=false">Anuluj</button>
+              <button class="btn-sm" (click)="showEmailCompose=false; includeHistoryCompose=false">Anuluj</button>
               <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}</button>
             </div>
           </ng-container>
@@ -644,26 +679,66 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
           </div>
           <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
-            <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            <ng-container *ngIf="a.gmail_thread_id; else singleBody">
+              <div *ngIf="loadingThread" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie wątku…</div>
+              <div *ngFor="let m of threadMessages"
+                   [style.background]="m.created_by ? 'white' : '#fffbeb'"
+                   [style.border]="m.created_by ? '1px solid #e5e7eb' : '1px solid #fbbf24'"
+                   style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                  <span style="display:flex;align-items:center;gap:4px">
+                    <span style="font-size:10px;color:#9ca3af">{{m.created_by ? 'Do:' : 'Od:'}}</span>
+                    <span style="font-weight:600">{{m.created_by ? firstAddressDisplay(m.to) : firstAddressDisplay(m.from)}}</span>
+                    <span *ngIf="m.created_by && extraAddressCount(m.to) > 0" style="font-size:10px;color:#9ca3af">+{{extraAddressCount(m.to)}}</span>
+                  </span>
+                  <span>{{m.date | date:'dd.MM.yyyy HH:mm'}}</span>
+                </div>
+                <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
+                <ng-container *ngIf="m.quotedBody">
+                  <button (click)="m._showQuote = !m._showQuote" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
+                    {{m._showQuote ? '▲ Ukryj cytowaną historię' : '▾ Pokaż cytowaną historię'}}
+                  </button>
+                  <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
+                </ng-container>
+              </div>
+            </ng-container>
+            <ng-template #singleBody>
+              <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+            </ng-template>
             <div *ngIf="showReplyInline" style="border:1px solid #dbeafe;border-radius:8px;padding:12px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
-              <div style="font-size:11px;font-weight:700;color:#1d4ed8">↩ Odpowiedz</div>
-              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
-                <div class="participant-chips">
-                  <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
-                  <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" placeholder="email@firma.pl" autocomplete="off">
+              <!-- Compact header -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <div style="font-size:11px;color:#374151;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                  ↩ <strong>Odpowiadasz do:</strong> {{inlineReplyForm.recipientList[0] || '—'}}
+                  <span style="color:#9ca3af"> · </span>{{inlineReplyForm.subject}}
                 </div>
-              </label>
-              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
-                <div class="participant-chips">
-                  <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
-                  <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" placeholder="dw@firma.pl" autocomplete="off">
-                </div>
-              </label>
-              <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
-                <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
-              </label>
+                <button (click)="showReplyDetails=!showReplyDetails"
+                        style="flex-shrink:0;background:none;border:1px solid #d1d5db;border-radius:5px;color:#6b7280;font-size:10px;padding:2px 7px;cursor:pointer">
+                  {{showReplyDetails ? '▲ Ukryj' : '▾ Szczegóły'}}
+                </button>
+              </div>
+              <!-- Collapsible fields -->
+              <ng-container *ngIf="showReplyDetails">
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+                  <div class="participant-chips">
+                    <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
+                    <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" placeholder="email@firma.pl" autocomplete="off">
+                  </div>
+                </label>
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+                  <div class="participant-chips">
+                    <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
+                    <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" placeholder="dw@firma.pl" autocomplete="off">
+                  </div>
+                </label>
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
+                  <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
+                </label>
+                <label *ngIf="inlineReplyForm.quotedHtml" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer">
+                  <input type="checkbox" [(ngModel)]="includeHistoryInline"> Dołącz historię korespondencji
+                </label>
+              </ng-container>
               <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" placeholder="Treść odpowiedzi…" style="display:block" theme="snow"></quill-editor>
-              <div *ngIf="inlineReplyForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px">📋 Historia korespondencji zostanie dołączona</div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
               </div>
@@ -673,14 +748,128 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
                 <button class="btn-sm" (click)="cancelInlineReply()">Anuluj</button>
-                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.recipientList?.length || !inlineReplyForm.subject">{{inlineReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}</button>
+                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}</button>
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
-              <button *ngIf="a.gmail_thread_id && gmailConnected && canEdit" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
+              <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- WhatsApp tab -->
+      <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div *ngIf="whatsappConfigured===true" style="display:flex;justify-content:flex-end;gap:6px">
+          <button class="btn-sm" [disabled]="whatsappHistoryLoading" (click)="loadWhatsappHistory()" title="Odśwież historię WhatsApp — odbiór przez webhook nie zawsze jest natychmiastowy">
+            {{ whatsappHistoryLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
+          </button>
+        </div>
+
+        <div *ngIf="whatsappConfigured===null" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
+
+        <div *ngIf="whatsappConfigured===false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+          <div style="font-size:32px">💬</div>
+          <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
+          <div style="font-size:13px;color:#9ca3af;text-align:center">Nie masz podłączonego numeru WhatsApp.</div>
+          <a routerLink="/my-settings" style="font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none">→ Podłącz numer w Moje ustawienia</a>
+        </div>
+
+        <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 Nowa wiadomość WhatsApp</div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:#f0fdf4;border-radius:6px;overflow:hidden">
+              <span style="padding:4px 10px;font-size:11px;color:#374151">Od: <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
+            </div>
+          </div>
+
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+            <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
+                   placeholder="+48 123 123 123">
+          </label>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">Podaj numer z kierunkowym kraju, np. +48 123 123 123.</div>
+
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Treść wiadomości
+            <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
+                      placeholder="Treść wiadomości..."></textarea>
+          </label>
+
+          <div *ngIf="whatsappError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" style="color:#16a34a;font-size:12px;background:#f0fdf4;border-radius:6px;padding:6px 10px">✅ Wiadomość wysłana.</div>
+
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !whatsappMessage.trim() || whatsappToPhoneMissingCountryCode || whatsappSending"
+                    (click)="sendWhatsapp()">
+              {{ whatsappSending ? 'Wysyłanie...' : 'Wyślij WhatsApp' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa -->
+        <ng-container *ngIf="whatsappConfigured===true">
+          <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie historii…</div>
+          <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
+
+          <div *ngFor="let conv of whatsappConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white"
+               [style.border-left]="getWhatsappConvState(conv.phone).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
+                 [style.background]="getWhatsappConvState(conv.phone).expanded ? '#eff6ff' : 'white'"
+                 (click)="toggleWhatsappConvExpanded(conv.phone)">
+              <span style="font-size:16px;flex-shrink:0">💬</span>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rozmowa WhatsApp</strong>
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:1px">
+                  {{formatWhatsappHistoryPhone(conv.phone)}} · ostatnia wiadomość: {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
+                </div>
+              </div>
+              <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getWhatsappConvState(conv.phone).expanded ? '▲' : '▾'}}</span>
+            </div>
+
+            <div *ngIf="getWhatsappConvState(conv.phone).expanded" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
+              <div *ngFor="let h of conv.messages"
+                   [style.background]="h.direction==='incoming' ? '#fffbeb' : 'white'"
+                   [style.border]="h.direction==='incoming' ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
+                   style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                  <span style="display:flex;align-items:center;gap:4px">
+                    <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? 'Do:' : 'Od:'}}</span>
+                    <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
+                  </span>
+                  <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+                </div>
+                <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap">
+                  <div [class.wa-body-clamp]="!isWhatsappExpanded(h.id)">{{h.message}}</div>
+                </div>
+                <button *ngIf="h.message && h.message.length > 200" class="wa-expand-btn" (click)="toggleWhatsappExpand(h.id)">
+                  {{isWhatsappExpanded(h.id) ? '▲ Zwiń' : '▼ Rozwiń'}}
+                </button>
+              </div>
+
+              <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:6px">
+                <button class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ Odpowiedz</button>
+              </div>
+
+              <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:11px;color:#374151"><strong>↩ Odpowiadasz przez WhatsApp</strong></div>
+                <div style="font-size:11px;color:#6b7280">Do: {{formatWhatsappHistoryPhone(conv.phone)}}</div>
+                <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
+                          (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
+                          [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
+                          placeholder="Treść odpowiedzi..."></textarea>
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                <div style="display:flex;gap:6px;justify-content:flex-end">
+                  <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">Anuluj</button>
+                  <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
+                    {{ getWhatsappConvState(conv.phone).replySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
 
     </div>
@@ -1527,15 +1716,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
       <input class="act-input" [(ngModel)]="msgModalForm.subject" placeholder="Temat">
       <textarea class="act-input" id="partner-msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="7" placeholder="Treść…"></textarea>
-      <div *ngIf="msgModalForm.quotedHtml" style="font-size:11px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-top:2px">
-        📋 Historia korespondencji zostanie automatycznie dołączona
-      </div>
+      <label *ngIf="msgModalForm.quotedHtml" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer;margin-top:2px">
+        <input type="checkbox" [(ngModel)]="includeHistoryModal"> Dołącz historię korespondencji
+      </label>
       <!-- Załączniki w odpowiedzi -->
       <div style="display:flex;flex-direction:column;gap:4px">
         <span style="font-size:12px;font-weight:600">Załączniki</span>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
-          <button *ngIf="gmailConnected && !driveNeedsReauth"
+          <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
                   (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
                   style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
             <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
@@ -1752,6 +1941,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .suggestion-item { padding:7px 12px;font-size:12px;cursor:pointer; }
     .suggestion-item:hover { background:#f9fafb; }
     .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:16px; }
+    .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10.5px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
     .loading, .not-found { padding:40px; text-align:center; color:#9ca3af; }
     /* Modal */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
@@ -1940,6 +2131,75 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  openWhatsappTab(): void {
+    this.midTab = 'whatsapp';
+    this.whatsappConvState.forEach(s => { s.replyOpen = false; });
+    if (this.whatsappConfigured === null) {
+      // Prefill only with the partner's own real phone — never a placeholder/demo
+      // example, even if a seed record was ever created with one as literal data.
+      const partnerPhone = this.partner?.phone;
+      this.whatsappToPhone = isLikelyDemoPhone(partnerPhone) ? '' : formatPhoneDisplay(partnerPhone);
+      this.api.getWhatsappStatus().subscribe({
+        next: status => this.zone.run(() => {
+          this.whatsappConfigured    = status.configured && status.enabled;
+          this.whatsappDisplayNumber = status.display_phone_number;
+          this.cdr.markForCheck();
+        }),
+        error: () => this.zone.run(() => {
+          this.whatsappConfigured = false;
+          this.cdr.markForCheck();
+        }),
+      });
+    }
+    this.loadWhatsappHistory();
+  }
+
+  loadWhatsappHistory(): void {
+    if (!this.partner) return;
+    this.whatsappHistoryLoading = true;
+    this.api.getPartnerWhatsappHistory(this.pid).subscribe({
+      next: history => this.zone.run(() => {
+        this.whatsappConversations  = this.groupWhatsappConversations(history);
+        this.whatsappHistoryLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => {
+        this.whatsappHistoryLoading = false;
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  // Reformats on blur, not on every keystroke, so typing/pasting doesn't
+  // fight the cursor position. Purely a display convenience — the value
+  // is still only used for this one send, never saved to the partner.
+  onWhatsappToPhoneBlur(): void {
+    this.whatsappToPhone = formatPhoneDisplay(this.whatsappToPhone);
+  }
+
+  sendWhatsapp(): void {
+    if (!this.partner || !this.whatsappToPhone.trim() || !this.whatsappMessage.trim()) return;
+    if (this.whatsappToPhoneMissingCountryCode) return;
+    this.whatsappSending = true;
+    this.whatsappError   = null;
+    this.whatsappSuccess = false;
+    this.cdr.markForCheck();
+    this.api.sendPartnerWhatsapp(this.pid, this.whatsappMessage.trim(), this.whatsappToPhone.trim()).subscribe({
+      next: () => this.zone.run(() => {
+        this.whatsappSending = false;
+        this.whatsappSuccess = true;
+        this.whatsappMessage = '';
+        this.cdr.markForCheck();
+        this.loadWhatsappHistory();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.whatsappSending = false;
+        this.whatsappError   = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
   saveConsents(): void {
     if (!this.partner || this.savingConsents || !this.consentsDirty) return;
     const pid = this.partner.crm_uuid || String(this.partner.id!);
@@ -1961,7 +2221,147 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
-  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' = 'all';
+
+  // WhatsApp tab — status reflects the CURRENT USER's own connected number
+  // (whatsapp_configs, keyed by user_id), not a tenant-wide setting.
+  whatsappConfigured: boolean | null = null;
+  whatsappDisplayNumber: string | null = null;
+  whatsappToPhone = '';
+  whatsappMessage = '';
+  whatsappSending = false;
+  whatsappError: string | null = null;
+  whatsappSuccess = false;
+  // Real conversation history (whatsapp_messages table), not an activity log —
+  // grouped by counterpart phone number: each number is its own conversation,
+  // never merged. A new conversation is only ever started via "Nowa wiadomość
+  // WhatsApp" above; there is no "add participant to this thread" action.
+  whatsappConversations: WhatsappConversation[] = [];
+  whatsappHistoryLoading = false;
+  private whatsappConvState = new Map<string, WhatsappConvUiState>();
+
+  get whatsappFromDisplay(): string {
+    return this.whatsappDisplayNumber ? formatPhoneDisplay(this.whatsappDisplayNumber) : 'skonfigurowany numer';
+  }
+
+  // No country is ever assumed (CRMtree is multi-country) — the user must
+  // type a full international number. Doesn't block typing, only sending.
+  get whatsappToPhoneMissingCountryCode(): boolean {
+    return requiresCountryCode(this.whatsappToPhone);
+  }
+
+  formatWhatsappHistoryPhone(raw: string | null): string {
+    return raw ? formatPhoneDisplay(raw) : '—';
+  }
+
+  // Per-message expand/collapse for long WhatsApp bodies, same "clamp + Rozwiń/Zwiń"
+  // interaction as the generic activity cards — kept as its own Set (ids are
+  // whatsapp_messages UUIDs, not the numeric activity ids expandedActIds holds).
+  whatsappExpandedIds = new Set<string>();
+  isWhatsappExpanded(id: string): boolean { return this.whatsappExpandedIds.has(id); }
+  toggleWhatsappExpand(id: string): void {
+    if (this.whatsappExpandedIds.has(id)) this.whatsappExpandedIds.delete(id);
+    else this.whatsappExpandedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  // Per-conversation UI state (expand/collapse, inline reply), keyed by the
+  // counterpart phone number's DIGITS ONLY, not the raw string — the same
+  // number can be stored differently between an outgoing send ("+48 739 210
+  // 704", user-typed) and an incoming webhook payload ("+48739210704", from
+  // Meta), and the state must stay stable regardless of which formatting a
+  // given conversation's representative phone happens to carry. Entries are
+  // created once, in groupWhatsappConversations(), for every phone the
+  // history contains — the getter below only ever reads, never lazily
+  // creates, so it stays safe to call from the template.
+  getWhatsappConvState(phone: string): WhatsappConvUiState {
+    return this.whatsappConvState.get(normalizePhoneDigits(phone))!;
+  }
+
+  toggleWhatsappConvExpanded(phone: string): void {
+    this.getWhatsappConvState(phone).expanded = !this.getWhatsappConvState(phone).expanded;
+    this.cdr.markForCheck();
+  }
+
+  setWhatsappConvReplyMessage(phone: string, value: string): void {
+    this.getWhatsappConvState(phone).replyMessage = value;
+  }
+
+  startWhatsappConvReply(phone: string): void {
+    const s = this.getWhatsappConvState(phone);
+    s.replyMessage = '';
+    s.replyError   = null;
+    s.replyOpen    = true;
+  }
+
+  cancelWhatsappConvReply(phone: string): void {
+    const s = this.getWhatsappConvState(phone);
+    s.replyOpen    = false;
+    s.replyMessage = '';
+    s.replyError   = null;
+  }
+
+  sendWhatsappConvReply(phone: string): void {
+    if (!this.partner) return;
+    const s = this.getWhatsappConvState(phone);
+    if (!s.replyMessage.trim()) return;
+    s.replySending = true;
+    s.replyError   = null;
+    this.cdr.markForCheck();
+    this.api.sendPartnerWhatsapp(this.pid, s.replyMessage.trim(), phone).subscribe({
+      next: () => this.zone.run(() => {
+        s.replySending = false;
+        s.replyMessage = '';
+        s.replyOpen    = false;
+        this.cdr.markForCheck();
+        this.loadWhatsappHistory();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        s.replySending = false;
+        s.replyError   = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  // Splits the flat history into one conversation per counterpart phone
+  // number, most recently active first. Grouped by digits-only, not the raw
+  // stored string — outgoing sends store the user-typed format ("+48 739 210
+  // 704") while incoming webhook messages store Meta's digit-only format
+  // ("+48739210704"); grouping by the raw string treated those as two
+  // different numbers and split one real conversation into two cards. Ensures
+  // UI state exists for every phone found; on the very first load (state map
+  // still empty) expands only the most recent conversation, matching the old
+  // single-thread default of opening the one thing this section exists to show.
+  private groupWhatsappConversations(history: WhatsappHistoryEntry[]): WhatsappConversation[] {
+    const order: string[] = []; // digits-only keys, in first-seen order
+    const byDigits = new Map<string, WhatsappConversation>();
+    for (const h of history) {
+      const rawPhone = h.direction === 'outgoing' ? h.to_phone : h.from_phone;
+      const digits   = normalizePhoneDigits(rawPhone);
+      let conv = byDigits.get(digits);
+      if (!conv) { conv = { phone: rawPhone, messages: [] }; byDigits.set(digits, conv); order.push(digits); }
+      conv.phone = rawPhone; // keep the most recent message's formatting as the representative
+      conv.messages.push(h);
+    }
+    order.sort((a, b) => {
+      const aMsgs = byDigits.get(a)!.messages, bMsgs = byDigits.get(b)!.messages;
+      return new Date(bMsgs[bMsgs.length - 1].created_at).getTime() - new Date(aMsgs[aMsgs.length - 1].created_at).getTime();
+    });
+
+    const isFirstLoad = this.whatsappConvState.size === 0;
+    const conversations = order.map(digits => byDigits.get(digits)!);
+    for (const digits of order) {
+      if (!this.whatsappConvState.has(digits)) {
+        this.whatsappConvState.set(digits, { expanded: false, replyOpen: false, replyMessage: '', replySending: false, replyError: null });
+      }
+    }
+    if (isFirstLoad && order.length) {
+      this.whatsappConvState.get(order[0])!.expanded = true;
+    }
+    return conversations;
+  }
+
   history: any[] = [];
   historyLoaded  = false;
   historyLoading = false;
@@ -2076,9 +2476,22 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   churnData: ChurnPartner | null = null;
   churnLoading = false;
   readonly currentYear = new Date().getFullYear();
-  gmailConnected      = false;
-  gmailEmail          = '';
-  gmailAuthUrl        = '';
+  // ── Email — tenant's single active provider and shared company mailbox.
+  // Connect/change/disconnect only happens from Tenant → Email (superadmin) —
+  // this view is read-only with respect to the mailbox connection itself.
+  emailStatus: EmailStatus | null = null;
+  emailAddress = '';
+
+  get emailProviderKey(): EmailProviderKey | null { return this.emailStatus?.provider ?? null; }
+  get emailConnected(): boolean { return !!this.emailStatus?.connected; }
+  get emailProviderLabel(): string { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].label : ''; }
+  get emailProviderColor(): string { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].color : '#9ca3af'; }
+  get emailProviderBg(): string    { return this.emailProviderKey ? EMAIL_PROVIDERS[this.emailProviderKey].bg    : '#f9fafb'; }
+
+  canReplyToActivity(a: any): boolean {
+    return this.emailConnected && (a.email_provider || 'gmail') === this.emailProviderKey;
+  }
+
   downloadingAttachment = '';
   drivePickerLoading  = false;
   driveNeedsReauth    = false;
@@ -2432,35 +2845,58 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   private gmailBc: BroadcastChannel | null = null;
+  private outlookBc: BroadcastChannel | null = null;
+  private zohoBc: BroadcastChannel | null = null;
   private emailPollInterval: any = null;
+  debugProcessing        = false;
+  syncingAll             = false;
+  syncResult             = '';
+  showReplyDetails       = false;
+  includeHistoryCompose  = false;
+  includeHistoryInline   = false;
+  includeHistoryModal    = false;
 
-  private onGmailOauthResult(status: string): void {
+  // Any of the 3 OAuth callback pages (gmail/outlook/zoho) reports back here —
+  // whichever one fired is, by construction, the tenant's active provider, so
+  // we just refresh the unified status instead of tracking 3 separate flags.
+  private onEmailOauthResult(status: string): void {
     if (status !== 'connected') return;
-    this.api.getGmailStatus().subscribe({
-      next: s => this.zone.run(() => {
-        this.gmailConnected = s.connected;
-        this.gmailEmail     = s.email || '';
-        this.gmailAuthUrl   = '';
-        this.cdr.markForCheck();
-      }),
-      error: () => {},
-    });
+    this.loadEmailStatus();
   }
 
-  // storage event — główny mechanizm (nowa karta / popup przez redirecty)
+  // storage event — primary mechanism (new tab / popup via redirects)
   private gmailStorageHandler = (e: StorageEvent) => {
     if (e.key === 'gmail_oauth_connected' && e.newValue) {
       localStorage.removeItem('gmail_oauth_connected');
-      this.onGmailOauthResult('connected');
+      this.onEmailOauthResult('connected');
+    }
+    if (e.key === 'outlook_oauth_connected' && e.newValue) {
+      localStorage.removeItem('outlook_oauth_connected');
+      this.onEmailOauthResult('connected');
+    }
+    if (e.key === 'zoho_oauth_connected' && e.newValue) {
+      localStorage.removeItem('zoho_oauth_connected');
+      this.onEmailOauthResult('connected');
     }
   };
 
   private _gmailMsgHandler = (ev: MessageEvent) => {
     if (ev.origin !== window.location.origin) return;
-    if (ev.data?.type === 'gmail-oauth-result') {
-      this.onGmailOauthResult(ev.data.status);
+    if (ev.data?.type === 'gmail-oauth-result' || ev.data?.type === 'outlook-oauth-result' || ev.data?.type === 'zoho-oauth-result') {
+      this.onEmailOauthResult(ev.data.status);
     }
   };
+
+  loadEmailStatus(): void {
+    this.api.getEmailStatus().subscribe({
+      next: s => this.zone.run(() => {
+        this.emailStatus  = s;
+        this.emailAddress = s.email || '';
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
 
   ngOnInit() {
     const rawId = this.id || this.route.snapshot.paramMap.get('id') || '';
@@ -2470,19 +2906,26 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.loadSuggestions(rawId);
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
-    this.api.getGmailStatus().subscribe({
-      next: s => this.zone.run(() => { this.gmailConnected = s.connected; this.gmailEmail = s.email || ''; this.cdr.markForCheck(); }),
-      error: () => {},
-    });
-    // storage event — główny mechanizm
+    this.loadEmailStatus();
+    // storage event — primary mechanism
     window.addEventListener('storage', this.gmailStorageHandler);
-    // Fallback: BroadcastChannel
+    // BroadcastChannel — fallback for cross-tab OAuth result
     try {
       this.gmailBc = new BroadcastChannel('gmail-oauth');
       this.gmailBc.onmessage = (e) => {
-        if (e.data?.type === 'gmail-oauth-result') {
-          this.onGmailOauthResult(e.data.status);
-        }
+        if (e.data?.type === 'gmail-oauth-result') this.onEmailOauthResult(e.data.status);
+      };
+    } catch (_) {}
+    try {
+      this.outlookBc = new BroadcastChannel('outlook-oauth');
+      this.outlookBc.onmessage = (e) => {
+        if (e.data?.type === 'outlook-oauth-result') this.onEmailOauthResult(e.data.status);
+      };
+    } catch (_) {}
+    try {
+      this.zohoBc = new BroadcastChannel('zoho-oauth');
+      this.zohoBc.onmessage = (e) => {
+        if (e.data?.type === 'zoho-oauth-result') this.onEmailOauthResult(e.data.status);
       };
     } catch (_) {}
     // Fallback: postMessage
@@ -2493,6 +2936,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     window.removeEventListener('storage', this.gmailStorageHandler);
     this.gmailBc?.close();
     this.gmailBc = null;
+    this.outlookBc?.close();
+    this.outlookBc = null;
+    this.zohoBc?.close();
+    this.zohoBc = null;
     window.removeEventListener('message', this._gmailMsgHandler);
     if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
@@ -3041,26 +3488,47 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.showNewActivity = true;
   }
 
-  // ── Gmail ────────────────────────────────────────────────────────────────────
-  connectGmail(): void {
-    if (!this.gmailAuthUrl) return;
-    const popup = window.open(this.gmailAuthUrl, 'gmail-oauth', 'width=600,height=700,left=300,top=100');
-    if (!popup) return;
-    // Polling: gdy popup zostanie zamknięty — odśwież status Gmail
-    const timer = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(timer);
-        this.api.getGmailStatus().subscribe({
-          next: s => this.zone.run(() => {
-            this.gmailConnected = s.connected;
-            this.gmailEmail     = s.email || '';
-            if (s.connected) this.gmailAuthUrl = '';
-            this.cdr.markForCheck();
-          }),
-          error: () => {},
-        });
-      }
-    }, 500);
+  debugProcessEmail(): void {
+    this.debugProcessing = true;
+    this.cdr.markForCheck();
+    this.api.debugProcessEmail().subscribe({
+      next: (result: any) => this.zone.run(() => {
+        this.debugProcessing = false;
+        console.log('[Debug] processEmail result:', result);
+        alert(`Nowe wiadomości: ${result.newMessages_found ?? 0}`);
+        this.cdr.markForCheck();
+      }),
+      error: (e: any) => this.zone.run(() => {
+        this.debugProcessing = false;
+        alert('Błąd: ' + (e.error?.error || e.message));
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  checkNewEmails(): void {
+    if (this.syncingAll || !this.emailConnected) return;
+    this.syncingAll = true;
+    this.syncResult = '';
+    this.cdr.markForCheck();
+
+    this.api.debugProcessEmail().pipe(
+      map((r: any) => r?.recovered
+        ? `${this.emailProviderLabel}: odzyskano synchronizację, ${r?.newMessages_found ?? 0}`
+        : `${this.emailProviderLabel}: ${r?.newMessages_found ?? 0}`),
+      catchError(() => of(`${this.emailProviderLabel}: błąd synchronizacji`)),
+    ).subscribe({
+      next: label => this.zone.run(() => {
+        this.syncResult = label;
+        this.syncingAll = false;
+        this.refreshEmailActivities();
+        this.cdr.markForCheck();
+      }),
+      error: () => this.zone.run(() => {
+        this.syncingAll = false;
+        this.cdr.markForCheck();
+      }),
+    });
   }
 
   openEmailCompose(prefillThreadId?: string): void {
@@ -3078,17 +3546,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.ccQuery          = '';
     this.emailAttachments = [];
     this.emailError       = '';
-    if (!this.gmailConnected && !this.gmailAuthUrl && !this.settings.settings().crm_training_mode) {
-      this.api.getGmailAuthUrl().subscribe({
-        next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.showEmailCompose = true; this.cdr.markForCheck(); }),
-        error: () => this.zone.run(() => { this.gmailAuthUrl = ''; this.showEmailCompose = true; this.cdr.markForCheck(); }),
-      });
-    } else {
-      this.showEmailCompose = true;
-      this.midTab = 'emails';
+    this.showEmailCompose = true;
+    this.midTab = 'emails';
+    if (this.emailConnected) {
       this.loadEmailTemplates();
-      this.cdr.markForCheck();
     }
+    this.cdr.markForCheck();
   }
 
   openEmailModal(prefillThreadId?: string): void { this.openEmailCompose(prefillThreadId); }
@@ -3199,6 +3662,14 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     }).filter((s: string) => s.includes('@'));
   }
 
+  firstAddressDisplay(addrStr: string): string {
+    return formatAddressDisplay(addrStr);
+  }
+
+  extraAddressCount(addrStr: string): number {
+    return countExtraAddresses(addrStr);
+  }
+
   onAttachmentChange(event: Event): void {
     const files = (event.target as HTMLInputElement).files;
     if (files) this.emailAttachments = [...this.emailAttachments, ...Array.from(files)];
@@ -3225,10 +3696,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
         this.drivePickerLoading = false;
         this.driveNeedsReauth   = true;
         this.cdr.markForCheck();
-        this.api.getGmailAuthUrl().subscribe({
-          next: r => this.zone.run(() => { this.gmailAuthUrl = r.url; this.cdr.markForCheck(); }),
-          error: () => {},
-        });
         return;
       }
 
@@ -3318,73 +3785,85 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (!this.partner || !this.emailForm.recipientList?.length || !this.emailForm.subject) return;
     this.sendingEmail = true;
     this.emailError   = '';
+
+    // Provider is whatever the tenant has active — never chosen in this form.
+    const provider = this.emailProviderKey || 'gmail';
+
+    const onSuccess = (result: GmailSendResult) => {
+      this.zone.run(() => {
+        const wasReply      = !!this.emailForm.threadId;
+        const replyThreadId = this.emailForm.threadId;
+        if (!wasReply && this.partner) {
+          const newAct: any = {
+            id: result.activityId,
+            type: 'email',
+            title: this.emailForm.subject,
+            body: this.emailForm.body,
+            gmail_thread_id:  result.threadId,
+            gmail_message_id: result.messageId,
+            email_provider:   provider,
+            activity_at: new Date().toISOString(),
+            created_by: this.auth.user()?.id || null,
+            created_by_name: this.auth.user()?.display_name || null,
+            is_read: true,
+          };
+          this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
+        } else if (replyThreadId && this.partner) {
+          this.getPartnerThreadObs(replyThreadId).subscribe({
+            next: msgs => this.zone.run(() => {
+              this.threadMessages = msgs;
+              this.openThreadId   = replyThreadId;
+              this.cdr.markForCheck();
+            }),
+            error: () => {},
+          });
+        }
+        this.sendingEmail          = false;
+        this.showEmailCompose      = false;
+        this.includeHistoryCompose = false;
+        if (this.partner) {
+          this.api.getPartner(this.pid).subscribe({
+            next: (fresh: any) => this.zone.run(() => {
+              if (this.partner) {
+                (this.partner as any).extra_contacts = fresh.extra_contacts || [];
+                this.cdr.markForCheck();
+              }
+            }),
+            error: () => {},
+          });
+        }
+        if (this.settings.settings().crm_training_mode) {
+          setTimeout(() => this.refreshEmailActivities(), 47_000);
+        }
+        this.cdr.markForCheck();
+      });
+    };
+
+    const onError = (err: any) => {
+      this.zone.run(() => {
+        this.emailError   = err?.error?.error || 'Błąd wysyłki emaila';
+        this.sendingEmail = false;
+        this.cdr.markForCheck();
+      });
+    };
+
     const fd = new FormData();
     fd.append('to', this.emailForm.recipientList.join(','));
     if (this.emailForm.ccList?.length) fd.append('cc', this.emailForm.ccList.join(','));
     fd.append('subject', this.emailForm.subject);
-    fd.append('body', (this.emailForm.body || '') + (this.emailForm.quotedHtml || ''));
+    fd.append('body', trimEdgeEmptyHtml(this.emailForm.body || '') + (this.includeHistoryCompose ? this.emailForm.quotedHtml || '' : ''));
     if (this.emailForm.threadId)   fd.append('threadId',   this.emailForm.threadId);
     if (this.emailForm.inReplyTo)  fd.append('inReplyTo',  this.emailForm.inReplyTo);
     if (this.emailForm.references) fd.append('references', this.emailForm.references);
     this.emailAttachments.forEach(f => fd.append('attachments', f, f.name));
+    this.api.sendPartnerEmailUnified(this.pid, fd).subscribe({ next: onSuccess, error: onError });
+  }
 
-    this.api.sendPartnerEmail(this.pid, fd).subscribe({
-      next: (result: GmailSendResult) => {
-        this.zone.run(() => {
-          const wasReply      = !!this.emailForm.threadId;
-          const replyThreadId = this.emailForm.threadId;
-          if (!wasReply && this.partner) {
-            const newAct: any = {
-              id: result.activityId,
-              type: 'email',
-              title: this.emailForm.subject,
-              body: this.emailForm.body,
-              gmail_thread_id: result.threadId,
-              gmail_message_id: result.messageId,
-              activity_at: new Date().toISOString(),
-              created_by: this.auth.user()?.id || null,
-              created_by_name: this.auth.user()?.display_name || null,
-              is_read: true,
-            };
-            this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
-          } else if (replyThreadId && this.partner) {
-            this.api.getPartnerEmailThread(this.pid, replyThreadId).subscribe({
-              next: msgs => this.zone.run(() => {
-                this.threadMessages = msgs;
-                this.openThreadId   = replyThreadId;
-                this.cdr.markForCheck();
-              }),
-              error: () => {},
-            });
-          }
-          this.sendingEmail   = false;
-          this.showEmailCompose = false;
-          // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
-          if (this.partner) {
-            this.api.getPartner(this.pid).subscribe({
-              next: (fresh: any) => this.zone.run(() => {
-                if (this.partner) {
-                  (this.partner as any).extra_contacts = fresh.extra_contacts || [];
-                  this.cdr.markForCheck();
-                }
-              }),
-              error: () => {},
-            });
-          }
-          if (this.settings.settings().crm_training_mode) {
-            setTimeout(() => this.refreshEmailActivities(), 47_000);
-          }
-          this.cdr.markForCheck();
-        });
-      },
-      error: (err: any) => {
-        this.zone.run(() => {
-          this.emailError   = err?.error?.error || 'Błąd wysyłki emaila';
-          this.sendingEmail = false;
-          this.cdr.markForCheck();
-        });
-      },
-    });
+  private getPartnerThreadObs(threadId: string) {
+    const act = (this.partner?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
+    if (act?.email_provider === 'outlook') return this.api.getPartnerEmailThreadOutlook(this.pid, threadId);
+    if (act?.email_provider === 'zoho')    return this.api.getPartnerEmailThreadZoho(this.pid, threadId);
+    return this.api.getPartnerEmailThread(this.pid, threadId);
   }
 
   openThread(threadId: string): void {
@@ -3393,7 +3872,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       this.openThreadId = ''; this.threadMessages = []; this.cdr.markForCheck(); return;
     }
     this.openThreadId = threadId;
-    this.api.getPartnerEmailThread(this.pid, threadId).subscribe({
+    this.getPartnerThreadObs(threadId).subscribe({
       next: msgs => this.zone.run(() => {
         this.threadMessages = msgs;
         const act = (this.partner?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
@@ -3410,7 +3889,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     } else {
       if (!this.partner) return;
       this.openThreadId = a.gmail_thread_id;
-      this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
+      this.getPartnerThreadObs(a.gmail_thread_id).subscribe({
         next: msgs => this.zone.run(() => {
           this.threadMessages = msgs;
           this.cdr.markForCheck();
@@ -3427,9 +3906,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (m) {
       if (!this.emailForm.subject)
         this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
-      const fromAddrs  = this.parseAddressList(m.from);
-      const toAddrs    = this.parseAddressList(m.to);
-      const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+      const fromAddrs   = this.parseAddressList(m.from);
+      const toAddrs     = this.parseAddressList(m.to);
+      const activeEmail = this.emailAddress;
+      const isReceived  = fromAddrs.length > 0 && fromAddrs[0] !== activeEmail;
       this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
       if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
       this.emailForm.inReplyTo  = m.messageIdHeader || '';
@@ -3448,43 +3928,76 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (this.expandedEmailId === a.id) {
       this.expandedEmailId = null;
       this.showReplyInline = false;
+      this.openThreadId   = '';
+      this.threadMessages = [];
+      this.loadingThread  = false;
       this.cdr.markForCheck();
       return;
     }
     this.expandedEmailId = a.id;
     this.showReplyInline = false;
+    this.openThreadId    = '';
+    this.threadMessages  = [];
+    this.loadingThread   = false;
     this.cdr.markForCheck();
-    if (!a.is_read) {
+    if (!a.is_read && !a.gmail_thread_id) {
       a.is_read = true;
       this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
+    }
+    if (a.gmail_thread_id) {
+      this.toggleThreadInline(a);
     }
   }
 
   startInlineReply(a: any): void {
     if (!this.partner) return;
-    const subj = (a.title || '');
+    const activeEmail = this.emailAddress;
+    const lastMsg     = this.threadMessages.length > 0 ? this.threadMessages[this.threadMessages.length - 1] : null;
+
+    let replyRecipients: string[];
+    let replySubject: string;
+    let replyInReplyTo = '';
+
+    if (lastMsg) {
+      const fromAddrs  = this.parseAddressList(lastMsg.from || '');
+      const toAddrs    = this.parseAddressList(lastMsg.to   || '');
+      const isIncoming = fromAddrs.length > 0 && fromAddrs[0].toLowerCase() !== (activeEmail || '').toLowerCase();
+      replyRecipients  = isIncoming ? fromAddrs : toAddrs;
+      replySubject     = lastMsg.subject?.startsWith('Re:') ? lastMsg.subject : `Re: ${lastMsg.subject || a.title || ''}`;
+      replyInReplyTo   = lastMsg.messageIdHeader || '';
+    } else {
+      const subj      = a.title || '';
+      replySubject    = subj.startsWith('Re:') ? subj : `Re: ${subj}`;
+      replyRecipients = this.partner.email ? [this.partner.email] : [];
+    }
+
     this.inlineReplyForm = {
-      subject:       subj.startsWith('Re:') ? subj : `Re: ${subj}`,
+      subject:       replySubject,
       body:          '',
-      recipientList: this.partner.email ? [this.partner.email] : [],
+      recipientList: replyRecipients,
       ccList:        [],
       threadId:      a.gmail_thread_id || '',
-      inReplyTo:     '',
-      references:    '',
-      quotedHtml:    '',
+      inReplyTo:     replyInReplyTo,
+      references:    lastMsg ? this.buildReferences(this.threadMessages) : '',
+      quotedHtml:    lastMsg ? this.buildQuotedBody(this.threadMessages) : '',
+      emailProvider: a.email_provider || 'gmail',
     };
     this.inlineReplyRecipientQuery = '';
     this.inlineReplyCcQuery        = '';
     this.inlineReplySending        = false;
     this.inlineReplyError          = '';
     this.inlineReplyAttachments    = [];
+    this.showReplyDetails          = false;
+    this.includeHistoryInline      = false;
     this.showReplyInline           = true;
     this.cdr.markForCheck();
   }
 
   cancelInlineReply(): void {
-    this.showReplyInline = false;
-    this.inlineReplyForm = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+    this.showReplyInline      = false;
+    this.showReplyDetails     = false;
+    this.includeHistoryInline = false;
+    this.inlineReplyForm      = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
     this.cdr.markForCheck();
   }
 
@@ -3518,37 +4031,34 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   sendInlineReply(): void {
     this.addInlineReplyRecipient();
     this.addInlineReplyCc();
-    if (!this.partner || !this.inlineReplyForm.recipientList?.length || !this.inlineReplyForm.subject) return;
+    if (!this.partner || !this.inlineReplyForm.body?.trim()) return;
     this.inlineReplySending = true;
     this.inlineReplyError   = '';
     this.cdr.markForCheck();
+
+    const onSuccess = () => this.zone.run(() => {
+      this.inlineReplySending = false;
+      this.showReplyInline    = false;
+      this.showReplyDetails   = false;
+      this.cdr.markForCheck();
+    });
+    const onError = (err: any) => this.zone.run(() => {
+      this.inlineReplyError   = err?.error?.error || 'Błąd wysyłki';
+      this.inlineReplySending = false;
+      this.cdr.markForCheck();
+    });
 
     const fd = new FormData();
     fd.append('to', this.inlineReplyForm.recipientList.join(','));
     if (this.inlineReplyForm.ccList?.length) fd.append('cc', this.inlineReplyForm.ccList.join(','));
     fd.append('subject', this.inlineReplyForm.subject);
-    fd.append('body', (this.inlineReplyForm.body || '') + (this.inlineReplyForm.quotedHtml || ''));
+    fd.append('body', trimEdgeEmptyHtml(this.inlineReplyForm.body || '') + (this.includeHistoryInline ? this.inlineReplyForm.quotedHtml || '' : ''));
     if (this.inlineReplyForm.threadId)   fd.append('threadId',   this.inlineReplyForm.threadId);
     if (this.inlineReplyForm.inReplyTo)  fd.append('inReplyTo',  this.inlineReplyForm.inReplyTo);
     if (this.inlineReplyForm.references) fd.append('references', this.inlineReplyForm.references);
     this.inlineReplyAttachments.forEach(f => fd.append('attachments', f, f.name));
 
-    this.api.sendPartnerEmail(this.pid, fd).subscribe({
-      next: () => {
-        this.zone.run(() => {
-          this.inlineReplySending = false;
-          this.showReplyInline    = false;
-          this.cdr.markForCheck();
-        });
-      },
-      error: (err: any) => {
-        this.zone.run(() => {
-          this.inlineReplyError   = err?.error?.error || 'Błąd wysyłki';
-          this.inlineReplySending = false;
-          this.cdr.markForCheck();
-        });
-      },
-    });
+    this.api.sendPartnerEmailUnified(this.pid, fd).subscribe({ next: onSuccess, error: onError });
   }
 
   selectEmailForPanel(a: any): void { this.toggleEmailExpand(a); }
@@ -3562,16 +4072,15 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.threadMessages = [];
     this.loadingThread = true;
     this.cdr.markForCheck();
-    // Wątek ma nieprzeczytane — oznacz jako przeczytany
     if (!a.is_read) {
       a.is_read = true;
       this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
     }
-    this.api.getPartnerEmailThread(this.pid, a.gmail_thread_id).subscribe({
+    this.getPartnerThreadObs(a.gmail_thread_id).subscribe({
       next: msgs => this.zone.run(() => {
+        if (this.openThreadId !== a.gmail_thread_id) return;
         this.threadMessages = msgs;
         this.loadingThread = false;
-        // Auto-mark all unread incoming messages in the thread
         msgs.forEach((m: any) => {
           if (m.is_read === false && m.created_by === null) {
             m.is_read = true;
@@ -3580,7 +4089,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
         });
         this.cdr.markForCheck();
       }),
-      error: () => this.zone.run(() => { this.loadingThread = false; this.cdr.markForCheck(); }),
+      error: () => this.zone.run(() => {
+        if (this.openThreadId !== a.gmail_thread_id) return;
+        this.loadingThread = false;
+        this.cdr.markForCheck();
+      }),
     });
   }
 
@@ -3746,15 +4259,17 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.msgModalMsg         = null;
     this.msgModalReply       = false;
     this.msgModalAttachments = [];
+    this.includeHistoryModal = false;
     this.cdr.markForCheck();
   }
 
   startMsgReply(): void {
     const m = this.msgModalMsg;
     if (!m) return;
-    const fromAddrs  = this.parseAddressList(m.from);
-    const toAddrs    = this.parseAddressList(m.to);
-    const isReceived = fromAddrs.length > 0 && fromAddrs[0] !== this.gmailEmail;
+    const activeEmail = this.emailAddress;
+    const fromAddrs   = this.parseAddressList(m.from);
+    const toAddrs     = this.parseAddressList(m.to);
+    const isReceived  = fromAddrs.length > 0 && fromAddrs[0] !== activeEmail;
     this.msgModalForm = {
       subject:       m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`,
       body:          '',
@@ -3768,6 +4283,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.msgModalRecipientQuery = '';
     this.msgModalCcQuery        = '';
     this.msgModalAttachments    = [];
+    this.includeHistoryModal    = false;
     this.msgModalReply = true;
     this.cdr.markForCheck();
     this.focusEmailBodyTop('partner-msg-reply-textarea');
@@ -3790,54 +4306,50 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (!this.partner || !this.msgModalForm.recipientList?.length || !this.msgModalForm.subject) return;
     this.msgModalSending = true;
     this.msgModalError   = '';
+
+    const onSuccess = () => this.zone.run(() => {
+      const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
+      this.msgModalSending = false;
+      this.closeMsgModal();
+      if (replyThreadId && this.partner) {
+        this.getPartnerThreadObs(replyThreadId).subscribe({
+          next: msgs => this.zone.run(() => {
+            this.threadMessages = msgs;
+            this.openThreadId   = replyThreadId;
+            this.cdr.markForCheck();
+          }),
+          error: () => {},
+        });
+      }
+      if (this.partner) {
+        this.api.getPartner(this.pid).subscribe({
+          next: (fresh: any) => this.zone.run(() => {
+            if (this.partner) {
+              (this.partner as any).extra_contacts = fresh.extra_contacts || [];
+              this.cdr.markForCheck();
+            }
+          }),
+          error: () => {},
+        });
+      }
+      this.cdr.markForCheck();
+    });
+    const onError = (err: any) => this.zone.run(() => {
+      this.msgModalError   = err?.error?.error || 'Błąd wysyłki';
+      this.msgModalSending = false;
+      this.cdr.markForCheck();
+    });
+
     const fd = new FormData();
     fd.append('to', this.msgModalForm.recipientList.join(','));
     if (this.msgModalForm.ccList?.length) fd.append('cc', this.msgModalForm.ccList.join(','));
     fd.append('subject', this.msgModalForm.subject);
-    fd.append('body', (this.msgModalForm.body || '') + (this.msgModalForm.quotedHtml || ''));
+    fd.append('body', (this.msgModalForm.body || '') + (this.includeHistoryModal ? this.msgModalForm.quotedHtml || '' : ''));
     if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId || this.msgModalMsg?.threadId);
     if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
     if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
     this.msgModalAttachments.forEach(f => fd.append('attachments', f, f.name));
-    this.api.sendPartnerEmail(this.pid, fd).subscribe({
-      next: (result: GmailSendResult) => {
-        this.zone.run(() => {
-          const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
-          this.msgModalSending = false;
-          this.closeMsgModal();
-          if (replyThreadId && this.partner) {
-            this.api.getPartnerEmailThread(this.pid, replyThreadId).subscribe({
-              next: msgs => this.zone.run(() => {
-                this.threadMessages = msgs;
-                this.openThreadId   = replyThreadId;
-                this.cdr.markForCheck();
-              }),
-              error: () => {},
-            });
-          }
-          // Odśwież extra_contacts (autoSavePartnerContacts mogło dodać nowe)
-          if (this.partner) {
-            this.api.getPartner(this.pid).subscribe({
-              next: (fresh: any) => this.zone.run(() => {
-                if (this.partner) {
-                  (this.partner as any).extra_contacts = fresh.extra_contacts || [];
-                  this.cdr.markForCheck();
-                }
-              }),
-              error: () => {},
-            });
-          }
-          this.cdr.markForCheck();
-        });
-      },
-      error: (err: any) => {
-        this.zone.run(() => {
-          this.msgModalError   = err?.error?.error || 'Błąd wysyłki';
-          this.msgModalSending = false;
-          this.cdr.markForCheck();
-        });
-      },
-    });
+    this.api.sendPartnerEmailUnified(this.pid, fd).subscribe({ next: onSuccess, error: onError });
   }
 
   viewAttachment(att: any, msg: any): void {
