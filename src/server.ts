@@ -15,12 +15,18 @@ const API_UPSTREAM = process.env['API_UPSTREAM'] || 'http://127.0.0.1:3001';
 const APP_ENV = process.env['APP_ENV'] || 'production';
 
 const app = express();
+
 // Azure Container Apps ingress sits directly in front of this container and adds
 // x-forwarded-* headers — without trusting them, Angular silently deopts to CSR
 // (no crash, just loses SSR/SEO on every request behind the platform's own proxy).
 // Azure also sends a non-standard "x-forwarded-path" (Angular only knows
 // "x-forwarded-prefix"), so the standard headers alone aren't enough — list it explicitly.
+//
+// allowedHosts: Angular's SSRF guard rejects any request whose Host/X-Forwarded-Host
+// isn't on this list — every one of our real front doors needs to be here, or
+// server-rendered routes 400 with "Header ... is not allowed" instead of rendering.
 const angularApp = new AngularNodeAppEngine({
+  allowedHosts: ['crmtree.pl', '*.crmtree.pl'],
   trustProxyHeaders: [
     'x-forwarded-for',
     'x-forwarded-host',
