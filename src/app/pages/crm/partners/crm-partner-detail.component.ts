@@ -5,15 +5,16 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize, catchError, map } from 'rxjs/operators';
-import { forkJoin, of } from 'rxjs';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, WhatsappHistoryEntry } from '../../../core/services/crm-api.service';
+import { forkJoin, of, Subscription } from 'rxjs';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
-import { formatAddressDisplay, countExtraAddresses } from '../../../shared/utils/email-address.util';
+import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
-import { formatPhoneDisplay, requiresCountryCode, isLikelyDemoPhone, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
+import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
+import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { QuillModule } from 'ngx-quill';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
@@ -48,6 +49,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   selector: 'wt-crm-partner-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule],
+  providers: [EmailOauthListenerService],
   template: `
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
@@ -578,28 +580,29 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
             <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
           </ng-container>
-          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" (click)="openEmailCompose()">+ Nowy email</button>
+          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ Łączenie z Google…' : '+ Nowy email'}}</button>
         </div>
 
         <!-- INLINE COMPOSE -->
         <div *ngIf="showEmailCompose" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ Nowy email</div>
-            <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false; includeHistoryCompose=false">✕</button>
+            <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
-          <!-- Provider row — always visible when compose is open. The company mailbox is
-               connected/changed/disconnected only by a superadmin from Tenant → Email;
-               this only shows the tenant's single active provider's connection state. -->
+          <!-- Provider row — always visible when compose is open. Every user connects
+               their OWN mailbox (triggered from "Nowy email"); this shows which
+               account is currently connected, or that the tenant hasn't chosen a
+               provider yet. -->
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0;align-items:stretch">
               <div *ngIf="emailConnected"
                    [style.border]="'1.5px solid ' + emailProviderColor"
                    [style.background]="emailProviderBg"
-                   style="display:inline-flex;align-items:center;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden">
-                <span style="min-width:0;padding:4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                   style="display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;padding-right:8px">
+                <span style="min-width:0;padding:4px 0 4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                       [title]="emailAddress">Od: <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
+                <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">Rozłącz</button>
               </div>
-              <div *ngIf="!emailConnected && emailProviderKey && !settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">Skrzynka firmowa nie jest jeszcze podłączona — skontaktuj się z administratorem.</div>
               <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.</div>
             </div>
             <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 Tryb szkoleniowy</div>
@@ -635,9 +638,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" placeholder="Treść wiadomości…" style="display:block" theme="snow"></quill-editor>
-            <label *ngIf="emailForm.quotedHtml" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer">
-              <input type="checkbox" [(ngModel)]="includeHistoryCompose"> Dołącz historię korespondencji
-            </label>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
               <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
@@ -650,13 +650,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
             <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
-              <button class="btn-sm" (click)="showEmailCompose=false; includeHistoryCompose=false">Anuluj</button>
+              <button class="btn-sm" (click)="showEmailCompose=false">Anuluj</button>
               <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}</button>
             </div>
           </ng-container>
         </div>
 
-        <div *ngIf="emailActivities.length===0" class="empty-act">Brak emaili. Wyślij pierwszą wiadomość klikając „+ Nowy email".</div>
+        <div *ngIf="emailActivities.length===0" class="empty-act">{{ emailStatus?.configured===false ? 'Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.' : 'Brak emaili. Wyślij pierwszą wiadomość klikając „+ Nowy email".' }}</div>
 
         <!-- Email cards — expand/collapse inline -->
         <div *ngFor="let a of emailActivities" style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;background:white"
@@ -681,6 +681,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
             <ng-container *ngIf="a.gmail_thread_id; else singleBody">
               <div *ngIf="loadingThread" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie wątku…</div>
+              <div *ngIf="!loadingThread && threadUnavailableReason" style="font-size:12px;color:#92400e;background:#fef3c7;border-radius:6px;padding:8px 10px">{{threadUnavailableReason}}</div>
               <div *ngFor="let m of threadMessages"
                    [style.background]="m.created_by ? 'white' : '#fffbeb'"
                    [style.border]="m.created_by ? '1px solid #e5e7eb' : '1px solid #fbbf24'"
@@ -734,9 +735,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
                   <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
                 </label>
-                <label *ngIf="inlineReplyForm.quotedHtml" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer">
-                  <input type="checkbox" [(ngModel)]="includeHistoryInline"> Dołącz historię korespondencji
-                </label>
               </ng-container>
               <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" placeholder="Treść odpowiedzi…" style="display:block" theme="snow"></quill-editor>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -752,7 +750,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
-              <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)">↩ Odpowiedz</button>
+              <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)"
+                      [title]="threadCanReply ? '' : ('Wątek należy do ' + (threadOwnerEmail || 'innego użytkownika') + ' — wyślesz nową wiadomość ze swojego konta')">
+                {{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}
+              </button>
             </div>
           </div>
         </div>
@@ -766,13 +767,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </button>
         </div>
 
-        <div *ngIf="whatsappConfigured===null" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
+        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
 
-        <div *ngIf="whatsappConfigured===false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+        <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania. -->
+        <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
           <div style="font-size:32px">💬</div>
           <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-          <div style="font-size:13px;color:#9ca3af;text-align:center">Nie masz podłączonego numeru WhatsApp.</div>
-          <a routerLink="/my-settings" style="font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none">→ Podłącz numer w Moje ustawienia</a>
+          <div style="font-size:13px;color:#9ca3af;text-align:center">WhatsApp nie jest skonfigurowany dla tego tenanta. Skontaktuj się z administratorem.</div>
         </div>
 
         <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
@@ -806,8 +807,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
         </div>
 
-        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa -->
-        <ng-container *ngIf="whatsappConfigured===true">
+        <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa, wspólny dla
+             całego tenanta. -->
+        <ng-container *ngIf="whatsappConfigured===true || whatsappHistoryLoading || whatsappConversations.length>0">
           <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie historii…</div>
           <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
 
@@ -1668,10 +1670,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
     <div class="modal-body" style="gap:10px" *ngIf="msgModalMsg && !msgModalReply">
       <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12px">
-        <span style="color:#9ca3af">Od:</span><span>{{msgModalMsg.from}}</span>
-        <span style="color:#9ca3af">Do:</span><span>{{msgModalMsg.to}}</span>
+        <span style="color:#9ca3af">Od:</span><span>{{firstAddressDisplay(msgModalMsg.from)}}</span>
+        <span style="color:#9ca3af">Do:</span><span>{{decodeAddress(msgModalMsg.to)}}</span>
         <span *ngIf="msgModalMsg.cc" style="color:#9ca3af">DW:</span>
-        <span *ngIf="msgModalMsg.cc">{{msgModalMsg.cc}}</span>
+        <span *ngIf="msgModalMsg.cc">{{decodeAddress(msgModalMsg.cc)}}</span>
         <span style="color:#9ca3af">Data:</span><span>{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
       <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;color:#374151;max-height:320px;overflow-y:auto"
@@ -1716,9 +1718,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
       <input class="act-input" [(ngModel)]="msgModalForm.subject" placeholder="Temat">
       <textarea class="act-input" id="partner-msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="7" placeholder="Treść…"></textarea>
-      <label *ngIf="msgModalForm.quotedHtml" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer;margin-top:2px">
-        <input type="checkbox" [(ngModel)]="includeHistoryModal"> Dołącz historię korespondencji
-      </label>
       <!-- Załączniki w odpowiedzi -->
       <div style="display:flex;flex-direction:column;gap:4px">
         <span style="font-size:12px;font-weight:600">Załączniki</span>
@@ -1743,7 +1742,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
     <div class="modal-footer">
       <button class="btn-outline" (click)="closeMsgModal()">Zamknij</button>
-      <button *ngIf="!msgModalReply" class="btn-primary" (click)="startMsgReply()">↩ Odpowiedz</button>
+      <button *ngIf="!msgModalReply" class="btn-primary" (click)="startMsgReply()">{{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}</button>
       <button *ngIf="msgModalReply" class="btn-primary" (click)="sendMsgReply()"
               [disabled]="msgModalSending||!msgModalForm.recipientList?.length||!msgModalForm.subject">
         {{msgModalSending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}
@@ -2017,6 +2016,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private auth     = inject(AuthService);
   private router   = inject(Router);
   private sanitizer = inject(DomSanitizer);
+  private emailOauthListener = inject(EmailOauthListenerService);
   protected settings = inject(AppSettingsService);
 
   // Słowniki z app_settings
@@ -2135,10 +2135,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.midTab = 'whatsapp';
     this.whatsappConvState.forEach(s => { s.replyOpen = false; });
     if (this.whatsappConfigured === null) {
-      // Prefill only with the partner's own real phone — never a placeholder/demo
-      // example, even if a seed record was ever created with one as literal data.
-      const partnerPhone = this.partner?.phone;
-      this.whatsappToPhone = isLikelyDemoPhone(partnerPhone) ? '' : formatPhoneDisplay(partnerPhone);
+      // Always starts empty — the example number is shown only via the
+      // input's placeholder, never prefilled as an editable value, even
+      // when the partner has a real phone on file.
+      this.whatsappToPhone = '';
       this.api.getWhatsappStatus().subscribe({
         next: status => this.zone.run(() => {
           this.whatsappConfigured    = status.configured && status.enabled;
@@ -2223,8 +2223,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
   midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' = 'all';
 
-  // WhatsApp tab — status reflects the CURRENT USER's own connected number
-  // (whatsapp_configs, keyed by user_id), not a tenant-wide setting.
+  // WhatsApp tab — status reflects the tenant's one shared WhatsApp Business
+  // number (tenant_whatsapp_config), configured by a super admin.
   whatsappConfigured: boolean | null = null;
   whatsappDisplayNumber: string | null = null;
   whatsappToPhone = '';
@@ -2448,7 +2448,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   showEmailCompose    = false;
   expandedEmailId: number | null = null;
   showReplyInline     = false;
-  inlineReplyForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  inlineReplyForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '' };
   inlineReplyRecipientQuery = '';
   inlineReplyCcQuery        = '';
   inlineReplySending        = false;
@@ -2456,12 +2456,19 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   inlineReplyAttachments: File[] = [];
   sendingEmail        = false;
   emailError          = '';
-  emailForm: any      = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  emailForm: any      = { recipientList: [] as string[], ccList: [] as string[], subject: '', body: '', threadId: '', inReplyTo: '', references: '' };
   recipientQuery      = '';
   ccQuery             = '';
   emailAttachments: File[] = [];
   emailTemplates: any[] = [];
   threadMessages: any[] = [];
+  // Whether the CURRENT user owns the open thread's mailbox (only the owner
+  // can reply in-thread — Gmail threads live in one Google account). Defaults
+  // true so training mode / non-Gmail providers (still shared in Phase 1) work
+  // as before.
+  threadCanReply = true;
+  threadOwnerEmail: string | null = null;
+  threadUnavailableReason: string | null = null;
   loadingThread       = false;
   openThreadId        = '';
   selectedEmailActivity: any = null;
@@ -2476,11 +2483,13 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   churnData: ChurnPartner | null = null;
   churnLoading = false;
   readonly currentYear = new Date().getFullYear();
-  // ── Email — tenant's single active provider and shared company mailbox.
-  // Connect/change/disconnect only happens from Tenant → Email (superadmin) —
-  // this view is read-only with respect to the mailbox connection itself.
+  // ── Email — tenant chooses the active provider; each user connects their
+  // OWN mailbox for it, triggered inline from "Nowy email" below.
   emailStatus: EmailStatus | null = null;
   emailAddress = '';
+  connectingEmail = false;
+  // '' = new email pending connect, a threadId = reply pending connect, null = no pending intent
+  private pendingEmailComposeThreadId: string | null = null;
 
   get emailProviderKey(): EmailProviderKey | null { return this.emailStatus?.provider ?? null; }
   get emailConnected(): boolean { return !!this.emailStatus?.connected; }
@@ -2502,7 +2511,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   showMsgModal    = false;
   msgModalMsg: any = null;
   msgModalReply   = false;
-  msgModalForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+  msgModalForm: any = { subject: '', body: '', recipientList: [] as string[], ccList: [] as string[], threadId: '', inReplyTo: '', references: '' };
   msgModalRecipientQuery = '';
   msgModalCcQuery        = '';
   msgModalSending        = false;
@@ -2844,54 +2853,35 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return Math.round(((this.partner.active_users || 0) / this.partner.license_count) * 100);
   }
 
-  private gmailBc: BroadcastChannel | null = null;
-  private outlookBc: BroadcastChannel | null = null;
-  private zohoBc: BroadcastChannel | null = null;
   private emailPollInterval: any = null;
+  private emailOauthSub: Subscription | null = null;
   debugProcessing        = false;
   syncingAll             = false;
   syncResult             = '';
   showReplyDetails       = false;
-  includeHistoryCompose  = false;
-  includeHistoryInline   = false;
-  includeHistoryModal    = false;
 
-  // Any of the 3 OAuth callback pages (gmail/outlook/zoho) reports back here —
-  // whichever one fired is, by construction, the tenant's active provider, so
-  // we just refresh the unified status instead of tracking 3 separate flags.
+  // Whichever provider's OAuth callback page reports back here is, by
+  // construction, the tenant's active provider, so we just refresh the
+  // unified status instead of tracking per-provider flags. If a "Nowy email"
+  // click triggered the connect popup, resume opening compose once connected.
   private onEmailOauthResult(status: string): void {
-    if (status !== 'connected') return;
-    this.loadEmailStatus();
+    this.connectingEmail = false;
+    if (status !== 'connected') { this.pendingEmailComposeThreadId = null; return; }
+    this.loadEmailStatus(() => {
+      if (this.pendingEmailComposeThreadId !== null) {
+        const threadId = this.pendingEmailComposeThreadId || undefined;
+        this.pendingEmailComposeThreadId = null;
+        this.openEmailCompose(threadId);
+      }
+    });
   }
 
-  // storage event — primary mechanism (new tab / popup via redirects)
-  private gmailStorageHandler = (e: StorageEvent) => {
-    if (e.key === 'gmail_oauth_connected' && e.newValue) {
-      localStorage.removeItem('gmail_oauth_connected');
-      this.onEmailOauthResult('connected');
-    }
-    if (e.key === 'outlook_oauth_connected' && e.newValue) {
-      localStorage.removeItem('outlook_oauth_connected');
-      this.onEmailOauthResult('connected');
-    }
-    if (e.key === 'zoho_oauth_connected' && e.newValue) {
-      localStorage.removeItem('zoho_oauth_connected');
-      this.onEmailOauthResult('connected');
-    }
-  };
-
-  private _gmailMsgHandler = (ev: MessageEvent) => {
-    if (ev.origin !== window.location.origin) return;
-    if (ev.data?.type === 'gmail-oauth-result' || ev.data?.type === 'outlook-oauth-result' || ev.data?.type === 'zoho-oauth-result') {
-      this.onEmailOauthResult(ev.data.status);
-    }
-  };
-
-  loadEmailStatus(): void {
+  loadEmailStatus(onDone?: () => void): void {
     this.api.getEmailStatus().subscribe({
       next: s => this.zone.run(() => {
         this.emailStatus  = s;
         this.emailAddress = s.email || '';
+        onDone?.();
         this.cdr.markForCheck();
       }),
       error: () => {},
@@ -2907,40 +2897,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.api.getGroups().subscribe({ next: g => { this.zone.run(() => { this.partnerGroups = g; this.cdr.markForCheck(); }); }, error: () => {} });
     this.api.getCrmUsers().subscribe({ next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); }, error: () => {} });
     this.loadEmailStatus();
-    // storage event — primary mechanism
-    window.addEventListener('storage', this.gmailStorageHandler);
-    // BroadcastChannel — fallback for cross-tab OAuth result
-    try {
-      this.gmailBc = new BroadcastChannel('gmail-oauth');
-      this.gmailBc.onmessage = (e) => {
-        if (e.data?.type === 'gmail-oauth-result') this.onEmailOauthResult(e.data.status);
-      };
-    } catch (_) {}
-    try {
-      this.outlookBc = new BroadcastChannel('outlook-oauth');
-      this.outlookBc.onmessage = (e) => {
-        if (e.data?.type === 'outlook-oauth-result') this.onEmailOauthResult(e.data.status);
-      };
-    } catch (_) {}
-    try {
-      this.zohoBc = new BroadcastChannel('zoho-oauth');
-      this.zohoBc.onmessage = (e) => {
-        if (e.data?.type === 'zoho-oauth-result') this.onEmailOauthResult(e.data.status);
-      };
-    } catch (_) {}
-    // Fallback: postMessage
-    window.addEventListener('message', this._gmailMsgHandler);
+    this.emailOauthSub = this.emailOauthListener.result$.subscribe(status => this.onEmailOauthResult(status));
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('storage', this.gmailStorageHandler);
-    this.gmailBc?.close();
-    this.gmailBc = null;
-    this.outlookBc?.close();
-    this.outlookBc = null;
-    this.zohoBc?.close();
-    this.zohoBc = null;
-    window.removeEventListener('message', this._gmailMsgHandler);
+    this.emailOauthSub?.unsubscribe();
     if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
   }
 
@@ -3532,6 +3493,26 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   openEmailCompose(prefillThreadId?: string): void {
+    const training_mode = this.settings.settings().crm_training_mode;
+    if (!this.emailConnected && !training_mode) {
+      if (!this.emailProviderKey) {
+        // No provider configured for this tenant at all — nothing to connect to.
+        this.emailForm = { recipientList: [], ccList: [], subject: '', body: '', threadId: prefillThreadId || '', inReplyTo: '', references: '' };
+        this.showEmailCompose = true;
+        return;
+      }
+      this.pendingEmailComposeThreadId = prefillThreadId ?? '';
+      this.connectingEmail = true;
+      this.api.getMyEmailOauthUrl().subscribe({
+        next: ({ url }) => window.open(url, 'mailbox-oauth', 'width=520,height=650'),
+        error: () => this.zone.run(() => {
+          this.connectingEmail = false;
+          this.pendingEmailComposeThreadId = null;
+          this.cdr.markForCheck();
+        }),
+      });
+      return;
+    }
     this.emailForm = {
       recipientList: this.partner?.email ? [this.partner.email] : (this.partner?.billing_email_address ? [this.partner.billing_email_address] : []),
       ccList: [],
@@ -3540,7 +3521,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       threadId: prefillThreadId || '',
       inReplyTo: '',
       references: '',
-      quotedHtml: '',
     };
     this.recipientQuery   = '';
     this.ccQuery          = '';
@@ -3555,6 +3535,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   openEmailModal(prefillThreadId?: string): void { this.openEmailCompose(prefillThreadId); }
+
+  disconnectEmail(): void {
+    if (!confirm('Rozłączyć swoje konto pocztowe? Aby dalej wysyłać maile, będziesz musiał połączyć je ponownie.')) return;
+    this.api.disconnectMyEmail().subscribe({
+      next: () => this.zone.run(() => {
+        this.emailStatus     = null;
+        this.emailAddress    = '';
+        this.showEmailCompose = false;
+        this.loadEmailStatus();
+        this.cdr.markForCheck();
+      }),
+      error: () => {},
+    });
+  }
 
   loadEmailTemplates(): void {
     this.api.getEmailTemplates().subscribe({
@@ -3656,7 +3650,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   /** Parsuje "Name <email>, email2" → ['email1', 'email2'] */
   parseAddressList(header: string): string[] {
     if (!header) return [];
-    return header.split(',').map((s: string) => {
+    return decodeAddressEntities(header).split(',').map((s: string) => {
       const m = s.trim().match(/<([^>]+)>/);
       return m ? m[1].trim().toLowerCase() : s.trim().toLowerCase();
     }).filter((s: string) => s.includes('@'));
@@ -3668,6 +3662,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   extraAddressCount(addrStr: string): number {
     return countExtraAddresses(addrStr);
+  }
+
+  decodeAddress(addrStr: string): string {
+    return formatAddressListDisplay(addrStr);
   }
 
   onAttachmentChange(event: Event): void {
@@ -3810,9 +3808,17 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
           this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
         } else if (replyThreadId && this.partner) {
           this.getPartnerThreadObs(replyThreadId).subscribe({
-            next: msgs => this.zone.run(() => {
-              this.threadMessages = msgs;
-              this.openThreadId   = replyThreadId;
+            next: res => this.zone.run(() => {
+              this.threadMessages  = res.messages;
+              this.threadCanReply  = res.canReply;
+              this.threadOwnerEmail = res.ownerEmail;
+              this.openThreadId    = replyThreadId;
+              // Keep the card expanded under the newly-created activity's id —
+              // emailActivities groups by gmail_thread_id and always shows the
+              // highest-id row as the card's representative, so once
+              // partner.activities refreshes (poller, tab switch, "Sprawdź nowe")
+              // the card would otherwise collapse under the stale old id.
+              this.expandedEmailId = result.activityId;
               this.cdr.markForCheck();
             }),
             error: () => {},
@@ -3820,7 +3826,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
         }
         this.sendingEmail          = false;
         this.showEmailCompose      = false;
-        this.includeHistoryCompose = false;
         if (this.partner) {
           this.api.getPartner(this.pid).subscribe({
             next: (fresh: any) => this.zone.run(() => {
@@ -3851,7 +3856,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     fd.append('to', this.emailForm.recipientList.join(','));
     if (this.emailForm.ccList?.length) fd.append('cc', this.emailForm.ccList.join(','));
     fd.append('subject', this.emailForm.subject);
-    fd.append('body', trimEdgeEmptyHtml(this.emailForm.body || '') + (this.includeHistoryCompose ? this.emailForm.quotedHtml || '' : ''));
+    fd.append('body', trimEdgeEmptyHtml(this.emailForm.body || ''));
     if (this.emailForm.threadId)   fd.append('threadId',   this.emailForm.threadId);
     if (this.emailForm.inReplyTo)  fd.append('inReplyTo',  this.emailForm.inReplyTo);
     if (this.emailForm.references) fd.append('references', this.emailForm.references);
@@ -3859,10 +3864,17 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.api.sendPartnerEmailUnified(this.pid, fd).subscribe({ next: onSuccess, error: onError });
   }
 
+  // Normalizes to GmailThreadResponse regardless of provider. All three
+  // providers are per-user (same ownership model as Gmail) — every
+  // provider's endpoint returns the wrapper shape natively.
   private getPartnerThreadObs(threadId: string) {
     const act = (this.partner?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
-    if (act?.email_provider === 'outlook') return this.api.getPartnerEmailThreadOutlook(this.pid, threadId);
-    if (act?.email_provider === 'zoho')    return this.api.getPartnerEmailThreadZoho(this.pid, threadId);
+    if (act?.email_provider === 'outlook') {
+      return this.api.getPartnerEmailThreadOutlook(this.pid, threadId);
+    }
+    if (act?.email_provider === 'zoho') {
+      return this.api.getPartnerEmailThreadZoho(this.pid, threadId);
+    }
     return this.api.getPartnerEmailThread(this.pid, threadId);
   }
 
@@ -3873,8 +3885,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     }
     this.openThreadId = threadId;
     this.getPartnerThreadObs(threadId).subscribe({
-      next: msgs => this.zone.run(() => {
-        this.threadMessages = msgs;
+      next: res => this.zone.run(() => {
+        this.threadMessages = res.messages;
+        this.threadCanReply = res.canReply;
+        this.threadOwnerEmail = res.ownerEmail;
+        this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
         const act = (this.partner?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
         if (act && !act.is_read) act.is_read = true;
         this.cdr.markForCheck();
@@ -3890,8 +3905,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       if (!this.partner) return;
       this.openThreadId = a.gmail_thread_id;
       this.getPartnerThreadObs(a.gmail_thread_id).subscribe({
-        next: msgs => this.zone.run(() => {
-          this.threadMessages = msgs;
+        next: res => this.zone.run(() => {
+          this.threadMessages = res.messages;
+          this.threadCanReply = res.canReply;
+          this.threadOwnerEmail = res.ownerEmail;
           this.cdr.markForCheck();
           this._applyThreadReply(a.gmail_thread_id);
         }),
@@ -3901,21 +3918,32 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   private _applyThreadReply(threadId: string): void {
+    // Not the thread's owner — open compose prefilled with the same
+    // recipient, but as a brand-new email from the current user's own
+    // account (no threadId/inReplyTo/references tying it to a thread they
+    // don't own; Gmail threads live in one Google account).
+    const canReplyInThread = this.threadCanReply;
     const m = this.threadMessages[this.threadMessages.length - 1];
-    this.openEmailModal(threadId);
+    this.openEmailModal(canReplyInThread ? threadId : undefined);
+    if (!canReplyInThread) {
+      this.emailError = this.threadOwnerEmail
+        ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Poniższy e-mail zostanie wysłany jako nowa wiadomość z Twojego konta.`
+        : 'Nie możesz odpowiadać w tym wątku. Poniższy e-mail zostanie wysłany jako nowa wiadomość z Twojego konta.';
+    }
     if (m) {
       if (!this.emailForm.subject)
         this.emailForm.subject = m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`;
       const fromAddrs   = this.parseAddressList(m.from);
       const toAddrs     = this.parseAddressList(m.to);
       const activeEmail = this.emailAddress;
-      const isReceived  = fromAddrs.length > 0 && fromAddrs[0] !== activeEmail;
+      const isReceived  = fromAddrs.length > 0 && !isSameMailboxAddress(fromAddrs[0], activeEmail);
       this.emailForm.recipientList = isReceived ? fromAddrs : toAddrs;
       if (m.cc) this.emailForm.ccList = this.parseAddressList(m.cc);
-      this.emailForm.inReplyTo  = m.messageIdHeader || '';
-      this.emailForm.references = this.buildReferences(this.threadMessages);
-      this.emailForm.body       = '';
-      this.emailForm.quotedHtml = this.buildQuotedBody(this.threadMessages);
+      if (canReplyInThread) {
+        this.emailForm.inReplyTo  = m.messageIdHeader || '';
+        this.emailForm.references = this.buildReferences(this.threadMessages);
+      }
+      this.emailForm.body = '';
       this.focusEmailBodyTop();
     }
     this.cdr.markForCheck();
@@ -3961,7 +3989,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (lastMsg) {
       const fromAddrs  = this.parseAddressList(lastMsg.from || '');
       const toAddrs    = this.parseAddressList(lastMsg.to   || '');
-      const isIncoming = fromAddrs.length > 0 && fromAddrs[0].toLowerCase() !== (activeEmail || '').toLowerCase();
+      const isIncoming = fromAddrs.length > 0 && !isSameMailboxAddress(fromAddrs[0], activeEmail);
       replyRecipients  = isIncoming ? fromAddrs : toAddrs;
       replySubject     = lastMsg.subject?.startsWith('Re:') ? lastMsg.subject : `Re: ${lastMsg.subject || a.title || ''}`;
       replyInReplyTo   = lastMsg.messageIdHeader || '';
@@ -3971,24 +3999,31 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       replyRecipients = this.partner.email ? [this.partner.email] : [];
     }
 
+    // Not the thread's owner — this must go out as a brand-new email from the
+    // current user's own account, not a reply tied to a thread they don't own
+    // (Gmail threads live in one Google account).
+    const canReplyInThread = this.threadCanReply;
+
     this.inlineReplyForm = {
       subject:       replySubject,
       body:          '',
       recipientList: replyRecipients,
       ccList:        [],
-      threadId:      a.gmail_thread_id || '',
-      inReplyTo:     replyInReplyTo,
-      references:    lastMsg ? this.buildReferences(this.threadMessages) : '',
-      quotedHtml:    lastMsg ? this.buildQuotedBody(this.threadMessages) : '',
+      threadId:      canReplyInThread ? (a.gmail_thread_id || '') : '',
+      inReplyTo:     canReplyInThread ? replyInReplyTo : '',
+      references:    canReplyInThread && lastMsg ? this.buildReferences(this.threadMessages) : '',
       emailProvider: a.email_provider || 'gmail',
     };
     this.inlineReplyRecipientQuery = '';
     this.inlineReplyCcQuery        = '';
     this.inlineReplySending        = false;
-    this.inlineReplyError          = '';
+    this.inlineReplyError          = canReplyInThread ? '' : (this.threadOwnerEmail
+      ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.`
+      : 'Nie możesz odpowiadać w tym wątku. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.');
     this.inlineReplyAttachments    = [];
-    this.showReplyDetails          = false;
-    this.includeHistoryInline      = false;
+    // Recipient/CC/subject must be immediately visible and editable on reply
+    // — not hidden behind the "Szczegóły" toggle.
+    this.showReplyDetails          = true;
     this.showReplyInline           = true;
     this.cdr.markForCheck();
   }
@@ -3996,8 +4031,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   cancelInlineReply(): void {
     this.showReplyInline      = false;
     this.showReplyDetails     = false;
-    this.includeHistoryInline = false;
-    this.inlineReplyForm      = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '', quotedHtml: '' };
+    this.inlineReplyForm      = { subject: '', body: '', recipientList: [], ccList: [], threadId: '', inReplyTo: '', references: '' };
     this.cdr.markForCheck();
   }
 
@@ -4036,10 +4070,26 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.inlineReplyError   = '';
     this.cdr.markForCheck();
 
-    const onSuccess = () => this.zone.run(() => {
+    const onSuccess = (result: GmailSendResult) => this.zone.run(() => {
+      const replyThreadId = this.inlineReplyForm.threadId;
       this.inlineReplySending = false;
       this.showReplyInline    = false;
       this.showReplyDetails   = false;
+      if (replyThreadId && this.partner) {
+        this.getPartnerThreadObs(replyThreadId).subscribe({
+          next: res => this.zone.run(() => {
+            this.threadMessages   = res.messages;
+            this.threadCanReply   = res.canReply;
+            this.threadOwnerEmail = res.ownerEmail;
+            this.openThreadId     = replyThreadId;
+            // See sendEmail()'s reply branch — keeps the card expanded under
+            // the new activity's id instead of the now-stale previous one.
+            this.expandedEmailId  = result.activityId;
+            this.cdr.markForCheck();
+          }),
+          error: () => {},
+        });
+      }
       this.cdr.markForCheck();
     });
     const onError = (err: any) => this.zone.run(() => {
@@ -4052,7 +4102,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     fd.append('to', this.inlineReplyForm.recipientList.join(','));
     if (this.inlineReplyForm.ccList?.length) fd.append('cc', this.inlineReplyForm.ccList.join(','));
     fd.append('subject', this.inlineReplyForm.subject);
-    fd.append('body', trimEdgeEmptyHtml(this.inlineReplyForm.body || '') + (this.includeHistoryInline ? this.inlineReplyForm.quotedHtml || '' : ''));
+    fd.append('body', trimEdgeEmptyHtml(this.inlineReplyForm.body || ''));
     if (this.inlineReplyForm.threadId)   fd.append('threadId',   this.inlineReplyForm.threadId);
     if (this.inlineReplyForm.inReplyTo)  fd.append('inReplyTo',  this.inlineReplyForm.inReplyTo);
     if (this.inlineReplyForm.references) fd.append('references', this.inlineReplyForm.references);
@@ -4077,11 +4127,15 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
     }
     this.getPartnerThreadObs(a.gmail_thread_id).subscribe({
-      next: msgs => this.zone.run(() => {
+      next: res => this.zone.run(() => {
         if (this.openThreadId !== a.gmail_thread_id) return;
-        this.threadMessages = msgs;
+        this.threadMessages = res.messages;
+        this.threadCanReply = res.canReply;
+        this.threadOwnerEmail = res.ownerEmail;
+        this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
         this.loadingThread = false;
-        msgs.forEach((m: any) => {
+        // Auto-mark all unread incoming messages in the thread
+        res.messages.forEach((m: any) => {
           if (m.is_read === false && m.created_by === null) {
             m.is_read = true;
             this.api.patchEmailMessageRead(m.id, true).subscribe({ error: () => {} });
@@ -4200,32 +4254,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return String(val);
   }
 
-  private buildQuotedBody(messages: any[]): string {
-    if (!messages?.length) return '';
-    const divider = '<br><hr style="border:none;border-top:2px solid #e5e7eb;margin:16px 0"><div style="font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Historia korespondencji</div>';
-    const quoted = messages.map((m: any) => {
-      const d = m.date ? new Date(m.date) : null;
-      const dateStr = d ? d.toLocaleString('pl-PL', {
-        day: '2-digit', month: 'long', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      }) : '';
-      const atts = [...(m.attachments || []), ...(m.sentAttachments || [])]
-        .map((a: any) => `📎 ${a.filename}`).join(' &nbsp;');
-      const bodyHtml = (m.body || (m.snippet ? m.snippet : '')).trim();
-      const meta = [
-        `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Od:</td><td style="font-size:11px"><strong>${m.from}</strong></td></tr>`,
-        m.to  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Do:</td><td style="font-size:11px">${m.to}</td></tr>`  : '',
-        m.cc  ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">DW:</td><td style="font-size:11px">${m.cc}</td></tr>`  : '',
-        dateStr ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Data:</td><td style="font-size:11px">${dateStr}</td></tr>` : '',
-        m.subject ? `<tr><td style="color:#9ca3af;padding-right:8px;white-space:nowrap;font-size:11px">Temat:</td><td style="font-size:11px">${m.subject}</td></tr>` : '',
-      ].filter(Boolean).join('');
-      return `<div style="border-left:3px solid #d1d5db;padding:8px 14px;margin:8px 0;background:#fafafa;border-radius:0 6px 6px 0">
-<table style="margin-bottom:8px;border-collapse:collapse">${meta}</table>
-<div style="color:#374151;font-size:13px;line-height:1.6">${bodyHtml}</div>${atts ? `<div style="margin-top:8px;font-size:11px;color:#6b7280;padding-top:6px;border-top:1px solid #f3f4f6">${atts}</div>` : ''}</div>`;
-    }).join('\n');
-    return divider + quoted;
-  }
-
   private buildReferences(messages: any[]): string {
     return (messages || []).map((m: any) => m.messageIdHeader).filter(Boolean).join(' ');
   }
@@ -4259,7 +4287,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.msgModalMsg         = null;
     this.msgModalReply       = false;
     this.msgModalAttachments = [];
-    this.includeHistoryModal = false;
     this.cdr.markForCheck();
   }
 
@@ -4269,22 +4296,26 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     const activeEmail = this.emailAddress;
     const fromAddrs   = this.parseAddressList(m.from);
     const toAddrs     = this.parseAddressList(m.to);
-    const isReceived  = fromAddrs.length > 0 && fromAddrs[0] !== activeEmail;
+    const isReceived  = fromAddrs.length > 0 && !isSameMailboxAddress(fromAddrs[0], activeEmail);
+    // Not the thread's owner — send as a brand-new email from the current
+    // user's own account, not a reply tied to a thread they don't own.
+    const canReplyInThread = this.threadCanReply;
     this.msgModalForm = {
       subject:       m.subject?.startsWith('Re:') ? m.subject : `Re: ${m.subject || ''}`,
       body:          '',
-      quotedHtml:    this.buildQuotedBody(this.threadMessages),
-      threadId:      m.threadId,
-      inReplyTo:     m.messageIdHeader || '',
-      references:    this.buildReferences(this.threadMessages),
+      threadId:      canReplyInThread ? m.threadId : '',
+      inReplyTo:     canReplyInThread ? (m.messageIdHeader || '') : '',
+      references:    canReplyInThread ? this.buildReferences(this.threadMessages) : '',
       recipientList: isReceived ? fromAddrs : toAddrs,
       ccList:        m.cc ? this.parseAddressList(m.cc) : [],
     };
     this.msgModalRecipientQuery = '';
     this.msgModalCcQuery        = '';
     this.msgModalAttachments    = [];
-    this.includeHistoryModal    = false;
     this.msgModalReply = true;
+    this.msgModalError = canReplyInThread ? '' : (this.threadOwnerEmail
+      ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.`
+      : 'Nie możesz odpowiadać w tym wątku. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.');
     this.cdr.markForCheck();
     this.focusEmailBodyTop('partner-msg-reply-textarea');
   }
@@ -4307,15 +4338,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.msgModalSending = true;
     this.msgModalError   = '';
 
-    const onSuccess = () => this.zone.run(() => {
+    const onSuccess = (result: GmailSendResult) => this.zone.run(() => {
       const replyThreadId = this.msgModalForm.threadId || this.msgModalMsg?.threadId;
       this.msgModalSending = false;
       this.closeMsgModal();
       if (replyThreadId && this.partner) {
         this.getPartnerThreadObs(replyThreadId).subscribe({
-          next: msgs => this.zone.run(() => {
-            this.threadMessages = msgs;
-            this.openThreadId   = replyThreadId;
+          next: res => this.zone.run(() => {
+            this.threadMessages  = res.messages;
+            this.threadCanReply  = res.canReply;
+            this.threadOwnerEmail = res.ownerEmail;
+            this.openThreadId    = replyThreadId;
+            // See sendEmail()'s reply branch — keeps the card expanded under
+            // the new activity's id instead of the now-stale previous one.
+            this.expandedEmailId = result.activityId;
             this.cdr.markForCheck();
           }),
           error: () => {},
@@ -4344,7 +4380,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     fd.append('to', this.msgModalForm.recipientList.join(','));
     if (this.msgModalForm.ccList?.length) fd.append('cc', this.msgModalForm.ccList.join(','));
     fd.append('subject', this.msgModalForm.subject);
-    fd.append('body', (this.msgModalForm.body || '') + (this.includeHistoryModal ? this.msgModalForm.quotedHtml || '' : ''));
+    fd.append('body', (this.msgModalForm.body || ''));
     if (this.msgModalForm.threadId)   fd.append('threadId',   this.msgModalForm.threadId || this.msgModalMsg?.threadId);
     if (this.msgModalForm.inReplyTo)  fd.append('inReplyTo',  this.msgModalForm.inReplyTo);
     if (this.msgModalForm.references) fd.append('references', this.msgModalForm.references);
@@ -4353,7 +4389,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   viewAttachment(att: any, msg: any): void {
-    const base = '/api/crm/gmail';
+    const base = `/api/crm/${this.emailProviderKey || 'gmail'}`;
     let url = '';
     if (att.attachmentId) {
       url = `${base}/attachment/${encodeURIComponent(msg.id)}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;
@@ -4364,7 +4400,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   async downloadAtt(att: any, msg: any): Promise<void> {
-    const base = '/api/crm/gmail';
+    const base = `/api/crm/${this.emailProviderKey || 'gmail'}`;
     let url = '';
     if (att.attachmentId) {
       url = `${base}/attachment/${encodeURIComponent(msg.id)}/${att.attachmentId}?filename=${encodeURIComponent(att.filename)}&mime=${encodeURIComponent(att.mimeType||'')}`;

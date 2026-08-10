@@ -6,20 +6,14 @@ import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QuillModule } from 'ngx-quill';
 import { environment } from '../../../environments/environment';
-import { CrmApiService, EmailTemplate, MyWhatsappConfig } from '../../core/services/crm-api.service';
-import { LucideCopy } from '@lucide/angular';
+import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
 
 const BASE = environment.apiUrl;
-// Meta calls this URL directly — it must be internet-reachable, so in local
-// dev (apiUrl is an absolute http://localhost:... URL) it only works behind
-// a tunnel (e.g. ngrok); shown as-is regardless, since the user pastes it
-// into their own Meta app and knows their own setup.
-const WEBHOOK_URL = (environment.apiUrl.startsWith('http') ? environment.apiUrl : window.location.origin + environment.apiUrl) + '/crm/whatsapp/webhook';
 
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, LucideCopy],
+  imports: [CommonModule, FormsModule, QuillModule],
   template: `
 <div id="topbar">
   <span class="page-title">Moje ustawienia</span>
@@ -131,92 +125,6 @@ const WEBHOOK_URL = (environment.apiUrl.startsWith('http') ? environment.apiUrl 
     </div>
   </div>
 
-  <!-- ── WhatsApp ───────────────────────────────────────────────────────── -->
-  <div class="card" style="padding:24px">
-    <h2 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#18181b;margin:0 0 6px">
-      💬 Mój numer WhatsApp
-    </h2>
-    <p style="font-size:12.5px;color:#6b7280;margin:0 0 20px;line-height:1.5">
-      Podłącz własny numer WhatsApp Business, aby wysyłać i odbierać wiadomości z leadami i partnerami
-      bezpośrednio w CRM. Numer i dane dostępowe pochodzą z Twojej własnej aplikacji w
-      <a href="https://developers.facebook.com/" target="_blank" rel="noopener">Meta for Developers</a>
-      (WhatsApp Business Platform) — CRM nigdy ich nie tworzy za Ciebie.
-    </p>
-
-    <div *ngIf="waLoading" style="color:#9ca3af;font-size:13px">Ładowanie…</div>
-
-    <div *ngIf="!waLoading">
-      <div *ngIf="waConfig?.configured" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 14px;background:#E6F4EA;border-radius:8px">
-        <span style="font-size:13px;font-weight:600;color:#18181b">
-          ✓ Podłączony: {{ waConfig?.display_phone_number || waConfig?.phone_number_id }}
-        </span>
-        <span *ngIf="!waConfig?.is_enabled" style="font-size:11px;color:#b45309;font-weight:600">(wyłączony)</span>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
-        <div class="fg">
-          <label class="fl">WABA ID *</label>
-          <input class="fi" [(ngModel)]="waForm.waba_id" placeholder="123456789012345">
-        </div>
-        <div class="fg">
-          <label class="fl">Phone Number ID *</label>
-          <input class="fi" [(ngModel)]="waForm.phone_number_id" placeholder="987654321098765">
-        </div>
-        <div class="fg">
-          <label class="fl">Numer widoczny dla klientów</label>
-          <input class="fi" [(ngModel)]="waForm.display_phone_number" placeholder="+48 500 100 200">
-        </div>
-        <div class="fg">
-          <label class="fl">Access Token {{ waConfig?.access_token_configured ? '' : '*' }}</label>
-          <input class="fi" [(ngModel)]="waForm.access_token" type="password"
-                 placeholder="{{ waConfig?.access_token_configured ? '••••••••••••' : 'EAAG...' }}">
-        </div>
-        <div class="fg">
-          <label class="fl">App Secret {{ waConfig?.app_secret_configured ? '' : '(opcjonalne, wymagane do weryfikacji webhooka)' }}</label>
-          <input class="fi" [(ngModel)]="waForm.app_secret" type="password"
-                 placeholder="{{ waConfig?.app_secret_configured ? '••••••••••••' : '' }}">
-        </div>
-        <div class="fg" style="justify-content:center">
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151">
-            <input type="checkbox" [(ngModel)]="waForm.is_enabled"> Aktywny
-          </label>
-        </div>
-      </div>
-
-      <div *ngIf="waConfig?.configured" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin-bottom:14px;background:#fafafa">
-        <div style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">
-          Konfiguracja webhooka w Twojej aplikacji Meta
-        </div>
-        <div style="font-size:12px;color:#374151;margin-bottom:4px">Callback URL: <code>{{ webhookUrl }}</code></div>
-        <div style="font-size:12px;color:#374151;display:flex;align-items:center;gap:8px">
-          Verify token:
-          <code *ngIf="waShowVerifyToken">{{ waConfig?.webhook_verify_token }}</code>
-          <code *ngIf="!waShowVerifyToken">••••••••••••••••</code>
-          <button *ngIf="waShowVerifyToken" class="icon-btn-bare" type="button"
-                  title="Kopiuj verify token" (click)="copyVerifyToken()">
-            <svg lucideCopy [size]="14"></svg>
-          </button>
-          <span *ngIf="waTokenCopied" style="font-size:12px;color:#16a34a;font-weight:600">Skopiowano</span>
-          <button class="btn btn-g btn-sm" (click)="waShowVerifyToken = !waShowVerifyToken">
-            {{ waShowVerifyToken ? 'Ukryj' : 'Pokaż' }}
-          </button>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-p" (click)="saveWaConfig()"
-                [disabled]="waSaving || !waForm.waba_id || !waForm.phone_number_id || (!waForm.access_token && !waConfig?.access_token_configured)">
-          {{ waSaving ? 'Zapisywanie…' : (waConfig?.configured ? '💾 Zapisz zmiany' : '🔗 Podłącz numer') }}
-        </button>
-        <button class="btn btn-g btn-sm" *ngIf="waConfig?.configured" (click)="disconnectWaConfig()" [disabled]="waSaving">
-          🗑 Odłącz numer
-        </button>
-      </div>
-      <div *ngIf="waSuccess" style="margin-top:8px;font-size:12px;color:#16a34a;font-weight:600">✓ Zapisano</div>
-      <div *ngIf="waError" style="margin-top:8px;font-size:12px;color:#dc2626">{{waError}}</div>
-    </div>
-  </div>
-
 </div>
   `,
   styles: [`
@@ -228,8 +136,6 @@ const WEBHOOK_URL = (environment.apiUrl.startsWith('http') ? environment.apiUrl 
     .btn-p { background:#3BAA5D; color:white; }
     .btn-g { background:white; border:1px solid #d1d5db; color:#374151; }
     .btn-sm { padding:6px 12px; font-size:12px; }
-    .icon-btn-bare { display:flex; align-items:center; background:none; border:none; cursor:pointer; color:#9ca3af; padding:2px; border-radius:4px; line-height:1; transition:color .15s; }
-    .icon-btn-bare:hover { color:#3BAA5D; }
   `],
 })
 export class MySettingsComponent implements OnInit {
@@ -257,24 +163,12 @@ export class MySettingsComponent implements OnInit {
     toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']],
   };
 
-  // ── WhatsApp ──────────────────────────────────────────────────────────────
-  readonly webhookUrl = WEBHOOK_URL;
-  waConfig: MyWhatsappConfig | null = null;
-  waLoading = true;
-  waSaving  = false;
-  waSuccess = false;
-  waError   = '';
-  waShowVerifyToken = false;
-  waTokenCopied = false;
-  waForm = { waba_id: '', phone_number_id: '', display_phone_number: '', access_token: '', app_secret: '', is_enabled: true };
-
   ngOnInit() {
     this.http.get<{ html: string }>(`${BASE}/profile/signature`).subscribe({
       next: r => { this.signatureHtml = r.html || ''; this.updatePreview(); this.cdr.markForCheck(); },
       error: () => {},
     });
     this.loadTemplates();
-    this.loadWaConfig();
   }
 
   // ── Stopka ──────────────────────────────────────────────────────────────────
@@ -383,82 +277,5 @@ export class MySettingsComponent implements OnInit {
 
   tplPreview(body: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(body);
-  }
-
-  // ── WhatsApp ──────────────────────────────────────────────────────────────
-
-  loadWaConfig() {
-    this.waLoading = true;
-    this.api.getMyWhatsappConfig().subscribe({
-      next: cfg => {
-        this.waConfig = cfg;
-        if (cfg.configured) {
-          this.waForm = {
-            waba_id: cfg.waba_id || '',
-            phone_number_id: cfg.phone_number_id || '',
-            display_phone_number: cfg.display_phone_number || '',
-            access_token: '',
-            app_secret: '',
-            is_enabled: cfg.is_enabled !== false,
-          };
-        }
-        this.waLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: () => { this.waLoading = false; this.cdr.markForCheck(); },
-    });
-  }
-
-  saveWaConfig() {
-    this.waSaving  = true;
-    this.waSuccess = false;
-    this.waError   = '';
-    this.api.saveMyWhatsappConfig({
-      waba_id: this.waForm.waba_id,
-      phone_number_id: this.waForm.phone_number_id,
-      display_phone_number: this.waForm.display_phone_number || undefined,
-      access_token: this.waForm.access_token || undefined,
-      app_secret: this.waForm.app_secret || undefined,
-      is_enabled: this.waForm.is_enabled,
-    }).subscribe({
-      next: cfg => {
-        this.waConfig = cfg;
-        this.waForm.access_token = '';
-        this.waForm.app_secret   = '';
-        this.waSaving  = false;
-        this.waSuccess = true;
-        this.cdr.markForCheck();
-        setTimeout(() => { this.waSuccess = false; this.cdr.markForCheck(); }, 3000);
-      },
-      error: err => {
-        this.waSaving = false;
-        this.waError  = err?.error?.error || 'Błąd zapisu — spróbuj ponownie';
-        this.cdr.markForCheck();
-      },
-    });
-  }
-
-  copyVerifyToken() {
-    const token = this.waConfig?.webhook_verify_token;
-    if (!token) return;
-    navigator.clipboard.writeText(token).then(() => {
-      this.waTokenCopied = true;
-      this.cdr.markForCheck();
-      setTimeout(() => { this.waTokenCopied = false; this.cdr.markForCheck(); }, 2000);
-    });
-  }
-
-  disconnectWaConfig() {
-    if (!confirm('Odłączyć numer WhatsApp? Historia konwersacji zostanie zachowana.')) return;
-    this.waSaving = true;
-    this.api.deleteMyWhatsappConfig().subscribe({
-      next: () => {
-        this.waConfig = null;
-        this.waForm   = { waba_id: '', phone_number_id: '', display_phone_number: '', access_token: '', app_secret: '', is_enabled: true };
-        this.waSaving = false;
-        this.cdr.markForCheck();
-      },
-      error: () => { this.waSaving = false; this.cdr.markForCheck(); },
-    });
   }
 }

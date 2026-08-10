@@ -40,6 +40,11 @@ app.use('/api', createProxyMiddleware({
   changeOrigin: true,
   // Express strips the '/api' mount prefix before the middleware sees req.url — add it back.
   pathRewrite: (path) => `/api${path}`,
+  // SEObot article generation is a single long-lived request (multiple sequential
+  // Claude calls, several minutes) — without this the proxy's default timeout kills
+  // the connection long before the backend responds, and the client just hangs.
+  proxyTimeout: 600_000,
+  timeout: 600_000,
   on: {
     proxyReq: (proxyReq, req) => {
       // changeOrigin above rewrites the outbound Host header to match

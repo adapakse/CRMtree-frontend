@@ -36,7 +36,21 @@
       "PowerShell(docker stop jenkins-crmtree; docker rm jenkins-crmtree)",
       "WebFetch(domain:www.crmtree.pl)",
       "WebFetch(domain:crmtree.pl)",
-      "PowerShell(python \"C:\\\\Users\\\\Adam\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Adam-Documents-crmtree-frontend\\\\853df636-882c-4aad-9fda-47f72dcdc277\\\\scratchpad\\\\gen_contracts.py\")"
+      "PowerShell(python \"C:\\\\Users\\\\Adam\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Adam-Documents-crmtree-frontend\\\\853df636-882c-4aad-9fda-47f72dcdc277\\\\scratchpad\\\\gen_contracts.py\")",
+      "PowerShell(Get-Content \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\.env.local\" | Where-Object { $_ -match \"DB_HOST|DB_NAME|DB_USER\" })",
+      "PowerShell(pg_dump *)",
+      "PowerShell(psql *)",
+      "PowerShell($crmtree = \\(Get-Item \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\crmtree_schema.sql\"\\).Length; $dwh = \\(Get-Item \"C:\\\\Users\\\\Adam\\\\Documents\\\\crmtree-backend\\\\dwh_schema.sql\"\\).Length; Write-Host \"crmtree_schema.sql: $\\([math]::Round\\($crmtree/1KB, 1\\)\\) KB\"; Write-Host \"dwh_schema.sql:     $\\([math]::Round\\($dwh/1KB, 1\\)\\) KB\")",
+      "PowerShell(Select-String *)",
+      "PowerShell(az containerapp show *)",
+      "PowerShell(az account show *)",
+      "PowerShell(az group list *)",
+      "PowerShell(\\(Invoke-WebRequest -Uri \"https://api.ipify.org\" -UseBasicParsing\\).Content)",
+      "PowerShell($ip = \\(Invoke-RestMethod -Uri \"https://api.ipify.org?format=json\"\\).ip; Write-Output \"Current IP: $ip\")",
+      "PowerShell(npm run *)",
+      "Skill(artifact-design)",
+      "Artifact",
+      "WebFetch(domain:getautoseo.com)"
     ]
   }
 }

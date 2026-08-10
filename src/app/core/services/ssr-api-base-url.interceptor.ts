@@ -6,12 +6,17 @@ import { HttpInterceptorFn } from '@angular/common/http';
  * During SSR, relative API URLs (e.g. `/api/...`) can't be resolved — Node has no
  * browser `location` to resolve against. Rewrite them to the real backend host,
  * same env var (`API_UPSTREAM`) the SSR server's own `/api` proxy uses.
+ *
+ * Angular's withFetch() backend forwards the original incoming request's headers
+ * onto outgoing SSR HttpClient calls, including `Host` — Node's fetch() (undici)
+ * rejects a manually-carried `Host` header as forbidden, so every SSR API call
+ * failed with "Header 'host' ... is not allowed" until this strips it.
  */
 export const ssrApiBaseUrlInterceptor: HttpInterceptorFn = (req, next) => {
   const platformId = inject(PLATFORM_ID);
   if (isPlatformServer(platformId) && req.url.startsWith('/api')) {
     const base = process.env['API_UPSTREAM'] || 'http://127.0.0.1:3001';
-    return next(req.clone({ url: base + req.url }));
+    return next(req.clone({ url: base + req.url, headers: req.headers.delete('host') }));
   }
   return next(req);
 };

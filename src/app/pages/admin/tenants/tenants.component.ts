@@ -1,13 +1,18 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { Tenant, TenantFeature, CrmFeature } from '../../../core/models/models';
+import { Tenant, TenantFeature, CrmFeature, BillingPlan, BillingCycle, TenantSubscription, TenantBillingDetails } from '../../../core/models/models';
 import { environment } from '../../../../environments/environment';
 
 const API = environment.apiUrl;
+// Meta calls this URL directly — it must be internet-reachable, so in local
+// dev (apiUrl is an absolute http://localhost:... URL) it only works behind
+// a tunnel (e.g. ngrok); shown as-is regardless, since the super admin pastes
+// it into the tenant's Meta app and knows their own setup.
+const WHATSAPP_WEBHOOK_URL = (API.startsWith('http') ? API : window.location.origin + API) + '/crm/whatsapp/webhook';
 
 const FEATURE_LABELS: Record<CrmFeature, string> = {
   documents:        'Dokumenty',
@@ -62,18 +67,45 @@ interface ZohoForm {
   redirect_uri: string;
 }
 
-// Read-only — WhatsApp numbers are connected by each user in their own My
-// Settings, never configured here. This is oversight only.
-interface WhatsappDirectoryRow {
-  user_id: string;
-  user_name: string;
-  email: string;
-  display_phone_number: string | null;
-  is_enabled: boolean;
-  updated_at: string;
+// One shared company WhatsApp Business number per tenant, configured here by
+// a super admin — never per-user. webhook_verify_token is only ever present
+// once configured (the CRM generates it on first save).
+// display_phone_number/verified_name/code_verification_status are always
+// fetched from Meta server-side on save — never editable, never sent by
+// this form — see whatsappService.upsertTenantConfig on the backend.
+interface WhatsappConfig {
+  configured: boolean;
+  id?: string;
+  waba_id?: string;
+  phone_number_id?: string;
+  display_phone_number?: string | null;
+  verified_name?: string | null;
+  code_verification_status?: string | null;
+  is_enabled?: boolean;
+  access_token_configured?: boolean;
+  app_secret_configured?: boolean;
+  webhook_verify_token?: string;
+  updated_at?: string;
 }
 
-type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
+interface WhatsappConfigForm {
+  waba_id: string; phone_number_id: string;
+  access_token: string; app_secret: string; is_enabled: boolean;
+}
+
+type EditTab = 'settings' | 'features' | 'plan' | 'billing' | 'users' | 'email' | 'whatsapp';
+
+interface PlanChangeConfirmData {
+  tenantId: string;
+  tenantName: string;
+  before: { planName: string; cycle: string; price: string | null };
+  after: { planName: string; cycle: string; price: string | null };
+}
+
+const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = { monthly: 'Miesięczny', annual: 'Roczny' };
+
+// Display order on the pricing page — not alphabetical (API returns plans ordered by code).
+const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, professional: 2 };
 
 @Component({
   selector: 'app-tenants',
@@ -169,6 +201,8 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                         <div class="tabs">
                           <button class="tab" [class.active]="editTab() === 'settings'" (click)="editTab.set('settings')">Ustawienia</button>
                           <button class="tab" [class.active]="editTab() === 'features'"  (click)="editTab.set('features')">Moduły</button>
+                          <button class="tab" [class.active]="editTab() === 'plan'" (click)="openPlanTab(t)">Plan</button>
+                          <button class="tab" [class.active]="editTab() === 'billing'" (click)="openBillingDetailsTab(t)">Dane rozliczeniowe</button>
                           <button class="tab" [class.active]="editTab() === 'users'"  (click)="openUsersTab(t.id)">
                             Użytkownicy
                             @if (tenantUsers().length > 0) { <span class="tab-badge">{{ tenantUsers().length }}</span> }
@@ -249,6 +283,145 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                           </div>
                         }
 
+                        <!-- Tab: Plan -->
+                        @if (editTab() === 'plan') {
+                          <div class="tab-body">
+                            @if (billingPlansLoading()) {
+                              <div class="state-msg">Ładowanie...</div>
+                            } @else {
+                              <div class="edit-grid">
+                                <div class="field">
+                                  <label>Plan</label>
+                                  <select [(ngModel)]="subscriptionDraft.planId" (ngModelChange)="onPlanChange()">
+                                    @for (p of billingPlans(); track p.id) {
+                                      <option [value]="p.id">{{ p.name }}</option>
+                                    }
+                                  </select>
+                                </div>
+                                <div class="field">
+                                  <label>Cykl rozliczeniowy</label>
+                                  <select [(ngModel)]="subscriptionDraft.billingCycle" (ngModelChange)="onBillingCycleChange()">
+                                    <option value="monthly">Miesięczny</option>
+                                    <option value="annual">Roczny</option>
+                                  </select>
+                                </div>
+                                @if (selectedPlanIsCustomPricing()) {
+                                  <div class="field">
+                                    <label>Kwota za okres rozliczeniowy (EUR)</label>
+                                    <input type="number" min="0.01" step="0.01"
+                                      placeholder="np. 5000.00"
+                                      [(ngModel)]="subscriptionDraft.customPriceEur">
+                                  </div>
+                                }
+                              </div>
+                              @if (selectedPlanIsCustomPricing()) {
+                                <div class="state-msg">Plan Professional wymaga indywidualnej kwoty — batch wygeneruje fakturę na tę kwotę zgodnie z wybranym cyklem (nie jest mnożona przez liczbę użytkowników).</div>
+                              }
+                              @if (t.subscription) {
+                                <div class="td-muted">
+                                  Obecny plan: {{ t.subscription.plan_name }} · {{ billingCycleLabel(t.subscription.billing_cycle) }}
+                                  @if (t.subscription.custom_price_eur) {
+                                    · {{ t.subscription.custom_price_eur }} EUR
+                                  }
+                                  @if (t.subscription.plan_started_at) {
+                                    · od {{ t.subscription.plan_started_at | date:'dd.MM.yyyy' }}
+                                  }
+                                </div>
+                              } @else {
+                                <div class="td-muted">Ten tenant nie ma przypisanego planu.</div>
+                              }
+                              @if (t.subscription?.cancelled_at) {
+                                <div class="billing-hint billing-hint-warn">
+                                  <span>
+                                    Subskrypcja zakończona {{ t.subscription!.cancelled_at | date:'dd.MM.yyyy HH:mm' }} —
+                                    bieżący okres rozliczeniowy zostanie jeszcze zafakturowany w całości (bez proracji),
+                                    kolejne już nie.
+                                  </span>
+                                  <button class="btn-secondary" [disabled]="saving()" (click)="reactivateSubscription(t)">Cofnij rezygnację</button>
+                                </div>
+                              } @else if (t.subscription) {
+                                <div class="billing-hint">
+                                  <button class="btn-secondary" [disabled]="saving()" (click)="cancelSubscription(t)">Zakończ subskrypcję</button>
+                                </div>
+                              }
+                              @if (t.subscription) {
+                                @if (isBillingDetailsComplete(t)) {
+                                  <div class="billing-hint billing-hint-ok">
+                                    <span>✓ Dane rozliczeniowe: kompletne</span>
+                                    <button class="btn-secondary" (click)="openBillingDetailsTab(t)">Edytuj dane rozliczeniowe →</button>
+                                  </div>
+                                } @else {
+                                  <div class="billing-hint billing-hint-warn">
+                                    <span>Ten tenant nie ma jeszcze kompletnych danych rozliczeniowych. Uzupełnij je w zakładce Dane rozliczeniowe.</span>
+                                    <button class="btn-secondary" (click)="openBillingDetailsTab(t)">Uzupełnij dane rozliczeniowe →</button>
+                                  </div>
+                                }
+                              }
+                              <div class="panel-footer">
+                                <button class="btn-secondary" [disabled]="isPlanDraftUnchanged(t)" (click)="cancelPlanEdit(t)">Anuluj</button>
+                                <button class="btn-primary"
+                                  [disabled]="saving() || !subscriptionDraft.planId || (selectedPlanIsCustomPricing() && !subscriptionDraft.customPriceEur)"
+                                  (click)="openPlanChangeConfirm(t)">
+                                  {{ saving() ? 'Zapisuję...' : 'Zapisz plan' }}
+                                </button>
+                              </div>
+                            }
+                          </div>
+                        }
+
+                        <!-- Tab: Billing details -->
+                        @if (editTab() === 'billing') {
+                          <div class="tab-body">
+                            @if (billingDetailsLoading()) {
+                              <div class="state-msg">Ładowanie...</div>
+                            } @else {
+                              <div class="state-msg">
+                                Dane prawne nabywcy na fakturach tego tenanta — niezależne od nazwy w CRM
+                                ({{ t.name }}), którą widzą jego użytkownicy.
+                              </div>
+                              <div class="edit-grid">
+                                <div class="field">
+                                  <label>Nazwa firmy (do faktury)</label>
+                                  <input [(ngModel)]="billingDetailsDraft.company_name" placeholder="np. Acme Sp. z o.o.">
+                                </div>
+                                <div class="field">
+                                  <label>NIP</label>
+                                  <input [(ngModel)]="billingDetailsDraft.nip" placeholder="np. 1234567890">
+                                </div>
+                                <div class="field">
+                                  <label>Ulica i numer</label>
+                                  <input [(ngModel)]="billingDetailsDraft.street" placeholder="ul. Przykładowa 1">
+                                </div>
+                                <div class="field">
+                                  <label>Kod pocztowy</label>
+                                  <input [(ngModel)]="billingDetailsDraft.postal_code" placeholder="00-001">
+                                </div>
+                                <div class="field">
+                                  <label>Miasto</label>
+                                  <input [(ngModel)]="billingDetailsDraft.city" placeholder="Warszawa">
+                                </div>
+                                <div class="field">
+                                  <label>Kraj</label>
+                                  <input [(ngModel)]="billingDetailsDraft.country" placeholder="Polska">
+                                </div>
+                                <div class="field">
+                                  <label>E-mail do faktur</label>
+                                  <input type="email" [(ngModel)]="billingDetailsDraft.invoice_email" placeholder="ksiegowosc@klient.pl">
+                                </div>
+                              </div>
+                              <div class="panel-footer">
+                                <button class="btn-secondary" [disabled]="isBillingDetailsDraftUnchanged(t)" (click)="cancelBillingDetailsEdit(t)">Anuluj</button>
+                                @if (t.billing_details) {
+                                  <button class="btn-danger" [disabled]="saving()" (click)="openDeleteBillingDetails(t)">Usuń dane rozliczeniowe</button>
+                                }
+                                <button class="btn-primary" [disabled]="saving()" (click)="saveBillingDetails(t.id)">
+                                  {{ saving() ? 'Zapisuję...' : 'Zapisz dane rozliczeniowe' }}
+                                </button>
+                              </div>
+                            }
+                          </div>
+                        }
+
                         <!-- Tab: Email -->
                         @if (editTab() === 'email') {
                           <div class="tab-body">
@@ -302,15 +475,15 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                       <input [(ngModel)]="gmailForm.client_secret" type="password" placeholder="{{ gmailProvider() ? '••••••••' : 'GOCSPX-...' }}">
                                     </div>
                                     <div class="field">
-                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <label>Redirect URI <span class="req">*</span></label>
                                       <input [(ngModel)]="gmailForm.redirect_uri" placeholder="https://app.example.com/api/crm/gmail/oauth/callback">
                                     </div>
                                     <div class="field">
-                                      <label>Pub/Sub Topic <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Pub/Sub Topic <span class="req">*</span></label>
                                       <input [(ngModel)]="gmailForm.pubsub_topic" placeholder="projects/my-project/topics/gmail-push">
                                     </div>
                                     <div class="field">
-                                      <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Pub/Sub Subscription <span class="hint-inline">(opcjonalne — obecnie nieużywane)</span></label>
                                       <input [(ngModel)]="gmailForm.pubsub_subscription" placeholder="projects/my-project/subscriptions/gmail-sub">
                                     </div>
                                   </div>
@@ -318,36 +491,12 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                     @if (gmailProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'gmail')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider())"
+                                    <button class="btn-primary" [disabled]="saving() || !gmailForm.client_id || (!gmailForm.client_secret && !gmailProvider()) || !gmailForm.redirect_uri || !gmailForm.pubsub_topic"
                                             (click)="saveEmailProvider(t.id, 'gmail')">
                                       {{ saving() ? 'Zapisuję...' : (gmailProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
                                 </div>
-                                @if (activeProvider() === 'gmail') {
-                                  <div class="mailbox-section">
-                                    <div class="mailbox-section-left">
-                                      <div class="mailbox-section-title">Firmowa skrzynka wysyłkowa</div>
-                                      @if (mailboxLoading()) {
-                                        <div class="mailbox-section-status is-muted">Sprawdzanie statusu...</div>
-                                      } @else if (mailboxStatus()?.connected) {
-                                        <div class="mailbox-section-status is-connected">Podłączono: {{ mailboxStatus()!.email }}</div>
-                                      } @else {
-                                        <div class="mailbox-section-status is-disconnected">Niepodłączona</div>
-                                      }
-                                    </div>
-                                    @if (!mailboxLoading()) {
-                                      <div class="mailbox-section-actions">
-                                        @if (mailboxStatus()?.connected) {
-                                          <button class="btn-secondary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Zmień skrzynkę</button>
-                                          <button class="btn-danger-sm" [disabled]="mailboxActionBusy()" (click)="disconnectMailbox(t.id)">Odłącz skrzynkę</button>
-                                        } @else {
-                                          <button class="btn-primary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Połącz skrzynkę firmową</button>
-                                        }
-                                      </div>
-                                    }
-                                  </div>
-                                }
                               </div>
 
                               <!-- Outlook -->
@@ -391,7 +540,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                       <input [(ngModel)]="outlookForm.azure_tenant_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
                                     </div>
                                     <div class="field">
-                                      <label>Redirect URI <span class="hint-inline">(opcjonalne)</span></label>
+                                      <label>Redirect URI <span class="req">*</span></label>
                                       <input [(ngModel)]="outlookForm.redirect_uri" placeholder="https://app.example.com/api/crm/outlook/oauth/callback">
                                     </div>
                                   </div>
@@ -399,36 +548,12 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                     @if (outlookProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'outlook')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id"
+                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id || !outlookForm.redirect_uri"
                                             (click)="saveEmailProvider(t.id, 'outlook')">
                                       {{ saving() ? 'Zapisuję...' : (outlookProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
                                 </div>
-                                @if (activeProvider() === 'outlook') {
-                                  <div class="mailbox-section">
-                                    <div class="mailbox-section-left">
-                                      <div class="mailbox-section-title">Firmowa skrzynka wysyłkowa</div>
-                                      @if (mailboxLoading()) {
-                                        <div class="mailbox-section-status is-muted">Sprawdzanie statusu...</div>
-                                      } @else if (mailboxStatus()?.connected) {
-                                        <div class="mailbox-section-status is-connected">Podłączono: {{ mailboxStatus()!.email }}</div>
-                                      } @else {
-                                        <div class="mailbox-section-status is-disconnected">Niepodłączona</div>
-                                      }
-                                    </div>
-                                    @if (!mailboxLoading()) {
-                                      <div class="mailbox-section-actions">
-                                        @if (mailboxStatus()?.connected) {
-                                          <button class="btn-secondary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Zmień skrzynkę</button>
-                                          <button class="btn-danger-sm" [disabled]="mailboxActionBusy()" (click)="disconnectMailbox(t.id)">Odłącz skrzynkę</button>
-                                        } @else {
-                                          <button class="btn-primary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Połącz skrzynkę firmową</button>
-                                        }
-                                      </div>
-                                    }
-                                  </div>
-                                }
                               </div>
 
                               <!-- Zoho -->
@@ -482,30 +607,6 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                     </button>
                                   </div>
                                 </div>
-                                @if (activeProvider() === 'zoho') {
-                                  <div class="mailbox-section">
-                                    <div class="mailbox-section-left">
-                                      <div class="mailbox-section-title">Firmowa skrzynka wysyłkowa</div>
-                                      @if (mailboxLoading()) {
-                                        <div class="mailbox-section-status is-muted">Sprawdzanie statusu...</div>
-                                      } @else if (mailboxStatus()?.connected) {
-                                        <div class="mailbox-section-status is-connected">Podłączono: {{ mailboxStatus()!.email }}</div>
-                                      } @else {
-                                        <div class="mailbox-section-status is-disconnected">Niepodłączona</div>
-                                      }
-                                    </div>
-                                    @if (!mailboxLoading()) {
-                                      <div class="mailbox-section-actions">
-                                        @if (mailboxStatus()?.connected) {
-                                          <button class="btn-secondary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Zmień skrzynkę</button>
-                                          <button class="btn-danger-sm" [disabled]="mailboxActionBusy()" (click)="disconnectMailbox(t.id)">Odłącz skrzynkę</button>
-                                        } @else {
-                                          <button class="btn-primary" [disabled]="mailboxActionBusy()" (click)="connectMailbox(t.id)">Połącz skrzynkę firmową</button>
-                                        }
-                                      </div>
-                                    }
-                                  </div>
-                                }
                               </div>
 
                               <div class="panel-footer">
@@ -515,7 +616,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                           </div>
                         }
 
-                        <!-- Tab: WhatsApp (read-only oversight — numbers are connected by each user in My Settings) -->
+                        <!-- Tab: WhatsApp (one shared company number per tenant, configured here) -->
                         @if (editTab() === 'whatsapp') {
                           <div class="tab-body">
                             @if (whatsappLoading()) {
@@ -528,32 +629,83 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                                     <span>WhatsApp Business</span>
                                   </div>
-                                </div>
-                                <div class="provider-meta">
-                                  Każdy użytkownik podłącza własny numer WhatsApp Business w swoich „Moje ustawienia" —
-                                  nie da się tego skonfigurować z tego miejsca. Poniżej lista podłączonych numerów w tym tenancie (tylko podgląd).
-                                </div>
-                                <div class="provider-form">
-                                  @if (whatsappDirectory().length === 0) {
-                                    <div class="state-msg">Nikt w tym tenancie nie ma jeszcze podłączonego numeru WhatsApp.</div>
-                                  } @else {
-                                    @for (row of whatsappDirectory(); track row.user_id) {
-                                      <div class="edit-grid" style="grid-template-columns: 2fr 1fr auto; align-items:center; margin-bottom:8px">
-                                        <div>
-                                          <strong>{{ row.user_name }}</strong>
-                                          <div class="hint-inline">{{ row.email }}</div>
-                                        </div>
-                                        <div>{{ row.display_phone_number || '—' }}</div>
-                                        <div>
-                                          @if (row.is_enabled) {
-                                            <span class="badge badge-on">Aktywny</span>
-                                          } @else {
-                                            <span class="badge badge-off">Wyłączony</span>
-                                          }
-                                        </div>
-                                      </div>
+                                  <div class="provider-header-right">
+                                    @if (whatsappConfig()?.configured) {
+                                      <span class="badge badge-on">Skonfigurowany</span>
+                                    } @else {
+                                      <span class="badge badge-off">Nieskonfigurowany</span>
                                     }
+                                  </div>
+                                </div>
+                                @if (whatsappConfig()?.configured) {
+                                  <div class="provider-meta">
+                                    Numer: <strong>{{ whatsappConfig()!.display_phone_number }}</strong>
+                                    @if (whatsappConfig()!.verified_name) { · {{ whatsappConfig()!.verified_name }} }
+                                    @if (whatsappConfig()!.code_verification_status === 'VERIFIED') {
+                                      <span class="badge badge-on">VERIFIED</span>
+                                    } @else {
+                                      <span class="badge badge-off">{{ whatsappConfig()!.code_verification_status || 'NIEZWERYFIKOWANY' }}</span>
+                                    }
+                                    <br>Phone Number ID: <code>{{ whatsappConfig()!.phone_number_id }}</code>
+                                    · zaktualizowany {{ whatsappConfig()!.updated_at | date:'dd.MM.yyyy' }}
+                                    <div class="hint-inline" style="margin-top:4px">
+                                      Numer, nazwa i status weryfikacji pochodzą bezpośrednio z Meta (pobierane przy każdym zapisie) — nie da się ich wpisać ręcznie.
+                                    </div>
+                                  </div>
+                                }
+                                <div class="provider-form">
+                                  <div class="edit-grid">
+                                    <div class="field">
+                                      <label>WABA ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="whatsappForm.waba_id" placeholder="123456789012345">
+                                    </div>
+                                    <div class="field">
+                                      <label>Phone Number ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="whatsappForm.phone_number_id" placeholder="987654321098765">
+                                    </div>
+                                    <div class="field">
+                                      <label>Access Token {{ whatsappConfig()?.access_token_configured ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
+                                      <input [(ngModel)]="whatsappForm.access_token" type="password"
+                                             placeholder="{{ whatsappConfig()?.access_token_configured ? '••••••••' : 'EAAG...' }}">
+                                    </div>
+                                    <div class="field">
+                                      <label>App Secret <span class="hint-inline">{{ whatsappConfig()?.app_secret_configured ? '(zostaw puste = bez zmian)' : '(opcjonalne, wymagane do weryfikacji webhooka)' }}</span></label>
+                                      <input [(ngModel)]="whatsappForm.app_secret" type="password"
+                                             placeholder="{{ whatsappConfig()?.app_secret_configured ? '••••••••' : '' }}">
+                                    </div>
+                                    <div class="field">
+                                      <label class="radio-option">
+                                        <input type="checkbox" [(ngModel)]="whatsappForm.is_enabled"> Aktywny
+                                      </label>
+                                    </div>
+                                  </div>
+
+                                  @if (whatsappConfig()?.configured) {
+                                    <div class="provider-meta" style="margin-top:12px">
+                                      <strong>Konfiguracja webhooka w Meta App</strong><br>
+                                      Callback URL: <code>{{ whatsappWebhookUrl }}</code><br>
+                                      Verify token:
+                                      @if (whatsappShowVerifyToken()) {
+                                        <code>{{ whatsappConfig()!.webhook_verify_token }}</code>
+                                        <button class="btn-secondary" style="padding:2px 8px;font-size:11px" (click)="copyWhatsappVerifyToken()">Kopiuj</button>
+                                      } @else {
+                                        <code>••••••••••••••••</code>
+                                      }
+                                      <button class="btn-secondary" style="padding:2px 8px;font-size:11px" (click)="whatsappShowVerifyToken.set(!whatsappShowVerifyToken())">
+                                        {{ whatsappShowVerifyToken() ? 'Ukryj' : 'Pokaż' }}
+                                      </button>
+                                    </div>
                                   }
+
+                                  <div class="provider-actions">
+                                    @if (whatsappConfig()?.configured) {
+                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteWhatsappConfig(t.id)">Usuń</button>
+                                    }
+                                    <button class="btn-primary" [disabled]="saving() || !whatsappForm.waba_id || !whatsappForm.phone_number_id || (!whatsappForm.access_token && !whatsappConfig()?.access_token_configured)"
+                                            (click)="saveWhatsappConfig(t.id)">
+                                      {{ saving() ? 'Zapisuję...' : (whatsappConfig()?.configured ? 'Aktualizuj' : 'Zapisz') }}
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
 
@@ -758,6 +910,46 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
       </div>
     }
 
+    <!-- Plan change confirm -->
+    @if (planChangeConfirm()) {
+      <div class="modal-backdrop" (click)="cancelPlanChangeConfirm()">
+        <div class="modal modal-sm" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Potwierdź zmianę planu</h2>
+            <button class="btn-icon" (click)="cancelPlanChangeConfirm()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Zmieniasz plan tenanta <strong>{{ planChangeConfirm()!.tenantName }}</strong>:</p>
+            <div class="plan-diff">
+              <div class="plan-diff-col">
+                <span class="plan-diff-label">Obecnie</span>
+                <span>{{ planChangeConfirm()!.before.planName }} · {{ planChangeConfirm()!.before.cycle }}</span>
+                @if (planChangeConfirm()!.before.price) { <span>{{ planChangeConfirm()!.before.price }} EUR</span> }
+              </div>
+              <span class="plan-diff-arrow">→</span>
+              <div class="plan-diff-col">
+                <span class="plan-diff-label">Nowo</span>
+                <span>{{ planChangeConfirm()!.after.planName }} · {{ planChangeConfirm()!.after.cycle }}</span>
+                @if (planChangeConfirm()!.after.price) { <span>{{ planChangeConfirm()!.after.price }} EUR</span> }
+              </div>
+            </div>
+            <p class="hint">
+              Zmiana wpływa wyłącznie na przyszłe rozliczenia — już wystawione faktury pozostają niezmienione
+              (batch zawsze fakturuje plan/cenę zapisane w historii dla danego okresu).
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="cancelPlanChangeConfirm()">Anuluj</button>
+            <button class="btn-primary" [disabled]="saving()" (click)="confirmPlanChange()">
+              {{ saving() ? 'Zapisuję...' : 'Potwierdź zmianę' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Delete tenant confirm -->
     @if (deleteTarget()) {
       <div class="modal-backdrop" (click)="cancelDeleteTenant()">
@@ -785,6 +977,35 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
         </div>
       </div>
     }
+
+    <!-- Delete billing details confirm -->
+    @if (deleteBillingDetailsTarget()) {
+      <div class="modal-backdrop" (click)="cancelDeleteBillingDetails()">
+        <div class="modal modal-sm" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Usuń dane rozliczeniowe</h2>
+            <button class="btn-icon" (click)="cancelDeleteBillingDetails()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Usuwasz dane rozliczeniowe nabywcy dla tenanta <strong>{{ deleteBillingDetailsTarget()!.name }}</strong>.</p>
+            <p class="hint">
+              To nie wpłynie na dane zapisane na już wystawionych fakturach — każda faktura zachowuje własną,
+              zamrożoną kopię danych nabywcy z momentu wystawienia. Usunięty zostanie tylko bieżący
+              formularz — kolejne faktury tego tenanta znów będą pokazywać baner „dokument roboczy”, dopóki
+              dane nie zostaną uzupełnione ponownie.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="cancelDeleteBillingDetails()">Anuluj</button>
+            <button class="btn-danger" [disabled]="saving()" (click)="confirmDeleteBillingDetails()">
+              {{ saving() ? 'Usuwam...' : 'Usuń dane rozliczeniowe' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .page { padding: 28px 32px; max-width: 1400px; }
@@ -797,6 +1018,13 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
     .page-sub   { font-size: 13px; color: var(--gray-500); margin: 0; }
 
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
+    .billing-hint {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 13px;
+    }
+    .billing-hint-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .billing-hint-ok   { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+    .billing-hint .btn-secondary { flex-shrink: 0; padding: 6px 12px; font-size: 12.5px; }
 
     /* Table */
     .table-wrap { overflow-x: auto; }
@@ -863,7 +1091,11 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
       width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
       border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
     }
-    .field input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field select {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+    }
     .field-check { display: flex; align-items: flex-end; padding-bottom: 2px; }
     .check-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); cursor: pointer; }
 
@@ -929,6 +1161,13 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
     .modal-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
     .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
     .modal-body p { margin: 0; font-size: 14px; color: var(--gray-700); }
+    .plan-diff {
+      display: flex; align-items: center; gap: 12px; background: var(--gray-50);
+      border: 1px solid var(--gray-200); border-radius: 8px; padding: 12px 14px;
+    }
+    .plan-diff-col { display: flex; flex-direction: column; gap: 2px; font-size: 13px; flex: 1; }
+    .plan-diff-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); }
+    .plan-diff-arrow { color: var(--gray-400); font-size: 16px; }
     .modal-footer {
       display: flex; gap: 8px; justify-content: flex-end;
       padding: 14px 22px 18px; border-top: 1px solid var(--gray-200);
@@ -988,20 +1227,6 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
     }
     .radio-option.disabled { color: var(--gray-400); cursor: not-allowed; }
 
-    /* Shared company mailbox connect/change/disconnect — second step inside the
-       active provider's card, visually separated from the Client ID/Secret form. */
-    .mailbox-section {
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
-      gap: 16px; padding: 16px; border-top: 1px solid var(--gray-200);
-    }
-    .mailbox-section-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .mailbox-section-title { font-size: 13px; font-weight: 600; color: var(--gray-800); }
-    .mailbox-section-status { font-size: 12.5px; }
-    .mailbox-section-status.is-muted        { color: var(--gray-400); }
-    .mailbox-section-status.is-disconnected { color: var(--gray-500); }
-    .mailbox-section-status.is-connected    { color: #16a34a; font-weight: 500; }
-    .mailbox-section-actions { display: flex; gap: 8px; flex-shrink: 0; }
-
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
     .req  { color: #dc2626; }
@@ -1013,7 +1238,7 @@ type EditTab = 'settings' | 'features' | 'users' | 'email' | 'whatsapp';
     }
   `],
 })
-export class TenantsComponent implements OnInit, OnDestroy {
+export class TenantsComponent implements OnInit {
   private http  = inject(HttpClient);
   private toast = inject(ToastService);
   auth = inject(AuthService);
@@ -1036,22 +1261,28 @@ export class TenantsComponent implements OnInit, OnDestroy {
   zohoProvider    = signal<EmailProvider | null>(null);
   activeProvider  = signal<EmailProviderKey | null>(null);
 
-  whatsappDirectory = signal<WhatsappDirectoryRow[]>([]);
-  whatsappLoading   = signal(false);
+  whatsappConfig          = signal<WhatsappConfig | null>(null);
+  whatsappLoading         = signal(false);
+  whatsappShowVerifyToken = signal(false);
 
   trainingMode = signal(false);
 
-  mailboxStatus     = signal<{ connected: boolean; email?: string } | null>(null);
-  mailboxLoading    = signal(false);
-  mailboxActionBusy = signal(false);
-  private emailTabTenantId: string | null = null;
-  private oauthChannels: BroadcastChannel[] = [];
+  billingPlans        = signal<BillingPlan[]>([]);
+  billingPlansLoading = signal(false);
+  subscriptionDraft: { planId: string; billingCycle: BillingCycle; customPriceEur: number | null } =
+    { planId: '', billingCycle: 'monthly', customPriceEur: null };
 
   showCreate        = signal(false);
   showAddUser       = signal(false);
   addUserTenantId   = signal<string | null>(null);
   impersonateTarget = signal<Tenant | null>(null);
   deleteTarget       = signal<Tenant | null>(null);
+  planChangeConfirm  = signal<PlanChangeConfirmData | null>(null);
+
+  billingDetailsLoading = signal(false);
+  billingDetailsDraft: { company_name: string; nip: string; street: string; postal_code: string; city: string; country: string; invoice_email: string } =
+    { company_name: '', nip: '', street: '', postal_code: '', city: '', country: '', invoice_email: '' };
+  deleteBillingDetailsTarget = signal<Tenant | null>(null);
 
   tempPassword  = signal<string | null>(null);
   tempUserEmail = signal<string>('');
@@ -1061,6 +1292,8 @@ export class TenantsComponent implements OnInit, OnDestroy {
   gmailForm:   GmailForm   = this.emptyGmailForm();
   outlookForm: OutlookForm = this.emptyOutlookForm();
   zohoForm:    ZohoForm    = this.emptyZohoForm();
+  whatsappForm: WhatsappConfigForm = this.emptyWhatsappForm();
+  readonly whatsappWebhookUrl = WHATSAPP_WEBHOOK_URL;
 
   editDraft: {
     name: string; email_domain: string; dwh_schema_prefix: string; is_active: boolean;
@@ -1069,37 +1302,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.load();
-    this.setupMailboxOAuthListeners();
-  }
-
-  ngOnDestroy(): void {
-    this.oauthChannels.forEach(bc => bc.close());
-    window.removeEventListener('storage', this.onMailboxOAuthStorageEvent);
-  }
-
-  // The OAuth callback pages (gmail/outlook/zoho-callback.component.ts) broadcast
-  // completion via BroadcastChannel + a localStorage write — the same mechanism
-  // lead/partner detail views used to listen to. Here we refresh the active
-  // provider card's mailbox status instead, only while the Email tab is open.
-  private setupMailboxOAuthListeners(): void {
-    for (const name of ['gmail-oauth', 'outlook-oauth', 'zoho-oauth']) {
-      try {
-        const bc = new BroadcastChannel(name);
-        bc.onmessage = () => this.refreshMailboxAfterOAuth();
-        this.oauthChannels.push(bc);
-      } catch (_) {}
-    }
-    window.addEventListener('storage', this.onMailboxOAuthStorageEvent);
-  }
-
-  private onMailboxOAuthStorageEvent = (e: StorageEvent): void => {
-    if (e.key && e.key.endsWith('_oauth_connected')) this.refreshMailboxAfterOAuth();
-  };
-
-  private refreshMailboxAfterOAuth(): void {
-    if (this.editTab() === 'email' && this.emailTabTenantId) {
-      this.loadMailboxStatus(this.emailTabTenantId);
-    }
   }
 
   load(): void {
@@ -1171,6 +1373,259 @@ export class TenantsComponent implements OnInit, OnDestroy {
         this.toast.success('Moduły zapisane');
       },
       error: () => { this.saving.set(false); this.toast.error('Błąd zapisu modułów'); },
+    });
+  }
+
+  // ── Plan tab ─────────────────────────────────────────────────
+  billingCycleLabel(c: BillingCycle): string { return BILLING_CYCLE_LABELS[c] ?? c; }
+
+  selectedPlanIsCustomPricing(): boolean {
+    return this.billingPlans().find(p => p.id === this.subscriptionDraft.planId)?.is_custom_pricing ?? false;
+  }
+
+  onPlanChange(): void {
+    // Switching away from a custom-pricing plan clears the quote — it's
+    // meaningless for Lite/Standard and the backend would discard it anyway,
+    // but leaving it in the draft would confuse a later switch back.
+    if (!this.selectedPlanIsCustomPricing()) this.subscriptionDraft.customPriceEur = null;
+  }
+
+  // Professional's custom_price_eur is a single amount for whichever cycle is
+  // currently active — it does NOT auto-convert between monthly/annual, so
+  // leaving a stale monthly quote in the draft after switching to annual (or
+  // vice versa) risks saving an annual subscription at a monthly price.
+  // Clearing it forces the admin to re-enter the amount for the new cycle.
+  onBillingCycleChange(): void {
+    this.subscriptionDraft.customPriceEur = null;
+  }
+
+  // Form pre-fill only when the tenant has no subscription row yet — never written to the
+  // backend on its own, just what the "Plan" tab shows until the admin hits "Zapisz plan".
+  private defaultPlanId(): string {
+    return this.billingPlans().find(p => p.code === 'lite')?.id ?? this.billingPlans()[0]?.id ?? '';
+  }
+
+  private applyPlanDraft(sub: TenantSubscription | null): void {
+    this.subscriptionDraft = sub
+      ? { planId: sub.plan_id, billingCycle: sub.billing_cycle, customPriceEur: sub.custom_price_eur ? Number(sub.custom_price_eur) : null }
+      : { planId: this.defaultPlanId(), billingCycle: 'monthly', customPriceEur: null };
+  }
+
+  openPlanTab(t: Tenant): void {
+    this.editTab.set('plan');
+    this.billingPlansLoading.set(true);
+    // The tenant list (GET /admin/tenants) doesn't carry `subscription` — re-fetch the
+    // single-tenant detail so the form reflects what's actually saved, not stale list data.
+    this.http.get<Tenant>(`${API}/admin/tenants/${t.id}`).subscribe({
+      next: fresh => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id ? { ...x, subscription: fresh.subscription, billing_details: fresh.billing_details } : x));
+        this.applyPlanDraft(fresh.subscription ?? null);
+        if (this.billingPlans().length > 0) { this.billingPlansLoading.set(false); return; }
+        this.http.get<BillingPlan[]>(`${API}/admin/billing/plans`).subscribe({
+          next: plans => {
+            const sorted = [...plans].sort((a, b) =>
+              (PLAN_DISPLAY_ORDER[a.code] ?? 99) - (PLAN_DISPLAY_ORDER[b.code] ?? 99));
+            this.billingPlans.set(sorted);
+            this.billingPlansLoading.set(false);
+            if (!fresh.subscription) this.applyPlanDraft(null);
+          },
+          error: () => { this.toast.error('Błąd ładowania planów'); this.billingPlansLoading.set(false); },
+        });
+      },
+      error: () => { this.toast.error('Błąd ładowania danych tenanta'); this.billingPlansLoading.set(false); },
+    });
+  }
+
+  // Reverts unsaved edits to the last-saved subscription — unlike cancelEdit(), it must
+  // NOT collapse the tenant panel, since this button sits next to "Zapisz plan" and reads
+  // as "discard form changes", not "close panel".
+  cancelPlanEdit(t: Tenant): void {
+    this.applyPlanDraft(t.subscription ?? null);
+  }
+
+  isPlanDraftUnchanged(t: Tenant): boolean {
+    const sub = t.subscription;
+    const savedPlanId = sub ? sub.plan_id : this.defaultPlanId();
+    const savedCycle: BillingCycle = sub ? sub.billing_cycle : 'monthly';
+    const savedCustomPrice = sub?.custom_price_eur ? Number(sub.custom_price_eur) : null;
+    return this.subscriptionDraft.planId === savedPlanId
+      && this.subscriptionDraft.billingCycle === savedCycle
+      && this.subscriptionDraft.customPriceEur === savedCustomPrice;
+  }
+
+  saveSubscription(id: string): void {
+    this.saving.set(true);
+    this.http.put<{ plan_id: string; billing_cycle: BillingCycle; custom_price_eur: string | null; started_at: string; plan_started_at: string; cancelled_at: string | null }>(
+      `${API}/admin/tenants/${id}/subscription`,
+      {
+        planId: this.subscriptionDraft.planId,
+        billingCycle: this.subscriptionDraft.billingCycle,
+        customPriceEur: this.subscriptionDraft.customPriceEur,
+      }
+    ).subscribe({
+      next: sub => {
+        const plan = this.billingPlans().find(p => p.id === sub.plan_id);
+        this.tenants.update(ts => ts.map(t => t.id === id
+          ? { ...t, subscription: { ...sub, plan_code: plan?.code ?? '', plan_name: plan?.name ?? '' } }
+          : t));
+        this.saving.set(false);
+        this.toast.success('Plan zapisany');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu planu'); },
+    });
+  }
+
+  // Superadmin guardrail: plan/cycle/price changes only ever affect future
+  // billing (already-issued invoices are frozen from tenant_subscription_history),
+  // but that's exactly the kind of thing that's easy to click by accident —
+  // show the before/after and require a second click before saving.
+  openPlanChangeConfirm(t: Tenant): void {
+    const draftPlan = this.billingPlans().find(p => p.id === this.subscriptionDraft.planId);
+    const sub = t.subscription;
+    this.planChangeConfirm.set({
+      tenantId: t.id,
+      tenantName: t.name,
+      before: sub
+        ? { planName: sub.plan_name, cycle: this.billingCycleLabel(sub.billing_cycle), price: sub.custom_price_eur }
+        : { planName: 'brak planu', cycle: '—', price: null },
+      after: {
+        planName: draftPlan?.name ?? '—',
+        cycle: this.billingCycleLabel(this.subscriptionDraft.billingCycle),
+        price: this.subscriptionDraft.customPriceEur != null ? String(this.subscriptionDraft.customPriceEur) : null,
+      },
+    });
+  }
+  cancelPlanChangeConfirm(): void { this.planChangeConfirm.set(null); }
+  confirmPlanChange(): void {
+    const c = this.planChangeConfirm();
+    if (!c) return;
+    this.planChangeConfirm.set(null);
+    this.saveSubscription(c.tenantId);
+  }
+
+  // Ends the subscription (tenant_subscriptions.cancelled_at) — billing's own
+  // record, independent from tenants.is_active. The already-running/closed
+  // billing period is still invoiced in full once it ends; nothing after it.
+  cancelSubscription(t: Tenant): void {
+    if (!confirm(`Zakończyć subskrypcję tenanta „${t.name}"? Bieżący okres rozliczeniowy zostanie jeszcze zafakturowany w całości (bez proracji) po jego zakończeniu — kolejne już nie, do czasu ponownego przypisania planu lub cofnięcia rezygnacji.`)) return;
+    this.saving.set(true);
+    this.http.put<{ cancelled_at: string }>(`${API}/admin/tenants/${t.id}/subscription/cancel`, {}).subscribe({
+      next: res => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id && x.subscription
+          ? { ...x, subscription: { ...x.subscription, cancelled_at: res.cancelled_at } }
+          : x));
+        this.saving.set(false);
+        this.toast.success('Subskrypcja zakończona');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd kończenia subskrypcji'); },
+    });
+  }
+
+  reactivateSubscription(t: Tenant): void {
+    this.saving.set(true);
+    this.http.delete(`${API}/admin/tenants/${t.id}/subscription/cancel`).subscribe({
+      next: () => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id && x.subscription
+          ? { ...x, subscription: { ...x.subscription, cancelled_at: null } }
+          : x));
+        this.saving.set(false);
+        this.toast.success('Rezygnacja cofnięta');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd cofania rezygnacji'); },
+    });
+  }
+
+  // ── Billing details tab (legal buyer data for invoices) ────────
+  openBillingDetailsTab(t: Tenant): void {
+    this.editTab.set('billing');
+    this.billingDetailsLoading.set(true);
+    // Same reasoning as openPlanTab: the tenant list doesn't carry billing_details.
+    this.http.get<Tenant>(`${API}/admin/tenants/${t.id}`).subscribe({
+      next: fresh => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id ? { ...x, billing_details: fresh.billing_details } : x));
+        this.applyBillingDetailsDraft(fresh.billing_details ?? null);
+        this.billingDetailsLoading.set(false);
+      },
+      error: () => { this.toast.error('Błąd ładowania danych rozliczeniowych'); this.billingDetailsLoading.set(false); },
+    });
+  }
+
+  private applyBillingDetailsDraft(details: TenantBillingDetails | null): void {
+    this.billingDetailsDraft = {
+      company_name: details?.company_name ?? '',
+      nip: details?.nip ?? '',
+      street: details?.street ?? '',
+      postal_code: details?.postal_code ?? '',
+      city: details?.city ?? '',
+      country: details?.country ?? '',
+      invoice_email: details?.invoice_email ?? '',
+    };
+  }
+
+  // Reverts unsaved form edits to whatever is currently saved in the
+  // database — never deletes anything. Deleting the saved record is a
+  // separate, explicit destructive action (openDeleteBillingDetails below).
+  cancelBillingDetailsEdit(t: Tenant): void {
+    this.applyBillingDetailsDraft(t.billing_details ?? null);
+  }
+
+  isBillingDetailsDraftUnchanged(t: Tenant): boolean {
+    const d = t.billing_details;
+    return this.billingDetailsDraft.company_name === (d?.company_name ?? '')
+      && this.billingDetailsDraft.nip === (d?.nip ?? '')
+      && this.billingDetailsDraft.street === (d?.street ?? '')
+      && this.billingDetailsDraft.postal_code === (d?.postal_code ?? '')
+      && this.billingDetailsDraft.city === (d?.city ?? '')
+      && this.billingDetailsDraft.country === (d?.country ?? '')
+      && this.billingDetailsDraft.invoice_email === (d?.invoice_email ?? '');
+  }
+
+  // True once every field a complete invoice needs is filled in — mirrors
+  // isInvoiceComplete() in invoicePdfService.js (backend is the source of
+  // truth for what actually gates the PDF banner; this is only used here to
+  // drive the non-blocking hint in the Plan tab).
+  isBillingDetailsComplete(t: Tenant): boolean {
+    const d = t.billing_details;
+    return !!(d?.company_name && d?.nip && d?.street && d?.postal_code && d?.city && d?.country && d?.invoice_email);
+  }
+
+  saveBillingDetails(id: string): void {
+    this.saving.set(true);
+    this.http.put<TenantBillingDetails>(`${API}/admin/tenants/${id}/billing-details`, {
+      company_name: this.billingDetailsDraft.company_name || null,
+      nip: this.billingDetailsDraft.nip || null,
+      street: this.billingDetailsDraft.street || null,
+      postal_code: this.billingDetailsDraft.postal_code || null,
+      city: this.billingDetailsDraft.city || null,
+      country: this.billingDetailsDraft.country || null,
+      invoice_email: this.billingDetailsDraft.invoice_email || null,
+    }).subscribe({
+      next: details => {
+        this.tenants.update(ts => ts.map(t => t.id === id ? { ...t, billing_details: details } : t));
+        this.saving.set(false);
+        this.toast.success('Dane rozliczeniowe zapisane');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu danych rozliczeniowych'); },
+    });
+  }
+
+  // ── Delete billing details (destructive, separate from Anuluj) ─
+  openDeleteBillingDetails(t: Tenant): void { this.deleteBillingDetailsTarget.set(t); }
+  cancelDeleteBillingDetails(): void { this.deleteBillingDetailsTarget.set(null); }
+
+  confirmDeleteBillingDetails(): void {
+    const t = this.deleteBillingDetailsTarget();
+    if (!t) return;
+    this.saving.set(true);
+    this.http.delete(`${API}/admin/tenants/${t.id}/billing-details`).subscribe({
+      next: () => {
+        this.tenants.update(ts => ts.map(x => x.id === t.id ? { ...x, billing_details: null } : x));
+        this.applyBillingDetailsDraft(null);
+        this.saving.set(false);
+        this.deleteBillingDetailsTarget.set(null);
+        this.toast.success('Dane rozliczeniowe usunięte — już wystawione faktury pozostają bez zmian.');
+      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd usuwania danych rozliczeniowych'); },
     });
   }
 
@@ -1304,11 +1759,8 @@ export class TenantsComponent implements OnInit, OnDestroy {
   openEmailTab(id: string): void {
     this.editTab.set('email');
     this.emailLoading.set(true);
-    this.emailTabTenantId = id;
     const tenant = this.tenants().find(t => t.id === id);
     this.activeProvider.set(tenant?.active_email_provider ?? null);
-    this.mailboxStatus.set(null);
-    this.loadMailboxStatus(id);
     this.http.get<EmailProvider[]>(`${API}/admin/tenants/${id}/email-providers`).subscribe({
       next: providers => {
         this.emailProviders.set(providers);
@@ -1401,7 +1853,7 @@ export class TenantsComponent implements OnInit, OnDestroy {
         else if (provider === 'outlook') { this.outlookProvider.set(null); this.outlookForm = this.emptyOutlookForm(); }
         else                              { this.zohoProvider.set(null);   this.zohoForm = this.emptyZohoForm(); }
         // Deleting the active provider's config deactivates it tenant-wide (mirrors backend).
-        if (this.activeProvider() === provider) { this.activeProvider.set(null); this.mailboxStatus.set(null); }
+        if (this.activeProvider() === provider) { this.activeProvider.set(null); }
         this.tenants.update(ts => ts.map(t => t.id === tenantId
           ? { ...t, active_email_provider: this.activeProvider() }
           : t
@@ -1426,8 +1878,6 @@ export class TenantsComponent implements OnInit, OnDestroy {
           ? { ...t, active_email_provider: result.active_email_provider }
           : t
         ));
-        this.mailboxStatus.set(null);
-        this.loadMailboxStatus(tenantId);
         this.saving.set(false);
         this.toast.success(provider
           ? `Aktywny provider: ${TenantsComponent.PROVIDER_LABELS[provider]}`
@@ -1458,65 +1908,69 @@ export class TenantsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── WhatsApp tab (superadmin — read-only oversight) ────────────────────────
-  // Numbers are connected per-user in My Settings, never here — this just
-  // lists who in the tenant has one connected.
+  // ── WhatsApp tab (superadmin — configures the tenant's one shared number) ──
   openWhatsappTab(id: string): void {
     this.editTab.set('whatsapp');
     this.whatsappLoading.set(true);
-    this.http.get<WhatsappDirectoryRow[]>(`${API}/admin/tenants/${id}/whatsapp-users`).subscribe({
-      next: rows => {
-        this.whatsappDirectory.set(rows);
+    this.whatsappShowVerifyToken.set(false);
+    this.http.get<WhatsappConfig>(`${API}/admin/tenants/${id}/whatsapp-config`).subscribe({
+      next: cfg => {
+        this.whatsappConfig.set(cfg);
+        this.whatsappForm = cfg.configured
+          ? {
+              waba_id: cfg.waba_id || '',
+              phone_number_id: cfg.phone_number_id || '',
+              access_token: '',
+              app_secret: '',
+              is_enabled: cfg.is_enabled !== false,
+            }
+          : this.emptyWhatsappForm();
         this.whatsappLoading.set(false);
       },
-      error: () => { this.toast.error('Błąd ładowania listy numerów WhatsApp'); this.whatsappLoading.set(false); },
+      error: () => { this.toast.error('Błąd ładowania konfiguracji WhatsApp'); this.whatsappLoading.set(false); },
     });
   }
 
-  // ── Company mailbox connect/change/disconnect (superadmin only) ──────────
-  // Delegates to the tenant-scoped, superadmin-gated provider routes
-  // (crm-gmail.js/crm-outlook.js/crm-zoho.js), never the per-user ones.
-  loadMailboxStatus(tenantId: string): void {
-    const provider = this.activeProvider();
-    if (!provider) { this.mailboxStatus.set(null); return; }
-    this.mailboxLoading.set(true);
-    this.http.get<{ connected: boolean; email?: string }>(
-      `${API}/crm/${provider}/status`, { params: { tenantId } },
-    ).subscribe({
-      next: status => { this.mailboxStatus.set(status); this.mailboxLoading.set(false); },
-      error: () => { this.mailboxStatus.set(null); this.mailboxLoading.set(false); },
-    });
-  }
-
-  connectMailbox(tenantId: string): void {
-    const provider = this.activeProvider();
-    if (!provider) return;
-    this.mailboxActionBusy.set(true);
-    this.http.get<{ url: string }>(`${API}/crm/${provider}/oauth/url`, { params: { tenantId } }).subscribe({
-      next: ({ url }) => {
-        this.mailboxActionBusy.set(false);
-        window.open(url, 'mailbox-oauth', 'width=520,height=650');
+  saveWhatsappConfig(tenantId: string): void {
+    this.saving.set(true);
+    const body = {
+      waba_id: this.whatsappForm.waba_id,
+      phone_number_id: this.whatsappForm.phone_number_id,
+      access_token: this.whatsappForm.access_token || undefined,
+      app_secret: this.whatsappForm.app_secret || undefined,
+      is_enabled: this.whatsappForm.is_enabled,
+    };
+    this.http.put<WhatsappConfig>(`${API}/admin/tenants/${tenantId}/whatsapp-config`, body).subscribe({
+      next: saved => {
+        this.whatsappConfig.set(saved);
+        this.whatsappForm.access_token = '';
+        this.whatsappForm.app_secret   = '';
+        this.saving.set(false);
+        this.toast.success('WhatsApp zapisany');
       },
-      error: err => {
-        this.mailboxActionBusy.set(false);
-        this.toast.error(err?.error?.error ?? 'Błąd generowania adresu autoryzacji');
-      },
+      error: err => { this.saving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu'); },
     });
   }
 
-  disconnectMailbox(tenantId: string): void {
-    const provider = this.activeProvider();
-    if (!provider) return;
-    if (!confirm('Odłączyć skrzynkę firmową? Wysyłka i odbiór poczty przestaną działać do czasu ponownego podłączenia.')) return;
-    this.mailboxActionBusy.set(true);
-    this.http.delete(`${API}/crm/${provider}/oauth/disconnect`, { params: { tenantId } }).subscribe({
+  deleteWhatsappConfig(tenantId: string): void {
+    if (!confirm('Usunąć konfigurację WhatsApp?')) return;
+    this.saving.set(true);
+    this.http.delete(`${API}/admin/tenants/${tenantId}/whatsapp-config`).subscribe({
       next: () => {
-        this.mailboxActionBusy.set(false);
-        this.mailboxStatus.set({ connected: false });
-        this.toast.success('Skrzynka odłączona');
+        this.whatsappConfig.set(null);
+        this.whatsappForm = this.emptyWhatsappForm();
+        this.saving.set(false);
+        this.toast.success('WhatsApp usunięty');
       },
-      error: () => { this.mailboxActionBusy.set(false); this.toast.error('Błąd odłączania skrzynki'); },
+      error: () => { this.saving.set(false); this.toast.error('Błąd usuwania'); },
     });
+  }
+
+  copyWhatsappVerifyToken(): void {
+    const token = this.whatsappConfig()?.webhook_verify_token;
+    if (!token) return;
+    navigator.clipboard.writeText(token);
+    this.toast.success('Verify token skopiowany');
   }
 
   private providerToGmailForm(p: EmailProvider): GmailForm {
@@ -1543,6 +1997,9 @@ export class TenantsComponent implements OnInit, OnDestroy {
   private emptyGmailForm():   GmailForm   { return { client_id: '', client_secret: '', redirect_uri: '', pubsub_topic: '', pubsub_subscription: '' }; }
   private emptyOutlookForm(): OutlookForm { return { client_id: '', client_secret: '', azure_tenant_id: '', redirect_uri: '' }; }
   private emptyZohoForm():    ZohoForm    { return { client_id: '', client_secret: '', redirect_uri: '' }; }
+  private emptyWhatsappForm(): WhatsappConfigForm {
+    return { waba_id: '', phone_number_id: '', access_token: '', app_secret: '', is_enabled: true };
+  }
 
   private emptyDraft() {
     return {

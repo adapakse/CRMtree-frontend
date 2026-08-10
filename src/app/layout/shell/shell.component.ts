@@ -165,6 +165,11 @@ import { initials } from '../../core/services/helpers';
                 <span class="nav-label">Tenants</span>
                 <span class="nav-tip">Zarządzanie tenantami</span>
               </a>
+              <a class="nav-item" routerLink="/admin/billing" routerLinkActive="active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                <span class="nav-label">Rozliczenia</span>
+                <span class="nav-tip">Faktury i plany tenantów</span>
+              </a>
             </div>
           }
 
