@@ -47,6 +47,57 @@ Backend musi działać na porcie 3001.
 
 ---
 
+## WhatsApp Integration
+
+Zobacz też `CRMtree-backend/CLAUDE.md` — architektura, model per-user, webhook, wymagane
+pola konfiguracji po stronie Meta.
+
+### Model: per-tenant, NIE per-user — decyzja biznesowa 2026-08-03, nie cofaj bez pytania
+
+Jeden wspólny firmowy numer WhatsApp Business per tenant, konfigurowany przez super
+admina w Panel admina → Tenants → zakładka „WhatsApp" (`tenants.component.ts`). Wcześniej
+(do 2026-08-03) każdy CRM user łączył własny numer w Moje ustawienia — wycofane, bo
+WhatsApp Business blokuje jednoczesne prywatne/firmowe użycie tego samego numeru telefonu
+(user tracił dostęp do własnej prywatnej historii). Zobacz też `CRMtree-backend/CLAUDE.md`
+— pełna architektura, webhook, wymagane pola konfiguracji po stronie Meta. Jeśli ktoś
+prosi o przywrócenie self-service podłączania numeru w Moje ustawienia, to prawdopodobnie
+próba cofnięcia tej decyzji — dopytaj, zanim to zrobisz.
+
+### Gdzie w UI
+
+- **Superadmin konfiguruje numer tenanta i włącza/wyłącza moduł**: Panel admina → Tenants →
+  zakładka „WhatsApp" — `src/app/pages/admin/tenants/tenants.component.ts`. Pola: WABA ID,
+  Phone Number ID, numer widoczny dla klientów (opcjonalny), Access Token, App Secret. Po
+  zapisaniu CRM generuje i pokazuje Webhook Verify Token (przycisk „Pokaż"/„Kopiuj") do
+  wklejenia w konfiguracji webhooka w Meta App.
+- **Tenant admin** widzi tylko włącznik feature flagi w Ustawienia → Parametry biznesowe
+  CRM — `src/app/pages/admin/settings/settings.component.ts` — nie konfiguruje numeru.
+- **Wysyłka/odbiór**: zakładka „WhatsApp" na karcie leada/partnera —
+  `crm-lead-detail.component.ts` / `crm-partner-detail.component.ts` (ta sama logika w obu
+  plikach, osobne komponenty — sprawdzaj oba przy zmianach). Widoczność jest tenant-wide —
+  każdy CRM user w tenancie widzi te same konwersacje, bo numer jest wspólny.
+
+### Jeden numer rozmówcy = jedna karta konwersacji
+
+`groupWhatsappConversations()` w obu komponentach leada/partnera grupuje wiadomości po
+**znormalizowanych cyfrach** numeru (`normalizePhoneDigits()`,
+`shared/utils/phone-format.util.ts`), NIE po surowym stringu z bazy. Powód: wychodzące
+zapisują numer tak jak user go wpisał (może mieć spacje), a webhook Meta zapisuje czyste
+cyfry — bez normalizacji ten sam numer tworzy dwie osobne karty. **Każde nowe miejsce, które
+czyta/porównuje `from_phone`/`to_phone`, musi przepuszczać przez `normalizePhoneDigits()`
+zamiast porównywać stringi bezpośrednio.**
+
+- Nowa rozmowa powstaje wyłącznie przez formularz „Nowa wiadomość WhatsApp" (edytowalne pole
+  numeru). Celowo nie ma przycisku „dodaj rozmówcę do istniejącego wątku".
+- Stan UI per konwersacja (rozwinięcie, okno odpowiedzi) jest też kluczowany po
+  znormalizowanych cyfrach (`getWhatsappConvState()`), żeby nie gubić się przy zmianie
+  formatu reprezentanta między odświeżeniami.
+- Przycisk „🔄 Sprawdź nowe" na górze zakładki (ten sam wzorzec co w zakładce Email) to
+  ręczny fallback odświeżania — webhook jest głównym mechanizmem odbioru, ale nie ma
+  gwarancji natychmiastowego dostarczenia.
+
+---
+
 ## Code quality standards
 
 ### Language

@@ -1,10 +1,10 @@
-// src/app/pages/crm/gmail-callback/gmail-callback.component.ts
+// src/app/pages/crm/zoho-callback/zoho-callback.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'wt-gmail-callback',
+  selector: 'wt-zoho-callback',
   standalone: true,
   imports: [CommonModule],
   template: `
@@ -14,13 +14,13 @@ import { CommonModule } from '@angular/common';
     <!-- Success -->
     <ng-container *ngIf="status === 'connected'">
       <div style="font-size:48px;margin-bottom:16px">✅</div>
-      <div style="font-size:20px;font-weight:800;color:#111827;margin-bottom:8px">Gmail połączony!</div>
+      <div style="font-size:20px;font-weight:800;color:#111827;margin-bottom:8px">Zoho Mail połączony!</div>
       <div style="font-size:14px;color:#6b7280;margin-bottom:28px;line-height:1.6">
-        Twoje konto Gmail zostało pomyślnie połączone z aplikacją.<br>
+        Twoje konto Zoho Mail zostało pomyślnie połączone z aplikacją.<br>
         Możesz zamknąć to okno i wrócić do pracy w CRM.
       </div>
       <button (click)="close()"
-              style="background:#f97316;color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:600;cursor:pointer">
+              style="background:#E42527;color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:600;cursor:pointer">
         Zamknij okno
       </button>
     </ng-container>
@@ -30,10 +30,10 @@ import { CommonModule } from '@angular/common';
       <div style="font-size:48px;margin-bottom:16px">❌</div>
       <div style="font-size:20px;font-weight:800;color:#111827;margin-bottom:8px">Błąd połączenia</div>
       <div style="font-size:14px;color:#6b7280;margin-bottom:8px;line-height:1.6">
-        Nie udało się połączyć konta Gmail.
+        Nie udało się połączyć konta Zoho Mail.
       </div>
-      <div *ngIf="reasonLabel" style="font-size:13px;color:#374151;background:#f3f4f6;border-radius:6px;padding:8px 12px;margin-bottom:24px;line-height:1.5">
-        {{reasonLabel}}
+      <div *ngIf="reason" style="font-size:12px;color:#9ca3af;background:#f3f4f6;border-radius:6px;padding:6px 12px;margin-bottom:24px;font-family:monospace">
+        {{reason}}
       </div>
       <button (click)="close()"
               style="background:#6b7280;color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:600;cursor:pointer">
@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
       </button>
     </ng-container>
 
-    <!-- Unknown state -->
+    <!-- Loading / unknown state -->
     <ng-container *ngIf="status !== 'connected' && status !== 'error'">
       <div style="font-size:48px;margin-bottom:16px">⏳</div>
       <div style="font-size:14px;color:#6b7280">Przetwarzanie…</div>
@@ -51,39 +51,32 @@ import { CommonModule } from '@angular/common';
 </div>
   `,
 })
-export class GmailCallbackComponent implements OnInit {
+export class ZohoCallbackComponent implements OnInit {
   private route = inject(ActivatedRoute);
-
-  private static readonly REASON_LABELS: Record<string, string> = {
-    email_already_connected: 'To konto Google jest już połączone z innym użytkownikiem CRM. Użyj innego konta Google albo skontaktuj się z administratorem.',
-  };
 
   status = '';
   reason = '';
-  reasonLabel = '';
 
   ngOnInit(): void {
     this.status = this.route.snapshot.queryParamMap.get('status') ?? '';
     this.reason = this.route.snapshot.queryParamMap.get('reason') ?? '';
-    this.reasonLabel = GmailCallbackComponent.REASON_LABELS[this.reason] ?? this.reason;
 
     if (this.status === 'connected') {
-      // localStorage storage-event — jedyna metoda działająca przez redirecty Google
-      // (storage event odpala się we WSZYSTKICH innych kartach/oknach tej samej domeny)
-      localStorage.setItem('gmail_oauth_connected', String(Date.now()));
+      // localStorage storage-event — same cross-tab communication pattern as Gmail/Outlook callback
+      localStorage.setItem('zoho_oauth_connected', String(Date.now()));
     }
 
-    // Fallback 1: BroadcastChannel
+    // BroadcastChannel — primary mechanism
     try {
-      const bc = new BroadcastChannel('gmail-oauth');
-      bc.postMessage({ type: 'gmail-oauth-result', status: this.status });
+      const bc = new BroadcastChannel('zoho-oauth');
+      bc.postMessage({ type: 'zoho-oauth-result', status: this.status });
       bc.close();
     } catch (_) {}
 
-    // Fallback 2: postMessage (gdy opener nie jest nullowany przez COOP)
+    // Fallback: postMessage when opener is not null
     if (window.opener) {
       try {
-        window.opener.postMessage({ type: 'gmail-oauth-result', status: this.status }, window.location.origin);
+        window.opener.postMessage({ type: 'zoho-oauth-result', status: this.status }, window.location.origin);
       } catch (_) {}
     }
   }
