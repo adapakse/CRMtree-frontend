@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoInternalLink, SocialPost, SocialPlatform } from '../../../core/services/crm-seo.service';
+import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 import { SeoSocialChannelsComponent } from './seo-social-channels.component';
 import { SeoTenantSettingsComponent } from './seo-tenant-settings.component';
+import { SeoAuthorsPanelComponent } from './seo-authors-panel.component';
 
 const STATUS_LABELS: Record<SeoContentStatus, string> = {
   draft: 'Szkic',
@@ -21,7 +22,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent],
+  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent, SeoAuthorsPanelComponent],
   template: `
     <div class="seo-page">
       <header class="seo-header">
@@ -29,6 +30,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
         <div class="header-actions">
           <button type="button" class="btn-ghost" (click)="showStrategy.set(!showStrategy())">
             Strategia treści ({{ pillars().length }} filarów)
+          </button>
+          <button type="button" class="btn-ghost" (click)="showAuthors.set(!showAuthors())">
+            Autorzy ({{ authors().length }})
           </button>
           <button type="button" class="btn-ghost" (click)="showChannels.set(!showChannels())">Kanały social</button>
           <button type="button" class="btn-ghost" (click)="showSettings.set(!showSettings())">Ustawienia</button>
@@ -50,6 +54,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
 
       @if (showStrategy()) {
         <wt-seo-strategy-panel [pillars]="pillars()" (pillarsChanged)="loadPillars()" />
+      }
+      @if (showAuthors()) {
+        <wt-seo-authors-panel (authorsChanged)="loadAuthors()" />
       }
       @if (showChannels()) {
         <wt-seo-social-channels />
@@ -109,6 +116,16 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
             <h2>
               <input class="title-input" [(ngModel)]="editTitle" [disabled]="!isEditable(d.status)">
             </h2>
+            <div class="author-row">
+              <label for="authorSelect">Autor</label>
+              <select id="authorSelect" [(ngModel)]="editAuthorId" [disabled]="!isEditable(d.status)" (change)="saveAuthor(d.id)">
+                <option [ngValue]="null">— wybierz autora —</option>
+                @for (a of selectableAuthors(); track a.id) {
+                  <option [ngValue]="a.id">{{ a.full_name }}{{ a.job_title ? ' · ' + a.job_title : '' }}{{ !a.is_active ? ' (nieaktywny)' : '' }}</option>
+                }
+              </select>
+              @if (!d.author_id) { <span class="author-missing-note">Wymagany przed zatwierdzeniem</span> }
+            </div>
             <textarea class="meta-input" [(ngModel)]="editMeta" [disabled]="!isEditable(d.status)" rows="2" placeholder="Meta description"></textarea>
             <textarea class="body-input" [(ngModel)]="editBody" [disabled]="!isEditable(d.status)" rows="14"></textarea>
 
@@ -232,6 +249,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .image-url-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
     .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .title-input { width: 100%; font-size: 1.1rem; font-weight: 700; border: none; padding: 0; }
+    .author-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem; font-size: 0.85rem; color: var(--gray-700); }
+    .author-row select { border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
+    .author-missing-note { font-size: 0.75rem; color: #92400E; background: #FEF3C7; border-radius: 999px; padding: 0.15rem 0.6rem; }
     .meta-input, .body-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.6rem; margin-top: 0.6rem; font-family: inherit; }
     .internal-links-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.75rem; }
     .internal-links-label { font-size: 0.78rem; color: var(--gray-500); }
@@ -281,7 +301,16 @@ export class CrmSeoComponent implements OnInit {
   readonly detail = signal<SeoContent | null>(null);
   readonly gsc = signal<GscStatus | null>(null);
   readonly pillars = signal<SeoPillar[]>([]);
+  readonly authors = signal<SeoAuthor[]>([]);
+  // Inactive authors drop out of the picker for new assignments, but an
+  // article already assigned to one keeps showing it — deactivating someone
+  // must never silently blank out an already-approved/published article's author.
+  readonly selectableAuthors = computed(() => {
+    const currentId = this.detail()?.author_id ?? null;
+    return this.authors().filter((a) => a.is_active || a.id === currentId);
+  });
   readonly showStrategy = signal(false);
+  readonly showAuthors = signal(false);
   readonly showChannels = signal(false);
   readonly showSettings = signal(false);
   readonly statusFilter = signal<SeoContentStatus | ''>('');
@@ -299,15 +328,21 @@ export class CrmSeoComponent implements OnInit {
   editBody = '';
   editImageUrl = '';
   editScheduledAt = '';
+  editAuthorId: number | null = null;
 
   ngOnInit(): void {
     this.loadList();
     this.seoService.gscStatus().subscribe((s) => this.gsc.set(s));
     this.loadPillars();
+    this.loadAuthors();
   }
 
   loadPillars(): void {
     this.seoService.pillars().subscribe((p) => this.pillars.set(p));
+  }
+
+  loadAuthors(): void {
+    this.seoService.authors().subscribe((a) => this.authors.set(a));
   }
 
   statusLabel(status: SeoContentStatus): string {
@@ -334,6 +369,7 @@ export class CrmSeoComponent implements OnInit {
       this.editMeta = d.meta_description ?? '';
       this.editBody = d.body;
       this.editImageUrl = d.header_image_url ?? '';
+      this.editAuthorId = d.author_id;
       // datetime-local expects "YYYY-MM-DDTHH:mm" in local time, not an ISO string with seconds/zone.
       this.editScheduledAt = d.scheduled_at ? this.toDatetimeLocal(d.scheduled_at) : '';
     });
@@ -363,6 +399,13 @@ export class CrmSeoComponent implements OnInit {
     this.seoService.update(id, { header_image_url: this.editImageUrl || null }).subscribe({
       next: (d) => { this.toast.success('Zapisano zdjęcie.'); this.detail.set(d); this.loadList(); },
       error: () => this.toast.error('Nie udało się zapisać zdjęcia.'),
+    });
+  }
+
+  saveAuthor(id: number): void {
+    this.seoService.update(id, { author_id: this.editAuthorId }).subscribe({
+      next: (d) => { this.toast.success('Zapisano autora.'); this.detail.set(d); this.loadList(); },
+      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się zapisać autora.'); },
     });
   }
 
@@ -400,7 +443,7 @@ export class CrmSeoComponent implements OnInit {
         this.detail.set(null);
         this.loadList();
       },
-      error: () => this.toast.error('Nie udało się zatwierdzić wpisu.'),
+      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się zatwierdzić wpisu.'),
     });
   }
 
