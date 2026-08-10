@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CrmSeoService } from '../../../core/services/crm-seo.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -70,6 +70,7 @@ import { ToastService } from '../../../core/services/toast.service';
 export class SeoTenantSettingsComponent implements OnInit {
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
   readonly auth = inject(AuthService);
 
   readonly saving = signal(false);
@@ -88,9 +89,16 @@ export class SeoTenantSettingsComponent implements OnInit {
       // A tenant's own explicit choice always wins; only prefill from the connected
       // WordPress site when nobody has set (or cleared) a GSC property yet.
       this.gscSiteUrl = s.seo_gsc_site_url ?? s.wordpress_site_url ?? '';
+      // OnPush doesn't repaint on a plain-property write from an async callback —
+      // without this the loaded values sit correctly in memory but stay invisible
+      // until some unrelated template event (e.g. clicking Save) forces a check.
+      this.cdr.markForCheck();
     });
     if (this.auth.isSuperAdmin()) {
-      this.seoService.wordpressPublishMode().subscribe((r) => this.wpPublishMode = r.wordpress_publish_mode);
+      this.seoService.wordpressPublishMode().subscribe((r) => {
+        this.wpPublishMode = r.wordpress_publish_mode;
+        this.cdr.markForCheck();
+      });
     }
   }
 
