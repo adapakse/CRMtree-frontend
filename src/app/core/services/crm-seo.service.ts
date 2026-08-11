@@ -14,6 +14,7 @@ export interface SeoContentSummary {
   status: SeoContentStatus;
   target_keyword: string | null;
   category: string | null;
+  author_id: number | null;
   scheduled_at: string | null;
   published_at: string | null;
   reviewed_by: string | null;
@@ -28,6 +29,16 @@ export interface SeoContent extends SeoContentSummary {
   body: string;
   meta_description: string | null;
   header_image_url: string | null;
+}
+
+export interface SeoAuthor {
+  id: number;
+  full_name: string;
+  job_title: string | null;
+  bio: string | null;
+  photo_url: string | null;
+  linkedin_url: string | null;
+  is_active: boolean;
 }
 
 export interface GscStatus {
@@ -92,6 +103,12 @@ export interface SocialPost {
 export interface TenantSettings {
   business_description: string | null;
   industry_vertical: string | null;
+  seo_gsc_site_url: string | null;
+}
+
+export interface TenantSettingsResponse extends TenantSettings {
+  /** Read-only — the connected WordPress site's URL, used only as a prefill suggestion. */
+  wordpress_site_url: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -109,7 +126,7 @@ export class CrmSeoService {
     return this.http.get<SeoContent>(`${this.api}/content/${id}`);
   }
 
-  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description' | 'header_image_url' | 'scheduled_at'>>): Observable<SeoContent> {
+  update(id: number, patch: Partial<Pick<SeoContent, 'title' | 'body' | 'meta_description' | 'header_image_url' | 'scheduled_at' | 'author_id'>>): Observable<SeoContent> {
     return this.http.patch<SeoContent>(`${this.api}/content/${id}`, patch);
   }
 
@@ -147,6 +164,22 @@ export class CrmSeoService {
 
   deletePillar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/pillars/${id}`);
+  }
+
+  authors(): Observable<SeoAuthor[]> {
+    return this.http.get<SeoAuthor[]>(`${this.api}/authors`);
+  }
+
+  addAuthor(author: Pick<SeoAuthor, 'full_name' | 'job_title' | 'bio' | 'photo_url' | 'linkedin_url'>): Observable<SeoAuthor> {
+    return this.http.post<SeoAuthor>(`${this.api}/authors`, author);
+  }
+
+  updateAuthor(id: number, patch: Partial<Pick<SeoAuthor, 'full_name' | 'job_title' | 'bio' | 'photo_url' | 'linkedin_url' | 'is_active'>>): Observable<SeoAuthor> {
+    return this.http.patch<SeoAuthor>(`${this.api}/authors/${id}`, patch);
+  }
+
+  deleteAuthor(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/authors/${id}`);
   }
 
   gscStatus(): Observable<GscStatus> {
@@ -233,8 +266,8 @@ export class CrmSeoService {
     return this.http.post<{ connected: boolean }>(`${this.api}/social/wordpress/connect`, { site_url: siteUrl, username, app_password: appPassword });
   }
 
-  tenantSettings(): Observable<TenantSettings> {
-    return this.http.get<TenantSettings>(`${this.api}/tenant-settings`);
+  tenantSettings(): Observable<TenantSettingsResponse> {
+    return this.http.get<TenantSettingsResponse>(`${this.api}/tenant-settings`);
   }
 
   updateTenantSettings(patch: Partial<TenantSettings>): Observable<TenantSettings> {

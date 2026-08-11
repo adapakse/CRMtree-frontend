@@ -12,10 +12,15 @@ export interface BlogPostSummary {
   header_image_url: string | null;
   published_at: string;
   reading_minutes: number;
+  author_name: string | null;
+  author_job_title: string | null;
+  author_photo_url: string | null;
 }
 
 export interface BlogPost extends BlogPostSummary {
   body: string;
+  author_bio: string | null;
+  author_linkedin_url: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
