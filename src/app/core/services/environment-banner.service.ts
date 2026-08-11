@@ -11,6 +11,17 @@ export class EnvironmentBannerService {
 
   constructor() {
     if (!isPlatformBrowser(this.platformId)) return;
+
+    // `ng serve` (local dev, `npm start`) has no Express server behind it, so
+    // /env-config.json 404s — the fetch below would silently never resolve
+    // isTest to true, leaving local dev stuck on the production-only login
+    // view. Short-circuit on the well-known local hostnames instead of
+    // waiting on a request that can't succeed there.
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      this.isTest.set(true);
+      return;
+    }
+
     fetch('/env-config.json')
       .then((r) => (r.ok ? r.json() : null))
       .then((config: { appEnv?: string } | null) => this.isTest.set(config?.appEnv !== 'production'))
