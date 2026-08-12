@@ -292,7 +292,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                               <div class="edit-grid">
                                 <div class="field">
                                   <label>Plan</label>
-                                  <select [(ngModel)]="subscriptionDraft.planId" (ngModelChange)="onPlanChange()">
+                                  <select [(ngModel)]="subscriptionDraft.planId">
                                     @for (p of billingPlans(); track p.id) {
                                       <option [value]="p.id">{{ p.name }}</option>
                                     }
@@ -305,17 +305,17 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     <option value="annual">Roczny</option>
                                   </select>
                                 </div>
-                                @if (selectedPlanIsCustomPricing()) {
-                                  <div class="field">
-                                    <label>Kwota za okres rozliczeniowy (EUR)</label>
-                                    <input type="number" min="0.01" step="0.01"
-                                      placeholder="np. 5000.00"
-                                      [(ngModel)]="subscriptionDraft.customPriceEur">
-                                  </div>
-                                }
+                                <div class="field">
+                                  <label>Kwota za okres rozliczeniowy (EUR)</label>
+                                  <input type="number" min="0.01" step="0.01"
+                                    placeholder="np. 5000.00"
+                                    [(ngModel)]="subscriptionDraft.customPriceEur">
+                                </div>
                               </div>
                               @if (selectedPlanIsCustomPricing()) {
                                 <div class="state-msg">Plan Professional wymaga indywidualnej kwoty — batch wygeneruje fakturę na tę kwotę zgodnie z wybranym cyklem (nie jest mnożona przez liczbę użytkowników).</div>
+                              } @else {
+                                <div class="state-msg">Zostaw puste, żeby rozliczać automatycznie wg cennika (cena × liczba aktywnych userów). Wpisana kwota nadpisuje cennik i liczy się jako stała stawka za okres — tak samo jak w Professional, nie jest mnożona przez liczbę użytkowników.</div>
                               }
                               @if (t.subscription) {
                                 <div class="td-muted">
@@ -1381,13 +1381,6 @@ export class TenantsComponent implements OnInit {
 
   selectedPlanIsCustomPricing(): boolean {
     return this.billingPlans().find(p => p.id === this.subscriptionDraft.planId)?.is_custom_pricing ?? false;
-  }
-
-  onPlanChange(): void {
-    // Switching away from a custom-pricing plan clears the quote — it's
-    // meaningless for Lite/Standard and the backend would discard it anyway,
-    // but leaving it in the draft would confuse a later switch back.
-    if (!this.selectedPlanIsCustomPricing()) this.subscriptionDraft.customPriceEur = null;
   }
 
   // Professional's custom_price_eur is a single amount for whichever cycle is
