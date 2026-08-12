@@ -26,7 +26,7 @@ const app = express();
 // isn't on this list — every one of our real front doors needs to be here, or
 // server-rendered routes 400 with "Header ... is not allowed" instead of rendering.
 const angularApp = new AngularNodeAppEngine({
-  allowedHosts: ['crmtree.pl', '*.crmtree.pl'],
+  allowedHosts: ['crmtree.pl', '*.crmtree.pl', 'int.crmtree.pl', '*.int.crmtree.pl'],
   trustProxyHeaders: [
     'x-forwarded-for',
     'x-forwarded-host',
