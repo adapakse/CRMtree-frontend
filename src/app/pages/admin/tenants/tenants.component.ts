@@ -306,22 +306,22 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                   </select>
                                 </div>
                                 <div class="field">
-                                  <label>Kwota za okres rozliczeniowy (EUR)</label>
+                                  <label>{{ selectedPlanIsCustomPricing() ? 'Kwota za okres rozliczeniowy (EUR)' : 'Cena za użytkownika (EUR)' }}</label>
                                   <input type="number" min="0.01" step="0.01"
-                                    placeholder="np. 5000.00"
+                                    [placeholder]="selectedPlanIsCustomPricing() ? 'np. 5000.00' : 'np. 26.00'"
                                     [(ngModel)]="subscriptionDraft.customPriceEur">
                                 </div>
                               </div>
                               @if (selectedPlanIsCustomPricing()) {
                                 <div class="state-msg">Plan Professional wymaga indywidualnej kwoty — batch wygeneruje fakturę na tę kwotę zgodnie z wybranym cyklem (nie jest mnożona przez liczbę użytkowników).</div>
                               } @else {
-                                <div class="state-msg">Zostaw puste, żeby rozliczać automatycznie wg cennika (cena × liczba aktywnych userów). Wpisana kwota nadpisuje cennik i liczy się jako stała stawka za okres — tak samo jak w Professional, nie jest mnożona przez liczbę użytkowników.</div>
+                                <div class="state-msg">Zostaw puste, żeby rozliczać wg standardowej ceny z cennika. Wpisana kwota nadpisuje cenę za użytkownika (np. przy wynegocjowanym rabacie, 29 → 26 EUR) — nadal mnożona przez liczbę aktywnych userów w okresie, w przeciwieństwie do ryczałtu w Professional.</div>
                               }
                               @if (t.subscription) {
                                 <div class="td-muted">
                                   Obecny plan: {{ t.subscription.plan_name }} · {{ billingCycleLabel(t.subscription.billing_cycle) }}
                                   @if (t.subscription.custom_price_eur) {
-                                    · {{ t.subscription.custom_price_eur }} EUR
+                                    · {{ t.subscription.custom_price_eur }} EUR{{ t.subscription.plan_code === 'professional' ? '' : '/user' }}
                                   }
                                   @if (t.subscription.plan_started_at) {
                                     · od {{ t.subscription.plan_started_at | date:'dd.MM.yyyy' }}
