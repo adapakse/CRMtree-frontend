@@ -292,7 +292,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                               <div class="edit-grid">
                                 <div class="field">
                                   <label>Plan</label>
-                                  <select [(ngModel)]="subscriptionDraft.planId" (ngModelChange)="onPlanChange()">
+                                  <select [(ngModel)]="subscriptionDraft.planId">
                                     @for (p of billingPlans(); track p.id) {
                                       <option [value]="p.id">{{ p.name }}</option>
                                     }
@@ -305,23 +305,23 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     <option value="annual">Roczny</option>
                                   </select>
                                 </div>
-                                @if (selectedPlanIsCustomPricing()) {
-                                  <div class="field">
-                                    <label>Kwota za okres rozliczeniowy (EUR)</label>
-                                    <input type="number" min="0.01" step="0.01"
-                                      placeholder="np. 5000.00"
-                                      [(ngModel)]="subscriptionDraft.customPriceEur">
-                                  </div>
-                                }
+                                <div class="field">
+                                  <label>{{ selectedPlanIsCustomPricing() ? 'Kwota za okres rozliczeniowy (EUR)' : 'Cena za użytkownika (EUR)' }}</label>
+                                  <input type="number" min="0.01" step="0.01"
+                                    [placeholder]="selectedPlanIsCustomPricing() ? 'np. 5000.00' : 'np. 26.00'"
+                                    [(ngModel)]="subscriptionDraft.customPriceEur">
+                                </div>
                               </div>
                               @if (selectedPlanIsCustomPricing()) {
                                 <div class="state-msg">Plan Professional wymaga indywidualnej kwoty — batch wygeneruje fakturę na tę kwotę zgodnie z wybranym cyklem (nie jest mnożona przez liczbę użytkowników).</div>
+                              } @else {
+                                <div class="state-msg">Zostaw puste, żeby rozliczać wg standardowej ceny z cennika. Wpisana kwota nadpisuje cenę za użytkownika (np. przy wynegocjowanym rabacie, 29 → 26 EUR) — nadal mnożona przez liczbę aktywnych userów w okresie, w przeciwieństwie do ryczałtu w Professional.</div>
                               }
                               @if (t.subscription) {
                                 <div class="td-muted">
                                   Obecny plan: {{ t.subscription.plan_name }} · {{ billingCycleLabel(t.subscription.billing_cycle) }}
                                   @if (t.subscription.custom_price_eur) {
-                                    · {{ t.subscription.custom_price_eur }} EUR
+                                    · {{ t.subscription.custom_price_eur }} EUR{{ t.subscription.plan_code === 'professional' ? '' : '/user' }}
                                   }
                                   @if (t.subscription.plan_started_at) {
                                     · od {{ t.subscription.plan_started_at | date:'dd.MM.yyyy' }}
@@ -1381,13 +1381,6 @@ export class TenantsComponent implements OnInit {
 
   selectedPlanIsCustomPricing(): boolean {
     return this.billingPlans().find(p => p.id === this.subscriptionDraft.planId)?.is_custom_pricing ?? false;
-  }
-
-  onPlanChange(): void {
-    // Switching away from a custom-pricing plan clears the quote — it's
-    // meaningless for Lite/Standard and the backend would discard it anyway,
-    // but leaving it in the draft would confuse a later switch back.
-    if (!this.selectedPlanIsCustomPricing()) this.subscriptionDraft.customPriceEur = null;
   }
 
   // Professional's custom_price_eur is a single amount for whichever cycle is
