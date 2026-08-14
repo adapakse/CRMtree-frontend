@@ -9,6 +9,7 @@ import { ToastService } from '../../../core/services/toast.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule],
   template: `
+    <div class="strategy-sections">
     <div class="pillar-grid">
       @for (p of pillars; track p.id) {
         <div class="pillar-card">
@@ -114,9 +115,13 @@ import { ToastService } from '../../../core/services/toast.service';
         }
       </div>
     </div>
+    </div>
   `,
   styles: [`
-    .pillar-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
+    /* 12px gap between this panel's own tiles (pillars / competitors / backlinks) —
+       the 24px gap between main SEO sections lives on the parent .seo-sections in crm-seo.component.ts. */
+    .strategy-sections { display: flex; flex-direction: column; gap: 0.75rem; }
+    .pillar-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
     .pillar-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: #fff; }
     .pillar-card-top { display:flex; align-items:center; justify-content:space-between; gap: 0.5rem; }
     .pillar-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
@@ -135,7 +140,7 @@ import { ToastService } from '../../../core/services/toast.service';
     }
     .btn-add-pillar:hover { color: var(--orange-dark); }
 
-    .competitors-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; margin-bottom: 1.25rem; }
+    .competitors-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
     .competitors-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.75rem; }
     .competitors-list { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; }

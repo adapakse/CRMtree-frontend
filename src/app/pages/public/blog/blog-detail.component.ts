@@ -2,8 +2,10 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, inject, signal } 
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DomSanitizer, Meta, SafeHtml } from '@angular/platform-browser';
+import { LucideCopy } from '@lucide/angular';
 import { PublicBlogService, BlogPost } from '../../../core/services/public-blog.service';
-import { SeoService } from '../../../core/services/seo.service';
+import { SeoService, SITE_URL } from '../../../core/services/seo.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 // Body is stored as a small, fixed markdown subset (## / ### headings, "- " lists,
 // **bold**, [text](url) links) — see CRMtree-backend's seoContentService.renderBody.
@@ -41,7 +43,7 @@ function renderBodyHtml(body: string): string {
   selector: 'wt-blog-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, LucideCopy],
   template: `
     @if (post(); as p) {
       <article class="blog-post">
@@ -54,6 +56,23 @@ function renderBodyHtml(body: string): string {
             <span class="meta-dot">·</span>
             <span>{{ p.reading_minutes }} min czytania</span>
           </div>
+
+          <div class="share-row">
+            <span class="share-label">Udostępnij:</span>
+            <a class="share-btn share-linkedin" [href]="linkedinShareUrl(p)" target="_blank" rel="noopener noreferrer" title="Udostępnij na LinkedIn" aria-label="Udostępnij na LinkedIn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
+              </svg>
+            </a>
+            <a class="share-btn share-facebook" [href]="facebookShareUrl(p)" target="_blank" rel="noopener noreferrer" title="Udostępnij na Facebooku" aria-label="Udostępnij na Facebooku">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.732-.011c-.9 0-1.658.166-2.264.502a2.567 2.567 0 0 0-.933.933c-.435.774-.635 1.706-.635 3.088v1.058h4.318l-.652 3.667h-3.666V23.691h-3.667z"/>
+              </svg>
+            </a>
+            <button type="button" class="share-btn share-copy" (click)="copyLink(p)" title="Kopiuj link" aria-label="Kopiuj link">
+              <svg lucideCopy [size]="16"></svg>
+            </button>
+          </div>
         </div>
 
         @if (p.header_image_url) {
@@ -64,6 +83,29 @@ function renderBodyHtml(body: string): string {
 
         <div class="post-container">
           <div class="post-content" [innerHTML]="bodyHtml()"></div>
+
+          @if (p.author_name) {
+            <div class="author-box">
+              @if (p.author_photo_url) {
+                <img class="author-photo" [src]="p.author_photo_url" alt="">
+              }
+              <div class="author-info">
+                <span class="author-label">Autor</span>
+                <span class="author-name">{{ p.author_name }}</span>
+                @if (p.author_job_title) { <span class="author-job-title">{{ p.author_job_title }}</span> }
+                @if (p.author_bio) { <p class="author-bio">{{ p.author_bio }}</p> }
+                @if (p.author_linkedin_url) {
+                  <a class="author-linkedin" [href]="p.author_linkedin_url" target="_blank" rel="noopener noreferrer">
+                    <svg class="linkedin-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
+                    </svg>
+                    Profil LinkedIn
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
           <a routerLink="/blog" class="back-link back-link-bottom">&larr; Wszystkie wpisy</a>
         </div>
       </article>
@@ -95,6 +137,18 @@ function renderBodyHtml(body: string): string {
     .post-meta { display:flex; align-items:center; gap:0.4rem; font-size:0.85rem; color:var(--gray-500); }
     .meta-dot { color:var(--gray-300); }
 
+    .share-row { display:flex; align-items:center; gap:0.5rem; margin-top:0.9rem; }
+    .share-label { font-size:0.78rem; color:var(--gray-500); margin-right:0.1rem; }
+    .share-btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:32px; height:32px; border-radius:50%; border:none; cursor:pointer;
+      color:#fff; flex-shrink:0; transition:opacity .15s ease;
+    }
+    .share-btn:hover { opacity:0.85; }
+    .share-linkedin { background:#0A66C2; }
+    .share-facebook { background:#1877F2; }
+    .share-copy { background:var(--gray-100); color:var(--gray-700); }
+
     .hero-wrap { max-width:920px; margin:2rem auto 0; padding:0 1.5rem; }
     .post-hero-image { width:100%; max-height:420px; object-fit:cover; border-radius:var(--radius); display:block; }
 
@@ -106,6 +160,25 @@ function renderBodyHtml(body: string): string {
     .post-content li { margin-top:0.4rem; }
     .post-content strong { color:var(--gray-900); }
     .post-content a { color:var(--orange-dark); text-decoration-color:var(--orange-muted); }
+
+    .author-box {
+      display:flex; gap:1rem; align-items:flex-start; margin-top:3rem; padding-top:2rem;
+      border-top:1px solid var(--gray-200);
+    }
+    .author-photo { width:56px; height:56px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+    .author-info { display:flex; flex-direction:column; min-width:0; }
+    .author-label {
+      font-size:0.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-500); font-weight:700;
+    }
+    .author-name { font-size:0.95rem; font-weight:700; color:var(--gray-900); margin-top:0.15rem; }
+    .author-job-title { font-size:0.82rem; color:var(--gray-500); }
+    .author-bio { font-size:0.88rem; color:var(--gray-600); line-height:1.5; margin:0.5rem 0 0; }
+    .author-linkedin {
+      display:inline-flex; align-items:center; gap:0.35rem; margin-top:0.5rem;
+      font-size:0.82rem; font-weight:600; color:#0A66C2; text-decoration:none;
+    }
+    .author-linkedin:hover { text-decoration:underline; }
+    .linkedin-icon { flex-shrink:0; }
 
     .not-found { max-width:680px; margin:0 auto; padding:4rem 1.5rem; text-align:center; }
     .not-found h1 { font-family:'Sora', sans-serif; margin-bottom:0.5rem; }
@@ -119,6 +192,7 @@ export class BlogDetailComponent implements OnChanges {
   private seo = inject(SeoService);
   private metaService = inject(Meta);
   private sanitizer = inject(DomSanitizer);
+  private toast = inject(ToastService);
 
   readonly post = signal<BlogPost | null>(null);
   readonly notFound = signal(false);
@@ -144,6 +218,14 @@ export class BlogDetailComponent implements OnChanges {
           description: post.meta_description,
           datePublished: post.published_at,
           publisher: { '@type': 'Organization', name: 'CRMtree' },
+          ...(post.author_name ? {
+            author: {
+              '@type': 'Person',
+              name: post.author_name,
+              ...(post.author_job_title ? { jobTitle: post.author_job_title } : {}),
+              ...(post.author_linkedin_url ? { url: post.author_linkedin_url } : {}),
+            },
+          } : {}),
         });
       },
       error: () => {
@@ -158,5 +240,24 @@ export class BlogDetailComponent implements OnChanges {
         });
       },
     });
+  }
+
+  private articleUrl(post: BlogPost): string {
+    return `${SITE_URL}/blog/${post.slug}`;
+  }
+
+  linkedinShareUrl(post: BlogPost): string {
+    return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(this.articleUrl(post))}`;
+  }
+
+  facebookShareUrl(post: BlogPost): string {
+    return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.articleUrl(post))}`;
+  }
+
+  copyLink(post: BlogPost): void {
+    navigator.clipboard.writeText(this.articleUrl(post)).then(
+      () => this.toast.success('Link skopiowany.'),
+      () => this.toast.error('Nie udało się skopiować linku.'),
+    );
   }
 }

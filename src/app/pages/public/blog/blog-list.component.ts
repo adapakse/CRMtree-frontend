@@ -38,6 +38,14 @@ import { SeoService } from '../../../core/services/seo.service';
                 <span class="meta-dot">·</span>
                 <span>{{ post.reading_minutes }} min czytania</span>
               </div>
+              @if (post.author_name) {
+                <div class="post-author">
+                  @if (post.author_photo_url) {
+                    <img class="post-author-photo" [src]="post.author_photo_url" alt="">
+                  }
+                  <span class="post-author-name">{{ post.author_name }}</span>
+                </div>
+              }
             </div>
           </a>
         }
@@ -87,6 +95,9 @@ import { SeoService } from '../../../core/services/seo.service';
       font-size:0.78rem; color:var(--gray-500);
     }
     .meta-dot { color:var(--gray-300); }
+    .post-author { display:flex; align-items:center; gap:0.4rem; margin-top:0.75rem; }
+    .post-author-photo { width:22px; height:22px; border-radius:50%; object-fit:cover; }
+    .post-author-name { font-size:0.78rem; color:var(--gray-600); font-weight:600; }
   `],
 })
 export class BlogListComponent implements OnInit {

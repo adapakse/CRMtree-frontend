@@ -11,7 +11,7 @@ export interface SeoPageData {
 }
 
 const SITE_NAME = 'CRMtree';
-const SITE_URL = 'https://crmtree.pl';
+export const SITE_URL = 'https://crmtree.pl';
 
 @Injectable({ providedIn: 'root' })
 export class SeoService {
