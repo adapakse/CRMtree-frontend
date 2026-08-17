@@ -99,6 +99,14 @@ import { initials } from '../../core/services/helpers';
                   <span class="nav-label">Prospekty</span>
                   <span class="nav-tip">Prospekty</span>
                 </a>
+
+                @if (isSalesManager() || auth.isAdmin()) {
+                  <a class="nav-item" routerLink="/crm/prospects-dashboard" routerLinkActive="active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><circle cx="18" cy="8" r="2"/><circle cx="12" cy="2" r="2"/><circle cx="6" cy="12" r="2"/></svg>
+                    <span class="nav-label">Dashboard Prospekty</span>
+                    <span class="nav-tip">Dashboard Prospekty</span>
+                  </a>
+                }
               }
             </div>
 

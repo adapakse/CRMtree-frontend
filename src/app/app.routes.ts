@@ -187,6 +187,11 @@ export const routes: Routes = [
         canActivate: [crmGuard],
         loadComponent: () => import('./pages/admin/prospects/admin-prospects.component').then(m => m.AdminProspectsComponent),
       },
+      {
+        path: 'crm/prospects-dashboard',
+        canActivate: [adminOrSalesManagerGuard],
+        loadComponent: () => import('./pages/crm/dashboard/crm-prospects-dashboard.component').then(m => m.CrmProspectsDashboardComponent),
+      },
       // ─────────────────────────────────────────────────────────────────────
     ],
   },
