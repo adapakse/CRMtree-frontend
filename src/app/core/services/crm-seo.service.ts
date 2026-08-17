@@ -136,7 +136,6 @@ export interface SeoCalendarWeek {
 export interface TenantSettings {
   business_description: string | null;
   industry_vertical: string | null;
-  seo_gsc_site_url: string | null;
 }
 
 export interface TenantSettingsResponse extends TenantSettings {
