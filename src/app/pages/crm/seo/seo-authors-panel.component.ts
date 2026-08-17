@@ -21,8 +21,11 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             <input class="field-input" [(ngModel)]="editJobTitle" placeholder="np. Head of Sales">
             <label class="field-label">Opis kompetencji</label>
             <textarea class="field-input" rows="3" [(ngModel)]="editBio"></textarea>
-            <label class="field-label">URL zdjęcia</label>
-            <input class="field-input" [(ngModel)]="editPhotoUrl">
+            <label class="field-label">Zdjęcie</label>
+            <div class="photo-upload-row">
+              @if (photoSrc(a); as src) { <img class="author-photo" [src]="src" alt=""> }
+              <input #photoInput type="file" accept="image/jpeg,image/png,image/webp" (change)="uploadPhoto(a.id, photoInput)" [disabled]="uploadingPhoto()">
+            </div>
             <label class="field-label">Profil LinkedIn</label>
             <input class="field-input" [(ngModel)]="editLinkedinUrl" placeholder="https://linkedin.com/in/...">
             <div class="author-edit-actions">
@@ -33,7 +36,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             </div>
           } @else {
             <div class="author-card-top">
-              @if (a.photo_url) { <img class="author-photo" [src]="a.photo_url" alt=""> }
+              @if (photoSrc(a); as src) { <img class="author-photo" [src]="src" alt=""> }
               <div class="author-heading">
                 <span class="author-name">{{ a.full_name }}</span>
                 @if (a.job_title) { <span class="author-job-title">{{ a.job_title }}</span> }
@@ -70,8 +73,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
           <input class="field-input" [(ngModel)]="newJobTitle" placeholder="np. Kierownik działu sprzedaży">
           <label class="field-label">Opis kompetencji</label>
           <textarea class="field-input" rows="3" [(ngModel)]="newBio" placeholder="Krótki opis doświadczenia i eksperckości"></textarea>
-          <label class="field-label">URL zdjęcia</label>
-          <input class="field-input" [(ngModel)]="newPhotoUrl">
+          <p class="hint">Zdjęcie dodasz po utworzeniu autora, w trybie edycji.</p>
           <label class="field-label">Profil LinkedIn</label>
           <input class="field-input" [(ngModel)]="newLinkedinUrl" placeholder="https://linkedin.com/in/...">
           <div class="author-edit-actions">
@@ -128,6 +130,9 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     }
     .btn-delete:hover { background: #FECACA; }
     .empty { color: var(--gray-500); font-size: 0.82rem; margin: 0.75rem 0 0; }
+    .photo-upload-row { display: flex; align-items: center; gap: 0.6rem; }
+    .photo-upload-row input[type="file"] { font-size: 0.75rem; flex: 1; min-width: 0; }
+    .hint { font-size: 0.75rem; color: var(--gray-500); margin: 0.45rem 0 0; }
   `],
 })
 export class SeoAuthorsPanelComponent implements OnInit {
@@ -140,10 +145,10 @@ export class SeoAuthorsPanelComponent implements OnInit {
 
   readonly editingId = signal<number | null>(null);
   readonly savingEdit = signal(false);
+  readonly uploadingPhoto = signal(false);
   editName = '';
   editJobTitle = '';
   editBio = '';
-  editPhotoUrl = '';
   editLinkedinUrl = '';
 
   readonly adding = signal(false);
@@ -151,7 +156,6 @@ export class SeoAuthorsPanelComponent implements OnInit {
   newName = '';
   newJobTitle = '';
   newBio = '';
-  newPhotoUrl = '';
   newLinkedinUrl = '';
 
   ngOnInit(): void {
@@ -167,12 +171,34 @@ export class SeoAuthorsPanelComponent implements OnInit {
     this.editName = a.full_name;
     this.editJobTitle = a.job_title ?? '';
     this.editBio = a.bio ?? '';
-    this.editPhotoUrl = a.photo_url ?? '';
     this.editLinkedinUrl = a.linkedin_url ?? '';
   }
 
   cancelEdit(): void {
     this.editingId.set(null);
+  }
+
+  photoSrc(a: SeoAuthor): string | null {
+    return this.seoService.authorPhotoSrc(a);
+  }
+
+  uploadPhoto(id: number, input: HTMLInputElement): void {
+    const file = input.files?.[0];
+    if (!file) return;
+    this.uploadingPhoto.set(true);
+    this.seoService.uploadAuthorPhoto(id, file).subscribe({
+      next: (updated) => {
+        this.uploadingPhoto.set(false);
+        input.value = '';
+        this.authors.update((list) => list.map((a) => (a.id === id ? updated : a)));
+        this.toast.success('Zdjęcie przesłane.');
+      },
+      error: (err) => {
+        this.uploadingPhoto.set(false);
+        input.value = '';
+        this.toast.error(err?.error?.error ?? 'Nie udało się przesłać zdjęcia.');
+      },
+    });
   }
 
   saveEdit(id: number): void {
@@ -183,7 +209,6 @@ export class SeoAuthorsPanelComponent implements OnInit {
       full_name,
       job_title: this.editJobTitle.trim() || null,
       bio: this.editBio.trim() || null,
-      photo_url: this.editPhotoUrl.trim() || null,
       linkedin_url: normalizeLinkedinUrl(this.editLinkedinUrl),
     }).subscribe({
       next: () => {
@@ -222,7 +247,7 @@ export class SeoAuthorsPanelComponent implements OnInit {
       full_name,
       job_title: this.newJobTitle.trim() || null,
       bio: this.newBio.trim() || null,
-      photo_url: this.newPhotoUrl.trim() || null,
+      photo_url: null,
       linkedin_url: normalizeLinkedinUrl(this.newLinkedinUrl),
     }).subscribe({
       next: () => {
@@ -231,7 +256,6 @@ export class SeoAuthorsPanelComponent implements OnInit {
         this.newName = '';
         this.newJobTitle = '';
         this.newBio = '';
-        this.newPhotoUrl = '';
         this.newLinkedinUrl = '';
         this.toast.success('Autor dodany.');
         this.load();

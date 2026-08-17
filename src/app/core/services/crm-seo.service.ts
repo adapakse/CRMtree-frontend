@@ -214,6 +214,21 @@ export class CrmSeoService {
     return this.http.delete<void>(`${this.api}/authors/${id}`);
   }
 
+  uploadAuthorPhoto(id: number, file: File): Observable<SeoAuthor> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<SeoAuthor>(`${this.api}/authors/${id}/photo`, formData);
+  }
+
+  /** Resolves an author's photo into a directly-usable <img> src — photo_url
+   * may be a real external URL (pasted before upload existed) or an Azure
+   * blob path (uploaded), which needs routing through the streaming endpoint. */
+  authorPhotoSrc(a: Pick<SeoAuthor, 'id' | 'photo_url'>): string | null {
+    if (!a.photo_url) return null;
+    if (/^https?:\/\//i.test(a.photo_url)) return a.photo_url;
+    return `${this.api}/authors/${a.id}/photo-img`;
+  }
+
   gscStatus(): Observable<GscStatus> {
     return this.http.get<GscStatus>(`${this.api}/gsc/status`);
   }
