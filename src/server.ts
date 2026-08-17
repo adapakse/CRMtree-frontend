@@ -68,6 +68,27 @@ app.use('/api', createProxyMiddleware({
 }));
 
 /**
+ * https://crmtree.pl/... is the only canonical public host. Every tenant
+ * subdomain ({slug}.crmtree.pl, app.crmtree.pl, and the .int. equivalents)
+ * serves byte-identical marketing/blog SSR content for branding reasons —
+ * without this, Google crawls and indexes each one as a separate duplicate
+ * of the canonical page (GSC: "Alternate page with proper canonical tag").
+ * The <link rel="canonical"> tag (SeoService) already points every duplicate
+ * back to crmtree.pl, but that alone isn't a reliable enough signal on its
+ * own — the X-Robots-Tag header is what actually stops Google from indexing
+ * the duplicate host in the first place. Deliberately NOT blocked via
+ * robots.txt: a noindex'd page still needs to be crawlable for Google to see
+ * this header at all.
+ */
+app.use((req, res, next) => {
+  const host = ((req.headers['x-forwarded-host'] as string) || req.headers.host || '').replace(/:\d+$/, '');
+  if (host !== 'crmtree.pl') {
+    res.setHeader('X-Robots-Tag', 'noindex, follow');
+  }
+  next();
+});
+
+/**
  * sitemap.xml / robots.txt — built from the backend's published blog posts.
  */
 app.get('/sitemap.xml', async (req, res) => {
