@@ -182,6 +182,11 @@ export const routes: Routes = [
         canActivate: [crmGuard],
         loadComponent: () => import('./pages/crm/seo/crm-seo.component').then(m => m.CrmSeoComponent),
       },
+      {
+        path: 'admin/prospects',
+        canActivate: [crmGuard],
+        loadComponent: () => import('./pages/admin/prospects/admin-prospects.component').then(m => m.AdminProspectsComponent),
+      },
       // ─────────────────────────────────────────────────────────────────────
     ],
   },

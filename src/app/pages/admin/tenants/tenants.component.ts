@@ -24,11 +24,12 @@ const FEATURE_LABELS: Record<CrmFeature, string> = {
   performance:      'Performance',
   seo_bot:          'SEObot',
   whatsapp:         'WhatsApp',
+  prospects:        'Prospekty',
 };
 
 const ALL_FEATURES: CrmFeature[] = [
   'documents', 'leads', 'sales_reports', 'onboarding',
-  'partner_registry', 'dwh_integration', 'performance', 'seo_bot', 'whatsapp',
+  'partner_registry', 'dwh_integration', 'performance', 'seo_bot', 'whatsapp', 'prospects',
 ];
 
 interface TenantUser {
