@@ -21,7 +21,7 @@ const SIGNAL_DEFS = [
     desc: 'Dedykowani handlowcy, w miarę możności formalna struktura sprzedaży.',
   },
   {
-    key: 'zlozony_proces_sprzedazy', label: 'Indywidualna wycena',
+    key: 'zlozony_proces_sprzedazy', label: 'Ind. wycena',
     desc: 'Złożony proces sprzedaży / indywidualna wycena — relacyjny, projektowy lub negocjacyjny model, nie zakup impulsowy.',
   },
   {
@@ -29,7 +29,7 @@ const SIGNAL_DEFS = [
     desc: 'Sprzedaż wymaga rozmowy przed zakupem — demo, bezpłatna konsultacja, analiza potrzeb.',
   },
   {
-    key: 'opieka_nad_klientem', label: 'Opieka nad klientem',
+    key: 'opieka_nad_klientem', label: 'Opieka B2B',
     desc: 'Dedykowana opieka nad klientem B2B — przypisany opiekun, Key Account Manager, Customer Success.',
   },
   {
@@ -37,7 +37,7 @@ const SIGNAL_DEFS = [
     desc: 'Firma sprzedaje w przetargach / ma dział ofertowania — nie: kupuje w przetargach.',
   },
   {
-    key: 'rozproszona_struktura', label: 'Rozproszona struktura',
+    key: 'rozproszona_struktura', label: 'Wiele oddziałów',
     desc: 'Zespół lub sieć sprzedaży fizycznie rozproszona terytorialnie — konkretni przedstawiciele/oddziały z ludźmi.',
   },
   {
@@ -222,7 +222,7 @@ interface BatchProgress {
     <div id="content">
 
       <!-- Import CSV -->
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:16px;padding:16px">
         <div style="font-weight:600;margin-bottom:10px">Import firm z CSV</div>
         <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
           Wymagane kolumny: <code>nip</code>, <code>BAZA</code> (nazwa bazy źródłowej — musi mieć wartość w każdym wierszu). Wykrywane automatycznie:
@@ -288,7 +288,7 @@ interface BatchProgress {
       </div>
 
       <!-- Filtry -->
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:16px;padding:16px">
         <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
 
           <div class="fld">
@@ -1464,27 +1464,6 @@ interface BatchProgress {
           </span>
         </label>
 
-        <label style="font-size:12px;font-weight:500;color:#374151;display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          Pracuj.pl
-          @if (reprocessTarget()?.pracuj_status === 'ok') {
-            <span style="font-size:10px;font-weight:600;color:#16a34a">✓ pobrano</span>
-          } @else if (reprocessTarget()?.pracuj_status === 'not_found') {
-            <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ nie znaleziono</span>
-          }
-        </label>
-        <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:10px"
-          [(ngModel)]="reprocessPracujValue"
-          placeholder="https://www.pracuj.pl/praca/... (wklej link do listy ofert tej firmy)">
-
-        <label style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer">
-          <input type="checkbox" [(ngModel)]="reprocessDoPracuj"
-            style="width:14px;height:14px;accent-color:#3BAA5D;cursor:pointer">
-          <span style="font-size:12px;color:#374151">
-            Analizuj oferty pracy podczas przetwarzania
-            <span style="color:#6b7280">(automatyczne wyszukiwanie po nazwie firmy nie działa niezawodnie — wklej link ręcznie)</span>
-          </span>
-        </label>
-
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <button class="btn btn-g" (click)="reprocessTarget.set(null)">Anuluj</button>
           <button class="btn btn-p" (click)="confirmReprocess()">🔄 Przetwórz</button>
@@ -1539,9 +1518,10 @@ interface BatchProgress {
 
     .tbl { width:100%; border-collapse:collapse; font-size:13px; }
     .tbl th {
-      background:#f9fafb; text-align:left; padding:8px 10px;
+      background:#f9fafb; text-align:left; padding:8px 10px 14px;
       border-bottom:1px solid #e5e7eb; font-size:11px;
       font-weight:600; color:#6b7280; white-space:nowrap; position:sticky; top:0; z-index:1;
+      vertical-align:bottom;
     }
     .tbl td { padding:8px 10px; border-bottom:1px solid #f3f4f6; vertical-align:top; }
     .tbl tr:hover td { background:#fafafa; }
@@ -1552,14 +1532,14 @@ interface BatchProgress {
     .tbl tr.detail-row:hover td { background:#fafafa !important; }
 
     /* Kolumna checkbox */
-    .cb-th { width: 36px; min-width: 36px; max-width: 36px; text-align: center; padding: 8px 4px !important; }
+    .cb-th { width: 36px; min-width: 36px; max-width: 36px; text-align: center; padding: 8px 4px 14px !important; vertical-align: bottom; }
     .cb-td { width: 36px; padding: 8px 4px !important; text-align: center; vertical-align: middle; }
     .cb-th input, .cb-td input { cursor: pointer; accent-color: var(--orange); }
 
     /* Nagłówki sygnałów — tekst pionowy */
     .sig-th {
       width: 28px; min-width: 28px; max-width: 28px;
-      height: 96px;
+      height: 80px;
       padding: 4px 0 4px 0 !important;
       vertical-align: bottom;
       text-align: center;
@@ -2009,8 +1989,6 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   reprocessNipValue     = '';
   reprocessLinkedinValue = '';
   reprocessDoLinkedin   = false;
-  reprocessPracujValue  = '';
-  reprocessDoPracuj     = false;
 
   // Inspect modal — wizualizacja logiki enrichmentu
   inspectTarget = signal<Prospect | null>(null);
@@ -2381,8 +2359,6 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     this.reprocessNipValue      = '';
     this.reprocessLinkedinValue = p.linkedin_url || 'https://www.linkedin.com/company/';
     this.reprocessDoLinkedin    = false;
-    this.reprocessPracujValue   = p.pracuj_url || '';
-    this.reprocessDoPracuj      = false;
     this.closeMenu();
   }
 
@@ -2398,21 +2374,16 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
       nip?: string;
       linkedin_url?: string;
       process_linkedin?: boolean;
-      pracuj_url?: string;
-      process_pracuj?: boolean;
     } = {};
 
     const url      = this.reprocessUrlValue.trim();
     const nip      = this.reprocessNipValue.replace(/\D/g, '');
     const linkedin = this.reprocessLinkedinValue.trim();
-    const pracuj   = this.reprocessPracujValue.trim();
 
     if (url)     body.website_url     = url;
     if (nip)     body.nip             = nip;
     if (linkedin) body.linkedin_url   = linkedin;
     if (this.reprocessDoLinkedin) body.process_linkedin = true;
-    if (pracuj)  body.pracuj_url      = pracuj;
-    if (this.reprocessDoPracuj) body.process_pracuj = true;
 
     this.http.post<{ queued: boolean }>(`${API}/${p.id}/re-process`, body).subscribe({
       next: () => {
