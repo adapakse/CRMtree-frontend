@@ -92,6 +92,22 @@ import { initials } from '../../core/services/helpers';
                   <span class="nav-tip">Raporty sprzedaży</span>
                 </a>
               }
+
+              @if (auth.hasFeature('prospects')) {
+                <a class="nav-item" routerLink="/admin/prospects" routerLinkActive="active">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                  <span class="nav-label">Prospekty</span>
+                  <span class="nav-tip">Prospekty</span>
+                </a>
+
+                @if (isSalesManager() || auth.isAdmin()) {
+                  <a class="nav-item" routerLink="/crm/prospects-dashboard" routerLinkActive="active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><circle cx="18" cy="8" r="2"/><circle cx="12" cy="2" r="2"/><circle cx="6" cy="12" r="2"/></svg>
+                    <span class="nav-label">Dashboard Prospekty</span>
+                    <span class="nav-tip">Dashboard Prospekty</span>
+                  </a>
+                }
+              }
             </div>
 
             @if (auth.hasFeature('partner_registry') || auth.hasFeature('onboarding') || auth.hasFeature('performance')) {
@@ -457,7 +473,8 @@ export class ShellComponent implements OnInit {
       this.auth.hasFeature('partner_registry') ||
       this.auth.hasFeature('sales_reports') ||
       this.auth.hasFeature('onboarding') ||
-      this.auth.hasFeature('performance')
+      this.auth.hasFeature('performance') ||
+      this.auth.hasFeature('prospects')
     );
   });
 
