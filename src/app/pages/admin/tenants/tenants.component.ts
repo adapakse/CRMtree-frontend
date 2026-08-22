@@ -537,7 +537,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                       <input [(ngModel)]="outlookForm.client_secret" type="password" placeholder="{{ outlookProvider() ? '••••••••' : 'secret~...' }}">
                                     </div>
                                     <div class="field">
-                                      <label>Azure Tenant ID <span class="req">*</span></label>
+                                      <label>Azure Tenant ID <span class="hint-inline">(opcjonalne — appka jest multitenant, logowanie działa bez tego)</span></label>
                                       <input [(ngModel)]="outlookForm.azure_tenant_id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
                                     </div>
                                     <div class="field">
@@ -549,7 +549,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     @if (outlookProvider()) {
                                       <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'outlook')">Usuń</button>
                                     }
-                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.azure_tenant_id || !outlookForm.redirect_uri"
+                                    <button class="btn-primary" [disabled]="saving() || !outlookForm.client_id || (!outlookForm.client_secret && !outlookProvider()) || !outlookForm.redirect_uri"
                                             (click)="saveEmailProvider(t.id, 'outlook')">
                                       {{ saving() ? 'Zapisuję...' : (outlookProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
