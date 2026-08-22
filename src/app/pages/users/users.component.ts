@@ -386,6 +386,19 @@ import { AuthService } from '../../core/auth/auth.service';
                 </div>
                 <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">Assign</button>
               </div>
+
+              @if (tenantHasProspects()) {
+                <div class="sec-title" style="margin-top:24px">Feature Access</div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
+                  <div style="flex:1">
+                    <div style="font-weight:600">Prospekty</div>
+                    <div style="font-size:12px;color:var(--gray-500)">Analiza i wzbogacanie prospektów firm (AI)</div>
+                  </div>
+                  <input type="checkbox"
+                         [checked]="!!prospectsRole()"
+                         (change)="toggleProspectsAccess($any($event.target).checked)">
+                </div>
+              }
             }
           </div>
 
@@ -461,6 +474,9 @@ export class UsersComponent implements OnInit {
 
   isAdmin = computed(() => !!this.auth.user()?.is_admin);
   currentUserId = computed(() => this.auth.user()?.id ?? '');
+  tenantHasProspects = computed(() => this.auth.hasFeature('prospects'));
+
+  prospectsRole = computed(() => this.selected()?.roles?.find(r => r.group_name === 'Prospekty'));
 
   users      = signal<User[]>([]);
   groups     = signal<GroupProfile[]>([]);
@@ -817,5 +833,45 @@ export class UsersComponent implements OnInit {
       this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== roleId) } : s);
       this.toast.success('Role removed');
     });
+  }
+
+  // "Feature Access" to przyjazny checkbox nad tym samym mechanizmem co Group
+  // Roles — włączenie dodaje usera do grupy "Prospekty" (access_level 'full'),
+  // wyłączenie usuwa tę rolę. Celowo nie ma osobnej tabeli uprawnień.
+  toggleProspectsAccess(checked: boolean): void {
+    const u = this.selected();
+    if (!u) return;
+    if (checked) {
+      const existingGroup = this.groups().find(g => g.name === 'Prospekty');
+      const assign = (group: GroupProfile) => {
+        this.userSvc.assignRole(u.id, group.id, 'full').subscribe(role => {
+          const newRole = { ...role, group_name: group.name, group_display: group.display_name };
+          this.selected.update(s => s ? { ...s, roles: [...(s.roles ?? []), newRole] } : s);
+          this.toast.success('Dostęp do Prospektów włączony');
+        });
+      };
+      if (existingGroup) {
+        assign(existingGroup);
+      } else {
+        // Grupa jeszcze nie istnieje dla tego tenanta (np. pierwszy raz włączamy
+        // Prospekty) — tworzymy ją tak samo jak zrobiłaby to migracja dogfoodingowa.
+        this.groupSvc.create({
+          name: 'Prospekty',
+          display_name: 'Prospekty',
+          description: 'Dostęp do modułu Prospektów (import CSV, enrichment, konwersja na lead).',
+          is_active: true,
+        }).subscribe(group => {
+          this.groups.update(gs => [...gs, group]);
+          assign(group);
+        });
+      }
+    } else {
+      const existing = this.prospectsRole();
+      if (!existing) return;
+      this.userSvc.removeRole(u.id, existing.role_id).subscribe(() => {
+        this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== existing.role_id) } : s);
+        this.toast.success('Dostęp do Prospektów wyłączony');
+      });
+    }
   }
 }

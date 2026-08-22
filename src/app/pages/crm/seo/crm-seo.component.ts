@@ -7,6 +7,7 @@ import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 import { SeoSocialChannelsComponent } from './seo-social-channels.component';
 import { SeoTenantSettingsComponent } from './seo-tenant-settings.component';
 import { SeoAuthorsPanelComponent } from './seo-authors-panel.component';
+import { SeoPublishingCalendarComponent } from './seo-publishing-calendar.component';
 
 const STATUS_LABELS: Record<SeoContentStatus, string> = {
   draft: 'Szkic',
@@ -16,13 +17,14 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
   published: 'Opublikowane',
   needs_update: 'Do odświeżenia',
   archived: 'Zarchiwizowane',
+  queued: 'W kolejce (auto)',
 };
 
 @Component({
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent, SeoAuthorsPanelComponent],
+  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent, SeoAuthorsPanelComponent, SeoPublishingCalendarComponent],
   template: `
     <div class="seo-page">
       <header class="seo-header">
@@ -35,6 +37,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
             Autorzy ({{ authors().length }})
           </button>
           <button type="button" class="btn-ghost section-toggle" [class.active]="showChannels()" (click)="showChannels.set(!showChannels())">Kanały social</button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showCalendar()" (click)="showCalendar.set(!showCalendar())">Kalendarz publikacji</button>
           <button type="button" class="btn-ghost section-toggle" [class.active]="showSettings()" (click)="showSettings.set(!showSettings())">Ustawienia</button>
           <button type="button" class="btn-accent" (click)="generate()" [disabled]="generating()">
             @if (generating()) { Generuję… (może potrwać kilka minut) } @else { Generuj nowy artykuł }
@@ -74,6 +77,12 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
         <section class="seo-section">
           <h2 class="section-title">Ustawienia</h2>
           <wt-seo-tenant-settings />
+        </section>
+      }
+      @if (showCalendar()) {
+        <section class="seo-section">
+          <h2 class="section-title">Kalendarz publikacji</h2>
+          <wt-seo-publishing-calendar />
         </section>
       }
 
@@ -323,6 +332,7 @@ export class CrmSeoComponent implements OnInit {
     { value: 'scheduled', label: 'Zaplanowane' },
     { value: 'published', label: 'Opublikowane' },
     { value: 'draft', label: 'Szkice' },
+    { value: 'queued', label: 'W kolejce (auto)' },
   ];
 
   readonly items = signal<SeoContentSummary[]>([]);
@@ -341,6 +351,7 @@ export class CrmSeoComponent implements OnInit {
   readonly showAuthors = signal(false);
   readonly showChannels = signal(false);
   readonly showSettings = signal(false);
+  readonly showCalendar = signal(false);
   readonly statusFilter = signal<SeoContentStatus | ''>('');
   readonly generating = signal(false);
   readonly rerolling = signal(false);

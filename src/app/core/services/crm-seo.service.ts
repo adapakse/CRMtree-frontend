@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export type SeoContentStatus =
-  | 'draft' | 'in_review' | 'approved' | 'scheduled' | 'published' | 'needs_update' | 'archived';
+  | 'draft' | 'in_review' | 'approved' | 'scheduled' | 'published' | 'needs_update' | 'archived' | 'queued';
 
 export interface SeoContentSummary {
   id: number;
@@ -98,6 +98,39 @@ export interface SocialPost {
   remote_url: string | null;
   error_message: string | null;
   published_at: string | null;
+}
+
+export interface SeoCalendarConfig {
+  is_enabled: boolean;
+  monday_count: number;
+  tuesday_count: number;
+  wednesday_count: number;
+  thursday_count: number;
+  friday_count: number;
+  saturday_count: number;
+  sunday_count: number;
+  end_date: string | null;
+}
+
+export interface SeoCalendarArticle {
+  id: number;
+  title: string;
+  slug: string;
+  status: SeoContentStatus;
+  author_id: number | null;
+  scheduled_at?: string | null;
+  created_at?: string;
+}
+
+export interface SeoCalendarDay {
+  date: string;
+  articles: SeoCalendarArticle[];
+}
+
+export interface SeoCalendarWeek {
+  week_start: string;
+  is_locked: boolean;
+  days: SeoCalendarDay[];
 }
 
 export interface TenantSettings {
@@ -272,6 +305,26 @@ export class CrmSeoService {
 
   updateTenantSettings(patch: Partial<TenantSettings>): Observable<TenantSettings> {
     return this.http.patch<TenantSettings>(`${this.api}/tenant-settings`, patch);
+  }
+
+  calendarConfig(): Observable<SeoCalendarConfig> {
+    return this.http.get<SeoCalendarConfig>(`${this.api}/calendar/config`);
+  }
+
+  updateCalendarConfig(patch: Partial<SeoCalendarConfig>): Observable<SeoCalendarConfig> {
+    return this.http.patch<SeoCalendarConfig>(`${this.api}/calendar/config`, patch);
+  }
+
+  calendarWeek(weekStart: string): Observable<SeoCalendarWeek> {
+    return this.http.get<SeoCalendarWeek>(`${this.api}/calendar`, { params: { week_start: weekStart } });
+  }
+
+  calendarUnassigned(): Observable<SeoCalendarArticle[]> {
+    return this.http.get<SeoCalendarArticle[]>(`${this.api}/calendar/unassigned`);
+  }
+
+  assignToCalendarDay(contentId: number, targetDate: string | null): Observable<SeoContent> {
+    return this.http.patch<SeoContent>(`${this.api}/calendar/content/${contentId}/assign`, { target_date: targetDate });
   }
 
   wordpressPublishMode(): Observable<{ wordpress_publish_mode: 'draft' | 'publish' }> {

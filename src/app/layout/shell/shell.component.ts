@@ -92,6 +92,22 @@ import { initials } from '../../core/services/helpers';
                   <span class="nav-tip">Raporty sprzedaży</span>
                 </a>
               }
+
+              @if (auth.hasFeature('prospects')) {
+                <a class="nav-item" routerLink="/admin/prospects" routerLinkActive="active">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                  <span class="nav-label">Prospekty</span>
+                  <span class="nav-tip">Prospekty</span>
+                </a>
+
+                @if (isSalesManager() || auth.isAdmin()) {
+                  <a class="nav-item" routerLink="/crm/prospects-dashboard" routerLinkActive="active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><circle cx="18" cy="8" r="2"/><circle cx="12" cy="2" r="2"/><circle cx="6" cy="12" r="2"/></svg>
+                    <span class="nav-label">Dashboard Prospekty</span>
+                    <span class="nav-tip">Dashboard Prospekty</span>
+                  </a>
+                }
+              }
             </div>
 
             @if (auth.hasFeature('partner_registry') || auth.hasFeature('onboarding') || auth.hasFeature('performance')) {
@@ -116,7 +132,7 @@ import { initials } from '../../core/services/helpers';
                 }
 
                 @if (auth.hasFeature('partner_registry')) {
-                  <a class="nav-item" routerLink="/crm/partners" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                  <a class="nav-item" routerLink="/crm/partners" [class.active]="partnersRegistryActive()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     <span class="nav-label">Rejestr Partnerów</span>
                     <span class="nav-tip">Rejestr Partnerów</span>
@@ -449,6 +465,17 @@ export class ShellComponent implements OnInit {
   docBadge  = signal(0);
   collapsed = false;
 
+  currentUrl = signal(this.router.url);
+  // /crm/partners/analytics has its own nav item — exclude it so both links
+  // don't light up together, but keep the registry link active for
+  // /crm/partners/:id (partner detail), which plain routerLinkActive
+  // exact-matching would otherwise miss.
+  partnersRegistryActive = computed(() => {
+    const url = this.currentUrl();
+    return (url === '/crm/partners' || url.startsWith('/crm/partners/'))
+      && !url.startsWith('/crm/partners/analytics');
+  });
+
   hasCrmAccess = computed(() => {
     const user = this.auth.user() as any;
     const hasRole = !!(user?.is_admin || user?.crm_role === 'salesperson' || user?.crm_role === 'sales_manager');
@@ -457,7 +484,8 @@ export class ShellComponent implements OnInit {
       this.auth.hasFeature('partner_registry') ||
       this.auth.hasFeature('sales_reports') ||
       this.auth.hasFeature('onboarding') ||
-      this.auth.hasFeature('performance')
+      this.auth.hasFeature('performance') ||
+      this.auth.hasFeature('prospects')
     );
   });
 
@@ -466,7 +494,10 @@ export class ShellComponent implements OnInit {
     this.refreshTaskBadge();
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
-    ).subscribe(() => this.refreshTaskBadge());
+    ).subscribe(() => {
+      this.refreshTaskBadge();
+      this.currentUrl.set(this.router.url);
+    });
   }
 
   toggleSidebar(): void {

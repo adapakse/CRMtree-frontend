@@ -878,6 +878,47 @@ export interface PartnersAnalytics {
   b: AnalyticsPeriod | null;
 }
 
+// ── Dashboard Prospekty ──────────────────────────────────────────
+
+export interface ProspectDashLeadRow {
+  user_id:      string;
+  display_name: string;
+  score_range:  string;
+  count:        number;
+}
+
+export interface ProspectDashScoreRow {
+  status:          string;
+  score_range:     string;
+  source_database: string;
+  count:           number;
+}
+
+export interface ProspectDashScoreResponse {
+  data:      ProspectDashScoreRow[];
+  databases: string[];
+}
+
+export interface ProspectDashAiTagRow {
+  tag:   string;
+  stage: string;
+  count: number;
+}
+
+export interface ProspectDashEnrichedRow {
+  source_database: string;
+  score_range:     string;
+  count:           number;
+}
+
+export interface ProspectDashCallRow {
+  user_id:      string;
+  display_name: string;
+  direction:    'inbound' | 'outbound';
+  status:       string;
+  count:        number;
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Service
 // ─────────────────────────────────────────────────────────────────
@@ -1456,6 +1497,56 @@ export class CrmApiService {
   }
   downloadDriveFile(fileId: string): Observable<Blob> {
     return this.http.get(`${BASE}/gmail/drive/file/${fileId}`, { responseType: 'blob' });
+  }
+
+  // ── Dashboard Prospekty ─────────────────────────────────────────
+
+  getProspectDashLeadsBySalesperson(
+    opts: { period: string; fromDate?: string; toDate?: string; stage?: string }
+  ): Observable<ProspectDashLeadRow[]> {
+    let params = new HttpParams().set('period', opts.period);
+    if (opts.period === 'custom' && opts.fromDate) params = params.set('from_date', opts.fromDate);
+    if (opts.period === 'custom' && opts.toDate)   params = params.set('to_date',   opts.toDate);
+    if (opts.stage)                                params = params.set('stage',     opts.stage);
+    return this.http.get<ProspectDashLeadRow[]>(
+      `${environment.apiUrl}/crm/prospects-dashboard/leads-by-salesperson`,
+      { params }
+    );
+  }
+
+  getProspectDashProspectsByScore(filters: { status?: string } = {}): Observable<ProspectDashScoreResponse> {
+    let params = new HttpParams();
+    if (filters.status) params = params.set('status', filters.status);
+    return this.http.get<ProspectDashScoreResponse>(
+      `${environment.apiUrl}/crm/prospects-dashboard/prospects-by-score`, { params }
+    );
+  }
+
+  getProspectDashLeadsByAiTag(stage?: string): Observable<ProspectDashAiTagRow[]> {
+    const params: any = {};
+    if (stage) params['stage'] = stage;
+    return this.http.get<ProspectDashAiTagRow[]>(
+      `${environment.apiUrl}/crm/prospects-dashboard/leads-by-ai-tag`, { params }
+    );
+  }
+
+  getProspectDashEnrichedByDatabase(): Observable<ProspectDashEnrichedRow[]> {
+    return this.http.get<ProspectDashEnrichedRow[]>(
+      `${environment.apiUrl}/crm/prospects-dashboard/enriched-by-database`
+    );
+  }
+
+  getProspectDashCallsBySalesperson(
+    opts: { period: string; direction?: string; status?: string; fromDate?: string; toDate?: string }
+  ): Observable<ProspectDashCallRow[]> {
+    let p = new HttpParams().set('period', opts.period);
+    if (opts.direction) p = p.set('direction', opts.direction);
+    if (opts.status)    p = p.set('status',    opts.status);
+    if (opts.period === 'custom' && opts.fromDate) p = p.set('from_date', opts.fromDate);
+    if (opts.period === 'custom' && opts.toDate)   p = p.set('to_date',   opts.toDate);
+    return this.http.get<ProspectDashCallRow[]>(
+      `${environment.apiUrl}/crm/prospects-dashboard/calls-by-salesperson`, { params: p }
+    );
   }
 
 }
