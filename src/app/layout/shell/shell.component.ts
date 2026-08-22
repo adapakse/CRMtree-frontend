@@ -132,7 +132,7 @@ import { initials } from '../../core/services/helpers';
                 }
 
                 @if (auth.hasFeature('partner_registry')) {
-                  <a class="nav-item" routerLink="/crm/partners" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                  <a class="nav-item" routerLink="/crm/partners" [class.active]="partnersRegistryActive()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     <span class="nav-label">Rejestr Partnerów</span>
                     <span class="nav-tip">Rejestr Partnerów</span>
@@ -465,6 +465,17 @@ export class ShellComponent implements OnInit {
   docBadge  = signal(0);
   collapsed = false;
 
+  currentUrl = signal(this.router.url);
+  // /crm/partners/analytics has its own nav item — exclude it so both links
+  // don't light up together, but keep the registry link active for
+  // /crm/partners/:id (partner detail), which plain routerLinkActive
+  // exact-matching would otherwise miss.
+  partnersRegistryActive = computed(() => {
+    const url = this.currentUrl();
+    return (url === '/crm/partners' || url.startsWith('/crm/partners/'))
+      && !url.startsWith('/crm/partners/analytics');
+  });
+
   hasCrmAccess = computed(() => {
     const user = this.auth.user() as any;
     const hasRole = !!(user?.is_admin || user?.crm_role === 'salesperson' || user?.crm_role === 'sales_manager');
@@ -483,7 +494,10 @@ export class ShellComponent implements OnInit {
     this.refreshTaskBadge();
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
-    ).subscribe(() => this.refreshTaskBadge());
+    ).subscribe(() => {
+      this.refreshTaskBadge();
+      this.currentUrl.set(this.router.url);
+    });
   }
 
   toggleSidebar(): void {

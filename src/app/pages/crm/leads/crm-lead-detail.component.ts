@@ -295,10 +295,9 @@ interface WhatsappConvUiState {
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">
             {{actIcon(actForm.type)}} {{actTypeName(actForm.type)}}
           </div>
-          <input [(ngModel)]="actForm.title"
-                 [placeholder]="actForm.type==='meeting' ? 'Tytuł spotkania *' : 'Tytuł *'"
-                 class="act-input">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;align-items:start">
+          <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
+          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" placeholder="Tytuł spotkania *" class="act-input">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px;align-items:start">
             <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Termin
               <div style="position:relative">
                 <div *ngIf="actDueDateOpen" style="position:fixed;inset:0;z-index:99" (click)="actDueDateOpen=false"></div>
@@ -325,7 +324,7 @@ interface WhatsappConvUiState {
                        (mousedown)="selectDueDatePreset('custom')">📅 Własna data…</div>
                 </div>
               </div>
-              <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
+              <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom' && actForm.type!=='task'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
                 <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:90px;font-size:11px;padding:4px 6px">
                 <button type="button" (click)="clearDueDate()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:0">🗑</button>
               </div>
@@ -416,8 +415,8 @@ interface WhatsappConvUiState {
           <!-- Inline edit mode -->
           <ng-container *ngIf="inlineEditActId === a.id">
             <div style="display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
-              <input [(ngModel)]="inlineEditForm.title" placeholder="Tytuł" class="act-input" style="font-size:12.5px;font-weight:600">
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+              <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" placeholder="Tytuł spotkania" class="act-input" style="font-size:12.5px;font-weight:600">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
                 <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   Data i godzina
                   <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
@@ -3988,18 +3987,23 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       calls: 'call', meetings: 'meeting', emails: 'note',
     };
     const actType = typeMap[this.midTab] ?? 'task';
+    // Tytuł jest edytowalny tylko dla Spotkania (i Maila, obsługiwanego osobnym
+    // formularzem) — dla pozostałych typów generujemy go automatycznie z nazwy typu.
     this.actForm = {
-      type: actType, title: '', body: '',
+      type: actType, title: actType === 'meeting' ? '' : this.actTypeName(actType), body: '',
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
       priority: '',
     };
-    this.actDueDateHour   = '09:00';
+    const now = new Date();
+    this.actDueDateHour   = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     this.actDueDateOpen   = false;
     this.actReminderType  = '';
     this.actReminderAt    = '';
     this.participantQuery = '';
-    if (actType === 'task') {
+    if (actType === 'task' || actType === 'note') {
+      // Zadanie: tylko data, bez konkretnej godziny (ukryta w szablonie dla 'task').
+      // Notatka: domyślnie aktualna godzina (ustawiona wyżej), nie sztywne 09:00.
       this.actDueDatePreset = 'today';
       this.applyDueDatePreset();
     } else {

@@ -410,13 +410,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </button>
         <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">Zadania</button>
         <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">Notatki</button>
-        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
-        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
-          Maile
+          Emaile
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
+        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
+        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
@@ -425,61 +425,60 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
         <div class="new-activity-form" *ngIf="showNewActivity">
-          <!-- Typ + tytuł -->
-          <div style="display:grid;grid-template-columns:140px 1fr;gap:6px">
-            <select [(ngModel)]="actForm.type" class="act-sel" (ngModelChange)="onActTypeChange()">
-              <option *ngFor="let t of actTypeOptions" [value]="t.value">{{t.label}}</option>
-            </select>
-            <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" placeholder="Temat spotkania *" class="act-input">
-            <ng-container *ngIf="actForm.type!=='meeting'">
-              <input [(ngModel)]="actForm.title" placeholder="Tytuł *" class="act-input">
-            </ng-container>
+          <!-- Typ (ustalany kontekstem zakładki, nie wybierany ręcznie — jak w crm-lead-detail.component.ts) -->
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">
+            {{actIcon(actForm.type)}} {{actTypeName(actForm.type)}}
           </div>
-          <!-- Termin z presetami -->
-          <div style="display:flex;flex-direction:column;gap:4px">
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-              <button *ngFor="let p of computedDueDatePresets" type="button"
-                      (click)="selectDueDatePreset(p.value)"
-                      style="font-size:11px;padding:2px 8px;border-radius:12px;border:1px solid;cursor:pointer;transition:all .12s"
-                      [style.background]="actDueDatePreset===p.value ? '#3BAA5D' : 'white'"
-                      [style.color]="actDueDatePreset===p.value ? 'white' : '#6b7280'"
-                      [style.border-color]="actDueDatePreset===p.value ? '#3BAA5D' : '#e5e7eb'">
-                {{p.label}}
-              </button>
-              <button *ngIf="actDueDatePreset" type="button" (click)="clearDueDate()"
-                      style="font-size:11px;padding:2px 6px;border-radius:12px;border:1px solid #e5e7eb;background:white;color:#9ca3af;cursor:pointer">✕</button>
-            </div>
-            <div *ngIf="actDueDatePreset" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-              <span style="font-size:11px;color:#9ca3af">Godzina:</span>
-              <button *ngFor="let h of ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00']" type="button"
-                      (click)="setActDueDateHour(h)"
-                      style="font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid;cursor:pointer;transition:all .12s"
-                      [style.background]="actDueDateHour===h ? '#3BAA5D' : 'white'"
-                      [style.color]="actDueDateHour===h ? 'white' : '#6b7280'"
-                      [style.border-color]="actDueDateHour===h ? '#3BAA5D' : '#e5e7eb'">{{h}}</button>
-            </div>
-            <input *ngIf="!actDueDatePreset" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px">
-            <div *ngIf="actDueDateSelectedLabel" style="font-size:11px;color:#3BAA5D;font-weight:600">📅 {{actDueDateSelectedLabel}}</div>
-          </div>
-          <!-- Przypisz + przypomnienie + priorytet -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Przypisz do
-              <select [(ngModel)]="actForm.assigned_to" class="act-sel" style="font-size:11px">
+          <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
+          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" placeholder="Temat spotkania *" class="act-input">
+          <!-- Termin + przypomnienie + przypisz + priorytet — layout matches crm-lead-detail.component.ts 1:1 -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px;align-items:start">
+            <label style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">Termin
+              <div style="position:relative">
+                <div *ngIf="actDueDateOpen" style="position:fixed;inset:0;z-index:99" (click)="actDueDateOpen=false"></div>
+                <button type="button" class="act-input"
+                        style="display:flex;align-items:center;gap:4px;width:100%;text-align:left;cursor:pointer;background:white;padding:5px 8px"
+                        (click)="actDueDateOpen=!actDueDateOpen">
+                  <span style="flex:1;font-size:11px" [style.color]="actDueDatePreset ? '#111827' : '#9ca3af'">
+                    {{actDueDateSelectedLabel || 'Brak'}}
+                  </span>
+                  <span style="font-size:9px;color:#9ca3af">{{actDueDateOpen ? '▲' : '▾'}}</span>
+                </button>
+                <div *ngIf="actDueDateOpen"
+                     style="position:absolute;top:calc(100% + 2px);left:0;min-width:200px;background:white;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.14);z-index:100;overflow:hidden">
+                  <div *ngFor="let p of computedDueDatePresets"
+                       style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;white-space:nowrap"
+                       [style.background]="actDueDatePreset===p.value ? '#E6F4EA' : 'white'"
+                       [style.color]="actDueDatePreset===p.value ? '#3BAA5D' : '#374151'"
+                       [style.fontWeight]="actDueDatePreset===p.value ? '600' : '400'"
+                       (mousedown)="selectDueDatePreset(p.value)">{{p.label}}</div>
+                  <div style="padding:8px 12px;font-size:12px;cursor:pointer;white-space:nowrap"
+                       [style.background]="actDueDatePreset==='custom' ? '#E6F4EA' : 'white'"
+                       [style.color]="actDueDatePreset==='custom' ? '#3BAA5D' : '#374151'"
+                       [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
+                       (mousedown)="selectDueDatePreset('custom')">📅 Własna data…</div>
+                </div>
+              </div>
+              <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom' && actForm.type!=='task'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
+                <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:90px;font-size:11px;padding:4px 6px">
+                <button type="button" (click)="clearDueDate()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:0">🗑</button>
+              </div>
+              <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px;margin-top:2px">
+            </label>
+            <label style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">Przypomnienie
+              <select [(ngModel)]="actReminderType" class="act-input" style="font-size:11px">
+                <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
+              </select>
+              <input *ngIf="actReminderType==='custom'" type="datetime-local" [(ngModel)]="actReminderAt" class="act-input" style="font-size:11px;margin-top:2px">
+            </label>
+            <label style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">Właściciel
+              <select [(ngModel)]="actForm.assigned_to" class="act-input" style="font-size:11px">
                 <option value="">— ja (domyślnie) —</option>
                 <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
               </select>
             </label>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Przypomnienie
-              <select [(ngModel)]="actReminderType" class="act-sel" style="font-size:11px">
-                <option value="">— brak —</option>
-                <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
-              </select>
-            </label>
-            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
-              Priorytet
-              <select [(ngModel)]="actForm.priority" class="act-sel" style="font-size:11px">
+            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">Priorytet
+              <select [(ngModel)]="actForm.priority" class="act-input" style="font-size:11px">
                 <option value="">— brak —</option>
                 <option value="asap">ASAP</option>
                 <option value="important">Ważne</option>
@@ -490,7 +489,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </div>
           <!-- Spotkanie: miejsce + uczestnicy -->
           <ng-container *ngIf="actForm.type === 'meeting'">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
               <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
                 Czas trwania (min)
                 <input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="np. 60" class="act-input" style="font-size:11px">
@@ -537,33 +536,89 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div *ngFor="let a of filteredActivities" class="act-card"
              [class.act-closed]="a.status==='closed'"
              [class.act-card-expanded]="isActExpanded(a.id)"
+             [class.act-card-editable]="canEdit && inlineEditActId!==a.id"
              [class.act-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
-             (click)="toggleActExpand(a.id)">
-          <div class="act-card-header">
-            <span style="font-size:18px;flex-shrink:0">{{actIcon(a.type)}}</span>
-            <div class="act-card-meta">
-              <span class="act-card-title">{{a.title}}</span>
+             (click)="canEdit && inlineEditActId!==a.id && startInlineEdit(a)">
+          <ng-container *ngIf="inlineEditActId!==a.id">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:16px">{{actIcon(a.type)}}</span>
+              <span style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9ca3af;letter-spacing:.4px">{{actTypeName(a.type)}}</span>
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
-              <span style="font-size:11px;color:#9ca3af" *ngIf="a.activity_at">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
-              <span style="font-size:11px;color:#9ca3af" *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
             </div>
-            <div class="act-card-controls" (click)="$event.stopPropagation()">
-              <button class="act-ctrl-btn" (click)="openActModal(a)" title="Szczegóły">↗</button>
-              <button *ngIf="canEditActivity(a)" class="act-ctrl-btn" (click)="startInlineEdit(a)" title="Edytuj">✏️</button>
+            <div class="act-card-title">{{a.title}}</div>
+            <div class="act-meta">
+              <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
+              <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
             </div>
-          </div>
-          <div *ngIf="a.body && !isActExpanded(a.id)" class="act-body-clamp" [innerHTML]="a.body"></div>
-          <div *ngIf="a.body && isActExpanded(a.id)" style="font-size:12px;color:#374151;margin-top:6px" [innerHTML]="a.body"></div>
-          <div *ngIf="canEdit && a.type==='task' && inlineEditActId!==a.id" class="task-actions-row" (click)="$event.stopPropagation()">
-            <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ Zamknij zadanie</button>
-            <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ Otwórz ponownie</button>
-          </div>
-          <!-- Inline edit -->
+            <div *ngIf="a.body" class="act-card-body">
+              <div [class.act-body-clamp]="!isActExpanded(a.id)" [innerHTML]="a.body"></div>
+              <button *ngIf="a.body.length > 200" class="act-expand-btn" (click)="$event.stopPropagation(); toggleActExpand(a.id)">
+                {{isActExpanded(a.id) ? '▲ Zwiń' : '▼ Rozwiń'}}
+              </button>
+            </div>
+            <div *ngIf="canEdit && a.type==='task'" class="task-actions-row" (click)="$event.stopPropagation()">
+              <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ Zamknij zadanie</button>
+              <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ Otwórz ponownie</button>
+            </div>
+            <div class="act-card-controls">
+              <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" title="Usuń">🗑️</button>
+            </div>
+          </ng-container>
+          <!-- Inline edit — layout matches crm-lead-detail.component.ts's inline edit 1:1 -->
           <div *ngIf="inlineEditActId===a.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
-            <input [(ngModel)]="inlineEditForm.title" class="act-input" placeholder="Tytuł *">
+            <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" class="act-input" placeholder="Temat spotkania *">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
+              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                Data i godzina
+                <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
+              </label>
+              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                Przypomnienie
+                <select [(ngModel)]="inlineEditForm.reminder_type" class="act-sel" style="font-size:11px">
+                  <option value="">— brak —</option>
+                  <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
+                </select>
+              </label>
+              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                Właściciel
+                <select [(ngModel)]="inlineEditForm.assigned_to" class="act-sel" style="font-size:11px">
+                  <option value="">— brak —</option>
+                  <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+                </select>
+              </label>
+            </div>
+            <ng-container *ngIf="a.type === 'opportunity'">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:6px">
+                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                  Status szansy
+                  <select [(ngModel)]="inlineEditForm.opp_status" class="act-sel" style="font-size:11px">
+                    <option value="new">Nowa</option>
+                    <option value="in_progress">W trakcie</option>
+                    <option value="closed">Zamknięta</option>
+                  </select>
+                </label>
+                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                  Termin
+                  <input type="date" [(ngModel)]="inlineEditForm.opp_due_date" class="act-input" style="font-size:11px">
+                </label>
+              </div>
+              <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
+                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                  Wartość
+                  <input type="number" min="0" step="0.01" [(ngModel)]="inlineEditForm.opp_value" class="act-input" style="font-size:11px">
+                </label>
+                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                  Waluta
+                  <select [(ngModel)]="inlineEditForm.opp_currency" class="act-sel" style="font-size:11px">
+                    <option value="PLN">PLN</option><option value="EUR">EUR</option>
+                    <option value="USD">USD</option><option value="GBP">GBP</option>
+                  </select>
+                </label>
+              </div>
+            </ng-container>
             <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" style="background:white" placeholder="Treść…"></quill-editor>
-            <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
             <div style="display:flex;gap:6px;justify-content:flex-end">
               <button class="btn-sm" (click)="cancelInlineEdit()">Anuluj</button>
               <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="!inlineEditForm.title||savingActivity">{{savingActivity?'…':'Zapisz'}}</button>
@@ -1035,143 +1090,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </button>
       </div>
 
-    </div>
-  </div>
-
-  <!-- ï¿½?ï¿½? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI �?�? -->
-  <div *ngIf="selectedAct" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px" (click)="closeActModal()">
-    <div style="background:white;border-radius:14px;width:min(520px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;flex-direction:column" (click)="$event.stopPropagation()">
-      <!-- Nagłówek -->
-      <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1">
-        <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
-        <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
-        <span style="flex:1"></span>
-        <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#E6F4EA;border:1px solid #a7d7b5;color:#166534;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
-        <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
-      </div>
-
-      <!-- Widok -->
-      <div *ngIf="!actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
-        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">{{selectedAct.title}}</div>
-        <div *ngIf="selectedAct.activity_at" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📅 Data i czas</span>
-          <span>{{selectedAct.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
-        </div>
-        <div *ngIf="selectedAct.assigned_to_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👤 Przypisano do</span>
-          <span>{{selectedAct.assigned_to_name}}</span>
-        </div>
-        <div *ngIf="selectedAct.created_by_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">✍️ Dodał</span>
-          <span>{{selectedAct.created_by_name}}</span>
-        </div>
-        <div *ngIf="selectedAct.meeting_location" style="display:flex;gap:12px;font-size:13px">
-          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📍 Miejsce</span>
-          <span>{{selectedAct.meeting_location}}</span>
-        </div>
-        <div *ngIf="selectedAct.participants" style="display:flex;gap:12px;font-size:13px">
-          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👥 Uczestnicy</span>
-          <span style="word-break:break-all">{{selectedAct.participants}}</span>
-        </div>
-        <ng-container *ngIf="selectedAct.type === 'opportunity'">
-          <div style="display:flex;gap:12px;font-size:13px">
-            <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💡 Szansa</span>
-            <span class="opp-status-badge opp-st-{{selectedAct.opp_status}}">{{oppStatusLabel(selectedAct.opp_status)}}</span>
-            <span *ngIf="selectedAct.opp_value" style="font-weight:700;color:#3BAA5D">{{selectedAct.opp_value | number:'1.0-0'}} {{selectedAct.opp_currency}}</span>
-          </div>
-        </ng-container>
-        <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📝 Opis</span>
-          <span style="white-space:pre-line">{{selectedAct.body}}</span>
-        </div>
-        <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:13px">
-          <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 Komentarz</span>
-          <span style="font-style:italic">{{selectedAct.close_comment}}</span>
-        </div>
-        <!-- Zamknij — bez komentarza -->
-        <div *ngIf="selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
-          <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="savingActivity">{{savingActivity ? '…' : '✓ Zamknij aktywność'}}</button>
-        </div>
-      </div>
-
-      <!-- Edycja -->
-      <div *ngIf="actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:12px;font-weight:600;color:#374151">Typ</label>
-          <select [(ngModel)]="actEditForm.type" class="act-sel">
-            <option value="call">📞 Połączenie</option>
-            <option value="meeting">🤝 Spotkanie</option>
-            <option value="note">📝 Notatka</option>
-            <option value="training">🎓 Szkolenie</option>
-            <option value="qbr">📊 QBR</option>
-            <option value="opportunity">💡 Szansa</option>
-          </select>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:12px;font-weight:600;color:#374151">Tytuł <span style="color:#dc2626">*</span></label>
-          <input [(ngModel)]="actEditForm.title" class="act-input">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="display:flex;flex-direction:column;gap:5px">
-            <label style="font-size:12px;font-weight:600;color:#374151">Data i godzina</label>
-            <input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px">
-            <label style="font-size:12px;font-weight:600;color:#374151">Przypisz do handlowca</label>
-            <select [(ngModel)]="actEditForm.assigned_to" class="act-sel">
-              <option value="">— bez przypisania —</option>
-              <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
-            </select>
-          </div>
-        </div>
-        <ng-container *ngIf="actEditForm.type === 'meeting'">
-          <div style="display:flex;flex-direction:column;gap:5px">
-            <label style="font-size:12px;font-weight:600;color:#374151">Miejsce spotkania</label>
-            <input [(ngModel)]="actEditForm.meeting_location" class="act-input">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px">
-            <label style="font-size:12px;font-weight:600;color:#374151">Uczestnicy</label>
-            <input [(ngModel)]="actEditForm.participants" class="act-input" placeholder="emaile oddzielone przecinkiem">
-          </div>
-        </ng-container>
-        <ng-container *ngIf="actEditForm.type === 'opportunity'">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <label style="font-size:12px;font-weight:600;color:#374151">Status szansy</label>
-              <select [(ngModel)]="actEditForm.opp_status" class="act-sel">
-                <option value="new">Nowa</option>
-                <option value="in_progress">W trakcie</option>
-                <option value="closed">Zamknięta</option>
-              </select>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <label style="font-size:12px;font-weight:600;color:#374151">Termin</label>
-              <input type="date" [(ngModel)]="actEditForm.opp_due_date" class="act-input">
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px">
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <label style="font-size:12px;font-weight:600;color:#374151">Wartość</label>
-              <input type="number" min="0" step="0.01" [(ngModel)]="actEditForm.opp_value" class="act-input">
-            </div>
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <label style="font-size:12px;font-weight:600;color:#374151">Waluta</label>
-              <select [(ngModel)]="actEditForm.opp_currency" class="act-sel">
-                <option value="PLN">PLN</option><option value="EUR">EUR</option>
-                <option value="USD">USD</option><option value="GBP">GBP</option>
-              </select>
-            </div>
-          </div>
-        </ng-container>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:12px;font-weight:600;color:#374151">Opis / notatki</label>
-          <textarea [(ngModel)]="actEditForm.body" rows="4" class="act-input" style="resize:vertical"></textarea>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-          <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
-          <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1987,13 +1905,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-card { border:1px solid #e5e7eb; border-radius:10px; padding:12px 14px; background:white; cursor:pointer; transition:box-shadow .15s; position:relative; }
     .act-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08); }
     .act-card.act-card-expanded { border-color:#3BAA5D; }
-    .act-card-header { display:flex; align-items:flex-start; gap:8px; }
-    .act-card-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; min-width:0; }
-    .act-card-title { font-size:13px; font-weight:600; color:#111827; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .act-card-title { font-size:12.5px; font-weight:600; color:#111827; margin-bottom:2px; }
     .act-body-clamp { font-size:12px; color:#6b7280; margin-top:6px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
     .act-expand-btn { background:none; border:none; cursor:pointer; font-size:11px; color:#9ca3af; padding:2px 0; margin-top:4px; }
     .act-expand-btn:hover { color:#3BAA5D; }
-    .act-card-controls { display:flex; gap:4px; align-items:center; flex-shrink:0; }
+    .act-card-controls { display:flex; gap:4px; align-items:center; flex-shrink:0; margin-top:8px; }
     .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 6px; border-radius:5px; color:#9ca3af; line-height:1; }
     .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
     .act-ctrl-btn.del:hover { color:#ef4444; }
@@ -2386,17 +2302,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     { value: 'custom',     label: 'Własna data…' },
   ];
   readonly quillModules = { toolbar: [['bold','italic','underline'],['bullet','list'],[{ list:'ordered' }],['link']] };
-  readonly actTypeOptions = [
-    { value: 'call',        label: '📞 Połączenie' },
-    { value: 'meeting',     label: '🤝 Spotkanie' },
-    { value: 'note',        label: '📝 Notatka' },
-    { value: 'training',    label: '🎓 Szkolenie' },
-    { value: 'qbr',         label: '📊 QBR' },
-    { value: 'opportunity', label: '💡 Szansa' },
-  ];
-  // Modal aktywności
-  selectedAct: any = null;
-  actModalEditMode = false;
   submitAttempted = false;
   partnerNipEditError = '';
 
@@ -2723,10 +2628,23 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   startInlineEdit(a: any): void {
     this.inlineEditActId = a.id;
     this.inlineEditForm  = {
-      title: a.title, body: a.body || '',
-      activity_at: a.activity_at ? this.toLocalDT(a.activity_at) : '',
+      title:         a.title         || '',
+      body:          a.body          || '',
+      activity_at:   a.activity_at ? this.toLocalDT(a.activity_at) : '',
+      assigned_to:   a.assigned_to   || '',
+      reminder_type: a.reminder_type || '',
+      opp_value:     a.opp_value     ?? '',
+      opp_currency:  a.opp_currency  || 'PLN',
+      opp_status:    a.opp_status    || 'new',
+      opp_due_date:  a.opp_due_date  || '',
     };
     this.expandedActIds.add(a.id);
+    if (!this.crmUsers.length) {
+      this.api.getCrmUsers().subscribe({
+        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
+        error: () => {},
+      });
+    }
     this.cdr.markForCheck();
   }
 
@@ -2735,11 +2653,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   saveInlineEdit(a: any): void {
     if (!this.inlineEditForm.title || !this.partner) return;
     this.savingActivity = true;
-    this.api.updatePartnerActivity(this.pid, a.id, {
-      title:       this.inlineEditForm.title,
-      body:        this.inlineEditForm.body || null,
-      activity_at: this.toUtcISO(this.inlineEditForm.activity_at),
-    }).subscribe({
+    const payload: any = {
+      title:         this.inlineEditForm.title,
+      body:          this.inlineEditForm.body || null,
+      activity_at:   this.toUtcISO(this.inlineEditForm.activity_at),
+      assigned_to:   this.inlineEditForm.assigned_to || null,
+      reminder_type: this.inlineEditForm.reminder_type || null,
+    };
+    if (a.type === 'opportunity') {
+      payload.opp_value    = this.inlineEditForm.opp_value != null && this.inlineEditForm.opp_value !== '' ? +this.inlineEditForm.opp_value : null;
+      payload.opp_currency = this.inlineEditForm.opp_currency || 'PLN';
+      payload.opp_status   = this.inlineEditForm.opp_status || 'new';
+      payload.opp_due_date = this.inlineEditForm.opp_due_date || null;
+    }
+    this.api.updatePartnerActivity(this.pid, a.id, payload).subscribe({
       next: updated => this.zone.run(() => {
         if (this.partner)
           this.partner = { ...this.partner, activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x) };
@@ -3371,6 +3298,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       payload.assigned_to = this.actForm.assigned_to || null;
     }
     if (this.actForm.type === 'task' && this.actForm.priority) payload.priority = this.actForm.priority;
+    if (this.actReminderType) payload.reminder_type = this.actReminderType;
     if (this.actForm.type === 'meeting') {
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
@@ -3422,19 +3350,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       all: 'task', tasks: 'task', notes: 'note', calls: 'call', meetings: 'meeting', emails: 'note',
     };
     const actType = typeMap[this.midTab] ?? 'task';
+    // Tytuł jest edytowalny tylko dla Spotkania (i Maila, obsługiwanego osobnym
+    // formularzem) — dla pozostałych typów generujemy go automatycznie z nazwy typu.
     this.actForm = {
-      type: actType, title: '', body: '',
+      type: actType, title: actType === 'meeting' ? '' : this.actTypeName(actType), body: '',
       activity_at: '', assigned_to: currentUserId,
       duration_min: null, meeting_location: '', participantList: [] as string[],
       opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '',
       priority: '',
     };
-    this.actDueDateHour   = '09:00';
+    const now = new Date();
+    this.actDueDateHour   = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     this.actDueDateOpen   = false;
     this.actReminderType  = '';
     this.actReminderAt    = '';
     this.participantQuery = '';
-    if (actType === 'task') {
+    if (actType === 'task' || actType === 'note') {
+      // Zadanie: tylko data, bez konkretnej godziny (hidden w szablonie dla 'task').
+      // Notatka: domyślnie aktualna godzina (ustawiona wyżej), nie sztywne 09:00.
       this.actDueDatePreset = 'today';
       this.applyDueDatePreset();
     } else {
@@ -4458,7 +4391,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return parts.join(' · ');
   }
   actIcon(type: string) {
-    return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
+    return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';
   }
   commissionBasisLabel(basis: string | null): string {
     const map: Record<string, string> = {
@@ -4475,9 +4408,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return map[p] ?? p;
   }
 
-  // ── Modal aktywności ────────────────────────────────────────────────────────
   actTypeName(type: string): string {
     const map: Record<string, string> = {
+      task:        'Zadanie',
       call:        'Połączenie',
       email:       'Email',
       meeting:     'Spotkanie',
@@ -4488,110 +4421,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       opportunity: 'Szansa',
     };
     return map[type] || type;
-  }
-
-  openActModal(a: any): void {
-    this.selectedAct      = a;
-    this.actModalEditMode = false;
-    if (!this.crmUsers.length) {
-      this.api.getCrmUsers().subscribe({
-        next: u => { this.zone.run(() => { this.crmUsers = u; this.cdr.markForCheck(); }); },
-        error: () => {},
-      });
-    }
-    this.cdr.markForCheck();
-  }
-
-  closeActModal(): void {
-    this.selectedAct      = null;
-    this.actModalEditMode = false;
-    this.cdr.markForCheck();
-  }
-
-  startEditActModal(): void {
-    const a = this.selectedAct;
-    if (!a) return;
-    this.actEditForm = {
-      type:             a.type,
-      title:            a.title,
-      body:             a.body || '',
-      activity_at:      a.activity_at ? this.toLocalDT(a.activity_at) : '',
-      duration_min:     a.duration_min ?? '',
-      meeting_location: a.meeting_location || '',
-      participants:     a.participants || '',
-      opp_value:        a.opp_value ?? '',
-      opp_currency:     a.opp_currency || 'PLN',
-      opp_status:       a.opp_status || 'new',
-      opp_due_date:     a.opp_due_date || '',
-      assigned_to:      a.assigned_to || '',
-    };
-    this.actModalEditMode = true;
-    this.cdr.markForCheck();
-  }
-
-  confirmCloseActModal(): void {
-    const a = this.selectedAct;
-    if (!a || !this.partner) return;
-    this.savingActivity = true;
-    this.api.updatePartnerActivity(this.pid, a.id, { status: 'closed' }).subscribe({
-      next: updated => {
-        this.zone.run(() => {
-          if (this.partner) {
-            this.partner = {
-              ...this.partner,
-              activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
-            };
-          }
-          this.selectedAct    = { ...a, ...updated };
-          this.savingActivity = false;
-          this.cdr.markForCheck();
-        });
-      },
-      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
-    });
-  }
-
-  saveEditActivityModal(): void {
-    const a = this.selectedAct;
-    if (!this.actEditForm.title || !a || !this.partner) return;
-    this.savingActivity = true;
-    const payload: any = {
-      type:  this.actEditForm.type,
-      title: this.actEditForm.title,
-      body:  this.actEditForm.body || null,
-    };
-    if (this.actEditForm.type !== 'email') {
-      payload.activity_at = this.toUtcISO(this.actEditForm.activity_at);
-      payload.assigned_to = this.actEditForm.assigned_to || null;
-    }
-    if (this.actEditForm.type === 'meeting') {
-      if (this.actEditForm.duration_min !== '') payload.duration_min = +this.actEditForm.duration_min;
-      payload.meeting_location = this.actEditForm.meeting_location || null;
-      payload.participants     = this.actEditForm.participants || null;
-    }
-    if (this.actEditForm.type === 'opportunity') {
-      payload.opp_value    = this.actEditForm.opp_value != null && this.actEditForm.opp_value !== '' ? +this.actEditForm.opp_value : null;
-      payload.opp_currency = this.actEditForm.opp_currency || 'PLN';
-      payload.opp_status   = this.actEditForm.opp_status || 'new';
-      payload.opp_due_date = this.actEditForm.opp_due_date || null;
-    }
-    this.api.updatePartnerActivity(this.pid, a.id, payload).subscribe({
-      next: (updated: PartnerActivity) => {
-        this.zone.run(() => {
-          if (this.partner) {
-            this.partner = {
-              ...this.partner,
-              activities: (this.partner.activities || []).map(x => x.id === a.id ? { ...x, ...updated } : x),
-            };
-          }
-          this.selectedAct      = { ...a, ...updated };
-          this.actModalEditMode = false;
-          this.savingActivity   = false;
-          this.cdr.markForCheck();
-        });
-      },
-      error: () => { this.zone.run(() => { this.savingActivity = false; this.cdr.markForCheck(); }); },
-    });
   }
 
   canEditActivity(a: any): boolean {
@@ -4732,19 +4561,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       },
       error: () => {},
     });
-  }
-
-  onActTypeChange(): void {
-    if (this.actForm.type !== 'meeting') {
-      this.actForm.participantList = [];
-      this.participantQuery = '';
-    }
-    if (this.actForm.type === 'note' && !this.actDueDatePreset) {
-      this.actDueDatePreset = 'today';
-      const now = new Date();
-      this.actDueDateHour = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    }
-    this.cdr.markForCheck();
   }
 
   filterSuggestions(): void {
