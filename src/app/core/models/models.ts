@@ -40,6 +40,7 @@ export interface Tenant {
   email_domain?: string | null;
   dwh_schema_prefix?: string | null;
   is_active: boolean;
+  seo_daily_article_limit?: number;
   user_count?: number;
   total_users?: number;
   features?: TenantFeature[];

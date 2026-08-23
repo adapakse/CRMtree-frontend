@@ -275,6 +275,13 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                 </label>
                               }
                             </div>
+                            @if (editDraft.features['seo_bot']) {
+                              <div class="field" style="margin-top: 12px; max-width: 260px;">
+                                <label>Limit artykułów SEO / dzień</label>
+                                <input type="number" min="0" [(ngModel)]="editDraft.seo_daily_article_limit">
+                                <div class="td-muted">0 = generowanie wyłączone mimo aktywnego modułu SEObot.</div>
+                              </div>
+                            }
                             <div class="panel-footer">
                               <button class="btn-secondary" (click)="cancelEdit()">Anuluj</button>
                               <button class="btn-primary" [disabled]="saving()" (click)="saveFeatures(t.id)">
@@ -1298,7 +1305,7 @@ export class TenantsComponent implements OnInit {
 
   editDraft: {
     name: string; email_domain: string; dwh_schema_prefix: string; is_active: boolean;
-    features: Record<CrmFeature, boolean>;
+    features: Record<CrmFeature, boolean>; seo_daily_article_limit: number;
   } = this.emptyDraft();
 
   ngOnInit(): void {
@@ -1326,6 +1333,7 @@ export class TenantsComponent implements OnInit {
     this.editDraft = {
       name: t.name, email_domain: t.email_domain ?? '', dwh_schema_prefix: t.dwh_schema_prefix ?? '',
       is_active: t.is_active, features: featMap,
+      seo_daily_article_limit: t.seo_daily_article_limit ?? 0,
     };
     this.trainingMode.set(t.crm_training_mode ?? false);
     this.editTab.set('settings');
@@ -1370,8 +1378,14 @@ export class TenantsComponent implements OnInit {
     this.http.put<TenantFeature[]>(`${API}/admin/tenants/${id}/features`, { features: this.editDraft.features }).subscribe({
       next: features => {
         this.tenants.update(ts => ts.map(t => t.id === id ? { ...t, features } : t));
-        this.saving.set(false);
-        this.toast.success('Moduły zapisane');
+        this.http.patch<Tenant>(`${API}/admin/tenants/${id}`, { seo_daily_article_limit: this.editDraft.seo_daily_article_limit }).subscribe({
+          next: updated => {
+            this.tenants.update(ts => ts.map(t => t.id === id ? { ...t, ...updated } : t));
+            this.saving.set(false);
+            this.toast.success('Moduły zapisane');
+          },
+          error: () => { this.saving.set(false); this.toast.error('Moduły zapisane, ale limit dziennych artykułów SEO nie zapisał się'); },
+        });
       },
       error: () => { this.saving.set(false); this.toast.error('Błąd zapisu modułów'); },
     });
@@ -1999,6 +2013,7 @@ export class TenantsComponent implements OnInit {
     return {
       name: '', email_domain: '', dwh_schema_prefix: '', is_active: true,
       features: Object.fromEntries(ALL_FEATURES.map(f => [f, false])) as Record<CrmFeature, boolean>,
+      seo_daily_article_limit: 0,
     };
   }
 }
