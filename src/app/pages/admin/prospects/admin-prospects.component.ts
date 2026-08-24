@@ -15,37 +15,42 @@ const API = `${environment.apiUrl}/admin/prospects`;
 // polom icp_signals[].id zwracanym przez backend (decyzja 19.08.2026, artefakt
 // "Sygnały Prospektów"). Sygnały 9-11 (rekrutacja/raportowanie/call center)
 // nie są tu jeszcze — wymagają portali z ofertami pracy, niepodpięte.
+// reasoningKey — nazwa pola w enrichment_log.claude.signal_reasoning (patrz
+// backend ICP_SIGNALS.promptKey, prospectEnrichmentService.js). Rozjeżdża się
+// z `key` (id sygnału) dla 7 z 8 sygnałów — bez tego mapowania
+// getSignalReasoning() cicho nie znajdowała uzasadnienia mimo że było zapisane
+// w bazie (audyt 24.08, Wodmax/Targor-Truck/Parmet).
 const SIGNAL_DEFS = [
   {
-    key: 'dzial_handlowy', label: 'Dział handlowy',
+    key: 'dzial_handlowy', reasoningKey: 'field_sales_team', label: 'Dział handlowy',
     desc: 'Dedykowani handlowcy, w miarę możności formalna struktura sprzedaży.',
   },
   {
-    key: 'zlozony_proces_sprzedazy', label: 'Ind. wycena',
+    key: 'zlozony_proces_sprzedazy', reasoningKey: 'custom_quote_process', label: 'Ind. wycena',
     desc: 'Złożony proces sprzedaży / indywidualna wycena — relacyjny, projektowy lub negocjacyjny model, nie zakup impulsowy.',
   },
   {
-    key: 'konsultacja_demo', label: 'Konsultacja/demo',
+    key: 'konsultacja_demo', reasoningKey: 'consultation_demo_needs_analysis', label: 'Konsultacja/demo',
     desc: 'Sprzedaż wymaga rozmowy przed zakupem — demo, bezpłatna konsultacja, analiza potrzeb.',
   },
   {
-    key: 'opieka_nad_klientem', label: 'Opieka B2B',
+    key: 'opieka_nad_klientem', reasoningKey: 'dedicated_customer_care_b2b', label: 'Opieka B2B',
     desc: 'Dedykowana opieka nad klientem B2B — przypisany opiekun, Key Account Manager, Customer Success.',
   },
   {
-    key: 'przetargi', label: 'Przetargi',
+    key: 'przetargi', reasoningKey: 'tender_bidding_department', label: 'Przetargi',
     desc: 'Firma sprzedaje w przetargach / ma dział ofertowania — nie: kupuje w przetargach.',
   },
   {
-    key: 'rozproszona_struktura', label: 'Wiele oddziałów',
+    key: 'rozproszona_struktura', reasoningKey: 'distributed_sales_structure', label: 'Wiele oddziałów',
     desc: 'Zespół lub sieć sprzedaży fizycznie rozproszona terytorialnie — konkretni przedstawiciele/oddziały z ludźmi.',
   },
   {
-    key: 'siec_partnerow', label: 'Sieć partnerów',
+    key: 'siec_partnerow', reasoningKey: 'partner_dealer_network', label: 'Sieć partnerów',
     desc: 'Firma buduje lub rozwija sieć sprzedaży pośredniej — dealerzy, dystrybutorzy.',
   },
   {
-    key: 'ecommerce_b2b', label: 'E-commerce B2B',
+    key: 'ecommerce_b2b', reasoningKey: 'ecommerce_b2b', label: 'E-commerce B2B',
     desc: 'Sklep/platforma zamówieniowa B2B z realną obsługą — liczy się tylko razem z działem handlowym lub opieką nad klientem.',
   },
 ] as const;
@@ -960,7 +965,7 @@ interface BatchProgress {
                               @if (p.enrichment_log.claude.signal_reasoning) {
                                 <div class="log-signals">
                                   @for (s of signalDefs; track s.key) {
-                                    @if (p.enrichment_log.claude.signal_reasoning![s.key]) {
+                                    @if (getSignalReasoning(p, s)) {
                                       <div class="log-signal-row">
                                         <span class="sig-dot log-sig-dot"
                                           [class.sig-yes]="getSignal(p, s.key) === true"
@@ -968,7 +973,7 @@ interface BatchProgress {
                                         </span>
                                         <span class="log-signal-key">{{ s.label }}</span>
                                         <span class="log-signal-reason">
-                                          {{ p.enrichment_log.claude.signal_reasoning![s.key] }}
+                                          {{ getSignalReasoning(p, s) }}
                                         </span>
                                       </div>
                                     }
@@ -1318,8 +1323,8 @@ interface BatchProgress {
                   </span>
                   <div class="inspect-signal-body">
                     <div class="inspect-signal-name">{{ s.label }}</div>
-                    @if (getSignalReasoning(inspectTarget()!, s.key)) {
-                      <div class="inspect-signal-reason">{{ getSignalReasoning(inspectTarget()!, s.key) }}</div>
+                    @if (getSignalReasoning(inspectTarget()!, s)) {
+                      <div class="inspect-signal-reason">{{ getSignalReasoning(inspectTarget()!, s) }}</div>
                     } @else {
                       <div class="inspect-signal-reason inspect-muted">brak uzasadnienia</div>
                     }
@@ -2608,10 +2613,14 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getSignalReasoning(p: Prospect, key: string): string | null {
+  getSignalReasoning(p: Prospect, s: { key: string; reasoningKey: string }): string | null {
     const r = p.enrichment_log?.claude?.signal_reasoning;
     if (!r) return null;
-    return r[key] || null;
+    // reasoningKey = nazwa pola z promptu AI (np. field_sales_team), różna od
+    // `key` = id sygnału (np. dzial_handlowy) dla 7 z 8 sygnałów. Fallback do
+    // `key` — starsze rekordy sprzed wprowadzenia promptKey mogły zapisać
+    // reasoning pod samym id.
+    return r[s.reasoningKey] || r[s.key] || null;
   }
 
   // Backend liczy już cały breakdown (icp_signals/icp_gates/icp_bonus_signals) —
