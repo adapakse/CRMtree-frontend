@@ -188,6 +188,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/prospects/admin-prospects.component').then(m => m.AdminProspectsComponent),
       },
       {
+        path: 'admin/call-analysis',
+        canActivate: [crmGuard],
+        loadComponent: () => import('./pages/admin/call-analysis/admin-call-analysis.component').then(m => m.AdminCallAnalysisComponent),
+      },
+      {
         path: 'crm/prospects-dashboard',
         canActivate: [adminOrSalesManagerGuard],
         loadComponent: () => import('./pages/crm/dashboard/crm-prospects-dashboard.component').then(m => m.CrmProspectsDashboardComponent),

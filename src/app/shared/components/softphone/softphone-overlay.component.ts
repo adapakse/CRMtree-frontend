@@ -423,6 +423,25 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
         await firstValueFrom(this.crmApi.createPartnerActivity(context.entityId, data));
       }
 
+      // Auto-upsert do Analizatora Rozmów — tylko gdy notatka niepusta i NIP znany
+      if (note && context.nip) {
+        const nip = context.nip.replace(/\D/g, '');
+        if (nip.length === 10) {
+          this.crmApi.upsertCallNote({
+            nip,
+            company_name:     context.companyName ?? null,
+            city:             context.city ?? null,
+            salesperson:      this.auth.currentUser?.display_name ?? null,
+            salesperson_id:   this.auth.currentUser?.id ?? null,
+            salesperson_name: this.auth.currentUser?.display_name ?? null,
+            note,
+            call_date:        (startedAt ?? new Date()).toISOString().slice(0, 16).replace('T', ' '),
+          }).subscribe({
+            error: e => console.warn('[PBX] Call-analysis upsert failed:', e.status, e.error?.error),
+          });
+        }
+      }
+
       this.pbx.notifyActivitySaved(context);
       this.pbx.clearCall();
     } catch (e) {

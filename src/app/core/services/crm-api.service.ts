@@ -1544,6 +1544,25 @@ export class CrmApiService {
     return this.http.post<SmsMessage>(`${environment.apiUrl}/sms/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
   }
 
+  // ── Analizator Rozmów ───────────────────────────────────────────────────
+  // Wywoływane z softphone-overlay po zapisaniu notatki z rozmowy — fire & forget,
+  // auto-analiza DeepSeek w tle po stronie backendu.
+  upsertCallNote(data: {
+    nip:              string;
+    company_name:     string | null;
+    city:             string | null;
+    salesperson:      string | null;
+    salesperson_id:   string | null;
+    salesperson_name: string | null;
+    note:             string;
+    call_date:        string | null;
+  }): Observable<{ nip: string; was_existing: boolean }> {
+    return this.http.post<{ nip: string; was_existing: boolean }>(
+      `${environment.apiUrl}/admin/call-analysis/upsert-from-call`,
+      data
+    );
+  }
+
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────
   getPartnersAnalytics(p: {
     period_from?: string; period_to?: string;
