@@ -15,6 +15,7 @@ import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
+import { PbxService } from '../../../core/services/pbx.service';
 import { QuillModule } from 'ngx-quill';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
@@ -65,6 +66,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           [title]="churnBadgeTitle(partner)">
       🔥 Churn: {{churnLabel(partner.churn_risk)}}
     </span>
+    <button class="btn-outline" *ngIf="partner.phone || partner.billing_phone || partner.agent_phone"
+            (click)="makePartnerCall()" title="Zadzwoń">📞</button>
     <button class="btn-outline" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj partnera' : 'Brak uprawnień do edycji tego partnera'">✏️ Edytuj</button>
   </div>
 
@@ -1934,6 +1937,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private emailOauthListener = inject(EmailOauthListenerService);
   protected settings = inject(AppSettingsService);
+  private pbx = inject(PbxService);
 
   // Słowniki z app_settings
   get dictStatuses():  string[] { return this._dictArr('crm_partner_statuses', ['onboarding','active','inactive','churned']); }
@@ -2919,6 +2923,22 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       }),
       error: () => {},
     });
+  }
+
+  makePartnerCall(): void {
+    if (!this.partner) return;
+    const phones: { label: string; number: string }[] = [];
+    if (this.partner.phone)         phones.push({ label: `Kontakt: ${this.partner.phone}`, number: this.partner.phone });
+    if (this.partner.billing_phone) phones.push({ label: `Rozliczenia: ${this.partner.billing_phone}`, number: this.partner.billing_phone });
+    if (this.partner.agent_phone)   phones.push({ label: `Agent: ${this.partner.agent_phone}`, number: this.partner.agent_phone });
+    if (!phones.length) return;
+    this.pbx.initiate(phones[0].number, {
+      entityType:  'partner',
+      entityId:    this.partner.id ?? this.partner.crm_id ?? undefined,
+      nip:         this.partner.dwh_nip ?? this.partner.nip ?? null,
+      companyName: this.partner.dwh_company_name ?? this.partner.company ?? null,
+      city:        this.partner.billing_city ?? null,
+    }, phones.length > 1 ? phones : undefined);
   }
 
   openEdit() {

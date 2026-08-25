@@ -7,6 +7,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QuillModule } from 'ngx-quill';
 import { environment } from '../../../environments/environment';
 import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 const BASE = environment.apiUrl;
 
@@ -125,6 +126,112 @@ const BASE = environment.apiUrl;
     </div>
   </div>
 
+  <!-- ── Softphone PBX ──────────────────────────────────────────────────── -->
+  <div class="card" style="padding:24px" *ngIf="auth.hasFeature('pbx')">
+    <h2 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#18181b;margin:0 0 6px">
+      📞 Softphone — token PBX
+    </h2>
+    <p style="font-size:12.5px;color:#6b7280;margin:0 0 20px;line-height:1.5">
+      Aby korzystać z wbudowanego telefonu, wklej swój Personal Access Token z panelu ip-pbx.eu.
+      Token umożliwia aplikacji pobranie Twoich danych SIP. Klienci widzący Twój numer bezpośredni
+      mogą oddzwonić prosto do Ciebie.
+    </p>
+
+    <!-- Status -->
+    <div *ngIf="pbxLoading" style="font-size:13px;color:#6b7280">Ładowanie…</div>
+
+    <div *ngIf="!pbxLoading">
+      <!-- Skonfigurowany -->
+      <div *ngIf="pbxConfigured"
+           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:16px">
+        <span style="font-size:18px">✅</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#166534">Token skonfigurowany</div>
+          <div *ngIf="pbxDirectPhone" style="font-size:12px;color:#166534;margin-top:1px">
+            Twój numer bezpośredni: <strong>{{pbxDirectPhone}}</strong>
+          </div>
+          <div *ngIf="!pbxDirectPhone" style="font-size:12px;color:#6b7280;margin-top:1px">
+            Numer bezpośredni nie jest przypisany w PBX
+          </div>
+        </div>
+      </div>
+
+      <!-- Nieskonfigurowany -->
+      <div *ngIf="!pbxConfigured"
+           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;margin-bottom:16px">
+        <span style="font-size:18px">⚠️</span>
+        <div style="font-size:13px;color:#854d0e">Brak tokenu — softphone nie będzie działał.</div>
+      </div>
+
+      <!-- Formularz tokenu -->
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">
+          Personal Access Token (PAT)
+        </label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input
+            [type]="pbxShowToken ? 'text' : 'password'"
+            [(ngModel)]="pbxToken"
+            placeholder="Wklej token z ip-pbx.eu…"
+            autocomplete="off"
+            style="flex:1;padding:9px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;font-family:monospace;color:#111827;outline:none"
+          />
+          <button class="btn btn-g btn-sm" type="button" (click)="pbxShowToken = !pbxShowToken">
+            {{pbxShowToken ? 'Ukryj' : 'Pokaż'}}
+          </button>
+        </div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:5px;line-height:1.5">
+          Panel ip-pbx.eu → kliknij swoje imię (prawy górny róg) → <em>API Tokens (PAT)</em> → Create token → skopiuj i wklej tutaj.
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:14px">
+        <button class="btn btn-p" (click)="savePbxToken()" [disabled]="pbxSaving || !pbxToken.trim()">
+          {{pbxSaving ? 'Zapisywanie…' : 'Zapisz token'}}
+        </button>
+        <button *ngIf="pbxConfigured" class="btn btn-g btn-sm" (click)="deletePbxToken()"
+                [disabled]="pbxSaving" style="color:#dc2626">
+          Usuń
+        </button>
+      </div>
+
+      <div *ngIf="pbxSaveOk" style="margin-top:8px;font-size:12px;color:#16a34a;font-weight:600">
+        ✓ Token zapisany{{pbxDirectPhone ? ' — numer: ' + pbxDirectPhone : ''}}
+      </div>
+      <div *ngIf="pbxSaveErr" style="margin-top:8px;font-size:12px;color:#dc2626">
+        {{pbxSaveErr}}
+      </div>
+
+      <!-- Powiadomienia systemowe o połączeniach przychodzących -->
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f3f4f6">
+        <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:6px">
+          Powiadomienia o połączeniach
+        </div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
+          Wyświetla powiadomienie systemowe gdy dzwoni klient — nawet gdy przeglądarka jest w tle lub pracujesz w innym programie.
+        </div>
+
+        <ng-container [ngSwitch]="notifBrowserPerm">
+          <div *ngSwitchCase="'granted'"
+               style="font-size:12px;color:#16a34a;font-weight:600">
+            ✓ Powiadomienia włączone
+          </div>
+          <div *ngSwitchCase="'denied'"
+               style="font-size:12px;color:#dc2626">
+            ✗ Powiadomienia zablokowane — odblokuj ręcznie w ustawieniach przeglądarki:<br>
+            <span style="color:#6b7280">Kłódka przy adresie strony → Powiadomienia → Zezwalaj</span>
+          </div>
+          <div *ngSwitchDefault style="display:flex;align-items:center;gap:10px">
+            <button class="btn btn-p btn-sm" (click)="enableNotifications()">
+              Włącz powiadomienia
+            </button>
+            <span style="font-size:11px;color:#9ca3af">Przeglądarka zapyta o zgodę</span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
 </div>
   `,
   styles: [`
@@ -143,6 +250,7 @@ export class MySettingsComponent implements OnInit {
   private sanitizer  = inject(DomSanitizer);
   private cdr        = inject(ChangeDetectorRef);
   private api        = inject(CrmApiService);
+  auth               = inject(AuthService);
 
   // ── Stopka ──────────────────────────────────────────────────────────────────
   signatureHtml = '';
@@ -163,12 +271,86 @@ export class MySettingsComponent implements OnInit {
     toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']],
   };
 
+  // ── Softphone PBX (self-service PAT) ──────────────────────────────────────────
+  pbxLoading     = true;
+  pbxConfigured  = false;
+  pbxDirectPhone = '';
+  pbxToken       = '';
+  pbxShowToken   = false;
+  pbxSaving      = false;
+  pbxSaveOk      = false;
+  pbxSaveErr     = '';
+
+  notifBrowserPerm: NotificationPermission = ('Notification' in window)
+    ? Notification.permission
+    : 'denied';
+
+  async enableNotifications(): Promise<void> {
+    if (!('Notification' in window)) return;
+    const result = await Notification.requestPermission();
+    this.notifBrowserPerm = result;
+    this.cdr.markForCheck();
+  }
+
   ngOnInit() {
     this.http.get<{ html: string }>(`${BASE}/profile/signature`).subscribe({
       next: r => { this.signatureHtml = r.html || ''; this.updatePreview(); this.cdr.markForCheck(); },
       error: () => {},
     });
     this.loadTemplates();
+    if (this.auth.hasFeature('pbx')) this.loadPbxStatus();
+  }
+
+  loadPbxStatus() {
+    this.pbxLoading = true;
+    this.http.get<any>(`${BASE}/pbx/my-pat`).subscribe({
+      next: r => {
+        this.pbxConfigured  = r.configured;
+        this.pbxDirectPhone = r.direct_phone ?? '';
+        this.pbxLoading     = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.pbxLoading = false; this.cdr.markForCheck(); },
+    });
+  }
+
+  savePbxToken() {
+    const pat = this.pbxToken.trim();
+    if (!pat) return;
+    this.pbxSaving  = true;
+    this.pbxSaveOk  = false;
+    this.pbxSaveErr = '';
+    this.http.put<any>(`${BASE}/pbx/my-pat`, { pat_token: pat }).subscribe({
+      next: r => {
+        this.pbxSaving      = false;
+        this.pbxSaveOk      = true;
+        this.pbxConfigured  = true;
+        this.pbxDirectPhone = r.direct_phone ?? '';
+        this.pbxToken       = '';
+        this.pbxShowToken   = false;
+        this.cdr.markForCheck();
+        setTimeout(() => { this.pbxSaveOk = false; this.cdr.markForCheck(); }, 4000);
+      },
+      error: err => {
+        this.pbxSaving  = false;
+        this.pbxSaveErr = err.error?.error ?? 'Błąd zapisu — spróbuj ponownie';
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  deletePbxToken() {
+    this.pbxSaving  = true;
+    this.pbxSaveErr = '';
+    this.http.delete(`${BASE}/pbx/my-pat`).subscribe({
+      next: () => {
+        this.pbxSaving      = false;
+        this.pbxConfigured  = false;
+        this.pbxDirectPhone = '';
+        this.cdr.markForCheck();
+      },
+      error: () => { this.pbxSaving = false; this.cdr.markForCheck(); },
+    });
   }
 
   // ── Stopka ──────────────────────────────────────────────────────────────────

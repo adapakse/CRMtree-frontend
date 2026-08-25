@@ -15,6 +15,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
+import { PbxService } from '../../../core/services/pbx.service';
 import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
@@ -776,10 +777,6 @@ interface WhatsappConvUiState {
           </div>
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
-        <div *ngIf="mockCallActive" style="margin-top:8px;background:#dcfce7;border-radius:6px;padding:8px;font-size:11px;color:#15803d;text-align:center">
-          🔔 Symulacja połączenia z {{lead.phone}}…
-          <button (click)="mockCallActive=false" style="background:none;border:none;cursor:pointer;color:#15803d;margin-left:8px;font-weight:700">Rozłącz</button>
-        </div>
       </div>
 
       <!-- Powiązane dokumenty -->
@@ -1708,6 +1705,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private emailOauthListener = inject(EmailOauthListenerService);
   protected settings = inject(AppSettingsService);
+  private pbx = inject(PbxService);
   logoSasUrl       = '';
 
   // Słowniki z app_settings
@@ -2334,8 +2332,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   historySearch = '';
   private historyLoaded = false;
 
-  // Mock komunikacja
-  mockCallActive      = false;
+  // Symulator (tryb szkoleniowy)
   phoneSimulatorActive = false;
 
   // ── Email — tenant chooses the active provider; each user connects their
@@ -4190,9 +4187,19 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
       return;
     }
-    this.mockCallActive = true;
-    this.cdr.markForCheck();
-    setTimeout(() => { this.mockCallActive = false; this.cdr.markForCheck(); }, 5000);
+    const phones: { label: string; number: string }[] = [];
+    if (this.lead.phone) phones.push({ label: `Główny: ${this.lead.phone}`, number: this.lead.phone });
+    this.lead.extra_contacts?.forEach(ec => {
+      if (ec.phone) phones.push({ label: `${ec.contact_name || 'Kontakt'}: ${ec.phone}`, number: ec.phone });
+    });
+    if (!phones.length) return;
+    this.pbx.initiate(phones[0].number, {
+      entityType:  'lead',
+      entityId:    this.lead.id,
+      nip:         this.lead.nip ?? null,
+      companyName: this.lead.company ?? null,
+      city:        null,
+    }, phones.length > 1 ? phones : undefined);
   }
 
   onPhoneSimulatorClosed(): void {

@@ -768,6 +768,28 @@ export interface WhatsappHistoryEntry {
   created_by_name: string | null;
 }
 
+export interface PhoneLookupResult {
+  found: boolean;
+  type?: 'lead' | 'partner';
+  id?: number;
+  company_name?: string | null;
+  nip?: string | null;
+  city?: string | null;
+}
+
+export interface PbxCallLogPayload {
+  direction:      'inbound' | 'outbound';
+  status:         'answered' | 'missed' | 'not_answered' | 'rejected' | 'error';
+  caller_number?: string;
+  callee_number?: string;
+  nip?:           string | null;
+  duration_sec?:  number;
+  started_at?:    string;
+  ended_at?:      string;
+  lead_id?:       number | null;
+  partner_id?:    number | null;
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Stałe
 // ─────────────────────────────────────────────────────────────────
@@ -1452,6 +1474,26 @@ export class CrmApiService {
   }
   getPartnerWhatsappHistory(partnerId: number | string): Observable<WhatsappHistoryEntry[]> {
     return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/partner/${partnerId}`);
+  }
+
+  // ── PBX / SIP ────────────────────────────────────────────────────────
+  // Softphone in the browser (sip.js/WebRTC) talks to ip-pbx.eu directly —
+  // this backend only proxies credential lookups and logs finished calls.
+  // Mounted at /api/pbx (sibling to /api/crm), not under BASE.
+  getSipCredentials(): Observable<{
+    username: string; password: string; sip_url: string; sip_uri: string;
+    direct_phone?: string | null;
+    turn?: { urls: string[]; username: string; password: string } | null;
+  }> {
+    return this.http.get<any>(`${environment.apiUrl}/pbx/sip-credentials`);
+  }
+  lookupByPhone(phone: string): Observable<PhoneLookupResult> {
+    return this.http.get<PhoneLookupResult>(`${environment.apiUrl}/pbx/phone-lookup`, {
+      params: { phone },
+    });
+  }
+  postCallLog(payload: PbxCallLogPayload): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${environment.apiUrl}/pbx/call-log`, payload);
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────
