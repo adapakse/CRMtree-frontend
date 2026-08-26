@@ -1511,6 +1511,21 @@ export class CrmApiService {
   postCallLog(payload: PbxCallLogPayload): Observable<{ ok: boolean }> {
     return this.http.post<{ ok: boolean }>(`${environment.apiUrl}/pbx/call-log`, payload);
   }
+  findPbxCall(number: string, startedAt: string, direction: 'inbound' | 'outbound'): Observable<{ call_id: string; direction: string }> {
+    return this.http.get<{ call_id: string; direction: string }>(`${environment.apiUrl}/pbx/find-call`, {
+      params: { number, started_at: startedAt, direction },
+    });
+  }
+  getPbxTranscription(callId: string, direction: 'inbound' | 'outbound'): Observable<{
+    agent_status:    string;
+    client_status:   string;
+    agent_segments:  { start: number; end: number; text: string }[];
+    client_segments: { start: number; end: number; text: string }[];
+  }> {
+    return this.http.get<any>(`${environment.apiUrl}/pbx/transcription/${callId}`, {
+      params: { direction },
+    });
+  }
 
   // ── SMS ──────────────────────────────────────────────────────────────────
   // Same provider/PAT as PBX. Local log (sms_messages) — ip-pbx.eu has no
