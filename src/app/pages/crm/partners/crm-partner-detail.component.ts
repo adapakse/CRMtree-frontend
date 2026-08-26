@@ -550,6 +550,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+              <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">utworzono {{a.created_at|date:'dd.MM.yyyy HH:mm'}}</span>
             </div>
             <div class="act-card-title">{{a.title}}</div>
             <div class="act-meta">
