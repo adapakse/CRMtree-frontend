@@ -423,7 +423,7 @@ interface WhatsappConvUiState {
                   Data i godzina
                   <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
                 </label>
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label *ngIf="a.type!=='note'" style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   Przypomnienie
                   <select [(ngModel)]="inlineEditForm.reminder_type" class="act-input" style="font-size:11px">
                     <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>

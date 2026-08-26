@@ -407,11 +407,11 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
     const note  = withNote ? this.noteText.trim() : '';
 
     const data = {
-      type:         'call' as const,
+      type:         'note' as const,
       title,
       body:         note || null,
       duration_min: durationMin,
-      activity_at:  (startedAt ?? new Date()).toISOString(),
+      activity_at:  null,
       assigned_to:  this.auth.currentUser?.id ?? null,
       direction,
     };
