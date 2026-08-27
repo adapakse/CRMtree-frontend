@@ -4,7 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize, catchError, map } from 'rxjs/operators';
+import { finalize, catchError } from 'rxjs/operators';
 import { forkJoin, of, Subscription } from 'rxjs';
 import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -636,10 +636,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
-          <ng-container *ngIf="emailConnected">
-            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
-            <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
-          </ng-container>
           <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ Łączenie z Google…' : '+ Nowy email'}}</button>
         </div>
 
@@ -821,11 +817,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
       <!-- WhatsApp tab -->
       <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
-        <div *ngIf="whatsappConfigured===true" style="display:flex;justify-content:flex-end;gap:6px">
-          <button class="btn-sm" [disabled]="whatsappHistoryLoading" (click)="loadWhatsappHistory()" title="Odśwież historię WhatsApp — odbiór przez webhook nie zawsze jest natychmiastowy">
-            {{ whatsappHistoryLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
-          </button>
-        </div>
 
         <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
 
@@ -936,12 +927,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
       <!-- SMS tab -->
       <div *ngIf="midTab==='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <div style="font-size:11px;color:#9ca3af">Brak powiadomień na żywo o nowych SMS-ach — odświeżaj ręcznie.</div>
-          <button class="btn-sm" [disabled]="smsLoading" (click)="loadSmsThread()">
-            {{ smsLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
-          </button>
-        </div>
 
         <div *ngIf="smsThreadError" style="font-size:13px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
           ⚠️ {{smsThreadError}}
@@ -2135,6 +2120,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       });
     }
     this.loadWhatsappHistory();
+    // Webhook delivery isn't guaranteed instant — poll while this partner is
+    // open so an active conversation doesn't require a manual refresh.
+    if (!this.whatsappPollInterval) this.whatsappPollInterval = setInterval(() => this.loadWhatsappHistory(), 30_000);
   }
 
   loadWhatsappHistory(): void {
@@ -2219,6 +2207,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   openSmsTab(): void {
     this.midTab = 'sms';
     this.loadSmsThread();
+    // No live push from ip-pbx.eu for incoming SMS — poll while this partner
+    // is open so an active conversation doesn't require a manual refresh.
+    if (!this.smsPollInterval) this.smsPollInterval = setInterval(() => this.loadSmsThread(), 30_000);
   }
 
   loadSmsThread(): void {
@@ -2600,6 +2591,22 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     return [...byThread.values(), ...noThread];
   }
 
+  private markActivityRead(activityId: number): void {
+    const act = (this.partner?.activities || []).find((a: any) => a.id === activityId);
+    if (act && !act.is_read) { act.is_read = true; this.cdr.markForCheck(); }
+  }
+
+  private markThreadRead(threadId: string): void {
+    let changed = false;
+    for (const act of (this.partner?.activities || [])) {
+      if (act.type === 'email' && act.gmail_thread_id === threadId && !act.is_read) {
+        act.is_read = true;
+        changed = true;
+      }
+    }
+    if (changed) this.cdr.markForCheck();
+  }
+
   private _safeHtmlCache = new Map<string, SafeHtml>();
   safeHtml(html: string): SafeHtml {
     const key = html || '';
@@ -2938,10 +2945,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   private emailPollInterval: any = null;
+  private smsPollInterval: any = null;
+  private whatsappPollInterval: any = null;
   private emailOauthSub: Subscription | null = null;
   debugProcessing        = false;
-  syncingAll             = false;
-  syncResult             = '';
   showReplyDetails       = false;
 
   // Whichever provider's OAuth callback page reports back here is, by
@@ -2986,7 +2993,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emailOauthSub?.unsubscribe();
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
   }
 
   private loadPartnerSalesData(p: any): void {
@@ -3046,7 +3055,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.loadError = false;
     this.partner = null;
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
     this.api.getPartner(id).pipe(
       finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
     ).subscribe({
@@ -3573,31 +3584,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  checkNewEmails(): void {
-    if (this.syncingAll || !this.emailConnected) return;
-    this.syncingAll = true;
-    this.syncResult = '';
-    this.cdr.markForCheck();
-
-    this.api.debugProcessEmail().pipe(
-      map((r: any) => r?.recovered
-        ? `${this.emailProviderLabel}: odzyskano synchronizację, ${r?.newMessages_found ?? 0}`
-        : `${this.emailProviderLabel}: ${r?.newMessages_found ?? 0}`),
-      catchError(() => of(`${this.emailProviderLabel}: błąd synchronizacji`)),
-    ).subscribe({
-      next: label => this.zone.run(() => {
-        this.syncResult = label;
-        this.syncingAll = false;
-        this.refreshEmailActivities();
-        this.cdr.markForCheck();
-      }),
-      error: () => this.zone.run(() => {
-        this.syncingAll = false;
-        this.cdr.markForCheck();
-      }),
-    });
-  }
-
   openEmailCompose(prefillThreadId?: string): void {
     const training_mode = this.settings.settings().crm_training_mode;
     if (!this.emailConnected && !training_mode) {
@@ -4075,7 +4061,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.loadingThread   = false;
     this.cdr.markForCheck();
     if (!a.is_read && !a.gmail_thread_id) {
-      a.is_read = true;
+      this.markActivityRead(a.id);
       this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
     }
     if (a.gmail_thread_id) {
@@ -4228,10 +4214,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.threadMessages = [];
     this.loadingThread = true;
     this.cdr.markForCheck();
-    if (!a.is_read) {
-      a.is_read = true;
-      this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
-    }
     this.getPartnerThreadObs(a.gmail_thread_id).subscribe({
       next: res => this.zone.run(() => {
         if (this.openThreadId !== a.gmail_thread_id) return;
@@ -4240,6 +4222,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
         this.threadOwnerEmail = res.ownerEmail;
         this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
         this.loadingThread = false;
+        this.markThreadRead(a.gmail_thread_id);
         // Auto-mark all unread incoming messages in the thread
         res.messages.forEach((m: any) => {
           if (m.is_read === false && m.created_by === null) {

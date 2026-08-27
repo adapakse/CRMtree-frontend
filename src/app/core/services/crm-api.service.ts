@@ -53,6 +53,10 @@ export interface Lead {
   converted_partner_company?: string | null;
   activity_count?: number;
   non_email_activity_count?: number;
+  new_email_count?: number;
+  unread_sms_count?: number;
+  unread_whatsapp_count?: number;
+  missed_call_count?: number;
   document_count?: number;
   email_count?: number;
   activities?: LeadActivity[];
@@ -260,6 +264,8 @@ export interface Partner {
   email_count?: number;
   non_email_activity_count?: number;
   new_email_count?: number;
+  unread_sms_count?: number;
+  unread_whatsapp_count?: number;
   last_reply_at?: string | null;
   doc_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
@@ -765,6 +771,7 @@ export interface WhatsappHistoryEntry {
   to_phone: string;
   message: string | null;
   status: string;
+  is_read: boolean;
   created_by_name: string | null;
 }
 
@@ -776,6 +783,7 @@ export interface SmsMessage {
   created_at: string;
   from:       string;
   to:         string;
+  is_read:    boolean;
 }
 
 export interface SmsConversation {
