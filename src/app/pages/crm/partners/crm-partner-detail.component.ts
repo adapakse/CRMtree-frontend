@@ -3098,7 +3098,11 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     if (!phones.length) return;
     this.pbx.initiate(phones[0].number, {
       entityType:  'partner',
-      entityId:    this.partner.id ?? this.partner.crm_id ?? undefined,
+      // crm_id (crm_partners.id, a UUID) must win over id — for DWH-linked
+      // partners `id` here is the numeric dwh_partner_id, not a valid UUID,
+      // and pbx/call-log's partner_id validation rejects anything else.
+      // Same precedence as the `pid` getter elsewhere in this component.
+      entityId:    this.partner.crm_id ?? this.partner.id ?? undefined,
       nip:         this.partner.dwh_nip ?? this.partner.nip ?? null,
       companyName: this.partner.dwh_company_name ?? this.partner.company ?? null,
       city:        this.partner.billing_city ?? null,

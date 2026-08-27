@@ -266,6 +266,7 @@ export interface Partner {
   new_email_count?: number;
   unread_sms_count?: number;
   unread_whatsapp_count?: number;
+  missed_call_count?: number;
   last_reply_at?: string | null;
   doc_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
@@ -811,7 +812,7 @@ export interface PbxCallLogPayload {
   started_at?:    string;
   ended_at?:      string;
   lead_id?:       number | null;
-  partner_id?:    number | null;
+  partner_id?:    string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────

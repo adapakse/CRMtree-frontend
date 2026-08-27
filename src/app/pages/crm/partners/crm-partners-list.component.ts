@@ -85,7 +85,8 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.industry"   class="pc-tag">🏭 {{p.industry}}</span>
         <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
       </div>
-      <div *ngIf="hasUnreadReply(p)||(hasPbxFeature&&(p.unread_sms_count??0)>0)||(hasWhatsappFeature&&(p.unread_whatsapp_count??0)>0)" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+      <div *ngIf="hasUnreadReply(p)||(hasPbxFeature&&(p.missed_call_count??0)>0)||(hasPbxFeature&&(p.unread_sms_count??0)>0)||(hasWhatsappFeature&&(p.unread_whatsapp_count??0)>0)" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+        <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
         <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">💬 {{p.unread_sms_count}}</span>
         <span *ngIf="hasWhatsappFeature && (p.unread_whatsapp_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
         <span *ngIf="hasUnreadReply(p)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
@@ -131,6 +132,8 @@ type SortDir = 'asc' | 'desc';
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
+          <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0"
+                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
           <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">💬 {{p.unread_sms_count}}</span>
           <span *ngIf="hasWhatsappFeature && (p.unread_whatsapp_count??0)>0"
