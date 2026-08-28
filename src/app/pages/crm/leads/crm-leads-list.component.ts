@@ -437,9 +437,9 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="fg" style="grid-column:1/-1">
           <div>
           <!-- Enrich prompt banner -->
-          <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
+          <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
             <span>🔍 Pobierz dane firmy ze strony?</span>
-            <button style="background:#f97316;color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">Tak, pobierz</button>
+            <button style="background:var(--orange);color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">Tak, pobierz</button>
             <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:11px" (click)="enrichPrompt=false">Nie</button>
           </div>
           <!-- Enrich result badge -->
@@ -479,7 +479,7 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="fg" style="grid-column:1/-1">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <label class="fl" style="margin:0">Dodatkowe kontakty</label>
-            <button type="button" style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addNewExtraContact()">+ Dodaj kontakt</button>
+            <button type="button" style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addNewExtraContact()">+ Dodaj kontakt</button>
           </div>
           @for (ec of newExtraContacts; track $index; let i = $index) {
             <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">

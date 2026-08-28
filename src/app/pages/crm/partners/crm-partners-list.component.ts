@@ -52,10 +52,10 @@ type SortDir = 'asc' | 'desc';
   </div>
 
   <!-- Banner filtru z raportu -->
-  <div *ngIf="reportFilterLabel" style="background:#fff7ed;border-bottom:1px solid #fed7aa;padding:6px 20px;font-size:12px;color:#9a3412;display:flex;align-items:center;gap:8px;flex-shrink:0">
+  <div *ngIf="reportFilterLabel" style="background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:6px 20px;font-size:12px;color:var(--orange-dark);display:flex;align-items:center;gap:8px;flex-shrink:0">
     <span>📊</span>
     <span>Filtr z raportu: <strong>{{reportFilterLabel}}</strong></span>
-    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:#9a3412;font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
+    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:var(--orange-dark);font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
   </div>
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac)"></div>
@@ -227,9 +227,9 @@ type SortDir = 'asc' | 'desc';
     /* Toolbar */
     .toolbar { display:flex; align-items:center; gap:8px; padding:10px 20px; border-bottom:1px solid #f4f4f5; flex-shrink:0; flex-wrap:wrap; }
     .tb-search { border:1px solid #d1d5db; border-radius:8px; padding:6px 12px; font-size:12px; outline:none; width:200px; }
-    .tb-search:focus { border-color:#f97316; }
+    .tb-search:focus { border-color:var(--orange); }
     .sel { border:1px solid #d1d5db; border-radius:8px; padding:6px 10px; font-size:12px; outline:none; background:white; cursor:pointer; }
-    .sel:focus { border-color:#f97316; }
+    .sel:focus { border-color:var(--orange); }
     .btn-clear { background:#fee2e2; color:#991b1b; border:none; border-radius:8px; padding:6px 10px; font-size:11px; cursor:pointer; font-weight:600; }
     /* Cards */
     .cards-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:12px; padding:16px 20px; align-content:start; }
