@@ -657,7 +657,9 @@ export class PbxService {
       started_at:    call.startedAt?.toISOString() ?? new Date().toISOString(),
       ended_at:      new Date().toISOString(),
       lead_id:    call.context?.entityType === 'lead'    ? Number(call.context.entityId) : undefined,
-      partner_id: call.context?.entityType === 'partner' ? Number(call.context.entityId) : undefined,
+      // crm_partners.id is a UUID (unlike crm_leads.id) — must NOT go through
+      // Number(), which would silently produce NaN → serialized as null.
+      partner_id: call.context?.entityType === 'partner' ? String(call.context.entityId) : undefined,
     };
     this.crmApi.postCallLog(payload).subscribe({
       error: err => console.warn('[PBX call-log] zapis nieudany:', err.message),

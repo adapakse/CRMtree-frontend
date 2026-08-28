@@ -53,6 +53,10 @@ export interface Lead {
   converted_partner_company?: string | null;
   activity_count?: number;
   non_email_activity_count?: number;
+  new_email_count?: number;
+  unread_sms_count?: number;
+  unread_whatsapp_count?: number;
+  missed_call_count?: number;
   document_count?: number;
   email_count?: number;
   activities?: LeadActivity[];
@@ -260,6 +264,9 @@ export interface Partner {
   email_count?: number;
   non_email_activity_count?: number;
   new_email_count?: number;
+  unread_sms_count?: number;
+  unread_whatsapp_count?: number;
+  missed_call_count?: number;
   last_reply_at?: string | null;
   doc_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
@@ -765,6 +772,7 @@ export interface WhatsappHistoryEntry {
   to_phone: string;
   message: string | null;
   status: string;
+  is_read: boolean;
   created_by_name: string | null;
 }
 
@@ -776,6 +784,7 @@ export interface SmsMessage {
   created_at: string;
   from:       string;
   to:         string;
+  is_read:    boolean;
 }
 
 export interface SmsConversation {
@@ -803,7 +812,7 @@ export interface PbxCallLogPayload {
   started_at?:    string;
   ended_at?:      string;
   lead_id?:       number | null;
-  partner_id?:    number | null;
+  partner_id?:    string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1511,6 +1520,21 @@ export class CrmApiService {
   postCallLog(payload: PbxCallLogPayload): Observable<{ ok: boolean }> {
     return this.http.post<{ ok: boolean }>(`${environment.apiUrl}/pbx/call-log`, payload);
   }
+  findPbxCall(number: string, startedAt: string, direction: 'inbound' | 'outbound'): Observable<{ call_id: string; direction: string }> {
+    return this.http.get<{ call_id: string; direction: string }>(`${environment.apiUrl}/pbx/find-call`, {
+      params: { number, started_at: startedAt, direction },
+    });
+  }
+  getPbxTranscription(callId: string, direction: 'inbound' | 'outbound'): Observable<{
+    agent_status:    string;
+    client_status:   string;
+    agent_segments:  { start: number; end: number; text: string }[];
+    client_segments: { start: number; end: number; text: string }[];
+  }> {
+    return this.http.get<any>(`${environment.apiUrl}/pbx/transcription/${callId}`, {
+      params: { direction },
+    });
+  }
 
   // ── SMS ──────────────────────────────────────────────────────────────────
   // Same provider/PAT as PBX. Local log (sms_messages) — ip-pbx.eu has no
@@ -1527,6 +1551,25 @@ export class CrmApiService {
   }
   sendPartnerSms(partnerId: number | string, message: string, toPhone?: string): Observable<SmsMessage> {
     return this.http.post<SmsMessage>(`${environment.apiUrl}/sms/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
+  }
+
+  // ── Analizator Rozmów ───────────────────────────────────────────────────
+  // Wywoływane z softphone-overlay po zapisaniu notatki z rozmowy — fire & forget,
+  // auto-analiza DeepSeek w tle po stronie backendu.
+  upsertCallNote(data: {
+    nip:              string;
+    company_name:     string | null;
+    city:             string | null;
+    salesperson:      string | null;
+    salesperson_id:   string | null;
+    salesperson_name: string | null;
+    note:             string;
+    call_date:        string | null;
+  }): Observable<{ nip: string; was_existing: boolean }> {
+    return this.http.post<{ nip: string; was_existing: boolean }>(
+      `${environment.apiUrl}/admin/call-analysis/upsert-from-call`,
+      data
+    );
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────

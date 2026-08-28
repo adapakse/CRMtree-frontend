@@ -4,8 +4,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize, catchError, map } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
   LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
@@ -394,6 +394,7 @@ interface WhatsappConvUiState {
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
+              <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">utworzono {{a.created_at|date:'dd.MM.yyyy HH:mm'}}</span>
             </div>
             <div style="font-size:12.5px;font-weight:600;color:#111827;margin-bottom:2px">{{a.title}}</div>
             <div class="act-meta" style="margin-bottom:4px">
@@ -423,7 +424,7 @@ interface WhatsappConvUiState {
                   Data i godzina
                   <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
                 </label>
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label *ngIf="a.type!=='note'" style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   Przypomnienie
                   <select [(ngModel)]="inlineEditForm.reminder_type" class="act-input" style="font-size:11px">
                     <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
@@ -453,10 +454,6 @@ interface WhatsappConvUiState {
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
           <ng-container *ngIf="settings.settings().crm_training_mode">
             <button class="btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
-          </ng-container>
-          <ng-container *ngIf="!settings.settings().crm_training_mode && emailConnected">
-            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
-            <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
           </ng-container>
           <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ Łączenie z Google…' : '+ Nowy email'}}</button>
         </div>
@@ -642,11 +639,6 @@ interface WhatsappConvUiState {
 
       <!-- WhatsApp tab -->
       <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
-        <div *ngIf="whatsappConfigured===true" style="display:flex;justify-content:flex-end;gap:6px">
-          <button class="btn-sm" [disabled]="whatsappHistoryLoading" (click)="loadWhatsappHistory()" title="Odśwież historię WhatsApp — odbiór przez webhook nie zawsze jest natychmiastowy">
-            {{ whatsappHistoryLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
-          </button>
-        </div>
 
         <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
 
@@ -757,12 +749,6 @@ interface WhatsappConvUiState {
 
       <!-- SMS tab -->
       <div *ngIf="midTab==='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <div style="font-size:11px;color:#9ca3af">Brak powiadomień na żywo o nowych SMS-ach — odświeżaj ręcznie.</div>
-          <button class="btn-sm" [disabled]="smsLoading" (click)="loadSmsThread()">
-            {{ smsLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
-          </button>
-        </div>
 
         <div *ngIf="smsThreadError" style="font-size:13px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
           ⚠️ {{smsThreadError}}
@@ -1734,10 +1720,10 @@ interface WhatsappConvUiState {
 })
 export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private emailPollInterval: any = null;
+  private smsPollInterval: any = null;
+  private whatsappPollInterval: any = null;
   private emailOauthSub: Subscription | null = null;
   debugProcessing = false;
-  syncingAll  = false;
-  syncResult  = '';
   showReplyDetails       = false;
 
   // Whichever provider's OAuth callback page reports back here is, by
@@ -2261,6 +2247,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   openSmsTab(): void {
     this.midTab = 'sms';
     this.loadSmsThread();
+    // No live push from ip-pbx.eu for incoming SMS — poll while this lead is
+    // open so an active conversation doesn't require a manual refresh.
+    if (!this.smsPollInterval) this.smsPollInterval = setInterval(() => this.loadSmsThread(), 30_000);
   }
 
   loadSmsThread(): void {
@@ -2594,6 +2583,22 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   trackEmailActivity(_: number, a: any): any { return a.gmail_thread_id || a.id; }
   trackActivity(_: number, a: any): number { return a.id; }
 
+  private markActivityRead(activityId: number): void {
+    const act = (this.lead?.activities || []).find((a: any) => a.id === activityId);
+    if (act && !act.is_read) { act.is_read = true; this.cdr.markForCheck(); }
+  }
+
+  private markThreadRead(threadId: string): void {
+    let changed = false;
+    for (const act of (this.lead?.activities || [])) {
+      if (act.type === 'email' && act.gmail_thread_id === threadId && !act.is_read) {
+        act.is_read = true;
+        changed = true;
+      }
+    }
+    if (changed) this.cdr.markForCheck();
+  }
+
   private _safeHtmlCache = new Map<string, SafeHtml>();
   safeHtml(html: string): SafeHtml {
     const key = html || '';
@@ -2661,7 +2666,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emailOauthSub?.unsubscribe();
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
   }
 
   loadLead(numId?: number) {
@@ -2670,7 +2677,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.loadError = false;
     this.lead = null;
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
     this.api.getLead(id).pipe(
       finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
     ).subscribe({
@@ -2723,6 +2732,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       });
     }
     this.loadWhatsappHistory();
+    // Webhook delivery isn't guaranteed instant — poll while this lead is
+    // open so an active conversation doesn't require a manual refresh.
+    if (!this.whatsappPollInterval) this.whatsappPollInterval = setInterval(() => this.loadWhatsappHistory(), 30_000);
   }
 
   loadWhatsappHistory(): void {
@@ -2785,31 +2797,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       error: (e: any) => this.zone.run(() => {
         this.debugProcessing = false;
         alert('Błąd: ' + (e.error?.error || e.message));
-        this.cdr.markForCheck();
-      }),
-    });
-  }
-
-  checkNewEmails(): void {
-    if (this.syncingAll || !this.emailConnected) return;
-    this.syncingAll = true;
-    this.syncResult = '';
-    this.cdr.markForCheck();
-
-    this.api.debugProcessEmail().pipe(
-      map((r: any) => r?.recovered
-        ? `${this.emailProviderLabel}: odzyskano synchronizację, ${r?.newMessages_found ?? 0}`
-        : `${this.emailProviderLabel}: ${r?.newMessages_found ?? 0}`),
-      catchError(() => of(`${this.emailProviderLabel}: błąd synchronizacji`)),
-    ).subscribe({
-      next: label => this.zone.run(() => {
-        this.syncResult = label;
-        this.syncingAll = false;
-        this.refreshEmailActivities();
-        this.cdr.markForCheck();
-      }),
-      error: () => this.zone.run(() => {
-        this.syncingAll = false;
         this.cdr.markForCheck();
       }),
     });
@@ -3222,8 +3209,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.threadOwnerEmail = res.ownerEmail;
         this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
         this.loadingThread = false;
-        const act = (this.lead?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
-        if (act && !act.is_read) act.is_read = true;
+        this.markThreadRead(threadId);
         this.cdr.markForCheck();
       }),
       error: () => this.zone.run(() => {
@@ -3337,8 +3323,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.threadMessages  = [];
     this.loadingThread   = false;
     this.cdr.markForCheck();
-    if (!a.is_read) {
-      a.is_read = true;
+    if (!a.is_read && !a.gmail_thread_id) {
+      this.markActivityRead(a.id);
       this.api.patchLeadActivityRead(this.lead.id, a.id, true).subscribe({ error: () => {} });
     }
     if (a.gmail_thread_id && !this.settings.settings().crm_training_mode) {

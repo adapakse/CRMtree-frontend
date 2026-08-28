@@ -52,13 +52,13 @@ type SortDir = 'asc' | 'desc';
   </div>
 
   <!-- Banner filtru z raportu -->
-  <div *ngIf="reportFilterLabel" style="background:#fff7ed;border-bottom:1px solid #fed7aa;padding:6px 20px;font-size:12px;color:#9a3412;display:flex;align-items:center;gap:8px;flex-shrink:0">
+  <div *ngIf="reportFilterLabel" style="background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:6px 20px;font-size:12px;color:var(--orange-dark);display:flex;align-items:center;gap:8px;flex-shrink:0">
     <span>📊</span>
     <span>Filtr z raportu: <strong>{{reportFilterLabel}}</strong></span>
-    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:#9a3412;font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
+    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:var(--orange-dark);font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
   </div>
 
-  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#f97316,#fb923c)"></div>
+  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac)"></div>
 
   <!-- ══ KARTY ══ -->
   <div *ngIf="!loading && viewMode==='cards'" class="cards-grid">
@@ -85,9 +85,11 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.industry"   class="pc-tag">🏭 {{p.industry}}</span>
         <span *ngIf="p.manager_name" class="pc-tag">👤 {{p.manager_name}}</span>
       </div>
-      <div *ngIf="hasUnreadReply(p)||((p.non_email_activity_count??0)>0)" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+      <div *ngIf="hasUnreadReply(p)||(hasPbxFeature&&(p.missed_call_count??0)>0)||(hasPbxFeature&&(p.unread_sms_count??0)>0)||(hasWhatsappFeature&&(p.unread_whatsapp_count??0)>0)" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+        <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
+        <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">💬 {{p.unread_sms_count}}</span>
+        <span *ngIf="hasWhatsappFeature && (p.unread_whatsapp_count??0)>0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
         <span *ngIf="hasUnreadReply(p)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
-        <span *ngIf="(p.non_email_activity_count??0)>0" style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
       </div>
       <div class="pc-financials">
         <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
@@ -130,10 +132,14 @@ type SortDir = 'asc' | 'desc';
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
+          <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0"
+                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
+          <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0"
+                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">💬 {{p.unread_sms_count}}</span>
+          <span *ngIf="hasWhatsappFeature && (p.unread_whatsapp_count??0)>0"
+                style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
           <span *ngIf="hasUnreadReply(p)"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
-          <span *ngIf="(p.non_email_activity_count??0)>0"
-                style="background:#6b7280;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{p.non_email_activity_count}}</span>
           <span *ngIf="(p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
@@ -214,16 +220,16 @@ type SortDir = 'asc' | 'desc';
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
     .topbar { display:flex; align-items:center; gap:10px; padding:12px 20px; border-bottom:1px solid #e5e7eb; flex-shrink:0; }
     .topbar h1 { font-size:17px; font-weight:700; margin:0; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .btn-view { background:none; border:1px solid #e5e7eb; border-radius:7px; padding:5px 10px; font-size:12px; cursor:pointer; color:#6b7280; }
-    .btn-view.active { background:#fff7ed; border-color:#f97316; color:#f97316; font-weight:700; }
+    .btn-view.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:700; }
     /* Toolbar */
     .toolbar { display:flex; align-items:center; gap:8px; padding:10px 20px; border-bottom:1px solid #f4f4f5; flex-shrink:0; flex-wrap:wrap; }
     .tb-search { border:1px solid #d1d5db; border-radius:8px; padding:6px 12px; font-size:12px; outline:none; width:200px; }
-    .tb-search:focus { border-color:#f97316; }
+    .tb-search:focus { border-color:var(--orange); }
     .sel { border:1px solid #d1d5db; border-radius:8px; padding:6px 10px; font-size:12px; outline:none; background:white; cursor:pointer; }
-    .sel:focus { border-color:#f97316; }
+    .sel:focus { border-color:var(--orange); }
     .btn-clear { background:#fee2e2; color:#991b1b; border:none; border-radius:8px; padding:6px 10px; font-size:11px; cursor:pointer; font-weight:600; }
     /* Cards */
     .cards-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:12px; padding:16px 20px; align-content:start; }
@@ -292,6 +298,9 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   private auth   = inject(AuthService);
   private router = inject(Router);
   private route  = inject(ActivatedRoute);
+
+  get hasPbxFeature(): boolean { return this.auth.hasFeature('pbx'); }
+  get hasWhatsappFeature(): boolean { return this.auth.hasFeature('whatsapp'); }
 
   partners: Partner[] = [];
   total = 0; page = 1; pageSize = 50; loading = false;
