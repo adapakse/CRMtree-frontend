@@ -58,7 +58,7 @@ type SortDir = 'asc' | 'desc';
     <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:#9a3412;font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
   </div>
 
-  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#f97316,#fb923c)"></div>
+  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac)"></div>
 
   <!-- ══ KARTY ══ -->
   <div *ngIf="!loading && viewMode==='cards'" class="cards-grid">
@@ -220,10 +220,10 @@ type SortDir = 'asc' | 'desc';
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
     .topbar { display:flex; align-items:center; gap:10px; padding:12px 20px; border-bottom:1px solid #e5e7eb; flex-shrink:0; }
     .topbar h1 { font-size:17px; font-weight:700; margin:0; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .btn-view { background:none; border:1px solid #e5e7eb; border-radius:7px; padding:5px 10px; font-size:12px; cursor:pointer; color:#6b7280; }
-    .btn-view.active { background:#fff7ed; border-color:#f97316; color:#f97316; font-weight:700; }
+    .btn-view.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:700; }
     /* Toolbar */
     .toolbar { display:flex; align-items:center; gap:8px; padding:10px 20px; border-bottom:1px solid #f4f4f5; flex-shrink:0; flex-wrap:wrap; }
     .tb-search { border:1px solid #d1d5db; border-radius:8px; padding:6px 12px; font-size:12px; outline:none; width:200px; }
