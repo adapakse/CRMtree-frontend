@@ -294,12 +294,12 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     .sel-clear { background:none; border:none; cursor:pointer; color:#9ca3af; font-size:14px; padding:0 2px; flex-shrink:0; }
     .sel-clear:hover { color:#ef4444; }
     .dm-input { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; width:100%; box-sizing:border-box; }
-    .dm-input:focus { border-color:#f97316; }
+    .dm-input:focus { border-color:var(--orange); }
     .btn-danger { background:#ef4444; color:white; border:none; border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
     .btn-danger:hover:not(:disabled) { background:#dc2626; }
     .btn-danger:disabled { opacity:.6; cursor:not-allowed; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:7px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; }
-    .btn-primary:hover:not(:disabled) { background:#ea6a0a; }
+    .btn-primary { background:var(--orange); color:white; border:none; border-radius:7px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary:hover:not(:disabled) { background:var(--orange-dark); }
     .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
     .btn-cancel { background:white; color:#374151; border:1px solid #d1d5db; border-radius:7px; padding:7px 14px; font-size:12px; cursor:pointer; }
     .result-ok { color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:8px 12px; font-size:12px; }
@@ -317,7 +317,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     .ei-title { font-size:14px; font-weight:700; margin-bottom:6px; }
     .ei-desc { font-size:12px; color:#6b7280; line-height:1.5; }
     .drop-zone { border:2px dashed #d1d5db; border-radius:8px; padding:20px; text-align:center; cursor:pointer; font-size:13px; color:#9ca3af; transition:.2s; }
-    .drop-zone:hover, .drop-zone.drag-over { border-color:#f97316; color:#f97316; background:#fff7ed; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--orange); color:var(--orange); background:var(--orange-pale); }
   `],
 })
 export class DataManagementComponent {
