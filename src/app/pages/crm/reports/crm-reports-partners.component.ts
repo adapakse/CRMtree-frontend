@@ -97,7 +97,7 @@ function healthColor(engagement: number): string {
 <!-- CONTENT -->
 <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px">
 
-  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac);border-radius:2px"></div>
+  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#f26522,#fb923c);border-radius:2px"></div>
 
   <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
     <div style="font-size:48px;margin-bottom:12px">📈</div>

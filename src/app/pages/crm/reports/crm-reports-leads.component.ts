@@ -83,7 +83,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 <div style="flex:1;overflow-y:auto;padding:24px">
 
   <!-- loading bar -->
-  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac);border-radius:2px;margin-bottom:16px"></div>
+  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#f26522,#fb923c);border-radius:2px;margin-bottom:16px"></div>
 
   <!-- Brak danych -->
   <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
