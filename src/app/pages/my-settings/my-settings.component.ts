@@ -202,8 +202,10 @@ export class MySettingsComponent implements OnInit {
   }
 
   clear() {
+    if (!confirm('Usunąć zapisaną stopkę? Nie będzie już doklejana do maili.')) return;
     this.signatureHtml = '';
     this.updatePreview();
+    this.save();
   }
 
   // ── Szablony emaili ─────────────────────────────────────────────────────────
