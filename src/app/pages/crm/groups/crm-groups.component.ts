@@ -5,6 +5,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CrmApiService, PartnerGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'wt-crm-groups',
@@ -115,14 +116,14 @@ import { AuthService } from '../../../core/auth/auth.service';
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
     .topbar { display:flex; align-items:center; padding:14px 20px; border-bottom:1px solid #e5e7eb; flex-shrink:0; }
     .topbar h1 { font-size:18px; font-weight:700; margin:0; flex:1; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .btn-danger { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .loading { padding:40px; text-align:center; color:#9ca3af; }
     .groups-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; padding:16px 20px; align-content:start; }
     .group-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; cursor:pointer; transition:box-shadow .15s, border-color .15s; }
-    .group-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08); border-color:#fed7aa; }
-    .group-card.highlighted { border-color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.15); }
+    .group-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08); border-color:var(--orange-muted); }
+    .group-card.highlighted { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.15); }
     .gc-header { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
     .gc-icon { font-size:24px; }
     .gc-title { flex:1; }
@@ -133,7 +134,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     .icon-btn:hover { opacity:1; }
     .gc-stats { display:flex; gap:12px; margin-bottom:6px; }
     .gc-stat { font-size:12px; color:#6b7280; }
-    .gc-stat.accent strong { color:#f97316; }
+    .gc-stat.accent strong { color:var(--orange); }
     .gc-mgr { font-size:11px; color:#9ca3af; margin-bottom:6px; }
     .gc-desc { font-size:11px; color:#6b7280; margin-bottom:8px; }
     .gc-partners { display:flex; flex-wrap:wrap; gap:4px; }
@@ -158,7 +159,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     .vp-stat { flex:1; padding:14px 20px; text-align:center; }
     .vp-stat:not(:last-child) { border-right:1px solid #f3f4f6; }
     .vp-stat-val { font-size:20px; font-weight:800; }
-    .vp-stat-val.accent { color:#f97316; }
+    .vp-stat-val.accent { color:var(--orange); }
     .vp-stat-lbl { font-size:11px; color:#9ca3af; margin-top:2px; }
     .vp-mgr { font-size:12px; color:#6b7280; padding:12px 20px 0; }
     .vp-desc { font-size:12px; color:#6b7280; padding:8px 20px 0; white-space:pre-line; }
@@ -166,10 +167,10 @@ import { AuthService } from '../../../core/auth/auth.service';
     .vp-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; }
     .vp-empty { font-size:13px; color:#9ca3af; text-align:center; padding:20px; }
     .vp-partner-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:8px; cursor:pointer; transition:.12s; }
-    .vp-partner-row:hover { background:#fff7ed; }
+    .vp-partner-row:hover { background:var(--orange-pale); }
     .vp-partner-name { font-size:13px; font-weight:600; }
     .vp-arrow { width:16px; height:16px; color:#d1d5db; flex-shrink:0; }
-    .vp-partner-row:hover .vp-arrow { color:#f97316; }
+    .vp-partner-row:hover .vp-arrow { color:var(--orange); }
   `],
 })
 export class CrmGroupsComponent implements OnInit {
@@ -179,6 +180,7 @@ export class CrmGroupsComponent implements OnInit {
   private auth  = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   groups: PartnerGroup[] = [];
   loading = false;
@@ -259,13 +261,13 @@ export class CrmGroupsComponent implements OnInit {
     const obs = this.editingGroup
       ? this.api.updateGroup(this.editingGroup.id!, data)
       : this.api.createGroup(data);
-    obs.subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; } });
+    obs.subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; this.toast.error('Nie udało się zapisać grupy'); } });
   }
 
   deleteGroup() {
     if (!this.editingGroup) return;
     if (!confirm(`Usunąć grupę "${this.editingGroup.name}"? Partnerzy zostaną odłączeni.`)) return;
     this.saving = true;
-    this.api.deleteGroup(this.editingGroup.id!).subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; } });
+    this.api.deleteGroup(this.editingGroup.id!).subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; this.toast.error('Nie udało się usunąć grupy'); } });
   }
 }

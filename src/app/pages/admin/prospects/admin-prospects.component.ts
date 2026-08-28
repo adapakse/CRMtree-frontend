@@ -2261,7 +2261,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         if (err.status === 409 && err.error?.error === 'duplicate_company') {
           this.toLeadDuplicateError.set(err.error.existing);
         } else if (err.status === 409 && err.error?.nip_conflict) {
-          alert(err.error.error);
+          this.toast.error(err.error.error);
         } else if (err.status === 409) {
           this.toLeadDialog.set(null);
           this.load();
@@ -2309,7 +2309,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         p.note_updated_at = r.note_updated_at;
         this.noteEdits.delete(p.id);
       },
-      error: e => alert(e.error?.error || 'Błąd zapisu notatki'),
+      error: e => this.toast.error(e.error?.error || 'Błąd zapisu notatki'),
     });
   }
 
@@ -2400,7 +2400,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.statusActioning.set(null);
         this.processingIds.update(set => { const n = new Set(set); n.delete(p.id); return n; });
         if (err.status === 409) {
-          alert(err.error?.error || 'Konflikt NIP — inny rekord ma już ten numer.');
+          this.toast.error(err.error?.error || 'Konflikt NIP — inny rekord ma już ten numer.');
         }
       },
     });

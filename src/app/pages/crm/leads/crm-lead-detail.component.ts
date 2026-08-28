@@ -48,7 +48,7 @@ interface WhatsappConvUiState {
 
   <!-- HEADER -->
   <div style="height:56px;background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0">
-    <button style="background:none;border:none;color:#f97316;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
+    <button style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
     <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
       <div *ngIf="lead.logo_url && logoSasUrl" style="width:34px;height:34px;border-radius:50%;background-size:cover;background-position:center;border:1px solid #e5e7eb;flex-shrink:0;background-color:#f9fafb"
            [style.background-image]="logoSasUrl"></div>
@@ -135,7 +135,7 @@ interface WhatsappConvUiState {
 
       <!-- Agent -->
       <div class="info-section" *ngIf="lead.agent_name || lead.agent_email || lead.agent_phone">
-        <div class="info-section-title" style="color:#f97316">🤝 Agent</div>
+        <div class="info-section-title" style="color:var(--orange)">🤝 Agent</div>
         <div class="info-kv" *ngIf="lead.agent_name"><span class="lbl">Imię i nazwisko</span><span class="val fw">{{lead.agent_name}}</span></div>
         <div class="info-kv" *ngIf="lead.agent_email">
           <span class="lbl">Email</span>
@@ -876,9 +876,9 @@ interface WhatsappConvUiState {
       </div>
 
       <!-- Onboarding -->
-      <div *ngIf="!lead.converted_at && canEdit" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">🚀 Rozpocznij onboarding</div>
-        <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Podaj wartość kontraktu i datę podpisania umowy, aby przenieść leada do procesu wdrożenia.</div>
+      <div *ngIf="!lead.converted_at && canEdit" style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange-dark);margin-bottom:8px">🚀 Rozpocznij onboarding</div>
+        <div style="font-size:12px;color:var(--orange-dark);margin-bottom:10px">Podaj wartość kontraktu i datę podpisania umowy, aby przenieść leada do procesu wdrożenia.</div>
         <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">🚀 Rozpocznij onboarding →</button>
       </div>
       <div *ngIf="lead.converted_at && lead.stage==='onboarding'" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px">
@@ -1149,7 +1149,7 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
           <span>Dodatkowe kontakty</span>
-          <button style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addExtraContact()">+ Dodaj kontakt</button>
+          <button style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ Dodaj kontakt</button>
         </div>
         @for (ec of extraContacts; track $index; let i = $index) {
           <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
@@ -1198,8 +1198,8 @@ interface WhatsappConvUiState {
           <label>Branża<select [(ngModel)]="editForm.industry"><option value="">— brak —</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select></label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
-          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#f97316">🤝 Dane Agenta</div>
+          <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange)">🤝 Dane Agenta</div>
             <div class="edit-row">
               <label>Imię i nazwisko<input [(ngModel)]="editForm.agent_name" placeholder="Jan Kowalski"></label>
               <label>Telefon<input [(ngModel)]="editForm.agent_phone" placeholder="+48 600 000 000"></label>
@@ -1466,7 +1466,7 @@ interface WhatsappConvUiState {
       <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
       <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
       <span style="flex:1"></span>
-      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
+      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:var(--orange-pale);border:1px solid var(--orange-muted);color:var(--orange-dark);border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
       <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
     </div>
     <!-- Widok -->
@@ -1553,7 +1553,7 @@ interface WhatsappConvUiState {
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
         <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
-        <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
+        <button style="background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
       </div>
     </div>
   </div>
@@ -1574,8 +1574,8 @@ interface WhatsappConvUiState {
     .hdr-btn:hover { background:#f9fafb; }
     .hdr-btn:disabled { opacity:.45; cursor:not-allowed; pointer-events:auto; }
     .hdr-btn-edit { border-color:#d1d5db; }
-    .hdr-btn-primary { background:#f97316; color:white; border-color:#f97316; }
-    .hdr-btn-primary:hover { background:#ea6a0a; }
+    .hdr-btn-primary { background:var(--orange); color:white; border-color:var(--orange); }
+    .hdr-btn-primary:hover { background:var(--orange-dark); }
     .hdr-btn-test { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
     .hdr-btn-test:hover { background:#dbeafe; }
     .ta-badge-ok { background:#16a34a; color:white; border-radius:10px; font-size:9px; font-weight:700; padding:0 5px; line-height:15px; display:inline-block; margin-left:2px; }
@@ -1597,7 +1597,7 @@ interface WhatsappConvUiState {
     .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; min-width:72px; padding-top:1px; }
     .val { color:#374151; flex:1; }
     .val.fw { font-weight:600; color:#18181b; }
-    .link { color:#f97316; text-decoration:none; }
+    .link { color:var(--orange); text-decoration:none; }
     .link:hover { text-decoration:underline; }
     .tab-btn { background:none; border:none; border-bottom:2px solid transparent; padding:10px 14px; font-size:12.5px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; border-radius:6px 6px 0 0; transition:all .15s; }
     .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
@@ -1608,8 +1608,8 @@ interface WhatsappConvUiState {
     .stage-negotiation{background:#ffedd5;color:#9a3412} .stage-closed_won{background:#dcfce7;color:#166534}
     .stage-closed_lost{background:#fee2e2;color:#991b1b}
     .stage-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:7px; background:white; font-size:12px; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
-    .stage-btn:hover:not(:disabled) { background:#fff7ed; border-color:#f97316; }
-    .stage-btn.active { background:#fff7ed; border-color:#f97316; color:#9a3412; font-weight:600; }
+    .stage-btn:hover:not(:disabled) { background:var(--orange-pale); border-color:var(--orange); }
+    .stage-btn.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:600; }
     .stage-btn:disabled { cursor:default; }
     .stage-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
     .stage-dot-new{background:#94a3b8} .stage-dot-qualification{background:#f59e0b} .stage-dot-presentation{background:#3b82f6}
@@ -1703,9 +1703,9 @@ interface WhatsappConvUiState {
     .edit-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .edit-row label.full { grid-column:1/-1; }
     .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
-    .edit-row label input:focus, .edit-row label select:focus { border-color:#f97316; }
+    .edit-row label input:focus, .edit-row label select:focus { border-color:var(--orange); }
     .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
     .btn-primary:disabled { opacity:.6; }
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .check-label { flex-direction:row !important; align-items:center; gap:8px !important; font-size:13px !important; font-weight:400 !important; cursor:pointer; }
