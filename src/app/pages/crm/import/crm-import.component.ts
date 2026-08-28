@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CrmApiService, ImportResult, ImportLog, SalesImportResult, SalesImportLog } from '../../../core/services/crm-api.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'wt-crm-import',
@@ -325,6 +326,7 @@ export class CrmImportComponent implements OnInit {
   private auth = inject(AuthService);
   private zone = inject(NgZone);
   private cdr  = inject(ChangeDetectorRef);
+  private toast = inject(ToastService);
 
   leadsResult:    ImportResult | null = null;
   partnersResult: ImportResult | null = null;
@@ -352,7 +354,7 @@ export class CrmImportComponent implements OnInit {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => alert('Nie udało się pobrać szablonu.'),
+      error: () => this.toast.error('Nie udało się pobrać szablonu.'),
     });
   }
 
@@ -375,7 +377,7 @@ export class CrmImportComponent implements OnInit {
         this.exportingType = '';
         this.cdr.markForCheck();
       },
-      error: () => { this.exportingType = ''; alert('Nie udało się wyeksportować danych.'); this.cdr.markForCheck(); },
+      error: () => { this.exportingType = ''; this.toast.error('Nie udało się wyeksportować danych.'); this.cdr.markForCheck(); },
     });
   }
 
@@ -391,7 +393,7 @@ export class CrmImportComponent implements OnInit {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => alert('Nie udało się pobrać szablonu.'),
+      error: () => this.toast.error('Nie udało się pobrać szablonu.'),
     });
   }
 
@@ -459,7 +461,7 @@ export class CrmImportComponent implements OnInit {
 
   uploadSalesFile(file: File) {
     if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
-      alert('Wybierz plik w formacie CSV.');
+      this.toast.error('Wybierz plik w formacie CSV.');
       return;
     }
     this.uploadingSales  = true;
