@@ -52,10 +52,10 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     </div>
 
     @if (partnerFilterName) {
-      <div style="display:flex;align-items:center;gap:8px;background:#fff7ed;border-bottom:1px solid #fed7aa;padding:6px 20px;font-size:12px;color:#9a3412">
+      <div style="display:flex;align-items:center;gap:8px;background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:6px 20px;font-size:12px;color:var(--orange-dark)">
         <span style="font-size:14px">🏢</span>
         <span>Dokumenty partnera: <strong>{{partnerFilterName}}</strong></span>
-        <button (click)="clearPartnerFilter()" style="margin-left:auto;background:none;border:1px solid #fdba74;border-radius:6px;color:#9a3412;font-size:11px;padding:2px 8px;cursor:pointer">✕ Pokaż wszystkie</button>
+        <button (click)="clearPartnerFilter()" style="margin-left:auto;background:none;border:1px solid var(--orange-muted);border-radius:6px;color:var(--orange-dark);font-size:11px;padding:2px 8px;cursor:pointer">✕ Pokaż wszystkie</button>
       </div>
     }
 
