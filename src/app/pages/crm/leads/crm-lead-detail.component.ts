@@ -9,7 +9,7 @@ import { of, Subscription } from 'rxjs';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
   LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
-  GmailSendResult, ConsentValue, EmailStatus, GmailThreadResponse, WhatsappHistoryEntry,
+  GmailSendResult, ConsentValue, EmailStatus, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -281,12 +281,13 @@ interface WhatsappConvUiState {
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
+        <button class="tab-btn" *ngIf="hasPbxFeature" [class.active]="midTab==='sms'" (click)="openSmsTab()">SMS</button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
         <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
       </div>
 
       <!-- Aktywności tabs (all/tasks/notes/calls/meetings) -->
-      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
@@ -752,6 +753,67 @@ interface WhatsappConvUiState {
             </div>
           </div>
         </ng-container>
+      </div>
+
+      <!-- SMS tab -->
+      <div *ngIf="midTab==='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div style="font-size:11px;color:#9ca3af">Brak powiadomień na żywo o nowych SMS-ach — odświeżaj ręcznie.</div>
+          <button class="btn-sm" [disabled]="smsLoading" (click)="loadSmsThread()">
+            {{ smsLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
+          </button>
+        </div>
+
+        <div *ngIf="smsThreadError" style="font-size:13px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
+          ⚠️ {{smsThreadError}}
+        </div>
+
+        <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie…</div>
+        <div *ngIf="!smsLoading && !smsThreadError && smsConversations.length===0" class="empty-act">Brak numerów telefonu do SMS-a.</div>
+
+        <div *ngFor="let conv of smsConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white;overflow:hidden"
+             [style.border-left]="getSmsConvState(conv.number).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer"
+               [style.background]="getSmsConvState(conv.number).expanded ? '#eff6ff' : 'white'"
+               (click)="toggleSmsConvExpanded(conv.number)">
+            <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
+              <strong style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="conv.messages.length">
+                ostatnia: {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
+              </span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="!conv.messages.length">Brak wiadomości</span>
+            </div>
+            <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getSmsConvState(conv.number).expanded ? '▲' : '▾'}}</span>
+          </div>
+
+          <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid #e5e7eb;display:flex;flex-direction:column">
+            <div [id]="'sms-scroll-lead-' + smsDomId(conv.number)" style="max-height:360px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f9fafb">
+              <div *ngIf="!conv.messages.length" style="font-size:12px;color:#9ca3af;text-align:center;padding:12px 0">Brak wiadomości — napisz pierwszą poniżej.</div>
+              <div *ngFor="let m of conv.messages" style="display:flex" [style.justify-content]="m.direction==='outbound' ? 'flex-end' : 'flex-start'">
+                <div [style.background]="m.direction==='outbound' ? '#3BAA5D' : 'white'"
+                     [style.color]="m.direction==='outbound' ? 'white' : '#111827'"
+                     [style.border]="m.direction==='outbound' ? 'none' : '1px solid #e5e7eb'"
+                     style="max-width:75%;border-radius:12px;padding:8px 12px;font-size:13px;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,.06)">
+                  <div>{{m.body}}</div>
+                  <div style="font-size:10px;opacity:.75;margin-top:4px;text-align:right">
+                    {{m.created_at | date:'HH:mm'}} · {{smsStatusLabel(m.status)}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="position:sticky;bottom:0;background:white;border-top:1px solid #e5e7eb;padding:10px;display:flex;gap:8px;align-items:flex-end">
+              <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
+                        (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
+                        rows="1" style="flex:1;resize:none;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit"
+                        placeholder="Wiadomość…" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
+              <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
+                      (click)="sendSmsToConv(conv)">
+                {{ getSmsConvState(conv.number).sending ? '⏳' : 'Wyślij' }}
+              </button>
+            </div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:#ef4444;font-size:11px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -2184,7 +2246,93 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   toggleLeftPanel(): void { this.leftCollapsed = !this.leftCollapsed; this.cdr.markForCheck(); }
 
   // Historia
-  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'calls' | 'meetings' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'sms' | 'calls' | 'meetings' = 'all';
+
+  // ── SMS — same PBX account/PAT as telephony. Local log, synced on demand
+  // (no webhook from ip-pbx.eu for incoming SMS) — grouped into one
+  // conversation per known number, like WhatsApp's groupWhatsappConversations().
+  get hasPbxFeature(): boolean { return this.auth.hasFeature('pbx'); }
+  formatPhoneDisplay = formatPhoneDisplay;
+  smsConversations: SmsConversation[] = [];
+  smsLoading = false;
+  smsThreadError: string | null = null;
+  private smsConvState = new Map<string, { expanded: boolean; replyMessage: string; sending: boolean; error: string | null }>();
+
+  openSmsTab(): void {
+    this.midTab = 'sms';
+    this.loadSmsThread();
+  }
+
+  loadSmsThread(): void {
+    if (!this.lead) return;
+    this.smsLoading = true;
+    this.smsThreadError = null;
+    this.api.getSmsThreadLead(this.lead.id).subscribe({
+      next: r => this.zone.run(() => {
+        this.smsConversations = r.conversations;
+        this.smsLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.smsLoading = false;
+        this.smsThreadError = err?.error?.error || 'Błąd pobierania SMS-ów';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  getSmsConvState(number: string) {
+    let s = this.smsConvState.get(number);
+    if (!s) { s = { expanded: false, replyMessage: '', sending: false, error: null }; this.smsConvState.set(number, s); }
+    return s;
+  }
+
+  toggleSmsConvExpanded(number: string): void {
+    const s = this.getSmsConvState(number);
+    s.expanded = !s.expanded;
+    if (s.expanded) setTimeout(() => this.scrollSmsToBottom('lead', number), 0);
+    this.cdr.markForCheck();
+  }
+
+  setSmsConvReplyMessage(number: string, val: string): void {
+    this.getSmsConvState(number).replyMessage = val;
+  }
+
+  smsStatusLabel(status: string): string {
+    const map: Record<string, string> = { sent: 'Wysłano', delivered: 'Dostarczono', received: 'Odebrano', failed: 'Błąd', error: 'Błąd' };
+    return map[status] || status;
+  }
+
+  smsDomId(number: string): string {
+    return number.replace(/[^0-9]/g, '');
+  }
+
+  private scrollSmsToBottom(entity: 'lead' | 'partner', number: string): void {
+    const el = document.getElementById(`sms-scroll-${entity}-${this.smsDomId(number)}`);
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  sendSmsToConv(conv: SmsConversation): void {
+    const state = this.getSmsConvState(conv.number);
+    if (!this.lead || !state.replyMessage.trim() || state.sending) return;
+    state.sending = true;
+    state.error = null;
+    this.cdr.markForCheck();
+    this.api.sendLeadSms(this.lead.id, state.replyMessage.trim(), conv.number).subscribe({
+      next: msg => this.zone.run(() => {
+        conv.messages.push(msg);
+        state.replyMessage = '';
+        state.sending = false;
+        this.cdr.markForCheck();
+        setTimeout(() => this.scrollSmsToBottom('lead', conv.number), 0);
+      }),
+      error: (err: any) => this.zone.run(() => {
+        state.sending = false;
+        state.error = err?.error?.error || 'Błąd wysyłki SMS';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
 
   // WhatsApp tab — status reflects the tenant's one shared WhatsApp Business
   // number (tenant_whatsapp_config), configured by a super admin. Same value

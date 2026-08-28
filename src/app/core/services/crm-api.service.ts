@@ -768,6 +768,22 @@ export interface WhatsappHistoryEntry {
   created_by_name: string | null;
 }
 
+export interface SmsMessage {
+  id:         string;
+  direction:  'inbound' | 'outbound';
+  body:       string;
+  status:     string;
+  created_at: string;
+  from:       string;
+  to:         string;
+}
+
+export interface SmsConversation {
+  label:    string;
+  number:   string;
+  messages: SmsMessage[];
+}
+
 export interface PhoneLookupResult {
   found: boolean;
   type?: 'lead' | 'partner';
@@ -1494,6 +1510,23 @@ export class CrmApiService {
   }
   postCallLog(payload: PbxCallLogPayload): Observable<{ ok: boolean }> {
     return this.http.post<{ ok: boolean }>(`${environment.apiUrl}/pbx/call-log`, payload);
+  }
+
+  // ── SMS ──────────────────────────────────────────────────────────────────
+  // Same provider/PAT as PBX. Local log (sms_messages) — ip-pbx.eu has no
+  // webhook for incoming SMS, so the backend syncs on each thread fetch
+  // (dedup via a unique index) instead of relying on push.
+  getSmsThreadLead(leadId: number): Observable<{ conversations: SmsConversation[] }> {
+    return this.http.get<{ conversations: SmsConversation[] }>(`${environment.apiUrl}/sms/thread/lead/${leadId}`);
+  }
+  getSmsThreadPartner(partnerId: number | string): Observable<{ conversations: SmsConversation[] }> {
+    return this.http.get<{ conversations: SmsConversation[] }>(`${environment.apiUrl}/sms/thread/partner/${partnerId}`);
+  }
+  sendLeadSms(leadId: number, message: string, toPhone?: string): Observable<SmsMessage> {
+    return this.http.post<SmsMessage>(`${environment.apiUrl}/sms/send/lead/${leadId}`, { message, to_phone: toPhone || undefined });
+  }
+  sendPartnerSms(partnerId: number | string, message: string, toPhone?: string): Observable<SmsMessage> {
+    return this.http.post<SmsMessage>(`${environment.apiUrl}/sms/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────
