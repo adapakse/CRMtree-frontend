@@ -6,11 +6,13 @@ import { AuthService } from '../../core/auth/auth.service';
 import { WorkflowService } from '../../core/services/api.services';
 import { AvatarComponent } from '../../shared/components/badges.components';
 import { initials } from '../../core/services/helpers';
+import { PbxService } from '../../core/services/pbx.service';
+import { SoftphoneOverlayComponent } from '../../shared/components/softphone/softphone-overlay.component';
 
 @Component({
   selector: 'wt-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, AvatarComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, AvatarComponent, SoftphoneOverlayComponent],
   template: `
     <div class="app-wrap">
 
@@ -251,6 +253,7 @@ import { initials } from '../../core/services/helpers';
         <router-outlet />
       </main>
     </div>
+    <app-softphone-overlay *ngIf="auth.hasFeature('pbx')" />
   `,
   styles: [`
     /* ── Layout ─────────────────────────────────────────────────────── */
@@ -456,6 +459,7 @@ import { initials } from '../../core/services/helpers';
 })
 export class ShellComponent implements OnInit {
   auth = inject(AuthService);
+  private pbx = inject(PbxService);
 
   isSalesManager = computed(() => (this.auth.user() as any)?.crm_role === 'sales_manager');
   private wf     = inject(WorkflowService);
@@ -492,6 +496,7 @@ export class ShellComponent implements OnInit {
   ngOnInit(): void {
     this.collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     this.refreshTaskBadge();
+    if (this.auth.hasFeature('pbx')) void this.pbx.autoConnect();
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe(() => {
