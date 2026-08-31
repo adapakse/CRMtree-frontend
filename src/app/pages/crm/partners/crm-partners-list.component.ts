@@ -228,7 +228,7 @@ type SortDir = 'asc' | 'desc';
     .toolbar { display:flex; align-items:center; gap:8px; padding:10px 20px; border-bottom:1px solid #f4f4f5; flex-shrink:0; flex-wrap:wrap; }
     .tb-search { border:1px solid #d1d5db; border-radius:8px; padding:6px 12px; font-size:12px; outline:none; width:200px; }
     .tb-search:focus { border-color:var(--orange); }
-    .sel { border:1px solid #d1d5db; border-radius:8px; padding:6px 10px; font-size:12px; outline:none; background:white; cursor:pointer; }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
     .sel:focus { border-color:var(--orange); }
     .btn-clear { background:#fee2e2; color:#991b1b; border:none; border-radius:8px; padding:6px 10px; font-size:11px; cursor:pointer; font-weight:600; }
     /* Cards */

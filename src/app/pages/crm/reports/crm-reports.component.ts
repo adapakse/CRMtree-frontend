@@ -398,7 +398,8 @@ const STAGE_COLORS: Record<string, string> = {
     #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
     .page-title { font-family:'Sora',sans-serif; font-size:17px; font-weight:700; color:var(--gray-900); }
     .tsp { flex:1; }
-    .sel { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:8px; padding:6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    .sel:focus { border-color:var(--orange); }
     .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; border:none; font-family:inherit; transition:all .15s; }
     .btn-g { background:white; color:var(--gray-600); border:1px solid var(--gray-200); } .btn-g:hover { background:var(--gray-50); }
     .btn-sm { padding:5px 10px; font-size:12px; }

@@ -845,11 +845,12 @@ const PROB_MAP: Record<LeadStage, number> = {
     .fchip { display:inline-flex; align-items:center; gap:5px; background:var(--gray-100); border:1px solid var(--gray-200); border-radius:20px; padding:4px 12px; font-size:12px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:all .12s; user-select:none; }
     .fchip:hover { border-color:var(--orange); color:var(--orange); }
     .fchip.on { background:var(--orange); color:white; border-color:var(--orange); }
-    .sel { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:8px; padding:6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    .sel:focus { border-color:var(--orange); }
 
     /* Buttons */
     .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; border:none; font-family:inherit; white-space:nowrap; transition:all .15s; text-decoration:none; }
-    .btn-p { background:var(--orange); color:white; } .btn-p:hover { background:#d4521a; }
+    .btn-p { background:var(--orange); color:white; } .btn-p:hover { background:var(--orange-dark); }
     .btn-g { background:white; color:var(--gray-600); border:1px solid var(--gray-200); } .btn-g:hover { background:var(--gray-50); }
     .btn-sm { padding:5px 10px; font-size:12px; }
     .btn:disabled { opacity:.55; cursor:not-allowed; }

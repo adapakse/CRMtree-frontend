@@ -96,7 +96,7 @@ import { groupCssClass } from '../../core/services/helpers';
                   <textarea class="fta" [(ngModel)]="editDescription"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p btn-sm" (click)="saveGroup()">Save Changes</button>
+              <button class="btn btn-p btn-sm" style="margin-top:16px" (click)="saveGroup()">Save Changes</button>
             }
 
             <div class="sec-title" style="margin-top:24px">Members</div>

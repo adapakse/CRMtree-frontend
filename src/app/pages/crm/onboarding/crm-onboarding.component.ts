@@ -416,7 +416,8 @@ const TYPE_LABELS: Record<string, string> = {
     .page-title { font-size:16px;font-weight:700;color:var(--gray-900);white-space:nowrap }
     .tsp { flex:1 }
     .srch { border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:12.5px;outline:none;width:180px }
-    .sel  { border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:12.5px;outline:none }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    .sel:focus { border-color:var(--orange); }
     .view-tabs { display:flex;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden }
     .view-tabs button { padding:6px 12px;border:none;background:white;font-size:12px;cursor:pointer;color:var(--gray-600) }
     .view-tabs button.active { background:var(--orange);color:white;font-weight:600 }
