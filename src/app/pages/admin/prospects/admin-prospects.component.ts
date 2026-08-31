@@ -122,6 +122,8 @@ interface IcpGates {
 interface IcpDowngradeFlag {
   id: string;
   label: string;
+  points?: number;
+  matched?: string[];
 }
 
 interface Prospect {
@@ -1358,6 +1360,14 @@ interface BatchProgress {
                     </div>
                   }
                 }
+                @for (f of sb.downgradeFlags; track f.id) {
+                  @if (f.points) {
+                    <div class="sb-row">
+                      <span class="sb-label">{{ f.label }}</span>
+                      <span class="sb-value sb-minus">{{ f.points }}</span>
+                    </div>
+                  }
+                }
                 <div class="sb-row sb-total">
                   <span class="sb-label">Wynik obliczony</span>
                   <span class="sb-value">= {{ sb.total }}</span>
@@ -1887,6 +1897,7 @@ interface BatchProgress {
     }
     .sb-value { font-weight: 600; }
     .sb-plus { color: #16a34a; }
+    .sb-minus { color: #dc2626; }
 
     .inspect-footer {
       border-top: 1px solid #e5e7eb;
@@ -2627,21 +2638,25 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // tu tylko składamy to w kształt wygodny do renderowania w inspektorze,
   // bez powtarzania formuły scoringu po stronie frontendu.
   calcScoreBreakdown(p: Prospect): {
-    trueCount: number; raw: number; bonus: number; total: number;
+    trueCount: number; raw: number; bonus: number; downgradePenalty: number; total: number;
     gates: IcpGates; gateStatus: string;
     bonusBreakdown: IcpBonusHit[];
+    downgradeFlags: IcpDowngradeFlag[];
   } {
     const signals = p.icp_signals ?? [];
     const trueCount = signals.filter(s => s.hit).length;
     const raw = signals.filter(s => s.hit).reduce((sum, s) => sum + s.points, 0);
     const bonusBreakdown = p.icp_bonus_signals ?? [];
     const bonus = bonusBreakdown.filter(b => b.hit).reduce((sum, b) => sum + b.points, 0);
+    const downgradeFlags = p.icp_downgrade_flags ?? [];
+    const downgradePenalty = downgradeFlags.reduce((sum, f) => sum + (f.points ?? 0), 0);
     return {
-      trueCount, raw, bonus,
-      total: p.icp_score ?? Math.min(100, raw + bonus),
+      trueCount, raw, bonus, downgradePenalty,
+      total: p.icp_score ?? Math.max(0, Math.min(100, raw + bonus + downgradePenalty)),
       gates: p.icp_gates ?? { b2b: 'unknown', company_size: 'unknown' },
       gateStatus: p.icp_gate_status ?? 'needs_review',
       bonusBreakdown,
+      downgradeFlags,
     };
   }
 }
