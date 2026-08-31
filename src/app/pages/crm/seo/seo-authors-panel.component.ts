@@ -73,7 +73,9 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
           <input class="field-input" [(ngModel)]="newJobTitle" placeholder="np. Kierownik działu sprzedaży">
           <label class="field-label">Opis kompetencji</label>
           <textarea class="field-input" rows="3" [(ngModel)]="newBio" placeholder="Krótki opis doświadczenia i eksperckości"></textarea>
-          <p class="hint">Zdjęcie dodasz po utworzeniu autora, w trybie edycji.</p>
+          <label class="field-label">Zdjęcie</label>
+          <input #newPhotoInput type="file" accept="image/jpeg,image/png,image/webp"
+                 (change)="onNewPhotoSelected(newPhotoInput)">
           <label class="field-label">Profil LinkedIn</label>
           <input class="field-input" [(ngModel)]="newLinkedinUrl" placeholder="https://linkedin.com/in/...">
           <div class="author-edit-actions">
@@ -157,6 +159,7 @@ export class SeoAuthorsPanelComponent implements OnInit {
   newJobTitle = '';
   newBio = '';
   newLinkedinUrl = '';
+  newPhotoFile: File | null = null;
 
   ngOnInit(): void {
     this.load();
@@ -239,6 +242,10 @@ export class SeoAuthorsPanelComponent implements OnInit {
     });
   }
 
+  onNewPhotoSelected(input: HTMLInputElement): void {
+    this.newPhotoFile = input.files?.[0] ?? null;
+  }
+
   add(): void {
     const full_name = this.newName.trim();
     if (!full_name) return;
@@ -249,7 +256,7 @@ export class SeoAuthorsPanelComponent implements OnInit {
       bio: this.newBio.trim() || null,
       photo_url: null,
       linkedin_url: normalizeLinkedinUrl(this.newLinkedinUrl),
-    }).subscribe({
+    }, this.newPhotoFile).subscribe({
       next: () => {
         this.savingNew.set(false);
         this.adding.set(false);
@@ -257,6 +264,7 @@ export class SeoAuthorsPanelComponent implements OnInit {
         this.newJobTitle = '';
         this.newBio = '';
         this.newLinkedinUrl = '';
+        this.newPhotoFile = null;
         this.toast.success('Autor dodany.');
         this.load();
         this.authorsChanged.emit();

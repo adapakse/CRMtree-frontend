@@ -202,7 +202,19 @@ export class CrmSeoService {
     return this.http.get<SeoAuthor[]>(`${this.api}/authors`);
   }
 
-  addAuthor(author: Pick<SeoAuthor, 'full_name' | 'job_title' | 'bio' | 'photo_url' | 'linkedin_url'>): Observable<SeoAuthor> {
+  addAuthor(
+    author: Pick<SeoAuthor, 'full_name' | 'job_title' | 'bio' | 'photo_url' | 'linkedin_url'>,
+    file?: File | null,
+  ): Observable<SeoAuthor> {
+    if (file) {
+      const fd = new FormData();
+      fd.append('full_name', author.full_name);
+      if (author.job_title)    fd.append('job_title', author.job_title);
+      if (author.bio)          fd.append('bio', author.bio);
+      if (author.linkedin_url) fd.append('linkedin_url', author.linkedin_url);
+      fd.append('file', file);
+      return this.http.post<SeoAuthor>(`${this.api}/authors`, fd);
+    }
     return this.http.post<SeoAuthor>(`${this.api}/authors`, author);
   }
 
