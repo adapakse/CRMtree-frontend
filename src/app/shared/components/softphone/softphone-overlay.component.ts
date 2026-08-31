@@ -2,7 +2,11 @@ import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy, ChangeDe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription, firstValueFrom } from 'rxjs';
+import {
+  Subscription, timer, interval, of,
+  switchMap, filter, take, map, catchError, retry, startWith, timeout, tap,
+  firstValueFrom,
+} from 'rxjs';
 import { PbxService, ActiveCall } from '../../../core/services/pbx.service';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -141,6 +145,20 @@ function fmtDuration(sec: number): string {
       Aktywność zostanie zapisana na poziomie {{ call.context.entityType === 'lead' ? 'Leada' : 'Partnera' }}
     </div>
 
+    <!-- Status transkrypcji -->
+    <div *ngIf="transcriptionState === 'loading'"
+         style="font-size:11px;color:#9ca3af;margin-top:6px;display:flex;align-items:center;gap:4px">
+      <span class="sp-spinner"></span> Pobieranie transkrypcji…
+    </div>
+    <div *ngIf="transcriptionState === 'loaded'"
+         style="font-size:11px;color:#4ade80;margin-top:6px">
+      ✓ Transkrypcja załadowana — możesz edytować
+    </div>
+    <div *ngIf="transcriptionState === 'unavailable'"
+         style="font-size:11px;color:#9ca3af;margin-top:6px">
+      Transkrypcja niedostępna — wpisz notatkę ręcznie
+    </div>
+
     <textarea class="sp-note" [(ngModel)]="noteText"
       placeholder="Notatka z rozmowy (opcjonalnie)…"
       rows="6"></textarea>
@@ -271,23 +289,31 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
   saveError  = false;
   micErrorMsg = '';
 
+  transcriptionState: 'idle' | 'loading' | 'loaded' | 'unavailable' = 'idle';
   answering = false; // true między kliknięciem "Odbierz" a fazą active
 
   fmtDuration = fmtDuration;
 
-  private subs = new Subscription();
+  private subs              = new Subscription();
+  private transcriptionSub: Subscription | null = null;
 
   ngOnInit(): void {
     this.subs.add(this.pbx.activeCall$.subscribe(c => {
+      const prevPhase = this.call?.phase;
       this.call = c;
 
       if (!c) {
-        this.noteText  = '';
-        this.saving    = false;
-        this.saveError = false;
-        this.answering = false;
-      } else if (c.phase === 'active') {
-        this.answering = false;
+        this.cancelTranscriptionFetch();
+        this.noteText           = '';
+        this.saving             = false;
+        this.saveError          = false;
+        this.answering          = false;
+        this.transcriptionState = 'idle';
+      } else {
+        if (c.phase === 'active') this.answering = false;
+        if (prevPhase !== 'post-call' && c.phase === 'post-call') {
+          this.startTranscriptionFetch(c);
+        }
       }
 
       this.cdr.markForCheck();
@@ -309,6 +335,7 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+    this.transcriptionSub?.unsubscribe();
   }
 
   confirm(): void {
@@ -380,11 +407,11 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
     const note  = withNote ? this.noteText.trim() : '';
 
     const data = {
-      type:         'call' as const,
+      type:         'note' as const,
       title,
       body:         note || null,
       duration_min: durationMin,
-      activity_at:  (startedAt ?? new Date()).toISOString(),
+      activity_at:  null,
       assigned_to:  this.auth.currentUser?.id ?? null,
       direction,
     };
@@ -396,6 +423,25 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
         await firstValueFrom(this.crmApi.createPartnerActivity(context.entityId, data));
       }
 
+      // Auto-upsert do Analizatora Rozmów — tylko gdy notatka niepusta i NIP znany
+      if (note && context.nip) {
+        const nip = context.nip.replace(/\D/g, '');
+        if (nip.length === 10) {
+          this.crmApi.upsertCallNote({
+            nip,
+            company_name:     context.companyName ?? null,
+            city:             context.city ?? null,
+            salesperson:      this.auth.currentUser?.display_name ?? null,
+            salesperson_id:   this.auth.currentUser?.id ?? null,
+            salesperson_name: this.auth.currentUser?.display_name ?? null,
+            note,
+            call_date:        (startedAt ?? new Date()).toISOString().slice(0, 16).replace('T', ' '),
+          }).subscribe({
+            error: e => console.warn('[PBX] Call-analysis upsert failed:', e.status, e.error?.error),
+          });
+        }
+      }
+
       this.pbx.notifyActivitySaved(context);
       this.pbx.clearCall();
     } catch (e) {
@@ -404,5 +450,132 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
       this.saveError = true;
       this.cdr.markForCheck();
     }
+  }
+
+  // ─── Transcription ────────────────────────────────────────────────────────
+
+  private startTranscriptionFetch(call: ActiveCall): void {
+    if ((call.durationSec ?? 0) < 5) {
+      this.transcriptionState = 'unavailable';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.transcriptionState = 'loading';
+    this.cdr.markForCheck();
+
+    const number    = call.number;
+    const startedAt = (call.startedAt ?? new Date()).toISOString();
+    const direction = call.direction;
+
+    console.log('[PBX transcript] starting — direction:', direction, 'callId:', call.callId, 'number:', number, 'duration:', call.durationSec);
+
+    const POLL_INTERVAL = 5_000;
+    const INITIAL_DELAY = 5_000;
+
+    const MAX_404      = 6;      // po 6 kolejnych 404 (~30s) rezygnujemy
+    const POLL_TIMEOUT = 45_000; // timeout całej sesji pollingu
+
+    const pollTranscription = (callId: string, pollDir: 'inbound' | 'outbound' = direction) => {
+      let notFoundCount = 0;
+      return interval(POLL_INTERVAL).pipe(
+        startWith(0),
+        switchMap(() => this.crmApi.getPbxTranscription(callId, pollDir).pipe(
+          tap(() => { notFoundCount = 0; }),
+          tap(d => console.log('[PBX transcript] poll:', d.agent_status, d.client_status)),
+          catchError(e => {
+            if (e.status === 404) {
+              notFoundCount++;
+              console.log('[PBX transcript] 404 —', notFoundCount, '/', MAX_404);
+              if (notFoundCount >= MAX_404) {
+                console.warn('[PBX transcript] transkrypcja niedostępna po', MAX_404, 'próbach 404');
+                throw e; // propaguj → catchError wyżej → 'unavailable'
+              }
+              return of(null);
+            }
+            throw e;
+          }),
+        )),
+        filter((data): data is NonNullable<typeof data> => {
+          if (!data) return false;
+          const done = (s: string) => s === 'finished' || s === 'failed';
+          return done(data.agent_status) && done(data.client_status);
+        }),
+        take(1),
+        timeout(POLL_TIMEOUT),
+      );
+    };
+
+    const findAndPoll = (initialDelay = INITIAL_DELAY, dir: 'inbound' | 'outbound' = direction) =>
+      timer(initialDelay).pipe(
+        switchMap(() => {
+          console.log('[PBX transcript] findPbxCall:', number, 'dir:', dir);
+          return this.crmApi.findPbxCall(number, startedAt, dir).pipe(
+            tap(r  => console.log('[PBX transcript] findPbxCall OK:', r)),
+            tap({ error: e => console.warn('[PBX transcript] findPbxCall error:', e.status, e.error) }),
+            retry({ count: 5, delay: 3_000 }),
+          );
+        }),
+        switchMap(({ call_id }) => {
+          console.log('[PBX transcript] polling call_id:', call_id, 'dir:', dir);
+          return pollTranscription(call_id, dir);
+        }),
+      );
+
+    // Outbound: X-CoreTel-Call-ID (5s) → fallback findPbxCall
+    // Inbound z callId: X-CoreTel-Call-ID z INVITE → fallback findPbxCall
+    // Inbound bez callId: bezpośrednio findPbxCall
+    let source$;
+    if (call.callId) {
+      const callId = call.callId;
+      source$ = timer(INITIAL_DELAY).pipe(
+        tap(() => console.log('[PBX transcript]', direction, '— X-CoreTel-Call-ID:', callId)),
+        switchMap(() => pollTranscription(callId, direction).pipe(
+          catchError(e => {
+            console.warn('[PBX transcript] X-CoreTel-Call-ID failed (', e.status, ') — fallback findPbxCall');
+            return findAndPoll(2_000, direction);
+          }),
+        )),
+      );
+    } else {
+      source$ = findAndPoll();
+    }
+
+    this.transcriptionSub = source$.pipe(
+      take(1),
+      map(data => this.assembleTranscription(data)),
+      catchError(e => { console.error('[PBX transcript] chain error:', e); return of(null); }),
+    ).subscribe(text => {
+      if (text) {
+        // Nie nadpisuj notatki jeśli user już coś wpisał
+        if (!this.noteText.trim()) this.noteText = text;
+        this.transcriptionState = 'loaded';
+      } else {
+        this.transcriptionState = 'unavailable';
+      }
+      this.cdr.markForCheck();
+    });
+  }
+
+  private cancelTranscriptionFetch(): void {
+    this.transcriptionSub?.unsubscribe();
+    this.transcriptionSub = null;
+  }
+
+  private assembleTranscription(data: {
+    agent_segments:  { start: number; end: number; text: string }[];
+    client_segments: { start: number; end: number; text: string }[];
+  }): string {
+    type Seg = { start: number; text: string; speaker: 'agent' | 'client' };
+    const segs: Seg[] = [
+      ...(data.agent_segments  ?? []).map(s => ({ ...s, speaker: 'agent'  as const })),
+      ...(data.client_segments ?? []).map(s => ({ ...s, speaker: 'client' as const })),
+    ].sort((a, b) => a.start - b.start);
+
+    if (!segs.length) return '';
+    const agentLabel = this.auth.currentUser?.display_name ?? 'Handlowiec';
+    return segs.map(s =>
+      `[${s.speaker === 'agent' ? agentLabel : 'Klient'}] ${s.text}`
+    ).join('\n');
   }
 }

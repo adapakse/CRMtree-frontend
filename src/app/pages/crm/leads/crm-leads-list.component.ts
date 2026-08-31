@@ -180,7 +180,9 @@ const PROB_MAP: Record<LeadStage, number> = {
               </span>
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap">
-              <span *ngIf="(lead.non_email_activity_count ?? 0) > 0" style="background:#f3f4f6;color:#374151;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;line-height:16px">🗓 {{lead.non_email_activity_count}}</span>
+              <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
+              <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">💬 {{lead.unread_sms_count}}</span>
+              <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
               <span *ngIf="hasUnreadReply(lead)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
             </div>
             <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
@@ -359,8 +361,12 @@ const PROB_MAP: Record<LeadStage, number> = {
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
           <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span>
-            <span *ngIf="(lead.non_email_activity_count ?? 0) > 0"
-                  style="background:#f3f4f6;color:#374151;font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">🗓 {{lead.non_email_activity_count}}</span>
+            <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
+                  style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
+            <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"
+                  style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">💬 {{lead.unread_sms_count}}</span>
+            <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0"
+                  style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
             <span *ngIf="hasUnreadReply(lead)"
                   style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
           </div>
@@ -431,9 +437,9 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="fg" style="grid-column:1/-1">
           <div>
           <!-- Enrich prompt banner -->
-          <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
+          <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
             <span>🔍 Pobierz dane firmy ze strony?</span>
-            <button style="background:#f97316;color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">Tak, pobierz</button>
+            <button style="background:var(--orange);color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">Tak, pobierz</button>
             <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:11px" (click)="enrichPrompt=false">Nie</button>
           </div>
           <!-- Enrich result badge -->
@@ -473,7 +479,7 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="fg" style="grid-column:1/-1">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <label class="fl" style="margin:0">Dodatkowe kontakty</label>
-            <button type="button" style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addNewExtraContact()">+ Dodaj kontakt</button>
+            <button type="button" style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addNewExtraContact()">+ Dodaj kontakt</button>
           </div>
           @for (ec of newExtraContacts; track $index; let i = $index) {
             <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
@@ -1152,6 +1158,9 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   private api      = inject(CrmApiService);
   private auth     = inject(AuthService);
   private settings = inject(AppSettingsService);
+
+  get hasPbxFeature(): boolean { return this.auth.hasFeature('pbx'); }
+  get hasWhatsappFeature(): boolean { return this.auth.hasFeature('whatsapp'); }
 
   get dictTitles(): string[] {
     try {
