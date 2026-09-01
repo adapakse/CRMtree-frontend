@@ -2093,10 +2093,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (!this.lead) return;
     this.savingActivity = true;
     const payload: any = {
-      title:       this.inlineEditForm.title || a.title,
-      body:        this.inlineEditForm.body || null,
-      activity_at: this.toUtcISO(this.inlineEditForm.activity_at),
-      assigned_to: this.inlineEditForm.assigned_to || null,
+      title:         this.inlineEditForm.title || a.title,
+      body:          this.inlineEditForm.body || null,
+      activity_at:   this.toUtcISO(this.inlineEditForm.activity_at),
+      assigned_to:   this.inlineEditForm.assigned_to || null,
+      reminder_type: this.inlineEditForm.reminder_type || null,
     };
     this.api.updateLeadActivity(this.lead.id, a.id, payload).subscribe({
       next: (updated: any) => this.zone.run(() => {
@@ -4160,6 +4161,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       assigned_to: this.actForm.assigned_to || null,
     };
     if (this.actForm.type === 'task' && this.actForm.priority) payload.priority = this.actForm.priority;
+    if (this.actReminderType) {
+      payload.reminder_type = this.actReminderType;
+      if (this.actReminderType === 'custom' && this.actReminderAt) {
+        payload.reminder_at = new Date(this.actReminderAt).toISOString();
+      }
+    }
     if (this.actForm.type === 'meeting') {
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
@@ -4174,6 +4181,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
             this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
           }
           this.actForm = { type: 'note', title: '', body: '', activity_at: '', assigned_to: '', duration_min: null, meeting_location: '', participantList: [], priority: '' };
+          this.actReminderType = '';
+          this.actReminderAt   = '';
           this.participantQuery = '';
           this.showNewActivity  = false;
           this.savingActivity   = false;
