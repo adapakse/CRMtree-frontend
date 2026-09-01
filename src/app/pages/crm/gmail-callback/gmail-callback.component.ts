@@ -20,7 +20,7 @@ import { CommonModule } from '@angular/common';
         Możesz zamknąć to okno i wrócić do pracy w CRM.
       </div>
       <button (click)="close()"
-              style="background:#f97316;color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:600;cursor:pointer">
+              style="background:var(--orange);color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:600;cursor:pointer">
         Zamknij okno
       </button>
     </ng-container>

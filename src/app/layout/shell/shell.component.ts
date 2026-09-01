@@ -6,11 +6,13 @@ import { AuthService } from '../../core/auth/auth.service';
 import { WorkflowService } from '../../core/services/api.services';
 import { AvatarComponent } from '../../shared/components/badges.components';
 import { initials } from '../../core/services/helpers';
+import { PbxService } from '../../core/services/pbx.service';
+import { SoftphoneOverlayComponent } from '../../shared/components/softphone/softphone-overlay.component';
 
 @Component({
   selector: 'wt-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, AvatarComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, AvatarComponent, SoftphoneOverlayComponent],
   template: `
     <div class="app-wrap">
 
@@ -107,6 +109,14 @@ import { initials } from '../../core/services/helpers';
                     <span class="nav-tip">Dashboard Prospekty</span>
                   </a>
                 }
+              }
+
+              @if (auth.hasFeature('call_analysis')) {
+                <a class="nav-item" routerLink="/admin/call-analysis" routerLinkActive="active">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <span class="nav-label">Analiza rozmów</span>
+                  <span class="nav-tip">Analiza rozmów</span>
+                </a>
               }
             </div>
 
@@ -251,6 +261,7 @@ import { initials } from '../../core/services/helpers';
         <router-outlet />
       </main>
     </div>
+    <app-softphone-overlay *ngIf="auth.hasFeature('pbx')" />
   `,
   styles: [`
     /* ── Layout ─────────────────────────────────────────────────────── */
@@ -456,6 +467,7 @@ import { initials } from '../../core/services/helpers';
 })
 export class ShellComponent implements OnInit {
   auth = inject(AuthService);
+  private pbx = inject(PbxService);
 
   isSalesManager = computed(() => (this.auth.user() as any)?.crm_role === 'sales_manager');
   private wf     = inject(WorkflowService);
@@ -492,6 +504,7 @@ export class ShellComponent implements OnInit {
   ngOnInit(): void {
     this.collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     this.refreshTaskBadge();
+    if (this.auth.hasFeature('pbx')) void this.pbx.autoConnect();
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe(() => {

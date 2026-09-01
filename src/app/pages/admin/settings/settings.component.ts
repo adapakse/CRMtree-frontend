@@ -760,7 +760,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                             </td>
                             <td style="padding:6px 10px">
                               @if (tpl.step === 0) {
-                                <span style="font-size:11px;color:#f97316;font-style:italic">← handlowiec leada</span>
+                                <span style="font-size:11px;color:var(--orange);font-style:italic">← handlowiec leada</span>
                               } @else {
                                 <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
                                         [ngModel]="tpl.assignee"
@@ -942,7 +942,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
     #content { flex:1;overflow-y:auto;padding:24px; }
     .tabs { display:flex;gap:4px;margin-bottom:24px;border-bottom:2px solid var(--gray-200);padding-bottom:0; }
     .tab-btn { background:none;border:none;padding:10px 20px;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s; }
-    .tab-btn.active { color:#f97316;border-bottom-color:#f97316; }
+    .tab-btn.active { color:var(--orange);border-bottom-color:var(--orange); }
     .tab-btn:hover:not(.active) { color:var(--gray-700); }
     .cat-header { padding:14px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px; }
     .cat-title { font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900); }

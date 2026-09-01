@@ -136,7 +136,6 @@ export interface SeoCalendarWeek {
 export interface TenantSettings {
   business_description: string | null;
   industry_vertical: string | null;
-  seo_gsc_site_url: string | null;
 }
 
 export interface TenantSettingsResponse extends TenantSettings {
@@ -203,7 +202,19 @@ export class CrmSeoService {
     return this.http.get<SeoAuthor[]>(`${this.api}/authors`);
   }
 
-  addAuthor(author: Pick<SeoAuthor, 'full_name' | 'job_title' | 'bio' | 'photo_url' | 'linkedin_url'>): Observable<SeoAuthor> {
+  addAuthor(
+    author: Pick<SeoAuthor, 'full_name' | 'job_title' | 'bio' | 'photo_url' | 'linkedin_url'>,
+    file?: File | null,
+  ): Observable<SeoAuthor> {
+    if (file) {
+      const fd = new FormData();
+      fd.append('full_name', author.full_name);
+      if (author.job_title)    fd.append('job_title', author.job_title);
+      if (author.bio)          fd.append('bio', author.bio);
+      if (author.linkedin_url) fd.append('linkedin_url', author.linkedin_url);
+      fd.append('file', file);
+      return this.http.post<SeoAuthor>(`${this.api}/authors`, fd);
+    }
     return this.http.post<SeoAuthor>(`${this.api}/authors`, author);
   }
 
@@ -213,6 +224,21 @@ export class CrmSeoService {
 
   deleteAuthor(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/authors/${id}`);
+  }
+
+  uploadAuthorPhoto(id: number, file: File): Observable<SeoAuthor> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<SeoAuthor>(`${this.api}/authors/${id}/photo`, formData);
+  }
+
+  /** Resolves an author's photo into a directly-usable <img> src — photo_url
+   * may be a real external URL (pasted before upload existed) or an Azure
+   * blob path (uploaded), which needs routing through the streaming endpoint. */
+  authorPhotoSrc(a: Pick<SeoAuthor, 'id' | 'photo_url'>): string | null {
+    if (!a.photo_url) return null;
+    if (/^https?:\/\//i.test(a.photo_url)) return a.photo_url;
+    return `${this.api}/authors/${a.id}/photo-img`;
   }
 
   gscStatus(): Observable<GscStatus> {

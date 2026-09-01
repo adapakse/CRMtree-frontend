@@ -4,17 +4,18 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize, catchError, map } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
   LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
-  GmailSendResult, ConsentValue, EmailStatus, GmailThreadResponse, WhatsappHistoryEntry,
+  GmailSendResult, ConsentValue, EmailStatus, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
+import { PbxService } from '../../../core/services/pbx.service';
 import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
@@ -47,7 +48,7 @@ interface WhatsappConvUiState {
 
   <!-- HEADER -->
   <div style="height:56px;background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0">
-    <button style="background:none;border:none;color:#f97316;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
+    <button style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
     <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
       <div *ngIf="lead.logo_url && logoSasUrl" style="width:34px;height:34px;border-radius:50%;background-size:cover;background-position:center;border:1px solid #e5e7eb;flex-shrink:0;background-color:#f9fafb"
            [style.background-image]="logoSasUrl"></div>
@@ -134,7 +135,7 @@ interface WhatsappConvUiState {
 
       <!-- Agent -->
       <div class="info-section" *ngIf="lead.agent_name || lead.agent_email || lead.agent_phone">
-        <div class="info-section-title" style="color:#f97316">🤝 Agent</div>
+        <div class="info-section-title" style="color:var(--orange)">🤝 Agent</div>
         <div class="info-kv" *ngIf="lead.agent_name"><span class="lbl">Imię i nazwisko</span><span class="val fw">{{lead.agent_name}}</span></div>
         <div class="info-kv" *ngIf="lead.agent_email">
           <span class="lbl">Email</span>
@@ -280,12 +281,13 @@ interface WhatsappConvUiState {
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
+        <button class="tab-btn" *ngIf="hasPbxFeature" [class.active]="midTab==='sms'" (click)="openSmsTab()">SMS</button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
         <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
       </div>
 
       <!-- Aktywności tabs (all/tasks/notes/calls/meetings) -->
-      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
@@ -392,6 +394,7 @@ interface WhatsappConvUiState {
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
+              <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">utworzono {{a.created_at|date:'dd.MM.yyyy HH:mm'}}</span>
             </div>
             <div style="font-size:12.5px;font-weight:600;color:#111827;margin-bottom:2px">{{a.title}}</div>
             <div class="act-meta" style="margin-bottom:4px">
@@ -421,7 +424,7 @@ interface WhatsappConvUiState {
                   Data i godzina
                   <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
                 </label>
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label *ngIf="a.type!=='note'" style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   Przypomnienie
                   <select [(ngModel)]="inlineEditForm.reminder_type" class="act-input" style="font-size:11px">
                     <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
@@ -451,10 +454,6 @@ interface WhatsappConvUiState {
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
           <ng-container *ngIf="settings.settings().crm_training_mode">
             <button class="btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
-          </ng-container>
-          <ng-container *ngIf="!settings.settings().crm_training_mode && emailConnected">
-            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
-            <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
           </ng-container>
           <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ Łączenie z Google…' : '+ Nowy email'}}</button>
         </div>
@@ -640,11 +639,6 @@ interface WhatsappConvUiState {
 
       <!-- WhatsApp tab -->
       <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
-        <div *ngIf="whatsappConfigured===true" style="display:flex;justify-content:flex-end;gap:6px">
-          <button class="btn-sm" [disabled]="whatsappHistoryLoading" (click)="loadWhatsappHistory()" title="Odśwież historię WhatsApp — odbiór przez webhook nie zawsze jest natychmiastowy">
-            {{ whatsappHistoryLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
-          </button>
-        </div>
 
         <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
 
@@ -753,6 +747,61 @@ interface WhatsappConvUiState {
         </ng-container>
       </div>
 
+      <!-- SMS tab -->
+      <div *ngIf="midTab==='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+
+        <div *ngIf="smsThreadError" style="font-size:13px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
+          ⚠️ {{smsThreadError}}
+        </div>
+
+        <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie…</div>
+        <div *ngIf="!smsLoading && !smsThreadError && smsConversations.length===0" class="empty-act">Brak numerów telefonu do SMS-a.</div>
+
+        <div *ngFor="let conv of smsConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white;overflow:hidden"
+             [style.border-left]="getSmsConvState(conv.number).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer"
+               [style.background]="getSmsConvState(conv.number).expanded ? '#eff6ff' : 'white'"
+               (click)="toggleSmsConvExpanded(conv.number)">
+            <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
+              <strong style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="conv.messages.length">
+                ostatnia: {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
+              </span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="!conv.messages.length">Brak wiadomości</span>
+            </div>
+            <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getSmsConvState(conv.number).expanded ? '▲' : '▾'}}</span>
+          </div>
+
+          <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid #e5e7eb;display:flex;flex-direction:column">
+            <div [id]="'sms-scroll-lead-' + smsDomId(conv.number)" style="max-height:360px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f9fafb">
+              <div *ngIf="!conv.messages.length" style="font-size:12px;color:#9ca3af;text-align:center;padding:12px 0">Brak wiadomości — napisz pierwszą poniżej.</div>
+              <div *ngFor="let m of conv.messages" style="display:flex" [style.justify-content]="m.direction==='outbound' ? 'flex-end' : 'flex-start'">
+                <div [style.background]="m.direction==='outbound' ? '#3BAA5D' : 'white'"
+                     [style.color]="m.direction==='outbound' ? 'white' : '#111827'"
+                     [style.border]="m.direction==='outbound' ? 'none' : '1px solid #e5e7eb'"
+                     style="max-width:75%;border-radius:12px;padding:8px 12px;font-size:13px;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,.06)">
+                  <div>{{m.body}}</div>
+                  <div style="font-size:10px;opacity:.75;margin-top:4px;text-align:right">
+                    {{m.created_at | date:'HH:mm'}} · {{smsStatusLabel(m.status)}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="position:sticky;bottom:0;background:white;border-top:1px solid #e5e7eb;padding:10px;display:flex;gap:8px;align-items:flex-end">
+              <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
+                        (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
+                        rows="1" style="flex:1;resize:none;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit"
+                        placeholder="Wiadomość…" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
+              <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
+                      (click)="sendSmsToConv(conv)">
+                {{ getSmsConvState(conv.number).sending ? '⏳' : 'Wyślij' }}
+              </button>
+            </div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:#ef4444;font-size:11px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- PRAWA: Mock call/email + Konwertuj info -->
@@ -776,10 +825,6 @@ interface WhatsappConvUiState {
           </div>
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
-        <div *ngIf="mockCallActive" style="margin-top:8px;background:#dcfce7;border-radius:6px;padding:8px;font-size:11px;color:#15803d;text-align:center">
-          🔔 Symulacja połączenia z {{lead.phone}}…
-          <button (click)="mockCallActive=false" style="background:none;border:none;cursor:pointer;color:#15803d;margin-left:8px;font-weight:700">Rozłącz</button>
-        </div>
       </div>
 
       <!-- Powiązane dokumenty -->
@@ -817,9 +862,9 @@ interface WhatsappConvUiState {
       </div>
 
       <!-- Onboarding -->
-      <div *ngIf="!lead.converted_at && canEdit" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c2410c;margin-bottom:8px">🚀 Rozpocznij onboarding</div>
-        <div style="font-size:12px;color:#9a3412;margin-bottom:10px">Podaj wartość kontraktu i datę podpisania umowy, aby przenieść leada do procesu wdrożenia.</div>
+      <div *ngIf="!lead.converted_at && canEdit" style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange-dark);margin-bottom:8px">🚀 Rozpocznij onboarding</div>
+        <div style="font-size:12px;color:var(--orange-dark);margin-bottom:10px">Podaj wartość kontraktu i datę podpisania umowy, aby przenieść leada do procesu wdrożenia.</div>
         <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">🚀 Rozpocznij onboarding →</button>
       </div>
       <div *ngIf="lead.converted_at && lead.stage==='onboarding'" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px">
@@ -1090,7 +1135,7 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
           <span>Dodatkowe kontakty</span>
-          <button style="background:none;border:1px solid #fed7aa;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:#f97316" (click)="addExtraContact()">+ Dodaj kontakt</button>
+          <button style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ Dodaj kontakt</button>
         </div>
         @for (ec of extraContacts; track $index; let i = $index) {
           <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
@@ -1139,8 +1184,8 @@ interface WhatsappConvUiState {
           <label>Branża<select [(ngModel)]="editForm.industry"><option value="">— brak —</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select></label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
-          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#f97316">🤝 Dane Agenta</div>
+          <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange)">🤝 Dane Agenta</div>
             <div class="edit-row">
               <label>Imię i nazwisko<input [(ngModel)]="editForm.agent_name" placeholder="Jan Kowalski"></label>
               <label>Telefon<input [(ngModel)]="editForm.agent_phone" placeholder="+48 600 000 000"></label>
@@ -1407,7 +1452,7 @@ interface WhatsappConvUiState {
       <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
       <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
       <span style="flex:1"></span>
-      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
+      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:var(--orange-pale);border:1px solid var(--orange-muted);color:var(--orange-dark);border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
       <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
     </div>
     <!-- Widok -->
@@ -1494,7 +1539,7 @@ interface WhatsappConvUiState {
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
         <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
-        <button style="background:#f97316;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
+        <button style="background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
       </div>
     </div>
   </div>
@@ -1515,8 +1560,8 @@ interface WhatsappConvUiState {
     .hdr-btn:hover { background:#f9fafb; }
     .hdr-btn:disabled { opacity:.45; cursor:not-allowed; pointer-events:auto; }
     .hdr-btn-edit { border-color:#d1d5db; }
-    .hdr-btn-primary { background:#f97316; color:white; border-color:#f97316; }
-    .hdr-btn-primary:hover { background:#ea6a0a; }
+    .hdr-btn-primary { background:var(--orange); color:white; border-color:var(--orange); }
+    .hdr-btn-primary:hover { background:var(--orange-dark); }
     .hdr-btn-test { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
     .hdr-btn-test:hover { background:#dbeafe; }
     .ta-badge-ok { background:#16a34a; color:white; border-radius:10px; font-size:9px; font-weight:700; padding:0 5px; line-height:15px; display:inline-block; margin-left:2px; }
@@ -1538,7 +1583,7 @@ interface WhatsappConvUiState {
     .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; min-width:72px; padding-top:1px; }
     .val { color:#374151; flex:1; }
     .val.fw { font-weight:600; color:#18181b; }
-    .link { color:#f97316; text-decoration:none; }
+    .link { color:var(--orange); text-decoration:none; }
     .link:hover { text-decoration:underline; }
     .tab-btn { background:none; border:none; border-bottom:2px solid transparent; padding:10px 14px; font-size:12.5px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; border-radius:6px 6px 0 0; transition:all .15s; }
     .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
@@ -1549,8 +1594,8 @@ interface WhatsappConvUiState {
     .stage-negotiation{background:#ffedd5;color:#9a3412} .stage-closed_won{background:#dcfce7;color:#166534}
     .stage-closed_lost{background:#fee2e2;color:#991b1b}
     .stage-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:7px; background:white; font-size:12px; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
-    .stage-btn:hover:not(:disabled) { background:#fff7ed; border-color:#f97316; }
-    .stage-btn.active { background:#fff7ed; border-color:#f97316; color:#9a3412; font-weight:600; }
+    .stage-btn:hover:not(:disabled) { background:var(--orange-pale); border-color:var(--orange); }
+    .stage-btn.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:600; }
     .stage-btn:disabled { cursor:default; }
     .stage-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
     .stage-dot-new{background:#94a3b8} .stage-dot-qualification{background:#f59e0b} .stage-dot-presentation{background:#3b82f6}
@@ -1644,9 +1689,9 @@ interface WhatsappConvUiState {
     .edit-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .edit-row label.full { grid-column:1/-1; }
     .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
-    .edit-row label input:focus, .edit-row label select:focus { border-color:#f97316; }
+    .edit-row label input:focus, .edit-row label select:focus { border-color:var(--orange); }
     .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
-    .btn-primary { background:#f97316; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
     .btn-primary:disabled { opacity:.6; }
     .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
     .check-label { flex-direction:row !important; align-items:center; gap:8px !important; font-size:13px !important; font-weight:400 !important; cursor:pointer; }
@@ -1675,10 +1720,10 @@ interface WhatsappConvUiState {
 })
 export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private emailPollInterval: any = null;
+  private smsPollInterval: any = null;
+  private whatsappPollInterval: any = null;
   private emailOauthSub: Subscription | null = null;
   debugProcessing = false;
-  syncingAll  = false;
-  syncResult  = '';
   showReplyDetails       = false;
 
   // Whichever provider's OAuth callback page reports back here is, by
@@ -1708,6 +1753,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private emailOauthListener = inject(EmailOauthListenerService);
   protected settings = inject(AppSettingsService);
+  private pbx = inject(PbxService);
   logoSasUrl       = '';
 
   // Słowniki z app_settings
@@ -2047,10 +2093,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (!this.lead) return;
     this.savingActivity = true;
     const payload: any = {
-      title:       this.inlineEditForm.title || a.title,
-      body:        this.inlineEditForm.body || null,
-      activity_at: this.toUtcISO(this.inlineEditForm.activity_at),
-      assigned_to: this.inlineEditForm.assigned_to || null,
+      title:         this.inlineEditForm.title || a.title,
+      body:          this.inlineEditForm.body || null,
+      activity_at:   this.toUtcISO(this.inlineEditForm.activity_at),
+      assigned_to:   this.inlineEditForm.assigned_to || null,
+      reminder_type: this.inlineEditForm.reminder_type || null,
     };
     this.api.updateLeadActivity(this.lead.id, a.id, payload).subscribe({
       next: (updated: any) => this.zone.run(() => {
@@ -2186,7 +2233,96 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   toggleLeftPanel(): void { this.leftCollapsed = !this.leftCollapsed; this.cdr.markForCheck(); }
 
   // Historia
-  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'calls' | 'meetings' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'sms' | 'calls' | 'meetings' = 'all';
+
+  // ── SMS — same PBX account/PAT as telephony. Local log, synced on demand
+  // (no webhook from ip-pbx.eu for incoming SMS) — grouped into one
+  // conversation per known number, like WhatsApp's groupWhatsappConversations().
+  get hasPbxFeature(): boolean { return this.auth.hasFeature('pbx'); }
+  formatPhoneDisplay = formatPhoneDisplay;
+  smsConversations: SmsConversation[] = [];
+  smsLoading = false;
+  smsThreadError: string | null = null;
+  private smsConvState = new Map<string, { expanded: boolean; replyMessage: string; sending: boolean; error: string | null }>();
+
+  openSmsTab(): void {
+    this.midTab = 'sms';
+    this.loadSmsThread();
+    // No live push from ip-pbx.eu for incoming SMS — poll while this lead is
+    // open so an active conversation doesn't require a manual refresh.
+    if (!this.smsPollInterval) this.smsPollInterval = setInterval(() => this.loadSmsThread(), 30_000);
+  }
+
+  loadSmsThread(): void {
+    if (!this.lead) return;
+    this.smsLoading = true;
+    this.smsThreadError = null;
+    this.api.getSmsThreadLead(this.lead.id).subscribe({
+      next: r => this.zone.run(() => {
+        this.smsConversations = r.conversations;
+        this.smsLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.smsLoading = false;
+        this.smsThreadError = err?.error?.error || 'Błąd pobierania SMS-ów';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  getSmsConvState(number: string) {
+    let s = this.smsConvState.get(number);
+    if (!s) { s = { expanded: false, replyMessage: '', sending: false, error: null }; this.smsConvState.set(number, s); }
+    return s;
+  }
+
+  toggleSmsConvExpanded(number: string): void {
+    const s = this.getSmsConvState(number);
+    s.expanded = !s.expanded;
+    if (s.expanded) setTimeout(() => this.scrollSmsToBottom('lead', number), 0);
+    this.cdr.markForCheck();
+  }
+
+  setSmsConvReplyMessage(number: string, val: string): void {
+    this.getSmsConvState(number).replyMessage = val;
+  }
+
+  smsStatusLabel(status: string): string {
+    const map: Record<string, string> = { sent: 'Wysłano', delivered: 'Dostarczono', received: 'Odebrano', failed: 'Błąd', error: 'Błąd' };
+    return map[status] || status;
+  }
+
+  smsDomId(number: string): string {
+    return number.replace(/[^0-9]/g, '');
+  }
+
+  private scrollSmsToBottom(entity: 'lead' | 'partner', number: string): void {
+    const el = document.getElementById(`sms-scroll-${entity}-${this.smsDomId(number)}`);
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  sendSmsToConv(conv: SmsConversation): void {
+    const state = this.getSmsConvState(conv.number);
+    if (!this.lead || !state.replyMessage.trim() || state.sending) return;
+    state.sending = true;
+    state.error = null;
+    this.cdr.markForCheck();
+    this.api.sendLeadSms(this.lead.id, state.replyMessage.trim(), conv.number).subscribe({
+      next: msg => this.zone.run(() => {
+        conv.messages.push(msg);
+        state.replyMessage = '';
+        state.sending = false;
+        this.cdr.markForCheck();
+        setTimeout(() => this.scrollSmsToBottom('lead', conv.number), 0);
+      }),
+      error: (err: any) => this.zone.run(() => {
+        state.sending = false;
+        state.error = err?.error?.error || 'Błąd wysyłki SMS';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
 
   // WhatsApp tab — status reflects the tenant's one shared WhatsApp Business
   // number (tenant_whatsapp_config), configured by a super admin. Same value
@@ -2334,8 +2470,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   historySearch = '';
   private historyLoaded = false;
 
-  // Mock komunikacja
-  mockCallActive      = false;
+  // Symulator (tryb szkoleniowy)
   phoneSimulatorActive = false;
 
   // ── Email — tenant chooses the active provider; each user connects their
@@ -2449,6 +2584,22 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   trackEmailActivity(_: number, a: any): any { return a.gmail_thread_id || a.id; }
   trackActivity(_: number, a: any): number { return a.id; }
 
+  private markActivityRead(activityId: number): void {
+    const act = (this.lead?.activities || []).find((a: any) => a.id === activityId);
+    if (act && !act.is_read) { act.is_read = true; this.cdr.markForCheck(); }
+  }
+
+  private markThreadRead(threadId: string): void {
+    let changed = false;
+    for (const act of (this.lead?.activities || [])) {
+      if (act.type === 'email' && act.gmail_thread_id === threadId && !act.is_read) {
+        act.is_read = true;
+        changed = true;
+      }
+    }
+    if (changed) this.cdr.markForCheck();
+  }
+
   private _safeHtmlCache = new Map<string, SafeHtml>();
   safeHtml(html: string): SafeHtml {
     const key = html || '';
@@ -2516,7 +2667,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emailOauthSub?.unsubscribe();
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
   }
 
   loadLead(numId?: number) {
@@ -2525,7 +2678,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.loadError = false;
     this.lead = null;
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
     this.api.getLead(id).pipe(
       finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
     ).subscribe({
@@ -2578,6 +2733,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       });
     }
     this.loadWhatsappHistory();
+    // Webhook delivery isn't guaranteed instant — poll while this lead is
+    // open so an active conversation doesn't require a manual refresh.
+    if (!this.whatsappPollInterval) this.whatsappPollInterval = setInterval(() => this.loadWhatsappHistory(), 30_000);
   }
 
   loadWhatsappHistory(): void {
@@ -2640,31 +2798,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       error: (e: any) => this.zone.run(() => {
         this.debugProcessing = false;
         alert('Błąd: ' + (e.error?.error || e.message));
-        this.cdr.markForCheck();
-      }),
-    });
-  }
-
-  checkNewEmails(): void {
-    if (this.syncingAll || !this.emailConnected) return;
-    this.syncingAll = true;
-    this.syncResult = '';
-    this.cdr.markForCheck();
-
-    this.api.debugProcessEmail().pipe(
-      map((r: any) => r?.recovered
-        ? `${this.emailProviderLabel}: odzyskano synchronizację, ${r?.newMessages_found ?? 0}`
-        : `${this.emailProviderLabel}: ${r?.newMessages_found ?? 0}`),
-      catchError(() => of(`${this.emailProviderLabel}: błąd synchronizacji`)),
-    ).subscribe({
-      next: label => this.zone.run(() => {
-        this.syncResult = label;
-        this.syncingAll = false;
-        this.refreshEmailActivities();
-        this.cdr.markForCheck();
-      }),
-      error: () => this.zone.run(() => {
-        this.syncingAll = false;
         this.cdr.markForCheck();
       }),
     });
@@ -3077,8 +3210,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.threadOwnerEmail = res.ownerEmail;
         this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
         this.loadingThread = false;
-        const act = (this.lead?.activities || []).find((a: any) => a.gmail_thread_id === threadId && a.type === 'email');
-        if (act && !act.is_read) act.is_read = true;
+        this.markThreadRead(threadId);
         this.cdr.markForCheck();
       }),
       error: () => this.zone.run(() => {
@@ -3192,8 +3324,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.threadMessages  = [];
     this.loadingThread   = false;
     this.cdr.markForCheck();
-    if (!a.is_read) {
-      a.is_read = true;
+    if (!a.is_read && !a.gmail_thread_id) {
+      this.markActivityRead(a.id);
       this.api.patchLeadActivityRead(this.lead.id, a.id, true).subscribe({ error: () => {} });
     }
     if (a.gmail_thread_id && !this.settings.settings().crm_training_mode) {
@@ -4029,6 +4161,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       assigned_to: this.actForm.assigned_to || null,
     };
     if (this.actForm.type === 'task' && this.actForm.priority) payload.priority = this.actForm.priority;
+    if (this.actReminderType) {
+      payload.reminder_type = this.actReminderType;
+      if (this.actReminderType === 'custom' && this.actReminderAt) {
+        payload.reminder_at = new Date(this.actReminderAt).toISOString();
+      }
+    }
     if (this.actForm.type === 'meeting') {
       if (this.actForm.duration_min) payload.duration_min = +this.actForm.duration_min;
       payload.meeting_location = this.actForm.meeting_location || null;
@@ -4043,6 +4181,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
             this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
           }
           this.actForm = { type: 'note', title: '', body: '', activity_at: '', assigned_to: '', duration_min: null, meeting_location: '', participantList: [], priority: '' };
+          this.actReminderType = '';
+          this.actReminderAt   = '';
           this.participantQuery = '';
           this.showNewActivity  = false;
           this.savingActivity   = false;
@@ -4190,9 +4330,19 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
       return;
     }
-    this.mockCallActive = true;
-    this.cdr.markForCheck();
-    setTimeout(() => { this.mockCallActive = false; this.cdr.markForCheck(); }, 5000);
+    const phones: { label: string; number: string }[] = [];
+    if (this.lead.phone) phones.push({ label: `Główny: ${this.lead.phone}`, number: this.lead.phone });
+    this.lead.extra_contacts?.forEach(ec => {
+      if (ec.phone) phones.push({ label: `${ec.contact_name || 'Kontakt'}: ${ec.phone}`, number: ec.phone });
+    });
+    if (!phones.length) return;
+    this.pbx.initiate(phones[0].number, {
+      entityType:  'lead',
+      entityId:    this.lead.id,
+      nip:         this.lead.nip ?? null,
+      companyName: this.lead.company ?? null,
+      city:        null,
+    }, phones.length > 1 ? phones : undefined);
   }
 
   onPhoneSimulatorClosed(): void {

@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser, CrmGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 type ViewMode = 'month' | 'week' | 'day' | 'tasks';
 
@@ -495,6 +496,7 @@ export class CrmCalendarComponent implements OnInit {
   private auth = inject(AuthService);
   private cdr  = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
+  private toast = inject(ToastService);
 
   loading  = false;
   saving   = false;
@@ -689,7 +691,11 @@ export class CrmCalendarComponent implements OnInit {
         if (!silent) { this.expandedTaskKey = null; this.saving = false; }
         this.cdr.markForCheck();
       }),
-      error: () => this.zone.run(() => { if (!silent) this.saving = false; this.cdr.markForCheck(); }),
+      error: () => this.zone.run(() => {
+        if (!silent) this.saving = false;
+        this.toast.error('Nie udało się zapisać zmian w zadaniu');
+        this.cdr.markForCheck();
+      }),
     });
   }
 

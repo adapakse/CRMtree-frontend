@@ -1,4 +1,4 @@
-import { Component, inject, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentService } from '@core/services/document.service';
@@ -69,28 +69,12 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             <!-- Owner -->
             <div class="fg">
               <label class="fl">Właściciel</label>
-              <div style="position:relative">
-                <input class="fi" style="width:100%;box-sizing:border-box"
-                       placeholder="Szukaj po imieniu lub emailu…"
-                       [(ngModel)]="ownerSearch"
-                       (ngModelChange)="onOwnerSearch($event)"
-                       (focus)="onOwnerFocus()"
-                       (blur)="hideOwnerDropdown()">
-                @if (ownerDropdown().length > 0) {
-                  <div style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px">
-                    @for (u of ownerDropdown(); track u.id) {
-                      <div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--gray-100)"
-                           (mousedown)="selectOwner(u)">
-                        <div style="font-weight:500;font-size:13px">{{ u.display_name }}</div>
-                        <div style="font-size:11px;color:var(--gray-400)">{{ u.email }}</div>
-                      </div>
-                    }
-                  </div>
+              <select class="fsel" [(ngModel)]="ownerId">
+                <option value="">— nieprzypisany —</option>
+                @for (u of users(); track u.id) {
+                  <option [value]="u.id">{{ u.display_name }}</option>
                 }
-                @if (ownerId) {
-                  <div style="font-size:11px;color:#3BAA5D;margin-top:3px;font-weight:500">✓ {{ ownerSearch }}</div>
-                }
-              </div>
+              </select>
             </div>
 
             <div class="fg">
@@ -117,7 +101,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             </div>
 
             <div class="fg">
-              <label class="fl">Entity 1 <span class="req">*</span></label>
+              <label class="fl">Podmiot 1 <span class="req">*</span></label>
               @if (entity1Options.length > 0) {
                 <select class="fsel" [(ngModel)]="entity1">
                   <option value="">— Wybierz podmiot —</option>
@@ -130,7 +114,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
               }
             </div>
             <div class="fg">
-              <label class="fl">Entity 2</label>
+              <label class="fl">Podmiot 2</label>
               <input class="fi" placeholder="np. Partner Ltd." [(ngModel)]="entity2">
             </div>
             <div class="fg">
@@ -218,7 +202,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
     .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 10px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
   `],
 })
-export class NewDocumentPanelComponent {
+export class NewDocumentPanelComponent implements OnInit {
   @Input() groups: GroupProfile[] = [];
   @Output() close   = new EventEmitter<void>();
   @Output() created = new EventEmitter<Document>();
@@ -299,10 +283,12 @@ export class NewDocumentPanelComponent {
   selectedFile: File | null = null;
   entity1 = '';
   entity2 = '';
-  ownerSearch  = '';
   ownerId      = '';
-  ownerDropdown = signal<any[]>([]);
-  private ownerSearchTimer: ReturnType<typeof setTimeout> | null = null;
+  users = signal<any[]>([]);
+
+  ngOnInit(): void {
+    this.crmApi.getCrmUsers().subscribe(users => this.users.set(users));
+  }
 
   form: {
     name: string; doc_type: DocType | ''; gdpr_type: GdprType | '';
@@ -337,36 +323,6 @@ export class NewDocumentPanelComponent {
 
   addTag(): void    { this.form.tags.push({ key: '', value: '' }); }
   removeTag(i: number): void { this.form.tags.splice(i, 1); }
-
-  onOwnerFocus(): void {
-    if (!this.ownerSearch && this.ownerDropdown().length === 0) {
-      this.crmApi.getCrmUsers().subscribe(users => this.ownerDropdown.set(users.slice(0, 20)));
-    }
-  }
-
-  onOwnerSearch(q: string): void {
-    this.ownerId = '';
-    if (!q || q.length < 2) { this.ownerDropdown.set([]); return; }
-    if (this.ownerSearchTimer) clearTimeout(this.ownerSearchTimer);
-    this.ownerSearchTimer = setTimeout(() => {
-      this.crmApi.getCrmUsers().subscribe(users => {
-        const lower = q.toLowerCase();
-        this.ownerDropdown.set(users.filter(u =>
-          u.display_name.toLowerCase().includes(lower) || u.email.toLowerCase().includes(lower)
-        ).slice(0, 10));
-      });
-    }, 300);
-  }
-
-  selectOwner(u: any): void {
-    this.ownerSearch = u.display_name;
-    this.ownerId     = u.id;
-    this.ownerDropdown.set([]);
-  }
-
-  hideOwnerDropdown(): void {
-    setTimeout(() => this.ownerDropdown.set([]), 200);
-  }
 
   onFileChange(e: Event): void {
     this.selectedFile = (e.target as HTMLInputElement).files?.[0] ?? null;
@@ -405,7 +361,7 @@ export class NewDocumentPanelComponent {
       file:             this.selectedFile ?? undefined,
     }).subscribe({
       next: doc => { this.saving.set(false); this.created.emit(doc); },
-      error: () => { this.saving.set(false); this.toast.error('Failed to create document'); },
+      error: () => { this.saving.set(false); this.toast.error('Nie udało się utworzyć dokumentu'); },
     });
   }
 }

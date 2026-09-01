@@ -22,6 +22,8 @@ export interface AppSettings {
   roles_preview_count:            number;
   lead_attachments_folder_url:    string;
   crm_training_mode:              boolean;
+  'prospect.icp_blacklist_keywords': string;   // JSON array of strings (value_type 'json' — GET zwraca surowy string)
+  'prospect.icp_blacklist_penalty':  number;
   [key: string]: number | boolean | string;
 }
 
@@ -33,6 +35,8 @@ const DEFAULTS: AppSettings = {
   roles_preview_count:            3,
   lead_attachments_folder_url:    '',
   crm_training_mode:              false,
+  'prospect.icp_blacklist_keywords': '["hurtow","sprzedaż hurtowa","handel hurtowy","dystrybucja hurtowa"]',
+  'prospect.icp_blacklist_penalty':  15,
 };
 
 @Injectable({ providedIn: 'root' })

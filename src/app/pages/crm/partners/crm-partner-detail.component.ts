@@ -4,9 +4,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize, catchError, map } from 'rxjs/operators';
+import { finalize, catchError } from 'rxjs/operators';
 import { forkJoin, of, Subscription } from 'rxjs';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
@@ -15,6 +15,7 @@ import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
+import { PbxService } from '../../../core/services/pbx.service';
 import { QuillModule } from 'ngx-quill';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
@@ -65,6 +66,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           [title]="churnBadgeTitle(partner)">
       🔥 Churn: {{churnLabel(partner.churn_risk)}}
     </span>
+    <button class="btn-outline" *ngIf="partner.phone || partner.billing_phone || partner.agent_phone"
+            (click)="makePartnerCall()" title="Zadzwoń">📞</button>
     <button class="btn-outline" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj partnera' : 'Brak uprawnień do edycji tego partnera'">✏️ Edytuj</button>
   </div>
 
@@ -415,12 +418,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
+        <button class="tab-btn" *ngIf="hasPbxFeature" [class.active]="midTab==='sms'" (click)="openSmsTab()" style="justify-content:center">SMS</button>
         <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
         <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
-      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:flex-end">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
@@ -546,6 +550,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
+              <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">utworzono {{a.created_at|date:'dd.MM.yyyy HH:mm'}}</span>
             </div>
             <div class="act-card-title">{{a.title}}</div>
             <div class="act-meta">
@@ -631,10 +636,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- ── Tab: Maile ──────────────────────────────────────────────────── -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
-          <ng-container *ngIf="emailConnected">
-            <button class="btn-sm" (click)="checkNewEmails()" [disabled]="syncingAll" title="Sprawdź nowe emaile">{{syncingAll ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe'}}</button>
-            <span *ngIf="syncResult" style="font-size:11px;color:#6b7280;align-self:center">{{syncResult}}</span>
-          </ng-container>
           <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ Łączenie z Google…' : '+ Nowy email'}}</button>
         </div>
 
@@ -816,11 +817,6 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
       <!-- WhatsApp tab -->
       <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
-        <div *ngIf="whatsappConfigured===true" style="display:flex;justify-content:flex-end;gap:6px">
-          <button class="btn-sm" [disabled]="whatsappHistoryLoading" (click)="loadWhatsappHistory()" title="Odśwież historię WhatsApp — odbiór przez webhook nie zawsze jest natychmiastowy">
-            {{ whatsappHistoryLoading ? '⏳ Sprawdzanie…' : '🔄 Sprawdź nowe' }}
-          </button>
-        </div>
 
         <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
 
@@ -927,6 +923,61 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
         </ng-container>
+      </div>
+
+      <!-- SMS tab -->
+      <div *ngIf="midTab==='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:12px">
+
+        <div *ngIf="smsThreadError" style="font-size:13px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
+          ⚠️ {{smsThreadError}}
+        </div>
+
+        <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie…</div>
+        <div *ngIf="!smsLoading && !smsThreadError && smsConversations.length===0" class="empty-act">Brak numerów telefonu do SMS-a.</div>
+
+        <div *ngFor="let conv of smsConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white;overflow:hidden"
+             [style.border-left]="getSmsConvState(conv.number).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer"
+               [style.background]="getSmsConvState(conv.number).expanded ? '#eff6ff' : 'white'"
+               (click)="toggleSmsConvExpanded(conv.number)">
+            <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
+              <strong style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="conv.messages.length">
+                ostatnia: {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
+              </span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="!conv.messages.length">Brak wiadomości</span>
+            </div>
+            <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getSmsConvState(conv.number).expanded ? '▲' : '▾'}}</span>
+          </div>
+
+          <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid #e5e7eb;display:flex;flex-direction:column">
+            <div [id]="'sms-scroll-partner-' + smsDomId(conv.number)" style="max-height:360px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f9fafb">
+              <div *ngIf="!conv.messages.length" style="font-size:12px;color:#9ca3af;text-align:center;padding:12px 0">Brak wiadomości — napisz pierwszą poniżej.</div>
+              <div *ngFor="let m of conv.messages" style="display:flex" [style.justify-content]="m.direction==='outbound' ? 'flex-end' : 'flex-start'">
+                <div [style.background]="m.direction==='outbound' ? '#3BAA5D' : 'white'"
+                     [style.color]="m.direction==='outbound' ? 'white' : '#111827'"
+                     [style.border]="m.direction==='outbound' ? 'none' : '1px solid #e5e7eb'"
+                     style="max-width:75%;border-radius:12px;padding:8px 12px;font-size:13px;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,.06)">
+                  <div>{{m.body}}</div>
+                  <div style="font-size:10px;opacity:.75;margin-top:4px;text-align:right">
+                    {{m.created_at | date:'HH:mm'}} · {{smsStatusLabel(m.status)}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="position:sticky;bottom:0;background:white;border-top:1px solid #e5e7eb;padding:10px;display:flex;gap:8px;align-items:flex-end">
+              <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
+                        (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
+                        rows="1" style="flex:1;resize:none;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit"
+                        placeholder="Wiadomość…" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
+              <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
+                      (click)="sendSmsToConv(conv)">
+                {{ getSmsConvState(conv.number).sending ? '⏳' : 'Wyślij' }}
+              </button>
+            </div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:#ef4444;font-size:11px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1934,6 +1985,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private emailOauthListener = inject(EmailOauthListenerService);
   protected settings = inject(AppSettingsService);
+  private pbx = inject(PbxService);
 
   // Słowniki z app_settings
   get dictStatuses():  string[] { return this._dictArr('crm_partner_statuses', ['onboarding','active','inactive','churned']); }
@@ -2068,6 +2120,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       });
     }
     this.loadWhatsappHistory();
+    // Webhook delivery isn't guaranteed instant — poll while this partner is
+    // open so an active conversation doesn't require a manual refresh.
+    if (!this.whatsappPollInterval) this.whatsappPollInterval = setInterval(() => this.loadWhatsappHistory(), 30_000);
   }
 
   loadWhatsappHistory(): void {
@@ -2137,7 +2192,100 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
-  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' = 'all';
+  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' | 'sms' = 'all';
+
+  // ── SMS — same PBX account/PAT as telephony. Local log, synced on demand
+  // (no webhook from ip-pbx.eu for incoming SMS) — grouped into one
+  // conversation per known number, like WhatsApp's groupWhatsappConversations().
+  get hasPbxFeature(): boolean { return this.auth.hasFeature('pbx'); }
+  formatPhoneDisplay = formatPhoneDisplay;
+  smsConversations: SmsConversation[] = [];
+  smsLoading = false;
+  smsThreadError: string | null = null;
+  private smsConvState = new Map<string, { expanded: boolean; replyMessage: string; sending: boolean; error: string | null }>();
+
+  openSmsTab(): void {
+    this.midTab = 'sms';
+    this.loadSmsThread();
+    // No live push from ip-pbx.eu for incoming SMS — poll while this partner
+    // is open so an active conversation doesn't require a manual refresh.
+    if (!this.smsPollInterval) this.smsPollInterval = setInterval(() => this.loadSmsThread(), 30_000);
+  }
+
+  loadSmsThread(): void {
+    if (!this.partner) return;
+    const partnerId = this.partner.id ?? this.partner.crm_id ?? undefined;
+    if (partnerId == null) return;
+    this.smsLoading = true;
+    this.smsThreadError = null;
+    this.api.getSmsThreadPartner(partnerId).subscribe({
+      next: r => this.zone.run(() => {
+        this.smsConversations = r.conversations;
+        this.smsLoading = false;
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.smsLoading = false;
+        this.smsThreadError = err?.error?.error || 'Błąd pobierania SMS-ów';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  getSmsConvState(number: string) {
+    let s = this.smsConvState.get(number);
+    if (!s) { s = { expanded: false, replyMessage: '', sending: false, error: null }; this.smsConvState.set(number, s); }
+    return s;
+  }
+
+  toggleSmsConvExpanded(number: string): void {
+    const s = this.getSmsConvState(number);
+    s.expanded = !s.expanded;
+    if (s.expanded) setTimeout(() => this.scrollSmsToBottom(number), 0);
+    this.cdr.markForCheck();
+  }
+
+  setSmsConvReplyMessage(number: string, val: string): void {
+    this.getSmsConvState(number).replyMessage = val;
+  }
+
+  smsStatusLabel(status: string): string {
+    const map: Record<string, string> = { sent: 'Wysłano', delivered: 'Dostarczono', received: 'Odebrano', failed: 'Błąd', error: 'Błąd' };
+    return map[status] || status;
+  }
+
+  smsDomId(number: string): string {
+    return number.replace(/[^0-9]/g, '');
+  }
+
+  private scrollSmsToBottom(number: string): void {
+    const el = document.getElementById(`sms-scroll-partner-${this.smsDomId(number)}`);
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  sendSmsToConv(conv: SmsConversation): void {
+    const state = this.getSmsConvState(conv.number);
+    if (!this.partner || !state.replyMessage.trim() || state.sending) return;
+    const partnerId = this.partner.id ?? this.partner.crm_id ?? undefined;
+    if (partnerId == null) return;
+    state.sending = true;
+    state.error = null;
+    this.cdr.markForCheck();
+    this.api.sendPartnerSms(partnerId, state.replyMessage.trim(), conv.number).subscribe({
+      next: msg => this.zone.run(() => {
+        conv.messages.push(msg);
+        state.replyMessage = '';
+        state.sending = false;
+        this.cdr.markForCheck();
+        setTimeout(() => this.scrollSmsToBottom(conv.number), 0);
+      }),
+      error: (err: any) => this.zone.run(() => {
+        state.sending = false;
+        state.error = err?.error?.error || 'Błąd wysyłki SMS';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
 
   // WhatsApp tab — status reflects the tenant's one shared WhatsApp Business
   // number (tenant_whatsapp_config), configured by a super admin.
@@ -2441,6 +2589,22 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       }
     }
     return [...byThread.values(), ...noThread];
+  }
+
+  private markActivityRead(activityId: number): void {
+    const act = (this.partner?.activities || []).find((a: any) => a.id === activityId);
+    if (act && !act.is_read) { act.is_read = true; this.cdr.markForCheck(); }
+  }
+
+  private markThreadRead(threadId: string): void {
+    let changed = false;
+    for (const act of (this.partner?.activities || [])) {
+      if (act.type === 'email' && act.gmail_thread_id === threadId && !act.is_read) {
+        act.is_read = true;
+        changed = true;
+      }
+    }
+    if (changed) this.cdr.markForCheck();
   }
 
   private _safeHtmlCache = new Map<string, SafeHtml>();
@@ -2781,10 +2945,10 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   private emailPollInterval: any = null;
+  private smsPollInterval: any = null;
+  private whatsappPollInterval: any = null;
   private emailOauthSub: Subscription | null = null;
   debugProcessing        = false;
-  syncingAll             = false;
-  syncResult             = '';
   showReplyDetails       = false;
 
   // Whichever provider's OAuth callback page reports back here is, by
@@ -2829,7 +2993,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.emailOauthSub?.unsubscribe();
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
   }
 
   private loadPartnerSalesData(p: any): void {
@@ -2889,7 +3055,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.loadError = false;
     this.partner = null;
-    if (this.emailPollInterval) { clearInterval(this.emailPollInterval); this.emailPollInterval = null; }
+    if (this.emailPollInterval)    { clearInterval(this.emailPollInterval);    this.emailPollInterval = null; }
+    if (this.smsPollInterval)      { clearInterval(this.smsPollInterval);      this.smsPollInterval = null; }
+    if (this.whatsappPollInterval) { clearInterval(this.whatsappPollInterval); this.whatsappPollInterval = null; }
     this.api.getPartner(id).pipe(
       finalize(() => { this.zone.run(() => { this.loading = false; this.cdr.markForCheck(); }); })
     ).subscribe({
@@ -2919,6 +3087,26 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       }),
       error: () => {},
     });
+  }
+
+  makePartnerCall(): void {
+    if (!this.partner) return;
+    const phones: { label: string; number: string }[] = [];
+    if (this.partner.phone)         phones.push({ label: `Kontakt: ${this.partner.phone}`, number: this.partner.phone });
+    if (this.partner.billing_phone) phones.push({ label: `Rozliczenia: ${this.partner.billing_phone}`, number: this.partner.billing_phone });
+    if (this.partner.agent_phone)   phones.push({ label: `Agent: ${this.partner.agent_phone}`, number: this.partner.agent_phone });
+    if (!phones.length) return;
+    this.pbx.initiate(phones[0].number, {
+      entityType:  'partner',
+      // crm_id (crm_partners.id, a UUID) must win over id — for DWH-linked
+      // partners `id` here is the numeric dwh_partner_id, not a valid UUID,
+      // and pbx/call-log's partner_id validation rejects anything else.
+      // Same precedence as the `pid` getter elsewhere in this component.
+      entityId:    this.partner.crm_id ?? this.partner.id ?? undefined,
+      nip:         this.partner.dwh_nip ?? this.partner.nip ?? null,
+      companyName: this.partner.dwh_company_name ?? this.partner.company ?? null,
+      city:        this.partner.billing_city ?? null,
+    }, phones.length > 1 ? phones : undefined);
   }
 
   openEdit() {
@@ -3395,31 +3583,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       error: (e: any) => this.zone.run(() => {
         this.debugProcessing = false;
         alert('Błąd: ' + (e.error?.error || e.message));
-        this.cdr.markForCheck();
-      }),
-    });
-  }
-
-  checkNewEmails(): void {
-    if (this.syncingAll || !this.emailConnected) return;
-    this.syncingAll = true;
-    this.syncResult = '';
-    this.cdr.markForCheck();
-
-    this.api.debugProcessEmail().pipe(
-      map((r: any) => r?.recovered
-        ? `${this.emailProviderLabel}: odzyskano synchronizację, ${r?.newMessages_found ?? 0}`
-        : `${this.emailProviderLabel}: ${r?.newMessages_found ?? 0}`),
-      catchError(() => of(`${this.emailProviderLabel}: błąd synchronizacji`)),
-    ).subscribe({
-      next: label => this.zone.run(() => {
-        this.syncResult = label;
-        this.syncingAll = false;
-        this.refreshEmailActivities();
-        this.cdr.markForCheck();
-      }),
-      error: () => this.zone.run(() => {
-        this.syncingAll = false;
         this.cdr.markForCheck();
       }),
     });
@@ -3902,7 +4065,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.loadingThread   = false;
     this.cdr.markForCheck();
     if (!a.is_read && !a.gmail_thread_id) {
-      a.is_read = true;
+      this.markActivityRead(a.id);
       this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
     }
     if (a.gmail_thread_id) {
@@ -4055,10 +4218,6 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.threadMessages = [];
     this.loadingThread = true;
     this.cdr.markForCheck();
-    if (!a.is_read) {
-      a.is_read = true;
-      this.api.patchPartnerActivityRead(this.pid, a.id, true).subscribe({ error: () => {} });
-    }
     this.getPartnerThreadObs(a.gmail_thread_id).subscribe({
       next: res => this.zone.run(() => {
         if (this.openThreadId !== a.gmail_thread_id) return;
@@ -4067,6 +4226,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
         this.threadOwnerEmail = res.ownerEmail;
         this.threadUnavailableReason = res.unavailable ? (res.reason || null) : null;
         this.loadingThread = false;
+        this.markThreadRead(a.gmail_thread_id);
         // Auto-mark all unread incoming messages in the thread
         res.messages.forEach((m: any) => {
           if (m.is_read === false && m.created_by === null) {

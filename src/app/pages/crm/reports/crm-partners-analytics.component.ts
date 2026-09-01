@@ -381,8 +381,8 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 </div>
   `,
   styles: [`
-    .sel { background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:6px 10px;font-size:12.5px;color:#3f3f46;outline:none;font-family:inherit;cursor:pointer }
-    .sel:focus { border-color:#3BAA5D }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    .sel:focus { border-color:var(--orange); }
     .mode-btn { background:none;border:none;padding:4px 10px;border-radius:6px;font-size:11.5px;font-weight:600;color:#71717a;cursor:pointer;font-family:inherit }
     .mode-active  { background:white;color:#3BAA5D;box-shadow:0 1px 3px rgba(0,0,0,.1) }
     .mode-year-b  { background:white;color:#3b82f6;box-shadow:0 1px 3px rgba(0,0,0,.1) }

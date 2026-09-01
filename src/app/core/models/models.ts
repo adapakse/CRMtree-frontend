@@ -26,7 +26,7 @@ export interface User {
 }
 
 // ── Tenant ────────────────────────────────────────────────
-export type CrmFeature = 'documents' | 'leads' | 'sales_reports' | 'onboarding' | 'partner_registry' | 'dwh_integration' | 'performance' | 'seo_bot' | 'whatsapp' | 'prospects';
+export type CrmFeature = 'documents' | 'leads' | 'sales_reports' | 'onboarding' | 'partner_registry' | 'dwh_integration' | 'performance' | 'seo_bot' | 'whatsapp' | 'prospects' | 'pbx' | 'call_analysis';
 
 export interface TenantFeature {
   feature: CrmFeature;

@@ -298,9 +298,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   setStatus(task: WorkflowTask, status: TaskStatus): void {
-    this.wfSvc.updateTask(task.document_id, task.id, { task_status: status }).subscribe(updated => {
-      this.myTasks.update(tasks => tasks.map(t => t.id === updated.id ? updated : t));
-      if (status === 'completed') this.toast.success('Task marked as completed');
+    this.wfSvc.updateTask(task.document_id, task.id, { task_status: status }).subscribe({
+      next: updated => {
+        this.myTasks.update(tasks => tasks.map(t => t.id === updated.id ? updated : t));
+        if (status === 'completed') this.toast.success('Task marked as completed');
+      },
+      error: () => this.toast.error('Could not update the task — please try again'),
     });
   }
 }

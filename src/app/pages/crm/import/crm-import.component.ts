@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CrmApiService, ImportResult, ImportLog, SalesImportResult, SalesImportLog } from '../../../core/services/crm-api.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'wt-crm-import',
@@ -281,13 +282,13 @@ import { AuthService } from '../../../core/auth/auth.service';
     .field-list span.required { background:#fef3c7; color:#92400e; font-weight:700; }
     .field-list span.key { background:#dbeafe; color:#1e40af; font-weight:700; }
     .btn-outline { display:inline-block; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; text-decoration:none; color:#374151; text-align:center; cursor:pointer; }
-    .btn-export { border-color:#f97316; color:#f97316; }
-    .btn-export:hover:not(:disabled) { background:#fff7ed; }
+    .btn-export { border-color:var(--orange); color:var(--orange); }
+    .btn-export:hover:not(:disabled) { background:var(--orange-pale); }
     .btn-export:disabled { opacity:.6; cursor:not-allowed; }
-    .btn-outline:hover { border-color:#f97316; color:#f97316; }
+    .btn-outline:hover { border-color:var(--orange); color:var(--orange); }
     .drop-zone { border:2px dashed #d1d5db; border-radius:10px; padding:28px; text-align:center; cursor:pointer; font-size:13px; color:#9ca3af; transition:.2s; }
-    .drop-zone:hover, .drop-zone.drag-over { border-color:#f97316; color:#f97316; background:#fff7ed; }
-    .drop-zone.uploading { border-color:#f97316; background:#fff7ed; color:#f97316; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--orange); color:var(--orange); background:var(--orange-pale); }
+    .drop-zone.uploading { border-color:var(--orange); background:var(--orange-pale); color:var(--orange); }
     .result-panel { border:1px solid #e5e7eb; border-radius:8px; padding:12px; }
     .result-stats { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
     .stat { font-size:12px; font-weight:700; padding:3px 10px; border-radius:8px; }
@@ -325,6 +326,7 @@ export class CrmImportComponent implements OnInit {
   private auth = inject(AuthService);
   private zone = inject(NgZone);
   private cdr  = inject(ChangeDetectorRef);
+  private toast = inject(ToastService);
 
   leadsResult:    ImportResult | null = null;
   partnersResult: ImportResult | null = null;
@@ -352,7 +354,7 @@ export class CrmImportComponent implements OnInit {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => alert('Nie udało się pobrać szablonu.'),
+      error: () => this.toast.error('Nie udało się pobrać szablonu.'),
     });
   }
 
@@ -375,7 +377,7 @@ export class CrmImportComponent implements OnInit {
         this.exportingType = '';
         this.cdr.markForCheck();
       },
-      error: () => { this.exportingType = ''; alert('Nie udało się wyeksportować danych.'); this.cdr.markForCheck(); },
+      error: () => { this.exportingType = ''; this.toast.error('Nie udało się wyeksportować danych.'); this.cdr.markForCheck(); },
     });
   }
 
@@ -391,7 +393,7 @@ export class CrmImportComponent implements OnInit {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => alert('Nie udało się pobrać szablonu.'),
+      error: () => this.toast.error('Nie udało się pobrać szablonu.'),
     });
   }
 
@@ -459,7 +461,7 @@ export class CrmImportComponent implements OnInit {
 
   uploadSalesFile(file: File) {
     if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
-      alert('Wybierz plik w formacie CSV.');
+      this.toast.error('Wybierz plik w formacie CSV.');
       return;
     }
     this.uploadingSales  = true;

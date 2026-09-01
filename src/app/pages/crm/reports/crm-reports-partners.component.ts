@@ -97,7 +97,7 @@ function healthColor(engagement: number): string {
 <!-- CONTENT -->
 <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px">
 
-  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#f26522,#fb923c);border-radius:2px"></div>
+  <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#4DC671);border-radius:2px"></div>
 
   <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
     <div style="font-size:48px;margin-bottom:12px">📈</div>
@@ -169,7 +169,7 @@ function healthColor(engagement: number): string {
             <tr *ngFor="let p of topPartners" style="border-bottom:1px solid #f4f4f5" class="tbl-row"
                 [style.cursor]="p.partner_id ? 'pointer' : 'default'"
                 (click)="p.partner_id && goToPartner(p.partner_id)"
-                (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+                (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
                 (mouseleave)="$any($event.currentTarget).style.background=''"
                 [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
               <td style="padding:10px 14px">
@@ -246,7 +246,7 @@ function healthColor(engagement: number): string {
     <div class="card" style="padding:18px" *ngIf="isManager">
       <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Wyniki handlowców</div>
       <div *ngFor="let r of byRep" style="margin-bottom:12px;cursor:pointer;border-radius:8px;padding:6px 8px;transition:background .12s"
-           (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+           (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
            (mouseleave)="$any($event.currentTarget).style.background=''"
            (click)="goToPartnersByRep(r.salesperson_id, r.salesperson_name)"
            title="Kliknij aby zobaczyć partnerów tego handlowca">
@@ -355,7 +355,7 @@ function healthColor(engagement: number): string {
           <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid #f4f4f5"
               [style.cursor]="p.partner_id ? 'pointer' : 'default'"
               (click)="p.partner_id && goToPartner(p.partner_id)"
-              (mouseenter)="$any($event.currentTarget).style.background='#fff7ed'"
+              (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
               (mouseleave)="$any($event.currentTarget).style.background=''"
               [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
             <td style="padding:9px 14px">
@@ -405,13 +405,13 @@ function healthColor(engagement: number): string {
 </div>
   `,
   styles: [`
-    .sel { background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:6px 10px;font-size:12.5px;color:#3f3f46;outline:none;font-family:inherit;cursor:pointer }
-    .sel:focus { border-color:#f26522 }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    .sel:focus { border-color:var(--orange); }
     .btn-g { background:transparent;color:#52525b;border:1px solid #e4e4e7 }
     .btn-g:hover { background:#fafafa }
     .stat-card { background:white;border:1px solid #e4e4e7;border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.08) }
     .stat-clickable { cursor:pointer;transition:box-shadow .12s,border-color .12s,transform .1s }
-    .stat-clickable:hover { box-shadow:0 4px 12px rgba(0,0,0,.12);border-color:#f26522;transform:translateY(-1px) }
+    .stat-clickable:hover { box-shadow:0 4px 12px rgba(0,0,0,.12);border-color:#3BAA5D;transform:translateY(-1px) }
     .stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#18181b;margin-bottom:2px }
     .stat-lbl { font-size:12px;color:#a1a1aa;font-weight:500 }
     .stat-trend { font-size:11px;margin-top:6px;font-weight:600 }

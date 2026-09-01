@@ -53,6 +53,10 @@ export interface Lead {
   converted_partner_company?: string | null;
   activity_count?: number;
   non_email_activity_count?: number;
+  new_email_count?: number;
+  unread_sms_count?: number;
+  unread_whatsapp_count?: number;
+  missed_call_count?: number;
   document_count?: number;
   email_count?: number;
   activities?: LeadActivity[];
@@ -260,6 +264,9 @@ export interface Partner {
   email_count?: number;
   non_email_activity_count?: number;
   new_email_count?: number;
+  unread_sms_count?: number;
+  unread_whatsapp_count?: number;
+  missed_call_count?: number;
   last_reply_at?: string | null;
   doc_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
@@ -765,7 +772,47 @@ export interface WhatsappHistoryEntry {
   to_phone: string;
   message: string | null;
   status: string;
+  is_read: boolean;
   created_by_name: string | null;
+}
+
+export interface SmsMessage {
+  id:         string;
+  direction:  'inbound' | 'outbound';
+  body:       string;
+  status:     string;
+  created_at: string;
+  from:       string;
+  to:         string;
+  is_read:    boolean;
+}
+
+export interface SmsConversation {
+  label:    string;
+  number:   string;
+  messages: SmsMessage[];
+}
+
+export interface PhoneLookupResult {
+  found: boolean;
+  type?: 'lead' | 'partner';
+  id?: number;
+  company_name?: string | null;
+  nip?: string | null;
+  city?: string | null;
+}
+
+export interface PbxCallLogPayload {
+  direction:      'inbound' | 'outbound';
+  status:         'answered' | 'missed' | 'not_answered' | 'rejected' | 'error';
+  caller_number?: string;
+  callee_number?: string;
+  nip?:           string | null;
+  duration_sec?:  number;
+  started_at?:    string;
+  ended_at?:      string;
+  lead_id?:       number | null;
+  partner_id?:    string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1452,6 +1499,77 @@ export class CrmApiService {
   }
   getPartnerWhatsappHistory(partnerId: number | string): Observable<WhatsappHistoryEntry[]> {
     return this.http.get<WhatsappHistoryEntry[]>(`${BASE}/whatsapp/history/partner/${partnerId}`);
+  }
+
+  // ── PBX / SIP ────────────────────────────────────────────────────────
+  // Softphone in the browser (sip.js/WebRTC) talks to ip-pbx.eu directly —
+  // this backend only proxies credential lookups and logs finished calls.
+  // Mounted at /api/pbx (sibling to /api/crm), not under BASE.
+  getSipCredentials(): Observable<{
+    username: string; password: string; sip_url: string; sip_uri: string;
+    direct_phone?: string | null;
+    turn?: { urls: string[]; username: string; password: string } | null;
+  }> {
+    return this.http.get<any>(`${environment.apiUrl}/pbx/sip-credentials`);
+  }
+  lookupByPhone(phone: string): Observable<PhoneLookupResult> {
+    return this.http.get<PhoneLookupResult>(`${environment.apiUrl}/pbx/phone-lookup`, {
+      params: { phone },
+    });
+  }
+  postCallLog(payload: PbxCallLogPayload): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${environment.apiUrl}/pbx/call-log`, payload);
+  }
+  findPbxCall(number: string, startedAt: string, direction: 'inbound' | 'outbound'): Observable<{ call_id: string; direction: string }> {
+    return this.http.get<{ call_id: string; direction: string }>(`${environment.apiUrl}/pbx/find-call`, {
+      params: { number, started_at: startedAt, direction },
+    });
+  }
+  getPbxTranscription(callId: string, direction: 'inbound' | 'outbound'): Observable<{
+    agent_status:    string;
+    client_status:   string;
+    agent_segments:  { start: number; end: number; text: string }[];
+    client_segments: { start: number; end: number; text: string }[];
+  }> {
+    return this.http.get<any>(`${environment.apiUrl}/pbx/transcription/${callId}`, {
+      params: { direction },
+    });
+  }
+
+  // ── SMS ──────────────────────────────────────────────────────────────────
+  // Same provider/PAT as PBX. Local log (sms_messages) — ip-pbx.eu has no
+  // webhook for incoming SMS, so the backend syncs on each thread fetch
+  // (dedup via a unique index) instead of relying on push.
+  getSmsThreadLead(leadId: number): Observable<{ conversations: SmsConversation[] }> {
+    return this.http.get<{ conversations: SmsConversation[] }>(`${environment.apiUrl}/sms/thread/lead/${leadId}`);
+  }
+  getSmsThreadPartner(partnerId: number | string): Observable<{ conversations: SmsConversation[] }> {
+    return this.http.get<{ conversations: SmsConversation[] }>(`${environment.apiUrl}/sms/thread/partner/${partnerId}`);
+  }
+  sendLeadSms(leadId: number, message: string, toPhone?: string): Observable<SmsMessage> {
+    return this.http.post<SmsMessage>(`${environment.apiUrl}/sms/send/lead/${leadId}`, { message, to_phone: toPhone || undefined });
+  }
+  sendPartnerSms(partnerId: number | string, message: string, toPhone?: string): Observable<SmsMessage> {
+    return this.http.post<SmsMessage>(`${environment.apiUrl}/sms/send/partner/${partnerId}`, { message, to_phone: toPhone || undefined });
+  }
+
+  // ── Analizator Rozmów ───────────────────────────────────────────────────
+  // Wywoływane z softphone-overlay po zapisaniu notatki z rozmowy — fire & forget,
+  // auto-analiza DeepSeek w tle po stronie backendu.
+  upsertCallNote(data: {
+    nip:              string;
+    company_name:     string | null;
+    city:             string | null;
+    salesperson:      string | null;
+    salesperson_id:   string | null;
+    salesperson_name: string | null;
+    note:             string;
+    call_date:        string | null;
+  }): Observable<{ nip: string; was_existing: boolean }> {
+    return this.http.post<{ nip: string; was_existing: boolean }>(
+      `${environment.apiUrl}/admin/call-analysis/upsert-from-call`,
+      data
+    );
   }
 
   // ── Partners Analytics (DWH) ─────────────────────────────────────────────

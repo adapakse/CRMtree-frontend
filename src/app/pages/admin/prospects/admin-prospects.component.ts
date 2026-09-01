@@ -11,40 +11,49 @@ import { ToastService } from '../../../core/services/toast.service';
 
 const API = `${environment.apiUrl}/admin/prospects`;
 
-// Definicja sygnałów podróżowych — klucze muszą odpowiadać kluczom z Claude
+// Definicja sygnałów ICP (dopasowanie do CRMtree) — klucze muszą odpowiadać
+// polom icp_signals[].id zwracanym przez backend (decyzja 19.08.2026, artefakt
+// "Sygnały Prospektów"). Sygnały 9-11 (rekrutacja/raportowanie/call center)
+// nie są tu jeszcze — wymagają portali z ofertami pracy, niepodpięte.
+// reasoningKey — nazwa pola w enrichment_log.claude.signal_reasoning (patrz
+// backend ICP_SIGNALS.promptKey, prospectEnrichmentService.js). Rozjeżdża się
+// z `key` (id sygnału) dla 7 z 8 sygnałów — bez tego mapowania
+// getSignalReasoning() cicho nie znajdowała uzasadnienia mimo że było zapisane
+// w bazie (audyt 24.08, Wodmax/Targor-Truck/Parmet).
 const SIGNAL_DEFS = [
   {
-    key: 'field_sales', label: 'Tereny',
-    desc: 'Handlowcy lub przedstawiciele terenowi odwiedzający klientów (KAM, sprzedaż objazdowa). Generuje regularne delegacje krajowe do klientów i dystrybutorów.',
+    key: 'dzial_handlowy', reasoningKey: 'field_sales_team', label: 'Dział handlowy',
+    desc: 'Dedykowani handlowcy, w miarę możności formalna struktura sprzedaży.',
   },
   {
-    key: 'branches', label: 'Oddziały',
-    desc: 'Sieć biur lub oddziałów w wielu miastach / województwach. Koordynacja i nadzór między lokalizacjami regularnie wymagają przejazdów.',
+    key: 'zlozony_proces_sprzedazy', reasoningKey: 'custom_quote_process', label: 'Ind. wycena',
+    desc: 'Złożony proces sprzedaży / indywidualna wycena — relacyjny, projektowy lub negocjacyjny model, nie zakup impulsowy.',
   },
   {
-    key: 'international', label: 'Eksport',
-    desc: 'Eksport, klienci zagraniczni lub przynależność do zagranicznej grupy kapitałowej. Generuje delegacje zagraniczne do partnerów i klientów za granicą.',
+    key: 'konsultacja_demo', reasoningKey: 'consultation_demo_needs_analysis', label: 'Konsultacja/demo',
+    desc: 'Sprzedaż wymaga rozmowy przed zakupem — demo, bezpłatna konsultacja, analiza potrzeb.',
   },
   {
-    key: 'implementations', label: 'Wdrożenia',
-    desc: 'Wdrożenia systemów IT, instalacje urządzeń lub projekty on-site u klientów. Konsultanci i inżynierowie wyjeżdżają do siedziby klienta na dni lub tygodnie.',
+    key: 'opieka_nad_klientem', reasoningKey: 'dedicated_customer_care_b2b', label: 'Opieka B2B',
+    desc: 'Dedykowana opieka nad klientem B2B — przypisany opiekun, Key Account Manager, Customer Success.',
   },
   {
-    key: 'field_service', label: 'Serwis',
-    desc: 'Serwis techniczny w terenie — ekipy naprawcze, przeglądy i pogotowie techniczne u klientów. Pracownicy dojeżdżają do instalacji i awarii na miejscu.',
+    key: 'przetargi', reasoningKey: 'tender_bidding_department', label: 'Przetargi',
+    desc: 'Firma sprzedaje w przetargach / ma dział ofertowania — nie: kupuje w przetargach.',
   },
   {
-    key: 'b2b_sales', label: 'B2B',
-    desc: 'Sprzedaż korporacyjna B2B wymagająca spotkań: przetargi, negocjacje kontraktów, prezentacje u klientów. Handlowcy i zarząd podróżują do firm-klientów.',
+    key: 'rozproszona_struktura', reasoningKey: 'distributed_sales_structure', label: 'Wiele oddziałów',
+    desc: 'Zespół lub sieć sprzedaży fizycznie rozproszona terytorialnie — konkretni przedstawiciele/oddziały z ludźmi.',
   },
   {
-    key: 'travel_manager', label: 'Travel Mgr',
-    desc: 'Firma ma stanowisko Travel Managera, rekrutuje na tę rolę lub współpracuje z agencją TMC (Egencia, CWT, BCD Travel). Sygnał: wdrożony proces zarządzania podróżami = szansa sprzedażowa.',
+    key: 'siec_partnerow', reasoningKey: 'partner_dealer_network', label: 'Sieć partnerów',
+    desc: 'Firma buduje lub rozwija sieć sprzedaży pośredniej — dealerzy, dystrybutorzy.',
+  },
+  {
+    key: 'ecommerce_b2b', reasoningKey: 'ecommerce_b2b', label: 'E-commerce B2B',
+    desc: 'Sklep/platforma zamówieniowa B2B z realną obsługą — liczy się tylko razem z działem handlowym lub opieką nad klientem.',
   },
 ] as const;
-
-type SignalKey = typeof SIGNAL_DEFS[number]['key'];
-type TravelSignals = Partial<Record<SignalKey, boolean | null>>;
 
 interface KeyContact {
   name: string | null;
@@ -79,12 +88,42 @@ interface EnrichmentLog {
     pages_count?: number;
   };
   claude?: {
+    provider: string;
     model: string;
-    score: number | null;
+    icp_raw: number | null;
+    icp_bonus: number | null;
+    icp_total: number | null;
+    gate_status: string | null;
     signal_reasoning: Record<string, string> | null;
-    branches_found: { count: number | null; locations: string[]; scope: string } | null;
-    branches_source: 'krs' | 'web' | 'none';
   };
+}
+
+interface IcpSignalHit {
+  id: string;
+  label: string;
+  tier: 'wysoka' | 'srednia';
+  points: number;
+  hit: boolean;
+  suppressed: boolean;
+}
+
+interface IcpBonusHit {
+  id: string;
+  label: string;
+  points: number;
+  hit: boolean;
+}
+
+interface IcpGates {
+  b2b: 'pass' | 'fail' | 'unknown';
+  company_size: 'pass' | 'fail' | 'unknown';
+}
+
+interface IcpDowngradeFlag {
+  id: string;
+  label: string;
+  points?: number;
+  matched?: string[];
 }
 
 interface Prospect {
@@ -120,16 +159,20 @@ interface Prospect {
   facebook_url: string | null;
   linkedin_url: string | null;
   linkedin_status: 'ok' | 'blocked' | 'not_found' | null;
+  pracuj_url: string | null;
+  pracuj_status: 'ok' | 'not_found' | null;
   decision_maker_linkedin: string | null;
   decision_maker_facebook: string | null;
   // Wyniki enrichmentu
   fb_about: string | null;
   fb_category: string | null;
   fb_fan_count: number | null;
-  travel_potential_score: number | null;
-  travel_signals: TravelSignals | string[] | null;
-  travel_scope: string | null;
-  field_teams_likely: boolean | null;
+  icp_score: number | null;
+  icp_signals: IcpSignalHit[] | null;
+  icp_gates: IcpGates | null;
+  icp_gate_status: 'qualified' | 'disqualified' | 'needs_review' | null;
+  icp_bonus_signals: IcpBonusHit[] | null;
+  icp_downgrade_flags: IcpDowngradeFlag[] | null;
   ai_summary: string | null;
   key_contacts: KeyContact[] | null;
   enrichment_log: EnrichmentLog | null;
@@ -186,7 +229,7 @@ interface BatchProgress {
     <div id="content">
 
       <!-- Import CSV -->
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:16px;padding:16px">
         <div style="font-weight:600;margin-bottom:10px">Import firm z CSV</div>
         <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
           Wymagane kolumny: <code>nip</code>, <code>BAZA</code> (nazwa bazy źródłowej — musi mieć wartość w każdym wierszu). Wykrywane automatycznie:
@@ -252,7 +295,7 @@ interface BatchProgress {
       </div>
 
       <!-- Filtry -->
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:16px;padding:16px">
         <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
 
           <div class="fld">
@@ -379,11 +422,11 @@ interface BatchProgress {
               Firma {{ sortIcon('company_name') }}
             </th>
             <th>NIP</th>
-            <th style="cursor:pointer" (click)="setSort('travel_potential_score')">
-              Score {{ sortIcon('travel_potential_score') }}
+            <th style="cursor:pointer" (click)="setSort('icp_score')">
+              Score {{ sortIcon('icp_score') }}
             </th>
             <th>Oddziały</th>
-            <th title="Zasięg geograficzny działalności (local/krajowy/EU/global)">Zasięg</th>
+            <th title="Bramki: B2B + minimum 15 pracowników — obie PASS = kwalifikacja">Bramki</th>
             @for (s of signalDefs; track s.key) {
               <th class="sig-th">
                 <span>{{ s.label }}</span>
@@ -481,15 +524,15 @@ interface BatchProgress {
               </td>
               <td style="font-family:monospace;font-size:12px">{{ p.nip }}</td>
               <td>
-                @if (p.travel_potential_score != null) {
+                @if (p.icp_score != null) {
                   <div style="display:flex;align-items:center;gap:6px">
                     <div style="width:44px;height:6px;border-radius:3px;background:#e5e7eb;overflow:hidden">
-                      <div [style.width.%]="p.travel_potential_score"
-                        [style.background]="scoreColor(p.travel_potential_score)"
+                      <div [style.width.%]="p.icp_score"
+                        [style.background]="scoreColor(p.icp_score)"
                         style="height:100%"></div>
                     </div>
-                    <b [style.color]="scoreColor(p.travel_potential_score)">
-                      {{ p.travel_potential_score }}
+                    <b [style.color]="scoreColor(p.icp_score)">
+                      {{ p.icp_score }}
                     </b>
                   </div>
                 } @else {
@@ -503,10 +546,10 @@ interface BatchProgress {
                 } @else { <span style="color:#d1d5db">—</span> }
               </td>
               <td>
-                @if (p.travel_scope) {
-                  <span class="scope-badge" [class]="'scope-' + p.travel_scope"
-                    [title]="scopeLabel(p.travel_scope)">
-                    {{ scopeIcon(p.travel_scope) }}
+                @if (p.icp_gate_status) {
+                  <span class="scope-badge" [class]="'gate-' + p.icp_gate_status"
+                    [title]="gateStatusLabel(p.icp_gate_status)">
+                    {{ gateStatusIcon(p.icp_gate_status) }}
                   </span>
                 } @else {
                   <span style="color:#d1d5db;font-size:12px">—</span>
@@ -620,9 +663,9 @@ interface BatchProgress {
                           <div style="font-size:13px;line-height:1.5">{{ p.ai_summary }}</div>
                         </div>
                       }
-                      @if (p.travel_signals && !$any(p.travel_signals).length) {
+                      @if (p.icp_signals?.length) {
                         <div style="margin-bottom:12px">
-                          <div class="detail-label">Sygnały podróżowe</div>
+                          <div class="detail-label">Sygnały ICP</div>
                           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
                             @for (s of signalDefs; track s.key) {
                               <span [title]="s.desc" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:12px;border:1px solid"
@@ -665,12 +708,21 @@ interface BatchProgress {
                             }
                           </div>
                         }
-                        @if (p.travel_scope) {
-                          <div><b>Zasięg podróży:</b> {{ p.travel_scope }}</div>
+                        @if (p.icp_gate_status) {
+                          <div><b>Bramki:</b> {{ gateStatusLabel(p.icp_gate_status) }}
+                            @if (p.icp_gates) {
+                              <span style="color:#9ca3af"> (B2B: {{ p.icp_gates.b2b }}, wielkość: {{ p.icp_gates.company_size }})</span>
+                            }
+                          </div>
                         }
-                        @if (p.field_teams_likely != null) {
-                          <div><b>Zespoły terenowe:</b>
-                            {{ p.field_teams_likely ? 'Prawdopodobne' : 'Mało prawdopodobne' }}
+                        @if (p.icp_downgrade_flags?.length) {
+                          <div><b>Obniżony priorytet:</b>
+                            {{ p.icp_downgrade_flags!.map(f => f.label).join(', ') }}
+                          </div>
+                        }
+                        @if (p.icp_bonus_signals?.length) {
+                          <div><b>Bonus:</b>
+                            {{ p.icp_bonus_signals!.filter(b => b.hit).map(b => b.label).join(', ') || 'brak' }}
                           </div>
                         }
                         @if (p.website_url) {
@@ -915,7 +967,7 @@ interface BatchProgress {
                               @if (p.enrichment_log.claude.signal_reasoning) {
                                 <div class="log-signals">
                                   @for (s of signalDefs; track s.key) {
-                                    @if (p.enrichment_log.claude.signal_reasoning![s.key]) {
+                                    @if (getSignalReasoning(p, s)) {
                                       <div class="log-signal-row">
                                         <span class="sig-dot log-sig-dot"
                                           [class.sig-yes]="getSignal(p, s.key) === true"
@@ -923,21 +975,11 @@ interface BatchProgress {
                                         </span>
                                         <span class="log-signal-key">{{ s.label }}</span>
                                         <span class="log-signal-reason">
-                                          {{ p.enrichment_log.claude.signal_reasoning![s.key] }}
+                                          {{ getSignalReasoning(p, s) }}
                                         </span>
                                       </div>
                                     }
                                   }
-                                </div>
-                              }
-                              @if (p.enrichment_log.claude.branches_found?.count) {
-                                <div class="log-branches">
-                                  <span class="log-muted">Oddziały ze strony WWW:</span>
-                                  <span class="log-detail"> {{ p.enrichment_log.claude.branches_found!.count }}</span>
-                                  @if (p.enrichment_log.claude.branches_found!.locations?.length) {
-                                    <span class="log-muted"> ({{ p.enrichment_log.claude.branches_found!.locations.join(', ') }})</span>
-                                  }
-                                  <span class="log-muted"> · zasięg: {{ p.enrichment_log.claude.branches_found!.scope }}</span>
                                 </div>
                               }
                             </div>
@@ -1260,8 +1302,8 @@ interface BatchProgress {
                     <span class="iv" style="font-family:monospace;font-size:10px">{{ inspectTarget()!.enrichment_log!.claude!.model }}</span>
                   </div>
                   <div class="inspect-row">
-                    <span class="ik">Oddziały z</span>
-                    <span class="iv">{{ branchesSourceLabel(inspectTarget()!.enrichment_log!.claude!.branches_source) }}</span>
+                    <span class="ik">Bramki</span>
+                    <span class="iv">{{ gateStatusLabel(inspectTarget()!.enrichment_log!.claude!.gate_status || '') }}</span>
                   </div>
                 </div>
               </div>
@@ -1283,8 +1325,8 @@ interface BatchProgress {
                   </span>
                   <div class="inspect-signal-body">
                     <div class="inspect-signal-name">{{ s.label }}</div>
-                    @if (getSignalReasoning(inspectTarget()!, s.key)) {
-                      <div class="inspect-signal-reason">{{ getSignalReasoning(inspectTarget()!, s.key) }}</div>
+                    @if (getSignalReasoning(inspectTarget()!, s)) {
+                      <div class="inspect-signal-reason">{{ getSignalReasoning(inspectTarget()!, s) }}</div>
                     } @else {
                       <div class="inspect-signal-reason inspect-muted">brak uzasadnienia</div>
                     }
@@ -1300,51 +1342,36 @@ interface BatchProgress {
               <div class="inspect-score-breakdown">
                 <div class="sb-row">
                   <span class="sb-label">Aktywne sygnały (true)</span>
-                  <span class="sb-value">{{ sb.trueCount }} / 7</span>
+                  <span class="sb-value">{{ sb.trueCount }} / 8</span>
                 </div>
                 <div class="sb-row" style="background:#f9fafb">
-                  <span class="sb-label">Baza ({{ sb.trueCount }}/7 sygnałów true)</span>
-                  <span class="sb-value" style="color:#374151">{{ sb.base }}</span>
+                  <span class="sb-label">Bramki (B2B / wielkość firmy)</span>
+                  <span class="sb-value" style="color:#374151">{{ sb.gates.b2b }} / {{ sb.gates.company_size }} → {{ gateStatusLabel(sb.gateStatus) }}</span>
                 </div>
-                @if (sb.branchCorrection !== 0) {
-                  <div class="sb-row">
-                    <span class="sb-label">Korekta za oddziały ({{ inspectTarget()!.branches_count }} szt.)</span>
-                    <span class="sb-value sb-plus">+{{ sb.branchCorrection }}</span>
-                  </div>
+                <div class="sb-row">
+                  <span class="sb-label">Suma sygnałów ({{ sb.trueCount }}/8 true, wagi 10/5)</span>
+                  <span class="sb-value sb-plus">{{ sb.raw }}</span>
+                </div>
+                @for (b of sb.bonusBreakdown; track b.id) {
+                  @if (b.hit) {
+                    <div class="sb-row">
+                      <span class="sb-label">Bonus: {{ b.label }}</span>
+                      <span class="sb-value sb-plus">+{{ b.points }}</span>
+                    </div>
+                  }
                 }
-                @if (sb.scopeCorrection !== 0) {
-                  <div class="sb-row">
-                    <span class="sb-label">Korekta za zasięg ({{ inspectTarget()!.travel_scope }})</span>
-                    <span class="sb-value sb-plus">+{{ sb.scopeCorrection }}</span>
-                  </div>
-                } @else {
-                  <div class="sb-row">
-                    <span class="sb-label">Korekta za zasięg ({{ inspectTarget()!.travel_scope || 'brak' }})</span>
-                    <span class="sb-value" style="color:#9ca3af">0</span>
-                  </div>
-                }
-                @if (sb.pkdBonus !== 0) {
-                  <div class="sb-row">
-                    <span class="sb-label">Bonus GUS PKD: {{ sb.pkdMain }} (branża)</span>
-                    <span class="sb-value sb-plus">+{{ sb.pkdBonus }}</span>
-                  </div>
-                }
-                @if (sb.noDataCorrection !== 0) {
-                  <div class="sb-row">
-                    <span class="sb-label">Kara: brak danych (no KRS + no WWW)</span>
-                    <span class="sb-value" style="color:#dc2626">{{ sb.noDataCorrection }}</span>
-                  </div>
+                @for (f of sb.downgradeFlags; track f.id) {
+                  @if (f.points) {
+                    <div class="sb-row">
+                      <span class="sb-label">{{ f.label }}</span>
+                      <span class="sb-value sb-minus">{{ f.points }}</span>
+                    </div>
+                  }
                 }
                 <div class="sb-row sb-total">
                   <span class="sb-label">Wynik obliczony</span>
                   <span class="sb-value">= {{ sb.total }}</span>
                 </div>
-                @if (sb.actualScore != null && sb.actualScore !== sb.total) {
-                  <div class="sb-row" style="font-size:11px;color:#9ca3af;background:#fafafa">
-                    <span class="sb-label">Wynik w bazie (Claude)</span>
-                    <span class="sb-value">{{ sb.actualScore }}</span>
-                  </div>
-                }
               </div>
             }
 
@@ -1362,18 +1389,6 @@ interface BatchProgress {
               </div>
             }
 
-            @if (inspectTarget()!.enrichment_log!.claude?.branches_found?.locations?.length) {
-              <div>
-                <div class="inspect-section-title" style="margin-bottom:5px">
-                  Lokalizacje znalezione na stronie ({{ inspectTarget()!.enrichment_log!.claude!.branches_found!.count }})
-                </div>
-                <div style="display:flex;flex-wrap:wrap;gap:4px">
-                  @for (loc of inspectTarget()!.enrichment_log!.claude!.branches_found!.locations; track $index) {
-                    <span style="padding:1px 7px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;font-size:11px">{{ loc }}</span>
-                  }
-                </div>
-              </div>
-            }
           </div>
 
           @if (inspectTarget()!.key_contacts?.length) {
@@ -1518,9 +1533,10 @@ interface BatchProgress {
 
     .tbl { width:100%; border-collapse:collapse; font-size:13px; }
     .tbl th {
-      background:#f9fafb; text-align:left; padding:8px 10px;
+      background:#f9fafb; text-align:left; padding:8px 10px 14px;
       border-bottom:1px solid #e5e7eb; font-size:11px;
       font-weight:600; color:#6b7280; white-space:nowrap; position:sticky; top:0; z-index:1;
+      vertical-align:bottom;
     }
     .tbl td { padding:8px 10px; border-bottom:1px solid #f3f4f6; vertical-align:top; }
     .tbl tr:hover td { background:#fafafa; }
@@ -1531,14 +1547,14 @@ interface BatchProgress {
     .tbl tr.detail-row:hover td { background:#fafafa !important; }
 
     /* Kolumna checkbox */
-    .cb-th { width: 36px; min-width: 36px; max-width: 36px; text-align: center; padding: 8px 4px !important; }
+    .cb-th { width: 36px; min-width: 36px; max-width: 36px; text-align: center; padding: 8px 4px 14px !important; vertical-align: bottom; }
     .cb-td { width: 36px; padding: 8px 4px !important; text-align: center; vertical-align: middle; }
     .cb-th input, .cb-td input { cursor: pointer; accent-color: var(--orange); }
 
     /* Nagłówki sygnałów — tekst pionowy */
     .sig-th {
       width: 28px; min-width: 28px; max-width: 28px;
-      height: 96px;
+      height: 80px;
       padding: 4px 0 4px 0 !important;
       vertical-align: bottom;
       text-align: center;
@@ -1881,6 +1897,7 @@ interface BatchProgress {
     }
     .sb-value { font-weight: 600; }
     .sb-plus { color: #16a34a; }
+    .sb-minus { color: #dc2626; }
 
     .inspect-footer {
       border-top: 1px solid #e5e7eb;
@@ -2055,7 +2072,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     if (qp.get('show_archived') === 'true') this.showArchived.set(true);
     const pg = parseInt(qp.get('page') ?? '', 10);
     if (!isNaN(pg) && pg > 0) this.page.set(pg);
-    const validSorts = ['imported_at', 'enriched_at', 'travel_potential_score', 'company_name'];
+    const validSorts = ['imported_at', 'enriched_at', 'icp_score', 'company_name'];
     const sortParam = qp.get('sort');
     if (sortParam && validSorts.includes(sortParam)) this.sort.set(sortParam);
     const dirParam = qp.get('dir');
@@ -2255,7 +2272,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         if (err.status === 409 && err.error?.error === 'duplicate_company') {
           this.toLeadDuplicateError.set(err.error.existing);
         } else if (err.status === 409 && err.error?.nip_conflict) {
-          alert(err.error.error);
+          this.toast.error(err.error.error);
         } else if (err.status === 409) {
           this.toLeadDialog.set(null);
           this.load();
@@ -2303,7 +2320,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         p.note_updated_at = r.note_updated_at;
         this.noteEdits.delete(p.id);
       },
-      error: e => alert(e.error?.error || 'Błąd zapisu notatki'),
+      error: e => this.toast.error(e.error?.error || 'Błąd zapisu notatki'),
     });
   }
 
@@ -2394,7 +2411,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.statusActioning.set(null);
         this.processingIds.update(set => { const n = new Set(set); n.delete(p.id); return n; });
         if (err.status === 409) {
-          alert(err.error?.error || 'Konflikt NIP — inny rekord ma już ten numer.');
+          this.toast.error(err.error?.error || 'Konflikt NIP — inny rekord ma już ten numer.');
         }
       },
     });
@@ -2512,19 +2529,14 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
 
   // ── Helpers ─────────────────────────────────────────────────────
 
-  // Zwraca wartość sygnału lub null dla starego formatu (tablica stringów)
   getSignal(p: Prospect, key: string): boolean | null {
-    let raw: unknown = p.travel_signals;
-    // Zabezpieczenie: pg może zwrócić JSONB jako string (gdy brak type parsera)
+    let raw: unknown = p.icp_signals;
     if (typeof raw === 'string') {
       try { raw = JSON.parse(raw); } catch { return null; }
     }
-    if (!raw || Array.isArray(raw)) return null;
-    const val = (raw as Record<string, unknown>)[key];
-    // Claude może zwrócić "true"/"false" jako string zamiast boolean
-    if (val === true  || val === 'true')  return true;
-    if (val === false || val === 'false') return false;
-    return null;
+    if (!Array.isArray(raw)) return null;
+    const found = (raw as IcpSignalHit[]).find(s => s.id === key);
+    return found ? found.hit : null;
   }
 
   signalTooltip(p: Prospect, key: string, desc: string): string {
@@ -2535,20 +2547,22 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   }
 
   qualifiesForLead(p: Prospect): boolean {
-    return p.travel_potential_score != null && p.travel_potential_score >= this.minLeadScore();
+    return p.icp_score != null && p.icp_score >= this.minLeadScore();
   }
 
   leadButtonTooltip(p: Prospect): string {
-    if (p.travel_potential_score == null) return 'Firma nie została jeszcze wzbogacona — brak score';
+    if (p.icp_score == null) return 'Firma nie została jeszcze wzbogacona — brak score';
     if (!this.qualifiesForLead(p)) {
-      return `Score zbyt niski (${p.travel_potential_score}/100). Wymagane ≥ ${this.minLeadScore()}. Próg konfigurowalny w App Settings → CRM.`;
+      return `Score zbyt niski (${p.icp_score}/100). Wymagane ≥ ${this.minLeadScore()}. Próg konfigurowalny w App Settings → CRM.`;
     }
     return 'Utwórz lead w CRM';
   }
 
+  // Progi przeliczone pod nowy max ICP (65 za sygnały + 10 bonus = 75, nie 100
+  // jak w starym systemie) — 60%/33% z 75, zaokrąglone.
   scoreColor(score: number): string {
-    if (score >= 70) return '#16a34a';
-    if (score >= 40) return '#d97706';
+    if (score >= 45) return '#16a34a';
+    if (score >= 25) return '#d97706';
     return '#dc2626';
   }
 
@@ -2563,17 +2577,16 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
 
   statusClass(s: string): string { return `badge badge-${s}`; }
 
-  scopeIcon(scope: string): string {
-    return { local: '📍', national: '🇵🇱', eu: '🇪🇺', global: '🌍' }[scope] ?? scope;
+  gateStatusIcon(status: string): string {
+    return { qualified: '✅', disqualified: '⛔', needs_review: '❓' }[status] ?? status;
   }
 
-  scopeLabel(scope: string): string {
+  gateStatusLabel(status: string): string {
     return {
-      local: 'Lokalny (jedno miasto/region)',
-      national: 'Krajowy (ogólnopolski)',
-      eu: 'Europejski (eksport / biura EU)',
-      global: 'Globalny (aktywność międzynarodowa)',
-    }[scope] ?? scope;
+      qualified: 'Zakwalifikowana (B2B + wielkość: pass)',
+      disqualified: 'Odrzucona (potwierdzony fail bramki)',
+      needs_review: 'Do ręcznego przeglądu (brak pewnych danych)',
+    }[status] ?? status;
   }
 
   websiteMethodLabel(method: string): string {
@@ -2611,70 +2624,39 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getSignalReasoning(p: Prospect, key: string): string | null {
+  getSignalReasoning(p: Prospect, s: { key: string; reasoningKey: string }): string | null {
     const r = p.enrichment_log?.claude?.signal_reasoning;
     if (!r) return null;
-    return r[key] || null;
+    // reasoningKey = nazwa pola z promptu AI (np. field_sales_team), różna od
+    // `key` = id sygnału (np. dzial_handlowy) dla 7 z 8 sygnałów. Fallback do
+    // `key` — starsze rekordy sprzed wprowadzenia promptKey mogły zapisać
+    // reasoning pod samym id.
+    return r[s.reasoningKey] || r[s.key] || null;
   }
 
-  branchesSourceLabel(src: string): string {
-    return ({ krs: 'KRS (rejestrowe)', web: 'strona WWW', none: 'brak' } as Record<string, string>)[src] ?? src;
-  }
-
-  private calcGusBonus(pkdCodes: string[], branchesCount: number | null): number {
-    const ALWAYS = [
-      { prefix: '79', bonus: 15 }, { prefix: '49', bonus: 10 },
-      { prefix: '28', bonus: 8  }, { prefix: '33', bonus: 8  },
-    ];
-    const WITH_BRANCHES = [
-      { prefix: '62', bonus: 6 }, { prefix: '63', bonus: 5 },
-      { prefix: '70', bonus: 5 }, { prefix: '71', bonus: 5 },
-      { prefix: '72', bonus: 4 }, { prefix: '73', bonus: 4 }, { prefix: '74', bonus: 4 },
-    ];
-    if (!pkdCodes?.length) return 0;
-    let max = 0;
-    for (const code of pkdCodes) {
-      const prefix = code.replace(/\./g, '').slice(0, 2);
-      const a = ALWAYS.find(p => p.prefix === prefix);
-      if (a && a.bonus > max) max = a.bonus;
-      if (branchesCount != null && branchesCount > 1) {
-        const b = WITH_BRANCHES.find(p => p.prefix === prefix);
-        if (b && b.bonus > max) max = b.bonus;
-      }
-    }
-    return max;
-  }
-
+  // Backend liczy już cały breakdown (icp_signals/icp_gates/icp_bonus_signals) —
+  // tu tylko składamy to w kształt wygodny do renderowania w inspektorze,
+  // bez powtarzania formuły scoringu po stronie frontendu.
   calcScoreBreakdown(p: Prospect): {
-    trueCount: number; base: number;
-    branchCorrection: number; scopeCorrection: number;
-    pkdBonus: number; pkdMain: string | null;
-    noDataCorrection: number; total: number; actualScore: number | null;
+    trueCount: number; raw: number; bonus: number; downgradePenalty: number; total: number;
+    gates: IcpGates; gateStatus: string;
+    bonusBreakdown: IcpBonusHit[];
+    downgradeFlags: IcpDowngradeFlag[];
   } {
-    const trueCount = SIGNAL_DEFS.filter(s => this.getSignal(p, s.key) === true).length;
-    const baseLookup = [15, 30, 40, 50, 60, 70, 80, 90];
-    const base = baseLookup[Math.min(trueCount, 7)];
-
-    const hasBranches = this.getSignal(p, 'branches') === true;
-    const cnt = p.branches_count;
-    const branchCorrection = hasBranches && cnt != null
-      ? cnt >= 50 ? 25 : cnt >= 10 ? 15 : cnt >= 2 ? 8 : 0
-      : 0;
-
-    const scopeMap: Record<string, number> = { local: 0, national: 5, eu: 7, global: 10 };
-    const scopeCorrection = scopeMap[p.travel_scope ?? ''] ?? 0;
-
-    const gusCodes = p.enrichment_log?.gus?.pkd_codes ?? [];
-    const pkdBonus = (gusCodes.length > 0 && trueCount < 3)
-      ? this.calcGusBonus(gusCodes, p.branches_count)
-      : 0;
-    const pkdMain = p.enrichment_log?.gus?.pkd_main ?? null;
-
-    const noKrs = !p.enrichment_log?.krs?.found;
-    const noWeb = !p.enrichment_log?.website?.url;
-    const noDataCorrection = noKrs && noWeb ? -10 : 0;
-
-    const total = Math.min(100, Math.max(5, base + branchCorrection + scopeCorrection + pkdBonus + noDataCorrection));
-    return { trueCount, base, branchCorrection, scopeCorrection, pkdBonus, pkdMain, noDataCorrection, total, actualScore: p.travel_potential_score };
+    const signals = p.icp_signals ?? [];
+    const trueCount = signals.filter(s => s.hit).length;
+    const raw = signals.filter(s => s.hit).reduce((sum, s) => sum + s.points, 0);
+    const bonusBreakdown = p.icp_bonus_signals ?? [];
+    const bonus = bonusBreakdown.filter(b => b.hit).reduce((sum, b) => sum + b.points, 0);
+    const downgradeFlags = p.icp_downgrade_flags ?? [];
+    const downgradePenalty = downgradeFlags.reduce((sum, f) => sum + (f.points ?? 0), 0);
+    return {
+      trueCount, raw, bonus, downgradePenalty,
+      total: p.icp_score ?? Math.max(0, Math.min(100, raw + bonus + downgradePenalty)),
+      gates: p.icp_gates ?? { b2b: 'unknown', company_size: 'unknown' },
+      gateStatus: p.icp_gate_status ?? 'needs_review',
+      bonusBreakdown,
+      downgradeFlags,
+    };
   }
 }

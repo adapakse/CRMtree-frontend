@@ -168,7 +168,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     .score-table th { color:#9ca3af; padding:6px 10px; font-size:10px; font-weight:600; border-bottom:1px solid #f3f4f6; text-align:left; }
     .score-table td { padding:7px 10px; border-bottom:1px solid #f9fafb; vertical-align:middle; }
     .num { text-align:right; }
-    .link { color:#f97316; text-decoration:none; font-weight:600; }
+    .link { color:var(--orange); text-decoration:none; font-weight:600; }
     .link:hover { text-decoration:underline; }
     .sbadge { padding:1px 7px; border-radius:8px; font-size:10px; font-weight:700; }
     .sbadge-active { background:#dcfce7; color:#166534; }

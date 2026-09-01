@@ -416,7 +416,8 @@ const TYPE_LABELS: Record<string, string> = {
     .page-title { font-size:16px;font-weight:700;color:var(--gray-900);white-space:nowrap }
     .tsp { flex:1 }
     .srch { border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:12.5px;outline:none;width:180px }
-    .sel  { border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:12.5px;outline:none }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    .sel:focus { border-color:var(--orange); }
     .view-tabs { display:flex;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden }
     .view-tabs button { padding:6px 12px;border:none;background:white;font-size:12px;cursor:pointer;color:var(--gray-600) }
     .view-tabs button.active { background:var(--orange);color:white;font-weight:600 }
@@ -428,16 +429,16 @@ const TYPE_LABELS: Record<string, string> = {
     /* Partners Grid */
     .partners-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px }
     .partner-card { background:white;border:1px solid var(--gray-200);border-radius:12px;padding:16px;cursor:pointer;transition:box-shadow .15s,border-color .15s }
-    .partner-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:#fed7aa }
+    .partner-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:var(--orange-muted) }
     .pc-header { display:flex;align-items:flex-start;gap:10px;margin-bottom:12px }
     .pc-icon { font-size:24px }
     .pc-name { font-weight:700;font-size:15px }
     .pc-nip  { font-size:11px;color:var(--gray-400);font-family:monospace }
-    .step-badge { background:#fff7ed;color:#f97316;border:1px solid #fed7aa;border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap }
+    .step-badge { background:var(--orange-pale);color:var(--orange-dark);border:1px solid var(--orange-muted);border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap }
     .pc-progress { display:flex;gap:4px;margin-bottom:10px }
     .pc-step { flex:1;text-align:center;padding:6px 2px;border-radius:6px;background:var(--gray-100);font-size:10px;color:var(--gray-500) }
     .pc-step.done   { background:#dcfce7;color:#166534 }
-    .pc-step.active { background:#fff7ed;color:#f97316;font-weight:700;border:1px solid #fed7aa }
+    .pc-step.active { background:var(--orange-pale);color:var(--orange-dark);font-weight:700;border:1px solid var(--orange) }
     .pc-step-lbl { display:block;font-size:9px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
     .pc-tasks { display:flex;align-items:center;gap:8px;margin-bottom:6px }
     .pc-task-bar { flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden }
@@ -445,14 +446,14 @@ const TYPE_LABELS: Record<string, string> = {
     .pc-task-text { font-size:11px;color:var(--gray-500);white-space:nowrap }
     .pc-mgr { font-size:11px;color:var(--gray-400) }
     .launch-btn { border:1px solid var(--gray-300);background:var(--gray-100);color:var(--gray-400);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:not-allowed;transition:all .15s }
-    .launch-btn.launch-ready { background:#f97316;border-color:#f97316;color:white;cursor:pointer }
-    .launch-btn.launch-ready:hover { background:#ea6c0a }
+    .launch-btn.launch-ready { background:var(--orange);border-color:var(--orange);color:white;cursor:pointer }
+    .launch-btn.launch-ready:hover { background:var(--orange-dark) }
     .launch-btn:disabled:not(.launch-ready) { opacity:.6 }
 
     /* Partners sub-toolbar */
     .partners-toolbar { display:flex;gap:6px;margin-bottom:12px }
     .btn-view { background:none;border:1px solid var(--gray-200);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--gray-500) }
-    .btn-view.active { background:#fff7ed;border-color:#f97316;color:#f97316;font-weight:700 }
+    .btn-view.active { background:var(--orange-pale);border-color:var(--orange);color:var(--orange-dark);font-weight:700 }
 
     /* Partners table */
     .pt-wrap { background:white;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden }
@@ -463,7 +464,7 @@ const TYPE_LABELS: Record<string, string> = {
     .si { font-size:10px;color:var(--gray-300) }
     .pt-row { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;padding:0 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s }
     .pt-row:last-child { border-bottom:none }
-    .pt-row:hover { background:#fffbf7 }
+    .pt-row:hover { background:var(--orange-pale) }
     .pt-td { padding:10px 10px;font-size:13px;color:var(--gray-700);display:flex;flex-direction:column;justify-content:center;gap:2px }
     .pt-company { font-weight:600;color:var(--gray-900) }
     .pt-nip { font-size:10px;color:var(--gray-400);font-family:monospace;display:none }
@@ -484,7 +485,7 @@ const TYPE_LABELS: Record<string, string> = {
     .kb-cnt { background:var(--gray-200);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700 }
     .kb-cards { flex:1;overflow-y:auto;padding:8px }
     .kb-card { background:white;border:1px solid var(--gray-200);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;transition:box-shadow .12s }
-    .kb-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08);border-color:#fed7aa }
+    .kb-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08);border-color:var(--orange-muted) }
     .kb-card.done { opacity:.6;background:var(--gray-50) }
     .kb-card-top { display:flex;align-items:center;gap:6px;margin-bottom:4px }
     .type-icon { font-size:14px }
@@ -498,20 +499,20 @@ const TYPE_LABELS: Record<string, string> = {
     .kb-card-actions { display:flex;justify-content:flex-end;margin-top:4px }
     .kb-del-btn { background:none;border:none;font-size:12px;cursor:pointer;opacity:.3;padding:2px 4px;border-radius:4px }
     .kb-del-btn:hover { opacity:1;background:#fee2e2 }
-    .kb-add:hover { border-color:#f97316;color:#f97316 }
+    .kb-add:hover { border-color:var(--orange);color:var(--orange) }
     .done-badge { background:#dcfce7;color:#166534;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700 }
 
     /* Timeline */
     .timeline-wrap { max-width:720px;margin:0 auto;padding-bottom:40px }
     .tl-group { margin-bottom:24px }
     .tl-date-label { display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px }
-    .tl-date-label.tl-today { color:#f97316 }
+    .tl-date-label.tl-today { color:var(--orange) }
     .tl-date-label.tl-past  { color:var(--gray-300) }
     .tl-dot { width:10px;height:10px;border-radius:50%;background:var(--gray-300);flex-shrink:0 }
-    .tl-today .tl-dot { background:#f97316 }
-    .today-tag { background:#f97316;color:white;border-radius:4px;padding:1px 6px;font-size:10px }
+    .tl-today .tl-dot { background:var(--orange) }
+    .today-tag { background:var(--orange);color:white;border-radius:4px;padding:1px 6px;font-size:10px }
     .tl-item { display:flex;gap:12px;padding:10px 12px;background:white;border:1px solid var(--gray-200);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:border-color .12s }
-    .tl-item:hover { border-color:#fed7aa }
+    .tl-item:hover { border-color:var(--orange-muted) }
     .tl-item.tl-done { opacity:.6 }
     .tl-time { font-size:12px;font-weight:700;color:var(--gray-600);width:44px;flex-shrink:0;padding-top:2px }
     .tl-content { flex:1 }
@@ -527,9 +528,9 @@ const TYPE_LABELS: Record<string, string> = {
     .cal-dow  { text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:var(--gray-500);border-bottom:1px solid var(--gray-200) }
     .cal-cell { min-height:90px;padding:4px;border-right:1px solid var(--gray-100);border-bottom:1px solid var(--gray-100);overflow:hidden }
     .cal-cell.cal-other { background:var(--gray-50) }
-    .cal-cell.cal-today { background:#fff7ed }
+    .cal-cell.cal-today { background:var(--orange-pale) }
     .cal-day-num { font-size:11px;font-weight:600;color:var(--gray-400);margin-bottom:3px }
-    .cal-today .cal-day-num { color:#f97316;font-weight:700 }
+    .cal-today .cal-day-num { color:var(--orange);font-weight:700 }
     .cal-event { font-size:10px;padding:2px 4px;border-radius:4px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#eff6ff;color:#1d4ed8 }
     .cal-event.cal-done { opacity:.5;text-decoration:line-through }
     .cal-step-0 { background:#fef3c7;color:#92400e }
@@ -556,7 +557,7 @@ const TYPE_LABELS: Record<string, string> = {
     .btn-g { background:var(--gray-100);color:var(--gray-700) }
     .btn-g:hover { background:var(--gray-200) }
     .btn-p { background:var(--orange);color:white }
-    .btn-p:hover { background:#ea6c0a }
+    .btn-p:hover { background:var(--orange-dark) }
     .btn-p:disabled { opacity:.5;cursor:not-allowed }
     .btn-d { background:#fee2e2;color:#991b1b }
     .btn-sm { padding:5px 10px;font-size:12px }
