@@ -49,10 +49,10 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
 
           <!-- OVERVIEW -->
           @if (activeTab === 'overview') {
-            <div class="sec-title">Document Metadata</div>
+            <div class="sec-title">Metadane dokumentu</div>
             <div class="fgrid">
               <div class="fg">
-                <label class="fl">Document Name <span class="req">*</span></label>
+                <label class="fl">Nazwa dokumentu <span class="req">*</span></label>
                 <input class="fi" [(ngModel)]="draft.name" [readOnly]="doc._access !== 'full'">
               </div>
               <div class="fg">
@@ -68,7 +68,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Document Type</label>
+                <label class="fl">Typ dokumentu</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.doc_type">
                     <option value="">— wybierz typ —</option>
@@ -81,7 +81,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">GDPR</label>
+                <label class="fl">Klasyfikacja GDPR</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.gdpr_type">
                     @for (t of gdprTypeOptions; track t.value) {
@@ -93,7 +93,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Group</label>
+                <label class="fl">Grupa</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.group_id">
                     @for (g of groups(); track g.id) {
@@ -105,25 +105,14 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Owner</label>
+                <label class="fl">Właściciel</label>
                 @if (doc._access === 'full') {
-                  <div style="position:relative">
-                    <input class="fi" style="width:100%;box-sizing:border-box"
-                           placeholder="Search by name or email..."
-                           [(ngModel)]="ownerSearch"
-                           (ngModelChange)="onOwnerSearch($event)"
-                           (blur)="hideOwnerDropdown()">
-                    @if (ownerDropdown().length > 0) {
-                      <div class="udrop">
-                        @for (u of ownerDropdown(); track u.id) {
-                          <div class="udrop-item" (mousedown)="selectOwner(u)">
-                            <div style="font-weight:500;font-size:13px">{{ u.display_name }}</div>
-                            <div style="font-size:11px;color:var(--gray-400)">{{ u.email }}</div>
-                          </div>
-                        }
-                      </div>
+                  <select class="fsel" [(ngModel)]="draft.owner_id">
+                    <option value="">— nieprzypisany —</option>
+                    @for (u of users(); track u.id) {
+                      <option [value]="u.id">{{ u.display_name }}</option>
                     }
-                  </div>
+                  </select>
                 } @else {
                   <div style="display:flex;align-items:center;gap:8px;padding-top:4px">
                     <wt-avatar [name]="doc.owner_name ?? ''" [size]="28" />
@@ -132,7 +121,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Entity 1</label>
+                <label class="fl">Podmiot 1</label>
                 @if (doc._access === 'full') {
                   @if (entity1Options.length > 0) {
                   <select class="fsel" [(ngModel)]="draft.entity1">
@@ -149,18 +138,18 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Entity 2</label>
+                <label class="fl">Podmiot 2</label>
                 <input class="fi" [(ngModel)]="draft.entity2"
                        [readOnly]="doc._access !== 'full'" placeholder="np. Partner Ltd.">
               </div>
               <div class="fg">
-                <label class="fl">Signing Date</label>
+                <label class="fl">Data podpisania</label>
                 <input class="fi" type="date" [(ngModel)]="draft.signing_date"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''">
               </div>
               <div class="fg">
-                <label class="fl">Expiration Date</label>
+                <label class="fl">Data wygaśnięcia</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
                     <option value="indefinite">Czas nieokreślony</option>
@@ -315,7 +304,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
 
             @if (doc.document_group_name) {
               <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--orange-dark)">
-                📎 Part of document bundle: <strong>{{ doc.document_group_name }}</strong>
+                📎 Część pakietu dokumentów: <strong>{{ doc.document_group_name }}</strong>
               </div>
             }
           }
@@ -346,17 +335,17 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                     </div>
                   }
                   @if (previewBlobUrl()) {
-                    <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" title="PDF Preview"></iframe>
+                    <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" title="Podgląd PDF"></iframe>
                   }
                 </div>
               }
             } @else {
               <div class="empty-state">
                 <div class="empty-icon">📎</div>
-                <div class="empty-title">No file attached</div>
+                <div class="empty-title">Brak dołączonego pliku</div>
                 @if (doc._access === 'full') {
                   <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
-                    Upload File
+                    Wgraj plik
                     <input type="file" hidden accept=".pdf,.docx,.doc" (change)="uploadFile($event)">
                   </label>
                 }
@@ -369,7 +358,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             @if (doc._access === 'full' && doc.blob_name) {
               <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
                 <label class="btn btn-p btn-sm" style="cursor:pointer">
-                  &#11014; Upload New Version
+                  &#11014; Wgraj nową wersję
                   <input type="file" hidden accept=".pdf,.docx,.doc" (change)="uploadNewVersion($event)">
                 </label>
               </div>
@@ -383,15 +372,15 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                   <div style="font-size:13px;font-weight:600;color:var(--gray-900)">v{{ v.version_number }} · {{ v.label }}</div>
                   <div style="font-size:11.5px;color:var(--gray-400)">
                     {{ v.created_at | date:'dd.MM.yyyy HH:mm' }}
-                    @if (v.signatory_name) { · Signed by {{ v.signatory_name }} }
+                    @if (v.signatory_name) { · Podpisał(a) {{ v.signatory_name }} }
                     @if (v.blob_size_bytes) { · {{ formatSize(v.blob_size_bytes) }} }
                   </div>
                 </div>
-                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)">⬇ Download</button>
+                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)">⬇ Pobierz</button>
               </div>
             }
             @empty {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No versions yet</div></div>
+              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Brak wersji</div></div>
             }
           }
 
@@ -400,7 +389,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             @if (doc._access === 'full') {
               <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
                 <label class="btn btn-p btn-sm" style="cursor:pointer">
-                  &#11014; Add Attachment
+                  &#11014; Dodaj załącznik
                   <input type="file" hidden (change)="uploadAttachment($event)">
                 </label>
               </div>
@@ -412,14 +401,14 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                   <div style="flex:1">
                     <div style="font-size:13px;font-weight:600;color:var(--gray-900)">{{ att.name }}</div>
                     <div style="font-size:11.5px;color:var(--gray-400)">
-                      {{ att.versions?.length ?? 0 }} version(s) &middot; {{ att.mime_type }}
+                      {{ att.versions?.length ?? 0 }} wersji &middot; {{ att.mime_type }}
                       @if (att.blob_size_bytes) { &middot; {{ formatSize(att.blob_size_bytes) }} }
                     </div>
                   </div>
-                  <button class="btn btn-g btn-sm" (click)="downloadAttachment(att)">&#11015; Download</button>
+                  <button class="btn btn-g btn-sm" (click)="downloadAttachment(att)">&#11015; Pobierz</button>
                   @if (doc._access === 'full') {
                     <label class="btn btn-g btn-sm" style="cursor:pointer">
-                      &#11014; New version
+                      &#11014; Nowa wersja
                       <input type="file" hidden (change)="uploadAttachmentVersion($event, att.id)">
                     </label>
                     <button class="btn btn-d btn-sm" (click)="deleteAttachment(att.id)">&#10005;</button>
@@ -427,7 +416,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 </div>
                 @if (att.versions?.length > 1) {
                   <div style="padding:8px 14px;border-top:1px solid var(--gray-100)">
-                    <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;margin-bottom:6px">Versions</div>
+                    <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;margin-bottom:6px">Wersje</div>
                     @for (ver of att.versions; track ver.id) {
                       <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-100);font-size:12px">
                         <span style="color:var(--gray-500);min-width:24px">v{{ ver.version_number }}</span>
@@ -444,10 +433,10 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             @empty {
               <div class="empty-state">
                 <div class="empty-icon">&#128206;</div>
-                <div class="empty-title">No attachments yet</div>
+                <div class="empty-title">Brak załączników</div>
                 @if (doc._access === 'full') {
                   <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
-                    Add First Attachment
+                    Dodaj pierwszy załącznik
                     <input type="file" hidden (change)="uploadAttachment($event)">
                   </label>
                 }
@@ -458,7 +447,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
           <!-- HISTORY TIMELINE -->
           @if (activeTab === 'history') {
             @if (history().length === 0) {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No history yet</div></div>
+              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Brak historii</div></div>
             } @else {
               <ul class="tl">
                 @for (entry of history(); track entry.id) {
@@ -480,13 +469,13 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
           <!-- WORKFLOW -->
           @if (activeTab === 'workflow') {
             @if (doc._access === 'full') {
-              <div class="sec-title">Assign Task</div>
+              <div class="sec-title">Przypisz zadanie</div>
               <div class="fgrid">
                 <div class="fg">
-                  <label class="fl">Assign to User <span class="req">*</span></label>
+                  <label class="fl">Przypisz do użytkownika <span class="req">*</span></label>
                   <div style="position:relative">
                     <input class="fi" style="width:100%;box-sizing:border-box"
-                           placeholder="Search by name or email..."
+                           placeholder="Szukaj po nazwisku lub e-mailu…"
                            [(ngModel)]="wf.assignSearch"
                            (ngModelChange)="onUserSearch($event)"
                            (blur)="hideDropdown()">
@@ -502,42 +491,42 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                     }
                     @if (wf.assignTo) {
                       <div style="margin-top:4px;font-size:12px;color:var(--orange);font-weight:500">
-                        Selected: {{ wf.assignToName }}
+                        Wybrano: {{ wf.assignToName }}
                       </div>
                     }
                   </div>
                 </div>
                 <div class="fg">
-                  <label class="fl">Task Type <span class="req">*</span></label>
+                  <label class="fl">Typ zadania <span class="req">*</span></label>
                   <select class="fsel" [(ngModel)]="wf.taskType">
-                    <option value="read">Read</option>
-                    <option value="edit">Edit</option>
-                    <option value="approve">Approve</option>
-                    <option value="sign">Sign</option>
+                    <option value="read">Odczyt</option>
+                    <option value="edit">Edycja</option>
+                    <option value="approve">Akceptacja</option>
+                    <option value="sign">Podpis</option>
                   </select>
                 </div>
                 <div class="fg">
-                  <label class="fl">Due Date</label>
+                  <label class="fl">Termin</label>
                   <input class="fi" type="date" [(ngModel)]="wf.dueDate">
                 </div>
                 <div class="fg full">
-                  <label class="fl">Message</label>
-                  <textarea class="fta" placeholder="Optional message to assignee…" [(ngModel)]="wf.message"></textarea>
+                  <label class="fl">Wiadomość</label>
+                  <textarea class="fta" placeholder="Opcjonalna wiadomość dla osoby przypisanej…" [(ngModel)]="wf.message"></textarea>
                 </div>
               </div>
               <button class="btn btn-p" [disabled]="!wf.assignTo" (click)="assignTask()">
-                📨 Assign &amp; Send Email
+                📨 Przypisz i wyślij e-mail
               </button>
             }
 
             @if (doc._access === 'full' && doc.blob_name) {
-              <div class="sec-title" style="margin-top:24px">E-Signing (Signus)</div>
+              <div class="sec-title" style="margin-top:24px">Podpis elektroniczny (Signus)</div>
               <button class="btn btn-p" (click)="openSignus()">
-                ✍ Initiate E-Signing via Signus
+                ✍ Rozpocznij podpisywanie przez Signus
               </button>
             }
 
-            <div class="sec-title" style="margin-top:24px">Active Tasks</div>
+            <div class="sec-title" style="margin-top:24px">Aktywne zadania</div>
             @for (task of doc.workflow_tasks ?? []; track task.id) {
               @if (task.task_status === 'pending' || task.task_status === 'in_progress') {
                 <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)">
@@ -546,7 +535,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                   <span style="font-size:13px;flex:1">{{ task.assignee_name }}</span>
                   <span style="font-size:11px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM.yy' }}</span>
                   @if (doc._access === 'full') {
-                    <button class="btn btn-d btn-sm" (click)="cancelTask(task.id)">Cancel</button>
+                    <button class="btn btn-d btn-sm" (click)="cancelTask(task.id)">Anuluj</button>
                   }
                 </div>
               }
@@ -557,13 +546,13 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
         <!-- Panel Footer -->
         <div class="pf">
           @if (doc._access === 'full' && doc.blob_name) {
-            <button class="btn btn-g" (click)="downloadDoc()">⬇ Download</button>
+            <button class="btn btn-g" (click)="downloadDoc()">⬇ Pobierz</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-d" (click)="deleteDoc()">🗑 Delete</button>
+            <button class="btn btn-d" (click)="deleteDoc()">🗑 Usuń</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-p" (click)="saveDoc()">💾 Save</button>
+            <button class="btn btn-p" (click)="saveDoc()">💾 Zapisz zmiany</button>
           }
           <button class="btn btn-g" (click)="close.emit()">Zamknij</button>
         </div>
@@ -577,22 +566,22 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
           <div class="moh">
             <div class="moico" style="background:#F5F3FF">✍</div>
             <div>
-              <div class="mot">Initiate E-Signing</div>
+              <div class="mot">Rozpocznij podpisywanie elektroniczne</div>
               <div class="mos">{{ doc.doc_number }} · {{ doc.name }}</div>
             </div>
           </div>
           <div style="padding:20px 24px">
             <div class="fg" style="margin-bottom:14px">
-              <label class="fl">Signatories (comma-separated emails) <span class="req">*</span></label>
+              <label class="fl">Osoby podpisujące (adresy e-mail po przecinku) <span class="req">*</span></label>
               <textarea class="fta" style="min-height:60px" placeholder="anna@firma.com, partner@example.com" [(ngModel)]="signusEmails"></textarea>
             </div>
             <div style="background:var(--gray-50);border-radius:8px;padding:12px;font-size:12px;color:var(--gray-500)">
-              ℹ The document will be sent to Signus API. Each signatory will receive an email. Signed versions are automatically archived.
+              ℹ Dokument zostanie wysłany do API Signus. Każda osoba podpisująca dostanie e-mail. Podpisane wersje są automatycznie archiwizowane.
             </div>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
             <button class="btn btn-g" (click)="signusOpen = false">Zamknij</button>
-            <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">Send to Signus →</button>
+            <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">Wyślij do Signus →</button>
           </div>
         </div>
       </div>
@@ -708,23 +697,23 @@ export class DetailPanelComponent implements OnChanges {
       const raw = this.settingsSvc.settings()?.['doc_statuses'];
       if (raw) {
         const STATUS_LABELS: Record<string, string> = {
-          new: 'New', being_edited: 'Being Edited', being_approved: 'Being Approved',
-          being_signed: 'Being Signed', signed: 'Signed', hold: 'Hold',
-          completed: 'Completed', rejected: 'Rejected',
+          new: 'Nowy', being_edited: 'W edycji', being_approved: 'W akceptacji',
+          being_signed: 'W podpisywaniu', signed: 'Podpisany', hold: 'Wstrzymany',
+          completed: 'Zakończony', rejected: 'Odrzucony',
         };
         const types: string[] = JSON.parse(String(raw));
         return types.map(v => ({ value: v, label: STATUS_LABELS[v] ?? v }));
       }
     } catch { }
     return [
-      { value: 'new',            label: 'New' },
-      { value: 'being_edited',   label: 'Being Edited' },
-      { value: 'being_approved', label: 'Being Approved' },
-      { value: 'being_signed',   label: 'Being Signed' },
-      { value: 'signed',         label: 'Signed' },
-      { value: 'hold',           label: 'Hold' },
-      { value: 'completed',      label: 'Completed' },
-      { value: 'rejected',       label: 'Rejected' },
+      { value: 'new',            label: 'Nowy' },
+      { value: 'being_edited',   label: 'W edycji' },
+      { value: 'being_approved', label: 'W akceptacji' },
+      { value: 'being_signed',   label: 'W podpisywaniu' },
+      { value: 'signed',         label: 'Podpisany' },
+      { value: 'hold',           label: 'Wstrzymany' },
+      { value: 'completed',      label: 'Zakończony' },
+      { value: 'rejected',       label: 'Odrzucony' },
     ];
   }
 
@@ -771,10 +760,8 @@ export class DetailPanelComponent implements OnChanges {
 
   wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
   userDropdown = signal<User[]>([]);
-  ownerSearch  = '';
-  ownerDropdown = signal<User[]>([]);
+  users = signal<User[]>([]);
   groups = signal<any[]>([]);
-  private ownerSearchTimer: ReturnType<typeof setTimeout> | null = null;
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
   draft: {
@@ -808,7 +795,6 @@ export class DetailPanelComponent implements OnChanges {
       contact_email:        (this.doc as any).contact_email ?? '',
       contact_phone:        (this.doc as any).contact_phone ?? '',
     };
-    this.ownerSearch = this.doc.owner_name ?? '';
   }
 
   saveDoc(): void {
@@ -839,7 +825,7 @@ export class DetailPanelComponent implements OnChanges {
       this.initDraft();
       this.cdr.markForCheck();
       this.updated.emit(this.doc);
-      this.toast.success('Document saved');
+      this.toast.success('Zapisano dokument');
     });
   }
 
@@ -859,7 +845,7 @@ export class DetailPanelComponent implements OnChanges {
         this.previewLoading.set(false);
       },
       error: (err) => {
-        this.previewError.set(err?.error?.error ?? 'Failed to load PDF');
+        this.previewError.set(err?.error?.error ?? 'Nie udało się wczytać PDF');
         this.previewLoading.set(false);
       }
     });
@@ -889,7 +875,6 @@ export class DetailPanelComponent implements OnChanges {
     this._activeTab = 'info';
 
     this.doc = { ...this.document };
-    this.ownerSearch = this.document.owner_name ?? '';
     this.linkedPartners.set([]);
     this.partnerSearch = '';
     this.partnerDropdown.set([]);
@@ -899,6 +884,9 @@ export class DetailPanelComponent implements OnChanges {
 
     if (this.groups().length === 0) {
       this.groupSvc.list().subscribe(list => this.groups.set(list));
+    }
+    if (this.users().length === 0) {
+      this.userSvc.list({ limit: 200 }).subscribe(res => this.users.set(res.data ?? []));
     }
   }
 
@@ -937,7 +925,7 @@ export class DetailPanelComponent implements OnChanges {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     this.docSvc.uploadFile(this.doc.id, file).subscribe(() => {
-      this.toast.success('File uploaded');
+      this.toast.success('Wgrano plik');
       this.docSvc.get(this.doc.id).subscribe(d => { this.doc = d; this.cdr.markForCheck(); this.updated.emit(d); });
     });
   }
@@ -947,7 +935,7 @@ export class DetailPanelComponent implements OnChanges {
     if (!file) return;
     const label = 'Version ' + ((this.doc.versions?.length ?? 0) + 1);
     this.docSvc.uploadFile(this.doc.id, file, label).subscribe(() => {
-      this.toast.success('New version uploaded');
+      this.toast.success('Wgrano nową wersję');
       this.reloadHistory();
       this.docSvc.get(this.doc.id).subscribe(d => { this.doc = d; this.cdr.markForCheck(); this.updated.emit(d); });
     });
@@ -982,8 +970,8 @@ export class DetailPanelComponent implements OnChanges {
     this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe({
       next: att => {
         this.attachments.update(list => [...list, att]);
-        this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment added: ${file.name}`, date: new Date().toISOString()}, ...evts]);
-        this.toast.success('Attachment uploaded');
+        this.attachmentEvents.update(evts => [{icon:'📎', title:`Dodano załącznik: ${file.name}`, date: new Date().toISOString()}, ...evts]);
+        this.toast.success('Wgrano załącznik');
         this.reloadHistory();
       },
       error: err => {
@@ -999,9 +987,9 @@ export class DetailPanelComponent implements OnChanges {
     const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? file.name;
     this.docSvc.uploadAttachmentVersion(this.doc.id, attId, file).subscribe({
       next: () => {
-        this.toast.success('New version uploaded');
+        this.toast.success('Wgrano nową wersję');
         this.reloadHistory();
-        this.attachmentEvents.update(evts => [{icon:'📎', title:`Attachment new version: ${attName}`, date: new Date().toISOString()}, ...evts]);
+        this.attachmentEvents.update(evts => [{icon:'📎', title:`Nowa wersja załącznika: ${attName}`, date: new Date().toISOString()}, ...evts]);
         this.attachmentsLoaded = false;
         this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
       },
@@ -1021,12 +1009,12 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   deleteAttachment(attId: string): void {
-    if (!confirm('Delete this attachment and all its versions?')) return;
+    if (!confirm('Usunąć ten załącznik wraz ze wszystkimi wersjami?')) return;
     const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? attId;
     this.docSvc.deleteAttachment(this.doc.id, attId).subscribe(() => {
       this.attachments.update(list => list.filter((a: any) => a.id !== attId));
-      this.attachmentEvents.update(evts => [{icon:'🗑', title:'Attachment deleted: ' + attName, date: new Date().toISOString()}, ...evts]);
-      this.toast.success('Attachment deleted');
+      this.attachmentEvents.update(evts => [{icon:'🗑', title:'Usunięto załącznik: ' + attName, date: new Date().toISOString()}, ...evts]);
+      this.toast.success('Usunięto załącznik');
       this.reloadHistory();
     });
   }
@@ -1059,50 +1047,26 @@ export class DetailPanelComponent implements OnChanges {
   historyLabel(entry: any): string {
     const after = entry.after_state ? (typeof entry.after_state === 'string' ? JSON.parse(entry.after_state) : entry.after_state) : null;
     switch (entry.action) {
-      case 'document_created':            return 'Document created';
-      case 'document_updated':            return 'Document updated';
-      case 'document_deleted':            return 'Document deleted';
-      case 'document_downloaded':         return 'Document downloaded';
-      case 'metadata_updated':            return 'Metadata updated';
-      case 'tag_added':                   return `Tag added: ${after?.key ?? ''}`;
-      case 'tag_removed':                 return `Tag removed: ${after?.key ?? ''}`;
-      case 'tag_updated':                 return `Tag updated: ${after?.key ?? ''}`;
-      case 'status_changed':              return `Status changed to: ${after?.status ?? ''}`;
-      case 'version_uploaded':            return `New document version uploaded (v${after?.version ?? ''})`;
-      case 'workflow_task_created':       return `Workflow task assigned`;
-      case 'workflow_task_completed':     return `Workflow task completed`;
-      case 'workflow_task_cancelled':     return `Workflow task cancelled`;
-      case 'signing_initiated':           return 'E-signing initiated';
-      case 'signing_completed':           return 'E-signing completed';
-      case 'signing_failed':              return 'E-signing failed';
-      case 'attachment_uploaded':         return `Attachment added: ${after?.name ?? after?.fileName ?? ''}`;
-      case 'attachment_version_uploaded': return `Attachment new version (v${after?.version ?? ''})`;
-      case 'attachment_deleted':          return `Attachment deleted`;
+      case 'document_created':            return 'Utworzono dokument';
+      case 'document_updated':            return 'Zaktualizowano dokument';
+      case 'document_deleted':            return 'Usunięto dokument';
+      case 'document_downloaded':         return 'Pobrano dokument';
+      case 'metadata_updated':            return 'Zaktualizowano metadane';
+      case 'tag_added':                   return `Dodano tag: ${after?.key ?? ''}`;
+      case 'tag_removed':                 return `Usunięto tag: ${after?.key ?? ''}`;
+      case 'tag_updated':                 return `Zmieniono tag: ${after?.key ?? ''}`;
+      case 'status_changed':              return `Zmieniono status na: ${after?.status ?? ''}`;
+      case 'version_uploaded':            return `Wgrano nową wersję dokumentu (v${after?.version ?? ''})`;
+      case 'workflow_task_created':       return `Przypisano zadanie workflow`;
+      case 'workflow_task_completed':     return `Ukończono zadanie workflow`;
+      case 'workflow_task_cancelled':     return `Anulowano zadanie workflow`;
+      case 'signing_initiated':           return 'Rozpoczęto podpisywanie elektroniczne';
+      case 'signing_completed':           return 'Zakończono podpisywanie elektroniczne';
+      case 'signing_failed':              return 'Podpisywanie elektroniczne nie powiodło się';
+      case 'attachment_uploaded':         return `Dodano załącznik: ${after?.name ?? after?.fileName ?? ''}`;
+      case 'attachment_version_uploaded': return `Nowa wersja załącznika (v${after?.version ?? ''})`;
+      case 'attachment_deleted':          return `Usunięto załącznik`;
       default:                            return entry.action.replace(/_/g, ' ');
-    }
-  }
-
-  onOwnerSearch(q: string): void {
-    if (!q || q.length < 2) { this.ownerDropdown.set([]); return; }
-    if (this.ownerSearchTimer) clearTimeout(this.ownerSearchTimer);
-    this.ownerSearchTimer = setTimeout(() => {
-      this.userSvc.search(q).subscribe(users => this.ownerDropdown.set(users));
-    }, 300);
-  }
-
-  selectOwner(u: User): void {
-    this.ownerSearch = u.display_name + ' <' + u.email + '>';
-    this.ownerDropdown.set([]);
-    this.draft.owner_id = u.id;
-  }
-
-  hideOwnerDropdown(): void {
-    setTimeout(() => this.ownerDropdown.set([]), 200);
-  }
-
-  onOwnerFocus(): void {
-    if (!this.ownerSearch && this.ownerDropdown().length === 0) {
-      this.userSvc.search('').subscribe(users => this.ownerDropdown.set(users.slice(0, 20)));
     }
   }
 
@@ -1164,7 +1128,7 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   deleteDoc(): void {
-    if (!confirm(`Delete "${this.doc.name}"?`)) return;
+    if (!confirm(`Usunąć „${this.doc.name}"?`)) return;
     this.docSvc.delete(this.doc.id).subscribe(() => this.deleted.emit(this.doc.id));
   }
 
@@ -1199,7 +1163,7 @@ export class DetailPanelComponent implements OnChanges {
       this.doc = { ...this.doc, workflow_tasks: [...(this.doc.workflow_tasks ?? []), task] };
       this.wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
       this.cdr.markForCheck();
-      this.toast.success('Task assigned — email notification sent');
+      this.toast.success('Przypisano zadanie — wysłano powiadomienie e-mail');
     });
   }
 
@@ -1210,7 +1174,7 @@ export class DetailPanelComponent implements OnChanges {
         workflow_tasks: (this.doc.workflow_tasks ?? []).map(t => t.id === taskId ? { ...t, task_status: 'cancelled' } : t),
       };
       this.cdr.markForCheck();
-      this.toast.success('Task cancelled');
+      this.toast.success('Anulowano zadanie');
     });
   }
 
@@ -1233,7 +1197,7 @@ export class DetailPanelComponent implements OnChanges {
             });
           }, 12_000);
         } else {
-          this.toast.success('Document sent to Signus — redirecting…');
+          this.toast.success('Wysłano dokument do Signus — przekierowanie…');
           setTimeout(() => window.open(res.redirectUrl, '_blank'), 800);
         }
       },

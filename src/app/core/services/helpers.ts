@@ -1,35 +1,35 @@
 import { DocStatus, DocType, GdprType, TaskType } from '../models/models';
 
 export const STATUS_MAP: Record<DocStatus, { label: string; cls: string }> = {
-  new:             { label: 'New',             cls: 's-new' },
-  being_edited:    { label: 'Being Edited',    cls: 's-editing' },
-  being_signed:    { label: 'Being Signed',    cls: 's-signing' },
-  being_approved:  { label: 'Being Approved',  cls: 's-approving' },
-  signed:          { label: 'Signed',          cls: 's-signed' },
-  hold:            { label: 'Hold',            cls: 's-hold' },
-  completed:       { label: 'Completed',       cls: 's-completed' },
-  rejected:        { label: 'Rejected',        cls: 's-rejected' },
+  new:             { label: 'Nowy',            cls: 's-new' },
+  being_edited:    { label: 'W edycji',        cls: 's-editing' },
+  being_signed:    { label: 'W podpisywaniu',  cls: 's-signing' },
+  being_approved:  { label: 'W akceptacji',    cls: 's-approving' },
+  signed:          { label: 'Podpisany',       cls: 's-signed' },
+  hold:            { label: 'Wstrzymany',      cls: 's-hold' },
+  completed:       { label: 'Zakończony',      cls: 's-completed' },
+  rejected:        { label: 'Odrzucony',       cls: 's-rejected' },
 };
 
 export const DOC_TYPE_MAP: Record<DocType, string> = {
-  partner_agreement:      'Partner Agreement',
-  it_supplier_agreement:  'IT Supplier Agreement',
-  employee_agreement:     'Employee Agreement',
+  partner_agreement:      'Umowa partnerska',
+  it_supplier_agreement:  'Umowa z dostawcą IT',
+  employee_agreement:     'Umowa pracownicza',
   nda:                    'NDA',
-  operator_agreement:     'Operator Agreement',
+  operator_agreement:     'Umowa operatorska',
 };
 
 export const GDPR_MAP: Record<GdprType, { label: string; cls: string }> = {
-  data_processing_entrustment: { label: 'Entrustment', cls: 'gp' },
-  data_administration:          { label: 'Administration', cls: 'ga' },
-  no_gdpr:                      { label: 'No GDPR', cls: 'gn' },
+  data_processing_entrustment: { label: 'Powierzenie', cls: 'gp' },
+  data_administration:          { label: 'Współadministrowanie', cls: 'ga' },
+  no_gdpr:                      { label: 'Brak GDPR', cls: 'gn' },
 };
 
 export const TASK_TYPE_MAP: Record<TaskType, { label: string; cls: string }> = {
-  read:    { label: 'Read',    cls: 'task-read' },
-  edit:    { label: 'Edit',    cls: 'task-edit' },
-  approve: { label: 'Approve', cls: 'task-approve' },
-  sign:    { label: 'Sign',    cls: 'task-sign' },
+  read:    { label: 'Odczyt',     cls: 'task-read' },
+  edit:    { label: 'Edycja',     cls: 'task-edit' },
+  approve: { label: 'Akceptacja', cls: 'task-approve' },
+  sign:    { label: 'Podpis',     cls: 'task-sign' },
 };
 
 export function groupCssClass(groupName: string): string {
