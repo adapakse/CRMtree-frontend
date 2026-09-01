@@ -47,7 +47,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       </div>
       <button class="btn btn-p" (click)="openNew = true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Document
+        Nowy dokument
       </button>
     </div>
 

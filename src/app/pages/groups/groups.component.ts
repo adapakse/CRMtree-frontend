@@ -13,10 +13,10 @@ import { groupCssClass } from '../../core/services/helpers';
   imports: [CommonModule, FormsModule],
   template: `
     <div id="topbar">
-      <span class="page-title">Groups &amp; Roles</span>
+      <span class="page-title">Grupy i role</span>
       <span class="tsp"></span>
       @if (auth.isAdmin()) {
-        <button class="btn btn-p" (click)="openNew = true">+ New Group</button>
+        <button class="btn btn-p" (click)="openNew = true">+ Nowa grupa</button>
       }
     </div>
 
@@ -36,23 +36,23 @@ import { groupCssClass } from '../../core/services/helpers';
               <div>
                 <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
                 @if (g.has_owner_restriction) {
-                  <span style="font-size:10.5px;font-weight:600;background:#EFF6FF;color:#1D4ED8;padding:1px 7px;border-radius:10px">Owner restriction</span>
+                  <span style="font-size:10.5px;font-weight:600;background:#EFF6FF;color:#1D4ED8;padding:1px 7px;border-radius:10px">Ograniczenie właściciela</span>
                 }
               </div>
               <span style="margin-left:auto">
                 @if (!g.is_active) {
-                  <span style="font-size:10.5px;font-weight:600;background:var(--gray-100);color:var(--gray-400);padding:2px 8px;border-radius:10px">Inactive</span>
+                  <span style="font-size:10.5px;font-weight:600;background:var(--gray-100);color:var(--gray-400);padding:2px 8px;border-radius:10px">Nieaktywna</span>
                 }
               </span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px">
                 <div style="font-size:18px;font-weight:700;font-family:'Sora',sans-serif;color:var(--gray-900)">{{ g.member_count ?? 0 }}</div>
-                <div style="font-size:11px;color:var(--gray-400)">Members</div>
+                <div style="font-size:11px;color:var(--gray-400)">Członkowie</div>
               </div>
               <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px">
                 <div style="font-size:18px;font-weight:700;font-family:'Sora',sans-serif;color:var(--gray-900)">{{ g.document_count ?? 0 }}</div>
-                <div style="font-size:11px;color:var(--gray-400)">Documents</div>
+                <div style="font-size:11px;color:var(--gray-400)">Dokumenty</div>
               </div>
             </div>
             @if (g.description) {
@@ -70,7 +70,7 @@ import { groupCssClass } from '../../core/services/helpers';
           <div class="ph">
             <div>
               <div class="pt">{{ selected()!.display_name }}</div>
-              <div class="ps">{{ selected()!.member_count ?? 0 }} members · {{ selected()!.document_count ?? 0 }} documents</div>
+              <div class="ps">{{ selected()!.member_count ?? 0 }} członków · {{ selected()!.document_count ?? 0 }} dokumentów</div>
             </div>
             <div class="pc" (click)="selected.set(null)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -78,28 +78,28 @@ import { groupCssClass } from '../../core/services/helpers';
           </div>
           <div class="pb">
             @if (auth.isAdmin()) {
-              <div class="sec-title">Edit Group</div>
+              <div class="sec-title">Edycja grupy</div>
               <div class="fgrid">
                 <div class="fg">
-                  <label class="fl">Display Name</label>
+                  <label class="fl">Nazwa wyświetlana</label>
                   <input class="fi" [(ngModel)]="editName">
                 </div>
                 <div class="fg">
-                  <label class="fl">Owner Restriction</label>
+                  <label class="fl">Ograniczenie właściciela</label>
                   <select class="fsel" [(ngModel)]="editOwnerRestriction">
-                    <option [value]="false">No restriction</option>
-                    <option [value]="true">Owner only (Sales)</option>
+                    <option [value]="false">Bez ograniczenia</option>
+                    <option [value]="true">Tylko właściciel (Sprzedaż)</option>
                   </select>
                 </div>
                 <div class="fg full">
-                  <label class="fl">Description</label>
+                  <label class="fl">Opis</label>
                   <textarea class="fta" [(ngModel)]="editDescription"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p btn-sm" style="margin-top:16px" (click)="saveGroup()">Save Changes</button>
+              <button class="btn btn-p btn-sm" style="margin-top:16px" (click)="saveGroup()">Zapisz zmiany</button>
             }
 
-            <div class="sec-title" style="margin-top:24px">Members</div>
+            <div class="sec-title" style="margin-top:24px">Członkowie</div>
             @for (m of selected()!.members ?? []; track m.user_id) {
               <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)">
                 <div class="av" style="width:32px;height:32px;font-size:12px">
@@ -110,18 +110,18 @@ import { groupCssClass } from '../../core/services/helpers';
                   <div style="font-size:11.5px;color:var(--gray-400)">{{ m.email }}</div>
                 </div>
                 <span class="badge" [class]="m.access_level === 'full' ? 's-signed' : 's-new'">
-                  {{ m.access_level === 'full' ? 'Full Access' : 'Read Only' }}
+                  {{ m.access_level === 'full' ? 'Pełny dostęp' : 'Tylko odczyt' }}
                 </span>
               </div>
             }
             @empty {
-              <div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">No members yet</div></div>
+              <div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">Brak członków</div></div>
             }
           </div>
           @if (auth.isAdmin()) {
             <div class="pf">
-              <button class="btn btn-d" (click)="deactivateGroup()">Deactivate Group</button>
-              <button class="btn btn-g" (click)="selected.set(null)">Close</button>
+              <button class="btn btn-d" (click)="deactivateGroup()">Dezaktywuj grupę</button>
+              <button class="btn btn-g" (click)="selected.set(null)">Zamknij</button>
             </div>
           }
         </div>
@@ -134,29 +134,29 @@ import { groupCssClass } from '../../core/services/helpers';
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
             <div class="moico" style="background:var(--orange-pale);font-size:18px">👥</div>
-            <div><div class="mot">Create Group</div><div class="mos">Add a new role group</div></div>
+            <div><div class="mot">Utwórz grupę</div><div class="mos">Dodaj nową grupę ról</div></div>
           </div>
           <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
             <div class="fg">
-              <label class="fl">Group Name (internal) <span class="req">*</span></label>
-              <input class="fi" placeholder="e.g. Sprzedaz" [(ngModel)]="newGroup.name">
+              <label class="fl">Nazwa grupy (wewnętrzna) <span class="req">*</span></label>
+              <input class="fi" placeholder="np. Sprzedaz" [(ngModel)]="newGroup.name">
             </div>
             <div class="fg">
-              <label class="fl">Display Name <span class="req">*</span></label>
-              <input class="fi" placeholder="e.g. Sprzedaż" [(ngModel)]="newGroup.display_name">
+              <label class="fl">Nazwa wyświetlana <span class="req">*</span></label>
+              <input class="fi" placeholder="np. Sprzedaż" [(ngModel)]="newGroup.display_name">
             </div>
             <div class="fg">
-              <label class="fl">Description</label>
+              <label class="fl">Opis</label>
               <textarea class="fta" style="min-height:60px" [(ngModel)]="newGroup.description"></textarea>
             </div>
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
               <input type="checkbox" [(ngModel)]="newGroup.has_owner_restriction">
-              Owner restriction (users see only own documents)
+              Ograniczenie właściciela (użytkownik widzi tylko swoje dokumenty)
             </label>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
-            <button class="btn btn-g" (click)="openNew=false">Cancel</button>
-            <button class="btn btn-p" [disabled]="!newGroup.name.trim()" (click)="createGroup()">Create Group</button>
+            <button class="btn btn-g" (click)="openNew=false">Anuluj</button>
+            <button class="btn btn-p" [disabled]="!newGroup.name.trim()" (click)="createGroup()">Utwórz grupę</button>
           </div>
         </div>
       </div>
@@ -224,17 +224,17 @@ export class GroupsComponent implements OnInit {
     this.groupSvc.update(g.id, { display_name: this.editName, description: this.editDescription, has_owner_restriction: this.editOwnerRestriction }).subscribe(updated => {
       this.groups.update(gs => gs.map(x => x.id === updated.id ? { ...x, ...updated } : x));
       this.selected.set({ ...g, ...updated });
-      this.toast.success('Group updated');
+      this.toast.success('Zaktualizowano grupę');
     });
   }
 
   deactivateGroup(): void {
     const g = this.selected();
-    if (!g || !confirm(`Deactivate group "${g.display_name}"?`)) return;
+    if (!g || !confirm(`Dezaktywować grupę „${g.display_name}"?`)) return;
     this.groupSvc.delete(g.id).subscribe(() => {
       this.selected.set(null);
       this.loadGroups();
-      this.toast.success('Group deactivated');
+      this.toast.success('Dezaktywowano grupę');
     });
   }
 
@@ -243,7 +243,7 @@ export class GroupsComponent implements OnInit {
       this.groups.update(gs => [...gs, g]);
       this.openNew = false;
       this.newGroup = { name: '', display_name: '', description: '', has_owner_restriction: false };
-      this.toast.success(`Group "${g.display_name}" created`);
+      this.toast.success(`Utworzono grupę „${g.display_name}"`);
     });
   }
 
