@@ -566,11 +566,15 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
     agent_segments:  { start: number; end: number; text: string }[];
     client_segments: { start: number; end: number; text: string }[];
   }): string {
-    type Seg = { start: number; text: string; speaker: 'agent' | 'client' };
+    type Seg = { start: number; end: number; text: string; speaker: 'agent' | 'client' };
+    // Sort by `end`, not `start`: when a leg was silent before an utterance, the
+    // PBX ASR pads that segment's `start` backwards into the silence (seen: a
+    // 2-word reply tagged start=0 end=12), which sorts it far too early. `end`
+    // marks when the phrase actually finished and stays reliable across both legs.
     const segs: Seg[] = [
       ...(data.agent_segments  ?? []).map(s => ({ ...s, speaker: 'agent'  as const })),
       ...(data.client_segments ?? []).map(s => ({ ...s, speaker: 'client' as const })),
-    ].sort((a, b) => a.start - b.start);
+    ].sort((a, b) => (a.end - b.end) || (a.start - b.start));
 
     if (!segs.length) return '';
     const agentLabel = this.auth.currentUser?.display_name ?? 'Handlowiec';
