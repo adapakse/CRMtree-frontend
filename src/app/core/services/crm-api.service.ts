@@ -983,7 +983,7 @@ export class CrmApiService {
   }
 
   // ── Użytkownicy CRM (do wyboru handlowca / opiekuna) ──────────
-  /** Zwraca aktywnych użytkowników z rolą CRM (salesperson + sales_manager) */
+  /** Zwraca aktywnych użytkowników z rolą CRM (salesperson + sales_manager) oraz adminów */
   getCrmUsers(): Observable<CrmUser[]> {
     return this.http.get<CrmUser[]>(`${BASE}/leads/users`);
   }
