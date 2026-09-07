@@ -8,13 +8,14 @@ import { QuillModule } from 'ngx-quill';
 import { environment } from '../../../environments/environment';
 import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitutions.component';
 
 const BASE = environment.apiUrl;
 
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent],
   template: `
 <div id="topbar">
   <span class="page-title">Moje ustawienia</span>
@@ -232,6 +233,11 @@ const BASE = environment.apiUrl;
     </div>
   </div>
 
+  <!-- ── Zastępstwa podczas nieobecności ─────────────────────────────────── -->
+  <div *ngIf="canSeeSubstitutions" style="margin-top:20px">
+    <wt-crm-substitutions></wt-crm-substitutions>
+  </div>
+
 </div>
   `,
   styles: [`
@@ -251,6 +257,12 @@ export class MySettingsComponent implements OnInit {
   private cdr        = inject(ChangeDetectorRef);
   private api        = inject(CrmApiService);
   auth               = inject(AuthService);
+
+  /** Substitutions panel — same scope as crmGuard: admin | salesperson | sales_manager. */
+  get canSeeSubstitutions(): boolean {
+    const role = this.auth.currentUser?.crm_role;
+    return this.auth.isAdmin() || role === 'salesperson' || role === 'sales_manager';
+  }
 
   // ── Stopka ──────────────────────────────────────────────────────────────────
   signatureHtml = '';
