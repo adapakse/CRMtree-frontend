@@ -242,6 +242,8 @@ const BASE = environment.apiUrl;
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; }
+    #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
+    .page-title { font-family:'Sora',sans-serif; font-size:17px; font-weight:700; color:var(--gray-900); }
     #content { flex:1; overflow-y:auto; }
     .card { background:white; border:1px solid #e5e7eb; border-radius:12px; }
     .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; }
