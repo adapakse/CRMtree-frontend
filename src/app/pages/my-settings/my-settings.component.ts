@@ -8,13 +8,14 @@ import { QuillModule } from 'ngx-quill';
 import { environment } from '../../../environments/environment';
 import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitutions.component';
 
 const BASE = environment.apiUrl;
 
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent],
   template: `
 <div id="topbar">
   <span class="page-title">Moje ustawienia</span>
@@ -232,10 +233,17 @@ const BASE = environment.apiUrl;
     </div>
   </div>
 
+  <!-- ── Zastępstwa podczas nieobecności ─────────────────────────────────── -->
+  <div *ngIf="canSeeSubstitutions" style="margin-top:20px">
+    <wt-crm-substitutions></wt-crm-substitutions>
+  </div>
+
 </div>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; }
+    #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
+    .page-title { font-family:'Sora',sans-serif; font-size:17px; font-weight:700; color:var(--gray-900); }
     #content { flex:1; overflow-y:auto; }
     .card { background:white; border:1px solid #e5e7eb; border-radius:12px; }
     .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; }
@@ -251,6 +259,12 @@ export class MySettingsComponent implements OnInit {
   private cdr        = inject(ChangeDetectorRef);
   private api        = inject(CrmApiService);
   auth               = inject(AuthService);
+
+  /** Substitutions panel — same scope as crmGuard: admin | salesperson | sales_manager. */
+  get canSeeSubstitutions(): boolean {
+    const role = this.auth.currentUser?.crm_role;
+    return this.auth.isAdmin() || role === 'salesperson' || role === 'sales_manager';
+  }
 
   // ── Stopka ──────────────────────────────────────────────────────────────────
   signatureHtml = '';
