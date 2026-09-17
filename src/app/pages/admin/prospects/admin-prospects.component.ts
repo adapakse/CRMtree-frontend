@@ -55,6 +55,21 @@ const SIGNAL_DEFS = [
   },
 ] as const;
 
+// Bramki ICP (decyzja 2026-09-17): 10 pkt za każdą bramkę ze statusem "pass",
+// wliczane do icp_score przez backend (calcIcpGatePoints, prospectEnrichmentService.js).
+// Treść opisów musi zostać zsynchronizowana ręcznie z definicją bramek w prompcie
+// AI (BRAMKI w prospectEnrichmentService.js) — nie jest generowana automatycznie.
+const GATE_DEFS = [
+  {
+    key: 'b2b', label: 'B2B', points: 10,
+    desc: 'Firma sprzedaje innym firmom, nie konsumentom detalicznym. Dowód: jawnie opisana obsługa klientów biznesowych ("dla firm", "sprzedaż hurtowa", oferta B2B) — sam NIP przy zamówieniu nie wystarcza.',
+  },
+  {
+    key: 'company_size', label: 'Wielkość firmy', points: 10,
+    desc: 'Firma zatrudnia minimum 15 pracowników. Oceniane na podstawie twardych danych handlowych (zatrudnienie) z bazy klienta — bez danych o zatrudnieniu bramka zwraca "unknown", a nie zgadywanie z treści strony.',
+  },
+] as const;
+
 interface KeyContact {
   name: string | null;
   title: string | null;
@@ -172,6 +187,7 @@ interface Prospect {
   icp_gates: IcpGates | null;
   icp_gate_status: 'qualified' | 'disqualified' | 'needs_review' | null;
   icp_bonus_signals: IcpBonusHit[] | null;
+  icp_gate_points: IcpBonusHit[] | null;
   icp_downgrade_flags: IcpDowngradeFlag[] | null;
   ai_summary: string | null;
   key_contacts: KeyContact[] | null;
@@ -426,7 +442,19 @@ interface BatchProgress {
               Score {{ sortIcon('icp_score') }}
             </th>
             <th>Oddziały</th>
-            <th title="Bramki: B2B + minimum 15 pracowników — obie PASS = kwalifikacja">Bramki</th>
+            <th class="sig-th">
+              <span>Bramki</span>
+              <div class="sig-info-wrap">
+                <button class="sig-info" (click)="$event.stopPropagation()">?</button>
+                <div class="sig-info-tip">
+                  <div class="sig-info-tip-title">Bramki kwalifikacji</div>
+                  Obie muszą mieć status PASS, żeby firma się zakwalifikowała — niezależnie od liczby trafionych sygnałów. Każda bramka ze statusem PASS dodaje też {{ gateDefs[0].points }} pkt do score.
+                  @for (g of gateDefs; track g.key) {
+                    <div style="margin-top:6px"><b>{{ g.label }} (+{{ g.points }} pkt):</b> {{ g.desc }}</div>
+                  }
+                </div>
+              </div>
+            </th>
             @for (s of signalDefs; track s.key) {
               <th class="sig-th">
                 <span>{{ s.label }}</span>
@@ -1352,6 +1380,14 @@ interface BatchProgress {
                   <span class="sb-label">Suma sygnałów ({{ sb.trueCount }}/8 true, wagi 10/5)</span>
                   <span class="sb-value sb-plus">{{ sb.raw }}</span>
                 </div>
+                @for (g of sb.gatePointsBreakdown; track g.id) {
+                  @if (g.hit) {
+                    <div class="sb-row">
+                      <span class="sb-label">Bramka: {{ g.label }}</span>
+                      <span class="sb-value sb-plus">+{{ g.points }}</span>
+                    </div>
+                  }
+                }
                 @for (b of sb.bonusBreakdown; track b.id) {
                   @if (b.hit) {
                     <div class="sb-row">
@@ -1949,6 +1985,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   minLeadScore = computed(() => Number(this.appSettings.settings()['prospect_lead_min_score'] ?? 45));
 
   readonly signalDefs = SIGNAL_DEFS;
+  readonly gateDefs = GATE_DEFS;
 
   rows       = signal<Prospect[]>([]);
   total      = signal(0);
@@ -2558,11 +2595,11 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     return 'Utwórz lead w CRM';
   }
 
-  // Progi przeliczone pod nowy max ICP (65 za sygnały + 10 bonus = 75, nie 100
-  // jak w starym systemie) — 60%/33% z 75, zaokrąglone.
+  // Progi przeliczone pod nowy max ICP (65 za sygnały + 10 bonus + 20 za bramki
+  // [2026-09-17] = 95, nie 100 jak w starym systemie) — 60%/33% z 95, zaokrąglone.
   scoreColor(score: number): string {
-    if (score >= 45) return '#16a34a';
-    if (score >= 25) return '#d97706';
+    if (score >= 57) return '#16a34a';
+    if (score >= 31) return '#d97706';
     return '#dc2626';
   }
 
@@ -2638,9 +2675,10 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // tu tylko składamy to w kształt wygodny do renderowania w inspektorze,
   // bez powtarzania formuły scoringu po stronie frontendu.
   calcScoreBreakdown(p: Prospect): {
-    trueCount: number; raw: number; bonus: number; downgradePenalty: number; total: number;
+    trueCount: number; raw: number; bonus: number; gatePoints: number; downgradePenalty: number; total: number;
     gates: IcpGates; gateStatus: string;
     bonusBreakdown: IcpBonusHit[];
+    gatePointsBreakdown: IcpBonusHit[];
     downgradeFlags: IcpDowngradeFlag[];
   } {
     const signals = p.icp_signals ?? [];
@@ -2648,14 +2686,17 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     const raw = signals.filter(s => s.hit).reduce((sum, s) => sum + s.points, 0);
     const bonusBreakdown = p.icp_bonus_signals ?? [];
     const bonus = bonusBreakdown.filter(b => b.hit).reduce((sum, b) => sum + b.points, 0);
+    const gatePointsBreakdown = p.icp_gate_points ?? [];
+    const gatePoints = gatePointsBreakdown.filter(g => g.hit).reduce((sum, g) => sum + g.points, 0);
     const downgradeFlags = p.icp_downgrade_flags ?? [];
     const downgradePenalty = downgradeFlags.reduce((sum, f) => sum + (f.points ?? 0), 0);
     return {
-      trueCount, raw, bonus, downgradePenalty,
-      total: p.icp_score ?? Math.max(0, Math.min(100, raw + bonus + downgradePenalty)),
+      trueCount, raw, bonus, gatePoints, downgradePenalty,
+      total: p.icp_score ?? Math.max(0, Math.min(100, raw + bonus + gatePoints + downgradePenalty)),
       gates: p.icp_gates ?? { b2b: 'unknown', company_size: 'unknown' },
       gateStatus: p.icp_gate_status ?? 'needs_review',
       bonusBreakdown,
+      gatePointsBreakdown,
       downgradeFlags,
     };
   }
