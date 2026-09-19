@@ -12,7 +12,14 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 function initApp(auth: AuthService, settings: AppSettingsService) {
   return async () => {
     await auth.init();
-    await settings.load();
+    // Settings are only ever read by authenticated CRM/admin pages — loading them
+    // unconditionally blocked APP_INITIALIZER (and so every SSR render, including
+    // the public /blog pages that never touch AppSettingsService) on a doomed
+    // admin-only API call for anonymous visitors, adding a wasted round trip to
+    // every public page load.
+    if (auth.isLoggedIn()) {
+      await settings.load();
+    }
   };
 }
 
