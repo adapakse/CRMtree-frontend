@@ -24,33 +24,33 @@ import { isExpiringSoon } from '../../core/services/helpers';
       <div class="stats-bar">
         <div class="stat-card">
           <div class="stat-ico ico-or">📄</div>
-          <div class="stat-lbl">Total Documents</div>
+          <div class="stat-lbl">Wszystkie dokumenty</div>
           <div class="stat-val">{{ stats().total }}</div>
-          <div class="stat-sub">All accessible</div>
+          <div class="stat-sub">Wszystkie dostępne</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-bl">⚡</div>
-          <div class="stat-lbl">In Workflow</div>
+          <div class="stat-lbl">W obiegu</div>
           <div class="stat-val">{{ stats().inWorkflow }}</div>
-          <div class="stat-sub">Active tasks</div>
+          <div class="stat-sub">Aktywne zadania</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-gr">✔</div>
-          <div class="stat-lbl">Signed / Done</div>
+          <div class="stat-lbl">Podpisane / Zakończone</div>
           <div class="stat-val">{{ stats().signed }}</div>
-          <div class="stat-sub">Signed + Completed</div>
+          <div class="stat-sub">Podpisane + Zakończone</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-re">⚠</div>
-          <div class="stat-lbl">Expiring 30d</div>
+          <div class="stat-lbl">Wygasają w 30 dni</div>
           <div class="stat-val">{{ stats().expiring }}</div>
-          <div class="stat-sub">Require attention</div>
+          <div class="stat-sub">Wymagają uwagi</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-pu">📋</div>
-          <div class="stat-lbl">My Tasks</div>
+          <div class="stat-lbl">Moje zadania</div>
           <div class="stat-val">{{ myTasks().length }}</div>
-          <div class="stat-sub">Pending action</div>
+          <div class="stat-sub">Oczekują na działanie</div>
         </div>
       </div>
 
@@ -59,19 +59,19 @@ import { isExpiringSoon } from '../../core/services/helpers';
         <!-- Recent Documents -->
         <div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">Recent Documents</h3>
-            <a routerLink="/documents" class="btn btn-g btn-sm">View all</a>
+            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">Ostatnie dokumenty</h3>
+            <a routerLink="/documents" class="btn btn-g btn-sm">Zobacz wszystkie</a>
           </div>
           @if (loading()) {
             <div class="loading-overlay"><div class="spinner"></div></div>
           } @else {
             <div class="tw">
               <div class="thead" style="grid-template-columns:130px 1fr 130px 110px 80px">
-                <div class="th">Number</div>
-                <div class="th">Name</div>
-                <div class="th">Group</div>
+                <div class="th">Numer</div>
+                <div class="th">Nazwa</div>
+                <div class="th">Grupa</div>
                 <div class="th">Status</div>
-                <div class="th">Expiry</div>
+                <div class="th">Ważność</div>
               </div>
               @for (doc of recentDocs(); track doc.id) {
                 <div class="tr" style="grid-template-columns:130px 1fr 130px 110px 80px;align-items:start"
@@ -117,7 +117,7 @@ import { isExpiringSoon } from '../../core/services/helpers';
                 </div>
               }
               @empty {
-                <div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">No documents yet</div></div>
+                <div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">Brak dokumentów</div></div>
               }
             </div>
           }
@@ -126,8 +126,8 @@ import { isExpiringSoon } from '../../core/services/helpers';
         <!-- My Tasks -->
         <div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">My Tasks</h3>
-            <a routerLink="/workflow" class="btn btn-g btn-sm">View all</a>
+            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">Moje zadania</h3>
+            <a routerLink="/workflow" class="btn btn-g btn-sm">Zobacz wszystkie</a>
           </div>
           <div class="tw">
             @for (task of myTasks(); track task.id) {
@@ -154,7 +154,7 @@ import { isExpiringSoon } from '../../core/services/helpers';
             @empty {
               <div class="empty-state" style="padding:28px 16px">
                 <div class="empty-icon">✅</div>
-                <div class="empty-title">No pending tasks</div>
+                <div class="empty-title">Brak oczekujących zadań</div>
               </div>
             }
           </div>
