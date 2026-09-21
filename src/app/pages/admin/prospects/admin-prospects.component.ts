@@ -70,6 +70,20 @@ const GATE_DEFS = [
   },
 ] as const;
 
+// Poprawka 18.09: dialog Re-process z góry wypełnia pole URL bieżącym adresem
+// (openReprocessDialog), więc samo otwarcie i zatwierdzenie dialogu BEZ
+// realnej edycji zawsze wysyłało website_url — backend traktuje to jako
+// świadomą ręczną korektę i ustawia website_source='manual_correction', co
+// (przed poprawką w prospectEnrichmentService.js) omijało checkDomainIdentity()
+// bezterminowo. Wydzielona jako czysta funkcja, żeby dało się ją przetestować
+// niezależnie od reszty komponentu (brak w tym projekcie infrastruktury do
+// testów Angular — patrz README/karma.conf.js, celowo tego tu nie dokładam).
+export function resolveManualUrlOverride(originalUrl: string, editedUrl: string): string | undefined {
+  const trimmed = (editedUrl || '').trim();
+  const original = (originalUrl || '').trim();
+  return trimmed && trimmed !== original ? trimmed : undefined;
+}
+
 interface KeyContact {
   name: string | null;
   title: string | null;
@@ -101,6 +115,13 @@ interface EnrichmentLog {
     method: string;
     chars_extracted?: number;
     pages_count?: number;
+    identity_check_failed?: boolean;
+    identity_check?: {
+      verified: boolean;
+      reason: string;
+      decided_by?: string;
+      fallback?: { attempted: boolean; used: boolean; pages_checked?: { url: string; status: string }[] };
+    };
   };
   claude?: {
     provider: string;
@@ -152,7 +173,7 @@ interface Prospect {
   branches_count: number | null;
   branches_scope: string | null;
   website_url: string | null;
-  website_status: 'ok' | 'failed' | 'not_found' | 'blocked' | null;
+  website_status: 'ok' | 'failed' | 'not_found' | 'blocked' | 'unconfirmed' | null;
   employment_range: string | null;
   // Dane z pliku importu
   employment_count: number | null;
@@ -533,6 +554,8 @@ interface BatchProgress {
                         <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" title="Strona niedostępna lub błąd scrapingu">!</span>
                       } @else if (p.website_status === 'not_found') {
                         <span style="font-size:10px;color:#9ca3af;font-weight:700;line-height:1" title="Nie znaleziono strony WWW">–</span>
+                      } @else if (p.website_status === 'unconfirmed') {
+                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" title="Nie udało się potwierdzić strony firmy">?</span>
                       }
                     </span>
                   }
@@ -771,6 +794,9 @@ interface BatchProgress {
                             } @else if (p.website_status === 'not_found') {
                               <span style="font-size:10px;font-weight:600;color:#9ca3af;white-space:nowrap"
                                 title="Nie znaleziono adresu strony WWW">✗ nie znaleziono</span>
+                            } @else if (p.website_status === 'unconfirmed') {
+                              <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
+                                title="Strona istnieje, ale nie znaleziono na niej NIP/KRS/REGON ani adresu firmy — użyj Re-process, aby podać właściwy adres">⚠ Nie udało się potwierdzić strony firmy</span>
                             }
                           </div>
                         }
@@ -1179,6 +1205,8 @@ interface BatchProgress {
                 (click)="inspectView.set('analysis')">Analiza</button>
               <button class="inspect-tab" [class.inspect-tab-active]="inspectView() === 'prompt'"
                 (click)="switchToPrompt()">Prompt Claude</button>
+              <button class="inspect-tab" [class.inspect-tab-active]="inspectView() === 'scoring'"
+                (click)="switchToScoringRules()">Zasady naliczania punktów</button>
             </div>
             <button class="inspect-close" (click)="inspectTarget.set(null)">✕</button>
           </div>
@@ -1193,6 +1221,21 @@ interface BatchProgress {
               </div>
             } @else if (inspectPrompt()) {
               <pre class="inspect-prompt-pre">{{ inspectPrompt() }}</pre>
+            }
+          </div>
+        }
+
+        <!-- Widok: Zasady naliczania punktów — algorytm jako dane (JSON),
+             wprost z ICP_SIGNALS/ICP_GATE_DEFS/ICP_BONUS_SIGNALS/blacklisty w
+             backendzie (GET /scoring-rules) — nie ręcznie przepisywana kopia. -->
+        @if (inspectView() === 'scoring') {
+          <div class="inspect-prompt-view">
+            @if (inspectScoringRulesLoading()) {
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:13px">
+                <span class="row-spin"></span> Wczytuję zasady naliczania punktów…
+              </div>
+            } @else if (inspectScoringRules()) {
+              <pre class="inspect-prompt-pre">{{ inspectScoringRules() | json }}</pre>
             }
           </div>
         }
@@ -1282,13 +1325,28 @@ interface BatchProgress {
             <div class="inspect-card">
               <div class="inspect-card-header">
                 <span class="inspect-badge"
-                  [class.inspect-badge-ok]="inspectTarget()!.enrichment_log!.website?.url"
-                  [class.inspect-badge-err]="!inspectTarget()!.enrichment_log!.website?.url">WWW</span>
+                  [class.inspect-badge-ok]="inspectTarget()!.enrichment_log!.website?.url && !inspectTarget()!.enrichment_log!.website?.identity_check_failed"
+                  [class.inspect-badge-err]="!inspectTarget()!.enrichment_log!.website?.url || inspectTarget()!.enrichment_log!.website?.identity_check_failed">WWW</span>
                 <span style="font-size:12px">
-                  {{ inspectTarget()!.enrichment_log!.website?.url ? '✓ Znaleziono' : '✗ Brak strony' }}
+                  @if (inspectTarget()!.enrichment_log!.website?.identity_check_failed) {
+                    ⚠ Nie udało się potwierdzić strony firmy
+                  } @else {
+                    {{ inspectTarget()!.enrichment_log!.website?.url ? '✓ Znaleziono' : '✗ Brak strony' }}
+                  }
                 </span>
               </div>
               <div class="inspect-kv">
+                @if (inspectTarget()!.enrichment_log!.website?.identity_check; as idc) {
+                  <div class="inspect-row">
+                    <span class="ik">Tożsamość</span>
+                    <span class="iv">
+                      {{ idc.verified ? 'potwierdzona' : 'niepotwierdzona' }} ({{ idc.reason }}{{ idc.decided_by ? ', ' + idc.decided_by : '' }})
+                      @if (idc.fallback?.attempted) {
+                        — sprawdzono podstrony: {{ idc.fallback!.pages_checked?.length ?? 0 }}
+                      }
+                    </span>
+                  </div>
+                }
                 @if (inspectTarget()!.enrichment_log!.website?.url) {
                   <div class="inspect-row">
                     <span class="ik">URL</span>
@@ -1486,6 +1544,8 @@ interface BatchProgress {
             <span style="font-size:10px;font-weight:600;color:#d97706">⚠ brak treści</span>
           } @else if (reprocessTarget()?.website_status === 'not_found') {
             <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ nie znaleziono</span>
+          } @else if (reprocessTarget()?.website_status === 'unconfirmed') {
+            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ Nie udało się potwierdzić strony firmy</span>
           }
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:12px"
@@ -2039,6 +2099,12 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // Re-process dialog — edycja pól przed przetworzeniem
   reprocessTarget       = signal<Prospect | null>(null);
   reprocessUrlValue     = '';
+  // Wartość URL-a z chwili otwarcia dialogu — do wykrycia, czy admin
+  // FAKTYCZNIE zmienił pole, zanim wyślemy website_url do backendu (poprawka
+  // 18.09: pole jest z góry wypełnione bieżącym adresem, więc samo
+  // otwarcie+zatwierdzenie dialogu bez edycji nie może już ustawiać
+  // website_source='manual_correction' i trwale wyłączać identity-check).
+  reprocessUrlOriginal  = '';
   reprocessNipValue     = '';
   reprocessLinkedinValue = '';
   reprocessDoLinkedin   = false;
@@ -2049,9 +2115,15 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     const p = this.inspectTarget();
     return p ? this.calcScoreBreakdown(p) : null;
   });
-  inspectView   = signal<'analysis' | 'prompt'>('analysis');
+  inspectView   = signal<'analysis' | 'prompt' | 'scoring'>('analysis');
   inspectPrompt = signal<string | null>(null);
   inspectPromptLoading = signal(false);
+  // Zasady naliczania punktów — per-tenant, nie per-prospekt (wagi/bramki są
+  // stałe w kodzie, jedyna część zależna od tenanta to blacklista ICP), więc
+  // celowo NIE resetowane w openInspect() — pobrane raz, używane dla każdego
+  // kolejnego prospektu w tej samej sesji.
+  inspectScoringRules        = signal<Record<string, unknown> | null>(null);
+  inspectScoringRulesLoading = signal(false);
 
   allSelected  = computed(() => {
     const ids = this.selectedIds();
@@ -2080,8 +2152,25 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   openMenuFor(event: MouseEvent, id: number) {
     event.stopPropagation();
     if (this.openMenu() === id) { this.closeMenu(); return; }
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    this.menuPos.set({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+    const rect  = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const right = window.innerWidth - rect.right;
+
+    // Domyślnie otwórz menu pod przyciskiem — ale jeśli przy tej wysokości
+    // wystawałoby poza dolną krawędź okna (np. ostatnie wiersze tabeli, mały
+    // ekran, pasek zadań Windows zabierający kawałek viewportu), otwórz je
+    // NAD przyciskiem zamiast pod nim. Menu jest position:fixed, więc nie da
+    // się do niego doprzewijać, gdyby wystawało — bez tego było nieosiągalne.
+    // 190px to bezpieczny górny szacunek wysokości (max 5 pozycji + separator,
+    // patrz .row-menu/.mi w CSS) — nie mierzymy realnego DOM-u, żeby uniknąć
+    // "mrugnięcia" menu przy zmianie pozycji.
+    const MENU_HEIGHT_ESTIMATE = 190;
+    const VIEWPORT_MARGIN      = 8;
+    const opensBelowViewport   = rect.bottom + MENU_HEIGHT_ESTIMATE + VIEWPORT_MARGIN > window.innerHeight;
+    const top = opensBelowViewport
+      ? Math.max(VIEWPORT_MARGIN, rect.top - 4 - MENU_HEIGHT_ESTIMATE)
+      : rect.bottom + 4;
+
+    this.menuPos.set({ top, right });
     this.openMenu.set(id);
   }
 
@@ -2409,6 +2498,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   openReprocessDialog(p: Prospect) {
     this.reprocessTarget.set(p);
     this.reprocessUrlValue      = p.website_url || '';
+    this.reprocessUrlOriginal   = p.website_url || '';
     this.reprocessNipValue      = '';
     this.reprocessLinkedinValue = p.linkedin_url || 'https://www.linkedin.com/company/';
     this.reprocessDoLinkedin    = false;
@@ -2429,7 +2519,11 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
       process_linkedin?: boolean;
     } = {};
 
-    const url      = this.reprocessUrlValue.trim();
+    // website_url idzie do backendu TYLKO gdy admin faktycznie zmienił pole
+    // względem wartości sprzed otwarcia dialogu — inaczej samo "Zatwierdź" bez
+    // edycji ustawiałoby website_source='manual_correction' i trwale
+    // wyłączało identity-check (poprawka 18.09, patrz resolveManualUrlOverride).
+    const url      = resolveManualUrlOverride(this.reprocessUrlOriginal, this.reprocessUrlValue);
     const nip      = this.reprocessNipValue.replace(/\D/g, '');
     const linkedin = this.reprocessLinkedinValue.trim();
 
@@ -2658,6 +2752,16 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     this.http.get<{ prompt: string }>(`${API}/${p.id}/prompt`).subscribe({
       next: r => { this.inspectPrompt.set(r.prompt); this.inspectPromptLoading.set(false); },
       error: ()  => { this.inspectPrompt.set('Błąd wczytywania promptu.'); this.inspectPromptLoading.set(false); },
+    });
+  }
+
+  switchToScoringRules() {
+    this.inspectView.set('scoring');
+    if (this.inspectScoringRules() !== null || this.inspectScoringRulesLoading()) return;
+    this.inspectScoringRulesLoading.set(true);
+    this.http.get<Record<string, unknown>>(`${API}/scoring-rules`).subscribe({
+      next: r  => { this.inspectScoringRules.set(r); this.inspectScoringRulesLoading.set(false); },
+      error: () => { this.inspectScoringRules.set({ error: 'Błąd wczytywania zasad naliczania punktów.' }); this.inspectScoringRulesLoading.set(false); },
     });
   }
 
