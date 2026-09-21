@@ -607,7 +607,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                       <span style="margin:0 6px">·</span>
                       <span>{{ g.document_count }} dokumentów</span>
                       @if (g.has_owner_restriction) {
-                        <span style="margin-left:8px;background:#FEF3C7;color:#92400E;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Owner restriction</span>
+                        <span style="margin-left:8px;background:#FEF3C7;color:#92400E;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Ograniczenie właściciela</span>
                       }
                       @if (!g.is_active) {
                         <span style="margin-left:8px;background:#F3F4F6;color:#6B7280;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Nieaktywna</span>
@@ -834,7 +834,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                 </select>
               </div>
               <div>
-                <label class="field-label" style="display:block;margin-bottom:4px">Label <span style="color:#ef4444">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:4px">Etykieta <span style="color:#ef4444">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipLabelKey" [disabled]="!newTipScreen">
                   <option value="">— wybierz label —</option>
                   @for (e of catalogForScreen; track e.key) {
