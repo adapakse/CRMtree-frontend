@@ -829,9 +829,12 @@ export class UsersComponent implements OnInit {
   removeRole(roleId: string): void {
     const u = this.selected();
     if (!u) return;
-    this.userSvc.removeRole(u.id, roleId).subscribe(() => {
-      this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== roleId) } : s);
-      this.toast.success('Rola usunięta');
+    this.userSvc.removeRole(u.id, roleId).subscribe({
+      next: () => {
+        this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== roleId) } : s);
+        this.toast.success('Rola usunięta');
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć roli'),
     });
   }
 
@@ -868,9 +871,12 @@ export class UsersComponent implements OnInit {
     } else {
       const existing = this.prospectsRole();
       if (!existing) return;
-      this.userSvc.removeRole(u.id, existing.role_id).subscribe(() => {
-        this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== existing.role_id) } : s);
-        this.toast.success('Dostęp do Prospektów wyłączony');
+      this.userSvc.removeRole(u.id, existing.role_id).subscribe({
+        next: () => {
+          this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== existing.role_id) } : s);
+          this.toast.success('Dostęp do Prospektów wyłączony');
+        },
+        error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć roli'),
       });
     }
   }
