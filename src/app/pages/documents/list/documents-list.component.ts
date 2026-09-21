@@ -16,13 +16,13 @@ import { DetailPanelComponent } from '../detail-panel/detail-panel.component';
 import { NewDocumentPanelComponent } from '../new-panel/new-document-panel.component';
 
 const STATUSES: { key: DocStatus | 'all'; label: string }[] = [
-  { key: 'all',          label: 'All' },
-  { key: 'new',          label: 'New' },
-  { key: 'being_edited', label: 'Editing' },
-  { key: 'being_signed', label: 'Signing' },
-  { key: 'signed',       label: 'Signed' },
-  { key: 'completed',    label: 'Completed' },
-  { key: 'rejected',     label: 'Rejected' },
+  { key: 'all',          label: 'Wszystkie' },
+  { key: 'new',          label: 'Nowe' },
+  { key: 'being_edited', label: 'W edycji' },
+  { key: 'being_signed', label: 'W podpisywaniu' },
+  { key: 'signed',       label: 'Podpisane' },
+  { key: 'completed',    label: 'Zakończone' },
+  { key: 'rejected',     label: 'Odrzucone' },
 ];
 
 const BACKEND_SORT_COLS = new Set(['doc_number','name','status','expiration_date']);
@@ -38,11 +38,11 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
   template: `
     <!-- Topbar -->
     <div id="topbar">
-      <span class="page-title">Documents</span>
+      <span class="page-title">Dokumenty</span>
       <span class="tsp"></span>
       <div class="srch-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="srch" type="search" placeholder="Search documents, tags…"
+        <input class="srch" type="search" placeholder="Szukaj dokumentów, tagów…"
                [(ngModel)]="searchQuery" (ngModelChange)="onSearch()">
       </div>
       <button class="btn btn-p" (click)="openNew = true">
@@ -67,13 +67,13 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
         }
         <span style="flex:1"></span>
         <select class="sel" [(ngModel)]="selectedGroup" (ngModelChange)="loadDocuments()">
-          <option value="">All Groups</option>
+          <option value="">Wszystkie grupy</option>
           @for (g of groups(); track g.id) {
             <option [value]="g.id">{{ g.display_name }}</option>
           }
         </select>
         <select class="sel" [(ngModel)]="selectedType" (ngModelChange)="loadDocuments()">
-          <option value="">All Types</option>
+          <option value="">Wszystkie typy</option>
           @for (t of docTypes; track t.key) {
             <option [value]="t.key">{{ t.label }}</option>
           }
@@ -88,17 +88,17 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       <div class="tw">
         <div class="thead" [style.grid-template-columns]="grid">
           <div class="th"><input type="checkbox" class="chk"></div>
-          <div class="th sortable" (click)="sortBy('doc_number')">Number <span class="sort-icon">{{ sortIcon('doc_number') }}</span></div>
-          <div class="th sortable" (click)="sortBy('name')">Name <span class="sort-icon">{{ sortIcon('name') }}</span></div>
-          <div class="th sortable" (click)="sortBy('doc_type')">Type <span class="sort-icon">{{ sortIcon('doc_type') }}</span></div>
-          <div class="th sortable" (click)="sortBy('group_name')">Group <span class="sort-icon">{{ sortIcon('group_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('doc_number')">Numer <span class="sort-icon">{{ sortIcon('doc_number') }}</span></div>
+          <div class="th sortable" (click)="sortBy('name')">Nazwa <span class="sort-icon">{{ sortIcon('name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('doc_type')">Typ <span class="sort-icon">{{ sortIcon('doc_type') }}</span></div>
+          <div class="th sortable" (click)="sortBy('group_name')">Grupa <span class="sort-icon">{{ sortIcon('group_name') }}</span></div>
           <div class="th sortable" (click)="sortBy('gdpr_type')">GDPR <span class="sort-icon">{{ sortIcon('gdpr_type') }}</span></div>
           <div class="th sortable" (click)="sortBy('status')">Status <span class="sort-icon">{{ sortIcon('status') }}</span></div>
           <div class="th" style="color:var(--orange)">
-            Active Tasks
-            <span style="font-size:8.5px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">NEW</span>
+            Aktywne zadania
+            <span style="font-size:8.5px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">NOWE</span>
           </div>
-          <div class="th sortable" (click)="sortBy('expiration_date')">Expiry <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
+          <div class="th sortable" (click)="sortBy('expiration_date')">Ważność <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
           <div class="th sortable" (click)="sortBy('owner_name')">Właściciel <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
         </div>
 
@@ -154,8 +154,8 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
         @if (displayedDocuments().length === 0 && !loading()) {
           <div class="empty-state">
             <div class="empty-icon">🔍</div>
-            <div class="empty-title">No documents found</div>
-            <div>Try adjusting filters or search query</div>
+            <div class="empty-title">Nie znaleziono dokumentów</div>
+            <div>Zmień filtry lub wyszukiwaną frazę</div>
           </div>
         }
       </div>
@@ -163,9 +163,9 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       <!-- Pagination -->
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page() - 1)">← Prev</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">Page {{ page() }} of {{ totalPages() }}</span>
-          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">Next →</button>
+          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page() - 1)">← Poprz.</button>
+          <span style="font-size:12.5px;color:var(--gray-500)">Strona {{ page() }} z {{ totalPages() }}</span>
+          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">Dalej →</button>
         </div>
       }
     </div>
@@ -299,7 +299,7 @@ export class DocumentsListComponent implements OnInit {
       `Wykonuje: ${task.assignee_name}`,
       `Przekazał: ${task.assigner_name}`,
     ];
-    if (task.due_date) lines.push(`Due: ${new Date(task.due_date).toLocaleDateString('pl-PL')}`);
+    if (task.due_date) lines.push(`Termin: ${new Date(task.due_date).toLocaleDateString('pl-PL')}`);
     if (task.message)  lines.push(`Wiadomość: ${task.message}`);
     return lines.join('\n');
   }
@@ -410,18 +410,18 @@ export class DocumentsListComponent implements OnInit {
   onDocumentUpdated(doc: Document): void {
     this.documents.update(docs => docs.map(d => d.id === doc.id ? { ...d, ...doc } : d));
     this.selectedDoc.set(doc);
-    this.toast.success('Document updated');
+    this.toast.success('Dokument zaktualizowany');
   }
 
   onDocumentDeleted(id: string): void {
     this.documents.update(docs => docs.filter(d => d.id !== id));
     this.selectedDoc.set(null);
-    this.toast.success('Document deleted');
+    this.toast.success('Dokument usunięty');
   }
 
   onDocumentCreated(doc: Document): void {
     this.openNew = false;
     this.loadDocuments();
-    this.toast.success(`Document ${doc.doc_number} created`);
+    this.toast.success(`Utworzono dokument ${doc.doc_number}`);
   }
 }

@@ -39,7 +39,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             <div class="fg">
               <label class="fl">Typ dokumentu <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.doc_type">
-                <option value="">— Select type —</option>
+                <option value="">— Wybierz typ —</option>
                 @for (t of docTypeOptions; track t.value) {
                   <option [value]="t.value">{{ t.label }}</option>
                 }
@@ -49,7 +49,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             <div class="fg">
               <label class="fl">Klasyfikacja GDPR <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.gdpr_type">
-                <option value="">— Select GDPR —</option>
+                <option value="">— Wybierz klasyfikację —</option>
                 @for (t of gdprTypeOptions; track t.value) {
                   <option [value]="t.value">{{ t.label }}</option>
                 }
@@ -173,8 +173,8 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
               <button class="btn btn-g btn-sm" style="margin-top:8px" (click)="$event.stopPropagation();selectedFile=null">Usuń</button>
             } @else {
               <div style="font-size:24px;margin-bottom:8px">📂</div>
-              <div style="font-size:13px;font-weight:600;color:var(--gray-700)">Drop file here or click to browse</div>
-              <div style="font-size:12px;color:var(--gray-400);margin-top:4px">PDF, DOCX — max 50 MB</div>
+              <div style="font-size:13px;font-weight:600;color:var(--gray-700)">Upuść plik tutaj lub kliknij, aby wybrać</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-top:4px">PDF, DOCX — maks. 50 MB</div>
             }
           </div>
           <input #fileInput type="file" hidden accept=".pdf,.docx,.doc" (change)="onFileChange($event)">

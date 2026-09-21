@@ -514,7 +514,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                   <textarea class="fta" placeholder="Opcjonalna wiadomość dla osoby przypisanej…" [(ngModel)]="wf.message"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p" [disabled]="!wf.assignTo" (click)="assignTask()">
+              <button class="btn btn-p" style="margin-top:16px" [disabled]="!wf.assignTo" (click)="assignTask()">
                 📨 Przypisz i wyślij e-mail
               </button>
             }
