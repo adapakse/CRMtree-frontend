@@ -11,64 +11,22 @@ import { ToastService } from '../../../core/services/toast.service';
 
 const API = `${environment.apiUrl}/admin/prospects`;
 
-// Definicja sygnałów ICP (dopasowanie do CRMtree) — klucze muszą odpowiadać
-// polom icp_signals[].id zwracanym przez backend (decyzja 19.08.2026, artefakt
-// "Sygnały Prospektów"). Sygnały 9-11 (rekrutacja/raportowanie/call center)
-// nie są tu jeszcze — wymagają portali z ofertami pracy, niepodpięte.
-// reasoningKey — nazwa pola w enrichment_log.claude.signal_reasoning (patrz
-// backend ICP_SIGNALS.promptKey, prospectEnrichmentService.js). Rozjeżdża się
-// z `key` (id sygnału) dla 7 z 8 sygnałów — bez tego mapowania
-// getSignalReasoning() cicho nie znajdowała uzasadnienia mimo że było zapisane
-// w bazie (audyt 24.08, Wodmax/Targor-Truck/Parmet).
-const SIGNAL_DEFS = [
-  {
-    key: 'dzial_handlowy', reasoningKey: 'field_sales_team', label: 'Dział handlowy',
-    desc: 'Dedykowani handlowcy, w miarę możności formalna struktura sprzedaży.',
-  },
-  {
-    key: 'zlozony_proces_sprzedazy', reasoningKey: 'custom_quote_process', label: 'Ind. wycena',
-    desc: 'Złożony proces sprzedaży / indywidualna wycena — relacyjny, projektowy lub negocjacyjny model, nie zakup impulsowy.',
-  },
-  {
-    key: 'konsultacja_demo', reasoningKey: 'consultation_demo_needs_analysis', label: 'Konsultacja/demo',
-    desc: 'Sprzedaż wymaga rozmowy przed zakupem — demo, bezpłatna konsultacja, analiza potrzeb.',
-  },
-  {
-    key: 'opieka_nad_klientem', reasoningKey: 'dedicated_customer_care_b2b', label: 'Opieka B2B',
-    desc: 'Dedykowana opieka nad klientem B2B — przypisany opiekun, Key Account Manager, Customer Success.',
-  },
-  {
-    key: 'przetargi', reasoningKey: 'tender_bidding_department', label: 'Przetargi',
-    desc: 'Firma sprzedaje w przetargach / ma dział ofertowania — nie: kupuje w przetargach.',
-  },
-  {
-    key: 'rozproszona_struktura', reasoningKey: 'distributed_sales_structure', label: 'Wiele oddziałów',
-    desc: 'Zespół lub sieć sprzedaży fizycznie rozproszona terytorialnie — konkretni przedstawiciele/oddziały z ludźmi.',
-  },
-  {
-    key: 'siec_partnerow', reasoningKey: 'partner_dealer_network', label: 'Sieć partnerów',
-    desc: 'Firma buduje lub rozwija sieć sprzedaży pośredniej — dealerzy, dystrybutorzy.',
-  },
-  {
-    key: 'ecommerce_b2b', reasoningKey: 'ecommerce_b2b', label: 'E-commerce B2B',
-    desc: 'Sklep/platforma zamówieniowa B2B z realną obsługą — liczy się tylko razem z działem handlowym lub opieką nad klientem.',
-  },
-] as const;
+// Sygnały ICP — dynamiczne, per tenant, pobierane z /admin/prospects/scoring-rules
+// (signals.definitions, zbudowane backendem z PUBLISHED configu tenanta —
+// tenantIcpConfigService.getPublishedConfig().activeSignals, patrz getIcpScoringRules()
+// w prospectEnrichmentService.js). Decyzja 2026-09-22: żadnych hardcoded signal keys
+// po stronie frontendu — kolumny/etykiety/kolejność mają zawsze odzwierciedlać
+// aktualny, opublikowany config tenanta, nie starą, wkompilowaną listę 8 sygnałów.
+interface SignalDef {
+  key: string;
+  label: string;
+  desc: string;
+}
 
-// Bramki ICP (decyzja 2026-09-17): 10 pkt za każdą bramkę ze statusem "pass",
-// wliczane do icp_score przez backend (calcIcpGatePoints, prospectEnrichmentService.js).
-// Treść opisów musi zostać zsynchronizowana ręcznie z definicją bramek w prompcie
-// AI (BRAMKI w prospectEnrichmentService.js) — nie jest generowana automatycznie.
-const GATE_DEFS = [
-  {
-    key: 'b2b', label: 'B2B', points: 10,
-    desc: 'Firma sprzedaje innym firmom, nie konsumentom detalicznym. Dowód: jawnie opisana obsługa klientów biznesowych ("dla firm", "sprzedaż hurtowa", oferta B2B) — sam NIP przy zamówieniu nie wystarcza.',
-  },
-  {
-    key: 'company_size', label: 'Wielkość firmy', points: 10,
-    desc: 'Firma zatrudnia minimum 15 pracowników. Oceniane na podstawie twardych danych handlowych (zatrudnienie) z bazy klienta — bez danych o zatrudnieniu bramka zwraca "unknown", a nie zgadywanie z treści strony.',
-  },
-] as const;
+// Bramki ICP (b2b/company_size) usunięte z UI (decyzja 2026-09-22, po
+// uproszczeniu scoringu) — nie wpływają już na icp_score/kwalifikację, więc
+// pokazywanie ich jako elementu scoringu tylko myliło. Surowe dane (icp_gates)
+// nadal przychodzą z backendu jako informacyjne — patrz interfejs Prospect.
 
 // Poprawka 18.09: dialog Re-process z góry wypełnia pole URL bieżącym adresem
 // (openReprocessDialog), więc samo otwarcie i zatwierdzenie dialogu BEZ
@@ -463,20 +421,7 @@ interface BatchProgress {
               Score {{ sortIcon('icp_score') }}
             </th>
             <th>Oddziały</th>
-            <th class="sig-th">
-              <span>Bramki</span>
-              <div class="sig-info-wrap">
-                <button class="sig-info" (click)="$event.stopPropagation()">?</button>
-                <div class="sig-info-tip">
-                  <div class="sig-info-tip-title">Bramki kwalifikacji</div>
-                  Obie muszą mieć status PASS, żeby firma się zakwalifikowała — niezależnie od liczby trafionych sygnałów. Każda bramka ze statusem PASS dodaje też {{ gateDefs[0].points }} pkt do score.
-                  @for (g of gateDefs; track g.key) {
-                    <div style="margin-top:6px"><b>{{ g.label }} (+{{ g.points }} pkt):</b> {{ g.desc }}</div>
-                  }
-                </div>
-              </div>
-            </th>
-            @for (s of signalDefs; track s.key) {
+            @for (s of signalDefs(); track s.key) {
               <th class="sig-th">
                 <span>{{ s.label }}</span>
                 <div class="sig-info-wrap">
@@ -596,17 +541,7 @@ interface BatchProgress {
                   <span style="color:#9ca3af">({{ p.branches_scope }})</span>
                 } @else { <span style="color:#d1d5db">—</span> }
               </td>
-              <td>
-                @if (p.icp_gate_status) {
-                  <span class="scope-badge" [class]="'gate-' + p.icp_gate_status"
-                    [title]="gateStatusLabel(p.icp_gate_status)">
-                    {{ gateStatusIcon(p.icp_gate_status) }}
-                  </span>
-                } @else {
-                  <span style="color:#d1d5db;font-size:12px">—</span>
-                }
-              </td>
-              @for (s of signalDefs; track s.key) {
+              @for (s of signalDefs(); track s.key) {
                 <td class="sig-cell" [title]="signalTooltip(p, s.key, s.desc)">
                   <span class="sig-dot"
                     [class.sig-yes]="getSignal(p, s.key) === true"
@@ -718,7 +653,7 @@ interface BatchProgress {
                         <div style="margin-bottom:12px">
                           <div class="detail-label">Sygnały ICP</div>
                           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
-                            @for (s of signalDefs; track s.key) {
+                            @for (s of signalDefs(); track s.key) {
                               <span [title]="s.desc" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:12px;border:1px solid"
                                 [style.background]="getSignal(p, s.key) === true ? '#bbf7d0' : getSignal(p, s.key) === false ? '#fee2e2' : '#f3f4f6'"
                                 [style.borderColor]="getSignal(p, s.key) === true ? '#4ade80' : getSignal(p, s.key) === false ? '#fca5a5' : '#d1d5db'"
@@ -756,13 +691,6 @@ interface BatchProgress {
                             <b>PKD (GUS):</b>
                             @for (code of (p.enrichment_log?.gus?.pkd_codes ?? []); track code) {
                               <span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:11px;font-family:monospace">{{ code }}</span>
-                            }
-                          </div>
-                        }
-                        @if (p.icp_gate_status) {
-                          <div><b>Bramki:</b> {{ gateStatusLabel(p.icp_gate_status) }}
-                            @if (p.icp_gates) {
-                              <span style="color:#9ca3af"> (B2B: {{ p.icp_gates.b2b }}, wielkość: {{ p.icp_gates.company_size }})</span>
                             }
                           </div>
                         }
@@ -1020,8 +948,8 @@ interface BatchProgress {
                               <span class="log-detail"> {{ p.enrichment_log.claude.model }}</span>
                               @if (p.enrichment_log.claude.signal_reasoning) {
                                 <div class="log-signals">
-                                  @for (s of signalDefs; track s.key) {
-                                    @if (getSignalReasoning(p, s)) {
+                                  @for (s of signalDefs(); track s.key) {
+                                    @if (getSignalReasoning(p, s.key)) {
                                       <div class="log-signal-row">
                                         <span class="sig-dot log-sig-dot"
                                           [class.sig-yes]="getSignal(p, s.key) === true"
@@ -1029,7 +957,7 @@ interface BatchProgress {
                                         </span>
                                         <span class="log-signal-key">{{ s.label }}</span>
                                         <span class="log-signal-reason">
-                                          {{ getSignalReasoning(p, s) }}
+                                          {{ getSignalReasoning(p, s.key) }}
                                         </span>
                                       </div>
                                     }
@@ -1387,10 +1315,6 @@ interface BatchProgress {
                     <span class="ik">Model</span>
                     <span class="iv" style="font-family:monospace;font-size:10px">{{ inspectTarget()!.enrichment_log!.claude!.model }}</span>
                   </div>
-                  <div class="inspect-row">
-                    <span class="ik">Bramki</span>
-                    <span class="iv">{{ gateStatusLabel(inspectTarget()!.enrichment_log!.claude!.gate_status || '') }}</span>
-                  </div>
                 </div>
               </div>
             }
@@ -1401,7 +1325,7 @@ interface BatchProgress {
 
             <div class="inspect-section-title">Sygnały i uzasadnienie Claude</div>
             <div class="inspect-signals">
-              @for (s of signalDefs; track s.key) {
+              @for (s of signalDefs(); track s.key) {
                 <div class="inspect-signal-row"
                   [class.inspect-signal-true]="getSignal(inspectTarget()!, s.key) === true"
                   [class.inspect-signal-false]="getSignal(inspectTarget()!, s.key) === false">
@@ -1411,8 +1335,8 @@ interface BatchProgress {
                   </span>
                   <div class="inspect-signal-body">
                     <div class="inspect-signal-name">{{ s.label }}</div>
-                    @if (getSignalReasoning(inspectTarget()!, s)) {
-                      <div class="inspect-signal-reason">{{ getSignalReasoning(inspectTarget()!, s) }}</div>
+                    @if (getSignalReasoning(inspectTarget()!, s.key)) {
+                      <div class="inspect-signal-reason">{{ getSignalReasoning(inspectTarget()!, s.key) }}</div>
                     } @else {
                       <div class="inspect-signal-reason inspect-muted">brak uzasadnienia</div>
                     }
@@ -1428,24 +1352,12 @@ interface BatchProgress {
               <div class="inspect-score-breakdown">
                 <div class="sb-row">
                   <span class="sb-label">Aktywne sygnały (true)</span>
-                  <span class="sb-value">{{ sb.trueCount }} / 8</span>
-                </div>
-                <div class="sb-row" style="background:#f9fafb">
-                  <span class="sb-label">Bramki (B2B / wielkość firmy)</span>
-                  <span class="sb-value" style="color:#374151">{{ sb.gates.b2b }} / {{ sb.gates.company_size }} → {{ gateStatusLabel(sb.gateStatus) }}</span>
+                  <span class="sb-value">{{ sb.trueCount }} / {{ signalDefs().length }}</span>
                 </div>
                 <div class="sb-row">
-                  <span class="sb-label">Suma sygnałów ({{ sb.trueCount }}/8 true, wagi 10/5)</span>
+                  <span class="sb-label">Suma sygnałów ({{ sb.trueCount }}/{{ signalDefs().length }} true)</span>
                   <span class="sb-value sb-plus">{{ sb.raw }}</span>
                 </div>
-                @for (g of sb.gatePointsBreakdown; track g.id) {
-                  @if (g.hit) {
-                    <div class="sb-row">
-                      <span class="sb-label">Bramka: {{ g.label }}</span>
-                      <span class="sb-value sb-plus">+{{ g.points }}</span>
-                    </div>
-                  }
-                }
                 @for (b of sb.bonusBreakdown; track b.id) {
                   @if (b.hit) {
                     <div class="sb-row">
@@ -2044,8 +1956,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
 
   minLeadScore = computed(() => Number(this.appSettings.settings()['prospect_lead_min_score'] ?? 45));
 
-  readonly signalDefs = SIGNAL_DEFS;
-  readonly gateDefs = GATE_DEFS;
+  // Dynamiczna lista sygnałów ICP tego tenanta (PUBLISHED), patrz loadSignalDefs().
+  signalDefs = signal<SignalDef[]>([]);
 
   rows       = signal<Prospect[]>([]);
   total      = signal(0);
@@ -2204,7 +2116,32 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     const dirParam = qp.get('dir');
     if (dirParam === 'asc' || dirParam === 'desc') this.dir.set(dirParam);
     this.load();
+    this.loadSignalDefs();
     this.pollBatch();
+  }
+
+  // Pobiera aktualną, PUBLISHED listę aktywnych sygnałów ICP tego tenanta —
+  // ten sam endpoint co zakładka "Zasady naliczania punktów" w Inspekcji
+  // (GET /scoring-rules), ale wołany raz przy starcie ekranu, nie leniwie per
+  // prospekt. Kolejność = kolejność zwrócona przez backend (sort_order configu).
+  loadSignalDefs(): void {
+    this.http.get<{ signals: { definitions: { id: string; label: string; short_description?: string | null }[] } }>(
+      `${API}/scoring-rules`,
+    ).subscribe({
+      next: rules => {
+        // Tooltip = short_description (krótki, biznesowy opis "co oznacza TRUE"),
+        // NIGDY ai_definition (pełna, wieloparagrafowa instrukcja dla AI — za
+        // długa i nieczytelna jako tooltip). Brak short_description = brak opisu,
+        // tooltip pokazuje wtedy samą nazwę sygnału.
+        const defs = (rules.signals?.definitions ?? []).map(d => ({
+          key: d.id,
+          label: d.label,
+          desc: d.short_description ?? '',
+        }));
+        this.signalDefs.set(defs);
+      },
+      error: () => { /* kolumny sygnałów zostają puste — reszta ekranu i tak działa */ },
+    });
   }
   ngOnDestroy() { clearTimeout(this.pollTimer); }
 
@@ -2708,18 +2645,6 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
 
   statusClass(s: string): string { return `badge badge-${s}`; }
 
-  gateStatusIcon(status: string): string {
-    return { qualified: '✅', disqualified: '⛔', needs_review: '❓' }[status] ?? status;
-  }
-
-  gateStatusLabel(status: string): string {
-    return {
-      qualified: 'Zakwalifikowana (B2B + wielkość: pass)',
-      disqualified: 'Odrzucona (potwierdzony fail bramki)',
-      needs_review: 'Do ręcznego przeglądu (brak pewnych danych)',
-    }[status] ?? status;
-  }
-
   websiteMethodLabel(method: string): string {
     const map: Record<string, string> = {
       krs:        'rejestr KRS',
@@ -2765,24 +2690,25 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getSignalReasoning(p: Prospect, s: { key: string; reasoningKey: string }): string | null {
+  // Decyzja 2026-09-22: sygnały są teraz dynamiczne (patrz signalDefs/loadSignalDefs),
+  // więc nie ma już stałej listy z osobnym "reasoningKey" per sygnał — signal_reasoning
+  // jest zapisywane kluczowane po `key` (patrz prospectEnrichmentService.js enrichOne()),
+  // dokładnie ten sam klucz co id kolumny. Rekordy sprzed refaktoru na kontrakt oparty o
+  // `key` (przed 24.08) mogły mieć reasoning zapisane pod starą nazwą pola promptu — dla
+  // takich historycznych rekordów sama wartość hit/false zostaje poprawna, tylko tekst
+  // uzasadnienia może się nie znaleźć.
+  getSignalReasoning(p: Prospect, key: string): string | null {
     const r = p.enrichment_log?.claude?.signal_reasoning;
     if (!r) return null;
-    // reasoningKey = nazwa pola z promptu AI (np. field_sales_team), różna od
-    // `key` = id sygnału (np. dzial_handlowy) dla 7 z 8 sygnałów. Fallback do
-    // `key` — starsze rekordy sprzed wprowadzenia promptKey mogły zapisać
-    // reasoning pod samym id.
-    return r[s.reasoningKey] || r[s.key] || null;
+    return r[key] || null;
   }
 
   // Backend liczy już cały breakdown (icp_signals/icp_gates/icp_bonus_signals) —
   // tu tylko składamy to w kształt wygodny do renderowania w inspektorze,
   // bez powtarzania formuły scoringu po stronie frontendu.
   calcScoreBreakdown(p: Prospect): {
-    trueCount: number; raw: number; bonus: number; gatePoints: number; downgradePenalty: number; total: number;
-    gates: IcpGates; gateStatus: string;
+    trueCount: number; raw: number; bonus: number; downgradePenalty: number; total: number;
     bonusBreakdown: IcpBonusHit[];
-    gatePointsBreakdown: IcpBonusHit[];
     downgradeFlags: IcpDowngradeFlag[];
   } {
     const signals = p.icp_signals ?? [];
@@ -2790,17 +2716,17 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     const raw = signals.filter(s => s.hit).reduce((sum, s) => sum + s.points, 0);
     const bonusBreakdown = p.icp_bonus_signals ?? [];
     const bonus = bonusBreakdown.filter(b => b.hit).reduce((sum, b) => sum + b.points, 0);
-    const gatePointsBreakdown = p.icp_gate_points ?? [];
-    const gatePoints = gatePointsBreakdown.filter(g => g.hit).reduce((sum, g) => sum + g.points, 0);
     const downgradeFlags = p.icp_downgrade_flags ?? [];
     const downgradePenalty = downgradeFlags.reduce((sum, f) => sum + (f.points ?? 0), 0);
     return {
-      trueCount, raw, bonus, gatePoints, downgradePenalty,
-      total: p.icp_score ?? Math.max(0, Math.min(100, raw + bonus + gatePoints + downgradePenalty)),
-      gates: p.icp_gates ?? { b2b: 'unknown', company_size: 'unknown' },
-      gateStatus: p.icp_gate_status ?? 'needs_review',
+      trueCount, raw, bonus, downgradePenalty,
+      // Decyzja 2026-09-22: icp_score = wyłącznie suma trafionych sygnałów (minus
+      // kara blacklisty w downgradePenalty) — bramki usunięte z UI, bonus zostaje
+      // tylko jako informacyjny breakdown, nie wchodzi do total. Fallback (gdy
+      // backend nie przysłał icp_score, np. rekord jeszcze nieprzetworzony) musi
+      // liczyć tak samo jak enrichOne(), inaczej inspektor pokazuje zawyżony wynik.
+      total: p.icp_score ?? Math.max(0, Math.min(100, raw + downgradePenalty)),
       bonusBreakdown,
-      gatePointsBreakdown,
       downgradeFlags,
     };
   }
