@@ -249,9 +249,14 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           <button class="tab-btn" [class.active]="activeTab() === 'tooltips'" (click)="activeTab.set('tooltips')">
             💬 Podpowiedzi
           </button>
-          <button class="tab-btn" [class.active]="activeTab() === 'icp'" (click)="activeTab.set('icp'); loadIcpConfig()">
-            🎯 Enrichment / ICP
-          </button>
+          <!-- Endpoint /admin/prospects/icp-config jest za requireFeature('prospects'),
+               więc bez modułu Prospekty zakładka mogłaby tylko pokazać błąd —
+               gate'ujemy ją tak samo jak pozycję Prospekty w sidebarze. -->
+          @if (auth.hasFeature('prospects')) {
+            <button class="tab-btn" [class.active]="activeTab() === 'icp'" (click)="activeTab.set('icp'); loadIcpConfig()">
+              🎯 Enrichment / ICP
+            </button>
+          }
         </div>
 
         <!-- TAB: Parametry globalne -->
@@ -992,7 +997,8 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           }
         }
 
-        <!-- TAB: Enrichment / ICP (dynamic ICP signals, superadmin only) -->
+        <!-- TAB: Enrichment / ICP — dynamic ICP signals of the LOGGED-IN tenant.
+             Any tenant admin (is_admin), not just the CRMTree superadmin. -->
         @if (activeTab() === 'icp') {
           <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">🎯</span>
@@ -1003,6 +1009,12 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
 
           @if (icpLoading()) {
             <div class="state-msg">Ładowanie...</div>
+          } @else if (icpError(); as err) {
+            <div class="icp-error">
+              <div><strong>Nie udało się wczytać konfiguracji ICP.</strong></div>
+              <div style="margin-top:4px">{{ err }}</div>
+              <button class="btn-secondary" style="margin-top:12px" (click)="loadIcpConfig()">Spróbuj ponownie</button>
+            </div>
           } @else if (icpConfig(); as cfg) {
 
             <div class="icp-summary">
@@ -1055,7 +1067,9 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
     <!-- ICP signal edit modal — the only place the full "jak rozpoznać ten
          sygnał" text is edited; the list only ever shows a truncated preview. -->
     @if (icpModalTarget() !== null) {
-      <div class="modal-backdrop" (click)="closeIcpEditModal()">
+      <div class="modal-backdrop"
+           (mousedown)="onIcpBackdropMouseDown($event)"
+           (mouseup)="onIcpBackdropMouseUp($event)">
         <div class="modal" (click)="$event.stopPropagation()">
           <div class="modal-header">
             <h2>{{ icpModalTarget() === 'new' ? 'Nowy sygnał' : 'Edytuj sygnał' }}</h2>
@@ -1150,6 +1164,10 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
       display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
       padding: 10px 16px; font-size: 12.5px; color: var(--gray-600);
       background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px;
+    }
+    .icp-error {
+      border: 1px solid #FECACA; background: #FEF2F2; color: #991B1B;
+      border-radius: 10px; padding: 16px 18px; font-size: 13px;
     }
     .icp-list { border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; margin-top: 14px; }
     .icp-row {
@@ -1617,7 +1635,7 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  // ── Enrichment / ICP tab (superadmin — dynamic ICP signals for THIS tenant) ─
+  // ── Enrichment / ICP tab (tenant admin — dynamic ICP signals of THIS tenant) ─
   // Two mutation paths, both one PUT/POST on an explicit click (no autosave):
   //  - quick inline edit on the list row (points/active only) → saveIcpRowQuickFields,
   //  - full edit (name + "jak rozpoznać ten sygnał") → the modal, saveIcpModalDraft.
@@ -1626,6 +1644,9 @@ export class SettingsComponent implements OnInit {
   icpConfig  = signal<IcpConfig | null>(null);
   icpLoading = signal(false);
   icpSaving  = signal(false);
+  // Osobny stan błędu — bez niego 403/404/5xx wyglądały w UI dokładnie tak samo
+  // jak poprawnie wczytana, pusta konfiguracja (audyt multi-tenant ICP, 23.09).
+  icpError   = signal<string | null>(null);
   icpRows    = signal<IcpRow[]>([]);
   // null = closed; 'new' = creating a signal; an IcpSignal = editing that one.
   icpModalTarget = signal<IcpSignal | 'new' | null>(null);
@@ -1637,8 +1658,13 @@ export class SettingsComponent implements OnInit {
 
   loadIcpConfig(): void {
     const tenantId = this.icpTenantId;
-    if (!tenantId) { this.toast.error('Brak przypisanego tenanta'); return; }
+    if (!tenantId) {
+      this.icpError.set('Twoje konto nie jest przypisane do żadnego tenanta, więc nie ma konfiguracji ICP do pokazania.');
+      this.toast.error('Brak przypisanego tenanta');
+      return;
+    }
     this.icpLoading.set(true);
+    this.icpError.set(null);
     this.icpModalTarget.set(null);
     this.http.get<IcpConfig>(`${environment.apiUrl}/admin/prospects/icp-config`).subscribe({
       next: cfg => {
@@ -1646,10 +1672,31 @@ export class SettingsComponent implements OnInit {
         this.icpRows.set([...cfg.signals]
           .sort((a, b) => a.sort_order - b.sort_order)
           .map(s => ({ signal: s, points: s.points, active: s.active })));
+        this.icpError.set(null);
         this.icpLoading.set(false);
       },
-      error: () => { this.toast.error('Błąd ładowania konfiguracji ICP'); this.icpLoading.set(false); },
+      error: err => {
+        // Pusta lista sygnałów i nieudany request to dwie różne rzeczy —
+        // czyścimy config, żeby nie pokazać nieaktualnych danych, ale
+        // renderujemy jawny komunikat, nie pustkę.
+        this.icpConfig.set(null);
+        this.icpRows.set([]);
+        this.icpError.set(this.icpLoadErrorMessage(err));
+        this.icpLoading.set(false);
+        this.toast.error('Błąd ładowania konfiguracji ICP');
+      },
     });
+  }
+
+  private icpLoadErrorMessage(err: { status?: number; error?: { error?: string } }): string {
+    const detail = err?.error?.error;
+    switch (err?.status) {
+      case 0:   return 'Brak połączenia z serwerem — sprawdź, czy backend działa, i spróbuj ponownie.';
+      case 401: return 'Sesja wygasła. Zaloguj się ponownie.';
+      case 403: return detail || 'Brak uprawnień do konfiguracji ICP tego tenanta.';
+      case 404: return 'Konfiguracja ICP nie jest dostępna w tej wersji backendu (404).';
+      default:  return detail || `Nie udało się pobrać konfiguracji ICP (błąd ${err?.status ?? 'nieznany'}).`;
+    }
   }
 
   isIcpRowDirty(row: IcpRow): boolean {
@@ -1684,6 +1731,27 @@ export class SettingsComponent implements OnInit {
     this.icpModalDraft = signal
       ? { label: signal.label, ai_definition: signal.ai_definition, short_description: signal.short_description ?? '', points: signal.points, active: signal.active }
       : { label: '', ai_definition: '', short_description: '', points: 0, active: true };
+  }
+
+  // Modal zamyka się tylko wtedy, gdy CAŁE kliknięcie — mousedown i mouseup —
+  // odbyło się na backdropie. Samo (click) na backdropie nie wystarczało:
+  // przy zaznaczaniu tekstu w input/textarea mouseup ląduje często poza
+  // modalem, a przeglądarka wysyła wtedy `click` na najbliższego wspólnego
+  // przodka obu zdarzeń, czyli właśnie backdrop — (click)="$event.stopPropagation()"
+  // na .modal nigdy się w tym scenariuszu nie odpala, więc modal zamykał się
+  // w trakcie zaznaczania tekstu.
+  private icpBackdropMouseDown = false;
+
+  onIcpBackdropMouseDown(event: MouseEvent): void {
+    this.icpBackdropMouseDown = event.target === event.currentTarget;
+  }
+
+  onIcpBackdropMouseUp(event: MouseEvent): void {
+    const startedOnBackdrop = this.icpBackdropMouseDown;
+    this.icpBackdropMouseDown = false;
+    if (startedOnBackdrop && event.target === event.currentTarget) {
+      this.closeIcpEditModal();
+    }
   }
 
   closeIcpEditModal(): void {

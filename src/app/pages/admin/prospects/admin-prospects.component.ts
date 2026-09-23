@@ -2626,8 +2626,10 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     return 'Utwórz lead w CRM';
   }
 
-  // Progi przeliczone pod nowy max ICP (65 za sygnały + 10 bonus + 20 za bramki
-  // [2026-09-17] = 95, nie 100 jak w starym systemie) — 60%/33% z 95, zaokrąglone.
+  // Progi 57/31 pochodzą z formuły max=95 sprzed 2026-09-22 (65 za sygnały +
+  // 10 bonus + 20 za bramki) — od 2026-09-22 icp_score liczy się wyłącznie z
+  // sygnałów, max=100, ale progi nie zostały przeliczone (nie zmieniamy ich
+  // teraz — to logika, nie komentarz, patrz audyt Enrichment V2, 23.09).
   scoreColor(score: number): string {
     if (score >= 57) return '#16a34a';
     if (score >= 31) return '#d97706';
