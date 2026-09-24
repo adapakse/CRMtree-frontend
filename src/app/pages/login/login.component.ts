@@ -38,10 +38,10 @@ type Tab = 'sso' | 'password';
             <p class="login-hint">Zaloguj się kontem Google Workspace swojej organizacji.</p>
             <button class="lbtn" (click)="loginSso()" [disabled]="loading()">
               @if (loading()) {
-                <span class="spinner"></span> Redirecting…
+                <span class="spinner"></span> Przekierowywanie…
               } @else {
                 <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#fff" d="M21.35 11.1H12v2.8h5.35c-.23 1.25-.97 2.3-2.07 3v2.5h3.35c1.96-1.8 3.1-4.47 3.1-7.6 0-.52-.05-1.03-.13-1.53-.01-.05-.02-.1-.03-.15-.07-.35-.17-.69-.3-1.02z"/><path fill="#fff" d="M12 22c2.7 0 4.96-.89 6.62-2.4l-3.35-2.5c-.89.6-2.03.95-3.27.95-2.51 0-4.64-1.7-5.4-3.98H3.18v2.57A9.99 9.99 0 0 0 12 22z"/><path fill="#fff" d="M6.6 14.07A5.97 5.97 0 0 1 6.28 12c0-.72.12-1.41.32-2.07V7.36H3.18A10.03 10.03 0 0 0 2 12c0 1.62.39 3.15 1.18 4.48l3.42-2.41z"/><path fill="#fff" d="M12 6.02c1.42 0 2.69.49 3.69 1.44l2.77-2.77C16.96 3.15 14.7 2.25 12 2.25A9.99 9.99 0 0 0 3.18 7.36l3.42 2.57C7.36 7.72 9.49 6.02 12 6.02z"/></svg>
-                Sign in with Google Workspace SSO
+                Zaloguj się przez Google Workspace SSO
               }
             </button>
             <div class="login-note">🔒 <b>SAML 2.0</b> · Google Workspace</div>

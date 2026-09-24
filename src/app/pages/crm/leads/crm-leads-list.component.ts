@@ -247,7 +247,7 @@ const PROB_MAP: Record<LeadStage, number> = {
 
       <div class="dp-body">
         <div class="tabs">
-          <button class="tab-btn" [class.active]="dpTab==='info'"     (click)="dpTab='info'">Info</button>
+          <button class="tab-btn" [class.active]="dpTab==='info'"     (click)="dpTab='info'">Informacje</button>
           <button class="tab-btn" [class.active]="dpTab==='activity'" (click)="dpTab='activity'">
             Historia<span *ngIf="selected.activities?.length" class="tab-cnt">{{ selected.activities!.length }}</span>
           </button>

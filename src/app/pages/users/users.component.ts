@@ -15,17 +15,17 @@ import { AuthService } from '../../core/auth/auth.service';
   imports: [CommonModule, FormsModule, AvatarComponent, GroupPillComponent],
   template: `
     <div id="topbar">
-      <span class="page-title">User Management</span>
+      <span class="page-title">Zarządzanie użytkownikami</span>
       <span class="tsp"></span>
       <div class="srch-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="srch" type="search" placeholder="Search users…"
+        <input class="srch" type="search" placeholder="Szukaj użytkowników…"
                [(ngModel)]="search" (ngModelChange)="onSearch()">
       </div>
       @if (isAdmin()) {
         <button class="btn btn-p" style="margin-left:8px" (click)="openNew()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          New User
+          Nowy użytkownik
         </button>
       }
     </div>
@@ -33,25 +33,25 @@ import { AuthService } from '../../core/auth/auth.service';
     <div id="content">
       <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center">
         <select class="sel" [(ngModel)]="filterGroup" (ngModelChange)="load()">
-          <option value="">All Groups</option>
+          <option value="">Wszystkie grupy</option>
           @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
         </select>
         <select class="sel" [(ngModel)]="filterActive" (ngModelChange)="load()">
-          <option value="">All Users</option>
-          <option value="true">Active only</option>
-          <option value="false">Inactive only</option>
+          <option value="">Wszyscy użytkownicy</option>
+          <option value="true">Tylko aktywni</option>
+          <option value="false">Tylko nieaktywni</option>
         </select>
-        <span style="font-size:12.5px;color:var(--gray-400)">{{ total() }} users</span>
+        <span style="font-size:12.5px;color:var(--gray-400)">Użytkowników: {{ total() }}</span>
       </div>
 
       <div class="tw">
         <div class="thead" style="grid-template-columns:40px 1fr 200px 1fr 110px 120px 80px">
           <div class="th"></div>
-          <div class="th sortable" (click)="sortBy('display_name')">User <span class="si">{{ sortIcon('display_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('display_name')">Użytkownik <span class="si">{{ sortIcon('display_name') }}</span></div>
           <div class="th sortable" (click)="sortBy('email')">Email <span class="si">{{ sortIcon('email') }}</span></div>
-          <div class="th">Groups &amp; Roles</div>
-          <div class="th sortable" (click)="sortBy('crm_role')">CRM Role <span class="si">{{ sortIcon('crm_role') }}</span></div>
-          <div class="th sortable" (click)="sortBy('last_login')">Last Login <span class="si">{{ sortIcon('last_login') }}</span></div>
+          <div class="th">Grupy i role</div>
+          <div class="th sortable" (click)="sortBy('crm_role')">Rola CRM <span class="si">{{ sortIcon('crm_role') }}</span></div>
+          <div class="th sortable" (click)="sortBy('last_login')">Ostatnie logowanie <span class="si">{{ sortIcon('last_login') }}</span></div>
           <div class="th sortable" (click)="sortBy('is_active')">Status <span class="si">{{ sortIcon('is_active') }}</span></div>
         </div>
 
@@ -90,27 +90,27 @@ import { AuthService } from '../../core/auth/auth.service';
               }
             </div>
             <div class="td" style="font-size:12px;color:var(--gray-400)">
-              {{ user.last_login_at ? (user.last_login_at | date:'dd.MM.yy HH:mm') : 'Never' }}
+              {{ user.last_login_at ? (user.last_login_at | date:'dd.MM.yy HH:mm') : 'Nigdy' }}
             </div>
             <div class="td">
               <span class="badge" [class]="user.is_active ? 's-signed' : 's-rejected'">
-                <span class="bdot"></span>{{ user.is_active ? 'Active' : 'Inactive' }}
+                <span class="bdot"></span>{{ user.is_active ? 'Aktywny' : 'Nieaktywny' }}
               </span>
             </div>
           </div>
         }
         @empty {
           @if (!loading()) {
-            <div class="empty-state"><div class="empty-icon">&#128100;</div><div class="empty-title">No users found</div></div>
+            <div class="empty-state"><div class="empty-icon">&#128100;</div><div class="empty-title">Nie znaleziono użytkowników</div></div>
           }
         }
       </div>
 
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">Prev</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">Page {{ page() }} of {{ totalPages() }}</span>
-          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">Next</button>
+          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">Poprz.</button>
+          <span style="font-size:12.5px;color:var(--gray-500)">Strona {{ page() }} z {{ totalPages() }}</span>
+          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">Dalej</button>
         </div>
       }
     </div>
@@ -124,8 +124,8 @@ import { AuthService } from '../../core/auth/auth.service';
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
             <div>
-              <div class="mot">Add New User</div>
-              <div class="mos">Create a new user account manually</div>
+              <div class="mot">Dodaj nowego użytkownika</div>
+              <div class="mos">Ręcznie utwórz nowe konto użytkownika</div>
             </div>
             <div class="mox" (click)="showNew.set(false)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -135,31 +135,31 @@ import { AuthService } from '../../core/auth/auth.service';
           <div style="padding:24px">
             <div class="fgrid">
               <div class="fg">
-                <label class="fl">First Name <span style="color:var(--orange)">*</span></label>
+                <label class="fl">Imię <span style="color:var(--orange)">*</span></label>
                 <input class="fi" [(ngModel)]="newFirst" placeholder="Anna" [class.fi-err]="submitted && !newFirst">
-                @if (submitted && !newFirst) { <span class="ferr">Required</span> }
+                @if (submitted && !newFirst) { <span class="ferr">Wymagane</span> }
               </div>
               <div class="fg">
-                <label class="fl">Last Name <span style="color:var(--orange)">*</span></label>
+                <label class="fl">Nazwisko <span style="color:var(--orange)">*</span></label>
                 <input class="fi" [(ngModel)]="newLast" placeholder="Kowalska" [class.fi-err]="submitted && !newLast">
-                @if (submitted && !newLast) { <span class="ferr">Required</span> }
+                @if (submitted && !newLast) { <span class="ferr">Wymagane</span> }
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Email Address <span style="color:var(--orange)">*</span></label>
+                <label class="fl">Adres e-mail <span style="color:var(--orange)">*</span></label>
                 <input class="fi" type="email" [(ngModel)]="newEmail" placeholder="anna.kowalska@firma.com" [class.fi-err]="submitted && !newEmail">
-                @if (submitted && !newEmail) { <span class="ferr">Required</span> }
+                @if (submitted && !newEmail) { <span class="ferr">Wymagane</span> }
               </div>
               <div class="fg">
                 <label class="fl">Status</label>
                 <select class="fsel" [(ngModel)]="newActive">
-                  <option [ngValue]="true">Active</option>
-                  <option [ngValue]="false">Inactive</option>
+                  <option [ngValue]="true">Aktywny</option>
+                  <option [ngValue]="false">Nieaktywny</option>
                 </select>
               </div>
               <div class="fg">
-                <label class="fl">Role</label>
+                <label class="fl">Rola administratora</label>
                 <select class="fsel" [(ngModel)]="newAdmin">
-                  <option [ngValue]="false">Regular User</option>
+                  <option [ngValue]="false">Zwykły użytkownik</option>
                   <option [ngValue]="true">Administrator</option>
                 </select>
               </div>
@@ -172,30 +172,30 @@ import { AuthService } from '../../core/auth/auth.service';
                 </select>
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Assign to Group (optional)</label>
+                <label class="fl">Przypisz do grupy (opcjonalnie)</label>
                 <select class="fsel" [(ngModel)]="newGroup">
-                  <option value="">No group</option>
+                  <option value="">Brak grupy</option>
                   @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
                 </select>
               </div>
               @if (newGroup) {
                 <div class="fg">
-                  <label class="fl">Access Level</label>
+                  <label class="fl">Poziom dostępu</label>
                   <select class="fsel" [(ngModel)]="newGroupAccess">
-                    <option value="read">Read</option>
-                    <option value="full">Full</option>
+                    <option value="read">Odczyt</option>
+                    <option value="full">Pełny</option>
                   </select>
                 </div>
               }
             </div>
             <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--gray-500);line-height:1.6">
-              <strong style="color:var(--gray-700)">Note:</strong> The user will be able to log in via SAML SSO using this email address. Authentication is handled entirely by Google Workspace.
+              <strong style="color:var(--gray-700)">Uwaga:</strong> Użytkownik będzie mógł logować się przez SAML SSO przy użyciu tego adresu e-mail. Uwierzytelnianie jest w całości obsługiwane przez Google Workspace.
             </div>
           </div>
 
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50)">
-            <button class="btn btn-g" (click)="showNew.set(false)">Cancel</button>
-            <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">Create User</button>
+            <button class="btn btn-g" (click)="showNew.set(false)">Anuluj</button>
+            <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">Utwórz użytkownika</button>
           </div>
         </div>
       </div>
@@ -218,20 +218,20 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <div class="pb">
             @if (isAdmin()) {
-              <div class="sec-title">Account Settings</div>
+              <div class="sec-title">Ustawienia konta</div>
               <div class="fgrid">
                 <div class="fg">
-                  <label class="fl">First Name</label>
+                  <label class="fl">Imię</label>
                   <input class="fi" [(ngModel)]="editFirst">
                 </div>
                 <div class="fg">
-                  <label class="fl">Last Name</label>
+                  <label class="fl">Nazwisko</label>
                   <input class="fi" [(ngModel)]="editLast">
                 </div>
 
                 <!-- ★ Email edit -->
                 <div class="fg" style="grid-column:1/-1">
-                  <label class="fl">Email Address</label>
+                  <label class="fl">Adres e-mail</label>
                   <input class="fi" type="email" [(ngModel)]="editEmail"
                          [class.fi-err]="!!emailError"
                          (ngModelChange)="emailError = ''">
@@ -246,14 +246,14 @@ import { AuthService } from '../../core/auth/auth.service';
                 <div class="fg">
                   <label class="fl">Status</label>
                   <select class="fsel" [(ngModel)]="editActive">
-                    <option [ngValue]="true">Active</option>
-                    <option [ngValue]="false">Inactive</option>
+                    <option [ngValue]="true">Aktywny</option>
+                    <option [ngValue]="false">Nieaktywny</option>
                   </select>
                 </div>
                 <div class="fg">
-                  <label class="fl">Admin Role</label>
+                  <label class="fl">Rola administratora</label>
                   <select class="fsel" [(ngModel)]="editAdmin">
-                    <option [ngValue]="false">Regular User</option>
+                    <option [ngValue]="false">Zwykły użytkownik</option>
                     <option [ngValue]="true">Administrator</option>
                   </select>
                 </div>
@@ -266,7 +266,7 @@ import { AuthService } from '../../core/auth/auth.service';
                   </select>
                 </div>
               </div>
-              <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Save Changes</button>
+              <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Zapisz zmiany</button>
 
               <div class="sec-title" style="margin-top:24px">Hasło do logowania</div>
               <div class="fgrid">
@@ -358,37 +358,37 @@ import { AuthService } from '../../core/auth/auth.service';
             <!-- ───────────────────────────────────────────────────────────────────────── -->
 
             @if (isAdmin()) {
-              <div class="sec-title" style="margin-top:24px">Group Roles ({{ (selected()!.roles ?? []).length }})</div>
+              <div class="sec-title" style="margin-top:24px">Role w grupach ({{ (selected()!.roles ?? []).length }})</div>
               @for (role of selected()!.roles ?? []; track role.role_id) {
                 <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
                   <wt-group-pill [name]="role.group_display || role.group_name" />
                   <span class="badge" [class]="role.access_level === 'full' ? 's-signed' : 's-new'">{{ role.access_level }}</span>
                   <span style="flex:1"></span>
-                  <button class="btn btn-d btn-sm" (click)="removeRole(role.role_id)">Remove</button>
+                  <button class="btn btn-d btn-sm" (click)="removeRole(role.role_id)">Usuń</button>
                 </div>
               }
 
-              <div class="sec-title" style="margin-top:20px">Assign New Role</div>
+              <div class="sec-title" style="margin-top:20px">Przypisz nową rolę</div>
               <div style="display:flex;gap:8px;align-items:flex-end">
                 <div class="fg" style="flex:1">
-                  <label class="fl">Group</label>
+                  <label class="fl">Grupa</label>
                   <select class="fsel" [(ngModel)]="newRoleGroup">
-                    <option value="">Select group...</option>
+                    <option value="">Wybierz grupę...</option>
                     @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
                   </select>
                 </div>
                 <div class="fg" style="width:120px">
-                  <label class="fl">Access</label>
+                  <label class="fl">Dostęp</label>
                   <select class="fsel" [(ngModel)]="newRoleAccess">
-                    <option value="read">Read</option>
-                    <option value="full">Full</option>
+                    <option value="read">Odczyt</option>
+                    <option value="full">Pełny</option>
                   </select>
                 </div>
-                <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">Assign</button>
+                <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">Przypisz</button>
               </div>
 
               @if (tenantHasProspects()) {
-                <div class="sec-title" style="margin-top:24px">Feature Access</div>
+                <div class="sec-title" style="margin-top:24px">Dostęp do funkcji</div>
                 <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
                   <div style="flex:1">
                     <div style="font-weight:600">Prospekty</div>
@@ -403,9 +403,9 @@ import { AuthService } from '../../core/auth/auth.service';
           </div>
 
           <div class="pf">
-            <button class="btn btn-g" (click)="selected.set(null)">Close</button>
+            <button class="btn btn-g" (click)="selected.set(null)">Zamknij</button>
             @if (isAdmin() && selected()!.id !== currentUserId()) {
-              <button class="btn btn-d" style="margin-left:auto" (click)="deleteUser()">Delete User</button>
+              <button class="btn btn-d" style="margin-left:auto" (click)="deleteUser()">Usuń użytkownika</button>
             }
           </div>
         </div>
@@ -708,11 +708,11 @@ export class UsersComponent implements OnInit {
         this.total.update(n => n + 1);
         this.showNew.set(false);
         this.saving.set(false);
-        this.toast.success('User ' + user.display_name + ' created');
+        this.toast.success('Utworzono użytkownika ' + user.display_name);
       },
       error: (err) => {
         this.saving.set(false);
-        this.toast.error(err?.error?.error ?? 'Failed to create user');
+        this.toast.error(err?.error?.error ?? 'Nie udało się utworzyć użytkownika');
       },
     });
   }
@@ -759,22 +759,22 @@ export class UsersComponent implements OnInit {
           this.loadBudgets();
         }
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Failed to load user'),
+      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się wczytać użytkownika'),
     });
   }
 
   deleteUser(): void {
     const u = this.selected();
     if (!u) return;
-    if (!confirm(`Delete user ${u.display_name} (${u.email})? This cannot be undone.`)) return;
+    if (!confirm(`Usunąć użytkownika ${u.display_name} (${u.email})? Tej operacji nie można cofnąć.`)) return;
     this.userSvc.delete(u.id).subscribe({
       next: () => {
         this.users.update(list => list.filter(x => x.id !== u.id));
         this.total.update(n => n - 1);
         this.selected.set(null);
-        this.toast.success('User deleted');
+        this.toast.success('Użytkownik usunięty');
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Failed to delete user'),
+      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć użytkownika'),
     });
   }
 
@@ -800,7 +800,7 @@ export class UsersComponent implements OnInit {
       next: updated => {
         this.selected.set({ ...u, ...updated });
         this.users.update(list => list.map(x => x.id === u.id ? { ...x, ...updated, crm_role: (updated as any).crm_role } : x));
-        this.toast.success('User updated');
+        this.toast.success('Użytkownik zaktualizowany');
       },
       error: err => {
         const msg: string = err?.error?.error ?? '';
@@ -808,7 +808,7 @@ export class UsersComponent implements OnInit {
         if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique')) {
           this.emailError = 'Ten adres e-mail jest już zajęty';
         } else {
-          this.toast.error(msg || 'Failed to update user');
+          this.toast.error(msg || 'Nie udało się zaktualizować użytkownika');
         }
       },
     });
@@ -822,16 +822,19 @@ export class UsersComponent implements OnInit {
       const newRole = { ...role, group_name: group?.name ?? '', group_display: group?.display_name ?? '' };
       this.selected.update(s => s ? { ...s, roles: [...(s.roles ?? []), newRole] } : s);
       this.newRoleGroup = '';
-      this.toast.success('Role assigned');
+      this.toast.success('Rola przypisana');
     });
   }
 
   removeRole(roleId: string): void {
     const u = this.selected();
     if (!u) return;
-    this.userSvc.removeRole(u.id, roleId).subscribe(() => {
-      this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== roleId) } : s);
-      this.toast.success('Role removed');
+    this.userSvc.removeRole(u.id, roleId).subscribe({
+      next: () => {
+        this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== roleId) } : s);
+        this.toast.success('Rola usunięta');
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć roli'),
     });
   }
 
@@ -868,9 +871,12 @@ export class UsersComponent implements OnInit {
     } else {
       const existing = this.prospectsRole();
       if (!existing) return;
-      this.userSvc.removeRole(u.id, existing.role_id).subscribe(() => {
-        this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== existing.role_id) } : s);
-        this.toast.success('Dostęp do Prospektów wyłączony');
+      this.userSvc.removeRole(u.id, existing.role_id).subscribe({
+        next: () => {
+          this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== existing.role_id) } : s);
+          this.toast.success('Dostęp do Prospektów wyłączony');
+        },
+        error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć roli'),
       });
     }
   }

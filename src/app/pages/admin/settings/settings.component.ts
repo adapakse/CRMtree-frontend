@@ -21,7 +21,64 @@ interface SettingField {
 }
 
 // Zakładki
-type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding' | 'tooltips';
+type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding' | 'tooltips' | 'icp';
+
+// Dynamic ICP config per tenant. `key` is immutable once created — editable
+// only through `label`; the backend rejects any attempt to change `key`, so
+// the form never sends it. `requires_any_of` holds OTHER signals' `id` (not
+// `key`) — an internal backend relationship, never edited from this tab
+// directly (V1: managed only via the API, not a dependency picker).
+interface IcpSignal {
+  id: string;
+  key: string;
+  label: string;
+  ai_definition: string;
+  short_description: string | null;
+  points: number;
+  tier: string | null;
+  active: boolean;
+  sort_order: number;
+  requires_any_of: string[] | null;
+}
+
+interface IcpConfig {
+  // qualification_threshold: read-only here — the single editable source is
+  // app_settings.prospect_lead_min_score (zakładka "Parametry biznesowe CRM"),
+  // frozen into this snapshot only for historical explainability.
+  qualification_threshold: number;
+  // config_revision: concurrency token dla LIVE edycji (tenant_icp_signals),
+  // niezależny od current_version/current_version_id — te dwa liczniki celowo
+  // się rozjeżdżają: LIVE może być chwilowo invalid bez ruszania opublikowanej
+  // wersji, którą realnie używa enrichment. Patrz tenantIcpConfigService.js.
+  config_revision: number;
+  current_version_id: string | null;
+  current_version: number | null;
+  is_default: boolean;
+  signals: IcpSignal[];
+  signals_sum: number;
+  signals_max: number;
+  is_valid: boolean;
+  final_max_score: number;
+}
+
+// One list row = one persisted signal. Only points/active are quick-editable
+// inline (number field + toggle right on the list); name and the full "jak
+// rozpoznać ten sygnał" text only change through the edit modal
+// (icpModalDraft below). Dirty state is derived (isIcpRowDirty).
+interface IcpRow {
+  signal: IcpSignal;
+  points: number;
+  active: boolean;
+}
+
+// Draft bound to the edit modal — plain-mutable-object + ngModel.
+interface IcpModalDraft {
+  label: string;
+  ai_definition: string;
+  short_description: string;
+  points: number;
+  active: boolean;
+}
 
 // Katalog tooltip-slotów: klucz techniczny → ekran + label (widoczne dla admina)
 const TOOLTIP_CATALOG: { key: string; screen: string; label: string }[] = [
@@ -192,6 +249,14 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           <button class="tab-btn" [class.active]="activeTab() === 'tooltips'" (click)="activeTab.set('tooltips')">
             💬 Podpowiedzi
           </button>
+          <!-- Endpoint /admin/prospects/icp-config jest za requireFeature('prospects'),
+               więc bez modułu Prospekty zakładka mogłaby tylko pokazać błąd —
+               gate'ujemy ją tak samo jak pozycję Prospekty w sidebarze. -->
+          @if (auth.hasFeature('prospects')) {
+            <button class="tab-btn" [class.active]="activeTab() === 'icp'" (click)="activeTab.set('icp'); loadIcpConfig()">
+              🎯 Enrichment / ICP
+            </button>
+          }
         </div>
 
         <!-- TAB: Parametry globalne -->
@@ -607,7 +672,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                       <span style="margin:0 6px">·</span>
                       <span>{{ g.document_count }} dokumentów</span>
                       @if (g.has_owner_restriction) {
-                        <span style="margin-left:8px;background:#FEF3C7;color:#92400E;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Owner restriction</span>
+                        <span style="margin-left:8px;background:#FEF3C7;color:#92400E;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Ograniczenie właściciela</span>
                       }
                       @if (!g.is_active) {
                         <span style="margin-left:8px;background:#F3F4F6;color:#6B7280;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">Nieaktywna</span>
@@ -834,7 +899,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                 </select>
               </div>
               <div>
-                <label class="field-label" style="display:block;margin-bottom:4px">Label <span style="color:#ef4444">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:4px">Etykieta <span style="color:#ef4444">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipLabelKey" [disabled]="!newTipScreen">
                   <option value="">— wybierz label —</option>
                   @for (e of catalogForScreen; track e.key) {
@@ -932,8 +997,125 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           }
         }
 
+        <!-- TAB: Enrichment / ICP — dynamic ICP signals of the LOGGED-IN tenant.
+             Any tenant admin (is_admin), not just the CRMTree superadmin. -->
+        @if (activeTab() === 'icp') {
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">🎯</span>
+            <div>
+              <strong>Sygnały ICP</strong> — konfiguracja punktowanych sygnałów używanych przez enrichment do oceny dopasowania firmy (ICP).
+            </div>
+          </div>
+
+          @if (icpLoading()) {
+            <div class="state-msg">Ładowanie...</div>
+          } @else if (icpError(); as err) {
+            <div class="icp-error">
+              <div><strong>Nie udało się wczytać konfiguracji ICP.</strong></div>
+              <div style="margin-top:4px">{{ err }}</div>
+              <button class="btn-secondary" style="margin-top:12px" (click)="loadIcpConfig()">Spróbuj ponownie</button>
+            </div>
+          } @else if (icpConfig(); as cfg) {
+
+            <div class="icp-summary">
+              <span>
+                Suma punktów:
+                <strong [style.color]="cfg.is_valid ? null : '#dc2626'">{{ cfg.final_max_score }} / 100</strong>
+              </span>
+            </div>
+            @if (!cfg.is_valid) {
+              <div class="hint-inline" style="margin-top:6px;color:#dc2626">
+                Konfiguracja robocza ma {{ cfg.final_max_score }} / 100 pkt. Enrichment nadal korzysta z ostatniej poprawnej wersji.
+              </div>
+            }
+
+            <div class="icp-list">
+              @for (row of icpRows(); track row.signal.id) {
+                <div class="icp-row">
+                  <div class="icp-row-main">
+                    <button type="button" class="icp-toggle" [class.on]="row.active" [disabled]="icpSaving()"
+                            [attr.aria-label]="row.active ? 'Wyłącz sygnał' : 'Włącz sygnał'"
+                            (click)="toggleIcpSignalActive(row)"></button>
+                    <div class="icp-row-text">
+                      <div class="icp-row-name" [class.inactive]="!row.active">{{ row.signal.label }}</div>
+                      <div class="icp-row-desc">{{ row.signal.short_description || row.signal.ai_definition }}</div>
+                    </div>
+                  </div>
+                  <div class="icp-row-side">
+                    <input type="number" min="0" class="icp-points-input" [(ngModel)]="row.points">
+                    @if (isIcpRowDirty(row)) {
+                      <button class="icp-save-check" [disabled]="icpSaving()" title="Zapisz zmiany" (click)="saveIcpRowQuickFields(row)">✓</button>
+                    }
+                    <button class="btn-secondary" style="padding:4px 10px;font-size:12px" [disabled]="icpSaving()" (click)="openIcpEditModal(row.signal)">Edytuj</button>
+                    <button class="btn-danger-sm" style="padding:4px 10px;font-size:12px" [disabled]="icpSaving()" (click)="deleteIcpRow(row)">Usuń</button>
+                  </div>
+                </div>
+              } @empty {
+                <div class="icp-row"><span class="td-muted">Brak sygnałów.</span></div>
+              }
+            </div>
+
+            <div class="panel-footer">
+              <button class="btn-primary" [disabled]="icpSaving()" (click)="openIcpEditModal(null)">+ Dodaj sygnał</button>
+            </div>
+          }
+        }
+
       </div>
     </div>
+
+    <!-- ICP signal edit modal — the only place the full "jak rozpoznać ten
+         sygnał" text is edited; the list only ever shows a truncated preview. -->
+    @if (icpModalTarget() !== null) {
+      <div class="modal-backdrop"
+           (mousedown)="onIcpBackdropMouseDown($event)"
+           (mouseup)="onIcpBackdropMouseUp($event)">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>{{ icpModalTarget() === 'new' ? 'Nowy sygnał' : 'Edytuj sygnał' }}</h2>
+            <button class="btn-icon" (click)="closeIcpEditModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="field">
+              <label>Nazwa sygnału <span class="req">*</span></label>
+              <input [(ngModel)]="icpModalDraft.label" placeholder="np. Własna flota transportowa">
+            </div>
+            <div class="field">
+              <label>Jak rozpoznać ten sygnał? <span class="req">*</span></label>
+              <textarea [(ngModel)]="icpModalDraft.ai_definition" rows="8"
+                placeholder="Opisz, po czym poznać, że firma spełnia ten warunek — konkretne słowa/frazy na stronie, sekcje, stanowiska."></textarea>
+              <div class="hint">Na podstawie tego opisu system ocenia, czy firma spełnia dany sygnał.</div>
+            </div>
+            <div class="field">
+              <label>Tooltip / krótki opis dla użytkownika</label>
+              <textarea [(ngModel)]="icpModalDraft.short_description" rows="2" maxlength="500"
+                placeholder="Krótki, biznesowy opis 1–2 zdania — np. „Jawnie nazwany dział/zespół sprzedaży”."></textarea>
+              <div class="hint">Pokazywany jako podpowiedź (?) przy sygnale w Prospektach. Krótkie, czytelne zdanie — nie techniczna instrukcja dla AI.</div>
+            </div>
+            <div class="edit-grid">
+              <div class="field">
+                <label>Punkty <span class="req">*</span></label>
+                <input type="number" min="0" [(ngModel)]="icpModalDraft.points">
+              </div>
+              <div class="field field-check">
+                <label class="check-label">
+                  <input type="checkbox" [(ngModel)]="icpModalDraft.active"> Aktywny
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" [disabled]="icpSaving()" (click)="closeIcpEditModal()">Anuluj</button>
+            <button class="btn-primary" [disabled]="icpSaving() || !icpModalDraft.label.trim() || !icpModalDraft.ai_definition.trim()"
+                    (click)="saveIcpModalDraft()">
+              {{ icpSaving() ? 'Zapisuję...' : 'Zapisz' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0; }
@@ -967,6 +1149,122 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
     .loading-overlay { display:flex;align-items:center;justify-content:center;padding:60px; }
     .spinner { width:32px;height:32px;border:3px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Enrichment / ICP tab */
+    .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
+    .td-muted { color: var(--gray-500); font-size: 13px; }
+    .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
+    .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
+    .req { color: #dc2626; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
+    .badge-off { background: var(--gray-100); color: var(--gray-500); }
+    .panel-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+    .icp-summary {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
+      padding: 10px 16px; font-size: 12.5px; color: var(--gray-600);
+      background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px;
+    }
+    .icp-error {
+      border: 1px solid #FECACA; background: #FEF2F2; color: #991B1B;
+      border-radius: 10px; padding: 16px 18px; font-size: 13px;
+    }
+    .icp-list { border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; margin-top: 14px; }
+    .icp-row {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+      padding: 10px 14px; border-bottom: 1px solid var(--gray-100); background: white;
+    }
+    .icp-row:last-child { border-bottom: none; }
+    .icp-row-main { display: flex; align-items: flex-start; gap: 10px; min-width: 0; flex: 1; }
+    .icp-row-text { min-width: 0; }
+    .icp-row-name { font-size: 13.5px; font-weight: 600; color: var(--gray-800); }
+    .icp-row-name.inactive { color: var(--gray-400); font-weight: 500; }
+    .icp-row-desc {
+      font-size: 12px; color: var(--gray-500); margin-top: 2px; max-width: 480px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .icp-row-side { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .icp-points-input {
+      width: 40px; padding: 4px 4px; border: 1px solid var(--gray-200); border-radius: 6px;
+      font-size: 12.5px; text-align: center;
+    }
+    .icp-save-check {
+      width: 22px; height: 22px; border-radius: 50%; border: none; background: #dcfce7; color: #16a34a;
+      cursor: pointer; font-size: 12px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .icp-save-check:disabled { opacity: .55; cursor: not-allowed; }
+    .icp-toggle {
+      position: relative; width: 32px; height: 18px; border-radius: 999px; border: none; cursor: pointer;
+      background: var(--gray-200); flex-shrink: 0; margin-top: 2px; transition: background .15s; padding: 0;
+    }
+    .icp-toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+      background: white; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25);
+    }
+    .icp-toggle.on { background: #16a34a; }
+    .icp-toggle.on::after { left: 16px; }
+    .icp-toggle:disabled { opacity: .55; cursor: not-allowed; }
+
+    /* ICP modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal { background: white; border-radius: 12px; width: 480px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px 14px; border-bottom: 1px solid var(--gray-200);
+    }
+    .modal-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
+    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .modal-footer {
+      display: flex; gap: 8px; justify-content: flex-end;
+      padding: 14px 22px 18px; border-top: 1px solid var(--gray-200);
+    }
+    .btn-icon {
+      width: 30px; height: 30px; border-radius: 6px; border: none; background: none;
+      cursor: pointer; color: var(--gray-500);
+      display: flex; align-items: center; justify-content: center; transition: background .12s, color .12s;
+    }
+    .btn-icon:hover { background: var(--gray-100); color: var(--gray-700); }
+    .btn-icon svg { width: 15px; height: 15px; }
+    .edit-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px 16px;
+    }
+    .field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
+    .field input:not([type=checkbox]) {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+    }
+    .field input:focus, .field textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field textarea {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+      font-family: inherit; resize: vertical;
+    }
+    .field-check { display: flex; align-items: flex-end; padding-bottom: 2px; }
+    .check-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); cursor: pointer; }
+    .btn-primary {
+      padding: 8px 18px; background: var(--orange); color: white;
+      border: none; border-radius: 7px; font-size: 13.5px; font-weight: 500;
+      cursor: pointer; transition: background .12s;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--orange-dark); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-secondary {
+      padding: 8px 18px; background: white; color: var(--gray-700);
+      border: 1px solid var(--gray-300); border-radius: 7px; font-size: 13.5px;
+      cursor: pointer; transition: background .12s;
+    }
+    .btn-secondary:hover { background: var(--gray-50); }
+    .btn-danger-sm {
+      padding: 6px 12px; background: #fee2e2; color: #dc2626;
+      border: 1px solid #fca5a5; border-radius: 6px; font-size: 12.5px; cursor: pointer;
+      transition: background .12s;
+    }
+    .btn-danger-sm:hover:not(:disabled) { background: #fecaca; }
+    .btn-danger-sm:disabled { opacity: .55; cursor: not-allowed; }
   `],
 })
 export class SettingsComponent implements OnInit {
@@ -1335,5 +1633,189 @@ export class SettingsComponent implements OnInit {
         this.toast.error(err?.error?.error ?? 'Błąd zapisu ustawień');
       },
     });
+  }
+
+  // ── Enrichment / ICP tab (tenant admin — dynamic ICP signals of THIS tenant) ─
+  // Two mutation paths, both one PUT/POST on an explicit click (no autosave):
+  //  - quick inline edit on the list row (points/active only) → saveIcpRowQuickFields,
+  //  - full edit (name + "jak rozpoznać ten sygnał") → the modal, saveIcpModalDraft.
+  // Uses a dedicated `icpSaving` signal (not the top-bar `saving`) so the global
+  // "Zapisz zmiany" button never shows a save state that isn't actually its own.
+  icpConfig  = signal<IcpConfig | null>(null);
+  icpLoading = signal(false);
+  icpSaving  = signal(false);
+  // Osobny stan błędu — bez niego 403/404/5xx wyglądały w UI dokładnie tak samo
+  // jak poprawnie wczytana, pusta konfiguracja (audyt multi-tenant ICP, 23.09).
+  icpError   = signal<string | null>(null);
+  icpRows    = signal<IcpRow[]>([]);
+  // null = closed; 'new' = creating a signal; an IcpSignal = editing that one.
+  icpModalTarget = signal<IcpSignal | 'new' | null>(null);
+  icpModalDraft: IcpModalDraft = { label: '', ai_definition: '', short_description: '', points: 0, active: true };
+
+  private get icpTenantId(): string | null {
+    return this.auth.user()?.tenant_id ?? null;
+  }
+
+  loadIcpConfig(): void {
+    const tenantId = this.icpTenantId;
+    if (!tenantId) {
+      this.icpError.set('Twoje konto nie jest przypisane do żadnego tenanta, więc nie ma konfiguracji ICP do pokazania.');
+      this.toast.error('Brak przypisanego tenanta');
+      return;
+    }
+    this.icpLoading.set(true);
+    this.icpError.set(null);
+    this.icpModalTarget.set(null);
+    this.http.get<IcpConfig>(`${environment.apiUrl}/admin/prospects/icp-config`).subscribe({
+      next: cfg => {
+        this.icpConfig.set(cfg);
+        this.icpRows.set([...cfg.signals]
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map(s => ({ signal: s, points: s.points, active: s.active })));
+        this.icpError.set(null);
+        this.icpLoading.set(false);
+      },
+      error: err => {
+        // Pusta lista sygnałów i nieudany request to dwie różne rzeczy —
+        // czyścimy config, żeby nie pokazać nieaktualnych danych, ale
+        // renderujemy jawny komunikat, nie pustkę.
+        this.icpConfig.set(null);
+        this.icpRows.set([]);
+        this.icpError.set(this.icpLoadErrorMessage(err));
+        this.icpLoading.set(false);
+        this.toast.error('Błąd ładowania konfiguracji ICP');
+      },
+    });
+  }
+
+  private icpLoadErrorMessage(err: { status?: number; error?: { error?: string } }): string {
+    const detail = err?.error?.error;
+    switch (err?.status) {
+      case 0:   return 'Brak połączenia z serwerem — sprawdź, czy backend działa, i spróbuj ponownie.';
+      case 401: return 'Sesja wygasła. Zaloguj się ponownie.';
+      case 403: return detail || 'Brak uprawnień do konfiguracji ICP tego tenanta.';
+      case 404: return 'Konfiguracja ICP nie jest dostępna w tej wersji backendu (404).';
+      default:  return detail || `Nie udało się pobrać konfiguracji ICP (błąd ${err?.status ?? 'nieznany'}).`;
+    }
+  }
+
+  isIcpRowDirty(row: IcpRow): boolean {
+    return row.points !== row.signal.points || row.active !== row.signal.active;
+  }
+
+  // Toggle sam w sobie JEST akcją zapisu (bez osobnego "✓") — inaczej admin
+  // przełącza wizualnie, ale bez świadomego dodatkowego kliknięcia zmiana
+  // nigdy nie trafia do backendu i po odświeżeniu wraca do stanu sprzed toggle.
+  toggleIcpSignalActive(row: IcpRow): void {
+    row.active = !row.active;
+    this.saveIcpRowQuickFields(row);
+  }
+
+  saveIcpRowQuickFields(row: IcpRow): void {
+    const tenantId = this.icpTenantId;
+    const cfg = this.icpConfig();
+    if (!tenantId || !cfg) return;
+    this.icpSaving.set(true);
+    this.http.put(`${environment.apiUrl}/admin/prospects/icp-signals/${row.signal.id}`, {
+      points: row.points,
+      active: row.active,
+      expected_revision: cfg.config_revision,
+    }).subscribe({
+      next: () => { this.icpSaving.set(false); this.loadIcpConfig(); },
+      error: err => this.handleIcpError(err),
+    });
+  }
+
+  openIcpEditModal(signal: IcpSignal | null): void {
+    this.icpModalTarget.set(signal ?? 'new');
+    this.icpModalDraft = signal
+      ? { label: signal.label, ai_definition: signal.ai_definition, short_description: signal.short_description ?? '', points: signal.points, active: signal.active }
+      : { label: '', ai_definition: '', short_description: '', points: 0, active: true };
+  }
+
+  // Modal zamyka się tylko wtedy, gdy CAŁE kliknięcie — mousedown i mouseup —
+  // odbyło się na backdropie. Samo (click) na backdropie nie wystarczało:
+  // przy zaznaczaniu tekstu w input/textarea mouseup ląduje często poza
+  // modalem, a przeglądarka wysyła wtedy `click` na najbliższego wspólnego
+  // przodka obu zdarzeń, czyli właśnie backdrop — (click)="$event.stopPropagation()"
+  // na .modal nigdy się w tym scenariuszu nie odpala, więc modal zamykał się
+  // w trakcie zaznaczania tekstu.
+  private icpBackdropMouseDown = false;
+
+  onIcpBackdropMouseDown(event: MouseEvent): void {
+    this.icpBackdropMouseDown = event.target === event.currentTarget;
+  }
+
+  onIcpBackdropMouseUp(event: MouseEvent): void {
+    const startedOnBackdrop = this.icpBackdropMouseDown;
+    this.icpBackdropMouseDown = false;
+    if (startedOnBackdrop && event.target === event.currentTarget) {
+      this.closeIcpEditModal();
+    }
+  }
+
+  closeIcpEditModal(): void {
+    this.icpModalTarget.set(null);
+  }
+
+  saveIcpModalDraft(): void {
+    const tenantId = this.icpTenantId;
+    const cfg = this.icpConfig();
+    const target = this.icpModalTarget();
+    if (!tenantId || !cfg || target === null) return;
+
+    this.icpSaving.set(true);
+    const body = {
+      label: this.icpModalDraft.label,
+      ai_definition: this.icpModalDraft.ai_definition,
+      short_description: this.icpModalDraft.short_description.trim() || null,
+      points: this.icpModalDraft.points,
+      active: this.icpModalDraft.active,
+      expected_revision: cfg.config_revision,
+    };
+    const req$ = target === 'new'
+      ? this.http.post(`${environment.apiUrl}/admin/prospects/icp-signals`, body)
+      : this.http.put(`${environment.apiUrl}/admin/prospects/icp-signals/${target.id}`, body);
+
+    req$.subscribe({
+      next: () => {
+        this.icpSaving.set(false);
+        this.toast.success(target === 'new' ? 'Sygnał dodany' : 'Sygnał zaktualizowany');
+        this.icpModalTarget.set(null);
+        this.loadIcpConfig();
+      },
+      error: err => this.handleIcpError(err),
+    });
+  }
+
+  deleteIcpRow(row: IcpRow): void {
+    const tenantId = this.icpTenantId;
+    if (!tenantId || !confirm(`Usunąć sygnał "${row.signal.label}"?`)) return;
+    const cfg = this.icpConfig();
+    this.icpSaving.set(true);
+    this.http.delete<{ soft_deleted: boolean }>(`${environment.apiUrl}/admin/prospects/icp-signals/${row.signal.id}`, {
+      body: { expected_revision: cfg?.config_revision },
+    }).subscribe({
+      next: res => {
+        this.icpSaving.set(false);
+        this.toast.success(res.soft_deleted ? 'Sygnał wyłączony (miał historię — zachowany do wyjaśnienia starych wyników)' : 'Sygnał usunięty');
+        this.loadIcpConfig();
+      },
+      error: err => this.handleIcpError(err),
+    });
+  }
+
+  // Shared by every ICP mutation above. 409 means someone else changed the LIVE
+  // draft since this tab loaded (optimistic concurrency on config_revision —
+  // independent of the published version number, patrz IcpConfig) — reload
+  // rather than silently overwrite their change.
+  private handleIcpError(err: { status?: number; error?: { error?: string } }): void {
+    this.icpSaving.set(false);
+    if (err?.status === 409) {
+      this.toast.error('Ktoś inny zmienił konfigurację ICP w międzyczasie — odświeżam');
+      this.loadIcpConfig();
+      return;
+    }
+    this.toast.error(err?.error?.error ?? 'Błąd zapisu');
   }
 }
