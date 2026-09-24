@@ -21,7 +21,7 @@ const KANBAN_STAGES: { key: LeadStage; label: string; dot: string }[] = [
 
 const PROB_MAP: Record<LeadStage, number> = {
   new: 10, qualification: 25, presentation: 50,
-  offer: 70, negotiation: 85, closed_won: 100, closed_lost: 0, onboarding: 100, onboarded: 100,
+  offer: 70, negotiation: 85, closed_won: 100, closed_lost: 0, onboarding: 100, onboarded: 100, archived: 0,
 };
 
 @Component({
@@ -92,6 +92,7 @@ const PROB_MAP: Record<LeadStage, number> = {
     <span class="fchip" [class.on]="scopeFilter==='all'"  (click)="setScope('all')">Wszystkie</span>
     <span class="fchip" [class.on]="scopeFilter==='mine'" (click)="setScope('mine')">Moje</span>
     <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()">🔥 Gorące</span>
+    <span class="fchip" [class.on]="filterHoldOnly"       (click)="filterHoldOnly=!filterHoldOnly; load()" title="Pokaż tylko leady na Holdzie">⏸️ Tylko Hold</span>
     <span style="flex:1"></span>
     <select class="sel" [(ngModel)]="filterStageUI" (ngModelChange)="onStageFilterChange()">
       <option value="">Wszystkie etapy</option>
@@ -102,6 +103,7 @@ const PROB_MAP: Record<LeadStage, number> = {
       <option value="negotiation">Negocjacje</option>
       <option value="closed_won">✓ Wygrany</option>
       <option value="closed_lost">✗ Przegrany</option>
+      <option value="archived">🗄️ Archiwum</option>
     </select>
     <select class="sel" [(ngModel)]="filterSource" (ngModelChange)="onSourceFilterChange()">
       <option value="">Wszystkie źródła</option>
@@ -135,7 +137,7 @@ const PROB_MAP: Record<LeadStage, number> = {
       Time Line
     </button>
     <button class="btn btn-g btn-sm" (click)="viewMode = viewMode==='kanban' ? 'table' : 'kanban'">
-      {{ viewMode === 'kanban' ? '☰ Tabela' : '⊞ Kanban' }}
+      {{ isKanbanView ? '☰ Tabela' : '⊞ Kanban' }}
     </button>
   </div>
 
@@ -145,7 +147,7 @@ const PROB_MAP: Record<LeadStage, number> = {
   </div>
 
   <!-- ════ KANBAN ════ -->
-  <div *ngIf="!loading && viewMode==='kanban'" class="kanban-wrap">
+  <div *ngIf="!loading && isKanbanView" class="kanban-wrap">
 
     <div class="kanban">
       <!-- Kolumny aktywne -->
@@ -158,11 +160,11 @@ const PROB_MAP: Record<LeadStage, number> = {
         </div>
         <div class="kol-cards">
           <div *ngFor="let lead of leadsFor(col.key); trackBy:trackById"
-               class="lead-card" [class.selected]="selected?.id===lead.id"
+               class="lead-card" [class.selected]="selected?.id===lead.id" [class.lead-card-held]="lead.hold_active"
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.stage==='onboarded'" title="Onboarding zakończony — Partner aktywny" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 5px;margin-left:3px;font-weight:700;vertical-align:middle">✓ Partner</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ Hold</span><span *ngIf="lead.stage==='onboarded'" title="Onboarding zakończony — Partner aktywny" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 5px;margin-left:3px;font-weight:700;vertical-align:middle">✓ Partner</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
@@ -245,7 +247,7 @@ const PROB_MAP: Record<LeadStage, number> = {
 
       <div class="dp-body">
         <div class="tabs">
-          <button class="tab-btn" [class.active]="dpTab==='info'"     (click)="dpTab='info'">Info</button>
+          <button class="tab-btn" [class.active]="dpTab==='info'"     (click)="dpTab='info'">Informacje</button>
           <button class="tab-btn" [class.active]="dpTab==='activity'" (click)="dpTab='activity'">
             Historia<span *ngIf="selected.activities?.length" class="tab-cnt">{{ selected.activities!.length }}</span>
           </button>
@@ -342,7 +344,7 @@ const PROB_MAP: Record<LeadStage, number> = {
   </div>
 
   <!-- ════ TABLE ════ -->
-  <div *ngIf="!loading && viewMode==='table'" class="tw">
+  <div *ngIf="!loading && !isKanbanView" class="tw">
     <div class="thead" style="grid-template-columns:2fr 90px 110px 70px 130px 70px 110px 100px 90px">
       <div class="th sortable" (click)="sortBy('company')">Firma / Kontakt <span class="si">{{sortIcon('company')}}</span></div>
       <div class="th sortable" (click)="sortBy('first_contact_date')" style="text-align:center">Pierw. kont. <span class="si">{{sortIcon('first_contact_date')}}</span></div>
@@ -355,12 +357,12 @@ const PROB_MAP: Record<LeadStage, number> = {
       <div class="th sortable" (click)="sortBy('close_date')">Zamkn. <span class="si">{{sortIcon('close_date')}}</span></div>
     </div>
     <div *ngFor="let lead of sortedLeads; trackBy:trackById"
-         class="tr-row" style="grid-template-columns:2fr 90px 110px 70px 130px 70px 110px 100px 90px"
+         class="tr-row" [class.tr-row-held]="lead.hold_active" style="grid-template-columns:2fr 90px 110px 70px 130px 70px 110px 100px 90px"
          [routerLink]="['/crm/leads',lead.id]">
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
-          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span>
+          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ Hold</span>
             <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
                   style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
             <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"
@@ -876,6 +878,9 @@ const PROB_MAP: Record<LeadStage, number> = {
     .lead-value { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:var(--orange); margin-bottom:3px; }
     .lead-meta { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
     .hot-dot { font-size:11px; }
+    .lead-card-held { opacity:.55; filter:grayscale(.6); }
+    .tr-row-held { opacity:.55; filter:grayscale(.6); }
+    .hold-badge { display:inline-flex; align-items:center; gap:2px; font-size:10px; font-weight:700; background:#e5e7eb; color:#374151; border-radius:6px; padding:1px 5px; line-height:16px; }
     .tag { display:inline-flex; align-items:center; padding:1px 6px; border-radius:10px; font-size:10px; font-weight:600; }
     .tag-blue { background:#EFF6FF; color:#1D4ED8; }
     .tag-purple { background:#FDF4FF; color:#7E22CE; }
@@ -896,6 +901,7 @@ const PROB_MAP: Record<LeadStage, number> = {
     .stage-negotiation { background:#FFEDD5; color:#9A3412; }
     .stage-closed_won { background:#DCFCE7; color:#166534; }
     .stage-closed_lost { background:#FEE2E2; color:#991B1B; }
+    .stage-archived { background:#E5E7EB; color:#4B5563; }
 
     /* Detail Panel */
     .dp-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:200; display:flex; align-items:center; justify-content:center; }
@@ -1193,6 +1199,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   search       = '';
   scopeFilter: 'all' | 'mine' = 'all';
   filterHot    = false;
+  filterHoldOnly = false;
   filterSource = '';
 
   sourcesWithoutGroup(): LeadSource[] { return this.leadSources.filter(s => !s.group); }
@@ -1331,6 +1338,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     this.filterCreatedTo     = qp.get('created_to')      || '';
     this.filterLostReason    = qp.get('lost_reason')     || '';
     if (qp.get('hot') === 'true') this.filterHot = true;
+    if (qp.get('hold_only') === 'true') this.filterHoldOnly = true;
     this.reportFilterLabel   = qp.get('label')           || '';
     if (qp.get('view') === 'table') this.viewMode = 'table';
     if (qp.get('mine') === 'true') this.scopeFilter = 'mine';
@@ -1431,12 +1439,20 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     this.load();
   }
 
+  /** Kanban ma stałe kolumny etapów lejka — nie ma w nim miejsca na pojedynczy
+   *  etap spoza lejka (np. Archiwum), więc przy aktywnym filtrze Etap zawsze
+   *  pokazujemy tabelę, niezależnie od wybranego viewMode. */
+  get isKanbanView(): boolean {
+    return this.viewMode === 'kanban' && !(this.filterStage || this.filterStageUI);
+  }
+
   load() {
     this.loading = true;
+    const isKanban = this.isKanbanView;
     const activeStageFilter = this.filterStage || this.filterStageUI;
-    const isKanban = this.viewMode === 'kanban' && !activeStageFilter;
     const params: any = { limit: isKanban ? 2000 : 200 };
     if (this.filterHot)              params['hot']             = true;
+    if (this.filterHoldOnly)         params['hold_only']       = true;
     if (this._sourceFilterValues.length === 1) {
       params['source'] = this._sourceFilterValues[0];
     } else if (this._sourceFilterValues.length > 1) {
@@ -1479,7 +1495,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   }
 
   calcStats() {
-    const active = this.allLeads.filter(l => !l.converted_at && l.stage !== 'new');
+    const active = this.allLeads.filter(l => !l.converted_at && l.stage !== 'new' && l.stage !== 'archived' && !l.hold_active);
     this.stats = {
       total:    this.totalQualified,
       hot:      active.filter(l => l.hot).length,

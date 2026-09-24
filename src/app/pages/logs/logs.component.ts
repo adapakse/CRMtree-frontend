@@ -21,11 +21,11 @@ const ACTION_ICONS: Record<string, string> = {
   imports: [CommonModule, FormsModule],
   template: `
     <div id="topbar">
-      <span class="page-title">Audit Logs</span>
+      <span class="page-title">Logi audytowe</span>
       <span class="tsp"></span>
       <div class="srch-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="srch" type="search" placeholder="Search user, document…"
+        <input class="srch" type="search" placeholder="Szukaj użytkownika, dokumentu…"
                [(ngModel)]="filters.search" (ngModelChange)="onSearch()">
       </div>
     </div>
@@ -34,39 +34,39 @@ const ACTION_ICONS: Record<string, string> = {
       <!-- Filters bar -->
       <div class="toolbar" style="flex-wrap:wrap;gap:10px">
         <div class="fg" style="min-width:140px">
-          <label class="fl">Date from</label>
+          <label class="fl">Data od</label>
           <input class="fi" type="date" [(ngModel)]="filters.date_from" (change)="load()" style="padding:5px 8px">
         </div>
         <div class="fg" style="min-width:140px">
-          <label class="fl">Date to</label>
+          <label class="fl">Data do</label>
           <input class="fi" type="date" [(ngModel)]="filters.date_to" (change)="load()" style="padding:5px 8px">
         </div>
         <div class="fg" style="min-width:160px">
-          <label class="fl">Action type</label>
+          <label class="fl">Typ akcji</label>
           <select class="sel" [(ngModel)]="filters.action" (change)="load()">
-            <option value="">All actions</option>
+            <option value="">Wszystkie akcje</option>
             @for (a of actions(); track a) { <option [value]="a">{{ a }}</option> }
           </select>
         </div>
         <div class="fg" style="min-width:160px">
-          <label class="fl">User email</label>
+          <label class="fl">Email użytkownika</label>
           <input class="fi" type="text" [(ngModel)]="filters.user_email" (blur)="load()" placeholder="user@firma.com" style="padding:5px 8px">
         </div>
         <div style="margin-top:auto">
-          <button class="btn btn-g btn-sm" (click)="clearFilters()">Clear filters</button>
+          <button class="btn btn-g btn-sm" (click)="clearFilters()">Wyczyść filtry</button>
         </div>
         <span style="flex:1"></span>
-        <span style="font-size:12px;color:var(--gray-400);margin-top:auto">{{ total() }} entries</span>
+        <span style="font-size:12px;color:var(--gray-400);margin-top:auto">Wpisów: {{ total() }}</span>
       </div>
 
       <!-- Log table -->
       <div class="tw">
         <div class="thead" style="grid-template-columns:160px 100px 1fr 180px 120px">
-          <div class="th">Timestamp</div>
-          <div class="th">Action</div>
-          <div class="th">Details</div>
-          <div class="th">User</div>
-          <div class="th">Document</div>
+          <div class="th">Data i godzina</div>
+          <div class="th">Akcja</div>
+          <div class="th">Szczegóły</div>
+          <div class="th">Użytkownik</div>
+          <div class="th">Dokument</div>
         </div>
 
         @if (loading()) {
@@ -98,7 +98,7 @@ const ACTION_ICONS: Record<string, string> = {
         }
         @empty {
           @if (!loading()) {
-            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No log entries found</div></div>
+            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Nie znaleziono wpisów logu</div></div>
           }
         }
       </div>
@@ -106,9 +106,9 @@ const ACTION_ICONS: Record<string, string> = {
       <!-- Pagination -->
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">← Prev</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">Page {{ page() }} of {{ totalPages() }}</span>
-          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">Next →</button>
+          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">← Poprz.</button>
+          <span style="font-size:12.5px;color:var(--gray-500)">Strona {{ page() }} z {{ totalPages() }}</span>
+          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">Dalej →</button>
         </div>
       }
     </div>
@@ -126,15 +126,15 @@ const ACTION_ICONS: Record<string, string> = {
           </div>
           <div style="padding:20px 24px;font-size:13px;line-height:1.7">
             @if (selectedLog()!.document_name) {
-              <div><strong>Document:</strong> {{ selectedLog()!.document_number }} — {{ selectedLog()!.document_name }}</div>
+              <div><strong>Dokument:</strong> {{ selectedLog()!.document_number }} — {{ selectedLog()!.document_name }}</div>
             }
             @if (selectedLog()!.before_state) {
-              <div style="margin-top:10px"><strong>Before:</strong>
+              <div style="margin-top:10px"><strong>Przed:</strong>
                 <pre style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:6px;padding:8px;font-size:11px;margin-top:4px;overflow:auto;max-height:120px">{{ selectedLog()!.before_state | json }}</pre>
               </div>
             }
             @if (selectedLog()!.after_state) {
-              <div style="margin-top:10px"><strong>After:</strong>
+              <div style="margin-top:10px"><strong>Po:</strong>
                 <pre style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:6px;padding:8px;font-size:11px;margin-top:4px;overflow:auto;max-height:120px">{{ selectedLog()!.after_state | json }}</pre>
               </div>
             }
@@ -143,7 +143,7 @@ const ACTION_ICONS: Record<string, string> = {
             }
           </div>
           <div style="padding:14px 24px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end">
-            <button class="btn btn-g" (click)="selectedLog.set(null)">Close</button>
+            <button class="btn btn-g" (click)="selectedLog.set(null)">Zamknij</button>
           </div>
         </div>
       </div>

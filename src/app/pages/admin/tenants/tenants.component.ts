@@ -652,7 +652,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     Numer: <strong>{{ whatsappConfig()!.display_phone_number }}</strong>
                                     @if (whatsappConfig()!.verified_name) { · {{ whatsappConfig()!.verified_name }} }
                                     @if (whatsappConfig()!.code_verification_status === 'VERIFIED') {
-                                      <span class="badge badge-on">VERIFIED</span>
+                                      <span class="badge badge-on">ZWERYFIKOWANY</span>
                                     } @else {
                                       <span class="badge badge-off">{{ whatsappConfig()!.code_verification_status || 'NIEZWERYFIKOWANY' }}</span>
                                     }
@@ -1016,6 +1016,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
         </div>
       </div>
     }
+
   `,
   styles: [`
     .page { padding: 28px 32px; max-width: 1400px; }
@@ -1101,10 +1102,15 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
       width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
       border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
     }
-    .field input:focus, .field select:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
     .field select {
       width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
       border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+    }
+    .field textarea {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+      font-family: inherit; resize: vertical;
     }
     .field-check { display: flex; align-items: flex-end; padding-bottom: 2px; }
     .check-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); cursor: pointer; }
@@ -2010,7 +2016,6 @@ export class TenantsComponent implements OnInit {
   private emptyWhatsappForm(): WhatsappConfigForm {
     return { waba_id: '', phone_number_id: '', access_token: '', app_secret: '', is_enabled: true };
   }
-
   private emptyDraft() {
     return {
       name: '', email_domain: '', dwh_schema_prefix: '', is_active: true,

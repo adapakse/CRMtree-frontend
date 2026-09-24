@@ -56,7 +56,18 @@ interface WhatsappConvUiState {
     </div>
     <span class="stage-badge stage-{{lead.stage}}">{{stageLabel(lead.stage)}}</span>
     <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 Gorący</span>
+    <span *ngIf="lead.hold_active" style="background:#e5e7eb;color:#374151;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700" title="{{lead.hold_reason}}">⏸️ Hold do {{lead.hold_until | date:'dd.MM.yyyy'}}</span>
     <div style="display:flex;gap:6px">
+      <button class="hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
+              [style.background]="lead.hold_active ? '#e5e7eb' : ''"
+              [style.color]="lead.hold_active ? '#374151' : ''"
+              (click)="openHoldModal()"
+              [title]="lead.hold_active ? ('Hold do ' + (lead.hold_until | date:'dd.MM.yyyy') + ' — kliknij aby edytować') : 'Ustaw Hold'">
+        ⏸️ {{ lead.hold_active ? 'Hold aktywny' : 'Hold' }}
+      </button>
+      <button class="hdr-btn" *ngIf="canEdit && lead.stage !== 'archived'" (click)="archiveLead()" title="Archiwizuj — lead zniknie z list, dashboardów i raportów">
+        🗄️ Archiwizuj
+      </button>
       <button class="hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        title="Zadzwoń: {{lead.phone}}">📞</button>
       <button class="hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  title="Email: {{lead.email}}">
         ✉️ Email
@@ -94,6 +105,10 @@ interface WhatsappConvUiState {
         </div>
         <div class="info-kv" *ngIf="lead.industry"><span class="lbl">Branża</span><span class="val">{{lead.industry}}</span></div>
         <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;font-size:11px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥 Gorący lead</div>
+        <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:2px;background:#f3f4f6;color:#374151;font-size:11px;padding:6px 10px;border-radius:8px;font-weight:600;margin-top:4px">
+          <span>⏸️ Hold do {{lead.hold_until | date:'dd.MM.yyyy'}}</span>
+          <span style="font-weight:400;color:#6b7280">{{lead.hold_reason}}</span>
+        </div>
       </div>
 
       <!-- Główny kontakt -->
@@ -1417,6 +1432,42 @@ interface WhatsappConvUiState {
   </div>
 </div>
 
+<!-- Hold dialog -->
+<div class="modal-overlay" *ngIf="showHoldModal" (click)="showHoldModal=false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>⏸️ {{ lead?.hold_active ? 'Edytuj Hold' : 'Ustaw Hold' }}</h3>
+    <p style="margin-bottom:16px">Lead <strong>{{lead?.company}}</strong> zostanie oznaczony jako wstrzymany — bez wpływu na aktywne KPI i pipeline, dopóki Hold trwa.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+        Powód
+        <select [(ngModel)]="holdForm.reason"
+                [style.border-color]="holdSubmitted && !holdForm.reason ? '#ef4444' : '#d1d5db'"
+                style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
+          <option value="" disabled>— wybierz powód —</option>
+          <option *ngFor="let r of holdReasons" [value]="r">{{r}}</option>
+        </select>
+        <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:11px;color:#ef4444">Wybierz powód</span>
+      </label>
+      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+        Aktywny do
+        <input type="date" [(ngModel)]="holdForm.until" [min]="todayStr"
+               [style.border-color]="holdSubmitted && !holdForm.until ? '#ef4444' : '#d1d5db'"
+               style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
+        <span *ngIf="holdSubmitted && !holdForm.until" style="font-size:11px;color:#ef4444">Podaj datę</span>
+      </label>
+    </div>
+    <div *ngIf="holdError" style="font-size:12px;color:#ef4444;margin-bottom:8px">{{holdError}}</div>
+    <div class="modal-actions" style="justify-content:space-between">
+      <button *ngIf="lead?.hold_active" class="btn-outline" style="color:#ef4444;border-color:#fecaca" (click)="cancelHold()" [disabled]="holdSaving">Zdejmij Hold</button>
+      <span *ngIf="!lead?.hold_active"></span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-outline" (click)="showHoldModal=false">Anuluj</button>
+        <button class="btn-primary" (click)="saveHold()" [disabled]="holdSaving">{{holdSaving ? '…' : (lead?.hold_active ? 'Zapisz' : '⏸️ Ustaw Hold')}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Rozpocznij onboarding dialog -->
 <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
   <div class="modal" (click)="$event.stopPropagation()">
@@ -1593,6 +1644,7 @@ interface WhatsappConvUiState {
     .stage-presentation{background:#fef3c7;color:#92400e} .stage-offer{background:#f3e8ff;color:#6b21a8}
     .stage-negotiation{background:#ffedd5;color:#9a3412} .stage-closed_won{background:#dcfce7;color:#166534}
     .stage-closed_lost{background:#fee2e2;color:#991b1b}
+    .stage-archived{background:#e5e7eb;color:#4b5563}
     .stage-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:7px; background:white; font-size:12px; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
     .stage-btn:hover:not(:disabled) { background:var(--orange-pale); border-color:var(--orange); }
     .stage-btn.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:600; }
@@ -1859,6 +1911,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private readonly STAGE_SEQ = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won'];
 
   private allowedNextStages(current: string): string[] {
+    if (current === 'archived')    return ['new']; // jedyne wyjście z Archiwum
     if (current === 'closed_lost') return ['new'];
     if (current === 'closed_won')  return ['negotiation'];
     const idx = this.STAGE_SEQ.indexOf(current);
@@ -1930,6 +1983,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   get allowedStageOptions() {
     const current = this.lead?.stage;
     if (!current) return this.stageOptions;
+    // Lead na Holdzie — etap zablokowany do zmiany, dopóki Hold nie zostanie zdjęty.
+    if (this.lead?.hold_active) {
+      return this.dictStages
+        .filter(s => s.value === current)
+        .map(s => ({ key: s.value as LeadStage, label: s.label }));
+    }
     const allowed = new Set([current, ...this.allowedNextStages(current)]);
     return this.dictStages
       .filter(s => allowed.has(s.value))
@@ -1944,6 +2003,86 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   get lostReasons(): string[] {
     try { return JSON.parse(String(this.settings.settings()['crm_lost_reasons'] || '[]')); }
     catch { return []; }
+  }
+
+  get holdReasons(): string[] {
+    try { return JSON.parse(String(this.settings.settings()['crm_hold_reasons'] || '[]')); }
+    catch { return []; }
+  }
+
+  private readonly HOLD_STAGES = ['qualification', 'presentation', 'offer', 'negotiation'];
+  isHoldEligibleStage(stage: string): boolean { return this.HOLD_STAGES.includes(stage); }
+
+  readonly todayStr = new Date().toISOString().slice(0, 10);
+  showHoldModal = false;
+  holdSubmitted = false;
+  holdSaving    = false;
+  holdError     = '';
+  holdForm: { reason: string; until: string } = { reason: '', until: '' };
+
+  openHoldModal(): void {
+    if (!this.lead) return;
+    this.holdForm = {
+      reason: this.lead.hold_active ? (this.lead.hold_reason || '') : '',
+      until:  this.lead.hold_active ? (this.lead.hold_until  || '') : '',
+    };
+    this.holdSubmitted = false;
+    this.holdError     = '';
+    this.showHoldModal = true;
+  }
+
+  saveHold(): void {
+    if (!this.lead) return;
+    this.holdSubmitted = true;
+    if (!this.holdForm.reason || !this.holdForm.until) return;
+    this.holdSaving = true;
+    this.holdError  = '';
+    this.api.setLeadHold(this.lead.id, { reason: this.holdForm.reason, until: this.holdForm.until }).subscribe({
+      next: updated => this.zone.run(() => {
+        this.lead = { ...this.lead!, ...updated };
+        this.holdSaving    = false;
+        this.showHoldModal = false;
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.holdSaving = false;
+        this.holdError  = err?.error?.error || 'Błąd zapisu Holda.';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  cancelHold(): void {
+    if (!this.lead) return;
+    this.holdSaving = true;
+    this.holdError  = '';
+    this.api.cancelLeadHold(this.lead.id).subscribe({
+      next: updated => this.zone.run(() => {
+        this.lead = { ...this.lead!, ...updated };
+        this.holdSaving    = false;
+        this.showHoldModal = false;
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        this.holdSaving = false;
+        this.holdError  = err?.error?.error || 'Błąd zdejmowania Holda.';
+        this.cdr.markForCheck();
+      }),
+    });
+  }
+
+  archiveLead(): void {
+    if (!this.lead) return;
+    if (!confirm(`Zarchiwizować lead „${this.lead.company}"? Zniknie z list, dashboardów i raportów — będzie widoczny tylko po wybraniu filtra Etap = Archiwum. Nadal będzie edytowalny, można go stamtąd przywrócić do etapu "Nowy".`)) return;
+    this.api.archiveLead(this.lead.id).subscribe({
+      next: updated => this.zone.run(() => {
+        this.lead = { ...this.lead!, ...updated };
+        this.cdr.markForCheck();
+      }),
+      error: (err: any) => this.zone.run(() => {
+        alert(err?.error?.error || 'Błąd archiwizacji leada.');
+      }),
+    });
   }
 
   // Powiązane dokumenty

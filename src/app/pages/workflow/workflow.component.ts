@@ -21,10 +21,10 @@ const STATUS_COLUMN: Record<string, 'pending' | 'in_progress' | 'completed' | 'c
 };
 
 const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: string }[] = [
-  { id: 'pending',     label: 'Pending' },
-  { id: 'in_progress', label: 'In Progress' },
-  { id: 'completed',   label: 'Completed' },
-  { id: 'cancelled',   label: 'Cancelled' },
+  { id: 'pending',     label: 'Oczekujące' },
+  { id: 'in_progress', label: 'W toku' },
+  { id: 'completed',   label: 'Zakończone' },
+  { id: 'cancelled',   label: 'Anulowane' },
 ];
 
 @Component({
@@ -37,12 +37,12 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
       <span class="tsp"></span>
       @if (view === 'kanban' && refreshIntervalSec() > 0) {
         <span style="font-size:11.5px;color:var(--gray-400);margin-right:4px">
-          Auto-refresh: {{ refreshIntervalSec() }}s
+          Auto-odświeżanie: {{ refreshIntervalSec() }} s
         </span>
       }
       <div class="tabs" style="margin-bottom:0;width:320px">
-        <button class="tab-btn" [class.active]="view==='mine'"   (click)="switchView('mine')">My Tasks</button>
-        <button class="tab-btn" [class.active]="view==='kanban'" (click)="switchView('kanban')">Kanban Board</button>
+        <button class="tab-btn" [class.active]="view==='mine'"   (click)="switchView('mine')">Moje zadania</button>
+        <button class="tab-btn" [class.active]="view==='kanban'" (click)="switchView('kanban')">Tablica Kanban</button>
       </div>
     </div>
 
@@ -56,8 +56,8 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
         @if (myTasks().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
             <div class="empty-icon">✅</div>
-            <div class="empty-title">No pending tasks</div>
-            <div>You're all caught up!</div>
+            <div class="empty-title">Brak oczekujących zadań</div>
+            <div>Wszystko załatwione!</div>
           </div>
         }
         <div style="display:flex;flex-direction:column;gap:10px">
@@ -85,10 +85,10 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
               </div>
               <div style="display:flex;gap:8px;flex-shrink:0">
                 @if (task.task_status === 'pending') {
-                  <button class="btn btn-g btn-sm" (click)="setStatus(task, 'in_progress')">Start</button>
+                  <button class="btn btn-g btn-sm" (click)="setStatus(task, 'in_progress')">Rozpocznij</button>
                 }
-                <button class="btn btn-p btn-sm" (click)="setStatus(task, 'completed')">Complete</button>
-                <a class="btn btn-g btn-sm" [routerLink]="['/documents']" [queryParams]="{open: task.document_id}">Open Doc</a>
+                <button class="btn btn-p btn-sm" (click)="setStatus(task, 'completed')">Zakończ</button>
+                <a class="btn btn-g btn-sm" [routerLink]="['/documents']" [queryParams]="{open: task.document_id}">Otwórz dokument</a>
               </div>
             </div>
           }
@@ -100,8 +100,8 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
         @if (kanbanDocs().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
             <div class="empty-icon">📋</div>
-            <div class="empty-title">No documents yet</div>
-            <div>Documents will appear here once created</div>
+            <div class="empty-title">Brak dokumentów</div>
+            <div>Dokumenty pojawią się tutaj po ich utworzeniu</div>
           </div>
         }
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start">
@@ -124,7 +124,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                       <span style="flex:1"></span>
                       @if (doc.active_task_count > 0) {
                         <span style="font-size:10px;background:var(--orange-pale);color:var(--orange-dark);border-radius:8px;padding:1px 6px;font-weight:600">
-                          {{ doc.active_task_count }} task{{ doc.active_task_count > 1 ? 's' : '' }}
+                          Zadania: {{ doc.active_task_count }}
                         </span>
                       }
                     </div>
@@ -149,11 +149,11 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                       <div style="font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px"
                            [style.color]="expirationColor(doc.expiration_date)">
                         @if (isExpired(doc.expiration_date)) {
-                          <span title="Expired">⚠️</span>
+                          <span title="Wygasł">⚠️</span>
                         }
-                        Expires {{ doc.expiration_date | date:'dd.MM.yy' }}
+                        Wygasa {{ doc.expiration_date | date:'dd.MM.yy' }}
                         @if (isExpiringSoon(doc.expiration_date) && !isExpired(doc.expiration_date)) {
-                          <span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 4px;font-weight:600">SOON</span>
+                          <span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 4px;font-weight:600">WKRÓTCE</span>
                         }
                       </div>
                     }
@@ -167,7 +167,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                             <span class="kbadge" [class]="'kbadge-' + t.task_type">{{ t.task_type.toUpperCase() }}</span>
                             <span class="ktask-name">{{ t.assignee_name }}</span>
                             @if (t.assigner_name) {
-                              <span class="ktask-from" title="Assigned by {{ t.assigner_name }}">← {{ t.assigner_name }}</span>
+                              <span class="ktask-from" title="Przydzielone przez {{ t.assigner_name }}">← {{ t.assigner_name }}</span>
                             }
                             @if (t.due_date) {
                               <span class="ktask-due" [class.overdue]="isDue(t.due_date)">
@@ -301,9 +301,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.wfSvc.updateTask(task.document_id, task.id, { task_status: status }).subscribe({
       next: updated => {
         this.myTasks.update(tasks => tasks.map(t => t.id === updated.id ? updated : t));
-        if (status === 'completed') this.toast.success('Task marked as completed');
+        if (status === 'completed') this.toast.success('Zadanie oznaczone jako zakończone');
       },
-      error: () => this.toast.error('Could not update the task — please try again'),
+      error: () => this.toast.error('Nie udało się zaktualizować zadania — spróbuj ponownie'),
     });
   }
 }

@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
 
 export type LeadStage =
   | 'new' | 'qualification' | 'presentation'
-  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost' | 'onboarding' | 'onboarded';
+  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost' | 'onboarding' | 'onboarded' | 'archived';
 
 export type PartnerStatus = 'onboarding' | 'active' | 'inactive' | 'churned';
 
@@ -40,6 +40,13 @@ export interface Lead {
   tags: string[];
   notes: string | null;
   hot: boolean;
+  hold_active?: boolean;
+  hold_reason?: string | null;
+  hold_until?: string | null;
+  hold_set_by?: string | null;
+  hold_set_at?: string | null;
+  archived_at?: string | null;
+  archived_by?: string | null;
   lost_reason: string | null;
   annual_turnover_currency: string;
   online_pct: number | null;
@@ -829,6 +836,7 @@ export const LEAD_STAGE_LABELS: Record<LeadStage, string> = {
   closed_lost:   'Przegrany',
   onboarding:    'W onboardingu',
   onboarded:     'Onboardowany',
+  archived:      'Archiwum',
 };
 
 export const PARTNER_STATUS_LABELS: Record<PartnerStatus, string> = {
@@ -1002,6 +1010,15 @@ export class CrmApiService {
   }
   createLead(data: Partial<Lead>): Observable<Lead> {
     return this.http.post<Lead>(`${BASE}/leads`, data);
+  }
+  setLeadHold(id: number, data: { reason: string; until: string }): Observable<Lead> {
+    return this.http.put<Lead>(`${BASE}/leads/${id}/hold`, data);
+  }
+  cancelLeadHold(id: number): Observable<Lead> {
+    return this.http.delete<Lead>(`${BASE}/leads/${id}/hold`);
+  }
+  archiveLead(id: number): Observable<Lead> {
+    return this.http.put<Lead>(`${BASE}/leads/${id}/archive`, {});
   }
   getLeadLogoSas(leadId: number): Observable<{ url: string }> {
     return this.http.get<{ url: string }>(`${BASE}/leads/${leadId}/logo`);
