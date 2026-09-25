@@ -23,6 +23,19 @@ function renderInline(text: string): string {
   return out;
 }
 
+// Markdown table support — a comparison table is now a mandatory section
+// (see CRMtree-backend's seoContentService validateArticle). A table block
+// has no blank lines within it, so it arrives as one block whose first line
+// is the header row and second is the `|---|---|` separator. Mirrors
+// CRMtree-backend's utils/seoMarkdown.js — keep both in sync.
+function isTableSeparatorRow(line: string): boolean {
+  return /-/.test(line) && /^\|?[\s:-]+\|[\s:|-]*\|?$/.test(line.trim());
+}
+
+function parseTableRow(line: string): string[] {
+  return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
+}
+
 function renderBodyHtml(body: string): string {
   return body
     .split(/\n\n+/)
@@ -33,6 +46,13 @@ function renderBodyHtml(body: string): string {
       const lines = trimmed.split('\n');
       if (lines.length && lines.every((l) => l.startsWith('- '))) {
         return `<ul>${lines.map((l) => `<li>${renderInline(l.slice(2))}</li>`).join('')}</ul>`;
+      }
+      if (lines.length >= 2 && lines[0].trim().startsWith('|') && isTableSeparatorRow(lines[1])) {
+        const header = parseTableRow(lines[0]);
+        const bodyRows = lines.slice(2).map(parseTableRow);
+        return `<table><thead><tr>${header.map((h) => `<th>${renderInline(h)}</th>`).join('')}</tr></thead><tbody>${bodyRows
+          .map((r) => `<tr>${r.map((c) => `<td>${renderInline(c)}</td>`).join('')}</tr>`)
+          .join('')}</tbody></table>`;
       }
       return `<p>${renderInline(trimmed)}</p>`;
     })
@@ -49,12 +69,20 @@ function renderBodyHtml(body: string): string {
       <article class="blog-post">
         <div class="post-container">
           <a routerLink="/blog" class="back-link">&larr; Wszystkie wpisy</a>
-          <span class="post-category">{{ p.category }}</span>
+          @if (p.pillar_slug) {
+            <a class="post-category" [routerLink]="['/blog/temat', p.pillar_slug]">{{ p.category }}</a>
+          } @else {
+            <span class="post-category">{{ p.category }}</span>
+          }
           <h1>{{ p.title }}</h1>
           <div class="post-meta">
             <time>{{ p.published_at | date:'d MMMM y':'':'pl' }}</time>
             <span class="meta-dot">·</span>
             <span>{{ p.reading_minutes }} min czytania</span>
+            @if (isUpdated(p)) {
+              <span class="meta-dot">·</span>
+              <span>Zaktualizowano {{ p.updated_at | date:'d MMMM y':'':'pl' }}</span>
+            }
           </div>
 
           <div class="share-row">
@@ -77,7 +105,7 @@ function renderBodyHtml(body: string): string {
 
         @if (p.header_image_url) {
           <div class="hero-wrap">
-            <img class="post-hero-image" [src]="p.header_image_url" alt="">
+            <img class="post-hero-image" [src]="p.header_image_url" [alt]="p.title">
           </div>
         }
 
@@ -87,7 +115,7 @@ function renderBodyHtml(body: string): string {
           @if (p.author_name) {
             <div class="author-box">
               @if (p.author_photo_url) {
-                <img class="author-photo" [src]="p.author_photo_url" alt="">
+                <img class="author-photo" [src]="p.author_photo_url" [alt]="'Zdjęcie autora: ' + p.author_name">
               }
               <div class="author-info">
                 <span class="author-label">Autor</span>
@@ -128,8 +156,9 @@ function renderBodyHtml(body: string): string {
     .back-link-bottom { margin-top:3rem; margin-bottom:0; }
     .post-category {
       font-size:0.72rem; text-transform:uppercase; letter-spacing:.05em;
-      color:var(--orange-dark); font-weight:700;
+      color:var(--orange-dark); font-weight:700; text-decoration:none;
     }
+    a.post-category:hover { text-decoration:underline; }
     .blog-post h1 {
       font-family:'Sora', sans-serif; font-size:clamp(1.7rem, 3.6vw, 2.4rem);
       margin:0.5rem 0 0.6rem; line-height:1.2; font-weight:700; color:var(--gray-900);
@@ -160,6 +189,14 @@ function renderBodyHtml(body: string): string {
     .post-content li { margin-top:0.4rem; }
     .post-content strong { color:var(--gray-900); }
     .post-content a { color:var(--orange-dark); text-decoration-color:var(--orange-muted); }
+    .post-content table {
+      margin:1.5rem 0 0; width:100%; border-collapse:collapse; font-size:0.95rem;
+      display:block; overflow-x:auto;
+    }
+    .post-content th, .post-content td {
+      border:1px solid var(--gray-200); padding:0.6rem 0.8rem; text-align:left;
+    }
+    .post-content th { background:var(--gray-50, #f9fafb); font-weight:700; color:var(--gray-900); }
 
     .author-box {
       display:flex; gap:1rem; align-items:flex-start; margin-top:3rem; padding-top:2rem;
@@ -217,6 +254,7 @@ export class BlogDetailComponent implements OnChanges {
           headline: post.title,
           description: post.meta_description,
           datePublished: post.published_at,
+          dateModified: post.updated_at || post.published_at,
           publisher: { '@type': 'Organization', name: 'CRMtree' },
           ...(post.author_name ? {
             author: {
@@ -227,9 +265,24 @@ export class BlogDetailComponent implements OnChanges {
             },
           } : {}),
         });
+
+        if (post.faq?.length) {
+          this.seo.setJsonLd('ld-faq', {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: post.faq.map((item) => ({
+              '@type': 'Question',
+              name: item.question,
+              acceptedAnswer: { '@type': 'Answer', text: item.answer },
+            })),
+          });
+        } else {
+          this.seo.removeJsonLd('ld-faq');
+        }
       },
       error: () => {
         this.notFound.set(true);
+        this.seo.removeJsonLd('ld-faq');
         // Real 404 without an SSR-level status hook (not available in this Angular/SSR version) —
         // at minimum keep it out of the index via robots noindex.
         this.metaService.updateTag({ name: 'robots', content: 'noindex' });
@@ -240,6 +293,14 @@ export class BlogDetailComponent implements OnChanges {
         });
       },
     });
+  }
+
+  // Only worth surfacing when the article was actually revised after
+  // publishing — same-day updated_at from the initial insert trigger isn't
+  // a real "refresh" a reader or AI crawler should be told about.
+  isUpdated(post: BlogPost): boolean {
+    if (!post.updated_at || !post.published_at) return false;
+    return new Date(post.updated_at).getTime() - new Date(post.published_at).getTime() > 24 * 3600 * 1000;
   }
 
   private articleUrl(post: BlogPost): string {
