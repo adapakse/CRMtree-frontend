@@ -1,6 +1,7 @@
 # ADR 001: Natywna aplikacja mobilna CRMtree (Flutter)
 
-- **Status:** Zaakceptowana
+- **Status:** Zaakceptowana, zmieniona 2026-09-26 (sekcje 2–3: jeden email w wielu
+  tenantach zamiast globalnej unikalności)
 - **Data:** 2026-09-25
 - **Decydent:** Adam
 - **Dotyczy:** `crmtree-mobile` (nowe repo), `CRMtree-backend`, `CRMtree-frontend`
@@ -46,7 +47,7 @@ Ustalenia z analizy obecnego frontendu:
 |---|---|
 | 0 | Zmiany w backendzie (sekcja „Wymagane zmiany w backendzie”), szkielet aplikacji, theme, CI |
 | 1 — MVP | Logowanie + biometria, ekran „Dziś”, leady (lista, kanban etapów, karta), partnerzy, aktywności, `tel:` + notatka po rozmowie, kalendarz |
-| 2 | Push, WhatsApp / SMS / email, dokumenty (aparat, pliki), offline z kolejką zapisów, lekki dashboard |
+| 2 | Push, WhatsApp / SMS / email, dokumenty (aparat, pliki), offline z kolejką zapisów, lekki dashboard, wiele firm na jednym telefonie (przełącznik, „Dodaj firmę”) |
 | 3 | Softphone SIP (CallKit / ConnectionService), skanowanie wizytówek, widgety |
 
 ### 2. Tenant i logowanie
@@ -54,85 +55,79 @@ Ustalenia z analizy obecnego frontendu:
 **Koncepcja `nazwafirmy.crmtree.pl` zostaje bez zmian.** Web i mechanizm
 `TENANT_HOST_MISMATCH` nie są modyfikowane.
 
-Na mobile tenant ustalamy **na podstawie emaila** (logowanie zaczynające się od
-emaila):
+Na mobile tenant ustalamy **na podstawie emaila i hasła** (decyzja Adama z
+2026-09-26). Ten sam email może mieć aktywne konta w kilku tenantach. Każde z nich
+to osobne konto z osobnym hasłem.
 
-1. User wpisuje email.
-2. `POST /auth/discover { email }` →
-   `{ tenant_slug, tenant_name, auth_methods: ['password' | 'saml', ...] }`.
-3. Aplikacja zapisuje `https://{tenant_slug}.crmtree.pl/api` jako adres API. Wszystkie
-   kolejne żądania idą na subdomenę firmy, więc obecna walidacja hosta działa bez zmian.
-4. Aplikacja pokazuje pole hasła, przycisk SSO albo oba — zgodnie z konfiguracją
-   tenanta (`auth_configs`).
-5. `must_change_password` obsługiwane jak w webie.
+1. User wpisuje email i hasło.
+2. `POST /auth/mobile/login { email, password, device_id }` na hoście bez subdomeny
+   (`app.crmtree.pl/api`). Backend szuka wszystkich aktywnych kont z tym emailem
+   (`lower(trim(email))`) w aktywnych tenantach, sprawdza hasło na każdym z nich i
+   zostawia tylko te konta, na których hasło pasuje i które mają rolę
+   `salesperson` / `sales_manager`.
+3. Odpowiedź: lista `[{ tenant_slug, tenant_name, access_token, refresh_token,
+   must_change_password }]`, osobna para tokenów dla każdego pasującego konta.
+   - **jedno konto** → aplikacja od razu wchodzi do tej firmy, bez żadnego wyboru;
+   - **kilka kont** → ekran „Wybierz firmę” z nazwami firm;
+   - **zero** → zwykły błąd „nieprawidłowe dane logowania”, bez informacji, czy email
+     w ogóle istnieje;
+   - hasło pasuje tylko do konta z inną rolą → komunikat, że aplikacja jest dla
+     handlowców, z linkiem do weba.
+4. Dla każdej firmy aplikacja używa `https://{tenant_slug}.crmtree.pl/api`. Każda
+   sesja idzie na subdomenę swojej firmy, więc `TENANT_HOST_MISMATCH` działa bez zmian.
+5. `must_change_password` obsługiwane per konto, jak w webie.
 
-Discovery musi się odbyć **przed** hasłem, bo o dostępności SSO decyduje tenant.
+**Lista firm dopiero po haśle.** Nazw firm nie pokazujemy po samym emailu. Inaczej
+każdy, kto zna czyjś email, dowiedziałby się, w jakich firmach (klientach CRMtree)
+ta osoba ma konto. Rate limit per IP i per email.
 
-**Ochrona discovery:** rate limit per IP i per email. Dla nieznanego emaila endpoint
-zwraca neutralną odpowiedź (`auth_methods: ['password']`, bez nazwy firmy) zamiast
-błędu, żeby nie dało się sprawdzać, kto jest klientem CRMtree. Logowanie hasłem
-kończy się wtedy zwykłym błędem „nieprawidłowe dane logowania”.
+**Wiele firm na jednym telefonie** (faza 2, patrz tabela faz):
 
-**SSO na mobile:** przeglądarka systemowa (`flutter_web_auth_2`) otwiera
-`https://{slug}.crmtree.pl/api/auth/saml?client=mobile`. Po sukcesie backend
-przekierowuje na `crmtree://auth/callback?code=…` z jednorazowym, krótko żyjącym
-kodem, który aplikacja wymienia na tokeny (PKCE). Tokeny nigdy nie trafiają do URL.
+- Jedno hasło dodaje wszystkie firmy, w których pasuje. Firmę z innym hasłem user
+  dodaje później przez „Dodaj firmę” (ten sam endpoint, nowe konta dochodzą do
+  listy).
+- Przełączanie między firmami bez ponownego logowania: aplikacja trzyma osobną
+  sesję dla każdej firmy.
+- „Usuń firmę z aplikacji” wylogowuje tylko tę jedną sesję.
+- W MVP ekran „Wybierz firmę” przy logowaniu już istnieje, ale aplikacja trzyma
+  tylko wybraną firmę. Architektura od początku jest per tenant (sekcja 6), więc
+  faza 2 dodaje UI, bez przebudowy.
 
-### 3. Unikalność emaila między tenantami
+**SSO na mobile — odłożone.** Żaden tenant nie ma dziś skonfigurowanego SAML.
+Wymaga to wskazania firmy przed logowaniem (o SSO decyduje tenant), co kłóci się z
+zasadą „lista firm dopiero po haśle”. Rozwiązanie zaprojektujemy, gdy pojawi się
+pierwszy klient z SSO. Kierunek: przeglądarka systemowa (`flutter_web_auth_2`),
+`https://{slug}.crmtree.pl/api/auth/saml?client=mobile`, powrót na
+`crmtree://auth/callback?code=…` z jednorazowym kodem wymienianym na tokeny (PKCE).
 
-Discovery działa tylko wtedy, gdy email jednoznacznie wskazuje tenanta. Dlatego:
+### 3. Email w wielu tenantach
 
-- **Jeden adres email może należeć do najwyżej jednego aktywnego użytkownika w całym
-  systemie, niezależnie od tenanta.** Reguła obejmuje wszystkich użytkowników, w tym
-  adminów tenantów i super adminów.
-- **Użytkownik nieaktywny (dezaktywowany lub usunięty logicznie, `deleted_at`) nie
-  jest duplikatem.** Ten sam email może zostać użyty dla nowego, aktywnego konta w
-  tym samym lub innym tenancie.
-- Porównanie bez rozróżniania wielkości liter i po przycięciu spacji
-  (`lower(trim(email))`).
+**Zmiana z 2026-09-26:** pierwotnie ADR zakładał globalną unikalność emaila wśród
+aktywnych kont (jeden email = jeden tenant). Adam ją odrzucił, bo blokowała osoby
+pracujące w kilku firmach (konsultanci, super admin z kontem w tenancie). Obowiązuje
+teraz:
 
-**Walidacja w backendzie** — w każdym miejscu, które może sprawić, że dwa aktywne
-konta mają ten sam email:
-
-- utworzenie użytkownika (panel admina, onboarding tenanta, SSO just-in-time
-  provisioning, jeśli istnieje),
-- zmiana emaila użytkownika,
-- **reaktywacja** nieaktywnego użytkownika (jego email mógł w międzyczasie zostać
-  użyty przez aktywne konto gdzie indziej),
-- przywrócenie usuniętego tenanta (reaktywuje wielu użytkowników naraz),
-- import użytkowników.
-
-Kontrola w kodzie aplikacji to za mało (race condition przy równoległych zapisach).
-Regułę gwarantuje baza — częściowy indeks unikalny, np. w PostgreSQL:
-
-```sql
-CREATE UNIQUE INDEX users_active_email_unique
-  ON users (lower(trim(email)))
-  WHERE is_active AND deleted_at IS NULL;
-```
-
-Dokładny warunek `WHERE` należy dopasować do tego, jak backend oznacza nieaktywne
-konta.
-
-**Błąd dla klienta:** `409 EMAIL_ALREADY_IN_USE` z komunikatem „Ten adres email jest
-już używany przez aktywne konto w CRMtree.”. Komunikat **nie ujawnia**, w którym
-tenancie jest konto — admin jednej firmy nie może się dowiedzieć, kto jest klientem
-innej. Web (`users.component.ts`, panel tenantów) pokazuje ten komunikat przy
-formularzu.
-
-**Migracja:** przed założeniem indeksu uruchamiamy zapytanie wykrywające istniejące
-duplikaty wśród aktywnych kont. Duplikaty rozwiązujemy ręcznie (dezaktywacja lub
-zmiana emaila) — indeks zakładamy dopiero, gdy wynik jest pusty.
+- **Ten sam email może mieć aktywne konta w wielu tenantach.** Konta są niezależne:
+  osobne hasła, role i uprawnienia. Logowanie mobilne rozstrzyga niejednoznaczność
+  hasłem (sekcja 2).
+- **W obrębie jednego tenanta email musi być unikalny bez rozróżniania wielkości
+  liter.** Obecny indeks `idx_users_tenant_email (tenant_id, email)` rozróżnia
+  wielkość liter, więc `Jan@x.pl` i `jan@x.pl` mogą dziś istnieć w tej samej firmie,
+  a logowanie po `lower(trim(email))` trafiłoby wtedy na dwa konta. Zastępujemy go
+  indeksem na `(tenant_id, lower(trim(email)))`, po sprawdzeniu, że w danych nie ma
+  takich par.
+- Tabela `users` nie ma `deleted_at` — konto nieaktywne to `is_active = false`.
 
 ### 4. Sesja i biometria
 
 - Zaraz po pierwszym udanym logowaniu aplikacja proponuje włączenie biometrii
   (Face ID / odcisk palca) i — w tym samym momencie — zgodę na powiadomienia.
-- **Biometria włączona:** refresh token zapisany w Keychain (iOS,
+- **Biometria włączona:** refresh tokeny zapisane w Keychain (iOS,
   `biometryCurrentSet`) / Keystore (Android, klucz wymagający uwierzytelnienia
-  użytkownika) przez `biometric_storage`. Start aplikacji = prompt biometryczny →
-  odblokowanie refresh tokenu → od razu zalogowany. Samo `local_auth` jako bramka UI
-  nie wystarcza.
+  użytkownika) przez `biometric_storage`. Przy kilku firmach to jeden zaszyfrowany
+  wpis z mapą `tenant → refresh token`, więc jeden prompt odblokowuje wszystkie
+  sesje. Start aplikacji = prompt biometryczny → odblokowanie → od razu zalogowany
+  do ostatnio otwartej firmy. Samo `local_auth` jako bramka UI nie wystarcza.
 - **Biometria odrzucona:** refresh token trzymany tylko w pamięci. Każdy zimny start
   wymaga logowania; zapamiętany jest email (i tenant), więc user wpisuje tylko hasło
   lub klika SSO.
@@ -195,6 +190,14 @@ lib/
 zmiana etapu) do `outbox` z `client_id` dla idempotencji. Pełnej dwukierunkowej
 synchronizacji celowo nie robimy.
 
+**Wszystko per tenant od pierwszego dnia** (sekcja 2, wiele firm na telefonie).
+Tenant jest kluczem dla: adresu API, pary tokenów, lokalnej bazy drift (osobny
+zaszyfrowany plik na firmę — dane klientów różnych firm nie mogą się mieszać),
+kolejki `outbox` (zapis zrobiony w firmie A nie może trafić do B po przełączeniu),
+rejestracji urządzenia do push, roli i `tenant_features`. Przełączenie firmy
+podmienia zakres providerów Riverpod, zamiast czyścić stan ręcznie. Dopisanie tego
+w szkielecie jest tanie; przerabianie gotowej aplikacji byłoby drogie.
+
 **Theme:** tokeny z `src/styles/global.scss` (`#3BAA5D`, `#2F8F4D`, `#E6F4EA`,
 `#1F2933`, `#3B82F6`) → Material 3 `ThemeData`; adaptacyjne kontrolki Cupertino na
 iOS tam, gdzie użytkownik ich oczekuje.
@@ -224,6 +227,12 @@ są domyślnym dialerem.
   wiadomości i numerów telefonu — powiadomienie widać na zablokowanym ekranie.
 - Kanały Androida: Wiadomości, Zadania, Leady (osobno wyciszane).
 - Kliknięcie → go_router → np. `/crm/leads/123`.
+- **Powiadomienia ze wszystkich firm** zapisanych w aplikacji, nie tylko z otwartej
+  (decyzja 2026-09-26). Payload zawiera `tenant_slug`; przy więcej niż jednej firmie
+  tekst powiadomienia zawiera nazwę firmy, a kliknięcie przełącza na nią przed
+  otwarciem ekranu. Urządzenie rejestruje token FCM osobno w każdej firmie.
+- Universal links z maili webowych przychodzą z hosta `{slug}.crmtree.pl`, więc
+  firma wynika z hosta (`applinks:*.crmtree.pl` w iOS Associated Domains).
 - Zdarzenia: przychodzący WhatsApp / SMS, nowy lead przypisany do handlowca,
   przypomnienie o zadaniu, nieodebrane połączenie.
 - Konfiguracja: klucz APNs (`.p8`) w Firebase, osobny projekt Firebase per flavor.
@@ -231,6 +240,11 @@ są domyślnym dialerem.
 ### 9. CI/CD
 
 - Flavory `dev`, `int` (`int.crmtree.pl`), `prod` z osobnymi bundle ID.
+- Flavor `int` zawsze używa `int.crmtree.pl` bez subdomeny firmy. Na INT jest DNS
+  `*.int.crmtree.pl`, ale bez certyfikatu i powiązania z aplikacją, więc
+  `https://{slug}.int.crmtree.pl` nie działa. Na hoście bez subdomeny tenant wynika z
+  konta (tokenu), tak jak na `app.crmtree.pl`.
+- Buildy iOS wymagają macOS (runner macOS w GitHub Actions albo Mac).
 - GitHub Actions + fastlane → TestFlight i Google Play Internal.
 - `flutter analyze` (`very_good_analysis`), testy jednostkowe repozytoriów i
   notifierów, widget testy kluczowych ekranów, `integration_test` dla logowania i
@@ -239,16 +253,16 @@ są domyślnym dialerem.
 
 ## Wymagane zmiany w backendzie (faza 0)
 
-1. Walidacja unikalności emaila wśród aktywnych kont we wszystkich tenantach
-   (sekcja 3): czyszczenie duplikatów, częściowy indeks unikalny, `409
-   EMAIL_ALREADY_IN_USE` we wszystkich ścieżkach tworzenia, zmiany emaila i
-   reaktywacji.
-2. `POST /auth/discover` z rate limitem i neutralną odpowiedzią dla nieznanego emaila.
-3. SSO dla mobile: `client=mobile`, redirect na `crmtree://auth/callback` z
-   jednorazowym kodem + PKCE.
-4. Mobilne refresh tokeny przypisane do urządzenia: rotacja, wykrywanie ponownego
-   użycia, unieważnianie, endpoint listy urządzeń.
-5. Ograniczenie logowania `client=mobile` do ról `salesperson` / `sales_manager`.
+1. Unikalność emaila w obrębie tenanta bez rozróżniania wielkości liter (sekcja 3):
+   sprawdzenie danych, indeks `(tenant_id, lower(trim(email)))` w miejsce obecnego.
+2. `POST /auth/mobile/login` sprawdzający hasło na wszystkich aktywnych kontach z
+   danym emailem i zwracający listę pasujących firm z tokenami (sekcja 2), z rate
+   limitem.
+3. ~~SSO dla mobile~~ — odłożone do pierwszego klienta z SAML (sekcja 2).
+4. Mobilne refresh tokeny przypisane do urządzenia i konta: rotacja, wykrywanie
+   ponownego użycia, unieważnianie, endpoint listy urządzeń.
+5. Ograniczenie logowania mobilnego do ról `salesperson` / `sales_manager`
+   (sprawdzane per konto).
 6. `POST` / `DELETE /api/devices` (token FCM) i wysyłka push przez Firebase Admin SDK.
 7. OpenAPI dla endpointów MVP + kontrola kompatybilności w CI.
 8. Paginacja kursorowa list, lekka lista leadów, agregat dla ekranu „Dziś”,
@@ -266,14 +280,16 @@ są domyślnym dialerem.
   tenanta.
 - Handlowiec loguje się raz; kolejne wejścia to biometria.
 - OpenAPI i przeniesienie logiki do backendu ograniczają rozjazd web ↔ mobile.
-- Reguła unikalnego emaila upraszcza też logowanie na `app.crmtree.pl`.
+- Osoba z kontami w kilku firmach loguje się raz i przełącza między nimi (od fazy
+  2); nie trzeba czyścić duplikatów emaili w istniejących danych.
 
 **Negatywne / ryzyka**
 
 - Każda nowa funkcja CRM potencjalnie powstaje dwa razy (Angular + Flutter).
-- Reguła unikalności blokuje przypadek „jedna osoba aktywna w dwóch firmach”
-  (np. konsultant, super admin z kontem w tenancie). Taka osoba potrzebuje osobnych
-  adresów email.
+- Aplikacja musi być od początku zbudowana per tenant (sekcja 6) — kilka dni pracy
+  więcej w szkielecie i MVP.
+- SSO na mobile wymaga osobnego projektu, bo wskazanie firmy przed logowaniem kłóci
+  się z zasadą „lista firm dopiero po haśle”.
 - Dane klientów w cache na urządzeniu — wymagane szyfrowanie bazy i czyszczenie przy
   wylogowaniu (RODO).
 - VoIP na iOS (CallKit / PushKit) jest pracochłonny i podlega review Apple — dlatego
@@ -284,7 +300,9 @@ są domyślnym dialerem.
 
 - **Jeden host API z tenantem w JWT zamiast subdomen** — odrzucone: wymaga przebudowy
   rozpoznawania tenanta w działającym webie i backendzie.
-- **Użytkownik wpisuje subdomenę firmy przy pierwszym logowaniu** — odrzucone na
-  rzecz discovery po emailu: prostsze dla użytkownika.
-- **Discovery zwracające listę tenantów dla emaila** — odrzucone: wprowadzamy
-  globalną unikalność emaila wśród aktywnych kont.
+- **Użytkownik wpisuje subdomenę firmy przy pierwszym logowaniu** — odrzucone:
+  logowanie emailem i hasłem jest prostsze dla użytkownika.
+- **Lista firm pokazywana po samym emailu** (`/auth/discover`) — odrzucone
+  2026-09-26: zdradza, w jakich firmach ma konto osoba o danym emailu.
+- **Globalna unikalność emaila wśród aktywnych kont** (pierwotna wersja tego ADR) —
+  odrzucone 2026-09-26: blokuje osoby pracujące w kilku firmach.
