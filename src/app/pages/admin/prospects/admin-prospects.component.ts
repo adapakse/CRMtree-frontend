@@ -8,6 +8,7 @@ import { environment } from '../../../../environments/environment';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { NavBackService } from '../../../core/services/nav-back.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 const API = `${environment.apiUrl}/admin/prospects`;
 
@@ -192,6 +193,26 @@ interface BatchProgress {
   processing_ids?: number[];
 }
 
+// Firma zaproponowana przez "Znajdź konkurencję". Flagi in_* mówią wyłącznie
+// o zasobach TEGO tenanta — backend filtruje je po tenant_id.
+interface DiscoveredCompany {
+  company_name: string;
+  nip: string | null;
+  website_url: string | null;
+  pkd_main: string | null;
+  pkd_codes: string[];
+  regon: string | null;
+  nip_verified: boolean;
+  in_prospects: boolean;
+  in_leads: boolean;
+  in_partners: boolean;
+  industry?: string | null;
+  // Pola edycji po stronie UI
+  nip_edit: string;
+  website_edit: string;
+  selected: boolean;
+}
+
 @Component({
   selector: 'wt-admin-prospects',
   standalone: true,
@@ -201,6 +222,7 @@ interface BatchProgress {
     <div id="topbar">
       <span class="page-title">Prospekty — Enrichment firm</span>
       <span class="tsp"></span>
+      <button class="btn btn-g" (click)="openDiscovery()" title="Generuj prospekty z konkurencji">🔍 Znajdź konkurencję</button>
       <button class="btn btn-g" (click)="exportCsv()">⬇ Eksport CSV</button>
       <button class="btn btn-p"
         [disabled]="batch().running || enriching()"
@@ -1493,9 +1515,218 @@ interface BatchProgress {
         </div>
       </div>
     }
+
+    <!-- ── Discovery modal — znajdź konkurencję ──────────────────── -->
+    @if (discoveryOpen()) {
+      <div class="discovery-overlay"></div>
+      <div class="discovery-dialog" (click)="$event.stopPropagation()">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div style="font-weight:700;font-size:15px;color:#111827">🔍 Znajdź konkurencję</div>
+            <div style="font-size:12px;color:#6b7280;margin-top:2px">
+              Podaj firmę wejściową — AI zaproponuje konkurentów z weryfikacją GUS
+            </div>
+          </div>
+          <button (click)="cancelDiscovery()"
+            style="background:none;border:none;font-size:18px;cursor:pointer;color:#6b7280;padding:4px 8px">✕</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 160px;gap:8px;margin-bottom:10px">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">Nazwa firmy</label>
+            <input class="inp" style="width:100%;box-sizing:border-box"
+              [(ngModel)]="discoverySeedName"
+              placeholder="np. Comarch S.A."
+              [disabled]="discoveryLoading()"
+              (keydown.enter)="startDiscovery()">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">NIP firmy *</label>
+            <input class="inp" style="width:100%;box-sizing:border-box"
+              [(ngModel)]="discoverySeedNip"
+              placeholder="1234567890"
+              [disabled]="discoveryLoading()"
+              (keydown.enter)="startDiscovery()">
+          </div>
+        </div>
+
+        @if (discoveryLoading()) {
+          <div style="margin-bottom:12px">
+            <div style="height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden">
+              <div class="discovery-progress-bar"></div>
+            </div>
+            @if (discoveryResults().length > 0) {
+              <div style="font-size:11px;color:#6b7280;margin-top:5px">
+                ⏳ Wyszukiwanie w toku…
+                <b style="color:var(--orange)"> {{ discoveryResults().length }} znalezionych</b>
+              </div>
+            } @else {
+              <div style="font-size:11px;color:#6b7280;margin-top:5px">⏳ Wyszukiwanie w toku…</div>
+            }
+          </div>
+        }
+
+
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="btn btn-p"
+            [disabled]="discoveryLoading() || !discoverySeedName.trim() || discoverySeedNip.replace(/\D/g,'').length !== 10"
+            (click)="startDiscovery()">
+            ▶ Szukaj
+          </button>
+          <button class="btn btn-g" (click)="cancelDiscovery()">Anuluj</button>
+          @if (discoveryResults().length > 0 && !discoveryLoading()) {
+            <span style="align-self:center;font-size:12px;color:#6b7280">
+              Branża: <b style="color:#374151">{{ discoveryIndustry() || '—' }}</b>
+            </span>
+          }
+        </div>
+
+        @if (discoveryResults().length > 0) {
+          <div style="border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;margin-bottom:10px">
+            <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;background:#f9fafb;border-bottom:1px solid #e5e7eb;padding:6px 10px;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em">
+              <label style="display:flex;align-items:center;cursor:pointer">
+                <input type="checkbox"
+                  [checked]="discoveryAllSelected()"
+                  (change)="toggleDiscoveryAll($any($event.target).checked)"
+                  style="accent-color:var(--orange)">
+              </label>
+              <span>Firma</span>
+              <span>NIP</span>
+              <span>Strona WWW</span>
+              <span>PKD</span>
+              <span>Zasoby</span>
+            </div>
+
+            @for (c of discoveryResults(); track $index) {
+              <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;padding:7px 10px;border-bottom:1px solid #f3f4f6;font-size:12px;align-items:center"
+                [style.background]="c.selected ? 'var(--orange-pale)' : 'white'">
+
+                <label style="display:flex;align-items:center;cursor:pointer">
+                  <input type="checkbox"
+                    [checked]="c.selected"
+                    [disabled]="!c.nip && !c.nip_edit"
+                    (change)="toggleDiscoveryItem($index, $any($event.target).checked)"
+                    style="accent-color:var(--orange)">
+                </label>
+
+                <div>
+                  <div style="font-weight:500;color:#111827;line-height:1.3">{{ c.company_name }}</div>
+                  @if (c.regon) {
+                    <div style="font-size:10px;color:#9ca3af">REGON {{ c.regon }}</div>
+                  }
+                </div>
+
+                <div>
+                  @if (c.nip_verified) {
+                    <span style="font-family:monospace;font-size:11px;color:#374151">{{ c.nip }}</span>
+                    <span style="margin-left:4px;font-size:10px;color:#16a34a" title="Zweryfikowany w GUS">✓</span>
+                  } @else {
+                    <input class="inp" style="width:100px;font-size:11px;padding:2px 5px;height:24px;font-family:monospace"
+                      [(ngModel)]="c.nip_edit"
+                      placeholder="NIP"
+                      title="Wpisz NIP ręcznie">
+                    @if (c.nip) {
+                      <div style="font-size:9px;color:#f59e0b;margin-top:1px">⚠ nieweryfik.</div>
+                    }
+                  }
+                </div>
+
+                <div>
+                  @if (c.website_url && !c.website_edit) {
+                    <a [href]="c.website_url" target="_blank" rel="noopener"
+                      style="color:var(--orange);text-decoration:none;font-size:11px;word-break:break-all"
+                      (click)="$event.stopPropagation()">
+                      {{ c.website_url | slice:0:22 }}…
+                    </a>
+                  } @else {
+                    <input class="inp" style="width:130px;font-size:11px;padding:2px 5px;height:24px"
+                      [(ngModel)]="c.website_edit"
+                      [placeholder]="c.website_url || 'https://…'"
+                      title="Edytuj adres WWW">
+                  }
+                </div>
+
+                <div style="font-size:11px;color:#374151">
+                  @if (c.pkd_main) {
+                    <span style="background:#eff6ff;color:#1d4ed8;border-radius:3px;padding:1px 5px;font-size:10px">{{ c.pkd_main }}</span>
+                  } @else {
+                    <span style="color:#9ca3af">—</span>
+                  }
+                </div>
+
+                <!-- Obecność WYŁĄCZNIE w zasobach tego tenanta — backend filtruje
+                     po tenant_id, front nigdy nie widzi danych innego klienta. -->
+                <div style="display:flex;flex-wrap:wrap;gap:3px">
+                  @if (c.in_prospects) { <span class="badge-cp">P</span> }
+                  @if (c.in_leads)     { <span class="badge-cl">L</span> }
+                  @if (c.in_partners)  { <span class="badge-cpa">PA</span> }
+                  @if (!c.in_prospects && !c.in_leads && !c.in_partners) {
+                    <span style="font-size:10px;color:#9ca3af">nowa</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid #e5e7eb">
+            <span style="font-size:12px;color:#6b7280">
+              Zaznaczono: <b style="color:#111827">{{ discoverySelectedCount() }}</b> firm
+            </span>
+            <span class="tsp"></span>
+            @if (discoveryDone()) {
+              <div style="font-size:12px;padding:6px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;color:#166534">
+                ✓ Dodano <b>{{ discoveryDone()!.added }}</b> firm do bazy
+                <b>„{{ discoveryDone()!.source_database }}"</b>
+                @if (discoveryDone()!.batchStarted) { i uruchomiono Enrichment }
+              </div>
+            } @else {
+              <button class="btn btn-p"
+                [disabled]="discoveryAdding() || discoverySelectedCount() === 0"
+                (click)="bulkAddAndEnrich()">
+                @if (discoveryAdding()) { ⏳ Dodaję… } @else { ▶ Dodaj zaznaczone i uruchom Enrichment }
+              </button>
+            }
+          </div>
+        }
+
+        @if (!discoveryLoading() && discoveryResults().length === 0 && discoverySeedName.trim()) {
+          <div style="padding:20px;text-align:center;color:#6b7280;font-size:12px">
+            Wpisz dane firmy i kliknij „Szukaj"
+          </div>
+        }
+      </div>
+    }
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
+
+    /* ── Discovery modal ── */
+    .discovery-overlay {
+      position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.35); cursor:default;
+    }
+    @keyframes discovery-scan {
+      0%   { left:-40%; width:40% }
+      50%  { left:30%;  width:50% }
+      100% { left:100%; width:40% }
+    }
+    .discovery-progress-bar {
+      position:relative; height:100%;
+      background:linear-gradient(90deg, var(--orange), #86c99a);
+      border-radius:2px;
+      animation: discovery-scan 1.6s ease-in-out infinite;
+    }
+    .discovery-dialog {
+      position:fixed; z-index:2001;
+      top:50%; left:50%; transform:translate(-50%,-50%);
+      width:860px; max-width:95vw; max-height:90vh; overflow-y:auto;
+      background:white; border-radius:12px; padding:22px 24px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.22);
+    }
+    /* Obecność w zasobach TEGO tenanta: P = prospekt, L = lead, PA = partner */
+    .badge-cp  { background:var(--orange-pale);color:var(--orange);border:1px solid #a7d8b6;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
+    .badge-cl  { background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
+    .badge-cpa { background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
 
     .reprocess-overlay {
       position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.35);
@@ -1953,6 +2184,29 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   private appSettings = inject(AppSettingsService);
   navBack             = inject(NavBackService);
   private toast       = inject(ToastService);
+  // Strumień SSE idzie przez fetch(), a nie HttpClient, więc interceptor JWT go
+  // nie obsłuży — token dokładamy ręcznie z AuthService (sessionStorage, SSR-safe).
+  private auth        = inject(AuthService);
+
+  // ── "Znajdź konkurencję" ───────────────────────────────────────
+  discoveryOpen      = signal(false);
+  discoverySeedName  = '';
+  discoverySeedNip   = '';
+  discoveryResults   = signal<DiscoveredCompany[]>([]);
+  discoveryLoading   = signal(false);
+  discoveryAdding    = signal(false);
+  discoveryIndustry  = signal<string | null>(null);
+  discoveryDone      = signal<{ source_database: string; added: number; skipped: number; batchStarted: boolean } | null>(null);
+  private discoveryAbort: AbortController | null = null;
+
+  discoverySelectedCount = computed(() =>
+    this.discoveryResults().filter(c => c.selected).length
+  );
+
+  discoveryAllSelected = computed(() => {
+    const r = this.discoveryResults().filter(c => c.nip || c.nip_edit);
+    return r.length > 0 && r.every(c => c.selected);
+  });
 
   minLeadScore = computed(() => Number(this.appSettings.settings()['prospect_lead_min_score'] ?? 45));
 
@@ -2143,7 +2397,135 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
       error: () => { /* kolumny sygnałów zostają puste — reszta ekranu i tak działa */ },
     });
   }
-  ngOnDestroy() { clearTimeout(this.pollTimer); }
+  ngOnDestroy() {
+    clearTimeout(this.pollTimer);
+    // Strumień SSE żyje poza cyklem Angulara — bez tego zapytanie wisiałoby
+    // po wyjściu z ekranu.
+    this.discoveryAbort?.abort();
+  }
+
+  // ── "Znajdź konkurencję" ───────────────────────────────────────
+
+  openDiscovery() {
+    this.discoverySeedName = '';
+    this.discoverySeedNip  = '';
+    this.discoveryResults.set([]);
+    this.discoveryIndustry.set(null);
+    this.discoveryDone.set(null);
+    this.discoveryOpen.set(true);
+  }
+
+  cancelDiscovery() {
+    this.discoveryAbort?.abort();
+    this.discoveryAbort = null;
+    this.discoveryLoading.set(false);
+    this.discoveryOpen.set(false);
+  }
+
+  startDiscovery() {
+    const name = this.discoverySeedName.trim();
+    const nip  = this.discoverySeedNip.replace(/\D/g, '');
+    if (!name || nip.length !== 10) return;
+
+    this.discoveryAbort?.abort();
+    this.discoveryAbort = new AbortController();
+    const signal = this.discoveryAbort.signal;
+
+    this.discoveryLoading.set(true);
+    this.discoveryResults.set([]);
+    this.discoveryDone.set(null);
+    this.discoveryIndustry.set(null);
+
+    const params = new URLSearchParams({ company_name: name, seed_nip: nip });
+    const token  = this.auth.getAccessToken();
+
+    fetch(`${API}/discover-competitors-stream?${params}`, {
+      signal,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then(async response => {
+        if (!response.ok || !response.body) {
+          this.toast.error('Błąd wyszukiwania konkurencji');
+          this.discoveryLoading.set(false);
+          return;
+        }
+        const reader  = response.body.getReader();
+        const decoder = new TextDecoder();
+        let   buffer  = '';
+
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop()!;
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.type === 'industry') {
+                this.discoveryIndustry.set(data.industry);
+              } else if (data.type === 'company') {
+                const { type, ...company } = data;
+                this.discoveryResults.update(prev => [
+                  ...prev,
+                  { ...company, nip_edit: '', website_edit: '', selected: false } as DiscoveredCompany,
+                ]);
+              } else if (data.type === 'done') {
+                this.discoveryLoading.set(false);
+                this.discoveryAbort = null;
+              } else if (data.type === 'error') {
+                this.toast.error('Błąd wyszukiwania: ' + (data.message || ''));
+                this.discoveryLoading.set(false);
+              }
+            } catch { /* ignoruj niepoprawne linie */ }
+          }
+        }
+        this.discoveryLoading.set(false);
+      })
+      .catch((err: Error) => {
+        if (err.name !== 'AbortError') this.toast.error('Błąd wyszukiwania konkurencji');
+        this.discoveryLoading.set(false);
+      });
+  }
+
+  toggleDiscoveryItem(index: number, checked: boolean) {
+    this.discoveryResults.update(r => r.map((c, i) => i === index ? { ...c, selected: checked } : c));
+  }
+
+  toggleDiscoveryAll(checked: boolean) {
+    this.discoveryResults.update(r => r.map(c => ({ ...c, selected: checked && !!(c.nip || c.nip_edit) })));
+  }
+
+  bulkAddAndEnrich() {
+    const toAdd = this.discoveryResults()
+      .filter(c => c.selected)
+      .map(c => ({
+        nip:          (c.nip_edit.replace(/\D/g, '') || c.nip || ''),
+        company_name: c.company_name,
+        website_url:  c.website_edit || c.website_url || null,
+      }))
+      .filter(c => c.nip.length === 10);
+
+    if (!toAdd.length) return;
+    this.discoveryAdding.set(true);
+
+    this.http.post<{ source_database: string; added: number; skipped: number; batchStarted: boolean }>(
+      `${API}/discover-competitors/bulk-add`, { companies: toAdd },
+    ).subscribe({
+      next: r => {
+        this.discoveryDone.set(r);
+        this.discoveryAdding.set(false);
+        this.load();
+        this.pollBatch();
+      },
+      error: () => {
+        this.toast.error('Błąd dodawania firm do bazy');
+        this.discoveryAdding.set(false);
+      },
+    });
+  }
 
   load() {
     this.loading.set(true);
