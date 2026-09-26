@@ -6,6 +6,30 @@ import { environment } from '../../../environments/environment';
 export type SeoContentStatus =
   | 'draft' | 'in_review' | 'approved' | 'scheduled' | 'published' | 'needs_update' | 'archived' | 'queued';
 
+export type SeoRefreshReason = 'striking_distance' | 'position_drop' | 'age' | 'manual';
+export type SeoRefreshStatus = 'generating' | 'ready' | 'failed';
+
+/** GSC numbers that queued the article — which fields are set depends on the reason. */
+export interface SeoRefreshSignal {
+  impressions?: number;
+  clicks?: number;
+  position?: number;
+  positionBefore?: number;
+  positionNow?: number;
+}
+
+export interface SeoRefreshDraft {
+  title: string;
+  meta_description: string;
+  body: string;
+  faq: { question: string; answer: string }[];
+  queries: { phrase: string; impressions: number; position: number }[];
+  facts_used: number;
+  validation_errors: string[];
+  cost_usd: number;
+  generated_at: string;
+}
+
 export interface SeoContentSummary {
   id: number;
   locale: string;
@@ -23,12 +47,19 @@ export interface SeoContentSummary {
   clicks_28d: number;
   impressions_28d: number;
   avg_position_28d: number | null;
+  refresh_reason: SeoRefreshReason | null;
+  refresh_status: SeoRefreshStatus | null;
+  refresh_signal: SeoRefreshSignal | null;
+  refresh_requested_at: string | null;
 }
 
 export interface SeoContent extends SeoContentSummary {
   body: string;
   meta_description: string | null;
   header_image_url: string | null;
+  refresh_draft: SeoRefreshDraft | null;
+  refresh_error: string | null;
+  last_refreshed_at: string | null;
 }
 
 export interface SeoAuthor {
@@ -152,6 +183,27 @@ export class CrmSeoService {
     return this.http.get<SeoContentSummary[]>(`${this.api}/content`, {
       params: status ? { status } : {},
     });
+  }
+
+  /** Published articles queued for a refresh, most promising first. */
+  refreshQueue(): Observable<SeoContentSummary[]> {
+    return this.http.get<SeoContentSummary[]>(`${this.api}/content`, { params: { refresh: '1' } });
+  }
+
+  requestRefresh(id: number): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/refresh/request`, {});
+  }
+
+  generateRefresh(id: number): Observable<{ refresh_status: SeoRefreshStatus }> {
+    return this.http.post<{ refresh_status: SeoRefreshStatus }>(`${this.api}/content/${id}/refresh/generate`, {});
+  }
+
+  applyRefresh(id: number): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/refresh/apply`, {});
+  }
+
+  dismissRefresh(id: number): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/refresh/dismiss`, {});
   }
 
   get(id: number): Observable<SeoContent> {
