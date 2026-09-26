@@ -253,6 +253,10 @@ export class CrmSeoService {
     return this.http.post<{ synced: boolean }>(`${this.api}/gsc/sync`, {});
   }
 
+  gscDisconnect(): Observable<{ disconnected: boolean }> {
+    return this.http.delete<{ disconnected: boolean }>(`${this.api}/gsc/disconnect`);
+  }
+
   competitors(): Observable<SeoCompetitor[]> {
     return this.http.get<SeoCompetitor[]>(`${this.api}/competitors`);
   }
@@ -359,5 +363,13 @@ export class CrmSeoService {
 
   setWordpressPublishMode(mode: 'draft' | 'publish'): Observable<{ wordpress_publish_mode: 'draft' | 'publish' }> {
     return this.http.patch<{ wordpress_publish_mode: 'draft' | 'publish' }>(`${this.api}/tenant-settings/wordpress-publish-mode`, { wordpress_publish_mode: mode });
+  }
+
+  gscSiteUrl(): Observable<{ seo_gsc_site_url: string | null }> {
+    return this.http.get<{ seo_gsc_site_url: string | null }>(`${this.api}/tenant-settings/gsc-site-url`);
+  }
+
+  setGscSiteUrl(url: string | null): Observable<{ seo_gsc_site_url: string | null }> {
+    return this.http.patch<{ seo_gsc_site_url: string | null }>(`${this.api}/tenant-settings/gsc-site-url`, { seo_gsc_site_url: url });
   }
 }

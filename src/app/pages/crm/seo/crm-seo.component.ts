@@ -48,6 +48,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               <button type="button" class="btn-ghost btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
                 @if (syncingGsc()) { Synchronizuję… } @else { Synchronizuj teraz }
               </button>
+              <button type="button" class="btn-ghost btn-sm" (click)="disconnectGsc()">Rozłącz</button>
             } @else {
               <button type="button" class="btn-ghost" (click)="connectGsc()">Połącz Search Console</button>
             }
@@ -516,6 +517,16 @@ export class CrmSeoComponent implements OnInit {
 
   connectGsc(): void {
     this.seoService.gscAuthUrl().subscribe((res) => window.location.assign(res.url));
+  }
+
+  disconnectGsc(): void {
+    this.seoService.gscDisconnect().subscribe({
+      next: () => {
+        this.gsc.set(null);
+        this.toast.success('Search Console rozłączony — możesz połączyć ponownie właściwym kontem Google.');
+      },
+      error: () => this.toast.error('Nie udało się rozłączyć Search Console.'),
+    });
   }
 
   syncGsc(): void {
