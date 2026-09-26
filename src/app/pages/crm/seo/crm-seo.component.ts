@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform } from '../../../core/services/crm-seo.service';
+import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform, SeoRefreshReason, SeoRefreshSignal, SeoGenerationJob } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 import { SeoSocialChannelsComponent } from './seo-social-channels.component';
@@ -15,10 +15,24 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
   approved: 'Zaakceptowane',
   scheduled: 'Zaplanowane',
   published: 'Opublikowane',
-  needs_update: 'Do odświeżenia',
+  // Since 0299 only new drafts that failed automatic validation land here —
+  // published articles queued for a refresh stay 'published' (refresh_reason).
+  needs_update: 'Do poprawy',
   archived: 'Zarchiwizowane',
   queued: 'W kolejce (auto)',
 };
+
+// "Do odświeżenia" isn't a status: it lists published articles with a refresh_reason.
+type ContentFilter = SeoContentStatus | '' | 'refresh';
+
+const REFRESH_REASON_LABELS: Record<SeoRefreshReason, string> = {
+  striking_distance: 'Blisko 1. strony Google',
+  position_drop: 'Spadek pozycji',
+  age: 'Nieaktualizowany 90+ dni',
+  manual: 'Oznaczony ręcznie',
+};
+
+const REFRESH_POLL_MS = 15000;
 
 @Component({
   selector: 'wt-crm-seo',
@@ -48,6 +62,7 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               <button type="button" class="btn-ghost btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
                 @if (syncingGsc()) { Synchronizuję… } @else { Synchronizuj teraz }
               </button>
+              <button type="button" class="btn-ghost btn-sm" (click)="disconnectGsc()">Rozłącz</button>
             } @else {
               <button type="button" class="btn-ghost" (click)="connectGsc()">Połącz Search Console</button>
             }
@@ -111,6 +126,9 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               <span class="status-pill" [attr.data-status]="item.status">{{ statusLabel(item.status) }}</span>
               <span class="row-title">{{ item.title }}</span>
               <span class="row-locale">{{ item.locale }}</span>
+              @if (item.status === 'published' && item.refresh_reason) {
+                <span class="refresh-pill">↻ {{ refreshReasonLabel(item.refresh_reason) }}</span>
+              }
               @if (item.impressions_28d > 0 || item.clicks_28d > 0) {
                 <span class="row-metrics">{{ item.impressions_28d }} wyśw. · {{ item.clicks_28d }} kliknięć (28 dni)</span>
               }
@@ -192,8 +210,66 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
               }
               @if (d.status === 'published') {
                 <button type="button" class="btn-reject" (click)="unpublish(d.id)">Wycofaj do szkicu</button>
+                @if (!d.refresh_reason) {
+                  <button type="button" class="btn-ghost" (click)="requestRefresh(d.id)">Oznacz do odświeżenia</button>
+                }
               }
             </div>
+
+            @if (d.status === 'published' && d.refresh_reason) {
+              <div class="refresh-box">
+                <h3>Odświeżenie artykułu</h3>
+                <p class="refresh-reason">
+                  <strong>{{ refreshReasonLabel(d.refresh_reason) }}</strong> — {{ refreshReasonDetail(d.refresh_reason, d.refresh_signal) }}
+                </p>
+                <p class="refresh-note">Artykuł jest cały czas opublikowany. Zmiany trafią na stronę dopiero po kliknięciu „Zastosuj na stronie".</p>
+
+                @if (d.refresh_status === 'generating') {
+                  <p class="refresh-generating">Przygotowuję propozycję (analiza zapytań z GSC, aktualne dane, przepisanie) — trwa kilka minut, panel odświeży się sam.</p>
+                } @else if (d.refresh_status === 'ready' && d.refresh_draft) {
+                  @if (d.refresh_draft; as draft) {
+                  @if (draft.validation_errors.length) {
+                    <div class="refresh-warnings">
+                      <strong>Propozycja nie przeszła wszystkich automatycznych kontroli:</strong>
+                      <ul>@for (e of draft.validation_errors; track e) { <li>{{ e }}</li> }</ul>
+                    </div>
+                  }
+                  @if (draft.queries.length) {
+                    <div class="refresh-queries">
+                      <span class="refresh-label">Zapytania z GSC wzięte pod uwagę:</span>
+                      @for (q of draft.queries; track q.phrase) {
+                        <span class="query-chip">{{ q.phrase }} <small>({{ q.impressions }} wyśw., poz. {{ q.position }})</small></span>
+                      }
+                    </div>
+                  } @else {
+                    <p class="refresh-note">Brak danych o zapytaniach z GSC dla tej strony — propozycja skupia się na aktualności i strukturze.</p>
+                  }
+                  <label class="refresh-label" for="refreshTitle">Nowy tytuł</label>
+                  <input id="refreshTitle" class="title-input" [value]="draft.title" readonly>
+                  <label class="refresh-label" for="refreshMeta">Nowy meta description</label>
+                  <textarea id="refreshMeta" class="meta-input" rows="2" [value]="draft.meta_description" readonly></textarea>
+                  <label class="refresh-label" for="refreshBody">Nowa treść</label>
+                  <textarea id="refreshBody" class="body-input" rows="14" [value]="draft.body" readonly></textarea>
+                  <p class="refresh-note">
+                    Wygenerowano {{ draft.generated_at | date:'d MMM y, HH:mm':'':'pl' }} · koszt ok. \${{ draft.cost_usd }} · cytowanych źródeł: {{ draft.facts_used }}
+                  </p>
+                  <div class="detail-actions">
+                    <button type="button" class="btn-accent" (click)="applyRefresh(d.id)">Zastosuj na stronie</button>
+                    <button type="button" class="btn-ghost" (click)="generateRefresh(d.id)">Wygeneruj ponownie</button>
+                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">Odrzuć propozycję</button>
+                  </div>
+                  }
+                } @else {
+                  @if (d.refresh_status === 'failed') {
+                    <p class="social-error">Nie udało się przygotować propozycji: {{ d.refresh_error }}</p>
+                  }
+                  <div class="detail-actions">
+                    <button type="button" class="btn-accent" (click)="generateRefresh(d.id)">Przygotuj propozycję (AI)</button>
+                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">Nie wymaga odświeżenia</button>
+                  </div>
+                }
+              </div>
+            }
 
             @if (d.status === 'published' || d.status === 'scheduled' || socialPosts().length > 0) {
               <div class="social-box">
@@ -261,6 +337,18 @@ const STATUS_LABELS: Record<SeoContentStatus, string> = {
     .row-title { font-size: 0.9rem; font-weight: 600; color: var(--gray-900); }
     .row-locale { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; }
     .row-metrics { font-size: 0.72rem; color: var(--gray-500); }
+    .refresh-pill { font-size: 0.7rem; font-weight: 600; color: var(--orange-dark); background: var(--orange-pale); border-radius: 999px; padding: 0.1rem 0.5rem; }
+    .refresh-box { border: 1px solid var(--orange-muted, #bfe3c9); background: #fbfdfb; border-radius: var(--radius); margin-top: 1.25rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .refresh-box h3 { font-size: 0.9rem; margin: 0; color: var(--gray-800); }
+    .refresh-reason { font-size: 0.85rem; margin: 0; color: var(--gray-800); }
+    .refresh-note { font-size: 0.78rem; color: var(--gray-500); margin: 0; }
+    .refresh-generating { font-size: 0.85rem; color: var(--orange-dark); margin: 0; }
+    .refresh-label { font-size: 0.78rem; font-weight: 600; color: var(--gray-700); }
+    .refresh-warnings { font-size: 0.78rem; color: #92400E; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 0.5rem 0.75rem; }
+    .refresh-warnings ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
+    .refresh-queries { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+    .query-chip { font-size: 0.75rem; background: var(--gray-100); border-radius: 999px; padding: 0.15rem 0.6rem; color: var(--gray-700); }
+    .query-chip small { color: var(--gray-500); }
     .status-pill {
       font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
       padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
@@ -325,10 +413,15 @@ export class CrmSeoComponent implements OnInit {
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
 
-  readonly statusFilters: { value: SeoContentStatus | ''; label: string }[] = [
+  private destroyRef = inject(DestroyRef);
+  private refreshPoll: ReturnType<typeof setInterval> | null = null;
+  private generationPoll: ReturnType<typeof setInterval> | null = null;
+
+  readonly statusFilters: { value: ContentFilter; label: string }[] = [
     { value: '', label: 'Wszystkie' },
     { value: 'in_review', label: 'Do akceptacji' },
-    { value: 'needs_update', label: 'Do odświeżenia' },
+    { value: 'refresh', label: 'Do odświeżenia' },
+    { value: 'needs_update', label: 'Do poprawy' },
     { value: 'scheduled', label: 'Zaplanowane' },
     { value: 'published', label: 'Opublikowane' },
     { value: 'draft', label: 'Szkice' },
@@ -352,7 +445,7 @@ export class CrmSeoComponent implements OnInit {
   readonly showChannels = signal(false);
   readonly showSettings = signal(false);
   readonly showCalendar = signal(false);
-  readonly statusFilter = signal<SeoContentStatus | ''>('');
+  readonly statusFilter = signal<ContentFilter>('');
   readonly generating = signal(false);
   readonly rerolling = signal(false);
   readonly syncingGsc = signal(false);
@@ -370,7 +463,9 @@ export class CrmSeoComponent implements OnInit {
   editAuthorId: number | null = null;
 
   ngOnInit(): void {
+    this.destroyRef.onDestroy(() => { this.stopRefreshPoll(); this.stopGenerationPoll(); });
     this.loadList();
+    this.checkGenerationJob(false);
     this.seoService.gscStatus().subscribe((s) => this.gsc.set(s));
     this.loadPillars();
     this.loadAuthors();
@@ -392,18 +487,84 @@ export class CrmSeoComponent implements OnInit {
     return status === 'in_review' || status === 'needs_update' || status === 'draft';
   }
 
-  setStatusFilter(value: SeoContentStatus | ''): void {
+  setStatusFilter(value: ContentFilter): void {
     this.statusFilter.set(value);
     this.loadList();
   }
 
   private loadList(): void {
-    this.seoService.list(this.statusFilter() || undefined).subscribe((items) => this.items.set(items));
+    const filter = this.statusFilter();
+    const request = filter === 'refresh' ? this.seoService.refreshQueue() : this.seoService.list(filter || undefined);
+    request.subscribe((items) => this.items.set(items));
+  }
+
+  refreshReasonLabel(reason: SeoRefreshReason): string {
+    return REFRESH_REASON_LABELS[reason] ?? reason;
+  }
+
+  refreshReasonDetail(reason: SeoRefreshReason, signal: SeoRefreshSignal | null): string {
+    const s = signal ?? {};
+    switch (reason) {
+      case 'striking_distance':
+        return `śr. pozycja ${s.position} przy ${s.impressions} wyświetleniach w 28 dni. Najtańsza szansa na wejście do TOP 10.`;
+      case 'position_drop':
+        return `pozycja spadła z ${s.positionBefore} na ${s.positionNow} (ostatnie 14 dni vs. poprzednie 14).`;
+      case 'age':
+        return 'brak aktualizacji od ponad 90 dni.';
+      default:
+        return 'oznaczony do odświeżenia przez redaktora.';
+    }
+  }
+
+  requestRefresh(id: number): void {
+    this.seoService.requestRefresh(id).subscribe({
+      next: () => { this.toast.success('Oznaczono do odświeżenia.'); this.select(id); this.loadList(); },
+      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się oznaczyć wpisu.'),
+    });
+  }
+
+  generateRefresh(id: number): void {
+    this.seoService.generateRefresh(id).subscribe({
+      next: () => { this.toast.success('Przygotowuję propozycję — potrwa kilka minut.'); this.select(id); },
+      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się rozpocząć generowania.'),
+    });
+  }
+
+  applyRefresh(id: number): void {
+    if (!confirm('Zastąpić opublikowaną treść nową wersją? Zmiana od razu trafi na stronę.')) return;
+    this.seoService.applyRefresh(id).subscribe({
+      next: () => { this.toast.success('Odświeżona wersja jest już na stronie.'); this.select(id); this.loadList(); },
+      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się zastosować odświeżenia.'),
+    });
+  }
+
+  dismissRefresh(id: number): void {
+    this.seoService.dismissRefresh(id).subscribe({
+      next: () => { this.toast.success('Usunięto z kolejki odświeżeń.'); this.select(id); this.loadList(); },
+      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć z kolejki.'),
+    });
+  }
+
+  // Draft generation runs server-side for minutes; poll the open article
+  // until it leaves 'generating'.
+  private syncRefreshPoll(d: SeoContent): void {
+    if (d.refresh_status !== 'generating') { this.stopRefreshPoll(); return; }
+    if (this.refreshPoll) return;
+    this.refreshPoll = setInterval(() => {
+      const current = this.detail();
+      if (current) this.select(current.id);
+    }, REFRESH_POLL_MS);
+  }
+
+  private stopRefreshPoll(): void {
+    if (this.refreshPoll) { clearInterval(this.refreshPoll); this.refreshPoll = null; }
   }
 
   select(id: number): void {
+    if (this.detail()?.id !== id) this.stopRefreshPoll();
     this.seoService.get(id).subscribe((d) => {
       this.detail.set(d);
+      this.syncRefreshPoll(d);
       this.editTitle = d.title;
       this.editMeta = d.meta_description ?? '';
       this.editBody = d.body;
@@ -502,20 +663,62 @@ export class CrmSeoComponent implements OnInit {
 
   generate(): void {
     if (this.generating()) return;
-    this.generating.set(true);
     this.seoService.generate().subscribe({
-      next: () => {
+      next: (job) => {
+        this.toast.success('Generuję artykuł w tle — potrwa kilka minut. Możesz dalej pracować.');
+        this.trackGenerationJob(job);
+      },
+      error: (err) => {
+        this.toast.error(err?.error?.error ?? 'Nie udało się rozpocząć generowania.');
+        // 409 = a job is already running (e.g. started in another tab) — follow that one.
+        if (err?.error?.job) this.trackGenerationJob(err.error.job);
+      },
+    });
+  }
+
+  // Also called on page load, so a generation started before a reload (or in
+  // another tab) keeps showing as in progress and still announces its result.
+  private checkGenerationJob(announce: boolean): void {
+    this.seoService.generationStatus().subscribe((job) => {
+      if (!job) { this.generating.set(false); return; }
+      if (job.status === 'generating') { this.trackGenerationJob(job); return; }
+      this.stopGenerationPoll();
+      if (!announce) return;
+      if (job.status === 'done') {
         this.toast.success('Nowy artykuł wygenerowany i czeka na akceptację.');
-        this.generating.set(false);
         this.loadList();
         this.loadPillars();
-      },
-      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się wygenerować artykułu.'); this.generating.set(false); },
+        if (job.content_id) this.select(job.content_id);
+      } else {
+        this.toast.error(`Nie udało się wygenerować artykułu: ${job.error ?? 'nieznany błąd'}`);
+      }
     });
+  }
+
+  private trackGenerationJob(job: SeoGenerationJob): void {
+    if (job.status !== 'generating') return;
+    this.generating.set(true);
+    if (this.generationPoll) return;
+    this.generationPoll = setInterval(() => this.checkGenerationJob(true), REFRESH_POLL_MS);
+  }
+
+  private stopGenerationPoll(): void {
+    this.generating.set(false);
+    if (this.generationPoll) { clearInterval(this.generationPoll); this.generationPoll = null; }
   }
 
   connectGsc(): void {
     this.seoService.gscAuthUrl().subscribe((res) => window.location.assign(res.url));
+  }
+
+  disconnectGsc(): void {
+    this.seoService.gscDisconnect().subscribe({
+      next: () => {
+        this.gsc.set(null);
+        this.toast.success('Search Console rozłączony — możesz połączyć ponownie właściwym kontem Google.');
+      },
+      error: () => this.toast.error('Nie udało się rozłączyć Search Console.'),
+    });
   }
 
   syncGsc(): void {

@@ -37,6 +37,17 @@ import { ToastService } from '../../../core/services/toast.service';
             </label>
           </div>
         </div>
+
+        <div class="superadmin-box">
+          <h4>Właściwość Search Console <span class="sa-badge">SuperAdmin</span></h4>
+          <p class="hint">
+            Rzeczywista, zweryfikowana właściwość GSC do której podłączać się przy "Połącz Search Console" — URL-prefix
+            (np. https://klient.pl/) albo domenowa (sc-domain:klient.pl). Puste = zgadywanie po WordPressie albo
+            podane niżej.
+          </p>
+          <input class="field-input" [(ngModel)]="gscSiteUrl" placeholder="https://crmtree.pl/ albo sc-domain:crmtree.pl">
+          <button type="button" class="btn-ghost btn-sm" (click)="saveGscSiteUrl()">Zapisz właściwość GSC</button>
+        </div>
       }
     </div>
   `,
@@ -66,6 +77,7 @@ export class SeoTenantSettingsComponent implements OnInit {
   businessDescription = '';
   industryVertical = '';
   wpPublishMode: 'draft' | 'publish' = 'draft';
+  gscSiteUrl = '';
 
   ngOnInit(): void {
     this.seoService.tenantSettings().subscribe((s) => {
@@ -79,6 +91,10 @@ export class SeoTenantSettingsComponent implements OnInit {
     if (this.auth.isSuperAdmin()) {
       this.seoService.wordpressPublishMode().subscribe((r) => {
         this.wpPublishMode = r.wordpress_publish_mode;
+        this.cdr.markForCheck();
+      });
+      this.seoService.gscSiteUrl().subscribe((r) => {
+        this.gscSiteUrl = r.seo_gsc_site_url ?? '';
         this.cdr.markForCheck();
       });
     }
@@ -102,6 +118,13 @@ export class SeoTenantSettingsComponent implements OnInit {
     this.seoService.setWordpressPublishMode(mode).subscribe({
       next: () => this.toast.success(mode === 'publish' ? 'WordPress: publikacja od razu live.' : 'WordPress: publikacja jako szkic.'),
       error: () => this.toast.error('Nie udało się zapisać trybu.'),
+    });
+  }
+
+  saveGscSiteUrl(): void {
+    this.seoService.setGscSiteUrl(this.gscSiteUrl || null).subscribe({
+      next: () => this.toast.success('Zapisano właściwość Search Console.'),
+      error: () => this.toast.error('Nie udało się zapisać właściwości GSC.'),
     });
   }
 }
