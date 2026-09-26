@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform, SeoRefreshReason, SeoRefreshSignal } from '../../../core/services/crm-seo.service';
+import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform, SeoRefreshReason, SeoRefreshSignal, SeoGenerationJob } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 import { SeoSocialChannelsComponent } from './seo-social-channels.component';
@@ -415,6 +415,7 @@ export class CrmSeoComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
   private refreshPoll: ReturnType<typeof setInterval> | null = null;
+  private generationPoll: ReturnType<typeof setInterval> | null = null;
 
   readonly statusFilters: { value: ContentFilter; label: string }[] = [
     { value: '', label: 'Wszystkie' },
@@ -462,8 +463,9 @@ export class CrmSeoComponent implements OnInit {
   editAuthorId: number | null = null;
 
   ngOnInit(): void {
-    this.destroyRef.onDestroy(() => this.stopRefreshPoll());
+    this.destroyRef.onDestroy(() => { this.stopRefreshPoll(); this.stopGenerationPoll(); });
     this.loadList();
+    this.checkGenerationJob(false);
     this.seoService.gscStatus().subscribe((s) => this.gsc.set(s));
     this.loadPillars();
     this.loadAuthors();
@@ -661,16 +663,48 @@ export class CrmSeoComponent implements OnInit {
 
   generate(): void {
     if (this.generating()) return;
-    this.generating.set(true);
     this.seoService.generate().subscribe({
-      next: () => {
+      next: (job) => {
+        this.toast.success('Generuję artykuł w tle — potrwa kilka minut. Możesz dalej pracować.');
+        this.trackGenerationJob(job);
+      },
+      error: (err) => {
+        this.toast.error(err?.error?.error ?? 'Nie udało się rozpocząć generowania.');
+        // 409 = a job is already running (e.g. started in another tab) — follow that one.
+        if (err?.error?.job) this.trackGenerationJob(err.error.job);
+      },
+    });
+  }
+
+  // Also called on page load, so a generation started before a reload (or in
+  // another tab) keeps showing as in progress and still announces its result.
+  private checkGenerationJob(announce: boolean): void {
+    this.seoService.generationStatus().subscribe((job) => {
+      if (!job) { this.generating.set(false); return; }
+      if (job.status === 'generating') { this.trackGenerationJob(job); return; }
+      this.stopGenerationPoll();
+      if (!announce) return;
+      if (job.status === 'done') {
         this.toast.success('Nowy artykuł wygenerowany i czeka na akceptację.');
-        this.generating.set(false);
         this.loadList();
         this.loadPillars();
-      },
-      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się wygenerować artykułu.'); this.generating.set(false); },
+        if (job.content_id) this.select(job.content_id);
+      } else {
+        this.toast.error(`Nie udało się wygenerować artykułu: ${job.error ?? 'nieznany błąd'}`);
+      }
     });
+  }
+
+  private trackGenerationJob(job: SeoGenerationJob): void {
+    if (job.status !== 'generating') return;
+    this.generating.set(true);
+    if (this.generationPoll) return;
+    this.generationPoll = setInterval(() => this.checkGenerationJob(true), REFRESH_POLL_MS);
+  }
+
+  private stopGenerationPoll(): void {
+    this.generating.set(false);
+    if (this.generationPoll) { clearInterval(this.generationPoll); this.generationPoll = null; }
   }
 
   connectGsc(): void {

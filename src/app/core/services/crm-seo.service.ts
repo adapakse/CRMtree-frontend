@@ -30,6 +30,15 @@ export interface SeoRefreshDraft {
   generated_at: string;
 }
 
+export interface SeoGenerationJob {
+  id: number;
+  status: 'generating' | 'done' | 'failed';
+  content_id: number | null;
+  error: string | null;
+  created_at: string;
+  finished_at: string | null;
+}
+
 export interface SeoContentSummary {
   id: number;
   locale: string;
@@ -214,8 +223,13 @@ export class CrmSeoService {
     return this.http.patch<SeoContent>(`${this.api}/content/${id}`, patch);
   }
 
-  generate(): Observable<SeoContent> {
-    return this.http.post<SeoContent>(`${this.api}/content/generate`, {});
+  /** Starts a background generation; poll generationStatus() for the outcome. */
+  generate(): Observable<SeoGenerationJob> {
+    return this.http.post<SeoGenerationJob>(`${this.api}/content/generate`, {});
+  }
+
+  generationStatus(): Observable<SeoGenerationJob | null> {
+    return this.http.get<SeoGenerationJob | null>(`${this.api}/content/generate/status`);
   }
 
   rerollImage(id: number): Observable<SeoContent> {
