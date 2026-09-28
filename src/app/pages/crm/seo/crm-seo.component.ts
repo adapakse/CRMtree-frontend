@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform, SeoRefreshReason, SeoRefreshSignal, SeoGenerationJob, SeoScreenshot } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
@@ -35,6 +36,19 @@ const REFRESH_REASON_LABELS: Record<SeoRefreshReason, string> = {
 };
 
 const REFRESH_POLL_MS = 15000;
+
+const SOCIAL_PLATFORM_LABELS: Record<string, string> = { linkedin: 'LinkedIn', facebook: 'Facebook' };
+
+// Reasons sent back by the backend OAuth callbacks (crm-seo.js) — LinkedIn's
+// and Meta's own error codes are passed through as-is.
+const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
+  user_cancelled_login: 'Anulowano logowanie.',
+  user_cancelled_authorize: 'Anulowano udzielenie dostępu.',
+  access_denied: 'Nie udzielono dostępu.',
+  unauthorized_scope_error: 'Aplikacja LinkedIn nie ma zatwierdzonego dostępu do publikacji na stronie firmowej (produkt Community Management API).',
+  invalid_state: 'Sesja łączenia wygasła — spróbuj ponownie.',
+  callback_failed: 'Nie udało się dokończyć łączenia. Upewnij się, że łączone konto jest administratorem strony firmowej.',
+};
 
 @Component({
   selector: 'wt-crm-seo',
@@ -291,8 +305,17 @@ const REFRESH_POLL_MS = 15000;
             @if (d.status === 'published' || d.status === 'scheduled' || socialPosts().length > 0) {
               <div class="social-box">
                 <h3>Publikacja social</h3>
-                @if (socialPosts().length === 0) {
+                @if (socialPosts().length === 0 && unpublishedSocialPlatforms().length === 0) {
                   <p class="empty">Brak podłączonych kanałów — połącz je w "Kanały social" u góry.</p>
+                }
+                @if (d.status === 'published' && unpublishedSocialPlatforms().length > 0) {
+                  <div class="social-actions">
+                    @for (platform of unpublishedSocialPlatforms(); track platform) {
+                      <button type="button" class="btn-ghost btn-sm" (click)="retrySocialPost(d.id, platform)" [disabled]="retryingSocial().has(platform)">
+                        @if (retryingSocial().has(platform)) { Publikuję… } @else { Opublikuj na {{ platformLabel(platform) }} }
+                      </button>
+                    }
+                  </div>
                 }
                 @for (post of socialPosts(); track post.platform) {
                   <div class="social-platform">
@@ -431,6 +454,8 @@ export class CrmSeoComponent implements OnInit {
   private toast = inject(ToastService);
 
   private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private refreshPoll: ReturnType<typeof setInterval> | null = null;
   private generationPoll: ReturnType<typeof setInterval> | null = null;
 
@@ -460,6 +485,13 @@ export class CrmSeoComponent implements OnInit {
   readonly showStrategy = signal(false);
   readonly showAuthors = signal(false);
   readonly showScreenshots = signal(false);
+  readonly connectedSocialPlatforms = signal<SocialPlatform[]>([]);
+  // A channel connected after the article went live has no post yet — offer
+  // to publish there by hand (WordPress publishes the whole article, not a post).
+  readonly unpublishedSocialPlatforms = computed(() => {
+    const posted = new Set(this.socialPosts().map((p) => p.platform));
+    return this.connectedSocialPlatforms().filter((p) => p !== 'wordpress' && !posted.has(p));
+  });
   readonly screenshots = signal<SeoScreenshot[]>([]);
   readonly pendingSlotCount = computed(() => (this.detail()?.enrichment_slots ?? []).filter((s) => s.status === 'pending').length);
   readonly showChannels = signal(false);
@@ -484,11 +516,29 @@ export class CrmSeoComponent implements OnInit {
 
   ngOnInit(): void {
     this.destroyRef.onDestroy(() => { this.stopRefreshPoll(); this.stopGenerationPoll(); });
+    this.showSocialConnectResult();
     this.loadList();
     this.checkGenerationJob(false);
     this.seoService.gscStatus().subscribe((s) => this.gsc.set(s));
     this.loadPillars();
     this.loadAuthors();
+  }
+
+  // The LinkedIn/Facebook OAuth callback redirects back here with the outcome
+  // in the query string; before this it was silently ignored.
+  private showSocialConnectResult(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const result = params.get('social');
+    if (!result) return;
+    const platform = SOCIAL_PLATFORM_LABELS[params.get('platform') ?? ''] ?? 'kanał social';
+    if (result === 'connected') {
+      this.toast.success(`${platform} połączony.`);
+    } else {
+      const reason = params.get('reason') ?? '';
+      this.toast.error(`${platform}: ${SOCIAL_ERROR_MESSAGES[reason] ?? `nie udało się połączyć (${reason || 'nieznany błąd'}).`}`);
+    }
+    this.showChannels.set(true);
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   loadPillars(): void {
@@ -595,6 +645,7 @@ export class CrmSeoComponent implements OnInit {
     });
     this.seoService.internalLinks(id).subscribe((links) => this.internalLinks.set(links));
     this.seoService.articleSocialPosts(id).subscribe((posts) => this.socialPosts.set(posts));
+    this.seoService.socialAccounts().subscribe((accounts) => this.connectedSocialPlatforms.set(accounts.map((a) => a.platform)));
     this.loadScreenshots();
   }
 
@@ -803,7 +854,9 @@ export class CrmSeoComponent implements OnInit {
     this.seoService.retrySocialPost(id, platform).subscribe({
       next: (post) => {
         this.toast.success(post.status === 'published' ? 'Opublikowano.' : 'Nie udało się opublikować — sprawdź błąd.');
-        this.socialPosts.update((posts) => posts.map((p) => (p.platform === platform ? post : p)));
+        this.socialPosts.update((posts) => (posts.some((p) => p.platform === platform)
+          ? posts.map((p) => (p.platform === platform ? post : p))
+          : [...posts, post]));
         this.retryingSocial.update((s) => { const n = new Set(s); n.delete(platform); return n; });
       },
       error: () => {

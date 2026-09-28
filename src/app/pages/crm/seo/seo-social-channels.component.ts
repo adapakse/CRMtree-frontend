@@ -126,7 +126,10 @@ export class SeoSocialChannelsComponent implements OnInit {
 
   connect(platform: 'linkedin' | 'facebook'): void {
     const authUrl$ = platform === 'linkedin' ? this.seoService.linkedinAuthUrl() : this.seoService.facebookAuthUrl();
-    authUrl$.subscribe((res) => window.location.assign(res.url));
+    authUrl$.subscribe({
+      next: (res) => window.location.assign(res.url),
+      error: (err) => this.toast.error(err?.error?.error ?? `Nie udało się rozpocząć łączenia z ${PLATFORM_LABELS[platform]}.`),
+    });
   }
 
   disconnect(platform: SocialPlatform): void {
