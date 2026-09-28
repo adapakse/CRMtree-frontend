@@ -305,8 +305,17 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
             @if (d.status === 'published' || d.status === 'scheduled' || socialPosts().length > 0) {
               <div class="social-box">
                 <h3>Publikacja social</h3>
-                @if (socialPosts().length === 0) {
+                @if (socialPosts().length === 0 && unpublishedSocialPlatforms().length === 0) {
                   <p class="empty">Brak podłączonych kanałów — połącz je w "Kanały social" u góry.</p>
+                }
+                @if (d.status === 'published' && unpublishedSocialPlatforms().length > 0) {
+                  <div class="social-actions">
+                    @for (platform of unpublishedSocialPlatforms(); track platform) {
+                      <button type="button" class="btn-ghost btn-sm" (click)="retrySocialPost(d.id, platform)" [disabled]="retryingSocial().has(platform)">
+                        @if (retryingSocial().has(platform)) { Publikuję… } @else { Opublikuj na {{ platformLabel(platform) }} }
+                      </button>
+                    }
+                  </div>
                 }
                 @for (post of socialPosts(); track post.platform) {
                   <div class="social-platform">
@@ -476,6 +485,13 @@ export class CrmSeoComponent implements OnInit {
   readonly showStrategy = signal(false);
   readonly showAuthors = signal(false);
   readonly showScreenshots = signal(false);
+  readonly connectedSocialPlatforms = signal<SocialPlatform[]>([]);
+  // A channel connected after the article went live has no post yet — offer
+  // to publish there by hand (WordPress publishes the whole article, not a post).
+  readonly unpublishedSocialPlatforms = computed(() => {
+    const posted = new Set(this.socialPosts().map((p) => p.platform));
+    return this.connectedSocialPlatforms().filter((p) => p !== 'wordpress' && !posted.has(p));
+  });
   readonly screenshots = signal<SeoScreenshot[]>([]);
   readonly pendingSlotCount = computed(() => (this.detail()?.enrichment_slots ?? []).filter((s) => s.status === 'pending').length);
   readonly showChannels = signal(false);
@@ -629,6 +645,7 @@ export class CrmSeoComponent implements OnInit {
     });
     this.seoService.internalLinks(id).subscribe((links) => this.internalLinks.set(links));
     this.seoService.articleSocialPosts(id).subscribe((posts) => this.socialPosts.set(posts));
+    this.seoService.socialAccounts().subscribe((accounts) => this.connectedSocialPlatforms.set(accounts.map((a) => a.platform)));
     this.loadScreenshots();
   }
 
@@ -837,7 +854,9 @@ export class CrmSeoComponent implements OnInit {
     this.seoService.retrySocialPost(id, platform).subscribe({
       next: (post) => {
         this.toast.success(post.status === 'published' ? 'Opublikowano.' : 'Nie udało się opublikować — sprawdź błąd.');
-        this.socialPosts.update((posts) => posts.map((p) => (p.platform === platform ? post : p)));
+        this.socialPosts.update((posts) => (posts.some((p) => p.platform === platform)
+          ? posts.map((p) => (p.platform === platform ? post : p))
+          : [...posts, post]));
         this.retryingSocial.update((s) => { const n = new Set(s); n.delete(platform); return n; });
       },
       error: () => {
