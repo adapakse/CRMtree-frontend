@@ -6,6 +6,39 @@ import { environment } from '../../../environments/environment';
 export type SeoContentStatus =
   | 'draft' | 'in_review' | 'approved' | 'scheduled' | 'published' | 'needs_update' | 'archived' | 'queued';
 
+export type SeoRefreshReason = 'striking_distance' | 'position_drop' | 'age' | 'manual';
+export type SeoRefreshStatus = 'generating' | 'ready' | 'failed';
+
+/** GSC numbers that queued the article — which fields are set depends on the reason. */
+export interface SeoRefreshSignal {
+  impressions?: number;
+  clicks?: number;
+  position?: number;
+  positionBefore?: number;
+  positionNow?: number;
+}
+
+export interface SeoRefreshDraft {
+  title: string;
+  meta_description: string;
+  body: string;
+  faq: { question: string; answer: string }[];
+  queries: { phrase: string; impressions: number; position: number }[];
+  facts_used: number;
+  validation_errors: string[];
+  cost_usd: number;
+  generated_at: string;
+}
+
+export interface SeoGenerationJob {
+  id: number;
+  status: 'generating' | 'done' | 'failed';
+  content_id: number | null;
+  error: string | null;
+  created_at: string;
+  finished_at: string | null;
+}
+
 export interface SeoContentSummary {
   id: number;
   locale: string;
@@ -23,12 +56,53 @@ export interface SeoContentSummary {
   clicks_28d: number;
   impressions_28d: number;
   avg_position_28d: number | null;
+  refresh_reason: SeoRefreshReason | null;
+  refresh_status: SeoRefreshStatus | null;
+  refresh_signal: SeoRefreshSignal | null;
+  refresh_requested_at: string | null;
 }
 
 export interface SeoContent extends SeoContentSummary {
   body: string;
   meta_description: string | null;
   header_image_url: string | null;
+  refresh_draft: SeoRefreshDraft | null;
+  refresh_error: string | null;
+  last_refreshed_at: string | null;
+  enrichment_slots: SeoEnrichmentSlot[];
+}
+
+export type SeoSlotType = 'expert_comment' | 'quote' | 'screenshot';
+
+/** A verified quote the generator found on its source page, offered as a pre-fill. */
+export interface SeoQuoteSuggestion {
+  quote: string;
+  author: string;
+  author_role: string | null;
+  source_title: string | null;
+  source_url: string;
+}
+
+/** A place in the article the editor fills or removes before approval. */
+export interface SeoEnrichmentSlot {
+  id: string;
+  type: SeoSlotType;
+  brief: string;
+  feature_tag: string | null;
+  status: 'pending' | 'filled' | 'removed';
+  suggestion: SeoQuoteSuggestion | null;
+}
+
+export interface ExpertCommentValue { text: string; author_name: string; author_role: string | null }
+export interface QuoteValue { text: string; author: string; author_role: string | null; source_title: string | null; source_url: string | null }
+export interface ScreenshotValue { screenshot_id: number }
+export type SeoSlotValue = ExpertCommentValue | QuoteValue | ScreenshotValue;
+
+export interface SeoScreenshot {
+  id: number;
+  feature_tag: string;
+  caption: string;
+  created_at: string;
 }
 
 export interface SeoAuthor {
@@ -136,6 +210,7 @@ export interface SeoCalendarWeek {
 export interface TenantSettings {
   business_description: string | null;
   industry_vertical: string | null;
+  product_name: string | null;
 }
 
 export interface TenantSettingsResponse extends TenantSettings {
@@ -154,6 +229,27 @@ export class CrmSeoService {
     });
   }
 
+  /** Published articles queued for a refresh, most promising first. */
+  refreshQueue(): Observable<SeoContentSummary[]> {
+    return this.http.get<SeoContentSummary[]>(`${this.api}/content`, { params: { refresh: '1' } });
+  }
+
+  requestRefresh(id: number): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/refresh/request`, {});
+  }
+
+  generateRefresh(id: number): Observable<{ refresh_status: SeoRefreshStatus }> {
+    return this.http.post<{ refresh_status: SeoRefreshStatus }>(`${this.api}/content/${id}/refresh/generate`, {});
+  }
+
+  applyRefresh(id: number): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/refresh/apply`, {});
+  }
+
+  dismissRefresh(id: number): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/refresh/dismiss`, {});
+  }
+
   get(id: number): Observable<SeoContent> {
     return this.http.get<SeoContent>(`${this.api}/content/${id}`);
   }
@@ -162,8 +258,13 @@ export class CrmSeoService {
     return this.http.patch<SeoContent>(`${this.api}/content/${id}`, patch);
   }
 
-  generate(): Observable<SeoContent> {
-    return this.http.post<SeoContent>(`${this.api}/content/generate`, {});
+  /** Starts a background generation; poll generationStatus() for the outcome. */
+  generate(): Observable<SeoGenerationJob> {
+    return this.http.post<SeoGenerationJob>(`${this.api}/content/generate`, {});
+  }
+
+  generationStatus(): Observable<SeoGenerationJob | null> {
+    return this.http.get<SeoGenerationJob | null>(`${this.api}/content/generate/status`);
   }
 
   rerollImage(id: number): Observable<SeoContent> {
@@ -172,6 +273,38 @@ export class CrmSeoService {
 
   approve(id: number): Observable<SeoContent> {
     return this.http.post<SeoContent>(`${this.api}/content/${id}/approve`, {});
+  }
+
+  fillSlot(id: number, slotId: string, value: SeoSlotValue): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/slots/${slotId}/fill`, value);
+  }
+
+  removeSlot(id: number, slotId: string): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/slots/${slotId}/remove`, {});
+  }
+
+  screenshots(): Observable<SeoScreenshot[]> {
+    return this.http.get<SeoScreenshot[]>(`${this.api}/screenshots`);
+  }
+
+  uploadScreenshot(file: File, featureTag: string, caption: string): Observable<SeoScreenshot> {
+    const formData = new FormData();
+    formData.append('feature_tag', featureTag);
+    formData.append('caption', caption);
+    formData.append('file', file);
+    return this.http.post<SeoScreenshot>(`${this.api}/screenshots`, formData);
+  }
+
+  updateScreenshot(id: number, patch: Partial<Pick<SeoScreenshot, 'feature_tag' | 'caption'>>): Observable<SeoScreenshot> {
+    return this.http.patch<SeoScreenshot>(`${this.api}/screenshots/${id}`, patch);
+  }
+
+  deleteScreenshot(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/screenshots/${id}`);
+  }
+
+  screenshotSrc(id: number): string {
+    return `${environment.apiUrl}/public/blog/screenshots/${id}`;
   }
 
   reject(id: number, note?: string): Observable<SeoContent> {
@@ -251,6 +384,10 @@ export class CrmSeoService {
 
   gscSync(): Observable<{ synced: boolean }> {
     return this.http.post<{ synced: boolean }>(`${this.api}/gsc/sync`, {});
+  }
+
+  gscDisconnect(): Observable<{ disconnected: boolean }> {
+    return this.http.delete<{ disconnected: boolean }>(`${this.api}/gsc/disconnect`);
   }
 
   competitors(): Observable<SeoCompetitor[]> {
@@ -359,5 +496,13 @@ export class CrmSeoService {
 
   setWordpressPublishMode(mode: 'draft' | 'publish'): Observable<{ wordpress_publish_mode: 'draft' | 'publish' }> {
     return this.http.patch<{ wordpress_publish_mode: 'draft' | 'publish' }>(`${this.api}/tenant-settings/wordpress-publish-mode`, { wordpress_publish_mode: mode });
+  }
+
+  gscSiteUrl(): Observable<{ seo_gsc_site_url: string | null }> {
+    return this.http.get<{ seo_gsc_site_url: string | null }>(`${this.api}/tenant-settings/gsc-site-url`);
+  }
+
+  setGscSiteUrl(url: string | null): Observable<{ seo_gsc_site_url: string | null }> {
+    return this.http.patch<{ seo_gsc_site_url: string | null }>(`${this.api}/tenant-settings/gsc-site-url`, { seo_gsc_site_url: url });
   }
 }

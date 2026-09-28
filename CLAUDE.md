@@ -24,6 +24,8 @@ Katalog: `C:\Users\Adam\Documents\crmtree-frontend`
 
 ## Git workflow
 - Branch roboczy: `develop`
+- Nie twórz gałęzi o automatycznej nazwie (np. `claude/...`) — zapytaj Adama o nazwę
+  gałęzi przed pierwszym commitem i używaj dokładnie tej, którą poda.
 - Push TYLKO do `develop`: `git push crmtree develop`
 - Merge do `master` robi Adam ręcznie po testach (master = deploy na Azure)
 - Remote `crmtree` = GitHub (`git@github-crmtree:adapakse/CRMtree-frontend.git`)

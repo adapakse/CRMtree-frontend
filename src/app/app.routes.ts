@@ -18,6 +18,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/public/blog/blog-list.component').then(m => m.BlogListComponent),
       },
       {
+        path: 'blog/temat/:slug',
+        loadComponent: () => import('./pages/public/blog/blog-pillar.component').then(m => m.BlogPillarComponent),
+      },
+      {
         path: 'blog/:slug',
         loadComponent: () => import('./pages/public/blog/blog-detail.component').then(m => m.BlogDetailComponent),
       },
