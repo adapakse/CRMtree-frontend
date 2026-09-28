@@ -69,6 +69,40 @@ export interface SeoContent extends SeoContentSummary {
   refresh_draft: SeoRefreshDraft | null;
   refresh_error: string | null;
   last_refreshed_at: string | null;
+  enrichment_slots: SeoEnrichmentSlot[];
+}
+
+export type SeoSlotType = 'expert_comment' | 'quote' | 'screenshot';
+
+/** A verified quote the generator found on its source page, offered as a pre-fill. */
+export interface SeoQuoteSuggestion {
+  quote: string;
+  author: string;
+  author_role: string | null;
+  source_title: string | null;
+  source_url: string;
+}
+
+/** A place in the article the editor fills or removes before approval. */
+export interface SeoEnrichmentSlot {
+  id: string;
+  type: SeoSlotType;
+  brief: string;
+  feature_tag: string | null;
+  status: 'pending' | 'filled' | 'removed';
+  suggestion: SeoQuoteSuggestion | null;
+}
+
+export interface ExpertCommentValue { text: string; author_name: string; author_role: string | null }
+export interface QuoteValue { text: string; author: string; author_role: string | null; source_title: string | null; source_url: string | null }
+export interface ScreenshotValue { screenshot_id: number }
+export type SeoSlotValue = ExpertCommentValue | QuoteValue | ScreenshotValue;
+
+export interface SeoScreenshot {
+  id: number;
+  feature_tag: string;
+  caption: string;
+  created_at: string;
 }
 
 export interface SeoAuthor {
@@ -176,6 +210,7 @@ export interface SeoCalendarWeek {
 export interface TenantSettings {
   business_description: string | null;
   industry_vertical: string | null;
+  product_name: string | null;
 }
 
 export interface TenantSettingsResponse extends TenantSettings {
@@ -238,6 +273,38 @@ export class CrmSeoService {
 
   approve(id: number): Observable<SeoContent> {
     return this.http.post<SeoContent>(`${this.api}/content/${id}/approve`, {});
+  }
+
+  fillSlot(id: number, slotId: string, value: SeoSlotValue): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/slots/${slotId}/fill`, value);
+  }
+
+  removeSlot(id: number, slotId: string): Observable<SeoContent> {
+    return this.http.post<SeoContent>(`${this.api}/content/${id}/slots/${slotId}/remove`, {});
+  }
+
+  screenshots(): Observable<SeoScreenshot[]> {
+    return this.http.get<SeoScreenshot[]>(`${this.api}/screenshots`);
+  }
+
+  uploadScreenshot(file: File, featureTag: string, caption: string): Observable<SeoScreenshot> {
+    const formData = new FormData();
+    formData.append('feature_tag', featureTag);
+    formData.append('caption', caption);
+    formData.append('file', file);
+    return this.http.post<SeoScreenshot>(`${this.api}/screenshots`, formData);
+  }
+
+  updateScreenshot(id: number, patch: Partial<Pick<SeoScreenshot, 'feature_tag' | 'caption'>>): Observable<SeoScreenshot> {
+    return this.http.patch<SeoScreenshot>(`${this.api}/screenshots/${id}`, patch);
+  }
+
+  deleteScreenshot(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/screenshots/${id}`);
+  }
+
+  screenshotSrc(id: number): string {
+    return `${environment.apiUrl}/public/blog/screenshots/${id}`;
   }
 
   reject(id: number, note?: string): Observable<SeoContent> {

@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform, SeoRefreshReason, SeoRefreshSignal, SeoGenerationJob } from '../../../core/services/crm-seo.service';
+import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform, SeoRefreshReason, SeoRefreshSignal, SeoGenerationJob, SeoScreenshot } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
 import { SeoSocialChannelsComponent } from './seo-social-channels.component';
 import { SeoTenantSettingsComponent } from './seo-tenant-settings.component';
 import { SeoAuthorsPanelComponent } from './seo-authors-panel.component';
 import { SeoPublishingCalendarComponent } from './seo-publishing-calendar.component';
+import { SeoScreenshotsPanelComponent } from './seo-screenshots-panel.component';
+import { SeoContentSlotsComponent } from './seo-content-slots.component';
 
 const STATUS_LABELS: Record<SeoContentStatus, string> = {
   draft: 'Szkic',
@@ -38,7 +40,7 @@ const REFRESH_POLL_MS = 15000;
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent, SeoAuthorsPanelComponent, SeoPublishingCalendarComponent],
+  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent, SeoAuthorsPanelComponent, SeoPublishingCalendarComponent, SeoScreenshotsPanelComponent, SeoContentSlotsComponent],
   template: `
     <div class="seo-page">
       <header class="seo-header">
@@ -50,6 +52,7 @@ const REFRESH_POLL_MS = 15000;
           <button type="button" class="btn-ghost section-toggle" [class.active]="showAuthors()" (click)="showAuthors.set(!showAuthors())">
             Autorzy ({{ authors().length }})
           </button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showScreenshots()" (click)="showScreenshots.set(!showScreenshots())">Screeny</button>
           <button type="button" class="btn-ghost section-toggle" [class.active]="showChannels()" (click)="showChannels.set(!showChannels())">Kanały social</button>
           <button type="button" class="btn-ghost section-toggle" [class.active]="showCalendar()" (click)="showCalendar.set(!showCalendar())">Kalendarz publikacji</button>
           <button type="button" class="btn-ghost section-toggle" [class.active]="showSettings()" (click)="showSettings.set(!showSettings())">Ustawienia</button>
@@ -80,6 +83,12 @@ const REFRESH_POLL_MS = 15000;
         <section class="seo-section">
           <h2 class="section-title">Autorzy</h2>
           <wt-seo-authors-panel (authorsChanged)="loadAuthors()" />
+        </section>
+      }
+      @if (showScreenshots()) {
+        <section class="seo-section">
+          <h2 class="section-title">Screeny produktu</h2>
+          <wt-seo-screenshots-panel />
         </section>
       }
       @if (showChannels()) {
@@ -172,6 +181,13 @@ const REFRESH_POLL_MS = 15000;
             <textarea class="meta-input" [(ngModel)]="editMeta" [disabled]="!isEditable(d.status)" rows="2" placeholder="Meta description"></textarea>
             <textarea class="body-input" [(ngModel)]="editBody" [disabled]="!isEditable(d.status)" rows="14"></textarea>
 
+            <wt-seo-content-slots
+              [content]="d"
+              [editable]="isEditable(d.status)"
+              [screenshots]="screenshots()"
+              (contentChanged)="onSlotsChanged($event)"
+              (screenshotAdded)="loadScreenshots()" />
+
             @if (internalLinks().length > 0) {
               <div class="internal-links-row">
                 <span class="internal-links-label">Linki wewnętrzne:</span>
@@ -204,7 +220,8 @@ const REFRESH_POLL_MS = 15000;
                 <button type="button" class="btn-reject" (click)="unpublish(d.id)">Anuluj harmonogram</button>
               }
               @if (d.status === 'draft' || d.status === 'in_review' || d.status === 'needs_update') {
-                <button type="button" class="btn-accent" (click)="approve(d.id)">
+                <button type="button" class="btn-accent" (click)="approve(d.id)" [disabled]="pendingSlotCount() > 0"
+                        [title]="pendingSlotCount() > 0 ? 'Najpierw uzupełnij albo usuń miejsca do uzupełnienia' : ''">
                   @if (editScheduledAt) { Zatwierdź i zaplanuj } @else { Zatwierdź i opublikuj }
                 </button>
               }
@@ -442,6 +459,9 @@ export class CrmSeoComponent implements OnInit {
   });
   readonly showStrategy = signal(false);
   readonly showAuthors = signal(false);
+  readonly showScreenshots = signal(false);
+  readonly screenshots = signal<SeoScreenshot[]>([]);
+  readonly pendingSlotCount = computed(() => (this.detail()?.enrichment_slots ?? []).filter((s) => s.status === 'pending').length);
   readonly showChannels = signal(false);
   readonly showSettings = signal(false);
   readonly showCalendar = signal(false);
@@ -575,6 +595,19 @@ export class CrmSeoComponent implements OnInit {
     });
     this.seoService.internalLinks(id).subscribe((links) => this.internalLinks.set(links));
     this.seoService.articleSocialPosts(id).subscribe((posts) => this.socialPosts.set(posts));
+    this.loadScreenshots();
+  }
+
+  loadScreenshots(): void {
+    this.seoService.screenshots().subscribe((s) => this.screenshots.set(s));
+  }
+
+  // Filling a slot rewrites the body server-side; the textarea must follow,
+  // or a later "Zapisz zmiany" would write the old markers back.
+  onSlotsChanged(d: SeoContent): void {
+    this.detail.set(d);
+    this.editBody = d.body;
+    this.loadList();
   }
 
   private toDatetimeLocal(iso: string): string {

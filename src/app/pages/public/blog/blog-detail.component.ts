@@ -6,58 +6,7 @@ import { LucideCopy } from '@lucide/angular';
 import { PublicBlogService, BlogPost } from '../../../core/services/public-blog.service';
 import { SeoService, SITE_URL } from '../../../core/services/seo.service';
 import { ToastService } from '../../../core/services/toast.service';
-
-// Body is stored as a small, fixed markdown subset (## / ### headings, "- " lists,
-// **bold**, [text](url) links) — see CRMtree-backend's seoContentService.renderBody.
-// Text is HTML-escaped before any tag is added, so this only ever emits the
-// whitelisted tags below, never markup coming straight from the source text.
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function renderInline(text: string): string {
-  let out = escapeHtml(text);
-  out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Only relative (/blog/...) or https:// links are honored — anything else stays plain text.
-  out = out.replace(/\[([^\]]+)\]\((\/[^)\s]*|https:\/\/[^)\s]*)\)/g, (_m, label, href) => `<a href="${href}">${label}</a>`);
-  return out;
-}
-
-// Markdown table support — a comparison table is now a mandatory section
-// (see CRMtree-backend's seoContentService validateArticle). A table block
-// has no blank lines within it, so it arrives as one block whose first line
-// is the header row and second is the `|---|---|` separator. Mirrors
-// CRMtree-backend's utils/seoMarkdown.js — keep both in sync.
-function isTableSeparatorRow(line: string): boolean {
-  return /-/.test(line) && /^\|?[\s:-]+\|[\s:|-]*\|?$/.test(line.trim());
-}
-
-function parseTableRow(line: string): string[] {
-  return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
-}
-
-function renderBodyHtml(body: string): string {
-  return body
-    .split(/\n\n+/)
-    .map((block) => {
-      const trimmed = block.trim();
-      if (trimmed.startsWith('### ')) return `<h3>${renderInline(trimmed.slice(4))}</h3>`;
-      if (trimmed.startsWith('## ')) return `<h2>${renderInline(trimmed.slice(3))}</h2>`;
-      const lines = trimmed.split('\n');
-      if (lines.length && lines.every((l) => l.startsWith('- '))) {
-        return `<ul>${lines.map((l) => `<li>${renderInline(l.slice(2))}</li>`).join('')}</ul>`;
-      }
-      if (lines.length >= 2 && lines[0].trim().startsWith('|') && isTableSeparatorRow(lines[1])) {
-        const header = parseTableRow(lines[0]);
-        const bodyRows = lines.slice(2).map(parseTableRow);
-        return `<table><thead><tr>${header.map((h) => `<th>${renderInline(h)}</th>`).join('')}</tr></thead><tbody>${bodyRows
-          .map((r) => `<tr>${r.map((c) => `<td>${renderInline(c)}</td>`).join('')}</tr>`)
-          .join('')}</tbody></table>`;
-      }
-      return `<p>${renderInline(trimmed)}</p>`;
-    })
-    .join('');
-}
+import { renderSeoMarkdown } from '../../../shared/utils/seo-markdown.util';
 
 @Component({
   selector: 'wt-blog-detail',
@@ -181,22 +130,39 @@ function renderBodyHtml(body: string): string {
     .hero-wrap { max-width:920px; margin:2rem auto 0; padding:0 1.5rem; }
     .post-hero-image { width:100%; max-height:420px; object-fit:cover; border-radius:var(--radius); display:block; }
 
+    /* The article body is injected via [innerHTML], so its elements carry no
+       _ngcontent attribute — without ::ng-deep none of these rules matched and
+       the global margin/padding reset left paragraphs, headings and lists with
+       zero spacing on the live blog (found 2026-09-28). */
     .post-content { margin-top:2.2rem; font-size:1.05rem; line-height:1.8; color:var(--gray-800); }
-    .post-content p { margin:1.3rem 0 0; }
-    .post-content h2 { font-family:'Sora', sans-serif; font-size:1.4rem; font-weight:700; margin:2.4rem 0 0.7rem; line-height:1.3; color:var(--gray-900); }
-    .post-content h3 { font-family:'Sora', sans-serif; font-size:1.15rem; font-weight:600; margin:1.8rem 0 0.5rem; line-height:1.3; color:var(--gray-900); }
-    .post-content ul { margin:1.3rem 0 0; padding-left:1.4rem; }
-    .post-content li { margin-top:0.4rem; }
-    .post-content strong { color:var(--gray-900); }
-    .post-content a { color:var(--orange-dark); text-decoration-color:var(--orange-muted); }
-    .post-content table {
+    .post-content ::ng-deep p { margin:1.3rem 0 0; }
+    .post-content ::ng-deep h2 { font-family:'Sora', sans-serif; font-size:1.4rem; font-weight:700; margin:2.6rem 0 0.7rem; line-height:1.3; color:var(--gray-900); }
+    .post-content ::ng-deep h3 { font-family:'Sora', sans-serif; font-size:1.15rem; font-weight:600; margin:1.9rem 0 0.5rem; line-height:1.3; color:var(--gray-900); }
+    .post-content ::ng-deep ul, .post-content ::ng-deep ol { margin:1.1rem 0 0; padding-left:1.5rem; }
+    .post-content ::ng-deep ul { list-style:disc; }
+    .post-content ::ng-deep ol { list-style:decimal; }
+    .post-content ::ng-deep li { margin-top:0.45rem; padding-left:0.2rem; }
+    .post-content ::ng-deep strong { color:var(--gray-900); }
+    .post-content ::ng-deep a { color:var(--orange-dark); text-decoration-color:var(--orange-muted); }
+    .post-content ::ng-deep table {
       margin:1.5rem 0 0; width:100%; border-collapse:collapse; font-size:0.95rem;
       display:block; overflow-x:auto;
     }
-    .post-content th, .post-content td {
+    .post-content ::ng-deep th, .post-content ::ng-deep td {
       border:1px solid var(--gray-200); padding:0.6rem 0.8rem; text-align:left;
     }
-    .post-content th { background:var(--gray-50, #f9fafb); font-weight:700; color:var(--gray-900); }
+    .post-content ::ng-deep th { background:var(--gray-50, #f9fafb); font-weight:700; color:var(--gray-900); }
+    .post-content ::ng-deep blockquote {
+      margin:1.8rem 0 0; padding:1rem 1.25rem; border-left:4px solid var(--orange);
+      background:var(--orange-pale); border-radius:0 var(--radius) var(--radius) 0;
+    }
+    .post-content ::ng-deep blockquote p { margin:0; font-style:italic; }
+    .post-content ::ng-deep blockquote footer { margin-top:0.6rem; font-size:0.9rem; color:var(--gray-600); }
+    .post-content ::ng-deep figure { margin:1.8rem 0 0; }
+    .post-content ::ng-deep figure img {
+      display:block; width:100%; height:auto; border:1px solid var(--gray-200); border-radius:var(--radius);
+    }
+    .post-content ::ng-deep figcaption { margin-top:0.5rem; font-size:0.88rem; color:var(--gray-600); text-align:center; }
 
     .author-box {
       display:flex; gap:1rem; align-items:flex-start; margin-top:3rem; padding-top:2rem;
@@ -240,7 +206,7 @@ export class BlogDetailComponent implements OnChanges {
     this.blogService.bySlug(this.slug, 'pl').subscribe({
       next: (post) => {
         this.post.set(post);
-        this.bodyHtml.set(this.sanitizer.bypassSecurityTrustHtml(renderBodyHtml(post.body)));
+        this.bodyHtml.set(this.sanitizer.bypassSecurityTrustHtml(renderSeoMarkdown(post.body)));
         this.seo.setPage({
           title: post.title,
           description: post.meta_description,
