@@ -9,6 +9,7 @@ import { CrmApiService, CrmUser } from '../../../core/services/crm-api.service';
 import { NavBackService } from '../../../core/services/nav-back.service';
 
 const API = `${environment.apiUrl}/admin/call-analysis`;
+const ROW_POLL_TIMEOUT_MS = 120000;
 
 interface CallAnalysisRow {
   nip: string;
@@ -816,6 +817,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   batchProgress = { total: 0, done: 0, errors: 0, analyzing: 0, pending: 0, running: false };
   batchStartedHere = false;
   private pollTimer: any;
+  private rowPollTimer: any;
   private filterTimer: any;
   private routerSub: any;
 
@@ -853,6 +855,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     clearInterval(this.pollTimer);
+    clearInterval(this.rowPollTimer);
     clearTimeout(this.filterTimer);
     this.routerSub?.unsubscribe();
   }
@@ -1200,13 +1203,32 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
     this.http.post<any>(`${API}/${nip}/re-analyze`, {}).subscribe({
       next: () => {
         const row = this.rows.find(r => r.nip === nip);
-        if (row) (row as any).analysis_status = 'pending';
-        this.batchStartedHere = true;
-        this.startPolling();
+        if (row) (row as any).analysis_status = 'analyzing';
+        this.startRowPolling(nip);
         this.cdr.markForCheck();
       },
       error: e => alert(e.error?.error || 'Błąd re-analizy'),
     });
+  }
+
+  // Re-analiza jednej firmy nie jest batchem — pasek postępu batcha pokazywałby
+  // tu cudze liczby ("2 / 50 firm"), więc odpytujemy tylko o ten jeden wiersz.
+  private startRowPolling(nip: string) {
+    clearInterval(this.rowPollTimer);
+    const startedAt = Date.now();
+    this.rowPollTimer = setInterval(() => {
+      if (Date.now() - startedAt > ROW_POLL_TIMEOUT_MS) {
+        clearInterval(this.rowPollTimer);
+        this.load();
+        return;
+      }
+      this.http.get<any>(API, { params: { search: nip, limit: 1, page: 1 } }).subscribe(d => {
+        const fresh = (d.rows || []).find((r: any) => r.nip === nip);
+        if (!fresh || fresh.analysis_status === 'pending' || fresh.analysis_status === 'analyzing') return;
+        clearInterval(this.rowPollTimer);
+        this.load();
+      });
+    }, 2000);
   }
 
   deleteRow(r: CallAnalysisRow, event: Event) {
