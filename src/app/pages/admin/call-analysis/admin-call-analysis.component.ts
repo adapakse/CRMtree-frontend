@@ -1117,9 +1117,17 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
     if (status) body.status = status;
 
     this.http.post<any>(`${API}/bulk`, body).subscribe({
-      next: () => {
+      next: r => {
         this.selectedNips.clear();
         this.load();
+        if (action === 're-analyze' && r?.started) {
+          if (r.nips?.length === 1) {
+            this.startRowPolling(r.nips[0]);
+          } else {
+            this.batchStartedHere = true;
+            this.startPolling();
+          }
+        }
         this.cdr.markForCheck();
       },
       error: e => alert(e.error?.error || 'Błąd operacji zbiorczej'),
