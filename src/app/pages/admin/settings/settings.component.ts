@@ -6,6 +6,7 @@ import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { environment } from '../../../../environments/environment';
+import { Tenant } from '../../../core/models/models';
 
 interface SettingField {
   key: string;
@@ -53,6 +54,10 @@ interface IcpConfig {
   config_revision: number;
   current_version_id: string | null;
   current_version: number | null;
+  // Kto i kiedy opublikował wersję, której realnie używa enrichment. Autor może
+  // być null — created_by ma ON DELETE SET NULL, wersja przeżywa usunięcie usera.
+  current_version_published_at: string | null;
+  current_version_author: string | null;
   is_default: boolean;
   signals: IcpSignal[];
   signals_sum: number;
@@ -251,9 +256,12 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           </button>
           <!-- Endpoint /admin/prospects/icp-config jest za requireFeature('prospects'),
                więc bez modułu Prospekty zakładka mogłaby tylko pokazać błąd —
-               gate'ujemy ją tak samo jak pozycję Prospekty w sidebarze. -->
-          @if (auth.hasFeature('prospects')) {
-            <button class="tab-btn" [class.active]="activeTab() === 'icp'" (click)="activeTab.set('icp'); loadIcpConfig()">
+               gate'ujemy ją tak samo jak pozycję Prospekty w sidebarze.
+               Superadmin jest wyjątkiem: on konfiguruje ICP INNYCH tenantów przez
+               /admin/tenants/:id/icp-* (bez requireFeature), więc flaga jego
+               własnego tenanta nie może mu tego ekranu odbierać. -->
+          @if (auth.hasFeature('prospects') || auth.isSuperAdmin()) {
+            <button class="tab-btn" [class.active]="activeTab() === 'icp'" (click)="activeTab.set('icp'); loadIcpTenants(); loadIcpConfig()">
               🎯 Enrichment / ICP
             </button>
           }
@@ -997,8 +1005,10 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
           }
         }
 
-        <!-- TAB: Enrichment / ICP — dynamic ICP signals of the LOGGED-IN tenant.
-             Any tenant admin (is_admin), not just the CRMTree superadmin. -->
+        <!-- TAB: Enrichment / ICP — sygnały ICP tenanta. Admin tenanta edytuje
+             WYŁĄCZNIE swojego (endpoint bierze tenant z sesji); superadmin
+             dostaje dodatkowo dropdown i edytuje dowolnego, tą samą logiką
+             ekranu — patrz icpApiBase(). -->
         @if (activeTab() === 'icp') {
           <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">🎯</span>
@@ -1006,6 +1016,24 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
               <strong>Sygnały ICP</strong> — konfiguracja punktowanych sygnałów używanych przez enrichment do oceny dopasowania firmy (ICP).
             </div>
           </div>
+
+          @if (auth.isSuperAdmin()) {
+            <!-- Nazwa tenanta jest też POZA selectem, na stałe widoczna: bez tego
+                 łatwo opublikować zmianę u złego klienta, bo cały ekran wygląda
+                 identycznie dla każdego tenanta. -->
+            <div class="icp-tenant-bar">
+              <label class="fl" style="margin:0;white-space:nowrap">Konfiguracja tenanta</label>
+              <select class="fsel" style="min-width:240px"
+                      [ngModel]="icpTenantId()"
+                      (ngModelChange)="switchIcpTenant($event)"
+                      [disabled]="icpLoading() || icpSaving()">
+                @for (t of icpTenants(); track t.id) {
+                  <option [value]="t.id">{{ t.name }}{{ t.id === auth.user()?.tenant_id ? ' (Twój)' : '' }}</option>
+                }
+              </select>
+              <span class="icp-tenant-current">Edytujesz: <strong>{{ icpTenantName() }}</strong></span>
+            </div>
+          }
 
           @if (icpLoading()) {
             <div class="state-msg">Ładowanie...</div>
@@ -1028,6 +1056,25 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
                 Konfiguracja robocza ma {{ cfg.final_max_score }} / 100 pkt. Enrichment nadal korzysta z ostatniej poprawnej wersji.
               </div>
             }
+            <!-- Wersja opublikowana = ta, której realnie używa enrichment; nie to
+                 samo co stan roboczy na tej liście (config_revision).
+                 Brak autora NIE znaczy "nie wiadomo kto" — wersje wstawiane
+                 migracjami (aktualizacja wbudowanych defaultów po stronie CRM
+                 Tree, np. 0288-0293) nie mają usera, bo nie stoi za nimi
+                 człowiek. Każda zmiana zrobiona z UI zawsze ma autora. -->
+            <div class="field-meta" style="margin-top:6px">
+              @if (cfg.current_version) {
+                Ostatnia aktualizacja: wersja <strong>{{ cfg.current_version }}</strong>
+                @if (cfg.current_version_published_at) { · {{ cfg.current_version_published_at | date:'dd.MM.yyyy HH:mm' }} }
+                @if (cfg.current_version_author) {
+                  · {{ cfg.current_version_author }}
+                } @else {
+                  · aktualizacja systemowa (wbudowane domyślne sygnały CRM Tree)
+                }
+              } @else {
+                Konfiguracja domyślna — nie była jeszcze zmieniana.
+              }
+            </div>
 
             <div class="icp-list">
               @for (row of icpRows(); track row.signal.id) {
@@ -1160,6 +1207,12 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
     .badge-off { background: var(--gray-100); color: var(--gray-500); }
     .panel-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
 
+    .icp-tenant-bar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+      padding: 12px 16px; margin-bottom: 14px; border-radius: 10px;
+      background: #EFF6FF; border: 1px solid #BFDBFE;
+    }
+    .icp-tenant-current { font-size: 12.5px; color: #1D4ED8; margin-left: auto; }
     .icp-summary {
       display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
       padding: 10px 16px; font-size: 12.5px; color: var(--gray-600);
@@ -1652,12 +1705,51 @@ export class SettingsComponent implements OnInit {
   icpModalTarget = signal<IcpSignal | 'new' | null>(null);
   icpModalDraft: IcpModalDraft = { label: '', ai_definition: '', short_description: '', points: 0, active: true };
 
-  private get icpTenantId(): string | null {
-    return this.auth.user()?.tenant_id ?? null;
+  // Tenant, którego konfigurację pokazuje ekran. Admin tenanta ma tu na stałe
+  // swój własny; superadmin przestawia to dropdownem (switchIcpTenant).
+  icpTenantId = signal<string | null>(this.auth.user()?.tenant_id ?? null);
+  icpTenants  = signal<Tenant[]>([]);
+
+  icpTenantName = computed(() => {
+    const id = this.icpTenantId();
+    return this.icpTenants().find(t => t.id === id)?.name
+      ?? (id === this.auth.user()?.tenant_id ? 'Twój tenant' : '—');
+  });
+
+  // Jedyne miejsce, które decyduje, w którą rodzinę endpointów idą żądania ICP.
+  // Oba zestawy mają IDENTYCZNY kształt żądania i odpowiedzi, różnią się tylko
+  // ścieżką, dzięki czemu reszta ekranu nie wie o tym podziale:
+  //   superadmin    → /admin/tenants/:id/icp-*   (requireSuperAdmin, dowolny tenant)
+  //   admin tenanta → /admin/prospects/icp-*     (tenant brany z sesji)
+  private icpApiBase(): string {
+    const id = this.icpTenantId();
+    return this.auth.isSuperAdmin() && id
+      ? `${environment.apiUrl}/admin/tenants/${id}`
+      : `${environment.apiUrl}/admin/prospects`;
+  }
+
+  private icpSignalsUrl(signalId?: string): string {
+    return `${this.icpApiBase()}/icp-signals${signalId ? `/${signalId}` : ''}`;
+  }
+
+  // Lista tenantów tylko dla superadmina — admin tenanta nie ma dostępu do
+  // /admin/tenants (requireSuperAdmin) i nie ma czego wybierać.
+  loadIcpTenants(): void {
+    if (!this.auth.isSuperAdmin() || this.icpTenants().length) return;
+    this.http.get<Tenant[]>(`${environment.apiUrl}/admin/tenants`).subscribe({
+      next: ts => this.icpTenants.set(ts.filter(t => !t.deleted_at)),
+      error: () => { /* dropdown zostaje pusty — własny tenant i tak się wczyta */ },
+    });
+  }
+
+  switchIcpTenant(tenantId: string): void {
+    if (!tenantId || tenantId === this.icpTenantId()) return;
+    this.icpTenantId.set(tenantId);
+    this.loadIcpConfig();
   }
 
   loadIcpConfig(): void {
-    const tenantId = this.icpTenantId;
+    const tenantId = this.icpTenantId();
     if (!tenantId) {
       this.icpError.set('Twoje konto nie jest przypisane do żadnego tenanta, więc nie ma konfiguracji ICP do pokazania.');
       this.toast.error('Brak przypisanego tenanta');
@@ -1666,7 +1758,7 @@ export class SettingsComponent implements OnInit {
     this.icpLoading.set(true);
     this.icpError.set(null);
     this.icpModalTarget.set(null);
-    this.http.get<IcpConfig>(`${environment.apiUrl}/admin/prospects/icp-config`).subscribe({
+    this.http.get<IcpConfig>(`${this.icpApiBase()}/icp-config`).subscribe({
       next: cfg => {
         this.icpConfig.set(cfg);
         this.icpRows.set([...cfg.signals]
@@ -1712,11 +1804,11 @@ export class SettingsComponent implements OnInit {
   }
 
   saveIcpRowQuickFields(row: IcpRow): void {
-    const tenantId = this.icpTenantId;
+    const tenantId = this.icpTenantId();
     const cfg = this.icpConfig();
     if (!tenantId || !cfg) return;
     this.icpSaving.set(true);
-    this.http.put(`${environment.apiUrl}/admin/prospects/icp-signals/${row.signal.id}`, {
+    this.http.put(this.icpSignalsUrl(row.signal.id), {
       points: row.points,
       active: row.active,
       expected_revision: cfg.config_revision,
@@ -1759,7 +1851,7 @@ export class SettingsComponent implements OnInit {
   }
 
   saveIcpModalDraft(): void {
-    const tenantId = this.icpTenantId;
+    const tenantId = this.icpTenantId();
     const cfg = this.icpConfig();
     const target = this.icpModalTarget();
     if (!tenantId || !cfg || target === null) return;
@@ -1774,8 +1866,8 @@ export class SettingsComponent implements OnInit {
       expected_revision: cfg.config_revision,
     };
     const req$ = target === 'new'
-      ? this.http.post(`${environment.apiUrl}/admin/prospects/icp-signals`, body)
-      : this.http.put(`${environment.apiUrl}/admin/prospects/icp-signals/${target.id}`, body);
+      ? this.http.post(this.icpSignalsUrl(), body)
+      : this.http.put(this.icpSignalsUrl(target.id), body);
 
     req$.subscribe({
       next: () => {
@@ -1789,11 +1881,11 @@ export class SettingsComponent implements OnInit {
   }
 
   deleteIcpRow(row: IcpRow): void {
-    const tenantId = this.icpTenantId;
+    const tenantId = this.icpTenantId();
     if (!tenantId || !confirm(`Usunąć sygnał "${row.signal.label}"?`)) return;
     const cfg = this.icpConfig();
     this.icpSaving.set(true);
-    this.http.delete<{ soft_deleted: boolean }>(`${environment.apiUrl}/admin/prospects/icp-signals/${row.signal.id}`, {
+    this.http.delete<{ soft_deleted: boolean }>(this.icpSignalsUrl(row.signal.id), {
       body: { expected_revision: cfg?.config_revision },
     }).subscribe({
       next: res => {
