@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-settings.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -209,7 +210,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div id="topbar">
       <span class="page-title">Ustawienia aplikacji</span>
@@ -233,6 +234,15 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
       }
 
       <div style="max-width:820px">
+
+        <a class="survey-link" routerLink="/admin/onboarding-survey">
+          <span style="font-size:18px">📝</span>
+          <span>
+            <strong>Ankieta wdrożeniowa</strong> — dane, na podstawie których zespół CRMtree konfiguruje
+            Państwa środowisko (moduły, poczta, WhatsApp, telefonia, modele AI).
+          </span>
+          <span class="survey-link-cta">Otwórz ankietę →</span>
+        </a>
 
         <!-- Zakładki -->
         <div class="tabs">
@@ -1318,6 +1328,13 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
     }
     .btn-danger-sm:hover:not(:disabled) { background: #fecaca; }
     .btn-danger-sm:disabled { opacity: .55; cursor: not-allowed; }
+    .survey-link {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 12px 18px;
+      background: var(--orange-pale); border: 1px solid var(--orange); border-radius: 10px;
+      font-size: 13px; color: var(--gray-800); text-decoration: none;
+    }
+    .survey-link:hover { background: white; }
+    .survey-link-cta { margin-left: auto; font-weight: 600; color: var(--orange-dark); white-space: nowrap; }
   `],
 })
 export class SettingsComponent implements OnInit {
