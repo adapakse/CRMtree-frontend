@@ -175,7 +175,7 @@ lib/
 
 | Obszar | Wybór |
 |---|---|
-| Stan | Riverpod. Na start bez generatora kodu: `riverpod_generator` nie rozwiązuje się z Flutterem 3.32 (stan na 2026-10-01); do rozważenia ponownie po aktualizacji SDK |
+| Stan | Riverpod (codegen) — wymaga Fluttera przypiętego w `.fvmrc` repo `crmtree-mobile` (3.47.5); globalny Flutter 3.32 jest na to za stary |
 | HTTP | Dio + interceptory (auth, refresh z kolejką, błędy) |
 | Modele | freezed + json_serializable / klient z OpenAPI |
 | Routing | go_router; ścieżki zgodne z webem (`/crm/leads/:id`) → deep linki i universal links |
