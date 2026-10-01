@@ -6,6 +6,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Tenant, TenantFeature, CrmFeature, BillingPlan, BillingCycle, TenantSubscription, TenantBillingDetails } from '../../../core/models/models';
 import { environment } from '../../../../environments/environment';
+import { OnboardingSurveyAnswersComponent } from '../onboarding-survey/onboarding-survey-answers.component';
 
 const API = environment.apiUrl;
 // Meta calls this URL directly — it must be internet-reachable, so in local
@@ -96,7 +97,7 @@ interface WhatsappConfigForm {
   access_token: string; app_secret: string; is_enabled: boolean;
 }
 
-type EditTab = 'settings' | 'features' | 'plan' | 'billing' | 'users' | 'email' | 'whatsapp';
+type EditTab = 'settings' | 'features' | 'plan' | 'billing' | 'users' | 'email' | 'whatsapp' | 'survey';
 
 interface PlanChangeConfirmData {
   tenantId: string;
@@ -113,7 +114,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
 @Component({
   selector: 'app-tenants',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, OnboardingSurveyAnswersComponent],
   template: `
     <div class="page">
 
@@ -212,6 +213,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                           </button>
                           <button class="tab" [class.active]="editTab() === 'email'" (click)="openEmailTab(t.id)">Email</button>
                           <button class="tab" [class.active]="editTab() === 'whatsapp'" (click)="openWhatsappTab(t.id)">WhatsApp</button>
+                          <button class="tab" [class.active]="editTab() === 'survey'" (click)="editTab.set('survey')">Ankieta</button>
                         </div>
 
                         <!-- Tab: Settings -->
@@ -723,6 +725,16 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                 <button class="btn-secondary" (click)="cancelEdit()">Zamknij</button>
                               </div>
                             }
+                          </div>
+                        }
+
+                        <!-- Tab: Onboarding survey filled in by the tenant admin (read-only here) -->
+                        @if (editTab() === 'survey') {
+                          <div class="tab-body">
+                            <app-onboarding-survey-answers [tenantId]="t.id" />
+                            <div class="panel-footer">
+                              <button class="btn-secondary" (click)="cancelEdit()">Zamknij</button>
+                            </div>
                           </div>
                         }
 

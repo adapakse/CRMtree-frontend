@@ -100,6 +100,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/settings/settings.component').then(m => m.SettingsComponent),
       },
       {
+        path: 'admin/onboarding-survey',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./pages/admin/onboarding-survey/onboarding-survey.component').then(m => m.OnboardingSurveyComponent),
+      },
+      {
         path: 'admin/data',
         canActivate: [adminGuard],
         loadComponent: () => import('./pages/admin/data-management/data-management.component').then(m => m.DataManagementComponent),

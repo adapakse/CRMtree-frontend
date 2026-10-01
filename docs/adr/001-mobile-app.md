@@ -175,7 +175,7 @@ lib/
 
 | Obszar | Wybór |
 |---|---|
-| Stan | Riverpod (codegen) |
+| Stan | Riverpod. Na start bez generatora kodu: `riverpod_generator` nie rozwiązuje się z Flutterem 3.32 (stan na 2026-10-01); do rozważenia ponownie po aktualizacji SDK |
 | HTTP | Dio + interceptory (auth, refresh z kolejką, błędy) |
 | Modele | freezed + json_serializable / klient z OpenAPI |
 | Routing | go_router; ścieżki zgodne z webem (`/crm/leads/:id`) → deep linki i universal links |
@@ -239,11 +239,13 @@ są domyślnym dialerem.
 
 ### 9. CI/CD
 
-- Flavory `dev`, `int` (`int.crmtree.pl`), `prod` z osobnymi bundle ID.
-- Flavor `int` zawsze używa `int.crmtree.pl` bez subdomeny firmy. Na INT jest DNS
-  `*.int.crmtree.pl`, ale bez certyfikatu i powiązania z aplikacją, więc
-  `https://{slug}.int.crmtree.pl` nie działa. Na hoście bez subdomeny tenant wynika z
-  konta (tokenu), tak jak na `app.crmtree.pl`.
+- Flavory `dev`, `int` (`app.int.crmtree.pl`), `prod` z osobnymi bundle ID.
+- Flavor `int` zawsze używa `app.int.crmtree.pl` bez subdomeny firmy (sprawdzone
+  2026-10-01: API odpowiada pod `https://app.int.crmtree.pl/api`, a samo
+  `int.crmtree.pl` nie serwuje API). Na INT jest DNS `*.int.crmtree.pl`, ale bez
+  certyfikatu i powiązania z aplikacją, więc `https://{slug}.int.crmtree.pl` nie
+  działa. Na hoście bez subdomeny tenant wynika z konta (tokenu), tak jak na
+  `app.crmtree.pl`.
 - Buildy iOS wymagają macOS (runner macOS w GitHub Actions albo Mac).
 - GitHub Actions + fastlane → TestFlight i Google Play Internal.
 - `flutter analyze` (`very_good_analysis`), testy jednostkowe repozytoriów i

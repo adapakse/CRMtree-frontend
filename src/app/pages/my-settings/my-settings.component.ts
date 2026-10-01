@@ -9,13 +9,14 @@ import { environment } from '../../../environments/environment';
 import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitutions.component';
+import { MyDevicesComponent } from './my-devices.component';
 
 const BASE = environment.apiUrl;
 
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent],
   template: `
 <div id="topbar">
   <span class="page-title">Moje ustawienia</span>
@@ -126,6 +127,8 @@ const BASE = environment.apiUrl;
       <div *ngIf="tplError" style="margin-top:8px;font-size:12px;color:#dc2626">{{tplError}}</div>
     </div>
   </div>
+
+  <wt-my-devices />
 
   <!-- ── Softphone PBX ──────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px" *ngIf="auth.hasFeature('pbx')">
