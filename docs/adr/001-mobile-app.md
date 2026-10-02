@@ -125,10 +125,10 @@ teraz:
 - **Biometria włączona** (zmiana z 2026-10-01, decyzja Adama: ten sam wzorzec co w
   aplikacji mobilnej Worktrips, zamiast pierwotnie planowanego `biometric_storage`):
   `local_auth` jest lokalną bramką odblokowania, a refresh token i firma leżą w
-  `flutter_secure_storage` (Keychain / Keystore). Zimny start = ekran odblokowania →
-  użytkownik dotyka ikony odcisku → prompt biometryczny → ciche odświeżenie tokenu →
-  aplikacja. Ekran jest pasywny (prompt nie odpala się sam) i ma wyjście „Zaloguj
-  się hasłem”. Odświeżanie tokenu w trakcie pracy nigdy nie pyta o biometrię.
+  `flutter_secure_storage` (Keychain / Keystore). Zimny start = ekran odblokowania,
+  który sam otwiera systemowy prompt biometryczny → ciche odświeżenie tokenu →
+  aplikacja. Ikona odcisku służy do ponowienia po anulowanym prompcie; jest też
+  wyjście „Zaloguj się hasłem”. Odświeżanie tokenu w trakcie pracy nigdy nie pyta o biometrię.
   Rotowany refresh token jest zapisywany po każdym odświeżeniu.
 - **Biometria odrzucona:** refresh token trzymany tylko w pamięci. Każdy zimny start
   wymaga logowania; zapamiętany jest email, więc user wpisuje tylko hasło.
