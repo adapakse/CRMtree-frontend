@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard, publicRootGuard } from './core/auth/guards';
+import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard, publicRootGuard, externalUserGuard } from './core/auth/guards';
 
 export const routes: Routes = [
   // ── Public, SSR-rendered marketing surface (Faza 0 — SEO fundament) ──────
@@ -63,6 +63,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],
+    canActivateChild: [externalUserGuard],
     children: [
       {
         path: 'dashboard',
@@ -207,6 +208,16 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/crm/dashboard/crm-prospects-dashboard.component').then(m => m.CrmProspectsDashboardComponent),
       },
       // ─────────────────────────────────────────────────────────────────────
+
+      // ── Projects ─────────────────────────────────────────────────────────
+      {
+        path: 'projects',
+        loadComponent: () => import('./pages/projects/projects-list.component').then(m => m.ProjectsListComponent),
+      },
+      {
+        path: 'projects/:id',
+        loadComponent: () => import('./pages/projects/project-detail.component').then(m => m.ProjectDetailComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '/dashboard' },

@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { map, of, catchError } from 'rxjs';
 
@@ -83,3 +83,17 @@ export const publicRootGuard: CanActivateFn = () => {
 };
 
 
+
+const EXTERNAL_USER_ALLOWED_PATHS = ['/projects', '/my-settings'];
+
+// An external account takes part in projects only; every other page of the
+// shell sends it back to the project list. The backend enforces the same rule.
+export const externalUserGuard: CanActivateChildFn = (_route, state) => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+  if (!auth.user()?.is_external) return true;
+  const isAllowed = EXTERNAL_USER_ALLOWED_PATHS.some(
+    path => state.url === path || state.url.startsWith(path + '/') || state.url.startsWith(path + '?'),
+  );
+  return isAllowed ? true : router.createUrlTree(['/projects']);
+};

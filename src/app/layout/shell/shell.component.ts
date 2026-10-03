@@ -34,6 +34,7 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
         <!-- Scrollable nav content -->
         <div class="s-scroll">
 
+          @if (!isExternalUser()) {
           <div class="s-sec">
             <div class="s-lbl">Dokumenty</div>
 
@@ -62,6 +63,19 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
               <span class="nav-tip">Grupy i role</span>
             </a>
           </div>
+          }
+
+          @if (auth.hasFeature('projects')) {
+            @if (!isExternalUser()) { <div class="nav-sep"></div> }
+            <div class="s-sec">
+              <div class="s-lbl">Projekty</div>
+              <a class="nav-item" routerLink="/projects" routerLinkActive="active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="10" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/></svg>
+                <span class="nav-label">Projekty</span>
+                <span class="nav-tip">Projekty</span>
+              </a>
+            </div>
+          }
 
           @if (hasCrmAccess()) {
             <div class="nav-sep"></div>
@@ -487,6 +501,8 @@ export class ShellComponent implements OnInit {
     return (url === '/crm/partners' || url.startsWith('/crm/partners/'))
       && !url.startsWith('/crm/partners/analytics');
   });
+
+  isExternalUser = computed(() => this.auth.user()?.is_external === true);
 
   hasCrmAccess = computed(() => {
     const user = this.auth.user() as any;

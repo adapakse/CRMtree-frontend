@@ -20,13 +20,18 @@ export interface User {
   must_change_password?: boolean;
   tenant_features?: Partial<Record<CrmFeature, boolean>>;
   crm_role?: 'salesperson' | 'sales_manager' | null;
+  phone?: string | null;
+  company?: string | null;
+  department?: string | null;
+  is_external?: boolean;
+  can_create_projects?: boolean;
   last_login_at?: string;
   created_at?: string;
   roles?: UserRole[];
 }
 
 // ── Tenant ────────────────────────────────────────────────
-export type CrmFeature = 'documents' | 'leads' | 'sales_reports' | 'onboarding' | 'partner_registry' | 'dwh_integration' | 'performance' | 'seo_bot' | 'whatsapp' | 'prospects' | 'pbx' | 'call_analysis';
+export type CrmFeature = 'documents' | 'leads' | 'sales_reports' | 'onboarding' | 'partner_registry' | 'dwh_integration' | 'performance' | 'seo_bot' | 'whatsapp' | 'prospects' | 'pbx' | 'call_analysis' | 'projects';
 
 export interface TenantFeature {
   feature: CrmFeature;

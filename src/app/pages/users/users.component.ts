@@ -171,6 +171,34 @@ import { AuthService } from '../../core/auth/auth.service';
                   <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
                 </select>
               </div>
+              <div class="fg">
+                <label class="fl">Telefon</label>
+                <input class="fi" [(ngModel)]="newPhone" maxlength="40" placeholder="+48 600 100 200">
+              </div>
+              <div class="fg">
+                <label class="fl">Firma</label>
+                <input class="fi" [(ngModel)]="newCompany" maxlength="200">
+              </div>
+              <div class="fg" style="grid-column:1/-1">
+                <label class="fl">Dział</label>
+                <input class="fi" [(ngModel)]="newDepartment" maxlength="200">
+              </div>
+              @if (hasProjectsFeature()) {
+                <div class="fg">
+                  <label class="fl">Typ konta</label>
+                  <select class="fsel" [(ngModel)]="newExternal">
+                    <option [ngValue]="false">Wewnętrzne</option>
+                    <option [ngValue]="true">Zewnętrzne (tylko Projekty)</option>
+                  </select>
+                </div>
+                <div class="fg">
+                  <label class="fl">Zakładanie projektów</label>
+                  <select class="fsel" [(ngModel)]="newCanCreateProjects" [disabled]="newExternal">
+                    <option [ngValue]="false">Nie</option>
+                    <option [ngValue]="true">Tak</option>
+                  </select>
+                </div>
+              }
               <div class="fg" style="grid-column:1/-1">
                 <label class="fl">Przypisz do grupy (opcjonalnie)</label>
                 <select class="fsel" [(ngModel)]="newGroup">
@@ -265,6 +293,34 @@ import { AuthService } from '../../core/auth/auth.service';
                     <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
                   </select>
                 </div>
+                <div class="fg">
+                  <label class="fl">Telefon</label>
+                  <input class="fi" [(ngModel)]="editPhone" maxlength="40" placeholder="+48 600 100 200">
+                </div>
+                <div class="fg">
+                  <label class="fl">Firma</label>
+                  <input class="fi" [(ngModel)]="editCompany" maxlength="200">
+                </div>
+                <div class="fg" style="grid-column:1/-1">
+                  <label class="fl">Dział</label>
+                  <input class="fi" [(ngModel)]="editDepartment" maxlength="200">
+                </div>
+                @if (hasProjectsFeature()) {
+                  <div class="fg">
+                    <label class="fl">Typ konta</label>
+                    <select class="fsel" [(ngModel)]="editExternal">
+                      <option [ngValue]="false">Wewnętrzne</option>
+                      <option [ngValue]="true">Zewnętrzne (tylko Projekty)</option>
+                    </select>
+                  </div>
+                  <div class="fg">
+                    <label class="fl">Zakładanie projektów</label>
+                    <select class="fsel" [(ngModel)]="editCanCreateProjects" [disabled]="editExternal">
+                      <option [ngValue]="false">Nie</option>
+                      <option [ngValue]="true">Tak</option>
+                    </select>
+                  </div>
+                }
               </div>
               <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Zapisz zmiany</button>
 
@@ -545,6 +601,17 @@ export class UsersComponent implements OnInit {
   newActive      = true;
   newAdmin       = false;
   newCrmRole     = '';           // ★ rola CRM dla nowego usera
+  newPhone       = '';
+  newCompany     = '';
+  newDepartment  = '';
+  newExternal    = false;
+  newCanCreateProjects = false;
+  editPhone      = '';
+  editCompany    = '';
+  editDepartment = '';
+  editExternal   = false;
+  editCanCreateProjects = false;
+  readonly hasProjectsFeature = computed(() => this.auth.hasFeature('projects'));
   newGroup       = '';
   newGroupAccess: 'read' | 'full' = 'read';
   submitted      = false;
@@ -683,6 +750,8 @@ export class UsersComponent implements OnInit {
   openNew(): void {
     this.newFirst = ''; this.newLast = ''; this.newEmail = '';
     this.newActive = true; this.newAdmin = false; this.newCrmRole = '';
+    this.newPhone = ''; this.newCompany = ''; this.newDepartment = '';
+    this.newExternal = false; this.newCanCreateProjects = false;
     this.newGroup = ''; this.newGroupAccess = 'read';
     this.submitted = false;
     this.showNew.set(true);
@@ -699,6 +768,11 @@ export class UsersComponent implements OnInit {
       is_active:  this.newActive,
       is_admin:   this.newAdmin,
       crm_role:   this.newCrmRole || null,
+      phone:      this.newPhone.trim() || null,
+      company:    this.newCompany.trim() || null,
+      department: this.newDepartment.trim() || null,
+      is_external: this.newExternal,
+      can_create_projects: this.newCanCreateProjects && !this.newExternal,
     } as any).subscribe({
       next: (user) => {
         if (this.newGroup) {
@@ -748,6 +822,11 @@ export class UsersComponent implements OnInit {
         this.editActive  = u.is_active;
         this.editAdmin   = u.is_admin;
         this.editCrmRole = (u as any).crm_role ?? '';
+        this.editPhone      = u.phone ?? '';
+        this.editCompany    = u.company ?? '';
+        this.editDepartment = u.department ?? '';
+        this.editExternal   = u.is_external ?? false;
+        this.editCanCreateProjects = u.can_create_projects ?? false;
         this.emailError        = '';
         this.newPasswordVal    = '';
         this.newPasswordConfirm = '';
@@ -796,6 +875,11 @@ export class UsersComponent implements OnInit {
       is_active:  this.editActive,
       is_admin:   this.editAdmin,
       crm_role:   this.editCrmRole || null,
+      phone:      this.editPhone.trim() || null,
+      company:    this.editCompany.trim() || null,
+      department: this.editDepartment.trim() || null,
+      is_external: this.editExternal,
+      can_create_projects: this.editCanCreateProjects && !this.editExternal,
     } as any).subscribe({
       next: updated => {
         this.selected.set({ ...u, ...updated });
