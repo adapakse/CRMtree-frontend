@@ -100,6 +100,65 @@ zamiast porównywać stringi bezpośrednio.**
 
 ---
 
+## Moduł Projekty
+
+Projekty z zespołem, zadaniami, osią czasu i czatem. Osobny moduł poza CRM, za flagą
+`projects` (`auth.hasFeature('projects')`). Reguły biznesowe i uprawnienia są opisane w
+`CRMtree-backend/CLAUDE.md` — to decyzje Adama z 2026-10-03/04, nie zmieniaj ich bez pytania.
+
+### Gdzie w UI
+
+- **Projekty** (`/projects`) — `pages/projects/projects-list.component.ts`: lista z filtrem
+  otwarte / zamknięte / wszystkie oraz przełącznik „Moje zadania”
+  (`project-my-tasks.component.ts`) dla osób bez kalendarza CRM.
+- **Projekt** (`/projects/:id`) — `project-detail.component.ts` z zakładkami: Zadania
+  (`project-task-list`), Oś czasu (`project-gantt`, własny komponent, tylko podgląd), Czat
+  (`project-chat`), Karta projektu (`project-card` + `project-crm-link`).
+- **Panel zadania** — `project-task-panel.component.ts`; otwarte zadanie jest w URL
+  (`?task=<id>`), bo na ten adres prowadzą linki z maili.
+- **Ustawienia → Projekty** — `pages/admin/project-settings/`: słowniki, macierz przejść
+  statusów, definicje pól.
+- **Panel użytkowników** — telefon, firma, dział, typ konta (zewnętrzne) i „zakładanie
+  projektów” w `pages/users/users.component.ts`.
+- **Moduł włącza superadmin**: Panel admina → Tenants → Moduły.
+
+### Zadania projektowe w CRM
+
+- Zadania projektowe dochodzą do list CRM jako kolejne źródło **na poziomie serwisu**:
+  `CrmApiService.getActivityTasks`, `getCalendarMeetings` i `getCrmTasks` doklejają je przez
+  `core/services/project-task-feed.ts` (`source_type: 'project'`, `all_day: true`,
+  `project_task_id`). Błąd lub wyłączony moduł daje pustą listę, CRM działa dalej.
+- **W listach CRM są tylko do podglądu.** Każde miejsce, które zamyka/edytuje zadanie przez
+  `updateLeadActivity` / `updatePartnerActivity`, musi pomijać `source_type === 'project'`
+  (kalendarz, dashboard, oś spotkań na liście leadów) — inaczej wyśle żądanie do złego API.
+- Zadanie nie ma godziny: w kalendarzu stoi o **09:00** w dniu zakończenia
+  (`ALL_DAY_ANCHOR_TIME`), a widoki pokazują „termin” zamiast godziny.
+- Kliknięcie przenosi do Projektów przez `ProjectTaskNavigationService.open()`, które
+  zapamiętuje miejsce wyjścia w `NavBackService`; `project-detail` pokazuje wtedy przycisk
+  powrotu („← Lead X”, „← Kalendarz”).
+- Karta leada i partnera: `shared/components/linked-project-tasks` — widoczne dla każdego,
+  kto widzi kartę; bez członkostwa w projekcie kliknięcie jest nieaktywne (`can_open`).
+  Wstawione w `crm-lead-detail` i `crm-partner-detail` (zmieniaj oba).
+
+### Wspólne komponenty powstałe przy module
+
+- `shared/components/add-to-calendar` + `shared/utils/calendar-export.util.ts` — „Przekaż do
+  kalendarza” (Google, Outlook, plik .ics) dla zadań leada, partnera, dokumentów, onboardingu
+  i projektów. Wpis bez uczestników; zadania z samą datą trafiają na 09:00. Menu ma
+  `position: fixed`, bo w tabelach i stopce panelu było obcinane.
+- `shared/components/typeahead` — jedno pole z podpowiedziami od 3 znaków (wybór leada lub
+  partnera, wybór osób do projektu).
+
+### Pułapki
+
+- `pages/projects/projects-shared.styles.ts` trzyma wspólne style topbara, modala i tabel
+  modułu — aplikacja nie ma ich globalnie.
+- Czat w panelu zadania leży w przewijanej kolumnie flex: elementy panelu muszą mieć
+  `flex-shrink: 0`, inaczej wątek kurczy się do zera, a pole wiadomości nachodzi na sekcję
+  poniżej.
+
+---
+
 ## Code quality standards
 
 ### Language
