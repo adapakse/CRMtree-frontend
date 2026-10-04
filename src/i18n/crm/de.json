@@ -120,6 +120,156 @@
       "week": "Woche"
     }
   },
+  "callAnalysis": {
+    "actions": {
+      "archive": "Archivieren",
+      "reanalyze": "Neu analysieren"
+    },
+    "bulk": {
+      "deleteSelected": "Ausgewählte löschen",
+      "hold": "Zurückstellen",
+      "restore": "Wiederherstellen",
+      "selected": "{count, plural, one {# ausgewählt} other {# ausgewählt}}"
+    },
+    "confirm": {
+      "deleteRow": "Analyse für {name} löschen?",
+      "deleteSelected": "{count, plural, one {# Datensatz löschen?} other {# Datensätze löschen?}}"
+    },
+    "details": {
+      "callsLabel": "Gespräche:",
+      "importedLabel": "Import:",
+      "lastCallLabel": "Letztes:",
+      "objections": "Einwände",
+      "positiveSignals": "Positive Signale"
+    },
+    "empty": {
+      "hint": "Notizen erscheinen nach dem CSV-Import oder nach dem Ende von Telefongesprächen",
+      "noNotes": "Keine Gesprächsnotizen",
+      "noResults": "Keine Ergebnisse für die gewählten Filter"
+    },
+    "errors": {
+      "bulkFailed": "Fehler bei der Sammelaktion",
+      "deleteFailed": "Fehler beim Löschen",
+      "followUpUpdateFailed": "Fehler beim Aktualisieren des Follow-ups",
+      "reanalyzeFailed": "Fehler bei der erneuten Analyse",
+      "statusChangeFailed": "Fehler beim Ändern des Status"
+    },
+    "filters": {
+      "allFollowUps": "Alle Follow-ups",
+      "allLinks": "Alle Verknüpfungen",
+      "allSalespeople": "Alle Vertriebsmitarbeiter",
+      "allStatuses": "Alle Status",
+      "firstCall": "Erstes Gespräch:",
+      "followUpDate": "Follow-up-Datum:",
+      "followUpDone": "Follow-up erledigt",
+      "followUpRequired": "Follow-up erforderlich",
+      "lastCall": "Letztes Gespräch:",
+      "noLinks": "Keine Verknüpfungen",
+      "presets": {
+        "custom": "Eigener…",
+        "nextTwoDays": "Nächste 2 Tage",
+        "thisWeek": "Diese Woche",
+        "today": "Heute",
+        "todayTomorrow": "Heute+Morgen"
+      },
+      "score": "Score:",
+      "scoreMax": "max",
+      "scoreMin": "min",
+      "searchPlaceholder": "Firma oder Steuernummer suchen...",
+      "statusAnalyzing": "Wird analysiert",
+      "total": "{count, plural, one {# Firma} other {# Firmen}}"
+    },
+    "followUp": {
+      "done": "Erledigt",
+      "label": "Follow-up",
+      "markDoneTitle": "Klicken, um das Follow-up als erledigt zu markieren",
+      "notRequired": "Nicht erforderlich",
+      "required": "Erforderlich",
+      "undoTitle": "Follow-up erledigt. Klicken, um dies rückgängig zu machen."
+    },
+    "header": {
+      "analyze": "Analysieren ({count})",
+      "analyzing": "Analyse läuft...",
+      "importCsv": "CSV-Import"
+    },
+    "import": {
+      "failed": "Fehler beim Import",
+      "resultCreated": "Importiert: {created} neu, {appended} aktualisiert aus {totalRows} Zeilen (Notizspalten: {note1} / {note2})",
+      "resultUpserted": "Importiert: {upserted} Firmen aus {totalRows} Zeilen (Notizspalten: {note1} / {note2})"
+    },
+    "inspect": {
+      "aiSummary": "KI-Zusammenfassung",
+      "analysisStatus": "Status der Analyse",
+      "basis": "Grundlage der Analyse — Notizen ({chars, plural, one {# Zeichen} other {# Zeichen}} · {calls, plural, one {# Gespräch} other {# Gespräche}})",
+      "noResults": "Keine KI-Analyseergebnisse für diese Firma.",
+      "noScore": "Keine Bewertung",
+      "promptFailed": "Fehler beim Laden des Prompts.",
+      "promptLoading": "Prompt wird geladen…",
+      "purchasePotential": "Kaufpotenzial",
+      "tabAnalysis": "KI-Analyse",
+      "tabPrompt": "DeepSeek-Prompt",
+      "title": "Inspektion des Analysators"
+    },
+    "links": {
+      "goToLead": "Zum Lead",
+      "goToPartner": "Zum Partner",
+      "goToProspect": "Zum Interessenten",
+      "prospect": "Interessent"
+    },
+    "menu": {
+      "delete": "Löschen",
+      "inspect": "Inspektion",
+      "putOnHold": "Zurückstellen",
+      "restoreFromArchive": "Aus dem Archiv wiederherstellen",
+      "restoreFromHold": "Zurückstellung aufheben"
+    },
+    "potentialHelp": {
+      "description": "Bewertung der Bereitschaft der Firma, CRM-Leistungen zu kaufen.",
+      "footer": "Den Wert berechnet ein KI-Modell auf Grundlage der Gesprächsnotizen.",
+      "title": "Potenzial (0–100)"
+    },
+    "progress": {
+      "companies": "{done} / {total} Firmen",
+      "errors": "{count, plural, one {# Fehler} other {# Fehler}}",
+      "finished": "Abgeschlossen",
+      "running": "Analyse läuft...",
+      "runningOtherUser": "Analyse läuft (anderer Benutzer)..."
+    },
+    "scoreLabels": {
+      "lowInterest": "Geringes Interesse",
+      "moderateInterest": "Mäßiges Interesse",
+      "notInterested": "Kein Interesse",
+      "readyToBuy": "Kaufbereit",
+      "strongInterest": "Starkes Interesse"
+    },
+    "statuses": {
+      "analyzing": "Wird analysiert...",
+      "archived": "Archiv",
+      "done": "Fertig",
+      "error": "Fehler",
+      "hold": "Zurückgestellt",
+      "pending": "Ausstehend"
+    },
+    "subtitle": "Analyse der Notizen aus Telefongesprächen — Kaufbereitschaft (DeepSeek AI)",
+    "table": {
+      "actions": "Aktionen",
+      "analyzedAt": "Analysiert",
+      "calls": "Gespräche",
+      "company": "Firma",
+      "firstCall": "Erstes Gespräch",
+      "lastCall": "Letztes Gespräch",
+      "links": "Verknüpfungen",
+      "potential": "Potenzial",
+      "salesperson": "Vertriebsmitarbeiter",
+      "status": "Status",
+      "taxId": "Steuernummer"
+    },
+    "title": "Gesprächsanalyse",
+    "transcript": {
+      "callNumber": "Gespräch {number}",
+      "title": "Gesprächstranskript ({count})"
+    }
+  },
   "callSimulator": {
     "activity": {
       "demoTranscript": "[00:00] Vertriebsmitarbeiter: Guten Tag, hier ist Jan Nowak von CRMtree. Kann ich mit der Person sprechen, die für Geschäftsreisen zuständig ist?\n\n[00:08] Kunde: Ja, am Apparat. Hier spricht Marek Kowalski.\n\n[00:10] Vertriebsmitarbeiter: Guten Tag, Herr Kowalski. Ich melde mich wegen der Optimierung der Geschäftsreisekosten in Ihrem Unternehmen. Haben Sie einen Moment Zeit?\n\n[00:18] Kunde: Ja, bitte. Was genau schlagen Sie vor?\n\n[00:22] Vertriebsmitarbeiter: Wir bieten ein umfassendes System für das Management von Geschäftsreisen — Buchung von Flügen, Hotels und Transport an einem Ort. Im Durchschnitt sparen unsere Kunden 15 bis 25% der Reisekosten.\n\n[00:35] Kunde: Das klingt interessant. Wie viele Reisen pro Jahr braucht es, damit sich das lohnt?\n\n[00:40] Vertriebsmitarbeiter: Unsere Plattform rechnet sich schon ab einigen Dutzend Reisen pro Jahr. Ich kann eine individuelle Kalkulation für Ihr Unternehmen vorbereiten.\n\n[00:49] Kunde: Gut. Bitte schicken Sie das Angebot per E-Mail. Unser Team sieht es sich an.\n\n[00:54] Vertriebsmitarbeiter: Selbstverständlich, ich schicke es noch heute. Können wir auch eine kurze Online-Präsentation vereinbaren, um Ihnen das System in Aktion zu zeigen?\n\n[01:02] Kunde: Ja, gern. Ich schlage einen Termin vor, sobald wir das Angebot durchgesehen haben.\n\n[01:06] Vertriebsmitarbeiter: Wunderbar. Vielen Dank für das Gespräch, auf Wiederhören.\n\n[01:09] Kunde: Auf Wiederhören.",
@@ -881,6 +1031,18 @@
       "timeline": "Zeitachse"
     }
   },
+  "mailCallback": {
+    "closeHint": "Sie können dieses Fenster schließen und im CRM weiterarbeiten.",
+    "closeWindow": "Fenster schließen",
+    "connectedBody": "Ihr {provider}-Konto wurde erfolgreich mit der Anwendung verbunden.",
+    "connectedTitle": "{provider} verbunden!",
+    "errorBody": "Das {provider}-Konto konnte nicht verbunden werden.",
+    "errorTitle": "Verbindungsfehler",
+    "processing": "Wird verarbeitet…",
+    "reasons": {
+      "email_already_connected": "Dieses Google-Konto ist bereits mit einem anderen CRM-Benutzer verbunden. Verwenden Sie ein anderes Google-Konto oder wenden Sie sich an den Administrator."
+    }
+  },
   "meetings": {
     "durationMin": "Dauer (Min.)",
     "location": "Ort",
@@ -1325,6 +1487,21 @@
       "cards": "Karten",
       "table": "Tabelle"
     }
+  },
+  "pbx": {
+    "errors": {
+      "callRejected": "Anruf abgelehnt ({code}). Prüfen Sie die Nummer.",
+      "micPermissionDenied": "Keine Berechtigung für das Mikrofon. Erlauben Sie den Zugriff in den Browsereinstellungen.",
+      "micUnavailable": "Mikrofon nicht verfügbar: {reason}",
+      "noAudio": "Keine Audioverbindung (ICE failed). Prüfen Sie das Netzwerk oder wenden Sie sich an den Administrator.",
+      "numberBusy": "Nummer besetzt — versuchen Sie es gleich noch einmal.",
+      "registrationFailed": "Die SIP-Registrierung ist fehlgeschlagen. Prüfen Sie den PBX-Token.",
+      "registrationTimeout": "Timeout der SIP-Registrierung (12s). Prüfen Sie die Verbindung und die PBX-Konfiguration.",
+      "sipConnectionFailed": "SIP-Verbindungsfehler. Konfigurieren Sie den PBX-Token unter „Meine Einstellungen“.",
+      "sipUnauthorized": "SIP-Autorisierungsfehler (401). Prüfen Sie Ihren PBX-Token unter Meine Einstellungen → Softphone."
+    },
+    "incomingTabTitle": "{name} ruft an...",
+    "unknownCaller": "unbekannt"
   },
   "periodFilter": {
     "groups": {
@@ -1778,6 +1955,466 @@
       "overdue": "überfällig",
       "showAll": "Alle Aufgaben anzeigen →",
       "title": "Aufgaben für heute"
+    }
+  },
+  "seo": {
+    "authors": {
+      "actions": {
+        "activate": "Aktivieren",
+        "add": "Autor hinzufügen",
+        "addNew": "+ Autor hinzufügen",
+        "adding": "Wird hinzugefügt…",
+        "deactivate": "Deaktivieren",
+        "delete": "Autor löschen",
+        "edit": "Bearbeiten",
+        "saving": "Wird gespeichert…"
+      },
+      "empty": "Keine Autoren — fügen Sie den ersten hinzu, um Artikel freigeben zu können (vor der Veröffentlichung ist ein Autor erforderlich).",
+      "fields": {
+        "bio": "Beschreibung der Kompetenzen",
+        "fullName": "Vor- und Nachname",
+        "jobTitle": "Position",
+        "linkedinProfile": "LinkedIn-Profil",
+        "photo": "Foto"
+      },
+      "inactiveBadge": "Inaktiv",
+      "placeholders": {
+        "bio": "Kurze Beschreibung von Erfahrung und Expertise",
+        "fullName": "z. B. Anna Schmidt",
+        "jobTitleEdit": "z. B. Head of Sales",
+        "jobTitleNew": "z. B. Vertriebsleiterin"
+      },
+      "toasts": {
+        "addFailed": "Der Autor konnte nicht hinzugefügt werden.",
+        "added": "Autor hinzugefügt.",
+        "deleteFailed": "Der Autor konnte nicht gelöscht werden.",
+        "deleted": "Autor gelöscht.",
+        "photoUploadFailed": "Das Foto konnte nicht hochgeladen werden.",
+        "photoUploaded": "Foto hochgeladen.",
+        "saveFailed": "Der Autor konnte nicht gespeichert werden.",
+        "statusChangeFailed": "Der Status konnte nicht geändert werden.",
+        "updated": "Autor aktualisiert."
+      }
+    },
+    "contentSlots": {
+      "actions": {
+        "fill": "Ausfüllen",
+        "insert": "In den Artikel einfügen",
+        "remove": "Diese Stelle entfernen"
+      },
+      "fields": {
+        "caption": "Bildunterschrift",
+        "comment": "Kommentar",
+        "fullName": "Vor- und Nachname",
+        "quote": "Zitat",
+        "quoteAuthor": "Autor (Person oder Institution)",
+        "role": "Rolle",
+        "roleCompany": "Position / Firma",
+        "sourceTitle": "Titel der Quelle",
+        "sourceUrl": "Link zur Quelle (https://)"
+      },
+      "hint": "SEObot hat im Text Stellen markiert, an denen der Artikel etwas braucht, das die KI nicht redlich erfinden kann. Füllen Sie jede Stelle aus oder entfernen Sie sie — erst dann lässt sich der Beitrag freigeben.",
+      "placeholders": {
+        "roleCompany": "z. B. Head of Sales, CRMtree"
+      },
+      "removeConfirm": "Diese Stelle aus dem Artikel entfernen? Der umgebende Text bleibt unverändert.",
+      "screenshots": {
+        "emptyLibrary": "Die Screenshot-Bibliothek ist leer — fügen Sie unten einen Screenshot hinzu oder im Bereich „Screenshots“.",
+        "uploadNew": "Neuen Screenshot hochladen",
+        "uploadToLibrary": "In die Bibliothek hochladen"
+      },
+      "statuses": {
+        "filled": "Ausgefüllt",
+        "removed": "Entfernt"
+      },
+      "suggestion": {
+        "label": "Vorschlag von SEObot (auf der Seite der Quelle geprüft):",
+        "use": "Dieses Zitat verwenden"
+      },
+      "title": "Vor der Veröffentlichung zu ergänzen",
+      "toasts": {
+        "checkField": "Prüfen Sie das Feld: {field}",
+        "chooseScreenshot": "Wählen Sie einen Screenshot.",
+        "insertFailed": "Einfügen fehlgeschlagen.",
+        "inserted": "In den Artikel eingefügt.",
+        "removeFailed": "Entfernen fehlgeschlagen.",
+        "screenshotUploadFailed": "Der Screenshot konnte nicht hochgeladen werden.",
+        "screenshotUploaded": "Screenshot zur Bibliothek hinzugefügt und ausgewählt.",
+        "textAndAuthorRequired": "Füllen Sie Text und Autor aus."
+      },
+      "types": {
+        "expert_comment": "Expertenkommentar",
+        "quote": "Zitat mit Quelle",
+        "screenshot": "Produkt-Screenshot"
+      }
+    },
+    "main": {
+      "actions": {
+        "approveAndPublish": "Freigeben und veröffentlichen",
+        "approveAndSchedule": "Freigeben und planen",
+        "cancelSchedule": "Planung aufheben",
+        "markForRefresh": "Zur Aktualisierung markieren",
+        "pendingSlotsHint": "Füllen Sie zuerst die offenen Stellen aus oder entfernen Sie sie",
+        "reject": "Ablehnen",
+        "saveChanges": "Änderungen speichern",
+        "unpublish": "Zurück in den Entwurf"
+      },
+      "detail": {
+        "author": {
+          "choose": "— Autor wählen —",
+          "inactive": "inaktiv",
+          "label": "Autor",
+          "required": "Vor der Freigabe erforderlich"
+        },
+        "empty": "Wählen Sie einen Beitrag aus der Liste.",
+        "image": {
+          "reroll": "Anderes Bild von Pexels",
+          "rerolling": "Wird gewählt…",
+          "save": "Bild speichern",
+          "urlPlaceholder": "URL des Titelbilds"
+        },
+        "internalLinks": "Interne Links:",
+        "metaPlaceholder": "Meta description",
+        "metrics": {
+          "avgPosition": "Ø Position {position}",
+          "clicks": "{count, plural, one {# Klick} other {# Klicks}}",
+          "impressions": "{count, plural, one {# Impression} other {# Impressionen}}",
+          "note": "(letzte 28 Tage, Daten aus Search Console)"
+        }
+      },
+      "errors": {
+        "unknown": "unbekannter Fehler"
+      },
+      "filters": {
+        "all": "Alle",
+        "drafts": "Entwürfe",
+        "refresh": "Zu aktualisieren"
+      },
+      "generate": {
+        "action": "Neuen Artikel generieren",
+        "inProgress": "Wird generiert… (kann einige Minuten dauern)"
+      },
+      "gsc": {
+        "connect": "Search Console verbinden",
+        "connected": "Search Console: verbunden ({siteUrl})",
+        "disconnect": "Trennen",
+        "syncNow": "Jetzt synchronisieren",
+        "syncing": "Synchronisiert…"
+      },
+      "header": {
+        "authorsToggle": "Autoren ({count})",
+        "screenshotsToggle": "Screenshots",
+        "strategyToggle": "Content-Strategie ({count, plural, one {# Säule} other {# Säulen}})"
+      },
+      "list": {
+        "empty": "Keine Beiträge in diesem Status.",
+        "metrics": "{impressions} Impr. · {clicks, plural, one {# Klick} other {# Klicks}} (28 Tage)"
+      },
+      "refresh": {
+        "apply": "Auf der Website anwenden",
+        "applyConfirm": "Den veröffentlichten Inhalt durch die neue Version ersetzen? Die Änderung erscheint sofort auf der Website.",
+        "dismissDraft": "Vorschlag verwerfen",
+        "failed": "Der Vorschlag konnte nicht erstellt werden: {error}",
+        "generatedInfo": "Erstellt: {date} · Kosten ca. ${cost} · zitierte Quellen: {facts}",
+        "generating": "Der Vorschlag wird erstellt (Analyse der GSC-Suchanfragen, aktuelle Daten, Neufassung) — das dauert einige Minuten, der Bereich aktualisiert sich von selbst.",
+        "newBody": "Neuer Inhalt",
+        "newMeta": "Neue Meta description",
+        "newTitle": "Neuer Titel",
+        "noQueries": "Keine GSC-Daten zu Suchanfragen für diese Seite — der Vorschlag konzentriert sich auf Aktualität und Struktur.",
+        "notNeeded": "Keine Aktualisierung nötig",
+        "prepare": "Vorschlag erstellen (KI)",
+        "publishedNote": "Der Artikel bleibt die ganze Zeit veröffentlicht. Die Änderungen erscheinen erst nach einem Klick auf „Auf der Website anwenden“ auf der Website.",
+        "queriesLabel": "Berücksichtigte GSC-Suchanfragen:",
+        "queryStats": "({impressions} Impr., Pos. {position})",
+        "reasonDetails": {
+          "age": "seit über 90 Tagen nicht aktualisiert.",
+          "manual": "von der Redaktion zur Aktualisierung markiert.",
+          "positionDrop": "Position von {before} auf {now} gefallen (letzte 14 Tage vs. vorherige 14).",
+          "strikingDistance": "Ø Position {position} bei {impressions} Impressionen in 28 Tagen. Die günstigste Chance auf die TOP 10."
+        },
+        "reasons": {
+          "age": "Seit 90+ Tagen nicht aktualisiert",
+          "manual": "Manuell markiert",
+          "position_drop": "Positionsverlust",
+          "striking_distance": "Nahe an Seite 1 bei Google"
+        },
+        "regenerate": "Erneut generieren",
+        "title": "Aktualisierung des Artikels",
+        "validationWarning": "Der Vorschlag hat nicht alle automatischen Prüfungen bestanden:"
+      },
+      "schedule": {
+        "clear": "Termin entfernen",
+        "label": "Veröffentlichung planen für:",
+        "scheduledNote": "Veröffentlichung geplant: {date}"
+      },
+      "sections": {
+        "authors": "Autoren",
+        "calendar": "Veröffentlichungskalender",
+        "channels": "Social-Media-Kanäle",
+        "screenshots": "Produkt-Screenshots",
+        "settings": "Einstellungen",
+        "strategy": "Content-Strategie"
+      },
+      "social": {
+        "copy": "Kopieren",
+        "noChannels": "Keine verbundenen Kanäle — verbinden Sie sie oben unter „Social-Media-Kanäle“.",
+        "publishOn": "Auf {platform} veröffentlichen",
+        "publishOrRetry": "Veröffentlichen / erneut versuchen",
+        "publishing": "Wird veröffentlicht…",
+        "statuses": {
+          "draft": "Entwurf",
+          "failed": "Fehler",
+          "published": "Veröffentlicht",
+          "queued": "Wird veröffentlicht…"
+        },
+        "title": "Social-Media-Veröffentlichung",
+        "viewPost": "Beitrag ansehen"
+      },
+      "socialConnect": {
+        "connected": "{platform}: verbunden.",
+        "errors": {
+          "access_denied": "Der Zugriff wurde nicht gewährt.",
+          "callback_failed": "Die Verbindung konnte nicht abgeschlossen werden. Stellen Sie sicher, dass das verbundene Konto Administrator der Unternehmensseite ist.",
+          "invalid_state": "Die Verbindungssitzung ist abgelaufen — versuchen Sie es erneut.",
+          "unauthorized_scope_error": "Die LinkedIn-App hat keinen genehmigten Zugriff für Veröffentlichungen auf der Unternehmensseite (Produkt Community Management API).",
+          "user_cancelled_authorize": "Die Zugriffsfreigabe wurde abgebrochen.",
+          "user_cancelled_login": "Die Anmeldung wurde abgebrochen."
+        },
+        "fallbackPlatform": "Social-Media-Kanal",
+        "unknownFailure": "Verbindung fehlgeschlagen ({reason})."
+      },
+      "statuses": {
+        "approved": "Freigegeben",
+        "archived": "Archiviert",
+        "draft": "Entwurf",
+        "in_review": "Zur Freigabe",
+        "needs_update": "Zu überarbeiten",
+        "published": "Veröffentlicht",
+        "queued": "In Warteschlange (auto)",
+        "scheduled": "Geplant"
+      },
+      "title": "SEObot — Content-Redaktion",
+      "toasts": {
+        "approveFailed": "Der Beitrag konnte nicht freigegeben werden.",
+        "authorSaveFailed": "Der Autor konnte nicht gespeichert werden.",
+        "authorSaved": "Autor gespeichert.",
+        "changesSaveFailed": "Die Änderungen konnten nicht gespeichert werden.",
+        "changesSaved": "Änderungen gespeichert.",
+        "copied": "In die Zwischenablage kopiert.",
+        "copyFailed": "Kopieren fehlgeschlagen.",
+        "generationDone": "Der neue Artikel wurde generiert und wartet auf die Freigabe.",
+        "generationFailed": "Der Artikel konnte nicht generiert werden: {error}",
+        "generationStartFailed": "Die Generierung konnte nicht gestartet werden.",
+        "generationStarted": "Der Artikel wird im Hintergrund generiert — das dauert einige Minuten. Sie können weiterarbeiten.",
+        "gscDisconnectFailed": "Search Console konnte nicht getrennt werden.",
+        "gscDisconnected": "Search Console getrennt — Sie können sie mit dem richtigen Google-Konto erneut verbinden.",
+        "gscSyncFailed": "Die Metriken konnten nicht synchronisiert werden.",
+        "gscSynced": "Search-Console-Metriken synchronisiert.",
+        "imageRerollFailed": "Es konnte kein neues Bild gewählt werden.",
+        "imageRerolled": "Neues Bild gewählt.",
+        "imageSaveFailed": "Das Bild konnte nicht gespeichert werden.",
+        "imageSaved": "Bild gespeichert.",
+        "published": "Beitrag veröffentlicht.",
+        "refreshApplied": "Die aktualisierte Version ist bereits auf der Website.",
+        "refreshApplyFailed": "Die Aktualisierung konnte nicht angewendet werden.",
+        "refreshDismissFailed": "Entfernen aus der Warteschlange fehlgeschlagen.",
+        "refreshDismissed": "Aus der Aktualisierungswarteschlange entfernt.",
+        "refreshGenerating": "Der Vorschlag wird erstellt — das dauert einige Minuten.",
+        "refreshMarkFailed": "Der Beitrag konnte nicht markiert werden.",
+        "refreshMarked": "Zur Aktualisierung markiert.",
+        "rejectFailed": "Der Beitrag konnte nicht abgelehnt werden.",
+        "rejected": "Beitrag abgelehnt, zurück bei den Entwürfen.",
+        "scheduleSaveFailed": "Der Termin konnte nicht gespeichert werden.",
+        "scheduleSaved": "Veröffentlichungstermin gespeichert.",
+        "scheduled": "Veröffentlichung geplant.",
+        "socialPostSaveFailed": "Der Beitrag konnte nicht gespeichert werden.",
+        "socialPostSaved": "Beitrag gespeichert.",
+        "socialPublishFailed": "Veröffentlichung fehlgeschlagen.",
+        "socialPublishFailedCheck": "Veröffentlichung fehlgeschlagen — prüfen Sie den Fehler.",
+        "socialPublished": "Veröffentlicht.",
+        "unpublishFailed": "Der Beitrag konnte nicht zurückgezogen werden.",
+        "unpublished": "Beitrag zurück in die Entwürfe verschoben."
+      }
+    },
+    "publishingCalendar": {
+      "config": {
+        "autoMode": "Automatischer Modus (ohne manuelles Review)",
+        "autoModeWarning": "Artikel in diesem Modus werden zum festgelegten Datum automatisch veröffentlicht — ohne manuelle Freigabe durch die Redaktion.",
+        "noEndDate": "Ohne zeitliche Begrenzung (der Zeitplan läuft unbegrenzt weiter)",
+        "save": "Zeitplan speichern",
+        "saving": "Wird gespeichert…",
+        "title": "Automatischer Zeitplan"
+      },
+      "enableConfirm": "Der automatische Modus veröffentlicht Artikel ohne manuelle Freigabe durch die Redaktion — fortfahren?",
+      "toasts": {
+        "configSaveFailed": "Der Zeitplan konnte nicht gespeichert werden.",
+        "configSaved": "Zeitplan gespeichert.",
+        "disabled": "Automatischer Modus deaktiviert.",
+        "enabled": "Automatischer Modus aktiviert.",
+        "moveFailed": "Der Artikel konnte nicht verschoben werden.",
+        "movedTo": "Verschoben auf {date}.",
+        "movedToUnassigned": "Zurück in die Warteschlange der nicht zugewiesenen Artikel.",
+        "saveFailed": "Speichern fehlgeschlagen."
+      },
+      "unassigned": {
+        "empty": "Keine nicht zugewiesenen Artikel.",
+        "title": "Nicht zugewiesen ({count})"
+      },
+      "weeks": {
+        "current": "Diese Woche (läuft, gesperrt)",
+        "next": "Nächste Woche (bearbeitbar)"
+      }
+    },
+    "screenshots": {
+      "actions": {
+        "add": "+ Screenshot hinzufügen",
+        "delete": "Screenshot löschen",
+        "edit": "Bearbeiten",
+        "uploading": "Lädt hoch…"
+      },
+      "deleteConfirm": "Diesen Screenshot aus der Bibliothek löschen?",
+      "fields": {
+        "caption": "Bildunterschrift",
+        "captionUnderImage": "Bildunterschrift",
+        "feature": "Funktion",
+        "file": "Datei (PNG, JPEG, WebP, max. 8 MB)"
+      },
+      "hint": "Screenshots des Produkts, mit einer Funktion gekennzeichnet (z. B. „Interessenten“, „KI-Gesprächsanalyse“). SEObot fügt den passenden Screenshot selbst in einen neuen Artikel ein; gibt es keinen, lässt er im Text eine Stelle zum Ergänzen. Laden Sie keine Bildschirme mit echten Kundendaten hoch.",
+      "placeholders": {
+        "caption": "z. B. Interessentenliste, sortiert nach ICP-Scoring",
+        "feature": "z. B. Interessenten"
+      },
+      "toasts": {
+        "added": "Screenshot hinzugefügt.",
+        "deleteFailed": "Der Screenshot konnte nicht gelöscht werden.",
+        "deleted": "Screenshot gelöscht.",
+        "saveFailed": "Speichern fehlgeschlagen.",
+        "saved": "Gespeichert.",
+        "uploadFailed": "Der Screenshot konnte nicht hochgeladen werden."
+      }
+    },
+    "socialChannels": {
+      "connect": "Verbinden",
+      "connected": "Verbunden",
+      "disconnect": "Trennen",
+      "hint": "Mit der Freigabe eines Artikels wird er gleichzeitig auf den verbundenen Kanälen veröffentlicht — mit einem Klick. Instagram wird automatisch zusammen mit Facebook verbunden (dasselbe Meta-Konto).",
+      "instagramHint": "Wird nach dem Verbinden von Facebook automatisch verbunden, wenn die Seite ein verknüpftes Instagram-Business-Konto hat.",
+      "toasts": {
+        "connectStartFailed": "Die Verbindung mit {platform} konnte nicht gestartet werden.",
+        "disconnectFailed": "Trennen fehlgeschlagen.",
+        "disconnected": "{platform}: getrennt.",
+        "wordpressConnectFailed": "Die Verbindung mit WordPress ist fehlgeschlagen.",
+        "wordpressConnected": "WordPress verbunden."
+      },
+      "wordpress": {
+        "appPassword": "Anwendungspasswort",
+        "appPasswordPlaceholder": "in WP erstellt: Benutzer → Profil → Anwendungspasswörter",
+        "connect": "WordPress verbinden",
+        "connecting": "Verbindung läuft…",
+        "siteUrl": "Adresse der Website",
+        "siteUrlPlaceholder": "https://ihre-website.de",
+        "username": "Benutzername",
+        "usernamePlaceholder": "z. B. admin"
+      },
+      "wordpressHint": "Veröffentlichung des vollständigen Artikels auf der eigenen WordPress-Website des Kunden (Application Password)."
+    },
+    "strategy": {
+      "backlinks": {
+        "accept": "Akzeptieren",
+        "empty": "Keine Backlinks.",
+        "findCandidates": "Kandidaten suchen",
+        "hint": "Opt-in-Linktausch mit anderen Organisationen derselben Branche (industry_vertical), ausschließlich thematisch passend, ohne erzwungene Gegenseitigkeit. Der Abgleich funktioniert erst, wenn sich auch eine andere Organisation anmeldet — heute sind Sie die einzige.",
+        "optIn": "Zustimmung zum Backlink-Tausch mit anderen Organisationen",
+        "reject": "Ablehnen",
+        "searching": "Suche läuft…",
+        "statuses": {
+          "accepted": "Akzeptiert",
+          "rejected": "Abgelehnt",
+          "suggested": "Vorgeschlagen"
+        },
+        "title": "Backlinks zwischen Organisationen ({count})"
+      },
+      "competitors": {
+        "add": "Hinzufügen",
+        "empty": "Keine Wettbewerber auf der Liste.",
+        "hint": "Die Liste beeinflusst die Generierung der Themensäulen — je besser sie beschrieben ist, desto treffender die Strategie.",
+        "notesPlaceholder": "Notiz (optional)",
+        "removeAria": "Entfernen",
+        "title": "Wettbewerber ({count})",
+        "urlPlaceholder": "https://wettbewerber.de"
+      },
+      "pillars": {
+        "add": "Säule hinzufügen",
+        "addOwn": "+ Eigene Säule hinzufügen",
+        "adding": "Wird hinzugefügt…",
+        "articleCount": "{count} Art.",
+        "description": "Beschreibung",
+        "descriptionPlaceholder": "Worum es in den Artikeln dieser Säule gehen soll",
+        "edit": "Bearbeiten",
+        "keywordTheme": "Keyword-Thema",
+        "keywordThemePlaceholder": "z. B. Yachtcharter, Marina",
+        "name": "Name",
+        "namePlaceholder": "z. B. Verwaltung einer Yachtflotte",
+        "removeAria": "Säule entfernen",
+        "saving": "Wird gespeichert…"
+      },
+      "toasts": {
+        "backlinkAcceptFailed": "Akzeptieren fehlgeschlagen.",
+        "backlinkAccepted": "Backlink akzeptiert.",
+        "backlinkRejectFailed": "Ablehnen fehlgeschlagen.",
+        "backlinkRejected": "Backlink abgelehnt.",
+        "candidatesFound": "{count, plural, one {# Kandidat gefunden.} other {# Kandidaten gefunden.}}",
+        "candidatesSearchFailed": "Die Kandidatensuche ist fehlgeschlagen.",
+        "competitorAddFailed": "Der Wettbewerber konnte nicht hinzugefügt werden.",
+        "competitorAdded": "Wettbewerber hinzugefügt.",
+        "competitorRemoveFailed": "Der Wettbewerber konnte nicht entfernt werden.",
+        "competitorRemoved": "Wettbewerber entfernt.",
+        "noCandidates": "Keine Kandidaten — noch passt keine andere Organisation nach Branche und Zustimmung.",
+        "optInDisabled": "Zustimmung zu Backlinks deaktiviert.",
+        "optInEnabled": "Zustimmung zu Backlinks aktiviert.",
+        "optInSaveFailed": "Die Zustimmung konnte nicht gespeichert werden.",
+        "pillarAddFailed": "Die Säule konnte nicht hinzugefügt werden.",
+        "pillarAdded": "Säule hinzugefügt.",
+        "pillarRemoveFailed": "Die Säule konnte nicht entfernt werden.",
+        "pillarRemoved": "Säule entfernt.",
+        "pillarSaveFailed": "Die Säule konnte nicht gespeichert werden.",
+        "pillarUpdated": "Säule aktualisiert."
+      }
+    },
+    "tenantSettings": {
+      "fields": {
+        "businessDescription": "Beschreibung von Produkt und Geschäft",
+        "businessDescriptionPlaceholder": "Was das Unternehmen macht, welche Funktionen das Produkt hat, wer die Zielgruppe ist, welche Branche…",
+        "industry": "Branche (industry_vertical)",
+        "industryPlaceholder": "z. B. yachting, saas_crm, personal_brand",
+        "productName": "Produktname",
+        "productNamePlaceholder": "z. B. CRMtree"
+      },
+      "gscProperty": {
+        "hint": "Die tatsächliche, verifizierte GSC-Property, mit der bei „Search Console verbinden“ verbunden wird — URL-Präfix (z. B. https://kunde.de/) oder Domain-Property (sc-domain:kunde.de). Leer = Ermittlung anhand von WordPress oder der unten angegebenen Adresse.",
+        "placeholder": "https://crmtree.pl/ oder sc-domain:crmtree.pl",
+        "save": "GSC-Property speichern",
+        "title": "Search-Console-Property"
+      },
+      "hint": "Speist die Strategie (Säulen, Keywords) und jeden Artikel. SEObot zeigt im Text, wie das Problem im Produkt gelöst wird, und beschreibt nur die in der Beschreibung genannten Funktionen — je genauer Sie sie aufführen, desto konkreter die Artikel.",
+      "save": "Einstellungen speichern",
+      "saving": "Wird gespeichert…",
+      "title": "SEO-Einstellungen der Organisation",
+      "toasts": {
+        "gscPropertySaveFailed": "Die GSC-Property konnte nicht gespeichert werden.",
+        "gscPropertySaved": "Search-Console-Property gespeichert.",
+        "modeSaveFailed": "Der Modus konnte nicht gespeichert werden.",
+        "saveFailed": "Die Einstellungen konnten nicht gespeichert werden.",
+        "saved": "Einstellungen gespeichert.",
+        "wordpressDraft": "WordPress: Veröffentlichung als Entwurf.",
+        "wordpressLive": "WordPress: Veröffentlichung sofort live."
+      },
+      "wordpressMode": {
+        "draft": "Entwurf (sicher, erfordert manuelle Veröffentlichung in WP)",
+        "hint": "Die Entscheidung wird nach dem Gespräch mit dem Kunden getroffen — ob Artikel auf seinem WordPress sofort live gehen oder als Entwurf zur manuellen Veröffentlichung dort landen sollen.",
+        "publish": "Sofort veröffentlichen (live, ohne Zwischenschritt)",
+        "title": "WordPress-Veröffentlichungsmodus"
+      }
     }
   },
   "sms": {

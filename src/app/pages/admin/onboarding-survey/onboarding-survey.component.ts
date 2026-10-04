@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../../core/services/toast.service';
 import { environment } from '../../../../environments/environment';
 import {
@@ -15,21 +16,23 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
 @Component({
   selector: 'app-onboarding-survey',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslocoDirective],
+  providers: [provideTranslocoScope('admin')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <ng-container *transloco="let t; prefix: 'admin'">
     <div id="topbar">
-      <span class="page-title">Ankieta wdrożeniowa</span>
+      <span class="page-title">{{ t('onboardingSurvey.page.title') }}</span>
       @if (status() === 'submitted') {
-        <span class="status-badge status-submitted">Wysłana {{ submittedAt() | date:'dd.MM.yyyy HH:mm' }}</span>
+        <span class="status-badge status-submitted">{{ t('onboardingSurvey.page.statusSubmitted', { date: (submittedAt() | date:'dd.MM.yyyy HH:mm') }) }}</span>
       } @else if (status() === 'draft') {
-        <span class="status-badge status-draft">Wersja robocza</span>
+        <span class="status-badge status-draft">{{ t('onboardingSurvey.page.statusDraft') }}</span>
       }
       <span class="tsp"></span>
-      <a class="btn btn-g" routerLink="/admin/settings">← Ustawienia</a>
-      <button class="btn btn-g" [disabled]="isSaving() || isLoading()" (click)="save(false)">Zapisz wersję roboczą</button>
+      <a class="btn btn-g" routerLink="/admin/settings">← {{ t('onboardingSurvey.page.backToSettings') }}</a>
+      <button class="btn btn-g" [disabled]="isSaving() || isLoading()" (click)="save(false)">{{ t('onboardingSurvey.page.saveDraft') }}</button>
       <button class="btn btn-p" [disabled]="isSaving() || isLoading()" (click)="save(true)">
-        {{ status() === 'submitted' ? 'Wyślij ponownie' : 'Wyślij ankietę' }}
+        {{ status() === 'submitted' ? t('onboardingSurvey.page.resubmit') : t('onboardingSurvey.page.submit') }}
       </button>
     </div>
 
@@ -39,42 +42,41 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
       } @else {
         <div class="survey">
           <div class="survey-intro">
-            Na podstawie tej ankiety zespół CRMtree skonfiguruje Państwa środowisko. Można ją wypełniać etapami —
-            „Zapisz wersję roboczą” zachowuje odpowiedzi, a „Wyślij ankietę” przekazuje je do nas.
-            Pola oznaczone <span class="req">*</span> są wymagane do wysłania. Hasła, tokeny i klucze API są
-            zapisywane w formie zaszyfrowanej i po zapisaniu nie są już wyświetlane.
+            {{ t('onboardingSurvey.page.intro.howItWorks') }}
+            {{ t('onboardingSurvey.page.intro.requiredBefore') }} <span class="req">*</span> {{ t('onboardingSurvey.page.intro.requiredAfter') }}
+            {{ t('onboardingSurvey.page.intro.secrets') }}
           </div>
 
-          @if (missingRequiredLabels().length > 0) {
+          @if (missingRequiredLabelKeys().length > 0) {
             <div class="survey-errors">
-              <strong>Uzupełnij wymagane pola, aby wysłać ankietę:</strong>
+              <strong>{{ t('onboardingSurvey.page.missingRequiredTitle') }}</strong>
               <ul>
-                @for (label of missingRequiredLabels(); track label) { <li>{{ label }}</li> }
+                @for (labelKey of missingRequiredLabelKeys(); track labelKey) { <li>{{ t(labelKey) }}</li> }
               </ul>
             </div>
           }
 
           @for (section of visibleSections(); track section.id) {
             <div class="card survey-section">
-              <h2 class="survey-section-title">{{ section.title }}</h2>
-              @if (section.intro) { <p class="survey-section-intro">{{ section.intro }}</p> }
+              <h2 class="survey-section-title">{{ t(section.titleKey) }}</h2>
+              @if (section.introKey) { <p class="survey-section-intro">{{ t(section.introKey) }}</p> }
 
               @for (field of visibleFields(section); track field.key) {
                 <div class="fg survey-field">
                   <label class="fl" [attr.for]="field.key">
-                    {{ field.label }} @if (field.isRequired) { <span class="req">*</span> }
+                    {{ t(field.labelKey) }} @if (field.isRequired) { <span class="req">*</span> }
                   </label>
 
                   @switch (field.type) {
                     @case ('textarea') {
-                      <textarea class="fta" rows="4" [id]="field.key" [placeholder]="field.placeholder ?? ''"
+                      <textarea class="fta" rows="4" [id]="field.key" [placeholder]="field.placeholderKey ? t(field.placeholderKey) : ''"
                                 [(ngModel)]="answers[field.key]"></textarea>
                     }
                     @case ('select') {
                       <select class="fsel" [id]="field.key" [(ngModel)]="answers[field.key]">
-                        <option value="">— wybierz —</option>
+                        <option value="">{{ t('onboardingSurvey.page.choose') }}</option>
                         @for (option of field.options; track option.value) {
-                          <option [value]="option.value">{{ option.label }}</option>
+                          <option [value]="option.value">{{ t(option.labelKey) }}</option>
                         }
                       </select>
                     }
@@ -85,8 +87,8 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
                             <input type="checkbox" [checked]="isOptionSelected(field.key, option.value)"
                                    (change)="toggleOption(field.key, option.value)">
                             <span>
-                              {{ option.label }}
-                              @if (option.hint) { <span class="survey-option-hint">{{ option.hint }}</span> }
+                              {{ t(option.labelKey) }}
+                              @if (option.hintKey) { <span class="survey-option-hint">{{ t(option.hintKey) }}</span> }
                             </span>
                           </label>
                         }
@@ -94,16 +96,16 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
                     }
                     @case ('secret') {
                       <input class="fi" type="password" autocomplete="new-password" [id]="field.key"
-                             [placeholder]="isSecretSaved(field.key) ? '•••••••• zapisano — zostaw puste, aby nie zmieniać' : ''"
+                             [placeholder]="isSecretSaved(field.key) ? '•••••••• ' + t('onboardingSurvey.page.secretSavedPlaceholder') : ''"
                              [(ngModel)]="secrets[field.key]">
                     }
                     @default {
-                      <input class="fi" [type]="field.type" [id]="field.key" [placeholder]="field.placeholder ?? ''"
+                      <input class="fi" [type]="field.type" [id]="field.key" [placeholder]="field.placeholderKey ? t(field.placeholderKey) : ''"
                              [(ngModel)]="answers[field.key]">
                     }
                   }
 
-                  @if (field.hint) { <span class="survey-hint">{{ field.hint }}</span> }
+                  @if (field.hintKey) { <span class="survey-hint">{{ t(field.hintKey) }}</span> }
                 </div>
               }
             </div>
@@ -111,6 +113,7 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
         </div>
       }
     </div>
+    </ng-container>
   `,
   styles: [`
     .survey { max-width: 820px; }
@@ -141,13 +144,14 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
 export class OnboardingSurveyComponent implements OnInit {
   private http  = inject(HttpClient);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   isLoading = signal(true);
   isSaving  = signal(false);
   status    = signal<OnboardingSurveyResponse['status']>('not_started');
   submittedAt = signal<string | null>(null);
   savedSecretKeys = signal<string[]>([]);
-  missingRequiredLabels = signal<string[]>([]);
+  missingRequiredLabelKeys = signal<string[]>([]);
 
   answers: SurveyAnswers = {};
   secrets: Record<string, string> = {};
@@ -155,7 +159,7 @@ export class OnboardingSurveyComponent implements OnInit {
   ngOnInit(): void {
     this.http.get<OnboardingSurveyResponse>(SURVEY_URL).subscribe({
       next: survey => { this.applySurvey(survey); this.isLoading.set(false); },
-      error: () => { this.toast.error('Nie udało się pobrać ankiety'); this.isLoading.set(false); },
+      error: () => { this.toast.error(this.transloco.translate('admin.onboardingSurvey.page.loadFailed')); this.isLoading.set(false); },
     });
   }
 
@@ -178,10 +182,10 @@ export class OnboardingSurveyComponent implements OnInit {
 
   save(isSubmit: boolean): void {
     if (isSubmit) {
-      const missing = this.findMissingRequiredLabels();
-      this.missingRequiredLabels.set(missing);
+      const missing = this.findMissingRequiredLabelKeys();
+      this.missingRequiredLabelKeys.set(missing);
       if (missing.length > 0) {
-        this.toast.error('Uzupełnij wymagane pola');
+        this.toast.error(this.transloco.translate('admin.onboardingSurvey.page.fillRequired'));
         document.getElementById('content')?.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -197,9 +201,9 @@ export class OnboardingSurveyComponent implements OnInit {
       next: survey => {
         this.applySurvey(survey);
         this.isSaving.set(false);
-        this.toast.success(isSubmit ? 'Ankieta wysłana do zespołu CRMtree' : 'Wersja robocza zapisana');
+        this.toast.success(isSubmit ? this.transloco.translate('admin.onboardingSurvey.page.submitted') : this.transloco.translate('admin.onboardingSurvey.page.draftSaved'));
       },
-      error: err => { this.isSaving.set(false); this.toast.error(err?.error?.error ?? 'Błąd zapisu ankiety'); },
+      error: err => { this.isSaving.set(false); this.toast.error(err?.error?.error ?? this.transloco.translate('admin.onboardingSurvey.page.saveFailed')); },
     });
   }
 
@@ -226,11 +230,11 @@ export class OnboardingSurveyComponent implements OnInit {
     return visibleAnswers;
   }
 
-  private findMissingRequiredLabels(): string[] {
+  private findMissingRequiredLabelKeys(): string[] {
     const answered = this.answersForVisibleFields();
     return this.visibleSections()
       .flatMap(section => this.visibleFields(section))
       .filter(field => field.isRequired && !(answered[field.key]?.length))
-      .map(field => field.label);
+      .map(field => field.labelKey);
   }
 }

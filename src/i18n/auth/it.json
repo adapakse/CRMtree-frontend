@@ -1,4 +1,18 @@
 {
+  "changePassword": {
+    "errors": {
+      "failed": "Errore nel cambio della password",
+      "mismatch": "Le password non coincidono",
+      "tooShort": "La password deve avere almeno 8 caratteri"
+    },
+    "hint": "La tua password temporanea è scaduta. Imposta una password personale prima di continuare.",
+    "newPassword": "Nuova password",
+    "newPasswordPlaceholder": "min. 8 caratteri",
+    "repeatPassword": "Ripeti la password",
+    "submit": "Imposta la password e accedi",
+    "submitting": "Salvataggio…",
+    "title": "Imposta una nuova password"
+  },
   "login": {
     "email": "Email",
     "emailPlaceholder": "mario@azienda.it",

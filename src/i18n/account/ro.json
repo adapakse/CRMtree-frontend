@@ -1,0 +1,71 @@
+{
+  "myDevices": {
+    "empty": "Niciun telefon conectat.",
+    "hint": "Telefoanele pe care sunteți conectat în aplicația mobilă CRMtree. Dacă pierdeți telefonul sau îl înlocuiți, deconectați-l aici — aplicația de pe acesta va pierde accesul în cel mult câteva minute.",
+    "lastActive": "ultima activitate {date}",
+    "signOut": "Deconectare",
+    "signOutConfirm": "Deconectați {name} din aplicația CRMtree?",
+    "signOutFailed": "Dispozitivul nu a putut fi deconectat.",
+    "signedInSince": "conectat din {date}",
+    "signedOut": "Deconectat: {name}.",
+    "signingOut": "Se deconectează…",
+    "thisDevice": "acest dispozitiv",
+    "title": "Telefoane conectate",
+    "unknownDevice": "Dispozitiv necunoscut"
+  },
+  "mySettings": {
+    "delete": "Ștergere",
+    "pbx": {
+      "configured": "Token configurat",
+      "directPhone": "Numărul dvs. direct:",
+      "hideToken": "Ascundere",
+      "hint": "Pentru a folosi telefonul integrat, lipiți Personal Access Token din panoul ip-pbx.eu. Tokenul permite aplicației să preia datele dvs. SIP. Clienții care văd numărul dvs. direct vă pot suna înapoi direct.",
+      "noDirectPhone": "Numărul direct nu este atribuit în PBX",
+      "notConfigured": "Lipsește tokenul — softphone-ul nu va funcționa.",
+      "notifications": {
+        "blocked": "Notificări blocate — deblocați-le manual în setările browserului:",
+        "enable": "Activare notificări",
+        "enabled": "Notificări activate",
+        "hint": "Afișează o notificare de sistem când sună un client — chiar și atunci când browserul este în fundal sau lucrați în alt program.",
+        "permissionHint": "Browserul va cere permisiunea",
+        "title": "Notificări despre apeluri",
+        "unblockPath": "Lacătul de lângă adresa paginii → Notificări → Permite"
+      },
+      "saveToken": "Salvare token",
+      "showToken": "Afișare",
+      "title": "Softphone — token PBX",
+      "tokenHelpEnd": "copiați și lipiți aici.",
+      "tokenHelpStart": "Panoul ip-pbx.eu → faceți clic pe numele dvs. (colțul din dreapta sus)",
+      "tokenPlaceholder": "Lipiți tokenul din ip-pbx.eu…",
+      "tokenSaved": "Token salvat",
+      "tokenSavedWithPhone": "Token salvat — număr: {phone}"
+    },
+    "saveFailed": "Eroare la salvare — încercați din nou",
+    "saving": "Se salvează…",
+    "signature": {
+      "deleteConfirm": "Ștergeți semnătura salvată? Nu va mai fi adăugată la e-mailuri.",
+      "empty": "Nicio semnătură — lipiți codul HTML în stânga",
+      "hint": "Lipiți mai jos codul HTML al semnăturii dvs. Aceasta va fi adăugată automat la fiecare e-mail trimis din sistem (Leaduri și Registru parteneri). Puteți folosi codul HTML gata făcut din clientul de e-mail sau un instrument de creare a semnăturilor — de ex. HubSpot Email Signature Generator.",
+      "htmlLabel": "Codul HTML al semnăturii",
+      "htmlPlaceholder": "Lipiți aici codul HTML al semnăturii…",
+      "preview": "Previzualizare",
+      "save": "Salvare semnătură",
+      "saved": "Semnătură salvată",
+      "title": "Semnătura mea de e-mail"
+    },
+    "templates": {
+      "bodyLabel": "Conținut",
+      "bodyPlaceholder": "Conținutul șablonului…",
+      "deleteConfirm": "Ștergeți șablonul „{name}”?",
+      "edit": "Editare",
+      "editTitle": "Editare șablon",
+      "empty": "Niciun șablon. Faceți clic pe „+ Șablon nou” pentru a adăuga primul.",
+      "hint": "Salvați texte gata făcute, pe care le puteți insera rapid când scrieți un e-mail către un lead sau un partener.",
+      "nameLabel": "Numele șablonului",
+      "namePlaceholder": "de ex. Întâlnire de prezentare, Follow-up după demo…",
+      "new": "Șablon nou",
+      "title": "Șabloane de e-mail"
+    },
+    "title": "Setările mele"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "myDevices": {
+    "empty": "Aucun téléphone connecté.",
+    "hint": "Téléphones sur lesquels vous êtes connecté à l’application mobile CRMtree. Si vous perdez votre téléphone ou le remplacez, déconnectez-le ici — l’application qui s’y trouve perdra l’accès au plus tard après une quinzaine de minutes.",
+    "lastActive": "dernière activité : {date}",
+    "signOut": "Déconnecter",
+    "signOutConfirm": "Déconnecter {name} de l’application CRMtree ?",
+    "signOutFailed": "Impossible de déconnecter l’appareil.",
+    "signedInSince": "session ouverte : {date}",
+    "signedOut": "Déconnexion effectuée : {name}.",
+    "signingOut": "Déconnexion…",
+    "thisDevice": "cet appareil",
+    "title": "Téléphones connectés",
+    "unknownDevice": "Appareil inconnu"
+  },
+  "mySettings": {
+    "delete": "Supprimer",
+    "pbx": {
+      "configured": "Jeton configuré",
+      "directPhone": "Votre numéro direct :",
+      "hideToken": "Masquer",
+      "hint": "Pour utiliser le téléphone intégré, collez votre Personal Access Token depuis le panneau ip-pbx.eu. Le jeton permet à l’application de récupérer vos données SIP. Les clients qui voient votre numéro direct peuvent vous rappeler directement.",
+      "noDirectPhone": "Aucun numéro direct attribué dans le PBX",
+      "notConfigured": "Aucun jeton — le softphone ne fonctionnera pas.",
+      "notifications": {
+        "blocked": "Notifications bloquées — débloquez-les manuellement dans les paramètres du navigateur :",
+        "enable": "Activer les notifications",
+        "enabled": "Notifications activées",
+        "hint": "Affiche une notification système lorsqu’un client appelle — même si le navigateur est en arrière-plan ou si vous travaillez dans un autre programme.",
+        "permissionHint": "Le navigateur demandera votre autorisation",
+        "title": "Notifications d’appels",
+        "unblockPath": "Cadenas à côté de l’adresse du site → Notifications → Autoriser"
+      },
+      "saveToken": "Enregistrer le jeton",
+      "showToken": "Afficher",
+      "title": "Softphone — jeton PBX",
+      "tokenHelpEnd": "copiez-le et collez-le ici.",
+      "tokenHelpStart": "Panneau ip-pbx.eu → cliquez sur votre nom (en haut à droite)",
+      "tokenPlaceholder": "Collez le jeton d’ip-pbx.eu…",
+      "tokenSaved": "Jeton enregistré",
+      "tokenSavedWithPhone": "Jeton enregistré — numéro : {phone}"
+    },
+    "saveFailed": "Échec de l’enregistrement — veuillez réessayer",
+    "saving": "Enregistrement…",
+    "signature": {
+      "deleteConfirm": "Supprimer la signature enregistrée ? Elle ne sera plus ajoutée aux e-mails.",
+      "empty": "Aucune signature — collez le HTML à gauche",
+      "hint": "Collez ci-dessous le code HTML de votre signature. Elle sera automatiquement ajoutée à chaque e-mail envoyé depuis le système (Leads et Registre des partenaires). Vous pouvez utiliser le HTML fourni par votre client de messagerie ou un outil de création de signatures — par ex. HubSpot Email Signature Generator.",
+      "htmlLabel": "Code HTML de la signature",
+      "htmlPlaceholder": "Collez ici le code HTML de la signature…",
+      "preview": "Aperçu",
+      "save": "Enregistrer la signature",
+      "saved": "Signature enregistrée",
+      "title": "Ma signature e-mail"
+    },
+    "templates": {
+      "bodyLabel": "Contenu",
+      "bodyPlaceholder": "Contenu du modèle…",
+      "deleteConfirm": "Supprimer le modèle « {name} » ?",
+      "edit": "Modifier",
+      "editTitle": "Modification du modèle",
+      "empty": "Aucun modèle. Cliquez sur « + Nouveau modèle » pour ajouter le premier.",
+      "hint": "Enregistrez des messages prêts à l’emploi que vous pourrez insérer rapidement en rédigeant un e-mail à un lead ou à un partenaire.",
+      "nameLabel": "Nom du modèle",
+      "namePlaceholder": "ex. Réunion d’introduction, Relance après démo…",
+      "new": "Nouveau modèle",
+      "title": "Modèles d’e-mails"
+    },
+    "title": "Mes paramètres"
+  }
+}

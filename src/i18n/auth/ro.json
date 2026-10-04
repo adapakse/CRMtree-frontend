@@ -1,4 +1,18 @@
 {
+  "changePassword": {
+    "errors": {
+      "failed": "Eroare la schimbarea parolei",
+      "mismatch": "Parolele nu sunt identice",
+      "tooShort": "Parola trebuie să aibă cel puțin 8 caractere"
+    },
+    "hint": "Parola dvs. temporară a expirat. Setați o parolă proprie înainte de a continua.",
+    "newPassword": "Parolă nouă",
+    "newPasswordPlaceholder": "min. 8 caractere",
+    "repeatPassword": "Repetați parola",
+    "submit": "Setare parolă și conectare",
+    "submitting": "Se salvează…",
+    "title": "Setați o parolă nouă"
+  },
   "login": {
     "email": "E-mail",
     "emailPlaceholder": "ion@firma.ro",

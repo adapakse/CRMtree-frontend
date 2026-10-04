@@ -21,6 +21,9 @@
   "states": {
     "loading": "Загрузка…"
   },
+  "testEnvironmentBanner": {
+    "title": "Тестовая версия — это не продуктивная среда"
+  },
   "typeahead": {
     "minChars": "Минимум символов для поиска: {count}…",
     "noResults": "Нет результатов.",

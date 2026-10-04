@@ -1,0 +1,71 @@
+{
+  "myDevices": {
+    "empty": "Nessun telefono connesso.",
+    "hint": "Telefoni sui quali hai effettuato l'accesso all'app mobile CRMtree. Se perdi il telefono o lo cambi, disconnettilo qui — l'app su quel telefono perderà l'accesso al più tardi dopo una quindicina di minuti.",
+    "lastActive": "ultima attività {date}",
+    "signOut": "Disconnetti",
+    "signOutConfirm": "Disconnettere {name} dall’app CRMtree?",
+    "signOutFailed": "Impossibile disconnettere il dispositivo.",
+    "signedInSince": "accesso dal {date}",
+    "signedOut": "Disconnessione eseguita: {name}.",
+    "signingOut": "Disconnessione…",
+    "thisDevice": "questo dispositivo",
+    "title": "Telefoni connessi",
+    "unknownDevice": "Dispositivo sconosciuto"
+  },
+  "mySettings": {
+    "delete": "Elimina",
+    "pbx": {
+      "configured": "Token configurato",
+      "directPhone": "Il tuo numero diretto:",
+      "hideToken": "Nascondi",
+      "hint": "Per usare il telefono integrato, incolla il tuo Personal Access Token dal pannello ip-pbx.eu. Il token consente all'applicazione di recuperare i tuoi dati SIP. I clienti che vedono il tuo numero diretto possono richiamarti direttamente.",
+      "noDirectPhone": "Nessun numero diretto assegnato nel PBX",
+      "notConfigured": "Nessun token — il softphone non funzionerà.",
+      "notifications": {
+        "blocked": "Notifiche bloccate — sbloccale manualmente nelle impostazioni del browser:",
+        "enable": "Attiva notifiche",
+        "enabled": "Notifiche attive",
+        "hint": "Mostra una notifica di sistema quando chiama un cliente — anche se il browser è in background o stai lavorando in un altro programma.",
+        "permissionHint": "Il browser chiederà l'autorizzazione",
+        "title": "Notifiche delle chiamate",
+        "unblockPath": "Lucchetto accanto all'indirizzo del sito → Notifiche → Consenti"
+      },
+      "saveToken": "Salva token",
+      "showToken": "Mostra",
+      "title": "Softphone — token PBX",
+      "tokenHelpEnd": "copia e incolla qui.",
+      "tokenHelpStart": "Pannello ip-pbx.eu → clicca sul tuo nome (in alto a destra)",
+      "tokenPlaceholder": "Incolla il token da ip-pbx.eu…",
+      "tokenSaved": "Token salvato",
+      "tokenSavedWithPhone": "Token salvato — numero: {phone}"
+    },
+    "saveFailed": "Errore di salvataggio — riprova",
+    "saving": "Salvataggio…",
+    "signature": {
+      "deleteConfirm": "Eliminare la firma salvata? Non verrà più aggiunta alle e-mail.",
+      "empty": "Nessuna firma — incolla l'HTML a sinistra",
+      "hint": "Incolla qui sotto il codice HTML della tua firma. Verrà aggiunta automaticamente a ogni e-mail inviata dal sistema (Lead e Registro partner). Puoi usare l'HTML già pronto del tuo client di posta o di uno strumento per creare firme — ad es. HubSpot Email Signature Generator.",
+      "htmlLabel": "Codice HTML della firma",
+      "htmlPlaceholder": "Incolla qui il codice HTML della firma…",
+      "preview": "Anteprima",
+      "save": "Salva firma",
+      "saved": "Firma salvata",
+      "title": "La mia firma e-mail"
+    },
+    "templates": {
+      "bodyLabel": "Testo",
+      "bodyPlaceholder": "Testo del modello…",
+      "deleteConfirm": "Eliminare il modello «{name}»?",
+      "edit": "Modifica",
+      "editTitle": "Modifica del modello",
+      "empty": "Nessun modello. Clicca su «+ Nuovo modello» per aggiungere il primo.",
+      "hint": "Salva testi già pronti da inserire rapidamente mentre scrivi un'e-mail a un lead o a un partner.",
+      "nameLabel": "Nome del modello",
+      "namePlaceholder": "ad es. Incontro introduttivo, Follow-up dopo la demo…",
+      "new": "Nuovo modello",
+      "title": "Modelli di e-mail"
+    },
+    "title": "Le mie impostazioni"
+  }
+}

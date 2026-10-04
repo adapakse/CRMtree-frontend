@@ -1,4 +1,18 @@
 {
+  "changePassword": {
+    "errors": {
+      "failed": "Échec du changement de mot de passe",
+      "mismatch": "Les mots de passe ne sont pas identiques",
+      "tooShort": "Le mot de passe doit contenir au moins 8 caractères"
+    },
+    "hint": "Votre mot de passe temporaire a expiré. Définissez votre propre mot de passe avant de continuer.",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "min. 8 caractères",
+    "repeatPassword": "Répétez le mot de passe",
+    "submit": "Définir le mot de passe et se connecter",
+    "submitting": "Enregistrement…",
+    "title": "Définir un nouveau mot de passe"
+  },
   "login": {
     "email": "E-mail",
     "emailPlaceholder": "jean@entreprise.fr",

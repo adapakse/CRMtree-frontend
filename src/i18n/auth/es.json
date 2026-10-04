@@ -1,4 +1,18 @@
 {
+  "changePassword": {
+    "errors": {
+      "failed": "Error al cambiar la contraseña",
+      "mismatch": "Las contraseñas no coinciden",
+      "tooShort": "La contraseña debe tener al menos 8 caracteres"
+    },
+    "hint": "Tu contraseña temporal ha caducado. Establece tu propia contraseña antes de continuar.",
+    "newPassword": "Nueva contraseña",
+    "newPasswordPlaceholder": "mín. 8 caracteres",
+    "repeatPassword": "Repite la contraseña",
+    "submit": "Establecer contraseña e iniciar sesión",
+    "submitting": "Guardando…",
+    "title": "Establece una nueva contraseña"
+  },
   "login": {
     "email": "Correo electrónico",
     "emailPlaceholder": "juan@empresa.es",

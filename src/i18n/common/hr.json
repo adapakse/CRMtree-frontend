@@ -21,6 +21,9 @@
   "states": {
     "loading": "Učitavanje…"
   },
+  "testEnvironmentBanner": {
+    "title": "Testna verzija — ovo nije produkcijsko okruženje"
+  },
   "typeahead": {
     "minChars": "Upišite najmanje {count} znaka…",
     "noResults": "Nema rezultata.",

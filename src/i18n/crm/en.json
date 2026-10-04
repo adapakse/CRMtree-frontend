@@ -120,6 +120,156 @@
       "week": "Week"
     }
   },
+  "callAnalysis": {
+    "actions": {
+      "archive": "Archive",
+      "reanalyze": "Re-analyze"
+    },
+    "bulk": {
+      "deleteSelected": "Delete selected",
+      "hold": "Hold",
+      "restore": "Restore",
+      "selected": "{count, plural, one {# selected} other {# selected}}"
+    },
+    "confirm": {
+      "deleteRow": "Delete the analysis for {name}?",
+      "deleteSelected": "{count, plural, one {Delete # record?} other {Delete # records?}}"
+    },
+    "details": {
+      "callsLabel": "Calls:",
+      "importedLabel": "Imported:",
+      "lastCallLabel": "Last:",
+      "objections": "Objections",
+      "positiveSignals": "Positive signals"
+    },
+    "empty": {
+      "hint": "Notes will appear after a CSV import or once phone calls have ended",
+      "noNotes": "No call notes",
+      "noResults": "No results for the selected filters"
+    },
+    "errors": {
+      "bulkFailed": "Bulk action failed",
+      "deleteFailed": "Couldn't delete",
+      "followUpUpdateFailed": "Couldn't update the follow-up",
+      "reanalyzeFailed": "Re-analysis failed",
+      "statusChangeFailed": "Couldn't change the status"
+    },
+    "filters": {
+      "allFollowUps": "All follow-ups",
+      "allLinks": "All links",
+      "allSalespeople": "All salespeople",
+      "allStatuses": "All statuses",
+      "firstCall": "First call:",
+      "followUpDate": "Follow-up date:",
+      "followUpDone": "Follow-up done",
+      "followUpRequired": "Follow-up required",
+      "lastCall": "Last call:",
+      "noLinks": "No links",
+      "presets": {
+        "custom": "Custom…",
+        "nextTwoDays": "Next 2 days",
+        "thisWeek": "This week",
+        "today": "Today",
+        "todayTomorrow": "Today+Tomorrow"
+      },
+      "score": "Score:",
+      "scoreMax": "max",
+      "scoreMin": "min",
+      "searchPlaceholder": "Search company or tax ID...",
+      "statusAnalyzing": "Analyzing",
+      "total": "{count, plural, one {# company} other {# companies}}"
+    },
+    "followUp": {
+      "done": "Done",
+      "label": "Follow-up",
+      "markDoneTitle": "Click to mark the follow-up as done",
+      "notRequired": "Not required",
+      "required": "Required",
+      "undoTitle": "Follow-up done. Click to undo."
+    },
+    "header": {
+      "analyze": "Analyze ({count})",
+      "analyzing": "Analyzing...",
+      "importCsv": "Import CSV"
+    },
+    "import": {
+      "failed": "Import failed",
+      "resultCreated": "Imported: {created} new, {appended} updated out of {totalRows} rows (note columns: {note1} / {note2})",
+      "resultUpserted": "Imported: {upserted} companies out of {totalRows} rows (note columns: {note1} / {note2})"
+    },
+    "inspect": {
+      "aiSummary": "AI summary",
+      "analysisStatus": "Analysis status",
+      "basis": "Analysis basis — notes ({chars, plural, one {# character} other {# characters}} · {calls, plural, one {# call} other {# calls}})",
+      "noResults": "No AI analysis results for this company.",
+      "noScore": "No score",
+      "promptFailed": "Couldn't load the prompt.",
+      "promptLoading": "Loading prompt…",
+      "purchasePotential": "Purchase potential",
+      "tabAnalysis": "AI analysis",
+      "tabPrompt": "DeepSeek prompt",
+      "title": "Analyzer inspection"
+    },
+    "links": {
+      "goToLead": "Go to lead",
+      "goToPartner": "Go to partner",
+      "goToProspect": "Go to prospect",
+      "prospect": "Prospect"
+    },
+    "menu": {
+      "delete": "Delete",
+      "inspect": "Inspect",
+      "putOnHold": "Put on hold",
+      "restoreFromArchive": "Restore from archive",
+      "restoreFromHold": "Restore from hold"
+    },
+    "potentialHelp": {
+      "description": "A rating of how likely the company is to buy CRM services.",
+      "footer": "The value is calculated by an AI model from the call notes.",
+      "title": "Potential (0–100)"
+    },
+    "progress": {
+      "companies": "{done} / {total} companies",
+      "errors": "{count, plural, one {# error} other {# errors}}",
+      "finished": "Finished",
+      "running": "Analyzing...",
+      "runningOtherUser": "Analyzing (another user)..."
+    },
+    "scoreLabels": {
+      "lowInterest": "Low interest",
+      "moderateInterest": "Moderate interest",
+      "notInterested": "Not interested",
+      "readyToBuy": "Ready to buy",
+      "strongInterest": "Strong interest"
+    },
+    "statuses": {
+      "analyzing": "Analyzing...",
+      "archived": "Archived",
+      "done": "Done",
+      "error": "Error",
+      "hold": "On hold",
+      "pending": "Pending"
+    },
+    "subtitle": "Analysis of phone call notes — likelihood to buy (DeepSeek AI)",
+    "table": {
+      "actions": "Actions",
+      "analyzedAt": "Analyzed",
+      "calls": "Calls",
+      "company": "Company",
+      "firstCall": "First call",
+      "lastCall": "Last call",
+      "links": "Links",
+      "potential": "Potential",
+      "salesperson": "Salesperson",
+      "status": "Status",
+      "taxId": "Tax ID"
+    },
+    "title": "Call analysis",
+    "transcript": {
+      "callNumber": "Call {number}",
+      "title": "Call transcripts ({count})"
+    }
+  },
   "callSimulator": {
     "activity": {
       "demoTranscript": "[00:00] Salesperson: Good morning, this is Jan Nowak from CRMtree. Could I speak to the person responsible for business travel?\n\n[00:08] Customer: Yes, speaking. This is Marek Kowalski.\n\n[00:10] Salesperson: Good morning, Mr. Kowalski. I am calling about optimizing business travel costs at your company. Do you have a moment?\n\n[00:18] Customer: Yes, go ahead. What exactly are you proposing?\n\n[00:22] Salesperson: We offer a complete corporate travel management system — flight, hotel and transport bookings in one place. On average, our customers save between 15 and 25% on travel costs.\n\n[00:35] Customer: Sounds interesting. How many people need to travel per year for it to make sense?\n\n[00:40] Salesperson: Our platform pays off from just a few dozen trips a year. I can prepare an individual calculation for your company.\n\n[00:49] Customer: All right. Please send the offer by email. Our team will review it.\n\n[00:54] Salesperson: Of course, I will send it today. Could we also schedule a short online presentation to show the system in action?\n\n[01:02] Customer: Yes, we can. I will suggest a date once we have reviewed the offer.\n\n[01:06] Salesperson: Great. Thank you for your time, speak soon.\n\n[01:09] Customer: Goodbye.",
@@ -881,6 +1031,18 @@
       "timeline": "Timeline"
     }
   },
+  "mailCallback": {
+    "closeHint": "You can close this window and get back to work in the CRM.",
+    "closeWindow": "Close window",
+    "connectedBody": "Your {provider} account has been successfully connected to the app.",
+    "connectedTitle": "{provider} connected!",
+    "errorBody": "Couldn’t connect the {provider} account.",
+    "errorTitle": "Connection error",
+    "processing": "Processing…",
+    "reasons": {
+      "email_already_connected": "This Google account is already connected to another CRM user. Use a different Google account or contact your administrator."
+    }
+  },
   "meetings": {
     "durationMin": "Duration (min)",
     "location": "Location",
@@ -1325,6 +1487,21 @@
       "cards": "Cards",
       "table": "Table"
     }
+  },
+  "pbx": {
+    "errors": {
+      "callRejected": "Call rejected ({code}). Check the number.",
+      "micPermissionDenied": "No microphone permission. Allow access in your browser settings.",
+      "micUnavailable": "Microphone unavailable: {reason}",
+      "noAudio": "No audio connection (ICE failed). Check your network or contact your administrator.",
+      "numberBusy": "Number busy — try again in a moment.",
+      "registrationFailed": "SIP registration failed. Check your PBX token.",
+      "registrationTimeout": "SIP registration timeout (12s). Check your connection and PBX configuration.",
+      "sipConnectionFailed": "SIP connection error. Set up your PBX token in My settings → Softphone.",
+      "sipUnauthorized": "SIP authorization error (401). Check your PBX token in My settings → Softphone."
+    },
+    "incomingTabTitle": "{name} is calling...",
+    "unknownCaller": "unknown caller"
   },
   "periodFilter": {
     "groups": {
@@ -1778,6 +1955,466 @@
       "overdue": "overdue",
       "showAll": "View all tasks →",
       "title": "Tasks for today"
+    }
+  },
+  "seo": {
+    "authors": {
+      "actions": {
+        "activate": "Activate",
+        "add": "Add author",
+        "addNew": "+ Add author",
+        "adding": "Adding…",
+        "deactivate": "Deactivate",
+        "delete": "Delete author",
+        "edit": "Edit",
+        "saving": "Saving…"
+      },
+      "empty": "No authors — add the first one to be able to approve articles (an author is required before publishing).",
+      "fields": {
+        "bio": "Expertise summary",
+        "fullName": "Full name",
+        "jobTitle": "Job title",
+        "linkedinProfile": "LinkedIn profile",
+        "photo": "Photo"
+      },
+      "inactiveBadge": "Inactive",
+      "placeholders": {
+        "bio": "A short summary of experience and expertise",
+        "fullName": "e.g. Emma Collins",
+        "jobTitleEdit": "e.g. Head of Sales",
+        "jobTitleNew": "e.g. Sales Department Manager"
+      },
+      "toasts": {
+        "addFailed": "Couldn't add the author.",
+        "added": "Author added.",
+        "deleteFailed": "Couldn't delete the author.",
+        "deleted": "Author deleted.",
+        "photoUploadFailed": "Couldn't upload the photo.",
+        "photoUploaded": "Photo uploaded.",
+        "saveFailed": "Couldn't save the author.",
+        "statusChangeFailed": "Couldn't change the status.",
+        "updated": "Author updated."
+      }
+    },
+    "contentSlots": {
+      "actions": {
+        "fill": "Fill in",
+        "insert": "Insert into article",
+        "remove": "Remove this slot"
+      },
+      "fields": {
+        "caption": "Image caption",
+        "comment": "Comment",
+        "fullName": "Full name",
+        "quote": "Quote",
+        "quoteAuthor": "Author (person or institution)",
+        "role": "Role",
+        "roleCompany": "Job title / company",
+        "sourceTitle": "Source title",
+        "sourceUrl": "Source link (https://)"
+      },
+      "hint": "SEObot has marked the places in the text where the article needs something AI cannot honestly make up. Fill in each one or remove it — only then can the post be approved.",
+      "placeholders": {
+        "roleCompany": "e.g. Head of Sales, CRMtree"
+      },
+      "removeConfirm": "Remove this slot from the article? The surrounding text will stay unchanged.",
+      "screenshots": {
+        "emptyLibrary": "The screenshot library is empty — add a screenshot below or in the “Screenshots” panel.",
+        "uploadNew": "Upload a new screenshot",
+        "uploadToLibrary": "Upload to library"
+      },
+      "statuses": {
+        "filled": "Filled in",
+        "removed": "Removed"
+      },
+      "suggestion": {
+        "label": "SEObot’s suggestion (verified on the source page):",
+        "use": "Use this quote"
+      },
+      "title": "To fill in before publishing",
+      "toasts": {
+        "checkField": "Check the field: {field}",
+        "chooseScreenshot": "Choose a screenshot.",
+        "insertFailed": "Couldn't insert.",
+        "inserted": "Inserted into the article.",
+        "removeFailed": "Couldn't remove.",
+        "screenshotUploadFailed": "Couldn't upload the screenshot.",
+        "screenshotUploaded": "Screenshot added to the library and selected.",
+        "textAndAuthorRequired": "Fill in the text and the author."
+      },
+      "types": {
+        "expert_comment": "Expert comment",
+        "quote": "Quote with source",
+        "screenshot": "Product screenshot"
+      }
+    },
+    "main": {
+      "actions": {
+        "approveAndPublish": "Approve and publish",
+        "approveAndSchedule": "Approve and schedule",
+        "cancelSchedule": "Cancel schedule",
+        "markForRefresh": "Mark for refresh",
+        "pendingSlotsHint": "First fill in or remove the slots awaiting content",
+        "reject": "Reject",
+        "saveChanges": "Save changes",
+        "unpublish": "Revert to draft"
+      },
+      "detail": {
+        "author": {
+          "choose": "— choose an author —",
+          "inactive": "inactive",
+          "label": "Author",
+          "required": "Required before approval"
+        },
+        "empty": "Choose a post from the list.",
+        "image": {
+          "reroll": "Pick another from Pexels",
+          "rerolling": "Picking…",
+          "save": "Save image",
+          "urlPlaceholder": "Header image URL"
+        },
+        "internalLinks": "Internal links:",
+        "metaPlaceholder": "Meta description",
+        "metrics": {
+          "avgPosition": "avg. position {position}",
+          "clicks": "{count, plural, one {# click} other {# clicks}}",
+          "impressions": "{count, plural, one {# impression} other {# impressions}}",
+          "note": "(last 28 days, Search Console data)"
+        }
+      },
+      "errors": {
+        "unknown": "unknown error"
+      },
+      "filters": {
+        "all": "All",
+        "drafts": "Drafts",
+        "refresh": "To refresh"
+      },
+      "generate": {
+        "action": "Generate new article",
+        "inProgress": "Generating… (may take a few minutes)"
+      },
+      "gsc": {
+        "connect": "Connect Search Console",
+        "connected": "Search Console: connected ({siteUrl})",
+        "disconnect": "Disconnect",
+        "syncNow": "Sync now",
+        "syncing": "Syncing…"
+      },
+      "header": {
+        "authorsToggle": "Authors ({count})",
+        "screenshotsToggle": "Screenshots",
+        "strategyToggle": "Content strategy ({count, plural, one {# pillar} other {# pillars}})"
+      },
+      "list": {
+        "empty": "No posts in this state.",
+        "metrics": "{impressions} impr. · {clicks, plural, one {# click} other {# clicks}} (28 days)"
+      },
+      "refresh": {
+        "apply": "Apply to site",
+        "applyConfirm": "Replace the published content with the new version? The change will go live on the site immediately.",
+        "dismissDraft": "Dismiss proposal",
+        "failed": "Couldn’t prepare the proposal: {error}",
+        "generatedInfo": "Generated {date} · cost approx. ${cost} · sources cited: {facts}",
+        "generating": "Preparing the proposal (GSC query analysis, up-to-date data, rewrite) — this takes a few minutes, the panel will refresh by itself.",
+        "newBody": "New content",
+        "newMeta": "New meta description",
+        "newTitle": "New title",
+        "noQueries": "No GSC query data for this page — the proposal focuses on freshness and structure.",
+        "notNeeded": "No refresh needed",
+        "prepare": "Prepare proposal (AI)",
+        "publishedNote": "The article stays published the whole time. Changes will reach the site only after you click “Apply to site”.",
+        "queriesLabel": "GSC queries taken into account:",
+        "queryStats": "({impressions} impr., pos. {position})",
+        "reasonDetails": {
+          "age": "not updated for over 90 days.",
+          "manual": "marked for refresh by an editor.",
+          "positionDrop": "position dropped from {before} to {now} (last 14 days vs. the previous 14).",
+          "strikingDistance": "avg. position {position} with {impressions} impressions in 28 days. The cheapest chance to get into the TOP 10."
+        },
+        "reasons": {
+          "age": "Not updated for 90+ days",
+          "manual": "Marked manually",
+          "position_drop": "Position drop",
+          "striking_distance": "Close to Google page 1"
+        },
+        "regenerate": "Regenerate",
+        "title": "Article refresh",
+        "validationWarning": "The proposal didn't pass all automatic checks:"
+      },
+      "schedule": {
+        "clear": "Clear date",
+        "label": "Schedule publication for:",
+        "scheduledNote": "Publication scheduled: {date}"
+      },
+      "sections": {
+        "authors": "Authors",
+        "calendar": "Publishing calendar",
+        "channels": "Social channels",
+        "screenshots": "Product screenshots",
+        "settings": "Settings",
+        "strategy": "Content strategy"
+      },
+      "social": {
+        "copy": "Copy",
+        "noChannels": "No connected channels — connect them in “Social channels” at the top.",
+        "publishOn": "Publish on {platform}",
+        "publishOrRetry": "Publish / try again",
+        "publishing": "Publishing…",
+        "statuses": {
+          "draft": "Draft",
+          "failed": "Failed",
+          "published": "Published",
+          "queued": "Publishing…"
+        },
+        "title": "Social publishing",
+        "viewPost": "View post"
+      },
+      "socialConnect": {
+        "connected": "{platform} connected.",
+        "errors": {
+          "access_denied": "Access was not granted.",
+          "callback_failed": "Couldn't complete the connection. Make sure the account being connected is an administrator of the company page.",
+          "invalid_state": "The connection session has expired — try again.",
+          "unauthorized_scope_error": "The LinkedIn app has no approved access to publish on the company page (Community Management API product).",
+          "user_cancelled_authorize": "Granting access was cancelled.",
+          "user_cancelled_login": "Sign-in was cancelled."
+        },
+        "fallbackPlatform": "social channel",
+        "unknownFailure": "couldn’t connect ({reason})."
+      },
+      "statuses": {
+        "approved": "Approved",
+        "archived": "Archived",
+        "draft": "Draft",
+        "in_review": "In review",
+        "needs_update": "Needs update",
+        "published": "Published",
+        "queued": "Queued (auto)",
+        "scheduled": "Scheduled"
+      },
+      "title": "SEObot — content desk",
+      "toasts": {
+        "approveFailed": "Couldn't approve the post.",
+        "authorSaveFailed": "Couldn't save the author.",
+        "authorSaved": "Author saved.",
+        "changesSaveFailed": "Couldn't save the changes.",
+        "changesSaved": "Changes saved.",
+        "copied": "Copied to clipboard.",
+        "copyFailed": "Couldn't copy.",
+        "generationDone": "The new article has been generated and is awaiting approval.",
+        "generationFailed": "Couldn’t generate the article: {error}",
+        "generationStartFailed": "Couldn't start generating.",
+        "generationStarted": "Generating the article in the background — it will take a few minutes. You can keep working.",
+        "gscDisconnectFailed": "Couldn't disconnect Search Console.",
+        "gscDisconnected": "Search Console disconnected — you can reconnect with the right Google account.",
+        "gscSyncFailed": "Couldn't sync the metrics.",
+        "gscSynced": "Search Console metrics synced.",
+        "imageRerollFailed": "Couldn't pick an image.",
+        "imageRerolled": "New image picked.",
+        "imageSaveFailed": "Couldn't save the image.",
+        "imageSaved": "Image saved.",
+        "published": "Post published.",
+        "refreshApplied": "The refreshed version is now on the site.",
+        "refreshApplyFailed": "Couldn't apply the refresh.",
+        "refreshDismissFailed": "Couldn't remove from the queue.",
+        "refreshDismissed": "Removed from the refresh queue.",
+        "refreshGenerating": "Preparing the proposal — it will take a few minutes.",
+        "refreshMarkFailed": "Couldn't mark the post.",
+        "refreshMarked": "Marked for refresh.",
+        "rejectFailed": "Couldn't reject the post.",
+        "rejected": "Post rejected and moved back to drafts.",
+        "scheduleSaveFailed": "Couldn't save the date.",
+        "scheduleSaved": "Publication date saved.",
+        "scheduled": "Publication scheduled.",
+        "socialPostSaveFailed": "Couldn't save the post.",
+        "socialPostSaved": "Post saved.",
+        "socialPublishFailed": "Couldn't publish.",
+        "socialPublishFailedCheck": "Couldn't publish — check the error.",
+        "socialPublished": "Published.",
+        "unpublishFailed": "Couldn't revert the post.",
+        "unpublished": "Post reverted to drafts."
+      }
+    },
+    "publishingCalendar": {
+      "config": {
+        "autoMode": "Automatic mode (no manual review)",
+        "autoModeWarning": "Articles in this mode are published automatically on the scheduled date — without manual approval by an editor.",
+        "noEndDate": "No time limit (the schedule rolls on indefinitely)",
+        "save": "Save schedule",
+        "saving": "Saving…",
+        "title": "Automatic schedule"
+      },
+      "enableConfirm": "Automatic mode publishes articles without manual approval by an editor — continue?",
+      "toasts": {
+        "configSaveFailed": "Couldn't save the schedule.",
+        "configSaved": "Schedule saved.",
+        "disabled": "Automatic mode turned off.",
+        "enabled": "Automatic mode turned on.",
+        "moveFailed": "Couldn't move the article.",
+        "movedTo": "Moved to {date}.",
+        "movedToUnassigned": "Moved back to the unassigned queue.",
+        "saveFailed": "Couldn't save."
+      },
+      "unassigned": {
+        "empty": "No unassigned articles.",
+        "title": "Unassigned ({count})"
+      },
+      "weeks": {
+        "current": "This week (in progress, locked)",
+        "next": "Next week (editable)"
+      }
+    },
+    "screenshots": {
+      "actions": {
+        "add": "+ Add screenshot",
+        "delete": "Delete screenshot",
+        "edit": "Edit",
+        "uploading": "Uploading…"
+      },
+      "deleteConfirm": "Delete this screenshot from the library?",
+      "fields": {
+        "caption": "Caption",
+        "captionUnderImage": "Image caption",
+        "feature": "Feature",
+        "file": "File (PNG, JPEG, WebP, max 8 MB)"
+      },
+      "hint": "Product screenshots, tagged with a feature (e.g. “Prospects”, “AI call analysis”). SEObot inserts a matching screenshot into a new article by itself, and if there is none, it leaves a slot in the text to fill in. Do not upload screens showing real customer data.",
+      "placeholders": {
+        "caption": "e.g. Prospect list sorted by ICP score",
+        "feature": "e.g. Prospects"
+      },
+      "toasts": {
+        "added": "Screenshot added.",
+        "deleteFailed": "Couldn't delete the screenshot.",
+        "deleted": "Screenshot deleted.",
+        "saveFailed": "Couldn't save.",
+        "saved": "Saved.",
+        "uploadFailed": "Couldn't upload the screenshot."
+      }
+    },
+    "socialChannels": {
+      "connect": "Connect",
+      "connected": "Connected",
+      "disconnect": "Disconnect",
+      "hint": "Approving an article publishes it on the connected channels at the same time — with one click. Instagram is connected automatically together with Facebook (the same Meta account).",
+      "instagramHint": "It will connect automatically once Facebook is connected, if the page has a linked Instagram Business account.",
+      "toasts": {
+        "connectStartFailed": "Couldn’t start connecting to {platform}.",
+        "disconnectFailed": "Couldn't disconnect.",
+        "disconnected": "{platform} disconnected.",
+        "wordpressConnectFailed": "Couldn't connect to WordPress.",
+        "wordpressConnected": "WordPress connected."
+      },
+      "wordpress": {
+        "appPassword": "Application password",
+        "appPasswordPlaceholder": "generated in WP: Users → Profile → Application Passwords",
+        "connect": "Connect WordPress",
+        "connecting": "Connecting…",
+        "siteUrl": "Site address",
+        "siteUrlPlaceholder": "https://your-site.com",
+        "username": "Username",
+        "usernamePlaceholder": "e.g. admin"
+      },
+      "wordpressHint": "Publishes the full article on the customer's own WordPress site (Application Password)."
+    },
+    "strategy": {
+      "backlinks": {
+        "accept": "Accept",
+        "empty": "No backlinks.",
+        "findCandidates": "Find candidates",
+        "hint": "Opt-in link exchange with other tenants in the same industry (industry_vertical), topically relevant only, with no forced reciprocity. Matching only works once another tenant signs up too — today you are the only one.",
+        "optIn": "Consent to exchanging backlinks with other tenants",
+        "reject": "Reject",
+        "searching": "Searching…",
+        "statuses": {
+          "accepted": "Accepted",
+          "rejected": "Rejected",
+          "suggested": "Suggested"
+        },
+        "title": "Backlinks between tenants ({count})"
+      },
+      "competitors": {
+        "add": "Add",
+        "empty": "No competitors on the list.",
+        "hint": "The list affects how topic pillars are generated — the better it is described, the more accurate the strategy.",
+        "notesPlaceholder": "Note (optional)",
+        "removeAria": "Remove",
+        "title": "Competitors ({count})",
+        "urlPlaceholder": "https://competitor.com"
+      },
+      "pillars": {
+        "add": "Add pillar",
+        "addOwn": "+ Add your own pillar",
+        "adding": "Adding…",
+        "articleCount": "{count} art.",
+        "description": "Description",
+        "descriptionPlaceholder": "What the articles in this pillar should be about",
+        "edit": "Edit",
+        "keywordTheme": "Keyword theme",
+        "keywordThemePlaceholder": "e.g. yacht charter, marina",
+        "name": "Name",
+        "namePlaceholder": "e.g. Yacht fleet management",
+        "removeAria": "Remove pillar",
+        "saving": "Saving…"
+      },
+      "toasts": {
+        "backlinkAcceptFailed": "Couldn't accept.",
+        "backlinkAccepted": "Backlink accepted.",
+        "backlinkRejectFailed": "Couldn't reject.",
+        "backlinkRejected": "Backlink rejected.",
+        "candidatesFound": "{count, plural, one {Found # candidate.} other {Found # candidates.}}",
+        "candidatesSearchFailed": "Couldn't search for candidates.",
+        "competitorAddFailed": "Couldn't add the competitor.",
+        "competitorAdded": "Competitor added.",
+        "competitorRemoveFailed": "Couldn't remove the competitor.",
+        "competitorRemoved": "Competitor removed.",
+        "noCandidates": "No candidates — no other tenant matches by industry and consent yet.",
+        "optInDisabled": "Backlink consent turned off.",
+        "optInEnabled": "Backlink consent turned on.",
+        "optInSaveFailed": "Couldn't save the consent.",
+        "pillarAddFailed": "Couldn't add the pillar.",
+        "pillarAdded": "Pillar added.",
+        "pillarRemoveFailed": "Couldn't remove the pillar.",
+        "pillarRemoved": "Pillar removed.",
+        "pillarSaveFailed": "Couldn't save the pillar.",
+        "pillarUpdated": "Pillar updated."
+      }
+    },
+    "tenantSettings": {
+      "fields": {
+        "businessDescription": "Product and business description",
+        "businessDescriptionPlaceholder": "What the company does, what features the product has, who the audience is, which industry…",
+        "industry": "Industry (industry_vertical)",
+        "industryPlaceholder": "e.g. yachting, saas_crm, personal_brand",
+        "productName": "Product name",
+        "productNamePlaceholder": "e.g. CRMtree"
+      },
+      "gscProperty": {
+        "hint": "The actual, verified GSC property to connect to when using “Connect Search Console” — a URL-prefix property (e.g. https://customer.com/) or a domain property (sc-domain:customer.com). Empty = guessed from WordPress or from the one given below.",
+        "placeholder": "https://crmtree.pl/ or sc-domain:crmtree.pl",
+        "save": "Save GSC property",
+        "title": "Search Console property"
+      },
+      "hint": "Feeds the strategy (pillars, keywords) and every article. SEObot shows in the text how the problem is solved in the product and describes only the features listed in the description — the more precisely you list them, the more specific the articles.",
+      "save": "Save settings",
+      "saving": "Saving…",
+      "title": "Tenant SEO settings",
+      "toasts": {
+        "gscPropertySaveFailed": "Couldn't save the GSC property.",
+        "gscPropertySaved": "Search Console property saved.",
+        "modeSaveFailed": "Couldn't save the mode.",
+        "saveFailed": "Couldn't save the settings.",
+        "saved": "Settings saved.",
+        "wordpressDraft": "WordPress: publishing as a draft.",
+        "wordpressLive": "WordPress: publishing live right away."
+      },
+      "wordpressMode": {
+        "draft": "Draft (safe, requires manual publishing in WP)",
+        "hint": "A decision made after talking to the customer — whether articles should go live on their WordPress right away or land as a draft to be published there manually.",
+        "publish": "Publish right away (live, no stop in between)",
+        "title": "WordPress publishing mode"
+      }
     }
   },
   "sms": {

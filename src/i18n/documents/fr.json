@@ -1,0 +1,354 @@
+{
+  "badges": {
+    "gdpr": {
+      "data_administration": "Coresponsabilité",
+      "data_processing_entrustment": "Sous-traitance",
+      "no_gdpr": "Hors RGPD"
+    }
+  },
+  "dashboard": {
+    "recentDocuments": "Derniers documents",
+    "seeAll": "Tout voir",
+    "stats": {
+      "expiring": "Expirent sous 30 jours",
+      "expiringHint": "À surveiller",
+      "inWorkflow": "En circulation",
+      "myTasksHint": "En attente d’action",
+      "signed": "Signés / Terminés",
+      "signedHint": "Signés + Terminés",
+      "total": "Tous les documents",
+      "totalHint": "Tous les documents accessibles"
+    },
+    "taskStrip": {
+      "assigneePrefix": "chez :"
+    },
+    "title": "Tableau de bord"
+  },
+  "detail": {
+    "actions": {
+      "delete": "Supprimer",
+      "download": "Télécharger",
+      "saveChanges": "Enregistrer les modifications"
+    },
+    "attachments": {
+      "add": "Ajouter une pièce jointe",
+      "addFirst": "Ajouter la première pièce jointe",
+      "deleteConfirm": "Supprimer cette pièce jointe avec toutes ses versions ?",
+      "deleted": "Pièce jointe supprimée",
+      "empty": "Aucune pièce jointe",
+      "events": {
+        "deleted": "Pièce jointe supprimée : {name}",
+        "newVersion": "Nouvelle version de la pièce jointe : {name}"
+      },
+      "newVersion": "Nouvelle version",
+      "uploadFailed": "Erreur lors de l’envoi de la pièce jointe",
+      "uploaded": "Pièce jointe envoyée",
+      "versionCount": "{count, plural, one {# version} other {# versions}}",
+      "versionUploadFailed": "Erreur lors de l’envoi de la nouvelle version"
+    },
+    "deleteConfirm": "Supprimer « {name} » ?",
+    "history": {
+      "actions": {
+        "attachment_deleted": "Pièce jointe supprimée",
+        "attachment_uploaded": "Pièce jointe ajoutée : {name}",
+        "attachment_version_uploaded": "Nouvelle version de la pièce jointe (v{version})",
+        "document_created": "Document créé",
+        "document_deleted": "Document supprimé",
+        "document_downloaded": "Document téléchargé",
+        "document_updated": "Document mis à jour",
+        "metadata_updated": "Métadonnées mises à jour",
+        "signing_completed": "Signature électronique terminée",
+        "signing_failed": "Échec de la signature électronique",
+        "signing_initiated": "Signature électronique lancée",
+        "status_changed": "Statut modifié : {status}",
+        "tag_added": "Tag ajouté : {key}",
+        "tag_removed": "Tag supprimé : {key}",
+        "tag_updated": "Tag modifié : {key}",
+        "version_uploaded": "Nouvelle version du document envoyée (v{version})",
+        "workflow_task_cancelled": "Tâche de workflow annulée",
+        "workflow_task_completed": "Tâche de workflow terminée",
+        "workflow_task_created": "Tâche de workflow attribuée"
+      },
+      "empty": "Aucun historique"
+    },
+    "overview": {
+      "chooseEntity": "— choisir une entité —",
+      "chooseType": "— choisir un type —",
+      "metadata": "Métadonnées du document",
+      "packagePart": "Fait partie du lot de documents :"
+    },
+    "partners": {
+      "empty": "Aucun partenaire associé.",
+      "linkFailed": "Erreur lors de l’association au partenaire",
+      "linked": "Associé à {company}",
+      "searchPlaceholder": "Rechercher un partenaire par nom…",
+      "taxId": "N° fiscal : {nip}",
+      "title": "Partenaires associés",
+      "unlink": "Dissocier",
+      "unlinkConfirm": "Dissocier le partenaire « {company} » ?",
+      "unlinkFailed": "Erreur lors de la dissociation du partenaire",
+      "unlinked": "Partenaire dissocié"
+    },
+    "preview": {
+      "downloadFile": "Télécharger le fichier",
+      "fileUploaded": "Fichier envoyé",
+      "frameTitle": "Aperçu PDF",
+      "loadFailed": "Impossible de charger le PDF",
+      "noFile": "Aucun fichier joint",
+      "unavailable": "Aperçu indisponible",
+      "unavailableFormat": "Aperçu indisponible pour les formats autres que PDF.",
+      "unavailableHint": "Téléchargez le fichier pour le consulter.",
+      "uploadFile": "Envoyer un fichier"
+    },
+    "signus": {
+      "emailsPlaceholder": "anne@entreprise.com, partner@example.com",
+      "info": "Le document sera envoyé à l’API Signus. Chaque signataire recevra un e-mail. Les versions signées sont archivées automatiquement.",
+      "modalTitle": "Lancer la signature électronique",
+      "sectionTitle": "Signature électronique (Signus)",
+      "send": "Envoyer à Signus",
+      "sendFailed": "Erreur lors de l’envoi à Signus",
+      "sentRedirect": "Document envoyé à Signus — redirection…",
+      "sentTraining": "Document envoyé pour signature (simulation). La version signée apparaîtra dans ~10 secondes.",
+      "signatories": "Signataires (adresses e-mail séparées par des virgules)",
+      "start": "Lancer la signature via Signus"
+    },
+    "tabs": {
+      "attachments": "Pièces jointes",
+      "history": "Historique",
+      "overview": "Détails",
+      "preview": "Document principal",
+      "versions": "Versions",
+      "workflow": "Workflow"
+    },
+    "tags": {
+      "added": "Tag ajouté",
+      "empty": "Aucun tag.",
+      "key": "Clé",
+      "keyPlaceholder": "Clé (p. ex. contract_id)",
+      "title": "Tags"
+    },
+    "toasts": {
+      "saved": "Document enregistré"
+    },
+    "versions": {
+      "empty": "Aucune version",
+      "signedBy": "Signé par {name}",
+      "uploadNew": "Envoyer une nouvelle version",
+      "uploaded": "Nouvelle version envoyée"
+    },
+    "workflow": {
+      "assign": "Attribuer et envoyer l’e-mail",
+      "assignTitle": "Attribuer une tâche",
+      "assignTo": "Attribuer à un utilisateur",
+      "assigned": "Tâche attribuée — notification e-mail envoyée",
+      "cancelled": "Tâche annulée",
+      "dueDate": "Échéance",
+      "message": "Message",
+      "messagePlaceholder": "Message facultatif pour la personne désignée…",
+      "selected": "Sélectionné : {name}",
+      "taskType": "Type de tâche",
+      "userSearchPlaceholder": "Rechercher par nom ou e-mail…"
+    }
+  },
+  "labels": {
+    "activeTasks": "Tâches actives",
+    "addTag": "Ajouter un tag",
+    "columns": {
+      "name": "Nom",
+      "number": "Numéro",
+      "validity": "Validité"
+    },
+    "contractSubjects": {
+      "accommodation": "Hébergement",
+      "businessTravel": "Voyages d’affaires",
+      "conferences": "Conférences/Réunions",
+      "other": "Autre",
+      "system": "Système"
+    },
+    "countries": {
+      "at": "Autriche",
+      "ch": "Suisse",
+      "cz": "Tchéquie",
+      "de": "Allemagne",
+      "fr": "France",
+      "gb": "Royaume-Uni",
+      "hu": "Hongrie",
+      "pl": "Pologne",
+      "ro": "Roumanie",
+      "ru": "Russie",
+      "sk": "Slovaquie",
+      "ua": "Ukraine"
+    },
+    "docTypes": {
+      "employee_agreement": "Contrat de travail",
+      "it_supplier_agreement": "Contrat avec un fournisseur IT",
+      "nda": "NDA",
+      "operator_agreement": "Contrat d’opérateur",
+      "partner_agreement": "Contrat de partenariat"
+    },
+    "fields": {
+      "contactName": "Prénom et nom",
+      "contactSection": "Contact pour le contrat",
+      "contractSubject": "Objet du contrat",
+      "counterpartyCountry": "Pays du cocontractant",
+      "counterpartyTaxId": "Numéro fiscal du cocontractant",
+      "documentName": "Nom du document",
+      "documentType": "Type de document",
+      "email": "E-mail",
+      "entity1": "Entité 1",
+      "entity2": "Entité 2",
+      "expirationDate": "Date d’expiration",
+      "gdprClassification": "Classification RGPD",
+      "group": "Groupe",
+      "owner": "Propriétaire",
+      "phone": "Téléphone",
+      "signingDate": "Date de signature",
+      "status": "Statut"
+    },
+    "from": "De : {name}",
+    "gdprTypes": {
+      "data_administration": "Coresponsabilité du traitement des données",
+      "data_processing_entrustment": "Sous-traitance du traitement des données",
+      "no_gdpr": "Hors RGPD"
+    },
+    "myTasks": "Mes tâches",
+    "noDocuments": "Aucun document",
+    "noPendingTasks": "Aucune tâche en attente",
+    "options": {
+      "choose": "— Choisir —",
+      "chooseCountry": "— Choisir un pays —",
+      "fixedDate": "Date déterminée",
+      "indefinite": "Durée indéterminée",
+      "unassigned": "— non attribué —"
+    },
+    "placeholders": {
+      "contactEmail": "p. ex. jean.dupont@entreprise.fr",
+      "contactName": "p. ex. Jean Dupont",
+      "contactPhone": "p. ex. +33 6 00 00 00 00",
+      "entity1": "p. ex. CRMtree Sp. z o.o.",
+      "entity2": "p. ex. Partner Ltd.",
+      "taxId": "p. ex. 1234567890"
+    },
+    "statuses": {
+      "being_approved": "En validation",
+      "being_edited": "En rédaction",
+      "being_signed": "En signature",
+      "completed": "Terminé",
+      "hold": "Suspendu",
+      "new": "Nouveau",
+      "rejected": "Rejeté",
+      "signed": "Signé"
+    },
+    "taskTypes": {
+      "approve": "Validation",
+      "edit": "Rédaction",
+      "read": "Lecture",
+      "sign": "Signature"
+    }
+  },
+  "list": {
+    "columns": {
+      "gdpr": "RGPD",
+      "newBadge": "NOUVEAU",
+      "type": "Type"
+    },
+    "empty": {
+      "hint": "Modifiez les filtres ou la recherche",
+      "title": "Aucun document trouvé"
+    },
+    "filters": {
+      "allGroups": "Tous les groupes",
+      "allTypes": "Tous les types",
+      "noFiles": "Afficher les documents sans scan joint"
+    },
+    "newDocument": "Nouveau document",
+    "noPartnerWarning": "Document non associé à un partenaire",
+    "pagination": {
+      "next": "Suivant",
+      "page": "Page {page} sur {total}",
+      "previous": "Préc."
+    },
+    "partnerFilter": {
+      "clear": "Tout afficher",
+      "label": "Documents du partenaire :"
+    },
+    "searchPlaceholder": "Rechercher des documents, des tags…",
+    "statusFilters": {
+      "all": "Tous",
+      "being_edited": "En rédaction",
+      "being_signed": "En signature",
+      "completed": "Terminés",
+      "new": "Nouveaux",
+      "rejected": "Rejetés",
+      "signed": "Signés"
+    },
+    "taskTooltip": {
+      "assignee": "Assigné à : {name}",
+      "assigner": "Transmis par : {name}",
+      "dueDate": "Échéance : {date}",
+      "message": "Message : {message}",
+      "type": "Type : {type}"
+    },
+    "title": "Documents",
+    "toasts": {
+      "created": "Document {number} créé",
+      "deleted": "Document supprimé",
+      "updated": "Document mis à jour"
+    }
+  },
+  "newDocument": {
+    "basicInfo": "Informations de base",
+    "chooseEntity": "— Choisir une entité —",
+    "chooseGdpr": "— Choisir une classification —",
+    "chooseGroup": "— Choisir un groupe —",
+    "chooseType": "— Choisir un type —",
+    "create": "Créer le document",
+    "createFailed": "Impossible de créer le document",
+    "file": {
+      "dropHint": "Déposez un fichier ici ou cliquez pour en choisir un",
+      "formats": "PDF, DOCX — 50 Mo max.",
+      "remove": "Retirer",
+      "title": "Pièce jointe (facultatif)"
+    },
+    "namePlaceholder": "p. ex. Contrat de partenariat — ABC SAS",
+    "subtitle": "Renseignez les métadonnées et ajoutez éventuellement un fichier",
+    "tags": {
+      "keyPlaceholder": "clé",
+      "title": "Tags (facultatif)"
+    },
+    "title": "Nouveau document"
+  },
+  "workflow": {
+    "autoRefresh": "Actualisation auto : {seconds} s",
+    "calendar": {
+      "documentFallback": "Document"
+    },
+    "columns": {
+      "cancelled": "Annulées",
+      "completed": "Terminées",
+      "in_progress": "En cours",
+      "pending": "En attente"
+    },
+    "kanban": {
+      "assignedBy": "Attribuée par {name}",
+      "emptyColumn": "Vide",
+      "emptyHint": "Les documents apparaîtront ici une fois créés",
+      "expired": "Expiré",
+      "expires": "Expire le {date}",
+      "soon": "BIENTÔT",
+      "taskCount": "Tâches : {count}"
+    },
+    "kanbanTab": "Tableau Kanban",
+    "mine": {
+      "allDone": "Tout est réglé !",
+      "complete": "Terminer",
+      "openDocument": "Ouvrir le document",
+      "start": "Commencer"
+    },
+    "title": "Workflow",
+    "toasts": {
+      "completed": "Tâche marquée comme terminée",
+      "updateFailed": "Impossible de mettre à jour la tâche — réessayez"
+    }
+  }
+}

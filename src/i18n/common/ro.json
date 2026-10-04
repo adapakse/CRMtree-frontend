@@ -21,6 +21,9 @@
   "states": {
     "loading": "Se încarcă…"
   },
+  "testEnvironmentBanner": {
+    "title": "Versiune de test — acesta nu este mediul de producție"
+  },
   "typeahead": {
     "minChars": "Introduceți cel puțin {count} caractere…",
     "noResults": "Niciun rezultat.",

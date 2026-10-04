@@ -1,4 +1,18 @@
 {
+  "changePassword": {
+    "errors": {
+      "failed": "Błąd zmiany hasła",
+      "mismatch": "Hasła nie są identyczne",
+      "tooShort": "Hasło musi mieć minimum 8 znaków"
+    },
+    "hint": "Twoje hasło tymczasowe wygasło. Ustaw własne hasło przed kontynuowaniem.",
+    "newPassword": "Nowe hasło",
+    "newPasswordPlaceholder": "min. 8 znaków",
+    "repeatPassword": "Powtórz hasło",
+    "submit": "Ustaw hasło i zaloguj",
+    "submitting": "Zapisuję…",
+    "title": "Ustaw nowe hasło"
+  },
   "login": {
     "email": "Email",
     "emailPlaceholder": "jan@firma.pl",

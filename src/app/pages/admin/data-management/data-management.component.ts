@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -17,12 +18,14 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
 @Component({
   selector: 'wt-data-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('admin')],
   template: `
+<ng-container *transloco="let t; prefix: 'admin'">
 <div class="dm-page">
   <div class="dm-header">
-    <h1>🗄️ Zarządzanie danymi</h1>
-    <p class="sub">Operacje administracyjne: usuwanie rekordów, czyszczenie środowiska, eksport/import ustawień. Dostępne tylko dla administratorów.</p>
+    <h1>🗄️ {{ t('dataManagement.title') }}</h1>
+    <p class="sub">{{ t('dataManagement.subtitle') }}</p>
   </div>
 
   <!-- ── Sekcja 1: Kasowanie pojedynczych elementów ── -->
@@ -30,8 +33,8 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     <div class="section-head">
       <div class="section-icon danger">🗑️</div>
       <div>
-        <div class="section-title">Kasowanie rekordów</div>
-        <div class="section-sub">Trwałe usunięcie dokumentu, leada lub partnera wraz ze wszystkimi powiązanymi danymi i logami.</div>
+        <div class="section-title">{{ t('dataManagement.delete.title') }}</div>
+        <div class="section-sub">{{ t('dataManagement.delete.subtitle') }}</div>
       </div>
     </div>
 
@@ -42,13 +45,13 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
         <div class="dc-head">
           <span class="dc-icon">📄</span>
           <div>
-            <div class="dc-title">Dokument</div>
-            <div class="dc-desc">Usuwa: metadane, wszystkie wersje + pliki z Blob, tagi, zadania workflow, powiązania CRM, logi audytu</div>
+            <div class="dc-title">{{ t('dataManagement.delete.document.title') }}</div>
+            <div class="dc-desc">{{ t('dataManagement.delete.document.description') }}</div>
           </div>
         </div>
         <div class="search-wrap">
           <input class="dm-input" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch($event)"
-                 placeholder="Wpisz nazwę lub numer dokumentu (min. 2 znaki)…" autocomplete="off">
+                 [placeholder]="t('dataManagement.delete.document.searchPlaceholder')" autocomplete="off">
           <div class="suggestions" *ngIf="docSuggestions.length && !docSelected">
             <div *ngFor="let s of docSuggestions" class="suggestion-item" (mousedown)="selectDoc(s)">
               <span class="sug-label">{{ s.label }}</span>
@@ -61,9 +64,9 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <button class="sel-clear" (click)="clearDocSel()">✕</button>
         </div>
         <button class="btn-danger" (click)="deleteDocument()" [disabled]="!docSelected || deleting() === 'doc'">
-          {{ deleting() === 'doc' ? '⏳ Usuwanie…' : '🗑️ Usuń dokument' }}
+          {{ deleting() === 'doc' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.document.action') }}
         </button>
-        <div *ngIf="deleteDocResult" class="result-ok">✓ Usunięto: {{ deleteDocResult }}</div>
+        <div *ngIf="deleteDocResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteDocResult }) }}</div>
       </div>
 
       <!-- Lead -->
@@ -71,13 +74,13 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
         <div class="dc-head">
           <span class="dc-icon">👤</span>
           <div>
-            <div class="dc-title">Lead</div>
-            <div class="dc-desc">Usuwa: lead, aktywności, powiązania dokumentów, historię. Nie usuwa partnera z konwersji.</div>
+            <div class="dc-title">{{ t('dataManagement.delete.lead.title') }}</div>
+            <div class="dc-desc">{{ t('dataManagement.delete.lead.description') }}</div>
           </div>
         </div>
         <div class="search-wrap">
           <input class="dm-input" [(ngModel)]="leadSearch" (ngModelChange)="onLeadSearch($event)"
-                 placeholder="Wpisz nazwę firmy lub kontakt (min. 2 znaki)…" autocomplete="off">
+                 [placeholder]="t('dataManagement.delete.lead.searchPlaceholder')" autocomplete="off">
           <div class="suggestions" *ngIf="leadSuggestions.length && !leadSelected">
             <div *ngFor="let s of leadSuggestions" class="suggestion-item" (mousedown)="selectLead(s)">
               <span class="sug-label">{{ s.label }}</span>
@@ -90,9 +93,9 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <button class="sel-clear" (click)="clearLeadSel()">✕</button>
         </div>
         <button class="btn-danger" (click)="deleteLead()" [disabled]="!leadSelected || deleting() === 'lead'">
-          {{ deleting() === 'lead' ? '⏳ Usuwanie…' : '🗑️ Usuń lead' }}
+          {{ deleting() === 'lead' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.lead.action') }}
         </button>
-        <div *ngIf="deleteLeadResult" class="result-ok">✓ Usunięto: {{ deleteLeadResult }}</div>
+        <div *ngIf="deleteLeadResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteLeadResult }) }}</div>
       </div>
 
       <!-- Partner -->
@@ -100,13 +103,13 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
         <div class="dc-head">
           <span class="dc-icon">🤝</span>
           <div>
-            <div class="dc-title">Partner</div>
-            <div class="dc-desc">Usuwa: partnera, aktywności, powiązania dokumentów, dane sprzedażowe, historię.</div>
+            <div class="dc-title">{{ t('dataManagement.delete.partner.title') }}</div>
+            <div class="dc-desc">{{ t('dataManagement.delete.partner.description') }}</div>
           </div>
         </div>
         <div class="search-wrap">
           <input class="dm-input" [(ngModel)]="partnerSearch" (ngModelChange)="onPartnerSearch($event)"
-                 placeholder="Wpisz nazwę firmy lub NIP (min. 2 znaki)…" autocomplete="off">
+                 [placeholder]="t('dataManagement.delete.partner.searchPlaceholder')" autocomplete="off">
           <div class="suggestions" *ngIf="partnerSuggestions.length && !partnerSelected">
             <div *ngFor="let s of partnerSuggestions" class="suggestion-item" (mousedown)="selectPartner(s)">
               <span class="sug-label">{{ s.label }}</span>
@@ -119,9 +122,9 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <button class="sel-clear" (click)="clearPartnerSel()">✕</button>
         </div>
         <button class="btn-danger" (click)="deletePartner()" [disabled]="!partnerSelected || deleting() === 'partner'">
-          {{ deleting() === 'partner' ? '⏳ Usuwanie…' : '🗑️ Usuń partnera' }}
+          {{ deleting() === 'partner' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.partner.action') }}
         </button>
-        <div *ngIf="deletePartnerResult" class="result-ok">✓ Usunięto: {{ deletePartnerResult }}</div>
+        <div *ngIf="deletePartnerResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deletePartnerResult }) }}</div>
       </div>
 
     </div>
@@ -133,8 +136,8 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     <div class="section-head">
       <div class="section-icon danger">⚠️</div>
       <div>
-        <div class="section-title">Czyszczenie środowiska testowego</div>
-        <div class="section-sub">Usuń wszystkie rekordy wybranej kategorii. Zachowuje: użytkowników, role, profile grup, grupy partnerów, ustawienia aplikacji.</div>
+        <div class="section-title">{{ t('dataManagement.purge.title') }}</div>
+        <div class="section-sub">{{ t('dataManagement.purge.subtitle') }}</div>
       </div>
     </div>
 
@@ -145,21 +148,21 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
         <div class="purge-card-head">
           <span style="font-size:22px">📄</span>
           <div>
-            <div class="purge-card-title">Wszystkie dokumenty</div>
-            <div class="purge-card-desc">Usuwa: dokumenty, wersje, pliki z Blob, tagi, grupy dokumentów, zadania workflow, logi audytu dokumentów</div>
+            <div class="purge-card-title">{{ t('dataManagement.purge.docs.title') }}</div>
+            <div class="purge-card-desc">{{ t('dataManagement.purge.docs.description') }}</div>
           </div>
         </div>
         <div *ngIf="purgeConfirming !== 'docs'" style="text-align:center;margin-top:8px">
-          <button class="btn-danger" (click)="purgeConfirming='docs'">🗑️ Usuń wszystkie dokumenty</button>
+          <button class="btn-danger" (click)="purgeConfirming='docs'">🗑️ {{ t('dataManagement.purge.docs.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'docs'" class="inline-confirm">
-          <input class="dm-input" [(ngModel)]="purgeTexts.docs" placeholder="Wpisz: USUŃ DOKUMENTY">
+          <input class="dm-input" [(ngModel)]="purgeTexts.docs" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.docs.confirmPhrase') })">
           <div style="display:flex;gap:6px;margin-top:6px">
             <button class="btn-danger" (click)="purgeCategory('docs')"
-                    [disabled]="purgeTexts.docs !== 'USUŃ DOKUMENTY' || purging() === 'docs'">
-              {{ purging() === 'docs' ? '⏳…' : 'Potwierdź' }}
+                    [disabled]="purgeTexts.docs !== t('dataManagement.purge.docs.confirmPhrase') || purging() === 'docs'">
+              {{ purging() === 'docs' ? '⏳…' : t('dataManagement.purge.confirm') }}
             </button>
-            <button class="btn-cancel" (click)="purgeConfirming=''">Anuluj</button>
+            <button class="btn-cancel" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
           </div>
         </div>
         <div *ngIf="purgeResults.docs" class="result-ok" style="margin-top:8px">✓ {{ purgeResults.docs }}</div>
@@ -170,21 +173,21 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
         <div class="purge-card-head">
           <span style="font-size:22px">👤</span>
           <div>
-            <div class="purge-card-title">Wszystkie leady</div>
-            <div class="purge-card-desc">Usuwa: leady, aktywności leadów, powiązania dokumentów leadów, historię importów leadów, logi audytu leadów</div>
+            <div class="purge-card-title">{{ t('dataManagement.purge.leads.title') }}</div>
+            <div class="purge-card-desc">{{ t('dataManagement.purge.leads.description') }}</div>
           </div>
         </div>
         <div *ngIf="purgeConfirming !== 'leads'" style="text-align:center;margin-top:8px">
-          <button class="btn-danger" (click)="purgeConfirming='leads'">🗑️ Usuń wszystkie leady</button>
+          <button class="btn-danger" (click)="purgeConfirming='leads'">🗑️ {{ t('dataManagement.purge.leads.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'leads'" class="inline-confirm">
-          <input class="dm-input" [(ngModel)]="purgeTexts.leads" placeholder="Wpisz: USUŃ LEADY">
+          <input class="dm-input" [(ngModel)]="purgeTexts.leads" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.leads.confirmPhrase') })">
           <div style="display:flex;gap:6px;margin-top:6px">
             <button class="btn-danger" (click)="purgeCategory('leads')"
-                    [disabled]="purgeTexts.leads !== 'USUŃ LEADY' || purging() === 'leads'">
-              {{ purging() === 'leads' ? '⏳…' : 'Potwierdź' }}
+                    [disabled]="purgeTexts.leads !== t('dataManagement.purge.leads.confirmPhrase') || purging() === 'leads'">
+              {{ purging() === 'leads' ? '⏳…' : t('dataManagement.purge.confirm') }}
             </button>
-            <button class="btn-cancel" (click)="purgeConfirming=''">Anuluj</button>
+            <button class="btn-cancel" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
           </div>
         </div>
         <div *ngIf="purgeResults.leads" class="result-ok" style="margin-top:8px">✓ {{ purgeResults.leads }}</div>
@@ -195,21 +198,21 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
         <div class="purge-card-head">
           <span style="font-size:22px">🤝</span>
           <div>
-            <div class="purge-card-title">Wszystkich partnerów</div>
-            <div class="purge-card-desc">Usuwa: partnerów, aktywności partnerów, powiązania dokumentów, dane sprzedażowe, budżety, logi audytu partnerów</div>
+            <div class="purge-card-title">{{ t('dataManagement.purge.partners.title') }}</div>
+            <div class="purge-card-desc">{{ t('dataManagement.purge.partners.description') }}</div>
           </div>
         </div>
         <div *ngIf="purgeConfirming !== 'partners'" style="text-align:center;margin-top:8px">
-          <button class="btn-danger" (click)="purgeConfirming='partners'">🗑️ Usuń wszystkich partnerów</button>
+          <button class="btn-danger" (click)="purgeConfirming='partners'">🗑️ {{ t('dataManagement.purge.partners.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'partners'" class="inline-confirm">
-          <input class="dm-input" [(ngModel)]="purgeTexts.partners" placeholder="Wpisz: USUŃ PARTNERÓW">
+          <input class="dm-input" [(ngModel)]="purgeTexts.partners" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.partners.confirmPhrase') })">
           <div style="display:flex;gap:6px;margin-top:6px">
             <button class="btn-danger" (click)="purgeCategory('partners')"
-                    [disabled]="purgeTexts.partners !== 'USUŃ PARTNERÓW' || purging() === 'partners'">
-              {{ purging() === 'partners' ? '⏳…' : 'Potwierdź' }}
+                    [disabled]="purgeTexts.partners !== t('dataManagement.purge.partners.confirmPhrase') || purging() === 'partners'">
+              {{ purging() === 'partners' ? '⏳…' : t('dataManagement.purge.confirm') }}
             </button>
-            <button class="btn-cancel" (click)="purgeConfirming=''">Anuluj</button>
+            <button class="btn-cancel" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
           </div>
         </div>
         <div *ngIf="purgeResults.partners" class="result-ok" style="margin-top:8px">✓ {{ purgeResults.partners }}</div>
@@ -224,46 +227,47 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     <div class="section-head">
       <div class="section-icon">📦</div>
       <div>
-        <div class="section-title">Eksport / Import ustawień</div>
-        <div class="section-sub">Przenoszenie konfiguracji między środowiskami. Eksport pobiera plik JSON z app_settings i group_profiles. Import nadpisuje istniejące wartości.</div>
+        <div class="section-title">{{ t('dataManagement.settings.title') }}</div>
+        <div class="section-sub">{{ t('dataManagement.settings.subtitle') }}</div>
       </div>
     </div>
 
     <div class="export-import-grid">
       <div class="ei-card">
-        <div class="ei-title">📥 Eksport ustawień</div>
-        <div class="ei-desc">Pobierz plik JSON ze wszystkimi słownikami, parametrami aplikacji i profilami grup dokumentowych.</div>
+        <div class="ei-title">📥 {{ t('dataManagement.settings.export.title') }}</div>
+        <div class="ei-desc">{{ t('dataManagement.settings.export.description') }}</div>
         <div style="margin-top:12px">
           <button class="btn-primary" (click)="exportSettings()" [disabled]="exporting()">
-            {{ exporting() ? '⏳ Generowanie…' : '📥 Pobierz settings.json' }}
+            {{ exporting() ? '⏳ ' + t('dataManagement.settings.export.generating') : '📥 ' + t('dataManagement.settings.export.download') }}
           </button>
         </div>
       </div>
 
       <div class="ei-card">
-        <div class="ei-title">📤 Import ustawień</div>
-        <div class="ei-desc">Wgraj plik JSON pobrany z innego środowiska. Istniejące ustawienia zostaną nadpisane. Nowe klucze zostaną dodane.</div>
+        <div class="ei-title">📤 {{ t('dataManagement.settings.import.title') }}</div>
+        <div class="ei-desc">{{ t('dataManagement.settings.import.description') }}</div>
         <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
           <div class="drop-zone" [class.drag-over]="isDragging"
                (dragover)="$event.preventDefault(); isDragging=true"
                (dragleave)="isDragging=false" (drop)="onDrop($event)" (click)="fileInput.click()">
             <input #fileInput type="file" accept=".json" hidden (change)="onFileChange($event)">
-            <span *ngIf="!selectedFile && !importing()">📂 Przeciągnij plik JSON lub kliknij</span>
+            <span *ngIf="!selectedFile && !importing()">📂 {{ t('dataManagement.settings.import.dropHint') }}</span>
             <span *ngIf="selectedFile && !importing()">📄 {{ selectedFile.name }}</span>
-            <span *ngIf="importing()">⏳ Importowanie…</span>
+            <span *ngIf="importing()">⏳ {{ t('dataManagement.settings.import.inProgress') }}</span>
           </div>
           <button class="btn-primary" (click)="importSettings()" [disabled]="!selectedFile || importing()">
-            {{ importing() ? '⏳ Importowanie…' : '📤 Importuj ustawienia' }}
+            {{ importing() ? '⏳ ' + t('dataManagement.settings.import.inProgress') : '📤 ' + t('dataManagement.settings.import.action') }}
           </button>
         </div>
         <div *ngIf="importResult" class="result-ok" style="margin-top:8px">
-          ✓ Zaimportowano: {{ importResult.settingsUpdated }} ustawień, {{ importResult.groupsUpdated }} profili grup
+          ✓ {{ t('dataManagement.settings.import.result', { settingsUpdated: importResult.settingsUpdated, groupsUpdated: importResult.groupsUpdated }) }}
         </div>
         <div *ngIf="importError" class="result-err" style="margin-top:8px">✗ {{ importError }}</div>
       </div>
     </div>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
     .dm-page { padding:24px; max-width:1000px; overflow-y:auto; height:100%; box-sizing:border-box; }
@@ -323,6 +327,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
 export class DataManagementComponent {
   private http = inject(HttpClient);
   private auth = inject(AuthService);
+  private transloco = inject(TranslocoService);
 
   // ── Search state ──────────────────────────────────────────────
   docSearch       = ''; docSuggestions:  SearchResult[] = []; docSelected:  SearchResult | null = null;
@@ -422,7 +427,7 @@ export class DataManagementComponent {
     this.deleting.set('doc'); this.deleteDocResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/documents/${this.docSelected.id}`, { headers: this.hdrs() }).subscribe({
       next: r => { this.deleting.set(''); this.deleteDocResult = r.name || String(r.id); this.clearDocSel(); },
-      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || 'Błąd usuwania dokumentu'; },
+      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || this.transloco.translate('admin.dataManagement.delete.document.failed'); },
     });
   }
 
@@ -431,7 +436,7 @@ export class DataManagementComponent {
     this.deleting.set('lead'); this.deleteLeadResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/leads/${this.leadSelected.id}`, { headers: this.hdrs() }).subscribe({
       next: r => { this.deleting.set(''); this.deleteLeadResult = r.company || String(r.id); this.clearLeadSel(); },
-      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || 'Błąd usuwania leada'; },
+      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || this.transloco.translate('admin.dataManagement.delete.lead.failed'); },
     });
   }
 
@@ -440,26 +445,24 @@ export class DataManagementComponent {
     this.deleting.set('partner'); this.deletePartnerResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/partners/${this.partnerSelected.id}`, { headers: this.hdrs() }).subscribe({
       next: r => { this.deleting.set(''); this.deletePartnerResult = r.company || String(r.id); this.clearPartnerSel(); },
-      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || 'Błąd usuwania partnera'; },
+      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || this.transloco.translate('admin.dataManagement.delete.partner.failed'); },
     });
   }
 
   // ── Purge category ────────────────────────────────────────────
   purgeCategory(cat: string) {
-    const confirmMap: Record<string, string> = {
-      docs: 'USUŃ DOKUMENTY', leads: 'USUŃ LEADY', partners: 'USUŃ PARTNERÓW'
-    };
-    if ((this.purgeTexts as any)[cat] !== confirmMap[cat]) return;
+    const confirmPhrase = this.transloco.translate('admin.dataManagement.purge.' + cat + '.confirmPhrase');
+    if ((this.purgeTexts as any)[cat] !== confirmPhrase) return;
     this.purging.set(cat);
     this.purgeError = '';
     this.http.post<any>(`${BASE}/purge-category`, { category: cat }, { headers: this.hdrs() }).subscribe({
       next: r => {
         this.purging.set('');
-        (this.purgeResults as any)[cat] = `Usunięto ${r.deleted} rekordów, ${r.blobsDeleted} plików z Blob`;
+        (this.purgeResults as any)[cat] = this.transloco.translate('admin.dataManagement.purge.result', { deleted: r.deleted, blobsDeleted: r.blobsDeleted });
         this.purgeConfirming = '';
         (this.purgeTexts as any)[cat] = '';
       },
-      error: e => { this.purging.set(''); this.purgeError = e?.error?.error || 'Błąd czyszczenia'; },
+      error: e => { this.purging.set(''); this.purgeError = e?.error?.error || this.transloco.translate('admin.dataManagement.purge.failed'); },
     });
   }
 
@@ -498,9 +501,9 @@ export class DataManagementComponent {
         const payload = JSON.parse(reader.result as string);
         this.http.post<any>(`${BASE}/import-settings`, payload, { headers: this.hdrs() }).subscribe({
           next: r => { this.importing.set(false); this.importResult = r; this.selectedFile = null; },
-          error: e => { this.importing.set(false); this.importError = e?.error?.error || 'Błąd importu'; },
+          error: e => { this.importing.set(false); this.importError = e?.error?.error || this.transloco.translate('admin.dataManagement.settings.import.failed'); },
         });
-      } catch { this.importing.set(false); this.importError = 'Nieprawidłowy plik JSON'; }
+      } catch { this.importing.set(false); this.importError = this.transloco.translate('admin.dataManagement.settings.import.invalidFile'); }
     };
     reader.readAsText(this.selectedFile);
   }

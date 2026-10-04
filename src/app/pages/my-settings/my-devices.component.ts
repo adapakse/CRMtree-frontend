@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ToastService } from '../../core/services/toast.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 interface SignedInDevice {
   device_id: string;
@@ -17,31 +18,31 @@ interface SignedInDevice {
   selector: 'wt-my-devices',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe],
+  imports: [DatePipe, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('account')],
   template: `
-    <div class="card devices-card">
-      <h2>📱 Zalogowane telefony</h2>
+    <div class="card devices-card" *transloco="let t; prefix: 'account'">
+      <h2>📱 {{ t('myDevices.title') }}</h2>
       <p class="hint">
-        Telefony, na których jesteś zalogowany w aplikacji mobilnej CRMtree. Jeśli zgubisz telefon albo go wymienisz,
-        wyloguj go tutaj — aplikacja na nim straci dostęp najpóźniej po kilkunastu minutach.
+        {{ t('myDevices.hint') }}
       </p>
       @if (loading()) {
-        <p class="hint">Ładowanie…</p>
+        <p class="hint">{{ 'states.loading' | transloco }}</p>
       } @else if (devices().length === 0) {
-        <p class="empty">Brak zalogowanych telefonów.</p>
+        <p class="empty">{{ t('myDevices.empty') }}</p>
       } @else {
         <ul class="device-list">
           @for (d of devices(); track d.device_id) {
             <li class="device-row">
               <div class="device-info">
-                <span class="device-name">{{ d.device_name || 'Nieznane urządzenie' }}</span>
+                <span class="device-name">{{ d.device_name || t('myDevices.unknownDevice') }}</span>
                 <span class="device-meta">
-                  ostatnia aktywność {{ d.last_active_at | date:'d MMM y, HH:mm':'':'pl' }} ·
-                  zalogowany od {{ d.first_seen_at | date:'d MMM y':'':'pl' }}
+                  {{ t('myDevices.lastActive', { date: (d.last_active_at | date:'d MMM y, HH:mm') }) }} ·
+                  {{ t('myDevices.signedInSince', { date: (d.first_seen_at | date:'d MMM y') }) }}
                 </span>
               </div>
               <button type="button" class="btn-signout" (click)="signOut(d)" [disabled]="signingOut() === d.device_id">
-                @if (signingOut() === d.device_id) { Wylogowuję… } @else { Wyloguj }
+                @if (signingOut() === d.device_id) { {{ t('myDevices.signingOut') }} } @else { {{ t('myDevices.signOut') }} }
               </button>
             </li>
           }
@@ -72,6 +73,7 @@ interface SignedInDevice {
 export class MyDevicesComponent implements OnInit {
   private http = inject(HttpClient);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
   private readonly api = `${environment.apiUrl}/auth/devices`;
 
   readonly devices = signal<SignedInDevice[]>([]);
@@ -86,18 +88,18 @@ export class MyDevicesComponent implements OnInit {
   }
 
   signOut(device: SignedInDevice): void {
-    const name = device.device_name || 'to urządzenie';
-    if (!confirm(`Wylogować ${name} z aplikacji CRMtree?`)) return;
+    const name = device.device_name || this.transloco.translate('account.myDevices.thisDevice');
+    if (!confirm(this.transloco.translate('account.myDevices.signOutConfirm', { name }))) return;
     this.signingOut.set(device.device_id);
     this.http.delete<void>(`${this.api}/${encodeURIComponent(device.device_id)}`).subscribe({
       next: () => {
         this.devices.update((list) => list.filter((d) => d.device_id !== device.device_id));
         this.signingOut.set(null);
-        this.toast.success(`Wylogowano ${name}.`);
+        this.toast.success(this.transloco.translate('account.myDevices.signedOut', { name }));
       },
       error: () => {
         this.signingOut.set(null);
-        this.toast.error('Nie udało się wylogować urządzenia.');
+        this.toast.error(this.transloco.translate('account.myDevices.signOutFailed'));
       },
     });
   }

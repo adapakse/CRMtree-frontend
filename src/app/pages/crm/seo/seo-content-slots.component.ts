@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import {
   CrmSeoService, SeoContent, SeoEnrichmentSlot, SeoScreenshot, SeoSlotType, SeoSlotValue,
 } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 
 const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
-  expert_comment: 'Komentarz eksperta',
-  quote: 'Cytat ze źródłem',
-  screenshot: 'Screen produktu',
+  expert_comment: 'crm.seo.contentSlots.types.expert_comment',
+  quote: 'crm.seo.contentSlots.types.quote',
+  screenshot: 'crm.seo.contentSlots.types.screenshot',
 };
 
 // Each generated article asks for an expert comment, attributed quotes and
@@ -18,21 +19,22 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
   selector: 'wt-seo-content-slots',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+    <ng-container *transloco="let t; prefix: 'crm'">
     @if (visibleSlots().length) {
       <div class="slots-box">
-        <h3>Do uzupełnienia przed publikacją</h3>
+        <h3>{{ t('seo.contentSlots.title') }}</h3>
         <p class="hint">
-          SEObot zaznaczył w tekście miejsca, w których artykuł potrzebuje czegoś, czego AI nie może uczciwie wymyślić.
-          Uzupełnij każde albo usuń je — dopiero wtedy da się zatwierdzić wpis.
+          {{ t('seo.contentSlots.hint') }}
         </p>
         @for (slot of visibleSlots(); track slot.id) {
           <div class="slot-card" [class.done]="slot.status !== 'pending'">
             <div class="slot-head">
               <span class="slot-type">{{ typeLabel(slot.type) }}</span>
-              @if (slot.status === 'filled') { <span class="slot-status filled">Uzupełnione</span> }
-              @if (slot.status === 'removed') { <span class="slot-status removed">Usunięte</span> }
+              @if (slot.status === 'filled') { <span class="slot-status filled">{{ t('seo.contentSlots.statuses.filled') }}</span> }
+              @if (slot.status === 'removed') { <span class="slot-status removed">{{ t('seo.contentSlots.statuses.removed') }}</span> }
             </div>
             <p class="slot-brief">{{ slot.brief }}</p>
 
@@ -40,50 +42,50 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
               @if (activeSlotId() === slot.id) {
                 @switch (slot.type) {
                   @case ('expert_comment') {
-                    <label class="field-label" [for]="slot.id + '-text'">Komentarz</label>
+                    <label class="field-label" [for]="slot.id + '-text'">{{ t('seo.contentSlots.fields.comment') }}</label>
                     <textarea class="field-input" [id]="slot.id + '-text'" rows="4" [(ngModel)]="text"></textarea>
                     <div class="field-row">
                       <div>
-                        <label class="field-label" [for]="slot.id + '-author'">Imię i nazwisko</label>
+                        <label class="field-label" [for]="slot.id + '-author'">{{ t('seo.contentSlots.fields.fullName') }}</label>
                         <input class="field-input" [id]="slot.id + '-author'" [(ngModel)]="author">
                       </div>
                       <div>
-                        <label class="field-label" [for]="slot.id + '-role'">Stanowisko / firma</label>
-                        <input class="field-input" [id]="slot.id + '-role'" [(ngModel)]="authorRole" placeholder="np. Head of Sales, CRMtree">
+                        <label class="field-label" [for]="slot.id + '-role'">{{ t('seo.contentSlots.fields.roleCompany') }}</label>
+                        <input class="field-input" [id]="slot.id + '-role'" [(ngModel)]="authorRole" [placeholder]="t('seo.contentSlots.placeholders.roleCompany')">
                       </div>
                     </div>
                   }
                   @case ('quote') {
                     @if (slot.suggestion; as s) {
                       <div class="suggestion">
-                        <span class="suggestion-label">Propozycja SEObota (sprawdzona na stronie źródła):</span>
+                        <span class="suggestion-label">{{ t('seo.contentSlots.suggestion.label') }}</span>
                         <p class="suggestion-quote">„{{ s.quote }}”</p>
                         <p class="suggestion-source">
                           — {{ s.author }}{{ s.author_role ? ', ' + s.author_role : '' }} ·
                           <a [href]="s.source_url" target="_blank" rel="noopener noreferrer">{{ s.source_title || s.source_url }}</a>
                         </p>
-                        <button type="button" class="btn-ghost btn-sm" (click)="useSuggestion(slot)">Użyj tego cytatu</button>
+                        <button type="button" class="btn-ghost btn-sm" (click)="useSuggestion(slot)">{{ t('seo.contentSlots.suggestion.use') }}</button>
                       </div>
                     }
-                    <label class="field-label" [for]="slot.id + '-text'">Cytat</label>
+                    <label class="field-label" [for]="slot.id + '-text'">{{ t('seo.contentSlots.fields.quote') }}</label>
                     <textarea class="field-input" [id]="slot.id + '-text'" rows="3" [(ngModel)]="text"></textarea>
                     <div class="field-row">
                       <div>
-                        <label class="field-label" [for]="slot.id + '-author'">Autor (osoba lub instytucja)</label>
+                        <label class="field-label" [for]="slot.id + '-author'">{{ t('seo.contentSlots.fields.quoteAuthor') }}</label>
                         <input class="field-input" [id]="slot.id + '-author'" [(ngModel)]="author">
                       </div>
                       <div>
-                        <label class="field-label" [for]="slot.id + '-role'">Rola</label>
+                        <label class="field-label" [for]="slot.id + '-role'">{{ t('seo.contentSlots.fields.role') }}</label>
                         <input class="field-input" [id]="slot.id + '-role'" [(ngModel)]="authorRole">
                       </div>
                     </div>
                     <div class="field-row">
                       <div>
-                        <label class="field-label" [for]="slot.id + '-source'">Tytuł źródła</label>
+                        <label class="field-label" [for]="slot.id + '-source'">{{ t('seo.contentSlots.fields.sourceTitle') }}</label>
                         <input class="field-input" [id]="slot.id + '-source'" [(ngModel)]="sourceTitle">
                       </div>
                       <div>
-                        <label class="field-label" [for]="slot.id + '-url'">Link do źródła (https://)</label>
+                        <label class="field-label" [for]="slot.id + '-url'">{{ t('seo.contentSlots.fields.sourceUrl') }}</label>
                         <input class="field-input" [id]="slot.id + '-url'" [(ngModel)]="sourceUrl">
                       </div>
                     </div>
@@ -99,25 +101,25 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
                         }
                       </div>
                     } @else {
-                      <p class="hint">Biblioteka screenów jest pusta — dodaj screen poniżej albo w panelu „Screeny".</p>
+                      <p class="hint">{{ t('seo.contentSlots.screenshots.emptyLibrary') }}</p>
                     }
                     <details class="upload-new">
-                      <summary>Wgraj nowy screen</summary>
+                      <summary>{{ t('seo.contentSlots.screenshots.uploadNew') }}</summary>
                       <input #fileInput type="file" accept="image/png,image/jpeg,image/webp" (change)="newFile = fileInput.files?.[0] ?? null">
-                      <label class="field-label" [for]="slot.id + '-caption'">Podpis pod zdjęciem</label>
+                      <label class="field-label" [for]="slot.id + '-caption'">{{ t('seo.contentSlots.fields.caption') }}</label>
                       <input class="field-input" [id]="slot.id + '-caption'" [(ngModel)]="newCaption">
-                      <button type="button" class="btn-ghost btn-sm" (click)="uploadAndSelect(slot)" [disabled]="!newFile || !newCaption.trim() || busy()">Wgraj do biblioteki</button>
+                      <button type="button" class="btn-ghost btn-sm" (click)="uploadAndSelect(slot)" [disabled]="!newFile || !newCaption.trim() || busy()">{{ t('seo.contentSlots.screenshots.uploadToLibrary') }}</button>
                     </details>
                   }
                 }
                 <div class="slot-actions">
-                  <button type="button" class="btn-accent btn-sm" (click)="fill(slot)" [disabled]="busy()">Wstaw do artykułu</button>
-                  <button type="button" class="btn-ghost btn-sm" (click)="activeSlotId.set(null)">Anuluj</button>
+                  <button type="button" class="btn-accent btn-sm" (click)="fill(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.insert') }}</button>
+                  <button type="button" class="btn-ghost btn-sm" (click)="activeSlotId.set(null)">{{ 'actions.cancel' | transloco }}</button>
                 </div>
               } @else {
                 <div class="slot-actions">
-                  <button type="button" class="btn-accent btn-sm" (click)="open(slot)">Uzupełnij</button>
-                  <button type="button" class="btn-reject btn-sm" (click)="remove(slot)" [disabled]="busy()">Usuń to miejsce</button>
+                  <button type="button" class="btn-accent btn-sm" (click)="open(slot)">{{ t('seo.contentSlots.actions.fill') }}</button>
+                  <button type="button" class="btn-reject btn-sm" (click)="remove(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.remove') }}</button>
                 </div>
               }
             }
@@ -125,6 +127,7 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
         }
       </div>
     }
+    </ng-container>
   `,
   styles: [`
     .slots-box { border: 1px solid #FCD34D; background: #FFFBEB; border-radius: var(--radius); padding: 0.9rem 1rem; margin-top: 0.9rem; }
@@ -169,6 +172,7 @@ export class SeoContentSlotsComponent {
 
   readonly seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   readonly activeSlotId = signal<string | null>(null);
   readonly busy = signal(false);
@@ -184,7 +188,7 @@ export class SeoContentSlotsComponent {
   newCaption = '';
 
   typeLabel(type: SeoSlotType): string {
-    return SLOT_TYPE_LABELS[type];
+    return this.transloco.translate(SLOT_TYPE_LABELS[type]);
   }
 
   // Screenshots tagged with the slot's feature come first.
@@ -225,9 +229,9 @@ export class SeoContentSlotsComponent {
         this.newFile = null;
         this.busy.set(false);
         this.screenshotAdded.emit();
-        this.toast.success('Screen dodany do biblioteki i wybrany.');
+        this.toast.success(this.transloco.translate('crm.seo.contentSlots.toasts.screenshotUploaded'));
       },
-      error: (err) => { this.busy.set(false); this.toast.error(err?.error?.error ?? 'Nie udało się wgrać screena.'); },
+      error: (err) => { this.busy.set(false); this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.contentSlots.toasts.screenshotUploadFailed')); },
     });
   }
 
@@ -239,33 +243,33 @@ export class SeoContentSlotsComponent {
       next: (updated) => {
         this.busy.set(false);
         this.activeSlotId.set(null);
-        this.toast.success('Wstawiono do artykułu.');
+        this.toast.success(this.transloco.translate('crm.seo.contentSlots.toasts.inserted'));
         this.contentChanged.emit(updated);
       },
       error: (err) => {
         this.busy.set(false);
         this.toast.error(err?.error?.details?.[0]?.field
-          ? `Sprawdź pole: ${err.error.details[0].field}`
-          : err?.error?.error ?? 'Nie udało się wstawić.');
+          ? this.transloco.translate('crm.seo.contentSlots.toasts.checkField', { field: err.error.details[0].field })
+          : err?.error?.error ?? this.transloco.translate('crm.seo.contentSlots.toasts.insertFailed'));
       },
     });
   }
 
   remove(slot: SeoEnrichmentSlot): void {
-    if (!confirm('Usunąć to miejsce z artykułu? Tekst wokół zostanie bez zmian.')) return;
+    if (!confirm(this.transloco.translate('crm.seo.contentSlots.removeConfirm'))) return;
     this.busy.set(true);
     this.seoService.removeSlot(this.content().id, slot.id).subscribe({
       next: (updated) => { this.busy.set(false); this.contentChanged.emit(updated); },
-      error: (err) => { this.busy.set(false); this.toast.error(err?.error?.error ?? 'Nie udało się usunąć.'); },
+      error: (err) => { this.busy.set(false); this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.contentSlots.toasts.removeFailed')); },
     });
   }
 
   private buildValue(type: SeoSlotType): SeoSlotValue | null {
     if (type === 'screenshot') {
-      if (this.screenshotId == null) { this.toast.error('Wybierz screen.'); return null; }
+      if (this.screenshotId == null) { this.toast.error(this.transloco.translate('crm.seo.contentSlots.toasts.chooseScreenshot')); return null; }
       return { screenshot_id: this.screenshotId };
     }
-    if (!this.text.trim() || !this.author.trim()) { this.toast.error('Uzupełnij treść i autora.'); return null; }
+    if (!this.text.trim() || !this.author.trim()) { this.toast.error(this.transloco.translate('crm.seo.contentSlots.toasts.textAndAuthorRequired')); return null; }
     if (type === 'expert_comment') {
       return { text: this.text.trim(), author_name: this.author.trim(), author_role: this.authorRole.trim() || null };
     }

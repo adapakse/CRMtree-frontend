@@ -1,0 +1,1229 @@
+{
+  "dataManagement": {
+    "delete": {
+      "deleted": "Supprimé : {name}",
+      "document": {
+        "action": "Supprimer le document",
+        "description": "Supprime : les métadonnées, toutes les versions + les fichiers du Blob, les tags, les tâches de workflow, les liens CRM, les journaux d’audit",
+        "failed": "Erreur lors de la suppression du document",
+        "searchPlaceholder": "Saisissez le nom ou le numéro du document (min. 2 caractères)…",
+        "title": "Document"
+      },
+      "inProgress": "Suppression…",
+      "lead": {
+        "action": "Supprimer le lead",
+        "description": "Supprime : le lead, les activités, les liens avec les documents, l’historique. Ne supprime pas le partenaire issu de la conversion.",
+        "failed": "Erreur lors de la suppression du lead",
+        "searchPlaceholder": "Saisissez le nom de l’entreprise ou le contact (min. 2 caractères)…",
+        "title": "Lead"
+      },
+      "partner": {
+        "action": "Supprimer le partenaire",
+        "description": "Supprime : le partenaire, les activités, les liens avec les documents, les données de vente, l’historique.",
+        "failed": "Erreur lors de la suppression du partenaire",
+        "searchPlaceholder": "Saisissez le nom de l’entreprise ou le numéro fiscal (min. 2 caractères)…",
+        "title": "Partenaire"
+      },
+      "subtitle": "Suppression définitive d’un document, d’un lead ou d’un partenaire avec toutes les données et tous les journaux associés.",
+      "title": "Suppression d’enregistrements"
+    },
+    "purge": {
+      "confirm": "Confirmer",
+      "docs": {
+        "action": "Supprimer tous les documents",
+        "confirmPhrase": "SUPPRIMER DOCUMENTS",
+        "description": "Supprime : les documents, les versions, les fichiers du Blob, les tags, les groupes de documents, les tâches de workflow, les journaux d’audit des documents",
+        "title": "Tous les documents"
+      },
+      "failed": "Erreur lors du nettoyage",
+      "leads": {
+        "action": "Supprimer tous les leads",
+        "confirmPhrase": "SUPPRIMER LEADS",
+        "description": "Supprime : les leads, les activités des leads, les liens des leads avec les documents, l’historique des imports de leads, les journaux d’audit des leads",
+        "title": "Tous les leads"
+      },
+      "partners": {
+        "action": "Supprimer tous les partenaires",
+        "confirmPhrase": "SUPPRIMER PARTENAIRES",
+        "description": "Supprime : les partenaires, les activités des partenaires, les liens avec les documents, les données de vente, les budgets, les journaux d’audit des partenaires",
+        "title": "Tous les partenaires"
+      },
+      "result": "{deleted, plural, one {# enregistrement supprimé} other {# enregistrements supprimés}}, {blobsDeleted, plural, one {# fichier supprimé} other {# fichiers supprimés}} du Blob",
+      "subtitle": "Supprimez tous les enregistrements de la catégorie choisie. Sont conservés : les utilisateurs, les rôles, les profils de groupes, les groupes de partenaires, les paramètres de l’application.",
+      "title": "Nettoyage de l’environnement de test",
+      "typePhrase": "Saisissez : {phrase}"
+    },
+    "settings": {
+      "export": {
+        "description": "Téléchargez un fichier JSON contenant tous les dictionnaires, les paramètres de l’application et les profils des groupes de documents.",
+        "download": "Télécharger settings.json",
+        "generating": "Génération…",
+        "title": "Export des paramètres"
+      },
+      "import": {
+        "action": "Importer les paramètres",
+        "description": "Chargez un fichier JSON téléchargé depuis un autre environnement. Les paramètres existants seront écrasés. Les nouvelles clés seront ajoutées.",
+        "dropHint": "Glissez un fichier JSON ou cliquez",
+        "failed": "Erreur d’import",
+        "inProgress": "Import…",
+        "invalidFile": "Fichier JSON invalide",
+        "result": "Importé : {settingsUpdated, plural, one {# paramètre} other {# paramètres}}, {groupsUpdated, plural, one {# profil de groupes} other {# profils de groupes}}",
+        "title": "Import des paramètres"
+      },
+      "subtitle": "Transfert de la configuration entre environnements. L’export télécharge un fichier JSON avec app_settings et group_profiles. L’import écrase les valeurs existantes.",
+      "title": "Export / Import des paramètres"
+    },
+    "subtitle": "Opérations d’administration : suppression d’enregistrements, nettoyage de l’environnement, export/import des paramètres. Réservé aux administrateurs.",
+    "title": "Gestion des données"
+  },
+  "logs": {
+    "columns": {
+      "action": "Action",
+      "dateTime": "Date et heure",
+      "details": "Détails",
+      "document": "Document",
+      "user": "Utilisateur"
+    },
+    "count": "Entrées : {count}",
+    "detail": {
+      "after": "Après :",
+      "before": "Avant :",
+      "document": "Document :"
+    },
+    "empty": "Aucune entrée de journal trouvée",
+    "filters": {
+      "actionType": "Type d’action",
+      "allActions": "Toutes les actions",
+      "clear": "Effacer les filtres",
+      "dateFrom": "Date de début",
+      "dateTo": "Date de fin",
+      "userEmail": "E-mail de l’utilisateur",
+      "userEmailPlaceholder": "utilisateur@entreprise.com"
+    },
+    "pagination": {
+      "next": "Suivant",
+      "page": "Page {page} sur {total}",
+      "previous": "Préc."
+    },
+    "searchPlaceholder": "Rechercher un utilisateur, un document…",
+    "title": "Journaux d’audit"
+  },
+  "onboardingSurvey": {
+    "answers": {
+      "copied": "Copié",
+      "copySecret": "Copier",
+      "hideSecret": "Masquer",
+      "lastChange": "dernière modification le {date}",
+      "loadFailed": "Erreur lors du chargement du questionnaire de déploiement",
+      "loading": "Chargement...",
+      "notStarted": "L’administrateur de ce tenant n’a pas encore commencé le questionnaire de déploiement (Paramètres de l’application → Questionnaire de déploiement).",
+      "secretNotProvided": "— non renseigné —",
+      "showSecret": "Afficher",
+      "statusDraft": "Brouillon — pas encore envoyé",
+      "statusSubmitted": "Envoyé"
+    },
+    "options": {
+      "aiLicence": {
+        "own": "Licence / clé API dédiée, propre à notre entreprise",
+        "shared": "Licence CRMtree (partagée, facturée dans le cadre du contrat)",
+        "undecided": "Nous ne savons pas encore — merci de nous conseiller"
+      },
+      "oauthAppOwner": {
+        "client": "Notre service informatique enregistrera l’application et fournira les données ci-dessous",
+        "needs_help": "Nous avons besoin de l’aide de CRMtree pour enregistrer l’application"
+      },
+      "yesNo": {
+        "no": "Non",
+        "yes": "Oui"
+      }
+    },
+    "page": {
+      "backToSettings": "Paramètres",
+      "choose": "— choisir —",
+      "draftSaved": "Brouillon enregistré",
+      "fillRequired": "Veuillez remplir les champs obligatoires",
+      "intro": {
+        "howItWorks": "Sur la base de ce questionnaire, l’équipe CRMtree configurera votre environnement. Vous pouvez le remplir par étapes — « Enregistrer le brouillon » conserve vos réponses et « Envoyer le questionnaire » nous les transmet.",
+        "requiredAfter": "sont obligatoires pour l’envoi.",
+        "requiredBefore": "Les champs marqués d’un",
+        "secrets": "Les mots de passe, jetons et clés API sont enregistrés sous forme chiffrée et ne sont plus affichés après l’enregistrement."
+      },
+      "loadFailed": "Impossible de charger le questionnaire",
+      "missingRequiredTitle": "Veuillez remplir les champs obligatoires pour envoyer le questionnaire :",
+      "resubmit": "Envoyer à nouveau",
+      "saveDraft": "Enregistrer le brouillon",
+      "saveFailed": "Erreur lors de l’enregistrement du questionnaire",
+      "secretSavedPlaceholder": "enregistré — laisser vide pour conserver",
+      "statusDraft": "Brouillon",
+      "statusSubmitted": "Envoyé le {date}",
+      "submit": "Envoyer le questionnaire",
+      "submitted": "Questionnaire envoyé à l’équipe CRMtree",
+      "title": "Questionnaire de déploiement"
+    },
+    "questions": {
+      "additional_notes": {
+        "label": "Autres exigences, questions ou contraintes"
+      },
+      "ai_data_processing_consent": {
+        "label": "Traitement des données par les fournisseurs de modèles",
+        "options": {
+          "accepted": {
+            "label": "Nous acceptons la transmission de contenus (données d’entreprises, notes et transcriptions d’appels) au fournisseur de modèle d’IA choisi"
+          },
+          "eu_only": {
+            "label": "Nous exigeons un traitement exclusivement sur le territoire de l’UE"
+          }
+        }
+      },
+      "ai_monthly_budget": {
+        "hint": "Facultatif — si vous souhaitez limiter la consommation.",
+        "label": "Plafond mensuel des coûts des modèles d’IA",
+        "placeholder": "p. ex. 200 EUR"
+      },
+      "billing_city": {
+        "label": "Ville"
+      },
+      "billing_company_name": {
+        "label": "Raison sociale complète (pour la facture)",
+        "placeholder": "p. ex. Acme SAS"
+      },
+      "billing_country": {
+        "label": "Pays",
+        "placeholder": "France"
+      },
+      "billing_cycle": {
+        "label": "Cycle de facturation",
+        "options": {
+          "annual": {
+            "label": "Annuel"
+          },
+          "monthly": {
+            "label": "Mensuel"
+          }
+        }
+      },
+      "billing_invoice_email": {
+        "label": "E-mail auquel nous envoyons les factures",
+        "placeholder": "compta@entreprise.fr"
+      },
+      "billing_nip": {
+        "label": "Numéro fiscal"
+      },
+      "billing_plan": {
+        "label": "Forfait choisi",
+        "options": {
+          "lite": {
+            "label": "Lite"
+          },
+          "professional": {
+            "label": "Professional (tarification sur devis)"
+          },
+          "standard": {
+            "label": "Standard"
+          },
+          "undecided": {
+            "label": "À définir"
+          }
+        }
+      },
+      "billing_postal_code": {
+        "label": "Code postal"
+      },
+      "billing_street": {
+        "label": "Rue et numéro"
+      },
+      "business_contact_email": {
+        "label": "Décisionnaire — e-mail"
+      },
+      "business_contact_name": {
+        "label": "Décisionnaire côté métier — prénom et nom"
+      },
+      "business_contact_phone": {
+        "label": "Décisionnaire — téléphone"
+      },
+      "call_analysis_api_key": {
+        "label": "Analyse des appels — clé API propre"
+      },
+      "call_analysis_buying_signals": {
+        "hint": "Signaux d’intérêt typiques et objections typiques. Nous y adapterons l’évaluation de la propension à l’achat.",
+        "label": "Analyse des appels — à quoi reconnaissez-vous un client prêt à acheter ?"
+      },
+      "call_analysis_licence": {
+        "hint": "L’analyse des appels utilise le modèle DeepSeek.",
+        "label": "Analyse des appels — licence du modèle"
+      },
+      "call_analysis_monthly_volume": {
+        "label": "Analyse des appels — nombre estimé d’appels par mois"
+      },
+      "company_display_name": {
+        "label": "Nom de l’entreprise affiché dans le CRM",
+        "placeholder": "p. ex. Acme"
+      },
+      "company_email_domain": {
+        "hint": "Domaine depuis lequel vos collaborateurs se connectent.",
+        "label": "Domaine de la messagerie de l’entreprise",
+        "placeholder": "p. ex. acme.fr"
+      },
+      "company_industry": {
+        "label": "Secteur d’activité",
+        "placeholder": "p. ex. logistique, informatique, production"
+      },
+      "company_offer_description": {
+        "hint": "Brève description de l’offre et du client type. Nous l’utilisons pour configurer les dictionnaires et les suggestions de l’IA.",
+        "label": "Que vendez-vous et à qui ?"
+      },
+      "currencies": {
+        "label": "Devises dans lesquelles vous vendez",
+        "placeholder": "PLN, EUR"
+      },
+      "dwh_source": {
+        "hint": "Système source (ERP / système de vente), format d’export et fréquence.",
+        "label": "Données de vente — depuis quel système et à quelle fréquence doivent-elles être mises à jour ?"
+      },
+      "email_mailbox_count": {
+        "label": "Combien de boîtes mail seront connectées ?"
+      },
+      "email_oauth_app_owner": {
+        "label": "Qui enregistrera l’application auprès du fournisseur de messagerie ?"
+      },
+      "email_other_provider": {
+        "hint": "Nous prenons actuellement en charge Gmail, Microsoft 365 et Zoho — nous étudierons les possibilités pour un autre fournisseur.",
+        "label": "De quelle messagerie s’agit-il ?"
+      },
+      "email_provider": {
+        "label": "Quelle messagerie d’entreprise utilisez-vous ?",
+        "options": {
+          "gmail": {
+            "label": "Gmail / Google Workspace"
+          },
+          "none": {
+            "label": "Nous ne voulons pas d’intégration de la messagerie"
+          },
+          "other": {
+            "label": "Autre"
+          },
+          "outlook": {
+            "label": "Outlook / Microsoft 365"
+          },
+          "zoho": {
+            "label": "Zoho Mail"
+          }
+        }
+      },
+      "enrichment_api_key": {
+        "label": "Enrichment — clé API propre"
+      },
+      "enrichment_ideal_customer": {
+        "hint": "Secteurs, taille d’entreprise, région, signaux indiquant une bonne adéquation, ainsi que les entreprises que vous ne souhaitez pas prospecter. Sur cette base, nous configurerons les signaux et la notation.",
+        "label": "Enrichment — profil du client idéal (ICP)"
+      },
+      "enrichment_licence": {
+        "label": "Enrichment — licence du modèle"
+      },
+      "enrichment_model": {
+        "label": "Enrichment — modèle préféré",
+        "options": {
+          "anthropic": {
+            "label": "Anthropic Claude (qualité supérieure, coût plus élevé)"
+          },
+          "deepseek": {
+            "label": "DeepSeek (par défaut, coût plus faible)"
+          },
+          "undecided": {
+            "label": "Merci de nous conseiller"
+          }
+        }
+      },
+      "enrichment_monthly_volume": {
+        "label": "Enrichment — combien d’entreprises prévoyez-vous d’analyser par mois ?"
+      },
+      "gmail_client_id": {
+        "label": "Google — Client ID",
+        "placeholder": "123456789.apps.googleusercontent.com"
+      },
+      "gmail_client_secret": {
+        "label": "Google — Client Secret"
+      },
+      "gmail_pubsub_topic": {
+        "hint": "Nécessaire à la réception immédiate des nouveaux messages.",
+        "label": "Google — Pub/Sub Topic",
+        "placeholder": "projects/moj-projekt/topics/gmail-push"
+      },
+      "go_live_date": {
+        "label": "Date de mise en service prévue"
+      },
+      "import_scope": {
+        "label": "Quelles données importons-nous au démarrage ?",
+        "options": {
+          "contacts": {
+            "label": "Personnes de contact"
+          },
+          "documents": {
+            "label": "Documents / contrats"
+          },
+          "leads": {
+            "label": "Leads / opportunités de vente"
+          },
+          "partners": {
+            "label": "Clients / partenaires actuels"
+          }
+        }
+      },
+      "import_source": {
+        "hint": "Système actuel (Excel, autre CRM, ERP) et nombre approximatif d’enregistrements.",
+        "label": "D’où viennent les données et quel est leur volume ?",
+        "placeholder": "p. ex. Excel, env. 2 000 leads et 300 clients"
+      },
+      "lead_sources": {
+        "label": "Sources de leads",
+        "placeholder": "Site web, recommandation, cold call, LinkedIn, salons…"
+      },
+      "modules": {
+        "label": "Quels modules doivent être actifs ?",
+        "options": {
+          "call_analysis": {
+            "hint": "Évaluation des appels téléphoniques par l’IA.",
+            "label": "Analyse des appels"
+          },
+          "documents": {
+            "hint": "Registre des contrats, circuit de validation et signature.",
+            "label": "Documents"
+          },
+          "dwh_integration": {
+            "hint": "Alimentation du CRM avec le chiffre d’affaires issu de votre système de vente / ERP.",
+            "label": "Intégration des données de vente (DWH)"
+          },
+          "leads": {
+            "hint": "Entonnoir de vente, activités, calendrier.",
+            "label": "Leads"
+          },
+          "onboarding": {
+            "hint": "Modèles de tâches d’onboarding pour les nouveaux clients.",
+            "label": "Onboarding des clients"
+          },
+          "partner_registry": {
+            "hint": "Suivi des clients actuels, upsell et cross-sell.",
+            "label": "Registre des partenaires / clients"
+          },
+          "pbx": {
+            "hint": "Appels aux clients directement depuis le CRM.",
+            "label": "Téléphonie (softphone)"
+          },
+          "performance": {
+            "hint": "Health score et risque d’attrition du client (churn).",
+            "label": "Performances"
+          },
+          "prospects": {
+            "hint": "Recherche d’entreprises et leur évaluation automatique par l’IA (Enrichment / ICP).",
+            "label": "Prospects"
+          },
+          "sales_reports": {
+            "label": "Rapports de ventes"
+          },
+          "seo_bot": {
+            "hint": "Création et publication automatiques d’articles sur le blog.",
+            "label": "SEObot"
+          },
+          "whatsapp": {
+            "hint": "Numéro WhatsApp Business commun à l’entreprise, géré depuis les fiches des leads et des clients.",
+            "label": "WhatsApp"
+          }
+        }
+      },
+      "outlook_admin_consent": {
+        "label": "L’administrateur Microsoft 365 peut-il accorder le consentement (admin consent) pour toute l’organisation ?"
+      },
+      "outlook_azure_tenant_id": {
+        "hint": "Facultatif.",
+        "label": "Microsoft — Directory (tenant) ID"
+      },
+      "outlook_client_id": {
+        "label": "Microsoft — Application (client) ID",
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      "outlook_client_secret": {
+        "label": "Microsoft — Client Secret"
+      },
+      "pbx_account_name": {
+        "label": "Nom de l’entreprise / du compte dans ip-pbx.eu"
+      },
+      "pbx_account_status": {
+        "label": "Avez-vous un compte d’entreprise chez ip-pbx.eu ?",
+        "options": {
+          "has_account": {
+            "label": "Oui"
+          },
+          "needs_account": {
+            "label": "Non — merci de faire créer le compte par CRMtree"
+          },
+          "other_provider": {
+            "label": "Non — nous utilisons un autre standard / opérateur"
+          }
+        }
+      },
+      "pbx_call_recording": {
+        "hint": "Les enregistrements et leurs transcriptions sont la base du module Analyse des appels.",
+        "label": "Les appels doivent-ils être enregistrés ?"
+      },
+      "pbx_current_provider": {
+        "label": "Standard / opérateur actuel"
+      },
+      "pbx_extension_count": {
+        "label": "Combien de personnes appelleront depuis le CRM ?"
+      },
+      "pbx_phone_numbers": {
+        "hint": "Numéro principal de l’entreprise et numéros directs, s’ils doivent être attribués à des personnes précises. Indiquez les numéros à porter depuis l’opérateur actuel.",
+        "label": "Numéros depuis lesquels les appels doivent être émis"
+      },
+      "sales_stages": {
+        "hint": "Laissez vide si l’entonnoir par défaut vous convient.",
+        "label": "Étapes de l’entonnoir de vente",
+        "placeholder": "Nouveau → Qualification → Présentation → Offre → Négociation → Gagné / Perdu"
+      },
+      "seo_articles_per_day": {
+        "label": "Combien d’articles par jour ?"
+      },
+      "seo_channels": {
+        "label": "Canaux et sources de données supplémentaires",
+        "options": {
+          "facebook": {
+            "label": "Publication sur la page Facebook de l’entreprise"
+          },
+          "gsc": {
+            "label": "Google Search Console (nous avons un accès propriétaire au service)"
+          },
+          "linkedin": {
+            "label": "Publication sur le profil LinkedIn de l’entreprise"
+          }
+        }
+      },
+      "seo_publishing_platform": {
+        "label": "Où publions-nous les articles ?",
+        "options": {
+          "other": {
+            "label": "Autre système"
+          },
+          "undecided": {
+            "label": "À définir"
+          },
+          "wordpress": {
+            "label": "WordPress"
+          }
+        }
+      },
+      "seo_website_url": {
+        "label": "Adresse du site / du blog",
+        "placeholder": "https://entreprise.fr/blog"
+      },
+      "technical_contact_email": {
+        "label": "Contact technique — e-mail"
+      },
+      "technical_contact_name": {
+        "hint": "Personne disposant d’un accès administrateur à la messagerie, à la téléphonie et aux comptes Meta.",
+        "label": "Contact technique (IT) — prénom et nom"
+      },
+      "technical_contact_phone": {
+        "label": "Contact technique — téléphone"
+      },
+      "users_count": {
+        "label": "Nombre d’utilisateurs prévu"
+      },
+      "users_global_read": {
+        "label": "Les commerciaux doivent-ils voir les leads et les clients des autres commerciaux ?",
+        "options": {
+          "own_only": {
+            "label": "Non — chacun ne voit que les siens"
+          },
+          "read_all": {
+            "label": "Oui — tout le monde voit tout (lecture seule)"
+          },
+          "undecided": {
+            "label": "À définir"
+          }
+        }
+      },
+      "users_list": {
+        "hint": "Une personne par ligne : prénom et nom; e-mail; rôle (administrateur / responsable des ventes / commercial). Chacun recevra un mot de passe à usage unique, à changer lors de la première connexion.",
+        "label": "Liste des utilisateurs à créer",
+        "placeholder": "Jean Dupont; jean.dupont@entreprise.fr; commercial\nAnne Martin; anne.martin@entreprise.fr; responsable des ventes"
+      },
+      "users_team_structure": {
+        "hint": "Quelles sont les équipes / régions et qui dépend de qui. Sur cette base, nous définirons les groupes et la visibilité des données.",
+        "label": "Structure des équipes commerciales"
+      },
+      "whatsapp_access_token": {
+        "hint": "Autorisations : whatsapp_business_messaging, whatsapp_business_management.",
+        "label": "Access Token (jeton permanent de l’utilisateur système)"
+      },
+      "whatsapp_app_secret": {
+        "hint": "Meta App Dashboard → Settings → Basic.",
+        "label": "App Secret"
+      },
+      "whatsapp_display_name": {
+        "label": "Nom affiché aux clients dans WhatsApp"
+      },
+      "whatsapp_meta_verified": {
+        "label": "L’entreprise est-elle vérifiée dans Meta Business Manager ?",
+        "options": {
+          "unknown": {
+            "label": "Je ne sais pas"
+          }
+        }
+      },
+      "whatsapp_number_status": {
+        "label": "Avez-vous un numéro pour WhatsApp Business ?",
+        "options": {
+          "has_number": {
+            "label": "Nous avons un numéro, mais il n’est pas encore enregistré chez Meta"
+          },
+          "needs_number": {
+            "label": "Non — merci de faire acheter et configurer le numéro par CRMtree"
+          },
+          "ready": {
+            "label": "Oui — le numéro est déjà dans Meta WhatsApp Business Platform (Cloud API)"
+          }
+        }
+      },
+      "whatsapp_phone_number": {
+        "label": "Numéro de téléphone",
+        "placeholder": "+33 6 00 00 00 00"
+      },
+      "whatsapp_phone_number_id": {
+        "hint": "Il s’agit de l’identifiant du numéro chez Meta, et non du numéro de téléphone lui-même.",
+        "label": "Phone Number ID"
+      },
+      "whatsapp_waba_id": {
+        "hint": "Meta App Dashboard → WhatsApp → API Setup.",
+        "label": "WABA ID (WhatsApp Business Account ID)"
+      },
+      "zoho_client_id": {
+        "label": "Zoho — Client ID",
+        "placeholder": "1000.XXXXXXXX"
+      },
+      "zoho_client_secret": {
+        "label": "Zoho — Client Secret"
+      },
+      "zoho_data_center": {
+        "label": "Zoho — centre de données",
+        "options": {
+          "com": {
+            "label": "US (zoho.com)"
+          },
+          "eu": {
+            "label": "EU (zoho.eu)"
+          },
+          "other": {
+            "label": "Autre"
+          }
+        }
+      }
+    },
+    "sections": {
+      "ai": {
+        "intro": "Les modules Prospects (Enrichment) et Analyse des appels envoient des données à des modèles de langage externes. Vous pouvez utiliser la licence CRMtree ou une licence dédiée, propre à votre entreprise.",
+        "title": "8. Modèles d’IA — Enrichment et Analyse des appels"
+      },
+      "billing": {
+        "title": "2. Forfait et données de facturation"
+      },
+      "company": {
+        "intro": "Informations de base à partir desquelles nous préparerons l’environnement et déterminerons qui contacter pendant le déploiement.",
+        "title": "1. Entreprise et personnes de contact"
+      },
+      "data": {
+        "title": "10. Données et dictionnaires"
+      },
+      "email": {
+        "intro": "Chaque utilisateur connecte sa propre boîte mail au CRM (envoi et réception des messages sur les fiches des leads et des clients). Cela nécessite l’enregistrement, une seule fois, d’une application auprès du fournisseur de messagerie — nous transmettrons l’adresse de redirection (Redirect URI) au contact technique.",
+        "title": "5. Messagerie e-mail"
+      },
+      "modules": {
+        "intro": "Nous activerons les modules cochés dans votre environnement. Pour certains d’entre eux, des questions supplémentaires apparaîtront plus bas.",
+        "title": "4. Modules"
+      },
+      "notes": {
+        "title": "11. Remarques"
+      },
+      "pbx": {
+        "intro": "Le softphone du CRM fonctionne avec le standard virtuel ip-pbx.eu. Chaque utilisateur saisit ensuite son jeton personnel dans « Mes paramètres » — il n’est pas nécessaire de l’indiquer ici.",
+        "title": "7. Téléphonie (softphone)"
+      },
+      "seo": {
+        "title": "9. SEObot"
+      },
+      "users": {
+        "title": "3. Utilisateurs et rôles"
+      },
+      "whatsapp": {
+        "intro": "Le CRM gère un seul numéro WhatsApp Business commun à toute l’organisation (Meta WhatsApp Business Platform). Un numéro connecté au CRM ne peut pas fonctionner en même temps dans l’application WhatsApp classique sur un téléphone.",
+        "title": "6. WhatsApp Business"
+      }
+    }
+  },
+  "settings": {
+    "actions": {
+      "add": "Ajouter",
+      "delete": "Supprimer",
+      "discard": "Annuler les modifications",
+      "saveChanges": "Enregistrer les modifications",
+      "saving": "Enregistrement…"
+    },
+    "crm": {
+      "intro": "— dictionnaires et seuils utilisés par le module CRM. Modifiez les listes en ajoutant / supprimant des éléments. Les modifications prennent effet après l’enregistrement.",
+      "scoring": {
+        "activityLast20Days": "Activité (20 derniers jours)",
+        "churnTitle": "Algorithme Churn — paramètres de notation",
+        "description": "Description",
+        "healthLevelThresholds": "Seuils du Health Level (points)",
+        "healthTitle": "Health Score — paramètres de notation",
+        "noOrdersDays": "Absence de commandes (jours)",
+        "parameter": "Paramètre",
+        "revenueGrowth": "Hausse du revenu (M-2→M-1)",
+        "riskThresholds": "Seuils de risque (points)",
+        "salesDrop": "Baisse des ventes (M-2→M-1)",
+        "schedule": "Planification",
+        "value": "Valeur"
+      }
+    },
+    "documents": {
+      "empty": "Aucun dictionnaire de documents. Exécutez la migration 0116.",
+      "intro": "— gérez les valeurs disponibles pour les types de documents, les statuts et la classification RGPD. Attention : la suppression d’une valeur déjà utilisée dans des documents peut entraîner des problèmes d’affichage."
+    },
+    "errors": {
+      "saveFailed": "Erreur d’enregistrement",
+      "settingsSaveFailed": "Erreur lors de l’enregistrement des paramètres"
+    },
+    "fields": {
+      "changed": "Modifié",
+      "changedBy": "Modifié par",
+      "disabled": "Désactivé",
+      "emptyList": "— liste vide —",
+      "enabled": "Activé",
+      "errors": {
+        "nonNegativeNumber": "Doit être un nombre positif ou nul",
+        "valueExists": "Cette valeur existe déjà"
+      },
+      "newValueCode": "Nouvelle valeur (code, ex. hotel)",
+      "newValueExample": "Nouvelle valeur (ex. Prix élevé)",
+      "newValueTechnicalKey": "Nouvelle valeur (clé technique)"
+    },
+    "global": {
+      "categories": {
+        "crm": "CRM – paramètres métier",
+        "documents": "Documents et échéances",
+        "general": "Général / UI",
+        "workflow": "Workflow et Kanban"
+      },
+      "intro": "— paramètres techniques de l’application visibles par tous les utilisateurs. Les modifications prennent effet immédiatement après l’enregistrement.",
+      "preview": {
+        "expiringSoon": "jours → « expire bientôt »",
+        "moreThan": "Plus de",
+        "noWarning": "jours → aucun avertissement",
+        "title": "Aperçu des couleurs des échéances",
+        "urgent": "jours → rouge (urgent)"
+      }
+    },
+    "groups": {
+      "addFailed": "Erreur lors de l’ajout du groupe",
+      "addGroup": "Ajouter le groupe",
+      "addTitle": "Ajouter un nouveau groupe",
+      "added": "Le groupe « {name} » a été ajouté",
+      "adding": "Ajout…",
+      "cannotDelete": "Suppression impossible — des utilisateurs ou des documents y sont rattachés",
+      "deleteConfirm": "Supprimer le groupe « {name} » ?",
+      "deleteFailed": "Erreur lors de la suppression du groupe",
+      "deleteGroup": "Supprimer le groupe",
+      "deleted": "Groupe « {name} » supprimé",
+      "description": "Description",
+      "descriptionPlaceholder": "Description facultative du groupe",
+      "displayName": "Nom affiché",
+      "displayNameHint": "Visible par les utilisateurs (ex. Service client, Direction).",
+      "displayNamePlaceholder": "ex. Service client",
+      "documentCount": "{count, plural, one {# document} other {# documents}}",
+      "empty": "Aucun groupe. Ajoutez le premier groupe ci-dessus ou exécutez la migration 0127.",
+      "inactive": "Inactif",
+      "intro": "— gérez les groupes auxquels les utilisateurs peuvent être rattachés. Les groupes contrôlent l’accès aux documents. Un groupe auquel des utilisateurs ou des documents sont rattachés ne peut pas être supprimé.",
+      "memberCount": "{count, plural, one {# utilisateur} other {# utilisateurs}}",
+      "ownerRestriction": "Restriction au propriétaire",
+      "ownerRestrictionOption": "Restriction au propriétaire (Owner restriction)",
+      "technicalName": "Nom technique",
+      "technicalNameHint": "Identifiant unique (ex. Accounting, HR). Sans accents.",
+      "technicalNamePlaceholder": "ex. Accounting"
+    },
+    "icp": {
+      "addSignal": "Ajouter un signal",
+      "defaultConfig": "Configuration par défaut — elle n’a pas encore été modifiée.",
+      "deleteConfirm": "Supprimer le signal « {name} » ?",
+      "disableSignal": "Désactiver le signal",
+      "draftInvalid": "La configuration en brouillon totalise {score} / 100 pts. L’Enrichment continue d’utiliser la dernière version valide.",
+      "edit": "Modifier",
+      "editing": "Vous modifiez :",
+      "enableSignal": "Activer le signal",
+      "errors": {
+        "conflict": "Quelqu’un d’autre a modifié la configuration ICP entre-temps — actualisation en cours",
+        "fetchFailed": "Impossible de récupérer la configuration ICP (erreur {status}).",
+        "forbidden": "Vous n’avez pas les droits sur la configuration ICP de cette organisation.",
+        "loadFailed": "Erreur de chargement de la configuration ICP",
+        "noConnection": "Pas de connexion au serveur — vérifiez que le backend fonctionne, puis réessayez.",
+        "noTenant": "Votre compte n’est rattaché à aucune organisation : il n’y a donc aucune configuration ICP à afficher.",
+        "noTenantToast": "Aucune organisation rattachée",
+        "notFound": "La configuration ICP n’est pas disponible dans cette version du backend (404).",
+        "sessionExpired": "La session a expiré. Veuillez vous reconnecter.",
+        "unknownStatus": "inconnue"
+      },
+      "intro": "— configuration des signaux notés que l’Enrichment utilise pour évaluer l’adéquation d’une entreprise (ICP).",
+      "introTitle": "Signaux ICP",
+      "lastUpdateVersion": "Dernière mise à jour : version",
+      "loadFailedTitle": "Impossible de charger la configuration ICP.",
+      "loading": "Chargement...",
+      "modal": {
+        "active": "Actif",
+        "definition": "Comment reconnaître ce signal ?",
+        "definitionHint": "Le système s’appuie sur cette description pour évaluer si une entreprise présente ce signal.",
+        "definitionPlaceholder": "Décrivez à quoi l’on reconnaît qu’une entreprise remplit cette condition — mots/expressions précis sur le site, rubriques, postes.",
+        "editTitle": "Modifier le signal",
+        "name": "Nom du signal",
+        "namePlaceholder": "ex. Flotte de transport en propre",
+        "newTitle": "Nouveau signal",
+        "points": "Points",
+        "saving": "Enregistrement...",
+        "shortDescription": "Infobulle / courte description pour l’utilisateur",
+        "shortDescriptionHint": "Affichée comme infobulle (?) à côté du signal dans Prospects. Une phrase courte et lisible — pas une instruction technique pour l’IA.",
+        "shortDescriptionPlaceholder": "Courte description métier en 1–2 phrases — ex. « Service/équipe commerciale explicitement nommé »."
+      },
+      "noSignals": "Aucun signal.",
+      "ownTenant": "Votre organisation",
+      "ownTenantSuffix": "(la vôtre)",
+      "pointsSum": "Total des points :",
+      "retry": "Réessayer",
+      "signalAdded": "Signal ajouté",
+      "signalDeleted": "Signal supprimé",
+      "signalDisabled": "Signal désactivé (il avait un historique — conservé pour expliquer les anciens résultats)",
+      "signalUpdated": "Signal mis à jour",
+      "systemUpdate": "mise à jour système (signaux par défaut intégrés de CRM Tree)",
+      "tenantConfig": "Configuration de l’organisation"
+    },
+    "itemLabels": {
+      "commissionBasis": {
+        "nie_dotyczy": "Sans objet",
+        "progi_obrotowe": "Paliers de chiffre d’affaires",
+        "rezerwacje": "Nombre de réservations",
+        "segmenty": "Nombre de segments"
+      },
+      "contactTitles": {
+        "Director": "Directeur",
+        "Manager": "Manager",
+        "Other": "Autre",
+        "Owner": "Propriétaire",
+        "Specialist": "Spécialiste"
+      },
+      "documentStatuses": {
+        "being_approved": "À approuver",
+        "being_edited": "En cours de modification",
+        "being_signed": "À signer",
+        "completed": "Terminé",
+        "new": "Nouveau",
+        "rejected": "Rejeté",
+        "signed": "Signé"
+      },
+      "documentTypes": {
+        "employee_agreement": "Contrat de travail",
+        "it_supplier_agreement": "Contrat avec un fournisseur IT",
+        "nda": "NDA",
+        "partner_agreement": "Contrat de partenariat"
+      },
+      "gdprTypes": {
+        "data_administration": "Coresponsabilité du traitement",
+        "data_processing_entrustment": "Sous-traitance du traitement",
+        "no_gdpr": "Hors RGPD"
+      },
+      "industries": {
+        "Education": "Éducation",
+        "Finance": "Finance",
+        "Healthcare": "Santé",
+        "Legal": "Droit",
+        "Manufacturing": "Industrie",
+        "Other": "Autre",
+        "Retail": "Commerce",
+        "Tourism": "Tourisme",
+        "Transport": "Transport"
+      },
+      "leadSources": {
+        "agent": "Agent",
+        "cold_call": "Cold call",
+        "inbound": "Inbound",
+        "inne": "Autre",
+        "kampania": "Campagne e-mail",
+        "linkedin": "LinkedIn",
+        "partner": "Partenaire",
+        "polecenie": "Recommandation",
+        "strona_www": "Site web",
+        "targi": "Salon / Événement"
+      },
+      "leadStages": {
+        "closed_lost": "Perdu",
+        "closed_won": "Gagné",
+        "negotiation": "Négociation",
+        "new": "Nouveau",
+        "offer": "Offre",
+        "presentation": "Présentation",
+        "qualification": "Qualification"
+      },
+      "partnerStatuses": {
+        "active": "Actif",
+        "churned": "Perdu",
+        "inactive": "Inactif",
+        "onboarding": "En intégration"
+      },
+      "productTypes": {
+        "car_rental": "Location de voiture",
+        "hotel": "Hôtel",
+        "other": "Autre",
+        "transfer": "Transfert",
+        "transport_bus": "Bus",
+        "transport_ferry": "Ferry",
+        "transport_flight": "Vol",
+        "transport_train": "Train",
+        "travel_insurance": "Assurance",
+        "visa": "Visa"
+      }
+    },
+    "onboarding": {
+      "intro": "— définissez les tâches standard de chaque étape du processus d’intégration. Les modèles sont proposés automatiquement lors de la création de tâches dans le panneau Onboarding.",
+      "introTitle": "Modèles de tâches d’onboarding",
+      "jsonFormat": "Format JSON :",
+      "leadSources": {
+        "add": "Ajouter une source",
+        "group": "Groupe",
+        "groupHint": "Nom du groupe ou vide — les valeurs ayant un groupe s’affichent dans la section ci-dessous",
+        "label": "Libellé (affiché)",
+        "legend": "Fond bleu = la valeur appartient à un groupe (affichée dans la section Marketing des listes).",
+        "noGroup": "— aucun groupe —",
+        "value": "Valeur (code)"
+      },
+      "steps": {
+        "configuration": "Configuration",
+        "contractSigning": "Signature du contrat",
+        "launch": "Lancement",
+        "training": "Formation"
+      },
+      "stepsLegend": "Étapes : 0=Signature du contrat, 1=Configuration, 2=Formation, 3=Lancement.",
+      "taskTypes": {
+        "call": "Appel",
+        "doc_sent": "Document",
+        "email": "E-mail",
+        "meeting": "Réunion",
+        "task": "Tâche",
+        "training": "Formation"
+      },
+      "templates": {
+        "add": "Ajouter un modèle",
+        "assignee": "Assigné",
+        "assigneeHint": "Utilisateur assigné automatiquement. Étape 0 toujours → commercial du lead",
+        "days": "Jours",
+        "daysHint": "Nombre de jours après la date de migration à définir comme échéance (null = pas d’échéance)",
+        "empty": "Aucun modèle. Exécutez la migration 0133.",
+        "leadOwner": "commercial du lead",
+        "legend": "Fond vert = tâche standard (créée automatiquement lors de la migration du lead). L’étape « Signature du contrat » est toujours assignée au commercial du lead.",
+        "noAssignee": "— aucun —",
+        "standard": "Standard",
+        "standardCheckboxHint": "Créée automatiquement lors de la migration",
+        "standardHint": "Indique si la tâche est créée automatiquement lors de la migration du lead",
+        "step": "Étape",
+        "title": "Titre",
+        "type": "Type"
+      }
+    },
+    "saved": "{count, plural, one {# paramètre enregistré} other {# paramètres enregistrés}}",
+    "survey": {
+      "description": "— les données à partir desquelles l’équipe CRMtree configure votre environnement (modules, messagerie, WhatsApp, téléphonie, modèles d’IA).",
+      "open": "Ouvrir le questionnaire",
+      "title": "Questionnaire de déploiement"
+    },
+    "tabs": {
+      "crm": "Paramètres métier CRM",
+      "documents": "Dictionnaires de documents",
+      "global": "Paramètres globaux",
+      "icp": "Enrichment / ICP",
+      "onboarding": "Modèles d’onboarding",
+      "projects": "Projets",
+      "tooltips": "Infobulles",
+      "users": "Groupes d’utilisateurs"
+    },
+    "title": "Paramètres de l’application",
+    "tooltips": {
+      "add": "Ajouter une infobulle",
+      "added": "Infobulle ajoutée",
+      "catalog": {
+        "leadsFunnelActive": "Entonnoir : Leads actifs",
+        "leadsFunnelAvgWon": "Entonnoir : Valeur moy. gagnée",
+        "leadsFunnelConversion": "Entonnoir : Conversion vers Gagné",
+        "leadsFunnelHot": "Entonnoir : Leads chauds",
+        "leadsFunnelPct": "Entonnoir : % de conversion entre les étapes",
+        "leadsFunnelTitle": "Entonnoir de vente (titre)",
+        "leadsKpiAvgCycle": "KPI : Cycle de vente moy.",
+        "leadsKpiBudget": "KPI : Budget prévu (PLN)",
+        "leadsKpiPipeline": "KPI : Pipeline (PLN)",
+        "leadsKpiWinRate": "KPI : Win Rate",
+        "leadsKpiWon": "KPI : Clôturés / Won (PLN)",
+        "leadsLostTitle": "Motifs de perte (titre)",
+        "leadsRepsColLeads": "Commerciaux : colonne Leads",
+        "leadsRepsColPipeline": "Commerciaux : colonne Pipeline",
+        "leadsRepsColProgress": "Commerciaux : colonne Avancement",
+        "leadsRepsColWinRate": "Commerciaux : colonne Win%",
+        "leadsRepsColWon": "Commerciaux : colonne Won",
+        "leadsRepsTitle": "Résultats des commerciaux (titre)",
+        "leadsSourcesQuality": "Sources : Qualité par source (win rate)",
+        "leadsSourcesTitle": "Sources des leads (titre)",
+        "leadsTrendTitle": "Tendance mensuelle (titre)",
+        "leadsVelocityTitle": "Temps dans l’étape – jours moy. (titre)",
+        "partnersKpiActivePartners": "Partenaires actifs",
+        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiGrossTurnover": "Chiffre d’affaires brut (PLN)",
+        "partnersKpiRevenue": "Revenu / Marge (PLN)",
+        "partnersKpiTransactions": "Transactions",
+        "partnersScorecardHealth": "Scorecard : Health",
+        "salesActivity": "Panneau : Activité récente",
+        "salesChart": "Panneau : Résultats commerciaux (graphique)",
+        "salesKpiNewCompanies": "KPI : Nouvelles entreprises",
+        "salesKpiNewContacts": "KPI : Nouveaux contacts",
+        "salesKpiNewLeads": "KPI : Nouvelles opportunités (pipeline actif)",
+        "salesKpiPipelineValue": "KPI : Valeur des opportunités (pipeline)",
+        "salesKpiWon": "KPI : Opportunités gagnées",
+        "salesPipeline": "Panneau : Pipeline de vente",
+        "salesRecentLeads": "Panneau : Dernières opportunités (tableau)",
+        "salesTasks": "Panneau : Tâches du jour"
+      },
+      "chooseLabel": "— choisissez un libellé —",
+      "chooseScreen": "— choisissez un écran —",
+      "content": "Contenu de l’infobulle",
+      "contentPlaceholder": "Texte que l’utilisateur verra en survolant l’icône ?.",
+      "deleteConfirm": "Supprimer l’infobulle « {key} » ?",
+      "deleteFailed": "Erreur de suppression",
+      "deleted": "Infobulle « {key} » supprimée",
+      "empty": "Aucune infobulle définie. Ajoutez la première ci-dessus.",
+      "errors": {
+        "chooseLabel": "Choisissez un écran et un libellé",
+        "contentRequired": "Le contenu de l’infobulle est obligatoire"
+      },
+      "introAfterIcon": "apparaîtra automatiquement à côté du libellé concerné dès que le contenu est défini.",
+      "introBeforeIcon": "— choisissez un écran et un libellé, puis saisissez le texte. L’icône",
+      "introTitle": "Infobulles (Tooltips)",
+      "label": "Libellé",
+      "other": "Autres",
+      "saved": "Infobulle « {key} » enregistrée",
+      "screen": "Écran",
+      "screens": {
+        "partnerPerformance": "Partner Performance",
+        "salesDashboard": "Sales Dashboard",
+        "salesReports": "Rapports de vente"
+      }
+    },
+    "topbar": {
+      "unsavedChanges": "Modifications non enregistrées"
+    }
+  },
+  "userGroups": {
+    "accessLevels": {
+      "full": "Accès complet",
+      "read": "Lecture seule"
+    },
+    "create": {
+      "displayNamePlaceholder": "ex. Ventes",
+      "done": "Groupe « {name} » créé",
+      "internalNamePlaceholder": "ex. Ventes",
+      "ownerRestrictionCheckbox": "Restriction au propriétaire (l’utilisateur ne voit que ses propres documents)",
+      "subtitle": "Ajoutez un nouveau groupe de rôles",
+      "title": "Créer un groupe"
+    },
+    "deactivate": {
+      "action": "Désactiver le groupe",
+      "confirm": "Désactiver le groupe « {name} » ?",
+      "done": "Groupe désactivé"
+    },
+    "documents": "Documents",
+    "documentsCount": "{count, plural, one {# document} other {# documents}}",
+    "edit": {
+      "saveChanges": "Enregistrer les modifications",
+      "saved": "Groupe mis à jour",
+      "title": "Modification du groupe"
+    },
+    "fields": {
+      "description": "Description",
+      "displayName": "Nom affiché",
+      "internalName": "Nom du groupe (interne)"
+    },
+    "inactive": "Inactif",
+    "members": "Membres",
+    "membersCount": "{count, plural, one {# membre} other {# membres}}",
+    "newGroup": "Nouveau groupe",
+    "noMembers": "Aucun membre",
+    "ownerRestriction": "Restriction au propriétaire",
+    "ownerRestrictionOptions": {
+      "none": "Sans restriction",
+      "ownerOnly": "Propriétaire uniquement (Ventes)"
+    },
+    "title": "Groupes et rôles"
+  },
+  "users": {
+    "access": "Accès",
+    "accessLevels": {
+      "full": "Complet",
+      "read": "Lecture"
+    },
+    "accountTypes": {
+      "external": "Externe (Projets uniquement)",
+      "internal": "Interne"
+    },
+    "adminBadge": "ADMIN",
+    "adminRoles": {
+      "admin": "Administrateur",
+      "regular": "Utilisateur standard"
+    },
+    "budgets": {
+      "annualTotal": "Total annuel",
+      "changeTypeConfirm": "Le changement de type de période supprimera les budgets existants pour l’année {year}. Continuer ?",
+      "currency": "Devise",
+      "deleteFailed": "Erreur lors de la suppression des budgets",
+      "monthly": "Mensuel",
+      "periodType": "Type de période",
+      "quarterly": "Trimestriel",
+      "save": "Enregistrer le budget",
+      "saveFailed": "Erreur d’enregistrement",
+      "saved": "Budget enregistré",
+      "title": "Budgets de vente prévus",
+      "year": "Année"
+    },
+    "chooseGroup": "Choisissez un groupe...",
+    "columns": {
+      "email": "E-mail",
+      "groupsAndRoles": "Groupes et rôles",
+      "lastLogin": "Dernière connexion",
+      "user": "Utilisateur"
+    },
+    "count": "Utilisateurs : {count}",
+    "create": {
+      "accessLevel": "Niveau d’accès",
+      "assignGroup": "Rattacher à un groupe (facultatif)",
+      "emailPlaceholder": "marie.dupont@entreprise.com",
+      "failed": "Impossible de créer l’utilisateur",
+      "firstNamePlaceholder": "Marie",
+      "lastNamePlaceholder": "Dupont",
+      "noGroup": "Aucun groupe",
+      "ssoNoteLabel": "Remarque :",
+      "ssoNoteText": "L’utilisateur pourra se connecter via SAML SSO avec cette adresse e-mail. L’authentification est entièrement gérée par Google Workspace.",
+      "submit": "Créer l’utilisateur",
+      "subtitle": "Créez manuellement un nouveau compte utilisateur",
+      "success": "Utilisateur {name} créé",
+      "title": "Ajouter un nouvel utilisateur"
+    },
+    "crmRoles": {
+      "managerShort": "Manager",
+      "none": "Aucun rôle CRM",
+      "salesManager": "Responsable des ventes (sales_manager)",
+      "salesperson": "Commercial (salesperson)",
+      "salespersonShort": "Commercial"
+    },
+    "edit": {
+      "accountSettings": "Paramètres du compte",
+      "deleteConfirm": "Supprimer l’utilisateur {name} ({email}) ? Cette opération est irréversible.",
+      "deleteFailed": "Impossible de supprimer l’utilisateur",
+      "deleteUser": "Supprimer l’utilisateur",
+      "deleted": "Utilisateur supprimé",
+      "emailHint": "Le changement d’e-mail a une incidence sur la connexion SAML — assurez-vous que l’adresse correspond au compte Google Workspace.",
+      "emailInvalid": "Saisissez une adresse e-mail valide",
+      "emailTaken": "Cette adresse e-mail est déjà utilisée",
+      "loadFailed": "Impossible de charger l’utilisateur",
+      "saveChanges": "Enregistrer les modifications",
+      "updateFailed": "Impossible de mettre à jour l’utilisateur",
+      "updated": "Utilisateur mis à jour"
+    },
+    "empty": "Aucun utilisateur trouvé",
+    "featureAccess": {
+      "prospects": "Prospects",
+      "prospectsDisabled": "Accès aux Prospects désactivé",
+      "prospectsEnabled": "Accès aux Prospects activé",
+      "prospectsGroupDescription": "Accès au module Prospects (import CSV, enrichment, conversion en lead).",
+      "prospectsHint": "Analyse et enrichissement des entreprises prospects (IA)",
+      "title": "Accès aux fonctionnalités"
+    },
+    "fields": {
+      "accountType": "Type de compte",
+      "adminRole": "Rôle d’administrateur",
+      "canCreateProjects": "Création de projets",
+      "company": "Entreprise",
+      "crmRole": "Rôle CRM",
+      "department": "Service",
+      "email": "Adresse e-mail",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "required": "Obligatoire",
+      "status": "Statut"
+    },
+    "filters": {
+      "activeOnly": "Actifs uniquement",
+      "allGroups": "Tous les groupes",
+      "allUsers": "Tous les utilisateurs",
+      "inactiveOnly": "Inactifs uniquement"
+    },
+    "grants": {
+      "add": "Accorder",
+      "addFailed": "Impossible d’accorder le droit",
+      "addTitle": "Accorder un droit de visibilité",
+      "added": "Droit de visibilité accordé",
+      "group": "Groupe (enregistrements de qui)",
+      "hint": "Ce droit n’ajoute pas l’utilisateur au groupe. « Complet » permet aussi de modifier les enregistrements de ce groupe.",
+      "module": "Module",
+      "removeFailed": "Impossible de supprimer le droit",
+      "removed": "Droit de visibilité supprimé",
+      "title": "Droits de visibilité CRM ({count})",
+      "tooltip": "Voit les enregistrements du groupe « {group} » dans le module {module} ({access})",
+      "tooltipAccess": {
+        "full": "lecture et modification",
+        "read": "lecture seule"
+      }
+    },
+    "modules": {
+      "leads": "Prospects",
+      "partners": "Partenaires"
+    },
+    "neverLoggedIn": "Jamais",
+    "newUser": "Nouvel utilisateur",
+    "no": "Non",
+    "pagination": {
+      "next": "Suivant",
+      "page": "Page {page} sur {total}",
+      "previous": "Préc."
+    },
+    "password": {
+      "mismatch": "Les mots de passe ne sont pas identiques",
+      "new": "Nouveau mot de passe",
+      "placeholder": "Min. 8 caractères",
+      "repeat": "Répétez le mot de passe",
+      "saveFailed": "Erreur lors de l’enregistrement du mot de passe",
+      "saved": "Le mot de passe a été défini",
+      "submit": "Définir le mot de passe",
+      "title": "Mot de passe de connexion",
+      "tooShort": "Le mot de passe doit contenir au moins 8 caractères"
+    },
+    "remove": "Supprimer",
+    "roles": {
+      "assign": "Attribuer",
+      "assignTitle": "Attribuer un nouveau rôle",
+      "assigned": "Rôle attribué",
+      "group": "Groupe",
+      "removeFailed": "Impossible de supprimer le rôle",
+      "removed": "Rôle supprimé",
+      "title": "Rôles dans les groupes ({count})"
+    },
+    "saving": "Enregistrement…",
+    "searchPlaceholder": "Rechercher des utilisateurs…",
+    "statuses": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "title": "Gestion des utilisateurs",
+    "yes": "Oui"
+  }
+}

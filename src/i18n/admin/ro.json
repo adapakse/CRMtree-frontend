@@ -1,0 +1,1229 @@
+{
+  "dataManagement": {
+    "delete": {
+      "deleted": "Șters: {name}",
+      "document": {
+        "action": "Ștergere document",
+        "description": "Șterge: metadatele, toate versiunile + fișierele din Blob, tagurile, sarcinile de workflow, asocierile CRM, jurnalele de audit",
+        "failed": "Eroare la ștergerea documentului",
+        "searchPlaceholder": "Introduceți denumirea sau numărul documentului (min. 2 caractere)…",
+        "title": "Document"
+      },
+      "inProgress": "Se șterge…",
+      "lead": {
+        "action": "Ștergere lead",
+        "description": "Șterge: leadul, activitățile, asocierile cu documente, istoricul. Nu șterge partenerul rezultat din conversie.",
+        "failed": "Eroare la ștergerea leadului",
+        "searchPlaceholder": "Introduceți numele companiei sau contactul (min. 2 caractere)…",
+        "title": "Lead"
+      },
+      "partner": {
+        "action": "Ștergere partener",
+        "description": "Șterge: partenerul, activitățile, asocierile cu documente, datele de vânzări, istoricul.",
+        "failed": "Eroare la ștergerea partenerului",
+        "searchPlaceholder": "Introduceți numele companiei sau codul fiscal (min. 2 caractere)…",
+        "title": "Partener"
+      },
+      "subtitle": "Ștergerea definitivă a unui document, lead sau partener împreună cu toate datele și jurnalele asociate.",
+      "title": "Ștergerea înregistrărilor"
+    },
+    "purge": {
+      "confirm": "Confirmare",
+      "docs": {
+        "action": "Ștergere toate documentele",
+        "confirmPhrase": "ELIMIN DOCUMENTE",
+        "description": "Șterge: documentele, versiunile, fișierele din Blob, tagurile, grupurile de documente, sarcinile de workflow, jurnalele de audit ale documentelor",
+        "title": "Toate documentele"
+      },
+      "failed": "Eroare la curățare",
+      "leads": {
+        "action": "Ștergere toate leadurile",
+        "confirmPhrase": "ELIMIN LEADURI",
+        "description": "Șterge: leadurile, activitățile leadurilor, asocierile leadurilor cu documente, istoricul importurilor de leaduri, jurnalele de audit ale leadurilor",
+        "title": "Toate leadurile"
+      },
+      "partners": {
+        "action": "Ștergere toți partenerii",
+        "confirmPhrase": "ELIMIN PARTENERI",
+        "description": "Șterge: partenerii, activitățile partenerilor, asocierile cu documente, datele de vânzări, bugetele, jurnalele de audit ale partenerilor",
+        "title": "Toți partenerii"
+      },
+      "result": "Șterse: {deleted, plural, one {# înregistrare} few {# înregistrări} other {# de înregistrări}}, {blobsDeleted, plural, one {# fișier} few {# fișiere} other {# de fișiere}} din Blob",
+      "subtitle": "Ștergeți toate înregistrările din categoria aleasă. Se păstrează: utilizatorii, rolurile, profilurile de grup, grupurile de parteneri, setările aplicației.",
+      "title": "Curățarea mediului de test",
+      "typePhrase": "Introduceți: {phrase}"
+    },
+    "settings": {
+      "export": {
+        "description": "Descărcați fișierul JSON cu toate nomenclatoarele, parametrii aplicației și profilurile grupurilor de documente.",
+        "download": "Descărcare settings.json",
+        "generating": "Se generează…",
+        "title": "Export setări"
+      },
+      "import": {
+        "action": "Importare setări",
+        "description": "Încărcați fișierul JSON descărcat din alt mediu. Setările existente vor fi suprascrise. Cheile noi vor fi adăugate.",
+        "dropHint": "Trageți fișierul JSON aici sau faceți clic",
+        "failed": "Eroare la import",
+        "inProgress": "Se importă…",
+        "invalidFile": "Fișier JSON nevalid",
+        "result": "Importate: {settingsUpdated, plural, one {# setare} few {# setări} other {# de setări}}, {groupsUpdated, plural, one {# profil de grup} few {# profiluri de grup} other {# de profiluri de grup}}",
+        "title": "Import setări"
+      },
+      "subtitle": "Transferul configurației între medii. Exportul descarcă un fișier JSON cu app_settings și group_profiles. Importul suprascrie valorile existente.",
+      "title": "Export / Import setări"
+    },
+    "subtitle": "Operațiuni administrative: ștergerea înregistrărilor, curățarea mediului, exportul/importul setărilor. Disponibile doar pentru administratori.",
+    "title": "Gestionarea datelor"
+  },
+  "logs": {
+    "columns": {
+      "action": "Acțiune",
+      "dateTime": "Data și ora",
+      "details": "Detalii",
+      "document": "Document",
+      "user": "Utilizator"
+    },
+    "count": "Intrări: {count}",
+    "detail": {
+      "after": "După:",
+      "before": "Înainte:",
+      "document": "Document:"
+    },
+    "empty": "Nu s-au găsit intrări în jurnal",
+    "filters": {
+      "actionType": "Tip de acțiune",
+      "allActions": "Toate acțiunile",
+      "clear": "Ștergere filtre",
+      "dateFrom": "De la data",
+      "dateTo": "Până la data",
+      "userEmail": "E-mailul utilizatorului",
+      "userEmailPlaceholder": "user@firma.com"
+    },
+    "pagination": {
+      "next": "Înainte",
+      "page": "Pagina {page} din {total}",
+      "previous": "Înapoi"
+    },
+    "searchPlaceholder": "Căutare utilizator, document…",
+    "title": "Jurnale de audit"
+  },
+  "onboardingSurvey": {
+    "answers": {
+      "copied": "Copiat",
+      "copySecret": "Copiere",
+      "hideSecret": "Ascundere",
+      "lastChange": "ultima modificare {date}",
+      "loadFailed": "Eroare la încărcarea chestionarului de implementare",
+      "loading": "Se încarcă...",
+      "notStarted": "Administratorul acestui tenant nu a început încă chestionarul de implementare (Setări aplicație → Chestionar de implementare).",
+      "secretNotProvided": "— necompletat —",
+      "showSecret": "Afișare",
+      "statusDraft": "Versiune de lucru — încă netrimisă",
+      "statusSubmitted": "Trimis"
+    },
+    "options": {
+      "aiLicence": {
+        "own": "Licență / cheie API proprie, dedicată companiei noastre",
+        "shared": "Licența CRMtree (partajată, decontată în cadrul contractului)",
+        "undecided": "Nu știm încă — vă rugăm să ne recomandați"
+      },
+      "oauthAppOwner": {
+        "client": "Departamentul nostru IT va înregistra aplicația și va completa datele de mai jos",
+        "needs_help": "Avem nevoie de ajutorul CRMtree la înregistrarea aplicației"
+      },
+      "yesNo": {
+        "no": "Nu",
+        "yes": "Da"
+      }
+    },
+    "page": {
+      "backToSettings": "Setări",
+      "choose": "— alegeți —",
+      "draftSaved": "Versiunea de lucru a fost salvată",
+      "fillRequired": "Completați câmpurile obligatorii",
+      "intro": {
+        "howItWorks": "Pe baza acestui chestionar, echipa CRMtree va configura mediul dumneavoastră. Îl puteți completa în etape — „Salvare versiune de lucru” păstrează răspunsurile, iar „Trimitere chestionar” ni le transmite.",
+        "requiredAfter": "sunt obligatorii pentru trimitere.",
+        "requiredBefore": "Câmpurile marcate cu",
+        "secrets": "Parolele, tokenurile și cheile API sunt salvate în formă criptată și nu mai sunt afișate după salvare."
+      },
+      "loadFailed": "Chestionarul nu a putut fi încărcat",
+      "missingRequiredTitle": "Completați câmpurile obligatorii pentru a trimite chestionarul:",
+      "resubmit": "Retrimitere",
+      "saveDraft": "Salvare versiune de lucru",
+      "saveFailed": "Eroare la salvarea chestionarului",
+      "secretSavedPlaceholder": "salvat — lăsați gol pentru a nu modifica",
+      "statusDraft": "Versiune de lucru",
+      "statusSubmitted": "Trimis {date}",
+      "submit": "Trimitere chestionar",
+      "submitted": "Chestionarul a fost trimis echipei CRMtree",
+      "title": "Chestionar de implementare"
+    },
+    "questions": {
+      "additional_notes": {
+        "label": "Alte cerințe, întrebări sau restricții"
+      },
+      "ai_data_processing_consent": {
+        "label": "Prelucrarea datelor de către furnizorii de modele",
+        "options": {
+          "accepted": {
+            "label": "Acceptăm transmiterea conținutului (datele companiilor, notițele și transcrierile apelurilor) către furnizorul ales al modelului AI"
+          },
+          "eu_only": {
+            "label": "Solicităm prelucrarea exclusiv pe teritoriul UE"
+          }
+        }
+      },
+      "ai_monthly_budget": {
+        "hint": "Opțional — dacă doriți să limitați consumul.",
+        "label": "Limita lunară a costurilor modelelor AI",
+        "placeholder": "ex. 200 EUR"
+      },
+      "billing_city": {
+        "label": "Localitate"
+      },
+      "billing_company_name": {
+        "label": "Denumirea completă a companiei (pentru factură)",
+        "placeholder": "ex. Acme SRL"
+      },
+      "billing_country": {
+        "label": "Țară",
+        "placeholder": "România"
+      },
+      "billing_cycle": {
+        "label": "Ciclu de facturare",
+        "options": {
+          "annual": {
+            "label": "Anual"
+          },
+          "monthly": {
+            "label": "Lunar"
+          }
+        }
+      },
+      "billing_invoice_email": {
+        "label": "E-mailul la care trimitem facturile",
+        "placeholder": "contabilitate@firma.ro"
+      },
+      "billing_nip": {
+        "label": "Cod fiscal"
+      },
+      "billing_plan": {
+        "label": "Planul ales",
+        "options": {
+          "lite": {
+            "label": "Lite"
+          },
+          "professional": {
+            "label": "Professional (ofertă individuală)"
+          },
+          "standard": {
+            "label": "Standard"
+          },
+          "undecided": {
+            "label": "De stabilit"
+          }
+        }
+      },
+      "billing_postal_code": {
+        "label": "Cod poștal"
+      },
+      "billing_street": {
+        "label": "Strada și numărul"
+      },
+      "business_contact_email": {
+        "label": "Persoana de decizie — e-mail"
+      },
+      "business_contact_name": {
+        "label": "Persoana de decizie din partea de business — nume și prenume"
+      },
+      "business_contact_phone": {
+        "label": "Persoana de decizie — telefon"
+      },
+      "call_analysis_api_key": {
+        "label": "Analiza apelurilor — cheie API proprie"
+      },
+      "call_analysis_buying_signals": {
+        "hint": "Semnale tipice de interes și obiecții tipice. Vom adapta la ele evaluarea disponibilității de cumpărare.",
+        "label": "Analiza apelurilor — după ce recunoașteți un client pregătit să cumpere?"
+      },
+      "call_analysis_licence": {
+        "hint": "Analiza apelurilor folosește modelul DeepSeek.",
+        "label": "Analiza apelurilor — licența pentru model"
+      },
+      "call_analysis_monthly_volume": {
+        "label": "Analiza apelurilor — numărul estimat de apeluri pe lună"
+      },
+      "company_display_name": {
+        "label": "Numele companiei afișat în CRM",
+        "placeholder": "ex. Acme"
+      },
+      "company_email_domain": {
+        "hint": "Domeniul de pe care se autentifică angajații dumneavoastră.",
+        "label": "Domeniul de e-mail al companiei",
+        "placeholder": "ex. acme.ro"
+      },
+      "company_industry": {
+        "label": "Industrie",
+        "placeholder": "ex. logistică, IT, producție"
+      },
+      "company_offer_description": {
+        "hint": "O scurtă descriere a ofertei și a clientului tipic. O folosim pentru configurarea nomenclatoarelor și a sugestiilor AI.",
+        "label": "Ce vindeți și cui?"
+      },
+      "currencies": {
+        "label": "Monedele în care vindeți",
+        "placeholder": "PLN, EUR"
+      },
+      "dwh_source": {
+        "hint": "Sistemul sursă (ERP / sistem de vânzări), formatul exportului și frecvența.",
+        "label": "Date de vânzări — din ce sistem și cât de des trebuie actualizate?"
+      },
+      "email_mailbox_count": {
+        "label": "Câte căsuțe de e-mail vor fi conectate?"
+      },
+      "email_oauth_app_owner": {
+        "label": "Cine va înregistra aplicația la furnizorul de e-mail?"
+      },
+      "email_other_provider": {
+        "hint": "În prezent acceptăm Gmail, Microsoft 365 și Zoho — vom verifica posibilitățile pentru alt furnizor.",
+        "label": "Ce serviciu de e-mail este?"
+      },
+      "email_provider": {
+        "label": "Ce serviciu de e-mail folosește compania dumneavoastră?",
+        "options": {
+          "gmail": {
+            "label": "Gmail / Google Workspace"
+          },
+          "none": {
+            "label": "Nu dorim integrarea e-mailului"
+          },
+          "other": {
+            "label": "Altul"
+          },
+          "outlook": {
+            "label": "Outlook / Microsoft 365"
+          },
+          "zoho": {
+            "label": "Zoho Mail"
+          }
+        }
+      },
+      "enrichment_api_key": {
+        "label": "Enrichment — cheie API proprie"
+      },
+      "enrichment_ideal_customer": {
+        "hint": "Industrii, dimensiunea companiei, regiune, semnale care indică potrivirea, precum și companiile pe care nu doriți să le atrageți. Pe această bază vom configura semnalele și punctajul.",
+        "label": "Enrichment — profilul clientului ideal (ICP)"
+      },
+      "enrichment_licence": {
+        "label": "Enrichment — licența pentru model"
+      },
+      "enrichment_model": {
+        "label": "Enrichment — modelul preferat",
+        "options": {
+          "anthropic": {
+            "label": "Anthropic Claude (calitate mai ridicată, cost mai mare)"
+          },
+          "deepseek": {
+            "label": "DeepSeek (implicit, cost mai mic)"
+          },
+          "undecided": {
+            "label": "Vă rugăm să ne recomandați"
+          }
+        }
+      },
+      "enrichment_monthly_volume": {
+        "label": "Enrichment — câte companii pe lună intenționați să analizați?"
+      },
+      "gmail_client_id": {
+        "label": "Google — Client ID",
+        "placeholder": "123456789.apps.googleusercontent.com"
+      },
+      "gmail_client_secret": {
+        "label": "Google — Client Secret"
+      },
+      "gmail_pubsub_topic": {
+        "hint": "Necesar pentru primirea imediată a mesajelor noi.",
+        "label": "Google — Pub/Sub Topic",
+        "placeholder": "projects/moj-projekt/topics/gmail-push"
+      },
+      "go_live_date": {
+        "label": "Data planificată a lansării"
+      },
+      "import_scope": {
+        "label": "Ce date importăm la început?",
+        "options": {
+          "contacts": {
+            "label": "Persoane de contact"
+          },
+          "documents": {
+            "label": "Documente / contracte"
+          },
+          "leads": {
+            "label": "Leaduri / oportunități de vânzare"
+          },
+          "partners": {
+            "label": "Clienți / parteneri actuali"
+          }
+        }
+      },
+      "import_source": {
+        "hint": "Sistemul actual (Excel, alt CRM, ERP) și numărul aproximativ de înregistrări.",
+        "label": "De unde provin datele și câte sunt?",
+        "placeholder": "ex. Excel, aprox. 2 000 de leaduri și 300 de clienți"
+      },
+      "lead_sources": {
+        "label": "Surse de leaduri",
+        "placeholder": "Site web, recomandare, cold call, LinkedIn, târguri…"
+      },
+      "modules": {
+        "label": "Ce module trebuie să fie active?",
+        "options": {
+          "call_analysis": {
+            "hint": "Evaluarea apelurilor telefonice de către AI.",
+            "label": "Analiza apelurilor"
+          },
+          "documents": {
+            "hint": "Registru de contracte, flux de aprobare și semnare.",
+            "label": "Documente"
+          },
+          "dwh_integration": {
+            "hint": "Alimentarea CRM-ului cu cifrele de vânzări din sistemul dumneavoastră de vânzări / ERP.",
+            "label": "Integrare cu datele de vânzări (DWH)"
+          },
+          "leads": {
+            "hint": "Pâlnie de vânzări, activități, calendar.",
+            "label": "Leaduri"
+          },
+          "onboarding": {
+            "hint": "Șabloane de sarcini de implementare pentru clienții noi.",
+            "label": "Onboardingul clienților"
+          },
+          "partner_registry": {
+            "hint": "Gestionarea clienților actuali, upsell și cross-sell.",
+            "label": "Registru parteneri / clienți"
+          },
+          "pbx": {
+            "hint": "Apelarea clienților direct din CRM.",
+            "label": "Telefonie (softphone)"
+          },
+          "performance": {
+            "hint": "Health score și riscul de plecare a clientului (churn).",
+            "label": "Performanță"
+          },
+          "prospects": {
+            "hint": "Căutarea de companii și evaluarea lor automată de către AI (Enrichment / ICP).",
+            "label": "Prospecți"
+          },
+          "sales_reports": {
+            "label": "Rapoarte de vânzări"
+          },
+          "seo_bot": {
+            "hint": "Crearea și publicarea automată a articolelor pe blog.",
+            "label": "SEObot"
+          },
+          "whatsapp": {
+            "hint": "Un număr WhatsApp Business comun al companiei, folosit din fișele leadurilor și ale clienților.",
+            "label": "WhatsApp"
+          }
+        }
+      },
+      "outlook_admin_consent": {
+        "label": "Poate administratorul Microsoft 365 să acorde consimțământul (admin consent) pentru întreaga organizație?"
+      },
+      "outlook_azure_tenant_id": {
+        "hint": "Opțional.",
+        "label": "Microsoft — Directory (tenant) ID"
+      },
+      "outlook_client_id": {
+        "label": "Microsoft — Application (client) ID",
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      "outlook_client_secret": {
+        "label": "Microsoft — Client Secret"
+      },
+      "pbx_account_name": {
+        "label": "Numele companiei / contului în ip-pbx.eu"
+      },
+      "pbx_account_status": {
+        "label": "Aveți un cont de companie în ip-pbx.eu?",
+        "options": {
+          "has_account": {
+            "label": "Da"
+          },
+          "needs_account": {
+            "label": "Nu — vă rugăm ca CRMtree să creeze contul"
+          },
+          "other_provider": {
+            "label": "Nu — folosim altă centrală / alt operator"
+          }
+        }
+      },
+      "pbx_call_recording": {
+        "hint": "Înregistrările și transcrierile lor stau la baza modulului Analiza apelurilor.",
+        "label": "Trebuie înregistrate apelurile?"
+      },
+      "pbx_current_provider": {
+        "label": "Centrala / operatorul actual"
+      },
+      "pbx_extension_count": {
+        "label": "Câte persoane vor suna din CRM?"
+      },
+      "pbx_phone_numbers": {
+        "hint": "Numărul principal al companiei și numerele directe, dacă trebuie atribuite unor persoane anume. Marcați numerele care trebuie portate de la operatorul actual.",
+        "label": "Numerele de pe care se vor efectua apelurile"
+      },
+      "sales_stages": {
+        "hint": "Lăsați gol dacă pâlnia implicită vi se potrivește.",
+        "label": "Etapele pâlniei de vânzări",
+        "placeholder": "Nou → Calificare → Prezentare → Ofertă → Negociere → Câștigat / Pierdut"
+      },
+      "seo_articles_per_day": {
+        "label": "Câte articole pe zi?"
+      },
+      "seo_channels": {
+        "label": "Canale și surse de date suplimentare",
+        "options": {
+          "facebook": {
+            "label": "Publicare pe pagina de Facebook a companiei"
+          },
+          "gsc": {
+            "label": "Google Search Console (avem acces de proprietar la serviciu)"
+          },
+          "linkedin": {
+            "label": "Publicare pe profilul LinkedIn al companiei"
+          }
+        }
+      },
+      "seo_publishing_platform": {
+        "label": "Unde publicăm articolele?",
+        "options": {
+          "other": {
+            "label": "Alt sistem"
+          },
+          "undecided": {
+            "label": "De stabilit"
+          },
+          "wordpress": {
+            "label": "WordPress"
+          }
+        }
+      },
+      "seo_website_url": {
+        "label": "Adresa site-ului / blogului",
+        "placeholder": "https://firma.pl/blog"
+      },
+      "technical_contact_email": {
+        "label": "Persoana tehnică — e-mail"
+      },
+      "technical_contact_name": {
+        "hint": "Persoana care are acces de administrator la e-mail, telefonie și conturile Meta.",
+        "label": "Persoana tehnică (IT) — nume și prenume"
+      },
+      "technical_contact_phone": {
+        "label": "Persoana tehnică — telefon"
+      },
+      "users_count": {
+        "label": "Numărul planificat de utilizatori"
+      },
+      "users_global_read": {
+        "label": "Agenții de vânzări trebuie să vadă leadurile și clienții altor agenți de vânzări?",
+        "options": {
+          "own_only": {
+            "label": "Nu — fiecare le vede doar pe ale sale"
+          },
+          "read_all": {
+            "label": "Da — toți văd totul (doar citire)"
+          },
+          "undecided": {
+            "label": "De stabilit"
+          }
+        }
+      },
+      "users_list": {
+        "hint": "O persoană pe rând: nume și prenume; e-mail; rol (administrator / manager de vânzări / agent de vânzări). Fiecare va primi o parolă de unică folosință, care trebuie schimbată la prima autentificare.",
+        "label": "Lista utilizatorilor de creat",
+        "placeholder": "Ion Popescu; ion.popescu@firma.ro; agent de vânzări\nMaria Ionescu; maria.ionescu@firma.ro; manager de vânzări"
+      },
+      "users_team_structure": {
+        "hint": "Care sunt echipele / regiunile și cine cui îi este subordonat. Pe această bază vom configura grupurile și vizibilitatea datelor.",
+        "label": "Structura echipelor de vânzări"
+      },
+      "whatsapp_access_token": {
+        "hint": "Permisiuni: whatsapp_business_messaging, whatsapp_business_management.",
+        "label": "Access Token (token permanent al utilizatorului de sistem)"
+      },
+      "whatsapp_app_secret": {
+        "hint": "Meta App Dashboard → Settings → Basic.",
+        "label": "App Secret"
+      },
+      "whatsapp_display_name": {
+        "label": "Numele afișat clienților în WhatsApp"
+      },
+      "whatsapp_meta_verified": {
+        "label": "Compania este verificată în Meta Business Manager?",
+        "options": {
+          "unknown": {
+            "label": "Nu știu"
+          }
+        }
+      },
+      "whatsapp_number_status": {
+        "label": "Aveți un număr pentru WhatsApp Business?",
+        "options": {
+          "has_number": {
+            "label": "Avem un număr, dar nu este încă înregistrat în Meta"
+          },
+          "needs_number": {
+            "label": "Nu — vă rugăm ca CRMtree să achiziționeze și să configureze numărul"
+          },
+          "ready": {
+            "label": "Da — numărul este deja în Meta WhatsApp Business Platform (Cloud API)"
+          }
+        }
+      },
+      "whatsapp_phone_number": {
+        "label": "Număr de telefon",
+        "placeholder": "+40 700 000 000"
+      },
+      "whatsapp_phone_number_id": {
+        "hint": "Acesta este identificatorul numărului în Meta, nu numărul de telefon propriu-zis.",
+        "label": "Phone Number ID"
+      },
+      "whatsapp_waba_id": {
+        "hint": "Meta App Dashboard → WhatsApp → API Setup.",
+        "label": "WABA ID (WhatsApp Business Account ID)"
+      },
+      "zoho_client_id": {
+        "label": "Zoho — Client ID",
+        "placeholder": "1000.XXXXXXXX"
+      },
+      "zoho_client_secret": {
+        "label": "Zoho — Client Secret"
+      },
+      "zoho_data_center": {
+        "label": "Zoho — centru de date",
+        "options": {
+          "com": {
+            "label": "US (zoho.com)"
+          },
+          "eu": {
+            "label": "EU (zoho.eu)"
+          },
+          "other": {
+            "label": "Altul"
+          }
+        }
+      }
+    },
+    "sections": {
+      "ai": {
+        "intro": "Modulele Prospecți (Enrichment) și Analiza apelurilor trimit date către modele lingvistice externe. Puteți folosi licența CRMtree sau o licență proprie, dedicată companiei dumneavoastră.",
+        "title": "8. Modele AI — Enrichment și Analiza apelurilor"
+      },
+      "billing": {
+        "title": "2. Plan și date de facturare"
+      },
+      "company": {
+        "intro": "Informații de bază pe baza cărora vom pregăti mediul și vom stabili pe cine contactăm pe durata implementării.",
+        "title": "1. Compania și persoanele de contact"
+      },
+      "data": {
+        "title": "10. Date și nomenclatoare"
+      },
+      "email": {
+        "intro": "Fiecare utilizator își conectează în CRM propria căsuță de e-mail (trimiterea și primirea mesajelor pe fișele leadurilor și ale clienților). Aceasta necesită înregistrarea, o singură dată, a unei aplicații la furnizorul de e-mail — adresa de redirecționare (Redirect URI) o vom transmite persoanei tehnice.",
+        "title": "5. E-mail"
+      },
+      "modules": {
+        "intro": "Modulele bifate vor fi activate în mediul dumneavoastră. Pentru unele dintre ele vor apărea mai jos întrebări suplimentare.",
+        "title": "4. Module"
+      },
+      "notes": {
+        "title": "11. Observații"
+      },
+      "pbx": {
+        "intro": "Softphone-ul din CRM funcționează cu centrala virtuală ip-pbx.eu. Fiecare utilizator își introduce ulterior tokenul personal în „Setările mele” — aici nu trebuie completat.",
+        "title": "7. Telefonie (softphone)"
+      },
+      "seo": {
+        "title": "9. SEObot"
+      },
+      "users": {
+        "title": "3. Utilizatori și roluri"
+      },
+      "whatsapp": {
+        "intro": "CRM-ul gestionează un singur număr WhatsApp Business comun al companiei, pentru întreaga organizație (Meta WhatsApp Business Platform). Numărul conectat la CRM nu poate funcționa simultan în aplicația WhatsApp obișnuită de pe telefon.",
+        "title": "6. WhatsApp Business"
+      }
+    }
+  },
+  "settings": {
+    "actions": {
+      "add": "Adăugare",
+      "delete": "Ștergere",
+      "discard": "Renunțare",
+      "saveChanges": "Salvare modificări",
+      "saving": "Se salvează…"
+    },
+    "crm": {
+      "intro": "— dicționare și praguri utilizate de modulul CRM. Editați listele prin adăugarea / ștergerea elementelor. Modificările intră în vigoare după salvare.",
+      "scoring": {
+        "activityLast20Days": "Activitate (ultimele 20 de zile)",
+        "churnTitle": "Algoritmul Churn — parametri de punctaj",
+        "description": "Descriere",
+        "healthLevelThresholds": "Praguri Health Level (puncte)",
+        "healthTitle": "Health Score — parametri de punctaj",
+        "noOrdersDays": "Fără comenzi (zile)",
+        "parameter": "Parametru",
+        "revenueGrowth": "Creșterea veniturilor (M-2→M-1)",
+        "riskThresholds": "Praguri de risc (puncte)",
+        "salesDrop": "Scăderea vânzărilor (M-2→M-1)",
+        "schedule": "Program",
+        "value": "Valoare"
+      }
+    },
+    "documents": {
+      "empty": "Nu există dicționare de documente. Rulați migrarea 0116.",
+      "intro": "— gestionați valorile disponibile pentru tipurile de documente, statusuri și clasificarea GDPR. Atenție: ștergerea unei valori deja utilizate în documente poate cauza probleme de afișare."
+    },
+    "errors": {
+      "saveFailed": "Eroare la salvare",
+      "settingsSaveFailed": "Eroare la salvarea setărilor"
+    },
+    "fields": {
+      "changed": "Modificată",
+      "changedBy": "Modificată de",
+      "disabled": "Dezactivată",
+      "emptyList": "— listă goală —",
+      "enabled": "Activată",
+      "errors": {
+        "nonNegativeNumber": "Trebuie să fie un număr nenegativ",
+        "valueExists": "Valoarea există deja"
+      },
+      "newValueCode": "Valoare nouă (cod, de ex. hotel)",
+      "newValueExample": "Valoare nouă (de ex. Preț ridicat)",
+      "newValueTechnicalKey": "Valoare nouă (cheie tehnică)"
+    },
+    "global": {
+      "categories": {
+        "crm": "CRM – parametri de business",
+        "documents": "Documente și termene",
+        "general": "General / UI",
+        "workflow": "Workflow și Kanban"
+      },
+      "intro": "— setări tehnice ale aplicației, vizibile pentru toți utilizatorii. Modificările intră în vigoare imediat după salvare.",
+      "preview": {
+        "expiringSoon": "zile → „expiră în curând”",
+        "moreThan": "Peste",
+        "noWarning": "zile → fără avertizare",
+        "title": "Previzualizarea culorilor pentru termene",
+        "urgent": "zile → roșu (urgent)"
+      }
+    },
+    "groups": {
+      "addFailed": "Eroare la adăugarea grupului",
+      "addGroup": "Adăugare grup",
+      "addTitle": "Adăugare grup nou",
+      "added": "Grupul „{name}” a fost adăugat",
+      "adding": "Se adaugă…",
+      "cannotDelete": "Nu poate fi șters — are utilizatori sau documente atribuite",
+      "deleteConfirm": "Ștergeți grupul „{name}”?",
+      "deleteFailed": "Eroare la ștergerea grupului",
+      "deleteGroup": "Ștergere grup",
+      "deleted": "Grupul „{name}” a fost șters",
+      "description": "Descriere",
+      "descriptionPlaceholder": "Descriere opțională a grupului",
+      "displayName": "Denumire afișată",
+      "displayNameHint": "Vizibilă pentru utilizatori (de ex. Relații cu clienții, Conducere).",
+      "displayNamePlaceholder": "de ex. Relații cu clienții",
+      "documentCount": "{count, plural, one {# document} few {# documente} other {# de documente}}",
+      "empty": "Nu există grupuri. Adăugați primul grup mai sus sau rulați migrarea 0127.",
+      "inactive": "Inactiv",
+      "intro": "— gestionați grupurile în care pot fi incluși utilizatorii. Grupurile controlează accesul la documente. Un grup cu utilizatori sau documente atribuite nu poate fi șters.",
+      "memberCount": "{count, plural, one {# utilizator} few {# utilizatori} other {# de utilizatori}}",
+      "ownerRestriction": "Restricție de proprietar",
+      "ownerRestrictionOption": "Restricție de proprietar (Owner restriction)",
+      "technicalName": "Denumire tehnică",
+      "technicalNameHint": "Identificator unic (de ex. Accounting, HR). Fără diacritice.",
+      "technicalNamePlaceholder": "de ex. Accounting"
+    },
+    "icp": {
+      "addSignal": "Adăugare semnal",
+      "defaultConfig": "Configurație implicită — nu a fost încă modificată.",
+      "deleteConfirm": "Ștergeți semnalul „{name}”?",
+      "disableSignal": "Dezactivare semnal",
+      "draftInvalid": "Configurația de lucru are {score} / 100 pct. Enrichment folosește în continuare ultima versiune validă.",
+      "edit": "Editare",
+      "editing": "Editați:",
+      "enableSignal": "Activare semnal",
+      "errors": {
+        "conflict": "Altcineva a modificat între timp configurația ICP — se reîncarcă",
+        "fetchFailed": "Configurația ICP nu a putut fi preluată (eroare {status}).",
+        "forbidden": "Nu aveți permisiuni pentru configurația ICP a acestei organizații.",
+        "loadFailed": "Eroare la încărcarea configurației ICP",
+        "noConnection": "Fără conexiune la server — verificați dacă backendul funcționează și încercați din nou.",
+        "noTenant": "Contul dvs. nu este atribuit niciunei organizații, deci nu există o configurație ICP de afișat.",
+        "noTenantToast": "Nicio organizație atribuită",
+        "notFound": "Configurația ICP nu este disponibilă în această versiune de backend (404).",
+        "sessionExpired": "Sesiunea a expirat. Conectați-vă din nou.",
+        "unknownStatus": "necunoscută"
+      },
+      "intro": "— configurarea semnalelor punctate pe care enrichmentul le folosește pentru a evalua potrivirea unei companii (ICP).",
+      "introTitle": "Semnale ICP",
+      "lastUpdateVersion": "Ultima actualizare: versiunea",
+      "loadFailedTitle": "Configurația ICP nu a putut fi încărcată.",
+      "loading": "Se încarcă...",
+      "modal": {
+        "active": "Activ",
+        "definition": "Cum se recunoaște acest semnal?",
+        "definitionHint": "Pe baza acestei descrieri, sistemul evaluează dacă o companie îndeplinește semnalul.",
+        "definitionPlaceholder": "Descrieți după ce se recunoaște că firma îndeplinește această condiție — cuvinte/expresii concrete de pe site, secțiuni, funcții.",
+        "editTitle": "Editare semnal",
+        "name": "Denumirea semnalului",
+        "namePlaceholder": "de ex. Flotă proprie de transport",
+        "newTitle": "Semnal nou",
+        "points": "Puncte",
+        "saving": "Se salvează...",
+        "shortDescription": "Tooltip / descriere scurtă pentru utilizator",
+        "shortDescriptionHint": "Afișată ca sugestie (?) lângă semnal în Prospecți. O propoziție scurtă și clară — nu o instrucțiune tehnică pentru AI.",
+        "shortDescriptionPlaceholder": "Descriere scurtă, de business, de 1–2 propoziții — de ex. „Departament/echipă de vânzări numit(ă) explicit”."
+      },
+      "noSignals": "Niciun semnal.",
+      "ownTenant": "Organizația dvs.",
+      "ownTenantSuffix": "(a dvs.)",
+      "pointsSum": "Total puncte:",
+      "retry": "Reîncercare",
+      "signalAdded": "Semnal adăugat",
+      "signalDeleted": "Semnal șters",
+      "signalDisabled": "Semnal dezactivat (avea istoric — păstrat pentru explicarea rezultatelor vechi)",
+      "signalUpdated": "Semnal actualizat",
+      "systemUpdate": "actualizare de sistem (semnalele implicite încorporate CRM Tree)",
+      "tenantConfig": "Configurația organizației"
+    },
+    "itemLabels": {
+      "commissionBasis": {
+        "nie_dotyczy": "Nu se aplică",
+        "progi_obrotowe": "Praguri de cifră de afaceri",
+        "rezerwacje": "Număr de rezervări",
+        "segmenty": "Număr de segmente"
+      },
+      "contactTitles": {
+        "Director": "Director",
+        "Manager": "Manager",
+        "Other": "Altele",
+        "Owner": "Proprietar",
+        "Specialist": "Specialist"
+      },
+      "documentStatuses": {
+        "being_approved": "De aprobat",
+        "being_edited": "În editare",
+        "being_signed": "De semnat",
+        "completed": "Finalizat",
+        "new": "Nou",
+        "rejected": "Respins",
+        "signed": "Semnat"
+      },
+      "documentTypes": {
+        "employee_agreement": "Contract de muncă",
+        "it_supplier_agreement": "Contract cu furnizor IT",
+        "nda": "NDA",
+        "partner_agreement": "Contract de parteneriat"
+      },
+      "gdprTypes": {
+        "data_administration": "Operare asociată",
+        "data_processing_entrustment": "Împuternicire pentru prelucrare",
+        "no_gdpr": "Fără GDPR"
+      },
+      "industries": {
+        "Education": "Educație",
+        "Finance": "Finanțe",
+        "Healthcare": "Sănătate",
+        "Legal": "Juridic",
+        "Manufacturing": "Producție",
+        "Other": "Altele",
+        "Retail": "Comerț",
+        "Tourism": "Turism",
+        "Transport": "Transport"
+      },
+      "leadSources": {
+        "agent": "Agent",
+        "cold_call": "Cold call",
+        "inbound": "Inbound",
+        "inne": "Altele",
+        "kampania": "Campanie de e-mail",
+        "linkedin": "LinkedIn",
+        "partner": "Partener",
+        "polecenie": "Recomandare",
+        "strona_www": "Site web",
+        "targi": "Târg / Eveniment"
+      },
+      "leadStages": {
+        "closed_lost": "Pierdută",
+        "closed_won": "Câștigată",
+        "negotiation": "Negociere",
+        "new": "Nou",
+        "offer": "Ofertă",
+        "presentation": "Prezentare",
+        "qualification": "Calificare"
+      },
+      "partnerStatuses": {
+        "active": "Activ",
+        "churned": "Pierdut",
+        "inactive": "Inactiv",
+        "onboarding": "Implementare"
+      },
+      "productTypes": {
+        "car_rental": "Închiriere auto",
+        "hotel": "Hotel",
+        "other": "Altele",
+        "transfer": "Transfer",
+        "transport_bus": "Autobuz",
+        "transport_ferry": "Feribot",
+        "transport_flight": "Zbor",
+        "transport_train": "Tren",
+        "travel_insurance": "Asigurare",
+        "visa": "Viză"
+      }
+    },
+    "onboarding": {
+      "intro": "— definiți sarcinile standard pentru fiecare pas al procesului de implementare. Șabloanele sunt sugerate automat la crearea sarcinilor în panoul Onboarding.",
+      "introTitle": "Șabloane de sarcini de onboarding",
+      "jsonFormat": "Format JSON:",
+      "leadSources": {
+        "add": "Adăugare sursă",
+        "group": "Grup",
+        "groupHint": "Numele grupului sau gol — valorile cu grup sunt afișate în secțiunea de mai jos",
+        "label": "Etichetă (afișată)",
+        "legend": "Fundal albastru = valoarea aparține unui grup (afișată în secțiunea Marketing din liste).",
+        "noGroup": "— fără grup —",
+        "value": "Valoare (cod)"
+      },
+      "steps": {
+        "configuration": "Configurare",
+        "contractSigning": "Semnarea contractului",
+        "launch": "Lansare",
+        "training": "Instruire"
+      },
+      "stepsLegend": "Pași: 0=Semnarea contractului, 1=Configurare, 2=Instruire, 3=Lansare.",
+      "taskTypes": {
+        "call": "Apel",
+        "doc_sent": "Document",
+        "email": "E-mail",
+        "meeting": "Întâlnire",
+        "task": "Sarcină",
+        "training": "Instruire"
+      },
+      "templates": {
+        "add": "Adăugare șablon",
+        "assignee": "Atribuit",
+        "assigneeHint": "Utilizator atribuit automat. Pasul 0 întotdeauna → agentul de vânzări al leadului",
+        "days": "Zile",
+        "daysHint": "Câte zile de la data migrării se stabilesc ca termen (null = fără termen)",
+        "empty": "Nu există șabloane. Rulați migrarea 0133.",
+        "leadOwner": "agentul de vânzări al leadului",
+        "legend": "Fundal verde = sarcină standard (creată automat la migrarea leadului). Pasul „Semnarea contractului” este atribuit întotdeauna agentului de vânzări al leadului.",
+        "noAssignee": "— niciunul —",
+        "standard": "Standard",
+        "standardCheckboxHint": "Creată automat la migrare",
+        "standardHint": "Dacă sarcina se creează automat la migrarea leadului",
+        "step": "Pas",
+        "title": "Titlu",
+        "type": "Tip"
+      }
+    },
+    "saved": "{count, plural, one {# setare salvată} few {# setări salvate} other {# de setări salvate}}",
+    "survey": {
+      "description": "— datele pe baza cărora echipa CRMtree configurează mediul dumneavoastră (module, e-mail, WhatsApp, telefonie, modele AI).",
+      "open": "Deschidere chestionar",
+      "title": "Chestionar de implementare"
+    },
+    "tabs": {
+      "crm": "Parametri CRM",
+      "documents": "Dicționare documente",
+      "global": "Parametri globali",
+      "icp": "Enrichment / ICP",
+      "onboarding": "Șabloane Onboarding",
+      "projects": "Proiecte",
+      "tooltips": "Sugestii",
+      "users": "Grupuri de utilizatori"
+    },
+    "title": "Setări aplicație",
+    "tooltips": {
+      "add": "Adăugare sugestie",
+      "added": "Tooltip adăugat",
+      "catalog": {
+        "leadsFunnelActive": "Pâlnie: Leaduri active",
+        "leadsFunnelAvgWon": "Pâlnie: Valoare medie câștigată",
+        "leadsFunnelConversion": "Pâlnie: Conversie în Câștigat",
+        "leadsFunnelHot": "Pâlnie: Leaduri fierbinți",
+        "leadsFunnelPct": "Pâlnie: % conversie între etape",
+        "leadsFunnelTitle": "Pâlnie de vânzări (titlu)",
+        "leadsKpiAvgCycle": "KPI: Ciclu de vânzare mediu",
+        "leadsKpiBudget": "KPI: Buget planificat (PLN)",
+        "leadsKpiPipeline": "KPI: Pipeline (PLN)",
+        "leadsKpiWinRate": "KPI: Win Rate",
+        "leadsKpiWon": "KPI: Închise / Won (PLN)",
+        "leadsLostTitle": "Motivele pierderii (titlu)",
+        "leadsRepsColLeads": "Agenți de vânzări: coloana Leaduri",
+        "leadsRepsColPipeline": "Agenți de vânzări: coloana Pipeline",
+        "leadsRepsColProgress": "Agenți de vânzări: coloana Progres",
+        "leadsRepsColWinRate": "Agenți de vânzări: coloana Win%",
+        "leadsRepsColWon": "Agenți de vânzări: coloana Won",
+        "leadsRepsTitle": "Rezultatele agenților de vânzări (titlu)",
+        "leadsSourcesQuality": "Surse: Calitate după sursă (win rate)",
+        "leadsSourcesTitle": "Surse de leaduri (titlu)",
+        "leadsTrendTitle": "Trend lunar (titlu)",
+        "leadsVelocityTitle": "Timp în etapă – medie zile (titlu)",
+        "partnersKpiActivePartners": "Parteneri activi",
+        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiGrossTurnover": "Cifră de afaceri brută (PLN)",
+        "partnersKpiRevenue": "Venit / Marjă (PLN)",
+        "partnersKpiTransactions": "Tranzacții",
+        "partnersScorecardHealth": "Scorecard: Health",
+        "salesActivity": "Secțiune: Activitate recentă",
+        "salesChart": "Secțiune: Rezultate de vânzări (grafic)",
+        "salesKpiNewCompanies": "KPI: Companii noi",
+        "salesKpiNewContacts": "KPI: Contacte noi",
+        "salesKpiNewLeads": "KPI: Oportunități noi (pipeline activ)",
+        "salesKpiPipelineValue": "KPI: Valoarea oportunităților (pipeline)",
+        "salesKpiWon": "KPI: Oportunități câștigate",
+        "salesPipeline": "Secțiune: Pipeline de vânzări",
+        "salesRecentLeads": "Secțiune: Cele mai noi oportunități (tabel)",
+        "salesTasks": "Secțiune: Sarcini pentru azi"
+      },
+      "chooseLabel": "— selectați eticheta —",
+      "chooseScreen": "— selectați ecranul —",
+      "content": "Textul sugestiei",
+      "contentPlaceholder": "Textul pe care utilizatorul îl va vedea la trecerea cu mouse-ul peste pictograma ?.",
+      "deleteConfirm": "Ștergeți tooltipul „{key}”?",
+      "deleteFailed": "Eroare la ștergere",
+      "deleted": "Tooltipul „{key}” a fost șters",
+      "empty": "Nu există sugestii definite. Adăugați prima sugestie mai sus.",
+      "errors": {
+        "chooseLabel": "Selectați ecranul și eticheta",
+        "contentRequired": "Textul sugestiei este obligatoriu"
+      },
+      "introAfterIcon": "va apărea automat lângă eticheta respectivă atunci când textul este definit.",
+      "introBeforeIcon": "— selectați ecranul și eticheta, introduceți textul. Pictograma",
+      "introTitle": "Sugestii (Tooltips)",
+      "label": "Etichetă",
+      "other": "Altele",
+      "saved": "Tooltipul „{key}” a fost salvat",
+      "screen": "Ecran",
+      "screens": {
+        "partnerPerformance": "Partner Performance",
+        "salesDashboard": "Sales Dashboard",
+        "salesReports": "Rapoarte de vânzări"
+      }
+    },
+    "topbar": {
+      "unsavedChanges": "Modificări nesalvate"
+    }
+  },
+  "userGroups": {
+    "accessLevels": {
+      "full": "Acces complet",
+      "read": "Doar citire"
+    },
+    "create": {
+      "displayNamePlaceholder": "de ex. Vânzări",
+      "done": "Grupul „{name}” a fost creat",
+      "internalNamePlaceholder": "de ex. Vanzari",
+      "ownerRestrictionCheckbox": "Restricție de proprietar (utilizatorul vede doar documentele proprii)",
+      "subtitle": "Adăugați un grup nou de roluri",
+      "title": "Creare grup"
+    },
+    "deactivate": {
+      "action": "Dezactivare grup",
+      "confirm": "Dezactivați grupul „{name}”?",
+      "done": "Grupul a fost dezactivat"
+    },
+    "documents": "Documente",
+    "documentsCount": "{count, plural, one {# document} few {# documente} other {# de documente}}",
+    "edit": {
+      "saveChanges": "Salvare modificări",
+      "saved": "Grupul a fost actualizat",
+      "title": "Editare grup"
+    },
+    "fields": {
+      "description": "Descriere",
+      "displayName": "Denumire afișată",
+      "internalName": "Denumirea grupului (internă)"
+    },
+    "inactive": "Inactiv",
+    "members": "Membri",
+    "membersCount": "{count, plural, one {# membru} few {# membri} other {# de membri}}",
+    "newGroup": "Grup nou",
+    "noMembers": "Niciun membru",
+    "ownerRestriction": "Restricție de proprietar",
+    "ownerRestrictionOptions": {
+      "none": "Fără restricție",
+      "ownerOnly": "Doar proprietarul (Vânzări)"
+    },
+    "title": "Grupuri și roluri"
+  },
+  "users": {
+    "access": "Acces",
+    "accessLevels": {
+      "full": "Complet",
+      "read": "Citire"
+    },
+    "accountTypes": {
+      "external": "Extern (doar Proiecte)",
+      "internal": "Intern"
+    },
+    "adminBadge": "ADMIN",
+    "adminRoles": {
+      "admin": "Administrator",
+      "regular": "Utilizator obișnuit"
+    },
+    "budgets": {
+      "annualTotal": "Total anual",
+      "changeTypeConfirm": "Schimbarea tipului de perioadă va șterge bugetele existente pentru anul {year}. Continuați?",
+      "currency": "Monedă",
+      "deleteFailed": "Eroare la ștergerea bugetelor",
+      "monthly": "Lunar",
+      "periodType": "Tip de perioadă",
+      "quarterly": "Trimestrial",
+      "save": "Salvare buget",
+      "saveFailed": "Eroare la salvare",
+      "saved": "Buget salvat",
+      "title": "Bugete de vânzări planificate",
+      "year": "An"
+    },
+    "chooseGroup": "Selectați grupul...",
+    "columns": {
+      "email": "E-mail",
+      "groupsAndRoles": "Grupuri și roluri",
+      "lastLogin": "Ultima conectare",
+      "user": "Utilizator"
+    },
+    "count": "Utilizatori: {count}",
+    "create": {
+      "accessLevel": "Nivel de acces",
+      "assignGroup": "Atribuire la grup (opțional)",
+      "emailPlaceholder": "ana.popescu@firma.com",
+      "failed": "Utilizatorul nu a putut fi creat",
+      "firstNamePlaceholder": "Ana",
+      "lastNamePlaceholder": "Popescu",
+      "noGroup": "Fără grup",
+      "ssoNoteLabel": "Notă:",
+      "ssoNoteText": "Utilizatorul se va putea conecta prin SAML SSO folosind această adresă de e-mail. Autentificarea este gestionată integral de Google Workspace.",
+      "submit": "Creare utilizator",
+      "subtitle": "Creați manual un cont nou de utilizator",
+      "success": "Utilizatorul {name} a fost creat",
+      "title": "Adăugare utilizator nou"
+    },
+    "crmRoles": {
+      "managerShort": "Manager",
+      "none": "Fără rol CRM",
+      "salesManager": "Manager de vânzări (sales_manager)",
+      "salesperson": "Agent de vânzări (salesperson)",
+      "salespersonShort": "Agent vânzări"
+    },
+    "edit": {
+      "accountSettings": "Setările contului",
+      "deleteConfirm": "Ștergeți utilizatorul {name} ({email})? Această operațiune nu poate fi anulată.",
+      "deleteFailed": "Utilizatorul nu a putut fi șters",
+      "deleteUser": "Ștergere utilizator",
+      "deleted": "Utilizator șters",
+      "emailHint": "Schimbarea e-mailului afectează conectarea SAML — asigurați-vă că adresa corespunde contului Google Workspace.",
+      "emailInvalid": "Introduceți o adresă de e-mail validă",
+      "emailTaken": "Această adresă de e-mail este deja utilizată",
+      "loadFailed": "Utilizatorul nu a putut fi încărcat",
+      "saveChanges": "Salvare modificări",
+      "updateFailed": "Utilizatorul nu a putut fi actualizat",
+      "updated": "Utilizator actualizat"
+    },
+    "empty": "Nu s-au găsit utilizatori",
+    "featureAccess": {
+      "prospects": "Prospecți",
+      "prospectsDisabled": "Accesul la Prospecți a fost dezactivat",
+      "prospectsEnabled": "Accesul la Prospecți a fost activat",
+      "prospectsGroupDescription": "Acces la modulul Prospecți (import CSV, enrichment, conversie în lead).",
+      "prospectsHint": "Analiza și îmbogățirea prospecților — companii (AI)",
+      "title": "Acces la funcții"
+    },
+    "fields": {
+      "accountType": "Tip de cont",
+      "adminRole": "Rol de administrator",
+      "canCreateProjects": "Creare de proiecte",
+      "company": "Companie",
+      "crmRole": "Rol CRM",
+      "department": "Departament",
+      "email": "Adresă de e-mail",
+      "firstName": "Prenume",
+      "lastName": "Nume",
+      "phone": "Telefon",
+      "required": "Obligatoriu",
+      "status": "Status"
+    },
+    "filters": {
+      "activeOnly": "Doar activi",
+      "allGroups": "Toate grupurile",
+      "allUsers": "Toți utilizatorii",
+      "inactiveOnly": "Doar inactivi"
+    },
+    "grants": {
+      "add": "Acordare",
+      "addFailed": "Grantul nu a putut fi acordat",
+      "addTitle": "Acordare grant de vizibilitate",
+      "added": "Grant de vizibilitate acordat",
+      "group": "Grup (ale cui înregistrări)",
+      "hint": "Grantul nu adaugă utilizatorul în grup. „Complet” permite și editarea înregistrărilor acestui grup.",
+      "module": "Modul",
+      "removeFailed": "Grantul nu a putut fi eliminat",
+      "removed": "Grant de vizibilitate eliminat",
+      "title": "Granturi de vizibilitate CRM ({count})",
+      "tooltip": "Vede înregistrările grupului „{group}” în modulul {module} ({access})",
+      "tooltipAccess": {
+        "full": "citire și editare",
+        "read": "doar citire"
+      }
+    },
+    "modules": {
+      "leads": "Prospecți",
+      "partners": "Parteneri"
+    },
+    "neverLoggedIn": "Niciodată",
+    "newUser": "Utilizator nou",
+    "no": "Nu",
+    "pagination": {
+      "next": "Înainte",
+      "page": "Pagina {page} din {total}",
+      "previous": "Înapoi"
+    },
+    "password": {
+      "mismatch": "Parolele nu sunt identice",
+      "new": "Parolă nouă",
+      "placeholder": "Min. 8 caractere",
+      "repeat": "Repetați parola",
+      "saveFailed": "Eroare la salvarea parolei",
+      "saved": "Parola a fost setată",
+      "submit": "Setare parolă",
+      "title": "Parolă de conectare",
+      "tooShort": "Parola trebuie să aibă cel puțin 8 caractere"
+    },
+    "remove": "Eliminare",
+    "roles": {
+      "assign": "Atribuire",
+      "assignTitle": "Atribuire rol nou",
+      "assigned": "Rol atribuit",
+      "group": "Grup",
+      "removeFailed": "Rolul nu a putut fi eliminat",
+      "removed": "Rol eliminat",
+      "title": "Roluri în grupuri ({count})"
+    },
+    "saving": "Se salvează…",
+    "searchPlaceholder": "Căutare utilizatori…",
+    "statuses": {
+      "active": "Activ",
+      "inactive": "Inactiv"
+    },
+    "title": "Gestionarea utilizatorilor",
+    "yes": "Da"
+  }
+}

@@ -120,6 +120,156 @@
       "week": "Semaine"
     }
   },
+  "callAnalysis": {
+    "actions": {
+      "archive": "Archiver",
+      "reanalyze": "Réanalyser"
+    },
+    "bulk": {
+      "deleteSelected": "Supprimer la sélection",
+      "hold": "En attente",
+      "restore": "Rétablir",
+      "selected": "{count, plural, one {# sélectionné} other {# sélectionnés}}"
+    },
+    "confirm": {
+      "deleteRow": "Supprimer l’analyse de {name} ?",
+      "deleteSelected": "{count, plural, one {Supprimer # enregistrement ?} other {Supprimer # enregistrements ?}}"
+    },
+    "details": {
+      "callsLabel": "Appels :",
+      "importedLabel": "Import :",
+      "lastCallLabel": "Dernier :",
+      "objections": "Objections",
+      "positiveSignals": "Signaux positifs"
+    },
+    "empty": {
+      "hint": "Les notes apparaîtront après un import CSV ou à la fin des appels téléphoniques",
+      "noNotes": "Aucune note d’appel",
+      "noResults": "Aucun résultat pour les filtres sélectionnés"
+    },
+    "errors": {
+      "bulkFailed": "Échec de l’opération groupée",
+      "deleteFailed": "Échec de la suppression",
+      "followUpUpdateFailed": "Échec de la mise à jour de la relance",
+      "reanalyzeFailed": "Échec de la réanalyse",
+      "statusChangeFailed": "Échec du changement de statut"
+    },
+    "filters": {
+      "allFollowUps": "Toutes les relances",
+      "allLinks": "Tous les liens",
+      "allSalespeople": "Tous les commerciaux",
+      "allStatuses": "Tous les statuts",
+      "firstCall": "Premier appel :",
+      "followUpDate": "Date de relance :",
+      "followUpDone": "Relance effectuée",
+      "followUpRequired": "Relance requise",
+      "lastCall": "Dernier appel :",
+      "noLinks": "Aucun lien",
+      "presets": {
+        "custom": "Perso…",
+        "nextTwoDays": "2 prochains jours",
+        "thisWeek": "Cette semaine",
+        "today": "Auj.",
+        "todayTomorrow": "Auj.+Demain"
+      },
+      "score": "Score :",
+      "scoreMax": "max",
+      "scoreMin": "min",
+      "searchPlaceholder": "Rechercher une entreprise ou un numéro fiscal...",
+      "statusAnalyzing": "Analyse en cours",
+      "total": "{count, plural, one {# entreprise} other {# entreprises}}"
+    },
+    "followUp": {
+      "done": "Effectuée",
+      "label": "Relance",
+      "markDoneTitle": "Cliquez pour marquer la relance comme effectuée",
+      "notRequired": "Non requise",
+      "required": "Requise",
+      "undoTitle": "Relance effectuée. Cliquez pour annuler."
+    },
+    "header": {
+      "analyze": "Analyser ({count})",
+      "analyzing": "Analyse...",
+      "importCsv": "Import CSV"
+    },
+    "import": {
+      "failed": "Échec de l’import",
+      "resultCreated": "Importé : {created} nouvelles, {appended} mises à jour sur {totalRows} lignes (colonnes de notes : {note1} / {note2})",
+      "resultUpserted": "Importé : {upserted} entreprises sur {totalRows} lignes (colonnes de notes : {note1} / {note2})"
+    },
+    "inspect": {
+      "aiSummary": "Résumé IA",
+      "analysisStatus": "Statut de l’analyse",
+      "basis": "Base de l’analyse — notes ({chars, plural, one {# caractère} other {# caractères}} · {calls, plural, one {# appel} other {# appels}})",
+      "noResults": "Aucun résultat d’analyse IA pour cette entreprise.",
+      "noScore": "Aucune évaluation",
+      "promptFailed": "Échec du chargement du prompt.",
+      "promptLoading": "Chargement du prompt…",
+      "purchasePotential": "Potentiel d’achat",
+      "tabAnalysis": "Analyse IA",
+      "tabPrompt": "Prompt DeepSeek",
+      "title": "Inspection de l’analyseur"
+    },
+    "links": {
+      "goToLead": "Aller au lead",
+      "goToPartner": "Aller au partenaire",
+      "goToProspect": "Aller au prospect",
+      "prospect": "Prospect"
+    },
+    "menu": {
+      "delete": "Supprimer",
+      "inspect": "Inspection",
+      "putOnHold": "Mettre en attente",
+      "restoreFromArchive": "Rétablir depuis l’archive",
+      "restoreFromHold": "Sortir de l’attente"
+    },
+    "potentialHelp": {
+      "description": "Évaluation de la propension de l’entreprise à acheter des services CRM.",
+      "footer": "La valeur est calculée par un modèle d’IA à partir des notes d’appels.",
+      "title": "Potentiel (0–100)"
+    },
+    "progress": {
+      "companies": "{done} / {total} entreprises",
+      "errors": "{count, plural, one {# erreur} other {# erreurs}}",
+      "finished": "Terminé",
+      "running": "Analyse en cours...",
+      "runningOtherUser": "Analyse en cours (autre utilisateur)..."
+    },
+    "scoreLabels": {
+      "lowInterest": "Intérêt faible",
+      "moderateInterest": "Intérêt modéré",
+      "notInterested": "Pas d’intérêt",
+      "readyToBuy": "Prêt à acheter",
+      "strongInterest": "Intérêt fort"
+    },
+    "statuses": {
+      "analyzing": "Analyse...",
+      "archived": "Archive",
+      "done": "Terminé",
+      "error": "Erreur",
+      "hold": "En attente",
+      "pending": "À analyser"
+    },
+    "subtitle": "Analyse des notes d’appels téléphoniques — propension à l’achat (DeepSeek AI)",
+    "table": {
+      "actions": "Actions",
+      "analyzedAt": "Analysé le",
+      "calls": "Appels",
+      "company": "Entreprise",
+      "firstCall": "Premier appel",
+      "lastCall": "Dernier appel",
+      "links": "Liens",
+      "potential": "Potentiel",
+      "salesperson": "Commercial",
+      "status": "Statut",
+      "taxId": "Numéro fiscal"
+    },
+    "title": "Analyse des appels",
+    "transcript": {
+      "callNumber": "Appel {number}",
+      "title": "Transcription des appels ({count})"
+    }
+  },
   "callSimulator": {
     "activity": {
       "demoTranscript": "[00:00] Commercial : Bonjour, Jean Dupont de CRMtree à l’appareil. Pourrais-je parler à la personne responsable des déplacements professionnels ?\n\n[00:08] Client : Oui, je vous écoute. Marc Martin à l’appareil.\n\n[00:10] Commercial : Bonjour, Monsieur Martin. Je vous contacte au sujet de l’optimisation des coûts des déplacements professionnels dans votre entreprise. Avez-vous un instant ?\n\n[00:18] Client : Oui, allez-y. Que proposez-vous concrètement ?\n\n[00:22] Commercial : Nous proposons un système complet de gestion des voyages d’affaires — réservations de vols, d’hôtels et de transports au même endroit. En moyenne, nos clients économisent de 15 à 25 % sur leurs frais de déplacement.\n\n[00:35] Client : Cela semble intéressant. Combien de personnes doivent voyager par an pour que ce soit pertinent ?\n\n[00:40] Commercial : Notre plateforme est rentable dès quelques dizaines de déplacements par an. Je peux préparer une estimation personnalisée pour votre entreprise.\n\n[00:49] Client : Très bien. Envoyez-moi l’offre par e-mail. Notre équipe l’examinera.\n\n[00:54] Commercial : Bien sûr, je vous l’envoie dès aujourd’hui. Pouvons-nous aussi convenir d’une courte présentation en ligne pour vous montrer le système en action ?\n\n[01:02] Client : Oui, c’est possible. Je vous proposerai une date après avoir examiné l’offre.\n\n[01:06] Commercial : Parfait. Merci pour cet échange, à bientôt.\n\n[01:09] Client : Au revoir.",
@@ -881,6 +1031,18 @@
       "timeline": "Chronologie"
     }
   },
+  "mailCallback": {
+    "closeHint": "Vous pouvez fermer cette fenêtre et reprendre votre travail dans le CRM.",
+    "closeWindow": "Fermer la fenêtre",
+    "connectedBody": "Votre compte {provider} a bien été connecté à l’application.",
+    "connectedTitle": "Connexion à {provider} réussie !",
+    "errorBody": "Impossible de connecter le compte {provider}.",
+    "errorTitle": "Erreur de connexion",
+    "processing": "Traitement…",
+    "reasons": {
+      "email_already_connected": "Ce compte Google est déjà connecté à un autre utilisateur du CRM. Utilisez un autre compte Google ou contactez l’administrateur."
+    }
+  },
   "meetings": {
     "durationMin": "Durée (min)",
     "location": "Lieu",
@@ -1325,6 +1487,21 @@
       "cards": "Cartes",
       "table": "Tableau"
     }
+  },
+  "pbx": {
+    "errors": {
+      "callRejected": "Appel rejeté ({code}). Vérifiez le numéro.",
+      "micPermissionDenied": "Accès au microphone refusé. Autorisez l’accès dans les paramètres du navigateur.",
+      "micUnavailable": "Microphone indisponible : {reason}",
+      "noAudio": "Pas de connexion audio (ICE failed). Vérifiez le réseau ou contactez l’administrateur.",
+      "numberBusy": "Numéro occupé — réessayez dans un instant.",
+      "registrationFailed": "L’enregistrement SIP a échoué. Vérifiez le jeton PBX.",
+      "registrationTimeout": "Délai d’enregistrement SIP dépassé (12s). Vérifiez la connexion et la configuration PBX.",
+      "sipConnectionFailed": "Erreur de connexion SIP. Configurez le jeton PBX dans Mes paramètres.",
+      "sipUnauthorized": "Erreur d’autorisation SIP (401). Vérifiez votre jeton PBX dans Mes paramètres → Softphone."
+    },
+    "incomingTabTitle": "{name} appelle...",
+    "unknownCaller": "numéro inconnu"
   },
   "periodFilter": {
     "groups": {
@@ -1778,6 +1955,466 @@
       "overdue": "en retard",
       "showAll": "Voir toutes les tâches →",
       "title": "Tâches du jour"
+    }
+  },
+  "seo": {
+    "authors": {
+      "actions": {
+        "activate": "Activer",
+        "add": "Ajouter l’auteur",
+        "addNew": "+ Ajouter un auteur",
+        "adding": "Ajout…",
+        "deactivate": "Désactiver",
+        "delete": "Supprimer l’auteur",
+        "edit": "Modifier",
+        "saving": "Enregistrement…"
+      },
+      "empty": "Aucun auteur — ajoutez-en un premier pour pouvoir approuver des articles (un auteur est requis avant la publication).",
+      "fields": {
+        "bio": "Description des compétences",
+        "fullName": "Prénom et nom",
+        "jobTitle": "Poste",
+        "linkedinProfile": "Profil LinkedIn",
+        "photo": "Photo"
+      },
+      "inactiveBadge": "Inactif",
+      "placeholders": {
+        "bio": "Brève description de l’expérience et de l’expertise",
+        "fullName": "ex. Béatrice Dupont",
+        "jobTitleEdit": "ex. Head of Sales",
+        "jobTitleNew": "ex. Responsable du service commercial"
+      },
+      "toasts": {
+        "addFailed": "Impossible d’ajouter l’auteur.",
+        "added": "Auteur ajouté.",
+        "deleteFailed": "Impossible de supprimer l’auteur.",
+        "deleted": "Auteur supprimé.",
+        "photoUploadFailed": "Impossible d’envoyer la photo.",
+        "photoUploaded": "Photo envoyée.",
+        "saveFailed": "Impossible d’enregistrer l’auteur.",
+        "statusChangeFailed": "Impossible de changer le statut.",
+        "updated": "Auteur mis à jour."
+      }
+    },
+    "contentSlots": {
+      "actions": {
+        "fill": "Compléter",
+        "insert": "Insérer dans l’article",
+        "remove": "Supprimer cet emplacement"
+      },
+      "fields": {
+        "caption": "Légende de l’image",
+        "comment": "Commentaire",
+        "fullName": "Prénom et nom",
+        "quote": "Citation",
+        "quoteAuthor": "Auteur (personne ou institution)",
+        "role": "Rôle",
+        "roleCompany": "Poste / entreprise",
+        "sourceTitle": "Titre de la source",
+        "sourceUrl": "Lien vers la source (https://)"
+      },
+      "hint": "SEObot a marqué dans le texte les emplacements où l’article a besoin de quelque chose que l’IA ne peut pas honnêtement inventer. Complétez chacun d’eux ou supprimez-le — ce n’est qu’ensuite que l’article pourra être approuvé.",
+      "placeholders": {
+        "roleCompany": "ex. Head of Sales, CRMtree"
+      },
+      "removeConfirm": "Supprimer cet emplacement de l’article ? Le texte autour restera inchangé.",
+      "screenshots": {
+        "emptyLibrary": "La bibliothèque de captures est vide — ajoutez une capture ci-dessous ou dans le panneau « Captures ».",
+        "uploadNew": "Importer une nouvelle capture",
+        "uploadToLibrary": "Importer dans la bibliothèque"
+      },
+      "statuses": {
+        "filled": "Complété",
+        "removed": "Supprimé"
+      },
+      "suggestion": {
+        "label": "Proposition de SEObot (vérifiée sur la page de la source) :",
+        "use": "Utiliser cette citation"
+      },
+      "title": "À compléter avant la publication",
+      "toasts": {
+        "checkField": "Vérifiez le champ : {field}",
+        "chooseScreenshot": "Choisissez une capture.",
+        "insertFailed": "Impossible d’insérer.",
+        "inserted": "Inséré dans l’article.",
+        "removeFailed": "Impossible de supprimer.",
+        "screenshotUploadFailed": "Impossible d’importer la capture.",
+        "screenshotUploaded": "Capture ajoutée à la bibliothèque et sélectionnée.",
+        "textAndAuthorRequired": "Renseignez le contenu et l’auteur."
+      },
+      "types": {
+        "expert_comment": "Commentaire d’expert",
+        "quote": "Citation avec source",
+        "screenshot": "Capture du produit"
+      }
+    },
+    "main": {
+      "actions": {
+        "approveAndPublish": "Approuver et publier",
+        "approveAndSchedule": "Approuver et planifier",
+        "cancelSchedule": "Annuler la planification",
+        "markForRefresh": "Marquer à actualiser",
+        "pendingSlotsHint": "Complétez ou supprimez d’abord les emplacements à compléter",
+        "reject": "Rejeter",
+        "saveChanges": "Enregistrer les modifications",
+        "unpublish": "Repasser en brouillon"
+      },
+      "detail": {
+        "author": {
+          "choose": "— choisir un auteur —",
+          "inactive": "inactif",
+          "label": "Auteur",
+          "required": "Requis avant l’approbation"
+        },
+        "empty": "Sélectionnez un article dans la liste.",
+        "image": {
+          "reroll": "Tirer une autre image sur Pexels",
+          "rerolling": "Tirage…",
+          "save": "Enregistrer l’image",
+          "urlPlaceholder": "URL de l’image d’en-tête"
+        },
+        "internalLinks": "Liens internes :",
+        "metaPlaceholder": "Meta description",
+        "metrics": {
+          "avgPosition": "position moy. {position}",
+          "clicks": "{count, plural, one {# clic} other {# clics}}",
+          "impressions": "{count, plural, one {# impression} other {# impressions}}",
+          "note": "(28 derniers jours, données Search Console)"
+        }
+      },
+      "errors": {
+        "unknown": "erreur inconnue"
+      },
+      "filters": {
+        "all": "Tous",
+        "drafts": "Brouillons",
+        "refresh": "À actualiser"
+      },
+      "generate": {
+        "action": "Générer un nouvel article",
+        "inProgress": "Génération… (cela peut prendre quelques minutes)"
+      },
+      "gsc": {
+        "connect": "Connecter Search Console",
+        "connected": "Search Console : connexion active ({siteUrl})",
+        "disconnect": "Déconnecter",
+        "syncNow": "Synchroniser maintenant",
+        "syncing": "Synchronisation…"
+      },
+      "header": {
+        "authorsToggle": "Auteurs ({count})",
+        "screenshotsToggle": "Captures",
+        "strategyToggle": "Stratégie de contenu ({count, plural, one {# pilier} other {# piliers}})"
+      },
+      "list": {
+        "empty": "Aucun article dans cet état.",
+        "metrics": "{impressions} impr. · {clicks, plural, one {# clic} other {# clics}} (28 jours)"
+      },
+      "refresh": {
+        "apply": "Appliquer sur le site",
+        "applyConfirm": "Remplacer le contenu publié par la nouvelle version ? La modification sera immédiatement visible sur le site.",
+        "dismissDraft": "Rejeter la proposition",
+        "failed": "Impossible de préparer la proposition : {error}",
+        "generatedInfo": "Généré le {date} · coût env. ${cost} · sources citées : {facts}",
+        "generating": "Préparation de la proposition (analyse des requêtes GSC, données actuelles, réécriture) — cela prend quelques minutes, le panneau s’actualisera tout seul.",
+        "newBody": "Nouveau contenu",
+        "newMeta": "Nouvelle meta description",
+        "newTitle": "Nouveau titre",
+        "noQueries": "Aucune donnée de requêtes GSC pour cette page — la proposition se concentre sur l’actualité et la structure.",
+        "notNeeded": "Aucune actualisation nécessaire",
+        "prepare": "Préparer une proposition (IA)",
+        "publishedNote": "L’article reste publié en permanence. Les modifications n’arriveront sur le site qu’après un clic sur « Appliquer sur le site ».",
+        "queriesLabel": "Requêtes GSC prises en compte :",
+        "queryStats": "({impressions} impr., pos. {position})",
+        "reasonDetails": {
+          "age": "aucune mise à jour depuis plus de 90 jours.",
+          "manual": "marqué à actualiser par un rédacteur.",
+          "positionDrop": "la position est passée de {before} à {now} (14 derniers jours contre les 14 précédents).",
+          "strikingDistance": "position moy. {position} pour {impressions} impressions en 28 jours. La chance la moins coûteuse d’entrer dans le TOP 10."
+        },
+        "reasons": {
+          "age": "Non mis à jour depuis 90+ jours",
+          "manual": "Marqué manuellement",
+          "position_drop": "Baisse de position",
+          "striking_distance": "Proche de la 1re page Google"
+        },
+        "regenerate": "Générer à nouveau",
+        "title": "Actualisation de l’article",
+        "validationWarning": "La proposition n’a pas passé tous les contrôles automatiques :"
+      },
+      "schedule": {
+        "clear": "Supprimer la date",
+        "label": "Planifier la publication pour le :",
+        "scheduledNote": "Publication planifiée : {date}"
+      },
+      "sections": {
+        "authors": "Auteurs",
+        "calendar": "Calendrier de publication",
+        "channels": "Canaux sociaux",
+        "screenshots": "Captures du produit",
+        "settings": "Paramètres",
+        "strategy": "Stratégie de contenu"
+      },
+      "social": {
+        "copy": "Copier",
+        "noChannels": "Aucun canal connecté — connectez-les dans « Canaux sociaux » en haut.",
+        "publishOn": "Publier sur {platform}",
+        "publishOrRetry": "Publier / réessayer",
+        "publishing": "Publication…",
+        "statuses": {
+          "draft": "Brouillon",
+          "failed": "Erreur",
+          "published": "Publié",
+          "queued": "Publication…"
+        },
+        "title": "Publication sociale",
+        "viewPost": "Voir le post"
+      },
+      "socialConnect": {
+        "connected": "{platform} : connexion établie.",
+        "errors": {
+          "access_denied": "L’accès n’a pas été accordé.",
+          "callback_failed": "Impossible de finaliser la connexion. Assurez-vous que le compte connecté est administrateur de la page de l’entreprise.",
+          "invalid_state": "La session de connexion a expiré — veuillez réessayer.",
+          "unauthorized_scope_error": "L’application LinkedIn ne dispose pas d’un accès approuvé pour publier sur la page de l’entreprise (produit Community Management API).",
+          "user_cancelled_authorize": "L’octroi de l’accès a été annulé.",
+          "user_cancelled_login": "La connexion au compte a été annulée."
+        },
+        "fallbackPlatform": "canal social",
+        "unknownFailure": "échec de la connexion ({reason})."
+      },
+      "statuses": {
+        "approved": "Approuvé",
+        "archived": "Archivé",
+        "draft": "Brouillon",
+        "in_review": "À valider",
+        "needs_update": "À corriger",
+        "published": "Publié",
+        "queued": "En file (auto)",
+        "scheduled": "Planifié"
+      },
+      "title": "SEObot — rédaction de contenu",
+      "toasts": {
+        "approveFailed": "Impossible d’approuver l’article.",
+        "authorSaveFailed": "Impossible d’enregistrer l’auteur.",
+        "authorSaved": "Auteur enregistré.",
+        "changesSaveFailed": "Impossible d’enregistrer les modifications.",
+        "changesSaved": "Modifications enregistrées.",
+        "copied": "Copié dans le presse-papiers.",
+        "copyFailed": "Impossible de copier.",
+        "generationDone": "Le nouvel article est généré et attend la validation.",
+        "generationFailed": "Impossible de générer l’article : {error}",
+        "generationStartFailed": "Impossible de lancer la génération.",
+        "generationStarted": "Génération de l’article en arrière-plan — cela prendra quelques minutes. Vous pouvez continuer à travailler.",
+        "gscDisconnectFailed": "Impossible de déconnecter Search Console.",
+        "gscDisconnected": "Search Console déconnecté — vous pouvez le reconnecter avec le bon compte Google.",
+        "gscSyncFailed": "Impossible de synchroniser les métriques.",
+        "gscSynced": "Métriques Search Console synchronisées.",
+        "imageRerollFailed": "Impossible de tirer une image.",
+        "imageRerolled": "Nouvelle image tirée.",
+        "imageSaveFailed": "Impossible d’enregistrer l’image.",
+        "imageSaved": "Image enregistrée.",
+        "published": "Article publié.",
+        "refreshApplied": "La version actualisée est déjà sur le site.",
+        "refreshApplyFailed": "Impossible d’appliquer l’actualisation.",
+        "refreshDismissFailed": "Impossible de retirer de la file.",
+        "refreshDismissed": "Retiré de la file d’actualisation.",
+        "refreshGenerating": "Préparation de la proposition — cela prendra quelques minutes.",
+        "refreshMarkFailed": "Impossible de marquer l’article.",
+        "refreshMarked": "Marqué à actualiser.",
+        "rejectFailed": "Impossible de rejeter l’article.",
+        "rejected": "Article rejeté, il est revenu dans les brouillons.",
+        "scheduleSaveFailed": "Impossible d’enregistrer la date.",
+        "scheduleSaved": "Date de publication enregistrée.",
+        "scheduled": "Publication planifiée.",
+        "socialPostSaveFailed": "Impossible d’enregistrer le post.",
+        "socialPostSaved": "Post enregistré.",
+        "socialPublishFailed": "Impossible de publier.",
+        "socialPublishFailedCheck": "Impossible de publier — vérifiez l’erreur.",
+        "socialPublished": "Publié.",
+        "unpublishFailed": "Impossible de dépublier l’article.",
+        "unpublished": "Article repassé en brouillon."
+      }
+    },
+    "publishingCalendar": {
+      "config": {
+        "autoMode": "Mode automatique (sans relecture manuelle)",
+        "autoModeWarning": "Dans ce mode, les articles sont publiés automatiquement à la date prévue — sans validation manuelle d’un rédacteur.",
+        "noEndDate": "Sans limite de durée (le planning se renouvelle indéfiniment)",
+        "save": "Enregistrer le planning",
+        "saving": "Enregistrement…",
+        "title": "Planning automatique"
+      },
+      "enableConfirm": "Le mode automatique publie les articles sans validation manuelle d’un rédacteur — continuer ?",
+      "toasts": {
+        "configSaveFailed": "Impossible d’enregistrer le planning.",
+        "configSaved": "Planning enregistré.",
+        "disabled": "Mode automatique désactivé.",
+        "enabled": "Mode automatique activé.",
+        "moveFailed": "Impossible de déplacer l’article.",
+        "movedTo": "Déplacé au {date}.",
+        "movedToUnassigned": "Renvoyé dans la file des non attribués.",
+        "saveFailed": "Impossible d’enregistrer."
+      },
+      "unassigned": {
+        "empty": "Aucun article non attribué.",
+        "title": "Non attribués ({count})"
+      },
+      "weeks": {
+        "current": "Cette semaine (en cours, verrouillée)",
+        "next": "Semaine prochaine (modifiable)"
+      }
+    },
+    "screenshots": {
+      "actions": {
+        "add": "+ Ajouter une capture",
+        "delete": "Supprimer la capture",
+        "edit": "Modifier",
+        "uploading": "Import…"
+      },
+      "deleteConfirm": "Supprimer cette capture de la bibliothèque ?",
+      "fields": {
+        "caption": "Légende",
+        "captionUnderImage": "Légende de l’image",
+        "feature": "Fonctionnalité",
+        "file": "Fichier (PNG, JPEG, WebP, max 8 MB)"
+      },
+      "hint": "Captures d’écran du produit, étiquetées par fonctionnalité (ex. « Prospects », « Analyse des appels IA »). SEObot insère lui-même la capture adaptée dans un nouvel article et, s’il n’y en a aucune, laisse dans le texte un emplacement à compléter. N’importez pas d’écrans contenant de vraies données de clients.",
+      "placeholders": {
+        "caption": "ex. Liste des prospects triée par scoring ICP",
+        "feature": "ex. Prospects"
+      },
+      "toasts": {
+        "added": "Capture ajoutée.",
+        "deleteFailed": "Impossible de supprimer la capture.",
+        "deleted": "Capture supprimée.",
+        "saveFailed": "Impossible d’enregistrer.",
+        "saved": "Enregistré.",
+        "uploadFailed": "Impossible d’importer la capture."
+      }
+    },
+    "socialChannels": {
+      "connect": "Connecter",
+      "connected": "Connexion active",
+      "disconnect": "Déconnecter",
+      "hint": "L’approbation d’un article le publie simultanément sur les canaux connectés — en un seul clic. Instagram se connecte automatiquement avec Facebook (même compte Meta).",
+      "instagramHint": "Se connectera automatiquement après la connexion de Facebook, si la page a un compte Instagram Business associé.",
+      "toasts": {
+        "connectStartFailed": "Impossible de lancer la connexion à {platform}.",
+        "disconnectFailed": "Impossible de déconnecter.",
+        "disconnected": "{platform} : déconnexion effectuée.",
+        "wordpressConnectFailed": "Impossible de se connecter à WordPress.",
+        "wordpressConnected": "WordPress connecté."
+      },
+      "wordpress": {
+        "appPassword": "Mot de passe d’application",
+        "appPasswordPlaceholder": "généré dans WP : Comptes → Profil → Mots de passe d’application",
+        "connect": "Connecter WordPress",
+        "connecting": "Connexion…",
+        "siteUrl": "Adresse du site",
+        "siteUrlPlaceholder": "https://votre-site.fr",
+        "username": "Identifiant",
+        "usernamePlaceholder": "ex. admin"
+      },
+      "wordpressHint": "Publication de l’article en intégralité sur le site WordPress du client (Application Password)."
+    },
+    "strategy": {
+      "backlinks": {
+        "accept": "Accepter",
+        "empty": "Aucun backlink.",
+        "findCandidates": "Chercher des candidats",
+        "hint": "Échange de liens en opt-in avec d’autres organisations du même secteur (industry_vertical), uniquement pertinent thématiquement, sans réciprocité imposée. La mise en relation ne fonctionne que lorsqu’une autre organisation s’inscrit aussi — aujourd’hui, vous êtes la seule.",
+        "optIn": "Consentement à l’échange de backlinks avec d’autres organisations",
+        "reject": "Rejeter",
+        "searching": "Recherche…",
+        "statuses": {
+          "accepted": "Accepté",
+          "rejected": "Rejeté",
+          "suggested": "Suggéré"
+        },
+        "title": "Backlinks entre organisations ({count})"
+      },
+      "competitors": {
+        "add": "Ajouter",
+        "empty": "Aucun concurrent dans la liste.",
+        "hint": "La liste influence la génération des piliers thématiques — mieux elle est décrite, plus la stratégie est pertinente.",
+        "notesPlaceholder": "Note (facultatif)",
+        "removeAria": "Supprimer",
+        "title": "Concurrents ({count})",
+        "urlPlaceholder": "https://concurrent.fr"
+      },
+      "pillars": {
+        "add": "Ajouter le pilier",
+        "addOwn": "+ Ajouter un pilier personnalisé",
+        "adding": "Ajout…",
+        "articleCount": "{count} art.",
+        "description": "Description",
+        "descriptionPlaceholder": "De quoi doivent parler les articles de ce pilier",
+        "edit": "Modifier",
+        "keywordTheme": "Thème de mots-clés",
+        "keywordThemePlaceholder": "ex. location de yachts, marina",
+        "name": "Nom",
+        "namePlaceholder": "ex. Gestion d’une flotte de yachts",
+        "removeAria": "Supprimer le pilier",
+        "saving": "Enregistrement…"
+      },
+      "toasts": {
+        "backlinkAcceptFailed": "Impossible d’accepter.",
+        "backlinkAccepted": "Backlink accepté.",
+        "backlinkRejectFailed": "Impossible de rejeter.",
+        "backlinkRejected": "Backlink rejeté.",
+        "candidatesFound": "{count, plural, one {# candidat trouvé.} other {# candidats trouvés.}}",
+        "candidatesSearchFailed": "Impossible de rechercher des candidats.",
+        "competitorAddFailed": "Impossible d’ajouter le concurrent.",
+        "competitorAdded": "Concurrent ajouté.",
+        "competitorRemoveFailed": "Impossible de supprimer le concurrent.",
+        "competitorRemoved": "Concurrent supprimé.",
+        "noCandidates": "Aucun candidat — aucune autre organisation ne correspond encore par le secteur et le consentement.",
+        "optInDisabled": "Consentement aux backlinks désactivé.",
+        "optInEnabled": "Consentement aux backlinks activé.",
+        "optInSaveFailed": "Impossible d’enregistrer le consentement.",
+        "pillarAddFailed": "Impossible d’ajouter le pilier.",
+        "pillarAdded": "Pilier ajouté.",
+        "pillarRemoveFailed": "Impossible de supprimer le pilier.",
+        "pillarRemoved": "Pilier supprimé.",
+        "pillarSaveFailed": "Impossible d’enregistrer le pilier.",
+        "pillarUpdated": "Pilier mis à jour."
+      }
+    },
+    "tenantSettings": {
+      "fields": {
+        "businessDescription": "Description du produit et de l’activité",
+        "businessDescriptionPlaceholder": "Ce que fait l’entreprise, les fonctionnalités du produit, le public visé, le secteur…",
+        "industry": "Secteur (industry_vertical)",
+        "industryPlaceholder": "ex. yachting, saas_crm, personal_brand",
+        "productName": "Nom du produit",
+        "productNamePlaceholder": "ex. CRMtree"
+      },
+      "gscProperty": {
+        "hint": "Propriété GSC réelle et validée à laquelle se connecter via « Connecter Search Console » — préfixe d’URL (ex. https://client.fr/) ou domaine (sc-domain:client.fr). Vide = déduite du site WordPress ou de la valeur indiquée ci-dessous.",
+        "placeholder": "https://crmtree.pl/ ou sc-domain:crmtree.pl",
+        "save": "Enregistrer la propriété GSC",
+        "title": "Propriété Search Console"
+      },
+      "hint": "Alimente la stratégie (piliers, mots-clés) et chaque article. SEObot montre dans le texte comment le problème se résout dans le produit et ne décrit que les fonctionnalités citées dans la description — plus vous les détaillez, plus les articles sont concrets.",
+      "save": "Enregistrer les paramètres",
+      "saving": "Enregistrement…",
+      "title": "Paramètres SEO de l’organisation",
+      "toasts": {
+        "gscPropertySaveFailed": "Impossible d’enregistrer la propriété GSC.",
+        "gscPropertySaved": "Propriété Search Console enregistrée.",
+        "modeSaveFailed": "Impossible d’enregistrer le mode.",
+        "saveFailed": "Impossible d’enregistrer les paramètres.",
+        "saved": "Paramètres enregistrés.",
+        "wordpressDraft": "WordPress : publication en brouillon.",
+        "wordpressLive": "WordPress : publication immédiate, live."
+      },
+      "wordpressMode": {
+        "draft": "Brouillon (sûr, nécessite une publication manuelle dans WP)",
+        "hint": "Décision prise après discussion avec le client — les articles doivent-ils partir immédiatement en live sur son WordPress, ou arriver en brouillon pour y être publiés manuellement.",
+        "publish": "Publier immédiatement (live, sans étape intermédiaire)",
+        "title": "Mode de publication WordPress"
+      }
     }
   },
   "sms": {

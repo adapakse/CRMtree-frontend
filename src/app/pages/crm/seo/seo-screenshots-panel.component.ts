@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideTrash2 } from '@lucide/angular';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SeoScreenshot } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -8,32 +9,32 @@ import { ToastService } from '../../../core/services/toast.service';
   selector: 'wt-seo-screenshots-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, LucideTrash2],
+  imports: [FormsModule, LucideTrash2, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+    <ng-container *transloco="let t; prefix: 'crm'">
     <p class="hint">
-      Zrzuty ekranu produktu, oznaczone funkcją (np. „Prospekty", „Analiza rozmów AI"). SEObot sam wstawia pasujący
-      screen do nowego artykułu, a jeśli żadnego nie ma, zostawia w tekście miejsce do uzupełnienia.
-      Nie wgrywaj ekranów z prawdziwymi danymi klientów.
+      {{ t('seo.screenshots.hint') }}
     </p>
     <div class="shot-grid">
       @for (s of screenshots(); track s.id) {
         <div class="shot-card">
           <img class="shot-img" [src]="seoService.screenshotSrc(s.id)" [alt]="s.caption" loading="lazy">
           @if (editingId() === s.id) {
-            <label class="field-label" [for]="'tag-' + s.id">Funkcja</label>
+            <label class="field-label" [for]="'tag-' + s.id">{{ t('seo.screenshots.fields.feature') }}</label>
             <input class="field-input" [id]="'tag-' + s.id" [(ngModel)]="editTag">
-            <label class="field-label" [for]="'caption-' + s.id">Podpis</label>
+            <label class="field-label" [for]="'caption-' + s.id">{{ t('seo.screenshots.fields.caption') }}</label>
             <input class="field-input" [id]="'caption-' + s.id" [(ngModel)]="editCaption">
             <div class="card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(s.id)" [disabled]="!editTag.trim() || !editCaption.trim()">Zapisz</button>
-              <button type="button" class="btn-ghost btn-sm" (click)="editingId.set(null)">Anuluj</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(s.id)" [disabled]="!editTag.trim() || !editCaption.trim()">{{ 'actions.save' | transloco }}</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="editingId.set(null)">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
             <span class="shot-tag">{{ s.feature_tag }}</span>
             <p class="shot-caption">{{ s.caption }}</p>
             <div class="card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(s)">Edytuj</button>
-              <button type="button" class="btn-delete" (click)="remove(s.id)" title="Usuń screen" aria-label="Usuń screen">
+              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(s)">{{ t('seo.screenshots.actions.edit') }}</button>
+              <button type="button" class="btn-delete" (click)="remove(s.id)" [title]="t('seo.screenshots.actions.delete')" [attr.aria-label]="t('seo.screenshots.actions.delete')">
                 <svg lucideTrash2 [size]="14"></svg>
               </button>
             </div>
@@ -41,17 +42,18 @@ import { ToastService } from '../../../core/services/toast.service';
         </div>
       }
       <div class="shot-card shot-card-new">
-        <label class="field-label" for="newShotFile">Plik (PNG, JPEG, WebP, max 8 MB)</label>
+        <label class="field-label" for="newShotFile">{{ t('seo.screenshots.fields.file') }}</label>
         <input #fileInput id="newShotFile" type="file" accept="image/png,image/jpeg,image/webp" (change)="onFileSelected(fileInput)">
-        <label class="field-label" for="newShotTag">Funkcja</label>
-        <input id="newShotTag" class="field-input" [(ngModel)]="newTag" placeholder="np. Prospekty">
-        <label class="field-label" for="newShotCaption">Podpis pod zdjęciem</label>
-        <input id="newShotCaption" class="field-input" [(ngModel)]="newCaption" placeholder="np. Lista prospektów posortowana po scoringu ICP">
+        <label class="field-label" for="newShotTag">{{ t('seo.screenshots.fields.feature') }}</label>
+        <input id="newShotTag" class="field-input" [(ngModel)]="newTag" [placeholder]="t('seo.screenshots.placeholders.feature')">
+        <label class="field-label" for="newShotCaption">{{ t('seo.screenshots.fields.captionUnderImage') }}</label>
+        <input id="newShotCaption" class="field-input" [(ngModel)]="newCaption" [placeholder]="t('seo.screenshots.placeholders.caption')">
         <button type="button" class="btn-ghost btn-sm" (click)="upload(fileInput)" [disabled]="!newFile || !newTag.trim() || !newCaption.trim() || uploading()">
-          @if (uploading()) { Wgrywam… } @else { + Dodaj screen }
+          @if (uploading()) { {{ t('seo.screenshots.actions.uploading') }} } @else { {{ t('seo.screenshots.actions.add') }} }
         </button>
       </div>
     </div>
+    </ng-container>
   `,
   styles: [`
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.75rem; }
@@ -80,6 +82,7 @@ import { ToastService } from '../../../core/services/toast.service';
 export class SeoScreenshotsPanelComponent implements OnInit {
   readonly seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   readonly screenshots = signal<SeoScreenshot[]>([]);
   readonly editingId = signal<number | null>(null);
@@ -108,7 +111,7 @@ export class SeoScreenshotsPanelComponent implements OnInit {
     this.uploading.set(true);
     this.seoService.uploadScreenshot(this.newFile, this.newTag.trim(), this.newCaption.trim()).subscribe({
       next: () => {
-        this.toast.success('Dodano screen.');
+        this.toast.success(this.transloco.translate('crm.seo.screenshots.toasts.added'));
         this.newFile = null;
         this.newTag = '';
         this.newCaption = '';
@@ -117,7 +120,7 @@ export class SeoScreenshotsPanelComponent implements OnInit {
         this.load();
       },
       error: (err) => {
-        this.toast.error(err?.error?.error ?? 'Nie udało się wgrać screena.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.screenshots.toasts.uploadFailed'));
         this.uploading.set(false);
       },
     });
@@ -131,16 +134,16 @@ export class SeoScreenshotsPanelComponent implements OnInit {
 
   saveEdit(id: number): void {
     this.seoService.updateScreenshot(id, { feature_tag: this.editTag.trim(), caption: this.editCaption.trim() }).subscribe({
-      next: () => { this.toast.success('Zapisano.'); this.editingId.set(null); this.load(); },
-      error: () => this.toast.error('Nie udało się zapisać.'),
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.screenshots.toasts.saved')); this.editingId.set(null); this.load(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.screenshots.toasts.saveFailed')),
     });
   }
 
   remove(id: number): void {
-    if (!confirm('Usunąć ten screen z biblioteki?')) return;
+    if (!confirm(this.transloco.translate('crm.seo.screenshots.deleteConfirm'))) return;
     this.seoService.deleteScreenshot(id).subscribe({
-      next: () => { this.toast.success('Usunięto screen.'); this.load(); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć screena.'),
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.screenshots.toasts.deleted')); this.load(); },
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.screenshots.toasts.deleteFailed')),
     });
   }
 }

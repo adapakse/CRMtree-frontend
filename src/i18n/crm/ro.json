@@ -120,6 +120,156 @@
       "week": "Săptămână"
     }
   },
+  "callAnalysis": {
+    "actions": {
+      "archive": "Arhivare",
+      "reanalyze": "Reanalizare"
+    },
+    "bulk": {
+      "deleteSelected": "Ștergere selecție",
+      "hold": "În așteptare",
+      "restore": "Restaurare",
+      "selected": "{count, plural, one {# selectată} few {# selectate} other {# de selectate}}"
+    },
+    "confirm": {
+      "deleteRow": "Ștergeți analiza pentru {name}?",
+      "deleteSelected": "{count, plural, one {Ștergeți # înregistrare?} few {Ștergeți # înregistrări?} other {Ștergeți # de înregistrări?}}"
+    },
+    "details": {
+      "callsLabel": "Apeluri:",
+      "importedLabel": "Import:",
+      "lastCallLabel": "Ultimul:",
+      "objections": "Obiecții",
+      "positiveSignals": "Semnale pozitive"
+    },
+    "empty": {
+      "hint": "Notițele vor apărea după importul CSV sau după încheierea apelurilor telefonice",
+      "noNotes": "Nicio notiță din apeluri",
+      "noResults": "Niciun rezultat pentru filtrele selectate"
+    },
+    "errors": {
+      "bulkFailed": "Eroare la operațiunea în masă",
+      "deleteFailed": "Eroare la ștergere",
+      "followUpUpdateFailed": "Eroare la actualizarea follow-up-ului",
+      "reanalyzeFailed": "Eroare la reanalizare",
+      "statusChangeFailed": "Eroare la schimbarea statusului"
+    },
+    "filters": {
+      "allFollowUps": "Toate follow-up-urile",
+      "allLinks": "Toate asocierile",
+      "allSalespeople": "Toți agenții de vânzări",
+      "allStatuses": "Toate statusurile",
+      "firstCall": "Primul apel:",
+      "followUpDate": "Dată follow-up:",
+      "followUpDone": "Follow-up efectuat",
+      "followUpRequired": "Follow-up necesar",
+      "lastCall": "Ultimul apel:",
+      "noLinks": "Fără asocieri",
+      "presets": {
+        "custom": "Personalizat…",
+        "nextTwoDays": "Următoarele 2 zile",
+        "thisWeek": "Săptămâna aceasta",
+        "today": "Azi",
+        "todayTomorrow": "Azi+Mâine"
+      },
+      "score": "Score:",
+      "scoreMax": "max",
+      "scoreMin": "min",
+      "searchPlaceholder": "Căutare companie sau cod fiscal...",
+      "statusAnalyzing": "În curs de analiză",
+      "total": "{count, plural, one {# companie} few {# companii} other {# de companii}}"
+    },
+    "followUp": {
+      "done": "Efectuat",
+      "label": "Follow-up",
+      "markDoneTitle": "Faceți clic pentru a marca follow-up-ul ca efectuat",
+      "notRequired": "Nu este necesar",
+      "required": "Necesar",
+      "undoTitle": "Follow-up efectuat. Faceți clic pentru a anula."
+    },
+    "header": {
+      "analyze": "Analizare ({count})",
+      "analyzing": "Se analizează...",
+      "importCsv": "Import CSV"
+    },
+    "import": {
+      "failed": "Eroare la import",
+      "resultCreated": "Importate: {created} noi, {appended} actualizate din {totalRows} rânduri (coloane de notițe: {note1} / {note2})",
+      "resultUpserted": "Importate: {upserted} companii din {totalRows} rânduri (coloane de notițe: {note1} / {note2})"
+    },
+    "inspect": {
+      "aiSummary": "Rezumat AI",
+      "analysisStatus": "Statusul analizei",
+      "basis": "Baza analizei — notițe ({chars, plural, one {# caracter} few {# caractere} other {# de caractere}} · {calls, plural, one {# apel} few {# apeluri} other {# de apeluri}})",
+      "noResults": "Nu există rezultate ale analizei AI pentru această companie.",
+      "noScore": "Fără evaluare",
+      "promptFailed": "Eroare la încărcarea promptului.",
+      "promptLoading": "Se încarcă promptul…",
+      "purchasePotential": "Potențial de cumpărare",
+      "tabAnalysis": "Analiză AI",
+      "tabPrompt": "Prompt DeepSeek",
+      "title": "Inspecția analizatorului"
+    },
+    "links": {
+      "goToLead": "Deschidere lead",
+      "goToPartner": "Deschidere partener",
+      "goToProspect": "Deschidere prospect",
+      "prospect": "Prospect"
+    },
+    "menu": {
+      "delete": "Ștergere",
+      "inspect": "Inspecție",
+      "putOnHold": "Punere în așteptare",
+      "restoreFromArchive": "Restaurare din arhivă",
+      "restoreFromHold": "Scoatere din așteptare"
+    },
+    "potentialHelp": {
+      "description": "Evaluarea înclinației companiei de a cumpăra servicii CRM.",
+      "footer": "Valoarea este calculată de modelul AI pe baza notițelor din apeluri.",
+      "title": "Potențial (0–100)"
+    },
+    "progress": {
+      "companies": "{done} / {total} companii",
+      "errors": "{count, plural, one {# eroare} few {# erori} other {# de erori}}",
+      "finished": "Finalizat",
+      "running": "Se analizează...",
+      "runningOtherUser": "Se analizează (alt utilizator)..."
+    },
+    "scoreLabels": {
+      "lowInterest": "Interes scăzut",
+      "moderateInterest": "Interes moderat",
+      "notInterested": "Fără interes",
+      "readyToBuy": "Gata de cumpărare",
+      "strongInterest": "Interes puternic"
+    },
+    "statuses": {
+      "analyzing": "Se analizează...",
+      "archived": "Arhivă",
+      "done": "Gata",
+      "error": "Eroare",
+      "hold": "În așteptare",
+      "pending": "În curs de procesare"
+    },
+    "subtitle": "Analiza notițelor din apelurile telefonice — înclinația de cumpărare (DeepSeek AI)",
+    "table": {
+      "actions": "Acțiuni",
+      "analyzedAt": "Analizat la",
+      "calls": "Apeluri",
+      "company": "Companie",
+      "firstCall": "Primul apel",
+      "lastCall": "Ultimul apel",
+      "links": "Asocieri",
+      "potential": "Potențial",
+      "salesperson": "Agent de vânzări",
+      "status": "Status",
+      "taxId": "Cod fiscal"
+    },
+    "title": "Analiza apelurilor",
+    "transcript": {
+      "callNumber": "Apelul {number}",
+      "title": "Transcrierea apelurilor ({count})"
+    }
+  },
   "callSimulator": {
     "activity": {
       "demoTranscript": "[00:00] Agent de vânzări: Bună ziua, sunt Ion Popescu de la CRMtree. Aș putea vorbi cu persoana responsabilă de călătoriile de afaceri?\n\n[00:08] Client: Da, vă ascult. Sunt Andrei Ionescu.\n\n[00:10] Agent de vânzări: Bună ziua, domnule Ionescu. Vă contactez în legătură cu optimizarea costurilor călătoriilor de afaceri din compania dumneavoastră. Aveți un moment?\n\n[00:18] Client: Da, vă rog. Ce anume propuneți?\n\n[00:22] Agent de vânzări: Oferim un sistem complet de gestionare a călătoriilor corporative — rezervări de zboruri, hoteluri și transport într-un singur loc. În medie, clienții noștri economisesc între 15 și 25% din costurile de călătorie.\n\n[00:35] Client: Sună interesant. Câte persoane trebuie să călătorească anual ca să merite?\n\n[00:40] Agent de vânzări: Platforma noastră devine rentabilă începând de la câteva zeci de călătorii pe an. Pot pregăti un calcul personalizat pentru compania dumneavoastră.\n\n[00:49] Client: Bine. Vă rog să trimiteți oferta pe e-mail. Echipa noastră o va analiza.\n\n[00:54] Agent de vânzări: Desigur, o trimit chiar astăzi. Putem stabili și o scurtă prezentare online, pentru a vă arăta sistemul în funcțiune?\n\n[01:02] Client: Da, putem. Voi propune o dată după ce analizăm oferta.\n\n[01:06] Agent de vânzări: Excelent. Vă mulțumesc pentru discuție, pe curând.\n\n[01:09] Client: La revedere.",
@@ -881,6 +1031,18 @@
       "timeline": "Cronologie"
     }
   },
+  "mailCallback": {
+    "closeHint": "Puteți închide această fereastră și reveni la lucrul în CRM.",
+    "closeWindow": "Închidere fereastră",
+    "connectedBody": "Contul dvs. {provider} a fost conectat cu succes la aplicație.",
+    "connectedTitle": "Conectare {provider} reușită!",
+    "errorBody": "Contul {provider} nu a putut fi conectat.",
+    "errorTitle": "Eroare de conectare",
+    "processing": "Se procesează…",
+    "reasons": {
+      "email_already_connected": "Acest cont Google este deja conectat la un alt utilizator CRM. Folosiți un alt cont Google sau contactați administratorul."
+    }
+  },
   "meetings": {
     "durationMin": "Durată (min)",
     "location": "Loc",
@@ -1325,6 +1487,21 @@
       "cards": "Carduri",
       "table": "Tabel"
     }
+  },
+  "pbx": {
+    "errors": {
+      "callRejected": "Apel respins ({code}). Verificați numărul.",
+      "micPermissionDenied": "Lipsește permisiunea pentru microfon. Permiteți accesul în setările browserului.",
+      "micUnavailable": "Microfon indisponibil: {reason}",
+      "noAudio": "Lipsă conexiune audio (ICE failed). Verificați rețeaua sau contactați administratorul.",
+      "numberBusy": "Număr ocupat — încercați din nou peste câteva momente.",
+      "registrationFailed": "Înregistrarea SIP nu a reușit. Verificați tokenul PBX.",
+      "registrationTimeout": "Timeout la înregistrarea SIP (12s). Verificați conexiunea și configurarea PBX.",
+      "sipConnectionFailed": "Eroare de conexiune SIP. Configurați tokenul PBX în Setările mele.",
+      "sipUnauthorized": "Eroare de autorizare SIP (401). Verificați tokenul PBX în Setările mele → Softphone."
+    },
+    "incomingTabTitle": "{name} sună...",
+    "unknownCaller": "necunoscut"
   },
   "periodFilter": {
     "groups": {
@@ -1778,6 +1955,466 @@
       "overdue": "termen depășit",
       "showAll": "Afișare toate sarcinile →",
       "title": "Sarcini pentru azi"
+    }
+  },
+  "seo": {
+    "authors": {
+      "actions": {
+        "activate": "Activare",
+        "add": "Adăugare autor",
+        "addNew": "+ Adăugare autor",
+        "adding": "Se adaugă…",
+        "deactivate": "Dezactivare",
+        "delete": "Ștergere autor",
+        "edit": "Editare",
+        "saving": "Se salvează…"
+      },
+      "empty": "Niciun autor — adăugați primul pentru a putea aproba articole (autorul este obligatoriu înainte de publicare).",
+      "fields": {
+        "bio": "Descrierea competențelor",
+        "fullName": "Nume și prenume",
+        "jobTitle": "Funcție",
+        "linkedinProfile": "Profil LinkedIn",
+        "photo": "Fotografie"
+      },
+      "inactiveBadge": "Inactiv",
+      "placeholders": {
+        "bio": "Scurtă descriere a experienței și expertizei",
+        "fullName": "de ex. Ioana Popescu",
+        "jobTitleEdit": "de ex. Head of Sales",
+        "jobTitleNew": "de ex. Șef departament vânzări"
+      },
+      "toasts": {
+        "addFailed": "Autorul nu a putut fi adăugat.",
+        "added": "Autor adăugat.",
+        "deleteFailed": "Autorul nu a putut fi șters.",
+        "deleted": "Autor șters.",
+        "photoUploadFailed": "Fotografia nu a putut fi încărcată.",
+        "photoUploaded": "Fotografie încărcată.",
+        "saveFailed": "Autorul nu a putut fi salvat.",
+        "statusChangeFailed": "Statusul nu a putut fi schimbat.",
+        "updated": "Autor actualizat."
+      }
+    },
+    "contentSlots": {
+      "actions": {
+        "fill": "Completare",
+        "insert": "Inserare în articol",
+        "remove": "Eliminare loc"
+      },
+      "fields": {
+        "caption": "Legendă sub imagine",
+        "comment": "Comentariu",
+        "fullName": "Nume și prenume",
+        "quote": "Citat",
+        "quoteAuthor": "Autor (persoană sau instituție)",
+        "role": "Rol",
+        "roleCompany": "Funcție / companie",
+        "sourceTitle": "Titlul sursei",
+        "sourceUrl": "Link către sursă (https://)"
+      },
+      "hint": "SEObot a marcat în text locurile în care articolul are nevoie de ceva ce AI nu poate inventa în mod onest. Completați-le pe toate sau eliminați-le — abia atunci articolul poate fi aprobat.",
+      "placeholders": {
+        "roleCompany": "de ex. Head of Sales, CRMtree"
+      },
+      "removeConfirm": "Eliminați acest loc din articol? Textul din jur rămâne neschimbat.",
+      "screenshots": {
+        "emptyLibrary": "Biblioteca de capturi de ecran este goală — adăugați o captură mai jos sau în panoul „Capturi de ecran”.",
+        "uploadNew": "Încărcare captură nouă",
+        "uploadToLibrary": "Încărcare în bibliotecă"
+      },
+      "statuses": {
+        "filled": "Completat",
+        "removed": "Eliminat"
+      },
+      "suggestion": {
+        "label": "Propunerea SEObot (verificată pe pagina sursei):",
+        "use": "Folosire citat"
+      },
+      "title": "De completat înainte de publicare",
+      "toasts": {
+        "checkField": "Verificați câmpul: {field}",
+        "chooseScreenshot": "Selectați o captură de ecran.",
+        "insertFailed": "Inserarea nu a reușit.",
+        "inserted": "Inserat în articol.",
+        "removeFailed": "Eliminarea nu a reușit.",
+        "screenshotUploadFailed": "Captura de ecran nu a putut fi încărcată.",
+        "screenshotUploaded": "Captură adăugată în bibliotecă și selectată.",
+        "textAndAuthorRequired": "Completați textul și autorul."
+      },
+      "types": {
+        "expert_comment": "Comentariu de expert",
+        "quote": "Citat cu sursă",
+        "screenshot": "Captură de ecran a produsului"
+      }
+    },
+    "main": {
+      "actions": {
+        "approveAndPublish": "Aprobare și publicare",
+        "approveAndSchedule": "Aprobare și programare",
+        "cancelSchedule": "Anulare programare",
+        "markForRefresh": "Marcare pentru actualizare",
+        "pendingSlotsHint": "Mai întâi completați sau eliminați locurile de completat",
+        "reject": "Respingere",
+        "saveChanges": "Salvare modificări",
+        "unpublish": "Retragere în ciornă"
+      },
+      "detail": {
+        "author": {
+          "choose": "— selectați autorul —",
+          "inactive": "inactiv",
+          "label": "Autor",
+          "required": "Obligatoriu înainte de aprobare"
+        },
+        "empty": "Selectați un articol din listă.",
+        "image": {
+          "reroll": "Altă imagine din Pexels",
+          "rerolling": "Se alege…",
+          "save": "Salvare imagine",
+          "urlPlaceholder": "URL-ul imaginii de antet"
+        },
+        "internalLinks": "Linkuri interne:",
+        "metaPlaceholder": "Meta description",
+        "metrics": {
+          "avgPosition": "poz. medie {position}",
+          "clicks": "{count, plural, one {# clic} few {# clicuri} other {# de clicuri}}",
+          "impressions": "{count, plural, one {# afișare} few {# afișări} other {# de afișări}}",
+          "note": "(ultimele 28 de zile, date Search Console)"
+        }
+      },
+      "errors": {
+        "unknown": "eroare necunoscută"
+      },
+      "filters": {
+        "all": "Toate",
+        "drafts": "Ciorne",
+        "refresh": "De actualizat"
+      },
+      "generate": {
+        "action": "Generare articol nou",
+        "inProgress": "Se generează… (poate dura câteva minute)"
+      },
+      "gsc": {
+        "connect": "Conectare Search Console",
+        "connected": "Search Console: conectat ({siteUrl})",
+        "disconnect": "Deconectare",
+        "syncNow": "Sincronizare acum",
+        "syncing": "Se sincronizează…"
+      },
+      "header": {
+        "authorsToggle": "Autori ({count})",
+        "screenshotsToggle": "Capturi de ecran",
+        "strategyToggle": "Strategie de conținut ({count, plural, one {# pilon} few {# piloni} other {# de piloni}})"
+      },
+      "list": {
+        "empty": "Niciun articol în această stare.",
+        "metrics": "{impressions} afiș. · {clicks, plural, one {# clic} few {# clicuri} other {# de clicuri}} (28 de zile)"
+      },
+      "refresh": {
+        "apply": "Aplicare pe site",
+        "applyConfirm": "Înlocuiți conținutul publicat cu noua versiune? Modificarea ajunge imediat pe site.",
+        "dismissDraft": "Respingere propunere",
+        "failed": "Propunerea nu a putut fi pregătită: {error}",
+        "generatedInfo": "Generat la {date} · cost aprox. ${cost} · surse citate: {facts}",
+        "generating": "Se pregătește propunerea (analiza interogărilor din GSC, date actuale, rescriere) — durează câteva minute, panoul se va actualiza singur.",
+        "newBody": "Conținut nou",
+        "newMeta": "Meta description nou",
+        "newTitle": "Titlu nou",
+        "noQueries": "Nu există date despre interogări din GSC pentru această pagină — propunerea se concentrează pe actualitate și structură.",
+        "notNeeded": "Nu necesită actualizare",
+        "prepare": "Pregătire propunere (AI)",
+        "publishedNote": "Articolul rămâne publicat în tot acest timp. Modificările ajung pe site abia după ce faceți clic pe „Aplicare pe site”.",
+        "queriesLabel": "Interogări din GSC luate în considerare:",
+        "queryStats": "({impressions} afiș., poz. {position})",
+        "reasonDetails": {
+          "age": "nicio actualizare de peste 90 de zile.",
+          "manual": "marcat pentru actualizare de către redactor.",
+          "positionDrop": "poziția a scăzut de la {before} la {now} (ultimele 14 zile față de cele 14 anterioare).",
+          "strikingDistance": "poz. medie {position} la {impressions} afișări în 28 de zile. Cea mai ieftină șansă de a intra în TOP 10."
+        },
+        "reasons": {
+          "age": "Neactualizat de 90+ zile",
+          "manual": "Marcat manual",
+          "position_drop": "Scădere a poziției",
+          "striking_distance": "Aproape de prima pagină Google"
+        },
+        "regenerate": "Generare din nou",
+        "title": "Actualizarea articolului",
+        "validationWarning": "Propunerea nu a trecut toate verificările automate:"
+      },
+      "schedule": {
+        "clear": "Ștergere dată",
+        "label": "Programare publicare pentru:",
+        "scheduledNote": "Publicare programată: {date}"
+      },
+      "sections": {
+        "authors": "Autori",
+        "calendar": "Calendar de publicare",
+        "channels": "Canale sociale",
+        "screenshots": "Capturi de ecran ale produsului",
+        "settings": "Setări",
+        "strategy": "Strategie de conținut"
+      },
+      "social": {
+        "copy": "Copiere",
+        "noChannels": "Niciun canal conectat — conectați-le în „Canale sociale”, în partea de sus.",
+        "publishOn": "Publicare pe {platform}",
+        "publishOrRetry": "Publicare / reîncercare",
+        "publishing": "Se publică…",
+        "statuses": {
+          "draft": "Ciornă",
+          "failed": "Eroare",
+          "published": "Publicată",
+          "queued": "Se publică…"
+        },
+        "title": "Publicare pe canale sociale",
+        "viewPost": "Vizualizare postare"
+      },
+      "socialConnect": {
+        "connected": "{platform}: conectare reușită.",
+        "errors": {
+          "access_denied": "Accesul nu a fost acordat.",
+          "callback_failed": "Conectarea nu a putut fi finalizată. Asigurați-vă că contul conectat este administrator al paginii companiei.",
+          "invalid_state": "Sesiunea de conectare a expirat — încercați din nou.",
+          "unauthorized_scope_error": "Aplicația LinkedIn nu are acces aprobat pentru publicarea pe pagina companiei (produsul Community Management API).",
+          "user_cancelled_authorize": "Acordarea accesului a fost anulată.",
+          "user_cancelled_login": "Conectarea a fost anulată."
+        },
+        "fallbackPlatform": "canal social",
+        "unknownFailure": "conectarea nu a reușit ({reason})."
+      },
+      "statuses": {
+        "approved": "Aprobat",
+        "archived": "Arhivat",
+        "draft": "Ciornă",
+        "in_review": "De aprobat",
+        "needs_update": "De corectat",
+        "published": "Publicat",
+        "queued": "În coadă (auto)",
+        "scheduled": "Programat"
+      },
+      "title": "SEObot — redacția de conținut",
+      "toasts": {
+        "approveFailed": "Articolul nu a putut fi aprobat.",
+        "authorSaveFailed": "Autorul nu a putut fi salvat.",
+        "authorSaved": "Autor salvat.",
+        "changesSaveFailed": "Modificările nu au putut fi salvate.",
+        "changesSaved": "Modificări salvate.",
+        "copied": "Copiat în clipboard.",
+        "copyFailed": "Copierea nu a reușit.",
+        "generationDone": "Noul articol a fost generat și așteaptă aprobarea.",
+        "generationFailed": "Articolul nu a putut fi generat: {error}",
+        "generationStartFailed": "Generarea nu a putut fi pornită.",
+        "generationStarted": "Articolul se generează în fundal — durează câteva minute. Puteți continua lucrul.",
+        "gscDisconnectFailed": "Search Console nu a putut fi deconectat.",
+        "gscDisconnected": "Search Console deconectat — îl puteți conecta din nou cu contul Google corect.",
+        "gscSyncFailed": "Metricile nu au putut fi sincronizate.",
+        "gscSynced": "Metricile Search Console au fost sincronizate.",
+        "imageRerollFailed": "Nu s-a putut alege o altă imagine.",
+        "imageRerolled": "A fost aleasă o imagine nouă.",
+        "imageSaveFailed": "Imaginea nu a putut fi salvată.",
+        "imageSaved": "Imagine salvată.",
+        "published": "Articol publicat.",
+        "refreshApplied": "Versiunea actualizată este deja pe site.",
+        "refreshApplyFailed": "Actualizarea nu a putut fi aplicată.",
+        "refreshDismissFailed": "Eliminarea din coadă nu a reușit.",
+        "refreshDismissed": "Eliminat din coada de actualizări.",
+        "refreshGenerating": "Se pregătește propunerea — durează câteva minute.",
+        "refreshMarkFailed": "Articolul nu a putut fi marcat.",
+        "refreshMarked": "Marcat pentru actualizare.",
+        "rejectFailed": "Articolul nu a putut fi respins.",
+        "rejected": "Articol respins, a revenit la ciorne.",
+        "scheduleSaveFailed": "Data nu a putut fi salvată.",
+        "scheduleSaved": "Data publicării a fost salvată.",
+        "scheduled": "Publicare programată.",
+        "socialPostSaveFailed": "Postarea nu a putut fi salvată.",
+        "socialPostSaved": "Postare salvată.",
+        "socialPublishFailed": "Publicarea nu a reușit.",
+        "socialPublishFailedCheck": "Publicarea nu a reușit — verificați eroarea.",
+        "socialPublished": "Publicat.",
+        "unpublishFailed": "Articolul nu a putut fi retras.",
+        "unpublished": "Articol retras la ciorne."
+      }
+    },
+    "publishingCalendar": {
+      "config": {
+        "autoMode": "Mod automat (fără review manual)",
+        "autoModeWarning": "În acest mod articolele se publică automat la data stabilită — fără aprobarea manuală a redactorului.",
+        "noEndDate": "Fără limită de timp (programul se prelungește la nesfârșit)",
+        "save": "Salvare program",
+        "saving": "Se salvează…",
+        "title": "Program automat"
+      },
+      "enableConfirm": "Modul automat publică articolele fără aprobarea manuală a redactorului — continuați?",
+      "toasts": {
+        "configSaveFailed": "Programul nu a putut fi salvat.",
+        "configSaved": "Program salvat.",
+        "disabled": "Mod automat dezactivat.",
+        "enabled": "Mod automat activat.",
+        "moveFailed": "Articolul nu a putut fi mutat.",
+        "movedTo": "Mutat pe {date}.",
+        "movedToUnassigned": "Readus în coada celor neatribuite.",
+        "saveFailed": "Salvarea nu a reușit."
+      },
+      "unassigned": {
+        "empty": "Niciun articol neatribuit.",
+        "title": "Neatribuite ({count})"
+      },
+      "weeks": {
+        "current": "Săptămâna aceasta (în curs, blocată)",
+        "next": "Săptămâna viitoare (editabilă)"
+      }
+    },
+    "screenshots": {
+      "actions": {
+        "add": "+ Adăugare captură",
+        "delete": "Ștergere captură",
+        "edit": "Editare",
+        "uploading": "Se încarcă…"
+      },
+      "deleteConfirm": "Ștergeți această captură de ecran din bibliotecă?",
+      "fields": {
+        "caption": "Legendă",
+        "captionUnderImage": "Legendă sub imagine",
+        "feature": "Funcționalitate",
+        "file": "Fișier (PNG, JPEG, WebP, max. 8 MB)"
+      },
+      "hint": "Capturi de ecran ale produsului, etichetate cu funcționalitatea (de ex. „Prospecți”, „Analiza apelurilor cu AI”). SEObot inserează singur captura potrivită în articolul nou, iar dacă nu există niciuna, lasă în text un loc de completat. Nu încărcați ecrane cu date reale ale clienților.",
+      "placeholders": {
+        "caption": "de ex. Lista de prospecți sortată după scorul ICP",
+        "feature": "de ex. Prospecți"
+      },
+      "toasts": {
+        "added": "Captură adăugată.",
+        "deleteFailed": "Captura de ecran nu a putut fi ștearsă.",
+        "deleted": "Captură ștearsă.",
+        "saveFailed": "Salvarea nu a reușit.",
+        "saved": "Salvat.",
+        "uploadFailed": "Captura de ecran nu a putut fi încărcată."
+      }
+    },
+    "socialChannels": {
+      "connect": "Conectare",
+      "connected": "Conectat",
+      "disconnect": "Deconectare",
+      "hint": "Aprobarea articolului îl publică simultan pe canalele conectate — cu un singur clic. Instagram se conectează automat împreună cu Facebook (același cont Meta).",
+      "instagramHint": "Se va conecta automat după conectarea Facebook, dacă pagina are asociat un cont Instagram Business.",
+      "toasts": {
+        "connectStartFailed": "Conectarea la {platform} nu a putut fi pornită.",
+        "disconnectFailed": "Deconectarea nu a reușit.",
+        "disconnected": "{platform}: deconectare reușită.",
+        "wordpressConnectFailed": "Conectarea la WordPress nu a reușit.",
+        "wordpressConnected": "WordPress conectat."
+      },
+      "wordpress": {
+        "appPassword": "Parola aplicației",
+        "appPasswordPlaceholder": "generată în WP: Utilizatori → Profil → Parole pentru aplicații",
+        "connect": "Conectare WordPress",
+        "connecting": "Se conectează…",
+        "siteUrl": "Adresa site-ului",
+        "siteUrlPlaceholder": "https://site-ul-dvs.ro",
+        "username": "Nume de utilizator",
+        "usernamePlaceholder": "de ex. admin"
+      },
+      "wordpressHint": "Publicarea integrală a articolului pe site-ul WordPress propriu al clientului (Application Password)."
+    },
+    "strategy": {
+      "backlinks": {
+        "accept": "Acceptare",
+        "empty": "Niciun backlink.",
+        "findCandidates": "Căutare candidați",
+        "hint": "Schimb de linkuri opt-in cu alte organizații din același domeniu (industry_vertical), exclusiv relevant tematic, fără reciprocitate forțată. Potrivirea funcționează abia când se înscrie și o altă organizație — astăzi sunteți singura.",
+        "optIn": "Acord pentru schimbul de backlinkuri cu alte organizații",
+        "reject": "Respingere",
+        "searching": "Se caută…",
+        "statuses": {
+          "accepted": "Acceptat",
+          "rejected": "Respins",
+          "suggested": "Sugerat"
+        },
+        "title": "Backlinkuri între organizații ({count})"
+      },
+      "competitors": {
+        "add": "Adăugare",
+        "empty": "Niciun concurent în listă.",
+        "hint": "Lista influențează generarea pilonilor tematici — cu cât este descrisă mai bine, cu atât strategia este mai precisă.",
+        "notesPlaceholder": "Notiță (opțional)",
+        "removeAria": "Ștergere",
+        "title": "Concurenți ({count})",
+        "urlPlaceholder": "https://concurent.ro"
+      },
+      "pillars": {
+        "add": "Adăugare pilon",
+        "addOwn": "+ Adăugare pilon propriu",
+        "adding": "Se adaugă…",
+        "articleCount": "{count} art.",
+        "description": "Descriere",
+        "descriptionPlaceholder": "Despre ce trebuie să fie articolele din acest pilon",
+        "edit": "Editare",
+        "keywordTheme": "Tema cuvintelor-cheie",
+        "keywordThemePlaceholder": "de ex. charter de iahturi, marină",
+        "name": "Denumire",
+        "namePlaceholder": "de ex. Gestionarea flotei de iahturi",
+        "removeAria": "Ștergere pilon",
+        "saving": "Se salvează…"
+      },
+      "toasts": {
+        "backlinkAcceptFailed": "Acceptarea nu a reușit.",
+        "backlinkAccepted": "Backlink acceptat.",
+        "backlinkRejectFailed": "Respingerea nu a reușit.",
+        "backlinkRejected": "Backlink respins.",
+        "candidatesFound": "{count, plural, one {A fost găsit # candidat.} few {Au fost găsiți # candidați.} other {Au fost găsiți # de candidați.}}",
+        "candidatesSearchFailed": "Căutarea candidaților nu a reușit.",
+        "competitorAddFailed": "Concurentul nu a putut fi adăugat.",
+        "competitorAdded": "Concurent adăugat.",
+        "competitorRemoveFailed": "Concurentul nu a putut fi șters.",
+        "competitorRemoved": "Concurent șters.",
+        "noCandidates": "Niciun candidat — nicio altă organizație nu se potrivește încă prin domeniu și acord.",
+        "optInDisabled": "Acord pentru backlinkuri dezactivat.",
+        "optInEnabled": "Acord pentru backlinkuri activat.",
+        "optInSaveFailed": "Acordul nu a putut fi salvat.",
+        "pillarAddFailed": "Pilonul nu a putut fi adăugat.",
+        "pillarAdded": "Pilon adăugat.",
+        "pillarRemoveFailed": "Pilonul nu a putut fi șters.",
+        "pillarRemoved": "Pilon șters.",
+        "pillarSaveFailed": "Pilonul nu a putut fi salvat.",
+        "pillarUpdated": "Pilon actualizat."
+      }
+    },
+    "tenantSettings": {
+      "fields": {
+        "businessDescription": "Descrierea produsului și a afacerii",
+        "businessDescriptionPlaceholder": "Cu ce se ocupă compania, ce funcționalități are produsul, cine sunt clienții, ce domeniu…",
+        "industry": "Domeniu (industry_vertical)",
+        "industryPlaceholder": "de ex. yachting, saas_crm, personal_brand",
+        "productName": "Numele produsului",
+        "productNamePlaceholder": "de ex. CRMtree"
+      },
+      "gscProperty": {
+        "hint": "Proprietatea GSC reală, verificată, la care se face conectarea prin „Conectare Search Console” — cu prefix URL (de ex. https://client.ro/) sau de tip domeniu (sc-domain:client.ro). Gol = se deduce din WordPress sau din valoarea indicată mai jos.",
+        "placeholder": "https://crmtree.pl/ sau sc-domain:crmtree.pl",
+        "save": "Salvare proprietate GSC",
+        "title": "Proprietate Search Console"
+      },
+      "hint": "Alimentează strategia (piloni, cuvinte-cheie) și fiecare articol. SEObot arată în text cum se rezolvă problema în produs și descrie doar funcționalitățile menționate în descriere — cu cât le enumerați mai exact, cu atât articolele sunt mai concrete.",
+      "save": "Salvare setări",
+      "saving": "Se salvează…",
+      "title": "Setări SEO ale organizației",
+      "toasts": {
+        "gscPropertySaveFailed": "Proprietatea GSC nu a putut fi salvată.",
+        "gscPropertySaved": "Proprietatea Search Console a fost salvată.",
+        "modeSaveFailed": "Modul nu a putut fi salvat.",
+        "saveFailed": "Setările nu au putut fi salvate.",
+        "saved": "Setări salvate.",
+        "wordpressDraft": "WordPress: publicare ca ciornă.",
+        "wordpressLive": "WordPress: publicare direct live."
+      },
+      "wordpressMode": {
+        "draft": "Ciornă (sigur, necesită publicare manuală în WP)",
+        "hint": "Decizie luată după discuția cu clientul — dacă articolele trebuie să ajungă direct live pe WordPress-ul său sau să fie salvate ca ciornă pentru publicare manuală acolo.",
+        "publish": "Publicare imediată (live, fără oprire)",
+        "title": "Mod de publicare WordPress"
+      }
     }
   },
   "sms": {

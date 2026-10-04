@@ -21,6 +21,9 @@
   "states": {
     "loading": "Loading…"
   },
+  "testEnvironmentBanner": {
+    "title": "Test version — this is not the production environment"
+  },
   "typeahead": {
     "minChars": "Type at least {count} characters…",
     "noResults": "No results.",

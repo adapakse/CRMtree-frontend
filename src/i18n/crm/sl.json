@@ -120,6 +120,156 @@
       "week": "Teden"
     }
   },
+  "callAnalysis": {
+    "actions": {
+      "archive": "Arhiviraj",
+      "reanalyze": "Znova analiziraj"
+    },
+    "bulk": {
+      "deleteSelected": "Izbriši izbrane",
+      "hold": "Zadrži",
+      "restore": "Obnovi",
+      "selected": "{count, plural, one {# izbran} two {# izbrana} few {# izbrani} other {# izbranih}}"
+    },
+    "confirm": {
+      "deleteRow": "Želite izbrisati analizo za {name}?",
+      "deleteSelected": "{count, plural, one {Želite izbrisati # zapis?} two {Želite izbrisati # zapisa?} few {Želite izbrisati # zapise?} other {Želite izbrisati # zapisov?}}"
+    },
+    "details": {
+      "callsLabel": "Klicev:",
+      "importedLabel": "Uvoz:",
+      "lastCallLabel": "Zadnji:",
+      "objections": "Ugovori",
+      "positiveSignals": "Pozitivni signali"
+    },
+    "empty": {
+      "hint": "Zapiski se bodo prikazali po uvozu CSV ali po končanih telefonskih klicih",
+      "noNotes": "Ni zapiskov s klicev",
+      "noResults": "Ni rezultatov za izbrane filtre"
+    },
+    "errors": {
+      "bulkFailed": "Napaka pri množični operaciji",
+      "deleteFailed": "Napaka pri brisanju",
+      "followUpUpdateFailed": "Napaka pri posodabljanju follow-upa",
+      "reanalyzeFailed": "Napaka pri ponovni analizi",
+      "statusChangeFailed": "Napaka pri spremembi statusa"
+    },
+    "filters": {
+      "allFollowUps": "Vsi follow-upi",
+      "allLinks": "Vse povezave",
+      "allSalespeople": "Vsi prodajalci",
+      "allStatuses": "Vsi statusi",
+      "firstCall": "Prvi klic:",
+      "followUpDate": "Datum follow-upa:",
+      "followUpDone": "Follow-up opravljen",
+      "followUpRequired": "Follow-up potreben",
+      "lastCall": "Zadnji klic:",
+      "noLinks": "Brez povezav",
+      "presets": {
+        "custom": "Po meri…",
+        "nextTwoDays": "Naslednja 2 dneva",
+        "thisWeek": "Ta teden",
+        "today": "Danes",
+        "todayTomorrow": "Danes+Jutri"
+      },
+      "score": "Score:",
+      "scoreMax": "maks",
+      "scoreMin": "min",
+      "searchPlaceholder": "Iščite podjetje ali davčno št....",
+      "statusAnalyzing": "Analiziranje",
+      "total": "{count, plural, one {# podjetje} two {# podjetji} few {# podjetja} other {# podjetij}}"
+    },
+    "followUp": {
+      "done": "Opravljen",
+      "label": "Follow-up",
+      "markDoneTitle": "Kliknite, da follow-up označite kot opravljen",
+      "notRequired": "Ni potreben",
+      "required": "Potreben",
+      "undoTitle": "Follow-up opravljen. Kliknite za razveljavitev."
+    },
+    "header": {
+      "analyze": "Analiziraj ({count})",
+      "analyzing": "Analiziranje...",
+      "importCsv": "Uvoz CSV"
+    },
+    "import": {
+      "failed": "Napaka pri uvozu",
+      "resultCreated": "Uvoženo: {created} novih, {appended} posodobljenih iz {totalRows} vrstic (stolpca zapiskov: {note1} / {note2})",
+      "resultUpserted": "Uvoženo: {upserted} podjetij iz {totalRows} vrstic (stolpca zapiskov: {note1} / {note2})"
+    },
+    "inspect": {
+      "aiSummary": "Povzetek AI",
+      "analysisStatus": "Status analize",
+      "basis": "Podlaga analize — zapiski ({chars, plural, one {# znak} two {# znaka} few {# znaki} other {# znakov}} · {calls, plural, one {# klic} two {# klica} few {# klici} other {# klicev}})",
+      "noResults": "Za to podjetje ni rezultatov analize AI.",
+      "noScore": "Brez ocene",
+      "promptFailed": "Napaka pri nalaganju prompta.",
+      "promptLoading": "Nalaganje prompta…",
+      "purchasePotential": "Nakupni potencial",
+      "tabAnalysis": "Analiza AI",
+      "tabPrompt": "Prompt DeepSeek",
+      "title": "Pregled analizatorja"
+    },
+    "links": {
+      "goToLead": "Pojdi na lead",
+      "goToPartner": "Pojdi na partnerja",
+      "goToProspect": "Pojdi na potencialno stranko",
+      "prospect": "Potencialna stranka"
+    },
+    "menu": {
+      "delete": "Izbriši",
+      "inspect": "Pregled",
+      "putOnHold": "Zadrži (Hold)",
+      "restoreFromArchive": "Obnovi iz arhiva",
+      "restoreFromHold": "Obnovi iz zadržanja"
+    },
+    "potentialHelp": {
+      "description": "Ocena nagnjenosti podjetja k nakupu storitev CRM.",
+      "footer": "Vrednost izračuna model AI na podlagi zapiskov s klicev.",
+      "title": "Potencial (0–100)"
+    },
+    "progress": {
+      "companies": "{done} / {total} podjetij",
+      "errors": "{count, plural, one {# napaka} two {# napaki} few {# napake} other {# napak}}",
+      "finished": "Končano",
+      "running": "Analiziranje...",
+      "runningOtherUser": "Analiziranje (drug uporabnik)..."
+    },
+    "scoreLabels": {
+      "lowInterest": "Nizko zanimanje",
+      "moderateInterest": "Zmerno zanimanje",
+      "notInterested": "Brez zanimanja",
+      "readyToBuy": "Pripravljeno na nakup",
+      "strongInterest": "Močno zanimanje"
+    },
+    "statuses": {
+      "analyzing": "Analiziranje...",
+      "archived": "Arhiv",
+      "done": "Končano",
+      "error": "Napaka",
+      "hold": "Zadržano",
+      "pending": "Čaka"
+    },
+    "subtitle": "Analiza zapiskov s telefonskih klicev — nagnjenost k nakupu (DeepSeek AI)",
+    "table": {
+      "actions": "Dejanja",
+      "analyzedAt": "Analizirano",
+      "calls": "Klici",
+      "company": "Podjetje",
+      "firstCall": "Prvi klic",
+      "lastCall": "Zadnji klic",
+      "links": "Povezave",
+      "potential": "Potencial",
+      "salesperson": "Prodajalec",
+      "status": "Status",
+      "taxId": "Davčna številka"
+    },
+    "title": "Analiza klicev",
+    "transcript": {
+      "callNumber": "Klic {number}",
+      "title": "Prepis klicev ({count})"
+    }
+  },
   "callSimulator": {
     "activity": {
       "demoTranscript": "[00:00] Prodajalec: Dober dan, tukaj Janez Novak iz CRMtree. Ali lahko govorim z osebo, ki je odgovorna za službena potovanja?\n\n[00:08] Stranka: Da, poslušam. Pri telefonu Marko Kovač.\n\n[00:10] Prodajalec: Dober dan, gospod Kovač. Kličem glede optimizacije stroškov službenih potovanj v vašem podjetju. Imate trenutek časa?\n\n[00:18] Stranka: Da, kar povejte. Kaj konkretno predlagate?\n\n[00:22] Prodajalec: Ponujamo celovit sistem za upravljanje poslovnih potovanj — rezervacije letov, hotelov in prevozov na enem mestu. Naše stranke v povprečju prihranijo od 15 do 25 % stroškov potovanj.\n\n[00:35] Stranka: Sliši se zanimivo. Koliko ljudi mora potovati na leto, da se to izplača?\n\n[00:40] Prodajalec: Naša platforma se izplača že pri nekaj deset potovanjih na leto. Za vaše podjetje lahko pripravim individualni izračun.\n\n[00:49] Stranka: Dobro. Prosim, pošljite ponudbo po e-pošti. Naša ekipa jo bo pregledala.\n\n[00:54] Prodajalec: Seveda, poslal jo bom še danes. Se lahko dogovoriva tudi za kratko spletno predstavitev, da vam pokažem sistem v praksi?\n\n[01:02] Stranka: Da, lahko. Termin bom predlagal, ko pregledamo ponudbo.\n\n[01:06] Prodajalec: Odlično. Hvala za pogovor, slišiva se.\n\n[01:09] Stranka: Na svidenje.",
@@ -881,6 +1031,18 @@
       "timeline": "Časovnica"
     }
   },
+  "mailCallback": {
+    "closeHint": "To okno lahko zaprete in se vrnete k delu v CRM.",
+    "closeWindow": "Zapri okno",
+    "connectedBody": "Vaš račun {provider} je bil uspešno povezan z aplikacijo.",
+    "connectedTitle": "Račun {provider} je povezan!",
+    "errorBody": "Računa {provider} ni bilo mogoče povezati.",
+    "errorTitle": "Napaka pri povezovanju",
+    "processing": "Obdelava…",
+    "reasons": {
+      "email_already_connected": "Ta račun Google je že povezan z drugim uporabnikom CRM. Uporabite drug račun Google ali se obrnite na skrbnika."
+    }
+  },
   "meetings": {
     "durationMin": "Trajanje (min)",
     "location": "Kraj",
@@ -1325,6 +1487,21 @@
       "cards": "Kartice",
       "table": "Tabela"
     }
+  },
+  "pbx": {
+    "errors": {
+      "callRejected": "Klic zavrnjen ({code}). Preverite številko.",
+      "micPermissionDenied": "Ni dovoljenja za mikrofon. Dovolite dostop v nastavitvah brskalnika.",
+      "micUnavailable": "Mikrofon ni na voljo: {reason}",
+      "noAudio": "Ni zvočne povezave (ICE failed). Preverite omrežje ali se obrnite na skrbnika.",
+      "numberBusy": "Številka je zasedena — poskusite znova čez trenutek.",
+      "registrationFailed": "Registracija SIP ni uspela. Preverite žeton PBX.",
+      "registrationTimeout": "Časovna omejitev registracije SIP (12s). Preverite povezavo in nastavitve PBX.",
+      "sipConnectionFailed": "Napaka povezave SIP. Nastavite žeton PBX v razdelku Moje nastavitve.",
+      "sipUnauthorized": "Napaka avtorizacije SIP (401). Preverite svoj žeton PBX v razdelku Moje nastavitve → Softphone."
+    },
+    "incomingTabTitle": "{name} kliče...",
+    "unknownCaller": "neznani klicatelj"
   },
   "periodFilter": {
     "groups": {
@@ -1778,6 +1955,466 @@
       "overdue": "zapadlo",
       "showAll": "Prikaži vse naloge →",
       "title": "Naloge za danes"
+    }
+  },
+  "seo": {
+    "authors": {
+      "actions": {
+        "activate": "Aktiviraj",
+        "add": "Dodaj avtorja",
+        "addNew": "+ Dodaj avtorja",
+        "adding": "Dodajanje…",
+        "deactivate": "Deaktiviraj",
+        "delete": "Izbriši avtorja",
+        "edit": "Uredi",
+        "saving": "Shranjevanje…"
+      },
+      "empty": "Ni avtorjev — dodajte prvega, da boste lahko odobrili članke (avtor je obvezen pred objavo).",
+      "fields": {
+        "bio": "Opis kompetenc",
+        "fullName": "Ime in priimek",
+        "jobTitle": "Delovno mesto",
+        "linkedinProfile": "Profil LinkedIn",
+        "photo": "Fotografija"
+      },
+      "inactiveBadge": "Neaktiven",
+      "placeholders": {
+        "bio": "Kratek opis izkušenj in strokovnega znanja",
+        "fullName": "npr. Ana Novak",
+        "jobTitleEdit": "npr. Head of Sales",
+        "jobTitleNew": "npr. Vodja prodajnega oddelka"
+      },
+      "toasts": {
+        "addFailed": "Avtorja ni bilo mogoče dodati.",
+        "added": "Avtor dodan.",
+        "deleteFailed": "Avtorja ni bilo mogoče izbrisati.",
+        "deleted": "Avtor izbrisan.",
+        "photoUploadFailed": "Fotografije ni bilo mogoče naložiti.",
+        "photoUploaded": "Fotografija naložena.",
+        "saveFailed": "Avtorja ni bilo mogoče shraniti.",
+        "statusChangeFailed": "Statusa ni bilo mogoče spremeniti.",
+        "updated": "Avtor posodobljen."
+      }
+    },
+    "contentSlots": {
+      "actions": {
+        "fill": "Dopolni",
+        "insert": "Vstavi v članek",
+        "remove": "Odstrani to mesto"
+      },
+      "fields": {
+        "caption": "Podpis pod sliko",
+        "comment": "Komentar",
+        "fullName": "Ime in priimek",
+        "quote": "Citat",
+        "quoteAuthor": "Avtor (oseba ali ustanova)",
+        "role": "Vloga",
+        "roleCompany": "Delovno mesto / podjetje",
+        "sourceTitle": "Naslov vira",
+        "sourceUrl": "Povezava do vira (https://)"
+      },
+      "hint": "SEObot je v besedilu označil mesta, kjer članek potrebuje nekaj, česar si AI ne more pošteno izmisliti. Vsako dopolnite ali odstranite — šele nato bo objavo mogoče odobriti.",
+      "placeholders": {
+        "roleCompany": "npr. Head of Sales, CRMtree"
+      },
+      "removeConfirm": "Želite to mesto odstraniti iz članka? Besedilo okoli njega bo ostalo nespremenjeno.",
+      "screenshots": {
+        "emptyLibrary": "Knjižnica posnetkov zaslona je prazna — dodajte posnetek spodaj ali v plošči „Posnetki zaslona“.",
+        "uploadNew": "Naloži nov posnetek zaslona",
+        "uploadToLibrary": "Naloži v knjižnico"
+      },
+      "statuses": {
+        "filled": "Dopolnjeno",
+        "removed": "Odstranjeno"
+      },
+      "suggestion": {
+        "label": "Predlog SEObota (preverjen na strani vira):",
+        "use": "Uporabi ta citat"
+      },
+      "title": "Dopolniti pred objavo",
+      "toasts": {
+        "checkField": "Preverite polje: {field}",
+        "chooseScreenshot": "Izberite posnetek zaslona.",
+        "insertFailed": "Vstavljanje ni uspelo.",
+        "inserted": "Vstavljeno v članek.",
+        "removeFailed": "Odstranjevanje ni uspelo.",
+        "screenshotUploadFailed": "Posnetka zaslona ni bilo mogoče naložiti.",
+        "screenshotUploaded": "Posnetek zaslona je dodan v knjižnico in izbran.",
+        "textAndAuthorRequired": "Dopolnite besedilo in avtorja."
+      },
+      "types": {
+        "expert_comment": "Komentar strokovnjaka",
+        "quote": "Citat z virom",
+        "screenshot": "Posnetek zaslona izdelka"
+      }
+    },
+    "main": {
+      "actions": {
+        "approveAndPublish": "Odobri in objavi",
+        "approveAndSchedule": "Odobri in načrtuj",
+        "cancelSchedule": "Prekliči urnik",
+        "markForRefresh": "Označi za osvežitev",
+        "pendingSlotsHint": "Najprej dopolnite ali odstranite mesta za dopolnitev",
+        "reject": "Zavrni",
+        "saveChanges": "Shrani spremembe",
+        "unpublish": "Vrni v osnutek"
+      },
+      "detail": {
+        "author": {
+          "choose": "— izberite avtorja —",
+          "inactive": "neaktiven",
+          "label": "Avtor",
+          "required": "Obvezen pred odobritvijo"
+        },
+        "empty": "Izberite objavo s seznama.",
+        "image": {
+          "reroll": "Izžrebaj drugo iz Pexels",
+          "rerolling": "Žrebanje…",
+          "save": "Shrani sliko",
+          "urlPlaceholder": "URL naslovne slike"
+        },
+        "internalLinks": "Notranje povezave:",
+        "metaPlaceholder": "Meta description",
+        "metrics": {
+          "avgPosition": "povpr. položaj {position}",
+          "clicks": "{count, plural, one {# klik} two {# klika} few {# kliki} other {# klikov}}",
+          "impressions": "{count, plural, one {# prikaz} two {# prikaza} few {# prikazi} other {# prikazov}}",
+          "note": "(zadnjih 28 dni, podatki Search Console)"
+        }
+      },
+      "errors": {
+        "unknown": "neznana napaka"
+      },
+      "filters": {
+        "all": "Vse",
+        "drafts": "Osnutki",
+        "refresh": "Za osvežitev"
+      },
+      "generate": {
+        "action": "Ustvari nov članek",
+        "inProgress": "Ustvarjanje… (lahko traja nekaj minut)"
+      },
+      "gsc": {
+        "connect": "Poveži Search Console",
+        "connected": "Search Console: povezano ({siteUrl})",
+        "disconnect": "Prekini povezavo",
+        "syncNow": "Sinhroniziraj zdaj",
+        "syncing": "Sinhroniziranje…"
+      },
+      "header": {
+        "authorsToggle": "Avtorji ({count})",
+        "screenshotsToggle": "Posnetki zaslona",
+        "strategyToggle": "Vsebinska strategija ({count, plural, one {# steber} two {# stebra} few {# stebri} other {# stebrov}})"
+      },
+      "list": {
+        "empty": "V tem stanju ni objav.",
+        "metrics": "{impressions} prik. · {clicks, plural, one {# klik} two {# klika} few {# kliki} other {# klikov}} (28 dni)"
+      },
+      "refresh": {
+        "apply": "Uporabi na strani",
+        "applyConfirm": "Želite objavljeno vsebino zamenjati z novo različico? Sprememba bo takoj vidna na strani.",
+        "dismissDraft": "Zavrni predlog",
+        "failed": "Predloga ni bilo mogoče pripraviti: {error}",
+        "generatedInfo": "Ustvarjeno {date} · strošek pribl. ${cost} · citiranih virov: {facts}",
+        "generating": "Pripravljam predlog (analiza poizvedb iz GSC, aktualni podatki, prepis) — traja nekaj minut, plošča se bo osvežila sama.",
+        "newBody": "Nova vsebina",
+        "newMeta": "Nov meta description",
+        "newTitle": "Nov naslov",
+        "noQueries": "Za to stran ni podatkov o poizvedbah iz GSC — predlog se osredotoča na aktualnost in strukturo.",
+        "notNeeded": "Osvežitev ni potrebna",
+        "prepare": "Pripravi predlog (AI)",
+        "publishedNote": "Članek je ves čas objavljen. Spremembe bodo na strani vidne šele po kliku na „Uporabi na strani“.",
+        "queriesLabel": "Upoštevane poizvedbe iz GSC:",
+        "queryStats": "({impressions} prik., pol. {position})",
+        "reasonDetails": {
+          "age": "brez posodobitve že več kot 90 dni.",
+          "manual": "urednik ga je označil za osvežitev.",
+          "positionDrop": "položaj je padel: {before} → {now} (zadnjih 14 dni v primerjavi s prejšnjimi 14).",
+          "strikingDistance": "povpr. položaj {position} pri številu prikazov {impressions} v 28 dneh. Najcenejša priložnost za uvrstitev med TOP 10."
+        },
+        "reasons": {
+          "age": "Neposodobljen 90+ dni",
+          "manual": "Označen ročno",
+          "position_drop": "Padec položaja",
+          "striking_distance": "Blizu 1. strani Googla"
+        },
+        "regenerate": "Ustvari znova",
+        "title": "Osvežitev članka",
+        "validationWarning": "Predlog ni prestal vseh samodejnih preverjanj:"
+      },
+      "schedule": {
+        "clear": "Odstrani termin",
+        "label": "Načrtuj objavo za:",
+        "scheduledNote": "Objava je načrtovana: {date}"
+      },
+      "sections": {
+        "authors": "Avtorji",
+        "calendar": "Koledar objav",
+        "channels": "Družbeni kanali",
+        "screenshots": "Posnetki zaslona izdelka",
+        "settings": "Nastavitve",
+        "strategy": "Vsebinska strategija"
+      },
+      "social": {
+        "copy": "Kopiraj",
+        "noChannels": "Ni povezanih kanalov — povežite jih v razdelku „Družbeni kanali“ zgoraj.",
+        "publishOn": "Objavi na {platform}",
+        "publishOrRetry": "Objavi / poskusi znova",
+        "publishing": "Objavljanje…",
+        "statuses": {
+          "draft": "Osnutek",
+          "failed": "Napaka",
+          "published": "Objavljeno",
+          "queued": "Objavljanje…"
+        },
+        "title": "Objava na družbenih omrežjih",
+        "viewPost": "Ogled objave"
+      },
+      "socialConnect": {
+        "connected": "{platform}: povezava vzpostavljena.",
+        "errors": {
+          "access_denied": "Dostop ni bil odobren.",
+          "callback_failed": "Povezovanja ni bilo mogoče dokončati. Prepričajte se, da je račun, ki ga povezujete, skrbnik strani podjetja.",
+          "invalid_state": "Seja povezovanja je potekla — poskusite znova.",
+          "unauthorized_scope_error": "Aplikacija LinkedIn nima odobrenega dostopa za objavljanje na strani podjetja (izdelek Community Management API).",
+          "user_cancelled_authorize": "Odobritev dostopa je bila preklicana.",
+          "user_cancelled_login": "Prijava je bila preklicana."
+        },
+        "fallbackPlatform": "družbeni kanal",
+        "unknownFailure": "povezava ni uspela ({reason})."
+      },
+      "statuses": {
+        "approved": "Odobreno",
+        "archived": "Arhivirano",
+        "draft": "Osnutek",
+        "in_review": "Čaka na odobritev",
+        "needs_update": "Za popravek",
+        "published": "Objavljeno",
+        "queued": "V vrsti (samodejno)",
+        "scheduled": "Načrtovano"
+      },
+      "title": "SEObot — uredništvo vsebin",
+      "toasts": {
+        "approveFailed": "Objave ni bilo mogoče odobriti.",
+        "authorSaveFailed": "Avtorja ni bilo mogoče shraniti.",
+        "authorSaved": "Avtor shranjen.",
+        "changesSaveFailed": "Sprememb ni bilo mogoče shraniti.",
+        "changesSaved": "Spremembe shranjene.",
+        "copied": "Kopirano v odložišče.",
+        "copyFailed": "Kopiranje ni uspelo.",
+        "generationDone": "Nov članek je ustvarjen in čaka na odobritev.",
+        "generationFailed": "Članka ni bilo mogoče ustvariti: {error}",
+        "generationStartFailed": "Ustvarjanja ni bilo mogoče začeti.",
+        "generationStarted": "Članek se ustvarja v ozadju — trajalo bo nekaj minut. Lahko delate naprej.",
+        "gscDisconnectFailed": "Povezave s Search Console ni bilo mogoče prekiniti.",
+        "gscDisconnected": "Povezava s Search Console je prekinjena — znova jo lahko vzpostavite s pravim računom Google.",
+        "gscSyncFailed": "Metrik ni bilo mogoče sinhronizirati.",
+        "gscSynced": "Metrike Search Console so sinhronizirane.",
+        "imageRerollFailed": "Slike ni bilo mogoče izžrebati.",
+        "imageRerolled": "Izžrebana je nova slika.",
+        "imageSaveFailed": "Slike ni bilo mogoče shraniti.",
+        "imageSaved": "Slika shranjena.",
+        "published": "Objava je objavljena.",
+        "refreshApplied": "Osvežena različica je že na strani.",
+        "refreshApplyFailed": "Osvežitve ni bilo mogoče uporabiti.",
+        "refreshDismissFailed": "Odstranitev iz vrste ni uspela.",
+        "refreshDismissed": "Odstranjeno iz vrste osvežitev.",
+        "refreshGenerating": "Pripravljam predlog — trajalo bo nekaj minut.",
+        "refreshMarkFailed": "Objave ni bilo mogoče označiti.",
+        "refreshMarked": "Označeno za osvežitev.",
+        "rejectFailed": "Objave ni bilo mogoče zavrniti.",
+        "rejected": "Objava je zavrnjena in vrnjena med osnutke.",
+        "scheduleSaveFailed": "Termina ni bilo mogoče shraniti.",
+        "scheduleSaved": "Termin objave shranjen.",
+        "scheduled": "Objava je načrtovana.",
+        "socialPostSaveFailed": "Objave ni bilo mogoče shraniti.",
+        "socialPostSaved": "Objava shranjena.",
+        "socialPublishFailed": "Objavljanje ni uspelo.",
+        "socialPublishFailedCheck": "Objavljanje ni uspelo — preverite napako.",
+        "socialPublished": "Objavljeno.",
+        "unpublishFailed": "Objave ni bilo mogoče umakniti.",
+        "unpublished": "Objava je vrnjena med osnutke."
+      }
+    },
+    "publishingCalendar": {
+      "config": {
+        "autoMode": "Samodejni način (brez ročnega pregleda)",
+        "autoModeWarning": "Članki se v tem načinu objavijo samodejno na določeni datum — brez ročne odobritve urednika.",
+        "noEndDate": "Brez časovne omejitve (urnik se podaljšuje v nedogled)",
+        "save": "Shrani urnik",
+        "saving": "Shranjevanje…",
+        "title": "Samodejni urnik"
+      },
+      "enableConfirm": "Samodejni način objavlja članke brez ročne odobritve urednika — želite nadaljevati?",
+      "toasts": {
+        "configSaveFailed": "Urnika ni bilo mogoče shraniti.",
+        "configSaved": "Urnik shranjen.",
+        "disabled": "Samodejni način izklopljen.",
+        "enabled": "Samodejni način vklopljen.",
+        "moveFailed": "Članka ni bilo mogoče premakniti.",
+        "movedTo": "Premaknjeno na {date}.",
+        "movedToUnassigned": "Vrnjeno v vrsto nedodeljenih.",
+        "saveFailed": "Shranjevanje ni uspelo."
+      },
+      "unassigned": {
+        "empty": "Ni nedodeljenih člankov.",
+        "title": "Nedodeljeni ({count})"
+      },
+      "weeks": {
+        "current": "Ta teden (v teku, zaklenjen)",
+        "next": "Naslednji teden (možno urejanje)"
+      }
+    },
+    "screenshots": {
+      "actions": {
+        "add": "+ Dodaj posnetek zaslona",
+        "delete": "Izbriši posnetek zaslona",
+        "edit": "Uredi",
+        "uploading": "Nalaganje…"
+      },
+      "deleteConfirm": "Želite ta posnetek zaslona izbrisati iz knjižnice?",
+      "fields": {
+        "caption": "Podpis",
+        "captionUnderImage": "Podpis pod sliko",
+        "feature": "Funkcija",
+        "file": "Datoteka (PNG, JPEG, WebP, največ 8 MB)"
+      },
+      "hint": "Posnetki zaslona izdelka, označeni s funkcijo (npr. „Potencialne stranke“, „Analiza klicev AI“). SEObot sam vstavi ustrezen posnetek v nov članek, če pa nobenega ni, v besedilu pusti mesto za dopolnitev. Ne nalagajte zaslonov s pravimi podatki strank.",
+      "placeholders": {
+        "caption": "npr. Seznam potencialnih strank, razvrščen po oceni ICP",
+        "feature": "npr. Potencialne stranke"
+      },
+      "toasts": {
+        "added": "Posnetek zaslona dodan.",
+        "deleteFailed": "Posnetka zaslona ni bilo mogoče izbrisati.",
+        "deleted": "Posnetek zaslona izbrisan.",
+        "saveFailed": "Shranjevanje ni uspelo.",
+        "saved": "Shranjeno.",
+        "uploadFailed": "Posnetka zaslona ni bilo mogoče naložiti."
+      }
+    },
+    "socialChannels": {
+      "connect": "Poveži",
+      "connected": "Povezano",
+      "disconnect": "Prekini povezavo",
+      "hint": "Odobritev članka ga hkrati objavi na povezanih kanalih — z enim klikom. Instagram se poveže samodejno skupaj s Facebookom (isti račun Meta).",
+      "instagramHint": "Povezal se bo samodejno po povezavi Facebooka, če ima stran povezan račun Instagram Business.",
+      "toasts": {
+        "connectStartFailed": "Povezovanja ni bilo mogoče začeti: {platform}.",
+        "disconnectFailed": "Povezave ni bilo mogoče prekiniti.",
+        "disconnected": "{platform}: povezava prekinjena.",
+        "wordpressConnectFailed": "Povezava z WordPressom ni uspela.",
+        "wordpressConnected": "WordPress: povezava vzpostavljena."
+      },
+      "wordpress": {
+        "appPassword": "Geslo aplikacije",
+        "appPasswordPlaceholder": "ustvarjeno v WP: Uporabniki → Profil → Gesla aplikacij",
+        "connect": "Poveži WordPress",
+        "connecting": "Povezovanje…",
+        "siteUrl": "Naslov strani",
+        "siteUrlPlaceholder": "https://vasa-stran.si",
+        "username": "Uporabniško ime",
+        "usernamePlaceholder": "npr. admin"
+      },
+      "wordpressHint": "Objava celotnega članka na strankini lastni strani WordPress (Application Password)."
+    },
+    "strategy": {
+      "backlinks": {
+        "accept": "Sprejmi",
+        "empty": "Ni backlinkov.",
+        "findCandidates": "Poišči kandidate",
+        "hint": "Opt-in izmenjava povezav z drugimi organizacijami iz iste panoge (industry_vertical), izključno tematsko ustrezna, brez vsiljene vzajemnosti. Ujemanje deluje šele, ko se prijavi še kakšna druga organizacija — danes ste edini.",
+        "optIn": "Soglasje za izmenjavo backlinkov z drugimi organizacijami",
+        "reject": "Zavrni",
+        "searching": "Iskanje…",
+        "statuses": {
+          "accepted": "Sprejeto",
+          "rejected": "Zavrnjeno",
+          "suggested": "Predlagano"
+        },
+        "title": "Backlinki med organizacijami ({count})"
+      },
+      "competitors": {
+        "add": "Dodaj",
+        "empty": "Na seznamu ni konkurentov.",
+        "hint": "Seznam vpliva na ustvarjanje tematskih stebrov — bolje ko je opisan, natančnejša je strategija.",
+        "notesPlaceholder": "Zapisek (neobvezno)",
+        "removeAria": "Odstrani",
+        "title": "Konkurenti ({count})",
+        "urlPlaceholder": "https://konkurent.si"
+      },
+      "pillars": {
+        "add": "Dodaj steber",
+        "addOwn": "+ Dodaj svoj steber",
+        "adding": "Dodajanje…",
+        "articleCount": "{count} čl.",
+        "description": "Opis",
+        "descriptionPlaceholder": "O čem naj bodo članki v tem stebru",
+        "edit": "Uredi",
+        "keywordTheme": "Tema ključnih besed",
+        "keywordThemePlaceholder": "npr. najem jaht, marina",
+        "name": "Ime",
+        "namePlaceholder": "npr. Upravljanje flote jaht",
+        "removeAria": "Odstrani steber",
+        "saving": "Shranjevanje…"
+      },
+      "toasts": {
+        "backlinkAcceptFailed": "Sprejem ni uspel.",
+        "backlinkAccepted": "Backlink sprejet.",
+        "backlinkRejectFailed": "Zavrnitev ni uspela.",
+        "backlinkRejected": "Backlink zavrnjen.",
+        "candidatesFound": "{count, plural, one {Najden # kandidat.} two {Najdena # kandidata.} few {Najdeni # kandidati.} other {Najdenih # kandidatov.}}",
+        "candidatesSearchFailed": "Iskanje kandidatov ni uspelo.",
+        "competitorAddFailed": "Konkurenta ni bilo mogoče dodati.",
+        "competitorAdded": "Konkurent dodan.",
+        "competitorRemoveFailed": "Konkurenta ni bilo mogoče odstraniti.",
+        "competitorRemoved": "Konkurent odstranjen.",
+        "noCandidates": "Ni kandidatov — nobena druga organizacija se še ne ujema po panogi in soglasju.",
+        "optInDisabled": "Soglasje za backlinke izklopljeno.",
+        "optInEnabled": "Soglasje za backlinke vklopljeno.",
+        "optInSaveFailed": "Soglasja ni bilo mogoče shraniti.",
+        "pillarAddFailed": "Stebra ni bilo mogoče dodati.",
+        "pillarAdded": "Steber dodan.",
+        "pillarRemoveFailed": "Stebra ni bilo mogoče odstraniti.",
+        "pillarRemoved": "Steber odstranjen.",
+        "pillarSaveFailed": "Stebra ni bilo mogoče shraniti.",
+        "pillarUpdated": "Steber posodobljen."
+      }
+    },
+    "tenantSettings": {
+      "fields": {
+        "businessDescription": "Opis izdelka in poslovanja",
+        "businessDescriptionPlaceholder": "S čim se podjetje ukvarja, katere funkcije ima izdelek, kdo so uporabniki, katera panoga…",
+        "industry": "Panoga (industry_vertical)",
+        "industryPlaceholder": "npr. yachting, saas_crm, personal_brand",
+        "productName": "Ime izdelka",
+        "productNamePlaceholder": "npr. CRMtree"
+      },
+      "gscProperty": {
+        "hint": "Dejanska, preverjena lastnost GSC, s katero se povezuje pri „Poveži Search Console“ — s predpono URL (npr. https://stranka.si/) ali domenska (sc-domain:stranka.si). Prazno = ugibanje po WordPressu ali po spodaj navedenem.",
+        "placeholder": "https://crmtree.pl/ ali sc-domain:crmtree.pl",
+        "save": "Shrani lastnost GSC",
+        "title": "Lastnost Search Console"
+      },
+      "hint": "Napaja strategijo (stebri, ključne besede) in vsak članek. SEObot v besedilu pokaže, kako se težava reši v izdelku, in opisuje samo funkcije, navedene v opisu — natančneje ko jih naštejete, konkretnejši bodo članki.",
+      "save": "Shrani nastavitve",
+      "saving": "Shranjevanje…",
+      "title": "Nastavitve SEO organizacije",
+      "toasts": {
+        "gscPropertySaveFailed": "Lastnosti GSC ni bilo mogoče shraniti.",
+        "gscPropertySaved": "Lastnost Search Console shranjena.",
+        "modeSaveFailed": "Načina ni bilo mogoče shraniti.",
+        "saveFailed": "Nastavitev ni bilo mogoče shraniti.",
+        "saved": "Nastavitve shranjene.",
+        "wordpressDraft": "WordPress: objava kot osnutek.",
+        "wordpressLive": "WordPress: objava takoj live."
+      },
+      "wordpressMode": {
+        "draft": "Osnutek (varno, zahteva ročno objavo v WP)",
+        "hint": "Odločitev se sprejme po pogovoru s stranko — ali naj gredo članki takoj live na njenem WordPressu ali naj pristanejo kot osnutek za ročno objavo tam.",
+        "publish": "Objavi takoj (live, brez postanka)",
+        "title": "Način objave WordPress"
+      }
     }
   },
   "sms": {

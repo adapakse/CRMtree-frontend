@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditService } from '../../core/services/api.services';
 import { AuditLog } from '../../core/models/models';
+import { TranslocoDirective, TranslocoPipe, provideTranslocoScope } from '@jsverse/transloco';
 
 const ACTION_ICONS: Record<string, string> = {
   document_created:   '📄', document_viewed:    '👁', document_downloaded: '⬇',
@@ -18,14 +19,16 @@ const ACTION_ICONS: Record<string, string> = {
 @Component({
   selector: 'wt-logs',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('admin')],
   template: `
+<ng-container *transloco="let t; prefix: 'admin'">
     <div id="topbar">
-      <span class="page-title">Logi audytowe</span>
+      <span class="page-title">{{ t('logs.title') }}</span>
       <span class="tsp"></span>
       <div class="srch-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="srch" type="search" placeholder="Szukaj użytkownika, dokumentu…"
+        <input class="srch" type="search" [placeholder]="t('logs.searchPlaceholder')"
                [(ngModel)]="filters.search" (ngModelChange)="onSearch()">
       </div>
     </div>
@@ -34,39 +37,39 @@ const ACTION_ICONS: Record<string, string> = {
       <!-- Filters bar -->
       <div class="toolbar" style="flex-wrap:wrap;gap:10px">
         <div class="fg" style="min-width:140px">
-          <label class="fl">Data od</label>
+          <label class="fl">{{ t('logs.filters.dateFrom') }}</label>
           <input class="fi" type="date" [(ngModel)]="filters.date_from" (change)="load()" style="padding:5px 8px">
         </div>
         <div class="fg" style="min-width:140px">
-          <label class="fl">Data do</label>
+          <label class="fl">{{ t('logs.filters.dateTo') }}</label>
           <input class="fi" type="date" [(ngModel)]="filters.date_to" (change)="load()" style="padding:5px 8px">
         </div>
         <div class="fg" style="min-width:160px">
-          <label class="fl">Typ akcji</label>
+          <label class="fl">{{ t('logs.filters.actionType') }}</label>
           <select class="sel" [(ngModel)]="filters.action" (change)="load()">
-            <option value="">Wszystkie akcje</option>
+            <option value="">{{ t('logs.filters.allActions') }}</option>
             @for (a of actions(); track a) { <option [value]="a">{{ a }}</option> }
           </select>
         </div>
         <div class="fg" style="min-width:160px">
-          <label class="fl">Email użytkownika</label>
-          <input class="fi" type="text" [(ngModel)]="filters.user_email" (blur)="load()" placeholder="user@firma.com" style="padding:5px 8px">
+          <label class="fl">{{ t('logs.filters.userEmail') }}</label>
+          <input class="fi" type="text" [(ngModel)]="filters.user_email" (blur)="load()" [placeholder]="t('logs.filters.userEmailPlaceholder')" style="padding:5px 8px">
         </div>
         <div style="margin-top:auto">
-          <button class="btn btn-g btn-sm" (click)="clearFilters()">Wyczyść filtry</button>
+          <button class="btn btn-g btn-sm" (click)="clearFilters()">{{ t('logs.filters.clear') }}</button>
         </div>
         <span style="flex:1"></span>
-        <span style="font-size:12px;color:var(--gray-400);margin-top:auto">Wpisów: {{ total() }}</span>
+        <span style="font-size:12px;color:var(--gray-400);margin-top:auto">{{ t('logs.count', { count: total() }) }}</span>
       </div>
 
       <!-- Log table -->
       <div class="tw">
         <div class="thead" style="grid-template-columns:160px 100px 1fr 180px 120px">
-          <div class="th">Data i godzina</div>
-          <div class="th">Akcja</div>
-          <div class="th">Szczegóły</div>
-          <div class="th">Użytkownik</div>
-          <div class="th">Dokument</div>
+          <div class="th">{{ t('logs.columns.dateTime') }}</div>
+          <div class="th">{{ t('logs.columns.action') }}</div>
+          <div class="th">{{ t('logs.columns.details') }}</div>
+          <div class="th">{{ t('logs.columns.user') }}</div>
+          <div class="th">{{ t('logs.columns.document') }}</div>
         </div>
 
         @if (loading()) {
@@ -98,7 +101,7 @@ const ACTION_ICONS: Record<string, string> = {
         }
         @empty {
           @if (!loading()) {
-            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Nie znaleziono wpisów logu</div></div>
+            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('logs.empty') }}</div></div>
           }
         }
       </div>
@@ -106,9 +109,9 @@ const ACTION_ICONS: Record<string, string> = {
       <!-- Pagination -->
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">← Poprz.</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">Strona {{ page() }} z {{ totalPages() }}</span>
-          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">Dalej →</button>
+          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">← {{ t('logs.pagination.previous') }}</button>
+          <span style="font-size:12.5px;color:var(--gray-500)">{{ t('logs.pagination.page', { page: page(), total: totalPages() }) }}</span>
+          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">{{ t('logs.pagination.next') }} →</button>
         </div>
       }
     </div>
@@ -126,15 +129,15 @@ const ACTION_ICONS: Record<string, string> = {
           </div>
           <div style="padding:20px 24px;font-size:13px;line-height:1.7">
             @if (selectedLog()!.document_name) {
-              <div><strong>Dokument:</strong> {{ selectedLog()!.document_number }} — {{ selectedLog()!.document_name }}</div>
+              <div><strong>{{ t('logs.detail.document') }}</strong> {{ selectedLog()!.document_number }} — {{ selectedLog()!.document_name }}</div>
             }
             @if (selectedLog()!.before_state) {
-              <div style="margin-top:10px"><strong>Przed:</strong>
+              <div style="margin-top:10px"><strong>{{ t('logs.detail.before') }}</strong>
                 <pre style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:6px;padding:8px;font-size:11px;margin-top:4px;overflow:auto;max-height:120px">{{ selectedLog()!.before_state | json }}</pre>
               </div>
             }
             @if (selectedLog()!.after_state) {
-              <div style="margin-top:10px"><strong>Po:</strong>
+              <div style="margin-top:10px"><strong>{{ t('logs.detail.after') }}</strong>
                 <pre style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:6px;padding:8px;font-size:11px;margin-top:4px;overflow:auto;max-height:120px">{{ selectedLog()!.after_state | json }}</pre>
               </div>
             }
@@ -143,11 +146,12 @@ const ACTION_ICONS: Record<string, string> = {
             }
           </div>
           <div style="padding:14px 24px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end">
-            <button class="btn btn-g" (click)="selectedLog.set(null)">Zamknij</button>
+            <button class="btn btn-g" (click)="selectedLog.set(null)">{{ 'actions.close' | transloco }}</button>
           </div>
         </div>
       </div>
     }
+</ng-container>
   `,
   styles: [`
     #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }

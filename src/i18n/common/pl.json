@@ -21,6 +21,9 @@
   "states": {
     "loading": "Ładowanie…"
   },
+  "testEnvironmentBanner": {
+    "title": "Wersja testowa — to nie jest środowisko produkcyjne"
+  },
   "typeahead": {
     "minChars": "Wpisz co najmniej {count} znaki…",
     "noResults": "Brak wyników.",

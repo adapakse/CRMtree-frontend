@@ -1,0 +1,354 @@
+{
+  "badges": {
+    "gdpr": {
+      "data_administration": "Joint control",
+      "data_processing_entrustment": "Processing",
+      "no_gdpr": "No GDPR"
+    }
+  },
+  "dashboard": {
+    "recentDocuments": "Recent documents",
+    "seeAll": "See all",
+    "stats": {
+      "expiring": "Expiring in 30 days",
+      "expiringHint": "Need attention",
+      "inWorkflow": "In workflow",
+      "myTasksHint": "Awaiting action",
+      "signed": "Signed / Completed",
+      "signedHint": "Signed + Completed",
+      "total": "All documents",
+      "totalHint": "All available"
+    },
+    "taskStrip": {
+      "assigneePrefix": "with:"
+    },
+    "title": "Dashboard"
+  },
+  "detail": {
+    "actions": {
+      "delete": "Delete",
+      "download": "Download",
+      "saveChanges": "Save changes"
+    },
+    "attachments": {
+      "add": "Add attachment",
+      "addFirst": "Add the first attachment",
+      "deleteConfirm": "Delete this attachment together with all its versions?",
+      "deleted": "Attachment deleted",
+      "empty": "No attachments",
+      "events": {
+        "deleted": "Attachment deleted: {name}",
+        "newVersion": "New attachment version: {name}"
+      },
+      "newVersion": "New version",
+      "uploadFailed": "Failed to upload the attachment",
+      "uploaded": "Attachment uploaded",
+      "versionCount": "{count, plural, one {# version} other {# versions}}",
+      "versionUploadFailed": "Failed to upload the new version"
+    },
+    "deleteConfirm": "Delete “{name}”?",
+    "history": {
+      "actions": {
+        "attachment_deleted": "Attachment deleted",
+        "attachment_uploaded": "Attachment added: {name}",
+        "attachment_version_uploaded": "New attachment version (v{version})",
+        "document_created": "Document created",
+        "document_deleted": "Document deleted",
+        "document_downloaded": "Document downloaded",
+        "document_updated": "Document updated",
+        "metadata_updated": "Metadata updated",
+        "signing_completed": "Electronic signing completed",
+        "signing_failed": "Electronic signing failed",
+        "signing_initiated": "Electronic signing started",
+        "status_changed": "Status changed to: {status}",
+        "tag_added": "Tag added: {key}",
+        "tag_removed": "Tag removed: {key}",
+        "tag_updated": "Tag changed: {key}",
+        "version_uploaded": "New document version uploaded (v{version})",
+        "workflow_task_cancelled": "Workflow task cancelled",
+        "workflow_task_completed": "Workflow task completed",
+        "workflow_task_created": "Workflow task assigned"
+      },
+      "empty": "No history"
+    },
+    "overview": {
+      "chooseEntity": "— select entity —",
+      "chooseType": "— select type —",
+      "metadata": "Document metadata",
+      "packagePart": "Part of document package:"
+    },
+    "partners": {
+      "empty": "No linked partners.",
+      "linkFailed": "Failed to link the partner",
+      "linked": "Linked to {company}",
+      "searchPlaceholder": "Search for a partner by name…",
+      "taxId": "Tax ID: {nip}",
+      "title": "Linked partners",
+      "unlink": "Unlink",
+      "unlinkConfirm": "Unlink partner “{company}”?",
+      "unlinkFailed": "Failed to unlink the partner",
+      "unlinked": "Partner unlinked"
+    },
+    "preview": {
+      "downloadFile": "Download file",
+      "fileUploaded": "File uploaded",
+      "frameTitle": "PDF preview",
+      "loadFailed": "Couldn’t load the PDF",
+      "noFile": "No file attached",
+      "unavailable": "No preview",
+      "unavailableFormat": "No preview for formats other than PDF.",
+      "unavailableHint": "Download the file to view it.",
+      "uploadFile": "Upload file"
+    },
+    "signus": {
+      "emailsPlaceholder": "anna@company.com, partner@example.com",
+      "info": "The document will be sent to the Signus API. Each signatory will receive an email. Signed versions are archived automatically.",
+      "modalTitle": "Start electronic signing",
+      "sectionTitle": "Electronic signature (Signus)",
+      "send": "Send to Signus",
+      "sendFailed": "Failed to send to Signus",
+      "sentRedirect": "Document sent to Signus — redirecting…",
+      "sentTraining": "Document sent for signing (simulation). The signed version will appear in ~10 seconds.",
+      "signatories": "Signatories (email addresses separated by commas)",
+      "start": "Start signing with Signus"
+    },
+    "tabs": {
+      "attachments": "Attachments",
+      "history": "History",
+      "overview": "Details",
+      "preview": "Main document",
+      "versions": "Versions",
+      "workflow": "Workflow"
+    },
+    "tags": {
+      "added": "Tag added",
+      "empty": "No tags.",
+      "key": "Key",
+      "keyPlaceholder": "Key (e.g. contract_id)",
+      "title": "Tags"
+    },
+    "toasts": {
+      "saved": "Document saved"
+    },
+    "versions": {
+      "empty": "No versions",
+      "signedBy": "Signed by {name}",
+      "uploadNew": "Upload new version",
+      "uploaded": "New version uploaded"
+    },
+    "workflow": {
+      "assign": "Assign and send email",
+      "assignTitle": "Assign task",
+      "assignTo": "Assign to user",
+      "assigned": "Task assigned — email notification sent",
+      "cancelled": "Task cancelled",
+      "dueDate": "Due date",
+      "message": "Message",
+      "messagePlaceholder": "Optional message for the assignee…",
+      "selected": "Selected: {name}",
+      "taskType": "Task type",
+      "userSearchPlaceholder": "Search by name or email…"
+    }
+  },
+  "labels": {
+    "activeTasks": "Active tasks",
+    "addTag": "Add tag",
+    "columns": {
+      "name": "Name",
+      "number": "Number",
+      "validity": "Validity"
+    },
+    "contractSubjects": {
+      "accommodation": "Accommodation",
+      "businessTravel": "Business travel",
+      "conferences": "Conferences/Meetings",
+      "other": "Other",
+      "system": "System"
+    },
+    "countries": {
+      "at": "Austria",
+      "ch": "Switzerland",
+      "cz": "Czechia",
+      "de": "Germany",
+      "fr": "France",
+      "gb": "United Kingdom",
+      "hu": "Hungary",
+      "pl": "Poland",
+      "ro": "Romania",
+      "ru": "Russia",
+      "sk": "Slovakia",
+      "ua": "Ukraine"
+    },
+    "docTypes": {
+      "employee_agreement": "Employment agreement",
+      "it_supplier_agreement": "IT supplier agreement",
+      "nda": "NDA",
+      "operator_agreement": "Operator agreement",
+      "partner_agreement": "Partner agreement"
+    },
+    "fields": {
+      "contactName": "Full name",
+      "contactSection": "Contract contact details",
+      "contractSubject": "Contract subject",
+      "counterpartyCountry": "Counterparty country",
+      "counterpartyTaxId": "Counterparty tax ID",
+      "documentName": "Document name",
+      "documentType": "Document type",
+      "email": "Email",
+      "entity1": "Entity 1",
+      "entity2": "Entity 2",
+      "expirationDate": "Expiry date",
+      "gdprClassification": "GDPR classification",
+      "group": "Group",
+      "owner": "Owner",
+      "phone": "Phone",
+      "signingDate": "Signing date",
+      "status": "Status"
+    },
+    "from": "From: {name}",
+    "gdprTypes": {
+      "data_administration": "Joint data controllership",
+      "data_processing_entrustment": "Data processing entrustment",
+      "no_gdpr": "No GDPR"
+    },
+    "myTasks": "My tasks",
+    "noDocuments": "No documents",
+    "noPendingTasks": "No pending tasks",
+    "options": {
+      "choose": "— Select —",
+      "chooseCountry": "— Select country —",
+      "fixedDate": "Fixed date",
+      "indefinite": "Indefinite term",
+      "unassigned": "— unassigned —"
+    },
+    "placeholders": {
+      "contactEmail": "e.g. john.smith@company.com",
+      "contactName": "e.g. John Smith",
+      "contactPhone": "e.g. +44 7700 900000",
+      "entity1": "e.g. CRMtree Sp. z o.o.",
+      "entity2": "e.g. Partner Ltd.",
+      "taxId": "e.g. 1234567890"
+    },
+    "statuses": {
+      "being_approved": "In approval",
+      "being_edited": "In editing",
+      "being_signed": "In signing",
+      "completed": "Completed",
+      "hold": "On hold",
+      "new": "New",
+      "rejected": "Rejected",
+      "signed": "Signed"
+    },
+    "taskTypes": {
+      "approve": "Approval",
+      "edit": "Editing",
+      "read": "Reading",
+      "sign": "Signature"
+    }
+  },
+  "list": {
+    "columns": {
+      "gdpr": "GDPR",
+      "newBadge": "NEW",
+      "type": "Type"
+    },
+    "empty": {
+      "hint": "Change the filters or the search phrase",
+      "title": "No documents found"
+    },
+    "filters": {
+      "allGroups": "All groups",
+      "allTypes": "All types",
+      "noFiles": "Show documents without an attached scan"
+    },
+    "newDocument": "New document",
+    "noPartnerWarning": "Document not linked to a partner",
+    "pagination": {
+      "next": "Next",
+      "page": "Page {page} of {total}",
+      "previous": "Prev"
+    },
+    "partnerFilter": {
+      "clear": "Show all",
+      "label": "Documents of partner:"
+    },
+    "searchPlaceholder": "Search documents, tags…",
+    "statusFilters": {
+      "all": "All",
+      "being_edited": "In editing",
+      "being_signed": "In signing",
+      "completed": "Completed",
+      "new": "New",
+      "rejected": "Rejected",
+      "signed": "Signed"
+    },
+    "taskTooltip": {
+      "assignee": "Assignee: {name}",
+      "assigner": "Assigned by: {name}",
+      "dueDate": "Due date: {date}",
+      "message": "Message: {message}",
+      "type": "Type: {type}"
+    },
+    "title": "Documents",
+    "toasts": {
+      "created": "Document {number} created",
+      "deleted": "Document deleted",
+      "updated": "Document updated"
+    }
+  },
+  "newDocument": {
+    "basicInfo": "Basic information",
+    "chooseEntity": "— Select entity —",
+    "chooseGdpr": "— Select classification —",
+    "chooseGroup": "— Select group —",
+    "chooseType": "— Select type —",
+    "create": "Create document",
+    "createFailed": "Couldn’t create the document",
+    "file": {
+      "dropHint": "Drop a file here or click to select",
+      "formats": "PDF, DOCX — max. 50 MB",
+      "remove": "Remove",
+      "title": "Attachment (optional)"
+    },
+    "namePlaceholder": "e.g. Partner agreement — ABC Ltd.",
+    "subtitle": "Fill in the metadata and optionally add a file",
+    "tags": {
+      "keyPlaceholder": "key",
+      "title": "Tags (optional)"
+    },
+    "title": "New document"
+  },
+  "workflow": {
+    "autoRefresh": "Auto-refresh: {seconds} s",
+    "calendar": {
+      "documentFallback": "Document"
+    },
+    "columns": {
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "in_progress": "In progress",
+      "pending": "Pending"
+    },
+    "kanban": {
+      "assignedBy": "Assigned by {name}",
+      "emptyColumn": "Empty",
+      "emptyHint": "Documents will appear here once they are created",
+      "expired": "Expired",
+      "expires": "Expires {date}",
+      "soon": "SOON",
+      "taskCount": "Tasks: {count}"
+    },
+    "kanbanTab": "Kanban board",
+    "mine": {
+      "allDone": "All done!",
+      "complete": "Complete",
+      "openDocument": "Open document",
+      "start": "Start"
+    },
+    "title": "Workflow",
+    "toasts": {
+      "completed": "Task marked as completed",
+      "updateFailed": "Couldn’t update the task — please try again"
+    }
+  }
+}

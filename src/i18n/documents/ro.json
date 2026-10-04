@@ -1,0 +1,354 @@
+{
+  "badges": {
+    "gdpr": {
+      "data_administration": "Operare asociată",
+      "data_processing_entrustment": "Împuternicire",
+      "no_gdpr": "Fără GDPR"
+    }
+  },
+  "dashboard": {
+    "recentDocuments": "Documente recente",
+    "seeAll": "Vezi toate",
+    "stats": {
+      "expiring": "Expiră în 30 de zile",
+      "expiringHint": "Necesită atenție",
+      "inWorkflow": "În circuit",
+      "myTasksHint": "Așteaptă o acțiune",
+      "signed": "Semnate / Finalizate",
+      "signedHint": "Semnate + Finalizate",
+      "total": "Toate documentele",
+      "totalHint": "Toate cele disponibile"
+    },
+    "taskStrip": {
+      "assigneePrefix": "la:"
+    },
+    "title": "Panou"
+  },
+  "detail": {
+    "actions": {
+      "delete": "Ștergere",
+      "download": "Descărcare",
+      "saveChanges": "Salvare modificări"
+    },
+    "attachments": {
+      "add": "Adăugare atașament",
+      "addFirst": "Adăugați primul atașament",
+      "deleteConfirm": "Ștergeți acest atașament împreună cu toate versiunile?",
+      "deleted": "Atașament șters",
+      "empty": "Niciun atașament",
+      "events": {
+        "deleted": "Atașament șters: {name}",
+        "newVersion": "Versiune nouă a atașamentului: {name}"
+      },
+      "newVersion": "Versiune nouă",
+      "uploadFailed": "Eroare la încărcarea atașamentului",
+      "uploaded": "Atașament încărcat",
+      "versionCount": "{count, plural, one {# versiune} few {# versiuni} other {# de versiuni}}",
+      "versionUploadFailed": "Eroare la încărcarea versiunii noi"
+    },
+    "deleteConfirm": "Ștergeți „{name}”?",
+    "history": {
+      "actions": {
+        "attachment_deleted": "Atașament șters",
+        "attachment_uploaded": "Atașament adăugat: {name}",
+        "attachment_version_uploaded": "Versiune nouă a atașamentului (v{version})",
+        "document_created": "Document creat",
+        "document_deleted": "Document șters",
+        "document_downloaded": "Document descărcat",
+        "document_updated": "Document actualizat",
+        "metadata_updated": "Metadate actualizate",
+        "signing_completed": "Semnarea electronică a fost finalizată",
+        "signing_failed": "Semnarea electronică a eșuat",
+        "signing_initiated": "Semnarea electronică a fost inițiată",
+        "status_changed": "Status schimbat în: {status}",
+        "tag_added": "Tag adăugat: {key}",
+        "tag_removed": "Tag șters: {key}",
+        "tag_updated": "Tag modificat: {key}",
+        "version_uploaded": "Versiune nouă a documentului încărcată (v{version})",
+        "workflow_task_cancelled": "Sarcină de workflow anulată",
+        "workflow_task_completed": "Sarcină de workflow finalizată",
+        "workflow_task_created": "Sarcină de workflow atribuită"
+      },
+      "empty": "Niciun istoric"
+    },
+    "overview": {
+      "chooseEntity": "— alegeți entitatea —",
+      "chooseType": "— alegeți tipul —",
+      "metadata": "Metadatele documentului",
+      "packagePart": "Parte a pachetului de documente:"
+    },
+    "partners": {
+      "empty": "Niciun partener asociat.",
+      "linkFailed": "Eroare la asocierea cu partenerul",
+      "linked": "Asociat cu {company}",
+      "searchPlaceholder": "Căutare partener după nume…",
+      "taxId": "Cod fiscal: {nip}",
+      "title": "Parteneri asociați",
+      "unlink": "Disociere",
+      "unlinkConfirm": "Disociați partenerul „{company}”?",
+      "unlinkFailed": "Eroare la disocierea partenerului",
+      "unlinked": "Partener disociat"
+    },
+    "preview": {
+      "downloadFile": "Descărcare fișier",
+      "fileUploaded": "Fișier încărcat",
+      "frameTitle": "Previzualizare PDF",
+      "loadFailed": "PDF-ul nu a putut fi încărcat",
+      "noFile": "Niciun fișier atașat",
+      "unavailable": "Fără previzualizare",
+      "unavailableFormat": "Previzualizarea nu este disponibilă pentru alte formate decât PDF.",
+      "unavailableHint": "Descărcați fișierul pentru a-l vizualiza.",
+      "uploadFile": "Încărcare fișier"
+    },
+    "signus": {
+      "emailsPlaceholder": "anna@firma.com, partner@example.com",
+      "info": "Documentul va fi trimis către API-ul Signus. Fiecare semnatar va primi un e-mail. Versiunile semnate sunt arhivate automat.",
+      "modalTitle": "Inițiere semnare electronică",
+      "sectionTitle": "Semnătură electronică (Signus)",
+      "send": "Trimitere către Signus",
+      "sendFailed": "Eroare la trimiterea către Signus",
+      "sentRedirect": "Documentul a fost trimis către Signus — redirecționare…",
+      "sentTraining": "Documentul a fost trimis la semnat (simulare). Versiunea semnată va apărea în ~10 secunde.",
+      "signatories": "Semnatari (adrese de e-mail separate prin virgulă)",
+      "start": "Inițiere semnare prin Signus"
+    },
+    "tabs": {
+      "attachments": "Atașamente",
+      "history": "Istoric",
+      "overview": "Detalii",
+      "preview": "Document principal",
+      "versions": "Versiuni",
+      "workflow": "Workflow"
+    },
+    "tags": {
+      "added": "Tag adăugat",
+      "empty": "Niciun tag.",
+      "key": "Cheie",
+      "keyPlaceholder": "Cheie (ex. contract_id)",
+      "title": "Taguri"
+    },
+    "toasts": {
+      "saved": "Document salvat"
+    },
+    "versions": {
+      "empty": "Nicio versiune",
+      "signedBy": "Semnat de {name}",
+      "uploadNew": "Încărcare versiune nouă",
+      "uploaded": "Versiune nouă încărcată"
+    },
+    "workflow": {
+      "assign": "Atribuire și trimitere e-mail",
+      "assignTitle": "Atribuire sarcină",
+      "assignTo": "Atribuire către utilizator",
+      "assigned": "Sarcină atribuită — notificarea prin e-mail a fost trimisă",
+      "cancelled": "Sarcină anulată",
+      "dueDate": "Termen",
+      "message": "Mesaj",
+      "messagePlaceholder": "Mesaj opțional pentru persoana desemnată…",
+      "selected": "Selectat: {name}",
+      "taskType": "Tip sarcină",
+      "userSearchPlaceholder": "Căutare după nume sau e-mail…"
+    }
+  },
+  "labels": {
+    "activeTasks": "Sarcini active",
+    "addTag": "Adăugare tag",
+    "columns": {
+      "name": "Denumire",
+      "number": "Număr",
+      "validity": "Valabilitate"
+    },
+    "contractSubjects": {
+      "accommodation": "Cazare",
+      "businessTravel": "Călătorii de afaceri",
+      "conferences": "Conferințe/Întâlniri",
+      "other": "Altele",
+      "system": "Sistem"
+    },
+    "countries": {
+      "at": "Austria",
+      "ch": "Elveția",
+      "cz": "Cehia",
+      "de": "Germania",
+      "fr": "Franța",
+      "gb": "Regatul Unit",
+      "hu": "Ungaria",
+      "pl": "Polonia",
+      "ro": "România",
+      "ru": "Rusia",
+      "sk": "Slovacia",
+      "ua": "Ucraina"
+    },
+    "docTypes": {
+      "employee_agreement": "Contract de muncă",
+      "it_supplier_agreement": "Contract cu furnizor IT",
+      "nda": "NDA",
+      "operator_agreement": "Contract cu operator",
+      "partner_agreement": "Contract de parteneriat"
+    },
+    "fields": {
+      "contactName": "Nume și prenume",
+      "contactSection": "Date de contact pentru contract",
+      "contractSubject": "Obiectul contractului",
+      "counterpartyCountry": "Țara contractantului",
+      "counterpartyTaxId": "Codul fiscal al contractantului",
+      "documentName": "Denumirea documentului",
+      "documentType": "Tip document",
+      "email": "E-mail",
+      "entity1": "Entitate 1",
+      "entity2": "Entitate 2",
+      "expirationDate": "Data expirării",
+      "gdprClassification": "Clasificare GDPR",
+      "group": "Grup",
+      "owner": "Proprietar",
+      "phone": "Telefon",
+      "signingDate": "Data semnării",
+      "status": "Status"
+    },
+    "from": "De la: {name}",
+    "gdprTypes": {
+      "data_administration": "Operare asociată a datelor",
+      "data_processing_entrustment": "Împuternicire pentru prelucrarea datelor",
+      "no_gdpr": "Fără GDPR"
+    },
+    "myTasks": "Sarcinile mele",
+    "noDocuments": "Niciun document",
+    "noPendingTasks": "Nicio sarcină în așteptare",
+    "options": {
+      "choose": "— Alegeți —",
+      "chooseCountry": "— Alegeți țara —",
+      "fixedDate": "Dată stabilită",
+      "indefinite": "Perioadă nedeterminată",
+      "unassigned": "— neatribuit —"
+    },
+    "placeholders": {
+      "contactEmail": "ex. ion.popescu@firma.ro",
+      "contactName": "ex. Ion Popescu",
+      "contactPhone": "ex. +40 700 000 000",
+      "entity1": "ex. CRMtree Sp. z o.o.",
+      "entity2": "ex. Partner Ltd.",
+      "taxId": "ex. 12345678"
+    },
+    "statuses": {
+      "being_approved": "În aprobare",
+      "being_edited": "În editare",
+      "being_signed": "În curs de semnare",
+      "completed": "Finalizat",
+      "hold": "Suspendat",
+      "new": "Nou",
+      "rejected": "Respins",
+      "signed": "Semnat"
+    },
+    "taskTypes": {
+      "approve": "Aprobare",
+      "edit": "Editare",
+      "read": "Citire",
+      "sign": "Semnare"
+    }
+  },
+  "list": {
+    "columns": {
+      "gdpr": "GDPR",
+      "newBadge": "NOU",
+      "type": "Tip"
+    },
+    "empty": {
+      "hint": "Modificați filtrele sau termenul căutat",
+      "title": "Nu s-au găsit documente"
+    },
+    "filters": {
+      "allGroups": "Toate grupurile",
+      "allTypes": "Toate tipurile",
+      "noFiles": "Afișează documentele fără scan atașat"
+    },
+    "newDocument": "Document nou",
+    "noPartnerWarning": "Document neasociat cu un partener",
+    "pagination": {
+      "next": "Înainte",
+      "page": "Pagina {page} din {total}",
+      "previous": "Înapoi"
+    },
+    "partnerFilter": {
+      "clear": "Afișează toate",
+      "label": "Documentele partenerului:"
+    },
+    "searchPlaceholder": "Căutare documente, taguri…",
+    "statusFilters": {
+      "all": "Toate",
+      "being_edited": "În editare",
+      "being_signed": "În curs de semnare",
+      "completed": "Finalizate",
+      "new": "Noi",
+      "rejected": "Respinse",
+      "signed": "Semnate"
+    },
+    "taskTooltip": {
+      "assignee": "Responsabil: {name}",
+      "assigner": "Atribuit de: {name}",
+      "dueDate": "Termen: {date}",
+      "message": "Mesaj: {message}",
+      "type": "Tip: {type}"
+    },
+    "title": "Documente",
+    "toasts": {
+      "created": "Documentul {number} a fost creat",
+      "deleted": "Document șters",
+      "updated": "Document actualizat"
+    }
+  },
+  "newDocument": {
+    "basicInfo": "Informații de bază",
+    "chooseEntity": "— Alegeți entitatea —",
+    "chooseGdpr": "— Alegeți clasificarea —",
+    "chooseGroup": "— Alegeți grupul —",
+    "chooseType": "— Alegeți tipul —",
+    "create": "Creare document",
+    "createFailed": "Documentul nu a putut fi creat",
+    "file": {
+      "dropHint": "Plasați fișierul aici sau faceți clic pentru a-l alege",
+      "formats": "PDF, DOCX — max. 50 MB",
+      "remove": "Eliminare",
+      "title": "Atașament (opțional)"
+    },
+    "namePlaceholder": "ex. Contract de parteneriat — ABC SRL",
+    "subtitle": "Completați metadatele și, opțional, adăugați un fișier",
+    "tags": {
+      "keyPlaceholder": "cheie",
+      "title": "Taguri (opțional)"
+    },
+    "title": "Document nou"
+  },
+  "workflow": {
+    "autoRefresh": "Actualizare automată: {seconds} s",
+    "calendar": {
+      "documentFallback": "Document"
+    },
+    "columns": {
+      "cancelled": "Anulate",
+      "completed": "Finalizate",
+      "in_progress": "În curs",
+      "pending": "În așteptare"
+    },
+    "kanban": {
+      "assignedBy": "Atribuit de {name}",
+      "emptyColumn": "Gol",
+      "emptyHint": "Documentele vor apărea aici după ce sunt create",
+      "expired": "Expirat",
+      "expires": "Expiră la {date}",
+      "soon": "CURÂND",
+      "taskCount": "Sarcini: {count}"
+    },
+    "kanbanTab": "Tablou Kanban",
+    "mine": {
+      "allDone": "Totul este rezolvat!",
+      "complete": "Finalizare",
+      "openDocument": "Deschidere document",
+      "start": "Începere"
+    },
+    "title": "Workflow",
+    "toasts": {
+      "completed": "Sarcină marcată ca finalizată",
+      "updateFailed": "Sarcina nu a putut fi actualizată — încercați din nou"
+    }
+  }
+}

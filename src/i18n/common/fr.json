@@ -21,6 +21,9 @@
   "states": {
     "loading": "Chargement…"
   },
+  "testEnvironmentBanner": {
+    "title": "Version de test — ce n’est pas l’environnement de production"
+  },
   "typeahead": {
     "minChars": "Saisissez au moins {count} caractères…",
     "noResults": "Aucun résultat.",

@@ -1,4 +1,18 @@
 {
+  "changePassword": {
+    "errors": {
+      "failed": "Napaka pri spremembi gesla",
+      "mismatch": "Gesli se ne ujemata",
+      "tooShort": "Geslo mora imeti najmanj 8 znakov"
+    },
+    "hint": "Vaše začasno geslo je poteklo. Pred nadaljevanjem nastavite svoje geslo.",
+    "newPassword": "Novo geslo",
+    "newPasswordPlaceholder": "najm. 8 znakov",
+    "repeatPassword": "Ponovite geslo",
+    "submit": "Nastavi geslo in se prijavi",
+    "submitting": "Shranjevanje…",
+    "title": "Nastavite novo geslo"
+  },
   "login": {
     "email": "E-pošta",
     "emailPlaceholder": "janez@podjetje.si",

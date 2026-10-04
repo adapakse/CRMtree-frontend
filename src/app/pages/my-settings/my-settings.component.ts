@@ -11,16 +11,19 @@ import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.servic
 import { AuthService } from '../../core/auth/auth.service';
 import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitutions.component';
 import { MyDevicesComponent } from './my-devices.component';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 const BASE = environment.apiUrl;
 
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, LanguagePickerComponent],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('account')],
   template: `
+<ng-container *transloco="let t; prefix: 'account'">
 <div id="topbar">
-  <span class="page-title">Moje ustawienia</span>
+  <span class="page-title">{{ t('mySettings.title') }}</span>
 </div>
 
 <div id="content" style="padding:24px;max-width:860px;display:flex;flex-direction:column;gap:20px">
@@ -32,12 +35,10 @@ const BASE = environment.apiUrl;
   <!-- ── Stopka email ───────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px">
     <h2 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#18181b;margin:0 0 6px">
-      ✉️ Moja stopka email
+      ✉️ {{ t('mySettings.signature.title') }}
     </h2>
     <p style="font-size:12.5px;color:#6b7280;margin:0 0 20px;line-height:1.5">
-      Wklej poniżej kod HTML swojej stopki. Zostanie ona automatycznie doklejona do każdego maila
-      wysłanego z systemu (Leady i Rejestr partnerów). Możesz użyć gotowego HTML z klientem poczty
-      lub narzędzia do budowania stopek — np. HubSpot Email Signature Generator.
+      {{ t('mySettings.signature.hint') }}
     </p>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
@@ -45,24 +46,24 @@ const BASE = environment.apiUrl;
       <!-- Edytor HTML -->
       <div>
         <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">
-          Kod HTML stopki
+          {{ t('mySettings.signature.htmlLabel') }}
         </label>
         <textarea
           [(ngModel)]="signatureHtml"
           (ngModelChange)="onHtmlChange()"
-          placeholder="Wklej tutaj kod HTML stopki…"
+          [placeholder]="t('mySettings.signature.htmlPlaceholder')"
           style="width:100%;height:280px;font-family:monospace;font-size:11px;padding:10px;border:1px solid #d1d5db;border-radius:8px;resize:vertical;box-sizing:border-box;color:#374151;line-height:1.5"
         ></textarea>
         <div style="display:flex;gap:8px;margin-top:10px">
           <button class="btn btn-p" (click)="save()" [disabled]="saving">
-            {{ saving ? '⏳ Zapisywanie…' : '💾 Zapisz stopkę' }}
+            {{ saving ? '⏳ ' + t('mySettings.saving') : '💾 ' + t('mySettings.signature.save') }}
           </button>
           <button class="btn btn-g btn-sm" (click)="clear()" *ngIf="signatureHtml" [disabled]="saving">
-            🗑 Usuń
+            🗑 {{ t('mySettings.delete') }}
           </button>
         </div>
         <div *ngIf="saveSuccess" style="margin-top:8px;font-size:12px;color:#16a34a;font-weight:600">
-          ✓ Stopka zapisana
+          ✓ {{ t('mySettings.signature.saved') }}
         </div>
         <div *ngIf="saveError" style="margin-top:8px;font-size:12px;color:#dc2626">
           {{ saveError }}
@@ -72,11 +73,11 @@ const BASE = environment.apiUrl;
       <!-- Podgląd -->
       <div>
         <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">
-          Podgląd
+          {{ t('mySettings.signature.preview') }}
         </label>
         <div style="border:1px solid #d1d5db;border-radius:8px;padding:16px;background:#fafafa;min-height:280px;overflow:auto">
           <div *ngIf="!signatureHtml" style="color:#9ca3af;font-size:12px;font-style:italic">
-            Brak stopki — wklej HTML po lewej
+            {{ t('mySettings.signature.empty') }}
           </div>
           <div *ngIf="signatureHtml" [innerHTML]="safePreview"></div>
         </div>
@@ -89,44 +90,44 @@ const BASE = environment.apiUrl;
   <div class="card" style="padding:24px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
       <h2 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#18181b;margin:0;flex:1">
-        📋 Szablony emaili
+        📋 {{ t('mySettings.templates.title') }}
       </h2>
-      <button class="btn btn-p btn-sm" (click)="openTplForm()">+ Nowy szablon</button>
+      <button class="btn btn-p btn-sm" (click)="openTplForm()">+ {{ t('mySettings.templates.new') }}</button>
     </div>
     <p style="font-size:12.5px;color:#6b7280;margin:0 0 16px;line-height:1.5">
-      Zapisz gotowe treści wiadomości, które możesz szybko wstawić podczas pisania emaila do leada lub partnera.
+      {{ t('mySettings.templates.hint') }}
     </p>
 
     <!-- Lista szablonów -->
     <div *ngIf="templates.length === 0 && !tplFormVisible" style="color:#9ca3af;font-size:13px;font-style:italic;text-align:center;padding:16px">
-      Brak szablonów. Kliknij „+ Nowy szablon", aby dodać pierwszy.
+      {{ t('mySettings.templates.empty') }}
     </div>
-    <div *ngFor="let t of templates" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin-bottom:8px">
+    <div *ngFor="let tpl of templates" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin-bottom:8px">
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:13px;font-weight:700;color:#18181b;flex:1">{{t.name}}</span>
-        <button class="btn btn-g btn-sm" (click)="editTpl(t)">✏️ Edytuj</button>
-        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:none" (click)="deleteTpl(t)" [disabled]="tplSaving">🗑</button>
+        <span style="font-size:13px;font-weight:700;color:#18181b;flex:1">{{tpl.name}}</span>
+        <button class="btn btn-g btn-sm" (click)="editTpl(tpl)">✏️ {{ t('mySettings.templates.edit') }}</button>
+        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:none" (click)="deleteTpl(tpl)" [disabled]="tplSaving">🗑</button>
       </div>
-      <div *ngIf="t.body" style="font-size:11px;color:#6b7280;margin-top:6px;max-height:48px;overflow:hidden;line-height:1.5"
-           [innerHTML]="tplPreview(t.body)"></div>
+      <div *ngIf="tpl.body" style="font-size:11px;color:#6b7280;margin-top:6px;max-height:48px;overflow:hidden;line-height:1.5"
+           [innerHTML]="tplPreview(tpl.body)"></div>
     </div>
 
     <!-- Formularz dodawania/edycji -->
     <div *ngIf="tplFormVisible" style="border:1px solid #3BAA5D;border-radius:10px;padding:16px;margin-top:8px">
       <h3 style="font-size:13px;font-weight:700;margin:0 0 12px;color:#18181b">
-        {{tplEditingId ? 'Edycja szablonu' : 'Nowy szablon'}}
+        {{ tplEditingId ? t('mySettings.templates.editTitle') : t('mySettings.templates.new') }}
       </h3>
-      <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Nazwa szablonu *</label>
-      <input [(ngModel)]="tplForm.name" placeholder="np. Intro spotkanie, Follow-up po demo…"
+      <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px">{{ t('mySettings.templates.nameLabel') }} *</label>
+      <input [(ngModel)]="tplForm.name" [placeholder]="t('mySettings.templates.namePlaceholder')"
              style="width:100%;border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px;box-sizing:border-box;margin-bottom:12px;outline:none">
-      <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Treść *</label>
+      <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px">{{ t('mySettings.templates.bodyLabel') }} *</label>
       <quill-editor [(ngModel)]="tplForm.body" [modules]="quillModules"
                     style="background:white;margin-bottom:12px"
-                    placeholder="Treść szablonu…"></quill-editor>
+                    [placeholder]="t('mySettings.templates.bodyPlaceholder')"></quill-editor>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-        <button class="btn btn-g btn-sm" (click)="cancelTplForm()">Anuluj</button>
+        <button class="btn btn-g btn-sm" (click)="cancelTplForm()">{{ 'actions.cancel' | transloco }}</button>
         <button class="btn btn-p btn-sm" (click)="saveTpl()" [disabled]="!tplForm.name || tplSaving">
-          {{tplSaving ? '⏳ Zapisywanie…' : '💾 Zapisz'}}
+          {{ tplSaving ? '⏳ ' + t('mySettings.saving') : '💾 ' + ('actions.save' | transloco) }}
         </button>
       </div>
       <div *ngIf="tplError" style="margin-top:8px;font-size:12px;color:#dc2626">{{tplError}}</div>
@@ -138,16 +139,14 @@ const BASE = environment.apiUrl;
   <!-- ── Softphone PBX ──────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px" *ngIf="auth.hasFeature('pbx')">
     <h2 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#18181b;margin:0 0 6px">
-      📞 Softphone — token PBX
+      📞 {{ t('mySettings.pbx.title') }}
     </h2>
     <p style="font-size:12.5px;color:#6b7280;margin:0 0 20px;line-height:1.5">
-      Aby korzystać z wbudowanego telefonu, wklej swój Personal Access Token z panelu ip-pbx.eu.
-      Token umożliwia aplikacji pobranie Twoich danych SIP. Klienci widzący Twój numer bezpośredni
-      mogą oddzwonić prosto do Ciebie.
+      {{ t('mySettings.pbx.hint') }}
     </p>
 
     <!-- Status -->
-    <div *ngIf="pbxLoading" style="font-size:13px;color:#6b7280">Ładowanie…</div>
+    <div *ngIf="pbxLoading" style="font-size:13px;color:#6b7280">{{ 'states.loading' | transloco }}</div>
 
     <div *ngIf="!pbxLoading">
       <!-- Skonfigurowany -->
@@ -155,12 +154,12 @@ const BASE = environment.apiUrl;
            style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:16px">
         <span style="font-size:18px">✅</span>
         <div>
-          <div style="font-size:13px;font-weight:600;color:#166534">Token skonfigurowany</div>
+          <div style="font-size:13px;font-weight:600;color:#166534">{{ t('mySettings.pbx.configured') }}</div>
           <div *ngIf="pbxDirectPhone" style="font-size:12px;color:#166534;margin-top:1px">
-            Twój numer bezpośredni: <strong>{{pbxDirectPhone}}</strong>
+            {{ t('mySettings.pbx.directPhone') }} <strong>{{pbxDirectPhone}}</strong>
           </div>
           <div *ngIf="!pbxDirectPhone" style="font-size:12px;color:#6b7280;margin-top:1px">
-            Numer bezpośredni nie jest przypisany w PBX
+            {{ t('mySettings.pbx.noDirectPhone') }}
           </div>
         </div>
       </div>
@@ -169,7 +168,7 @@ const BASE = environment.apiUrl;
       <div *ngIf="!pbxConfigured"
            style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;margin-bottom:16px">
         <span style="font-size:18px">⚠️</span>
-        <div style="font-size:13px;color:#854d0e">Brak tokenu — softphone nie będzie działał.</div>
+        <div style="font-size:13px;color:#854d0e">{{ t('mySettings.pbx.notConfigured') }}</div>
       </div>
 
       <!-- Formularz tokenu -->
@@ -181,31 +180,31 @@ const BASE = environment.apiUrl;
           <input
             [type]="pbxShowToken ? 'text' : 'password'"
             [(ngModel)]="pbxToken"
-            placeholder="Wklej token z ip-pbx.eu…"
+            [placeholder]="t('mySettings.pbx.tokenPlaceholder')"
             autocomplete="off"
             style="flex:1;padding:9px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;font-family:monospace;color:#111827;outline:none"
           />
           <button class="btn btn-g btn-sm" type="button" (click)="pbxShowToken = !pbxShowToken">
-            {{pbxShowToken ? 'Ukryj' : 'Pokaż'}}
+            {{ pbxShowToken ? t('mySettings.pbx.hideToken') : t('mySettings.pbx.showToken') }}
           </button>
         </div>
         <div style="font-size:11px;color:#9ca3af;margin-top:5px;line-height:1.5">
-          Panel ip-pbx.eu → kliknij swoje imię (prawy górny róg) → <em>API Tokens (PAT)</em> → Create token → skopiuj i wklej tutaj.
+          {{ t('mySettings.pbx.tokenHelpStart') }} → <em>API Tokens (PAT)</em> → Create token → {{ t('mySettings.pbx.tokenHelpEnd') }}
         </div>
       </div>
 
       <div style="display:flex;gap:8px;align-items:center;margin-top:14px">
         <button class="btn btn-p" (click)="savePbxToken()" [disabled]="pbxSaving || !pbxToken.trim()">
-          {{pbxSaving ? 'Zapisywanie…' : 'Zapisz token'}}
+          {{ pbxSaving ? t('mySettings.saving') : t('mySettings.pbx.saveToken') }}
         </button>
         <button *ngIf="pbxConfigured" class="btn btn-g btn-sm" (click)="deletePbxToken()"
                 [disabled]="pbxSaving" style="color:#dc2626">
-          Usuń
+          {{ t('mySettings.delete') }}
         </button>
       </div>
 
       <div *ngIf="pbxSaveOk" style="margin-top:8px;font-size:12px;color:#16a34a;font-weight:600">
-        ✓ Token zapisany{{pbxDirectPhone ? ' — numer: ' + pbxDirectPhone : ''}}
+        ✓ {{ pbxDirectPhone ? t('mySettings.pbx.tokenSavedWithPhone', { phone: pbxDirectPhone }) : t('mySettings.pbx.tokenSaved') }}
       </div>
       <div *ngIf="pbxSaveErr" style="margin-top:8px;font-size:12px;color:#dc2626">
         {{pbxSaveErr}}
@@ -214,27 +213,27 @@ const BASE = environment.apiUrl;
       <!-- Powiadomienia systemowe o połączeniach przychodzących -->
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f3f4f6">
         <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:6px">
-          Powiadomienia o połączeniach
+          {{ t('mySettings.pbx.notifications.title') }}
         </div>
         <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
-          Wyświetla powiadomienie systemowe gdy dzwoni klient — nawet gdy przeglądarka jest w tle lub pracujesz w innym programie.
+          {{ t('mySettings.pbx.notifications.hint') }}
         </div>
 
         <ng-container [ngSwitch]="notifBrowserPerm">
           <div *ngSwitchCase="'granted'"
                style="font-size:12px;color:#16a34a;font-weight:600">
-            ✓ Powiadomienia włączone
+            ✓ {{ t('mySettings.pbx.notifications.enabled') }}
           </div>
           <div *ngSwitchCase="'denied'"
                style="font-size:12px;color:#dc2626">
-            ✗ Powiadomienia zablokowane — odblokuj ręcznie w ustawieniach przeglądarki:<br>
-            <span style="color:#6b7280">Kłódka przy adresie strony → Powiadomienia → Zezwalaj</span>
+            ✗ {{ t('mySettings.pbx.notifications.blocked') }}<br>
+            <span style="color:#6b7280">{{ t('mySettings.pbx.notifications.unblockPath') }}</span>
           </div>
           <div *ngSwitchDefault style="display:flex;align-items:center;gap:10px">
             <button class="btn btn-p btn-sm" (click)="enableNotifications()">
-              Włącz powiadomienia
+              {{ t('mySettings.pbx.notifications.enable') }}
             </button>
-            <span style="font-size:11px;color:#9ca3af">Przeglądarka zapyta o zgodę</span>
+            <span style="font-size:11px;color:#9ca3af">{{ t('mySettings.pbx.notifications.permissionHint') }}</span>
           </div>
         </ng-container>
       </div>
@@ -247,6 +246,7 @@ const BASE = environment.apiUrl;
   </div>
 
 </div>
+</ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; }
@@ -267,6 +267,7 @@ export class MySettingsComponent implements OnInit {
   private cdr        = inject(ChangeDetectorRef);
   private api        = inject(CrmApiService);
   auth               = inject(AuthService);
+  private transloco  = inject(TranslocoService);
 
   /** Substitutions panel — same scope as crmGuard: admin | salesperson | sales_manager. */
   get canSeeSubstitutions(): boolean {
@@ -355,7 +356,7 @@ export class MySettingsComponent implements OnInit {
       },
       error: err => {
         this.pbxSaving  = false;
-        this.pbxSaveErr = err.error?.error ?? 'Błąd zapisu — spróbuj ponownie';
+        this.pbxSaveErr = err.error?.error ?? this.transloco.translate('account.mySettings.saveFailed');
         this.cdr.markForCheck();
       },
     });
@@ -399,14 +400,14 @@ export class MySettingsComponent implements OnInit {
       },
       error: () => {
         this.saving    = false;
-        this.saveError = 'Błąd zapisu — spróbuj ponownie';
+        this.saveError = this.transloco.translate('account.mySettings.saveFailed');
         this.cdr.markForCheck();
       },
     });
   }
 
   clear() {
-    if (!confirm('Usunąć zapisaną stopkę? Nie będzie już doklejana do maili.')) return;
+    if (!confirm(this.transloco.translate('account.mySettings.signature.deleteConfirm'))) return;
     this.signatureHtml = '';
     this.updatePreview();
     this.save();
@@ -459,14 +460,14 @@ export class MySettingsComponent implements OnInit {
       },
       error: () => {
         this.tplSaving = false;
-        this.tplError  = 'Błąd zapisu — spróbuj ponownie';
+        this.tplError  = this.transloco.translate('account.mySettings.saveFailed');
         this.cdr.markForCheck();
       },
     });
   }
 
   deleteTpl(t: EmailTemplate) {
-    if (!confirm(`Usunąć szablon „${t.name}"?`)) return;
+    if (!confirm(this.transloco.translate('account.mySettings.templates.deleteConfirm', { name: t.name }))) return;
     this.tplSaving = true;
     this.api.deleteEmailTemplate(t.id).subscribe({
       next: () => {

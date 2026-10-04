@@ -1,0 +1,71 @@
+{
+  "myDevices": {
+    "empty": "Keine angemeldeten Telefone.",
+    "hint": "Telefone, auf denen Sie in der mobilen CRMtree-App angemeldet sind. Wenn Sie Ihr Telefon verlieren oder austauschen, melden Sie es hier ab — die App darauf verliert spätestens nach einigen Minuten den Zugriff.",
+    "lastActive": "zuletzt aktiv {date}",
+    "signOut": "Abmelden",
+    "signOutConfirm": "Möchten Sie {name} von der CRMtree-App abmelden?",
+    "signOutFailed": "Das Gerät konnte nicht abgemeldet werden.",
+    "signedInSince": "angemeldet seit {date}",
+    "signedOut": "Abgemeldet: {name}.",
+    "signingOut": "Wird abgemeldet…",
+    "thisDevice": "dieses Gerät",
+    "title": "Angemeldete Telefone",
+    "unknownDevice": "Unbekanntes Gerät"
+  },
+  "mySettings": {
+    "delete": "Löschen",
+    "pbx": {
+      "configured": "Token konfiguriert",
+      "directPhone": "Ihre Durchwahl:",
+      "hideToken": "Verbergen",
+      "hint": "Um das integrierte Telefon zu nutzen, fügen Sie Ihren Personal Access Token aus dem ip-pbx.eu-Panel ein. Mit dem Token kann die Anwendung Ihre SIP-Daten abrufen. Kunden, die Ihre Durchwahl sehen, können Sie direkt zurückrufen.",
+      "noDirectPhone": "In der PBX ist keine Durchwahl zugewiesen",
+      "notConfigured": "Kein Token — das Softphone funktioniert nicht.",
+      "notifications": {
+        "blocked": "Benachrichtigungen blockiert — bitte manuell in den Browsereinstellungen freigeben:",
+        "enable": "Benachrichtigungen aktivieren",
+        "enabled": "Benachrichtigungen aktiviert",
+        "hint": "Zeigt eine Systembenachrichtigung an, wenn ein Kunde anruft — auch wenn der Browser im Hintergrund läuft oder Sie in einem anderen Programm arbeiten.",
+        "permissionHint": "Der Browser fragt nach Ihrer Zustimmung",
+        "title": "Anrufbenachrichtigungen",
+        "unblockPath": "Schloss neben der Seitenadresse → Benachrichtigungen → Zulassen"
+      },
+      "saveToken": "Token speichern",
+      "showToken": "Anzeigen",
+      "title": "Softphone — PBX-Token",
+      "tokenHelpEnd": "kopieren und hier einfügen.",
+      "tokenHelpStart": "ip-pbx.eu-Panel → auf Ihren Namen klicken (oben rechts)",
+      "tokenPlaceholder": "Token aus ip-pbx.eu einfügen…",
+      "tokenSaved": "Token gespeichert",
+      "tokenSavedWithPhone": "Token gespeichert — Nummer: {phone}"
+    },
+    "saveFailed": "Fehler beim Speichern — bitte erneut versuchen",
+    "saving": "Wird gespeichert…",
+    "signature": {
+      "deleteConfirm": "Gespeicherte Signatur löschen? Sie wird dann nicht mehr an E-Mails angehängt.",
+      "empty": "Keine Signatur — fügen Sie links den HTML-Code ein",
+      "hint": "Fügen Sie unten den HTML-Code Ihrer Signatur ein. Sie wird automatisch an jede E-Mail angehängt, die aus dem System gesendet wird (Leads und Partnerverzeichnis). Sie können fertiges HTML aus Ihrem E-Mail-Programm oder ein Tool zum Erstellen von Signaturen verwenden — z. B. den HubSpot Email Signature Generator.",
+      "htmlLabel": "HTML-Code der Signatur",
+      "htmlPlaceholder": "HTML-Code der Signatur hier einfügen…",
+      "preview": "Vorschau",
+      "save": "Signatur speichern",
+      "saved": "Signatur gespeichert",
+      "title": "Meine E-Mail-Signatur"
+    },
+    "templates": {
+      "bodyLabel": "Inhalt",
+      "bodyPlaceholder": "Inhalt der Vorlage…",
+      "deleteConfirm": "Vorlage „{name}“ löschen?",
+      "edit": "Bearbeiten",
+      "editTitle": "Vorlage bearbeiten",
+      "empty": "Keine Vorlagen. Klicken Sie auf „+ Neue Vorlage“, um die erste hinzuzufügen.",
+      "hint": "Speichern Sie fertige Nachrichtentexte, die Sie beim Schreiben einer E-Mail an einen Lead oder Partner schnell einfügen können.",
+      "nameLabel": "Name der Vorlage",
+      "namePlaceholder": "z. B. Intro-Meeting, Follow-up nach der Demo…",
+      "new": "Neue Vorlage",
+      "title": "E-Mail-Vorlagen"
+    },
+    "title": "Meine Einstellungen"
+  }
+}

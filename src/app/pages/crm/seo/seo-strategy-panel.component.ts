@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SeoPillar, SeoCompetitor, SeoBacklink } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -7,62 +8,64 @@ import { ToastService } from '../../../core/services/toast.service';
   selector: 'wt-seo-strategy-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  providers: [provideTranslocoScope('crm')],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe],
   template: `
+    <ng-container *transloco="let t; prefix: 'crm'">
     <div class="strategy-sections">
     <div class="pillar-grid">
       @for (p of pillars; track p.id) {
         <div class="pillar-card">
           @if (editingId() === p.id) {
-            <label class="field-label">Nazwa</label>
+            <label class="field-label">{{ t('seo.strategy.pillars.name') }}</label>
             <input class="field-input" [(ngModel)]="editName">
-            <label class="field-label">Opis</label>
+            <label class="field-label">{{ t('seo.strategy.pillars.description') }}</label>
             <textarea class="field-input" rows="3" [(ngModel)]="editDescription"></textarea>
-            <label class="field-label">Motyw słów kluczowych</label>
+            <label class="field-label">{{ t('seo.strategy.pillars.keywordTheme') }}</label>
             <input class="field-input" [(ngModel)]="editTheme">
             <div class="pillar-edit-actions">
               <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(p.id)" [disabled]="!editName.trim() || savingEdit()">
-                @if (savingEdit()) { Zapisuję… } @else { Zapisz }
+                @if (savingEdit()) { {{ t('seo.strategy.pillars.saving') }} } @else { {{ 'actions.save' | transloco }} }
               </button>
-              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">Anuluj</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
             <div class="pillar-card-top">
               <span class="pillar-name">{{ p.name }}</span>
-              <span class="pillar-count">{{ p.article_count }} art.</span>
+              <span class="pillar-count">{{ t('seo.strategy.pillars.articleCount', { count: p.article_count }) }}</span>
             </div>
             <p class="pillar-desc">{{ p.description }}</p>
             <span class="pillar-theme">{{ p.target_keyword_theme }}</span>
             <div class="pillar-card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(p)">Edytuj</button>
-              <button type="button" class="btn-remove" (click)="removePillar(p.id)" aria-label="Usuń filar">&times;</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(p)">{{ t('seo.strategy.pillars.edit') }}</button>
+              <button type="button" class="btn-remove" (click)="removePillar(p.id)" [attr.aria-label]="t('seo.strategy.pillars.removeAria')">&times;</button>
             </div>
           }
         </div>
       }
       <div class="pillar-card pillar-card-new">
         @if (addingPillar()) {
-          <label class="field-label">Nazwa</label>
-          <input class="field-input" [(ngModel)]="newPillarName" placeholder="np. Zarządzanie flotą jachtów">
-          <label class="field-label">Opis</label>
-          <textarea class="field-input" rows="3" [(ngModel)]="newPillarDescription" placeholder="O czym mają być artykuły w tym filarze"></textarea>
-          <label class="field-label">Motyw słów kluczowych</label>
-          <input class="field-input" [(ngModel)]="newPillarTheme" placeholder="np. czarter jachtów, marina">
+          <label class="field-label">{{ t('seo.strategy.pillars.name') }}</label>
+          <input class="field-input" [(ngModel)]="newPillarName" [placeholder]="t('seo.strategy.pillars.namePlaceholder')">
+          <label class="field-label">{{ t('seo.strategy.pillars.description') }}</label>
+          <textarea class="field-input" rows="3" [(ngModel)]="newPillarDescription" [placeholder]="t('seo.strategy.pillars.descriptionPlaceholder')"></textarea>
+          <label class="field-label">{{ t('seo.strategy.pillars.keywordTheme') }}</label>
+          <input class="field-input" [(ngModel)]="newPillarTheme" [placeholder]="t('seo.strategy.pillars.keywordThemePlaceholder')">
           <div class="pillar-edit-actions">
             <button type="button" class="btn-ghost btn-sm" (click)="addPillar()" [disabled]="!newPillarName.trim() || savingNewPillar()">
-              @if (savingNewPillar()) { Dodaję… } @else { Dodaj filar }
+              @if (savingNewPillar()) { {{ t('seo.strategy.pillars.adding') }} } @else { {{ t('seo.strategy.pillars.add') }} }
             </button>
-            <button type="button" class="btn-ghost btn-sm" (click)="addingPillar.set(false)">Anuluj</button>
+            <button type="button" class="btn-ghost btn-sm" (click)="addingPillar.set(false)">{{ 'actions.cancel' | transloco }}</button>
           </div>
         } @else {
-          <button type="button" class="btn-add-pillar" (click)="addingPillar.set(true)">+ Dodaj własny filar</button>
+          <button type="button" class="btn-add-pillar" (click)="addingPillar.set(true)">{{ t('seo.strategy.pillars.addOwn') }}</button>
         }
       </div>
     </div>
 
     <div class="competitors-box">
-      <h3>Konkurenci ({{ competitors().length }})</h3>
-      <p class="hint">Lista wpływa na generowanie filarów tematycznych — im lepiej opisana, tym trafniejsza strategia.</p>
+      <h3>{{ t('seo.strategy.competitors.title', { count: competitors().length }) }}</h3>
+      <p class="hint">{{ t('seo.strategy.competitors.hint') }}</p>
       <div class="competitors-list">
         @for (c of competitors(); track c.id) {
           <div class="competitor-row">
@@ -70,33 +73,32 @@ import { ToastService } from '../../../core/services/toast.service';
               <a [href]="c.url" target="_blank" rel="noopener">{{ c.url }}</a>
               @if (c.notes) { <span class="competitor-notes">{{ c.notes }}</span> }
             </div>
-            <button type="button" class="btn-remove" (click)="remove(c.id)" aria-label="Usuń">&times;</button>
+            <button type="button" class="btn-remove" (click)="remove(c.id)" [attr.aria-label]="t('seo.strategy.competitors.removeAria')">&times;</button>
           </div>
         }
         @if (competitors().length === 0) {
-          <p class="empty">Brak konkurentów na liście.</p>
+          <p class="empty">{{ t('seo.strategy.competitors.empty') }}</p>
         }
       </div>
       <div class="competitor-form">
-        <input class="competitor-input" [(ngModel)]="newUrl" placeholder="https://konkurent.pl">
-        <input class="competitor-input" [(ngModel)]="newNotes" placeholder="Notatka (opcjonalnie)">
-        <button type="button" class="btn-ghost btn-sm" (click)="add()" [disabled]="!newUrl.trim()">Dodaj</button>
+        <input class="competitor-input" [(ngModel)]="newUrl" [placeholder]="t('seo.strategy.competitors.urlPlaceholder')">
+        <input class="competitor-input" [(ngModel)]="newNotes" [placeholder]="t('seo.strategy.competitors.notesPlaceholder')">
+        <button type="button" class="btn-ghost btn-sm" (click)="add()" [disabled]="!newUrl.trim()">{{ t('seo.strategy.competitors.add') }}</button>
       </div>
     </div>
 
     <div class="backlinks-box">
-      <h3>Backlinki między tenantami ({{ backlinks().length }})</h3>
+      <h3>{{ t('seo.strategy.backlinks.title', { count: backlinks().length }) }}</h3>
       <p class="hint">
-        Opt-in wymiana linków z innymi tenantami z tej samej branży (industry_vertical), wyłącznie tematycznie trafna,
-        bez wymuszonej wzajemności. Dopasowanie działa dopiero gdy inny tenant też się zgłosi — dziś jesteś jedynym.
+        {{ t('seo.strategy.backlinks.hint') }}
       </p>
       <label class="opt-in-row">
         <input type="checkbox" [ngModel]="optIn()" (ngModelChange)="toggleOptIn($event)">
-        Zgoda na wymianę backlinków z innymi tenantami
+        {{ t('seo.strategy.backlinks.optIn') }}
       </label>
       @if (optIn()) {
         <button type="button" class="btn-ghost btn-sm" (click)="findCandidates()" [disabled]="findingCandidates()">
-          @if (findingCandidates()) { Szukam… } @else { Szukaj kandydatów }
+          @if (findingCandidates()) { {{ t('seo.strategy.backlinks.searching') }} } @else { {{ t('seo.strategy.backlinks.findCandidates') }} }
         </button>
       }
       <div class="backlinks-list">
@@ -105,17 +107,18 @@ import { ToastService } from '../../../core/services/toast.service';
             <span class="backlink-desc">{{ b.from_title }} &rarr; {{ b.to_title }}</span>
             <span class="backlink-status" [attr.data-status]="b.status">{{ statusLabel(b.status) }}</span>
             @if (b.status === 'suggested') {
-              <button type="button" class="btn-ghost btn-sm" (click)="accept(b.id)">Akceptuj</button>
-              <button type="button" class="btn-ghost btn-sm" (click)="reject(b.id)">Odrzuć</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="accept(b.id)">{{ t('seo.strategy.backlinks.accept') }}</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="reject(b.id)">{{ t('seo.strategy.backlinks.reject') }}</button>
             }
           </div>
         }
         @if (backlinks().length === 0) {
-          <p class="empty">Brak backlinków.</p>
+          <p class="empty">{{ t('seo.strategy.backlinks.empty') }}</p>
         }
       </div>
     </div>
     </div>
+    </ng-container>
   `,
   styles: [`
     /* 12px gap between this panel's own tiles (pillars / competitors / backlinks) —
@@ -186,6 +189,7 @@ export class SeoStrategyPanelComponent implements OnInit {
 
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   readonly competitors = signal<SeoCompetitor[]>([]);
   readonly backlinks = signal<SeoBacklink[]>([]);
@@ -206,7 +210,11 @@ export class SeoStrategyPanelComponent implements OnInit {
   newPillarDescription = '';
   newPillarTheme = '';
 
-  private readonly statusLabels: Record<string, string> = { suggested: 'Sugerowany', accepted: 'Zaakceptowany', rejected: 'Odrzucony' };
+  private readonly statusLabelKeys: Record<string, string> = {
+    suggested: 'crm.seo.strategy.backlinks.statuses.suggested',
+    accepted: 'crm.seo.strategy.backlinks.statuses.accepted',
+    rejected: 'crm.seo.strategy.backlinks.statuses.rejected',
+  };
 
   ngOnInit(): void {
     this.loadCompetitors();
@@ -215,7 +223,8 @@ export class SeoStrategyPanelComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
-    return this.statusLabels[status] ?? status;
+    const key = this.statusLabelKeys[status];
+    return key ? this.transloco.translate(key) : status;
   }
 
   private loadCompetitors(): void {
@@ -227,19 +236,19 @@ export class SeoStrategyPanelComponent implements OnInit {
     if (!url) return;
     this.seoService.addCompetitor(url, this.newNotes.trim() || undefined).subscribe({
       next: () => {
-        this.toast.success('Dodano konkurenta.');
+        this.toast.success(this.transloco.translate('crm.seo.strategy.toasts.competitorAdded'));
         this.newUrl = '';
         this.newNotes = '';
         this.loadCompetitors();
       },
-      error: () => this.toast.error('Nie udało się dodać konkurenta.'),
+      error: () => this.toast.error(this.transloco.translate('crm.seo.strategy.toasts.competitorAddFailed')),
     });
   }
 
   remove(id: number): void {
     this.seoService.deleteCompetitor(id).subscribe({
-      next: () => { this.toast.info('Usunięto konkurenta.'); this.loadCompetitors(); },
-      error: () => this.toast.error('Nie udało się usunąć konkurenta.'),
+      next: () => { this.toast.info(this.transloco.translate('crm.seo.strategy.toasts.competitorRemoved')); this.loadCompetitors(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.strategy.toasts.competitorRemoveFailed')),
     });
   }
 
@@ -250,8 +259,8 @@ export class SeoStrategyPanelComponent implements OnInit {
   toggleOptIn(value: boolean): void {
     this.optIn.set(value);
     this.seoService.setBacklinksOptIn(value).subscribe({
-      next: () => this.toast.success(value ? 'Zgoda na backlinki włączona.' : 'Zgoda na backlinki wyłączona.'),
-      error: () => { this.toast.error('Nie udało się zapisać zgody.'); this.optIn.set(!value); },
+      next: () => this.toast.success(value ? this.transloco.translate('crm.seo.strategy.toasts.optInEnabled') : this.transloco.translate('crm.seo.strategy.toasts.optInDisabled')),
+      error: () => { this.toast.error(this.transloco.translate('crm.seo.strategy.toasts.optInSaveFailed')); this.optIn.set(!value); },
     });
   }
 
@@ -261,24 +270,24 @@ export class SeoStrategyPanelComponent implements OnInit {
     this.seoService.findBacklinkCandidates().subscribe({
       next: (found) => {
         this.findingCandidates.set(false);
-        this.toast.info(found.length ? `Znaleziono ${found.length} kandydatów.` : 'Brak kandydatów — żaden inny tenant nie pasuje jeszcze branżą i zgodą.');
+        this.toast.info(found.length ? this.transloco.translate('crm.seo.strategy.toasts.candidatesFound', { count: found.length }) : this.transloco.translate('crm.seo.strategy.toasts.noCandidates'));
         this.loadBacklinks();
       },
-      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się wyszukać kandydatów.'); this.findingCandidates.set(false); },
+      error: (err) => { this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.strategy.toasts.candidatesSearchFailed')); this.findingCandidates.set(false); },
     });
   }
 
   accept(id: number): void {
     this.seoService.acceptBacklink(id).subscribe({
-      next: () => { this.toast.success('Backlink zaakceptowany.'); this.loadBacklinks(); },
-      error: () => this.toast.error('Nie udało się zaakceptować.'),
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.strategy.toasts.backlinkAccepted')); this.loadBacklinks(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.strategy.toasts.backlinkAcceptFailed')),
     });
   }
 
   reject(id: number): void {
     this.seoService.rejectBacklink(id).subscribe({
-      next: () => { this.toast.info('Backlink odrzucony.'); this.loadBacklinks(); },
-      error: () => this.toast.error('Nie udało się odrzucić.'),
+      next: () => { this.toast.info(this.transloco.translate('crm.seo.strategy.toasts.backlinkRejected')); this.loadBacklinks(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.strategy.toasts.backlinkRejectFailed')),
     });
   }
 
@@ -305,20 +314,20 @@ export class SeoStrategyPanelComponent implements OnInit {
       next: () => {
         this.savingEdit.set(false);
         this.editingId.set(null);
-        this.toast.success('Filar zaktualizowany.');
+        this.toast.success(this.transloco.translate('crm.seo.strategy.toasts.pillarUpdated'));
         this.pillarsChanged.emit();
       },
       error: (err) => {
         this.savingEdit.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się zapisać filaru.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.strategy.toasts.pillarSaveFailed'));
       },
     });
   }
 
   removePillar(id: number): void {
     this.seoService.deletePillar(id).subscribe({
-      next: () => { this.toast.info('Filar usunięty.'); this.pillarsChanged.emit(); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć filaru.'),
+      next: () => { this.toast.info(this.transloco.translate('crm.seo.strategy.toasts.pillarRemoved')); this.pillarsChanged.emit(); },
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.strategy.toasts.pillarRemoveFailed')),
     });
   }
 
@@ -333,12 +342,12 @@ export class SeoStrategyPanelComponent implements OnInit {
         this.newPillarName = '';
         this.newPillarDescription = '';
         this.newPillarTheme = '';
-        this.toast.success('Filar dodany.');
+        this.toast.success(this.transloco.translate('crm.seo.strategy.toasts.pillarAdded'));
         this.pillarsChanged.emit();
       },
       error: (err) => {
         this.savingNewPillar.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się dodać filaru.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.strategy.toasts.pillarAddFailed'));
       },
     });
   }

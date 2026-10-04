@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal,
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SeoContentSummary, SeoContent, SeoContentStatus, GscStatus, SeoPillar, SeoAuthor, SeoInternalLink, SocialPost, SocialPlatform, SeoRefreshReason, SeoRefreshSignal, SeoGenerationJob, SeoScreenshot } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SeoStrategyPanelComponent } from './seo-strategy-panel.component';
@@ -12,27 +13,27 @@ import { SeoPublishingCalendarComponent } from './seo-publishing-calendar.compon
 import { SeoScreenshotsPanelComponent } from './seo-screenshots-panel.component';
 import { SeoContentSlotsComponent } from './seo-content-slots.component';
 
-const STATUS_LABELS: Record<SeoContentStatus, string> = {
-  draft: 'Szkic',
-  in_review: 'Do akceptacji',
-  approved: 'Zaakceptowane',
-  scheduled: 'Zaplanowane',
-  published: 'Opublikowane',
+const STATUS_LABEL_KEYS: Record<SeoContentStatus, string> = {
+  draft: 'crm.seo.main.statuses.draft',
+  in_review: 'crm.seo.main.statuses.in_review',
+  approved: 'crm.seo.main.statuses.approved',
+  scheduled: 'crm.seo.main.statuses.scheduled',
+  published: 'crm.seo.main.statuses.published',
   // Since 0299 only new drafts that failed automatic validation land here —
   // published articles queued for a refresh stay 'published' (refresh_reason).
-  needs_update: 'Do poprawy',
-  archived: 'Zarchiwizowane',
-  queued: 'W kolejce (auto)',
+  needs_update: 'crm.seo.main.statuses.needs_update',
+  archived: 'crm.seo.main.statuses.archived',
+  queued: 'crm.seo.main.statuses.queued',
 };
 
 // "Do odświeżenia" isn't a status: it lists published articles with a refresh_reason.
 type ContentFilter = SeoContentStatus | '' | 'refresh';
 
-const REFRESH_REASON_LABELS: Record<SeoRefreshReason, string> = {
-  striking_distance: 'Blisko 1. strony Google',
-  position_drop: 'Spadek pozycji',
-  age: 'Nieaktualizowany 90+ dni',
-  manual: 'Oznaczony ręcznie',
+const REFRESH_REASON_LABEL_KEYS: Record<SeoRefreshReason, string> = {
+  striking_distance: 'crm.seo.main.refresh.reasons.striking_distance',
+  position_drop: 'crm.seo.main.refresh.reasons.position_drop',
+  age: 'crm.seo.main.refresh.reasons.age',
+  manual: 'crm.seo.main.refresh.reasons.manual',
 };
 
 const REFRESH_POLL_MS = 15000;
@@ -41,47 +42,56 @@ const SOCIAL_PLATFORM_LABELS: Record<string, string> = { linkedin: 'LinkedIn', f
 
 // Reasons sent back by the backend OAuth callbacks (crm-seo.js) — LinkedIn's
 // and Meta's own error codes are passed through as-is.
-const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
-  user_cancelled_login: 'Anulowano logowanie.',
-  user_cancelled_authorize: 'Anulowano udzielenie dostępu.',
-  access_denied: 'Nie udzielono dostępu.',
-  unauthorized_scope_error: 'Aplikacja LinkedIn nie ma zatwierdzonego dostępu do publikacji na stronie firmowej (produkt Community Management API).',
-  invalid_state: 'Sesja łączenia wygasła — spróbuj ponownie.',
-  callback_failed: 'Nie udało się dokończyć łączenia. Upewnij się, że łączone konto jest administratorem strony firmowej.',
+const SOCIAL_ERROR_MESSAGE_KEYS: Record<string, string> = {
+  user_cancelled_login: 'crm.seo.main.socialConnect.errors.user_cancelled_login',
+  user_cancelled_authorize: 'crm.seo.main.socialConnect.errors.user_cancelled_authorize',
+  access_denied: 'crm.seo.main.socialConnect.errors.access_denied',
+  unauthorized_scope_error: 'crm.seo.main.socialConnect.errors.unauthorized_scope_error',
+  invalid_state: 'crm.seo.main.socialConnect.errors.invalid_state',
+  callback_failed: 'crm.seo.main.socialConnect.errors.callback_failed',
+};
+
+const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
+  draft: 'crm.seo.main.social.statuses.draft',
+  queued: 'crm.seo.main.social.statuses.queued',
+  published: 'crm.seo.main.social.statuses.published',
+  failed: 'crm.seo.main.social.statuses.failed',
 };
 
 @Component({
   selector: 'wt-crm-seo',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent, SeoAuthorsPanelComponent, SeoPublishingCalendarComponent, SeoScreenshotsPanelComponent, SeoContentSlotsComponent],
+  providers: [provideTranslocoScope('crm')],
+  imports: [FormsModule, DatePipe, TranslocoDirective, TranslocoPipe, SeoStrategyPanelComponent, SeoSocialChannelsComponent, SeoTenantSettingsComponent, SeoAuthorsPanelComponent, SeoPublishingCalendarComponent, SeoScreenshotsPanelComponent, SeoContentSlotsComponent],
   template: `
+    <ng-container *transloco="let t; prefix: 'crm'">
     <div class="seo-page">
       <header class="seo-header">
-        <h1>SEObot — redakcja treści</h1>
+        <h1>{{ t('seo.main.title') }}</h1>
         <div class="header-actions">
           <button type="button" class="btn-ghost section-toggle" [class.active]="showStrategy()" (click)="showStrategy.set(!showStrategy())">
-            Strategia treści ({{ pillars().length }} filarów)
+            {{ t('seo.main.header.strategyToggle', { count: pillars().length }) }}
           </button>
           <button type="button" class="btn-ghost section-toggle" [class.active]="showAuthors()" (click)="showAuthors.set(!showAuthors())">
-            Autorzy ({{ authors().length }})
+            {{ t('seo.main.header.authorsToggle', { count: authors().length }) }}
           </button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showScreenshots()" (click)="showScreenshots.set(!showScreenshots())">Screeny</button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showChannels()" (click)="showChannels.set(!showChannels())">Kanały social</button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showCalendar()" (click)="showCalendar.set(!showCalendar())">Kalendarz publikacji</button>
-          <button type="button" class="btn-ghost section-toggle" [class.active]="showSettings()" (click)="showSettings.set(!showSettings())">Ustawienia</button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showScreenshots()" (click)="showScreenshots.set(!showScreenshots())">{{ t('seo.main.header.screenshotsToggle') }}</button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showChannels()" (click)="showChannels.set(!showChannels())">{{ t('seo.main.sections.channels') }}</button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showCalendar()" (click)="showCalendar.set(!showCalendar())">{{ t('seo.main.sections.calendar') }}</button>
+          <button type="button" class="btn-ghost section-toggle" [class.active]="showSettings()" (click)="showSettings.set(!showSettings())">{{ t('seo.main.sections.settings') }}</button>
           <button type="button" class="btn-accent" (click)="generate()" [disabled]="generating()">
-            @if (generating()) { Generuję… (może potrwać kilka minut) } @else { Generuj nowy artykuł }
+            @if (generating()) { {{ t('seo.main.generate.inProgress') }} } @else { {{ t('seo.main.generate.action') }} }
           </button>
           <div class="gsc-status">
             @if (gsc()?.connected) {
-              <span class="gsc-badge gsc-connected">Search Console: połączony ({{ gsc()?.site_url }})</span>
+              <span class="gsc-badge gsc-connected">{{ t('seo.main.gsc.connected', { siteUrl: gsc()?.site_url }) }}</span>
               <button type="button" class="btn-ghost btn-sm" (click)="syncGsc()" [disabled]="syncingGsc()">
-                @if (syncingGsc()) { Synchronizuję… } @else { Synchronizuj teraz }
+                @if (syncingGsc()) { {{ t('seo.main.gsc.syncing') }} } @else { {{ t('seo.main.gsc.syncNow') }} }
               </button>
-              <button type="button" class="btn-ghost btn-sm" (click)="disconnectGsc()">Rozłącz</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="disconnectGsc()">{{ t('seo.main.gsc.disconnect') }}</button>
             } @else {
-              <button type="button" class="btn-ghost" (click)="connectGsc()">Połącz Search Console</button>
+              <button type="button" class="btn-ghost" (click)="connectGsc()">{{ t('seo.main.gsc.connect') }}</button>
             }
           </div>
         </div>
@@ -89,37 +99,37 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
 
       @if (showStrategy()) {
         <section class="seo-section">
-          <h2 class="section-title">Strategia treści</h2>
+          <h2 class="section-title">{{ t('seo.main.sections.strategy') }}</h2>
           <wt-seo-strategy-panel [pillars]="pillars()" (pillarsChanged)="loadPillars()" />
         </section>
       }
       @if (showAuthors()) {
         <section class="seo-section">
-          <h2 class="section-title">Autorzy</h2>
+          <h2 class="section-title">{{ t('seo.main.sections.authors') }}</h2>
           <wt-seo-authors-panel (authorsChanged)="loadAuthors()" />
         </section>
       }
       @if (showScreenshots()) {
         <section class="seo-section">
-          <h2 class="section-title">Screeny produktu</h2>
+          <h2 class="section-title">{{ t('seo.main.sections.screenshots') }}</h2>
           <wt-seo-screenshots-panel />
         </section>
       }
       @if (showChannels()) {
         <section class="seo-section">
-          <h2 class="section-title">Kanały social</h2>
+          <h2 class="section-title">{{ t('seo.main.sections.channels') }}</h2>
           <wt-seo-social-channels />
         </section>
       }
       @if (showSettings()) {
         <section class="seo-section">
-          <h2 class="section-title">Ustawienia</h2>
+          <h2 class="section-title">{{ t('seo.main.sections.settings') }}</h2>
           <wt-seo-tenant-settings />
         </section>
       }
       @if (showCalendar()) {
         <section class="seo-section">
-          <h2 class="section-title">Kalendarz publikacji</h2>
+          <h2 class="section-title">{{ t('seo.main.sections.calendar') }}</h2>
           <wt-seo-publishing-calendar />
         </section>
       }
@@ -135,14 +145,14 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
               class="tab"
               [class.active]="statusFilter() === s.value"
               (click)="setStatusFilter(s.value)"
-            >{{ s.label }}</button>
+            >{{ t(s.labelKey) }}</button>
           }
         </div>
 
         <div class="seo-layout">
           <div class="seo-list">
           @if (items().length === 0) {
-            <p class="empty">Brak wpisów w tym stanie.</p>
+            <p class="empty">{{ t('seo.main.list.empty') }}</p>
           }
           @for (item of items(); track item.id) {
             <button type="button" class="content-row" [class.selected]="selected()?.id === item.id" (click)="select(item.id)">
@@ -153,7 +163,7 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
                 <span class="refresh-pill">↻ {{ refreshReasonLabel(item.refresh_reason) }}</span>
               }
               @if (item.impressions_28d > 0 || item.clicks_28d > 0) {
-                <span class="row-metrics">{{ item.impressions_28d }} wyśw. · {{ item.clicks_28d }} kliknięć (28 dni)</span>
+                <span class="row-metrics">{{ t('seo.main.list.metrics', { impressions: item.impressions_28d, clicks: item.clicks_28d }) }}</span>
               }
             </button>
           }
@@ -166,33 +176,33 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
             }
             @if (d.impressions_28d > 0 || d.clicks_28d > 0) {
               <div class="metrics-row">
-                <span>{{ d.impressions_28d }} wyświetleń</span>
-                <span>{{ d.clicks_28d }} kliknięć</span>
-                @if (d.avg_position_28d) { <span>śr. pozycja {{ d.avg_position_28d }}</span> }
-                <span class="metrics-note">(ostatnie 28 dni, dane Search Console)</span>
+                <span>{{ t('seo.main.detail.metrics.impressions', { count: d.impressions_28d }) }}</span>
+                <span>{{ t('seo.main.detail.metrics.clicks', { count: d.clicks_28d }) }}</span>
+                @if (d.avg_position_28d) { <span>{{ t('seo.main.detail.metrics.avgPosition', { position: d.avg_position_28d }) }}</span> }
+                <span class="metrics-note">{{ t('seo.main.detail.metrics.note') }}</span>
               </div>
             }
             <div class="image-controls">
-              <input class="image-url-input" [(ngModel)]="editImageUrl" placeholder="URL zdjęcia nagłówkowego">
-              <button type="button" class="btn-ghost btn-sm" (click)="saveImageUrl(d.id)">Zapisz zdjęcie</button>
+              <input class="image-url-input" [(ngModel)]="editImageUrl" [placeholder]="t('seo.main.detail.image.urlPlaceholder')">
+              <button type="button" class="btn-ghost btn-sm" (click)="saveImageUrl(d.id)">{{ t('seo.main.detail.image.save') }}</button>
               <button type="button" class="btn-ghost btn-sm" (click)="rerollImage(d.id)" [disabled]="rerolling()">
-                @if (rerolling()) { Losuję… } @else { Losuj inne z Pexels }
+                @if (rerolling()) { {{ t('seo.main.detail.image.rerolling') }} } @else { {{ t('seo.main.detail.image.reroll') }} }
               </button>
             </div>
             <h2>
               <input class="title-input" [(ngModel)]="editTitle" [disabled]="!isEditable(d.status)">
             </h2>
             <div class="author-row">
-              <label for="authorSelect">Autor</label>
+              <label for="authorSelect">{{ t('seo.main.detail.author.label') }}</label>
               <select id="authorSelect" [(ngModel)]="editAuthorId" [disabled]="!isEditable(d.status)" (change)="saveAuthor(d.id)">
-                <option [ngValue]="null">— wybierz autora —</option>
+                <option [ngValue]="null">{{ t('seo.main.detail.author.choose') }}</option>
                 @for (a of selectableAuthors(); track a.id) {
-                  <option [ngValue]="a.id">{{ a.full_name }}{{ a.job_title ? ' · ' + a.job_title : '' }}{{ !a.is_active ? ' (nieaktywny)' : '' }}</option>
+                  <option [ngValue]="a.id">{{ a.full_name }}{{ a.job_title ? ' · ' + a.job_title : '' }}{{ !a.is_active ? ' (' + t('seo.main.detail.author.inactive') + ')' : '' }}</option>
                 }
               </select>
-              @if (!d.author_id) { <span class="author-missing-note">Wymagany przed zatwierdzeniem</span> }
+              @if (!d.author_id) { <span class="author-missing-note">{{ t('seo.main.detail.author.required') }}</span> }
             </div>
-            <textarea class="meta-input" [(ngModel)]="editMeta" [disabled]="!isEditable(d.status)" rows="2" placeholder="Meta description"></textarea>
+            <textarea class="meta-input" [(ngModel)]="editMeta" [disabled]="!isEditable(d.status)" rows="2" [placeholder]="t('seo.main.detail.metaPlaceholder')"></textarea>
             <textarea class="body-input" [(ngModel)]="editBody" [disabled]="!isEditable(d.status)" rows="14"></textarea>
 
             <wt-seo-content-slots
@@ -204,7 +214,7 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
 
             @if (internalLinks().length > 0) {
               <div class="internal-links-row">
-                <span class="internal-links-label">Linki wewnętrzne:</span>
+                <span class="internal-links-label">{{ t('seo.main.detail.internalLinks') }}</span>
                 @for (link of internalLinks(); track link.id) {
                   <span class="internal-link-chip">{{ link.to_title }}</span>
                 }
@@ -213,90 +223,90 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
 
             @if (isEditable(d.status)) {
               <div class="schedule-row">
-                <label for="scheduleInput">Zaplanuj publikację na:</label>
+                <label for="scheduleInput">{{ t('seo.main.schedule.label') }}</label>
                 <input id="scheduleInput" type="datetime-local" [(ngModel)]="editScheduledAt" (change)="saveScheduledAt(d.id)">
                 @if (editScheduledAt) {
-                  <button type="button" class="btn-ghost btn-sm" (click)="clearSchedule(d.id)">Usuń termin</button>
+                  <button type="button" class="btn-ghost btn-sm" (click)="clearSchedule(d.id)">{{ t('seo.main.schedule.clear') }}</button>
                 }
               </div>
             } @else if (d.status === 'scheduled' && d.scheduled_at) {
-              <p class="schedule-note">Zaplanowano publikację: {{ d.scheduled_at | date:'d MMMM y, HH:mm':'':'pl' }}</p>
+              <p class="schedule-note">{{ t('seo.main.schedule.scheduledNote', { date: (d.scheduled_at | date:'d MMMM y, HH:mm') }) }}</p>
             }
 
             <div class="detail-actions">
               @if (isEditable(d.status)) {
-                <button type="button" class="btn-ghost" (click)="saveEdits(d.id)">Zapisz zmiany</button>
+                <button type="button" class="btn-ghost" (click)="saveEdits(d.id)">{{ t('seo.main.actions.saveChanges') }}</button>
               }
               @if (d.status === 'in_review' || d.status === 'needs_update') {
-                <button type="button" class="btn-reject" (click)="reject(d.id)">Odrzuć</button>
+                <button type="button" class="btn-reject" (click)="reject(d.id)">{{ t('seo.main.actions.reject') }}</button>
               }
               @if (d.status === 'scheduled') {
-                <button type="button" class="btn-reject" (click)="unpublish(d.id)">Anuluj harmonogram</button>
+                <button type="button" class="btn-reject" (click)="unpublish(d.id)">{{ t('seo.main.actions.cancelSchedule') }}</button>
               }
               @if (d.status === 'draft' || d.status === 'in_review' || d.status === 'needs_update') {
                 <button type="button" class="btn-accent" (click)="approve(d.id)" [disabled]="pendingSlotCount() > 0"
-                        [title]="pendingSlotCount() > 0 ? 'Najpierw uzupełnij albo usuń miejsca do uzupełnienia' : ''">
-                  @if (editScheduledAt) { Zatwierdź i zaplanuj } @else { Zatwierdź i opublikuj }
+                        [title]="pendingSlotCount() > 0 ? t('seo.main.actions.pendingSlotsHint') : ''">
+                  @if (editScheduledAt) { {{ t('seo.main.actions.approveAndSchedule') }} } @else { {{ t('seo.main.actions.approveAndPublish') }} }
                 </button>
               }
               @if (d.status === 'published') {
-                <button type="button" class="btn-reject" (click)="unpublish(d.id)">Wycofaj do szkicu</button>
+                <button type="button" class="btn-reject" (click)="unpublish(d.id)">{{ t('seo.main.actions.unpublish') }}</button>
                 @if (!d.refresh_reason) {
-                  <button type="button" class="btn-ghost" (click)="requestRefresh(d.id)">Oznacz do odświeżenia</button>
+                  <button type="button" class="btn-ghost" (click)="requestRefresh(d.id)">{{ t('seo.main.actions.markForRefresh') }}</button>
                 }
               }
             </div>
 
             @if (d.status === 'published' && d.refresh_reason) {
               <div class="refresh-box">
-                <h3>Odświeżenie artykułu</h3>
+                <h3>{{ t('seo.main.refresh.title') }}</h3>
                 <p class="refresh-reason">
                   <strong>{{ refreshReasonLabel(d.refresh_reason) }}</strong> — {{ refreshReasonDetail(d.refresh_reason, d.refresh_signal) }}
                 </p>
-                <p class="refresh-note">Artykuł jest cały czas opublikowany. Zmiany trafią na stronę dopiero po kliknięciu „Zastosuj na stronie".</p>
+                <p class="refresh-note">{{ t('seo.main.refresh.publishedNote') }}</p>
 
                 @if (d.refresh_status === 'generating') {
-                  <p class="refresh-generating">Przygotowuję propozycję (analiza zapytań z GSC, aktualne dane, przepisanie) — trwa kilka minut, panel odświeży się sam.</p>
+                  <p class="refresh-generating">{{ t('seo.main.refresh.generating') }}</p>
                 } @else if (d.refresh_status === 'ready' && d.refresh_draft) {
                   @if (d.refresh_draft; as draft) {
                   @if (draft.validation_errors.length) {
                     <div class="refresh-warnings">
-                      <strong>Propozycja nie przeszła wszystkich automatycznych kontroli:</strong>
+                      <strong>{{ t('seo.main.refresh.validationWarning') }}</strong>
                       <ul>@for (e of draft.validation_errors; track e) { <li>{{ e }}</li> }</ul>
                     </div>
                   }
                   @if (draft.queries.length) {
                     <div class="refresh-queries">
-                      <span class="refresh-label">Zapytania z GSC wzięte pod uwagę:</span>
+                      <span class="refresh-label">{{ t('seo.main.refresh.queriesLabel') }}</span>
                       @for (q of draft.queries; track q.phrase) {
-                        <span class="query-chip">{{ q.phrase }} <small>({{ q.impressions }} wyśw., poz. {{ q.position }})</small></span>
+                        <span class="query-chip">{{ q.phrase }} <small>{{ t('seo.main.refresh.queryStats', { impressions: q.impressions, position: q.position }) }}</small></span>
                       }
                     </div>
                   } @else {
-                    <p class="refresh-note">Brak danych o zapytaniach z GSC dla tej strony — propozycja skupia się na aktualności i strukturze.</p>
+                    <p class="refresh-note">{{ t('seo.main.refresh.noQueries') }}</p>
                   }
-                  <label class="refresh-label" for="refreshTitle">Nowy tytuł</label>
+                  <label class="refresh-label" for="refreshTitle">{{ t('seo.main.refresh.newTitle') }}</label>
                   <input id="refreshTitle" class="title-input" [value]="draft.title" readonly>
-                  <label class="refresh-label" for="refreshMeta">Nowy meta description</label>
+                  <label class="refresh-label" for="refreshMeta">{{ t('seo.main.refresh.newMeta') }}</label>
                   <textarea id="refreshMeta" class="meta-input" rows="2" [value]="draft.meta_description" readonly></textarea>
-                  <label class="refresh-label" for="refreshBody">Nowa treść</label>
+                  <label class="refresh-label" for="refreshBody">{{ t('seo.main.refresh.newBody') }}</label>
                   <textarea id="refreshBody" class="body-input" rows="14" [value]="draft.body" readonly></textarea>
                   <p class="refresh-note">
-                    Wygenerowano {{ draft.generated_at | date:'d MMM y, HH:mm':'':'pl' }} · koszt ok. \${{ draft.cost_usd }} · cytowanych źródeł: {{ draft.facts_used }}
+                    {{ t('seo.main.refresh.generatedInfo', { date: (draft.generated_at | date:'d MMM y, HH:mm'), cost: draft.cost_usd, facts: draft.facts_used }) }}
                   </p>
                   <div class="detail-actions">
-                    <button type="button" class="btn-accent" (click)="applyRefresh(d.id)">Zastosuj na stronie</button>
-                    <button type="button" class="btn-ghost" (click)="generateRefresh(d.id)">Wygeneruj ponownie</button>
-                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">Odrzuć propozycję</button>
+                    <button type="button" class="btn-accent" (click)="applyRefresh(d.id)">{{ t('seo.main.refresh.apply') }}</button>
+                    <button type="button" class="btn-ghost" (click)="generateRefresh(d.id)">{{ t('seo.main.refresh.regenerate') }}</button>
+                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">{{ t('seo.main.refresh.dismissDraft') }}</button>
                   </div>
                   }
                 } @else {
                   @if (d.refresh_status === 'failed') {
-                    <p class="social-error">Nie udało się przygotować propozycji: {{ d.refresh_error }}</p>
+                    <p class="social-error">{{ t('seo.main.refresh.failed', { error: d.refresh_error }) }}</p>
                   }
                   <div class="detail-actions">
-                    <button type="button" class="btn-accent" (click)="generateRefresh(d.id)">Przygotuj propozycję (AI)</button>
-                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">Nie wymaga odświeżenia</button>
+                    <button type="button" class="btn-accent" (click)="generateRefresh(d.id)">{{ t('seo.main.refresh.prepare') }}</button>
+                    <button type="button" class="btn-reject" (click)="dismissRefresh(d.id)">{{ t('seo.main.refresh.notNeeded') }}</button>
                   </div>
                 }
               </div>
@@ -304,15 +314,15 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
 
             @if (d.status === 'published' || d.status === 'scheduled' || socialPosts().length > 0) {
               <div class="social-box">
-                <h3>Publikacja social</h3>
+                <h3>{{ t('seo.main.social.title') }}</h3>
                 @if (socialPosts().length === 0 && unpublishedSocialPlatforms().length === 0) {
-                  <p class="empty">Brak podłączonych kanałów — połącz je w "Kanały social" u góry.</p>
+                  <p class="empty">{{ t('seo.main.social.noChannels') }}</p>
                 }
                 @if (d.status === 'published' && unpublishedSocialPlatforms().length > 0) {
                   <div class="social-actions">
                     @for (platform of unpublishedSocialPlatforms(); track platform) {
                       <button type="button" class="btn-ghost btn-sm" (click)="retrySocialPost(d.id, platform)" [disabled]="retryingSocial().has(platform)">
-                        @if (retryingSocial().has(platform)) { Publikuję… } @else { Opublikuj na {{ platformLabel(platform) }} }
+                        @if (retryingSocial().has(platform)) { {{ t('seo.main.social.publishing') }} } @else { {{ t('seo.main.social.publishOn', { platform: platformLabel(platform) }) }} }
                       </button>
                     }
                   </div>
@@ -323,7 +333,7 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
                       <span class="social-platform-name">{{ platformLabel(post.platform) }}</span>
                       <span class="social-status" [attr.data-status]="post.status">{{ socialStatusLabel(post.status) }}</span>
                       @if (post.remote_url) {
-                        <a [href]="post.remote_url" target="_blank" rel="noopener" class="social-view-link">Zobacz post</a>
+                        <a [href]="post.remote_url" target="_blank" rel="noopener" class="social-view-link">{{ t('seo.main.social.viewPost') }}</a>
                       }
                     </div>
                     @if (post.status === 'failed' && post.error_message) {
@@ -331,11 +341,11 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
                     }
                     <textarea class="social-textarea" [ngModel]="post.body" (ngModelChange)="setSocialBody(post.platform, $event)" rows="4"></textarea>
                     <div class="social-actions">
-                      <button type="button" class="btn-ghost btn-sm" (click)="saveSocialPost(d.id, post.platform)">Zapisz</button>
-                      <button type="button" class="btn-ghost btn-sm" (click)="copySocialBody(post.body)">Kopiuj</button>
+                      <button type="button" class="btn-ghost btn-sm" (click)="saveSocialPost(d.id, post.platform)">{{ 'actions.save' | transloco }}</button>
+                      <button type="button" class="btn-ghost btn-sm" (click)="copySocialBody(post.body)">{{ t('seo.main.social.copy') }}</button>
                       @if (post.status === 'failed' || post.status === 'draft') {
                         <button type="button" class="btn-ghost btn-sm" (click)="retrySocialPost(d.id, post.platform)" [disabled]="retryingSocial().has(post.platform)">
-                          @if (retryingSocial().has(post.platform)) { Publikuję… } @else { Publikuj / spróbuj ponownie }
+                          @if (retryingSocial().has(post.platform)) { {{ t('seo.main.social.publishing') }} } @else { {{ t('seo.main.social.publishOrRetry') }} }
                         </button>
                       }
                     </div>
@@ -344,12 +354,13 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
               </div>
             }
           } @else {
-            <p class="empty">Wybierz wpis z listy.</p>
+            <p class="empty">{{ t('seo.main.detail.empty') }}</p>
           }
         </div>
         </div>
       </div>
     </div>
+    </ng-container>
   `,
   styles: [`
     /* Single source of truth for the ~24px gap between this page's main parts —
@@ -452,6 +463,7 @@ const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
 export class CrmSeoComponent implements OnInit {
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
@@ -459,15 +471,16 @@ export class CrmSeoComponent implements OnInit {
   private refreshPoll: ReturnType<typeof setInterval> | null = null;
   private generationPoll: ReturnType<typeof setInterval> | null = null;
 
-  readonly statusFilters: { value: ContentFilter; label: string }[] = [
-    { value: '', label: 'Wszystkie' },
-    { value: 'in_review', label: 'Do akceptacji' },
-    { value: 'refresh', label: 'Do odświeżenia' },
-    { value: 'needs_update', label: 'Do poprawy' },
-    { value: 'scheduled', label: 'Zaplanowane' },
-    { value: 'published', label: 'Opublikowane' },
-    { value: 'draft', label: 'Szkice' },
-    { value: 'queued', label: 'W kolejce (auto)' },
+  // Keys are relative to the 'crm' scope — the template translates them.
+  readonly statusFilters: { value: ContentFilter; labelKey: string }[] = [
+    { value: '', labelKey: 'seo.main.filters.all' },
+    { value: 'in_review', labelKey: 'seo.main.statuses.in_review' },
+    { value: 'refresh', labelKey: 'seo.main.filters.refresh' },
+    { value: 'needs_update', labelKey: 'seo.main.statuses.needs_update' },
+    { value: 'scheduled', labelKey: 'seo.main.statuses.scheduled' },
+    { value: 'published', labelKey: 'seo.main.statuses.published' },
+    { value: 'draft', labelKey: 'seo.main.filters.drafts' },
+    { value: 'queued', labelKey: 'seo.main.statuses.queued' },
   ];
 
   readonly items = signal<SeoContentSummary[]>([]);
@@ -530,12 +543,16 @@ export class CrmSeoComponent implements OnInit {
     const params = this.route.snapshot.queryParamMap;
     const result = params.get('social');
     if (!result) return;
-    const platform = SOCIAL_PLATFORM_LABELS[params.get('platform') ?? ''] ?? 'kanał social';
+    const platform = SOCIAL_PLATFORM_LABELS[params.get('platform') ?? ''] ?? this.transloco.translate('crm.seo.main.socialConnect.fallbackPlatform');
     if (result === 'connected') {
-      this.toast.success(`${platform} połączony.`);
+      this.toast.success(this.transloco.translate('crm.seo.main.socialConnect.connected', { platform }));
     } else {
       const reason = params.get('reason') ?? '';
-      this.toast.error(`${platform}: ${SOCIAL_ERROR_MESSAGES[reason] ?? `nie udało się połączyć (${reason || 'nieznany błąd'}).`}`);
+      const messageKey = SOCIAL_ERROR_MESSAGE_KEYS[reason];
+      const message = messageKey
+        ? this.transloco.translate(messageKey)
+        : this.transloco.translate('crm.seo.main.socialConnect.unknownFailure', { reason: reason || this.transloco.translate('crm.seo.main.errors.unknown') });
+      this.toast.error(`${platform}: ${message}`);
     }
     this.showChannels.set(true);
     this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
@@ -550,7 +567,8 @@ export class CrmSeoComponent implements OnInit {
   }
 
   statusLabel(status: SeoContentStatus): string {
-    return STATUS_LABELS[status] ?? status;
+    const key = STATUS_LABEL_KEYS[status];
+    return key ? this.transloco.translate(key) : status;
   }
 
   isEditable(status: SeoContentStatus): boolean {
@@ -569,49 +587,50 @@ export class CrmSeoComponent implements OnInit {
   }
 
   refreshReasonLabel(reason: SeoRefreshReason): string {
-    return REFRESH_REASON_LABELS[reason] ?? reason;
+    const key = REFRESH_REASON_LABEL_KEYS[reason];
+    return key ? this.transloco.translate(key) : reason;
   }
 
   refreshReasonDetail(reason: SeoRefreshReason, signal: SeoRefreshSignal | null): string {
     const s = signal ?? {};
     switch (reason) {
       case 'striking_distance':
-        return `śr. pozycja ${s.position} przy ${s.impressions} wyświetleniach w 28 dni. Najtańsza szansa na wejście do TOP 10.`;
+        return this.transloco.translate('crm.seo.main.refresh.reasonDetails.strikingDistance', { position: s.position, impressions: s.impressions });
       case 'position_drop':
-        return `pozycja spadła z ${s.positionBefore} na ${s.positionNow} (ostatnie 14 dni vs. poprzednie 14).`;
+        return this.transloco.translate('crm.seo.main.refresh.reasonDetails.positionDrop', { before: s.positionBefore, now: s.positionNow });
       case 'age':
-        return 'brak aktualizacji od ponad 90 dni.';
+        return this.transloco.translate('crm.seo.main.refresh.reasonDetails.age');
       default:
-        return 'oznaczony do odświeżenia przez redaktora.';
+        return this.transloco.translate('crm.seo.main.refresh.reasonDetails.manual');
     }
   }
 
   requestRefresh(id: number): void {
     this.seoService.requestRefresh(id).subscribe({
-      next: () => { this.toast.success('Oznaczono do odświeżenia.'); this.select(id); this.loadList(); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się oznaczyć wpisu.'),
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.refreshMarked')); this.select(id); this.loadList(); },
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.refreshMarkFailed')),
     });
   }
 
   generateRefresh(id: number): void {
     this.seoService.generateRefresh(id).subscribe({
-      next: () => { this.toast.success('Przygotowuję propozycję — potrwa kilka minut.'); this.select(id); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się rozpocząć generowania.'),
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.refreshGenerating')); this.select(id); },
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.generationStartFailed')),
     });
   }
 
   applyRefresh(id: number): void {
-    if (!confirm('Zastąpić opublikowaną treść nową wersją? Zmiana od razu trafi na stronę.')) return;
+    if (!confirm(this.transloco.translate('crm.seo.main.refresh.applyConfirm'))) return;
     this.seoService.applyRefresh(id).subscribe({
-      next: () => { this.toast.success('Odświeżona wersja jest już na stronie.'); this.select(id); this.loadList(); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się zastosować odświeżenia.'),
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.refreshApplied')); this.select(id); this.loadList(); },
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.refreshApplyFailed')),
     });
   }
 
   dismissRefresh(id: number): void {
     this.seoService.dismissRefresh(id).subscribe({
-      next: () => { this.toast.success('Usunięto z kolejki odświeżeń.'); this.select(id); this.loadList(); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć z kolejki.'),
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.refreshDismissed')); this.select(id); this.loadList(); },
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.refreshDismissFailed')),
     });
   }
 
@@ -674,30 +693,30 @@ export class CrmSeoComponent implements OnInit {
       body: this.editBody,
       header_image_url: this.editImageUrl || null,
     }).subscribe({
-      next: (d) => { this.toast.success('Zapisano zmiany.'); this.detail.set(d); this.loadList(); },
-      error: () => this.toast.error('Nie udało się zapisać zmian.'),
+      next: (d) => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.changesSaved')); this.detail.set(d); this.loadList(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.changesSaveFailed')),
     });
   }
 
   saveImageUrl(id: number): void {
     this.seoService.update(id, { header_image_url: this.editImageUrl || null }).subscribe({
-      next: (d) => { this.toast.success('Zapisano zdjęcie.'); this.detail.set(d); this.loadList(); },
-      error: () => this.toast.error('Nie udało się zapisać zdjęcia.'),
+      next: (d) => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.imageSaved')); this.detail.set(d); this.loadList(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.imageSaveFailed')),
     });
   }
 
   saveAuthor(id: number): void {
     this.seoService.update(id, { author_id: this.editAuthorId }).subscribe({
-      next: (d) => { this.toast.success('Zapisano autora.'); this.detail.set(d); this.loadList(); },
-      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się zapisać autora.'); },
+      next: (d) => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.authorSaved')); this.detail.set(d); this.loadList(); },
+      error: (err) => { this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.authorSaveFailed')); },
     });
   }
 
   saveScheduledAt(id: number): void {
     const iso = this.editScheduledAt ? new Date(this.editScheduledAt).toISOString() : null;
     this.seoService.update(id, { scheduled_at: iso }).subscribe({
-      next: (d) => { this.toast.success('Zapisano termin publikacji.'); this.detail.set(d); this.loadList(); },
-      error: () => this.toast.error('Nie udało się zapisać terminu.'),
+      next: (d) => { this.toast.success(this.transloco.translate('crm.seo.main.toasts.scheduleSaved')); this.detail.set(d); this.loadList(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.scheduleSaveFailed')),
     });
   }
 
@@ -711,37 +730,37 @@ export class CrmSeoComponent implements OnInit {
     this.rerolling.set(true);
     this.seoService.rerollImage(id).subscribe({
       next: (d) => {
-        this.toast.success('Wylosowano nowe zdjęcie.');
+        this.toast.success(this.transloco.translate('crm.seo.main.toasts.imageRerolled'));
         this.detail.set(d);
         this.editImageUrl = d.header_image_url ?? '';
         this.rerolling.set(false);
       },
-      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się wylosować zdjęcia.'); this.rerolling.set(false); },
+      error: (err) => { this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.imageRerollFailed')); this.rerolling.set(false); },
     });
   }
 
   approve(id: number): void {
     this.seoService.approve(id).subscribe({
       next: (d) => {
-        this.toast.success(d.status === 'scheduled' ? 'Zaplanowano publikację.' : 'Wpis opublikowany.');
+        this.toast.success(d.status === 'scheduled' ? this.transloco.translate('crm.seo.main.toasts.scheduled') : this.transloco.translate('crm.seo.main.toasts.published'));
         this.detail.set(null);
         this.loadList();
       },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się zatwierdzić wpisu.'),
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.approveFailed')),
     });
   }
 
   reject(id: number): void {
     this.seoService.reject(id).subscribe({
-      next: () => { this.toast.info('Wpis odrzucony, wrócił do szkiców.'); this.detail.set(null); this.loadList(); },
-      error: () => this.toast.error('Nie udało się odrzucić wpisu.'),
+      next: () => { this.toast.info(this.transloco.translate('crm.seo.main.toasts.rejected')); this.detail.set(null); this.loadList(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.rejectFailed')),
     });
   }
 
   unpublish(id: number): void {
     this.seoService.unpublish(id).subscribe({
-      next: () => { this.toast.info('Wpis wycofany do szkiców.'); this.detail.set(null); this.loadList(); },
-      error: () => this.toast.error('Nie udało się wycofać wpisu.'),
+      next: () => { this.toast.info(this.transloco.translate('crm.seo.main.toasts.unpublished')); this.detail.set(null); this.loadList(); },
+      error: () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.unpublishFailed')),
     });
   }
 
@@ -749,11 +768,11 @@ export class CrmSeoComponent implements OnInit {
     if (this.generating()) return;
     this.seoService.generate().subscribe({
       next: (job) => {
-        this.toast.success('Generuję artykuł w tle — potrwa kilka minut. Możesz dalej pracować.');
+        this.toast.success(this.transloco.translate('crm.seo.main.toasts.generationStarted'));
         this.trackGenerationJob(job);
       },
       error: (err) => {
-        this.toast.error(err?.error?.error ?? 'Nie udało się rozpocząć generowania.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.generationStartFailed'));
         // 409 = a job is already running (e.g. started in another tab) — follow that one.
         if (err?.error?.job) this.trackGenerationJob(err.error.job);
       },
@@ -769,12 +788,12 @@ export class CrmSeoComponent implements OnInit {
       this.stopGenerationPoll();
       if (!announce) return;
       if (job.status === 'done') {
-        this.toast.success('Nowy artykuł wygenerowany i czeka na akceptację.');
+        this.toast.success(this.transloco.translate('crm.seo.main.toasts.generationDone'));
         this.loadList();
         this.loadPillars();
         if (job.content_id) this.select(job.content_id);
       } else {
-        this.toast.error(`Nie udało się wygenerować artykułu: ${job.error ?? 'nieznany błąd'}`);
+        this.toast.error(this.transloco.translate('crm.seo.main.toasts.generationFailed', { error: job.error ?? this.transloco.translate('crm.seo.main.errors.unknown') }));
       }
     });
   }
@@ -799,9 +818,9 @@ export class CrmSeoComponent implements OnInit {
     this.seoService.gscDisconnect().subscribe({
       next: () => {
         this.gsc.set(null);
-        this.toast.success('Search Console rozłączony — możesz połączyć ponownie właściwym kontem Google.');
+        this.toast.success(this.transloco.translate('crm.seo.main.toasts.gscDisconnected'));
       },
-      error: () => this.toast.error('Nie udało się rozłączyć Search Console.'),
+      error: () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.gscDisconnectFailed')),
     });
   }
 
@@ -810,12 +829,12 @@ export class CrmSeoComponent implements OnInit {
     this.syncingGsc.set(true);
     this.seoService.gscSync().subscribe({
       next: () => {
-        this.toast.success('Metryki Search Console zsynchronizowane.');
+        this.toast.success(this.transloco.translate('crm.seo.main.toasts.gscSynced'));
         this.syncingGsc.set(false);
         this.loadList();
         if (this.detail()) this.select(this.detail()!.id);
       },
-      error: (err) => { this.toast.error(err?.error?.error ?? 'Nie udało się zsynchronizować metryk.'); this.syncingGsc.set(false); },
+      error: (err) => { this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.main.toasts.gscSyncFailed')); this.syncingGsc.set(false); },
     });
   }
 
@@ -824,7 +843,7 @@ export class CrmSeoComponent implements OnInit {
   }
 
   socialStatusLabel(status: SocialPost['status']): string {
-    return { draft: 'Szkic', queued: 'Publikuję…', published: 'Opublikowany', failed: 'Błąd' }[status];
+    return this.transloco.translate(SOCIAL_STATUS_LABEL_KEYS[status]);
   }
 
   setSocialBody(platform: SocialPlatform, body: string): void {
@@ -835,16 +854,16 @@ export class CrmSeoComponent implements OnInit {
     const post = this.socialPosts().find((p) => p.platform === platform);
     if (!post?.body) return;
     this.seoService.updateSocialPost(id, platform, post.body).subscribe({
-      next: () => this.toast.success('Zapisano post.'),
-      error: () => this.toast.error('Nie udało się zapisać posta.'),
+      next: () => this.toast.success(this.transloco.translate('crm.seo.main.toasts.socialPostSaved')),
+      error: () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.socialPostSaveFailed')),
     });
   }
 
   copySocialBody(body: string | null): void {
     if (!body) return;
     navigator.clipboard.writeText(body).then(
-      () => this.toast.success('Skopiowano do schowka.'),
-      () => this.toast.error('Nie udało się skopiować.'),
+      () => this.toast.success(this.transloco.translate('crm.seo.main.toasts.copied')),
+      () => this.toast.error(this.transloco.translate('crm.seo.main.toasts.copyFailed')),
     );
   }
 
@@ -853,14 +872,14 @@ export class CrmSeoComponent implements OnInit {
     this.retryingSocial.update((s) => new Set(s).add(platform));
     this.seoService.retrySocialPost(id, platform).subscribe({
       next: (post) => {
-        this.toast.success(post.status === 'published' ? 'Opublikowano.' : 'Nie udało się opublikować — sprawdź błąd.');
+        this.toast.success(post.status === 'published' ? this.transloco.translate('crm.seo.main.toasts.socialPublished') : this.transloco.translate('crm.seo.main.toasts.socialPublishFailedCheck'));
         this.socialPosts.update((posts) => (posts.some((p) => p.platform === platform)
           ? posts.map((p) => (p.platform === platform ? post : p))
           : [...posts, post]));
         this.retryingSocial.update((s) => { const n = new Set(s); n.delete(platform); return n; });
       },
       error: () => {
-        this.toast.error('Nie udało się opublikować.');
+        this.toast.error(this.transloco.translate('crm.seo.main.toasts.socialPublishFailed'));
         this.retryingSocial.update((s) => { const n = new Set(s); n.delete(platform); return n; });
       },
     });

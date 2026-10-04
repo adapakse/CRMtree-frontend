@@ -21,6 +21,9 @@
   "states": {
     "loading": "Nalaganje…"
   },
+  "testEnvironmentBanner": {
+    "title": "Testna različica — to ni produkcijsko okolje"
+  },
   "typeahead": {
     "minChars": "Vnesite vsaj toliko znakov: {count}…",
     "noResults": "Ni rezultatov.",

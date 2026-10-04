@@ -1,0 +1,71 @@
+{
+  "myDevices": {
+    "empty": "No signed-in phones.",
+    "hint": "Phones on which you are signed in to the CRMtree mobile app. If you lose your phone or replace it, sign it out here — the app on it will lose access within a dozen or so minutes at the latest.",
+    "lastActive": "last active {date}",
+    "signOut": "Sign out",
+    "signOutConfirm": "Sign {name} out of the CRMtree app?",
+    "signOutFailed": "Couldn't sign the device out.",
+    "signedInSince": "signed in since {date}",
+    "signedOut": "Signed out: {name}.",
+    "signingOut": "Signing out…",
+    "thisDevice": "this device",
+    "title": "Signed-in phones",
+    "unknownDevice": "Unknown device"
+  },
+  "mySettings": {
+    "delete": "Delete",
+    "pbx": {
+      "configured": "Token configured",
+      "directPhone": "Your direct number:",
+      "hideToken": "Hide",
+      "hint": "To use the built-in phone, paste your Personal Access Token from the ip-pbx.eu panel. The token lets the app retrieve your SIP details. Customers who see your direct number can call you back directly.",
+      "noDirectPhone": "No direct number is assigned in the PBX",
+      "notConfigured": "No token — the softphone will not work.",
+      "notifications": {
+        "blocked": "Notifications blocked — unblock them manually in your browser settings:",
+        "enable": "Enable notifications",
+        "enabled": "Notifications enabled",
+        "hint": "Shows a system notification when a customer calls — even when the browser is in the background or you are working in another program.",
+        "permissionHint": "The browser will ask for permission",
+        "title": "Call notifications",
+        "unblockPath": "Padlock next to the page address → Notifications → Allow"
+      },
+      "saveToken": "Save token",
+      "showToken": "Show",
+      "title": "Softphone — PBX token",
+      "tokenHelpEnd": "copy it and paste it here.",
+      "tokenHelpStart": "ip-pbx.eu panel → click your name (top right corner)",
+      "tokenPlaceholder": "Paste the token from ip-pbx.eu…",
+      "tokenSaved": "Token saved",
+      "tokenSavedWithPhone": "Token saved — number: {phone}"
+    },
+    "saveFailed": "Couldn't save — try again",
+    "saving": "Saving…",
+    "signature": {
+      "deleteConfirm": "Delete the saved signature? It will no longer be appended to emails.",
+      "empty": "No signature — paste the HTML on the left",
+      "hint": "Paste the HTML code of your signature below. It will be appended automatically to every email sent from the system (Leads and Partner registry). You can use ready-made HTML from your email client or a signature builder — e.g. HubSpot Email Signature Generator.",
+      "htmlLabel": "Signature HTML code",
+      "htmlPlaceholder": "Paste the signature HTML code here…",
+      "preview": "Preview",
+      "save": "Save signature",
+      "saved": "Signature saved",
+      "title": "My email signature"
+    },
+    "templates": {
+      "bodyLabel": "Body",
+      "bodyPlaceholder": "Template body…",
+      "deleteConfirm": "Delete the template “{name}”?",
+      "edit": "Edit",
+      "editTitle": "Edit template",
+      "empty": "No templates. Click “+ New template” to add the first one.",
+      "hint": "Save ready-made message texts that you can quickly insert when writing an email to a lead or partner.",
+      "nameLabel": "Template name",
+      "namePlaceholder": "e.g. Intro meeting, Follow-up after demo…",
+      "new": "New template",
+      "title": "Email templates"
+    },
+    "title": "My settings"
+  }
+}

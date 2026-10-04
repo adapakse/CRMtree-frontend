@@ -1,12 +1,22 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Routes } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
-import { catchError, map, of } from 'rxjs';
+import { catchError, forkJoin, map, of } from 'rxjs';
 
-// First path segment of a route → the Transloco scope its screens use.
-const SCOPE_BY_PATH_PREFIX: Record<string, string> = {
-  crm: 'crm',
-  projects: 'projects',
+// First path segment of a route → the Transloco scopes its screens use.
+const SCOPES_BY_PATH_PREFIX: Record<string, string[]> = {
+  crm: ['crm'],
+  projects: ['projects'],
+  // Call analysis lives under /admin but belongs to the CRM texts.
+  admin: ['admin', 'crm'],
+  users: ['admin'],
+  groups: ['admin'],
+  logs: ['admin'],
+  dashboard: ['documents'],
+  documents: ['documents'],
+  workflow: ['documents'],
+  'my-settings': ['account'],
+  'change-password': ['auth'],
 };
 
 /**
@@ -15,24 +25,24 @@ const SCOPE_BY_PATH_PREFIX: Record<string, string> = {
  * TypeScript on init (chart legends, option lists) could run before they
  * arrive and show raw keys.
  */
-function i18nScopeGuard(scope: string): CanActivateFn {
+function i18nScopeGuard(scopes: string[]): CanActivateFn {
   return () => {
     const transloco = inject(TranslocoService);
-    return transloco.load(`${scope}/${transloco.getActiveLang()}`).pipe(
-      map(() => true),
+    const lang = transloco.getActiveLang();
+    return forkJoin(scopes.map(scope => transloco.load(`${scope}/${lang}`).pipe(
       // Missing texts must never block navigation; the Polish fallback still applies.
-      catchError(() => of(true)),
-    );
+      catchError(() => of(null)),
+    ))).pipe(map(() => true));
   };
 }
 
 /** Adds the scope guard to every route (at any depth) whose path belongs to a translated module. */
 export function withI18nScopes(routes: Routes): Routes {
   return routes.map(route => {
-    const scope = SCOPE_BY_PATH_PREFIX[(route.path ?? '').split('/')[0]];
+    const scopes = SCOPES_BY_PATH_PREFIX[(route.path ?? '').split('/')[0]];
     return {
       ...route,
-      ...(scope ? { canActivate: [...(route.canActivate ?? []), i18nScopeGuard(scope)] } : {}),
+      ...(scopes ? { canActivate: [...(route.canActivate ?? []), i18nScopeGuard(scopes)] } : {}),
       ...(route.children ? { children: withI18nScopes(route.children) } : {}),
     };
   });

@@ -3,6 +3,11 @@
 // from it, so a question is added in exactly one place. The backend stores a
 // flat key → value map and knows nothing about these fields, except that
 // `secret` fields travel in a separate, encrypted map.
+//
+// Texts are Transloco keys relative to the `admin` scope, translated where they
+// are rendered: the translations load lazily, after this constant is built.
+// Field keys and option values are what gets stored, so they never change with
+// the language.
 
 export type SurveyAnswerValue = string | string[];
 export type SurveyAnswers = Record<string, SurveyAnswerValue>;
@@ -13,16 +18,16 @@ export type SurveyFieldType =
 
 export interface SurveyOption {
   value: string;
-  label: string;
-  hint?: string;
+  labelKey: string;
+  hintKey?: string;
 }
 
 export interface SurveyField {
   key: string;
-  label: string;
+  labelKey: string;
   type: SurveyFieldType;
-  hint?: string;
-  placeholder?: string;
+  hintKey?: string;
+  placeholderKey?: string;
   options?: SurveyOption[];
   isRequired?: boolean;
   isVisible?: (answers: SurveyAnswers) => boolean;
@@ -30,8 +35,8 @@ export interface SurveyField {
 
 export interface SurveySection {
   id: string;
-  title: string;
-  intro?: string;
+  titleKey: string;
+  introKey?: string;
   fields: SurveyField[];
   isVisible?: (answers: SurveyAnswers) => boolean;
 }
@@ -55,288 +60,288 @@ const hasModule = (module: string) => (answers: SurveyAnswers) => {
 const hasAnyModule = (...modules: string[]) => (answers: SurveyAnswers) => modules.some(m => hasModule(m)(answers));
 
 const YES_NO: SurveyOption[] = [
-  { value: 'yes', label: 'Tak' },
-  { value: 'no', label: 'Nie' },
+  { value: 'yes', labelKey: 'onboardingSurvey.options.yesNo.yes' },
+  { value: 'no', labelKey: 'onboardingSurvey.options.yesNo.no' },
 ];
 
 const OAUTH_APP_OWNER: SurveyOption[] = [
-  { value: 'client', label: 'Nasz dział IT zarejestruje aplikację i poda dane poniżej' },
-  { value: 'needs_help', label: 'Potrzebujemy pomocy CRMtree przy rejestracji aplikacji' },
+  { value: 'client', labelKey: 'onboardingSurvey.options.oauthAppOwner.client' },
+  { value: 'needs_help', labelKey: 'onboardingSurvey.options.oauthAppOwner.needs_help' },
 ];
 
 const AI_LICENCE: SurveyOption[] = [
-  { value: 'shared', label: 'Licencja CRMtree (współdzielona, rozliczana w ramach umowy)' },
-  { value: 'own', label: 'Własna, dedykowana licencja / klucz API naszej firmy' },
-  { value: 'undecided', label: 'Jeszcze nie wiemy — prosimy o rekomendację' },
+  { value: 'shared', labelKey: 'onboardingSurvey.options.aiLicence.shared' },
+  { value: 'own', labelKey: 'onboardingSurvey.options.aiLicence.own' },
+  { value: 'undecided', labelKey: 'onboardingSurvey.options.aiLicence.undecided' },
 ];
 
 export const ONBOARDING_SURVEY_SECTIONS: SurveySection[] = [
   {
     id: 'company',
-    title: '1. Firma i osoby kontaktowe',
-    intro: 'Podstawowe informacje, na podstawie których przygotujemy środowisko i ustalimy, z kim kontaktować się w trakcie wdrożenia.',
+    titleKey: 'onboardingSurvey.sections.company.title',
+    introKey: 'onboardingSurvey.sections.company.intro',
     fields: [
-      { key: 'company_display_name', label: 'Nazwa firmy widoczna w CRM', type: 'text', isRequired: true, placeholder: 'np. Acme' },
-      { key: 'company_email_domain', label: 'Domena firmowej poczty e-mail', type: 'text', placeholder: 'np. acme.pl', hint: 'Domena, z której logują się Państwa pracownicy.' },
-      { key: 'company_industry', label: 'Branża', type: 'text', placeholder: 'np. logistyka, IT, produkcja' },
-      { key: 'company_offer_description', label: 'Co Państwo sprzedają i komu?', type: 'textarea', hint: 'Krótki opis oferty i typowego klienta. Wykorzystujemy go do ustawienia słowników oraz podpowiedzi AI.' },
-      { key: 'business_contact_name', label: 'Osoba decyzyjna po stronie biznesu — imię i nazwisko', type: 'text', isRequired: true },
-      { key: 'business_contact_email', label: 'Osoba decyzyjna — e-mail', type: 'email', isRequired: true },
-      { key: 'business_contact_phone', label: 'Osoba decyzyjna — telefon', type: 'tel' },
-      { key: 'technical_contact_name', label: 'Osoba techniczna (IT) — imię i nazwisko', type: 'text', hint: 'Osoba, która ma dostęp administratora do poczty, telefonii i kont Meta.' },
-      { key: 'technical_contact_email', label: 'Osoba techniczna — e-mail', type: 'email' },
-      { key: 'technical_contact_phone', label: 'Osoba techniczna — telefon', type: 'tel' },
-      { key: 'go_live_date', label: 'Planowana data uruchomienia', type: 'date' },
+      { key: 'company_display_name', labelKey: 'onboardingSurvey.questions.company_display_name.label', type: 'text', isRequired: true, placeholderKey: 'onboardingSurvey.questions.company_display_name.placeholder' },
+      { key: 'company_email_domain', labelKey: 'onboardingSurvey.questions.company_email_domain.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.company_email_domain.placeholder', hintKey: 'onboardingSurvey.questions.company_email_domain.hint' },
+      { key: 'company_industry', labelKey: 'onboardingSurvey.questions.company_industry.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.company_industry.placeholder' },
+      { key: 'company_offer_description', labelKey: 'onboardingSurvey.questions.company_offer_description.label', type: 'textarea', hintKey: 'onboardingSurvey.questions.company_offer_description.hint' },
+      { key: 'business_contact_name', labelKey: 'onboardingSurvey.questions.business_contact_name.label', type: 'text', isRequired: true },
+      { key: 'business_contact_email', labelKey: 'onboardingSurvey.questions.business_contact_email.label', type: 'email', isRequired: true },
+      { key: 'business_contact_phone', labelKey: 'onboardingSurvey.questions.business_contact_phone.label', type: 'tel' },
+      { key: 'technical_contact_name', labelKey: 'onboardingSurvey.questions.technical_contact_name.label', type: 'text', hintKey: 'onboardingSurvey.questions.technical_contact_name.hint' },
+      { key: 'technical_contact_email', labelKey: 'onboardingSurvey.questions.technical_contact_email.label', type: 'email' },
+      { key: 'technical_contact_phone', labelKey: 'onboardingSurvey.questions.technical_contact_phone.label', type: 'tel' },
+      { key: 'go_live_date', labelKey: 'onboardingSurvey.questions.go_live_date.label', type: 'date' },
     ],
   },
   {
     id: 'billing',
-    title: '2. Plan i dane do faktury',
+    titleKey: 'onboardingSurvey.sections.billing.title',
     fields: [
       {
-        key: 'billing_plan', label: 'Wybrany plan', type: 'select', isRequired: true,
+        key: 'billing_plan', labelKey: 'onboardingSurvey.questions.billing_plan.label', type: 'select', isRequired: true,
         options: [
-          { value: 'lite', label: 'Lite' },
-          { value: 'standard', label: 'Standard' },
-          { value: 'professional', label: 'Professional (wycena indywidualna)' },
-          { value: 'undecided', label: 'Do ustalenia' },
+          { value: 'lite', labelKey: 'onboardingSurvey.questions.billing_plan.options.lite.label' },
+          { value: 'standard', labelKey: 'onboardingSurvey.questions.billing_plan.options.standard.label' },
+          { value: 'professional', labelKey: 'onboardingSurvey.questions.billing_plan.options.professional.label' },
+          { value: 'undecided', labelKey: 'onboardingSurvey.questions.billing_plan.options.undecided.label' },
         ],
       },
       {
-        key: 'billing_cycle', label: 'Cykl rozliczeniowy', type: 'select',
+        key: 'billing_cycle', labelKey: 'onboardingSurvey.questions.billing_cycle.label', type: 'select',
         options: [
-          { value: 'monthly', label: 'Miesięczny' },
-          { value: 'annual', label: 'Roczny' },
+          { value: 'monthly', labelKey: 'onboardingSurvey.questions.billing_cycle.options.monthly.label' },
+          { value: 'annual', labelKey: 'onboardingSurvey.questions.billing_cycle.options.annual.label' },
         ],
       },
-      { key: 'billing_company_name', label: 'Pełna nazwa firmy (do faktury)', type: 'text', isRequired: true, placeholder: 'np. Acme Sp. z o.o.' },
-      { key: 'billing_nip', label: 'NIP', type: 'text', isRequired: true },
-      { key: 'billing_street', label: 'Ulica i numer', type: 'text' },
-      { key: 'billing_postal_code', label: 'Kod pocztowy', type: 'text' },
-      { key: 'billing_city', label: 'Miasto', type: 'text' },
-      { key: 'billing_country', label: 'Kraj', type: 'text', placeholder: 'Polska' },
-      { key: 'billing_invoice_email', label: 'E-mail, na który wysyłamy faktury', type: 'email', placeholder: 'ksiegowosc@firma.pl' },
+      { key: 'billing_company_name', labelKey: 'onboardingSurvey.questions.billing_company_name.label', type: 'text', isRequired: true, placeholderKey: 'onboardingSurvey.questions.billing_company_name.placeholder' },
+      { key: 'billing_nip', labelKey: 'onboardingSurvey.questions.billing_nip.label', type: 'text', isRequired: true },
+      { key: 'billing_street', labelKey: 'onboardingSurvey.questions.billing_street.label', type: 'text' },
+      { key: 'billing_postal_code', labelKey: 'onboardingSurvey.questions.billing_postal_code.label', type: 'text' },
+      { key: 'billing_city', labelKey: 'onboardingSurvey.questions.billing_city.label', type: 'text' },
+      { key: 'billing_country', labelKey: 'onboardingSurvey.questions.billing_country.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.billing_country.placeholder' },
+      { key: 'billing_invoice_email', labelKey: 'onboardingSurvey.questions.billing_invoice_email.label', type: 'email', placeholderKey: 'onboardingSurvey.questions.billing_invoice_email.placeholder' },
     ],
   },
   {
     id: 'users',
-    title: '3. Użytkownicy i role',
+    titleKey: 'onboardingSurvey.sections.users.title',
     fields: [
-      { key: 'users_count', label: 'Planowana liczba użytkowników', type: 'number', isRequired: true },
+      { key: 'users_count', labelKey: 'onboardingSurvey.questions.users_count.label', type: 'number', isRequired: true },
       {
-        key: 'users_list', label: 'Lista użytkowników do założenia', type: 'textarea',
-        placeholder: 'Jan Kowalski; jan.kowalski@firma.pl; handlowiec\nAnna Nowak; anna.nowak@firma.pl; manager sprzedaży',
-        hint: 'Jedna osoba w wierszu: imię i nazwisko; e-mail; rola (administrator / manager sprzedaży / handlowiec). Każdy dostanie jednorazowe hasło do zmiany przy pierwszym logowaniu.',
+        key: 'users_list', labelKey: 'onboardingSurvey.questions.users_list.label', type: 'textarea',
+        placeholderKey: 'onboardingSurvey.questions.users_list.placeholder',
+        hintKey: 'onboardingSurvey.questions.users_list.hint',
       },
-      { key: 'users_team_structure', label: 'Struktura zespołów sprzedaży', type: 'textarea', hint: 'Jakie są zespoły / regiony i kto komu podlega. Na tej podstawie ustawimy grupy i widoczność danych.' },
+      { key: 'users_team_structure', labelKey: 'onboardingSurvey.questions.users_team_structure.label', type: 'textarea', hintKey: 'onboardingSurvey.questions.users_team_structure.hint' },
       {
-        key: 'users_global_read', label: 'Czy handlowcy mają widzieć leady i klientów innych handlowców?', type: 'select',
+        key: 'users_global_read', labelKey: 'onboardingSurvey.questions.users_global_read.label', type: 'select',
         options: [
-          { value: 'own_only', label: 'Nie — każdy widzi tylko swoje' },
-          { value: 'read_all', label: 'Tak — wszyscy widzą wszystko (tylko odczyt)' },
-          { value: 'undecided', label: 'Do ustalenia' },
+          { value: 'own_only', labelKey: 'onboardingSurvey.questions.users_global_read.options.own_only.label' },
+          { value: 'read_all', labelKey: 'onboardingSurvey.questions.users_global_read.options.read_all.label' },
+          { value: 'undecided', labelKey: 'onboardingSurvey.questions.users_global_read.options.undecided.label' },
         ],
       },
     ],
   },
   {
     id: 'modules',
-    title: '4. Moduły',
-    intro: 'Zaznaczone moduły włączymy w Państwa środowisku. Dla części z nich niżej pojawią się dodatkowe pytania.',
+    titleKey: 'onboardingSurvey.sections.modules.title',
+    introKey: 'onboardingSurvey.sections.modules.intro',
     fields: [
       {
-        key: 'modules', label: 'Które moduły mają być aktywne?', type: 'checkboxes', isRequired: true,
+        key: 'modules', labelKey: 'onboardingSurvey.questions.modules.label', type: 'checkboxes', isRequired: true,
         options: [
-          { value: 'leads', label: 'Leady', hint: 'Lejek sprzedażowy, aktywności, kalendarz.' },
-          { value: 'partner_registry', label: 'Rejestr partnerów / klientów', hint: 'Obsługa obecnych klientów, upsell i cross-sell.' },
-          { value: 'sales_reports', label: 'Raporty sprzedaży' },
-          { value: 'performance', label: 'Performance', hint: 'Health score i ryzyko odejścia klienta (churn).' },
-          { value: 'onboarding', label: 'Onboarding klientów', hint: 'Szablony zadań wdrożeniowych dla nowych klientów.' },
-          { value: 'documents', label: 'Dokumenty', hint: 'Rejestr umów, obieg akceptacji i podpis.' },
-          { value: 'prospects', label: 'Prospekty', hint: 'Wyszukiwanie firm i ich automatyczna ocena przez AI (Enrichment / ICP).' },
-          { value: 'pbx', label: 'Telefonia (softphone)', hint: 'Dzwonienie do klientów bezpośrednio z CRM.' },
-          { value: 'call_analysis', label: 'Analiza rozmów', hint: 'Ocena rozmów telefonicznych przez AI.' },
-          { value: 'whatsapp', label: 'WhatsApp', hint: 'Wspólny firmowy numer WhatsApp Business obsługiwany z kart leadów i klientów.' },
-          { value: 'seo_bot', label: 'SEObot', hint: 'Automatyczne tworzenie i publikacja artykułów na blogu.' },
-          { value: 'dwh_integration', label: 'Integracja z danymi sprzedażowymi (DWH)', hint: 'Zasilanie CRM obrotami z Państwa systemu sprzedażowego / ERP.' },
+          { value: 'leads', labelKey: 'onboardingSurvey.questions.modules.options.leads.label', hintKey: 'onboardingSurvey.questions.modules.options.leads.hint' },
+          { value: 'partner_registry', labelKey: 'onboardingSurvey.questions.modules.options.partner_registry.label', hintKey: 'onboardingSurvey.questions.modules.options.partner_registry.hint' },
+          { value: 'sales_reports', labelKey: 'onboardingSurvey.questions.modules.options.sales_reports.label' },
+          { value: 'performance', labelKey: 'onboardingSurvey.questions.modules.options.performance.label', hintKey: 'onboardingSurvey.questions.modules.options.performance.hint' },
+          { value: 'onboarding', labelKey: 'onboardingSurvey.questions.modules.options.onboarding.label', hintKey: 'onboardingSurvey.questions.modules.options.onboarding.hint' },
+          { value: 'documents', labelKey: 'onboardingSurvey.questions.modules.options.documents.label', hintKey: 'onboardingSurvey.questions.modules.options.documents.hint' },
+          { value: 'prospects', labelKey: 'onboardingSurvey.questions.modules.options.prospects.label', hintKey: 'onboardingSurvey.questions.modules.options.prospects.hint' },
+          { value: 'pbx', labelKey: 'onboardingSurvey.questions.modules.options.pbx.label', hintKey: 'onboardingSurvey.questions.modules.options.pbx.hint' },
+          { value: 'call_analysis', labelKey: 'onboardingSurvey.questions.modules.options.call_analysis.label', hintKey: 'onboardingSurvey.questions.modules.options.call_analysis.hint' },
+          { value: 'whatsapp', labelKey: 'onboardingSurvey.questions.modules.options.whatsapp.label', hintKey: 'onboardingSurvey.questions.modules.options.whatsapp.hint' },
+          { value: 'seo_bot', labelKey: 'onboardingSurvey.questions.modules.options.seo_bot.label', hintKey: 'onboardingSurvey.questions.modules.options.seo_bot.hint' },
+          { value: 'dwh_integration', labelKey: 'onboardingSurvey.questions.modules.options.dwh_integration.label', hintKey: 'onboardingSurvey.questions.modules.options.dwh_integration.hint' },
         ],
       },
     ],
   },
   {
     id: 'email',
-    title: '5. Poczta e-mail',
-    intro: 'Każdy użytkownik łączy w CRM własną skrzynkę (wysyłka i odbiór wiadomości na kartach leadów i klientów). Wymaga to jednorazowej rejestracji aplikacji u dostawcy poczty — adres zwrotny (Redirect URI) przekażemy osobie technicznej.',
+    titleKey: 'onboardingSurvey.sections.email.title',
+    introKey: 'onboardingSurvey.sections.email.intro',
     fields: [
       {
-        key: 'email_provider', label: 'Z jakiej poczty firmowej Państwo korzystają?', type: 'select', isRequired: true,
+        key: 'email_provider', labelKey: 'onboardingSurvey.questions.email_provider.label', type: 'select', isRequired: true,
         options: [
-          { value: 'gmail', label: 'Gmail / Google Workspace' },
-          { value: 'outlook', label: 'Outlook / Microsoft 365' },
-          { value: 'zoho', label: 'Zoho Mail' },
-          { value: 'other', label: 'Inna' },
-          { value: 'none', label: 'Nie chcemy integracji poczty' },
+          { value: 'gmail', labelKey: 'onboardingSurvey.questions.email_provider.options.gmail.label' },
+          { value: 'outlook', labelKey: 'onboardingSurvey.questions.email_provider.options.outlook.label' },
+          { value: 'zoho', labelKey: 'onboardingSurvey.questions.email_provider.options.zoho.label' },
+          { value: 'other', labelKey: 'onboardingSurvey.questions.email_provider.options.other.label' },
+          { value: 'none', labelKey: 'onboardingSurvey.questions.email_provider.options.none.label' },
         ],
       },
-      { key: 'email_other_provider', label: 'Jaka to poczta?', type: 'text', isVisible: isAnswer('email_provider', 'other'), hint: 'Obecnie obsługujemy Gmail, Microsoft 365 i Zoho — sprawdzimy możliwości dla innego dostawcy.' },
-      { key: 'email_mailbox_count', label: 'Ile skrzynek będzie podłączonych?', type: 'number', isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
-      { key: 'email_oauth_app_owner', label: 'Kto zarejestruje aplikację u dostawcy poczty?', type: 'select', options: OAUTH_APP_OWNER, isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
+      { key: 'email_other_provider', labelKey: 'onboardingSurvey.questions.email_other_provider.label', type: 'text', isVisible: isAnswer('email_provider', 'other'), hintKey: 'onboardingSurvey.questions.email_other_provider.hint' },
+      { key: 'email_mailbox_count', labelKey: 'onboardingSurvey.questions.email_mailbox_count.label', type: 'number', isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
+      { key: 'email_oauth_app_owner', labelKey: 'onboardingSurvey.questions.email_oauth_app_owner.label', type: 'select', options: OAUTH_APP_OWNER, isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
 
-      { key: 'gmail_client_id', label: 'Google — Client ID', type: 'text', placeholder: '123456789.apps.googleusercontent.com', isVisible: isAnswer('email_provider', 'gmail') },
-      { key: 'gmail_client_secret', label: 'Google — Client Secret', type: 'secret', isVisible: isAnswer('email_provider', 'gmail') },
-      { key: 'gmail_pubsub_topic', label: 'Google — Pub/Sub Topic', type: 'text', placeholder: 'projects/moj-projekt/topics/gmail-push', hint: 'Potrzebny do natychmiastowego odbioru nowych wiadomości.', isVisible: isAnswer('email_provider', 'gmail') },
+      { key: 'gmail_client_id', labelKey: 'onboardingSurvey.questions.gmail_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_client_id.placeholder', isVisible: isAnswer('email_provider', 'gmail') },
+      { key: 'gmail_client_secret', labelKey: 'onboardingSurvey.questions.gmail_client_secret.label', type: 'secret', isVisible: isAnswer('email_provider', 'gmail') },
+      { key: 'gmail_pubsub_topic', labelKey: 'onboardingSurvey.questions.gmail_pubsub_topic.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_pubsub_topic.placeholder', hintKey: 'onboardingSurvey.questions.gmail_pubsub_topic.hint', isVisible: isAnswer('email_provider', 'gmail') },
 
-      { key: 'outlook_client_id', label: 'Microsoft — Application (client) ID', type: 'text', placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', isVisible: isAnswer('email_provider', 'outlook') },
-      { key: 'outlook_client_secret', label: 'Microsoft — Client Secret', type: 'secret', isVisible: isAnswer('email_provider', 'outlook') },
-      { key: 'outlook_azure_tenant_id', label: 'Microsoft — Directory (tenant) ID', type: 'text', hint: 'Opcjonalne.', isVisible: isAnswer('email_provider', 'outlook') },
-      { key: 'outlook_admin_consent', label: 'Czy administrator Microsoft 365 może udzielić zgody (admin consent) dla całej organizacji?', type: 'select', options: YES_NO, isVisible: isAnswer('email_provider', 'outlook') },
+      { key: 'outlook_client_id', labelKey: 'onboardingSurvey.questions.outlook_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.outlook_client_id.placeholder', isVisible: isAnswer('email_provider', 'outlook') },
+      { key: 'outlook_client_secret', labelKey: 'onboardingSurvey.questions.outlook_client_secret.label', type: 'secret', isVisible: isAnswer('email_provider', 'outlook') },
+      { key: 'outlook_azure_tenant_id', labelKey: 'onboardingSurvey.questions.outlook_azure_tenant_id.label', type: 'text', hintKey: 'onboardingSurvey.questions.outlook_azure_tenant_id.hint', isVisible: isAnswer('email_provider', 'outlook') },
+      { key: 'outlook_admin_consent', labelKey: 'onboardingSurvey.questions.outlook_admin_consent.label', type: 'select', options: YES_NO, isVisible: isAnswer('email_provider', 'outlook') },
 
-      { key: 'zoho_client_id', label: 'Zoho — Client ID', type: 'text', placeholder: '1000.XXXXXXXX', isVisible: isAnswer('email_provider', 'zoho') },
-      { key: 'zoho_client_secret', label: 'Zoho — Client Secret', type: 'secret', isVisible: isAnswer('email_provider', 'zoho') },
+      { key: 'zoho_client_id', labelKey: 'onboardingSurvey.questions.zoho_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.zoho_client_id.placeholder', isVisible: isAnswer('email_provider', 'zoho') },
+      { key: 'zoho_client_secret', labelKey: 'onboardingSurvey.questions.zoho_client_secret.label', type: 'secret', isVisible: isAnswer('email_provider', 'zoho') },
       {
-        key: 'zoho_data_center', label: 'Zoho — centrum danych', type: 'select', isVisible: isAnswer('email_provider', 'zoho'),
+        key: 'zoho_data_center', labelKey: 'onboardingSurvey.questions.zoho_data_center.label', type: 'select', isVisible: isAnswer('email_provider', 'zoho'),
         options: [
-          { value: 'eu', label: 'EU (zoho.eu)' },
-          { value: 'com', label: 'US (zoho.com)' },
-          { value: 'other', label: 'Inne' },
+          { value: 'eu', labelKey: 'onboardingSurvey.questions.zoho_data_center.options.eu.label' },
+          { value: 'com', labelKey: 'onboardingSurvey.questions.zoho_data_center.options.com.label' },
+          { value: 'other', labelKey: 'onboardingSurvey.questions.zoho_data_center.options.other.label' },
         ],
       },
     ],
   },
   {
     id: 'whatsapp',
-    title: '6. WhatsApp Business',
-    intro: 'CRM obsługuje jeden wspólny firmowy numer WhatsApp Business dla całej organizacji (Meta WhatsApp Business Platform). Numer podłączony do CRM nie może jednocześnie działać w zwykłej aplikacji WhatsApp na telefonie.',
+    titleKey: 'onboardingSurvey.sections.whatsapp.title',
+    introKey: 'onboardingSurvey.sections.whatsapp.intro',
     isVisible: hasModule('whatsapp'),
     fields: [
       {
-        key: 'whatsapp_number_status', label: 'Czy mają Państwo numer do WhatsApp Business?', type: 'select', isRequired: true,
+        key: 'whatsapp_number_status', labelKey: 'onboardingSurvey.questions.whatsapp_number_status.label', type: 'select', isRequired: true,
         options: [
-          { value: 'ready', label: 'Tak — numer jest już w Meta WhatsApp Business Platform (Cloud API)' },
-          { value: 'has_number', label: 'Mamy numer, ale nie jest jeszcze zarejestrowany w Meta' },
-          { value: 'needs_number', label: 'Nie — prosimy o zakup i konfigurację numeru przez CRMtree' },
+          { value: 'ready', labelKey: 'onboardingSurvey.questions.whatsapp_number_status.options.ready.label' },
+          { value: 'has_number', labelKey: 'onboardingSurvey.questions.whatsapp_number_status.options.has_number.label' },
+          { value: 'needs_number', labelKey: 'onboardingSurvey.questions.whatsapp_number_status.options.needs_number.label' },
         ],
       },
-      { key: 'whatsapp_phone_number', label: 'Numer telefonu', type: 'tel', placeholder: '+48 600 000 000', isVisible: isAnyOf('whatsapp_number_status', ['ready', 'has_number']) },
-      { key: 'whatsapp_display_name', label: 'Nazwa wyświetlana klientom w WhatsApp', type: 'text' },
-      { key: 'whatsapp_meta_verified', label: 'Czy firma jest zweryfikowana w Meta Business Manager?', type: 'select', options: [...YES_NO, { value: 'unknown', label: 'Nie wiem' }] },
-      { key: 'whatsapp_waba_id', label: 'WABA ID (WhatsApp Business Account ID)', type: 'text', hint: 'Meta App Dashboard → WhatsApp → API Setup.', isVisible: isAnswer('whatsapp_number_status', 'ready') },
-      { key: 'whatsapp_phone_number_id', label: 'Phone Number ID', type: 'text', hint: 'To identyfikator numeru w Meta, nie sam numer telefonu.', isVisible: isAnswer('whatsapp_number_status', 'ready') },
-      { key: 'whatsapp_access_token', label: 'Access Token (stały token użytkownika systemowego)', type: 'secret', hint: 'Uprawnienia: whatsapp_business_messaging, whatsapp_business_management.', isVisible: isAnswer('whatsapp_number_status', 'ready') },
-      { key: 'whatsapp_app_secret', label: 'App Secret', type: 'secret', hint: 'Meta App Dashboard → Settings → Basic.', isVisible: isAnswer('whatsapp_number_status', 'ready') },
+      { key: 'whatsapp_phone_number', labelKey: 'onboardingSurvey.questions.whatsapp_phone_number.label', type: 'tel', placeholderKey: 'onboardingSurvey.questions.whatsapp_phone_number.placeholder', isVisible: isAnyOf('whatsapp_number_status', ['ready', 'has_number']) },
+      { key: 'whatsapp_display_name', labelKey: 'onboardingSurvey.questions.whatsapp_display_name.label', type: 'text' },
+      { key: 'whatsapp_meta_verified', labelKey: 'onboardingSurvey.questions.whatsapp_meta_verified.label', type: 'select', options: [...YES_NO, { value: 'unknown', labelKey: 'onboardingSurvey.questions.whatsapp_meta_verified.options.unknown.label' }] },
+      { key: 'whatsapp_waba_id', labelKey: 'onboardingSurvey.questions.whatsapp_waba_id.label', type: 'text', hintKey: 'onboardingSurvey.questions.whatsapp_waba_id.hint', isVisible: isAnswer('whatsapp_number_status', 'ready') },
+      { key: 'whatsapp_phone_number_id', labelKey: 'onboardingSurvey.questions.whatsapp_phone_number_id.label', type: 'text', hintKey: 'onboardingSurvey.questions.whatsapp_phone_number_id.hint', isVisible: isAnswer('whatsapp_number_status', 'ready') },
+      { key: 'whatsapp_access_token', labelKey: 'onboardingSurvey.questions.whatsapp_access_token.label', type: 'secret', hintKey: 'onboardingSurvey.questions.whatsapp_access_token.hint', isVisible: isAnswer('whatsapp_number_status', 'ready') },
+      { key: 'whatsapp_app_secret', labelKey: 'onboardingSurvey.questions.whatsapp_app_secret.label', type: 'secret', hintKey: 'onboardingSurvey.questions.whatsapp_app_secret.hint', isVisible: isAnswer('whatsapp_number_status', 'ready') },
     ],
   },
   {
     id: 'pbx',
-    title: '7. Telefonia (softphone)',
-    intro: 'Softphone w CRM działa z wirtualną centralą ip-pbx.eu. Każdy użytkownik wpisuje później swój osobisty token w „Moje ustawienia” — tutaj nie trzeba go podawać.',
+    titleKey: 'onboardingSurvey.sections.pbx.title',
+    introKey: 'onboardingSurvey.sections.pbx.intro',
     isVisible: hasModule('pbx'),
     fields: [
       {
-        key: 'pbx_account_status', label: 'Czy mają Państwo konto firmowe w ip-pbx.eu?', type: 'select', isRequired: true,
+        key: 'pbx_account_status', labelKey: 'onboardingSurvey.questions.pbx_account_status.label', type: 'select', isRequired: true,
         options: [
-          { value: 'has_account', label: 'Tak' },
-          { value: 'other_provider', label: 'Nie — korzystamy z innej centrali / operatora' },
-          { value: 'needs_account', label: 'Nie — prosimy o założenie konta przez CRMtree' },
+          { value: 'has_account', labelKey: 'onboardingSurvey.questions.pbx_account_status.options.has_account.label' },
+          { value: 'other_provider', labelKey: 'onboardingSurvey.questions.pbx_account_status.options.other_provider.label' },
+          { value: 'needs_account', labelKey: 'onboardingSurvey.questions.pbx_account_status.options.needs_account.label' },
         ],
       },
-      { key: 'pbx_account_name', label: 'Nazwa firmy / konta w ip-pbx.eu', type: 'text', isVisible: isAnswer('pbx_account_status', 'has_account') },
-      { key: 'pbx_current_provider', label: 'Obecna centrala / operator', type: 'text', isVisible: isAnswer('pbx_account_status', 'other_provider') },
-      { key: 'pbx_extension_count', label: 'Ile osób będzie dzwonić z CRM?', type: 'number' },
-      { key: 'pbx_phone_numbers', label: 'Numery, z których mają wychodzić połączenia', type: 'textarea', hint: 'Numer główny firmy oraz numery bezpośrednie, jeśli mają być przypisane do konkretnych osób. Zaznacz numery do przeniesienia od obecnego operatora.' },
-      { key: 'pbx_call_recording', label: 'Czy rozmowy mają być nagrywane?', type: 'select', options: YES_NO, hint: 'Nagrania i ich transkrypcje są podstawą modułu Analiza rozmów.' },
+      { key: 'pbx_account_name', labelKey: 'onboardingSurvey.questions.pbx_account_name.label', type: 'text', isVisible: isAnswer('pbx_account_status', 'has_account') },
+      { key: 'pbx_current_provider', labelKey: 'onboardingSurvey.questions.pbx_current_provider.label', type: 'text', isVisible: isAnswer('pbx_account_status', 'other_provider') },
+      { key: 'pbx_extension_count', labelKey: 'onboardingSurvey.questions.pbx_extension_count.label', type: 'number' },
+      { key: 'pbx_phone_numbers', labelKey: 'onboardingSurvey.questions.pbx_phone_numbers.label', type: 'textarea', hintKey: 'onboardingSurvey.questions.pbx_phone_numbers.hint' },
+      { key: 'pbx_call_recording', labelKey: 'onboardingSurvey.questions.pbx_call_recording.label', type: 'select', options: YES_NO, hintKey: 'onboardingSurvey.questions.pbx_call_recording.hint' },
     ],
   },
   {
     id: 'ai',
-    title: '8. Modele AI — Enrichment i Analiza rozmów',
-    intro: 'Moduły Prospekty (Enrichment) i Analiza rozmów wysyłają dane do zewnętrznych modeli językowych. Można korzystać z licencji CRMtree albo z własnej, dedykowanej licencji Państwa firmy.',
+    titleKey: 'onboardingSurvey.sections.ai.title',
+    introKey: 'onboardingSurvey.sections.ai.intro',
     isVisible: hasAnyModule('prospects', 'call_analysis'),
     fields: [
       {
-        key: 'enrichment_model', label: 'Enrichment — preferowany model', type: 'select', isVisible: hasModule('prospects'),
+        key: 'enrichment_model', labelKey: 'onboardingSurvey.questions.enrichment_model.label', type: 'select', isVisible: hasModule('prospects'),
         options: [
-          { value: 'deepseek', label: 'DeepSeek (domyślny, niższy koszt)' },
-          { value: 'anthropic', label: 'Anthropic Claude (wyższa jakość, wyższy koszt)' },
-          { value: 'undecided', label: 'Prosimy o rekomendację' },
+          { value: 'deepseek', labelKey: 'onboardingSurvey.questions.enrichment_model.options.deepseek.label' },
+          { value: 'anthropic', labelKey: 'onboardingSurvey.questions.enrichment_model.options.anthropic.label' },
+          { value: 'undecided', labelKey: 'onboardingSurvey.questions.enrichment_model.options.undecided.label' },
         ],
       },
-      { key: 'enrichment_licence', label: 'Enrichment — licencja na model', type: 'select', options: AI_LICENCE, isRequired: true, isVisible: hasModule('prospects') },
-      { key: 'enrichment_api_key', label: 'Enrichment — własny klucz API', type: 'secret', isVisible: answers => hasModule('prospects')(answers) && isAnswer('enrichment_licence', 'own')(answers) },
-      { key: 'enrichment_monthly_volume', label: 'Enrichment — ile firm miesięcznie planują Państwo analizować?', type: 'number', isVisible: hasModule('prospects') },
+      { key: 'enrichment_licence', labelKey: 'onboardingSurvey.questions.enrichment_licence.label', type: 'select', options: AI_LICENCE, isRequired: true, isVisible: hasModule('prospects') },
+      { key: 'enrichment_api_key', labelKey: 'onboardingSurvey.questions.enrichment_api_key.label', type: 'secret', isVisible: answers => hasModule('prospects')(answers) && isAnswer('enrichment_licence', 'own')(answers) },
+      { key: 'enrichment_monthly_volume', labelKey: 'onboardingSurvey.questions.enrichment_monthly_volume.label', type: 'number', isVisible: hasModule('prospects') },
       {
-        key: 'enrichment_ideal_customer', label: 'Enrichment — profil idealnego klienta (ICP)', type: 'textarea', isVisible: hasModule('prospects'),
-        hint: 'Branże, wielkość firmy, region, sygnały świadczące o dopasowaniu oraz firmy, których nie chcą Państwo pozyskiwać. Na tej podstawie skonfigurujemy sygnały i punktację.',
+        key: 'enrichment_ideal_customer', labelKey: 'onboardingSurvey.questions.enrichment_ideal_customer.label', type: 'textarea', isVisible: hasModule('prospects'),
+        hintKey: 'onboardingSurvey.questions.enrichment_ideal_customer.hint',
       },
 
-      { key: 'call_analysis_licence', label: 'Analiza rozmów — licencja na model', type: 'select', options: AI_LICENCE, isRequired: true, isVisible: hasModule('call_analysis'), hint: 'Analiza rozmów korzysta z modelu DeepSeek.' },
-      { key: 'call_analysis_api_key', label: 'Analiza rozmów — własny klucz API', type: 'secret', isVisible: answers => hasModule('call_analysis')(answers) && isAnswer('call_analysis_licence', 'own')(answers) },
-      { key: 'call_analysis_monthly_volume', label: 'Analiza rozmów — szacowana liczba rozmów miesięcznie', type: 'number', isVisible: hasModule('call_analysis') },
+      { key: 'call_analysis_licence', labelKey: 'onboardingSurvey.questions.call_analysis_licence.label', type: 'select', options: AI_LICENCE, isRequired: true, isVisible: hasModule('call_analysis'), hintKey: 'onboardingSurvey.questions.call_analysis_licence.hint' },
+      { key: 'call_analysis_api_key', labelKey: 'onboardingSurvey.questions.call_analysis_api_key.label', type: 'secret', isVisible: answers => hasModule('call_analysis')(answers) && isAnswer('call_analysis_licence', 'own')(answers) },
+      { key: 'call_analysis_monthly_volume', labelKey: 'onboardingSurvey.questions.call_analysis_monthly_volume.label', type: 'number', isVisible: hasModule('call_analysis') },
       {
-        key: 'call_analysis_buying_signals', label: 'Analiza rozmów — po czym poznają Państwo klienta gotowego do zakupu?', type: 'textarea', isVisible: hasModule('call_analysis'),
-        hint: 'Typowe sygnały zainteresowania i typowe obiekcje. Dopasujemy do nich ocenę skłonności do zakupu.',
+        key: 'call_analysis_buying_signals', labelKey: 'onboardingSurvey.questions.call_analysis_buying_signals.label', type: 'textarea', isVisible: hasModule('call_analysis'),
+        hintKey: 'onboardingSurvey.questions.call_analysis_buying_signals.hint',
       },
 
-      { key: 'ai_monthly_budget', label: 'Miesięczny limit kosztów modeli AI', type: 'text', placeholder: 'np. 200 EUR', hint: 'Opcjonalnie — jeśli chcą Państwo ograniczyć zużycie.' },
+      { key: 'ai_monthly_budget', labelKey: 'onboardingSurvey.questions.ai_monthly_budget.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.ai_monthly_budget.placeholder', hintKey: 'onboardingSurvey.questions.ai_monthly_budget.hint' },
       {
-        key: 'ai_data_processing_consent', label: 'Przetwarzanie danych przez dostawców modeli', type: 'checkboxes',
+        key: 'ai_data_processing_consent', labelKey: 'onboardingSurvey.questions.ai_data_processing_consent.label', type: 'checkboxes',
         options: [
-          { value: 'accepted', label: 'Akceptujemy przekazywanie treści (dane firm, notatki i transkrypcje rozmów) do wybranego dostawcy modelu AI' },
-          { value: 'eu_only', label: 'Wymagamy przetwarzania wyłącznie na terenie UE' },
+          { value: 'accepted', labelKey: 'onboardingSurvey.questions.ai_data_processing_consent.options.accepted.label' },
+          { value: 'eu_only', labelKey: 'onboardingSurvey.questions.ai_data_processing_consent.options.eu_only.label' },
         ],
       },
     ],
   },
   {
     id: 'seo',
-    title: '9. SEObot',
+    titleKey: 'onboardingSurvey.sections.seo.title',
     isVisible: hasModule('seo_bot'),
     fields: [
-      { key: 'seo_website_url', label: 'Adres strony / bloga', type: 'text', placeholder: 'https://firma.pl/blog' },
+      { key: 'seo_website_url', labelKey: 'onboardingSurvey.questions.seo_website_url.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.seo_website_url.placeholder' },
       {
-        key: 'seo_publishing_platform', label: 'Gdzie publikujemy artykuły?', type: 'select',
+        key: 'seo_publishing_platform', labelKey: 'onboardingSurvey.questions.seo_publishing_platform.label', type: 'select',
         options: [
-          { value: 'wordpress', label: 'WordPress' },
-          { value: 'other', label: 'Inny system' },
-          { value: 'undecided', label: 'Do ustalenia' },
+          { value: 'wordpress', labelKey: 'onboardingSurvey.questions.seo_publishing_platform.options.wordpress.label' },
+          { value: 'other', labelKey: 'onboardingSurvey.questions.seo_publishing_platform.options.other.label' },
+          { value: 'undecided', labelKey: 'onboardingSurvey.questions.seo_publishing_platform.options.undecided.label' },
         ],
       },
-      { key: 'seo_articles_per_day', label: 'Ile artykułów dziennie?', type: 'number' },
+      { key: 'seo_articles_per_day', labelKey: 'onboardingSurvey.questions.seo_articles_per_day.label', type: 'number' },
       {
-        key: 'seo_channels', label: 'Dodatkowe kanały i źródła danych', type: 'checkboxes',
+        key: 'seo_channels', labelKey: 'onboardingSurvey.questions.seo_channels.label', type: 'checkboxes',
         options: [
-          { value: 'gsc', label: 'Google Search Console (mamy dostęp właściciela do usługi)' },
-          { value: 'linkedin', label: 'Publikacja na firmowym profilu LinkedIn' },
-          { value: 'facebook', label: 'Publikacja na firmowej stronie Facebook' },
+          { value: 'gsc', labelKey: 'onboardingSurvey.questions.seo_channels.options.gsc.label' },
+          { value: 'linkedin', labelKey: 'onboardingSurvey.questions.seo_channels.options.linkedin.label' },
+          { value: 'facebook', labelKey: 'onboardingSurvey.questions.seo_channels.options.facebook.label' },
         ],
       },
     ],
   },
   {
     id: 'data',
-    title: '10. Dane i słowniki',
+    titleKey: 'onboardingSurvey.sections.data.title',
     fields: [
       {
-        key: 'import_scope', label: 'Jakie dane importujemy na start?', type: 'checkboxes',
+        key: 'import_scope', labelKey: 'onboardingSurvey.questions.import_scope.label', type: 'checkboxes',
         options: [
-          { value: 'leads', label: 'Leady / szanse sprzedaży' },
-          { value: 'partners', label: 'Obecni klienci / partnerzy' },
-          { value: 'contacts', label: 'Osoby kontaktowe' },
-          { value: 'documents', label: 'Dokumenty / umowy' },
+          { value: 'leads', labelKey: 'onboardingSurvey.questions.import_scope.options.leads.label' },
+          { value: 'partners', labelKey: 'onboardingSurvey.questions.import_scope.options.partners.label' },
+          { value: 'contacts', labelKey: 'onboardingSurvey.questions.import_scope.options.contacts.label' },
+          { value: 'documents', labelKey: 'onboardingSurvey.questions.import_scope.options.documents.label' },
         ],
       },
-      { key: 'import_source', label: 'Skąd pochodzą dane i ile ich jest?', type: 'textarea', placeholder: 'np. Excel, ok. 2 000 leadów i 300 klientów', hint: 'Obecny system (Excel, inny CRM, ERP) i przybliżona liczba rekordów.' },
-      { key: 'dwh_source', label: 'Dane sprzedażowe — z jakiego systemu i jak często mają być aktualizowane?', type: 'textarea', isVisible: hasModule('dwh_integration'), hint: 'System źródłowy (ERP / system sprzedażowy), format eksportu i częstotliwość.' },
-      { key: 'sales_stages', label: 'Etapy lejka sprzedażowego', type: 'textarea', placeholder: 'Nowy → Kwalifikacja → Prezentacja → Oferta → Negocjacje → Wygrana / Przegrana', hint: 'Zostaw puste, jeśli odpowiada Państwu domyślny lejek.' },
-      { key: 'lead_sources', label: 'Źródła leadów', type: 'textarea', placeholder: 'Strona www, polecenie, cold call, LinkedIn, targi…' },
-      { key: 'currencies', label: 'Waluty, w których Państwo sprzedają', type: 'text', placeholder: 'PLN, EUR' },
+      { key: 'import_source', labelKey: 'onboardingSurvey.questions.import_source.label', type: 'textarea', placeholderKey: 'onboardingSurvey.questions.import_source.placeholder', hintKey: 'onboardingSurvey.questions.import_source.hint' },
+      { key: 'dwh_source', labelKey: 'onboardingSurvey.questions.dwh_source.label', type: 'textarea', isVisible: hasModule('dwh_integration'), hintKey: 'onboardingSurvey.questions.dwh_source.hint' },
+      { key: 'sales_stages', labelKey: 'onboardingSurvey.questions.sales_stages.label', type: 'textarea', placeholderKey: 'onboardingSurvey.questions.sales_stages.placeholder', hintKey: 'onboardingSurvey.questions.sales_stages.hint' },
+      { key: 'lead_sources', labelKey: 'onboardingSurvey.questions.lead_sources.label', type: 'textarea', placeholderKey: 'onboardingSurvey.questions.lead_sources.placeholder' },
+      { key: 'currencies', labelKey: 'onboardingSurvey.questions.currencies.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.currencies.placeholder' },
     ],
   },
   {
     id: 'notes',
-    title: '11. Uwagi',
+    titleKey: 'onboardingSurvey.sections.notes.title',
     fields: [
-      { key: 'additional_notes', label: 'Inne wymagania, pytania lub ograniczenia', type: 'textarea' },
+      { key: 'additional_notes', labelKey: 'onboardingSurvey.questions.additional_notes.label', type: 'textarea' },
     ],
   },
 ];
