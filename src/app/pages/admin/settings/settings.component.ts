@@ -7,6 +7,7 @@ import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
+import { LanguagePickerComponent } from '../../../shared/components/language-picker/language-picker.component';
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
 
@@ -211,7 +212,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, LanguagePickerComponent],
   template: `
     <div id="topbar">
       <span class="page-title">Ustawienia aplikacji</span>
@@ -289,6 +290,10 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
 
         <!-- TAB: Parametry globalne -->
         @if (activeTab() === 'global') {
+
+          <div class="card" style="padding:18px 20px;margin-bottom:24px">
+            <wt-language-picker mode="tenant" />
+          </div>
 
           <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#1D4ED8;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">ℹ️</span>

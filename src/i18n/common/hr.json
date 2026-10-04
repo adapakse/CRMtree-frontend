@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Odustani",
+    "close": "Zatvori",
+    "save": "Spremi"
+  },
+  "language": {
+    "changeFailed": "Promjena jezika nije uspjela",
+    "followTenant": "Zadani jezik organizacije ({language})",
+    "hint": "Promjena jezika ponovno učitava stranicu. Na tom ćete jeziku primati i e-poruke i podsjetnike.",
+    "tenantHint": "Jezik za osobe koje nisu odabrale vlastiti. Promjena ponovno učitava stranicu.",
+    "tenantTitle": "Zadani jezik organizacije",
+    "title": "Jezik sučelja"
+  }
+}

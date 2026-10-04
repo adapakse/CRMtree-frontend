@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "activityCalendar": "Календарь активностей",
+    "analyticsDashboardTip": "Аналитический дашборд",
+    "appSettings": "Настройки приложения",
+    "auditLogs": "Журнал аудита",
+    "billing": "Расчёты",
+    "billingTip": "Счета и тарифы тенантов",
+    "budgets": "Бюджеты",
+    "callAnalysis": "Анализ звонков",
+    "csvImport": "Импорт CSV",
+    "dashboard": "Дашборд",
+    "dataManagement": "Управление данными",
+    "documents": "Документы",
+    "groupsAndRoles": "Группы и роли",
+    "leads": "Лиды",
+    "mySettings": "Мои настройки",
+    "onboarding": "Онбординг",
+    "partnerAnalytics": "Аналитика партнёров",
+    "partnerGroups": "Группы партнёров",
+    "partnerRegistry": "Реестр партнёров",
+    "performance": "Результаты",
+    "projects": "Проекты",
+    "prospects": "Потенциальные клиенты",
+    "prospectsDashboard": "Дашборд потенциальных клиентов",
+    "salesBudgetsTip": "Бюджеты менеджеров по продажам",
+    "salesReports": "Отчёты по продажам",
+    "seoBot": "SEObot",
+    "tenants": "Tenants",
+    "tenantsTip": "Управление тенантами",
+    "users": "Пользователи",
+    "workflow": "Бизнес-процессы"
+  },
+  "sections": {
+    "administration": "Администрирование",
+    "crm": "CRM",
+    "documents": "Документы",
+    "partners": "Партнёры",
+    "projects": "Проекты",
+    "superAdmin": "Суперадмин"
+  },
+  "sidebar": {
+    "collapse": "Свернуть меню",
+    "expand": "Развернуть меню"
+  },
+  "user": {
+    "admin": "Администратор",
+    "logout": "Выйти",
+    "user": "Пользователь"
+  }
+}

@@ -38,6 +38,9 @@ export interface User {
   department?: string | null;
   is_external?: boolean;
   can_create_projects?: boolean;
+  /** Interface language picked by the user; null = follow the tenant default. */
+  locale?: string | null;
+  tenant_default_locale?: string | null;
   last_login_at?: string;
   created_at?: string;
   roles?: UserRole[];

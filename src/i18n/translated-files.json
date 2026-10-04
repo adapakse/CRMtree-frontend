@@ -1,0 +1,5 @@
+[
+  "src/app/layout/shell/shell.component.ts",
+  "src/app/pages/login/login.component.ts",
+  "src/app/shared/components/language-picker/language-picker.component.ts"
+]

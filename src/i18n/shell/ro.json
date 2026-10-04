@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "activityCalendar": "Calendar activități",
+    "analyticsDashboardTip": "Panou de analiză",
+    "appSettings": "Setări aplicație",
+    "auditLogs": "Jurnale de audit",
+    "billing": "Facturare",
+    "billingTip": "Facturile și planurile organizațiilor",
+    "budgets": "Bugete",
+    "callAnalysis": "Analiza apelurilor",
+    "csvImport": "Import CSV",
+    "dashboard": "Panou",
+    "dataManagement": "Gestionarea datelor",
+    "documents": "Documente",
+    "groupsAndRoles": "Grupuri și roluri",
+    "leads": "Leaduri",
+    "mySettings": "Setările mele",
+    "onboarding": "Onboarding",
+    "partnerAnalytics": "Analiză parteneri",
+    "partnerGroups": "Grupuri de parteneri",
+    "partnerRegistry": "Registru parteneri",
+    "performance": "Performanță",
+    "projects": "Proiecte",
+    "prospects": "Prospecți",
+    "prospectsDashboard": "Panou prospecți",
+    "salesBudgetsTip": "Bugetele agenților de vânzări",
+    "salesReports": "Rapoarte de vânzări",
+    "seoBot": "SEObot",
+    "tenants": "Tenants",
+    "tenantsTip": "Administrarea organizațiilor",
+    "users": "Utilizatori",
+    "workflow": "Workflow"
+  },
+  "sections": {
+    "administration": "Administrare",
+    "crm": "CRM",
+    "documents": "Documente",
+    "partners": "Parteneri",
+    "projects": "Proiecte",
+    "superAdmin": "Super Admin"
+  },
+  "sidebar": {
+    "collapse": "Restrângere meniu",
+    "expand": "Extindere meniu"
+  },
+  "user": {
+    "admin": "Administrator",
+    "logout": "Deconectare",
+    "user": "Utilizator"
+  }
+}

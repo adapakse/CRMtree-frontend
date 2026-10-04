@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "activityCalendar": "Calendario azioni",
+    "analyticsDashboardTip": "Dashboard analitica",
+    "appSettings": "Impostazioni dell'applicazione",
+    "auditLogs": "Log di audit",
+    "billing": "Fatturazione",
+    "billingTip": "Fatture e piani dei tenant",
+    "budgets": "Budget",
+    "callAnalysis": "Analisi delle chiamate",
+    "csvImport": "Importazione CSV",
+    "dashboard": "Dashboard",
+    "dataManagement": "Gestione dati",
+    "documents": "Documenti",
+    "groupsAndRoles": "Gruppi e ruoli",
+    "leads": "Lead",
+    "mySettings": "Le mie impostazioni",
+    "onboarding": "Onboarding",
+    "partnerAnalytics": "Analisi partner",
+    "partnerGroups": "Gruppi di partner",
+    "partnerRegistry": "Registro partner",
+    "performance": "Risultati",
+    "projects": "Progetti",
+    "prospects": "Prospect",
+    "prospectsDashboard": "Dashboard prospect",
+    "salesBudgetsTip": "Budget dei commerciali",
+    "salesReports": "Report vendite",
+    "seoBot": "SEObot",
+    "tenants": "Tenants",
+    "tenantsTip": "Gestione dei tenant",
+    "users": "Utenti",
+    "workflow": "Workflow"
+  },
+  "sections": {
+    "administration": "Amministrazione",
+    "crm": "CRM",
+    "documents": "Documenti",
+    "partners": "Partner",
+    "projects": "Progetti",
+    "superAdmin": "Super Admin"
+  },
+  "sidebar": {
+    "collapse": "Comprimi menu",
+    "expand": "Espandi menu"
+  },
+  "user": {
+    "admin": "Amministratore",
+    "logout": "Esci",
+    "user": "Utente"
+  }
+}

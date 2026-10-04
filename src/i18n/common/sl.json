@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Prekliči",
+    "close": "Zapri",
+    "save": "Shrani"
+  },
+  "language": {
+    "changeFailed": "Jezika ni bilo mogoče spremeniti",
+    "followTenant": "Privzeti jezik organizacije ({language})",
+    "hint": "Sprememba jezika bo znova naložila stran. V tem jeziku boste prejemali tudi e-pošto in opomnike.",
+    "tenantHint": "Jezik za osebe, ki niso izbrale svojega. Sprememba bo znova naložila stran.",
+    "tenantTitle": "Privzeti jezik organizacije",
+    "title": "Jezik vmesnika"
+  }
+}

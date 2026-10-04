@@ -159,6 +159,23 @@ Projekty z zespołem, zadaniami, osią czasu i czatem. Osobny moduł poza CRM, z
 
 ---
 
+## Wielojęzyczność (i18n)
+
+Aplikacja jest tłumaczona na 10 języków (`pl, en, de, it, es, fr, ro, ru, sl, hr`), polski jest
+źródłowy. Pełne zasady, słowniczek i instrukcja dodawania tekstów: **`docs/i18n.md`** — przeczytaj
+przed dodaniem jakiegokolwiek tekstu widocznego dla użytkownika.
+
+- Mechanizm: Transloco, pliki `src/i18n/<zakres>/<język>.json`, kod w `src/app/core/i18n/`.
+- **Każdy nowy lub zmieniony tekst trafia od razu do wszystkich 10 plików** (zasada Adama).
+- `npm run i18n:check` pilnuje kompletu kluczy, parametrów i formatu; uruchamia się też przed
+  `npm run build`. Pliki z listy `src/i18n/translated-files.json` nie mogą już zawierać polskiego
+  tekstu wpisanego na sztywno.
+- Wdrażanie idzie modułami; nieprzetłumaczone moduły działają po polsku. Zakres „Polish is only
+  acceptable in user-facing UI strings” poniżej dotyczy już tylko modułów jeszcze nieprzetłumaczonych.
+- Panel superadmina zostaje po polsku. Danych wpisanych przez tenanta nie tłumaczymy.
+
+---
+
 ## Code quality standards
 
 ### Language

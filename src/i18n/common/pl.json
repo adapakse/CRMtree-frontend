@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "save": "Zapisz"
+  },
+  "language": {
+    "changeFailed": "Nie udało się zmienić języka",
+    "followTenant": "Domyślny język organizacji ({language})",
+    "hint": "Zmiana języka przeładuje stronę. W tym języku dostaniesz też e-maile i przypomnienia.",
+    "tenantHint": "Język dla osób, które nie wybrały własnego. Zmiana przeładuje stronę.",
+    "tenantTitle": "Domyślny język organizacji",
+    "title": "Język interfejsu"
+  }
+}

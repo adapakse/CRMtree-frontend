@@ -1,5 +1,6 @@
 // src/app/pages/my-settings/my-settings.component.ts
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { LanguagePickerComponent } from '../../shared/components/language-picker/language-picker.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -16,13 +17,17 @@ const BASE = environment.apiUrl;
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, LanguagePickerComponent],
   template: `
 <div id="topbar">
   <span class="page-title">Moje ustawienia</span>
 </div>
 
 <div id="content" style="padding:24px;max-width:860px;display:flex;flex-direction:column;gap:20px">
+
+  <div class="card" style="padding:24px">
+    <wt-language-picker mode="user" />
+  </div>
 
   <!-- ── Stopka email ───────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px">
