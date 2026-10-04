@@ -290,6 +290,7 @@ export interface Partner {
   doc_count?: number;
   group_siblings?: { id: number; company: string; status: string; contract_value: number | null }[];
   activities?: PartnerActivity[];
+  extra_contacts?: LeadContact[];
   open_opportunities?: Opportunity[];
   all_opportunities?: PartnerActivity[];
   // ── Churn & Health Score ────────────────────────────────────────────────────
@@ -1321,6 +1322,11 @@ export class CrmApiService {
   }
   saveLeadContacts(leadId: number, contacts: LeadContact[]): Observable<LeadContact[]> {
     return this.http.post<LeadContact[]>(`${BASE}/leads/${leadId}/contacts`, { contacts });
+  }
+
+  // Partner contacts share the lead contact shape (name, title, email, phone).
+  savePartnerContacts(partnerId: number | string, contacts: LeadContact[]): Observable<LeadContact[]> {
+    return this.http.post<LeadContact[]>(`${BASE}/partners/${partnerId}/contacts`, { contacts });
   }
 
   // ── Konto testowe ───────────────────────────────────────

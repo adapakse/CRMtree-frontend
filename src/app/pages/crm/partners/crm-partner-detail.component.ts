@@ -4,9 +4,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { finalize, catchError } from 'rxjs/operators';
+import { finalize, catchError, switchMap } from 'rxjs/operators';
 import { forkJoin, of, Subscription } from 'rxjs';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LeadContact, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
@@ -263,6 +263,17 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span class="lbl">Rola w firmie</span><span>{{partner.contact_title || '—'}}</span>
           <span class="lbl">Email</span><span>{{partner.email || '—'}}</span>
           <span class="lbl">Telefon</span><span>{{partner.phone || '—'}}</span>
+        </div>
+      </div>
+
+      <div class="info-subsection" *ngIf="partner.extra_contacts?.length">
+        <div class="info-subsection-title">Dodatkowe kontakty</div>
+        <div *ngFor="let ec of partner.extra_contacts" style="padding:8px 0;border-bottom:1px solid #f3f4f6">
+          <div style="font-size:12px;font-weight:600;color:#374151">
+            {{ec.contact_name || '—'}}<span style="color:#9ca3af;font-weight:400" *ngIf="ec.contact_title"> · {{ec.contact_title}}</span>
+          </div>
+          <div *ngIf="ec.email" style="font-size:11px;color:#6b7280;margin-top:2px"><a class="link" href="mailto:{{ec.email}}">{{ec.email}}</a></div>
+          <div *ngIf="ec.phone" style="font-size:11px;color:#6b7280;margin-top:1px"><a class="link" href="tel:{{ec.phone}}">{{ec.phone}}</a></div>
         </div>
       </div>
 
@@ -1347,6 +1358,25 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
 
         <div class="edit-section">
+          <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Dodatkowe kontakty</span>
+            <button type="button" style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ Dodaj kontakt</button>
+          </div>
+          <div *ngFor="let ec of extraContacts; let i = index" style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
+            <button type="button" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)" title="Usuń kontakt">✕</button>
+            <div class="edit-row">
+              <label>Imię i nazwisko<input [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></label>
+              <label>Rola w firmie<input [(ngModel)]="ec.contact_title" placeholder="CEO"></label>
+            </div>
+            <div class="edit-row">
+              <label>Email<input [(ngModel)]="ec.email" type="email" placeholder="jan@firma.pl"></label>
+              <label>Telefon<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
+            </div>
+          </div>
+          <div *ngIf="extraContacts.length === 0" style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px">Brak dodatkowych kontaktów</div>
+        </div>
+
+        <div class="edit-section">
           <div class="edit-section-title">Kontakt do spraw rozliczeń *</div>
           <div class="edit-row">
             <label>Imię i nazwisko *
@@ -1940,6 +1970,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid #f3f4f6; }
     .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#3BAA5D; margin-bottom:8px; }
+    .link { color:var(--orange); text-decoration:none; }
+    .link:hover { text-decoration:underline; }
     .dwh-badge { display:inline-block; background:#ede9fe; color:#7c3aed; font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
     .dwh-readonly-field { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .dwh-readonly-field.full { grid-column:1/-1; }
@@ -2497,6 +2529,21 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     this.partnerNipEditError = '';
   }
   editForm: any  = {};
+
+  extraContacts: LeadContact[] = [];
+
+  addExtraContact(): void {
+    this.extraContacts.push({ contact_name: null, contact_title: null, email: null, phone: null });
+  }
+
+  removeExtraContact(index: number): void {
+    this.extraContacts.splice(index, 1);
+  }
+
+  private isContactEmpty(contact: LeadContact): boolean {
+    return !contact.contact_name && !contact.email && !contact.phone;
+  }
+
   actForm: any   = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participantList: [] as string[], opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '' };
   actEditForm: any = { type: 'note', title: '', body: '', activity_at: '', duration_min: null, meeting_location: '', participants: '', opp_value: null, opp_currency: 'PLN', opp_status: 'new', opp_due_date: '', assigned_to: '' };
   editingActId: number | null = null;
@@ -3184,6 +3231,14 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       dwh_partner_id:        this.partner.dwh_partner_id || '',
     };
     this.submitAttempted = false;
+    this.extraContacts = (this.partner.extra_contacts || []).map(ec => ({
+      id:            ec.id,
+      contact_name:  ec.contact_name  || null,
+      contact_title: ec.contact_title || null,
+      email:         ec.email         || null,
+      phone:         ec.phone         || null,
+    }));
+    if (this.extraContacts.length === 0) this.addExtraContact();
     // Zawsze ładuj listę użytkowników przy otwarciu (manager i salesperson)
     if (!this.crmUsers.length) {
       this.api.getCrmUsers().subscribe({
@@ -3260,11 +3315,20 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       ...(this.isDwhFieldReadOnly('admin_email')           ? {} : { admin_email:           this.editForm.admin_email           || null }),
     };
     const partnerId = this.pid;
+    const extraContacts = this.extraContacts.filter(contact => !this.isContactEmpty(contact));
     this.api.updatePartner(partnerId, payload).subscribe({
       next: () => {
+        // Contacts are saved before the reload so the GET below already returns the stored rows.
+        // A failed contact save must not block the reload — the partner itself is already saved.
         // Przeładuj pełne dane partnera przez GET /:id (z COALESCE + _from_dwh flagami z DWH JOIN).
         // Nie używamy wyniku PATCH bezpośrednio — nie zawiera pól DWH.
-        this.api.getPartner(partnerId).subscribe({
+        this.api.savePartnerContacts(partnerId, extraContacts).pipe(
+          catchError(() => {
+            alert('Dane partnera zapisano, ale nie udało się zapisać dodatkowych kontaktów.');
+            return of(null);
+          }),
+          switchMap(() => this.api.getPartner(partnerId)),
+        ).subscribe({
           next: full => {
             this.zone.run(() => {
               this.partner = { ...full, activities: this.partner?.activities ?? full.activities };
