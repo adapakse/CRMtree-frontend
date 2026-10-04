@@ -9,6 +9,7 @@ import {
   CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, CrmUser, CrmGroup, CalendarMeeting,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 const KANBAN_STAGES: { key: LeadStage; label: string; dot: string }[] = [
@@ -657,7 +658,7 @@ const PROB_MAP: Record<LeadStage, number> = {
 
             <!-- Time column -->
             <div class="tl-item-time-col">
-              <div class="tl-item-time">{{ m.activity_at | date:'HH:mm' }}</div>
+              <div class="tl-item-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}</div>
               <div class="tl-item-dur" *ngIf="m.duration_min">{{ m.duration_min }}min</div>
             </div>
 
@@ -672,7 +673,7 @@ const PROB_MAP: Record<LeadStage, number> = {
             <div class="tl-item-card" [class.tl-card-today]="group.isToday">
               <div class="tl-item-header">
                 <span class="tl-src-badge" [class.tl-src-lead]="m.source_type==='lead'" [class.tl-src-partner]="m.source_type==='partner'">
-                  {{ m.source_type === 'lead' ? 'Lead' : 'Partner' }}
+                  {{ m.source_type === 'lead' ? 'Lead' : m.source_type === 'project' ? 'Projekt' : 'Partner' }}
                 </span>
                 <span class="tl-item-company">{{ m.source_name }}</span>
               </div>
@@ -1180,6 +1181,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   private zone   = inject(NgZone);
   readonly cdr   = inject(ChangeDetectorRef);
   private router = inject(Router);
+  private projectTaskNavigation = inject(ProjectTaskNavigationService);
   private route  = inject(ActivatedRoute);
 
   readonly kanbanCols  = KANBAN_STAGES;
@@ -1768,6 +1770,13 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   // ─── Meeting detail / edit ───────────────────────────────────────
 
   openMeetingDetail(m: CalendarMeeting) {
+    // Project tasks are view-only here: a click opens them in the Projects module.
+    if (m.source_type === 'project') {
+      this.projectTaskNavigation.open(String(m.source_id), m.project_task_id ?? null, {
+        label: 'Leady', route: ['/crm/leads'],
+      });
+      return;
+    }
     this.selectedMeeting = m;
     this.meetingEditMode = false;
     this.meetingForm = {
@@ -1809,8 +1818,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
     const src = this.selectedMeeting!;
     const obs$ = (src.source_type === 'lead'
-      ? this.api.updateLeadActivity(src.source_id, src.id, data)
-      : this.api.updatePartnerActivity(src.source_id, src.id, data)) as any;
+      ? this.api.updateLeadActivity(+src.source_id, src.id, data)
+      : this.api.updatePartnerActivity(+src.source_id, src.id, data)) as any;
 
     obs$.subscribe({
       next: () => this.zone.run(() => {

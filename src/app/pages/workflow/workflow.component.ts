@@ -6,6 +6,8 @@ import { WorkflowService } from '../../core/services/api.services';
 import { WorkflowTask, TaskStatus, DocStatus } from '../../core/models/models';
 import { StatusBadgeComponent, TaskBadgeComponent, AvatarComponent } from '../../shared/components/badges.components';
 import { ToastService } from '../../core/services/toast.service';
+import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
+import { CalendarEntry, dueDateCalendarEntry } from '../../shared/utils/calendar-export.util';
 import { AppSettingsService } from '../../core/services/app-settings.service';
 import { environment } from '../../../environments/environment';
 
@@ -30,7 +32,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
 @Component({
   selector: 'wt-workflow',
   standalone: true,
-  imports: [CommonModule, RouterLink, StatusBadgeComponent, TaskBadgeComponent, AvatarComponent],
+  imports: [CommonModule, RouterLink, StatusBadgeComponent, TaskBadgeComponent, AvatarComponent, AddToCalendarComponent],
   template: `
     <div id="topbar">
       <span class="page-title">Workflow</span>
@@ -77,6 +79,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                     <span [style.color]="isDue(task.due_date) ? '#DC2626' : '#065F46'">
                       · ⏰ {{ task.due_date | date:'dd.MM.yy' }}
                     </span>
+                    <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation(); $event.preventDefault()" />
                   }
                 </div>
                 @if (task.message) {
@@ -240,6 +243,15 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   isExpiringSoon(dateStr?: string): boolean  { return this.appSettings.isExpiringSoon(dateStr); }
   isExpired(dateStr?: string): boolean       { return this.appSettings.isExpired(dateStr); }
   refreshIntervalSec(): number               { return this.appSettings.get('kanban_refresh_interval_sec'); }
+
+  calendarEntryOf(task: WorkflowTask): CalendarEntry | null {
+    return dueDateCalendarEntry({
+      title: `${task.doc_number ?? 'Dokument'} — ${task.document_name ?? ''}`.trim(),
+      description: task.message ?? '',
+      path: `/documents/${task.document_id}`,
+      dueDate: task.due_date ?? null,
+    });
+  }
 
   isDue(dateStr?: string): boolean {
     if (!dateStr) return false;

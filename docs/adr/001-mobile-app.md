@@ -122,17 +122,18 @@ teraz:
 
 - Zaraz po pierwszym udanym logowaniu aplikacja proponuje włączenie biometrii
   (Face ID / odcisk palca) i — w tym samym momencie — zgodę na powiadomienia.
-- **Biometria włączona:** refresh tokeny zapisane w Keychain (iOS,
-  `biometryCurrentSet`) / Keystore (Android, klucz wymagający uwierzytelnienia
-  użytkownika) przez `biometric_storage`. Przy kilku firmach to jeden zaszyfrowany
-  wpis z mapą `tenant → refresh token`, więc jeden prompt odblokowuje wszystkie
-  sesje. Start aplikacji = prompt biometryczny → odblokowanie → od razu zalogowany
-  do ostatnio otwartej firmy. Samo `local_auth` jako bramka UI nie wystarcza.
+- **Biometria włączona** (zmiana z 2026-10-01, decyzja Adama: ten sam wzorzec co w
+  aplikacji mobilnej Worktrips, zamiast pierwotnie planowanego `biometric_storage`):
+  `local_auth` jest lokalną bramką odblokowania, a refresh token i firma leżą w
+  `flutter_secure_storage` (Keychain / Keystore). Zimny start = ekran odblokowania,
+  który sam otwiera systemowy prompt biometryczny → ciche odświeżenie tokenu →
+  aplikacja. Ikona odcisku służy do ponowienia po anulowanym prompcie; jest też
+  wyjście „Zaloguj się hasłem”. Odświeżanie tokenu w trakcie pracy nigdy nie pyta o biometrię.
+  Rotowany refresh token jest zapisywany po każdym odświeżeniu.
 - **Biometria odrzucona:** refresh token trzymany tylko w pamięci. Każdy zimny start
-  wymaga logowania; zapamiętany jest email (i tenant), więc user wpisuje tylko hasło
-  lub klika SSO.
-- **Zmiana biometrii w telefonie** (nowy odcisk / twarz) unieważnia klucz → pełne
-  logowanie.
+  wymaga logowania; zapamiętany jest email, więc user wpisuje tylko hasło.
+- Wylogowanie usuwa zapisaną sesję, ale zostawia włączoną biometrię — po kolejnym
+  logowaniu hasłem sesja znów jest zapisywana, bez ponownego pytania.
 - Mobilny refresh token jest przypisany do urządzenia (`device_id`), ma przedłużaną
   ważność (np. 60 dni), jest rotowany przy każdym refreshu; ponowne użycie starego
   tokenu unieważnia całą rodzinę tokenów.
@@ -175,7 +176,7 @@ lib/
 
 | Obszar | Wybór |
 |---|---|
-| Stan | Riverpod. Na start bez generatora kodu: `riverpod_generator` nie rozwiązuje się z Flutterem 3.32 (stan na 2026-10-01); do rozważenia ponownie po aktualizacji SDK |
+| Stan | Riverpod (codegen) — wymaga Fluttera przypiętego w `.fvmrc` repo `crmtree-mobile` (3.47.5); globalny Flutter 3.32 jest na to za stary |
 | HTTP | Dio + interceptory (auth, refresh z kolejką, błędy) |
 | Modele | freezed + json_serializable / klient z OpenAPI |
 | Routing | go_router; ścieżki zgodne z webem (`/crm/leads/:id`) → deep linki i universal links |

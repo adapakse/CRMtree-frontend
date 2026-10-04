@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-settings.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
 
@@ -23,7 +24,7 @@ interface SettingField {
 }
 
 // Zakładki
-type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding' | 'tooltips' | 'icp';
+type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding' | 'tooltips' | 'icp' | 'projects';
 
 // Dynamic ICP config per tenant. `key` is immutable once created — editable
 // only through `label`; the backend rejects any attempt to change `key`, so
@@ -210,7 +211,7 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent],
   template: `
     <div id="topbar">
       <span class="page-title">Ustawienia aplikacji</span>
@@ -275,7 +276,16 @@ const JSON_ITEM_LABELS: Record<string, Record<string, string>> = {
               🎯 Enrichment / ICP
             </button>
           }
+          @if (auth.hasFeature('projects')) {
+            <button class="tab-btn" [class.active]="activeTab() === 'projects'" (click)="activeTab.set('projects')">
+              📋 Projekty
+            </button>
+          }
         </div>
+
+        @if (activeTab() === 'projects') {
+          <wt-project-settings />
+        }
 
         <!-- TAB: Parametry globalne -->
         @if (activeTab() === 'global') {
