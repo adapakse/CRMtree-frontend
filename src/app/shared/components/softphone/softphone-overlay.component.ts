@@ -10,6 +10,7 @@ import {
 import { PbxService, ActiveCall } from '../../../core/services/pbx.service';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 function fmtDuration(sec: number): string {
   const m = Math.floor(sec / 60).toString().padStart(2, '0');
@@ -20,9 +21,11 @@ function fmtDuration(sec: number): string {
 @Component({
   selector: 'app-softphone-overlay',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <!-- ── Błąd mikrofonu ────────────────────────────────────── -->
 <div *ngIf="micErrorMsg"
      style="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:10000;
@@ -35,7 +38,7 @@ function fmtDuration(sec: number): string {
 <!-- ── Dialog potwierdzenia ─────────────────────────────── -->
 <div *ngIf="pending" class="sp-backdrop" (click)="cancelPending()">
   <div class="sp-card sp-confirm" (click)="$event.stopPropagation()">
-    <div class="sp-title">Zadzwonić?</div>
+    <div class="sp-title">{{ t('softphone.confirm.title') }}</div>
     <select *ngIf="pending.availableNumbers && pending.availableNumbers.length > 1"
             class="sp-number-input" style="margin-bottom:6px"
             [ngModel]="editNumber" (ngModelChange)="editNumber = $event">
@@ -43,8 +46,8 @@ function fmtDuration(sec: number): string {
     </select>
     <input class="sp-number-input" [(ngModel)]="editNumber" placeholder="+48 600 000 000" (keydown.enter)="confirm()">
     <div class="sp-row" style="gap:8px;margin-top:4px">
-      <button class="sp-btn sp-btn-call" (click)="confirm()">📞 Zadzwoń</button>
-      <button class="sp-btn sp-btn-cancel" (click)="cancelPending()">Anuluj</button>
+      <button class="sp-btn sp-btn-call" (click)="confirm()">📞 {{ t('calls.call') }}</button>
+      <button class="sp-btn sp-btn-cancel" (click)="cancelPending()">{{ 'actions.cancel' | transloco }}</button>
     </div>
   </div>
 </div>
@@ -54,13 +57,13 @@ function fmtDuration(sec: number): string {
 
   <!-- Połączenie przychodzące -->
   <ng-container *ngIf="call.phase === 'incoming'">
-    <div class="sp-phase-label sp-label-incoming">📲 Połączenie przychodzące</div>
+    <div class="sp-phase-label sp-label-incoming">📲 {{ t('softphone.incoming.title') }}</div>
     <div class="sp-caller">{{ call.displayName }}</div>
 
     <!-- Spinner lookup -->
     <div *ngIf="call.contextLoading"
          style="display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af;margin-top:5px">
-      <span class="sp-spinner"></span> Szukam kontaktu…
+      <span class="sp-spinner"></span> {{ t('softphone.lookingUpContact') }}
     </div>
 
     <!-- Znaleziono Lead / Partner -->
@@ -70,20 +73,20 @@ function fmtDuration(sec: number): string {
                    border:1px solid #3BAA5D;border-radius:6px;padding:7px 10px;
                    margin-top:6px;cursor:pointer;color:#4ade80;font-size:12px;
                    font-weight:600;font-family:inherit">
-      🔗 {{ call.context.entityType === 'lead' ? 'Lead' : 'Partner' }}: {{ call.context.companyName || call.displayName }}
+      🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
 
     <!-- Nie znaleziono -->
     <div *ngIf="!call.contextLoading && !call.context.entityType"
          style="font-size:11px;color:#6b7280;margin-top:4px">
-      Numer nieznany
+      {{ t('softphone.incoming.unknownNumber') }}
     </div>
 
     <div class="sp-row" style="gap:8px;margin-top:8px">
       <button class="sp-btn sp-btn-call" [disabled]="answering" (click)="answer()">
-        {{ answering ? 'Odbieranie…' : 'Odbierz' }}
+        {{ answering ? t('softphone.incoming.answering') : t('softphone.incoming.answer') }}
       </button>
-      <button class="sp-btn sp-btn-hangup" [disabled]="answering" (click)="hangup()">Odrzuć</button>
+      <button class="sp-btn sp-btn-hangup" [disabled]="answering" (click)="hangup()">{{ t('softphone.incoming.reject') }}</button>
     </div>
   </ng-container>
 
@@ -91,21 +94,21 @@ function fmtDuration(sec: number): string {
   <ng-container *ngIf="call.phase === 'dialing' || call.phase === 'ringing'">
     <div class="sp-phase-label">
       {{ call.phase === 'ringing' && call.direction === 'inbound'
-           ? '🟢 Odbieranie…'
-           : call.phase === 'ringing' ? '🔔 Dzwoni…' : '📡 Wybieranie…' }}
+           ? '🟢 ' + t('softphone.incoming.answering')
+           : call.phase === 'ringing' ? '🔔 ' + t('softphone.phases.ringing') : '📡 ' + t('softphone.phases.dialing') }}
     </div>
     <div class="sp-caller">{{ call.displayName }}</div>
-    <button class="sp-btn sp-btn-hangup" style="margin-top:8px" (click)="hangup()">Rozłącz</button>
+    <button class="sp-btn sp-btn-hangup" style="margin-top:8px" (click)="hangup()">{{ t('softphone.hangUp') }}</button>
   </ng-container>
 
   <!-- Aktywna rozmowa -->
   <ng-container *ngIf="call.phase === 'active'">
-    <div class="sp-phase-label sp-label-active">🟢 Rozmowa</div>
+    <div class="sp-phase-label sp-label-active">🟢 {{ t('softphone.phases.active') }}</div>
     <div class="sp-caller">{{ call.displayName }}</div>
 
     <div *ngIf="call.contextLoading"
          style="display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af;margin-top:4px">
-      <span class="sp-spinner"></span> Szukam kontaktu…
+      <span class="sp-spinner"></span> {{ t('softphone.lookingUpContact') }}
     </div>
     <button *ngIf="!call.contextLoading && call.context.entityType"
             (click)="goToEntity()"
@@ -113,7 +116,7 @@ function fmtDuration(sec: number): string {
                    border:1px solid #3BAA5D;border-radius:6px;padding:7px 10px;
                    margin-top:6px;cursor:pointer;color:#4ade80;font-size:12px;
                    font-weight:600;font-family:inherit">
-      🔗 {{ call.context.entityType === 'lead' ? 'Lead' : 'Partner' }}: {{ call.context.companyName || call.displayName }}
+      🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
 
     <div class="sp-duration">{{ fmtDuration(call.durationSec) }}</div>
@@ -128,54 +131,55 @@ function fmtDuration(sec: number): string {
 
     <div class="sp-row" style="gap:8px;margin-top:8px">
       <button class="sp-btn sp-btn-mute" [class.muted]="call.muted" (click)="toggleMute()">
-        {{ call.muted ? '🔇 Wyciszono' : '🎤 Wycisz' }}
+        {{ call.muted ? '🔇 ' + t('softphone.muted') : '🎤 ' + t('softphone.mute') }}
       </button>
-      <button class="sp-btn sp-btn-hangup" (click)="hangup()">Rozłącz</button>
+      <button class="sp-btn sp-btn-hangup" (click)="hangup()">{{ t('softphone.hangUp') }}</button>
     </div>
   </ng-container>
 
   <!-- Formularz notatki po zakończeniu -->
   <ng-container *ngIf="call.phase === 'post-call'">
-    <div class="sp-phase-label">📞 Rozmowa zakończona</div>
+    <div class="sp-phase-label">📞 {{ t('softphone.postCall.title') }}</div>
     <div class="sp-caller" style="font-size:13px">
       {{ call.displayName }}
       <span *ngIf="call.durationSec > 0" style="color:#9ca3af;font-weight:400"> · {{ fmtDuration(call.durationSec) }}</span>
     </div>
     <div *ngIf="call.context.entityType" style="font-size:11px;color:#6b7280;margin-top:2px">
-      Aktywność zostanie zapisana na poziomie {{ call.context.entityType === 'lead' ? 'Leada' : 'Partnera' }}
+      {{ t(call.context.entityType === 'lead' ? 'softphone.postCall.savedOnLead' : 'softphone.postCall.savedOnPartner') }}
     </div>
 
     <!-- Status transkrypcji -->
     <div *ngIf="transcriptionState === 'loading'"
          style="font-size:11px;color:#9ca3af;margin-top:6px;display:flex;align-items:center;gap:4px">
-      <span class="sp-spinner"></span> Pobieranie transkrypcji…
+      <span class="sp-spinner"></span> {{ t('softphone.postCall.transcriptLoading') }}
     </div>
     <div *ngIf="transcriptionState === 'loaded'"
          style="font-size:11px;color:#4ade80;margin-top:6px">
-      ✓ Transkrypcja załadowana — możesz edytować
+      ✓ {{ t('softphone.postCall.transcriptLoaded') }}
     </div>
     <div *ngIf="transcriptionState === 'unavailable'"
          style="font-size:11px;color:#9ca3af;margin-top:6px">
-      Transkrypcja niedostępna — wpisz notatkę ręcznie
+      {{ t('softphone.postCall.transcriptUnavailable') }}
     </div>
 
     <textarea class="sp-note" [(ngModel)]="noteText"
-      placeholder="Notatka z rozmowy (opcjonalnie)…"
+      [placeholder]="t('softphone.postCall.notePlaceholder')"
       rows="6"></textarea>
-    <div *ngIf="saveError" class="sp-error">Błąd zapisu — spróbuj ponownie</div>
+    <div *ngIf="saveError" class="sp-error">{{ t('softphone.postCall.saveFailed') }}</div>
     <div class="sp-row" style="gap:8px;margin-top:8px">
       <button class="sp-btn sp-btn-cancel"
               [disabled]="saving"
               (click)="saveActivity(false)"
               style="flex:0 0 auto;padding:9px 10px;font-size:12px">
-        Bez notatki
+        {{ t('softphone.postCall.withoutNote') }}
       </button>
       <button class="sp-btn sp-btn-save" [disabled]="saving" (click)="saveActivity(true)">
-        {{ saving ? 'Zapisuję…' : 'Zapisz z notatką' }}
+        {{ saving ? t('softphone.postCall.saving') : t('softphone.postCall.saveWithNote') }}
       </button>
     </div>
   </ng-container>
 </div>
+</ng-container>
   `,
   styles: [`
 .sp-backdrop {
@@ -280,6 +284,7 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
   private auth   = inject(AuthService);
   private cdr    = inject(ChangeDetectorRef);
   private router = inject(Router);
+  private transloco = inject(TranslocoService);
 
   call:      ActiveCall | null = null;
   pending:   { number: string; context: any; availableNumbers?: { label: string; number: string }[] } | null = null;
@@ -403,7 +408,10 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     const durationMin = durationSec > 0 ? Math.max(1, Math.round(durationSec / 60)) : null;
-    const title = direction === 'inbound' ? `Połączenie przychodzące od ${number}` : `Połączenie wychodzące do ${number}`;
+    const title = this.transloco.translate(
+      direction === 'inbound' ? 'crm.softphone.activity.incomingTitle' : 'crm.softphone.activity.outgoingTitle',
+      { number },
+    );
     const note  = withNote ? this.noteText.trim() : '';
 
     const data = {
@@ -445,7 +453,7 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
       this.pbx.notifyActivitySaved(context);
       this.pbx.clearCall();
     } catch (e) {
-      console.error('[PBX] Błąd zapisu aktywności', e);
+      console.error('[PBX] Activity save failed', e);
       this.saving    = false;
       this.saveError = true;
       this.cdr.markForCheck();
@@ -488,7 +496,7 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
               notFoundCount++;
               console.log('[PBX transcript] 404 —', notFoundCount, '/', MAX_404);
               if (notFoundCount >= MAX_404) {
-                console.warn('[PBX transcript] transkrypcja niedostępna po', MAX_404, 'próbach 404');
+                console.warn('[PBX transcript] transcription unavailable after', MAX_404, 'consecutive 404 responses');
                 throw e; // propaguj → catchError wyżej → 'unavailable'
               }
               return of(null);
@@ -577,9 +585,10 @@ export class SoftphoneOverlayComponent implements OnInit, OnDestroy {
     ].sort((a, b) => (a.end - b.end) || (a.start - b.start));
 
     if (!segs.length) return '';
-    const agentLabel = this.auth.currentUser?.display_name ?? 'Handlowiec';
+    const agentLabel = this.auth.currentUser?.display_name ?? this.transloco.translate('crm.softphone.transcript.agent');
+    const clientLabel = this.transloco.translate('crm.softphone.transcript.client');
     return segs.map(s =>
-      `[${s.speaker === 'agent' ? agentLabel : 'Klient'}] ${s.text}`
+      `[${s.speaker === 'agent' ? agentLabel : clientLabel}] ${s.text}`
     ).join('\n');
   }
 }

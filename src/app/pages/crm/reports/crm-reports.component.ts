@@ -8,6 +8,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CrmApiService, SalesSummaryRow, SalesByPerson, SalesByPartner, SalesPartnerMeta } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../../core/i18n/locale.service';
 
 // ─── Typy lokalne ────────────────────────────────────────────────────────────
 interface FunnelRow   { label: string; n: number; val: number; color: string; }
@@ -35,46 +37,48 @@ const STAGE_COLORS: Record<string, string> = {
   selector: 'wt-crm-reports',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslocoDirective],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <!-- Topbar -->
 <div id="topbar">
-  <span class="page-title">Raporty sprzedaży</span>
+  <span class="page-title">{{ t('reports.common.title') }}</span>
   <span class="tsp"></span>
   <div style="display:flex;align-items:center;gap:8px">
     <select class="sel" [(ngModel)]="period" (ngModelChange)="onFilterChange()">
       <option value="q1">Q1 2025</option>
       <option value="q2">Q2 2025</option>
       <option value="ytd">YTD 2025</option>
-      <option value="2024">Rok 2024</option>
+      <option value="2024">{{ t('reports.overview.periods.year', { year: 2024 }) }}</option>
     </select>
     <select class="sel" [(ngModel)]="ownerFilter" (ngModelChange)="onFilterChange()" *ngIf="isManager">
-      <option value="">Wszyscy handlowcy</option>
+      <option value="">{{ t('leadsList.filters.allReps') }}</option>
       <option *ngFor="let u of salesReps" [value]="u.id">{{ u.display_name }}</option>
     </select>
     <!-- Filtry dostępne gdy są dane zewnętrzne -->
     <ng-container *ngIf="partnersMeta.length > 0">
       <select class="sel" [(ngModel)]="filterPartner" (ngModelChange)="onSalesFilterChange()" style="max-width:180px">
-        <option value="">Wszyscy partnerzy</option>
+        <option value="">{{ t('reports.overview.filters.allPartners') }}</option>
         <option *ngFor="let p of partnersMeta" [value]="p.partner_name">{{ p.partner_name }}</option>
       </select>
       <select class="sel" [(ngModel)]="filterProduct" (ngModelChange)="onSalesFilterChange()">
-        <option value="">Wszystkie produkty</option>
-        <option value="hotel">Hotel</option>
-        <option value="transport_flight">Lot</option>
-        <option value="transport_train">Pociąg</option>
-        <option value="transport_bus">Autobus</option>
-        <option value="transport_ferry">Prom</option>
-        <option value="car_rental">Wynajem auta</option>
-        <option value="transfer">Transfer</option>
-        <option value="travel_insurance">Ubezpieczenie</option>
-        <option value="visa">Wiza</option>
-        <option value="other">Inne</option>
+        <option value="">{{ t('reports.overview.filters.allProducts') }}</option>
+        <option value="hotel">{{ t('labels.productTypes.hotel') }}</option>
+        <option value="transport_flight">{{ t('labels.productTypes.transport_flight') }}</option>
+        <option value="transport_train">{{ t('labels.productTypes.transport_train') }}</option>
+        <option value="transport_bus">{{ t('labels.productTypes.transport_bus') }}</option>
+        <option value="transport_ferry">{{ t('labels.productTypes.transport_ferry') }}</option>
+        <option value="car_rental">{{ t('labels.productTypes.car_rental') }}</option>
+        <option value="transfer">{{ t('labels.productTypes.transfer') }}</option>
+        <option value="travel_insurance">{{ t('labels.productTypes.travel_insurance') }}</option>
+        <option value="visa">{{ t('labels.productTypes.visa') }}</option>
+        <option value="other">{{ t('labels.productTypes.other') }}</option>
       </select>
     </ng-container>
     <button class="btn btn-g btn-sm" (click)="exportPDF()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Eksport PDF
+      {{ t('reports.common.exportPdf') }}
     </button>
   </div>
 </div>
@@ -84,15 +88,15 @@ const STAGE_COLORS: Record<string, string> = {
   <!-- Baner: dane ze źródła zewnętrznego -->
   <div class="data-source-banner" *ngIf="salesSummary.length > 0">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-    Wykresy bazują na <strong>{{ salesSummary.length }} miesiącach</strong> zaimportowanych danych
-    <ng-container *ngIf="filterPartner"> · partner: <strong>{{ filterPartner }}</strong></ng-container>
-    <ng-container *ngIf="filterProduct"> · produkt: <strong>{{ filterProduct }}</strong></ng-container>
-    <a class="btn-link" routerLink="/crm/import">Zarządzaj importem →</a>
+    {{ t('reports.overview.banner.before') }} <strong>{{ t('reports.overview.banner.months', { count: salesSummary.length }) }}</strong> {{ t('reports.overview.banner.after') }}
+    <ng-container *ngIf="filterPartner"> · {{ t('reports.overview.banner.partner') }} <strong>{{ filterPartner }}</strong></ng-container>
+    <ng-container *ngIf="filterProduct"> · {{ t('reports.overview.banner.product') }} <strong>{{ filterProduct }}</strong></ng-container>
+    <a class="btn-link" routerLink="/crm/import">{{ t('reports.overview.banner.manageImport') }} →</a>
   </div>
 
   <!-- Loading -->
   <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>Wczytywanie raportów…
+    <div class="spinner"></div>{{ t('reports.overview.loading') }}
   </div>
 
   <ng-container *ngIf="!loading">
@@ -101,31 +105,31 @@ const STAGE_COLORS: Record<string, string> = {
     <div class="stats-row">
       <div class="stat-card" style="border-top:3px solid var(--orange)">
         <div class="stat-val" style="color:var(--orange)">{{ formatPLN(kpi.pipeline) }}</div>
-        <div class="stat-lbl">Pipeline (PLN)</div>
-        <div class="stat-trend trend-up">Aktywny pipeline</div>
+        <div class="stat-lbl">{{ t('leadsList.stats.pipeline') }}</div>
+        <div class="stat-trend trend-up">{{ t('reports.overview.kpi.activePipeline') }}</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #22C55E">
         <div class="stat-val" style="color:#22C55E">{{ formatPLN(kpi.won) }}</div>
-        <div class="stat-lbl">Zamknięte / Won (PLN)</div>
-        <div class="stat-trend trend-up" *ngIf="kpi.won > 0">✓ Wygrane kontrakty</div>
-        <div class="stat-trend" *ngIf="kpi.won === 0" style="color:var(--gray-400)">Brak w tym okresie</div>
+        <div class="stat-lbl">{{ t('reports.common.kpi.wonPln') }}</div>
+        <div class="stat-trend trend-up" *ngIf="kpi.won > 0">✓ {{ t('reports.overview.kpi.wonContracts') }}</div>
+        <div class="stat-trend" *ngIf="kpi.won === 0" style="color:var(--gray-400)">{{ t('reports.overview.kpi.noneInPeriod') }}</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #3B82F6">
         <div class="stat-val">{{ kpi.winRate }}%</div>
-        <div class="stat-lbl">Win Rate</div>
+        <div class="stat-lbl">{{ t('reports.common.kpi.winRate') }}</div>
         <div class="stat-trend" [class.trend-up]="kpi.winRate >= 40" [class.trend-dn]="kpi.winRate < 40">
-          {{ kpi.winRate >= 40 ? '↑ Powyżej celu' : '↓ Poniżej celu' }}
+          {{ kpi.winRate >= 40 ? '↑ ' + t('reports.overview.kpi.aboveTarget') : '↓ ' + t('reports.overview.kpi.belowTarget') }}
         </div>
       </div>
       <div class="stat-card" style="border-top:3px solid #A855F7">
-        <div class="stat-val">{{ kpi.avgCycle }} dni</div>
-        <div class="stat-lbl">Avg. cykl sprzedaży</div>
-        <div class="stat-trend trend-up">Średni czas zamknięcia</div>
+        <div class="stat-val">{{ t('reports.common.days', { count: kpi.avgCycle }) }}</div>
+        <div class="stat-lbl">{{ t('reports.common.kpi.avgSalesCycle') }}</div>
+        <div class="stat-trend trend-up">{{ t('reports.overview.kpi.avgClosingTime') }}</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #F59E0B">
         <div class="stat-val">{{ kpi.active }}</div>
-        <div class="stat-lbl">Aktywne leady</div>
-        <div class="stat-trend">{{ kpi.hot }} gorących 🔥</div>
+        <div class="stat-lbl">{{ t('reports.common.kpi.activeLeads') }}</div>
+        <div class="stat-trend">{{ t('reports.overview.kpi.hotCount', { count: kpi.hot }) }} 🔥</div>
       </div>
     </div>
 
@@ -133,28 +137,28 @@ const STAGE_COLORS: Record<string, string> = {
     <div class="stats-row" *ngIf="salesSummary.length > 0" style="margin-top:-4px">
       <div class="stat-card" style="border-top:3px solid #0EA5E9">
         <div class="stat-val" style="color:#0EA5E9">{{ formatPLN(extKpi.grossTurnover) }}</div>
-        <div class="stat-lbl">Obrót brutto (PLN)</div>
-        <div class="stat-trend" style="color:#64748B">Dane zewnętrzne</div>
+        <div class="stat-lbl">{{ t('reports.overview.external.grossTurnoverPln') }}</div>
+        <div class="stat-trend" style="color:#64748B">{{ t('reports.overview.external.source') }}</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #0284C7">
         <div class="stat-val" style="color:#0284C7">{{ formatPLN(extKpi.netTurnover) }}</div>
-        <div class="stat-lbl">Obrót netto (PLN)</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? 'Marża: ' + (extKpi.netTurnover/extKpi.grossTurnover*100|number:'1.0-1') + '%' : '—' }}</div>
+        <div class="stat-lbl">{{ t('reports.overview.external.netTurnoverPln') }}</div>
+        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.margin', { value: (extKpi.netTurnover/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #7C3AED">
         <div class="stat-val" style="color:#7C3AED">{{ formatPLN(extKpi.fees) }}</div>
-        <div class="stat-lbl">Fees (PLN)</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? 'Fee rate: ' + (extKpi.fees/extKpi.grossTurnover*100|number:'1.0-1') + '%' : '—' }}</div>
+        <div class="stat-lbl">{{ t('reports.overview.external.feesPln') }}</div>
+        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.feeRate', { value: (extKpi.fees/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #059669">
         <div class="stat-val" style="color:#059669">{{ formatPLN(extKpi.revenue) }}</div>
-        <div class="stat-lbl">Przychód (PLN)</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? 'Udział: ' + (extKpi.revenue/extKpi.grossTurnover*100|number:'1.0-1') + '%' : '—' }}</div>
+        <div class="stat-lbl">{{ t('reports.overview.external.revenuePln') }}</div>
+        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.share', { value: (extKpi.revenue/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #64748B">
         <div class="stat-val">{{ extKpi.transactions | number }}</div>
-        <div class="stat-lbl">Transakcji</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.pax | number }} produktów</div>
+        <div class="stat-lbl">{{ t('reports.overview.external.transactions') }}</div>
+        <div class="stat-trend" style="color:#64748B">{{ t('reports.overview.external.productsCount', { count: extKpi.pax }) }}</div>
       </div>
     </div>
 
@@ -164,8 +168,8 @@ const STAGE_COLORS: Record<string, string> = {
       <!-- Funnel -->
       <div class="card" style="padding:20px">
         <div class="card-head">
-          <div class="card-title">Lejek sprzedażowy</div>
-          <span class="card-sub">Liczba leadów i wartość PLN</span>
+          <div class="card-title">{{ t('reports.common.funnel.title') }}</div>
+          <span class="card-sub">{{ t('reports.common.funnel.subtitle') }}</span>
         </div>
         <div class="funnel">
           <div *ngFor="let row of funnel; let i = index" class="funnel-row">
@@ -174,7 +178,7 @@ const STAGE_COLORS: Record<string, string> = {
               <div class="funnel-bg"></div>
               <div class="funnel-fill" [style.width.%]="funnelPct(row.val)" [style.background]="row.color"></div>
               <div class="funnel-txt">
-                <span class="funnel-n">{{ row.n }} lead.</span>
+                <span class="funnel-n">{{ t('reports.common.leadsShort', { count: row.n }) }}</span>
                 <span class="funnel-v">{{ (row.val/1000).toFixed(0) }}k PLN</span>
               </div>
             </div>
@@ -196,10 +200,10 @@ const STAGE_COLORS: Record<string, string> = {
       <!-- Monthly bar chart -->
       <div class="card" style="padding:20px">
         <div class="card-head">
-          <div class="card-title">Przychody miesięczne</div>
+          <div class="card-title">{{ t('reports.overview.chart.title') }}</div>
           <div class="chart-legend">
-            <span><span class="leg-dot" style="background:var(--orange)"></span>Won</span>
-            <span><span class="leg-dot" style="background:#BFDBFE"></span>Pipeline</span>
+            <span><span class="leg-dot" style="background:var(--orange)"></span>{{ t('reports.common.columns.won') }}</span>
+            <span><span class="leg-dot" style="background:#BFDBFE"></span>{{ t('reports.common.columns.pipeline') }}</span>
           </div>
         </div>
         <div class="bar-chart">
@@ -207,8 +211,8 @@ const STAGE_COLORS: Record<string, string> = {
             <div class="bar-won-lbl" *ngIf="d.won > 0" style="color:var(--orange)">{{ (d.won/1000).toFixed(0) }}k</div>
             <div class="bar-won-lbl" *ngIf="!d.won"></div>
             <div class="bar-bars">
-              <div class="bar-pipe" [style.height.px]="barH(d.pipe)" title="Pipeline: {{ (d.pipe/1000).toFixed(0) }}k PLN"></div>
-              <div class="bar-win" *ngIf="d.won" [style.height.px]="barH(d.won)" title="Won: {{ (d.won/1000).toFixed(0) }}k PLN"></div>
+              <div class="bar-pipe" [style.height.px]="barH(d.pipe)" [title]="t('reports.overview.chart.pipelineTooltip', { value: (d.pipe/1000).toFixed(0) })"></div>
+              <div class="bar-win" *ngIf="d.won" [style.height.px]="barH(d.won)" [title]="t('reports.overview.chart.wonTooltip', { value: (d.won/1000).toFixed(0) })"></div>
               <div class="bar-win empty" *ngIf="!d.won"></div>
             </div>
           </div>
@@ -218,7 +222,7 @@ const STAGE_COLORS: Record<string, string> = {
         </div>
         <!-- Projected -->
         <div class="proj-box" *ngIf="projected > 0">
-          <span>📈 Wartość prognozowana (ważona):</span>
+          <span>📈 {{ t('reports.overview.chart.projectedWeighted') }}</span>
           <strong style="color:var(--orange)">{{ formatPLN(projected) }} PLN</strong>
         </div>
       </div>
@@ -230,8 +234,8 @@ const STAGE_COLORS: Record<string, string> = {
       <!-- Sales table -->
       <div class="card" style="padding:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div class="card-title">Wyniki handlowców</div>
-          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:#0EA5E9">📥 Dane zewnętrzne</span>
+          <div class="card-title">{{ t('reports.common.salespeopleResults') }}</div>
+          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:#0EA5E9">📥 {{ t('reports.overview.external.source') }}</span>
         </div>
 
         <!-- Tabela z danych zewnętrznych (gdy dostępne) -->
@@ -239,12 +243,12 @@ const STAGE_COLORS: Record<string, string> = {
           <table class="sales-tbl">
             <thead>
               <tr>
-                <th>Handlowiec</th>
-                <th class="tr">Partnerzy</th>
-                <th class="tr">Obrót brutto</th>
-                <th class="tr">Netto</th>
-                <th class="tr">Fees</th>
-                <th class="tr">Przychód</th>
+                <th>{{ t('leadsList.fields.salesRep') }}</th>
+                <th class="tr">{{ t('reports.overview.table.partners') }}</th>
+                <th class="tr">{{ t('reports.overview.table.grossTurnover') }}</th>
+                <th class="tr">{{ t('reports.overview.table.net') }}</th>
+                <th class="tr">{{ t('reports.overview.table.fees') }}</th>
+                <th class="tr">{{ t('reports.overview.table.revenue') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -278,12 +282,12 @@ const STAGE_COLORS: Record<string, string> = {
           <table class="sales-tbl">
             <thead>
               <tr>
-                <th>Handlowiec</th>
-                <th class="tr">Leady</th>
-                <th class="tr">Pipeline</th>
-                <th class="tr">Won</th>
-                <th class="tr">Win%</th>
-                <th>Postęp</th>
+                <th>{{ t('leadsList.fields.salesRep') }}</th>
+                <th class="tr">{{ t('reports.common.columns.leads') }}</th>
+                <th class="tr">{{ t('reports.common.columns.pipeline') }}</th>
+                <th class="tr">{{ t('reports.common.columns.won') }}</th>
+                <th class="tr">{{ t('reports.common.columns.winRatePct') }}</th>
+                <th>{{ t('reports.common.columns.progress') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -311,7 +315,7 @@ const STAGE_COLORS: Record<string, string> = {
                 </td>
               </tr>
               <tr *ngIf="salesRows.length === 0">
-                <td colspan="6" style="text-align:center;color:var(--gray-400);padding:20px">Brak danych</td>
+                <td colspan="6" style="text-align:center;color:var(--gray-400);padding:20px">{{ t('reports.common.noData') }}</td>
               </tr>
             </tbody>
           </table>
@@ -320,7 +324,7 @@ const STAGE_COLORS: Record<string, string> = {
 
       <!-- Sources donut -->
       <div class="card" style="padding:20px">
-        <div class="card-title" style="margin-bottom:14px">Źródła leadów</div>
+        <div class="card-title" style="margin-bottom:14px">{{ t('reports.common.leadSources.title') }}</div>
         <div style="display:flex;align-items:center;gap:20px">
           <svg width="120" height="120" viewBox="0 0 120 120" style="flex-shrink:0">
             <circle cx="60" cy="60" r="44" fill="none" stroke="#F4F4F5" stroke-width="18"/>
@@ -329,7 +333,7 @@ const STAGE_COLORS: Record<string, string> = {
             </ng-container>
             <circle cx="60" cy="60" r="30" fill="white"/>
             <text x="60" y="57" text-anchor="middle" font-size="14" font-weight="700" fill="#18181B">{{ totalLeads }}</text>
-            <text x="60" y="69" text-anchor="middle" font-size="8" font-weight="600" fill="#A1A1AA">leadów</text>
+            <text x="60" y="69" text-anchor="middle" font-size="8" font-weight="600" fill="#A1A1AA">{{ t('reports.common.leadSources.totalCaption') }}</text>
           </svg>
           <div style="flex:1;display:flex;flex-direction:column;gap:8px">
             <div *ngFor="let s of sources" style="display:flex;align-items:center;gap:6px;font-size:12px">
@@ -340,11 +344,11 @@ const STAGE_COLORS: Record<string, string> = {
           </div>
         </div>
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray-200)">
-          <div class="mini-lbl" style="margin-bottom:8px">Jakość po źródle</div>
+          <div class="mini-lbl" style="margin-bottom:8px">{{ t('reports.overview.sourceQuality.title') }}</div>
           <div style="display:flex;flex-direction:column;gap:5px;font-size:12px">
             <div *ngFor="let s of sourceQuality" style="display:flex;justify-content:space-between">
-              <span>{{ s.label }}</span>
-              <span style="font-weight:700" [style.color]="s.color">{{ s.wr }}% win rate</span>
+              <span>{{ t(s.labelKey) }}</span>
+              <span style="font-weight:700" [style.color]="s.color">{{ t('reports.common.leadSources.winRate', { value: s.wr }) }}</span>
             </div>
           </div>
         </div>
@@ -356,12 +360,12 @@ const STAGE_COLORS: Record<string, string> = {
 
       <!-- Velocity -->
       <div class="card" style="padding:20px">
-        <div class="card-title" style="margin-bottom:16px">Czas w etapie (średnia dni)</div>
+        <div class="card-title" style="margin-bottom:16px">{{ t('reports.overview.velocity.title') }}</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <div *ngFor="let v of velocity">
             <div style="display:flex;justify-content:space-between;margin-bottom:4px">
               <span style="font-size:12px;color:var(--gray-600)">{{ v.label }}</span>
-              <span style="font-size:12px;font-weight:700" [style.color]="veloColor(v.days, v.max)">{{ v.days }} dni</span>
+              <span style="font-size:12px;font-weight:700" [style.color]="veloColor(v.days, v.max)">{{ t('reports.common.days', { count: v.days }) }}</span>
             </div>
             <div class="prog-bar" style="height:6px">
               <div class="prog-fill" [style.width.%]="v.days/v.max*100" [style.background]="veloColor(v.days, v.max)"></div>
@@ -372,7 +376,7 @@ const STAGE_COLORS: Record<string, string> = {
 
       <!-- Lost reasons -->
       <div class="card" style="padding:20px">
-        <div class="card-title" style="margin-bottom:16px">Powody przegranej</div>
+        <div class="card-title" style="margin-bottom:16px">{{ t('reports.common.lostReasons') }}</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <div *ngFor="let l of lostReasons">
             <div style="display:flex;justify-content:space-between;margin-bottom:4px">
@@ -385,13 +389,14 @@ const STAGE_COLORS: Record<string, string> = {
           </div>
         </div>
         <div class="insight-box" *ngIf="topLostReason">
-          💡 <strong>Insight:</strong> {{ topLostReason.pct }}% przegranych wynika z „{{ topLostReason.label }}".
+          💡 <strong>{{ t('reports.overview.lostReasons.insightLabel') }}</strong> {{ t('reports.overview.lostReasons.insight', { percent: topLostReason.pct, reason: topLostReason.label }) }}
         </div>
       </div>
     </div>
 
   </ng-container>
 </div>
+</ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
@@ -486,6 +491,8 @@ export class CrmReportsComponent implements OnInit {
   private auth = inject(AuthService);
   private zone = inject(NgZone);
   private cdr  = inject(ChangeDetectorRef);
+  private transloco = inject(TranslocoService);
+  private locale = inject(LocaleService);
 
   loading     = true;
   period      = 'ytd';
@@ -515,10 +522,10 @@ export class CrmReportsComponent implements OnInit {
   donutSegs:  { d: string; color: string }[] = [];
   miniStats:  { label: string; value: string; color?: string }[] = [];
   sourceQuality = [
-    { label: 'Polecenia',    wr: 68, color: '#22C55E' },
-    { label: 'Targi',        wr: 45, color: 'var(--orange)' },
-    { label: 'Strona www',   wr: 28, color: 'var(--gray-600)' },
-    { label: 'Cold outreach',wr: 15, color: 'var(--gray-400)' },
+    { labelKey: 'reports.overview.sources.referrals',    wr: 68, color: '#22C55E' },
+    { labelKey: 'reports.overview.sources.tradeFairs',   wr: 45, color: 'var(--orange)' },
+    { labelKey: 'labels.sources.website',                wr: 28, color: 'var(--gray-600)' },
+    { labelKey: 'reports.overview.sources.coldOutreach', wr: 15, color: 'var(--gray-400)' },
   ];
 
   totalLeads  = 0;
@@ -534,7 +541,8 @@ export class CrmReportsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.reload();
+    // Chart labels are built in TypeScript, so the crm texts must be loaded before the leads arrive.
+    this.transloco.load(`crm/${this.transloco.getActiveLang()}`).subscribe(() => this.reload());
     this.api.getCrmUsers().subscribe({
       next: u => this.zone.run(() => { this.salesReps = u; this.cdr.markForCheck(); }),
       error: () => {},
@@ -598,13 +606,9 @@ export class CrmReportsComponent implements OnInit {
     const last6  = sorted.slice(-6);
 
     // Wykres miesięczny: obrót brutto jako "pipe", przychód jako "won"
-    const MONTHS: Record<string, string> = {
-      '01':'Sty','02':'Lut','03':'Mar','04':'Kwi','05':'Maj','06':'Cze',
-      '07':'Lip','08':'Sie','09':'Wrz','10':'Paź','11':'Lis','12':'Gru',
-    };
     if (last6.length > 0) {
       this.monthly = last6.map(row => ({
-        m:    MONTHS[row.period.slice(5, 7)] ?? row.period.slice(5, 7),
+        m:    this.periodMonthName(row.period),
         won:  Number(row.revenue_pln),
         pipe: Number(row.gross_turnover_pln),
       }));
@@ -652,19 +656,15 @@ export class CrmReportsComponent implements OnInit {
 
     // Funnel
     const stageOrder = ['new','qualification','presentation','offer','negotiation'];
-    const stageLabels: Record<string,string> = {
-      new:'Nowy', qualification:'Kwalifikacja', presentation:'Prezentacja',
-      offer:'Oferta', negotiation:'Negocjacje',
-    };
     this.funnel = stageOrder.map(s => ({
-      label: stageLabels[s],
+      label: this.transloco.translate('crm.labels.stages.' + s),
       n:     active.filter(l => l.stage === s).length,
       val:   active.filter(l => l.stage === s).reduce((x, l) => x + (l.value_pln || 0), 0),
       color: STAGE_COLORS[s],
     }));
     // Dodaj zamknięte
     this.funnel.push({
-      label: 'Zamknięty',
+      label: this.transloco.translate('crm.reports.overview.funnel.closed'),
       n:     won.length,
       val:   won.reduce((x, l) => x + (l.value_pln || 0), 0),
       color: '#22C55E',
@@ -673,10 +673,10 @@ export class CrmReportsComponent implements OnInit {
     // Mini stats
     const maxWon = won.length > 0 ? Math.max(...won.map(l => l.value_pln || 0)) : 0;
     this.miniStats = [
-      { label: 'Konwersja Nowy→Kwalif.', value: this.convPctStr(0) },
-      { label: 'Konwersja Oferta→Zamkn.', value: this.convPctStr(3) },
-      { label: 'Avg. wartość wygranego', value: won.length > 0 ? this.formatPLN(won.reduce((s,l)=>s+(l.value_pln||0),0)/won.length)+' PLN' : '—' },
-      { label: 'Wartość prognozowana', value: this.formatPLN(this.projected)+' PLN', color: 'var(--orange)' },
+      { label: this.transloco.translate('crm.reports.overview.funnel.conversionNewToQualification'), value: this.convPctStr(0) },
+      { label: this.transloco.translate('crm.reports.overview.funnel.conversionOfferToClosed'), value: this.convPctStr(3) },
+      { label: this.transloco.translate('crm.reports.common.kpi.avgWonValue'), value: won.length > 0 ? this.formatPLN(won.reduce((s,l)=>s+(l.value_pln||0),0)/won.length)+' PLN' : '—' },
+      { label: this.transloco.translate('crm.reports.overview.funnel.projectedValue'), value: this.formatPLN(this.projected)+' PLN', color: 'var(--orange)' },
     ];
 
     // Monthly — generujemy ostatnie 6 miesięcy
@@ -697,9 +697,9 @@ export class CrmReportsComponent implements OnInit {
     // Zapewnij minimum danych statycznych jeśli brak
     if (this.monthly.every(m => m.pipe === 0 && m.won === 0)) {
       this.monthly = [
-        {m:'Sty',won:0,pipe:320000},{m:'Lut',won:0,pipe:580000},
-        {m:'Mar',won:670000,pipe:890000},{m:'Kwi',won:0,pipe:1200000},
-        {m:'Maj',won:0,pipe:520000},{m:'Cze',won:0,pipe:380000},
+        {m:this.shortMonthName(0),won:0,pipe:320000},{m:this.shortMonthName(1),won:0,pipe:580000},
+        {m:this.shortMonthName(2),won:670000,pipe:890000},{m:this.shortMonthName(3),won:0,pipe:1200000},
+        {m:this.shortMonthName(4),won:0,pipe:520000},{m:this.shortMonthName(5),won:0,pipe:380000},
       ];
     }
 
@@ -712,45 +712,45 @@ export class CrmReportsComponent implements OnInit {
       cold_call:'#A855F7', linkedin:'#F59E0B', partner:'#10B981',
       kampania:'#6366F1', inbound:'#14B8A6', inne:'#94A3B8',
     };
-    const srcLabels: Record<string,string> = {
-      targi:'Targi', polecenie:'Polecenia', strona_www:'Strona www',
-      cold_call:'Cold outreach', linkedin:'LinkedIn', partner:'Partner',
-      kampania:'Kampania', inbound:'Inbound', inne:'Inne',
+    const srcLabelKeys: Record<string,string> = {
+      targi:'reports.overview.sources.tradeFairs', polecenie:'reports.overview.sources.referrals', strona_www:'labels.sources.website',
+      cold_call:'reports.overview.sources.coldOutreach', linkedin:'labels.sources.linkedin', partner:'labels.sources.partner',
+      kampania:'reports.overview.sources.campaign', inbound:'labels.sources.inbound', inne:'labels.sources.other',
     };
     this.sources = Object.entries(srcCount)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
       .map(([k, n]) => ({
-        label: srcLabels[k] ?? k,
+        label: srcLabelKeys[k] ? this.transloco.translate('crm.' + srcLabelKeys[k]) : k,
         pct:   Math.round(n / srcTotal * 100),
         color: srcColors[k] ?? '#94A3B8',
       }));
     if (this.sources.length === 0) {
       this.sources = [
-        {label:'Targi',pct:35,color:'#3BAA5D'},
-        {label:'Polecenia',pct:28,color:'#22C55E'},
-        {label:'Strona www',pct:20,color:'#3B82F6'},
-        {label:'Cold outreach',pct:12,color:'#A855F7'},
-        {label:'Social media',pct:5,color:'#F59E0B'},
+        {label:this.transloco.translate('crm.reports.overview.sources.tradeFairs'),pct:35,color:'#3BAA5D'},
+        {label:this.transloco.translate('crm.reports.overview.sources.referrals'),pct:28,color:'#22C55E'},
+        {label:this.transloco.translate('crm.labels.sources.website'),pct:20,color:'#3B82F6'},
+        {label:this.transloco.translate('crm.reports.overview.sources.coldOutreach'),pct:12,color:'#A855F7'},
+        {label:this.transloco.translate('crm.reports.overview.sources.socialMedia'),pct:5,color:'#F59E0B'},
       ];
     }
     this.buildDonut();
 
     // Velocity (statyczny — wymagałby timestampów etapów)
     this.velocity = [
-      {label:'Nowy → Kwalifikacja',      days:5,  max:15},
-      {label:'Kwalifikacja → Demo',      days:9,  max:15},
-      {label:'Demo → Oferta',            days:8,  max:15},
-      {label:'Oferta → Negocjacje',      days:11, max:15},
-      {label:'Negocjacje → Zamknięcie',  days:5,  max:15},
+      {label:this.transloco.translate('crm.reports.overview.velocity.newToQualification'),  days:5,  max:15},
+      {label:this.transloco.translate('crm.reports.overview.velocity.qualificationToDemo'), days:9,  max:15},
+      {label:this.transloco.translate('crm.reports.overview.velocity.demoToOffer'),         days:8,  max:15},
+      {label:this.transloco.translate('crm.reports.overview.velocity.offerToNegotiation'),  days:11, max:15},
+      {label:this.transloco.translate('crm.reports.overview.velocity.negotiationToClosing'),days:5,  max:15},
     ];
 
     // Lost reasons (statyczny — wymagałby pola lost_reason)
     this.lostReasons = [
-      {label:'Cena zbyt wysoka',    pct:60, color:'#EF4444'},
-      {label:'Wybrał konkurencję',  pct:25, color:'#F59E0B'},
-      {label:'Brak budżetu',        pct:10, color:'#94A3B8'},
-      {label:'Projekt odłożony',    pct:5,  color:'#3B82F6'},
+      {label:this.transloco.translate('crm.reports.overview.lostReasons.priceTooHigh'),     pct:60, color:'#EF4444'},
+      {label:this.transloco.translate('crm.reports.overview.lostReasons.choseCompetitor'),  pct:25, color:'#F59E0B'},
+      {label:this.transloco.translate('crm.reports.overview.lostReasons.noBudget'),         pct:10, color:'#94A3B8'},
+      {label:this.transloco.translate('crm.reports.overview.lostReasons.projectPostponed'), pct:5,  color:'#3B82F6'},
     ];
 
     // Sales rows
@@ -804,12 +804,21 @@ export class CrmReportsComponent implements OnInit {
   }
 
   private last6Months(): { label: string; month: number; year: number }[] {
-    const names = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
     const now = new Date();
     return Array.from({length: 6}, (_, i) => {
       const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
-      return { label: names[d.getMonth()], month: d.getMonth(), year: d.getFullYear() };
+      return { label: this.shortMonthName(d.getMonth()), month: d.getMonth(), year: d.getFullYear() };
     });
+  }
+
+  private shortMonthName(monthIndex: number): string {
+    const name = new Intl.DateTimeFormat(this.locale.activeLocale(), { month: 'short' }).format(new Date(2000, monthIndex, 1));
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
+  private periodMonthName(period: string): string {
+    const monthNumber = Number(period.slice(5, 7));
+    return monthNumber >= 1 && monthNumber <= 12 ? this.shortMonthName(monthNumber - 1) : period.slice(5, 7);
   }
 
   funnelPct(val: number): number {

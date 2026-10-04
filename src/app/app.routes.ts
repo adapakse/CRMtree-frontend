@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
+import { withI18nScopes } from './core/i18n/i18n-scope.guard';
 import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard, publicRootGuard, externalUserGuard } from './core/auth/guards';
 
-export const routes: Routes = [
+export const routes: Routes = withI18nScopes([
   // ── Public, SSR-rendered marketing surface (Faza 0 — SEO fundament) ──────
   {
     path: '',
@@ -221,4 +222,4 @@ export const routes: Routes = [
     ],
   },
   { path: '**', redirectTo: '/dashboard' },
-];
+]);

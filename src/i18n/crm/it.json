@@ -65,6 +65,77 @@
       "tasks": "Attività"
     }
   },
+  "calendar": {
+    "allDay": "scad.",
+    "breadcrumb": "Calendario",
+    "durationMinutes": "{minutes} min",
+    "filters": {
+      "allPriorities": "Tutte le priorità",
+      "allReps": "Tutti i commerciali",
+      "allTypes": "Tutti i tipi",
+      "groupsGroup": "Gruppi",
+      "repsGroup": "Commerciali",
+      "showClosed": "mostra chiuse",
+      "showNoDate": "mostra senza data"
+    },
+    "meeting": {
+      "duration": "Durata",
+      "locationPlaceholder": "Sala A, Roma",
+      "notes": "Note",
+      "participantsPlaceholder": "email1@azienda.it, email2@azienda.it",
+      "salesperson": "Commerciale"
+    },
+    "month": {
+      "more": "+{count} altre"
+    },
+    "nav": {
+      "today": "Oggi"
+    },
+    "tasks": {
+      "bulk": {
+        "closeSelected": "Chiudi le attività selezionate",
+        "selectOverdue": "Seleziona tutte le attività scadute",
+        "selectedCount": "{count, plural, one {# selezionata} other {# selezionate}}"
+      },
+      "close": "Chiudi",
+      "count": "{count, plural, one {# azione} other {# azioni}}",
+      "editMode": "modalità modifica",
+      "empty": "Nessuna attività da visualizzare.",
+      "form": {
+        "assignTo": "Assegna a",
+        "descriptionPlaceholder": "Descrizione…",
+        "titlePlaceholder": "Titolo…"
+      },
+      "loading": "Caricamento delle attività…",
+      "noDate": "senza data",
+      "readOnly": "sola lettura",
+      "reopen": "Riapri",
+      "saveFailed": "Impossibile salvare le modifiche all’attività"
+    },
+    "title": "Calendario delle azioni",
+    "views": {
+      "day": "Giorno",
+      "month": "Mese",
+      "tasks": "Attività",
+      "week": "Settimana"
+    }
+  },
+  "callSimulator": {
+    "activity": {
+      "demoTranscript": "[00:00] Commerciale: Buongiorno, sono Mario Rossi di CRMtree. Posso parlare con la persona responsabile dei viaggi di lavoro?\n\n[00:08] Cliente: Sì, mi dica. Sono Marco Bianchi.\n\n[00:10] Commerciale: Buongiorno, signor Bianchi. La contatto in merito all’ottimizzazione dei costi dei viaggi di lavoro nella vostra azienda. Ha un momento?\n\n[00:18] Cliente: Sì, prego. Che cosa propone di preciso?\n\n[00:22] Commerciale: Offriamo un sistema completo per la gestione dei viaggi aziendali — prenotazioni di voli, hotel e trasporti in un unico posto. In media i nostri clienti risparmiano dal 15 al 25% sui costi di viaggio.\n\n[00:35] Cliente: Sembra interessante. Quante persone devono viaggiare all’anno perché ne valga la pena?\n\n[00:40] Commerciale: La nostra piattaforma conviene già a partire da qualche decina di viaggi all’anno. Posso preparare un calcolo personalizzato per la vostra azienda.\n\n[00:49] Cliente: Va bene. Mi mandi l’offerta via e-mail. Il nostro team la esaminerà.\n\n[00:54] Commerciale: Certamente, la invio oggi stesso. Possiamo anche fissare una breve presentazione online, per mostrarle il sistema in azione?\n\n[01:02] Cliente: Sì, possiamo. Le proporrò una data dopo aver esaminato l’offerta.\n\n[01:06] Commerciale: Perfetto. Grazie per la conversazione, a presto.\n\n[01:09] Cliente: Arrivederci.",
+      "summary": "Chiamata telefonica con {who} ({seconds}s)",
+      "title": "Chiamata telefonica — {who}",
+      "transcriptHeading": "--- Trascrizione ---"
+    },
+    "connected": "Connesso",
+    "connecting": "Connessione in corso...",
+    "duration": "Durata: {time}",
+    "endCall": "Termina chiamata",
+    "ended": "Chiamata terminata",
+    "hangUp": "Riaggancia",
+    "noteSaved": "Nota salvata",
+    "savingNote": "Salvataggio della nota..."
+  },
   "calls": {
     "call": "Chiama",
     "callNumber": "Chiama: {phone}",
@@ -85,6 +156,126 @@
       "granted": "Consenso concesso",
       "noData": "Nessun dato"
     }
+  },
+  "crmDashboard": {
+    "activities": {
+      "title": "Ultime azioni"
+    },
+    "columns": {
+      "adoption": "Adozione",
+      "days": "Giorni",
+      "expires": "Scade",
+      "opportunities": "Opportunità",
+      "partner": "Partner",
+      "revenue": "Ricavi"
+    },
+    "kpi": {
+      "activePartners": "Partner attivi",
+      "avgArrPerPartner": "ARR medio / partner",
+      "inOnboarding": "In onboarding",
+      "partnerGroups": "Gruppi di partner",
+      "totalArr": "ARR totale"
+    },
+    "partnerScores": {
+      "title": "Partner per risultati ({period})"
+    },
+    "periods": {
+      "currentYear": "Anno corrente",
+      "last12Months": "Ultimi 12 mesi",
+      "last30Days": "Ultimi 30 giorni",
+      "last90Days": "Ultimi 90 giorni"
+    },
+    "pipeline": {
+      "empty": "Nessun dato",
+      "title": "Pipeline dei lead"
+    },
+    "productMix": {
+      "title": "Mix di prodotti ({period})"
+    },
+    "renewals": {
+      "daysShort": "{days}g",
+      "title": "Rinnovi in arrivo"
+    },
+    "title": "Dashboard CRM"
+  },
+  "csvImport": {
+    "actions": {
+      "downloadTemplate": "Scarica modello",
+      "exportData": "Esporta dati"
+    },
+    "cards": {
+      "documents": {
+        "description": "Importazione dei metadati dei documenti. I file fisici vanno aggiunti manualmente dopo l’importazione. Il numero del documento viene generato automaticamente.",
+        "title": "Documenti (metadati)"
+      },
+      "leads": {
+        "title": "Lead di vendita"
+      },
+      "partners": {
+        "title": "Partner"
+      },
+      "sales": {
+        "description": "Dati a livello di riga dal sistema di vendita esterno, per Partner × Prodotto × Mese. Il collegamento con il commerciale viene effettuato automaticamente dal CRM (responsabile del partner).",
+        "title": "Dati di vendita"
+      }
+    },
+    "dictionaries": {
+      "documentGroups": "Accounting|HR|Marketing|Obsługa Klienta|Operations|Sprzedaz|Zarzad"
+    },
+    "dropZone": {
+      "importing": "Importazione…",
+      "prompt": "Trascina un file CSV o clicca"
+    },
+    "errorsTable": {
+      "company": "Azienda",
+      "error": "Errore",
+      "field": "Campo",
+      "name": "Nome",
+      "row": "Riga"
+    },
+    "files": {
+      "salesTemplate": "modello_dati_vendita.csv",
+      "template": "modello_{type}.csv"
+    },
+    "hints": {
+      "agentFields": "solo se source=agent",
+      "dictionaryValues": "valori da dizionario",
+      "dictionaryValuesHover": "valori da dizionario (passa il mouse per vederli)",
+      "dictionaryValuesTooltip": "valori da dizionario — apri il tooltip (passa il mouse) per vedere i valori disponibili",
+      "documentGroupName": "nome del gruppo di documenti",
+      "entitiesExample": "Azienda ABC|Mario Rossi",
+      "entitiesSeparator": "soggetti separati da",
+      "example": "es.",
+      "otherProducts": "altri…",
+      "partnerNumber": "chiave di collegamento con i dati di vendita",
+      "salesPartnerNumber": "chiave di collegamento con la scheda del Partner nel CRM",
+      "tagsSeparator": "separati da"
+    },
+    "history": {
+      "date": "Data",
+      "empty": "Nessuna importazione in cronologia.",
+      "errors": "Errori",
+      "file": "File",
+      "imported": "Importati",
+      "importedBy": "Da",
+      "status": "Stato",
+      "title": "Cronologia delle importazioni",
+      "type": "Tipo"
+    },
+    "messages": {
+      "csvRequired": "Seleziona un file in formato CSV.",
+      "exportFailed": "Impossibile esportare i dati.",
+      "serverError": "Errore del server",
+      "templateDownloadFailed": "Impossibile scaricare il modello."
+    },
+    "result": {
+      "errors": "{count, plural, one {# errore} other {# errori}}",
+      "imported": "{count, plural, one {# importato} other {# importati}}",
+      "skipped": "{count, plural, one {# ignorato} other {# ignorati}}",
+      "total": "Totale: {count}"
+    },
+    "subtitle": "Importa lead, partner e dati di vendita in blocco da un file CSV. Scarica il modello, compilalo e caricalo.",
+    "title": "Importazione CSV"
   },
   "documents": {
     "add": "Aggiungi",
@@ -701,6 +892,82 @@
     "titlePlaceholder": "Titolo della riunione",
     "titleRequiredPlaceholder": "Titolo della riunione *"
   },
+  "onboardingBoard": {
+    "filters": {
+      "allAssignees": "Tutti gli assegnatari",
+      "allPartners": "Tutti i partner",
+      "searchPlaceholder": "Cerca partner, partita IVA…"
+    },
+    "launch": {
+      "action": "Avvio",
+      "actionShort": "Avvia",
+      "confirm": "Avviare il partner «{company}»? Il partner passerà allo stato Attivo e sarà visibile nel Registro Partner.",
+      "failed": "Errore durante l’avvio del partner",
+      "inProgress": "Avvio in corso…",
+      "moveToRegistry": "Sposta nel Registro Partner",
+      "partnerProfile": "Profilo del partner",
+      "remainingTasks": "{count, plural, one {Resta # attività non completata} other {Restano # attività non completate}}",
+      "successHint": "Il partner è stato spostato nel Registro Partner ed è ora attivo.",
+      "successTitle": "{company} — avviato!"
+    },
+    "partners": {
+      "empty": "Nessun partner in fase di onboarding",
+      "emptyHint": "I partner arrivano qui dopo la migrazione dal lead",
+      "leadData": "Dati del lead",
+      "stepBadge": "Passo {step}/{total}",
+      "taskProgress": "{done}/{total} attività"
+    },
+    "steps": {
+      "configuration": "Configurazione",
+      "contractSigning": "Firma del contratto",
+      "launch": "Avvio",
+      "training": "Formazione"
+    },
+    "table": {
+      "action": "Azione",
+      "addedOn": "Aggiunto",
+      "step": "Passo",
+      "taskProgress": "Avanzamento attività"
+    },
+    "taskForm": {
+      "assignedTo": "Assegnata a",
+      "choosePerson": "— seleziona una persona —",
+      "create": "Crea attività",
+      "done": "Attività completata",
+      "dueDate": "Scadenza",
+      "newTask": "Nuova attività",
+      "note": "Nota",
+      "notePlaceholder": "Informazioni aggiuntive…",
+      "step": "Passo del processo",
+      "time": "Ora",
+      "timeHint": "(facoltativa, pred. 09:00)",
+      "title": "Titolo dell’attività",
+      "titlePlaceholder": "Nome dell’attività"
+    },
+    "taskTypes": {
+      "call": "Chiamata"
+    },
+    "tasks": {
+      "delete": "Elimina attività",
+      "empty": "Nessuna attività"
+    },
+    "timeline": {
+      "empty": "Nessuna attività con scadenza"
+    },
+    "title": "Onboarding dei partner",
+    "toasts": {
+      "taskAdded": "Attività aggiunta",
+      "taskDeleteFailed": "Errore durante l’eliminazione dell’attività",
+      "taskDeleted": "Attività eliminata",
+      "taskSaveFailed": "Errore durante il salvataggio dell’attività",
+      "taskUpdated": "Attività aggiornata"
+    },
+    "views": {
+      "calendar": "Calendario",
+      "partners": "Partner",
+      "timeline": "Timeline"
+    }
+  },
   "partnerDetail": {
     "activity": {
       "bodyPlaceholder": "Contenuto / descrizione…",
@@ -950,6 +1217,35 @@
       "partnerAdmin": "Partner Admin"
     }
   },
+  "partnerGroups": {
+    "card": {
+      "morePartners": "+{count} altri",
+      "partnersNoun": "{count, plural, one {partner} other {partner}}"
+    },
+    "details": {
+      "empty": "Nessun partner in questo gruppo.",
+      "manager": "Responsabile:",
+      "partnersInGroup": "Partner nel gruppo ({count})",
+      "partnersStat": "Partner"
+    },
+    "empty": "Nessun gruppo di partner.",
+    "form": {
+      "create": "Crea",
+      "delete": "Elimina",
+      "description": "Descrizione",
+      "editTitle": "Modifica gruppo",
+      "industry": "Settore",
+      "name": "Nome",
+      "namePlaceholder": "Nome del gruppo"
+    },
+    "messages": {
+      "deleteConfirm": "Eliminare il gruppo «{name}»? I partner verranno scollegati.",
+      "deleteFailed": "Impossibile eliminare il gruppo",
+      "saveFailed": "Impossibile salvare il gruppo"
+    },
+    "newGroup": "Nuovo gruppo",
+    "title": "Gruppi di partner"
+  },
   "partnersList": {
     "card": {
       "marginAmount": "{amount} PLN di margine",
@@ -1030,6 +1326,460 @@
       "table": "Tabella"
     }
   },
+  "periodFilter": {
+    "groups": {
+      "current": "Correnti",
+      "custom": "Personalizzato",
+      "previous": "Precedenti"
+    },
+    "presets": {
+      "currentMonth": "Mese corrente",
+      "currentQuarter": "Trimestre corrente",
+      "currentYear": "Anno corrente (YTD {year})",
+      "customRange": "Intervallo personalizzato…",
+      "previousMonth": "Mese precedente",
+      "previousQuarter": "Trimestre precedente",
+      "previousYear": "Anno precedente ({year})"
+    }
+  },
+  "reports": {
+    "common": {
+      "columns": {
+        "leads": "Lead",
+        "pipeline": "Pipeline",
+        "progress": "Avanzamento",
+        "winRatePct": "Win%",
+        "won": "Won"
+      },
+      "days": "{count, plural, one {# giorno} other {# giorni}}",
+      "exportPdf": "Esporta PDF",
+      "funnel": {
+        "subtitle": "Numero di lead e valore in PLN",
+        "title": "Funnel di vendita"
+      },
+      "kpi": {
+        "activeLeads": "Lead attivi",
+        "avgSalesCycle": "Ciclo di vendita medio",
+        "avgWonValue": "Valore medio dei vinti",
+        "winRate": "Win Rate",
+        "wonPln": "Chiusi / Won (PLN)"
+      },
+      "leadSources": {
+        "title": "Fonti dei lead",
+        "totalCaption": "lead",
+        "winRate": "{value}% win rate"
+      },
+      "leadsShort": "{count} lead",
+      "lostReasons": "Motivi della perdita",
+      "noData": "Nessun dato",
+      "periods": {
+        "currentMonth": "Mese corrente",
+        "currentQuarter": "Trimestre corrente",
+        "currentYear": "Anno corrente (YTD {year})",
+        "last3Months": "Ultimi 3 mesi",
+        "last6Months": "Ultimi 6 mesi"
+      },
+      "refresh": "Aggiorna",
+      "salespeopleResults": "Risultati dei commerciali",
+      "title": "Report di vendita"
+    },
+    "leads": {
+      "activity": {
+        "empty": "Nessun dato sulle azioni",
+        "sourceAll": "Tutte",
+        "sourceLeads": "Lead",
+        "sourcePartners": "Partner",
+        "title": "Attività dei commerciali",
+        "types": {
+          "email": "E-mail"
+        }
+      },
+      "drilldown": {
+        "funnel": "Funnel: {stage}",
+        "lost": "Persi: {reason}",
+        "pipelineAll": "Pipeline – tutti gli attivi",
+        "plannedBudget": "Budget pianificato – lead nel periodo",
+        "plannedInPeriod": "Chiusura prevista nel periodo",
+        "source": "Fonte: {source}",
+        "velocity": "Tempo nella fase: {stage}",
+        "won": "Chiusi / Won"
+      },
+      "empty": {
+        "hint": "Aggiungi dei lead o cambia l’intervallo di date",
+        "title": "Nessun dato per il periodo selezionato"
+      },
+      "funnel": {
+        "conversionToWon": "Conversione in Vinto"
+      },
+      "kpi": {
+        "activeCount": "{count, plural, one {# attivo} other {# attivi}}",
+        "budgetCompletion": "{value}% di realizzazione",
+        "contractsCount": "{count, plural, one {# contratto} other {# contratti}}",
+        "noPlan": "Nessun piano",
+        "plannedBudget": "Budget pianificato",
+        "plannedBudgetPln": "Budget pianificato (PLN)",
+        "plannedDelivery": "Chiusura prevista"
+      },
+      "lostReasons": {
+        "empty": "Nessun lead perso",
+        "leadsCount": "{count, plural, one {# lead} other {# lead}}",
+        "topReason": "Motivo principale:"
+      },
+      "sourceQuality": {
+        "title": "Qualità per fonte (win rate)"
+      },
+      "tooltips": {
+        "goToOnboarding": "Clicca per andare alla sezione Onboarding",
+        "viewLeads": "Clicca per vedere i lead",
+        "viewLeadsClosingInPeriod": "Clicca per vedere i lead con data di chiusura in questo periodo",
+        "viewLeadsInPeriod": "Clicca per vedere i lead di questo periodo",
+        "viewLostLeads": "Clicca per vedere i lead persi: {reason}",
+        "viewSalespersonLeads": "Clicca per vedere i lead del commerciale",
+        "viewSourceLeads": "Clicca per vedere i lead dalla fonte: {source}",
+        "viewStageLeads": "Clicca per vedere i lead nella fase: {stage}",
+        "viewWonLeads": "Clicca per vedere i lead vinti"
+      },
+      "trend": {
+        "activeTooltip": "Attivi (Qualificazione–Negoziazione): {count}",
+        "new": "Nuovi",
+        "title": "Trend mensile",
+        "won": "Vinti",
+        "wonTooltip": "Won: {count}"
+      },
+      "velocity": {
+        "scale": "Scala: max {count, plural, one {# giorno} other {# giorni}}",
+        "title": "Tempo nella fase (media giorni)"
+      }
+    },
+    "overview": {
+      "banner": {
+        "after": "di dati importati",
+        "before": "I grafici si basano su",
+        "manageImport": "Gestisci importazione",
+        "months": "{count, plural, one {# mese} other {# mesi}}",
+        "partner": "partner:",
+        "product": "prodotto:"
+      },
+      "chart": {
+        "pipelineTooltip": "Pipeline: {value}k PLN",
+        "projectedWeighted": "Valore previsto (ponderato):",
+        "title": "Ricavi mensili",
+        "wonTooltip": "Won: {value}k PLN"
+      },
+      "external": {
+        "feeRate": "Fee rate: {value}%",
+        "feesPln": "Fees (PLN)",
+        "grossTurnoverPln": "Fatturato lordo (PLN)",
+        "margin": "Margine: {value}%",
+        "netTurnoverPln": "Fatturato netto (PLN)",
+        "productsCount": "{count, plural, one {# prodotto} other {# prodotti}}",
+        "revenuePln": "Ricavi (PLN)",
+        "share": "Quota: {value}%",
+        "source": "Dati esterni",
+        "transactions": "Transazioni"
+      },
+      "filters": {
+        "allPartners": "Tutti i partner",
+        "allProducts": "Tutti i prodotti"
+      },
+      "funnel": {
+        "closed": "Chiuso",
+        "conversionNewToQualification": "Conversione Nuovo→Qualif.",
+        "conversionOfferToClosed": "Conversione Offerta→Chiuso",
+        "projectedValue": "Valore previsto"
+      },
+      "kpi": {
+        "aboveTarget": "Sopra l’obiettivo",
+        "activePipeline": "Pipeline attiva",
+        "avgClosingTime": "Tempo medio di chiusura",
+        "belowTarget": "Sotto l’obiettivo",
+        "hotCount": "{count, plural, one {# caldo} other {# caldi}}",
+        "noneInPeriod": "Nessuno in questo periodo",
+        "wonContracts": "Contratti vinti"
+      },
+      "loading": "Caricamento dei report…",
+      "lostReasons": {
+        "choseCompetitor": "Ha scelto la concorrenza",
+        "insight": "Il {percent}% dei lead persi è dovuto a «{reason}».",
+        "insightLabel": "Insight:",
+        "noBudget": "Budget assente",
+        "priceTooHigh": "Prezzo troppo alto",
+        "projectPostponed": "Progetto rinviato"
+      },
+      "periods": {
+        "year": "Anno {year}"
+      },
+      "sourceQuality": {
+        "title": "Qualità per fonte"
+      },
+      "sources": {
+        "campaign": "Campagna",
+        "coldOutreach": "Cold outreach",
+        "referrals": "Segnalazioni",
+        "socialMedia": "Social media",
+        "tradeFairs": "Fiere"
+      },
+      "table": {
+        "fees": "Fees",
+        "grossTurnover": "Fatturato lordo",
+        "net": "Netto",
+        "partners": "Partner",
+        "revenue": "Ricavi"
+      },
+      "velocity": {
+        "demoToOffer": "Presentazione → Offerta",
+        "negotiationToClosing": "Negoziazione → Chiusura",
+        "newToQualification": "Nuovo → Qualificazione",
+        "offerToNegotiation": "Offerta → Negoziazione",
+        "qualificationToDemo": "Qualificazione → Presentazione",
+        "title": "Tempo nella fase (media giorni)"
+      }
+    },
+    "partnerAnalytics": {
+      "byProduct": {
+        "title": "Struttura per prodotto"
+      },
+      "columns": {
+        "grossA": "Lordo A",
+        "grossB": "Lordo B",
+        "grossDelta": "Δ Lordo",
+        "marginA": "Margine A",
+        "marginB": "Margine B",
+        "netA": "Netto A",
+        "netB": "Netto B",
+        "partner": "Partner",
+        "partnersShort": "Part.",
+        "productsA": "Prod. A",
+        "productsB": "Prod. B",
+        "productsDelta": "Δ Prod.",
+        "segment": "Segmento"
+      },
+      "emptyPeriod": "Nessun dato per il periodo selezionato",
+      "filterMode": "Filtro",
+      "kpi": {
+        "grossTurnoverPln": "Fatturato lordo (PLN)",
+        "margin": "Margine",
+        "netTurnoverPln": "Fatturato netto (PLN)",
+        "productsCount": "Numero di prodotti"
+      },
+      "modes": {
+        "custom": "Personalizzato",
+        "mom": "MoM",
+        "qoq": "QoQ",
+        "yoy": "YoY"
+      },
+      "noData": "Nessun dato",
+      "partners": {
+        "allGroups": "Tutti i gruppi",
+        "allIndustries": "Tutti i settori",
+        "count": "{count, plural, one {# partner} other {# partner}}",
+        "searchPlaceholder": "Cerca partner…",
+        "showMore": "Mostra altri ({count} rimanenti)",
+        "title": "Partner — Fatturato lordo"
+      },
+      "percentagePoints": "{value} pp",
+      "period": {
+        "a": "Periodo A:",
+        "b": "Periodo B:",
+        "customB": "Periodo B personalizzato:",
+        "summary": "{partners, plural, one {# partner} other {# partner}} · {products, plural, one {# prodotto} other {# prodotti}}",
+        "to": "al"
+      },
+      "refresh": "Aggiorna",
+      "reps": {
+        "noSalesperson": "— nessuno —",
+        "subtitle": "Periodo A vs Periodo B",
+        "title": "Risultati per commerciale"
+      },
+      "title": "Dashboard analitica — Partner",
+      "trend": {
+        "countTooltip": "{period}: {count} unità",
+        "title": "Trend mensile — {metric}"
+      },
+      "trendMetrics": {
+        "count": "Numero di transazioni",
+        "gross": "Fatturato lordo",
+        "margin": "Margine (valore)",
+        "net": "Fatturato netto"
+      }
+    },
+    "partners": {
+      "allPartners": {
+        "empty": "Nessun dato per il periodo selezionato",
+        "title": "Risultati di tutti i partner",
+        "total": "TOTALE"
+      },
+      "churn": {
+        "criticalCount": "{count, plural, one {# critico} other {# critici}}",
+        "daysShort": "{days}g",
+        "empty": "Nessun partner a rischio di abbandono",
+        "showAll": "Mostra tutti i partner a rischio di abbandono",
+        "title": "Rischio di abbandono dei partner"
+      },
+      "columns": {
+        "fees": "Fees",
+        "grossTurnover": "Fatturato lordo",
+        "health": "Health",
+        "margin": "Margine",
+        "netTurnover": "Fatturato netto",
+        "partner": "Partner",
+        "revenue": "Ricavi",
+        "transactionsShort": "Trans."
+      },
+      "emptyHint": "Importa i dati tramite Importazione CSV",
+      "filters": {
+        "allPartners": "Tutti i partner",
+        "currentGroup": "Correnti",
+        "currentMonth": "Mese corrente",
+        "previousGroup": "Precedenti",
+        "previousMonth": "Mese precedente",
+        "previousQuarter": "Trimestre precedente",
+        "previousYear": "Anno precedente ({year})"
+      },
+      "grossTurnoverPln": "Fatturato lordo (PLN)",
+      "health": {
+        "good": "Sano",
+        "risk": "Rischio",
+        "warning": "Attenzione"
+      },
+      "healthPoints": "{score} pt",
+      "kpi": {
+        "activePartners": "Partner attivi",
+        "feeRateShare": "{percent}% fee rate",
+        "feesPln": "Fees (PLN)",
+        "productsCount": "{count} Prodotti",
+        "revenueMarginPln": "Ricavi / Margine (PLN)",
+        "revenueTrend": "trend dei ricavi",
+        "showPartnersTooltip": "Clicca per vedere i partner",
+        "vsPrevious": "{delta} vs precedente"
+      },
+      "marginShare": "{percent}% di margine",
+      "noData": "Nessun dato",
+      "openPartnerTooltip": "Clicca per aprire la scheda del partner",
+      "partnersCount": "{count, plural, one {# partner} other {# partner}}",
+      "products": {
+        "title": "Ripartizione per prodotto"
+      },
+      "refresh": "Aggiorna",
+      "reps": {
+        "showPartnersTooltip": "Clicca per vedere i partner di questo commerciale",
+        "title": "Risultati dei commerciali"
+      },
+      "scorecard": {
+        "empty": "Nessun dato sui partner",
+        "legend": {
+          "good": "buono",
+          "medium": "medio",
+          "poor": "scarso"
+        },
+        "title": "Scorecard dei partner"
+      },
+      "summary": {
+        "feeRate": "Fee rate",
+        "feesCommissions": "Fees / Commissioni",
+        "marginPct": "% di margine",
+        "revenueMargin": "Ricavi (margine)",
+        "title": "Riepilogo finanziario"
+      },
+      "title": "Partner Performance",
+      "trend": {
+        "title": "Trend dei ricavi",
+        "totalTurnover": "Fatturato totale"
+      }
+    }
+  },
+  "salesDashboard": {
+    "activity": {
+      "allLoaded": "Tutte le azioni caricate",
+      "empty": "Nessuna azione",
+      "incomingEmail": "← E-mail",
+      "refresh": "Aggiorna",
+      "title": "Ultime azioni",
+      "yesterday": "Ieri"
+    },
+    "chart": {
+      "periods": {
+        "month": "Mese",
+        "quarter": "Trimestre",
+        "week": "Settimana"
+      },
+      "title": "Risultati di vendita",
+      "vsPreviousPeriod": "vs periodo precedente"
+    },
+    "churn": {
+      "allLevels": "Tutti i livelli",
+      "daysSinceOrder": "giorni senza ordini",
+      "empty": "Nessun partner a rischio di abbandono corrisponde ai filtri.",
+      "generateResult": "{created, plural, one {Creata # attività} other {Create # attività}}, {skipped} ignorate (già esistenti).",
+      "generateTasks": "Genera attività",
+      "generating": "Generazione…",
+      "noRisk": "Nessun rischio di abbandono",
+      "salesDrop": "calo M-2→M-1",
+      "searchPlaceholder": "Cerca partner…",
+      "showAll": "Mostra tutti i partner a rischio di abbandono →"
+    },
+    "currency": {
+      "pln": "{value} PLN",
+      "thousandsPln": "{value}k PLN"
+    },
+    "header": {
+      "fallbackName": "utente",
+      "greeting": "Buongiorno, {name}!",
+      "subtitle": "Ecco il riepilogo delle tue azioni e dei tuoi risultati."
+    },
+    "kpi": {
+      "filters": {
+        "activeOpportunities": "Opportunità attive nella pipeline",
+        "newLeadsThisWeek": "Nuovi lead – settimana corrente",
+        "newLeadsValueThisWeek": "Nuovi lead – valore settimana corrente",
+        "pipelineValue": "Valore della pipeline"
+      },
+      "inPipeline": "nella pipeline",
+      "newLeads": "Nuovi lead",
+      "newLeadsValue": "Valore nuovi lead",
+      "newOpportunities": "Nuove opportunità",
+      "opportunitiesValue": "Valore delle opportunità",
+      "thisMonth": "questo mese",
+      "vsPreviousMonth": "vs mese precedente",
+      "vsPreviousWeek": "vs settimana precedente",
+      "wonOpportunities": "Opportunità vinte"
+    },
+    "opportunities": {
+      "empty": "Nessuna opportunità",
+      "name": "Nome dell’opportunità",
+      "probability": "Probabilità",
+      "showAll": "Vedi tutte le opportunità →",
+      "title": "Opportunità più recenti"
+    },
+    "pipeline": {
+      "empty": "Nessun dato sulla pipeline",
+      "modeCount": "Numero",
+      "modeValue": "Valore",
+      "opportunityCount": "{count, plural, one {# opportunità} other {# opportunità}}",
+      "title": "Pipeline di vendita",
+      "total": "Valore totale della pipeline:"
+    },
+    "stages": {
+      "closed_lost": "Perse",
+      "closed_won": "Vinte",
+      "new": "Lead",
+      "onboarded": "Onboarded",
+      "onboarding": "Onboarding"
+    },
+    "tabs": {
+      "dashboard": "Dashboard"
+    },
+    "tasks": {
+      "calendar": "Calendario",
+      "closeCommentPlaceholder": "Commento di chiusura *",
+      "closedNote": "[Chiusa il {date}]: {comment}",
+      "dueToday": "scade oggi",
+      "empty": "Nessuna attività per oggi",
+      "overdue": "scaduta",
+      "showAll": "Vedi tutte le attività →",
+      "title": "Attività di oggi"
+    }
+  },
   "sms": {
     "emptyConversation": "Nessun messaggio — scrivi il primo qui sotto.",
     "last": "ultimo:",
@@ -1045,6 +1795,164 @@
       "received": "Ricevuto",
       "sent": "Inviato"
     }
+  },
+  "softphone": {
+    "activity": {
+      "incomingTitle": "Chiamata in arrivo da {number}",
+      "outgoingTitle": "Chiamata in uscita verso {number}"
+    },
+    "confirm": {
+      "title": "Chiamare?"
+    },
+    "hangUp": "Riaggancia",
+    "incoming": {
+      "answer": "Rispondi",
+      "answering": "Risposta in corso…",
+      "reject": "Rifiuta",
+      "title": "Chiamata in arrivo",
+      "unknownNumber": "Numero sconosciuto"
+    },
+    "lookingUpContact": "Ricerca del contatto…",
+    "mute": "Silenzia",
+    "muted": "Silenziato",
+    "phases": {
+      "active": "In chiamata",
+      "dialing": "Composizione…",
+      "ringing": "Squilla…"
+    },
+    "postCall": {
+      "notePlaceholder": "Nota sulla chiamata (facoltativa)…",
+      "saveFailed": "Errore di salvataggio — riprova",
+      "saveWithNote": "Salva con nota",
+      "savedOnLead": "L’azione verrà salvata a livello del Lead",
+      "savedOnPartner": "L’azione verrà salvata a livello del Partner",
+      "saving": "Salvataggio…",
+      "title": "Chiamata terminata",
+      "transcriptLoaded": "Trascrizione caricata — puoi modificarla",
+      "transcriptLoading": "Recupero della trascrizione…",
+      "transcriptUnavailable": "Trascrizione non disponibile — inserisci la nota manualmente",
+      "withoutNote": "Senza nota"
+    },
+    "transcript": {
+      "agent": "Commerciale",
+      "client": "Cliente"
+    }
+  },
+  "substitutions": {
+    "cancel": {
+      "action": "Annulla",
+      "confirm": "Annullare questa assenza? Il sostituto perderà l’accesso derivante da questa sostituzione.",
+      "failed": "Impossibile annullare l’assenza.",
+      "inProgress": "Annullamento…"
+    },
+    "covering": {
+      "empty": "Al momento non sostituisci nessuno.",
+      "title": "Persone che sostituisco"
+    },
+    "errors": {
+      "dateFromRequired": "Indica la data di inizio.",
+      "dateToBeforeFrom": "La data di fine non può essere precedente alla data di inizio.",
+      "dateToRequired": "Indica la data di fine.",
+      "rangeConflict": "La persona assente ha già un’assenza registrata in un periodo che si sovrappone.",
+      "rangeInPast": "Il periodo di assenza non può trovarsi interamente nel passato.",
+      "substituteAbsent": "Questa persona è assente nel periodo selezionato.",
+      "substituteRequired": "Seleziona un sostituto.",
+      "substituteSameAsAbsent": "Il sostituto non può essere la stessa persona assente."
+    },
+    "fields": {
+      "absentPerson": "Persona assente",
+      "action": "Azione",
+      "dateFrom": "Data di inizio",
+      "dateTo": "Data di fine",
+      "note": "Nota",
+      "period": "Periodo",
+      "reason": "Motivo",
+      "status": "Stato",
+      "substitute": "Sostituto"
+    },
+    "form": {
+      "choose": "— seleziona —",
+      "fixErrors": "Correggi i campi evidenziati e riprova.",
+      "noteOptional": "Nota (facoltativa)",
+      "notePlaceholder": "es. per le questioni urgenti rivolgersi a…",
+      "saveFailed": "Impossibile salvare la sostituzione.",
+      "saved": "Sostituzione salvata — il sostituto ha ricevuto una notifica.",
+      "submit": "Salva sostituzione",
+      "substituteAbsentHint": "Questa persona è assente nel periodo selezionato — scegli un altro sostituto."
+    },
+    "hint": "Indica il periodo di assenza e la persona che ti sostituirà. Per quel periodo il sostituto avrà pieno accesso ai tuoi lead e partner — con gli stessi permessi che hai tu.",
+    "history": {
+      "toggle": "Cronologia ({count})"
+    },
+    "list": {
+      "empty": "Nessuna assenza in corso o in arrivo.",
+      "loadFailed": "Impossibile recuperare i dati.",
+      "retry": "Riprova",
+      "titleOwn": "Assenze (mie)",
+      "titleOwnAndTeam": "Assenze (mie e del team)"
+    },
+    "note": {
+      "collapse": "comprimi",
+      "expand": "espandi"
+    },
+    "pager": {
+      "next": "Pagina successiva",
+      "previous": "Pagina precedente"
+    },
+    "reasons": {
+      "other": "Altra assenza",
+      "sick_leave": "Malattia",
+      "vacation": "Ferie"
+    },
+    "selfFallback": "Io",
+    "statuses": {
+      "active": "In corso",
+      "cancelled": "Annullata",
+      "ended": "Terminata",
+      "upcoming": "In arrivo"
+    },
+    "title": "Sostituzione durante l’assenza"
+  },
+  "transactions": {
+    "amounts": {
+      "commission": "Commissione",
+      "gross": "Lordo",
+      "margin": "Margine",
+      "net": "Netto"
+    },
+    "filters": {
+      "allStatuses": "Tutti gli stati",
+      "allTypes": "Tutti i tipi",
+      "from": "Dal",
+      "resultCount": "{count, plural, one {# transazione} other {# transazioni}}",
+      "to": "Al"
+    },
+    "kpi": {
+      "count": "Transazioni",
+      "marginPct": "Margine %"
+    },
+    "products": {
+      "pax": "Pax",
+      "product": "Prodotto",
+      "routeOrPlace": "Tratta / Luogo",
+      "time": "Orario",
+      "type": "Tipo"
+    },
+    "statuses": {
+      "cancelled": "Annullata",
+      "confirmed": "Confermata",
+      "refunded": "Rimborsata"
+    },
+    "table": {
+      "date": "Data",
+      "empty": "Nessuna transazione corrisponde ai criteri.",
+      "partner": "Partner",
+      "products": "Prodotti",
+      "reference": "Rif.",
+      "status": "Stato",
+      "traveler": "Viaggiatore"
+    },
+    "title": "Transazioni"
   },
   "whatsapp": {
     "checkingConfig": "Verifica della configurazione...",

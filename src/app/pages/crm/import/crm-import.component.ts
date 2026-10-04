@@ -6,23 +6,26 @@ import { CrmApiService, ImportResult, ImportLog, SalesImportResult, SalesImportL
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'wt-crm-import',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="import-page">
   <div class="import-header">
-    <h1>Import CSV</h1>
-    <p class="sub">Importuj leady, partnerów i dane sprzedażowe zbiorczo z pliku CSV. Pobierz szablon, wypełnij i prześlij.</p>
+    <h1>{{ t('csvImport.title') }}</h1>
+    <p class="sub">{{ t('csvImport.subtitle') }}</p>
   </div>
 
   <div class="import-cards">
     <!-- Leads -->
     <div class="import-card">
       <div class="card-icon">👤</div>
-      <h2>Leady sprzedażowe</h2>
+      <h2>{{ t('csvImport.cards.leads.title') }}</h2>
       <div class="field-list">
         <span class="required">company*</span>
         <span>contact_name</span><span>contact_title</span>
@@ -37,11 +40,11 @@ import { ToastService } from '../../../core/services/toast.service';
         <span>agent_name</span><span>agent_email</span><span>agent_phone</span>
         <span>online_pct</span>
       </div>
-      <div class="field-hint">🔤 = wartości słownikowe — rozwiń tooltip (hover) aby zobaczyć dostępne wartości · <strong>agent_*</strong>: tylko gdy source=agent</div>
+      <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValuesTooltip') }} · <strong>agent_*</strong>: {{ t('csvImport.hints.agentFields') }}</div>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="downloadTemplate('leads')">⬇ Pobierz szablon</button>
+        <button class="btn-outline" (click)="downloadTemplate('leads')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
         <button class="btn-outline btn-export" (click)="exportData('leads')" [disabled]="exportingType==='leads'">
-          {{ exportingType==='leads' ? '⏳…' : '📤 Eksportuj dane' }}
+          {{ exportingType==='leads' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
         </button>
       </div>
       <div class="drop-zone"
@@ -52,18 +55,18 @@ import { ToastService } from '../../../core/services/toast.service';
            (drop)="onDrop($event, 'leads')"
            (click)="leadsInput.click()">
         <input #leadsInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'leads')">
-        <span *ngIf="!uploadingLeads">📂 Przeciągnij plik CSV lub kliknij</span>
-        <span *ngIf="uploadingLeads">⏳ Importowanie…</span>
+        <span *ngIf="!uploadingLeads">📂 {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingLeads">⏳ {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="leadsResult" class="result-panel">
         <div class="result-stats">
-          <span class="stat green">✓ {{leadsResult.imported}} zaimportowanych</span>
-          <span class="stat gray">⤳ {{leadsResult.skipped}} pominiętych</span>
-          <span class="stat red" *ngIf="leadsResult.errors_count">✗ {{leadsResult.errors_count}} błędów</span>
-          <span class="stat muted">Razem: {{leadsResult.rows_total}}</span>
+          <span class="stat green">✓ {{ t('csvImport.result.imported', { count: leadsResult.imported }) }}</span>
+          <span class="stat gray">⤳ {{ t('csvImport.result.skipped', { count: leadsResult.skipped }) }}</span>
+          <span class="stat red" *ngIf="leadsResult.errors_count">✗ {{ t('csvImport.result.errors', { count: leadsResult.errors_count }) }}</span>
+          <span class="stat muted">{{ t('csvImport.result.total', { count: leadsResult.rows_total }) }}</span>
         </div>
         <table class="errors-table" *ngIf="leadsResult.errors.length">
-          <thead><tr><th>Wiersz</th><th>Firma</th><th>Pole</th><th>Błąd</th></tr></thead>
+          <thead><tr><th>{{ t('csvImport.errorsTable.row') }}</th><th>{{ t('csvImport.errorsTable.company') }}</th><th>{{ t('csvImport.errorsTable.field') }}</th><th>{{ t('csvImport.errorsTable.error') }}</th></tr></thead>
           <tbody>
             <tr *ngFor="let e of leadsResult.errors">
               <td>{{e.row}}</td><td>{{e.company || '—'}}</td>
@@ -77,7 +80,7 @@ import { ToastService } from '../../../core/services/toast.service';
     <!-- Partners -->
     <div class="import-card">
       <div class="card-icon">🤝</div>
-      <h2>Partnerzy</h2>
+      <h2>{{ t('csvImport.cards.partners.title') }}</h2>
       <div class="field-list">
         <span class="required">company*</span>
         <span class="key">partner_number</span>
@@ -97,11 +100,11 @@ import { ToastService } from '../../../core/services/toast.service';
         <span title="nie_dotyczy|segmenty|rezerwacje|progi_obrotowe" class="hint">commission_basis 🔤</span>
         <span>agent_name</span><span>agent_email</span><span>agent_phone</span>
       </div>
-      <div class="field-hint">🔤 = wartości słownikowe (hover aby zobaczyć) · <strong>partner_number</strong>: klucz łączący z danymi sprzedażowymi · <strong>tags</strong>: oddzielone <code>|</code></div>
+      <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValuesHover') }} · <strong>partner_number</strong>: {{ t('csvImport.hints.partnerNumber') }} · <strong>tags</strong>: {{ t('csvImport.hints.tagsSeparator') }} <code>|</code></div>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="downloadTemplate('partners')">⬇ Pobierz szablon</button>
+        <button class="btn-outline" (click)="downloadTemplate('partners')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
         <button class="btn-outline btn-export" (click)="exportData('partners')" [disabled]="exportingType==='partners'">
-          {{ exportingType==='partners' ? '⏳…' : '📤 Eksportuj dane' }}
+          {{ exportingType==='partners' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
         </button>
       </div>
       <div class="drop-zone"
@@ -112,18 +115,18 @@ import { ToastService } from '../../../core/services/toast.service';
            (drop)="onDrop($event, 'partners')"
            (click)="partnersInput.click()">
         <input #partnersInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'partners')">
-        <span *ngIf="!uploadingPartners">📂 Przeciągnij plik CSV lub kliknij</span>
-        <span *ngIf="uploadingPartners">⏳ Importowanie…</span>
+        <span *ngIf="!uploadingPartners">📂 {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingPartners">⏳ {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="partnersResult" class="result-panel">
         <div class="result-stats">
-          <span class="stat green">✓ {{partnersResult.imported}} zaimportowanych</span>
-          <span class="stat gray">⤳ {{partnersResult.skipped}} pominiętych</span>
-          <span class="stat red" *ngIf="partnersResult.errors_count">✗ {{partnersResult.errors_count}} błędów</span>
-          <span class="stat muted">Razem: {{partnersResult.rows_total}}</span>
+          <span class="stat green">✓ {{ t('csvImport.result.imported', { count: partnersResult.imported }) }}</span>
+          <span class="stat gray">⤳ {{ t('csvImport.result.skipped', { count: partnersResult.skipped }) }}</span>
+          <span class="stat red" *ngIf="partnersResult.errors_count">✗ {{ t('csvImport.result.errors', { count: partnersResult.errors_count }) }}</span>
+          <span class="stat muted">{{ t('csvImport.result.total', { count: partnersResult.rows_total }) }}</span>
         </div>
         <table class="errors-table" *ngIf="partnersResult.errors.length">
-          <thead><tr><th>Wiersz</th><th>Firma</th><th>Pole</th><th>Błąd</th></tr></thead>
+          <thead><tr><th>{{ t('csvImport.errorsTable.row') }}</th><th>{{ t('csvImport.errorsTable.company') }}</th><th>{{ t('csvImport.errorsTable.field') }}</th><th>{{ t('csvImport.errorsTable.error') }}</th></tr></thead>
           <tbody>
             <tr *ngFor="let e of partnersResult.errors">
               <td>{{e.row}}</td><td>{{e.company || '—'}}</td>
@@ -137,22 +140,22 @@ import { ToastService } from '../../../core/services/toast.service';
     <!-- Dokumenty -->
     <div class="import-card">
       <div class="card-icon">📄</div>
-      <h2>Dokumenty (metadane)</h2>
-      <p class="card-desc">Import metadanych dokumentów. Pliki fizyczne należy dodać ręcznie po imporcie. Numer dokumentu jest generowany automatycznie.</p>
+      <h2>{{ t('csvImport.cards.documents.title') }}</h2>
+      <p class="card-desc">{{ t('csvImport.cards.documents.description') }}</p>
       <div class="field-list">
         <span class="required">name*</span>
         <span title="partner_agreement|nda|it_supplier_agreement|employee_agreement" class="hint">doc_type 🔤</span>
         <span title="no_gdpr|data_processing_entrustment|data_administration" class="hint">gdpr_type 🔤</span>
         <span title="new|being_edited|being_approved|being_signed|signed|completed|rejected" class="hint">status 🔤</span>
-        <span title="Accounting|HR|Marketing|Obsługa Klienta|Operations|Sprzedaz|Zarzad" class="hint">group_name 🔤</span>
+        <span [title]="t('csvImport.dictionaries.documentGroups')" class="hint">group_name 🔤</span>
         <span>entity_1</span><span>entity_2</span>
         <span>creation_date</span><span>signing_date</span><span>expiration_date</span>
       </div>
-      <div class="field-hint">🔤 = wartości słownikowe · <strong>entities</strong>: podmioty oddzielone <code>|</code> (np. "Firma ABC|Jan Kowalski") · <strong>group_name</strong>: nazwa grupy dokumentowej</div>
+      <div class="field-hint">🔤 = {{ t('csvImport.hints.dictionaryValues') }} · <strong>entities</strong>: {{ t('csvImport.hints.entitiesSeparator') }} <code>|</code> ({{ t('csvImport.hints.example') }} "{{ t('csvImport.hints.entitiesExample') }}") · <strong>group_name</strong>: {{ t('csvImport.hints.documentGroupName') }}</div>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="downloadTemplate('documents')">⬇ Pobierz szablon</button>
+        <button class="btn-outline" (click)="downloadTemplate('documents')">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
         <button class="btn-outline btn-export" (click)="exportData('documents')" [disabled]="exportingType==='documents'">
-          {{ exportingType==='documents' ? '⏳…' : '📤 Eksportuj dane' }}
+          {{ exportingType==='documents' ? '⏳…' : '📤 ' + t('csvImport.actions.exportData') }}
         </button>
       </div>
       <div class="drop-zone"
@@ -163,18 +166,18 @@ import { ToastService } from '../../../core/services/toast.service';
            (drop)="onDrop($event, 'documents')"
            (click)="docsInput.click()">
         <input #docsInput type="file" accept=".csv,.txt" hidden (change)="onFileChange($event, 'documents')">
-        <span *ngIf="!uploadingDocs">📂 Przeciągnij plik CSV lub kliknij</span>
-        <span *ngIf="uploadingDocs">⏳ Importowanie…</span>
+        <span *ngIf="!uploadingDocs">📂 {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingDocs">⏳ {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="docsResult" class="result-panel">
         <div class="result-stats">
-          <span class="stat green">✓ {{docsResult.imported}} zaimportowanych</span>
-          <span class="stat gray">⤳ {{docsResult.skipped}} pominiętych</span>
-          <span class="stat red" *ngIf="docsResult.errors_count">✗ {{docsResult.errors_count}} błędów</span>
-          <span class="stat muted">Razem: {{docsResult.rows_total}}</span>
+          <span class="stat green">✓ {{ t('csvImport.result.imported', { count: docsResult.imported }) }}</span>
+          <span class="stat gray">⤳ {{ t('csvImport.result.skipped', { count: docsResult.skipped }) }}</span>
+          <span class="stat red" *ngIf="docsResult.errors_count">✗ {{ t('csvImport.result.errors', { count: docsResult.errors_count }) }}</span>
+          <span class="stat muted">{{ t('csvImport.result.total', { count: docsResult.rows_total }) }}</span>
         </div>
         <table class="errors-table" *ngIf="docsResult.errors.length">
-          <thead><tr><th>Wiersz</th><th>Nazwa</th><th>Pole</th><th>Błąd</th></tr></thead>
+          <thead><tr><th>{{ t('csvImport.errorsTable.row') }}</th><th>{{ t('csvImport.errorsTable.name') }}</th><th>{{ t('csvImport.errorsTable.field') }}</th><th>{{ t('csvImport.errorsTable.error') }}</th></tr></thead>
           <tbody>
             <tr *ngFor="let e of docsResult.errors">
               <td>{{e.row}}</td><td>{{e.company || '—'}}</td>
@@ -188,8 +191,8 @@ import { ToastService } from '../../../core/services/toast.service';
     <!-- Dane sprzedażowe -->
     <div class="import-card">
       <div class="card-icon">📊</div>
-      <h2>Dane sprzedażowe</h2>
-      <p class="card-desc">Dane row-level z zewnętrznego systemu sprzedaży na poziomie Partner × Produkt × Miesiąc. Powiązanie z handlowcem realizowane automatycznie przez CRM (opiekun partnera).</p>
+      <h2>{{ t('csvImport.cards.sales.title') }}</h2>
+      <p class="card-desc">{{ t('csvImport.cards.sales.description') }}</p>
       <div class="field-list">
         <span class="required">okres*</span>
         <span class="required">numer_partnera*</span>
@@ -204,10 +207,10 @@ import { ToastService } from '../../../core/services/toast.service';
         <span>uwagi</span>
       </div>
       <div class="field-hint">
-        <strong>numer_partnera</strong>: klucz łączący z kartą Partnera w CRM (np. <code>P-0001</code>) &nbsp;·&nbsp;
-        <strong>produkt</strong>: hotel | transport_flight | car_rental | transfer | visa | inne…
+        <strong>numer_partnera</strong>: {{ t('csvImport.hints.salesPartnerNumber') }} ({{ t('csvImport.hints.example') }} <code>P-0001</code>) &nbsp;·&nbsp;
+        <strong>produkt</strong>: hotel | transport_flight | car_rental | transfer | visa | {{ t('csvImport.hints.otherProducts') }}
       </div>
-      <button class="btn-outline" (click)="downloadSalesTemplate()">⬇ Pobierz szablon</button>
+      <button class="btn-outline" (click)="downloadSalesTemplate()">⬇ {{ t('csvImport.actions.downloadTemplate') }}</button>
       <div class="drop-zone"
            [class.drag-over]="isDraggingSales"
            [class.uploading]="uploadingSales"
@@ -216,18 +219,18 @@ import { ToastService } from '../../../core/services/toast.service';
            (drop)="onDropSales($event)"
            (click)="salesInput.click()">
         <input #salesInput type="file" accept=".csv,.txt" hidden (change)="onSalesFileChange($event)">
-        <span *ngIf="!uploadingSales">📂 Przeciągnij plik CSV lub kliknij</span>
-        <span *ngIf="uploadingSales">⏳ Importowanie…</span>
+        <span *ngIf="!uploadingSales">📂 {{ t('csvImport.dropZone.prompt') }}</span>
+        <span *ngIf="uploadingSales">⏳ {{ t('csvImport.dropZone.importing') }}</span>
       </div>
       <div *ngIf="salesResult" class="result-panel">
         <div class="result-stats">
-          <span class="stat green">✓ {{salesResult.rows_imported}} zaimportowanych</span>
-          <span class="stat gray">⤳ {{salesResult.rows_skipped}} pominiętych</span>
-          <span class="stat red" *ngIf="salesResult.rows_error">✗ {{salesResult.rows_error}} błędów</span>
-          <span class="stat muted">Razem: {{salesResult.rows_total}}</span>
+          <span class="stat green">✓ {{ t('csvImport.result.imported', { count: salesResult.rows_imported }) }}</span>
+          <span class="stat gray">⤳ {{ t('csvImport.result.skipped', { count: salesResult.rows_skipped }) }}</span>
+          <span class="stat red" *ngIf="salesResult.rows_error">✗ {{ t('csvImport.result.errors', { count: salesResult.rows_error }) }}</span>
+          <span class="stat muted">{{ t('csvImport.result.total', { count: salesResult.rows_total }) }}</span>
         </div>
         <table class="errors-table" *ngIf="salesResult.errors.length">
-          <thead><tr><th>Wiersz</th><th>Błąd</th></tr></thead>
+          <thead><tr><th>{{ t('csvImport.errorsTable.row') }}</th><th>{{ t('csvImport.errorsTable.error') }}</th></tr></thead>
           <tbody>
             <tr *ngFor="let e of salesResult.errors">
               <td>{{e.line}}</td><td class="err-msg">{{e.reason}}</td>
@@ -240,10 +243,10 @@ import { ToastService } from '../../../core/services/toast.service';
 
   <!-- Import history -->
   <div class="history-section">
-    <h3>Historia importów</h3>
+    <h3>{{ t('csvImport.history.title') }}</h3>
     <table class="history-table" *ngIf="logs.length; else noLogs">
       <thead>
-        <tr><th>Typ</th><th>Plik</th><th>Zaimportowano</th><th>Błędy</th><th>Status</th><th>Przez</th><th>Data</th></tr>
+        <tr><th>{{ t('csvImport.history.type') }}</th><th>{{ t('csvImport.history.file') }}</th><th>{{ t('csvImport.history.imported') }}</th><th>{{ t('csvImport.history.errors') }}</th><th>{{ t('csvImport.history.status') }}</th><th>{{ t('csvImport.history.importedBy') }}</th><th>{{ t('csvImport.history.date') }}</th></tr>
       </thead>
       <tbody>
         <tr *ngFor="let log of logs">
@@ -260,9 +263,10 @@ import { ToastService } from '../../../core/services/toast.service';
         </tr>
       </tbody>
     </table>
-    <ng-template #noLogs><div class="empty">Brak historii importów.</div></ng-template>
+    <ng-template #noLogs><div class="empty">{{ t('csvImport.history.empty') }}</div></ng-template>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
     .import-page { padding:20px; max-width:1100px; height:100%; overflow-y:auto; box-sizing:border-box; }
@@ -327,6 +331,7 @@ export class CrmImportComponent implements OnInit {
   private zone = inject(NgZone);
   private cdr  = inject(ChangeDetectorRef);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   leadsResult:    ImportResult | null = null;
   partnersResult: ImportResult | null = null;
@@ -350,11 +355,11 @@ export class CrmImportComponent implements OnInit {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `szablon_${type}.csv`;
+        a.download = this.transloco.translate('crm.csvImport.files.template', { type });
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => this.toast.error('Nie udało się pobrać szablonu.'),
+      error: () => this.toast.error(this.transloco.translate('crm.csvImport.messages.templateDownloadFailed')),
     });
   }
 
@@ -377,7 +382,7 @@ export class CrmImportComponent implements OnInit {
         this.exportingType = '';
         this.cdr.markForCheck();
       },
-      error: () => { this.exportingType = ''; this.toast.error('Nie udało się wyeksportować danych.'); this.cdr.markForCheck(); },
+      error: () => { this.exportingType = ''; this.toast.error(this.transloco.translate('crm.csvImport.messages.exportFailed')); this.cdr.markForCheck(); },
     });
   }
 
@@ -389,11 +394,11 @@ export class CrmImportComponent implements OnInit {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'szablon_dane_sprzedazowe.csv';
+        a.download = this.transloco.translate('crm.csvImport.files.salesTemplate');
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => this.toast.error('Nie udało się pobrać szablonu.'),
+      error: () => this.toast.error(this.transloco.translate('crm.csvImport.messages.templateDownloadFailed')),
     });
   }
 
@@ -452,7 +457,7 @@ export class CrmImportComponent implements OnInit {
         next: (r: any) => this.zone.run(() => { this.uploadingDocs = false; this.docsResult = r; this.loadLogs(); this.cdr.markForCheck(); }),
         error: (err: any) => this.zone.run(() => {
           this.uploadingDocs = false;
-          this.docsResult = { import_id: 0, filename: file.name, rows_total: 0, imported: 0, skipped: 0, errors_count: 1, errors: [{ row: 0, error: err?.error?.error || 'Błąd serwera' }] } as any;
+          this.docsResult = { import_id: 0, filename: file.name, rows_total: 0, imported: 0, skipped: 0, errors_count: 1, errors: [{ row: 0, error: err?.error?.error || this.transloco.translate('crm.csvImport.messages.serverError') }] } as any;
           this.cdr.markForCheck();
         }),
       });
@@ -461,7 +466,7 @@ export class CrmImportComponent implements OnInit {
 
   uploadSalesFile(file: File) {
     if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
-      this.toast.error('Wybierz plik w formacie CSV.');
+      this.toast.error(this.transloco.translate('crm.csvImport.messages.csvRequired'));
       return;
     }
     this.uploadingSales  = true;
@@ -476,7 +481,7 @@ export class CrmImportComponent implements OnInit {
       }),
       error: err => this.zone.run(() => {
         this.uploadingSales = false;
-        this.salesResult    = { rows_total: 0, rows_imported: 0, rows_skipped: 0, rows_error: 1, errors: [{ line: 0, reason: err?.error?.error || 'Błąd serwera' }] };
+        this.salesResult    = { rows_total: 0, rows_imported: 0, rows_skipped: 0, rows_error: 1, errors: [{ line: 0, reason: err?.error?.error || this.transloco.translate('crm.csvImport.messages.serverError') }] };
         this.cdr.markForCheck();
       }),
     });

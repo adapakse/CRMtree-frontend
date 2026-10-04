@@ -7,13 +7,13 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
   CrmApiService, AnalyticsPeriod, PartnersAnalytics, CrmUser,
-  PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS,
+  PRODUCT_TYPE_ICONS,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PeriodFilterComponent, PeriodChangeEvent } from '../../../shared/components/period-filter/period-filter.component';
 import { getPresetDates } from '../../../shared/utils/period-dates';
-
-const MONTH_NAMES_PL = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../../core/i18n/locale.service';
 
 type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 
@@ -21,14 +21,16 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   selector: 'crm-partners-analytics',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, PeriodFilterComponent],
+  imports: [CommonModule, FormsModule, RouterModule, PeriodFilterComponent, TranslocoDirective],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
 <div style="min-height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:8px 24px;flex-shrink:0">
   <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">
-    Dashboard Analityczny — Partnerzy
+    {{ t('reports.partnerAnalytics.title') }}
   </span>
   <span style="flex:1"></span>
 
@@ -42,13 +44,13 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     <button class="mode-btn"
             [class.mode-active]="selectedYears.length===0"
             (click)="clearYears()">
-      Filtr
+      {{ t('reports.partnerAnalytics.filterMode') }}
     </button>
   </div>
 
   <div style="display:flex;background:#f4f4f5;border-radius:8px;padding:2px;gap:2px">
     <button *ngFor="let m of modes" [class.mode-active]="mode===m.v" class="mode-btn" (click)="setMode(m.v)">
-      {{m.l}}
+      {{ t('reports.partnerAnalytics.modes.' + m.v) }}
     </button>
   </div>
 
@@ -56,35 +58,35 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
                  (periodChange)="onPeriodChange($event)"></period-filter>
 
   <select *ngIf="isManager" class="sel" [(ngModel)]="repId" (ngModelChange)="load()">
-    <option value="">Wszyscy handlowcy</option>
+    <option value="">{{ t('partnersList.toolbar.allSalesReps') }}</option>
     <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
   </select>
 
-  <button class="btn-refresh" (click)="load()">{{loading ? '…' : '↻ Odśwież'}}</button>
+  <button class="btn-refresh" (click)="load()">{{loading ? '…' : '↻ ' + t('reports.partnerAnalytics.refresh')}}</button>
 </div>
 
 <!-- PERIOD BAR -->
 <div style="background:white;border-bottom:1px solid #e4e4e7;padding:8px 24px;display:flex;align-items:center;gap:10px;flex-shrink:0">
   <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600">
     <span style="width:10px;height:10px;border-radius:50%;background:#3BAA5D;display:inline-block"></span>
-    Okres A: <span style="color:#3BAA5D">{{labelA}}</span>
+    {{ t('reports.partnerAnalytics.period.a') }} <span style="color:#3BAA5D">{{labelA}}</span>
   </span>
   <span style="font-size:11px;font-weight:700;color:#a1a1aa;padding:2px 8px;background:#f4f4f5;border-radius:6px">VS</span>
   <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600">
     <span style="width:10px;height:10px;border-radius:50%;background:#3b82f6;display:inline-block"></span>
-    Okres B: <span style="color:#3b82f6">{{labelB || '—'}}</span>
+    {{ t('reports.partnerAnalytics.period.b') }} <span style="color:#3b82f6">{{labelB || '—'}}</span>
   </span>
 
   <ng-container *ngIf="mode==='custom'">
-    <span style="font-size:11px;color:#a1a1aa;margin-left:8px">Własny Okres B:</span>
+    <span style="font-size:11px;color:#a1a1aa;margin-left:8px">{{ t('reports.partnerAnalytics.period.customB') }}</span>
     <input type="month" class="sel" [(ngModel)]="customFromB" style="width:140px" (change)="onCustomB()">
-    <span style="font-size:11px;color:#a1a1aa">do</span>
+    <span style="font-size:11px;color:#a1a1aa">{{ t('reports.partnerAnalytics.period.to') }}</span>
     <input type="month" class="sel" [(ngModel)]="customToB"   style="width:140px" (change)="onCustomB()">
   </ng-container>
 
   <span style="flex:1"></span>
   <span *ngIf="data" style="font-size:11px;color:#a1a1aa">
-    {{data.a.kpi.partners_count}} partnerów · {{data.a.kpi.transactions_count | number}} produktów
+    {{ t('reports.partnerAnalytics.period.summary', { partners: +data.a.kpi.partners_count, products: +data.a.kpi.transactions_count }) }}
   </span>
 </div>
 
@@ -95,7 +97,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 
   <div *ngIf="!loading && !data" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
     <div style="font-size:48px;margin-bottom:12px">📊</div>
-    <div style="font-size:15px;font-weight:600">Brak danych dla wybranego okresu</div>
+    <div style="font-size:15px;font-weight:600">{{ t('reports.partnerAnalytics.emptyPeriod') }}</div>
   </div>
 
   <ng-container *ngIf="data">
@@ -104,7 +106,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
 
     <div class="kpi-card">
-      <div class="kpi-lbl">Obrót Brutto (PLN)</div>
+      <div class="kpi-lbl">{{ t('reports.partnerAnalytics.kpi.grossTurnoverPln') }}</div>
       <div class="kpi-val">{{data.a.kpi.gross_turnover_pln | number:'1.0-0'}}</div>
       <div *ngIf="data.b" class="kpi-compare">
         <span class="kpi-b">{{labelB}}: {{data.b.kpi.gross_turnover_pln | number:'1.0-0'}}</span>
@@ -117,7 +119,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     </div>
 
     <div class="kpi-card">
-      <div class="kpi-lbl">Obrót Netto (PLN)</div>
+      <div class="kpi-lbl">{{ t('reports.partnerAnalytics.kpi.netTurnoverPln') }}</div>
       <div class="kpi-val">{{data.a.kpi.net_turnover_pln | number:'1.0-0'}}</div>
       <div *ngIf="data.b" class="kpi-compare">
         <span class="kpi-b">{{labelB}}: {{data.b.kpi.net_turnover_pln | number:'1.0-0'}}</span>
@@ -130,7 +132,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     </div>
 
     <div class="kpi-card">
-      <div class="kpi-lbl">Marża</div>
+      <div class="kpi-lbl">{{ t('reports.partnerAnalytics.kpi.margin') }}</div>
       <div class="kpi-val">{{data.a.kpi.margin_pct || 0 | number:'1.1-1'}}%</div>
       <div *ngIf="data.b" class="kpi-compare">
         <span class="kpi-b">{{labelB}}: {{data.b.kpi.margin_pct || 0 | number:'1.1-1'}}%</span>
@@ -144,7 +146,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     </div>
 
     <div class="kpi-card">
-      <div class="kpi-lbl">Ilość Produktów</div>
+      <div class="kpi-lbl">{{ t('reports.partnerAnalytics.kpi.productsCount') }}</div>
       <div class="kpi-val">{{data.a.kpi.transactions_count | number}}</div>
       <div *ngIf="data.b" class="kpi-compare">
         <span class="kpi-b">{{labelB}}: {{data.b.kpi.transactions_count | number}}</span>
@@ -162,11 +164,11 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 
     <div class="card" style="padding:18px 20px">
       <div class="card-title">
-        <span>Trend miesięczny — {{trendMetricLabel}}</span>
+        <span>{{ t('reports.partnerAnalytics.trend.title', { metric: trendMetricLabel }) }}</span>
         <div style="display:flex;align-items:center;gap:12px">
           <select class="sel" [(ngModel)]="trendMetric" (ngModelChange)="onTrendMetricChange()"
                   style="font-size:11px;padding:3px 7px;border-radius:6px;font-weight:400">
-            <option *ngFor="let m of trendMetrics" [value]="m.v">{{m.l}}</option>
+            <option *ngFor="let m of trendMetrics" [value]="m.v">{{ t('reports.partnerAnalytics.trendMetrics.' + m.v) }}</option>
           </select>
           <div style="display:flex;gap:12px;font-size:11px">
             <span style="display:flex;align-items:center;gap:4px">
@@ -185,7 +187,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     </div>
 
     <div class="card" style="padding:18px 20px">
-      <div class="card-title">Struktura wg Produktu</div>
+      <div class="card-title">{{ t('reports.partnerAnalytics.byProduct.title') }}</div>
       <div #byProductEl style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
   </div>
@@ -193,25 +195,25 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   <!-- ROW 3: Tabela handlowców (manager only) -->
   <div class="card" style="padding:18px 20px;margin-bottom:16px" *ngIf="isManager && data.a.by_rep.length">
     <div class="card-title">
-      Wyniki wg Handlowca
-      <span class="card-subtitle">Okres A vs Okres B</span>
+      {{ t('reports.partnerAnalytics.reps.title') }}
+      <span class="card-subtitle">{{ t('reports.partnerAnalytics.reps.subtitle') }}</span>
     </div>
     <div style="overflow-x:auto">
     <table>
       <thead>
         <tr>
-          <th>Handlowiec</th>
-          <th class="r">Part.</th>
-          <th class="r">Brutto A</th>
-          <th class="r" *ngIf="data.b">Brutto B</th>
-          <th class="r" *ngIf="data.b">Δ Brutto</th>
-          <th class="r">Netto A</th>
-          <th class="r" *ngIf="data.b">Netto B</th>
-          <th class="r">Marża A</th>
-          <th class="r" *ngIf="data.b">Marża B</th>
-          <th class="r">Prod. A</th>
-          <th class="r" *ngIf="data.b">Prod. B</th>
-          <th class="r" *ngIf="data.b">Δ Prod.</th>
+          <th>{{ t('partnersList.fields.salesRep') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.partnersShort') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.grossA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.grossB') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.grossDelta') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.netA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.netB') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.marginA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.marginB') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.productsA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.productsB') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.productsDelta') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -221,7 +223,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
               <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;background:#9ca3af;flex-shrink:0">
                 {{initials(r.salesperson_name||'?')}}
               </div>
-              <span style="font-weight:600;white-space:nowrap">{{r.salesperson_name || '— brak —'}}</span>
+              <span style="font-weight:600;white-space:nowrap">{{r.salesperson_name || t('reports.partnerAnalytics.reps.noSalesperson')}}</span>
             </div>
           </td>
           <td class="r num">{{r.partners_count}}</td>
@@ -273,21 +275,21 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       <div class="card-title" style="margin-bottom:0;flex:1;min-width:200px">
-        Partnerzy — Obrót Brutto
+        {{ t('reports.partnerAnalytics.partners.title') }}
         <span class="card-subtitle">{{labelA}}{{data.b ? ' vs ' + labelB : ''}}</span>
       </div>
       <input type="text" class="sel" [(ngModel)]="partnerFilter" (ngModelChange)="onFilterChange()"
-             placeholder="🔍 Szukaj partnera…" style="width:190px;cursor:text">
+             [placeholder]="'🔍 ' + t('reports.partnerAnalytics.partners.searchPlaceholder')" style="width:190px;cursor:text">
       <select class="sel" [(ngModel)]="groupFilter" (ngModelChange)="onFilterChange()" style="min-width:150px">
-        <option value="">Wszystkie Grupy</option>
+        <option value="">{{ t('reports.partnerAnalytics.partners.allGroups') }}</option>
         <option *ngFor="let g of availableGroups" [value]="g">{{g}}</option>
       </select>
       <select class="sel" [(ngModel)]="industryFilter" (ngModelChange)="onFilterChange()" style="min-width:150px">
-        <option value="">Wszystkie Branże</option>
+        <option value="">{{ t('reports.partnerAnalytics.partners.allIndustries') }}</option>
         <option *ngFor="let ind of availableIndustries" [value]="ind">{{ind}}</option>
       </select>
       <span style="font-size:11px;color:#a1a1aa;white-space:nowrap">
-        {{filteredPartners.length}} partnerów
+        {{ t('reports.partnerAnalytics.partners.count', { count: filteredPartners.length }) }}
       </span>
     </div>
 
@@ -296,19 +298,19 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
       <thead>
         <tr>
           <th>#</th>
-          <th>Partner</th>
-          <th>Segment</th>
-          <th>Handlowiec</th>
-          <th class="r">Prod. A</th>
-          <th class="r" *ngIf="data.b">Prod. B</th>
-          <th class="r" *ngIf="data.b">Δ Prod.</th>
-          <th class="r">Brutto A</th>
-          <th class="r" *ngIf="data.b">Brutto B</th>
-          <th class="r" *ngIf="data.b">Δ Brutto</th>
-          <th class="r">Netto A</th>
-          <th class="r" *ngIf="data.b">Netto B</th>
-          <th class="r">Marża A</th>
-          <th class="r" *ngIf="data.b">Marża B</th>
+          <th>{{ t('reports.partnerAnalytics.columns.partner') }}</th>
+          <th>{{ t('reports.partnerAnalytics.columns.segment') }}</th>
+          <th>{{ t('partnersList.fields.salesRep') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.productsA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.productsB') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.productsDelta') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.grossA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.grossB') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.grossDelta') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.netA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.netB') }}</th>
+          <th class="r">{{ t('reports.partnerAnalytics.columns.marginA') }}</th>
+          <th class="r" *ngIf="data.b">{{ t('reports.partnerAnalytics.columns.marginB') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -361,7 +363,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
           </td>
         </tr>
         <tr *ngIf="!filteredPartners.length">
-          <td [attr.colspan]="data.b ? 14 : 8" style="text-align:center;padding:20px;color:#a1a1aa">Brak danych</td>
+          <td [attr.colspan]="data.b ? 14 : 8" style="text-align:center;padding:20px;color:#a1a1aa">{{ t('reports.partnerAnalytics.noData') }}</td>
         </tr>
       </tbody>
     </table>
@@ -370,7 +372,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     <div *ngIf="filteredPartners.length > displayLimit"
          style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid #f4f4f5">
       <button class="btn-more" (click)="showMore()">
-        Pokaż więcej ({{filteredPartners.length - displayLimit}} pozostało)
+        {{ t('reports.partnerAnalytics.partners.showMore', { count: filteredPartners.length - displayLimit }) }}
       </button>
     </div>
 
@@ -379,6 +381,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   </ng-container>
 </div>
 </div>
+</ng-container>
   `,
   styles: [`
     .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
@@ -424,6 +427,8 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
   private auth = inject(AuthService);
   private cdr  = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
+  private transloco = inject(TranslocoService);
+  private localeService = inject(LocaleService);
 
   loading      = false;
   mode: CompareMode = 'yoy';
@@ -447,10 +452,10 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
 
   trendMetric: 'gross' | 'net' | 'margin' | 'count' = 'gross';
   readonly trendMetrics = [
-    { v: 'gross'  as const, l: 'Obrót brutto'     },
-    { v: 'net'    as const, l: 'Obrót netto'       },
-    { v: 'margin' as const, l: 'Marża (wartość)'   },
-    { v: 'count'  as const, l: 'Ilość transakcji'  },
+    { v: 'gross'  as const },
+    { v: 'net'    as const },
+    { v: 'margin' as const },
+    { v: 'count'  as const },
   ];
 
   partnerFilter   = '';
@@ -462,10 +467,10 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
   private chartsBuilt = false;
 
   readonly modes = [
-    { v: 'yoy' as CompareMode, l: 'YoY' },
-    { v: 'qoq' as CompareMode, l: 'QoQ' },
-    { v: 'mom' as CompareMode, l: 'MoM' },
-    { v: 'custom' as CompareMode, l: 'Własny' },
+    { v: 'yoy' as CompareMode },
+    { v: 'qoq' as CompareMode },
+    { v: 'mom' as CompareMode },
+    { v: 'custom' as CompareMode },
   ];
 
   get filteredPartners() {
@@ -512,7 +517,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
   }
 
   get trendMetricLabel(): string {
-    return this.trendMetrics.find(m => m.v === this.trendMetric)?.l ?? 'Obrót brutto';
+    return this.transloco.translate('crm.reports.partnerAnalytics.trendMetrics.' + this.trendMetric);
   }
 
   onTrendMetricChange(): void {
@@ -533,7 +538,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
     const [fY, fM] = from.split('-').map(Number);
     const [tY, tM] = to.split('-').map(Number);
     const months = (tY - fY) * 12 + (tM - fM) + 1;
-    if (months === 1) return `${MONTH_NAMES_PL[fM - 1]} ${fY}`;
+    if (months === 1) return `${this.shortMonthName(fM)} ${fY}`;
     if (months === 3 && fY === tY && Math.ceil(fM / 3) === Math.ceil(tM / 3) && (Math.ceil(fM / 3) - 1) * 3 + 1 === fM) {
       return `Q${Math.ceil(fM / 3)} ${fY}`;
     }
@@ -541,6 +546,11 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
     if (months === 6  && fY === tY) return `H${fM <= 6 ? 1 : 2} ${fY}`;
     if (fM === 1 && fY === tY) return `${fY} YTD`;
     return `${from} – ${to}`;
+  }
+
+  private shortMonthName(month: number): string {
+    const name = new Date(2000, month - 1, 1).toLocaleDateString(this.localeService.activeLocale(), { month: 'short' });
+    return name.charAt(0).toUpperCase() + name.slice(1);
   }
 
   private shiftMonth(y: number, m: number, delta: number): { y: number; m: number } {
@@ -583,8 +593,9 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
 
   fmtDeltaPp(a: number, b: number): string {
     const d = +(a - b).toFixed(1);
-    if (d === 0) return '= 0 pp';
-    return (d > 0 ? '↑' : '↓') + ' ' + Math.abs(d) + ' pp';
+    const points = this.transloco.translate('crm.reports.partnerAnalytics.percentagePoints', { value: Math.abs(d) });
+    if (d === 0) return '= ' + points;
+    return (d > 0 ? '↑' : '↓') + ' ' + points;
   }
 
   getRepB(salesperson_id: string | null) {
@@ -739,7 +750,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
   private metricTooltip(row: any): string {
     const v = this.metricValue(row);
     switch (this.trendMetric) {
-      case 'count':  return `${row.period}: ${v.toLocaleString('pl-PL')} szt.`;
+      case 'count':  return this.transloco.translate('crm.reports.partnerAnalytics.trend.countTooltip', { period: row.period, count: v.toLocaleString(this.localeService.activeLocale()) });
       default:       return `${row.period}: ${(v / 1000).toFixed(1)}k PLN`;
     }
   }
@@ -818,8 +829,8 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
       const lbl = document.createElement('div');
       lbl.style.cssText = 'flex:1;text-align:center;font-size:10.5px;color:#a1a1aa';
       lbl.textContent = rowA
-        ? MONTH_NAMES_PL[parseInt(rowA.period.substring(5, 7)) - 1]
-        : (rowB ? MONTH_NAMES_PL[parseInt(rowB.period.substring(5, 7)) - 1] : '');
+        ? this.shortMonthName(parseInt(rowA.period.substring(5, 7)))
+        : (rowB ? this.shortMonthName(parseInt(rowB.period.substring(5, 7))) : '');
       labels.appendChild(lbl);
     }
   }
@@ -831,7 +842,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
 
     const products = this.data.a.by_product.slice(0, 7);
     if (!products.length) {
-      el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">Brak danych</div>';
+      el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">' + this.transloco.translate('crm.reports.partnerAnalytics.noData') + '</div>';
       return;
     }
     const maxVal = Math.max(...products.map(p => +p.gross_turnover_pln), 1);
@@ -840,7 +851,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
       const pctA  = Math.round(+p.gross_turnover_pln / maxVal * 100);
       const bRow  = this.data!.b?.by_product.find(b => b.product_type === p.product_type);
       const icon  = (PRODUCT_TYPE_ICONS as any)[p.product_type] || '📦';
-      const label = (PRODUCT_TYPE_LABELS as any)[p.product_type] || p.product_type;
+      const label = p.product_type in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + p.product_type) : p.product_type;
       const row = document.createElement('div');
       row.style.marginBottom = '8px';
       const delta = bRow ? +p.gross_turnover_pln - +bRow.gross_turnover_pln : null;

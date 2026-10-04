@@ -65,6 +65,77 @@
       "tasks": "Sarcini"
     }
   },
+  "calendar": {
+    "allDay": "termen",
+    "breadcrumb": "Calendar",
+    "durationMinutes": "{minutes} min",
+    "filters": {
+      "allPriorities": "Toate prioritățile",
+      "allReps": "Toți agenții de vânzări",
+      "allTypes": "Toate tipurile",
+      "groupsGroup": "Grupuri",
+      "repsGroup": "Agenți de vânzări",
+      "showClosed": "afișare închise",
+      "showNoDate": "afișare fără dată"
+    },
+    "meeting": {
+      "duration": "Durată",
+      "locationPlaceholder": "Sala A, București",
+      "notes": "Notițe",
+      "participantsPlaceholder": "email1@firma.ro, email2@firma.ro",
+      "salesperson": "Agent de vânzări"
+    },
+    "month": {
+      "more": "+{count} în plus"
+    },
+    "nav": {
+      "today": "Azi"
+    },
+    "tasks": {
+      "bulk": {
+        "closeSelected": "Închidere sarcini selectate",
+        "selectOverdue": "Selectare toate sarcinile cu termen depășit",
+        "selectedCount": "{count, plural, one {# selectată} few {# selectate} other {# de selectate}}"
+      },
+      "close": "Închidere",
+      "count": "{count, plural, one {# activitate} few {# activități} other {# de activități}}",
+      "editMode": "mod de editare",
+      "empty": "Nicio sarcină de afișat.",
+      "form": {
+        "assignTo": "Atribuire către",
+        "descriptionPlaceholder": "Descriere…",
+        "titlePlaceholder": "Titlu…"
+      },
+      "loading": "Se încarcă sarcinile…",
+      "noDate": "fără dată",
+      "readOnly": "doar citire",
+      "reopen": "Redeschidere",
+      "saveFailed": "Modificările sarcinii nu au putut fi salvate"
+    },
+    "title": "Calendarul activităților",
+    "views": {
+      "day": "Zi",
+      "month": "Lună",
+      "tasks": "Sarcini",
+      "week": "Săptămână"
+    }
+  },
+  "callSimulator": {
+    "activity": {
+      "demoTranscript": "[00:00] Agent de vânzări: Bună ziua, sunt Ion Popescu de la CRMtree. Aș putea vorbi cu persoana responsabilă de călătoriile de afaceri?\n\n[00:08] Client: Da, vă ascult. Sunt Andrei Ionescu.\n\n[00:10] Agent de vânzări: Bună ziua, domnule Ionescu. Vă contactez în legătură cu optimizarea costurilor călătoriilor de afaceri din compania dumneavoastră. Aveți un moment?\n\n[00:18] Client: Da, vă rog. Ce anume propuneți?\n\n[00:22] Agent de vânzări: Oferim un sistem complet de gestionare a călătoriilor corporative — rezervări de zboruri, hoteluri și transport într-un singur loc. În medie, clienții noștri economisesc între 15 și 25% din costurile de călătorie.\n\n[00:35] Client: Sună interesant. Câte persoane trebuie să călătorească anual ca să merite?\n\n[00:40] Agent de vânzări: Platforma noastră devine rentabilă începând de la câteva zeci de călătorii pe an. Pot pregăti un calcul personalizat pentru compania dumneavoastră.\n\n[00:49] Client: Bine. Vă rog să trimiteți oferta pe e-mail. Echipa noastră o va analiza.\n\n[00:54] Agent de vânzări: Desigur, o trimit chiar astăzi. Putem stabili și o scurtă prezentare online, pentru a vă arăta sistemul în funcțiune?\n\n[01:02] Client: Da, putem. Voi propune o dată după ce analizăm oferta.\n\n[01:06] Agent de vânzări: Excelent. Vă mulțumesc pentru discuție, pe curând.\n\n[01:09] Client: La revedere.",
+      "summary": "Apel telefonic cu {who} ({seconds}s)",
+      "title": "Convorbire telefonică — {who}",
+      "transcriptHeading": "--- Transcriere ---"
+    },
+    "connected": "Conectat",
+    "connecting": "Se stabilește conexiunea...",
+    "duration": "Durată: {time}",
+    "endCall": "Încheiere convorbire",
+    "ended": "Convorbire încheiată",
+    "hangUp": "Închidere apel",
+    "noteSaved": "Notiță salvată",
+    "savingNote": "Se salvează notița..."
+  },
   "calls": {
     "call": "Apelare",
     "callNumber": "Apelare: {phone}",
@@ -85,6 +156,126 @@
       "granted": "Acord acordat",
       "noData": "Fără date"
     }
+  },
+  "crmDashboard": {
+    "activities": {
+      "title": "Activități recente"
+    },
+    "columns": {
+      "adoption": "Adopție",
+      "days": "Zile",
+      "expires": "Expiră",
+      "opportunities": "Oportunități",
+      "partner": "Partener",
+      "revenue": "Venit"
+    },
+    "kpi": {
+      "activePartners": "Parteneri activi",
+      "avgArrPerPartner": "ARR mediu / partener",
+      "inOnboarding": "În onboarding",
+      "partnerGroups": "Grupuri de parteneri",
+      "totalArr": "ARR total"
+    },
+    "partnerScores": {
+      "title": "Parteneri după rezultate ({period})"
+    },
+    "periods": {
+      "currentYear": "Anul curent",
+      "last12Months": "Ultimele 12 luni",
+      "last30Days": "Ultimele 30 de zile",
+      "last90Days": "Ultimele 90 de zile"
+    },
+    "pipeline": {
+      "empty": "Fără date",
+      "title": "Pipeline leaduri"
+    },
+    "productMix": {
+      "title": "Mix de produse ({period})"
+    },
+    "renewals": {
+      "daysShort": "{days}z",
+      "title": "Reînnoiri apropiate"
+    },
+    "title": "Panou CRM"
+  },
+  "csvImport": {
+    "actions": {
+      "downloadTemplate": "Descărcare șablon",
+      "exportData": "Exportare date"
+    },
+    "cards": {
+      "documents": {
+        "description": "Import de metadate ale documentelor. Fișierele fizice trebuie adăugate manual după import. Numărul documentului este generat automat.",
+        "title": "Documente (metadate)"
+      },
+      "leads": {
+        "title": "Leaduri de vânzări"
+      },
+      "partners": {
+        "title": "Parteneri"
+      },
+      "sales": {
+        "description": "Date la nivel de rând din sistemul extern de vânzări, la nivelul Partener × Produs × Lună. Asocierea cu agentul de vânzări este realizată automat de CRM (responsabilul de cont al partenerului).",
+        "title": "Date de vânzări"
+      }
+    },
+    "dictionaries": {
+      "documentGroups": "Accounting|HR|Marketing|Obsługa Klienta|Operations|Sprzedaz|Zarzad"
+    },
+    "dropZone": {
+      "importing": "Se importă…",
+      "prompt": "Trageți fișierul CSV aici sau faceți clic"
+    },
+    "errorsTable": {
+      "company": "Companie",
+      "error": "Eroare",
+      "field": "Câmp",
+      "name": "Denumire",
+      "row": "Rând"
+    },
+    "files": {
+      "salesTemplate": "sablon_date_vanzari.csv",
+      "template": "sablon_{type}.csv"
+    },
+    "hints": {
+      "agentFields": "doar când source=agent",
+      "dictionaryValues": "valori din dicționar",
+      "dictionaryValuesHover": "valori din dicționar (treceți cu mouse-ul pentru a le vedea)",
+      "dictionaryValuesTooltip": "valori din dicționar — treceți cu mouse-ul peste tooltip pentru a vedea valorile disponibile",
+      "documentGroupName": "denumirea grupului de documente",
+      "entitiesExample": "Firma ABC|Ion Popescu",
+      "entitiesSeparator": "entități separate prin",
+      "example": "de ex.",
+      "otherProducts": "altele…",
+      "partnerNumber": "cheia de legătură cu datele de vânzări",
+      "salesPartnerNumber": "cheia de legătură cu fișa Partenerului din CRM",
+      "tagsSeparator": "separate prin"
+    },
+    "history": {
+      "date": "Data",
+      "empty": "Niciun import în istoric.",
+      "errors": "Erori",
+      "file": "Fișier",
+      "imported": "Importate",
+      "importedBy": "De către",
+      "status": "Status",
+      "title": "Istoricul importurilor",
+      "type": "Tip"
+    },
+    "messages": {
+      "csvRequired": "Selectați un fișier în format CSV.",
+      "exportFailed": "Datele nu au putut fi exportate.",
+      "serverError": "Eroare de server",
+      "templateDownloadFailed": "Șablonul nu a putut fi descărcat."
+    },
+    "result": {
+      "errors": "{count, plural, one {# eroare} few {# erori} other {# de erori}}",
+      "imported": "{count, plural, one {# importat} few {# importate} other {# de importate}}",
+      "skipped": "{count, plural, one {# omis} few {# omise} other {# de omise}}",
+      "total": "Total: {count}"
+    },
+    "subtitle": "Importați în bloc leaduri, parteneri și date de vânzări dintr-un fișier CSV. Descărcați șablonul, completați-l și încărcați-l.",
+    "title": "Import CSV"
   },
   "documents": {
     "add": "Adăugare",
@@ -701,6 +892,82 @@
     "titlePlaceholder": "Titlul întâlnirii",
     "titleRequiredPlaceholder": "Titlul întâlnirii *"
   },
+  "onboardingBoard": {
+    "filters": {
+      "allAssignees": "Toate persoanele atribuite",
+      "allPartners": "Toți partenerii",
+      "searchPlaceholder": "Căutare partener, cod fiscal…"
+    },
+    "launch": {
+      "action": "Lansare",
+      "actionShort": "Lansare",
+      "confirm": "Lansați partenerul „{company}”? Partenerul va trece în statusul Activ și va fi vizibil în Registrul partenerilor.",
+      "failed": "Eroare la lansarea partenerului",
+      "inProgress": "Se lansează…",
+      "moveToRegistry": "Mutare în Registrul partenerilor",
+      "partnerProfile": "Profilul partenerului",
+      "remainingTasks": "{count, plural, one {A rămas # sarcină nefinalizată} few {Au rămas # sarcini nefinalizate} other {Au rămas # de sarcini nefinalizate}}",
+      "successHint": "Partenerul a fost mutat în Registrul partenerilor și este acum activ.",
+      "successTitle": "{company} — lansat!"
+    },
+    "partners": {
+      "empty": "Niciun partener în proces de implementare",
+      "emptyHint": "Partenerii ajung aici după migrarea din lead",
+      "leadData": "Datele leadului",
+      "stepBadge": "Pasul {step}/{total}",
+      "taskProgress": "{done}/{total} sarcini"
+    },
+    "steps": {
+      "configuration": "Configurare",
+      "contractSigning": "Semnarea contractului",
+      "launch": "Lansare",
+      "training": "Instruire"
+    },
+    "table": {
+      "action": "Acțiune",
+      "addedOn": "Adăugat",
+      "step": "Pas",
+      "taskProgress": "Progresul sarcinilor"
+    },
+    "taskForm": {
+      "assignedTo": "Atribuit către",
+      "choosePerson": "— selectați persoana —",
+      "create": "Creare sarcină",
+      "done": "Sarcină finalizată",
+      "dueDate": "Termen",
+      "newTask": "Sarcină nouă",
+      "note": "Notiță",
+      "notePlaceholder": "Informații suplimentare…",
+      "step": "Pasul procesului",
+      "time": "Ora",
+      "timeHint": "(opțional, implicit 09:00)",
+      "title": "Titlul sarcinii",
+      "titlePlaceholder": "Denumirea sarcinii"
+    },
+    "taskTypes": {
+      "call": "Apel"
+    },
+    "tasks": {
+      "delete": "Ștergere sarcină",
+      "empty": "Nicio sarcină"
+    },
+    "timeline": {
+      "empty": "Nicio sarcină cu termen"
+    },
+    "title": "Onboarding parteneri",
+    "toasts": {
+      "taskAdded": "Sarcină adăugată",
+      "taskDeleteFailed": "Eroare la ștergerea sarcinii",
+      "taskDeleted": "Sarcină ștearsă",
+      "taskSaveFailed": "Eroare la salvarea sarcinii",
+      "taskUpdated": "Sarcină actualizată"
+    },
+    "views": {
+      "calendar": "Calendar",
+      "partners": "Parteneri",
+      "timeline": "Cronologie"
+    }
+  },
   "partnerDetail": {
     "activity": {
       "bodyPlaceholder": "Conținut / descriere…",
@@ -950,6 +1217,35 @@
       "partnerAdmin": "Partner Admin"
     }
   },
+  "partnerGroups": {
+    "card": {
+      "morePartners": "+{count} în plus",
+      "partnersNoun": "{count, plural, one {partener} few {parteneri} other {de parteneri}}"
+    },
+    "details": {
+      "empty": "Niciun partener în acest grup.",
+      "manager": "Responsabil de cont:",
+      "partnersInGroup": "Parteneri în grup ({count})",
+      "partnersStat": "Parteneri"
+    },
+    "empty": "Niciun grup de parteneri.",
+    "form": {
+      "create": "Creare",
+      "delete": "Ștergere",
+      "description": "Descriere",
+      "editTitle": "Editare grup",
+      "industry": "Domeniu",
+      "name": "Denumire",
+      "namePlaceholder": "Denumirea grupului"
+    },
+    "messages": {
+      "deleteConfirm": "Ștergeți grupul „{name}”? Partenerii vor fi disociați de acesta.",
+      "deleteFailed": "Grupul nu a putut fi șters",
+      "saveFailed": "Grupul nu a putut fi salvat"
+    },
+    "newGroup": "Grup nou",
+    "title": "Grupuri de parteneri"
+  },
   "partnersList": {
     "card": {
       "marginAmount": "{amount} PLN marjă",
@@ -1030,6 +1326,460 @@
       "table": "Tabel"
     }
   },
+  "periodFilter": {
+    "groups": {
+      "current": "Curente",
+      "custom": "Personalizat",
+      "previous": "Anterioare"
+    },
+    "presets": {
+      "currentMonth": "Luna curentă",
+      "currentQuarter": "Trimestrul curent",
+      "currentYear": "Anul curent (YTD {year})",
+      "customRange": "Interval personalizat…",
+      "previousMonth": "Luna anterioară",
+      "previousQuarter": "Trimestrul anterior",
+      "previousYear": "Anul anterior ({year})"
+    }
+  },
+  "reports": {
+    "common": {
+      "columns": {
+        "leads": "Leaduri",
+        "pipeline": "Pipeline",
+        "progress": "Progres",
+        "winRatePct": "Win%",
+        "won": "Won"
+      },
+      "days": "{count, plural, one {# zi} few {# zile} other {# de zile}}",
+      "exportPdf": "Export PDF",
+      "funnel": {
+        "subtitle": "Număr de leaduri și valoare PLN",
+        "title": "Pâlnie de vânzări"
+      },
+      "kpi": {
+        "activeLeads": "Leaduri active",
+        "avgSalesCycle": "Ciclu de vânzare mediu",
+        "avgWonValue": "Valoare medie câștigată",
+        "winRate": "Win Rate",
+        "wonPln": "Închise / Won (PLN)"
+      },
+      "leadSources": {
+        "title": "Surse de leaduri",
+        "totalCaption": "leaduri",
+        "winRate": "{value}% win rate"
+      },
+      "leadsShort": "{count} lead.",
+      "lostReasons": "Motivele pierderii",
+      "noData": "Fără date",
+      "periods": {
+        "currentMonth": "Luna curentă",
+        "currentQuarter": "Trimestrul curent",
+        "currentYear": "Anul curent (YTD {year})",
+        "last3Months": "Ultimele 3 luni",
+        "last6Months": "Ultimele 6 luni"
+      },
+      "refresh": "Reîmprospătare",
+      "salespeopleResults": "Rezultatele agenților de vânzări",
+      "title": "Rapoarte de vânzări"
+    },
+    "leads": {
+      "activity": {
+        "empty": "Nu există date despre activitate",
+        "sourceAll": "Toate",
+        "sourceLeads": "Leaduri",
+        "sourcePartners": "Parteneri",
+        "title": "Activitatea agenților de vânzări",
+        "types": {
+          "email": "E-mailuri"
+        }
+      },
+      "drilldown": {
+        "funnel": "Pâlnie: {stage}",
+        "lost": "Pierdute: {reason}",
+        "pipelineAll": "Pipeline – toate cele active",
+        "plannedBudget": "Buget planificat – leaduri din perioadă",
+        "plannedInPeriod": "Planificate pentru închidere în perioadă",
+        "source": "Sursă: {source}",
+        "velocity": "Timp în etapă: {stage}",
+        "won": "Închise / Won"
+      },
+      "empty": {
+        "hint": "Adăugați leaduri sau modificați intervalul de date",
+        "title": "Nu există date pentru perioada selectată"
+      },
+      "funnel": {
+        "conversionToWon": "Conversie în Câștigat"
+      },
+      "kpi": {
+        "activeCount": "{count, plural, one {# activ} few {# active} other {# de active}}",
+        "budgetCompletion": "{value}% realizat",
+        "contractsCount": "{count, plural, one {# contract} few {# contracte} other {# de contracte}}",
+        "noPlan": "Fără plan",
+        "plannedBudget": "Buget planificat",
+        "plannedBudgetPln": "Buget planificat (PLN)",
+        "plannedDelivery": "Planificate pentru închidere"
+      },
+      "lostReasons": {
+        "empty": "Niciun lead pierdut",
+        "leadsCount": "{count, plural, one {# lead} few {# leaduri} other {# de leaduri}}",
+        "topReason": "Motiv principal:"
+      },
+      "sourceQuality": {
+        "title": "Calitate după sursă (win rate)"
+      },
+      "tooltips": {
+        "goToOnboarding": "Faceți clic pentru a accesa secțiunea Onboarding",
+        "viewLeads": "Faceți clic pentru a vedea leadurile",
+        "viewLeadsClosingInPeriod": "Faceți clic pentru a vedea leadurile cu data închiderii în această perioadă",
+        "viewLeadsInPeriod": "Faceți clic pentru a vedea leadurile din această perioadă",
+        "viewLostLeads": "Faceți clic pentru a vedea leadurile pierdute: {reason}",
+        "viewSalespersonLeads": "Faceți clic pentru a vedea leadurile agentului de vânzări",
+        "viewSourceLeads": "Faceți clic pentru a vedea leadurile din sursa: {source}",
+        "viewStageLeads": "Faceți clic pentru a vedea leadurile din etapa: {stage}",
+        "viewWonLeads": "Faceți clic pentru a vedea leadurile câștigate"
+      },
+      "trend": {
+        "activeTooltip": "Active (Calificare–Negociere): {count}",
+        "new": "Noi",
+        "title": "Trend lunar",
+        "won": "Câștigate",
+        "wonTooltip": "Won: {count}"
+      },
+      "velocity": {
+        "scale": "Scală: max. {count, plural, one {# zi} few {# zile} other {# de zile}}",
+        "title": "Timp în etapă (medie zile)"
+      }
+    },
+    "overview": {
+      "banner": {
+        "after": "de date importate",
+        "before": "Graficele se bazează pe",
+        "manageImport": "Gestionare import",
+        "months": "{count, plural, one {# lună} few {# luni} other {# de luni}}",
+        "partner": "partener:",
+        "product": "produs:"
+      },
+      "chart": {
+        "pipelineTooltip": "Pipeline: {value}k PLN",
+        "projectedWeighted": "Valoare estimată (ponderată):",
+        "title": "Venituri lunare",
+        "wonTooltip": "Won: {value}k PLN"
+      },
+      "external": {
+        "feeRate": "Fee rate: {value}%",
+        "feesPln": "Fees (PLN)",
+        "grossTurnoverPln": "Cifră de afaceri brută (PLN)",
+        "margin": "Marjă: {value}%",
+        "netTurnoverPln": "Cifră de afaceri netă (PLN)",
+        "productsCount": "{count, plural, one {# produs} few {# produse} other {# de produse}}",
+        "revenuePln": "Venit (PLN)",
+        "share": "Pondere: {value}%",
+        "source": "Date externe",
+        "transactions": "Tranzacții"
+      },
+      "filters": {
+        "allPartners": "Toți partenerii",
+        "allProducts": "Toate produsele"
+      },
+      "funnel": {
+        "closed": "Închis",
+        "conversionNewToQualification": "Conversie Nou→Calif.",
+        "conversionOfferToClosed": "Conversie Ofertă→Închis",
+        "projectedValue": "Valoare estimată"
+      },
+      "kpi": {
+        "aboveTarget": "Peste obiectiv",
+        "activePipeline": "Pipeline activ",
+        "avgClosingTime": "Timp mediu de închidere",
+        "belowTarget": "Sub obiectiv",
+        "hotCount": "{count, plural, one {# fierbinte} few {# fierbinți} other {# de fierbinți}}",
+        "noneInPeriod": "Niciunul în această perioadă",
+        "wonContracts": "Contracte câștigate"
+      },
+      "loading": "Se încarcă rapoartele…",
+      "lostReasons": {
+        "choseCompetitor": "A ales concurența",
+        "insight": "{percent}% dintre pierderi se datorează motivului „{reason}”.",
+        "insightLabel": "Insight:",
+        "noBudget": "Lipsă buget",
+        "priceTooHigh": "Preț prea mare",
+        "projectPostponed": "Proiect amânat"
+      },
+      "periods": {
+        "year": "Anul {year}"
+      },
+      "sourceQuality": {
+        "title": "Calitate după sursă"
+      },
+      "sources": {
+        "campaign": "Campanie",
+        "coldOutreach": "Cold outreach",
+        "referrals": "Recomandări",
+        "socialMedia": "Social media",
+        "tradeFairs": "Târguri"
+      },
+      "table": {
+        "fees": "Fees",
+        "grossTurnover": "Cifră de afaceri brută",
+        "net": "Net",
+        "partners": "Parteneri",
+        "revenue": "Venit"
+      },
+      "velocity": {
+        "demoToOffer": "Prezentare → Ofertă",
+        "negotiationToClosing": "Negociere → Închidere",
+        "newToQualification": "Nou → Calificare",
+        "offerToNegotiation": "Ofertă → Negociere",
+        "qualificationToDemo": "Calificare → Prezentare",
+        "title": "Timp în etapă (medie zile)"
+      }
+    },
+    "partnerAnalytics": {
+      "byProduct": {
+        "title": "Structură după produs"
+      },
+      "columns": {
+        "grossA": "Brut A",
+        "grossB": "Brut B",
+        "grossDelta": "Δ Brut",
+        "marginA": "Marjă A",
+        "marginB": "Marjă B",
+        "netA": "Net A",
+        "netB": "Net B",
+        "partner": "Partener",
+        "partnersShort": "Part.",
+        "productsA": "Prod. A",
+        "productsB": "Prod. B",
+        "productsDelta": "Δ Prod.",
+        "segment": "Segment"
+      },
+      "emptyPeriod": "Nu există date pentru perioada selectată",
+      "filterMode": "Filtru",
+      "kpi": {
+        "grossTurnoverPln": "Cifră de afaceri brută (PLN)",
+        "margin": "Marjă",
+        "netTurnoverPln": "Cifră de afaceri netă (PLN)",
+        "productsCount": "Număr de produse"
+      },
+      "modes": {
+        "custom": "Personalizat",
+        "mom": "MoM",
+        "qoq": "QoQ",
+        "yoy": "YoY"
+      },
+      "noData": "Fără date",
+      "partners": {
+        "allGroups": "Toate grupurile",
+        "allIndustries": "Toate domeniile",
+        "count": "{count, plural, one {# partener} few {# parteneri} other {# de parteneri}}",
+        "searchPlaceholder": "Căutare partener…",
+        "showMore": "Afișare mai mulți ({count} rămași)",
+        "title": "Parteneri — Cifră de afaceri brută"
+      },
+      "percentagePoints": "{value} pp",
+      "period": {
+        "a": "Perioada A:",
+        "b": "Perioada B:",
+        "customB": "Perioada B personalizată:",
+        "summary": "{partners, plural, one {# partener} few {# parteneri} other {# de parteneri}} · {products, plural, one {# produs} few {# produse} other {# de produse}}",
+        "to": "până la"
+      },
+      "refresh": "Reîmprospătare",
+      "reps": {
+        "noSalesperson": "— niciunul —",
+        "subtitle": "Perioada A vs Perioada B",
+        "title": "Rezultate după agent de vânzări"
+      },
+      "title": "Panou analitic — Parteneri",
+      "trend": {
+        "countTooltip": "{period}: {count} buc.",
+        "title": "Trend lunar — {metric}"
+      },
+      "trendMetrics": {
+        "count": "Număr de tranzacții",
+        "gross": "Cifră de afaceri brută",
+        "margin": "Marjă (valoare)",
+        "net": "Cifră de afaceri netă"
+      }
+    },
+    "partners": {
+      "allPartners": {
+        "empty": "Nu există date pentru perioada selectată",
+        "title": "Rezultatele tuturor partenerilor",
+        "total": "TOTAL"
+      },
+      "churn": {
+        "criticalCount": "{count, plural, one {# critic} few {# critice} other {# de critice}}",
+        "daysShort": "{days}z",
+        "empty": "Niciun partener cu risc de churn",
+        "showAll": "Afișare toți partenerii cu risc de churn",
+        "title": "Riscul de churn al partenerilor"
+      },
+      "columns": {
+        "fees": "Fees",
+        "grossTurnover": "Cifră de afaceri brută",
+        "health": "Health",
+        "margin": "Marjă",
+        "netTurnover": "Cifră de afaceri netă",
+        "partner": "Partener",
+        "revenue": "Venit",
+        "transactionsShort": "Tranz."
+      },
+      "emptyHint": "Importați datele prin Import CSV",
+      "filters": {
+        "allPartners": "Toți partenerii",
+        "currentGroup": "Curente",
+        "currentMonth": "Luna curentă",
+        "previousGroup": "Anterioare",
+        "previousMonth": "Luna anterioară",
+        "previousQuarter": "Trimestrul anterior",
+        "previousYear": "Anul anterior ({year})"
+      },
+      "grossTurnoverPln": "Cifră de afaceri brută (PLN)",
+      "health": {
+        "good": "Sănătos",
+        "risk": "Risc",
+        "warning": "Atenție"
+      },
+      "healthPoints": "{score} pct.",
+      "kpi": {
+        "activePartners": "Parteneri activi",
+        "feeRateShare": "{percent}% fee rate",
+        "feesPln": "Fees (PLN)",
+        "productsCount": "{count} Produse",
+        "revenueMarginPln": "Venit / Marjă (PLN)",
+        "revenueTrend": "trendul veniturilor",
+        "showPartnersTooltip": "Faceți clic pentru a vedea partenerii",
+        "vsPrevious": "{delta} vs perioada anterioară"
+      },
+      "marginShare": "{percent}% marjă",
+      "noData": "Fără date",
+      "openPartnerTooltip": "Faceți clic pentru a deschide fișa partenerului",
+      "partnersCount": "{count, plural, one {# partener} few {# parteneri} other {# de parteneri}}",
+      "products": {
+        "title": "Defalcare pe produse"
+      },
+      "refresh": "Reîmprospătare",
+      "reps": {
+        "showPartnersTooltip": "Faceți clic pentru a vedea partenerii acestui agent de vânzări",
+        "title": "Rezultatele agenților de vânzări"
+      },
+      "scorecard": {
+        "empty": "Nu există date despre parteneri",
+        "legend": {
+          "good": "bine",
+          "medium": "mediu",
+          "poor": "slab"
+        },
+        "title": "Scorecard parteneri"
+      },
+      "summary": {
+        "feeRate": "Fee rate",
+        "feesCommissions": "Fees / Comisioane",
+        "marginPct": "% marjă",
+        "revenueMargin": "Venit (marjă)",
+        "title": "Rezumat financiar"
+      },
+      "title": "Partner Performance",
+      "trend": {
+        "title": "Trendul veniturilor",
+        "totalTurnover": "Cifră de afaceri totală"
+      }
+    }
+  },
+  "salesDashboard": {
+    "activity": {
+      "allLoaded": "Toate activitățile au fost încărcate",
+      "empty": "Nicio activitate",
+      "incomingEmail": "← E-mail",
+      "refresh": "Reîmprospătare",
+      "title": "Activitate recentă",
+      "yesterday": "Ieri"
+    },
+    "chart": {
+      "periods": {
+        "month": "Lună",
+        "quarter": "Trimestru",
+        "week": "Săptămână"
+      },
+      "title": "Rezultate de vânzări",
+      "vsPreviousPeriod": "vs perioada anterioară"
+    },
+    "churn": {
+      "allLevels": "Toate nivelurile",
+      "daysSinceOrder": "zile fără comandă",
+      "empty": "Niciun partener cu risc de churn care să îndeplinească criteriile filtrelor.",
+      "generateResult": "{created, plural, one {A fost creată # sarcină} few {Au fost create # sarcini} other {Au fost create # de sarcini}}, omise: {skipped} (există deja).",
+      "generateTasks": "Generare sarcini",
+      "generating": "Se generează…",
+      "noRisk": "Fără risc de churn",
+      "salesDrop": "scădere L-2→L-1",
+      "searchPlaceholder": "Căutare partener…",
+      "showAll": "Afișare toți partenerii cu risc de churn →"
+    },
+    "currency": {
+      "pln": "{value} PLN",
+      "thousandsPln": "{value} mii PLN"
+    },
+    "header": {
+      "fallbackName": "utilizator",
+      "greeting": "Bună ziua, {name}!",
+      "subtitle": "Iată rezumatul activităților și rezultatelor dumneavoastră."
+    },
+    "kpi": {
+      "filters": {
+        "activeOpportunities": "Oportunități active în pipeline",
+        "newLeadsThisWeek": "Leaduri noi – săptămâna curentă",
+        "newLeadsValueThisWeek": "Leaduri noi – valoare săptămâna curentă",
+        "pipelineValue": "Valoarea pipeline-ului"
+      },
+      "inPipeline": "în pipeline",
+      "newLeads": "Leaduri noi",
+      "newLeadsValue": "Valoare leaduri noi",
+      "newOpportunities": "Oportunități noi",
+      "opportunitiesValue": "Valoarea oportunităților",
+      "thisMonth": "în această lună",
+      "vsPreviousMonth": "vs luna anterioară",
+      "vsPreviousWeek": "vs săptămâna anterioară",
+      "wonOpportunities": "Oportunități câștigate"
+    },
+    "opportunities": {
+      "empty": "Nicio oportunitate",
+      "name": "Denumirea oportunității",
+      "probability": "Probabilitate",
+      "showAll": "Afișare toate oportunitățile →",
+      "title": "Cele mai noi oportunități"
+    },
+    "pipeline": {
+      "empty": "Nu există date pentru pipeline",
+      "modeCount": "Număr",
+      "modeValue": "Valoare",
+      "opportunityCount": "{count, plural, one {# oportunitate} few {# oportunități} other {# de oportunități}}",
+      "title": "Pipeline de vânzări",
+      "total": "Valoarea totală a pipeline-ului:"
+    },
+    "stages": {
+      "closed_lost": "Pierdute",
+      "closed_won": "Câștigate",
+      "new": "Lead",
+      "onboarded": "Onboardat",
+      "onboarding": "Onboarding"
+    },
+    "tabs": {
+      "dashboard": "Panou"
+    },
+    "tasks": {
+      "calendar": "Calendar",
+      "closeCommentPlaceholder": "Comentariu de închidere *",
+      "closedNote": "[Închis la {date}]: {comment}",
+      "dueToday": "termen azi",
+      "empty": "Nicio sarcină pentru azi",
+      "overdue": "termen depășit",
+      "showAll": "Afișare toate sarcinile →",
+      "title": "Sarcini pentru azi"
+    }
+  },
   "sms": {
     "emptyConversation": "Niciun mesaj — scrieți primul mai jos.",
     "last": "ultimul:",
@@ -1045,6 +1795,164 @@
       "received": "Primit",
       "sent": "Trimis"
     }
+  },
+  "softphone": {
+    "activity": {
+      "incomingTitle": "Apel primit de la {number}",
+      "outgoingTitle": "Apel efectuat către {number}"
+    },
+    "confirm": {
+      "title": "Apelați?"
+    },
+    "hangUp": "Închidere apel",
+    "incoming": {
+      "answer": "Răspundere",
+      "answering": "Se răspunde…",
+      "reject": "Respingere",
+      "title": "Apel primit",
+      "unknownNumber": "Număr necunoscut"
+    },
+    "lookingUpContact": "Se caută contactul…",
+    "mute": "Dezactivare microfon",
+    "muted": "Microfon dezactivat",
+    "phases": {
+      "active": "Convorbire",
+      "dialing": "Se apelează…",
+      "ringing": "Sună…"
+    },
+    "postCall": {
+      "notePlaceholder": "Notiță despre convorbire (opțional)…",
+      "saveFailed": "Eroare la salvare — încercați din nou",
+      "saveWithNote": "Salvare cu notiță",
+      "savedOnLead": "Activitatea va fi salvată la nivelul Leadului",
+      "savedOnPartner": "Activitatea va fi salvată la nivelul Partenerului",
+      "saving": "Se salvează…",
+      "title": "Convorbire încheiată",
+      "transcriptLoaded": "Transcriere încărcată — o puteți edita",
+      "transcriptLoading": "Se preia transcrierea…",
+      "transcriptUnavailable": "Transcriere indisponibilă — introduceți notița manual",
+      "withoutNote": "Fără notiță"
+    },
+    "transcript": {
+      "agent": "Agent de vânzări",
+      "client": "Client"
+    }
+  },
+  "substitutions": {
+    "cancel": {
+      "action": "Anulare",
+      "confirm": "Anulați această absență? Înlocuitorul va pierde accesul care decurge din această înlocuire.",
+      "failed": "Absența nu a putut fi anulată.",
+      "inProgress": "Se anulează…"
+    },
+    "covering": {
+      "empty": "În prezent nu înlocuiți pe nimeni.",
+      "title": "Persoane pe care le înlocuiesc"
+    },
+    "errors": {
+      "dateFromRequired": "Introduceți data de început.",
+      "dateToBeforeFrom": "Data de sfârșit nu poate fi anterioară datei de început.",
+      "dateToRequired": "Introduceți data de sfârșit.",
+      "rangeConflict": "Persoana absentă are deja o absență înregistrată într-o perioadă care se suprapune.",
+      "rangeInPast": "Perioada de absență nu se poate afla în întregime în trecut.",
+      "substituteAbsent": "Această persoană este absentă în perioada selectată.",
+      "substituteRequired": "Selectați înlocuitorul.",
+      "substituteSameAsAbsent": "Înlocuitorul nu poate fi aceeași persoană cu persoana absentă."
+    },
+    "fields": {
+      "absentPerson": "Persoana absentă",
+      "action": "Acțiune",
+      "dateFrom": "Data de început",
+      "dateTo": "Data de sfârșit",
+      "note": "Notiță",
+      "period": "Perioadă",
+      "reason": "Motiv",
+      "status": "Status",
+      "substitute": "Înlocuitor"
+    },
+    "form": {
+      "choose": "— selectați —",
+      "fixErrors": "Corectați câmpurile marcate și încercați din nou.",
+      "noteOptional": "Notiță (opțional)",
+      "notePlaceholder": "de ex. chestiunile urgente se adresează către…",
+      "saveFailed": "Înlocuirea nu a putut fi salvată.",
+      "saved": "Înlocuire salvată — înlocuitorul a primit o notificare.",
+      "submit": "Salvare înlocuire",
+      "substituteAbsentHint": "Această persoană este absentă în perioada selectată — selectați alt înlocuitor."
+    },
+    "hint": "Indicați perioada de absență și persoana care vă va înlocui în acest timp. Pe această durată, înlocuitorul va avea acces complet la leadurile și partenerii dumneavoastră — cu aceleași permisiuni pe care le aveți dumneavoastră.",
+    "history": {
+      "toggle": "Istoric ({count})"
+    },
+    "list": {
+      "empty": "Nicio absență în curs sau viitoare.",
+      "loadFailed": "Datele nu au putut fi preluate.",
+      "retry": "Reîncercare",
+      "titleOwn": "Absențe (ale mele)",
+      "titleOwnAndTeam": "Absențe (ale mele și ale echipei)"
+    },
+    "note": {
+      "collapse": "restrângere",
+      "expand": "extindere"
+    },
+    "pager": {
+      "next": "Pagina următoare",
+      "previous": "Pagina anterioară"
+    },
+    "reasons": {
+      "other": "Altă absență",
+      "sick_leave": "Concediu medical",
+      "vacation": "Concediu de odihnă"
+    },
+    "selfFallback": "Eu",
+    "statuses": {
+      "active": "În curs",
+      "cancelled": "Anulată",
+      "ended": "Încheiată",
+      "upcoming": "Viitoare"
+    },
+    "title": "Înlocuire pe durata absenței"
+  },
+  "transactions": {
+    "amounts": {
+      "commission": "Comision",
+      "gross": "Brut",
+      "margin": "Marjă",
+      "net": "Net"
+    },
+    "filters": {
+      "allStatuses": "Toate statusurile",
+      "allTypes": "Toate tipurile",
+      "from": "De la",
+      "resultCount": "{count, plural, one {# tranzacție} few {# tranzacții} other {# de tranzacții}}",
+      "to": "Până la"
+    },
+    "kpi": {
+      "count": "Tranzacții",
+      "marginPct": "Marjă %"
+    },
+    "products": {
+      "pax": "Pax",
+      "product": "Produs",
+      "routeOrPlace": "Rută / Loc",
+      "time": "Ora",
+      "type": "Tip"
+    },
+    "statuses": {
+      "cancelled": "Anulată",
+      "confirmed": "Confirmată",
+      "refunded": "Rambursată"
+    },
+    "table": {
+      "date": "Data",
+      "empty": "Nicio tranzacție care să îndeplinească criteriile.",
+      "partner": "Partener",
+      "products": "Produse",
+      "reference": "Ref.",
+      "status": "Status",
+      "traveler": "Călător"
+    },
+    "title": "Tranzacții"
   },
   "whatsapp": {
     "checkingConfig": "Se verifică configurația...",

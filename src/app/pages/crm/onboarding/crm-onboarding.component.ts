@@ -14,47 +14,59 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
 import { CalendarEntry, dueDateCalendarEntry } from '../../../shared/utils/calendar-export.util';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../../core/i18n/locale.service';
 
-const STEP_LABELS = ['Podpisanie umowy', 'Konfiguracja', 'Szkolenie', 'Uruchomienie'];
+// Translation keys relative to the `crm` scope.
+const STEP_LABELS = [
+  'onboardingBoard.steps.contractSigning',
+  'onboardingBoard.steps.configuration',
+  'onboardingBoard.steps.training',
+  'onboardingBoard.steps.launch',
+];
 const STEP_ICONS  = ['📝', '⚙️', '🎓', '🚀'];
 const TYPE_ICONS: Record<string, string> = {
   task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝',
   doc_sent:'📄', training:'🎓',
 };
+// Translation keys relative to the `crm` scope.
 const TYPE_LABELS: Record<string, string> = {
-  task:'Zadanie', call:'Telefon', email:'Email', meeting:'Spotkanie',
-  note:'Notatka', doc_sent:'Dokument', training:'Szkolenie',
+  task:'labels.activityTypes.task', call:'onboardingBoard.taskTypes.call', email:'labels.activityTypes.email',
+  meeting:'labels.activityTypes.meeting', note:'labels.activityTypes.note',
+  doc_sent:'labels.activityTypes.doc_sent', training:'labels.activityTypes.training',
 };
 
 @Component({
   selector: 'wt-crm-onboarding',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div id="topbar">
-  <span class="page-title">🚀 Onboarding partnerów</span>
+  <span class="page-title">🚀 {{ t('onboardingBoard.title') }}</span>
   <span class="tsp"></span>
   <!-- Filtry globalne -->
-  <input class="srch" type="search" placeholder="Szukaj partnera, NIP…"
+  <input class="srch" type="search" [placeholder]="t('onboardingBoard.filters.searchPlaceholder')"
          [ngModel]="search()" (ngModelChange)="search.set($event); onFilterChange()">
   <select class="sel" [ngModel]="filterPartner()" (ngModelChange)="filterPartner.set($event); onFilterChange()">
-    <option value="">Wszyscy partnerzy</option>
+    <option value="">{{ t('onboardingBoard.filters.allPartners') }}</option>
     @for (p of partners(); track p.id) {
       <option [value]="p.id">{{ p.company }}</option>
     }
   </select>
   <select class="sel" [ngModel]="filterUser()" (ngModelChange)="filterUser.set($event); onFilterChange()" *ngIf="isManager">
-    <option value="">Wszyscy przypisani</option>
+    <option value="">{{ t('onboardingBoard.filters.allAssignees') }}</option>
     @for (u of crmUsers; track u.id) {
       <option [value]="u.id">{{ u.display_name }}</option>
     }
   </select>
   <div class="view-tabs">
-    <button [class.active]="view==='partners'" (click)="view='partners'">🏢 Partnerzy</button>
-    <button [class.active]="view==='kanban'"   (click)="view='kanban'">📋 Kanban</button>
-    <button [class.active]="view==='timeline'" (click)="view='timeline'">📅 Timeline</button>
-    <button [class.active]="view==='calendar'" (click)="view='calendar'">🗓 Kalendarz</button>
+    <button [class.active]="view==='partners'" (click)="view='partners'">🏢 {{ t('onboardingBoard.views.partners') }}</button>
+    <button [class.active]="view==='kanban'"   (click)="view='kanban'">📋 {{ t('leadsList.view.kanban') }}</button>
+    <button [class.active]="view==='timeline'" (click)="view='timeline'">📅 {{ t('onboardingBoard.views.timeline') }}</button>
+    <button [class.active]="view==='calendar'" (click)="view='calendar'">🗓 {{ t('onboardingBoard.views.calendar') }}</button>
   </div>
 </div>
 
@@ -65,11 +77,11 @@ const TYPE_LABELS: Record<string, string> = {
     <div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
       <span style="font-size:22px">🎉</span>
       <div style="flex:1">
-        <div style="font-weight:700;color:#166534;font-size:14px">{{ launchResult()!.company }} — uruchomiony!</div>
-        <div style="font-size:12px;color:#4ade80;margin-top:2px">Partner przeniesiony do Rejestru Partnerów i jest teraz aktywny.</div>
+        <div style="font-weight:700;color:#166534;font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
+        <div style="font-size:12px;color:#4ade80;margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
       </div>
       <a [routerLink]="['/crm/partners', launchResult()!.id]" style="background:#3BAA5D;color:white;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none">
-        → Profil partnera
+        → {{ t('onboardingBoard.launch.partnerProfile') }}
       </a>
       <button (click)="launchResult.set(null)" style="background:none;border:none;color:#166534;font-size:18px;cursor:pointer;line-height:1">✕</button>
     </div>
@@ -79,8 +91,8 @@ const TYPE_LABELS: Record<string, string> = {
   @if (view === 'partners') {
     <!-- sub-toolbar: view toggle -->
     <div class="partners-toolbar">
-      <button class="btn-view" [class.active]="partnersView==='cards'" (click)="partnersView='cards'">⊞ Karty</button>
-      <button class="btn-view" [class.active]="partnersView==='table'" (click)="partnersView='table'">☰ Tabela</button>
+      <button class="btn-view" [class.active]="partnersView==='cards'" (click)="partnersView='cards'">⊞ {{ t('partnersList.view.cards') }}</button>
+      <button class="btn-view" [class.active]="partnersView==='table'" (click)="partnersView='table'">☰ {{ t('partnersList.view.table') }}</button>
     </div>
 
     @if (loadingPartners()) {
@@ -88,8 +100,8 @@ const TYPE_LABELS: Record<string, string> = {
     } @else if (filteredPartners().length === 0) {
       <div class="empty-state">
         <div style="font-size:48px">🎉</div>
-        <div style="font-weight:600;margin-top:8px">Brak partnerów w procesie wdrożenia</div>
-        <div style="font-size:12px;color:var(--gray-400);margin-top:4px">Partnerzy trafiają tutaj po migracji z leada</div>
+        <div style="font-weight:600;margin-top:8px">{{ t('onboardingBoard.partners.empty') }}</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('onboardingBoard.partners.emptyHint') }}</div>
       </div>
 
     } @else if (partnersView === 'cards') {
@@ -100,15 +112,15 @@ const TYPE_LABELS: Record<string, string> = {
               <div class="pc-icon">🤝</div>
               <div style="flex:1;min-width:0">
                 <div class="pc-name">{{ p.company }}</div>
-                @if (p.nip) { <div class="pc-nip">NIP: {{ p.nip }}</div> }
+                @if (p.nip) { <div class="pc-nip">{{ t('partnersList.fields.taxId') }}: {{ p.nip }}</div> }
               </div>
-              <span class="step-badge">Krok {{ p.onboarding_step + 1 }}/4</span>
+              <span class="step-badge">{{ t('onboardingBoard.partners.stepBadge', { step: p.onboarding_step + 1, total: 4 }) }}</span>
             </div>
             <div class="pc-progress">
               @for (s of [0,1,2,3]; track s) {
                 <div class="pc-step" [class.done]="s < p.onboarding_step" [class.active]="s === p.onboarding_step">
                   <span>{{ STEP_ICONS[s] }}</span>
-                  <span class="pc-step-lbl">{{ STEP_LABELS[s] }}</span>
+                  <span class="pc-step-lbl">{{ t(STEP_LABELS[s]) }}</span>
                 </div>
               }
             </div>
@@ -116,24 +128,24 @@ const TYPE_LABELS: Record<string, string> = {
               <div class="pc-task-bar">
                 <div class="pc-task-fill" [style.width.%]="p.task_count ? (p.done_count / p.task_count * 100) : 100"></div>
               </div>
-              <span class="pc-task-text">{{ p.task_count === 0 ? 'Brak zadań' : (p.done_count + '/' + p.task_count + ' zadań') }}</span>
+              <span class="pc-task-text">{{ p.task_count === 0 ? t('onboardingBoard.tasks.empty') : t('onboardingBoard.partners.taskProgress', { done: p.done_count, total: p.task_count }) }}</span>
             </div>
             @if (p.manager_name) { <div class="pc-mgr">👤 {{ p.manager_name }}</div> }
             <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
               @if (p.lead_id) {
                 <a [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()"
                    style="font-size:11px;color:#3b82f6;font-weight:600;text-decoration:none;border:1px solid #bfdbfe;border-radius:6px;padding:3px 8px;background:#eff6ff">
-                  🎯 Dane leada
+                  🎯 {{ t('onboardingBoard.partners.leadData') }}
                 </a>
               }
               <button class="launch-btn"
                       [class.launch-ready]="p.done_count >= p.task_count"
                       [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="$event.stopPropagation(); launchPartner(p)"
-                      [title]="p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
-                @if (launching() === p.id) { ⏳ Uruchamianie…
-                } @else if (p.done_count >= p.task_count) { 🚀 Uruchomienie
-                } @else { 🔒 Uruchomienie ({{ p.done_count }}/{{ p.task_count }}) }
+                      [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
+                @if (launching() === p.id) { ⏳ {{ t('onboardingBoard.launch.inProgress') }}
+                } @else if (p.done_count >= p.task_count) { 🚀 {{ t('onboardingBoard.launch.action') }}
+                } @else { 🔒 {{ t('onboardingBoard.launch.action') }} ({{ p.done_count }}/{{ p.task_count }}) }
               </button>
             </div>
           </div>
@@ -144,13 +156,13 @@ const TYPE_LABELS: Record<string, string> = {
       <!-- TABLE VIEW -->
       <div class="pt-wrap">
         <div class="pt-head">
-          <div class="pt-th sortable" (click)="sortPartnersBy('company')">Firma <span class="si">{{ partnerSortIcon('company') }}</span></div>
-          <div class="pt-th sortable" (click)="sortPartnersBy('nip')">NIP <span class="si">{{ partnerSortIcon('nip') }}</span></div>
-          <div class="pt-th sortable" (click)="sortPartnersBy('onboarding_step')">Krok <span class="si">{{ partnerSortIcon('onboarding_step') }}</span></div>
-          <div class="pt-th">Postęp zadań</div>
-          <div class="pt-th sortable" (click)="sortPartnersBy('manager_name')">Handlowiec <span class="si">{{ partnerSortIcon('manager_name') }}</span></div>
-          <div class="pt-th sortable" (click)="sortPartnersBy('created_at')">Dodano <span class="si">{{ partnerSortIcon('created_at') }}</span></div>
-          <div class="pt-th">Akcja</div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('company')">{{ t('partnersList.fields.company') }} <span class="si">{{ partnerSortIcon('company') }}</span></div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('nip')">{{ t('partnersList.fields.taxId') }} <span class="si">{{ partnerSortIcon('nip') }}</span></div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('onboarding_step')">{{ t('onboardingBoard.table.step') }} <span class="si">{{ partnerSortIcon('onboarding_step') }}</span></div>
+          <div class="pt-th">{{ t('onboardingBoard.table.taskProgress') }}</div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('manager_name')">{{ t('partnersList.fields.salesRep') }} <span class="si">{{ partnerSortIcon('manager_name') }}</span></div>
+          <div class="pt-th sortable" (click)="sortPartnersBy('created_at')">{{ t('onboardingBoard.table.addedOn') }} <span class="si">{{ partnerSortIcon('created_at') }}</span></div>
+          <div class="pt-th">{{ t('onboardingBoard.table.action') }}</div>
         </div>
         @for (p of sortedPartners(); track p.id) {
           <div class="pt-row" (click)="selectPartner(p)">
@@ -163,8 +175,8 @@ const TYPE_LABELS: Record<string, string> = {
             <div class="pt-td pt-mono">{{ p.nip || '—' }}</div>
             <!-- Krok -->
             <div class="pt-td">
-              <span class="step-badge">{{ STEP_ICONS[p.onboarding_step] }} Krok {{ p.onboarding_step + 1 }}/4</span>
-              <span class="pt-step-name">{{ STEP_LABELS[p.onboarding_step] }}</span>
+              <span class="step-badge">{{ STEP_ICONS[p.onboarding_step] }} {{ t('onboardingBoard.partners.stepBadge', { step: p.onboarding_step + 1, total: 4 }) }}</span>
+              <span class="pt-step-name">{{ t(STEP_LABELS[p.onboarding_step]) }}</span>
             </div>
             <!-- Postęp -->
             <div class="pt-td pt-progress-cell">
@@ -181,9 +193,9 @@ const TYPE_LABELS: Record<string, string> = {
                       [class.launch-ready]="p.done_count >= p.task_count"
                       [disabled]="p.done_count < p.task_count || launching() === p.id"
                       (click)="launchPartner(p)"
-                      [title]="p.done_count < p.task_count ? 'Pozostało ' + (p.task_count - p.done_count) + ' nieukończonych zadań' : 'Przenieś do Rejestru Partnerów'">
+                      [title]="p.done_count < p.task_count ? t('onboardingBoard.launch.remainingTasks', { count: p.task_count - p.done_count }) : t('onboardingBoard.launch.moveToRegistry')">
                 @if (launching() === p.id) { ⏳
-                } @else if (p.done_count >= p.task_count) { 🚀 Uruchom
+                } @else if (p.done_count >= p.task_count) { 🚀 {{ t('onboardingBoard.launch.actionShort') }}
                 } @else { 🔒 ({{ p.done_count }}/{{ p.task_count }}) }
               </button>
             </div>
@@ -203,41 +215,41 @@ const TYPE_LABELS: Record<string, string> = {
           <div class="kb-col">
             <div class="kb-head">
               <span class="kb-icon">{{ STEP_ICONS[step] }}</span>
-              <span class="kb-title">{{ STEP_LABELS[step] }}</span>
+              <span class="kb-title">{{ t(STEP_LABELS[step]) }}</span>
               <span class="kb-cnt">{{ tasksForStep(step).length }}</span>
             </div>
             <div class="kb-cards">
-              @for (t of tasksForStep(step); track t.id) {
-                <div class="kb-card" [class.done]="t.done" (click)="openTask(t)">
+              @for (task of tasksForStep(step); track task.id) {
+                <div class="kb-card" [class.done]="task.done" (click)="openTask(task)">
                   <div class="kb-card-top">
-                    <span class="type-icon">{{ TYPE_ICONS[t.type] }}</span>
-                    <span class="kb-partner">{{ t.partner_name }}</span>
-                    @if (t.done) { <span class="done-badge">✓</span> }
+                    <span class="type-icon">{{ TYPE_ICONS[task.type] }}</span>
+                    <span class="kb-partner">{{ task.partner_name }}</span>
+                    @if (task.done) { <span class="done-badge">✓</span> }
                   </div>
-                  <div class="kb-card-title">{{ t.title }}</div>
-                  @if (t.due_date) {
-                    <div class="kb-due" [class.overdue]="isOverdue(t)">
-                      📅 {{ t.due_date | date:'dd.MM' }}
-                      @if (t.due_time) { {{ t.due_time.slice(0,5) }} }
+                  <div class="kb-card-title">{{ task.title }}</div>
+                  @if (task.due_date) {
+                    <div class="kb-due" [class.overdue]="isOverdue(task)">
+                      📅 {{ task.due_date | date:'dd.MM' }}
+                      @if (task.due_time) { {{ task.due_time.slice(0,5) }} }
                       @else { 09:00 }
-                      <wt-add-to-calendar [entry]="calendarEntryOf(t)" (click)="$event.stopPropagation()" />
+                      <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation()" />
                     </div>
                   }
-                  @if (t.assigned_to_name) {
-                    <div class="kb-assignee">👤 {{ t.assigned_to_name }}</div>
+                  @if (task.assigned_to_name) {
+                    <div class="kb-assignee">👤 {{ task.assigned_to_name }}</div>
                   }
                   <div class="kb-card-actions">
-                    <button class="kb-del-btn" (click)="$event.stopPropagation(); quickDeleteTask(t)"
-                            title="Usuń zadanie">🗑</button>
+                    <button class="kb-del-btn" (click)="$event.stopPropagation(); quickDeleteTask(task)"
+                            [title]="t('onboardingBoard.tasks.delete')">🗑</button>
                   </div>
                 </div>
               }
               @if (tasksForStep(step).length === 0) {
-                <div class="kb-empty">Brak zadań</div>
+                <div class="kb-empty">{{ t('onboardingBoard.tasks.empty') }}</div>
               }
               <!-- Dodaj zadanie -->
               @if (filterPartner()) {
-                <button class="kb-add" (click)="openNewTask(step)">+ Dodaj zadanie</button>
+                <button class="kb-add" (click)="openNewTask(step)">+ {{ t('partnerDetail.onboarding.addTask') }}</button>
               }
             </div>
           </div>
@@ -255,7 +267,7 @@ const TYPE_LABELS: Record<string, string> = {
         @if (timelineGroups().length === 0) {
           <div class="empty-state">
             <div style="font-size:36px">📅</div>
-            <div style="margin-top:8px;font-weight:600">Brak zadań z datą wykonania</div>
+            <div style="margin-top:8px;font-weight:600">{{ t('onboardingBoard.timeline.empty') }}</div>
           </div>
         }
         @for (g of timelineGroups(); track g.date) {
@@ -263,22 +275,22 @@ const TYPE_LABELS: Record<string, string> = {
             <div class="tl-date-label" [class.tl-today]="g.isToday" [class.tl-past]="g.isPast">
               <span class="tl-dot"></span>
               {{ g.label }}
-              @if (g.isToday) { <span class="today-tag">DZIŚ</span> }
+              @if (g.isToday) { <span class="today-tag">{{ t('leadsList.timeline.todayTag') }}</span> }
             </div>
-            @for (t of g.tasks; track t.id) {
-              <div class="tl-item" [class.tl-done]="t.done" (click)="openTask(t)">
+            @for (task of g.tasks; track task.id) {
+              <div class="tl-item" [class.tl-done]="task.done" (click)="openTask(task)">
                 <div class="tl-time">
-                  {{ t.due_time ? t.due_time.slice(0,5) : '09:00' }}
+                  {{ task.due_time ? task.due_time.slice(0,5) : '09:00' }}
                 </div>
                 <div class="tl-content">
                   <div class="tl-top">
-                    <span>{{ TYPE_ICONS[t.type] }} {{ t.title }}</span>
-                    @if (t.done) { <span class="done-badge">✓</span> }
+                    <span>{{ TYPE_ICONS[task.type] }} {{ task.title }}</span>
+                    @if (task.done) { <span class="done-badge">✓</span> }
                   </div>
                   <div class="tl-meta">
-                    <span class="tl-partner">🤝 {{ t.partner_name }}</span>
-                    @if (t.assigned_to_name) { <span>· 👤 {{ t.assigned_to_name }}</span> }
-                    <span>· {{ STEP_LABELS[t.step] }}</span>
+                    <span class="tl-partner">🤝 {{ task.partner_name }}</span>
+                    @if (task.assigned_to_name) { <span>· 👤 {{ task.assigned_to_name }}</span> }
+                    <span>· {{ t(STEP_LABELS[task.step]) }}</span>
                   </div>
                 </div>
               </div>
@@ -301,19 +313,19 @@ const TYPE_LABELS: Record<string, string> = {
           <button class="btn btn-g btn-sm" (click)="nextMonth()">›</button>
         </div>
         <div class="cal-grid">
-          @for (d of ['Pn','Wt','Śr','Cz','Pt','Sb','Nd']; track d) {
+          @for (d of weekdayLabels; track $index) {
             <div class="cal-dow">{{ d }}</div>
           }
           @for (cell of calCells(); track cell.key) {
             <div class="cal-cell" [class.cal-other]="!cell.inMonth"
                  [class.cal-today]="cell.isToday">
               <div class="cal-day-num">{{ cell.day }}</div>
-              @for (t of cell.tasks; track t.id) {
-                <div class="cal-event" [class.cal-done]="t.done"
-                     [class]="'cal-step-'+t.step"
-                     (click)="openTask(t)"
-                     [title]="t.partner_name + ': ' + t.title">
-                  {{ TYPE_ICONS[t.type] }} {{ t.title | slice:0:18 }}
+              @for (task of cell.tasks; track task.id) {
+                <div class="cal-event" [class.cal-done]="task.done"
+                     [class]="'cal-step-'+task.step"
+                     (click)="openTask(task)"
+                     [title]="task.partner_name + ': ' + task.title">
+                  {{ TYPE_ICONS[task.type] }} {{ task.title | slice:0:18 }}
                 </div>
               }
             </div>
@@ -332,10 +344,10 @@ const TYPE_LABELS: Record<string, string> = {
       <div class="modal-head">
         <div>
           <div class="modal-title">
-            {{ editingTask ? TYPE_ICONS[editingTask.type] + ' ' + editingTask.title : 'Nowe zadanie' }}
+            {{ editingTask ? TYPE_ICONS[editingTask.type] + ' ' + editingTask.title : t('onboardingBoard.taskForm.newTask') }}
           </div>
           @if (editingTask?.partner_name) {
-            <div style="font-size:12px;color:var(--gray-400)">🤝 {{ editingTask!.partner_name }} · {{ STEP_LABELS[editingTask!.step] }}</div>
+            <div style="font-size:12px;color:var(--gray-400)">🤝 {{ editingTask!.partner_name }} · {{ t(STEP_LABELS[editingTask!.step]) }}</div>
           }
         </div>
         <button class="dp-close" (click)="closeTaskModal()">✕</button>
@@ -344,41 +356,41 @@ const TYPE_LABELS: Record<string, string> = {
         <div class="fgrid2">
           <!-- Tytuł -->
           <div class="fg full">
-            <label class="fl">Tytuł zadania</label>
-            <input class="fi" [(ngModel)]="taskForm.title" placeholder="Nazwa zadania">
+            <label class="fl">{{ t('onboardingBoard.taskForm.title') }}</label>
+            <input class="fi" [(ngModel)]="taskForm.title" [placeholder]="t('onboardingBoard.taskForm.titlePlaceholder')">
           </div>
           <!-- Typ -->
           <div class="fg">
-            <label class="fl">Typ</label>
+            <label class="fl">{{ t('activity.modal.type') }}</label>
             <select class="fsel" [(ngModel)]="taskForm.type">
-              @for (t of taskTypes; track t.value) {
-                <option [value]="t.value">{{ t.icon }} {{ t.label }}</option>
+              @for (taskType of taskTypes; track taskType.value) {
+                <option [value]="taskType.value">{{ taskType.icon }} {{ t(taskType.label) }}</option>
               }
             </select>
           </div>
           <!-- Krok -->
           <div class="fg">
-            <label class="fl">Krok procesu</label>
+            <label class="fl">{{ t('onboardingBoard.taskForm.step') }}</label>
             <select class="fsel" [(ngModel)]="taskForm.step">
               @for (s of [0,1,2,3]; track s) {
-                <option [value]="s">{{ STEP_ICONS[s] }} {{ STEP_LABELS[s] }}</option>
+                <option [value]="s">{{ STEP_ICONS[s] }} {{ t(STEP_LABELS[s]) }}</option>
               }
             </select>
           </div>
           <!-- Data + godzina -->
           <div class="fg">
-            <label class="fl">Data wykonania</label>
+            <label class="fl">{{ t('onboardingBoard.taskForm.dueDate') }}</label>
             <input class="fi" type="date" [(ngModel)]="taskForm.due_date">
           </div>
           <div class="fg">
-            <label class="fl">Godzina <span style="color:var(--gray-400);font-size:10px">(opcjonalna, def. 09:00)</span></label>
+            <label class="fl">{{ t('onboardingBoard.taskForm.time') }} <span style="color:var(--gray-400);font-size:10px">{{ t('onboardingBoard.taskForm.timeHint') }}</span></label>
             <input class="fi" type="time" [(ngModel)]="taskForm.due_time">
           </div>
           <!-- Przypisany -->
           <div class="fg full">
-            <label class="fl">Przypisany do <span style="color:var(--orange)">*</span></label>
+            <label class="fl">{{ t('onboardingBoard.taskForm.assignedTo') }} <span style="color:var(--orange)">*</span></label>
             <select class="fsel" [(ngModel)]="taskForm.assigned_to">
-              <option value="">— wybierz osobę —</option>
+              <option value="">{{ t('onboardingBoard.taskForm.choosePerson') }}</option>
               @for (u of crmUsers; track u.id) {
                 <option [value]="u.id">{{ u.display_name }}</option>
               }
@@ -386,33 +398,34 @@ const TYPE_LABELS: Record<string, string> = {
           </div>
           <!-- Notatka -->
           <div class="fg full">
-            <label class="fl">Notatka</label>
-            <textarea class="fta" [(ngModel)]="taskForm.body" rows="2" placeholder="Dodatkowe informacje…"></textarea>
+            <label class="fl">{{ t('onboardingBoard.taskForm.note') }}</label>
+            <textarea class="fta" [(ngModel)]="taskForm.body" rows="2" [placeholder]="t('onboardingBoard.taskForm.notePlaceholder')"></textarea>
           </div>
           <!-- Status -->
           @if (editingTask) {
             <div class="fg full">
               <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
                 <input type="checkbox" [(ngModel)]="taskForm.done" style="width:auto">
-                ✅ Zadanie wykonane
+                ✅ {{ t('onboardingBoard.taskForm.done') }}
               </label>
             </div>
           }
         </div>
       </div>
       <div class="modal-foot">
-        <button class="btn btn-g" (click)="closeTaskModal()">Anuluj</button>
+        <button class="btn btn-g" (click)="closeTaskModal()">{{ 'actions.cancel' | transloco }}</button>
         @if (editingTask) {
-          <button class="btn btn-d btn-sm" (click)="deleteTask()">🗑 Usuń</button>
+          <button class="btn btn-d btn-sm" (click)="deleteTask()">🗑 {{ t('activity.card.delete') }}</button>
         }
         <button class="btn btn-p" [disabled]="!taskForm.title || saving()"
                 (click)="saveTask()">
-          {{ saving() ? 'Zapisywanie…' : (editingTask ? 'Zapisz zmiany' : 'Utwórz zadanie') }}
+          {{ saving() ? t('leadsList.saving') : (editingTask ? t('activity.modal.saveChanges') : t('onboardingBoard.taskForm.create')) }}
         </button>
       </div>
     </div>
   </div>
 }
+</ng-container>
   `,
   styles: [`
     #topbar { display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--gray-200);flex-shrink:0;flex-wrap:wrap }
@@ -574,10 +587,16 @@ export class CrmOnboardingComponent implements OnInit {
   private cdr      = inject(ChangeDetectorRef);
   private zone     = inject(NgZone);
   private route    = inject(ActivatedRoute);
+  private transloco = inject(TranslocoService);
+  private locale   = inject(LocaleService);
 
   readonly STEP_LABELS = STEP_LABELS;
   readonly STEP_ICONS  = STEP_ICONS;
   readonly TYPE_ICONS  = TYPE_ICONS;
+
+  // 1 January 2024 is a Monday — the calendar grid starts the week on Monday.
+  readonly weekdayLabels = Array.from({ length: 7 }, (_, dayOffset) =>
+    new Date(2024, 0, 1 + dayOffset).toLocaleDateString(this.locale.activeLocale(), { weekday: 'short' }));
 
   // ── State ──────────────────────────────────────────────────────────────────
   view: 'partners' | 'kanban' | 'timeline' | 'calendar' = 'partners';
@@ -656,7 +675,7 @@ export class CrmOnboardingComponent implements OnInit {
           ? new Date(va).getTime() - new Date(vb).getTime()
           : new Date(vb).getTime() - new Date(va).getTime();
       }
-      const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
+      const cmp = String(va).localeCompare(String(vb), this.locale.activeLocale(), { sensitivity: 'base' });
       return dir === 'asc' ? cmp : -cmp;
     });
   });
@@ -696,7 +715,7 @@ export class CrmOnboardingComponent implements OnInit {
         const isPast  = d < today;
         return {
           date,
-          label: d.toLocaleDateString('pl-PL', { weekday:'long', day:'numeric', month:'long' }),
+          label: d.toLocaleDateString(this.locale.activeLocale(), { weekday:'long', day:'numeric', month:'long' }),
           isToday, isPast,
           tasks: tasks.sort((a, b) => (a.due_time || '09:00').localeCompare(b.due_time || '09:00')),
         };
@@ -705,7 +724,7 @@ export class CrmOnboardingComponent implements OnInit {
 
   calMonthLabel = computed(() => {
     return new Date(this.calYear(), this.calMonth(), 1)
-      .toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+      .toLocaleDateString(this.locale.activeLocale(), { month: 'long', year: 'numeric' });
   });
 
   calCells = computed(() => {
@@ -901,11 +920,11 @@ export class CrmOnboardingComponent implements OnInit {
         this.closeTaskModal();
         this.loadTasks();
         this.loadPartners();
-        this.toast.success(this.editingTask ? 'Zadanie zaktualizowane' : 'Zadanie dodane');
+        this.toast.success(this.transloco.translate(this.editingTask ? 'crm.onboardingBoard.toasts.taskUpdated' : 'crm.onboardingBoard.toasts.taskAdded'));
       }),
       error: () => this.zone.run(() => {
         this.saving.set(false);
-        this.toast.error('Błąd zapisu zadania');
+        this.toast.error(this.transloco.translate('crm.onboardingBoard.toasts.taskSaveFailed'));
         this.cdr.markForCheck();
       }),
     });
@@ -918,7 +937,7 @@ export class CrmOnboardingComponent implements OnInit {
 
   launchPartner(p: OnboardingPartner): void {
     if (p.done_count < p.task_count) return;
-    if (!confirm(`Uruchomić partnera "${p.company}"? Partner zostanie przeniesiony do statusu Aktywny i będzie widoczny w Rejestrze Partnerów.`)) return;
+    if (!confirm(this.transloco.translate('crm.onboardingBoard.launch.confirm', { company: p.company }))) return;
     this.launching.set(p.id);
     this.api.updatePartner(p.id, { status: 'active' } as any).subscribe({
       next: () => this.zone.run(() => {
@@ -929,21 +948,21 @@ export class CrmOnboardingComponent implements OnInit {
       }),
       error: (err: any) => this.zone.run(() => {
         this.launching.set(null);
-        this.toast.error(err?.error?.error ?? 'Błąd uruchamiania partnera');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.onboardingBoard.launch.failed'));
         this.cdr.markForCheck();
       }),
     });
   }
 
   quickDeleteTask(t: OnboardingTask, onDone?: () => void): void {
-    if (!confirm(`Usunąć zadanie "${t.title}"?`)) return;
+    if (!confirm(this.transloco.translate('crm.partnerDetail.onboarding.deleteTaskConfirm', { title: t.title }))) return;
     this.api.deleteOnboardingTask(t.partner_id, t.id).subscribe({
       next: () => this.zone.run(() => {
         if (onDone) onDone();
         this.loadTasks();
-        this.toast.success('Zadanie usunięte');
+        this.toast.success(this.transloco.translate('crm.onboardingBoard.toasts.taskDeleted'));
       }),
-      error: () => this.toast.error('Błąd usuwania zadania'),
+      error: () => this.toast.error(this.transloco.translate('crm.onboardingBoard.toasts.taskDeleteFailed')),
     });
   }
 

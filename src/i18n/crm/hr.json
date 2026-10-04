@@ -65,6 +65,77 @@
       "tasks": "Zadaci"
     }
   },
+  "calendar": {
+    "allDay": "rok",
+    "breadcrumb": "Kalendar",
+    "durationMinutes": "{minutes} min",
+    "filters": {
+      "allPriorities": "Svi prioriteti",
+      "allReps": "Svi prodavači",
+      "allTypes": "Sve vrste",
+      "groupsGroup": "Grupe",
+      "repsGroup": "Prodavači",
+      "showClosed": "prikaži zatvorene",
+      "showNoDate": "prikaži bez datuma"
+    },
+    "meeting": {
+      "duration": "Trajanje",
+      "locationPlaceholder": "Dvorana A, Zagreb",
+      "notes": "Bilješke",
+      "participantsPlaceholder": "email1@tvrtka.hr, email2@tvrtka.hr",
+      "salesperson": "Prodavač"
+    },
+    "month": {
+      "more": "+{count} više"
+    },
+    "nav": {
+      "today": "Danas"
+    },
+    "tasks": {
+      "bulk": {
+        "closeSelected": "Zatvori označene zadatke",
+        "selectOverdue": "Označi sve zadatke kojima je istekao rok",
+        "selectedCount": "{count, plural, one {# označen} few {# označena} other {# označenih}}"
+      },
+      "close": "Zatvori",
+      "count": "{count, plural, one {# aktivnost} few {# aktivnosti} other {# aktivnosti}}",
+      "editMode": "način uređivanja",
+      "empty": "Nema zadataka za prikaz.",
+      "form": {
+        "assignTo": "Dodijeli",
+        "descriptionPlaceholder": "Opis…",
+        "titlePlaceholder": "Naslov…"
+      },
+      "loading": "Učitavanje zadataka…",
+      "noDate": "bez datuma",
+      "readOnly": "samo za čitanje",
+      "reopen": "Ponovno otvori",
+      "saveFailed": "Spremanje izmjena zadatka nije uspjelo"
+    },
+    "title": "Kalendar aktivnosti",
+    "views": {
+      "day": "Dan",
+      "month": "Mjesec",
+      "tasks": "Zadaci",
+      "week": "Tjedan"
+    }
+  },
+  "callSimulator": {
+    "activity": {
+      "demoTranscript": "[00:00] Prodavač: Dobar dan, ovdje Ivan Horvat iz CRMtreeja. Mogu li razgovarati s osobom zaduženom za službena putovanja?\n\n[00:08] Klijent: Da, izvolite. Marko Kovač pri telefonu.\n\n[00:10] Prodavač: Dobar dan, gospodine Kovač. Javljam se u vezi s optimizacijom troškova službenih putovanja u vašoj tvrtki. Imate li trenutak?\n\n[00:18] Klijent: Imam, recite. Što točno predlažete?\n\n[00:22] Prodavač: Nudimo cjelovit sustav za upravljanje korporativnim putovanjima — rezervacije letova, hotela i prijevoza na jednom mjestu. Naši klijenti u prosjeku uštede od 15 do 25% troškova putovanja.\n\n[00:35] Klijent: Zvuči zanimljivo. Koliko putovanja godišnje treba biti da bi se to isplatilo?\n\n[00:40] Prodavač: Naša se platforma isplati već od nekoliko desetaka putovanja godišnje. Mogu pripremiti individualni izračun za vašu tvrtku.\n\n[00:49] Klijent: Dobro. Pošaljite ponudu e-poštom. Naš će je tim pregledati.\n\n[00:54] Prodavač: Naravno, poslat ću je još danas. Možemo li dogovoriti i kratku online prezentaciju kako bismo vam pokazali sustav u radu?\n\n[01:02] Klijent: Možemo. Predložit ću termin nakon što pregledamo ponudu.\n\n[01:06] Prodavač: Odlično. Hvala na razgovoru, čujemo se.\n\n[01:09] Klijent: Doviđenja.",
+      "summary": "Telefonski poziv — {who} ({seconds}s)",
+      "title": "Telefonski razgovor — {who}",
+      "transcriptHeading": "--- Transkript ---"
+    },
+    "connected": "Povezano",
+    "connecting": "Uspostavljanje poziva...",
+    "duration": "Vrijeme: {time}",
+    "endCall": "Završi razgovor",
+    "ended": "Razgovor završen",
+    "hangUp": "Prekini",
+    "noteSaved": "Bilješka spremljena",
+    "savingNote": "Spremanje bilješke..."
+  },
   "calls": {
     "call": "Nazovi",
     "callNumber": "Nazovi: {phone}",
@@ -85,6 +156,126 @@
       "granted": "Privola",
       "noData": "Nema podataka"
     }
+  },
+  "crmDashboard": {
+    "activities": {
+      "title": "Zadnje aktivnosti"
+    },
+    "columns": {
+      "adoption": "Usvajanje",
+      "days": "Dani",
+      "expires": "Istječe",
+      "opportunities": "Prilike",
+      "partner": "Partner",
+      "revenue": "Prihod"
+    },
+    "kpi": {
+      "activePartners": "Aktivnih partnera",
+      "avgArrPerPartner": "Prosj. ARR / partner",
+      "inOnboarding": "U onboardingu",
+      "partnerGroups": "Grupa partnera",
+      "totalArr": "Ukupni ARR"
+    },
+    "partnerScores": {
+      "title": "Partneri prema rezultatima ({period})"
+    },
+    "periods": {
+      "currentYear": "Tekuća godina",
+      "last12Months": "Zadnjih 12 mj.",
+      "last30Days": "Zadnjih 30 dana",
+      "last90Days": "Zadnjih 90 dana"
+    },
+    "pipeline": {
+      "empty": "Nema podataka",
+      "title": "Pipeline leadova"
+    },
+    "productMix": {
+      "title": "Miks proizvoda ({period})"
+    },
+    "renewals": {
+      "daysShort": "{days}d",
+      "title": "Nadolazeće obnove"
+    },
+    "title": "CRM nadzorna ploča"
+  },
+  "csvImport": {
+    "actions": {
+      "downloadTemplate": "Preuzmi predložak",
+      "exportData": "Izvezi podatke"
+    },
+    "cards": {
+      "documents": {
+        "description": "Uvoz metapodataka dokumenata. Fizičke datoteke treba dodati ručno nakon uvoza. Broj dokumenta generira se automatski.",
+        "title": "Dokumenti (metapodaci)"
+      },
+      "leads": {
+        "title": "Prodajni leadovi"
+      },
+      "partners": {
+        "title": "Partneri"
+      },
+      "sales": {
+        "description": "Podaci na razini retka iz vanjskog prodajnog sustava, na razini Partner × Proizvod × Mjesec. Povezivanje s prodavačem CRM obavlja automatski (voditelj klijenta partnera).",
+        "title": "Prodajni podaci"
+      }
+    },
+    "dictionaries": {
+      "documentGroups": "Accounting|HR|Marketing|Obsługa Klienta|Operations|Sprzedaz|Zarzad"
+    },
+    "dropZone": {
+      "importing": "Uvoz…",
+      "prompt": "Povucite CSV datoteku ili kliknite"
+    },
+    "errorsTable": {
+      "company": "Tvrtka",
+      "error": "Pogreška",
+      "field": "Polje",
+      "name": "Naziv",
+      "row": "Redak"
+    },
+    "files": {
+      "salesTemplate": "predlozak_prodajni_podaci.csv",
+      "template": "predlozak_{type}.csv"
+    },
+    "hints": {
+      "agentFields": "samo kada je source=agent",
+      "dictionaryValues": "vrijednosti iz šifrarnika",
+      "dictionaryValuesHover": "vrijednosti iz šifrarnika (prijeđite pokazivačem za prikaz)",
+      "dictionaryValuesTooltip": "vrijednosti iz šifrarnika — prijeđite pokazivačem preko opisa da biste vidjeli dostupne vrijednosti",
+      "documentGroupName": "naziv grupe dokumenata",
+      "entitiesExample": "Tvrtka ABC|Ivan Horvat",
+      "entitiesSeparator": "subjekti odvojeni znakom",
+      "example": "npr.",
+      "otherProducts": "ostalo…",
+      "partnerNumber": "ključ koji povezuje s prodajnim podacima",
+      "salesPartnerNumber": "ključ koji povezuje s karticom partnera u CRM-u",
+      "tagsSeparator": "odvojene znakom"
+    },
+    "history": {
+      "date": "Datum",
+      "empty": "Nema povijesti uvoza.",
+      "errors": "Pogreške",
+      "file": "Datoteka",
+      "imported": "Uvezeno",
+      "importedBy": "Uvezao/la",
+      "status": "Status",
+      "title": "Povijest uvoza",
+      "type": "Vrsta"
+    },
+    "messages": {
+      "csvRequired": "Odaberite datoteku u CSV formatu.",
+      "exportFailed": "Izvoz podataka nije uspio.",
+      "serverError": "Pogreška poslužitelja",
+      "templateDownloadFailed": "Preuzimanje predloška nije uspjelo."
+    },
+    "result": {
+      "errors": "{count, plural, one {# pogreška} few {# pogreške} other {# pogrešaka}}",
+      "imported": "{count, plural, one {# uvezen} few {# uvezena} other {# uvezenih}}",
+      "skipped": "{count, plural, one {# preskočen} few {# preskočena} other {# preskočenih}}",
+      "total": "Ukupno: {count}"
+    },
+    "subtitle": "Skupno uvezite leadove, partnere i prodajne podatke iz CSV datoteke. Preuzmite predložak, ispunite ga i prenesite.",
+    "title": "Uvoz CSV-a"
   },
   "documents": {
     "add": "Dodaj",
@@ -701,6 +892,82 @@
     "titlePlaceholder": "Naslov sastanka",
     "titleRequiredPlaceholder": "Naslov sastanka *"
   },
+  "onboardingBoard": {
+    "filters": {
+      "allAssignees": "Svi dodijeljeni",
+      "allPartners": "Svi partneri",
+      "searchPlaceholder": "Traži partnera, porezni broj…"
+    },
+    "launch": {
+      "action": "Pokretanje",
+      "actionShort": "Pokreni",
+      "confirm": "Pokrenuti partnera „{company}”? Partner će prijeći u status Aktivan i bit će vidljiv u Registru partnera.",
+      "failed": "Pogreška pri pokretanju partnera",
+      "inProgress": "Pokretanje…",
+      "moveToRegistry": "Premjesti u Registar partnera",
+      "partnerProfile": "Profil partnera",
+      "remainingTasks": "{count, plural, one {Preostao je # nedovršen zadatak} few {Preostala su # nedovršena zadatka} other {Preostalo je # nedovršenih zadataka}}",
+      "successHint": "Partner je premješten u Registar partnera i sada je aktivan.",
+      "successTitle": "{company} — pokrenut!"
+    },
+    "partners": {
+      "empty": "Nema partnera u procesu uvođenja",
+      "emptyHint": "Partneri dolaze ovamo nakon prijenosa iz leada",
+      "leadData": "Podaci o leadu",
+      "stepBadge": "Korak {step}/{total}",
+      "taskProgress": "{done}/{total} zadataka"
+    },
+    "steps": {
+      "configuration": "Konfiguracija",
+      "contractSigning": "Potpisivanje ugovora",
+      "launch": "Pokretanje",
+      "training": "Obuka"
+    },
+    "table": {
+      "action": "Radnja",
+      "addedOn": "Dodano",
+      "step": "Korak",
+      "taskProgress": "Napredak zadataka"
+    },
+    "taskForm": {
+      "assignedTo": "Dodijeljeno",
+      "choosePerson": "— odaberite osobu —",
+      "create": "Izradi zadatak",
+      "done": "Zadatak izvršen",
+      "dueDate": "Rok izvršenja",
+      "newTask": "Novi zadatak",
+      "note": "Bilješka",
+      "notePlaceholder": "Dodatne informacije…",
+      "step": "Korak procesa",
+      "time": "Vrijeme",
+      "timeHint": "(neobavezno, zadano 09:00)",
+      "title": "Naslov zadatka",
+      "titlePlaceholder": "Naziv zadatka"
+    },
+    "taskTypes": {
+      "call": "Poziv"
+    },
+    "tasks": {
+      "delete": "Izbriši zadatak",
+      "empty": "Nema zadataka"
+    },
+    "timeline": {
+      "empty": "Nema zadataka s rokom izvršenja"
+    },
+    "title": "Onboarding partnera",
+    "toasts": {
+      "taskAdded": "Zadatak dodan",
+      "taskDeleteFailed": "Pogreška pri brisanju zadatka",
+      "taskDeleted": "Zadatak izbrisan",
+      "taskSaveFailed": "Pogreška pri spremanju zadatka",
+      "taskUpdated": "Zadatak ažuriran"
+    },
+    "views": {
+      "calendar": "Kalendar",
+      "partners": "Partneri",
+      "timeline": "Vremenska crta"
+    }
+  },
   "partnerDetail": {
     "activity": {
       "bodyPlaceholder": "Sadržaj / opis…",
@@ -950,6 +1217,35 @@
       "partnerAdmin": "Partner Admin"
     }
   },
+  "partnerGroups": {
+    "card": {
+      "morePartners": "+{count} više",
+      "partnersNoun": "{count, plural, one {partner} few {partnera} other {partnera}}"
+    },
+    "details": {
+      "empty": "Nema partnera u ovoj grupi.",
+      "manager": "Voditelj klijenta:",
+      "partnersInGroup": "Partneri u grupi ({count})",
+      "partnersStat": "Partnera"
+    },
+    "empty": "Nema grupa partnera.",
+    "form": {
+      "create": "Izradi",
+      "delete": "Izbriši",
+      "description": "Opis",
+      "editTitle": "Uredi grupu",
+      "industry": "Djelatnost",
+      "name": "Naziv",
+      "namePlaceholder": "Naziv grupe"
+    },
+    "messages": {
+      "deleteConfirm": "Izbrisati grupu „{name}”? Partneri će biti odvojeni od grupe.",
+      "deleteFailed": "Brisanje grupe nije uspjelo",
+      "saveFailed": "Spremanje grupe nije uspjelo"
+    },
+    "newGroup": "Nova grupa",
+    "title": "Grupe partnera"
+  },
   "partnersList": {
     "card": {
       "marginAmount": "{amount} PLN marže",
@@ -1030,6 +1326,460 @@
       "table": "Tablica"
     }
   },
+  "periodFilter": {
+    "groups": {
+      "current": "Tekuća",
+      "custom": "Vlastito",
+      "previous": "Prethodna"
+    },
+    "presets": {
+      "currentMonth": "Tekući mjesec",
+      "currentQuarter": "Tekući kvartal",
+      "currentYear": "Tekuća godina (YTD {year})",
+      "customRange": "Vlastito razdoblje…",
+      "previousMonth": "Prethodni mjesec",
+      "previousQuarter": "Prethodni kvartal",
+      "previousYear": "Prethodna godina ({year})"
+    }
+  },
+  "reports": {
+    "common": {
+      "columns": {
+        "leads": "Leadovi",
+        "pipeline": "Pipeline",
+        "progress": "Napredak",
+        "winRatePct": "Win%",
+        "won": "Won"
+      },
+      "days": "{count, plural, one {# dan} few {# dana} other {# dana}}",
+      "exportPdf": "Izvoz u PDF",
+      "funnel": {
+        "subtitle": "Broj leadova i vrijednost u PLN",
+        "title": "Prodajni lijevak"
+      },
+      "kpi": {
+        "activeLeads": "Aktivni leadovi",
+        "avgSalesCycle": "Prosj. prodajni ciklus",
+        "avgWonValue": "Prosj. vrijednost dobivenog",
+        "winRate": "Win Rate",
+        "wonPln": "Zatvoreno / Won (PLN)"
+      },
+      "leadSources": {
+        "title": "Izvori leadova",
+        "totalCaption": "leadova",
+        "winRate": "{value}% win rate"
+      },
+      "leadsShort": "{count} lead.",
+      "lostReasons": "Razlozi gubitka",
+      "noData": "Nema podataka",
+      "periods": {
+        "currentMonth": "Tekući mjesec",
+        "currentQuarter": "Tekući kvartal",
+        "currentYear": "Tekuća godina (YTD {year})",
+        "last3Months": "Zadnja 3 mjeseca",
+        "last6Months": "Zadnjih 6 mjeseci"
+      },
+      "refresh": "Osvježi",
+      "salespeopleResults": "Rezultati prodavača",
+      "title": "Izvješća o prodaji"
+    },
+    "leads": {
+      "activity": {
+        "empty": "Nema podataka o aktivnostima",
+        "sourceAll": "Sve",
+        "sourceLeads": "Leadovi",
+        "sourcePartners": "Partneri",
+        "title": "Aktivnost prodavača",
+        "types": {
+          "email": "E-poruke"
+        }
+      },
+      "drilldown": {
+        "funnel": "Lijevak: {stage}",
+        "lost": "Izgubljeni: {reason}",
+        "pipelineAll": "Pipeline – svi aktivni",
+        "plannedBudget": "Planirani budžet – leadovi u razdoblju",
+        "plannedInPeriod": "Planirano za realizaciju u razdoblju",
+        "source": "Izvor: {source}",
+        "velocity": "Vrijeme u fazi: {stage}",
+        "won": "Zatvoreno / Won"
+      },
+      "empty": {
+        "hint": "Dodajte leadove ili promijenite raspon datuma",
+        "title": "Nema podataka za odabrano razdoblje"
+      },
+      "funnel": {
+        "conversionToWon": "Konverzija u dobivene"
+      },
+      "kpi": {
+        "activeCount": "{count, plural, one {# aktivan} few {# aktivna} other {# aktivnih}}",
+        "budgetCompletion": "{value}% ostvarenja",
+        "contractsCount": "{count, plural, one {# ugovor} few {# ugovora} other {# ugovora}}",
+        "noPlan": "Nema plana",
+        "plannedBudget": "Planirani budžet",
+        "plannedBudgetPln": "Planirani budžet (PLN)",
+        "plannedDelivery": "Planirano za realizaciju"
+      },
+      "lostReasons": {
+        "empty": "Nema izgubljenih leadova",
+        "leadsCount": "{count, plural, one {# lead} few {# leada} other {# leadova}}",
+        "topReason": "Glavni razlog:"
+      },
+      "sourceQuality": {
+        "title": "Kvaliteta po izvoru (win rate)"
+      },
+      "tooltips": {
+        "goToOnboarding": "Kliknite za prelazak u odjeljak Onboarding",
+        "viewLeads": "Kliknite za prikaz leadova",
+        "viewLeadsClosingInPeriod": "Kliknite za prikaz leadova s datumom zatvaranja u ovom razdoblju",
+        "viewLeadsInPeriod": "Kliknite za prikaz leadova u ovom razdoblju",
+        "viewLostLeads": "Kliknite za prikaz izgubljenih leadova: {reason}",
+        "viewSalespersonLeads": "Kliknite za prikaz leadova prodavača",
+        "viewSourceLeads": "Kliknite za prikaz leadova iz izvora: {source}",
+        "viewStageLeads": "Kliknite za prikaz leadova u fazi: {stage}",
+        "viewWonLeads": "Kliknite za prikaz dobivenih leadova"
+      },
+      "trend": {
+        "activeTooltip": "Aktivni (Kvalifikacija–Pregovori): {count}",
+        "new": "Novi",
+        "title": "Mjesečni trend",
+        "won": "Dobiveni",
+        "wonTooltip": "Won: {count}"
+      },
+      "velocity": {
+        "scale": "Skala: maks. {count, plural, one {# dan} few {# dana} other {# dana}}",
+        "title": "Vrijeme u fazi (prosj. dana)"
+      }
+    },
+    "overview": {
+      "banner": {
+        "after": "uvezenih podataka",
+        "before": "Grafikoni se temelje na",
+        "manageImport": "Upravljaj uvozom",
+        "months": "{count, plural, one {# mjesecu} few {# mjeseca} other {# mjeseci}}",
+        "partner": "partner:",
+        "product": "proizvod:"
+      },
+      "chart": {
+        "pipelineTooltip": "Pipeline: {value}k PLN",
+        "projectedWeighted": "Predviđena vrijednost (ponderirana):",
+        "title": "Mjesečni prihodi",
+        "wonTooltip": "Won: {value}k PLN"
+      },
+      "external": {
+        "feeRate": "Fee rate: {value}%",
+        "feesPln": "Fees (PLN)",
+        "grossTurnoverPln": "Bruto promet (PLN)",
+        "margin": "Marža: {value}%",
+        "netTurnoverPln": "Neto promet (PLN)",
+        "productsCount": "{count, plural, one {# proizvod} few {# proizvoda} other {# proizvoda}}",
+        "revenuePln": "Prihod (PLN)",
+        "share": "Udio: {value}%",
+        "source": "Vanjski podaci",
+        "transactions": "Transakcija"
+      },
+      "filters": {
+        "allPartners": "Svi partneri",
+        "allProducts": "Svi proizvodi"
+      },
+      "funnel": {
+        "closed": "Zatvoren",
+        "conversionNewToQualification": "Konverzija Novi→Kvalif.",
+        "conversionOfferToClosed": "Konverzija Ponuda→Zatv.",
+        "projectedValue": "Predviđena vrijednost"
+      },
+      "kpi": {
+        "aboveTarget": "Iznad cilja",
+        "activePipeline": "Aktivni pipeline",
+        "avgClosingTime": "Prosječno vrijeme zatvaranja",
+        "belowTarget": "Ispod cilja",
+        "hotCount": "{count, plural, one {# vrući} few {# vruća} other {# vrućih}}",
+        "noneInPeriod": "Nema u ovom razdoblju",
+        "wonContracts": "Dobiveni ugovori"
+      },
+      "loading": "Učitavanje izvješća…",
+      "lostReasons": {
+        "choseCompetitor": "Odabrao konkurenciju",
+        "insight": "{percent}% izgubljenih proizlazi iz razloga „{reason}”.",
+        "insightLabel": "Uvid:",
+        "noBudget": "Nema budžeta",
+        "priceTooHigh": "Previsoka cijena",
+        "projectPostponed": "Projekt odgođen"
+      },
+      "periods": {
+        "year": "Godina {year}"
+      },
+      "sourceQuality": {
+        "title": "Kvaliteta po izvoru"
+      },
+      "sources": {
+        "campaign": "Kampanja",
+        "coldOutreach": "Cold outreach",
+        "referrals": "Preporuke",
+        "socialMedia": "Društvene mreže",
+        "tradeFairs": "Sajmovi"
+      },
+      "table": {
+        "fees": "Fees",
+        "grossTurnover": "Bruto promet",
+        "net": "Neto",
+        "partners": "Partneri",
+        "revenue": "Prihod"
+      },
+      "velocity": {
+        "demoToOffer": "Prezentacija → Ponuda",
+        "negotiationToClosing": "Pregovori → Zatvaranje",
+        "newToQualification": "Novi → Kvalifikacija",
+        "offerToNegotiation": "Ponuda → Pregovori",
+        "qualificationToDemo": "Kvalifikacija → Prezentacija",
+        "title": "Vrijeme u fazi (prosjek dana)"
+      }
+    },
+    "partnerAnalytics": {
+      "byProduct": {
+        "title": "Struktura po proizvodu"
+      },
+      "columns": {
+        "grossA": "Bruto A",
+        "grossB": "Bruto B",
+        "grossDelta": "Δ Bruto",
+        "marginA": "Marža A",
+        "marginB": "Marža B",
+        "netA": "Neto A",
+        "netB": "Neto B",
+        "partner": "Partner",
+        "partnersShort": "Part.",
+        "productsA": "Proizv. A",
+        "productsB": "Proizv. B",
+        "productsDelta": "Δ Proizv.",
+        "segment": "Segment"
+      },
+      "emptyPeriod": "Nema podataka za odabrano razdoblje",
+      "filterMode": "Filtar",
+      "kpi": {
+        "grossTurnoverPln": "Bruto promet (PLN)",
+        "margin": "Marža",
+        "netTurnoverPln": "Neto promet (PLN)",
+        "productsCount": "Broj proizvoda"
+      },
+      "modes": {
+        "custom": "Vlastito",
+        "mom": "MoM",
+        "qoq": "QoQ",
+        "yoy": "YoY"
+      },
+      "noData": "Nema podataka",
+      "partners": {
+        "allGroups": "Sve grupe",
+        "allIndustries": "Sve djelatnosti",
+        "count": "{count, plural, one {# partner} few {# partnera} other {# partnera}}",
+        "searchPlaceholder": "Traži partnera…",
+        "showMore": "Prikaži više (preostalo: {count})",
+        "title": "Partneri — bruto promet"
+      },
+      "percentagePoints": "{value} p. b.",
+      "period": {
+        "a": "Razdoblje A:",
+        "b": "Razdoblje B:",
+        "customB": "Vlastito razdoblje B:",
+        "summary": "{partners, plural, one {# partner} few {# partnera} other {# partnera}} · {products, plural, one {# proizvod} few {# proizvoda} other {# proizvoda}}",
+        "to": "do"
+      },
+      "refresh": "Osvježi",
+      "reps": {
+        "noSalesperson": "— nema —",
+        "subtitle": "Razdoblje A vs Razdoblje B",
+        "title": "Rezultati po prodavaču"
+      },
+      "title": "Analitička nadzorna ploča — Partneri",
+      "trend": {
+        "countTooltip": "{period}: {count} kom.",
+        "title": "Mjesečni trend — {metric}"
+      },
+      "trendMetrics": {
+        "count": "Broj transakcija",
+        "gross": "Bruto promet",
+        "margin": "Marža (vrijednost)",
+        "net": "Neto promet"
+      }
+    },
+    "partners": {
+      "allPartners": {
+        "empty": "Nema podataka za odabrano razdoblje",
+        "title": "Rezultati svih partnera",
+        "total": "UKUPNO"
+      },
+      "churn": {
+        "criticalCount": "{count, plural, one {# kritičan} few {# kritična} other {# kritičnih}}",
+        "daysShort": "{days}d",
+        "empty": "Nema partnera s rizikom churna",
+        "showAll": "Prikaži sve partnere s rizikom churna",
+        "title": "Rizik churna partnera"
+      },
+      "columns": {
+        "fees": "Fees",
+        "grossTurnover": "Bruto promet",
+        "health": "Health",
+        "margin": "Marža",
+        "netTurnover": "Neto promet",
+        "partner": "Partner",
+        "revenue": "Prihod",
+        "transactionsShort": "Trans."
+      },
+      "emptyHint": "Uvezite podatke putem Uvoza CSV-a",
+      "filters": {
+        "allPartners": "Svi partneri",
+        "currentGroup": "Tekuća",
+        "currentMonth": "Tekući mjesec",
+        "previousGroup": "Prethodna",
+        "previousMonth": "Prethodni mjesec",
+        "previousQuarter": "Prethodni kvartal",
+        "previousYear": "Prethodna godina ({year})"
+      },
+      "grossTurnoverPln": "Bruto promet (PLN)",
+      "health": {
+        "good": "Zdrav",
+        "risk": "Rizik",
+        "warning": "Upozorenje"
+      },
+      "healthPoints": "{score} bod.",
+      "kpi": {
+        "activePartners": "Aktivnih partnera",
+        "feeRateShare": "{percent}% fee rate",
+        "feesPln": "Fees (PLN)",
+        "productsCount": "Proizvodi: {count}",
+        "revenueMarginPln": "Prihod / Marža (PLN)",
+        "revenueTrend": "trend prihoda",
+        "showPartnersTooltip": "Kliknite za prikaz partnera",
+        "vsPrevious": "{delta} vs prethodno"
+      },
+      "marginShare": "{percent}% marže",
+      "noData": "Nema podataka",
+      "openPartnerTooltip": "Kliknite za otvaranje kartice partnera",
+      "partnersCount": "{count, plural, one {# partner} few {# partnera} other {# partnera}}",
+      "products": {
+        "title": "Raspodjela po proizvodima"
+      },
+      "refresh": "Osvježi",
+      "reps": {
+        "showPartnersTooltip": "Kliknite za prikaz partnera ovog prodavača",
+        "title": "Rezultati prodavača"
+      },
+      "scorecard": {
+        "empty": "Nema podataka o partnerima",
+        "legend": {
+          "good": "dobro",
+          "medium": "srednje",
+          "poor": "slabo"
+        },
+        "title": "Scorecard partnera"
+      },
+      "summary": {
+        "feeRate": "Fee rate",
+        "feesCommissions": "Fees / Provizije",
+        "marginPct": "% marže",
+        "revenueMargin": "Prihod (marža)",
+        "title": "Financijski sažetak"
+      },
+      "title": "Partner Performance",
+      "trend": {
+        "title": "Trend prihoda",
+        "totalTurnover": "Ukupni promet"
+      }
+    }
+  },
+  "salesDashboard": {
+    "activity": {
+      "allLoaded": "Sve aktivnosti su učitane",
+      "empty": "Nema aktivnosti",
+      "incomingEmail": "← E-pošta",
+      "refresh": "Osvježi",
+      "title": "Zadnja aktivnost",
+      "yesterday": "Jučer"
+    },
+    "chart": {
+      "periods": {
+        "month": "Mjesec",
+        "quarter": "Kvartal",
+        "week": "Tjedan"
+      },
+      "title": "Prodajni rezultati",
+      "vsPreviousPeriod": "vs prethodno razdoblje"
+    },
+    "churn": {
+      "allLevels": "Sve razine",
+      "daysSinceOrder": "dana bez narudžbe",
+      "empty": "Nema partnera s rizikom churna koji zadovoljavaju kriterije filtara.",
+      "generateResult": "Izrađeno: {created, plural, one {# zadatak} few {# zadatka} other {# zadataka}}, preskočeno: {skipped} (već postoje).",
+      "generateTasks": "Generiraj zadatke",
+      "generating": "Generiranje…",
+      "noRisk": "Nema rizika churna",
+      "salesDrop": "pad M-2→M-1",
+      "searchPlaceholder": "Traži partnera…",
+      "showAll": "Prikaži sve partnere s rizikom churna →"
+    },
+    "currency": {
+      "pln": "{value} PLN",
+      "thousandsPln": "{value} tis. PLN"
+    },
+    "header": {
+      "fallbackName": "korisniče",
+      "greeting": "Dobar dan, {name}!",
+      "subtitle": "Ovo je sažetak vaših aktivnosti i rezultata."
+    },
+    "kpi": {
+      "filters": {
+        "activeOpportunities": "Aktivne prilike u pipelineu",
+        "newLeadsThisWeek": "Novi leadovi – tekući tjedan",
+        "newLeadsValueThisWeek": "Novi leadovi – vrijednost, tekući tjedan",
+        "pipelineValue": "Vrijednost pipelinea"
+      },
+      "inPipeline": "u pipelineu",
+      "newLeads": "Novi leadovi",
+      "newLeadsValue": "Vrijednost novih leadova",
+      "newOpportunities": "Nove prilike",
+      "opportunitiesValue": "Vrijednost prilika",
+      "thisMonth": "ovaj mjesec",
+      "vsPreviousMonth": "vs prethodni mjesec",
+      "vsPreviousWeek": "vs prethodni tjedan",
+      "wonOpportunities": "Dobivene prilike"
+    },
+    "opportunities": {
+      "empty": "Nema prilika",
+      "name": "Naziv prilike",
+      "probability": "Vjerojatnost",
+      "showAll": "Prikaži sve prilike →",
+      "title": "Najnovije prilike"
+    },
+    "pipeline": {
+      "empty": "Nema podataka o pipelineu",
+      "modeCount": "Broj",
+      "modeValue": "Vrijednost",
+      "opportunityCount": "{count, plural, one {# prilika} few {# prilike} other {# prilika}}",
+      "title": "Prodajni pipeline",
+      "total": "Ukupna vrijednost pipelinea:"
+    },
+    "stages": {
+      "closed_lost": "Izgubljene",
+      "closed_won": "Dobivene",
+      "new": "Lead",
+      "onboarded": "Onboarded",
+      "onboarding": "Onboarding"
+    },
+    "tabs": {
+      "dashboard": "Nadzorna ploča"
+    },
+    "tasks": {
+      "calendar": "Kalendar",
+      "closeCommentPlaceholder": "Komentar pri zatvaranju *",
+      "closedNote": "[Zatvoreno {date}]: {comment}",
+      "dueToday": "rok danas",
+      "empty": "Nema zadataka za danas",
+      "overdue": "rok istekao",
+      "showAll": "Prikaži sve zadatke →",
+      "title": "Zadaci za danas"
+    }
+  },
   "sms": {
     "emptyConversation": "Nema poruka — napišite prvu u nastavku.",
     "last": "zadnja:",
@@ -1045,6 +1795,164 @@
       "received": "Primljeno",
       "sent": "Poslano"
     }
+  },
+  "softphone": {
+    "activity": {
+      "incomingTitle": "Dolazni poziv s broja {number}",
+      "outgoingTitle": "Odlazni poziv na broj {number}"
+    },
+    "confirm": {
+      "title": "Nazvati?"
+    },
+    "hangUp": "Prekini",
+    "incoming": {
+      "answer": "Javi se",
+      "answering": "Javljanje…",
+      "reject": "Odbij",
+      "title": "Dolazni poziv",
+      "unknownNumber": "Nepoznat broj"
+    },
+    "lookingUpContact": "Tražim kontakt…",
+    "mute": "Isključi zvuk",
+    "muted": "Zvuk isključen",
+    "phases": {
+      "active": "Razgovor",
+      "dialing": "Biranje…",
+      "ringing": "Zvoni…"
+    },
+    "postCall": {
+      "notePlaceholder": "Bilješka o razgovoru (neobavezno)…",
+      "saveFailed": "Pogreška pri spremanju — pokušajte ponovno",
+      "saveWithNote": "Spremi s bilješkom",
+      "savedOnLead": "Aktivnost će biti spremljena na razini leada",
+      "savedOnPartner": "Aktivnost će biti spremljena na razini partnera",
+      "saving": "Spremanje…",
+      "title": "Razgovor završen",
+      "transcriptLoaded": "Transkript je učitan — možete ga uređivati",
+      "transcriptLoading": "Dohvaćanje transkripta…",
+      "transcriptUnavailable": "Transkript nije dostupan — unesite bilješku ručno",
+      "withoutNote": "Bez bilješke"
+    },
+    "transcript": {
+      "agent": "Prodavač",
+      "client": "Klijent"
+    }
+  },
+  "substitutions": {
+    "cancel": {
+      "action": "Otkaži",
+      "confirm": "Otkazati ovu odsutnost? Zamjenik će izgubiti pristup koji proizlazi iz ove zamjene.",
+      "failed": "Otkazivanje odsutnosti nije uspjelo.",
+      "inProgress": "Otkazivanje…"
+    },
+    "covering": {
+      "empty": "Trenutačno nikoga ne zamjenjujete.",
+      "title": "Osobe koje zamjenjujem"
+    },
+    "errors": {
+      "dateFromRequired": "Unesite datum od.",
+      "dateToBeforeFrom": "Datum do ne može biti raniji od datuma od.",
+      "dateToRequired": "Unesite datum do.",
+      "rangeConflict": "Odsutna osoba već ima evidentiranu odsutnost u razdoblju koje se preklapa.",
+      "rangeInPast": "Razdoblje odsutnosti ne može u cijelosti biti u prošlosti.",
+      "substituteAbsent": "Ta je osoba odsutna u odabranom razdoblju.",
+      "substituteRequired": "Odaberite zamjenika.",
+      "substituteSameAsAbsent": "Zamjenik ne može biti ista osoba kao odsutna osoba."
+    },
+    "fields": {
+      "absentPerson": "Odsutna osoba",
+      "action": "Radnja",
+      "dateFrom": "Datum od",
+      "dateTo": "Datum do",
+      "note": "Bilješka",
+      "period": "Razdoblje",
+      "reason": "Razlog",
+      "status": "Status",
+      "substitute": "Zamjenik"
+    },
+    "form": {
+      "choose": "— odaberite —",
+      "fixErrors": "Ispravite označena polja i pokušajte ponovno.",
+      "noteOptional": "Bilješka (neobavezno)",
+      "notePlaceholder": "npr. hitne predmete uputiti…",
+      "saveFailed": "Spremanje zamjene nije uspjelo.",
+      "saved": "Zamjena je spremljena — zamjenik je dobio obavijest.",
+      "submit": "Spremi zamjenu",
+      "substituteAbsentHint": "Ta je osoba odsutna u odabranom razdoblju — odaberite drugog zamjenika."
+    },
+    "hint": "Navedite razdoblje odsutnosti i osobu koja će vas tada zamjenjivati. Za to vrijeme zamjenik dobiva potpun pristup vašim leadovima i partnerima — s istim ovlastima koje imate vi.",
+    "history": {
+      "toggle": "Povijest ({count})"
+    },
+    "list": {
+      "empty": "Nema odsutnosti koje su u tijeku ni nadolazećih.",
+      "loadFailed": "Dohvaćanje podataka nije uspjelo.",
+      "retry": "Pokušajte ponovno",
+      "titleOwn": "Odsutnosti (moje)",
+      "titleOwnAndTeam": "Odsutnosti (moje i tima)"
+    },
+    "note": {
+      "collapse": "sažmi",
+      "expand": "proširi"
+    },
+    "pager": {
+      "next": "Sljedeća stranica",
+      "previous": "Prethodna stranica"
+    },
+    "reasons": {
+      "other": "Druga odsutnost",
+      "sick_leave": "Bolovanje",
+      "vacation": "Godišnji odmor"
+    },
+    "selfFallback": "Ja",
+    "statuses": {
+      "active": "U tijeku",
+      "cancelled": "Otkazano",
+      "ended": "Završeno",
+      "upcoming": "Nadolazeće"
+    },
+    "title": "Zamjena tijekom odsutnosti"
+  },
+  "transactions": {
+    "amounts": {
+      "commission": "Provizija",
+      "gross": "Bruto",
+      "margin": "Marža",
+      "net": "Neto"
+    },
+    "filters": {
+      "allStatuses": "Svi statusi",
+      "allTypes": "Sve vrste",
+      "from": "Od",
+      "resultCount": "{count, plural, one {# transakcija} few {# transakcije} other {# transakcija}}",
+      "to": "Do"
+    },
+    "kpi": {
+      "count": "Transakcija",
+      "marginPct": "Marža %"
+    },
+    "products": {
+      "pax": "Pax",
+      "product": "Proizvod",
+      "routeOrPlace": "Ruta / Mjesto",
+      "time": "Vrijeme",
+      "type": "Vrsta"
+    },
+    "statuses": {
+      "cancelled": "Otkazana",
+      "confirmed": "Potvrđena",
+      "refunded": "Povrat"
+    },
+    "table": {
+      "date": "Datum",
+      "empty": "Nema transakcija koje zadovoljavaju kriterije.",
+      "partner": "Partner",
+      "products": "Proizvodi",
+      "reference": "Ref.",
+      "status": "Status",
+      "traveler": "Putnik"
+    },
+    "title": "Transakcije"
   },
   "whatsapp": {
     "checkingConfig": "Provjera konfiguracije...",

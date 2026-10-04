@@ -65,6 +65,77 @@
       "tasks": "Задачи"
     }
   },
+  "calendar": {
+    "allDay": "срок",
+    "breadcrumb": "Календарь",
+    "durationMinutes": "{minutes} мин",
+    "filters": {
+      "allPriorities": "Все приоритеты",
+      "allReps": "Все менеджеры по продажам",
+      "allTypes": "Все типы",
+      "groupsGroup": "Группы",
+      "repsGroup": "Менеджеры по продажам",
+      "showClosed": "показать закрытые",
+      "showNoDate": "показать без даты"
+    },
+    "meeting": {
+      "duration": "Длительность",
+      "locationPlaceholder": "Переговорная А, Москва",
+      "notes": "Заметки",
+      "participantsPlaceholder": "email1@company.ru, email2@company.ru",
+      "salesperson": "Менеджер по продажам"
+    },
+    "month": {
+      "more": "+ещё {count}"
+    },
+    "nav": {
+      "today": "Сегодня"
+    },
+    "tasks": {
+      "bulk": {
+        "closeSelected": "Закрыть выбранные задачи",
+        "selectOverdue": "Выбрать все просроченные задачи",
+        "selectedCount": "{count, plural, one {Выбрано: #} few {Выбрано: #} many {Выбрано: #} other {Выбрано: #}}"
+      },
+      "close": "Закрыть",
+      "count": "{count, plural, one {# активность} few {# активности} many {# активностей} other {# активности}}",
+      "editMode": "режим редактирования",
+      "empty": "Нет задач для отображения.",
+      "form": {
+        "assignTo": "Назначить",
+        "descriptionPlaceholder": "Описание…",
+        "titlePlaceholder": "Название…"
+      },
+      "loading": "Загрузка задач…",
+      "noDate": "без даты",
+      "readOnly": "только чтение",
+      "reopen": "Открыть снова",
+      "saveFailed": "Не удалось сохранить изменения в задаче"
+    },
+    "title": "Календарь активностей",
+    "views": {
+      "day": "День",
+      "month": "Месяц",
+      "tasks": "Задачи",
+      "week": "Неделя"
+    }
+  },
+  "callSimulator": {
+    "activity": {
+      "demoTranscript": "[00:00] Менеджер: Добрый день, это Ян Новак из CRMtree. Могу ли я поговорить с сотрудником, который отвечает за командировки?\n\n[00:08] Клиент: Да, слушаю. Это Марек Ковальский.\n\n[00:10] Менеджер: Добрый день, Марек. Я звоню по поводу оптимизации расходов на командировки в вашей компании. У вас есть минута?\n\n[00:18] Клиент: Да, говорите. Что именно вы предлагаете?\n\n[00:22] Менеджер: Мы предлагаем комплексную систему управления корпоративными поездками — бронирование авиабилетов, отелей и транспорта в одном месте. В среднем наши клиенты экономят от 15 до 25% расходов на поездки.\n\n[00:35] Клиент: Звучит интересно. Сколько поездок в год должно быть, чтобы это имело смысл?\n\n[00:40] Менеджер: Наша платформа окупается уже при нескольких десятках поездок в год. Я могу подготовить индивидуальный расчёт для вашей компании.\n\n[00:49] Клиент: Хорошо. Пришлите предложение на почту. Наша команда его посмотрит.\n\n[00:54] Менеджер: Конечно, отправлю уже сегодня. Можем ли мы также договориться о короткой онлайн-презентации, чтобы показать систему в работе?\n\n[01:02] Клиент: Да, можем. Я предложу время после того, как посмотрю предложение.\n\n[01:06] Менеджер: Отлично. Спасибо за разговор, до связи.\n\n[01:09] Клиент: До свидания.",
+      "summary": "Телефонный звонок: {who} ({seconds} с)",
+      "title": "Телефонный разговор — {who}",
+      "transcriptHeading": "--- Расшифровка ---"
+    },
+    "connected": "Соединено",
+    "connecting": "Установка соединения...",
+    "duration": "Время: {time}",
+    "endCall": "Завершить разговор",
+    "ended": "Разговор завершён",
+    "hangUp": "Завершить",
+    "noteSaved": "Заметка сохранена",
+    "savingNote": "Сохранение заметки..."
+  },
   "calls": {
     "call": "Позвонить",
     "callNumber": "Позвонить: {phone}",
@@ -85,6 +156,126 @@
       "granted": "Согласие",
       "noData": "Нет данных"
     }
+  },
+  "crmDashboard": {
+    "activities": {
+      "title": "Последние активности"
+    },
+    "columns": {
+      "adoption": "Использование",
+      "days": "Дни",
+      "expires": "Истекает",
+      "opportunities": "Сделки",
+      "partner": "Партнёр",
+      "revenue": "Выручка"
+    },
+    "kpi": {
+      "activePartners": "Активных партнёров",
+      "avgArrPerPartner": "Ср. ARR / партнёр",
+      "inOnboarding": "В онбординге",
+      "partnerGroups": "Групп партнёров",
+      "totalArr": "Общий ARR"
+    },
+    "partnerScores": {
+      "title": "Партнёры по результатам ({period})"
+    },
+    "periods": {
+      "currentYear": "Текущий год",
+      "last12Months": "Последние 12 мес.",
+      "last30Days": "Последние 30 дней",
+      "last90Days": "Последние 90 дней"
+    },
+    "pipeline": {
+      "empty": "Нет данных",
+      "title": "Воронка лидов"
+    },
+    "productMix": {
+      "title": "Продуктовый микс ({period})"
+    },
+    "renewals": {
+      "daysShort": "{days} дн.",
+      "title": "Предстоящие продления"
+    },
+    "title": "Дашборд CRM"
+  },
+  "csvImport": {
+    "actions": {
+      "downloadTemplate": "Скачать шаблон",
+      "exportData": "Экспорт данных"
+    },
+    "cards": {
+      "documents": {
+        "description": "Импорт метаданных документов. Сами файлы нужно добавить вручную после импорта. Номер документа генерируется автоматически.",
+        "title": "Документы (метаданные)"
+      },
+      "leads": {
+        "title": "Лиды продаж"
+      },
+      "partners": {
+        "title": "Партнёры"
+      },
+      "sales": {
+        "description": "Построчные данные из внешней системы продаж на уровне Партнёр × Продукт × Месяц. Связь с менеджером по продажам CRM устанавливает автоматически (ответственный за партнёра).",
+        "title": "Данные о продажах"
+      }
+    },
+    "dictionaries": {
+      "documentGroups": "Accounting|HR|Marketing|Obsługa Klienta|Operations|Sprzedaz|Zarzad"
+    },
+    "dropZone": {
+      "importing": "Импорт…",
+      "prompt": "Перетащите файл CSV или нажмите"
+    },
+    "errorsTable": {
+      "company": "Компания",
+      "error": "Ошибка",
+      "field": "Поле",
+      "name": "Название",
+      "row": "Строка"
+    },
+    "files": {
+      "salesTemplate": "shablon_dannye_o_prodazhah.csv",
+      "template": "shablon_{type}.csv"
+    },
+    "hints": {
+      "agentFields": "только если source=agent",
+      "dictionaryValues": "значения из справочника",
+      "dictionaryValuesHover": "значения из справочника (наведите курсор, чтобы увидеть)",
+      "dictionaryValuesTooltip": "значения из справочника — наведите курсор на подсказку, чтобы увидеть доступные значения",
+      "documentGroupName": "название группы документов",
+      "entitiesExample": "Компания ABC|Иван Иванов",
+      "entitiesSeparator": "организации, разделённые",
+      "example": "напр.",
+      "otherProducts": "другие…",
+      "partnerNumber": "ключ для связи с данными о продажах",
+      "salesPartnerNumber": "ключ для связи с карточкой партнёра в CRM",
+      "tagsSeparator": "разделённые"
+    },
+    "history": {
+      "date": "Дата",
+      "empty": "История импортов пуста.",
+      "errors": "Ошибки",
+      "file": "Файл",
+      "imported": "Импортировано",
+      "importedBy": "Кем",
+      "status": "Статус",
+      "title": "История импортов",
+      "type": "Тип"
+    },
+    "messages": {
+      "csvRequired": "Выберите файл в формате CSV.",
+      "exportFailed": "Не удалось экспортировать данные.",
+      "serverError": "Ошибка сервера",
+      "templateDownloadFailed": "Не удалось скачать шаблон."
+    },
+    "result": {
+      "errors": "{count, plural, one {# ошибка} few {# ошибки} many {# ошибок} other {# ошибки}}",
+      "imported": "{count, plural, one {Импортировано: #} few {Импортировано: #} many {Импортировано: #} other {Импортировано: #}}",
+      "skipped": "{count, plural, one {Пропущено: #} few {Пропущено: #} many {Пропущено: #} other {Пропущено: #}}",
+      "total": "Всего: {count}"
+    },
+    "subtitle": "Импортируйте лиды, партнёров и данные о продажах массово из файла CSV. Скачайте шаблон, заполните и загрузите.",
+    "title": "Импорт CSV"
   },
   "documents": {
     "add": "Добавить",
@@ -701,6 +892,82 @@
     "titlePlaceholder": "Название встречи",
     "titleRequiredPlaceholder": "Название встречи *"
   },
+  "onboardingBoard": {
+    "filters": {
+      "allAssignees": "Все исполнители",
+      "allPartners": "Все партнёры",
+      "searchPlaceholder": "Поиск партнёра, ИНН…"
+    },
+    "launch": {
+      "action": "Запуск",
+      "actionShort": "Запустить",
+      "confirm": "Запустить партнёра «{company}»? Партнёр получит статус «Активный» и будет виден в Реестре партнёров.",
+      "failed": "Ошибка запуска партнёра",
+      "inProgress": "Запуск…",
+      "moveToRegistry": "Перенести в Реестр партнёров",
+      "partnerProfile": "Профиль партнёра",
+      "remainingTasks": "{count, plural, one {Осталась # незавершённая задача} few {Остались # незавершённые задачи} many {Осталось # незавершённых задач} other {Осталось # незавершённой задачи}}",
+      "successHint": "Партнёр перенесён в Реестр партнёров и теперь активен.",
+      "successTitle": "{company} — запущен!"
+    },
+    "partners": {
+      "empty": "Нет партнёров в процессе внедрения",
+      "emptyHint": "Партнёры попадают сюда после перевода из лида",
+      "leadData": "Данные лида",
+      "stepBadge": "Шаг {step}/{total}",
+      "taskProgress": "{done}/{total} задач"
+    },
+    "steps": {
+      "configuration": "Настройка",
+      "contractSigning": "Подписание договора",
+      "launch": "Запуск",
+      "training": "Обучение"
+    },
+    "table": {
+      "action": "Действие",
+      "addedOn": "Добавлено",
+      "step": "Шаг",
+      "taskProgress": "Прогресс задач"
+    },
+    "taskForm": {
+      "assignedTo": "Назначено",
+      "choosePerson": "— выберите сотрудника —",
+      "create": "Создать задачу",
+      "done": "Задача выполнена",
+      "dueDate": "Срок выполнения",
+      "newTask": "Новая задача",
+      "note": "Заметка",
+      "notePlaceholder": "Дополнительная информация…",
+      "step": "Шаг процесса",
+      "time": "Время",
+      "timeHint": "(необязательно, по умолч. 09:00)",
+      "title": "Название задачи",
+      "titlePlaceholder": "Название задачи"
+    },
+    "taskTypes": {
+      "call": "Звонок"
+    },
+    "tasks": {
+      "delete": "Удалить задачу",
+      "empty": "Нет задач"
+    },
+    "timeline": {
+      "empty": "Нет задач со сроком выполнения"
+    },
+    "title": "Онбординг партнёров",
+    "toasts": {
+      "taskAdded": "Задача добавлена",
+      "taskDeleteFailed": "Ошибка удаления задачи",
+      "taskDeleted": "Задача удалена",
+      "taskSaveFailed": "Ошибка сохранения задачи",
+      "taskUpdated": "Задача обновлена"
+    },
+    "views": {
+      "calendar": "Календарь",
+      "partners": "Партнёры",
+      "timeline": "Шкала времени"
+    }
+  },
   "partnerDetail": {
     "activity": {
       "bodyPlaceholder": "Содержание / описание…",
@@ -950,6 +1217,35 @@
       "partnerAdmin": "Администратор партнёра"
     }
   },
+  "partnerGroups": {
+    "card": {
+      "morePartners": "+ещё {count}",
+      "partnersNoun": "{count, plural, one {партнёр} few {партнёра} many {партнёров} other {партнёра}}"
+    },
+    "details": {
+      "empty": "В этой группе нет партнёров.",
+      "manager": "Ответственный:",
+      "partnersInGroup": "Партнёры в группе ({count})",
+      "partnersStat": "Партнёров"
+    },
+    "empty": "Нет групп партнёров.",
+    "form": {
+      "create": "Создать",
+      "delete": "Удалить",
+      "description": "Описание",
+      "editTitle": "Редактировать группу",
+      "industry": "Отрасль",
+      "name": "Название",
+      "namePlaceholder": "Название группы"
+    },
+    "messages": {
+      "deleteConfirm": "Удалить группу «{name}»? Партнёры будут откреплены от неё.",
+      "deleteFailed": "Не удалось удалить группу",
+      "saveFailed": "Не удалось сохранить группу"
+    },
+    "newGroup": "Новая группа",
+    "title": "Группы партнёров"
+  },
   "partnersList": {
     "card": {
       "marginAmount": "{amount} PLN маржи",
@@ -1030,6 +1326,460 @@
       "table": "Таблица"
     }
   },
+  "periodFilter": {
+    "groups": {
+      "current": "Текущие",
+      "custom": "Свой",
+      "previous": "Предыдущие"
+    },
+    "presets": {
+      "currentMonth": "Текущий месяц",
+      "currentQuarter": "Текущий квартал",
+      "currentYear": "Текущий год (YTD {year})",
+      "customRange": "Свой период…",
+      "previousMonth": "Предыдущий месяц",
+      "previousQuarter": "Предыдущий квартал",
+      "previousYear": "Предыдущий год ({year})"
+    }
+  },
+  "reports": {
+    "common": {
+      "columns": {
+        "leads": "Лиды",
+        "pipeline": "Воронка",
+        "progress": "Прогресс",
+        "winRatePct": "Win%",
+        "won": "Выиграно"
+      },
+      "days": "{count, plural, one {# день} few {# дня} many {# дней} other {# дня}}",
+      "exportPdf": "Экспорт PDF",
+      "funnel": {
+        "subtitle": "Количество лидов и сумма PLN",
+        "title": "Воронка продаж"
+      },
+      "kpi": {
+        "activeLeads": "Активные лиды",
+        "avgSalesCycle": "Ср. цикл продажи",
+        "avgWonValue": "Ср. сумма выигранного",
+        "winRate": "Win Rate",
+        "wonPln": "Закрыто / Выиграно (PLN)"
+      },
+      "leadSources": {
+        "title": "Источники лидов",
+        "totalCaption": "лидов",
+        "winRate": "{value}% win rate"
+      },
+      "leadsShort": "{count} лид.",
+      "lostReasons": "Причины проигрыша",
+      "noData": "Нет данных",
+      "periods": {
+        "currentMonth": "Текущий месяц",
+        "currentQuarter": "Текущий квартал",
+        "currentYear": "Текущий год (YTD {year})",
+        "last3Months": "Последние 3 месяца",
+        "last6Months": "Последние 6 месяцев"
+      },
+      "refresh": "Обновить",
+      "salespeopleResults": "Результаты менеджеров по продажам",
+      "title": "Отчёты по продажам"
+    },
+    "leads": {
+      "activity": {
+        "empty": "Нет данных об активности",
+        "sourceAll": "Все",
+        "sourceLeads": "Лиды",
+        "sourcePartners": "Партнёры",
+        "title": "Активность менеджеров по продажам",
+        "types": {
+          "email": "Письма"
+        }
+      },
+      "drilldown": {
+        "funnel": "Воронка: {stage}",
+        "lost": "Проигранные: {reason}",
+        "pipelineAll": "Воронка – все активные",
+        "plannedBudget": "Плановый бюджет – лиды за период",
+        "plannedInPeriod": "Запланировано к закрытию в периоде",
+        "source": "Источник: {source}",
+        "velocity": "Время на этапе: {stage}",
+        "won": "Закрыто / Выиграно"
+      },
+      "empty": {
+        "hint": "Добавьте лиды или измените диапазон дат",
+        "title": "Нет данных за выбранный период"
+      },
+      "funnel": {
+        "conversionToWon": "Конверсия в «Выигран»"
+      },
+      "kpi": {
+        "activeCount": "{count, plural, one {# активный} few {# активных} many {# активных} other {# активного}}",
+        "budgetCompletion": "{value}% выполнения",
+        "contractsCount": "{count, plural, one {# контракт} few {# контракта} many {# контрактов} other {# контракта}}",
+        "noPlan": "Нет плана",
+        "plannedBudget": "Плановый бюджет",
+        "plannedBudgetPln": "Плановый бюджет (PLN)",
+        "plannedDelivery": "Запланировано к закрытию"
+      },
+      "lostReasons": {
+        "empty": "Нет проигранных лидов",
+        "leadsCount": "{count, plural, one {# лид} few {# лида} many {# лидов} other {# лида}}",
+        "topReason": "Главная причина:"
+      },
+      "sourceQuality": {
+        "title": "Качество по источникам (win rate)"
+      },
+      "tooltips": {
+        "goToOnboarding": "Нажмите, чтобы перейти в раздел «Онбординг»",
+        "viewLeads": "Нажмите, чтобы посмотреть лиды",
+        "viewLeadsClosingInPeriod": "Нажмите, чтобы посмотреть лиды с датой закрытия в этом периоде",
+        "viewLeadsInPeriod": "Нажмите, чтобы посмотреть лиды за этот период",
+        "viewLostLeads": "Нажмите, чтобы посмотреть проигранные лиды: {reason}",
+        "viewSalespersonLeads": "Нажмите, чтобы посмотреть лиды менеджера по продажам",
+        "viewSourceLeads": "Нажмите, чтобы посмотреть лиды из источника: {source}",
+        "viewStageLeads": "Нажмите, чтобы посмотреть лиды на этапе: {stage}",
+        "viewWonLeads": "Нажмите, чтобы посмотреть выигранные лиды"
+      },
+      "trend": {
+        "activeTooltip": "Активные (Квалификация–Переговоры): {count}",
+        "new": "Новые",
+        "title": "Помесячный тренд",
+        "won": "Выигранные",
+        "wonTooltip": "Выиграно: {count}"
+      },
+      "velocity": {
+        "scale": "Шкала: макс. {count, plural, one {# день} few {# дня} many {# дней} other {# дня}}",
+        "title": "Время на этапе (ср. дней)"
+      }
+    },
+    "overview": {
+      "banner": {
+        "after": "импортированных данных",
+        "before": "Графики основаны на",
+        "manageImport": "Управление импортом",
+        "months": "{count, plural, one {# месяце} few {# месяцах} many {# месяцах} other {# месяца}}",
+        "partner": "партнёр:",
+        "product": "продукт:"
+      },
+      "chart": {
+        "pipelineTooltip": "Воронка: {value} тыс. PLN",
+        "projectedWeighted": "Прогнозная сумма (взвешенная):",
+        "title": "Выручка по месяцам",
+        "wonTooltip": "Выиграно: {value} тыс. PLN"
+      },
+      "external": {
+        "feeRate": "Fee rate: {value}%",
+        "feesPln": "Fees (PLN)",
+        "grossTurnoverPln": "Оборот брутто (PLN)",
+        "margin": "Маржа: {value}%",
+        "netTurnoverPln": "Оборот нетто (PLN)",
+        "productsCount": "{count, plural, one {# продукт} few {# продукта} many {# продуктов} other {# продукта}}",
+        "revenuePln": "Выручка (PLN)",
+        "share": "Доля: {value}%",
+        "source": "Внешние данные",
+        "transactions": "Транзакций"
+      },
+      "filters": {
+        "allPartners": "Все партнёры",
+        "allProducts": "Все продукты"
+      },
+      "funnel": {
+        "closed": "Закрыт",
+        "conversionNewToQualification": "Конверсия Новый→Квалиф.",
+        "conversionOfferToClosed": "Конверсия Предл.→Закр.",
+        "projectedValue": "Прогнозная сумма"
+      },
+      "kpi": {
+        "aboveTarget": "Выше цели",
+        "activePipeline": "Активная воронка",
+        "avgClosingTime": "Среднее время закрытия",
+        "belowTarget": "Ниже цели",
+        "hotCount": "{count, plural, one {# горячий} few {# горячих} many {# горячих} other {# горячего}}",
+        "noneInPeriod": "Нет в этом периоде",
+        "wonContracts": "Выигранные контракты"
+      },
+      "loading": "Загрузка отчётов…",
+      "lostReasons": {
+        "choseCompetitor": "Выбрал конкурента",
+        "insight": "{percent}% проигрышей связаны с причиной «{reason}».",
+        "insightLabel": "Вывод:",
+        "noBudget": "Нет бюджета",
+        "priceTooHigh": "Слишком высокая цена",
+        "projectPostponed": "Проект отложен"
+      },
+      "periods": {
+        "year": "{year} год"
+      },
+      "sourceQuality": {
+        "title": "Качество по источникам"
+      },
+      "sources": {
+        "campaign": "Кампания",
+        "coldOutreach": "Cold outreach",
+        "referrals": "Рекомендации",
+        "socialMedia": "Соцсети",
+        "tradeFairs": "Выставки"
+      },
+      "table": {
+        "fees": "Fees",
+        "grossTurnover": "Оборот брутто",
+        "net": "Нетто",
+        "partners": "Партнёры",
+        "revenue": "Выручка"
+      },
+      "velocity": {
+        "demoToOffer": "Презентация → Предложение",
+        "negotiationToClosing": "Переговоры → Закрытие",
+        "newToQualification": "Новый → Квалификация",
+        "offerToNegotiation": "Предложение → Переговоры",
+        "qualificationToDemo": "Квалификация → Презентация",
+        "title": "Время на этапе (в среднем дней)"
+      }
+    },
+    "partnerAnalytics": {
+      "byProduct": {
+        "title": "Структура по продуктам"
+      },
+      "columns": {
+        "grossA": "Брутто A",
+        "grossB": "Брутто B",
+        "grossDelta": "Δ Брутто",
+        "marginA": "Маржа A",
+        "marginB": "Маржа B",
+        "netA": "Нетто A",
+        "netB": "Нетто B",
+        "partner": "Партнёр",
+        "partnersShort": "Парт.",
+        "productsA": "Прод. A",
+        "productsB": "Прод. B",
+        "productsDelta": "Δ Прод.",
+        "segment": "Сегмент"
+      },
+      "emptyPeriod": "Нет данных за выбранный период",
+      "filterMode": "Фильтр",
+      "kpi": {
+        "grossTurnoverPln": "Оборот брутто (PLN)",
+        "margin": "Маржа",
+        "netTurnoverPln": "Оборот нетто (PLN)",
+        "productsCount": "Количество продуктов"
+      },
+      "modes": {
+        "custom": "Свой",
+        "mom": "MoM",
+        "qoq": "QoQ",
+        "yoy": "YoY"
+      },
+      "noData": "Нет данных",
+      "partners": {
+        "allGroups": "Все группы",
+        "allIndustries": "Все отрасли",
+        "count": "{count, plural, one {# партнёр} few {# партнёра} many {# партнёров} other {# партнёра}}",
+        "searchPlaceholder": "Поиск партнёра…",
+        "showMore": "Показать ещё (осталось: {count})",
+        "title": "Партнёры — оборот брутто"
+      },
+      "percentagePoints": "{value} п. п.",
+      "period": {
+        "a": "Период A:",
+        "b": "Период B:",
+        "customB": "Свой период B:",
+        "summary": "{partners, plural, one {# партнёр} few {# партнёра} many {# партнёров} other {# партнёра}} · {products, plural, one {# продукт} few {# продукта} many {# продуктов} other {# продукта}}",
+        "to": "по"
+      },
+      "refresh": "Обновить",
+      "reps": {
+        "noSalesperson": "— нет —",
+        "subtitle": "Период A vs Период B",
+        "title": "Результаты по менеджерам по продажам"
+      },
+      "title": "Аналитический дашборд — Партнёры",
+      "trend": {
+        "countTooltip": "{period}: {count} шт.",
+        "title": "Помесячный тренд — {metric}"
+      },
+      "trendMetrics": {
+        "count": "Количество транзакций",
+        "gross": "Оборот брутто",
+        "margin": "Маржа (сумма)",
+        "net": "Оборот нетто"
+      }
+    },
+    "partners": {
+      "allPartners": {
+        "empty": "Нет данных за выбранный период",
+        "title": "Результаты всех партнёров",
+        "total": "ИТОГО"
+      },
+      "churn": {
+        "criticalCount": "{count, plural, one {# критический} few {# критических} many {# критических} other {# критического}}",
+        "daysShort": "{days} дн.",
+        "empty": "Нет партнёров с риском оттока",
+        "showAll": "Показать всех партнёров с риском оттока",
+        "title": "Риск оттока партнёров"
+      },
+      "columns": {
+        "fees": "Fees",
+        "grossTurnover": "Оборот брутто",
+        "health": "Health",
+        "margin": "Маржа",
+        "netTurnover": "Оборот нетто",
+        "partner": "Партнёр",
+        "revenue": "Выручка",
+        "transactionsShort": "Транз."
+      },
+      "emptyHint": "Импортируйте данные через Импорт CSV",
+      "filters": {
+        "allPartners": "Все партнёры",
+        "currentGroup": "Текущие",
+        "currentMonth": "Текущий месяц",
+        "previousGroup": "Предыдущие",
+        "previousMonth": "Предыдущий месяц",
+        "previousQuarter": "Предыдущий квартал",
+        "previousYear": "Предыдущий год ({year})"
+      },
+      "grossTurnoverPln": "Оборот брутто (PLN)",
+      "health": {
+        "good": "Здоров",
+        "risk": "Риск",
+        "warning": "Внимание"
+      },
+      "healthPoints": "{score} балл.",
+      "kpi": {
+        "activePartners": "Активных партнёров",
+        "feeRateShare": "{percent}% fee rate",
+        "feesPln": "Fees (PLN)",
+        "productsCount": "Продукты: {count}",
+        "revenueMarginPln": "Выручка / Маржа (PLN)",
+        "revenueTrend": "тренд выручки",
+        "showPartnersTooltip": "Нажмите, чтобы посмотреть партнёров",
+        "vsPrevious": "{delta} к предыдущему"
+      },
+      "marginShare": "{percent}% маржи",
+      "noData": "Нет данных",
+      "openPartnerTooltip": "Нажмите, чтобы перейти в карточку партнёра",
+      "partnersCount": "{count, plural, one {# партнёр} few {# партнёра} many {# партнёров} other {# партнёра}}",
+      "products": {
+        "title": "Разбивка по продуктам"
+      },
+      "refresh": "Обновить",
+      "reps": {
+        "showPartnersTooltip": "Нажмите, чтобы посмотреть партнёров этого менеджера по продажам",
+        "title": "Результаты менеджеров по продажам"
+      },
+      "scorecard": {
+        "empty": "Нет данных о партнёрах",
+        "legend": {
+          "good": "хорошо",
+          "medium": "средне",
+          "poor": "слабо"
+        },
+        "title": "Scorecard партнёров"
+      },
+      "summary": {
+        "feeRate": "Fee rate",
+        "feesCommissions": "Fees / Комиссии",
+        "marginPct": "% маржи",
+        "revenueMargin": "Выручка (маржа)",
+        "title": "Финансовая сводка"
+      },
+      "title": "Partner Performance",
+      "trend": {
+        "title": "Тренд выручки",
+        "totalTurnover": "Общий оборот"
+      }
+    }
+  },
+  "salesDashboard": {
+    "activity": {
+      "allLoaded": "Все активности загружены",
+      "empty": "Нет активностей",
+      "incomingEmail": "← E-mail",
+      "refresh": "Обновить",
+      "title": "Последняя активность",
+      "yesterday": "Вчера"
+    },
+    "chart": {
+      "periods": {
+        "month": "Месяц",
+        "quarter": "Квартал",
+        "week": "Неделя"
+      },
+      "title": "Результаты продаж",
+      "vsPreviousPeriod": "к предыдущему периоду"
+    },
+    "churn": {
+      "allLevels": "Все уровни",
+      "daysSinceOrder": "дней без заказа",
+      "empty": "Нет партнёров с риском оттока, соответствующих фильтрам.",
+      "generateResult": "Создано: {created, plural, one {# задача} few {# задачи} many {# задач} other {# задачи}}, пропущено: {skipped} (уже существуют).",
+      "generateTasks": "Создать задачи",
+      "generating": "Создание…",
+      "noRisk": "Нет риска оттока",
+      "salesDrop": "падение M-2→M-1",
+      "searchPlaceholder": "Поиск партнёра…",
+      "showAll": "Показать всех партнёров с риском оттока →"
+    },
+    "currency": {
+      "pln": "{value} PLN",
+      "thousandsPln": "{value} тыс. PLN"
+    },
+    "header": {
+      "fallbackName": "пользователь",
+      "greeting": "Добрый день, {name}!",
+      "subtitle": "Вот сводка ваших активностей и результатов."
+    },
+    "kpi": {
+      "filters": {
+        "activeOpportunities": "Активные сделки в воронке",
+        "newLeadsThisWeek": "Новые лиды – текущая неделя",
+        "newLeadsValueThisWeek": "Новые лиды – сумма за текущую неделю",
+        "pipelineValue": "Сумма воронки"
+      },
+      "inPipeline": "в воронке",
+      "newLeads": "Новые лиды",
+      "newLeadsValue": "Сумма новых лидов",
+      "newOpportunities": "Новые сделки",
+      "opportunitiesValue": "Сумма сделок",
+      "thisMonth": "в этом месяце",
+      "vsPreviousMonth": "к предыдущему месяцу",
+      "vsPreviousWeek": "к предыдущей неделе",
+      "wonOpportunities": "Выигранные сделки"
+    },
+    "opportunities": {
+      "empty": "Нет сделок",
+      "name": "Название сделки",
+      "probability": "Вероятность",
+      "showAll": "Показать все сделки →",
+      "title": "Последние сделки"
+    },
+    "pipeline": {
+      "empty": "Нет данных по воронке",
+      "modeCount": "Количество",
+      "modeValue": "Сумма",
+      "opportunityCount": "{count, plural, one {# сделка} few {# сделки} many {# сделок} other {# сделки}}",
+      "title": "Воронка продаж",
+      "total": "Общая сумма воронки:"
+    },
+    "stages": {
+      "closed_lost": "Проигранные",
+      "closed_won": "Выигранные",
+      "new": "Лид",
+      "onboarded": "Прошли онбординг",
+      "onboarding": "Онбординг"
+    },
+    "tabs": {
+      "dashboard": "Дашборд"
+    },
+    "tasks": {
+      "calendar": "Календарь",
+      "closeCommentPlaceholder": "Комментарий при закрытии *",
+      "closedNote": "[Закрыто {date}]: {comment}",
+      "dueToday": "срок сегодня",
+      "empty": "На сегодня задач нет",
+      "overdue": "просрочено",
+      "showAll": "Показать все задачи →",
+      "title": "Задачи на сегодня"
+    }
+  },
   "sms": {
     "emptyConversation": "Нет сообщений — напишите первое ниже.",
     "last": "последнее:",
@@ -1045,6 +1795,164 @@
       "received": "Получено",
       "sent": "Отправлено"
     }
+  },
+  "softphone": {
+    "activity": {
+      "incomingTitle": "Входящий звонок от {number}",
+      "outgoingTitle": "Исходящий звонок на {number}"
+    },
+    "confirm": {
+      "title": "Позвонить?"
+    },
+    "hangUp": "Завершить",
+    "incoming": {
+      "answer": "Ответить",
+      "answering": "Соединение…",
+      "reject": "Отклонить",
+      "title": "Входящий звонок",
+      "unknownNumber": "Неизвестный номер"
+    },
+    "lookingUpContact": "Поиск контакта…",
+    "mute": "Выкл. микрофон",
+    "muted": "Микрофон выкл.",
+    "phases": {
+      "active": "Разговор",
+      "dialing": "Набор номера…",
+      "ringing": "Вызов…"
+    },
+    "postCall": {
+      "notePlaceholder": "Заметка о разговоре (необязательно)…",
+      "saveFailed": "Ошибка сохранения — попробуйте ещё раз",
+      "saveWithNote": "Сохранить с заметкой",
+      "savedOnLead": "Активность будет сохранена на уровне лида",
+      "savedOnPartner": "Активность будет сохранена на уровне партнёра",
+      "saving": "Сохранение…",
+      "title": "Разговор завершён",
+      "transcriptLoaded": "Расшифровка загружена — её можно отредактировать",
+      "transcriptLoading": "Загрузка расшифровки…",
+      "transcriptUnavailable": "Расшифровка недоступна — введите заметку вручную",
+      "withoutNote": "Без заметки"
+    },
+    "transcript": {
+      "agent": "Менеджер",
+      "client": "Клиент"
+    }
+  },
+  "substitutions": {
+    "cancel": {
+      "action": "Отменить",
+      "confirm": "Отменить это отсутствие? Замещающий потеряет доступ, полученный в рамках этого замещения.",
+      "failed": "Не удалось отменить отсутствие.",
+      "inProgress": "Отмена…"
+    },
+    "covering": {
+      "empty": "Сейчас вы никого не замещаете.",
+      "title": "Кого я замещаю"
+    },
+    "errors": {
+      "dateFromRequired": "Укажите дату начала.",
+      "dateToBeforeFrom": "Дата окончания не может быть раньше даты начала.",
+      "dateToRequired": "Укажите дату окончания.",
+      "rangeConflict": "У отсутствующего сотрудника уже зарегистрировано отсутствие на пересекающийся период.",
+      "rangeInPast": "Период отсутствия не может целиком находиться в прошлом.",
+      "substituteAbsent": "Этот сотрудник отсутствует в выбранный период.",
+      "substituteRequired": "Выберите замещающего.",
+      "substituteSameAsAbsent": "Замещающий не может быть тем же сотрудником, что и отсутствующий."
+    },
+    "fields": {
+      "absentPerson": "Отсутствующий сотрудник",
+      "action": "Действие",
+      "dateFrom": "Дата начала",
+      "dateTo": "Дата окончания",
+      "note": "Заметка",
+      "period": "Период",
+      "reason": "Причина",
+      "status": "Статус",
+      "substitute": "Замещающий"
+    },
+    "form": {
+      "choose": "— выберите —",
+      "fixErrors": "Исправьте отмеченные поля и попробуйте ещё раз.",
+      "noteOptional": "Заметка (необязательно)",
+      "notePlaceholder": "напр. срочные вопросы направлять…",
+      "saveFailed": "Не удалось сохранить замещение.",
+      "saved": "Замещение сохранено — замещающий получил уведомление.",
+      "submit": "Сохранить замещение",
+      "substituteAbsentHint": "Этот сотрудник отсутствует в выбранный период — выберите другого замещающего."
+    },
+    "hint": "Укажите период отсутствия и сотрудника, который будет вас замещать. На это время замещающий получит полный доступ к вашим лидам и партнёрам — с теми же правами, что и у вас.",
+    "history": {
+      "toggle": "История ({count})"
+    },
+    "list": {
+      "empty": "Нет текущих и предстоящих отсутствий.",
+      "loadFailed": "Не удалось загрузить данные.",
+      "retry": "Повторить попытку",
+      "titleOwn": "Отсутствия (мои)",
+      "titleOwnAndTeam": "Отсутствия (мои и команды)"
+    },
+    "note": {
+      "collapse": "свернуть",
+      "expand": "развернуть"
+    },
+    "pager": {
+      "next": "Следующая страница",
+      "previous": "Предыдущая страница"
+    },
+    "reasons": {
+      "other": "Другое отсутствие",
+      "sick_leave": "Больничный",
+      "vacation": "Отпуск"
+    },
+    "selfFallback": "Я",
+    "statuses": {
+      "active": "Идёт",
+      "cancelled": "Отменено",
+      "ended": "Завершено",
+      "upcoming": "Предстоит"
+    },
+    "title": "Замещение на время отсутствия"
+  },
+  "transactions": {
+    "amounts": {
+      "commission": "Комиссия",
+      "gross": "Брутто",
+      "margin": "Маржа",
+      "net": "Нетто"
+    },
+    "filters": {
+      "allStatuses": "Все статусы",
+      "allTypes": "Все типы",
+      "from": "С",
+      "resultCount": "{count, plural, one {# транзакция} few {# транзакции} many {# транзакций} other {# транзакции}}",
+      "to": "По"
+    },
+    "kpi": {
+      "count": "Транзакций",
+      "marginPct": "Маржа %"
+    },
+    "products": {
+      "pax": "Pax",
+      "product": "Продукт",
+      "routeOrPlace": "Маршрут / Место",
+      "time": "Время",
+      "type": "Тип"
+    },
+    "statuses": {
+      "cancelled": "Отменена",
+      "confirmed": "Подтверждена",
+      "refunded": "Возврат"
+    },
+    "table": {
+      "date": "Дата",
+      "empty": "Нет транзакций, соответствующих критериям.",
+      "partner": "Партнёр",
+      "products": "Продукты",
+      "reference": "Ref.",
+      "status": "Статус",
+      "traveler": "Путешественник"
+    },
+    "title": "Транзакции"
   },
   "whatsapp": {
     "checkingConfig": "Проверка конфигурации...",

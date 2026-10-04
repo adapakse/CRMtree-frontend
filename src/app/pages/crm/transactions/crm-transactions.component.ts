@@ -3,26 +3,29 @@ import { Component, OnInit, inject, NgZone, ChangeDetectorRef} from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  CrmApiService, Transaction, PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, ProductType,
+  CrmApiService, Transaction, PRODUCT_TYPE_ICONS, ProductType,
 } from '../../../core/services/crm-api.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'wt-crm-transactions',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="txn-page">
   <div class="txn-header">
-    <h1>Transakcje</h1>
+    <h1>{{ t('transactions.title') }}</h1>
   </div>
 
   <!-- KPI strip -->
   <div class="kpi-strip" *ngIf="report">
-    <div class="kpi"><div class="kpi-val">{{report.transaction_count | number}}</div><div class="kpi-lbl">Transakcji</div></div>
-    <div class="kpi accent"><div class="kpi-val">{{report.total_gross | number:'1.0-0'}} PLN</div><div class="kpi-lbl">Brutto</div></div>
-    <div class="kpi green"><div class="kpi-val">{{report.total_margin | number:'1.0-0'}} PLN</div><div class="kpi-lbl">Marża</div></div>
-    <div class="kpi"><div class="kpi-val">{{report.margin_pct | number:'1.0-1'}}%</div><div class="kpi-lbl">Marża %</div></div>
-    <div class="kpi"><div class="kpi-val">{{report.total_commission | number:'1.0-0'}} PLN</div><div class="kpi-lbl">Prowizja</div></div>
+    <div class="kpi"><div class="kpi-val">{{report.transaction_count | number}}</div><div class="kpi-lbl">{{ t('transactions.kpi.count') }}</div></div>
+    <div class="kpi accent"><div class="kpi-val">{{report.total_gross | number:'1.0-0'}} PLN</div><div class="kpi-lbl">{{ t('transactions.amounts.gross') }}</div></div>
+    <div class="kpi green"><div class="kpi-val">{{report.total_margin | number:'1.0-0'}} PLN</div><div class="kpi-lbl">{{ t('transactions.amounts.margin') }}</div></div>
+    <div class="kpi"><div class="kpi-val">{{report.margin_pct | number:'1.0-1'}}%</div><div class="kpi-lbl">{{ t('transactions.kpi.marginPct') }}</div></div>
+    <div class="kpi"><div class="kpi-val">{{report.total_commission | number:'1.0-0'}} PLN</div><div class="kpi-lbl">{{ t('transactions.amounts.commission') }}</div></div>
     <div class="product-mix" *ngIf="productMix.length">
       <span class="mix-chip" *ngFor="let m of productMix.slice(0,5)">
         {{productIcon(m.product_type)}} {{productLabel(m.product_type)}} {{m.total_gross | number:'1.0-0'}} PLN
@@ -32,72 +35,72 @@ import {
 
   <!-- Filters -->
   <div class="txn-filters">
-    <input type="date" [(ngModel)]="filterFrom" (ngModelChange)="reload()" class="filter-input" placeholder="Od">
-    <input type="date" [(ngModel)]="filterTo"   (ngModelChange)="reload()" class="filter-input" placeholder="Do">
+    <input type="date" [(ngModel)]="filterFrom" (ngModelChange)="reload()" class="filter-input" [placeholder]="t('transactions.filters.from')">
+    <input type="date" [(ngModel)]="filterTo"   (ngModelChange)="reload()" class="filter-input" [placeholder]="t('transactions.filters.to')">
     <select [(ngModel)]="filterType" (ngModelChange)="reload()" class="filter-input">
-      <option value="">Wszystkie typy</option>
-      <option *ngFor="let t of typeOptions" [value]="t.key">{{t.icon}} {{t.label}}</option>
+      <option value="">{{ t('transactions.filters.allTypes') }}</option>
+      <option *ngFor="let typeOption of typeOptions" [value]="typeOption.key">{{typeOption.icon}} {{productLabel(typeOption.key)}}</option>
     </select>
     <select [(ngModel)]="filterStatus" (ngModelChange)="reload()" class="filter-input">
-      <option value="">Wszystkie statusy</option>
-      <option value="confirmed">✓ Potwierdzona</option>
-      <option value="cancelled">✗ Anulowana</option>
-      <option value="refunded">↩ Zwrot</option>
+      <option value="">{{ t('transactions.filters.allStatuses') }}</option>
+      <option value="confirmed">✓ {{ t('transactions.statuses.confirmed') }}</option>
+      <option value="cancelled">✗ {{ t('transactions.statuses.cancelled') }}</option>
+      <option value="refunded">↩ {{ t('transactions.statuses.refunded') }}</option>
     </select>
-    <span class="result-count">{{total}} transakcji</span>
+    <span class="result-count">{{ t('transactions.filters.resultCount', { count: total }) }}</span>
   </div>
 
-  <div *ngIf="loading" class="loading">Ładowanie…</div>
+  <div *ngIf="loading" class="loading">{{ 'states.loading' | transloco }}</div>
 
   <div *ngIf="!loading" class="txn-table-wrap">
     <table class="txn-table">
       <thead>
         <tr>
-          <th>Data</th>
-          <th>Ref.</th>
-          <th>Partner</th>
-          <th>Podróżny</th>
-          <th>Produkty</th>
-          <th class="num">Brutto</th>
-          <th class="num green-th">Marża</th>
-          <th class="num">Prowizja</th>
-          <th>Status</th>
+          <th>{{ t('transactions.table.date') }}</th>
+          <th>{{ t('transactions.table.reference') }}</th>
+          <th>{{ t('transactions.table.partner') }}</th>
+          <th>{{ t('transactions.table.traveler') }}</th>
+          <th>{{ t('transactions.table.products') }}</th>
+          <th class="num">{{ t('transactions.amounts.gross') }}</th>
+          <th class="num green-th">{{ t('transactions.amounts.margin') }}</th>
+          <th class="num">{{ t('transactions.amounts.commission') }}</th>
+          <th>{{ t('transactions.table.status') }}</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let t of transactions">
-          <tr class="txn-row" [class.expanded]="expandedId === t.id">
-            <td class="muted">{{t.transaction_date | date:'dd.MM.yyyy'}}</td>
-            <td><code>{{t.booking_ref || t.external_id}}</code></td>
-            <td>{{t.partner_company || '—'}}</td>
+        <ng-container *ngFor="let txn of transactions">
+          <tr class="txn-row" [class.expanded]="expandedId === txn.id">
+            <td class="muted">{{txn.transaction_date | date:'dd.MM.yyyy'}}</td>
+            <td><code>{{txn.booking_ref || txn.external_id}}</code></td>
+            <td>{{txn.partner_company || '—'}}</td>
             <td>
-              {{t.traveler_name || '—'}}
-              <div class="row-sub" *ngIf="t.traveler_email">{{t.traveler_email}}</div>
+              {{txn.traveler_name || '—'}}
+              <div class="row-sub" *ngIf="txn.traveler_email">{{txn.traveler_email}}</div>
             </td>
             <td>
               <div class="product-tags">
-                <span class="ptag" *ngFor="let p of (t.products || []).slice(0,3)">
+                <span class="ptag" *ngFor="let p of (txn.products || []).slice(0,3)">
                   {{productIcon(p.product_type)}} {{productLabel(p.product_type)}}
                 </span>
-                <span class="ptag more" *ngIf="(t.products || []).length > 3">+{{(t.products || []).length - 3}}</span>
+                <span class="ptag more" *ngIf="(txn.products || []).length > 3">+{{(txn.products || []).length - 3}}</span>
               </div>
             </td>
-            <td class="num">{{t.total_gross | number:'1.0-0'}}</td>
-            <td class="num green-cell">{{t.total_margin | number:'1.0-0'}}</td>
-            <td class="num">{{t.total_commission | number:'1.0-0'}}</td>
-            <td><span class="status-chip status-{{t.status}}">{{statusLabel(t.status)}}</span></td>
-            <td><button class="expand-btn" (click)="toggleExpand(t.id)">{{expandedId === t.id ? '▲' : '▼'}}</button></td>
+            <td class="num">{{txn.total_gross | number:'1.0-0'}}</td>
+            <td class="num green-cell">{{txn.total_margin | number:'1.0-0'}}</td>
+            <td class="num">{{txn.total_commission | number:'1.0-0'}}</td>
+            <td><span class="status-chip status-{{txn.status}}">{{statusLabel(txn.status)}}</span></td>
+            <td><button class="expand-btn" (click)="toggleExpand(txn.id)">{{expandedId === txn.id ? '▲' : '▼'}}</button></td>
           </tr>
           <!-- Expanded products -->
-          <tr *ngIf="expandedId === t.id" class="detail-row">
+          <tr *ngIf="expandedId === txn.id" class="detail-row">
             <td colspan="10">
               <table class="products-table">
                 <thead>
-                  <tr><th>Typ</th><th>Produkt</th><th>Trasa / Miejsce</th><th>Czas</th><th class="num">Netto</th><th class="num">Brutto</th><th class="num">Prowizja</th><th class="num">Marża</th><th>Pax</th></tr>
+                  <tr><th>{{ t('transactions.products.type') }}</th><th>{{ t('transactions.products.product') }}</th><th>{{ t('transactions.products.routeOrPlace') }}</th><th>{{ t('transactions.products.time') }}</th><th class="num">{{ t('transactions.amounts.net') }}</th><th class="num">{{ t('transactions.amounts.gross') }}</th><th class="num">{{ t('transactions.amounts.commission') }}</th><th class="num">{{ t('transactions.amounts.margin') }}</th><th>{{ t('transactions.products.pax') }}</th></tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let p of (t.products || [])">
+                  <tr *ngFor="let p of (txn.products || [])">
                     <td>{{productIcon(p.product_type)}} {{productLabel(p.product_type)}}</td>
                     <td>
                       <strong>{{p.product_name || p.hotel_name || p.flight_number || p.car_category || '—'}}</strong>
@@ -129,7 +132,7 @@ import {
           </tr>
         </ng-container>
         <tr *ngIf="transactions.length === 0">
-          <td colspan="10" class="empty-msg">Brak transakcji spełniających kryteria.</td>
+          <td colspan="10" class="empty-msg">{{ t('transactions.table.empty') }}</td>
         </tr>
       </tbody>
     </table>
@@ -140,6 +143,7 @@ import {
     </div>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
     .txn-page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
@@ -193,6 +197,7 @@ export class CrmTransactionsComponent implements OnInit {
   private api = inject(CrmApiService);
   private zone = inject(NgZone);
   private cdr  = inject(ChangeDetectorRef);
+  private transloco = inject(TranslocoService);
 
   transactions: Transaction[] = [];
   report: any = null;
@@ -208,8 +213,8 @@ export class CrmTransactionsComponent implements OnInit {
   filterType = '';
   filterStatus = '';
 
-  typeOptions = Object.entries(PRODUCT_TYPE_LABELS)
-    .map(([key, label]) => ({ key: key as ProductType, label, icon: PRODUCT_TYPE_ICONS[key as ProductType] }));
+  typeOptions = (Object.keys(PRODUCT_TYPE_ICONS) as ProductType[])
+    .map(key => ({ key, icon: PRODUCT_TYPE_ICONS[key] }));
 
   get totalPages() { return Math.ceil(this.total / this.pageSize); }
 
@@ -235,9 +240,9 @@ export class CrmTransactionsComponent implements OnInit {
   }
 
   toggleExpand(id: number) { this.expandedId = this.expandedId === id ? null : id; }
-  productLabel(t: string) { return PRODUCT_TYPE_LABELS[t as ProductType] || t; }
+  productLabel(t: string) { return t in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + t) : t; }
   productIcon(t: string)  { return PRODUCT_TYPE_ICONS[t as ProductType] || '📦'; }
-  statusLabel(s: string)  { return { confirmed:'Potwierdzona', cancelled:'Anulowana', refunded:'Zwrot' }[s] || s; }
+  statusLabel(s: string)  { return ['confirmed', 'cancelled', 'refunded'].includes(s) ? this.transloco.translate('crm.transactions.statuses.' + s) : s; }
   stars(n: number) { return '★'.repeat(n); }
   prevPage() { if (this.page > 1) { this.page--; this.reload(); } }
   nextPage() { if (this.page < this.totalPages) { this.page++; this.reload(); } }

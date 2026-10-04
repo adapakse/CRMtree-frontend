@@ -4,14 +4,19 @@ import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser, CrmGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
+import { LocaleService } from '../../../core/i18n/locale.service';
 
 type ViewMode = 'month' | 'week' | 'day' | 'tasks';
+
+const KNOWN_ACTIVITY_TYPES = ['task', 'call', 'email', 'meeting', 'note', 'doc_sent', 'training', 'qbr', 'opportunity'];
+const KNOWN_PRIORITIES = ['asap', 'important', 'medium', 'low'];
 
 interface CalendarDay {
   date: Date;
@@ -23,57 +28,59 @@ interface CalendarDay {
 @Component({
   selector: 'wt-crm-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
 <div style="height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">Kalendarz działań</span>
+  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">{{ t('calendar.title') }}</span>
   <span style="flex:1"></span>
 
   <!-- Filtr handlowca (manager) -->
   <select class="ctl" *ngIf="isManager" [(ngModel)]="filterRep" (ngModelChange)="onFilterRepChange()">
-    <option value="">Wszyscy handlowcy</option>
-    <optgroup label="── Handlowcy ──" *ngIf="crmUsers.length > 0">
+    <option value="">{{ t('calendar.filters.allReps') }}</option>
+    <optgroup [label]="'── ' + t('calendar.filters.repsGroup') + ' ──'" *ngIf="crmUsers.length > 0">
       <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
     </optgroup>
-    <optgroup label="── Grupy ──" *ngIf="crmGroups.length > 0">
+    <optgroup [label]="'── ' + t('calendar.filters.groupsGroup') + ' ──'" *ngIf="crmGroups.length > 0">
       <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">📂 {{ g.name }}</option>
     </optgroup>
   </select>
 
   <!-- Filtr typu aktywności (zadania) -->
   <select class="ctl" *ngIf="view === 'tasks'" [(ngModel)]="filterActivityType" (ngModelChange)="loadTasks()">
-    <option value="">Wszystkie typy</option>
-    <option value="task">Zadanie</option>
-    <option value="call">Połączenie</option>
-    <option value="meeting">Spotkanie</option>
-    <option value="note">Notatka</option>
-    <option value="doc_sent">Dokument</option>
-    <option value="training">Szkolenie</option>
-    <option value="qbr">QBR</option>
-    <option value="opportunity">Szansa</option>
+    <option value="">{{ t('calendar.filters.allTypes') }}</option>
+    <option value="task">{{ t('labels.activityTypes.task') }}</option>
+    <option value="call">{{ t('labels.activityTypes.call') }}</option>
+    <option value="meeting">{{ t('labels.activityTypes.meeting') }}</option>
+    <option value="note">{{ t('labels.activityTypes.note') }}</option>
+    <option value="doc_sent">{{ t('labels.activityTypes.doc_sent') }}</option>
+    <option value="training">{{ t('labels.activityTypes.training') }}</option>
+    <option value="qbr">{{ t('labels.activityTypes.qbr') }}</option>
+    <option value="opportunity">{{ t('labels.activityTypes.opportunity') }}</option>
   </select>
 
   <!-- Filtr priorytetu (zadania) -->
   <select class="ctl" *ngIf="view === 'tasks'" [(ngModel)]="filterPriority" (ngModelChange)="loadTasks()">
-    <option value="">Wszystkie priorytety</option>
-    <option value="asap">ASAP</option>
-    <option value="important">Ważne</option>
-    <option value="medium">Średnie</option>
-    <option value="low">Niskie</option>
+    <option value="">{{ t('calendar.filters.allPriorities') }}</option>
+    <option value="asap">{{ t('labels.priorities.asap') }}</option>
+    <option value="important">{{ t('labels.priorities.important') }}</option>
+    <option value="medium">{{ t('labels.priorities.medium') }}</option>
+    <option value="low">{{ t('labels.priorities.low') }}</option>
   </select>
 
   <!-- Pokaż zamknięte (zadania) -->
   <label *ngIf="view === 'tasks'" style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:#374151">
     <input type="checkbox" [(ngModel)]="showClosedTasks" (ngModelChange)="loadTasks()">
-    pokaż zamknięte
+    {{ t('calendar.filters.showClosed') }}
   </label>
   <!-- Pokaż bez daty (zadania) -->
   <label *ngIf="view === 'tasks'" style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:#374151">
     <input type="checkbox" [(ngModel)]="showNoDateTasks" (ngModelChange)="loadTasks()">
-    pokaż bez daty
+    {{ t('calendar.filters.showNoDate') }}
   </label>
 
   <!-- Nawigacja (tylko dla widoków kalendarza) -->
@@ -81,17 +88,17 @@ interface CalendarDay {
     <button class="nav-btn" (click)="prev()">‹</button>
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;min-width:200px;text-align:center">{{ periodLabel }}</span>
     <button class="nav-btn" (click)="next()">›</button>
-    <button class="nav-btn" (click)="today()" style="font-size:12px;padding:5px 12px">Dziś</button>
+    <button class="nav-btn" (click)="today()" style="font-size:12px;padding:5px 12px">{{ t('calendar.nav.today') }}</button>
   </ng-container>
 
   <!-- Przełącznik widoku -->
   <div class="view-switch">
     <button [class.active]="view === 'tasks'" [class.tasks-btn]="view !== 'tasks'" (click)="setView('tasks')">
-      Zadania<span *ngIf="myTasksCount > 0" class="tasks-badge">{{myTasksCount}}</span>
+      {{ t('calendar.views.tasks') }}<span *ngIf="myTasksCount > 0" class="tasks-badge">{{myTasksCount}}</span>
     </button>
-    <button [class.active]="view === 'day'"   (click)="setView('day')">Dzień</button>
-    <button [class.active]="view === 'week'"  (click)="setView('week')">Tydzień</button>
-    <button [class.active]="view === 'month'" (click)="setView('month')">Miesiąc</button>
+    <button [class.active]="view === 'day'"   (click)="setView('day')">{{ t('calendar.views.day') }}</button>
+    <button [class.active]="view === 'week'"  (click)="setView('week')">{{ t('calendar.views.week') }}</button>
+    <button [class.active]="view === 'month'" (click)="setView('month')">{{ t('calendar.views.month') }}</button>
   </div>
 
   <button class="nav-btn" (click)="view === 'tasks' ? loadTasks() : load()" style="font-size:12px">↻</button>
@@ -115,12 +122,12 @@ interface CalendarDay {
                [class.partner-chip]="m.source_type === 'partner'"
                [class.project-chip]="m.source_type === 'project'"
                (click)="openMeeting(m)">
-            <span class="event-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}</span>
+            <span class="event-time">{{ m.all_day ? t('calendar.allDay') : (m.activity_at | date:'HH:mm') }}</span>
             <span class="event-title">{{ m.title }}</span>
           </div>
           <div *ngIf="day.meetings.length > 3" class="event-more"
                (click)="setView('day'); jumpToDate(day.date)">
-            +{{ day.meetings.length - 3 }} więcej
+            {{ t('calendar.month.more', { count: day.meetings.length - 3 }) }}
           </div>
         </div>
       </div>
@@ -146,7 +153,7 @@ interface CalendarDay {
                [class.partner-event]="m.source_type === 'partner'"
                [class.project-event]="m.source_type === 'project'"
                (click)="openMeeting(m)">
-            <div class="we-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}</div>
+            <div class="we-time">{{ m.all_day ? t('calendar.allDay') : (m.activity_at | date:'HH:mm') }}</div>
             <div class="we-title">{{ m.title }}</div>
             <div class="we-source">{{ m.source_name }}</div>
           </div>
@@ -167,8 +174,8 @@ interface CalendarDay {
                [class.project-event]="m.source_type === 'project'"
                (click)="openMeeting(m)">
             <div class="de-header">
-              <span class="de-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}
-                <span *ngIf="m.duration_min"> ({{ m.duration_min }} min)</span>
+              <span class="de-time">{{ m.all_day ? t('calendar.allDay') : (m.activity_at | date:'HH:mm') }}
+                <span *ngIf="m.duration_min"> ({{ t('calendar.durationMinutes', { minutes: m.duration_min }) }})</span>
               </span>
               <span class="de-badge" [class.lead-badge]="m.source_type==='lead'" [class.partner-badge]="m.source_type==='partner'"
                     [class.project-badge]="m.source_type==='project'">
@@ -193,123 +200,123 @@ interface CalendarDay {
 
     <!-- Toolbar: masowe zamykanie -->
     <div *ngIf="!tasksLoading && activities.length" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <span style="font-size:12px;color:#6b7280">{{activities.length}} aktywności</span>
+      <span style="font-size:12px;color:#6b7280">{{ t('calendar.tasks.count', { count: activities.length }) }}</span>
       <span style="flex:1"></span>
       <ng-container *ngIf="!bulkSelectMode">
         <button class="nav-btn" style="font-size:11px;padding:4px 12px" (click)="enterBulkSelect()">
-          ☑ Zaznacz wszystkie przeterminowane zadania
+          ☑ {{ t('calendar.tasks.bulk.selectOverdue') }}
         </button>
       </ng-container>
       <ng-container *ngIf="bulkSelectMode">
-        <span style="font-size:12px;color:#374151;font-weight:600">{{selectedTaskKeys.size}} zaznaczonych</span>
+        <span style="font-size:12px;color:#374151;font-weight:600">{{ t('calendar.tasks.bulk.selectedCount', { count: selectedTaskKeys.size }) }}</span>
         <button class="nav-btn" style="font-size:11px;padding:4px 14px;background:#3BAA5D;color:white;border-color:#3BAA5D"
                 (click)="bulkClose()" [disabled]="!selectedTaskKeys.size || saving">
-          {{saving ? '…' : 'Zamknij zaznaczone zadania'}}
+          {{saving ? '…' : t('calendar.tasks.bulk.closeSelected')}}
         </button>
-        <button class="nav-btn" style="font-size:11px;padding:4px 12px" (click)="exitBulkSelect()">Anuluj</button>
+        <button class="nav-btn" style="font-size:11px;padding:4px 12px" (click)="exitBulkSelect()">{{ 'actions.cancel' | transloco }}</button>
       </ng-container>
     </div>
 
-    <div *ngIf="tasksLoading" style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">Ładowanie zadań…</div>
-    <div *ngIf="!tasksLoading && !activities.length" style="text-align:center;padding:40px;color:#9ca3af;font-size:13px">Brak zadań do wyświetlenia.</div>
+    <div *ngIf="tasksLoading" style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">{{ t('calendar.tasks.loading') }}</div>
+    <div *ngIf="!tasksLoading && !activities.length" style="text-align:center;padding:40px;color:#9ca3af;font-size:13px">{{ t('calendar.tasks.empty') }}</div>
 
-    <div *ngFor="let t of activities" class="task-item"
-         [class.task-today]="t.activity_at && isTaskToday(t.activity_at)"
-         [class.task-overdue]="t.status !== 'closed' && t.activity_at && isTaskOverdue(t.activity_at)"
-         [class.task-closed]="t.status === 'closed'"
-         [class.task-readonly]="t.source_type !== 'project' && isTaskReadOnly(t)"
-         [class.task-expanded]="isExpanded(t)"
-         (click)="onTaskClick(t)" style="cursor:pointer">
+    <div *ngFor="let task of activities" class="task-item"
+         [class.task-today]="task.activity_at && isTaskToday(task.activity_at)"
+         [class.task-overdue]="task.status !== 'closed' && task.activity_at && isTaskOverdue(task.activity_at)"
+         [class.task-closed]="task.status === 'closed'"
+         [class.task-readonly]="task.source_type !== 'project' && isTaskReadOnly(task)"
+         [class.task-expanded]="isExpanded(task)"
+         (click)="onTaskClick(task)" style="cursor:pointer">
 
       <!-- Główny wiersz -->
       <div style="display:flex;align-items:stretch;gap:0">
         <!-- Checkbox (tryb masowy, tylko dla zadań) -->
-        <div *ngIf="bulkSelectMode && t.type==='task' && t.source_type !== 'project'"
+        <div *ngIf="bulkSelectMode && task.type==='task' && task.source_type !== 'project'"
              style="display:flex;align-items:center;padding-right:10px;flex-shrink:0"
              (click)="$event.stopPropagation()">
           <input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:#3BAA5D"
-                 [checked]="selectedTaskKeys.has(taskKey(t))"
-                 (change)="toggleTaskSelect(t)">
+                 [checked]="selectedTaskKeys.has(taskKey(task))"
+                 (change)="toggleTaskSelect(task)">
         </div>
 
         <!-- Kolumna daty -->
         <div class="task-date-col">
-          <ng-container *ngIf="t.activity_at; else noDate">
-            <span class="task-date-day">{{t.activity_at | date:'d'}}</span>
-            <span class="task-date-mon">{{t.activity_at | date:'MMM'}}</span>
-            <span class="task-date-time" *ngIf="!t.all_day">{{t.activity_at | date:'HH:mm'}}</span>
+          <ng-container *ngIf="task.activity_at; else noDate">
+            <span class="task-date-day">{{task.activity_at | date:'d'}}</span>
+            <span class="task-date-mon">{{task.activity_at | date:'MMM'}}</span>
+            <span class="task-date-time" *ngIf="!task.all_day">{{task.activity_at | date:'HH:mm'}}</span>
           </ng-container>
-          <ng-template #noDate><span class="task-date-none">brak daty</span></ng-template>
+          <ng-template #noDate><span class="task-date-none">{{ t('calendar.tasks.noDate') }}</span></ng-template>
         </div>
 
         <!-- Treść -->
         <div style="flex:1;min-width:0;padding-left:12px">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <strong style="font-size:13px;color:#18181b">
-              <span style="color:#6b7280;font-weight:500">{{taskTypeName(t.type)}}:</span> {{t.title}}
+              <span style="color:#6b7280;font-weight:500">{{taskTypeName(task.type)}}:</span> {{task.title}}
             </strong>
-            <span class="task-status-badge task-st-{{t.status}}">{{t.status_label || taskStatusLabel(t.status)}}</span>
-            <span *ngIf="t.priority" class="priority-badge priority-{{t.priority}}">{{priorityLabel(t.priority)}}</span>
-            <span class="task-source-badge task-src-{{t.source_type}}">{{sourceLabel(t.source_type)}}</span>
-            <wt-add-to-calendar [entry]="calendarEntryOf(t)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
-            <span *ngIf="t.source_type !== 'project' && isTaskReadOnly(t)" style="font-size:9px;color:#9ca3af;font-style:italic">tylko odczyt</span>
+            <span class="task-status-badge task-st-{{task.status}}">{{task.status_label || taskStatusLabel(task.status)}}</span>
+            <span *ngIf="task.priority" class="priority-badge priority-{{task.priority}}">{{priorityLabel(task.priority)}}</span>
+            <span class="task-source-badge task-src-{{task.source_type}}">{{sourceLabel(task.source_type)}}</span>
+            <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
+            <span *ngIf="task.source_type !== 'project' && isTaskReadOnly(task)" style="font-size:9px;color:#9ca3af;font-style:italic">{{ t('calendar.tasks.readOnly') }}</span>
           </div>
           <div style="font-size:11px;color:#9ca3af;margin-top:2px">
-            <a *ngIf="t.source_type === 'lead'"    [routerLink]="['/crm/leads', t.source_id]"    class="task-link" (click)="$event.stopPropagation()">{{t.source_name}}</a>
-            <a *ngIf="t.source_type === 'partner'" [routerLink]="['/crm/partners', t.source_id]" class="task-link" (click)="$event.stopPropagation()">{{t.source_name}}</a>
-            <span *ngIf="t.source_type === 'project'" class="task-link">{{t.source_name}}</span>
-            <span *ngIf="t.act_assigned_to_name"> → {{t.act_assigned_to_name}}</span>
-            <span *ngIf="!t.act_assigned_to_name && t.assigned_to_name"> → {{t.assigned_to_name}}</span>
+            <a *ngIf="task.source_type === 'lead'"    [routerLink]="['/crm/leads', task.source_id]"    class="task-link" (click)="$event.stopPropagation()">{{task.source_name}}</a>
+            <a *ngIf="task.source_type === 'partner'" [routerLink]="['/crm/partners', task.source_id]" class="task-link" (click)="$event.stopPropagation()">{{task.source_name}}</a>
+            <span *ngIf="task.source_type === 'project'" class="task-link">{{task.source_name}}</span>
+            <span *ngIf="task.act_assigned_to_name"> → {{task.act_assigned_to_name}}</span>
+            <span *ngIf="!task.act_assigned_to_name && task.assigned_to_name"> → {{task.assigned_to_name}}</span>
           </div>
-          <div *ngIf="t.body && !isExpanded(t)"
+          <div *ngIf="task.body && !isExpanded(task)"
                style="font-size:12px;color:#6b7280;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:600px">
-            {{stripHtml(t.body)}}
+            {{stripHtml(task.body)}}
           </div>
-          <span *ngIf="isExpanded(t)" style="font-size:11px;color:#3BAA5D;margin-top:2px;display:block">✎ tryb edycji</span>
+          <span *ngIf="isExpanded(task)" style="font-size:11px;color:#3BAA5D;margin-top:2px;display:block">✎ {{ t('calendar.tasks.editMode') }}</span>
         </div>
 
         <!-- Przyciski akcji (tylko dla zadań) -->
-        <div *ngIf="t.type === 'task' && t.source_type !== 'project' && !isTaskReadOnly(t)"
+        <div *ngIf="task.type === 'task' && task.source_type !== 'project' && !isTaskReadOnly(task)"
              style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;padding-left:8px"
              (click)="$event.stopPropagation()">
-          <button *ngIf="t.status !== 'closed'" class="nav-btn"
+          <button *ngIf="task.status !== 'closed'" class="nav-btn"
                   style="font-size:11px;padding:3px 10px;white-space:nowrap"
-                  (click)="closeTaskDirect(t)" [disabled]="saving">✓ Zamknij</button>
-          <button *ngIf="t.status === 'closed'" class="nav-btn"
+                  (click)="closeTaskDirect(task)" [disabled]="saving">✓ {{ t('calendar.tasks.close') }}</button>
+          <button *ngIf="task.status === 'closed'" class="nav-btn"
                   style="font-size:11px;padding:3px 10px;white-space:nowrap;color:#3BAA5D;border-color:#3BAA5D"
-                  (click)="reopenTaskDirect(t)" [disabled]="saving">↩ Ponownie aktywuj</button>
+                  (click)="reopenTaskDirect(task)" [disabled]="saving">↩ {{ t('calendar.tasks.reopen') }}</button>
         </div>
       </div>
 
       <!-- Formularz edycji (inline) -->
-      <div *ngIf="isExpanded(t)"
+      <div *ngIf="isExpanded(task)"
            style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb;display:flex;flex-direction:column;gap:8px"
            (click)="$event.stopPropagation()">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div style="display:flex;flex-direction:column;gap:4px">
-            <label style="font-size:11px;font-weight:600;color:#374151">Tytuł *</label>
-            <input [(ngModel)]="inlineEditForm.title" class="ef-input" placeholder="Tytuł…">
+            <label style="font-size:11px;font-weight:600;color:#374151">{{ t('activity.modal.title') }} *</label>
+            <input [(ngModel)]="inlineEditForm.title" class="ef-input" [placeholder]="t('calendar.tasks.form.titlePlaceholder')">
           </div>
           <div style="display:flex;flex-direction:column;gap:4px">
-            <label style="font-size:11px;font-weight:600;color:#374151">Data i godzina</label>
+            <label style="font-size:11px;font-weight:600;color:#374151">{{ t('activity.form.dateTime') }}</label>
             <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="ef-input">
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:4px">
-          <label style="font-size:11px;font-weight:600;color:#374151">Opis / notatki</label>
-          <textarea [(ngModel)]="inlineEditForm.body" rows="2" class="ef-input" style="resize:vertical" placeholder="Opis…"></textarea>
+          <label style="font-size:11px;font-weight:600;color:#374151">{{ t('activity.modal.descriptionNotes') }}</label>
+          <textarea [(ngModel)]="inlineEditForm.body" rows="2" class="ef-input" style="resize:vertical" [placeholder]="t('calendar.tasks.form.descriptionPlaceholder')"></textarea>
         </div>
         <div *ngIf="crmUsers.length" style="display:flex;flex-direction:column;gap:4px">
-          <label style="font-size:11px;font-weight:600;color:#374151">Przypisz do</label>
+          <label style="font-size:11px;font-weight:600;color:#374151">{{ t('calendar.tasks.form.assignTo') }}</label>
           <select [(ngModel)]="inlineEditForm.assigned_to" class="ef-input">
-            <option value="">— bez przypisania —</option>
+            <option value="">{{ t('activity.modal.unassigned') }}</option>
             <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
           </select>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="dp-btn-g" (click)="cancelInlineEdit()">Anuluj</button>
-          <button class="dp-btn-p" (click)="saveInlineEdit(t)" [disabled]="!inlineEditForm.title?.trim() || saving">
-            {{saving ? '…' : 'Zapisz'}}
+          <button class="dp-btn-g" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
+          <button class="dp-btn-p" (click)="saveInlineEdit(task)" [disabled]="!inlineEditForm.title?.trim() || saving">
+            {{saving ? '…' : ('actions.save' | transloco)}}
           </button>
         </div>
       </div>
@@ -322,10 +329,10 @@ interface CalendarDay {
   <div class="detail-panel" (click)="$event.stopPropagation()">
     <div class="dp-header">
       <span class="dp-badge" [class.lead-badge]="selectedMeeting.source_type==='lead'" [class.partner-badge]="selectedMeeting.source_type==='partner'">
-        {{ selectedMeeting.source_type === 'lead' ? '🎯 Lead' : '🤝 Partner' }}
+        {{ selectedMeeting.source_type === 'lead' ? '🎯 ' + t('labels.sourceTypes.lead') : '🤝 ' + t('labels.sourceTypes.partner') }}
       </span>
       <span style="flex:1"></span>
-      <button class="dp-edit-btn" (click)="startEdit()" *ngIf="!editMode && canEdit(selectedMeeting)">✏️ Edytuj</button>
+      <button class="dp-edit-btn" (click)="startEdit()" *ngIf="!editMode && canEdit(selectedMeeting)">✏️ {{ t('activity.modal.edit') }}</button>
       <button class="dp-close" (click)="closeMeeting()">✕</button>
     </div>
 
@@ -336,48 +343,51 @@ interface CalendarDay {
         <a *ngIf="selectedMeeting.source_type === 'lead'"    [routerLink]="['/crm/leads',    selectedMeeting.source_id]" class="dp-link">{{ selectedMeeting.source_name }}</a>
         <a *ngIf="selectedMeeting.source_type === 'partner'" [routerLink]="['/crm/partners', selectedMeeting.source_id]" class="dp-link">{{ selectedMeeting.source_name }}</a>
       </div>
-      <div class="dp-row"><span class="dp-lbl">📅 Data i czas</span><span>{{ selectedMeeting.activity_at | date:'dd.MM.yyyy HH:mm' }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.duration_min"><span class="dp-lbl">⏱ Czas trwania</span><span>{{ selectedMeeting.duration_min }} min</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.meeting_location"><span class="dp-lbl">📍 Miejsce</span><span>{{ selectedMeeting.meeting_location }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.participants"><span class="dp-lbl">👥 Uczestnicy</span><span style="word-break:break-all">{{ selectedMeeting.participants }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.body"><span class="dp-lbl">📝 Notatki</span><span>{{ selectedMeeting.body }}</span></div>
-      <div class="dp-row"><span class="dp-lbl">👤 Dodał</span><span>{{ selectedMeeting.created_by_name }}</span></div>
-      <div class="dp-row" *ngIf="selectedMeeting.assigned_to_name"><span class="dp-lbl">🙋 Handlowiec</span><span>{{ selectedMeeting.assigned_to_name }}</span></div>
+      <div class="dp-row"><span class="dp-lbl">📅 {{ t('activity.modal.dateTime') }}</span><span>{{ selectedMeeting.activity_at | date:'dd.MM.yyyy HH:mm' }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.duration_min"><span class="dp-lbl">⏱ {{ t('calendar.meeting.duration') }}</span><span>{{ t('calendar.durationMinutes', { minutes: selectedMeeting.duration_min }) }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.meeting_location"><span class="dp-lbl">📍 {{ t('meetings.location') }}</span><span>{{ selectedMeeting.meeting_location }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.participants"><span class="dp-lbl">👥 {{ t('meetings.participants') }}</span><span style="word-break:break-all">{{ selectedMeeting.participants }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.body"><span class="dp-lbl">📝 {{ t('calendar.meeting.notes') }}</span><span>{{ selectedMeeting.body }}</span></div>
+      <div class="dp-row"><span class="dp-lbl">👤 {{ t('activity.modal.addedBy') }}</span><span>{{ selectedMeeting.created_by_name }}</span></div>
+      <div class="dp-row" *ngIf="selectedMeeting.assigned_to_name"><span class="dp-lbl">🙋 {{ t('calendar.meeting.salesperson') }}</span><span>{{ selectedMeeting.assigned_to_name }}</span></div>
     </div>
 
     <!-- Tryb edycji -->
     <div *ngIf="editMode" class="dp-body">
       <div class="ef-row">
-        <label class="ef-lbl">Tytuł *</label>
+        <label class="ef-lbl">{{ t('activity.modal.title') }} *</label>
         <input class="ef-input" [(ngModel)]="editForm.title">
       </div>
       <div class="ef-row">
-        <label class="ef-lbl">Data i czas</label>
+        <label class="ef-lbl">{{ t('activity.modal.dateTime') }}</label>
         <input class="ef-input" type="datetime-local" [(ngModel)]="editForm.activity_at">
       </div>
       <div class="ef-row">
-        <label class="ef-lbl">Czas trwania (min)</label>
+        <label class="ef-lbl">{{ t('meetings.durationMin') }}</label>
         <input class="ef-input" type="number" min="0" [(ngModel)]="editForm.duration_min" placeholder="60">
       </div>
       <div class="ef-row">
-        <label class="ef-lbl">Miejsce</label>
-        <input class="ef-input" [(ngModel)]="editForm.meeting_location" placeholder="Sala A, Warszawa">
+        <label class="ef-lbl">{{ t('meetings.location') }}</label>
+        <input class="ef-input" [(ngModel)]="editForm.meeting_location" [placeholder]="t('calendar.meeting.locationPlaceholder')">
       </div>
       <div class="ef-row">
-        <label class="ef-lbl">Uczestnicy</label>
-        <input class="ef-input" [(ngModel)]="editForm.participants" placeholder="email1@firma.pl, email2@firma.pl">
+        <label class="ef-lbl">{{ t('meetings.participants') }}</label>
+        <input class="ef-input" [(ngModel)]="editForm.participants" [placeholder]="t('calendar.meeting.participantsPlaceholder')">
       </div>
       <div class="ef-row">
-        <label class="ef-lbl">Notatki</label>
+        <label class="ef-lbl">{{ t('calendar.meeting.notes') }}</label>
         <textarea class="ef-input" rows="3" [(ngModel)]="editForm.body" style="resize:vertical"></textarea>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <button class="dp-btn-g" (click)="editMode = false">Anuluj</button>
-        <button class="dp-btn-p" (click)="saveEdit()" [disabled]="saving">{{ saving ? '…' : 'Zapisz' }}</button>
+        <button class="dp-btn-g" (click)="editMode = false">{{ 'actions.cancel' | transloco }}</button>
+        <button class="dp-btn-p" (click)="saveEdit()" [disabled]="saving">{{ saving ? '…' : ('actions.save' | transloco) }}</button>
       </div>
     </div>
   </div>
 </div>
+
+</div>
+</ng-container>
   `,
   styles: [`
     :host { display:flex;flex-direction:column;height:100%;overflow:hidden; }
@@ -509,6 +519,8 @@ export class CrmCalendarComponent implements OnInit {
   private zone = inject(NgZone);
   private toast = inject(ToastService);
   private projectTaskNavigation = inject(ProjectTaskNavigationService);
+  private transloco = inject(TranslocoService);
+  private locale = inject(LocaleService);
 
   loading  = false;
   saving   = false;
@@ -541,8 +553,9 @@ export class CrmCalendarComponent implements OnInit {
   editMode = false;
   editForm: any = {};
 
-  readonly DAY_SHORT = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
-  readonly dayNames  = ['Pn','Wt','Śr','Cz','Pt','Sb','Nd'];
+  // DAY_SHORT is indexed by Date.getDay() (Sunday first); dayNames starts on Monday like the month grid.
+  readonly DAY_SHORT = this.buildWeekdayShortNames();
+  readonly dayNames  = [...this.DAY_SHORT.slice(1), this.DAY_SHORT[0]];
   readonly hours     = Array.from({ length: 16 }, (_, i) => i + 7);
 
   get isManager() { const u = this.auth.user(); return u?.is_admin || u?.crm_role === 'sales_manager'; }
@@ -550,13 +563,13 @@ export class CrmCalendarComponent implements OnInit {
   get periodLabel(): string {
     const d = this.currentDate;
     if (this.view === 'day')
-      return d.toLocaleDateString('pl-PL', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      return d.toLocaleDateString(this.locale.activeLocale(), { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     if (this.view === 'week') {
       const start = this.weekStart(d);
       const end   = new Date(start); end.setDate(end.getDate() + 6);
-      return `${start.getDate()} — ${end.getDate()} ${end.toLocaleDateString('pl-PL', { month:'long', year:'numeric' })}`;
+      return `${start.getDate()} — ${end.getDate()} ${end.toLocaleDateString(this.locale.activeLocale(), { month:'long', year:'numeric' })}`;
     }
-    return d.toLocaleDateString('pl-PL', { month:'long', year:'numeric' });
+    return d.toLocaleDateString(this.locale.activeLocale(), { month:'long', year:'numeric' });
   }
 
   ngOnInit(): void {
@@ -652,13 +665,14 @@ export class CrmCalendarComponent implements OnInit {
   }
 
   sourceLabel(sourceType: string): string {
-    return sourceType === 'lead' ? 'Lead' : sourceType === 'project' ? 'Projekt' : 'Partner';
+    const knownType = sourceType === 'lead' || sourceType === 'project' ? sourceType : 'partner';
+    return this.transloco.translate('crm.labels.sourceTypes.' + knownType);
   }
 
   // Project tasks are view-only here: a click opens them in the Projects module.
   private openProjectTask(task: { source_id: number | string; project_task_id?: string }): void {
     this.projectTaskNavigation.open(String(task.source_id), task.project_task_id ?? null, {
-      label: 'Kalendarz', route: ['/crm/calendar'],
+      label: this.transloco.translate('crm.calendar.breadcrumb'), route: ['/crm/calendar'],
     });
   }
 
@@ -721,7 +735,7 @@ export class CrmCalendarComponent implements OnInit {
       }),
       error: () => this.zone.run(() => {
         if (!silent) this.saving = false;
-        this.toast.error('Nie udało się zapisać zmian w zadaniu');
+        this.toast.error(this.transloco.translate('crm.calendar.tasks.saveFailed'));
         this.cdr.markForCheck();
       }),
     });
@@ -825,21 +839,16 @@ export class CrmCalendarComponent implements OnInit {
 
   // ── Helpers ───────────────────────────────────────────────
   taskTypeName(type: string): string {
-    const names: Record<string, string> = {
-      task: 'Zadanie', call: 'Połączenie', email: 'Email', meeting: 'Spotkanie',
-      note: 'Notatka', doc_sent: 'Dokument', training: 'Szkolenie',
-      qbr: 'QBR', opportunity: 'Szansa',
-    };
-    return names[type] || type;
+    return KNOWN_ACTIVITY_TYPES.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
 
   taskStatusLabel(s: string): string {
-    return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+    const knownStatus = s === 'closed' || s === 'open' ? s : 'new';
+    return this.transloco.translate('crm.labels.activityStatuses.' + knownStatus);
   }
 
   priorityLabel(p: string): string {
-    const map: Record<string, string> = { asap: 'ASAP', important: 'Ważne', medium: 'Średnie', low: 'Niskie' };
-    return map[p] ?? p;
+    return KNOWN_PRIORITIES.includes(p) ? this.transloco.translate('crm.labels.priorities.' + p) : p;
   }
 
   isTaskToday(activityAt: string): boolean {
@@ -990,6 +999,12 @@ export class CrmCalendarComponent implements OnInit {
     return s;
   }
   private fmt(d: Date): string { return this.localDateStr(d); }
+
+  private buildWeekdayShortNames(): string[] {
+    const formatter = new Intl.DateTimeFormat(this.locale.activeLocale(), { weekday: 'short' });
+    // 2024-01-07 is a Sunday.
+    return Array.from({ length: 7 }, (_, dayIndex) => formatter.format(new Date(2024, 0, 7 + dayIndex)));
+  }
 }
 
 function isTaskReadOnly(self: CrmCalendarComponent, t: ActivityTask): boolean {
