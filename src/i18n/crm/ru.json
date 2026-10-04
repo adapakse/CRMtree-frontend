@@ -1,0 +1,1076 @@
+{
+  "activity": {
+    "add": "Добавить активность",
+    "card": {
+      "closeTask": "Закрыть задачу",
+      "collapse": "Свернуть",
+      "createdAt": "создано {date}",
+      "delete": "Удалить",
+      "expand": "Развернуть",
+      "reopen": "Открыть снова"
+    },
+    "communication": "Коммуникация",
+    "customDate": "Своя дата…",
+    "deleteConfirm": "Удалить активность «{title}»?",
+    "dueDate": {
+      "inOneWeek": "Через неделю ({date})",
+      "inThreeBusinessDays": "Через 3 рабочих дня ({weekday})",
+      "inTwoBusinessDays": "Через 2 рабочих дня ({weekday})",
+      "inTwoWeeks": "Через 2 недели ({date})",
+      "none": "Нет",
+      "today": "Сегодня",
+      "tomorrow": "Завтра"
+    },
+    "empty": "В этой категории нет активностей.",
+    "form": {
+      "bodyPlaceholder": "Содержание / заметки…",
+      "bodyShortPlaceholder": "Содержание…",
+      "dateTime": "Дата и время",
+      "dueDate": "Дата",
+      "noOwner": "— без —",
+      "none": "— нет —",
+      "owner": "Владелец",
+      "priority": "Приоритет",
+      "reminder": "Напоминание"
+    },
+    "modal": {
+      "addedBy": "Кем добавлено",
+      "assignToSalesperson": "Назначить менеджеру по продажам",
+      "assignedTo": "Назначено",
+      "comment": "Комментарий",
+      "dateTime": "Дата и время",
+      "description": "Описание",
+      "descriptionNotes": "Описание / заметки",
+      "edit": "Редактировать",
+      "saveChanges": "Сохранить изменения",
+      "title": "Название",
+      "type": "Тип",
+      "unassigned": "— не назначено —"
+    },
+    "reminders": {
+      "atDue": "В срок задачи",
+      "day1Before": "За 1 день",
+      "days2Before": "За 2 дня",
+      "days3Before": "За 3 дня",
+      "hour1Before": "За 1 ч.",
+      "minutes30Before": "За 30 мин",
+      "none": "Без напоминания"
+    },
+    "tabs": {
+      "all": "Все",
+      "calls": "Звонки",
+      "emails": "Письма",
+      "meetings": "Встречи",
+      "notes": "Заметки",
+      "tasks": "Задачи"
+    }
+  },
+  "calls": {
+    "call": "Позвонить",
+    "callNumber": "Позвонить: {phone}",
+    "contactFallback": "Контакт",
+    "mainNumber": "Основной: {phone}",
+    "noNumber": "Нет номера"
+  },
+  "consents": {
+    "collapse": "свернуть",
+    "details": "подробнее",
+    "lastChange": "Последнее изменение:",
+    "save": "Сохранить согласия",
+    "saved": "Сохранено",
+    "saving": "Сохранение…",
+    "title": "Маркетинговые согласия",
+    "values": {
+      "denied": "Нет согласия",
+      "granted": "Согласие",
+      "noData": "Нет данных"
+    }
+  },
+  "documents": {
+    "add": "Добавить",
+    "linkFailed": "Не удалось связать документ. Проверьте, есть ли у вас необходимые права.",
+    "none": "Нет",
+    "open": "Открыть документ",
+    "picker": {
+      "added": "Добавлено",
+      "hint": "Ищите документы по названию, номеру или организации.",
+      "noResults": "Нет результатов",
+      "readOnly": "Чтение",
+      "readOnlyTooltip": "Только чтение — нет прав на связывание",
+      "searchPlaceholder": "Поиск документа…",
+      "searching": "Поиск…",
+      "title": "Добавить связанный документ"
+    },
+    "titleWithCount": "Документы ({count})",
+    "unlinkConfirm": "Удалить связь с документом?",
+    "unlinkFailed": "Не удалось удалить связь."
+  },
+  "email": {
+    "addressTooltip": "E-mail: {email}",
+    "attachments": {
+      "download": "Скачать",
+      "downloadTooltip": "Скачать файл",
+      "preview": "Просмотр",
+      "previewTooltip": "Открыть в браузере"
+    },
+    "cc": "Копия:",
+    "checkNew": "Проверить новые",
+    "checkNewTooltip": "Проверить новые письма (debug)",
+    "connecting": "Подключение к Google…",
+    "date": "Дата:",
+    "debug": {
+      "error": "Ошибка: {message}",
+      "newMessages": "Новые сообщения: {count}"
+    },
+    "disconnect": "Отключить",
+    "disconnectConfirm": "Отключить ваш почтовый ящик? Чтобы снова отправлять письма, вам придётся подключить его заново.",
+    "driveDownloadFailed": "Ошибка загрузки файла из Drive",
+    "drivePickerTitle": "Выберите файлы для вложения",
+    "driveReauthRequired": "Требуется повторное подключение ящика Gmail — обратитесь к администратору.",
+    "empty": "Нет отправленных писем.",
+    "fields": {
+      "attachments": "Вложения",
+      "body": "Текст",
+      "cc": "Копия",
+      "subject": "Тема",
+      "to": "Кому"
+    },
+    "from": "От:",
+    "fromDrive": "Из Drive",
+    "fromGoogleDrive": "Из Google Drive",
+    "hideQuoted": "Скрыть цитируемую переписку",
+    "incomingReply": "Ответ",
+    "label": "E-mail",
+    "messageFallbackTitle": "Сообщение",
+    "new": "Новое письмо",
+    "noAddress": "Нет адреса",
+    "noTemplate": "— без шаблона —",
+    "notConfigured": "Почта не настроена для этой организации. Обратитесь к администратору.",
+    "placeholders": {
+      "body": "Текст сообщения…",
+      "cc": "kopiya@company.ru",
+      "ccShort": "Копия…",
+      "recipient": "email@company.ru",
+      "replyBody": "Текст ответа…",
+      "subject": "Тема сообщения",
+      "toShort": "Кому…"
+    },
+    "reply": {
+      "action": "Ответить",
+      "hideDetails": "Скрыть",
+      "replyingTo": "Вы отвечаете:",
+      "send": "Отправить ответ",
+      "sendFailed": "Ошибка отправки",
+      "showDetails": "Подробнее"
+    },
+    "replyHeading": "Ответ",
+    "send": "Отправить письмо",
+    "sendAction": "Отправить",
+    "sendFailed": "Ошибка отправки письма",
+    "sending": "Отправка…",
+    "showQuoted": "Показать цитируемую переписку",
+    "thread": {
+      "anotherUser": "другой пользователь",
+      "empty": "В цепочке нет сообщений.",
+      "loading": "Загрузка цепочки…",
+      "notOwnerCompose": "Владелец этой цепочки — {owner}, вы не можете в ней отвечать. Письмо ниже будет отправлено как новое сообщение с вашей учётной записи.",
+      "notOwnerComposeUnknown": "Вы не можете отвечать в этой цепочке. Письмо ниже будет отправлено как новое сообщение с вашей учётной записи.",
+      "notOwnerReply": "Владелец этой цепочки — {owner}, вы не можете в ней отвечать. Это сообщение будет отправлено как новое, с вашей учётной записи.",
+      "notOwnerReplyUnknown": "Вы не можете отвечать в этой цепочке. Это сообщение будет отправлено как новое, с вашей учётной записи.",
+      "ownedByTooltip": "Владелец цепочки — {owner}; вы отправите новое сообщение со своей учётной записи",
+      "title": "Цепочка писем"
+    },
+    "to": "Кому:",
+    "trainingMode": "Учебный режим",
+    "writeNew": "Написать новое письмо"
+  },
+  "history": {
+    "activityAdded": "Активность добавлена: {title}",
+    "activityClosed": "Активность закрыта: {title}",
+    "activityDeleted": "Активность удалена: {title}",
+    "activityUpdated": "Активность обновлена: {title}",
+    "changed": "Изменено: {changes}",
+    "consentChanged": "Согласие «{label}»: {from} → {to}",
+    "documentLinked": "Документ связан",
+    "empty": "Нет записей.",
+    "emptyValue": "(нет)",
+    "fields": {
+      "activeUsers": "Активные пользователи",
+      "agentName": "Агент",
+      "annualTurnoverCurrency": "Валюта",
+      "assignedTo": "Менеджер по продажам",
+      "billingAddress": "Адрес",
+      "billingCity": "Город",
+      "billingEmail": "E-mail расч.",
+      "billingPhone": "Тел. расч.",
+      "closeDate": "Дата закр.",
+      "commission": "Комиссия",
+      "company": "Компания",
+      "contactName": "Контакт",
+      "contactTitle": "Должность в компании",
+      "contractExpires": "Договор до",
+      "contractSigned": "Договор с",
+      "contractValue": "Оборот",
+      "country": "Страна",
+      "creditLimit": "Кредитный лимит",
+      "deposit": "Депозит",
+      "dwhPartnerId": "CRMtree Partner ID",
+      "email": "E-mail",
+      "firstContactDate": "Первый контакт",
+      "group": "Группа",
+      "hot": "Горячий",
+      "industry": "Отрасль",
+      "language": "Язык",
+      "lostReason": "Причина проигрыша",
+      "nip": "ИНН",
+      "notes": "Заметки",
+      "onlinePct": "% Онлайн",
+      "partnerCurrency": "Валюта",
+      "phone": "Телефон",
+      "probability": "Вероятность %",
+      "source": "Источник",
+      "stage": "Этап",
+      "status": "Статус",
+      "subdomain": "Поддомен",
+      "tags": "Теги",
+      "valuePln": "Сумма PLN",
+      "website": "Сайт"
+    },
+    "lostReason": "Причина: {reason}",
+    "no": "Нет",
+    "noResults": "Нет результатов.",
+    "searchPlaceholder": "Поиск в истории…",
+    "showAll": "Показать всё",
+    "stageChanged": "Смена этапа: {from} → {to}",
+    "systemUser": "Система",
+    "title": "История изменений",
+    "yes": "Да"
+  },
+  "labels": {
+    "activityStatuses": {
+      "closed": "закрыта",
+      "new": "новая",
+      "open": "открыта"
+    },
+    "activityTypes": {
+      "call": "Звонок",
+      "doc_sent": "Документ",
+      "email": "E-mail",
+      "meeting": "Встреча",
+      "note": "Заметка",
+      "opportunity": "Сделка",
+      "qbr": "QBR",
+      "task": "Задача",
+      "training": "Обучение"
+    },
+    "partnerStatuses": {
+      "active": "Активный",
+      "churned": "Потерян",
+      "inactive": "Неактивный",
+      "onboarding": "Внедрение"
+    },
+    "priorities": {
+      "asap": "ASAP",
+      "important": "Важный",
+      "low": "Низкий",
+      "medium": "Средний"
+    },
+    "productTypes": {
+      "car_rental": "Аренда авто",
+      "hotel": "Отель",
+      "other": "Другое",
+      "transfer": "Трансфер",
+      "transport_bus": "Автобус",
+      "transport_ferry": "Паром",
+      "transport_flight": "Авиаперелёт",
+      "transport_train": "Поезд",
+      "travel_insurance": "Страховка",
+      "visa": "Виза"
+    },
+    "sourceTypes": {
+      "document": "Документ",
+      "lead": "Лид",
+      "onboarding": "Онбординг",
+      "partner": "Партнёр",
+      "project": "Проект"
+    },
+    "sources": {
+      "agent": "Агент",
+      "aliasHello": "Alias Hello",
+      "coldCall": "Cold Call",
+      "emailCampaign": "E-mail-рассылка",
+      "googleAdsAiSearch": "Google Ads AI Search",
+      "googleAdsPmax": "Google Ads PMax",
+      "googleAdsSeaBrand": "Google Ads SEA Brand",
+      "inbound": "Inbound",
+      "linkedin": "LinkedIn",
+      "linkedinInMail": "LinkedIn InMail",
+      "linkedinLeadForm": "LinkedIn Lead Form",
+      "onlineForm": "Онлайн-форма",
+      "other": "Другое",
+      "own": "Собственный",
+      "partner": "Партнёр",
+      "referral": "Рекомендация",
+      "tradeFair": "Выставка / Мероприятие",
+      "website": "Сайт"
+    },
+    "stages": {
+      "archived": "Архив",
+      "closed_lost": "Проигран",
+      "closed_won": "Выигран",
+      "negotiation": "Переговоры",
+      "new": "Новый",
+      "offer": "Предложение",
+      "onboarded": "Прошёл онбординг",
+      "onboarding": "В онбординге",
+      "presentation": "Презентация",
+      "qualification": "Квалификация"
+    }
+  },
+  "leadDetail": {
+    "archive": {
+      "action": "Архивировать",
+      "confirm": "Архивировать лид «{company}»? Он исчезнет из списков, дашбордов и отчётов — будет виден только при выборе фильтра Этап = Архив. Его по-прежнему можно будет редактировать и вернуть оттуда на этап «Новый».",
+      "failed": "Ошибка архивации лида.",
+      "tooltip": "Архивировать — лид исчезнет из списков, дашбордов и отчётов"
+    },
+    "edit": {
+      "addContact": "Добавить контакт",
+      "chooseReason": "— выберите причину —",
+      "noExtraContacts": "Нет дополнительных контактов",
+      "noPermission": "Нет прав — менеджер по продажам не входит в вашу группу",
+      "none": "— нет —",
+      "placeholders": {
+        "agentEmail": "agent@company.ru",
+        "email": "ivan@company.ru",
+        "fullName": "Иван Иванов",
+        "notes": "Любые заметки…",
+        "website": "напр. acme.ru"
+      },
+      "requiredFields": "Заполните обязательные поля:",
+      "requiredForStage": "Заполните обязательные поля для этапа «{stage}»:",
+      "saveChanges": "Сохранить изменения",
+      "saving": "Сохранение…",
+      "sections": {
+        "agent": "Данные агента",
+        "basic": "Основное",
+        "sales": "Детали продажи"
+      },
+      "title": "Редактировать лид",
+      "unassigned": "— не назначен —"
+    },
+    "enrich": {
+      "action": "Загрузить данные",
+      "done": "Данные загружены — проверьте поля ниже",
+      "loading": "Загрузка…"
+    },
+    "fields": {
+      "annualTurnover": "Годовой оборот",
+      "closeDate": "Дата закрытия",
+      "companyName": "Название компании",
+      "contactTitle": "Должность в компании",
+      "email": "E-mail",
+      "firstContact": "Первый контакт",
+      "fullName": "Имя и фамилия",
+      "hotLead": "Горячий лид",
+      "industry": "Отрасль",
+      "lostReason": "Причина проигрыша",
+      "name": "Название",
+      "nip": "ИНН",
+      "onlinePct": "% Онлайн",
+      "person": "Контактное лицо",
+      "phone": "Телефон",
+      "probability": "Вероятность",
+      "probabilityPct": "% Вероятность",
+      "salesperson": "Менеджер по продажам",
+      "source": "Источник",
+      "stage": "Этап",
+      "tagsHint": "Теги (через запятую)",
+      "website": "Сайт",
+      "www": "WWW"
+    },
+    "header": {
+      "backToLeads": "Лиды",
+      "edit": "Редактировать",
+      "hot": "Горячий"
+    },
+    "history": {
+      "converted": "Лид преобразован в партнёра",
+      "created": "Лид создан",
+      "deleted": "Лид удалён",
+      "updated": "Лид обновлён"
+    },
+    "hold": {
+      "active": "Пауза активна",
+      "activeUntil": "Активна до",
+      "dateRequired": "Укажите дату",
+      "edit": "Изменить паузу",
+      "editTooltip": "На паузе до {date} — нажмите, чтобы изменить",
+      "introAfter": "будет отмечен как поставленный на паузу — без влияния на активные KPI и воронку, пока действует пауза.",
+      "introBefore": "Лид",
+      "label": "На паузе",
+      "reason": "Причина",
+      "reasonRequired": "Выберите причину",
+      "remove": "Снять с паузы",
+      "removeFailed": "Ошибка снятия с паузы.",
+      "saveFailed": "Ошибка сохранения паузы.",
+      "set": "Поставить на паузу",
+      "until": "На паузе до {date}"
+    },
+    "info": {
+      "collapsePanel": "Свернуть панель",
+      "expandPanel": "Развернуть панель",
+      "title": "Информация"
+    },
+    "loadError": "Ошибка загрузки лида.",
+    "nip": {
+      "countryCodeRequired": "Укажите код страны (2 буквы), напр. PL",
+      "duplicate": "Этот ИНН уже присвоен другой записи.",
+      "numberRequired": "Укажите номер после кода страны",
+      "plTenDigits": "Для PL требуется 10 цифр после кода страны",
+      "required": "ИНН обязателен"
+    },
+    "notFound": "Лид не найден.",
+    "onboarding": {
+      "completed": "Онбординг завершён",
+      "completedPartnerActive": "Онбординг завершён — партнёр активен",
+      "contractSigned": "Дата подписания договора",
+      "contractValue": "Сумма контракта (PLN)",
+      "contractValuePlaceholder": "напр. 50000",
+      "goTo": "Перейти в Онбординг",
+      "hint": "Укажите сумму контракта и дату подписания договора, чтобы перевести лид в процесс внедрения.",
+      "inProgress": "В процессе онбординга",
+      "inProgressHint": "Лид находится в процессе внедрения. Подробности — в разделе «Онбординг».",
+      "introAfter": "в процесс внедрения. Лид появится в разделе «Онбординг». В Реестре партнёров он появится после синхронизации с DWH.",
+      "introBefore": "Перевод лида",
+      "leadLocked": "Лид заблокирован для редактирования",
+      "panelLink": "Панель онбординга",
+      "partnerAfterSync": "Партнёр появится в Реестре партнёров после синхронизации с DWH.",
+      "partnerInProgress": "партнёр в процессе внедрения",
+      "partnerRegistryLink": "Реестр партнёров",
+      "start": "Начать онбординг",
+      "startedAt": "Начато:"
+    },
+    "sections": {
+      "agent": "Агент",
+      "company": "Компания",
+      "contact": "Контакт",
+      "extraContacts": "Дополнительные контакты",
+      "notes": "Заметки",
+      "sales": "Продажи"
+    },
+    "stage": {
+      "backToNew": "Вернуть на «Новый»",
+      "next": "Следующий этап",
+      "previous": "Предыдущий этап"
+    },
+    "testAccount": {
+      "apiError": "Ошибка соединения с внешним API",
+      "choose": "— выберите —",
+      "countries": {
+        "cz": "Чехия",
+        "de": "Германия",
+        "fr": "Франция",
+        "gb": "Великобритания",
+        "hu": "Венгрия",
+        "pl": "Польша",
+        "ro": "Румыния",
+        "ru": "Россия",
+        "sk": "Словакия",
+        "ua": "Украина"
+      },
+      "create": "Создать тестовую учётную запись",
+      "created": "Тестовая учётная запись создана",
+      "creating": "Создание учётной записи…",
+      "fields": {
+        "adminEmail": "E-mail администратора",
+        "billingCountry": "Страна для расчётов",
+        "billingEmail": "E-mail для расчётов",
+        "city": "Город",
+        "country": "Страна",
+        "currency": "Валюта",
+        "firstName": "Имя",
+        "language": "Язык",
+        "lastName": "Фамилия",
+        "street": "Улица и номер дома",
+        "subdomain": "Поддомен",
+        "zip": "Почтовый индекс"
+      },
+      "fixAndRetry": "Исправьте данные ниже и повторите попытку.",
+      "languages": {
+        "de": "Немецкий",
+        "en": "Английский",
+        "pl": "Польский",
+        "ro": "Румынский",
+        "ru": "Русский"
+      },
+      "numberHint": "Этот номер будет передан как № партнёра при переводе в партнёры.",
+      "numberLabel": "№:",
+      "openPriceList": "Открыть прайс-лист в HTCD",
+      "openTooltip": "Создать тестовую учётную запись во внешней системе",
+      "placeholders": {
+        "adminEmail": "admin@company.ru",
+        "billingEmail": "scheta@company.ru",
+        "city": "напр. Москва",
+        "firstName": "Иван",
+        "lastName": "Иванов",
+        "street": "напр. ул. Примерная, 1",
+        "subdomain": "напр. test-company",
+        "zip": "напр. 101000"
+      },
+      "previousError": "Предыдущий вызов завершился ошибкой",
+      "retry": "Повторить создание",
+      "sections": {
+        "admin": "C — Администратор учётной записи",
+        "billing": "B — Адрес для расчётов",
+        "technical": "A — Технические данные учётной записи"
+      },
+      "title": "Тестовая учётная запись"
+    }
+  },
+  "leadsList": {
+    "breadcrumb": "Лиды",
+    "detail": {
+      "addInDetails": "Добавьте в карточке",
+      "closeDate": "Дата закрытия",
+      "details": "Подробности",
+      "industry": "Отрасль",
+      "noActivities": "Нет активностей.",
+      "note": "Заметка",
+      "openDetails": "Открыть карточку",
+      "pipeline": "Воронка",
+      "probability": "Вероятн.",
+      "stageValue": "Этап: {stage}",
+      "tabs": {
+        "history": "История",
+        "info": "Информация"
+      },
+      "tags": "Теги",
+      "value": "Сумма",
+      "weightedValue": "Взвешенная сумма"
+    },
+    "fields": {
+      "annualTurnover": "Годовой оборот",
+      "company": "Компания",
+      "companyRole": "Должность в компании",
+      "email": "E-mail",
+      "firstContact": "Первый контакт",
+      "phone": "Телефон",
+      "salesRep": "Менеджер по продажам",
+      "source": "Источник",
+      "stage": "Этап",
+      "website": "Сайт"
+    },
+    "filters": {
+      "all": "Все",
+      "allReps": "Все менеджеры по продажам",
+      "allSources": "Все источники",
+      "allStages": "Все этапы",
+      "groupChip": "Группа: {name}",
+      "groupsGroup": "Группы",
+      "holdOnly": "Только на паузе",
+      "holdOnlyTitle": "Показать только лиды на паузе",
+      "hot": "Горячие",
+      "mine": "Мои",
+      "repChip": "Менеджер по продажам: {name}",
+      "reportFilter": "Фильтр из отчёта: {label}",
+      "repsGroup": "Менеджеры по продажам",
+      "wholeGroup": "Вся группа: {group}"
+    },
+    "importCsv": "Импорт CSV",
+    "kanban": {
+      "closed": "Закрытые",
+      "closedCount": "{won}В / {lost}П",
+      "closedEmpty": "Нет",
+      "empty": "Нет лидов",
+      "holdBadge": "На паузе",
+      "onboardedTitle": "Онбординг завершён — партнёр активен",
+      "partnerBadge": "Партнёр"
+    },
+    "loading": "Загрузка лидов…",
+    "meeting": {
+      "addedBy": "Добавил(а)",
+      "dateTime": "Дата и время",
+      "detailTitle": "Сведения об активности",
+      "duration": "Длительность",
+      "durationMinutes": "Длительность (мин)",
+      "durationValue": "{count, plural, one {# минута} few {# минуты} many {# минут} other {# минуты}}",
+      "edit": "Редактировать активность",
+      "editTitle": "Редактирование активности",
+      "location": "Место",
+      "locationPlaceholder": "напр. Офис клиента, Google Meet…",
+      "meetingTitle": "Название встречи",
+      "notes": "Заметки со встречи",
+      "notesPlaceholder": "Обсуждённые темы, выводы, следующие шаги…",
+      "openLead": "Открыть лид",
+      "openPartner": "Открыть партнёра",
+      "participants": "Участники",
+      "participantsPlaceholder": "напр. Иван Иванов, anna@company.ru",
+      "saveChanges": "Сохранить изменения",
+      "titlePlaceholder": "Тема встречи"
+    },
+    "newLead": {
+      "addContact": "Добавить контакт",
+      "companyName": "Название компании",
+      "companyPlaceholder": "напр. ООО «Акме»",
+      "contactName": "Имя и фамилия контакта",
+      "create": "Создать лид",
+      "emailPlaceholder": "ivan@company.ru",
+      "enrichConfirm": "Да, загрузить",
+      "enrichDecline": "Нет",
+      "enrichDone": "Данные загружены — проверьте поля ниже и заполните недостающие",
+      "enrichPrompt": "Загрузить данные компании с сайта?",
+      "extraContacts": "Дополнительные контакты",
+      "fieldRequired": "Обязательное поле",
+      "fillRequired": "Заполните обязательные поля:",
+      "fullName": "Имя и фамилия",
+      "hot": "Горячий лид",
+      "namePlaceholder": "Иван Иванов",
+      "noExtraContacts": "Нет дополнительных контактов",
+      "notes": "Заметки",
+      "notesPlaceholder": "Дополнительная информация…",
+      "optional": "(необязательно)",
+      "requiredContactName": "Имя и фамилия",
+      "select": "— выберите —",
+      "subtitle": "Добавьте новую потенциальную сделку",
+      "taxId": "ИНН",
+      "taxIdErrors": {
+        "countryCode": "Укажите код страны (2 буквы), напр. PL",
+        "numberMissing": "Укажите номер после кода страны",
+        "polishDigits": "Для PL требуется 10 цифр после кода страны",
+        "required": "ИНН обязателен"
+      },
+      "title": "Новый лид",
+      "unassigned": "— не назначен —",
+      "value": "Сумма (PLN)",
+      "websitePlaceholder": "напр. acme.ru"
+    },
+    "saving": "Сохранение…",
+    "searchPlaceholder": "Поиск компаний, контактов…",
+    "sourceGroups": {
+      "marketing": "Маркетинг"
+    },
+    "stats": {
+      "hot": "Горячих",
+      "lost": "Проигранных",
+      "opportunities": "Потенциальных сделок",
+      "pipeline": "Воронка (PLN)",
+      "won": "Выигранных"
+    },
+    "table": {
+      "chance": "% Вероятность",
+      "closeDateShort": "Закр.",
+      "companyContact": "Компания / Контакт",
+      "empty": "Нет лидов, соответствующих критериям",
+      "firstContactShort": "Перв. конт.",
+      "migrated": "Переведён",
+      "next": "Следующая",
+      "online": "% Онлайн",
+      "pageOf": "Страница {page} из {pages}",
+      "previous": "Предыдущая"
+    },
+    "timeline": {
+      "allDay": "срок",
+      "durationShort": "{minutes}мин",
+      "empty": "Нет встреч",
+      "emptyHint": "Запланируйте первую встречу в карточке лида или партнёра",
+      "futureHint": "Прокрутите вниз, чтобы увидеть следующие встречи",
+      "loading": "Загрузка встреч…",
+      "pastHint": "Прокрутите вверх, чтобы увидеть предыдущие встречи",
+      "subtitle": "Активности с датой · в хронологическом порядке",
+      "title": "Календарь активностей",
+      "todayTag": "СЕГОДНЯ",
+      "tomorrow": "Завтра · {date}",
+      "yesterday": "Вчера · {date}"
+    },
+    "title": "Лиды продаж",
+    "view": {
+      "kanban": "Канбан",
+      "table": "Таблица",
+      "timeline": "Шкала времени"
+    }
+  },
+  "meetings": {
+    "durationMin": "Длительность (мин)",
+    "location": "Место",
+    "locationPlaceholder": "напр. Переговорная А",
+    "meetingLocation": "Место встречи",
+    "participantPlaceholder": "Введите e-mail…",
+    "participants": "Участники",
+    "participantsHint": "e-mail через запятую",
+    "titlePlaceholder": "Название встречи",
+    "titleRequiredPlaceholder": "Название встречи *"
+  },
+  "partnerDetail": {
+    "activity": {
+      "bodyPlaceholder": "Содержание / описание…",
+      "dueDate": {
+        "businessDays": "{count} раб. дн. ({date})",
+        "today": "Сегодня ({date})",
+        "tomorrow": "Завтра ({date})"
+      },
+      "durationPlaceholder": "напр. 60",
+      "empty": "Нет активностей.",
+      "meetingSubjectPlaceholder": "Тема встречи *",
+      "ownerMeDefault": "— я (по умолчанию) —",
+      "participantPlaceholder": "Введите e-mail или имя…",
+      "participantsEmails": "Участники (e-mail)"
+    },
+    "calls": {
+      "agentNumber": "Агент: {phone}",
+      "billingNumber": "Расчёты: {phone}",
+      "contactNumber": "Контакт: {phone}"
+    },
+    "churn": {
+      "badge": {
+        "analyzedAt": "Анализ: {date}",
+        "daysSinceOrder": "Дней без зак.: {days}",
+        "salesDrop": "Падение продаж: {percent}%"
+      },
+      "daysSinceOrder": "Дней без заказа",
+      "levels": {
+        "critical": "Критический",
+        "high": "Высокий",
+        "low": "Низкий",
+        "medium": "Средний"
+      },
+      "noRisk": "Нет риска оттока",
+      "salesDrop": "Падение M-2→M-1",
+      "score": "{score} балл.",
+      "title": "Риск оттока"
+    },
+    "commissionBasis": {
+      "bookings": "Количество бронирований",
+      "notApplicable": "Не применяется",
+      "segments": "Количество сегментов",
+      "turnoverThresholds": "Пороги оборота"
+    },
+    "documents": {
+      "empty": "Нет связанных документов",
+      "fallbackTitle": "Документ №{id}",
+      "goTo": "Перейти к документу",
+      "noContractHint": "Добавьте документ, чтобы подтвердить сотрудничество с партнёром.",
+      "noContractTitle": "Нет связанного договора.",
+      "pickerHint": "Ищите документы по названию, номеру или организации (Entity). Видны только документы, к которым у вас есть доступ (мин. Read).",
+      "unlink": "Удалить связь"
+    },
+    "edit": {
+      "addContact": "Добавить контакт",
+      "billingContactIncomplete": "Рекомендуется заполнить все поля контакта по вопросам расчётов.",
+      "contactsSaveFailed": "Данные партнёра сохранены, но не удалось сохранить дополнительные контакты.",
+      "contractContactIncomplete": "Рекомендуется заполнить все поля контакта по вопросам договора.",
+      "dwhLockedHint": "Поля с пометкой DWH синхронизируются из транзакционной системы и не могут редактироваться.",
+      "managersOnly": "редактировать могут только руководители",
+      "noExtraContacts": "Нет дополнительных контактов",
+      "noGroup": "— без группы —",
+      "none": "— нет —",
+      "openTasksWarning": "{count, plural, one {# невыполненная задача внедрения} few {# невыполненные задачи внедрения} many {# невыполненных задач внедрения} other {# невыполненной задачи внедрения}} — нельзя установить статус «Активный»",
+      "partnerIdHint": "ID партнёра в транзакционной системе",
+      "placeholders": {
+        "address": "ул. Примерная, 1",
+        "adminEmail": "admin@company.ru",
+        "adminFirstName": "напр. Иван",
+        "adminLastName": "напр. Иванов",
+        "billingContactEmail": "raschety@company.ru",
+        "billingContactTitle": "Руководитель отдела расчётов",
+        "billingCountry": "Россия",
+        "billingEmail": "billing@company.ru",
+        "billingFullName": "Анна Смирнова",
+        "city": "Москва",
+        "commission": "напр. 0.05",
+        "country": "напр. Россия",
+        "creditLimit": "напр. 50000",
+        "deposit": "напр. 10000",
+        "email": "ivan@company.ru",
+        "fullName": "Иван Иванов",
+        "language": "напр. ru",
+        "notes": "Любые заметки…",
+        "partnerId": "напр. 42",
+        "source": "напр. выставка, рекомендация, cold call",
+        "subdomain": "напр. acme",
+        "website": "https://company.ru"
+      },
+      "removeContact": "Удалить контакт",
+      "saveChanges": "Сохранить изменения",
+      "saveFailed": "Ошибка сохранения",
+      "saving": "Сохранение…",
+      "sections": {
+        "basic": "Основное",
+        "contractAndFinance": "Договор и финансы",
+        "managerAndGroup": "Ответственный и группа",
+        "salesAndSource": "Продажи и источник",
+        "tagsAndNotes": "Теги и заметки"
+      },
+      "subdomainHint": "Адрес поддомена в системе (заполняется при создании тестовой учётной записи)",
+      "syncedWithDwh": "Синхронизируется с DWH",
+      "title": "Редактировать партнёра",
+      "unassigned": "— не назначен —"
+    },
+    "email": {
+      "empty": "Нет писем. Отправьте первое сообщение, нажав «+ Новое письмо»."
+    },
+    "fields": {
+      "activeUsers": "Активные пользователи",
+      "activeUsersShort": "Акт. польз.",
+      "address": "Адрес",
+      "adminEmail": "E-mail админа",
+      "adminFirstName": "Имя админа",
+      "adminLastName": "Фамилия админа",
+      "annualTurnover": "Годовой оборот",
+      "billingCountry": "Страна для расчётов",
+      "billingEmail": "E-mail для расчётов",
+      "city": "Город",
+      "commission": "Комиссия WT/TM",
+      "commissionBasis": "Основание",
+      "companyName": "Название компании",
+      "contactTitle": "Должность в компании",
+      "contractExpires": "Дата окончания",
+      "contractFrom": "Договор с",
+      "contractSigned": "Дата подписания",
+      "contractTo": "Договор до",
+      "country": "Страна",
+      "creditLimit": "Кредитный лимит",
+      "crmtreeId": "CRMtree ID",
+      "crmtreePartnerId": "CRMtree Partner ID",
+      "currency": "Валюта",
+      "depositAmount": "Сумма депозита",
+      "depositDateIn": "Дата внесения",
+      "depositDateOut": "Дата возврата",
+      "email": "E-mail",
+      "firstContact": "Первый контакт",
+      "firstName": "Имя",
+      "fullName": "Имя и фамилия",
+      "industry": "Отрасль",
+      "language": "Язык",
+      "lastName": "Фамилия",
+      "manager": "Ответственный",
+      "managerSalesperson": "Ответственный / Менеджер по продажам",
+      "nip": "ИНН",
+      "note": "Заметка",
+      "notes": "Заметки",
+      "onlinePct": "% Онлайн",
+      "partnerCurrency": "Валюта партнёра",
+      "partnerGroup": "Группа партнёров",
+      "phone": "Телефон",
+      "source": "Источник",
+      "status": "Статус",
+      "subdomain": "Поддомен",
+      "tags": "Теги",
+      "tagsHint": "Теги (через запятую)",
+      "value": "Сумма",
+      "website": "Сайт",
+      "zip": "Почтовый индекс"
+    },
+    "header": {
+      "activeSince": "Активен с {date}",
+      "backToPartners": "Партнёры",
+      "churn": "Отток: {level}",
+      "edit": "Редактировать",
+      "noEditPermission": "Нет прав на редактирование этого партнёра"
+    },
+    "history": {
+      "created": "Партнёр создан",
+      "deleted": "Партнёр удалён",
+      "searchPlaceholder": "Поиск…",
+      "updated": "Партнёр обновлён"
+    },
+    "info": {
+      "activeUsersCount": "{count, plural, one {# активный} few {# активных} many {# активных} other {# активных}}",
+      "collapsePanel": "Свернуть панель",
+      "expandPanel": "Развернуть панель",
+      "notSet": "не задано",
+      "title": "Информация"
+    },
+    "loadError": "Ошибка загрузки.",
+    "nip": {
+      "countryCodeRequired": "Укажите код страны (2 буквы), напр. PL",
+      "numberRequired": "Укажите номер после кода страны",
+      "plTenDigits": "Для PL требуется 10 цифр после кода страны",
+      "required": "ИНН обязателен"
+    },
+    "notFound": "Партнёр не найден.",
+    "onboarding": {
+      "addTask": "Добавить задачу",
+      "advanceFailed": "Не удалось завершить этап",
+      "deleteTaskConfirm": "Удалить задачу «{title}»?",
+      "descriptionOptionalPlaceholder": "Описание (необязательно)…",
+      "descriptionPlaceholder": "Описание…",
+      "empty": "Для этого этапа нет задач. Нажмите «+ Добавить задачу».",
+      "finish": "Завершить внедрение",
+      "finishFailed": "Не удалось завершить внедрение",
+      "nextStep": "Следующий этап",
+      "overdue": "Просрочено",
+      "responsiblePerson": "— ответственное лицо —",
+      "steps": {
+        "contractSigned": "Договор подписан",
+        "ready": "Готов",
+        "systemSetup": "Настройка системы",
+        "userTraining": "Обучение пользователей"
+      },
+      "taskTitlePlaceholder": "Название задачи *",
+      "tasksFor": "Задачи:"
+    },
+    "opportunities": {
+      "dueBy": "до {date}",
+      "status": "Статус сделки",
+      "statuses": {
+        "closed": "Закрыта",
+        "in_progress": "В работе",
+        "new": "Новая"
+      },
+      "titleWithCount": "Сделки ({count})"
+    },
+    "sales": {
+      "kpi": {
+        "grossTurnover": "Оборот брутто PLN",
+        "netRevenue": "Выручка нетто PLN",
+        "netTurnover": "Оборот нетто PLN",
+        "products": "Продукты",
+        "transactions": "Транзакции"
+      },
+      "noData": "Нет данных о продажах",
+      "periods": {
+        "currentMonth": "Текущий мес.",
+        "last12Months": "Последние 12 мес.",
+        "last3Months": "Последние 3 мес.",
+        "last6Months": "Последние 6 мес.",
+        "ytd": "YTD {year}"
+      },
+      "productBreakdown": "Разбивка по продуктам",
+      "title": "Данные о продажах DWH"
+    },
+    "sections": {
+      "additionalData": "Дополнительные данные",
+      "agent": "Данные агента",
+      "billingAddress": "Адрес для расчётов",
+      "billingContact": "Контакт по вопросам расчётов",
+      "contractContact": "Контакт по вопросам договора",
+      "extraContacts": "Дополнительные контакты",
+      "financialTerms": "Финансовые условия",
+      "partnerAdmin": "Администратор партнёра"
+    }
+  },
+  "partnersList": {
+    "card": {
+      "marginAmount": "{amount} PLN маржи",
+      "onboardingStep": "Шаг {step} / {total}",
+      "openOpportunities": "{count, plural, one {# сделка} few {# сделки} many {# сделок} other {# сделки}}"
+    },
+    "churn": {
+      "levels": {
+        "critical": "Критический",
+        "high": "Высокий",
+        "low": "Низкий",
+        "medium": "Средний"
+      },
+      "points": "{score} балл.",
+      "risk": "Риск оттока",
+      "riskWithLevel": "Риск оттока: {level}"
+    },
+    "create": {
+      "companyPlaceholder": "Название компании",
+      "error": "Ошибка создания партнёра. Попробуйте ещё раз.",
+      "hint": "Вы можете создать партнёра без связанного лида.",
+      "saving": "Сохранение…",
+      "submit": "Создать партнёра",
+      "taxIdHint": "(необязательно — для партнёров DWH заполняется автоматически)",
+      "title": "Новый партнёр",
+      "unassigned": "— не назначен —"
+    },
+    "documents": {
+      "linkedCount": "{count, plural, one {У партнёра # связанный документ} few {У партнёра # связанных документа} many {У партнёра # связанных документов} other {У партнёра # связанного документа}}. Нажмите, чтобы посмотреть.",
+      "noContract": "Нет связанного договора"
+    },
+    "empty": "Нет партнёров, соответствующих критериям.",
+    "fields": {
+      "accountManager": "Ответственный / Менеджер по продажам",
+      "annualTurnover": "Годовой оборот",
+      "company": "Компания",
+      "contact": "Контакт",
+      "email": "E-mail",
+      "group": "Группа",
+      "industry": "Отрасль",
+      "licenseCount": "Количество лицензий",
+      "salesRep": "Менеджер по продажам",
+      "status": "Статус",
+      "taxId": "ИНН"
+    },
+    "reportFilter": {
+      "clear": "Сбросить фильтр",
+      "label": "Фильтр из отчёта:"
+    },
+    "table": {
+      "churn": "Отток",
+      "contractUntil": "Договор до",
+      "crmTurnover": "Оборот CRM",
+      "dwhMargin": "DWH Маржа",
+      "dwhMarginHint": "Маржа YTD из DWH",
+      "dwhTurnover": "DWH Оборот",
+      "dwhTurnoverHint": "Оборот брутто YTD из DWH"
+    },
+    "taxIdErrors": {
+      "countryCode": "Укажите код страны (2 буквы), напр. PL",
+      "duplicate": "Этот ИНН уже присвоен другой записи.",
+      "numberMissing": "Укажите номер после кода страны",
+      "polishDigits": "Для PL требуется 10 цифр после кода страны",
+      "required": "ИНН обязателен"
+    },
+    "title": "Реестр партнёров",
+    "toolbar": {
+      "allGroups": "Все группы",
+      "allIndustries": "Все отрасли",
+      "allSalesReps": "Все менеджеры по продажам",
+      "allStatuses": "Все статусы",
+      "clear": "Сбросить",
+      "onlyMine": "Только мои",
+      "searchPlaceholder": "Поиск компании, контакта…"
+    },
+    "view": {
+      "cards": "Карточки",
+      "table": "Таблица"
+    }
+  },
+  "sms": {
+    "emptyConversation": "Нет сообщений — напишите первое ниже.",
+    "last": "последнее:",
+    "loadFailed": "Ошибка загрузки SMS",
+    "messagePlaceholder": "Сообщение…",
+    "noMessages": "Нет сообщений",
+    "noNumbers": "Нет номеров телефона для SMS.",
+    "send": "Отправить",
+    "sendFailed": "Ошибка отправки SMS",
+    "statuses": {
+      "delivered": "Доставлено",
+      "failed": "Ошибка",
+      "received": "Получено",
+      "sent": "Отправлено"
+    }
+  },
+  "whatsapp": {
+    "checkingConfig": "Проверка конфигурации...",
+    "configuredNumber": "настроенный номер",
+    "conversation": "Переписка в WhatsApp",
+    "empty": "Нет отправленных сообщений WhatsApp.",
+    "from": "От:",
+    "lastMessage": "последнее сообщение:",
+    "loadingHistory": "Загрузка истории…",
+    "messageBody": "Текст сообщения",
+    "messagePlaceholder": "Текст сообщения...",
+    "missingCountryCode": "Укажите номер с кодом страны, напр. +7 912 345 67 89.",
+    "newMessage": "Новое сообщение WhatsApp",
+    "notConfigured": "WhatsApp не настроен для этой организации. Обратитесь к администратору.",
+    "reply": {
+      "action": "Ответить",
+      "placeholder": "Текст ответа...",
+      "replyingVia": "Вы отвечаете через WhatsApp",
+      "send": "Отправить ответ",
+      "sending": "Отправка…"
+    },
+    "send": "Отправить в WhatsApp",
+    "sendFailed": "Ошибка отправки WhatsApp",
+    "sending": "Отправка...",
+    "sent": "Сообщение отправлено.",
+    "to": "Кому:",
+    "toField": "Кому"
+  }
+}

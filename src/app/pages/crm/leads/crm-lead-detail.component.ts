@@ -8,7 +8,7 @@ import { finalize } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import {
   CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
-  LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
+  LEAD_SOURCES, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
   GmailSendResult, ConsentValue, EmailStatus, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
@@ -25,6 +25,9 @@ import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '.
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { QuillModule } from 'ngx-quill';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../../core/i18n/locale.service';
+import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -45,45 +48,46 @@ interface WhatsappConvUiState {
   selector: 'wt-crm-lead-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent],
-  providers: [EmailOauthListenerService],
+            AddToCalendarComponent, LinkedProjectTasksComponent, TranslocoDirective, TranslocoPipe],
+  providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden" *ngIf="lead">
 
   <!-- HEADER -->
   <div style="height:56px;background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0">
-    <button style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← Leady</button>
+    <button style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← {{ t('leadDetail.header.backToLeads') }}</button>
     <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
       <div *ngIf="lead.logo_url && logoSasUrl" style="width:34px;height:34px;border-radius:50%;background-size:cover;background-position:center;border:1px solid #e5e7eb;flex-shrink:0;background-color:#f9fafb"
            [style.background-image]="logoSasUrl"></div>
       <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{lead.company}}</div>
     </div>
     <span class="stage-badge stage-{{lead.stage}}">{{stageLabel(lead.stage)}}</span>
-    <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 Gorący</span>
-    <span *ngIf="lead.hold_active" style="background:#e5e7eb;color:#374151;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700" title="{{lead.hold_reason}}">⏸️ Hold do {{lead.hold_until | date:'dd.MM.yyyy'}}</span>
+    <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 {{ t('leadDetail.header.hot') }}</span>
+    <span *ngIf="lead.hold_active" style="background:#e5e7eb;color:#374151;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700" title="{{lead.hold_reason}}">⏸️ {{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
     <div style="display:flex;gap:6px">
       <button class="hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
               [style.background]="lead.hold_active ? '#e5e7eb' : ''"
               [style.color]="lead.hold_active ? '#374151' : ''"
               (click)="openHoldModal()"
-              [title]="lead.hold_active ? ('Hold do ' + (lead.hold_until | date:'dd.MM.yyyy') + ' — kliknij aby edytować') : 'Ustaw Hold'">
-        ⏸️ {{ lead.hold_active ? 'Hold aktywny' : 'Hold' }}
+              [title]="lead.hold_active ? t('leadDetail.hold.editTooltip', { date: (lead.hold_until | date:'dd.MM.yyyy') }) : t('leadDetail.hold.set')">
+        ⏸️ {{ lead.hold_active ? t('leadDetail.hold.active') : t('leadDetail.hold.label') }}
       </button>
-      <button class="hdr-btn" *ngIf="canEdit && lead.stage !== 'archived'" (click)="archiveLead()" title="Archiwizuj — lead zniknie z list, dashboardów i raportów">
-        🗄️ Archiwizuj
+      <button class="hdr-btn" *ngIf="canEdit && lead.stage !== 'archived'" (click)="archiveLead()" [title]="t('leadDetail.archive.tooltip')">
+        🗄️ {{ t('leadDetail.archive.action') }}
       </button>
-      <button class="hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        title="Zadzwoń: {{lead.phone}}">📞</button>
-      <button class="hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  title="Email: {{lead.email}}">
-        ✉️ Email
+      <button class="hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        [title]="t('calls.callNumber', { phone: lead.phone })">📞</button>
+      <button class="hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  [title]="t('email.addressTooltip', { email: lead.email })">
+        ✉️ {{ t('email.label') }}
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
-      <button class="hdr-btn hdr-btn-edit" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? 'Edytuj lead' : 'Brak uprawnień — handlowiec nie należy do Twojej grupy'">✏️ Edytuj</button>
-      <button class="hdr-btn hdr-btn-test" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" title="Załóż konto testowe w systemie zewnętrznym">
-        🖥️ Konto testowe
+      <button class="hdr-btn hdr-btn-edit" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('leadDetail.edit.title') : t('leadDetail.edit.noPermission')">✏️ {{ t('leadDetail.header.edit') }}</button>
+      <button class="hdr-btn hdr-btn-test" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" [title]="t('leadDetail.testAccount.openTooltip')">
+        🖥️ {{ t('leadDetail.testAccount.title') }}
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
         <span *ngIf="testAccount?.status==='error'"   class="ta-badge-err">!</span>
       </button>
-      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at && canEdit" (click)="showConvert=true">🚀 Rozpocznij onboarding</button>
+      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at && canEdit" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }}</button>
     </div>
   </div>
 
@@ -93,54 +97,54 @@ interface WhatsappConvUiState {
     <!-- LEWA: Informacje -->
     <div style="border-right:1px solid #e5e7eb;display:flex;flex-direction:column;min-height:0" [class.left-panel-collapsed]="leftCollapsed">
       <div class="left-panel-hdr">
-        <span *ngIf="!leftCollapsed" class="left-panel-title">Informacje</span>
-        <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed?'Rozwiń panel':'Zwiń panel'">{{leftCollapsed?'›':'‹'}}</button>
+        <span *ngIf="!leftCollapsed" class="left-panel-title">{{ t('leadDetail.info.title') }}</span>
+        <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')">{{leftCollapsed?'›':'‹'}}</button>
       </div>
       <div *ngIf="!leftCollapsed" style="padding:0 16px 16px;overflow-y:auto;flex:1">
 
       <!-- Firma -->
       <div class="info-section">
-        <div class="info-section-title">Firma</div>
-        <div class="info-kv"><span class="lbl">Nazwa</span><span class="val fw">{{lead.company}}</span></div>
-        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">NIP</span><span class="val" style="font-family:monospace">{{lead.nip}}</span></div>
+        <div class="info-section-title">{{ t('leadDetail.sections.company') }}</div>
+        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.name') }}</span><span class="val fw">{{lead.company}}</span></div>
+        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">{{ t('leadDetail.fields.nip') }}</span><span class="val" style="font-family:monospace">{{lead.nip}}</span></div>
         <div class="info-kv" *ngIf="lead.website">
-          <span class="lbl">WWW</span>
+          <span class="lbl">{{ t('leadDetail.fields.www') }}</span>
           <span class="val"><a class="link" [href]="'https://'+lead.website" target="_blank">{{lead.website}}</a></span>
         </div>
-        <div class="info-kv" *ngIf="lead.industry"><span class="lbl">Branża</span><span class="val">{{lead.industry}}</span></div>
-        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;font-size:11px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥 Gorący lead</div>
+        <div class="info-kv" *ngIf="lead.industry"><span class="lbl">{{ t('leadDetail.fields.industry') }}</span><span class="val">{{lead.industry}}</span></div>
+        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;font-size:11px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥 {{ t('leadDetail.fields.hotLead') }}</div>
         <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:2px;background:#f3f4f6;color:#374151;font-size:11px;padding:6px 10px;border-radius:8px;font-weight:600;margin-top:4px">
-          <span>⏸️ Hold do {{lead.hold_until | date:'dd.MM.yyyy'}}</span>
+          <span>⏸️ {{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
           <span style="font-weight:400;color:#6b7280">{{lead.hold_reason}}</span>
         </div>
       </div>
 
       <!-- Główny kontakt -->
       <div class="info-section" *ngIf="lead.contact_name || lead.email || lead.phone">
-        <div class="info-section-title">Kontakt</div>
+        <div class="info-section-title">{{ t('leadDetail.sections.contact') }}</div>
         <div class="info-kv" *ngIf="lead.contact_name">
-          <span class="lbl">Osoba</span>
+          <span class="lbl">{{ t('leadDetail.fields.person') }}</span>
           <span class="val">{{lead.contact_name}}<span style="color:#9ca3af" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span>
         </div>
         <div class="info-kv" *ngIf="lead.email">
-          <span class="lbl">Email</span>
+          <span class="lbl">{{ t('leadDetail.fields.email') }}</span>
           <span class="val" style="display:flex;align-items:center;gap:4px">
             <a class="link" href="mailto:{{lead.email}}">{{lead.email}}</a>
-            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" title="Wyślij email">✉️</button>
+            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" [title]="t('email.send')">✉️</button>
           </span>
         </div>
         <div class="info-kv" *ngIf="lead.phone">
-          <span class="lbl">Telefon</span>
+          <span class="lbl">{{ t('leadDetail.fields.phone') }}</span>
           <span class="val">
             <a class="link" href="tel:{{lead.phone}}">{{lead.phone}}</a>
-            <button *ngIf="canEdit" style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;opacity:.6" (click)="mockCall()" title="Zadzwoń">📞</button>
+            <button *ngIf="canEdit" style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;opacity:.6" (click)="mockCall()" [title]="t('calls.call')">📞</button>
           </span>
         </div>
       </div>
 
       <!-- Dodatkowe kontakty -->
       <div class="info-section" *ngIf="lead.extra_contacts?.length">
-        <div class="info-section-title">Dodatkowe kontakty</div>
+        <div class="info-section-title">{{ t('leadDetail.sections.extraContacts') }}</div>
         @for (ec of lead.extra_contacts || []; track ec.id) {
           <div style="padding:8px 0;border-bottom:1px solid #f3f4f6">
             <div style="font-size:12px;font-weight:600;color:#374151">
@@ -154,38 +158,38 @@ interface WhatsappConvUiState {
 
       <!-- Agent -->
       <div class="info-section" *ngIf="lead.agent_name || lead.agent_email || lead.agent_phone">
-        <div class="info-section-title" style="color:var(--orange)">🤝 Agent</div>
-        <div class="info-kv" *ngIf="lead.agent_name"><span class="lbl">Imię i nazwisko</span><span class="val fw">{{lead.agent_name}}</span></div>
+        <div class="info-section-title" style="color:var(--orange)">🤝 {{ t('leadDetail.sections.agent') }}</div>
+        <div class="info-kv" *ngIf="lead.agent_name"><span class="lbl">{{ t('leadDetail.fields.fullName') }}</span><span class="val fw">{{lead.agent_name}}</span></div>
         <div class="info-kv" *ngIf="lead.agent_email">
-          <span class="lbl">Email</span>
+          <span class="lbl">{{ t('leadDetail.fields.email') }}</span>
           <a class="val link" href="mailto:{{lead.agent_email}}">{{lead.agent_email}}</a>
         </div>
-        <div class="info-kv" *ngIf="lead.agent_phone"><span class="lbl">Telefon</span><span class="val">{{lead.agent_phone}}</span></div>
+        <div class="info-kv" *ngIf="lead.agent_phone"><span class="lbl">{{ t('leadDetail.fields.phone') }}</span><span class="val">{{lead.agent_phone}}</span></div>
       </div>
 
       <!-- Sprzedaż -->
       <div class="info-section">
-        <div class="info-section-title">Sprzedaż</div>
-        <div class="info-kv"><span class="lbl">Etap</span><span class="val"><span class="stage-badge stage-{{lead.stage}}" style="font-size:10px">{{stageLabel(lead.stage)}}</span></span></div>
+        <div class="info-section-title">{{ t('leadDetail.sections.sales') }}</div>
+        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.stage') }}</span><span class="val"><span class="stage-badge stage-{{lead.stage}}" style="font-size:10px">{{stageLabel(lead.stage)}}</span></span></div>
         <div class="info-kv" *ngIf="lead.stage==='closed_lost' && lead.lost_reason">
-          <span class="lbl">Powód przegranej</span>
+          <span class="lbl">{{ t('leadDetail.fields.lostReason') }}</span>
           <span class="val" style="color:#991b1b">{{lead.lost_reason}}</span>
         </div>
-        <div class="info-kv"><span class="lbl">Szansa</span><span class="val">{{lead.probability||0}}%</span></div>
+        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.probability') }}</span><span class="val">{{lead.probability||0}}%</span></div>
         <div class="info-kv" *ngIf="lead.value_pln">
-          <span class="lbl">Obrót roczny</span>
+          <span class="lbl">{{ t('leadDetail.fields.annualTurnover') }}</span>
           <span class="val" style="color:#f97316;font-family:'Sora',sans-serif;font-weight:700">{{lead.value_pln|number:'1.0-0'}} {{lead.annual_turnover_currency||'PLN'}}</span>
         </div>
-        <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">% Online</span><span class="val">{{lead.online_pct}}%</span></div>
-        <div class="info-kv" *ngIf="lead.source"><span class="lbl">Źródło</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
-        <div class="info-kv" *ngIf="lead.first_contact_date"><span class="lbl">Pierwszy kontakt</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
-        <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">Data zamknięcia</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
-        <div class="info-kv" *ngIf="lead.assigned_to_name"><span class="lbl">Handlowiec</span><span class="val fw">{{lead.assigned_to_name}}</span></div>
+        <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">{{ t('leadDetail.fields.onlinePct') }}</span><span class="val">{{lead.online_pct}}%</span></div>
+        <div class="info-kv" *ngIf="lead.source"><span class="lbl">{{ t('leadDetail.fields.source') }}</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
+        <div class="info-kv" *ngIf="lead.first_contact_date"><span class="lbl">{{ t('leadDetail.fields.firstContact') }}</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
+        <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">{{ t('leadDetail.fields.closeDate') }}</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
+        <div class="info-kv" *ngIf="lead.assigned_to_name"><span class="lbl">{{ t('leadDetail.fields.salesperson') }}</span><span class="val fw">{{lead.assigned_to_name}}</span></div>
       </div>
 
       <!-- Notatki i tagi -->
       <div class="info-section" *ngIf="lead.tags?.length || lead.notes">
-        <div class="info-section-title">Notatki</div>
+        <div class="info-section-title">{{ t('leadDetail.sections.notes') }}</div>
         <div *ngIf="lead.tags?.length" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
           <span *ngFor="let t of lead.tags" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px">{{t}}</span>
         </div>
@@ -194,21 +198,21 @@ interface WhatsappConvUiState {
 
       <!-- Zgody marketingowe -->
       <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:12px">✅ Zgody marketingowe</div>
-        <div *ngIf="consentLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie…</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:12px">✅ {{ t('consents.title') }}</div>
+        <div *ngIf="consentLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:14px">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:5px">
             <div style="font-size:11.5px;font-weight:600;color:#374151;line-height:1.4;flex:1">{{ct.label}}</div>
             <button (click)="toggleConsentExpand(ct.consent_key)"
                     style="background:none;border:none;cursor:pointer;font-size:10px;color:#9ca3af;white-space:nowrap;padding:0;flex-shrink:0;line-height:1.8">
-              {{expandedConsent===ct.consent_key ? '▲ zwiń' : '▾ szczegóły'}}
+              {{expandedConsent===ct.consent_key ? '▲ ' + t('consents.collapse') : '▾ ' + t('consents.details')}}
             </button>
           </div>
           <div *ngIf="expandedConsent===ct.consent_key"
                style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:6px;padding:8px 10px;margin-bottom:7px;line-height:1.55;border-left:3px solid #e5e7eb">
             {{ct.description}}
             <div *ngIf="ct.updated_at" style="margin-top:5px;font-size:10px;color:#9ca3af">
-              Ostatnia zmiana: {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
+              {{ t('consents.lastChange') }} {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
               <span *ngIf="ct.updated_by_name"> · {{ct.updated_by_name}}</span>
             </div>
           </div>
@@ -220,7 +224,7 @@ interface WhatsappConvUiState {
                     [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : '#e5e7eb')"
                     [style.cursor]="canEditConsents ? 'pointer' : 'default'"
                     style="flex:1;font-size:10.5px;font-weight:600;padding:5px 2px;border-radius:6px;transition:all .12s;text-align:center;line-height:1.3">
-              {{v.label}}
+              {{ t(v.labelKey) }}
             </button>
           </div>
         </div>
@@ -230,7 +234,7 @@ interface WhatsappConvUiState {
                 [style.background]="consentsDirty ? '#3BAA5D' : '#f4f4f5'"
                 [style.color]="consentsDirty ? 'white' : '#a1a1aa'"
                 [style.cursor]="consentsDirty ? 'pointer' : 'default'">
-          {{savingConsents ? 'Zapisuję…' : consentsDirty ? '💾 Zapisz zgody' : '✓ Zapisano'}}
+          {{savingConsents ? t('consents.saving') : consentsDirty ? '💾 ' + t('consents.save') : '✓ ' + t('consents.saved')}}
         </button>
       </div>
 
@@ -245,31 +249,31 @@ interface WhatsappConvUiState {
         <!-- Onboarding in progress: blue banner -->
         <ng-container *ngIf="lead.stage==='onboarding'">
           <span style="font-size:15px">⏳</span>
-          <span style="color:#1d4ed8;font-weight:700;font-size:13px">W trakcie onboardingu</span>
-          <span style="font-size:12px;color:#6b7280;margin-left:4px">— partner w procesie wdrożenia</span>
+          <span style="color:#1d4ed8;font-weight:700;font-size:13px">{{ t('leadDetail.onboarding.inProgress') }}</span>
+          <span style="font-size:12px;color:#6b7280;margin-left:4px">— {{ t('leadDetail.onboarding.partnerInProgress') }}</span>
           <span style="flex:1"></span>
-          <span style="font-size:11px;color:#9ca3af">Lead zablokowany do edycji</span>
-          <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ Panel Onboarding</a>
+          <span style="font-size:11px;color:#9ca3af">{{ t('leadDetail.onboarding.leadLocked') }}</span>
+          <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.panelLink') }}</a>
         </ng-container>
         <!-- Onboarded: locked banner -->
         <ng-container *ngIf="lead.stage==='onboarded'">
           <span style="font-size:15px">✅</span>
-          <span style="color:#15803d;font-weight:700;font-size:13px">Onboarding zakończony — Partner aktywny</span>
+          <span style="color:#15803d;font-weight:700;font-size:13px">{{ t('leadDetail.onboarding.completedPartnerActive') }}</span>
           <span style="flex:1"></span>
-          <span style="font-size:11px;color:#9ca3af">Lead zablokowany do edycji</span>
-          <a routerLink="/crm/partners" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ Rejestr Partnerów</a>
+          <span style="font-size:11px;color:#9ca3af">{{ t('leadDetail.onboarding.leadLocked') }}</span>
+          <a routerLink="/crm/partners" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.partnerRegistryLink') }}</a>
         </ng-container>
         <!-- Closed lost: red banner mode -->
         <ng-container *ngIf="lead.stage==='closed_lost'">
           <span style="font-size:15px">⛔</span>
-          <span style="color:#dc2626;font-weight:700;font-size:13px">Przegrany</span>
+          <span style="color:#dc2626;font-weight:700;font-size:13px">{{ t('labels.stages.closed_lost') }}</span>
           <span *ngIf="lead.lost_reason" style="font-size:12px;color:#991b1b">· {{lead.lost_reason}}</span>
           <span style="flex:1"></span>
-          <button *ngIf="canEdit" class="stage-arrow-btn" style="color:#15803d;border-color:#bbf7d0;font-size:12px;padding:4px 12px" (click)="quickChangeStage('new')">↩ Wróć do Nowego</button>
+          <button *ngIf="canEdit" class="stage-arrow-btn" style="color:#15803d;border-color:#bbf7d0;font-size:12px;padding:4px 12px" (click)="quickChangeStage('new')">↩ {{ t('leadDetail.stage.backToNew') }}</button>
         </ng-container>
         <!-- Normal stepper mode -->
         <ng-container *ngIf="lead.stage!=='closed_lost' && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
-          <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" title="Poprzedni etap">‹</button>
+          <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" [title]="t('leadDetail.stage.previous')">‹</button>
           <div style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
             <ng-container *ngFor="let s of orderedStageOptions; let last=last">
               <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
@@ -283,32 +287,32 @@ interface WhatsappConvUiState {
                    [style.background]="isStageCompleted(s.key) ? '#22c55e' : '#d1d5db'"></div>
             </ng-container>
           </div>
-          <button class="stage-arrow-btn" [disabled]="!nextStage() || !canEdit" (click)="quickChangeStage(nextStage()!)" title="Następny etap">›</button>
-          <button *ngIf="canEdit && lead.stage!=='closed_won'" class="stage-arrow-btn" style="color:#dc2626;border-color:#fecaca;font-size:12px;padding:4px 8px" (click)="quickChangeStage('closed_lost')" title="Przegrany">⛔</button>
+          <button class="stage-arrow-btn" [disabled]="!nextStage() || !canEdit" (click)="quickChangeStage(nextStage()!)" [title]="t('leadDetail.stage.next')">›</button>
+          <button *ngIf="canEdit && lead.stage!=='closed_won'" class="stage-arrow-btn" style="color:#dc2626;border-color:#fecaca;font-size:12px;padding:4px 8px" (click)="quickChangeStage('closed_lost')" [title]="t('labels.stages.closed_lost')">⛔</button>
         </ng-container>
       </div>
 
       <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0;flex-wrap:wrap">
         <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
-          Wszystkie
+          {{ t('activity.tabs.all') }}
           <wt-activity-count-badge [activities]="lead.activities||[]"></wt-activity-count-badge>
         </button>
-        <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">Zadania</button>
-        <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">Notatki</button>
+        <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">{{ t('activity.tabs.tasks') }}</button>
+        <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">{{ t('activity.tabs.notes') }}</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
-          Emaile
+          {{ t('activity.tabs.emails') }}
           <span *ngIf="emailActivityCount>0" class="email-badge" style="margin-left:4px">{{emailActivityCount}}</span>
         </button>
         <button class="tab-btn" [class.active]="midTab==='whatsapp'" (click)="openWhatsappTab()">WhatsApp</button>
         <button class="tab-btn" *ngIf="hasPbxFeature" [class.active]="midTab==='sms'" (click)="openSmsTab()">SMS</button>
-        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">Połączenia</button>
-        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">Spotkania</button>
+        <button class="tab-btn" [class.active]="midTab==='calls'" (click)="midTab='calls'">{{ t('activity.tabs.calls') }}</button>
+        <button class="tab-btn" [class.active]="midTab==='meetings'" (click)="midTab='meetings'">{{ t('activity.tabs.meetings') }}</button>
       </div>
 
       <!-- Aktywności tabs (all/tasks/notes/calls/meetings) -->
       <div *ngIf="midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
+          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ {{ t('activity.add') }}</button>
         </div>
 
         <wt-linked-project-tasks *ngIf="midTab==='tasks' || midTab==='all'"
@@ -320,16 +324,16 @@ interface WhatsappConvUiState {
             {{actIcon(actForm.type)}} {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
-          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" placeholder="Tytuł spotkania *" class="act-input">
+          <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('meetings.titleRequiredPlaceholder')" class="act-input">
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px;align-items:start">
-            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Termin
+            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.dueDate') }}
               <div style="position:relative">
                 <div *ngIf="actDueDateOpen" style="position:fixed;inset:0;z-index:99" (click)="actDueDateOpen=false"></div>
                 <button type="button" class="act-input"
                         style="display:flex;align-items:center;gap:4px;width:100%;text-align:left;cursor:pointer;background:white;padding:5px 8px"
                         (click)="actDueDateOpen=!actDueDateOpen">
                   <span style="flex:1;font-size:11px" [style.color]="actDueDatePreset ? '#111827' : '#9ca3af'">
-                    {{actDueDateSelectedLabel || 'Brak'}}
+                    {{actDueDateSelectedLabel || t('activity.dueDate.none')}}
                   </span>
                   <span style="font-size:9px;color:#9ca3af">{{actDueDateOpen ? '▲' : '▾'}}</span>
                 </button>
@@ -345,7 +349,7 @@ interface WhatsappConvUiState {
                        [style.background]="actDueDatePreset==='custom' ? '#E6F4EA' : 'white'"
                        [style.color]="actDueDatePreset==='custom' ? '#3BAA5D' : '#374151'"
                        [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
-                       (mousedown)="selectDueDatePreset('custom')">📅 Własna data…</div>
+                       (mousedown)="selectDueDatePreset('custom')">📅 {{ t('activity.customDate') }}</div>
                 </div>
               </div>
               <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom' && actForm.type!=='task'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
@@ -354,39 +358,39 @@ interface WhatsappConvUiState {
               </div>
               <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px;margin-top:2px">
             </label>
-            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Przypomnienie
+            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.reminder') }}
               <select [(ngModel)]="actReminderType" class="act-input" style="font-size:11px">
-                <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
+                <option *ngFor="let r of reminderOptions" [value]="r.value">{{ t(r.labelKey) }}</option>
               </select>
               <input *ngIf="actReminderType==='custom'" type="datetime-local" [(ngModel)]="actReminderAt" class="act-input" style="font-size:11px;margin-top:2px">
             </label>
-            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Właściciel
+            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.owner') }}
               <select [(ngModel)]="actForm.assigned_to" class="act-input" style="font-size:11px">
-                <option value="">— bez —</option>
+                <option value="">{{ t('activity.form.noOwner') }}</option>
                 <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
               </select>
             </label>
-            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Priorytet
+            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.priority') }}
               <select [(ngModel)]="actForm.priority" class="act-input" style="font-size:11px">
-                <option value="">— brak —</option>
-                <option value="asap">ASAP</option>
-                <option value="important">Ważne</option>
-                <option value="medium">Średnie</option>
-                <option value="low">Niskie</option>
+                <option value="">{{ t('activity.form.none') }}</option>
+                <option value="asap">{{ t('labels.priorities.asap') }}</option>
+                <option value="important">{{ t('labels.priorities.important') }}</option>
+                <option value="medium">{{ t('labels.priorities.medium') }}</option>
+                <option value="low">{{ t('labels.priorities.low') }}</option>
               </select>
             </label>
           </div>
           <ng-container *ngIf="actForm.type==='meeting'">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">Czas trwania (min)<input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label>
-              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">Miejsce<input [(ngModel)]="actForm.meeting_location" placeholder="np. Sala konferencyjna A" class="act-input" style="font-size:11px"></label>
+              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">{{ t('meetings.durationMin') }}<input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label>
+              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">{{ t('meetings.location') }}<input [(ngModel)]="actForm.meeting_location" [placeholder]="t('meetings.locationPlaceholder')" class="act-input" style="font-size:11px"></label>
             </div>
             <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
-              Uczestnicy
+              {{ t('meetings.participants') }}
               <div class="participant-input-wrap">
                 <div class="participant-chips">
                   <span *ngFor="let e of actForm.participantList; let i=index" class="participant-chip">{{e}}<button (click)="removeParticipant(actForm,i)" type="button">✕</button></span>
-                  <input class="participant-input" [(ngModel)]="participantQuery" (ngModelChange)="filterSuggestions()" (keydown.enter)="addParticipantFromInput(actForm)" (keydown.Tab)="addParticipantFromInput(actForm)" placeholder="Wpisz email…" autocomplete="off">
+                  <input class="participant-input" [(ngModel)]="participantQuery" (ngModelChange)="filterSuggestions()" (keydown.enter)="addParticipantFromInput(actForm)" (keydown.Tab)="addParticipantFromInput(actForm)" [placeholder]="t('meetings.participantPlaceholder')" autocomplete="off">
                 </div>
                 <div class="suggestions-dropdown" *ngIf="filteredSuggestions.length && participantQuery">
                   <div *ngFor="let s of filteredSuggestions" class="suggestion-item" (mousedown)="pickSuggestion(actForm,s)"><span style="font-weight:600">{{s.name}}</span><span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span></div>
@@ -394,10 +398,10 @@ interface WhatsappConvUiState {
               </div>
             </label>
           </ng-container>
-          <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules" placeholder="Treść / notatki…" style="display:block" theme="snow"></quill-editor>
+          <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules" [placeholder]="t('activity.form.bodyPlaceholder')" style="display:block" theme="snow"></quill-editor>
           <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn-sm" (click)="showNewActivity=false">Anuluj</button>
-            <button class="btn-sm primary" (click)="addActivity()" [disabled]="savingActivity">{{savingActivity?'…':'Zapisz'}}</button>
+            <button class="btn-sm" (click)="showNewActivity=false">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn-sm primary" (click)="addActivity()" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
           </div>
         </div>
 
@@ -416,7 +420,7 @@ interface WhatsappConvUiState {
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
-              <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">utworzono {{a.created_at|date:'dd.MM.yyyy HH:mm'}}</span>
+              <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{ t('activity.card.createdAt', { date: (a.created_at|date:'dd.MM.yyyy HH:mm') }) }}</span>
               <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'note'"
                                   [entry]="calendarEntryOf(a)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
             </div>
@@ -428,64 +432,64 @@ interface WhatsappConvUiState {
             <div *ngIf="a.body" class="act-card-body">
               <div [class.act-body-clamp]="!isActExpanded(a.id)" [innerHTML]="a.body"></div>
               <button *ngIf="a.body.length > 200" class="act-expand-btn" (click)="$event.stopPropagation(); toggleActExpand(a.id)">
-                {{isActExpanded(a.id) ? '▲ Zwiń' : '▼ Rozwiń'}}
+                {{isActExpanded(a.id) ? '▲ ' + t('activity.card.collapse') : '▼ ' + t('activity.card.expand')}}
               </button>
             </div>
             <div *ngIf="canEdit && a.type==='task'" class="task-actions-row" (click)="$event.stopPropagation()">
-              <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ Zamknij zadanie</button>
-              <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ Otwórz ponownie</button>
+              <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ {{ t('activity.card.closeTask') }}</button>
+              <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ {{ t('activity.card.reopen') }}</button>
             </div>
             <div class="act-card-controls">
-              <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" title="Usuń">🗑️</button>
+              <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" [title]="t('activity.card.delete')">🗑️</button>
             </div>
           </ng-container>
           <!-- Inline edit mode -->
           <ng-container *ngIf="inlineEditActId === a.id">
             <div style="display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
-              <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" placeholder="Tytuł spotkania" class="act-input" style="font-size:12.5px;font-weight:600">
+              <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" [placeholder]="t('meetings.titlePlaceholder')" class="act-input" style="font-size:12.5px;font-weight:600">
               <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
                 <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
-                  Data i godzina
+                  {{ t('activity.form.dateTime') }}
                   <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
                 </label>
                 <label *ngIf="a.type!=='note'" style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
-                  Przypomnienie
+                  {{ t('activity.form.reminder') }}
                   <select [(ngModel)]="inlineEditForm.reminder_type" class="act-input" style="font-size:11px">
-                    <option *ngFor="let r of reminderOptions" [value]="r.value">{{r.label}}</option>
+                    <option *ngFor="let r of reminderOptions" [value]="r.value">{{ t(r.labelKey) }}</option>
                   </select>
                 </label>
                 <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
-                  Właściciel
+                  {{ t('activity.form.owner') }}
                   <select [(ngModel)]="inlineEditForm.assigned_to" class="act-input" style="font-size:11px">
-                    <option value="">— brak —</option>
+                    <option value="">{{ t('activity.form.none') }}</option>
                     <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
                   </select>
                 </label>
               </div>
-              <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" placeholder="Treść…" style="display:block" theme="snow"></quill-editor>
+              <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" [placeholder]="t('activity.form.bodyShortPlaceholder')" style="display:block" theme="snow"></quill-editor>
               <div style="display:flex;gap:6px;justify-content:flex-end">
-                <button class="btn-sm" (click)="cancelInlineEdit()">Anuluj</button>
-                <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="savingActivity">{{savingActivity?'…':'Zapisz'}}</button>
+                <button class="btn-sm" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
+                <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
               </div>
             </div>
           </ng-container>
         </div>
-        <div *ngIf="!filteredActivities.length" class="empty-act">Brak aktywności w tej kategorii.</div>
+        <div *ngIf="!filteredActivities.length" class="empty-act">{{ t('activity.empty') }}</div>
       </div>
 
       <!-- Emaile tab -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
           <ng-container *ngIf="settings.settings().crm_training_mode">
-            <button class="btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" title="Sprawdź nowe emaile (debug)">{{debugProcessing ? '⏳' : '🔄'}} Sprawdź nowe</button>
+            <button class="btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" [title]="t('email.checkNewTooltip')">{{debugProcessing ? '⏳' : '🔄'}} {{ t('email.checkNew') }}</button>
           </ng-container>
-          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ Łączenie z Google…' : '+ Nowy email'}}</button>
+          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ ' + t('email.connecting') : '+ ' + t('email.new')}}</button>
         </div>
 
         <!-- INLINE COMPOSE -->
         <div *ngIf="showEmailCompose" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ Nowy email</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ {{ t('email.new') }}</div>
             <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
           <!-- Provider row — always visible when compose is open. Every user connects
@@ -500,64 +504,64 @@ interface WhatsappConvUiState {
                    [style.background]="emailProviderBg"
                    style="display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;padding-right:8px">
                 <span style="min-width:0;padding:4px 0 4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-                      [title]="emailAddress">Od: <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
-                <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">Rozłącz</button>
+                      [title]="emailAddress">{{ t('email.from') }} <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
+                <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">{{ t('email.disconnect') }}</button>
               </div>
-              <div *ngIf="!emailProviderKey" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.</div>
+              <div *ngIf="!emailProviderKey" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ {{ t('email.notConfigured') }}</div>
             </div>
             </ng-container>
-            <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 Tryb szkoleniowy</div>
+            <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 {{ t('email.trainingMode') }}</div>
           </div>
           <!-- Email form — shown when connected or training mode -->
           <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
                       style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
-                <option value="">— brak szablonu —</option>
+                <option value="">{{ t('email.noTemplate') }}</option>
                 <option *ngFor="let t of emailTemplates" [value]="t.id">{{t.name}}</option>
               </select>
             </div>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.to') }}
               <div class="participant-chips">
                 <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
-                <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" placeholder="email@firma.pl" autocomplete="off">
+                <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                 <div *ngIf="showRecipientSug" class="suggest-dropdown">
                   <div *ngFor="let s of recipientSuggestions" class="suggest-item" (mousedown)="pickRecipientSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
                 </div>
               </div>
             </label>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.cc') }}
               <div class="participant-chips">
                 <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button></span>
-                <input class="participant-input" [(ngModel)]="ccQuery" (input)="onCcInput()" (keydown.enter)="addCc()" (keydown.Tab)="addCc()" (blur)="showCcSug=false" placeholder="dw@firma.pl" autocomplete="off">
+                <input class="participant-input" [(ngModel)]="ccQuery" (input)="onCcInput()" (keydown.enter)="addCc()" (keydown.Tab)="addCc()" (blur)="showCcSug=false" [placeholder]="t('email.placeholders.cc')" autocomplete="off">
                 <div *ngIf="showCcSug" class="suggest-dropdown">
                   <div *ngFor="let s of ccSuggestions" class="suggest-item" (mousedown)="pickCcSug(s)"><span style="font-weight:600">{{s.name||s.email}}</span><span style="color:#9ca3af;font-size:10px;margin-left:4px">{{s.name ? s.email : ''}}</span></div>
                 </div>
               </div>
             </label>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
-              <input class="act-input" [(ngModel)]="emailForm.subject" placeholder="Temat wiadomości">
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.subject') }}
+              <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')">
             </label>
-            <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" placeholder="Treść wiadomości…" style="display:block" theme="snow"></quill-editor>
+            <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.body')" style="display:block" theme="snow"></quill-editor>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Google Drive'}}</button>
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromGoogleDrive')}}</button>
             </div>
             <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px">
-              ⚠️ Wymagane ponowne połączenie skrzynki Gmail — skontaktuj się z administratorem.
+              ⚠️ {{ t('email.driveReauthRequired') }}
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
               <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
             </div>
             <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
-              <button class="btn-sm" (click)="showEmailCompose=false">Anuluj</button>
-              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ Wysyłanie…' : '📤 Wyślij'}}</button>
+              <button class="btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
+              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ ' + t('email.sending') : '📤 ' + t('email.sendAction')}}</button>
             </div>
           </ng-container>
         </div>
 
-        <div *ngIf="emailActivities.length===0" class="empty-act">{{ emailStatus?.configured===false ? 'Poczta nie jest skonfigurowana dla tej organizacji. Skontaktuj się z administratorem.' : 'Brak wysłanych emaili.' }}</div>
+        <div *ngIf="emailActivities.length===0" class="empty-act">{{ emailStatus?.configured===false ? t('email.notConfigured') : t('email.empty') }}</div>
 
         <!-- Email cards — expand/collapse inline -->
         <div *ngFor="let a of emailActivities; trackBy: trackEmailActivity" style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;background:white"
@@ -580,7 +584,7 @@ interface WhatsappConvUiState {
           </div>
           <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
             <ng-container *ngIf="a.gmail_thread_id && !settings.settings().crm_training_mode; else singleBody">
-              <div *ngIf="loadingThread" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie wątku…</div>
+              <div *ngIf="loadingThread" style="font-size:12px;color:#9ca3af;padding:4px 0">{{ t('email.thread.loading') }}</div>
               <div *ngIf="!loadingThread && threadUnavailableReason" style="font-size:12px;color:#92400e;background:#fef3c7;border-radius:6px;padding:8px 10px">{{threadUnavailableReason}}</div>
               <div *ngFor="let m of threadMessages"
                    [style.background]="m.created_by ? 'white' : '#fffbeb'"
@@ -588,7 +592,7 @@ interface WhatsappConvUiState {
                    style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
                 <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
                   <span style="display:flex;align-items:center;gap:4px">
-                    <span style="font-size:10px;color:#9ca3af">{{m.created_by ? 'Do:' : 'Od:'}}</span>
+                    <span style="font-size:10px;color:#9ca3af">{{m.created_by ? t('email.to') : t('email.from')}}</span>
                     <span style="font-weight:600">{{m.created_by ? firstAddressDisplay(m.to) : firstAddressDisplay(m.from)}}</span>
                     <span *ngIf="m.created_by && extraAddressCount(m.to) > 0" style="font-size:10px;color:#9ca3af">+{{extraAddressCount(m.to)}}</span>
                   </span>
@@ -597,7 +601,7 @@ interface WhatsappConvUiState {
                 <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
                 <ng-container *ngIf="m.quotedBody">
                   <button (click)="m._showQuote = !m._showQuote" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
-                    {{m._showQuote ? '▲ Ukryj cytowaną historię' : '▾ Pokaż cytowaną historię'}}
+                    {{m._showQuote ? '▲ ' + t('email.hideQuoted') : '▾ ' + t('email.showQuoted')}}
                   </button>
                   <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
                 </ng-container>
@@ -611,50 +615,50 @@ interface WhatsappConvUiState {
               <!-- Compact header -->
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                 <div style="font-size:11px;color:#374151;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-                  ↩ <strong>Odpowiadasz do:</strong> {{inlineReplyForm.recipientList[0] || '—'}}
+                  ↩ <strong>{{ t('email.reply.replyingTo') }}</strong> {{inlineReplyForm.recipientList[0] || '—'}}
                   <span style="color:#9ca3af"> · </span>{{inlineReplyForm.subject}}
                 </div>
                 <button (click)="showReplyDetails=!showReplyDetails"
                         style="flex-shrink:0;background:none;border:1px solid #d1d5db;border-radius:5px;color:#6b7280;font-size:10px;padding:2px 7px;cursor:pointer">
-                  {{showReplyDetails ? '▲ Ukryj' : '▾ Szczegóły'}}
+                  {{showReplyDetails ? '▲ ' + t('email.reply.hideDetails') : '▾ ' + t('email.reply.showDetails')}}
                 </button>
               </div>
               <!-- Collapsible fields -->
               <ng-container *ngIf="showReplyDetails">
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.to') }}
                   <div class="participant-chips">
                     <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
-                    <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" placeholder="email@firma.pl" autocomplete="off">
+                    <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                   </div>
                 </label>
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">DW
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.cc') }}
                   <div class="participant-chips">
                     <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
-                    <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" placeholder="dw@firma.pl" autocomplete="off">
+                    <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" [placeholder]="t('email.placeholders.cc')" autocomplete="off">
                   </div>
                 </label>
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">Temat
+                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.subject') }}
                   <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
                 </label>
               </ng-container>
-              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" placeholder="Treść odpowiedzi…" style="display:block" theme="snow"></quill-editor>
+              <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"></quill-editor>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 Z Drive'}}</button>
+                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromDrive')}}</button>
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
                 <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
               </div>
               <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
-                <button class="btn-sm" (click)="cancelInlineReply()">Anuluj</button>
-                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}</button>
+                <button class="btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
+                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
               </div>
             </div>
             <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
               <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)"
-                      [title]="threadCanReply ? '' : ('Wątek należy do ' + (threadOwnerEmail || 'innego użytkownika') + ' — wyślesz nową wiadomość ze swojego konta')">
-                {{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}
+                      [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">
+                {{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}
               </button>
             </div>
           </div>
@@ -664,42 +668,42 @@ interface WhatsappConvUiState {
       <!-- WhatsApp tab -->
       <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
 
-        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">Sprawdzanie konfiguracji...</div>
+        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">{{ t('whatsapp.checkingConfig') }}</div>
 
         <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania. -->
         <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
           <div style="font-size:32px">💬</div>
           <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-          <div style="font-size:13px;color:#9ca3af;text-align:center">WhatsApp nie jest skonfigurowany dla tego tenanta. Skontaktuj się z administratorem.</div>
+          <div style="font-size:13px;color:#9ca3af;text-align:center">{{ t('whatsapp.notConfigured') }}</div>
         </div>
 
         <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 Nowa wiadomość WhatsApp</div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:#f0fdf4;border-radius:6px;overflow:hidden">
-              <span style="padding:4px 10px;font-size:11px;color:#374151">Od: <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
+              <span style="padding:4px 10px;font-size:11px;color:#374151">{{ t('whatsapp.from') }} <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
             </div>
           </div>
 
-          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Do
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.toField') }}
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
                    placeholder="+48 123 123 123">
           </label>
-          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">Podaj numer z kierunkowym kraju, np. +48 123 123 123.</div>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">{{ t('whatsapp.missingCountryCode') }}</div>
 
-          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">Treść wiadomości
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.messageBody') }}
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
-                      placeholder="Treść wiadomości..."></textarea>
+                      [placeholder]="t('whatsapp.messagePlaceholder')"></textarea>
           </label>
 
           <div *ngIf="whatsappError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
-          <div *ngIf="whatsappSuccess" style="color:#16a34a;font-size:12px;background:#f0fdf4;border-radius:6px;padding:6px 10px">✅ Wiadomość wysłana.</div>
+          <div *ngIf="whatsappSuccess" style="color:#16a34a;font-size:12px;background:#f0fdf4;border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
 
           <div style="display:flex;gap:6px;justify-content:flex-end">
             <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !whatsappMessage.trim() || whatsappToPhoneMissingCountryCode || whatsappSending"
                     (click)="sendWhatsapp()">
-              {{ whatsappSending ? 'Wysyłanie...' : 'Wyślij WhatsApp' }}
+              {{ whatsappSending ? t('whatsapp.sending') : t('whatsapp.send') }}
             </button>
           </div>
         </div>
@@ -707,8 +711,8 @@ interface WhatsappConvUiState {
         <!-- Konwersacje WhatsApp — jeden numer = jedna osobna rozmowa, wspólny dla
              całego tenanta. -->
         <ng-container *ngIf="whatsappConfigured===true || whatsappHistoryLoading || whatsappConversations.length>0">
-          <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie historii…</div>
-          <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">Brak wysłanych wiadomości WhatsApp.</div>
+          <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">{{ t('whatsapp.loadingHistory') }}</div>
+          <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">{{ t('whatsapp.empty') }}</div>
 
           <div *ngFor="let conv of whatsappConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white"
                [style.border-left]="getWhatsappConvState(conv.phone).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
@@ -718,10 +722,10 @@ interface WhatsappConvUiState {
               <span style="font-size:16px;flex-shrink:0">💬</span>
               <div style="flex:1;min-width:0">
                 <div style="display:flex;align-items:center;gap:6px">
-                  <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rozmowa WhatsApp</strong>
+                  <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t('whatsapp.conversation') }}</strong>
                 </div>
                 <div style="font-size:10px;color:#9ca3af;margin-top:1px">
-                  {{formatWhatsappHistoryPhone(conv.phone)}} · ostatnia wiadomość: {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
+                  {{formatWhatsappHistoryPhone(conv.phone)}} · {{ t('whatsapp.lastMessage') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
                 </div>
               </div>
               <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getWhatsappConvState(conv.phone).expanded ? '▲' : '▾'}}</span>
@@ -734,7 +738,7 @@ interface WhatsappConvUiState {
                    style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
                 <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
                   <span style="display:flex;align-items:center;gap:4px">
-                    <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? 'Do:' : 'Od:'}}</span>
+                    <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? t('whatsapp.to') : t('whatsapp.from')}}</span>
                     <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
                   </span>
                   <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
@@ -743,26 +747,26 @@ interface WhatsappConvUiState {
                   <div [class.wa-body-clamp]="!isWhatsappExpanded(h.id)">{{h.message}}</div>
                 </div>
                 <button *ngIf="h.message && h.message.length > 200" class="wa-expand-btn" (click)="toggleWhatsappExpand(h.id)">
-                  {{isWhatsappExpanded(h.id) ? '▲ Zwiń' : '▼ Rozwiń'}}
+                  {{isWhatsappExpanded(h.id) ? '▲ ' + t('activity.card.collapse') : '▼ ' + t('activity.card.expand')}}
                 </button>
               </div>
 
               <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:6px">
-                <button class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ Odpowiedz</button>
+                <button class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ {{ t('whatsapp.reply.action') }}</button>
               </div>
 
               <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa;display:flex;flex-direction:column;gap:8px">
-                <div style="font-size:11px;color:#374151"><strong>↩ Odpowiadasz przez WhatsApp</strong></div>
-                <div style="font-size:11px;color:#6b7280">Do: {{formatWhatsappHistoryPhone(conv.phone)}}</div>
+                <div style="font-size:11px;color:#374151"><strong>↩ {{ t('whatsapp.reply.replyingVia') }}</strong></div>
+                <div style="font-size:11px;color:#6b7280">{{ t('whatsapp.to') }} {{formatWhatsappHistoryPhone(conv.phone)}}</div>
                 <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
-                          placeholder="Treść odpowiedzi..."></textarea>
+                          [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
                 <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
                 <div style="display:flex;gap:6px;justify-content:flex-end">
-                  <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">Anuluj</button>
+                  <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
                   <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
-                    {{ getWhatsappConvState(conv.phone).replySending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź' }}
+                    {{ getWhatsappConvState(conv.phone).replySending ? '⏳ ' + t('whatsapp.reply.sending') : '📤 ' + t('whatsapp.reply.send') }}
                   </button>
                 </div>
               </div>
@@ -778,8 +782,8 @@ interface WhatsappConvUiState {
           ⚠️ {{smsThreadError}}
         </div>
 
-        <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">Ładowanie…</div>
-        <div *ngIf="!smsLoading && !smsThreadError && smsConversations.length===0" class="empty-act">Brak numerów telefonu do SMS-a.</div>
+        <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">{{ 'states.loading' | transloco }}</div>
+        <div *ngIf="!smsLoading && !smsThreadError && smsConversations.length===0" class="empty-act">{{ t('sms.noNumbers') }}</div>
 
         <div *ngFor="let conv of smsConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white;overflow:hidden"
              [style.border-left]="getSmsConvState(conv.number).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
@@ -789,16 +793,16 @@ interface WhatsappConvUiState {
             <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
               <strong style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
               <span style="font-size:11px;color:#9ca3af" *ngIf="conv.messages.length">
-                ostatnia: {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
+                {{ t('sms.last') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
               </span>
-              <span style="font-size:11px;color:#9ca3af" *ngIf="!conv.messages.length">Brak wiadomości</span>
+              <span style="font-size:11px;color:#9ca3af" *ngIf="!conv.messages.length">{{ t('sms.noMessages') }}</span>
             </div>
             <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getSmsConvState(conv.number).expanded ? '▲' : '▾'}}</span>
           </div>
 
           <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid #e5e7eb;display:flex;flex-direction:column">
             <div [id]="'sms-scroll-lead-' + smsDomId(conv.number)" style="max-height:360px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f9fafb">
-              <div *ngIf="!conv.messages.length" style="font-size:12px;color:#9ca3af;text-align:center;padding:12px 0">Brak wiadomości — napisz pierwszą poniżej.</div>
+              <div *ngIf="!conv.messages.length" style="font-size:12px;color:#9ca3af;text-align:center;padding:12px 0">{{ t('sms.emptyConversation') }}</div>
               <div *ngFor="let m of conv.messages" style="display:flex" [style.justify-content]="m.direction==='outbound' ? 'flex-end' : 'flex-start'">
                 <div [style.background]="m.direction==='outbound' ? '#3BAA5D' : 'white'"
                      [style.color]="m.direction==='outbound' ? 'white' : '#111827'"
@@ -815,10 +819,10 @@ interface WhatsappConvUiState {
               <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
                         (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
                         rows="1" style="flex:1;resize:none;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit"
-                        placeholder="Wiadomość…" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
+                        [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
               <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
                       (click)="sendSmsToConv(conv)">
-                {{ getSmsConvState(conv.number).sending ? '⏳' : 'Wyślij' }}
+                {{ getSmsConvState(conv.number).sending ? '⏳' : t('sms.send') }}
               </button>
             </div>
             <div *ngIf="getSmsConvState(conv.number).error" style="color:#ef4444;font-size:11px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
@@ -833,19 +837,19 @@ interface WhatsappConvUiState {
 
       <!-- Komunikacja -->
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:10px">📞 Komunikacja</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:10px">📞 {{ t('activity.communication') }}</div>
         <button class="comm-btn" *ngIf="canEdit" (click)="mockCall()" [disabled]="!lead.phone">
           <span style="font-size:16px">📞</span>
           <div style="flex:1;text-align:left">
-            <div style="font-size:12px;font-weight:600">Zadzwoń</div>
-            <div style="font-size:10px;color:#9ca3af">{{lead.phone||'Brak numeru'}}</div>
+            <div style="font-size:12px;font-weight:600">{{ t('calls.call') }}</div>
+            <div style="font-size:10px;color:#9ca3af">{{lead.phone || t('calls.noNumber')}}</div>
           </div>
         </button>
         <button class="comm-btn" *ngIf="canEdit" (click)="openEmailCompose()" [disabled]="!lead.email" style="margin-top:6px">
           <span style="font-size:16px">✉️</span>
           <div style="flex:1;text-align:left">
-            <div style="font-size:12px;font-weight:600">Wyślij email</div>
-            <div style="font-size:10px;color:#9ca3af">{{lead.email||'Brak adresu'}}</div>
+            <div style="font-size:12px;font-weight:600">{{ t('email.send') }}</div>
+            <div style="font-size:10px;color:#9ca3af">{{lead.email || t('email.noAddress')}}</div>
           </div>
           <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
         </button>
@@ -854,11 +858,11 @@ interface WhatsappConvUiState {
       <!-- Powiązane dokumenty -->
       <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af">📎 Dokumenty ({{linkedDocs.length}})</div>
-          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:10px">+ Dodaj</button>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af">📎 {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:10px">+ {{ t('documents.add') }}</button>
         </div>
-        <div *ngIf="linkedDocs.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">Brak</div>
-        <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer" (click)="openDocument(d)" title="Otwórz dokument">
+        <div *ngIf="linkedDocs.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">{{ t('documents.none') }}</div>
+        <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer" (click)="openDocument(d)" [title]="t('documents.open')">
           <span style="font-size:13px">📄</span>
           <div style="flex:1;min-width:0">
             <div style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title||'#'+d.document_id}}</div>
@@ -871,66 +875,66 @@ interface WhatsappConvUiState {
       <!-- Historia zmian — mini sekcja -->
       <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af">🕐 Historia zmian</div>
-          <button *ngIf="history.length" class="btn-sm" style="font-size:10px" (click)="showHistoryModal=true">Pokaż wszystko</button>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af">🕐 {{ t('history.title') }}</div>
+          <button *ngIf="history.length" class="btn-sm" style="font-size:10px" (click)="showHistoryModal=true">{{ t('history.showAll') }}</button>
         </div>
-        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">Ładowanie…</div>
-        <div *ngIf="!historyLoading && history.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">Brak wpisów.</div>
+        <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">{{ 'states.loading' | transloco }}</div>
+        <div *ngIf="!historyLoading && history.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">{{ t('history.empty') }}</div>
         <div *ngFor="let h of history.slice(0,10)" class="hist-item">
           <div class="hist-dot" [style.background]="histColor(h.action)"></div>
           <div style="flex:1;min-width:0">
             <div style="font-size:11px;font-weight:600;color:#374151;line-height:1.35">{{histLabel(h)}}</div>
-            <div style="font-size:10px;color:#9ca3af;margin-top:1px">{{h.created_at|date:'dd.MM.yyyy HH:mm'}} · {{h.user_name||h.user_email||'System'}}</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:1px">{{h.created_at|date:'dd.MM.yyyy HH:mm'}} · {{h.user_name||h.user_email|| t('history.systemUser')}}</div>
           </div>
         </div>
       </div>
 
       <!-- Onboarding -->
       <div *ngIf="!lead.converted_at && canEdit" style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange-dark);margin-bottom:8px">🚀 Rozpocznij onboarding</div>
-        <div style="font-size:12px;color:var(--orange-dark);margin-bottom:10px">Podaj wartość kontraktu i datę podpisania umowy, aby przenieść leada do procesu wdrożenia.</div>
-        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">🚀 Rozpocznij onboarding →</button>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange-dark);margin-bottom:8px">🚀 {{ t('leadDetail.onboarding.start') }}</div>
+        <div style="font-size:12px;color:var(--orange-dark);margin-bottom:10px">{{ t('leadDetail.onboarding.hint') }}</div>
+        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }} →</button>
       </div>
       <div *ngIf="lead.converted_at && lead.stage==='onboarding'" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px">⏳ W trakcie onboardingu</div>
-        <div style="font-size:11px;color:#9ca3af;margin-bottom:6px">Rozpoczęto: {{lead.converted_at|date:'dd.MM.yyyy'}}</div>
-        <div style="font-size:11px;color:#6b7280;margin-bottom:8px">Lead jest w procesie wdrożenia. Szczegóły w sekcji Onboarding.</div>
-        <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none">→ Przejdź do Onboarding</a>
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px">⏳ {{ t('leadDetail.onboarding.inProgress') }}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:6px">{{ t('leadDetail.onboarding.startedAt') }} {{lead.converted_at|date:'dd.MM.yyyy'}}</div>
+        <div style="font-size:11px;color:#6b7280;margin-bottom:8px">{{ t('leadDetail.onboarding.inProgressHint') }}</div>
+        <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none">→ {{ t('leadDetail.onboarding.goTo') }}</a>
       </div>
       <div *ngIf="lead.stage==='onboarded'" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">✓ Onboarding zakończony</div>
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">✓ {{ t('leadDetail.onboarding.completed') }}</div>
         <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
-        <div style="font-size:11px;color:#6b7280">Partner pojawi się w Rejestrze Partnerów po synchronizacji z DWH.</div>
+        <div style="font-size:11px;color:#6b7280">{{ t('leadDetail.onboarding.partnerAfterSync') }}</div>
       </div>
     </div>
   </div>
 </div>
 
 <div *ngIf="!lead&&!loading" style="padding:40px;text-align:center;color:#9ca3af">
-  {{ loadError ? 'Błąd ładowania leada.' : 'Lead nie znaleziony.' }}
+  {{ loadError ? t('leadDetail.loadError') : t('leadDetail.notFound') }}
 </div>
-<div *ngIf="loading" style="padding:40px;text-align:center;color:#9ca3af">�?adowanie…</div>
+<div *ngIf="loading" style="padding:40px;text-align:center;color:#9ca3af">{{ 'states.loading' | transloco }}</div>
 
 <!-- ── Historia zmian Modal ──────────────────────────────────────────────── -->
 <div class="modal-overlay" *ngIf="showHistoryModal" (click)="showHistoryModal=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(600px,100%);max-height:80vh;display:flex;flex-direction:column;gap:0;padding:0">
     <div class="modal-header" style="padding:16px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0">
-      <h3 style="margin:0;font-size:15px;font-weight:700">🕐 Historia zmian</h3>
+      <h3 style="margin:0;font-size:15px;font-weight:700">🕐 {{ t('history.title') }}</h3>
       <button class="close-btn" (click)="showHistoryModal=false">✕</button>
     </div>
     <div style="padding:12px 16px;flex-shrink:0;border-bottom:1px solid #f3f4f6">
-      <input class="act-input" [(ngModel)]="historySearch" placeholder="Szukaj w historii…" style="width:100%;box-sizing:border-box">
+      <input class="act-input" [(ngModel)]="historySearch" [placeholder]="t('history.searchPlaceholder')" style="width:100%;box-sizing:border-box">
     </div>
     <div style="overflow-y:auto;padding:8px 16px 16px">
       <div *ngFor="let h of filteredHistory" class="hist-item">
         <div class="hist-dot" [style.background]="histColor(h.action)"></div>
         <div style="flex:1;min-width:0">
           <div style="font-size:12px;font-weight:600;color:#374151">{{histLabel(h)}}</div>
-          <div style="font-size:10px;color:#9ca3af;margin-top:1px">{{h.created_at|date:'dd.MM.yyyy HH:mm'}} · {{h.user_name||h.user_email||'System'}}</div>
+          <div style="font-size:10px;color:#9ca3af;margin-top:1px">{{h.created_at|date:'dd.MM.yyyy HH:mm'}} · {{h.user_name||h.user_email|| t('history.systemUser')}}</div>
           <div *ngIf="histDetail(h)" style="font-size:11px;color:#6b7280;margin-top:3px;background:#f9fafb;border-radius:4px;padding:4px 6px">{{histDetail(h)}}</div>
         </div>
       </div>
-      <div *ngIf="!filteredHistory.length" style="text-align:center;color:#9ca3af;font-size:12px;padding:20px">Brak wyników.</div>
+      <div *ngIf="!filteredHistory.length" style="text-align:center;color:#9ca3af;font-size:12px;padding:20px">{{ t('history.noResults') }}</div>
     </div>
   </div>
 </div>
@@ -939,11 +943,11 @@ interface WhatsappConvUiState {
 <div class="modal-overlay" *ngIf="showThreadModal" (click)="showThreadModal=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(680px,100%)">
     <div class="modal-header">
-      <h3>💬 Wątek email</h3>
+      <h3>💬 {{ t('email.thread.title') }}</h3>
       <button class="close-btn" (click)="showThreadModal=false">✕</button>
     </div>
     <div class="modal-body" style="gap:8px">
-      <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;padding:20px">�?adowanie wątku…</div>
+      <div *ngIf="loadingThread" style="text-align:center;color:#9ca3af;padding:20px">{{ t('email.thread.loading') }}</div>
       <div *ngFor="let m of threadMessages"
            [style.border]="!m.is_read && !m.created_by ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
            [style.background]="!m.is_read && !m.created_by ? '#fffbeb' : 'white'"
@@ -955,8 +959,8 @@ interface WhatsappConvUiState {
           <span [style.font-weight]="!m.is_read && !m.created_by ? '700' : '600'" style="color:#374151">{{firstAddressDisplay(m.from)}}</span>
           <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
         </div>
-        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">Do: {{decodeAddress(m.to)}}</div>
-        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">DW: {{decodeAddress(m.cc)}}</div>
+        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">{{ t('email.to') }} {{decodeAddress(m.to)}}</div>
+        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">{{ t('email.cc') }} {{decodeAddress(m.cc)}}</div>
         <div style="color:#374151;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px">{{m.snippet}}</div>
         <!-- Wszystkie załączniki (odebrane + wysłane) -->
         <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
@@ -964,25 +968,25 @@ interface WhatsappConvUiState {
           <span *ngFor="let att of m.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8">
             📎 {{att.filename}}
             <span class="att-chip-actions">
-              <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
-              <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
+              <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
+              <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
             </span>
           </span>
           <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534">
             📎 {{att.filename}}
             <span class="att-chip-actions">
-              <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" title="Otwórz w przeglądarce">Podgląd</button>
-              <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" title="Pobierz plik">Pobierz</button>
+              <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
+              <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
             </span>
           </span>
         </div>
       </div>
-      <div *ngIf="!loadingThread&&threadMessages.length===0&&!threadUnavailableReason" style="text-align:center;color:#9ca3af;padding:16px">Brak wiadomości w wątku.</div>
+      <div *ngIf="!loadingThread&&threadMessages.length===0&&!threadUnavailableReason" style="text-align:center;color:#9ca3af;padding:16px">{{ t('email.thread.empty') }}</div>
       <div *ngIf="!loadingThread&&threadUnavailableReason" style="text-align:center;color:#92400e;background:#fef3c7;border-radius:6px;padding:12px;font-size:12px">{{threadUnavailableReason}}</div>
     </div>
     <div class="modal-footer">
-      <button class="btn-outline" (click)="showThreadModal=false">Zamknij</button>
-      <button class="btn-primary" (click)="replyToCurrentThread()" [title]="threadCanReply ? '' : ('Wątek należy do ' + (threadOwnerEmail || 'innego użytkownika') + ' — wyślesz nową wiadomość ze swojego konta')">{{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}</button>
+      <button class="btn-outline" (click)="showThreadModal=false">{{ 'actions.close' | transloco }}</button>
+      <button class="btn-primary" (click)="replyToCurrentThread()" [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
     </div>
   </div>
 </div>
@@ -997,10 +1001,10 @@ interface WhatsappConvUiState {
     <div class="modal-body" style="gap:10px;overflow-y:auto;flex:1" *ngIf="msgModalMsg">
       <!-- Metadane -->
       <div style="background:#f9fafb;border-radius:8px;padding:12px;font-size:12px;display:flex;flex-direction:column;gap:4px">
-        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Od:</span><span style="color:#374151;font-weight:600">{{firstAddressDisplay(msgModalMsg.from)}}</span></div>
-        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Do:</span><span style="color:#374151">{{decodeAddress(msgModalMsg.to)}}</span></div>
-        <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">DW:</span><span style="color:#374151">{{decodeAddress(msgModalMsg.cc)}}</span></div>
-        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">Data:</span><span style="color:#374151">{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.from') }}</span><span style="color:#374151;font-weight:600">{{firstAddressDisplay(msgModalMsg.from)}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.to') }}</span><span style="color:#374151">{{decodeAddress(msgModalMsg.to)}}</span></div>
+        <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.cc') }}</span><span style="color:#374151">{{decodeAddress(msgModalMsg.cc)}}</span></div>
+        <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.date') }}</span><span style="color:#374151">{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span></div>
       </div>
       <!-- Treść -->
       <div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px;line-height:1.6;color:#374151;white-space:pre-line;max-height:320px;overflow-y:auto"
@@ -1011,65 +1015,65 @@ interface WhatsappConvUiState {
         <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
-            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" title="Otwórz w przeglądarce">Podgląd</button>
-            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" title="Pobierz plik">Pobierz</button>
+            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
+            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
         <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:11px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
-            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" title="Otwórz w przeglądarce">Podgląd</button>
-            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" title="Pobierz plik">Pobierz</button>
+            <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
+            <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
       </div>
       <!-- Reply form -->
       <div *ngIf="msgModalReply" style="border-top:1px solid #e5e7eb;padding-top:12px;display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:12px;font-weight:700;color:#374151">↩ Odpowiedz</div>
+        <div style="font-size:12px;font-weight:700;color:#374151">↩ {{ t('email.reply.action') }}</div>
         <!-- Do -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
-          Do
+          {{ t('email.fields.to') }}
           <div class="participant-chips">
             <span *ngFor="let r of msgModalForm.recipientList; let i=index" class="participant-chip">
               {{r}}<button (click)="msgModalForm.recipientList.splice(i,1)" type="button">✕</button>
             </span>
             <input class="participant-input" [(ngModel)]="msgModalRecipientQuery"
                    (keydown.enter)="pushMsgRecipient()" (keydown.Tab)="pushMsgRecipient()"
-                   placeholder="email@firma.pl" autocomplete="off">
+                   [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
           </div>
         </label>
         <!-- DW -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
-          DW
+          {{ t('email.fields.cc') }}
           <div class="participant-chips">
             <span *ngFor="let r of msgModalForm.ccList; let i=index" class="participant-chip">
               {{r}}<button (click)="msgModalForm.ccList.splice(i,1)" type="button">✕</button>
             </span>
             <input class="participant-input" [(ngModel)]="msgModalCcQuery"
                    (keydown.enter)="pushMsgCc()" (keydown.Tab)="pushMsgCc()"
-                   placeholder="dw@firma.pl" autocomplete="off">
+                   [placeholder]="t('email.placeholders.cc')" autocomplete="off">
           </div>
         </label>
         <!-- Temat -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
-          Temat
-          <input class="act-input" [(ngModel)]="msgModalForm.subject" placeholder="Temat wiadomości">
+          {{ t('email.fields.subject') }}
+          <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.placeholders.subject')">
         </label>
         <!-- Treść -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
-          Treść
-          <textarea class="act-input" id="msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="5" placeholder="Treść odpowiedzi…"></textarea>
+          {{ t('email.fields.body') }}
+          <textarea class="act-input" id="msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="5" [placeholder]="t('email.placeholders.replyBody')"></textarea>
         </label>
         <!-- Załączniki w odpowiedzi -->
         <div style="display:flex;flex-direction:column;gap:4px">
-          <span style="font-size:12px;font-weight:600">Załączniki</span>
+          <span style="font-size:12px;font-weight:600">{{ t('email.fields.attachments') }}</span>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
             <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
                     (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
                     style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
-              <span *ngIf="!drivePickerLoading">📁 Z Google Drive</span>
-              <span *ngIf="drivePickerLoading">⏳ Ładowanie…</span>
+              <span *ngIf="!drivePickerLoading">📁 {{ t('email.fromGoogleDrive') }}</span>
+              <span *ngIf="drivePickerLoading">⏳ {{ 'states.loading' | transloco }}</span>
             </button>
           </div>
           <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
@@ -1084,11 +1088,11 @@ interface WhatsappConvUiState {
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-outline" (click)="closeMsgModal()">Zamknij</button>
-      <button *ngIf="!msgModalReply && emailConnected" class="btn-outline" (click)="startMsgReply()">{{threadCanReply ? '↩ Odpowiedz' : '✉️ Napisz nowego maila'}}</button>
+      <button class="btn-outline" (click)="closeMsgModal()">{{ 'actions.close' | transloco }}</button>
+      <button *ngIf="!msgModalReply && emailConnected" class="btn-outline" (click)="startMsgReply()">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
       <button *ngIf="msgModalReply && emailConnected" class="btn-primary" (click)="sendMsgReply()"
               [disabled]="msgModalSending || !msgModalForm.recipientList?.length || !msgModalForm.subject">
-        {{msgModalSending ? '⏳ Wysyłanie…' : '📤 Wyślij odpowiedź'}}
+        {{msgModalSending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}
       </button>
     </div>
   </div>
@@ -1098,59 +1102,59 @@ interface WhatsappConvUiState {
 <div class="modal-overlay" *ngIf="showEdit" (click)="showEdit=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Edytuj lead</h3>
+      <h3>{{ t('leadDetail.edit.title') }}</h3>
       <button class="close-btn" (click)="showEdit=false">✕</button>
     </div>
     <div class="modal-body">
       <div class="edit-section">
-        <div class="edit-section-title">Podstawowe</div>
+        <div class="edit-section-title">{{ t('leadDetail.edit.sections.basic') }}</div>
         <div class="edit-row">
-          <label>Nazwa firmy *<input [(ngModel)]="editForm.company" placeholder="Nazwa firmy" required></label>
-          <label>Etap<select [(ngModel)]="editForm.stage"><option *ngFor="let s of allowedStageOptions" [value]="s.key">{{s.label}}</option></select></label>
+          <label>{{ t('leadDetail.fields.companyName') }} *<input [(ngModel)]="editForm.company" [placeholder]="t('leadDetail.fields.companyName')" required></label>
+          <label>{{ t('leadDetail.fields.stage') }}<select [(ngModel)]="editForm.stage"><option *ngFor="let s of allowedStageOptions" [value]="s.key">{{s.label}}</option></select></label>
         </div>
         <div class="edit-row" *ngIf="editForm.stage==='closed_lost'">
-          <label class="full" style="color:#991b1b">Powód przegranej *
+          <label class="full" style="color:#991b1b">{{ t('leadDetail.fields.lostReason') }} *
             <select [(ngModel)]="editForm.lost_reason"
                     [style.border-color]="!editForm.lost_reason ? '#ef4444' : ''">
-              <option value="">— wybierz powód —</option>
+              <option value="">{{ t('leadDetail.edit.chooseReason') }}</option>
               <option *ngFor="let r of lostReasons" [value]="r">{{r}}</option>
             </select>
           </label>
         </div>
-        <div class="edit-row"><label class="check-label"><input type="checkbox" [(ngModel)]="editForm.hot"> 🔥 Gorący lead</label></div>
+        <div class="edit-row"><label class="check-label"><input type="checkbox" [(ngModel)]="editForm.hot"> 🔥 {{ t('leadDetail.fields.hotLead') }}</label></div>
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">Strona WWW</div>
+        <div class="edit-section-title">{{ t('leadDetail.fields.website') }}</div>
         <div style="display:flex;gap:8px;align-items:center">
           <input style="flex:1;border:1px solid #d1d5db;border-radius:6px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit"
-                 [(ngModel)]="editForm.website" placeholder="np. acme.pl"
+                 [(ngModel)]="editForm.website" [placeholder]="t('leadDetail.edit.placeholders.website')"
                  (keydown.enter)="runDetailEnrich()">
           <button class="btn-outline" style="white-space:nowrap;flex-shrink:0"
                   (click)="runDetailEnrich()"
                   [disabled]="!editForm.website||detailEnriching">
-            {{detailEnriching ? '⏳ Pobieranie…' : '🔍 Pobierz dane'}}
+            {{detailEnriching ? '⏳ ' + t('leadDetail.enrich.loading') : '🔍 ' + t('leadDetail.enrich.action')}}
           </button>
         </div>
         <div *ngIf="detailEnrichDone" style="margin-top:6px;font-size:11px;color:#15803d;background:#f0fdf4;border-radius:6px;padding:5px 10px">
-          ✓ Dane pobrane — sprawdź pola poniżej
+          ✓ {{ t('leadDetail.enrich.done') }}
         </div>
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">Kontakt</div>
+        <div class="edit-section-title">{{ t('leadDetail.sections.contact') }}</div>
         <div class="edit-row">
-          <label><span style="display:flex;align-items:center;gap:4px">Imię i nazwisko <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
-            <input [(ngModel)]="editForm.contact_name" placeholder="Jan Kowalski"
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.fullName') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
+            <input [(ngModel)]="editForm.contact_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"
                    [style.border-color]="requiresFullFields && !editForm.contact_name ? '#fca5a5' : ''">
           </label>
-          <label><span style="display:flex;align-items:center;gap:4px">Rola w firmie <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span><select [(ngModel)]="editForm.contact_title"
-                   [style.border-color]="requiresFullFields && !editForm.contact_title ? '#fca5a5' : ''"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.contactTitle') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span><select [(ngModel)]="editForm.contact_title"
+                   [style.border-color]="requiresFullFields && !editForm.contact_title ? '#fca5a5' : ''"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
         </div>
         <div class="edit-row">
-          <label><span style="display:flex;align-items:center;gap:4px">Email <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
-            <input [(ngModel)]="editForm.email" type="email" placeholder="jan@firma.pl"
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.email') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
+            <input [(ngModel)]="editForm.email" type="email" [placeholder]="t('leadDetail.edit.placeholders.email')"
                    [style.border-color]="requiresFullFields && !editForm.email ? '#fca5a5' : ''">
           </label>
-          <label><span style="display:flex;align-items:center;gap:4px">Telefon <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.phone') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
             <input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"
                    [style.border-color]="requiresFullFields && !editForm.phone ? '#fca5a5' : ''">
           </label>
@@ -1158,30 +1162,30 @@ interface WhatsappConvUiState {
       </div>
       <div class="edit-section">
         <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
-          <span>Dodatkowe kontakty</span>
-          <button style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ Dodaj kontakt</button>
+          <span>{{ t('leadDetail.sections.extraContacts') }}</span>
+          <button style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ {{ t('leadDetail.edit.addContact') }}</button>
         </div>
         @for (ec of extraContacts; track $index; let i = $index) {
           <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
             <button style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)">✕</button>
             <div class="edit-row">
-              <label>Imię i nazwisko<input [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></label>
-              <label>Rola w firmie<select [(ngModel)]="ec.contact_title"><option value="">— brak —</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
+              <label>{{ t('leadDetail.fields.fullName') }}<input [(ngModel)]="ec.contact_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"></label>
+              <label>{{ t('leadDetail.fields.contactTitle') }}<select [(ngModel)]="ec.contact_title"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
             </div>
             <div class="edit-row">
-              <label>Email<input [(ngModel)]="ec.email" type="email" placeholder="jan@firma.pl"></label>
-              <label>Telefon<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
+              <label>{{ t('leadDetail.fields.email') }}<input [(ngModel)]="ec.email" type="email" [placeholder]="t('leadDetail.edit.placeholders.email')"></label>
+              <label>{{ t('leadDetail.fields.phone') }}<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
             </div>
           </div>
         }
         @if (extraContacts.length === 0) {
-          <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px">Brak dodatkowych kontaktów</div>
+          <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px">{{ t('leadDetail.edit.noExtraContacts') }}</div>
         }
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">NIP</div>
+        <div class="edit-section-title">{{ t('leadDetail.fields.nip') }}</div>
         <div class="edit-row">
-          <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">NIP <span style="color:#f97316">*</span></span>
+          <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">{{ t('leadDetail.fields.nip') }} <span style="color:#f97316">*</span></span>
             <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                    style="font-family:monospace"
                    (ngModelChange)="validateEditNip()"
@@ -1191,57 +1195,57 @@ interface WhatsappConvUiState {
         </div>
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">Szczegóły sprzedażowe</div>
+        <div class="edit-section-title">{{ t('leadDetail.edit.sections.sales') }}</div>
         <div class="edit-row">
-          <label>Obrót roczny<div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
-          <label>% Online<select [(ngModel)]="editForm.online_pct"><option value="">— brak —</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+          <label>{{ t('leadDetail.fields.annualTurnover') }}<div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
+          <label>{{ t('leadDetail.fields.onlinePct') }}<select [(ngModel)]="editForm.online_pct"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
         </div>
         <div class="edit-row">
-          <label>Pierwszy kontakt<input [(ngModel)]="editForm.first_contact_date" type="date"></label>
-          <label>Data zamknięcia<input [(ngModel)]="editForm.close_date" type="date"></label>
+          <label>{{ t('leadDetail.fields.firstContact') }}<input [(ngModel)]="editForm.first_contact_date" type="date"></label>
+          <label>{{ t('leadDetail.fields.closeDate') }}<input [(ngModel)]="editForm.close_date" type="date"></label>
         </div>
         <div class="edit-row">
-          <label>Źródło<select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()"><option value="">— brak —</option>
-                  @for (s of sourcesWithoutGroup(); track s.value) { <option [value]="s.value">{{s.label}}</option> }
-                  @for (g of sourceGroups(); track g) { <optgroup [label]="g">@for (s of sourcesInGroup(g); track s.value) { <option [value]="s.value">{{s.label}}</option> }</optgroup> }
+          <label>{{ t('leadDetail.fields.source') }}<select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()"><option value="">{{ t('leadDetail.edit.none') }}</option>
+                  @for (s of sourcesWithoutGroup(); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }
+                  @for (g of sourceGroups(); track g) { <optgroup [label]="g">@for (s of sourcesInGroup(g); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }</optgroup> }
                   </select></label>
-          <label>Branża<select [(ngModel)]="editForm.industry"><option value="">— brak —</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select></label>
+          <label>{{ t('leadDetail.fields.industry') }}<select [(ngModel)]="editForm.industry"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select></label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
           <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange)">🤝 Dane Agenta</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange)">🤝 {{ t('leadDetail.edit.sections.agent') }}</div>
             <div class="edit-row">
-              <label>Imię i nazwisko<input [(ngModel)]="editForm.agent_name" placeholder="Jan Kowalski"></label>
-              <label>Telefon<input [(ngModel)]="editForm.agent_phone" placeholder="+48 600 000 000"></label>
+              <label>{{ t('leadDetail.fields.fullName') }}<input [(ngModel)]="editForm.agent_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"></label>
+              <label>{{ t('leadDetail.fields.phone') }}<input [(ngModel)]="editForm.agent_phone" placeholder="+48 600 000 000"></label>
             </div>
-            <div class="edit-row"><label class="full">Email<input [(ngModel)]="editForm.agent_email" type="email" placeholder="agent@firma.pl"></label></div>
+            <div class="edit-row"><label class="full">{{ t('leadDetail.fields.email') }}<input [(ngModel)]="editForm.agent_email" type="email" [placeholder]="t('leadDetail.edit.placeholders.agentEmail')"></label></div>
           </div>
         </ng-container>
         <div class="edit-row">
-          <label>Handlowiec<select [(ngModel)]="editForm.assigned_to"><option value="">— nieprzypisany —</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select></label>
-          <label>% Szansa<select [(ngModel)]="editForm.probability"><option value="">— brak —</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+          <label>{{ t('leadDetail.fields.salesperson') }}<select [(ngModel)]="editForm.assigned_to"><option value="">{{ t('leadDetail.edit.unassigned') }}</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select></label>
+          <label>{{ t('leadDetail.fields.probabilityPct') }}<select [(ngModel)]="editForm.probability"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
         </div>
         <div class="edit-row">
-          <label class="full">Tagi (oddzielone przecinkiem)<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
+          <label class="full">{{ t('leadDetail.fields.tagsHint') }}<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
         </div>
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">Notatki</div>
-        <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" placeholder="Dowolne notatki…"></textarea>
+        <div class="edit-section-title">{{ t('leadDetail.sections.notes') }}</div>
+        <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" [placeholder]="t('leadDetail.edit.placeholders.notes')"></textarea>
       </div>
     </div>
 
       <!-- Błędy walidacji -->
       @if (editErrors.length > 0) {
         <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin:0 0 8px;font-size:12px;color:#991b1b">
-          <strong>Uzupełnij wymagane pola dla etapu "{{ stageLabel(editForm.stage) }}":</strong>
+          <strong>{{ t('leadDetail.edit.requiredForStage', { stage: stageLabel(editForm.stage) }) }}</strong>
           <div style="margin-top:4px">{{ editErrors.join(', ') }}</div>
         </div>
       }
 
     <div class="modal-footer">
-      <button class="btn-outline" (click)="showEdit=false">Anuluj</button>
-      <button class="btn-primary" (click)="saveLead()" [disabled]="saving||!editForm.company">{{saving?'Zapisywanie…':'Zapisz zmiany'}}</button>
+      <button class="btn-outline" (click)="showEdit=false">{{ 'actions.cancel' | transloco }}</button>
+      <button class="btn-primary" (click)="saveLead()" [disabled]="saving||!editForm.company">{{saving ? t('leadDetail.edit.saving') : t('leadDetail.edit.saveChanges')}}</button>
     </div>
   </div>
 </div>
@@ -1249,32 +1253,32 @@ interface WhatsappConvUiState {
 <!-- Document Picker Modal -->
 <div class="modal-overlay" *ngIf="showDocPicker" (click)="showDocPicker=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%)">
-    <div class="modal-header"><h3>📎 Dodaj powiązany dokument</h3><button class="close-btn" (click)="showDocPicker=false">✕</button></div>
+    <div class="modal-header"><h3>📎 {{ t('documents.picker.title') }}</h3><button class="close-btn" (click)="showDocPicker=false">✕</button></div>
     <div class="modal-body" style="gap:10px">
-      <div style="font-size:12px;color:#6b7280">Wyszukaj dokumenty po nazwie, numerze lub podmiocie.</div>
-      <input class="act-input" style="font-size:13px;padding:8px 12px" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch()" placeholder="Szukaj dokumentu…">
-      <div *ngIf="docSearching" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Wyszukuję…</div>
-      <div *ngIf="!docSearching&&docResults.length===0&&docSearch.length>1" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Brak wyników</div>
+      <div style="font-size:12px;color:#6b7280">{{ t('documents.picker.hint') }}</div>
+      <input class="act-input" style="font-size:13px;padding:8px 12px" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch()" [placeholder]="t('documents.picker.searchPlaceholder')">
+      <div *ngIf="docSearching" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">{{ t('documents.picker.searching') }}</div>
+      <div *ngIf="!docSearching&&docResults.length===0&&docSearch.length>1" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">{{ t('documents.picker.noResults') }}</div>
       <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
         <div *ngFor="let doc of docResults"
              style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;transition:background .1s"
              [style.cursor]="doc._access==='read' ? 'default' : 'pointer'"
              [style.opacity]="doc._access==='read' ? '0.55' : '1'"
-             [title]="doc._access==='read' ? 'Tylko odczyt — brak uprawnień do powiązania' : ''"
+             [title]="doc._access==='read' ? t('documents.picker.readOnlyTooltip') : ''"
              [style.background]="isLinked(doc.id)?'#f0fdf4':'white'"
              (click)="toggleLinkDoc(doc)">
           <span style="font-size:16px">📄</span>
           <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div><div style="font-size:10px;color:#9ca3af"><span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>{{doc.doc_type}}</div></div>
-          <span *ngIf="doc._access==='read'" style="font-size:11px;color:#9ca3af">🔒 Odczyt</span>
-          <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ Dodano</span>
-          <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:11px;color:#9ca3af">Dodaj</span>
+          <span *ngIf="doc._access==='read'" style="font-size:11px;color:#9ca3af">🔒 {{ t('documents.picker.readOnly') }}</span>
+          <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ {{ t('documents.picker.added') }}</span>
+          <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:11px;color:#9ca3af">{{ t('documents.add') }}</span>
         </div>
       </div>
       <div *ngIf="linkDocError" style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626">
         ⚠ {{linkDocError}}
       </div>
     </div>
-    <div class="modal-footer"><button class="btn-outline" (click)="showDocPicker=false">Zamknij</button></div>
+    <div class="modal-footer"><button class="btn-outline" (click)="showDocPicker=false">{{ 'actions.close' | transloco }}</button></div>
   </div>
 </div>
 
@@ -1283,8 +1287,8 @@ interface WhatsappConvUiState {
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(660px,100%)">
     <div class="modal-header">
       <div style="display:flex;flex-direction:column;gap:2px">
-        <h3>🖥️ Konto testowe</h3>
-        <div style="font-size:11px;color:#9ca3af;font-weight:400">{{lead?.company}}<span *ngIf="lead?.nip"> · NIP: {{lead?.nip}}</span></div>
+        <h3>🖥️ {{ t('leadDetail.testAccount.title') }}</h3>
+        <div style="font-size:11px;color:#9ca3af;font-weight:400">{{lead?.company}}<span *ngIf="lead?.nip"> · {{ t('leadDetail.fields.nip') }}: {{lead?.nip}}</span></div>
       </div>
       <button class="close-btn" (click)="closeTestAccountModal()">✕</button>
     </div>
@@ -1295,18 +1299,18 @@ interface WhatsappConvUiState {
       <div *ngIf="testAccount?.status==='created'" class="ta-status-ok">
         <span style="font-size:22px">✅</span>
         <div style="flex:1">
-          <div style="font-size:12px;font-weight:700;color:#15803d">Konto testowe założone</div>
+          <div style="font-size:12px;font-weight:700;color:#15803d">{{ t('leadDetail.testAccount.created') }}</div>
           <div style="font-size:12px;color:#16a34a;font-family:monospace;margin-top:2px">
-            Nr: {{testAccount!.test_account_number}}
+            {{ t('leadDetail.testAccount.numberLabel') }} {{testAccount!.test_account_number}}
             <span *ngIf="testAccount!.htcd_partner_id" style="color:#6b7280"> · ID HTCD: {{testAccount!.htcd_partner_id}}</span>
           </div>
           <div *ngIf="testAccount!.price_list_url" style="margin-top:4px">
             <a [href]="testAccount!.price_list_url" target="_blank"
                style="font-size:11px;color:#2563eb;text-decoration:underline">
-              📋 Otwórz cennik w HTCD
+              📋 {{ t('leadDetail.testAccount.openPriceList') }}
             </a>
           </div>
-          <div style="font-size:10px;color:#6b7280;margin-top:2px">Ten numer zostanie przekazany jako Nr. Partnera podczas migracji.</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">{{ t('leadDetail.testAccount.numberHint') }}</div>
         </div>
       </div>
 
@@ -1314,9 +1318,9 @@ interface WhatsappConvUiState {
       <div *ngIf="testAccount?.status==='error'" class="ta-status-err">
         <span style="font-size:22px">⚠️</span>
         <div>
-          <div style="font-size:12px;font-weight:700;color:#dc2626">Poprzednie wywołanie zakończyło się błędem</div>
+          <div style="font-size:12px;font-weight:700;color:#dc2626">{{ t('leadDetail.testAccount.previousError') }}</div>
           <div style="font-size:12px;color:#ef4444;margin-top:2px">{{testAccount!.last_error}}</div>
-          <div style="font-size:10px;color:#6b7280;margin-top:2px">Popraw dane poniżej i spróbuj ponownie.</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">{{ t('leadDetail.testAccount.fixAndRetry') }}</div>
         </div>
       </div>
 
@@ -1328,26 +1332,26 @@ interface WhatsappConvUiState {
 
       <!-- Sekcja A: Dane techniczne -->
       <div class="ta-section">
-        <div class="ta-section-title">A — Dane techniczne konta</div>
+        <div class="ta-section-title">{{ t('leadDetail.testAccount.sections.technical') }}</div>
         <div class="ta-row">
-          <label>Subdomena *
-            <input [(ngModel)]="taForm.subdomain" placeholder="np. firma-testowa" [style.border-color]="taSubmitAttempt&&!taForm.subdomain?'#ef4444':''">
+          <label>{{ t('leadDetail.testAccount.fields.subdomain') }} *
+            <input [(ngModel)]="taForm.subdomain" [placeholder]="t('leadDetail.testAccount.placeholders.subdomain')" [style.border-color]="taSubmitAttempt&&!taForm.subdomain?'#ef4444':''">
           </label>
-          <label>Język *
+          <label>{{ t('leadDetail.testAccount.fields.language') }} *
             <select [(ngModel)]="taForm.language" [style.border-color]="taSubmitAttempt&&!taForm.language?'#ef4444':''">
-              <option value="">— wybierz —</option>
-              <option value="PL">Polski</option>
-              <option value="EN">Angielski</option>
-              <option value="DE">Niemiecki</option>
-              <option value="RU">Rosyjski</option>
-              <option value="RO">Rumuński</option>
+              <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
+              <option value="PL">{{ t('leadDetail.testAccount.languages.pl') }}</option>
+              <option value="EN">{{ t('leadDetail.testAccount.languages.en') }}</option>
+              <option value="DE">{{ t('leadDetail.testAccount.languages.de') }}</option>
+              <option value="RU">{{ t('leadDetail.testAccount.languages.ru') }}</option>
+              <option value="RO">{{ t('leadDetail.testAccount.languages.ro') }}</option>
             </select>
           </label>
         </div>
         <div class="ta-row">
-          <label>Waluta *
+          <label>{{ t('leadDetail.testAccount.fields.currency') }} *
             <select [(ngModel)]="taForm.partner_currency" [style.border-color]="taSubmitAttempt&&!taForm.partner_currency?'#ef4444':''">
-              <option value="">— wybierz —</option>
+              <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
               <option value="PLN">PLN</option>
               <option value="EUR">EUR</option>
               <option value="USD">USD</option>
@@ -1355,19 +1359,19 @@ interface WhatsappConvUiState {
               <option value="CHF">CHF</option>
             </select>
           </label>
-          <label>Kraj *
+          <label>{{ t('leadDetail.testAccount.fields.country') }} *
             <select [(ngModel)]="taForm.country" [style.border-color]="taSubmitAttempt&&!taForm.country?'#ef4444':''">
-              <option value="">— wybierz —</option>
-              <option value="PL">Polska</option>
-              <option value="DE">Niemcy</option>
-              <option value="FR">Francja</option>
-              <option value="GB">Wielka Brytania</option>
-              <option value="CZ">Czechy</option>
-              <option value="SK">Słowacja</option>
-              <option value="HU">Węgry</option>
-              <option value="RO">Rumunia</option>
-              <option value="UA">Ukraina</option>
-              <option value="RU">Rosja</option>
+              <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
+              <option value="PL">{{ t('leadDetail.testAccount.countries.pl') }}</option>
+              <option value="DE">{{ t('leadDetail.testAccount.countries.de') }}</option>
+              <option value="FR">{{ t('leadDetail.testAccount.countries.fr') }}</option>
+              <option value="GB">{{ t('leadDetail.testAccount.countries.gb') }}</option>
+              <option value="CZ">{{ t('leadDetail.testAccount.countries.cz') }}</option>
+              <option value="SK">{{ t('leadDetail.testAccount.countries.sk') }}</option>
+              <option value="HU">{{ t('leadDetail.testAccount.countries.hu') }}</option>
+              <option value="RO">{{ t('leadDetail.testAccount.countries.ro') }}</option>
+              <option value="UA">{{ t('leadDetail.testAccount.countries.ua') }}</option>
+              <option value="RU">{{ t('leadDetail.testAccount.countries.ru') }}</option>
             </select>
           </label>
         </div>
@@ -1375,56 +1379,56 @@ interface WhatsappConvUiState {
 
       <!-- Sekcja B: Adres rozliczeniowy -->
       <div class="ta-section">
-        <div class="ta-section-title">B — Adres rozliczeniowy</div>
+        <div class="ta-section-title">{{ t('leadDetail.testAccount.sections.billing') }}</div>
         <div class="ta-row">
-          <label class="full">Ulica i numer *
-            <input [(ngModel)]="taForm.billing_address" placeholder="np. ul. Przykładowa 1" [style.border-color]="taSubmitAttempt&&!taForm.billing_address?'#ef4444':''">
+          <label class="full">{{ t('leadDetail.testAccount.fields.street') }} *
+            <input [(ngModel)]="taForm.billing_address" [placeholder]="t('leadDetail.testAccount.placeholders.street')" [style.border-color]="taSubmitAttempt&&!taForm.billing_address?'#ef4444':''">
           </label>
         </div>
         <div class="ta-row">
-          <label>Kod pocztowy *
-            <input [(ngModel)]="taForm.billing_zip" placeholder="np. 00-001" [style.border-color]="taSubmitAttempt&&!taForm.billing_zip?'#ef4444':''">
+          <label>{{ t('leadDetail.testAccount.fields.zip') }} *
+            <input [(ngModel)]="taForm.billing_zip" [placeholder]="t('leadDetail.testAccount.placeholders.zip')" [style.border-color]="taSubmitAttempt&&!taForm.billing_zip?'#ef4444':''">
           </label>
-          <label>Miasto *
-            <input [(ngModel)]="taForm.billing_city" placeholder="np. Warszawa" [style.border-color]="taSubmitAttempt&&!taForm.billing_city?'#ef4444':''">
+          <label>{{ t('leadDetail.testAccount.fields.city') }} *
+            <input [(ngModel)]="taForm.billing_city" [placeholder]="t('leadDetail.testAccount.placeholders.city')" [style.border-color]="taSubmitAttempt&&!taForm.billing_city?'#ef4444':''">
           </label>
         </div>
         <div class="ta-row">
-          <label>Kraj rozliczeniowy *
+          <label>{{ t('leadDetail.testAccount.fields.billingCountry') }} *
             <select [(ngModel)]="taForm.billing_country" [style.border-color]="taSubmitAttempt&&!taForm.billing_country?'#ef4444':''">
-              <option value="">— wybierz —</option>
-              <option value="PL">Polska</option>
-              <option value="DE">Niemcy</option>
-              <option value="FR">Francja</option>
-              <option value="GB">Wielka Brytania</option>
-              <option value="CZ">Czechy</option>
-              <option value="SK">Słowacja</option>
-              <option value="HU">Węgry</option>
-              <option value="RO">Rumunia</option>
-              <option value="UA">Ukraina</option>
-              <option value="RU">Rosja</option>
+              <option value="">{{ t('leadDetail.testAccount.choose') }}</option>
+              <option value="PL">{{ t('leadDetail.testAccount.countries.pl') }}</option>
+              <option value="DE">{{ t('leadDetail.testAccount.countries.de') }}</option>
+              <option value="FR">{{ t('leadDetail.testAccount.countries.fr') }}</option>
+              <option value="GB">{{ t('leadDetail.testAccount.countries.gb') }}</option>
+              <option value="CZ">{{ t('leadDetail.testAccount.countries.cz') }}</option>
+              <option value="SK">{{ t('leadDetail.testAccount.countries.sk') }}</option>
+              <option value="HU">{{ t('leadDetail.testAccount.countries.hu') }}</option>
+              <option value="RO">{{ t('leadDetail.testAccount.countries.ro') }}</option>
+              <option value="UA">{{ t('leadDetail.testAccount.countries.ua') }}</option>
+              <option value="RU">{{ t('leadDetail.testAccount.countries.ru') }}</option>
             </select>
           </label>
-          <label>Email rozliczeniowy *
-            <input [(ngModel)]="taForm.billing_email_address" type="email" placeholder="faktury@firma.pl" [style.border-color]="taSubmitAttempt&&!taForm.billing_email_address?'#ef4444':''">
+          <label>{{ t('leadDetail.testAccount.fields.billingEmail') }} *
+            <input [(ngModel)]="taForm.billing_email_address" type="email" [placeholder]="t('leadDetail.testAccount.placeholders.billingEmail')" [style.border-color]="taSubmitAttempt&&!taForm.billing_email_address?'#ef4444':''">
           </label>
         </div>
       </div>
 
       <!-- Sekcja C: Administrator konta -->
       <div class="ta-section">
-        <div class="ta-section-title">C — Administrator konta</div>
+        <div class="ta-section-title">{{ t('leadDetail.testAccount.sections.admin') }}</div>
         <div class="ta-row">
-          <label>Imię *
-            <input [(ngModel)]="taForm.admin_first_name" placeholder="Jan" [style.border-color]="taSubmitAttempt&&!taForm.admin_first_name?'#ef4444':''">
+          <label>{{ t('leadDetail.testAccount.fields.firstName') }} *
+            <input [(ngModel)]="taForm.admin_first_name" [placeholder]="t('leadDetail.testAccount.placeholders.firstName')" [style.border-color]="taSubmitAttempt&&!taForm.admin_first_name?'#ef4444':''">
           </label>
-          <label>Nazwisko *
-            <input [(ngModel)]="taForm.admin_last_name" placeholder="Kowalski" [style.border-color]="taSubmitAttempt&&!taForm.admin_last_name?'#ef4444':''">
+          <label>{{ t('leadDetail.testAccount.fields.lastName') }} *
+            <input [(ngModel)]="taForm.admin_last_name" [placeholder]="t('leadDetail.testAccount.placeholders.lastName')" [style.border-color]="taSubmitAttempt&&!taForm.admin_last_name?'#ef4444':''">
           </label>
         </div>
         <div class="ta-row">
-          <label class="full">Email administratora *
-            <input [(ngModel)]="taForm.admin_email" type="email" placeholder="admin@firma.pl" [style.border-color]="taSubmitAttempt&&!taForm.admin_email?'#ef4444':''">
+          <label class="full">{{ t('leadDetail.testAccount.fields.adminEmail') }} *
+            <input [(ngModel)]="taForm.admin_email" type="email" [placeholder]="t('leadDetail.testAccount.placeholders.adminEmail')" [style.border-color]="taSubmitAttempt&&!taForm.admin_email?'#ef4444':''">
           </label>
         </div>
       </div>
@@ -1432,10 +1436,10 @@ interface WhatsappConvUiState {
     </div>
 
     <div class="modal-footer">
-      <button class="btn-outline" (click)="closeTestAccountModal()">Anuluj</button>
+      <button class="btn-outline" (click)="closeTestAccountModal()">{{ 'actions.cancel' | transloco }}</button>
       <button class="btn-primary" (click)="submitTestAccount()" [disabled]="submittingTestAccount" style="background:#1d4ed8;border-color:#1d4ed8;min-width:180px">
-        <span *ngIf="!submittingTestAccount">🖥️ {{testAccount?.status==='created'?'Ponów założenie':'Załóż konto testowe'}}</span>
-        <span *ngIf="submittingTestAccount">⏳ Zakładanie konta…</span>
+        <span *ngIf="!submittingTestAccount">🖥️ {{testAccount?.status==='created' ? t('leadDetail.testAccount.retry') : t('leadDetail.testAccount.create')}}</span>
+        <span *ngIf="submittingTestAccount">⏳ {{ t('leadDetail.testAccount.creating') }}</span>
       </button>
     </div>
   </div>
@@ -1444,34 +1448,34 @@ interface WhatsappConvUiState {
 <!-- Hold dialog -->
 <div class="modal-overlay" *ngIf="showHoldModal" (click)="showHoldModal=false">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h3>⏸️ {{ lead?.hold_active ? 'Edytuj Hold' : 'Ustaw Hold' }}</h3>
-    <p style="margin-bottom:16px">Lead <strong>{{lead?.company}}</strong> zostanie oznaczony jako wstrzymany — bez wpływu na aktywne KPI i pipeline, dopóki Hold trwa.</p>
+    <h3>⏸️ {{ lead?.hold_active ? t('leadDetail.hold.edit') : t('leadDetail.hold.set') }}</h3>
+    <p style="margin-bottom:16px">{{ t('leadDetail.hold.introBefore') }} <strong>{{lead?.company}}</strong> {{ t('leadDetail.hold.introAfter') }}</p>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
       <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
-        Powód
+        {{ t('leadDetail.hold.reason') }}
         <select [(ngModel)]="holdForm.reason"
                 [style.border-color]="holdSubmitted && !holdForm.reason ? '#ef4444' : '#d1d5db'"
                 style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
-          <option value="" disabled>— wybierz powód —</option>
+          <option value="" disabled>{{ t('leadDetail.edit.chooseReason') }}</option>
           <option *ngFor="let r of holdReasons" [value]="r">{{r}}</option>
         </select>
-        <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:11px;color:#ef4444">Wybierz powód</span>
+        <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:11px;color:#ef4444">{{ t('leadDetail.hold.reasonRequired') }}</span>
       </label>
       <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
-        Aktywny do
+        {{ t('leadDetail.hold.activeUntil') }}
         <input type="date" [(ngModel)]="holdForm.until" [min]="todayStr"
                [style.border-color]="holdSubmitted && !holdForm.until ? '#ef4444' : '#d1d5db'"
                style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
-        <span *ngIf="holdSubmitted && !holdForm.until" style="font-size:11px;color:#ef4444">Podaj datę</span>
+        <span *ngIf="holdSubmitted && !holdForm.until" style="font-size:11px;color:#ef4444">{{ t('leadDetail.hold.dateRequired') }}</span>
       </label>
     </div>
     <div *ngIf="holdError" style="font-size:12px;color:#ef4444;margin-bottom:8px">{{holdError}}</div>
     <div class="modal-actions" style="justify-content:space-between">
-      <button *ngIf="lead?.hold_active" class="btn-outline" style="color:#ef4444;border-color:#fecaca" (click)="cancelHold()" [disabled]="holdSaving">Zdejmij Hold</button>
+      <button *ngIf="lead?.hold_active" class="btn-outline" style="color:#ef4444;border-color:#fecaca" (click)="cancelHold()" [disabled]="holdSaving">{{ t('leadDetail.hold.remove') }}</button>
       <span *ngIf="!lead?.hold_active"></span>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="showHoldModal=false">Anuluj</button>
-        <button class="btn-primary" (click)="saveHold()" [disabled]="holdSaving">{{holdSaving ? '…' : (lead?.hold_active ? 'Zapisz' : '⏸️ Ustaw Hold')}}</button>
+        <button class="btn-outline" (click)="showHoldModal=false">{{ 'actions.cancel' | transloco }}</button>
+        <button class="btn-primary" (click)="saveHold()" [disabled]="holdSaving">{{holdSaving ? '…' : (lead?.hold_active ? ('actions.save' | transloco) : '⏸️ ' + t('leadDetail.hold.set'))}}</button>
       </div>
     </div>
   </div>
@@ -1480,26 +1484,26 @@ interface WhatsappConvUiState {
 <!-- Rozpocznij onboarding dialog -->
 <div class="modal-overlay" *ngIf="showConvert" (click)="showConvert=false">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h3>🚀 Rozpocznij onboarding</h3>
-    <p style="margin-bottom:16px">Migracja leada <strong>{{lead?.company}}</strong> do procesu wdrożenia. Lead pojawi się w sekcji Onboarding. W Rejestrze Partnerów pojawi się po synchronizacji z DWH.</p>
+    <h3>🚀 {{ t('leadDetail.onboarding.start') }}</h3>
+    <p style="margin-bottom:16px">{{ t('leadDetail.onboarding.introBefore') }} <strong>{{lead?.company}}</strong> {{ t('leadDetail.onboarding.introAfter') }}</p>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
       <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
-        Wartość kontraktu (PLN)
+        {{ t('leadDetail.onboarding.contractValue') }}
         <input type="number" min="0" step="1000"
                [(ngModel)]="convertForm.contract_value"
-               placeholder="np. 50000"
+               [placeholder]="t('leadDetail.onboarding.contractValuePlaceholder')"
                style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
       </label>
       <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
-        Data podpisania umowy
+        {{ t('leadDetail.onboarding.contractSigned') }}
         <input type="date"
                [(ngModel)]="convertForm.contract_signed"
                style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
       </label>
     </div>
     <div class="modal-actions">
-      <button class="btn-outline" (click)="showConvert=false">Anuluj</button>
-      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'🚀 Rozpocznij onboarding'}}</button>
+      <button class="btn-outline" (click)="showConvert=false">{{ 'actions.cancel' | transloco }}</button>
+      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'🚀 ' + t('leadDetail.onboarding.start')}}</button>
     </div>
   </div>
 </div>
@@ -1512,94 +1516,94 @@ interface WhatsappConvUiState {
       <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
       <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
       <span style="flex:1"></span>
-      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:var(--orange-pale);border:1px solid var(--orange-muted);color:var(--orange-dark);border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ Edytuj</button>
+      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:var(--orange-pale);border:1px solid var(--orange-muted);color:var(--orange-dark);border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ {{ t('activity.modal.edit') }}</button>
       <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
     </div>
     <!-- Widok -->
     <div *ngIf="!actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
       <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">{{selectedAct.title}}</div>
       <div *ngIf="selectedAct.activity_at" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📅 Data i czas</span>
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📅 {{ t('activity.modal.dateTime') }}</span>
         <span>{{selectedAct.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
       <div *ngIf="selectedAct.assigned_to_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👤 Przypisano do</span>
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👤 {{ t('activity.modal.assignedTo') }}</span>
         <span>{{selectedAct.assigned_to_name}}</span>
       </div>
       <div *ngIf="selectedAct.created_by_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">✍️ Dodał</span>
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">✍️ {{ t('activity.modal.addedBy') }}</span>
         <span>{{selectedAct.created_by_name}}</span>
       </div>
       <div *ngIf="selectedAct.meeting_location" style="display:flex;gap:12px;font-size:13px">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📍 Miejsce</span>
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📍 {{ t('meetings.location') }}</span>
         <span>{{selectedAct.meeting_location}}</span>
       </div>
       <div *ngIf="selectedAct.participants" style="display:flex;gap:12px;font-size:13px">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👥 Uczestnicy</span>
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👥 {{ t('meetings.participants') }}</span>
         <span style="word-break:break-all">{{selectedAct.participants}}</span>
       </div>
       <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📝 Opis</span>
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📝 {{ t('activity.modal.description') }}</span>
         <span style="white-space:pre-line">{{selectedAct.body}}</span>
       </div>
       <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:13px">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 Komentarz</span>
+        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 {{ t('activity.modal.comment') }}</span>
         <span style="font-style:italic">{{selectedAct.close_comment}}</span>
       </div>
       <!-- Zamknij — tylko dla zadań, bez komentarza -->
       <div *ngIf="selectedAct.type==='task' && selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
-        <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="savingActivity">{{savingActivity ? '…' : '✓ Zamknij zadanie'}}</button>
+        <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="savingActivity">{{savingActivity ? '…' : '✓ ' + t('activity.card.closeTask')}}</button>
       </div>
     </div>
     <!-- Edycja -->
     <div *ngIf="actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;flex-direction:column;gap:5px">
-        <label style="font-size:12px;font-weight:600;color:#374151">Typ</label>
+        <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.type') }}</label>
         <select [(ngModel)]="actEditForm.type" class="act-sel">
-          <option value="task">✅ Zadanie</option>
-          <option value="call">📞 Połączenie</option>
-          <option value="meeting">🤝 Spotkanie</option>
-          <option value="note">📝 Notatka</option>
-          <option value="doc_sent">📄 Dokument</option>
-          <option value="training">🎓 Szkolenie</option>
-          <option value="qbr">📊 QBR</option>
-          <option value="opportunity">💡 Szansa</option>
+          <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
+          <option value="call">📞 {{ t('labels.activityTypes.call') }}</option>
+          <option value="meeting">🤝 {{ t('labels.activityTypes.meeting') }}</option>
+          <option value="note">📝 {{ t('labels.activityTypes.note') }}</option>
+          <option value="doc_sent">📄 {{ t('labels.activityTypes.doc_sent') }}</option>
+          <option value="training">🎓 {{ t('labels.activityTypes.training') }}</option>
+          <option value="qbr">📊 {{ t('labels.activityTypes.qbr') }}</option>
+          <option value="opportunity">💡 {{ t('labels.activityTypes.opportunity') }}</option>
         </select>
       </div>
       <div style="display:flex;flex-direction:column;gap:5px">
-        <label style="font-size:12px;font-weight:600;color:#374151">Tytuł <span style="color:#dc2626">*</span></label>
+        <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.title') }} <span style="color:#dc2626">*</span></label>
         <input [(ngModel)]="actEditForm.title" class="act-input">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:12px;font-weight:600;color:#374151">Data i godzina</label>
+          <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.form.dateTime') }}</label>
           <input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input">
         </div>
         <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:12px;font-weight:600;color:#374151">Przypisz do handlowca</label>
+          <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.assignToSalesperson') }}</label>
           <select [(ngModel)]="actEditForm.assigned_to" class="act-sel">
-            <option value="">— bez przypisania —</option>
+            <option value="">{{ t('activity.modal.unassigned') }}</option>
             <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
           </select>
         </div>
       </div>
       <ng-container *ngIf="actEditForm.type === 'meeting'">
         <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:12px;font-weight:600;color:#374151">Miejsce spotkania</label>
+          <label style="font-size:12px;font-weight:600;color:#374151">{{ t('meetings.meetingLocation') }}</label>
           <input [(ngModel)]="actEditForm.meeting_location" class="act-input">
         </div>
         <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:12px;font-weight:600;color:#374151">Uczestnicy</label>
-          <input [(ngModel)]="actEditForm.participants" class="act-input" placeholder="emaile oddzielone przecinkiem">
+          <label style="font-size:12px;font-weight:600;color:#374151">{{ t('meetings.participants') }}</label>
+          <input [(ngModel)]="actEditForm.participants" class="act-input" [placeholder]="t('meetings.participantsHint')">
         </div>
       </ng-container>
       <div style="display:flex;flex-direction:column;gap:5px">
-        <label style="font-size:12px;font-weight:600;color:#374151">Opis / notatki</label>
+        <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.descriptionNotes') }}</label>
         <textarea [(ngModel)]="actEditForm.body" rows="4" class="act-input" style="resize:vertical"></textarea>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-        <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">Anuluj</button>
-        <button style="background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : 'Zapisz zmiany'}}</button>
+        <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">{{ 'actions.cancel' | transloco }}</button>
+        <button style="background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : t('activity.modal.saveChanges')}}</button>
       </div>
     </div>
   </div>
@@ -1613,6 +1617,7 @@ interface WhatsappConvUiState {
   [contactName]="lead.contact_name || ''"
   (closed)="onPhoneSimulatorClosed()">
 </wt-phone-call-simulator>
+</ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
@@ -1815,14 +1820,14 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private emailOauthListener = inject(EmailOauthListenerService);
   protected settings = inject(AppSettingsService);
   private pbx = inject(PbxService);
+  private transloco = inject(TranslocoService);
+  private locale = inject(LocaleService);
   logoSasUrl       = '';
 
   // Słowniki z app_settings
-  get dictStages():    { value: string; label: string }[] { return this._dictList('crm_lead_stages',    LEAD_STAGE_LABELS as any); }
+  get dictStages():    { value: string; label: string }[] { return this._dictArr('crm_lead_stages', Object.keys(LEAD_STAGE_LABELS)).map(v => ({ value: v, label: this.stageLabel(v) })); }
   get dictIndustries(): string[] { return this._dictArr('crm_industries', ['IT','Finance','Transport','Tourism','Healthcare','Retail','Manufacturing','Legal','Education','Other']); }
   get dictTitles():    string[] { return this._dictArr('crm_contact_titles', ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other']); }
-  get dictPartnerLanguages(): string[] { return this._dictArr('crm_partner_languages', ['Polski','Angielski','Rosyjski','Rumuński','Niemiecki']); }
-  get dictPartnerCountries(): string[] { return this._dictArr('crm_partner_countries', ['Polska','Niemcy','Francja','Wielka Brytania','Czechy','Słowacja','Węgry','Rumunia','Ukraina','Rosja']); }
 
   private _dictArr(key: string, fallback: string[]): string[] {
     try {
@@ -1831,10 +1836,6 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       if (typeof v === 'string') return JSON.parse(v);
     } catch(_) {}
     return fallback;
-  }
-
-  private _dictList(key: string, labelMap: Record<string, string>): { value: string; label: string }[] {
-    return this._dictArr(key, Object.keys(labelMap)).map(v => ({ value: v, label: labelMap[v] || v }));
   }
 
   lead: Lead | null = null;
@@ -1875,32 +1876,33 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   get editErrors(): string[] {
     const f = this.editForm;
     const errs: string[] = [];
-    if (f.stage === 'closed_lost' && !f.lost_reason) errs.push('Powód przegranej');
+    const fieldName = (key: string) => this.transloco.translate('crm.leadDetail.fields.' + key);
+    if (f.stage === 'closed_lost' && !f.lost_reason) errs.push(fieldName('lostReason'));
     if (!this.requiresFullFields) return errs;
-    if (!f.website)            errs.push('Strona WWW');
-    if (!f.contact_name)       errs.push('Imię i Nazwisko');
-    if (!f.contact_title)      errs.push('Rola w firmie');
-    if (!f.email)              errs.push('Email');
-    if (!f.phone)              errs.push('Telefon');
-    if (!f.value_pln && f.value_pln !== 0) errs.push('Obrót roczny');
-    if (f.online_pct === '' || f.online_pct == null) errs.push('% Online');
-    if (!f.first_contact_date) errs.push('Pierwszy kontakt');
-    if (!f.close_date)         errs.push('Data zamknięcia');
-    if (!f.source)             errs.push('Źródło');
-    if (!f.industry)           errs.push('Branża');
-    if (!f.assigned_to)        errs.push('Handlowiec');
-    if (f.probability === '' || f.probability == null) errs.push('% Szansa');
+    if (!f.website)            errs.push(fieldName('website'));
+    if (!f.contact_name)       errs.push(fieldName('fullName'));
+    if (!f.contact_title)      errs.push(fieldName('contactTitle'));
+    if (!f.email)              errs.push(fieldName('email'));
+    if (!f.phone)              errs.push(fieldName('phone'));
+    if (!f.value_pln && f.value_pln !== 0) errs.push(fieldName('annualTurnover'));
+    if (f.online_pct === '' || f.online_pct == null) errs.push(fieldName('onlinePct'));
+    if (!f.first_contact_date) errs.push(fieldName('firstContact'));
+    if (!f.close_date)         errs.push(fieldName('closeDate'));
+    if (!f.source)             errs.push(fieldName('source'));
+    if (!f.industry)           errs.push(fieldName('industry'));
+    if (!f.assigned_to)        errs.push(fieldName('salesperson'));
+    if (f.probability === '' || f.probability == null) errs.push(fieldName('probabilityPct'));
     return errs;
   }
 
   validateEditNip(): void {
     const val = (this.editForm.nip || '').trim().toUpperCase();
-    if (!val) { this.editNipError = 'NIP jest wymagany'; return; }
+    if (!val) { this.editNipError = this.transloco.translate('crm.leadDetail.nip.required'); return; }
     const cc = val.slice(0, 2);
     const digits = val.slice(2);
-    if (!/^[A-Z]{2}$/.test(cc)) { this.editNipError = 'Podaj kod kraju (2 litery), np. PL'; return; }
-    if (cc === 'PL' && !/^\d{10}$/.test(digits)) { this.editNipError = 'Dla PL wymagane 10 cyfr po kodzie kraju'; return; }
-    if (cc !== 'PL' && digits.length === 0) { this.editNipError = 'Podaj numer po kodzie kraju'; return; }
+    if (!/^[A-Z]{2}$/.test(cc)) { this.editNipError = this.transloco.translate('crm.leadDetail.nip.countryCodeRequired'); return; }
+    if (cc === 'PL' && !/^\d{10}$/.test(digits)) { this.editNipError = this.transloco.translate('crm.leadDetail.nip.plTenDigits'); return; }
+    if (cc !== 'PL' && digits.length === 0) { this.editNipError = this.transloco.translate('crm.leadDetail.nip.numberRequired'); return; }
     this.editNipError = '';
   }
   detailEnriching   = false;
@@ -2008,6 +2010,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   sourcesWithoutGroup(): LeadSource[] { return this.leadSources.filter(s => !s.group); }
   sourceGroups(): string[] { return [...new Set(this.leadSources.filter(s => s.group).map(s => s.group!))]; }
   sourcesInGroup(g: string): LeadSource[] { return this.leadSources.filter(s => s.group === g); }
+  sourceOptionLabel(source: LeadSource): string {
+    const key = leadSourceLabelKey(source.value);
+    return key ? this.transloco.translate('crm.' + key) : source.label;
+  }
 
   get lostReasons(): string[] {
     try { return JSON.parse(String(this.settings.settings()['crm_lost_reasons'] || '[]')); }
@@ -2055,7 +2061,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.holdSaving = false;
-        this.holdError  = err?.error?.error || 'Błąd zapisu Holda.';
+        this.holdError  = err?.error?.error || this.transloco.translate('crm.leadDetail.hold.saveFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2074,7 +2080,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.holdSaving = false;
-        this.holdError  = err?.error?.error || 'Błąd zdejmowania Holda.';
+        this.holdError  = err?.error?.error || this.transloco.translate('crm.leadDetail.hold.removeFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2082,14 +2088,14 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   archiveLead(): void {
     if (!this.lead) return;
-    if (!confirm(`Zarchiwizować lead „${this.lead.company}"? Zniknie z list, dashboardów i raportów — będzie widoczny tylko po wybraniu filtra Etap = Archiwum. Nadal będzie edytowalny, można go stamtąd przywrócić do etapu "Nowy".`)) return;
+    if (!confirm(this.transloco.translate('crm.leadDetail.archive.confirm', { company: this.lead.company }))) return;
     this.api.archiveLead(this.lead.id).subscribe({
       next: updated => this.zone.run(() => {
         this.lead = { ...this.lead!, ...updated };
         this.cdr.markForCheck();
       }),
       error: (err: any) => this.zone.run(() => {
-        alert(err?.error?.error || 'Błąd archiwizacji leada.');
+        alert(err?.error?.error || this.transloco.translate('crm.leadDetail.archive.failed'));
       }),
     });
   }
@@ -2111,9 +2117,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   savingConsents   = false;
 
   readonly consentOptions = [
-    { val: 'no_data', label: 'Brak danych', bg: '#9ca3af' },
-    { val: 'granted', label: 'Zgoda',       bg: '#22c55e' },
-    { val: 'denied',  label: 'Brak zgody',  bg: '#ef4444' },
+    { val: 'no_data', labelKey: 'consents.values.noData',  bg: '#9ca3af' },
+    { val: 'granted', labelKey: 'consents.values.granted', bg: '#22c55e' },
+    { val: 'denied',  labelKey: 'consents.values.denied',  bg: '#ef4444' },
   ];
 
   get canEditConsents(): boolean { return !!this.lead && this.lead.can_edit !== false; }
@@ -2134,14 +2140,14 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   actReminderAt    = '';
 
   readonly reminderOptions = [
-    { value: '',           label: 'Brak przypomnienia'  },
-    { value: '30m_before', label: '30 min przed'        },
-    { value: '1h_before',  label: '1 godz. przed'       },
-    { value: 'at_due',     label: 'W terminie zadania'  },
-    { value: '1d_before',  label: '1 dzień przed'       },
-    { value: '2d_before',  label: '2 dni przed'         },
-    { value: '3d_before',  label: '3 dni przed'         },
-    { value: 'custom',     label: 'Własna data…'        },
+    { value: '',           labelKey: 'activity.reminders.none'             },
+    { value: '30m_before', labelKey: 'activity.reminders.minutes30Before'  },
+    { value: '1h_before',  labelKey: 'activity.reminders.hour1Before'      },
+    { value: 'at_due',     labelKey: 'activity.reminders.atDue'            },
+    { value: '1d_before',  labelKey: 'activity.reminders.day1Before'       },
+    { value: '2d_before',  labelKey: 'activity.reminders.days2Before'      },
+    { value: '3d_before',  labelKey: 'activity.reminders.days3Before'      },
+    { value: 'custom',     labelKey: 'activity.customDate'                 },
   ];
 
   readonly quillModules = {
@@ -2149,11 +2155,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   };
 
   readonly actTypeOptions = [
-    { value: 'note',     icon: '📝', label: 'Notatka'   },
-    { value: 'task',     icon: '✅', label: 'Zadanie'    },
-    { value: 'call',     icon: '📞', label: 'Połączenie' },
-    { value: 'meeting',  icon: '🤝', label: 'Spotkanie'  },
-    { value: 'doc_sent', icon: '📄', label: 'Dokument'   },
+    { value: 'note',     icon: '📝', labelKey: 'labels.activityTypes.note'     },
+    { value: 'task',     icon: '✅', labelKey: 'labels.activityTypes.task'     },
+    { value: 'call',     icon: '📞', labelKey: 'labels.activityTypes.call'     },
+    { value: 'meeting',  icon: '🤝', labelKey: 'labels.activityTypes.meeting'  },
+    { value: 'doc_sent', icon: '📄', labelKey: 'labels.activityTypes.doc_sent' },
   ];
 
   calendarEntryOf(activity: any): CalendarEntry | null {
@@ -2194,21 +2200,22 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       while (added < n) { r.setDate(r.getDate() + 1); if (r.getDay() !== 0 && r.getDay() !== 6) added++; }
       return r;
     };
-    const PL_DAYS   = ['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
-    const PL_MONTHS = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
-    const fmtDate   = (d: Date) => `${d.getDate()} ${PL_MONTHS[d.getMonth()]}`;
+    const locale    = this.locale.activeLocale();
+    const weekday   = (d: Date) => new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(d);
+    const fmtDate   = (d: Date) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(d);
+    const preset    = (key: string, params?: Record<string, string>) => this.transloco.translate('crm.activity.dueDate.' + key, params);
     const tom  = new Date(today); tom.setDate(today.getDate() + 1);
     const biz2 = addBizDays(today, 2);
     const biz3 = addBizDays(today, 3);
     const wk1  = new Date(today); wk1.setDate(today.getDate() + 7);
     const wk2  = new Date(today); wk2.setDate(today.getDate() + 14);
     return [
-      { value: 'today',    label: 'Dzisiaj',                                            date: today },
-      { value: 'tomorrow', label: 'Jutro',                                               date: tom   },
-      { value: 'biz2',     label: `Za 2 dni robocze (${PL_DAYS[biz2.getDay()]})`,       date: biz2  },
-      { value: 'biz3',     label: `Za 3 dni robocze (${PL_DAYS[biz3.getDay()]})`,       date: biz3  },
-      { value: 'week1',    label: `Za tydzień (${fmtDate(wk1)})`,                       date: wk1   },
-      { value: 'week2',    label: `Za 2 tygodnie (${fmtDate(wk2)})`,                    date: wk2   },
+      { value: 'today',    label: preset('today'),                                       date: today },
+      { value: 'tomorrow', label: preset('tomorrow'),                                    date: tom   },
+      { value: 'biz2',     label: preset('inTwoBusinessDays', { weekday: weekday(biz2) }),   date: biz2  },
+      { value: 'biz3',     label: preset('inThreeBusinessDays', { weekday: weekday(biz3) }), date: biz3  },
+      { value: 'week1',    label: preset('inOneWeek', { date: fmtDate(wk1) }),           date: wk1   },
+      { value: 'week2',    label: preset('inTwoWeeks', { date: fmtDate(wk2) }),          date: wk2   },
     ];
   }
 
@@ -2420,7 +2427,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.smsLoading = false;
-        this.smsThreadError = err?.error?.error || 'Błąd pobierania SMS-ów';
+        this.smsThreadError = err?.error?.error || this.transloco.translate('crm.sms.loadFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2444,8 +2451,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   smsStatusLabel(status: string): string {
-    const map: Record<string, string> = { sent: 'Wysłano', delivered: 'Dostarczono', received: 'Odebrano', failed: 'Błąd', error: 'Błąd' };
-    return map[status] || status;
+    const keys: Record<string, string> = { sent: 'sent', delivered: 'delivered', received: 'received', failed: 'failed', error: 'failed' };
+    return keys[status] ? this.transloco.translate('crm.sms.statuses.' + keys[status]) : status;
   }
 
   smsDomId(number: string): string {
@@ -2473,7 +2480,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         state.sending = false;
-        state.error = err?.error?.error || 'Błąd wysyłki SMS';
+        state.error = err?.error?.error || this.transloco.translate('crm.sms.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2498,7 +2505,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private whatsappConvState = new Map<string, WhatsappConvUiState>();
 
   get whatsappFromDisplay(): string {
-    return this.whatsappDisplayNumber ? formatPhoneDisplay(this.whatsappDisplayNumber) : 'skonfigurowany numer';
+    return this.whatsappDisplayNumber ? formatPhoneDisplay(this.whatsappDisplayNumber) : this.transloco.translate('crm.whatsapp.configuredNumber');
   }
 
   // No country is ever assumed (CRMtree is multi-country) — the user must
@@ -2575,7 +2582,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         s.replySending = false;
-        s.replyError   = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        s.replyError   = err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2933,7 +2940,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.whatsappSending = false;
-        this.whatsappError   = err?.error?.error || 'Błąd wysyłki WhatsApp';
+        this.whatsappError   = err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2946,13 +2953,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       next: (result: any) => this.zone.run(() => {
         this.debugProcessing = false;
         console.log('[Debug] processEmail result:', result);
-        alert(`Nowe wiadomości: ${result.newMessages_found ?? 0}`);
+        alert(this.transloco.translate('crm.email.debug.newMessages', { count: result.newMessages_found ?? 0 }));
         this.refreshEmailActivities();
         this.cdr.markForCheck();
       }),
       error: (e: any) => this.zone.run(() => {
         this.debugProcessing = false;
-        alert('Błąd: ' + (e.error?.error || e.message));
+        alert(this.transloco.translate('crm.email.debug.error', { message: e.error?.error || e.message }));
         this.cdr.markForCheck();
       }),
     });
@@ -3001,7 +3008,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   openEmailModal(prefillThreadId?: string): void { this.openEmailCompose(prefillThreadId); }
 
   disconnectEmail(): void {
-    if (!confirm('Rozłączyć swoje konto pocztowe? Aby dalej wysyłać maile, będziesz musiał połączyć je ponownie.')) return;
+    if (!confirm(this.transloco.translate('crm.email.disconnectConfirm'))) return;
     this.api.disconnectMyEmail().subscribe({
       next: () => this.zone.run(() => {
         this.emailStatus     = null;
@@ -3188,7 +3195,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
             .setOAuthToken(tok!.access_token)
             .setDeveloperKey(cfg!.apiKey)
             .setAppId(cfg!.appId)
-            .setTitle('Wybierz pliki do załączenia')
+            .setTitle(this.transloco.translate('crm.email.drivePickerTitle'))
             .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
             .setCallback((data: any) => {
               if (data.action !== google.picker.Action.PICKED) return;
@@ -3234,7 +3241,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        const msg = err?.error?.error || err?.message || 'Błąd pobierania pliku z Drive';
+        const msg = err?.error?.error || err?.message || this.transloco.translate('crm.email.driveDownloadFailed');
         if (target === 'reply') {
           this.msgModalError = msg;
         } else {
@@ -3315,7 +3322,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
     const onError = (err: any) => {
       this.zone.run(() => {
-        this.emailError   = err?.error?.error || 'Błąd wysyłki emaila';
+        this.emailError   = err?.error?.error || this.transloco.translate('crm.email.sendFailed');
         this.sendingEmail = false;
         this.cdr.markForCheck();
       });
@@ -3424,8 +3431,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.openEmailModal(canReplyInThread ? threadId : undefined);
     if (!canReplyInThread) {
       this.emailError = this.threadOwnerEmail
-        ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Poniższy e-mail zostanie wysłany jako nowa wiadomość z Twojego konta.`
-        : 'Nie możesz odpowiadać w tym wątku. Poniższy e-mail zostanie wysłany jako nowa wiadomość z Twojego konta.';
+        ? this.transloco.translate('crm.email.thread.notOwnerCompose', { owner: this.threadOwnerEmail })
+        : this.transloco.translate('crm.email.thread.notOwnerComposeUnknown');
     }
     if (m) {
       if (!this.emailForm.subject)
@@ -3534,8 +3541,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.inlineReplyCcQuery        = '';
     this.inlineReplySending        = false;
     this.inlineReplyError          = canReplyInThread ? '' : (this.threadOwnerEmail
-      ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.`
-      : 'Nie możesz odpowiadać w tym wątku. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.');
+      ? this.transloco.translate('crm.email.thread.notOwnerReply', { owner: this.threadOwnerEmail })
+      : this.transloco.translate('crm.email.thread.notOwnerReplyUnknown'));
     this.inlineReplyAttachments    = [];
     // Recipient/CC/subject must be immediately visible and editable on reply
     // — not hidden behind the "Szczegóły" toggle.
@@ -3609,7 +3616,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
     const onError = (err: any) => this.zone.run(() => {
-      this.inlineReplyError   = err?.error?.error || 'Błąd wysyłki';
+      this.inlineReplyError   = err?.error?.error || this.transloco.translate('crm.email.reply.sendFailed');
       this.inlineReplySending = false;
       this.cdr.markForCheck();
     });
@@ -3684,8 +3691,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.msgModalAttachments    = [];
     this.msgModalReply = true;
     this.msgModalError = canReplyInThread ? '' : (this.threadOwnerEmail
-      ? `Ten wątek należy do ${this.threadOwnerEmail} — nie możesz w nim odpowiadać. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.`
-      : 'Nie możesz odpowiadać w tym wątku. Ta wiadomość zostanie wysłana jako nowa, z Twojego konta.');
+      ? this.transloco.translate('crm.email.thread.notOwnerReply', { owner: this.threadOwnerEmail })
+      : this.transloco.translate('crm.email.thread.notOwnerReplyUnknown'));
     this.cdr.markForCheck();
     this.focusEmailBodyTop('msg-reply-textarea');
   }
@@ -3749,7 +3756,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
     const onError = (err: any) => this.zone.run(() => {
-      this.msgModalError   = err?.error?.error || 'Błąd wysyłki';
+      this.msgModalError   = err?.error?.error || this.transloco.translate('crm.email.reply.sendFailed');
       this.msgModalSending = false;
       this.cdr.markForCheck();
     });
@@ -3900,7 +3907,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (this.editNipError) return;
     // Walidacja wymagalności wg etapu
     if (this.editErrors.length > 0) {
-      alert('Uzupełnij wymagane pola:\n• ' + this.editErrors.join('\n• '));
+      alert(this.transloco.translate('crm.leadDetail.edit.requiredFields') + '\n• ' + this.editErrors.join('\n• '));
       return;
     }
     this.saving = true;
@@ -3960,7 +3967,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => { this.zone.run(() => {
         this.saving = false;
-        if (err?.status === 409) this.editNipError = err?.error?.error || 'Ten Numer NIP jest już przypisany dla innego rekordu.';
+        if (err?.status === 409) this.editNipError = err?.error?.error || this.transloco.translate('crm.leadDetail.nip.duplicate');
         this.cdr.markForCheck();
       }); },
     });
@@ -4000,21 +4007,19 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   priorityLabel(p: string): string {
-    const map: Record<string, string> = { asap: 'ASAP', important: 'Ważne', medium: 'Średnie', low: 'Niskie' };
-    return map[p] ?? p;
+    const known = ['asap', 'important', 'medium', 'low'];
+    return known.includes(p) ? this.transloco.translate('crm.labels.priorities.' + p) : p;
   }
 
   // ── Modal aktywności ────────────────────────────────────────────────────────
   actTypeName(type: string): string {
-    const map: Record<string, string> = {
-      task: 'Zadanie', call: 'Połączenie', email: 'Email', meeting: 'Spotkanie', note: 'Notatka',
-      training: 'Szkolenie', qbr: 'QBR', doc_sent: 'Dokument', opportunity: 'Szansa',
-    };
-    return map[type] || type;
+    const known = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
+    return known.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
 
   actStatusLabel(s: string): string {
-    return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+    const status = s === 'closed' || s === 'open' ? s : 'new';
+    return this.transloco.translate('crm.labels.activityStatuses.' + status);
   }
 
   isActOverdue(activityAt: string): boolean {
@@ -4191,7 +4196,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   deleteActivity(a: any): void {
-    if (!this.lead || !confirm(`Usunąć aktywność "${a.title}"?`)) return;
+    if (!this.lead || !confirm(this.transloco.translate('crm.activity.deleteConfirm', { title: a.title }))) return;
     this.api.deleteLeadActivity(this.lead.id, a.id).subscribe({
       next: () => {
         this.zone.run(() => {
@@ -4399,47 +4404,44 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     const a = h.action;
     const after  = h.after_state  || {};
     const before = h.before_state || {};
-    if (a === 'crm_lead_create')    return 'Lead utworzony';
-    if (a === 'crm_lead_delete')    return 'Lead usunięty';
-    if (a === 'crm_lead_converted') return 'Lead skonwertowany na Partnera';
+    if (a === 'crm_lead_create')    return this.transloco.translate('crm.leadDetail.history.created');
+    if (a === 'crm_lead_delete')    return this.transloco.translate('crm.leadDetail.history.deleted');
+    if (a === 'crm_lead_converted') return this.transloco.translate('crm.leadDetail.history.converted');
     if (a === 'crm_lead_consent_update') {
       const m = (h as any).metadata || {};
       const lbl = m.consent_label || after.consent_key || '';
-      return `✅ Zgoda „${lbl}": ${before.label || before.value || '—'} → ${after.label || after.value || '—'}`;
+      return '✅ ' + this.transloco.translate('crm.history.consentChanged', {
+        label: lbl, from: before.label || before.value || '—', to: after.label || after.value || '—',
+      });
     }
     if (a === 'crm_lead_update') {
-      if (after.activity_action === 'created') return `Aktywność dodana: ${after.title || ''}`;
-      if (after.activity_action === 'deleted') return `Aktywność usunięta: ${before.title || ''}`;
-      if (after.document_action === 'linked')  return 'Dokument powiązany';
+      if (after.activity_action === 'created') return this.transloco.translate('crm.history.activityAdded', { title: after.title || '' });
+      if (after.activity_action === 'deleted') return this.transloco.translate('crm.history.activityDeleted', { title: before.title || '' });
+      if (after.document_action === 'linked')  return this.transloco.translate('crm.history.documentLinked');
       if (before.stage && after.stage && before.stage !== after.stage) {
-        const bl = (LEAD_STAGE_LABELS as any)[before.stage] || before.stage;
-        const al = (LEAD_STAGE_LABELS as any)[after.stage]  || after.stage;
-        return `Zmiana etapu: ${bl} → ${al}`;
+        return this.transloco.translate('crm.history.stageChanged', { from: this.stageLabel(before.stage), to: this.stageLabel(after.stage) });
       }
       const changed = Object.keys(after).filter(k => k !== 'updated_at' && JSON.stringify(before[k]) !== JSON.stringify(after[k]));
-      if (changed.length === 1) {
-        const k = changed[0];
-        return `Zmieniono: ${this.fieldLabel(k)} → ${this._formatHistVal(k, after[k])}`;
+      if (changed.length > 0) {
+        const changes = changed.map(k => `${this.fieldLabel(k)} → ${this._formatHistVal(k, after[k])}`).join('; ');
+        return this.transloco.translate('crm.history.changed', { changes });
       }
-      if (changed.length > 1) {
-        return `Zmieniono: ${changed.map(k => `${this.fieldLabel(k)} → ${this._formatHistVal(k, after[k])}`).join('; ')}`;
-      }
-      return 'Zaktualizowano lead';
+      return this.transloco.translate('crm.leadDetail.history.updated');
     }
     return a.replace(/_/g, ' ');
   }
 
   private fieldLabel(key: string): string {
-    const MAP: Record<string, string> = {
-      company: 'Firma', stage: 'Etap', hot: 'Gorący', contact_name: 'Kontakt',
-      email: 'Email', phone: 'Telefon', value_pln: 'Wartość PLN', source: 'Źródło',
-      assigned_to: 'Handlowiec', close_date: 'Data zamk.', notes: 'Notatki',
-      probability: 'Szansa %', industry: 'Branża', lost_reason: 'Powód przegranej',
-      agent_name: 'Agent', annual_turnover_currency: 'Waluta', tags: 'Tagi',
-      contact_title: 'Rola w firmie', nip: 'NIP', website: 'Strona WWW',
-      online_pct: '% Online', first_contact_date: 'Pierwszy kontakt',
+    const KEYS: Record<string, string> = {
+      company: 'company', stage: 'stage', hot: 'hot', contact_name: 'contactName',
+      email: 'email', phone: 'phone', value_pln: 'valuePln', source: 'source',
+      assigned_to: 'assignedTo', close_date: 'closeDate', notes: 'notes',
+      probability: 'probability', industry: 'industry', lost_reason: 'lostReason',
+      agent_name: 'agentName', annual_turnover_currency: 'annualTurnoverCurrency', tags: 'tags',
+      contact_title: 'contactTitle', nip: 'nip', website: 'website',
+      online_pct: 'onlinePct', first_contact_date: 'firstContactDate',
     };
-    return MAP[key] || key;
+    return KEYS[key] ? this.transloco.translate('crm.history.fields.' + KEYS[key]) : key;
   }
 
   /** Konwertuje ISO timestamp do YYYY-MM-DD w lokalnej strefie czasowej (browser = Warsaw).
@@ -4453,10 +4455,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   private _formatHistVal(key: string, val: any): string {
-    if (val === null || val === undefined || val === '') return '(brak)';
-    if (typeof val === 'boolean') return val ? 'Tak' : 'Nie';
-    if (Array.isArray(val)) return val.length ? val.join(', ') : '(brak)';
-    if (key === 'stage') return (LEAD_STAGE_LABELS as any)[val] || val;
+    const emptyValue = this.transloco.translate('crm.history.emptyValue');
+    if (val === null || val === undefined || val === '') return emptyValue;
+    if (typeof val === 'boolean') return this.transloco.translate(val ? 'crm.history.yes' : 'crm.history.no');
+    if (Array.isArray(val)) return val.length ? val.join(', ') : emptyValue;
+    if (key === 'stage') return this.stageLabel(val);
     if (typeof val === 'string' && val.length > 60) return val.substring(0, 57) + '…';
     return String(val);
   }
@@ -4465,7 +4468,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     const after = h.after_state || {};
     const before = h.before_state || {};
     if (h.action === 'crm_lead_update' && before.stage && after.stage && before.stage !== after.stage) {
-      if (after.lost_reason) return `Powód: ${after.lost_reason}`;
+      if (after.lost_reason) return this.transloco.translate('crm.history.lostReason', { reason: after.lost_reason });
     }
     return '';
   }
@@ -4486,9 +4489,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       return;
     }
     const phones: { label: string; number: string }[] = [];
-    if (this.lead.phone) phones.push({ label: `Główny: ${this.lead.phone}`, number: this.lead.phone });
+    if (this.lead.phone) phones.push({ label: this.transloco.translate('crm.calls.mainNumber', { phone: this.lead.phone }), number: this.lead.phone });
     this.lead.extra_contacts?.forEach(ec => {
-      if (ec.phone) phones.push({ label: `${ec.contact_name || 'Kontakt'}: ${ec.phone}`, number: ec.phone });
+      if (ec.phone) phones.push({ label: `${ec.contact_name || this.transloco.translate('crm.calls.contactFallback')}: ${ec.phone}`, number: ec.phone });
     });
     if (!phones.length) return;
     this.pbx.initiate(phones[0].number, {
@@ -4553,7 +4556,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }),
         error: (err: any) => this.zone.run(() => {
-          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się usunąć powiązania.';
+          this.linkDocError = err?.error?.message || err?.error?.detail || this.transloco.translate('crm.documents.unlinkFailed');
           this.cdr.markForCheck();
         }),
       });
@@ -4564,7 +4567,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }),
         error: (err: any) => this.zone.run(() => {
-          this.linkDocError = err?.error?.message || err?.error?.detail || 'Nie udało się powiązać dokumentu. Sprawdź czy masz wymagane uprawnienia.';
+          this.linkDocError = err?.error?.message || err?.error?.detail || this.transloco.translate('crm.documents.linkFailed');
           this.cdr.markForCheck();
         }),
       });
@@ -4572,7 +4575,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   unlinkDoc(d: LinkedDocument): void {
-    if (!this.lead || !confirm('Usunąć powiązanie z dokumentem?')) return;
+    if (!this.lead || !confirm(this.transloco.translate('crm.documents.unlinkConfirm'))) return;
     this.api.unlinkLeadDocument(this.lead.id, d.document_id).subscribe({
       next: () => this.zone.run(() => {
         this.linkedDocs = this.linkedDocs.filter(x => x.document_id !== d.document_id);
@@ -4606,11 +4609,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   sourceLabel(val: string | null): string {
     if (!val) return '';
-    const found = this.leadSources.find(s => s.value === val);
-    return found?.label ?? LEAD_SOURCE_LABELS[val] ?? val;
+    const key = leadSourceLabelKey(val);
+    if (key) return this.transloco.translate('crm.' + key);
+    return this.leadSources.find(s => s.value === val)?.label ?? val;
   }
 
-  stageLabel(s: LeadStage) { return LEAD_STAGE_LABELS[s] || s; }
+  stageLabel(s: string): string { return s in LEAD_STAGE_LABELS ? this.transloco.translate('crm.labels.stages.' + s) : s; }
   actIcon(type: string) {
     return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] || '💬';
   }
@@ -4687,7 +4691,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         if (err?.status === 422 && err?.error?.record) {
           this.testAccount = err.error.record;
         }
-        this.testAccountError      = err?.error?.error || 'Błąd połączenia z zewnętrznym API';
+        this.testAccountError      = err?.error?.error || this.transloco.translate('crm.leadDetail.testAccount.apiError');
         this.submittingTestAccount = false;
         this.cdr.markForCheck();
       }),

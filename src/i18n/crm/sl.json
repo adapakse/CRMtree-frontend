@@ -1,0 +1,1076 @@
+{
+  "activity": {
+    "add": "Dodaj aktivnost",
+    "card": {
+      "closeTask": "Zapri nalogo",
+      "collapse": "Strni",
+      "createdAt": "ustvarjeno {date}",
+      "delete": "Izbriši",
+      "expand": "Razširi",
+      "reopen": "Znova odpri"
+    },
+    "communication": "Komunikacija",
+    "customDate": "Datum po meri…",
+    "deleteConfirm": "Želite izbrisati aktivnost „{title}“?",
+    "dueDate": {
+      "inOneWeek": "Čez en teden ({date})",
+      "inThreeBusinessDays": "Čez 3 delovne dni ({weekday})",
+      "inTwoBusinessDays": "Čez 2 delovna dneva ({weekday})",
+      "inTwoWeeks": "Čez 2 tedna ({date})",
+      "none": "Brez",
+      "today": "Danes",
+      "tomorrow": "Jutri"
+    },
+    "empty": "V tej kategoriji ni aktivnosti.",
+    "form": {
+      "bodyPlaceholder": "Vsebina / zapiski…",
+      "bodyShortPlaceholder": "Vsebina…",
+      "dateTime": "Datum in ura",
+      "dueDate": "Termin",
+      "noOwner": "— brez —",
+      "none": "— brez —",
+      "owner": "Lastnik",
+      "priority": "Prioriteta",
+      "reminder": "Opomnik"
+    },
+    "modal": {
+      "addedBy": "Avtor vnosa",
+      "assignToSalesperson": "Dodeli prodajalcu",
+      "assignedTo": "Dodeljeno",
+      "comment": "Komentar",
+      "dateTime": "Datum in čas",
+      "description": "Opis",
+      "descriptionNotes": "Opis / zapiski",
+      "edit": "Uredi",
+      "saveChanges": "Shrani spremembe",
+      "title": "Naslov",
+      "type": "Vrsta",
+      "unassigned": "— nedodeljeno —"
+    },
+    "reminders": {
+      "atDue": "Ob roku naloge",
+      "day1Before": "1 dan prej",
+      "days2Before": "2 dni prej",
+      "days3Before": "3 dni prej",
+      "hour1Before": "1 uro prej",
+      "minutes30Before": "30 min prej",
+      "none": "Brez opomnika"
+    },
+    "tabs": {
+      "all": "Vse",
+      "calls": "Klici",
+      "emails": "E-pošta",
+      "meetings": "Sestanki",
+      "notes": "Zapiski",
+      "tasks": "Naloge"
+    }
+  },
+  "calls": {
+    "call": "Pokliči",
+    "callNumber": "Pokliči: {phone}",
+    "contactFallback": "Kontakt",
+    "mainNumber": "Glavna: {phone}",
+    "noNumber": "Ni številke"
+  },
+  "consents": {
+    "collapse": "strni",
+    "details": "podrobnosti",
+    "lastChange": "Zadnja sprememba:",
+    "save": "Shrani soglasja",
+    "saved": "Shranjeno",
+    "saving": "Shranjevanje…",
+    "title": "Trženjska soglasja",
+    "values": {
+      "denied": "Ni soglasja",
+      "granted": "Soglasje",
+      "noData": "Ni podatkov"
+    }
+  },
+  "documents": {
+    "add": "Dodaj",
+    "linkFailed": "Dokumenta ni bilo mogoče povezati. Preverite, ali imate zahtevane pravice.",
+    "none": "Ni",
+    "open": "Odpri dokument",
+    "picker": {
+      "added": "Dodano",
+      "hint": "Poiščite dokumente po nazivu, številki ali subjektu.",
+      "noResults": "Ni rezultatov",
+      "readOnly": "Branje",
+      "readOnlyTooltip": "Samo za branje — ni pravic za povezovanje",
+      "searchPlaceholder": "Poiščite dokument…",
+      "searching": "Iskanje…",
+      "title": "Dodaj povezan dokument"
+    },
+    "titleWithCount": "Dokumenti ({count})",
+    "unlinkConfirm": "Želite odstraniti povezavo z dokumentom?",
+    "unlinkFailed": "Povezave ni bilo mogoče odstraniti."
+  },
+  "email": {
+    "addressTooltip": "E-pošta: {email}",
+    "attachments": {
+      "download": "Prenesi",
+      "downloadTooltip": "Prenesi datoteko",
+      "preview": "Predogled",
+      "previewTooltip": "Odpri v brskalniku"
+    },
+    "cc": "Kp:",
+    "checkNew": "Preveri nova",
+    "checkNewTooltip": "Preveri nova e-sporočila (debug)",
+    "connecting": "Povezovanje z Googlom…",
+    "date": "Datum:",
+    "debug": {
+      "error": "Napaka: {message}",
+      "newMessages": "Nova sporočila: {count}"
+    },
+    "disconnect": "Prekini povezavo",
+    "disconnectConfirm": "Želite prekiniti povezavo s svojim e-poštnim računom? Za nadaljnje pošiljanje e-pošte ga boste morali znova povezati.",
+    "driveDownloadFailed": "Napaka pri prenosu datoteke iz storitve Drive",
+    "drivePickerTitle": "Izberite datoteke za prilogo",
+    "driveReauthRequired": "Poštni predal Gmail je treba znova povezati — obrnite se na skrbnika.",
+    "empty": "Ni poslanih e-sporočil.",
+    "fields": {
+      "attachments": "Priloge",
+      "body": "Vsebina",
+      "cc": "Kp",
+      "subject": "Zadeva",
+      "to": "Za"
+    },
+    "from": "Od:",
+    "fromDrive": "Iz Drive",
+    "fromGoogleDrive": "Iz Google Drive",
+    "hideQuoted": "Skrij citirano zgodovino",
+    "incomingReply": "Odgovor",
+    "label": "E-pošta",
+    "messageFallbackTitle": "Sporočilo",
+    "new": "Novo e-sporočilo",
+    "noAddress": "Ni naslova",
+    "noTemplate": "— brez predloge —",
+    "notConfigured": "E-pošta za to organizacijo ni nastavljena. Obrnite se na skrbnika.",
+    "placeholders": {
+      "body": "Vsebina sporočila…",
+      "cc": "kopija@podjetje.si",
+      "ccShort": "Kp…",
+      "recipient": "email@podjetje.si",
+      "replyBody": "Vsebina odgovora…",
+      "subject": "Zadeva sporočila",
+      "toShort": "Za…"
+    },
+    "reply": {
+      "action": "Odgovori",
+      "hideDetails": "Skrij",
+      "replyingTo": "Odgovarjate:",
+      "send": "Pošlji odgovor",
+      "sendFailed": "Napaka pri pošiljanju",
+      "showDetails": "Podrobnosti"
+    },
+    "replyHeading": "Odgovor",
+    "send": "Pošlji e-sporočilo",
+    "sendAction": "Pošlji",
+    "sendFailed": "Napaka pri pošiljanju e-sporočila",
+    "sending": "Pošiljanje…",
+    "showQuoted": "Pokaži citirano zgodovino",
+    "thread": {
+      "anotherUser": "drug uporabnik",
+      "empty": "V niti ni sporočil.",
+      "loading": "Nalaganje niti…",
+      "notOwnerCompose": "Lastnik te niti je {owner} — v njej ne morete odgovarjati. Spodnje e-sporočilo bo poslano kot novo sporočilo iz vašega računa.",
+      "notOwnerComposeUnknown": "V tej niti ne morete odgovarjati. Spodnje e-sporočilo bo poslano kot novo sporočilo iz vašega računa.",
+      "notOwnerReply": "Lastnik te niti je {owner} — v njej ne morete odgovarjati. To sporočilo bo poslano kot novo, iz vašega računa.",
+      "notOwnerReplyUnknown": "V tej niti ne morete odgovarjati. To sporočilo bo poslano kot novo, iz vašega računa.",
+      "ownedByTooltip": "Lastnik niti je {owner} — poslali boste novo sporočilo iz svojega računa",
+      "title": "E-poštna nit"
+    },
+    "to": "Za:",
+    "trainingMode": "Način usposabljanja",
+    "writeNew": "Napiši novo e-sporočilo"
+  },
+  "history": {
+    "activityAdded": "Aktivnost dodana: {title}",
+    "activityClosed": "Aktivnost zaprta: {title}",
+    "activityDeleted": "Aktivnost izbrisana: {title}",
+    "activityUpdated": "Aktivnost posodobljena: {title}",
+    "changed": "Spremenjeno: {changes}",
+    "consentChanged": "Soglasje „{label}“: {from} → {to}",
+    "documentLinked": "Dokument povezan",
+    "empty": "Ni vnosov.",
+    "emptyValue": "(prazno)",
+    "fields": {
+      "activeUsers": "Aktivni uporabniki",
+      "agentName": "Agent",
+      "annualTurnoverCurrency": "Valuta",
+      "assignedTo": "Prodajalec",
+      "billingAddress": "Naslov",
+      "billingCity": "Kraj",
+      "billingEmail": "E-pošta za obr.",
+      "billingPhone": "Tel. za obr.",
+      "closeDate": "Datum zaprt.",
+      "commission": "Provizija",
+      "company": "Podjetje",
+      "contactName": "Kontakt",
+      "contactTitle": "Vloga v podjetju",
+      "contractExpires": "Pogodba do",
+      "contractSigned": "Pogodba od",
+      "contractValue": "Promet",
+      "country": "Država",
+      "creditLimit": "Kreditni limit",
+      "deposit": "Depozit",
+      "dwhPartnerId": "CRMtree Partner ID",
+      "email": "E-pošta",
+      "firstContactDate": "Prvi stik",
+      "group": "Skupina",
+      "hot": "Vroč",
+      "industry": "Panoga",
+      "language": "Jezik",
+      "lostReason": "Razlog za izgubo",
+      "nip": "Davčna številka",
+      "notes": "Zapiski",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Valuta",
+      "phone": "Telefon",
+      "probability": "Verjetnost %",
+      "source": "Vir",
+      "stage": "Faza",
+      "status": "Status",
+      "subdomain": "Poddomena",
+      "tags": "Oznake",
+      "valuePln": "Vrednost PLN",
+      "website": "Spletna stran"
+    },
+    "lostReason": "Razlog: {reason}",
+    "no": "Ne",
+    "noResults": "Ni rezultatov.",
+    "searchPlaceholder": "Iščite po zgodovini…",
+    "showAll": "Pokaži vse",
+    "stageChanged": "Sprememba faze: {from} → {to}",
+    "systemUser": "Sistem",
+    "title": "Zgodovina sprememb",
+    "yes": "Da"
+  },
+  "labels": {
+    "activityStatuses": {
+      "closed": "zaprta",
+      "new": "nova",
+      "open": "odprta"
+    },
+    "activityTypes": {
+      "call": "Klic",
+      "doc_sent": "Dokument",
+      "email": "E-pošta",
+      "meeting": "Sestanek",
+      "note": "Zapisek",
+      "opportunity": "Priložnost",
+      "qbr": "QBR",
+      "task": "Naloga",
+      "training": "Usposabljanje"
+    },
+    "partnerStatuses": {
+      "active": "Aktiven",
+      "churned": "Izgubljen",
+      "inactive": "Neaktiven",
+      "onboarding": "Uvajanje"
+    },
+    "priorities": {
+      "asap": "ASAP",
+      "important": "Pomembno",
+      "low": "Nizko",
+      "medium": "Srednje"
+    },
+    "productTypes": {
+      "car_rental": "Najem avtomobila",
+      "hotel": "Hotel",
+      "other": "Drugo",
+      "transfer": "Transfer",
+      "transport_bus": "Avtobus",
+      "transport_ferry": "Trajekt",
+      "transport_flight": "Let",
+      "transport_train": "Vlak",
+      "travel_insurance": "Zavarovanje",
+      "visa": "Vizum"
+    },
+    "sourceTypes": {
+      "document": "Dokument",
+      "lead": "Lead",
+      "onboarding": "Uvajanje",
+      "partner": "Partner",
+      "project": "Projekt"
+    },
+    "sources": {
+      "agent": "Agent",
+      "aliasHello": "Alias Hello",
+      "coldCall": "Cold Call",
+      "emailCampaign": "E-poštna kampanja",
+      "googleAdsAiSearch": "Google Ads AI Search",
+      "googleAdsPmax": "Google Ads PMax",
+      "googleAdsSeaBrand": "Google Ads SEA Brand",
+      "inbound": "Inbound",
+      "linkedin": "LinkedIn",
+      "linkedinInMail": "LinkedIn InMail",
+      "linkedinLeadForm": "LinkedIn Lead Form",
+      "onlineForm": "Spletni obrazec",
+      "other": "Drugo",
+      "own": "Lastno",
+      "partner": "Partner",
+      "referral": "Priporočilo",
+      "tradeFair": "Sejem / Dogodek",
+      "website": "Spletna stran"
+    },
+    "stages": {
+      "archived": "Arhiv",
+      "closed_lost": "Izgubljen",
+      "closed_won": "Dobljen",
+      "negotiation": "Pogajanja",
+      "new": "Nov",
+      "offer": "Ponudba",
+      "onboarded": "Uveden",
+      "onboarding": "V uvajanju",
+      "presentation": "Predstavitev",
+      "qualification": "Kvalifikacija"
+    }
+  },
+  "leadDetail": {
+    "archive": {
+      "action": "Arhiviraj",
+      "confirm": "Želite arhivirati lead „{company}“? Izginil bo s seznamov, nadzornih plošč in poročil — viden bo samo po izbiri filtra Faza = Arhiv. Še vedno ga bo mogoče urejati in ga od tam vrniti v fazo „Nov“.",
+      "failed": "Napaka pri arhiviranju leada.",
+      "tooltip": "Arhiviraj — lead bo izginil s seznamov, nadzornih plošč in poročil"
+    },
+    "edit": {
+      "addContact": "Dodaj kontakt",
+      "chooseReason": "— izberite razlog —",
+      "noExtraContacts": "Ni dodatnih kontaktov",
+      "noPermission": "Ni pravic — prodajalec ne pripada vaši skupini",
+      "none": "— brez —",
+      "placeholders": {
+        "agentEmail": "agent@podjetje.si",
+        "email": "janez@podjetje.si",
+        "fullName": "Janez Novak",
+        "notes": "Poljubni zapiski…",
+        "website": "npr. acme.si"
+      },
+      "requiredFields": "Izpolnite obvezna polja:",
+      "requiredForStage": "Izpolnite obvezna polja za fazo „{stage}“:",
+      "saveChanges": "Shrani spremembe",
+      "saving": "Shranjevanje…",
+      "sections": {
+        "agent": "Podatki agenta",
+        "basic": "Osnovno",
+        "sales": "Prodajne podrobnosti"
+      },
+      "title": "Uredi lead",
+      "unassigned": "— nedodeljen —"
+    },
+    "enrich": {
+      "action": "Pridobi podatke",
+      "done": "Podatki pridobljeni — preverite spodnja polja",
+      "loading": "Pridobivanje…"
+    },
+    "fields": {
+      "annualTurnover": "Letni promet",
+      "closeDate": "Datum zaprtja",
+      "companyName": "Naziv podjetja",
+      "contactTitle": "Vloga v podjetju",
+      "email": "E-pošta",
+      "firstContact": "Prvi stik",
+      "fullName": "Ime in priimek",
+      "hotLead": "Vroč lead",
+      "industry": "Panoga",
+      "lostReason": "Razlog za izgubo",
+      "name": "Naziv",
+      "nip": "Davčna številka",
+      "onlinePct": "% Online",
+      "person": "Oseba",
+      "phone": "Telefon",
+      "probability": "Verjetnost",
+      "probabilityPct": "% verjetnosti",
+      "salesperson": "Prodajalec",
+      "source": "Vir",
+      "stage": "Faza",
+      "tagsHint": "Oznake (ločene z vejico)",
+      "website": "Spletna stran",
+      "www": "WWW"
+    },
+    "header": {
+      "backToLeads": "Leadi",
+      "edit": "Uredi",
+      "hot": "Vroč"
+    },
+    "history": {
+      "converted": "Lead pretvorjen v partnerja",
+      "created": "Lead ustvarjen",
+      "deleted": "Lead izbrisan",
+      "updated": "Lead posodobljen"
+    },
+    "hold": {
+      "active": "Zadržanje aktivno",
+      "activeUntil": "Aktivno do",
+      "dateRequired": "Vnesite datum",
+      "edit": "Uredi zadržanje",
+      "editTooltip": "Zadržano do {date} — kliknite za urejanje",
+      "introAfter": "bo označen kot zadržan — brez vpliva na aktivne KPI in prodajni lijak, dokler zadržanje traja.",
+      "introBefore": "Lead",
+      "label": "Zadržano",
+      "reason": "Razlog",
+      "reasonRequired": "Izberite razlog",
+      "remove": "Odstrani zadržanje",
+      "removeFailed": "Napaka pri odstranjevanju zadržanja.",
+      "saveFailed": "Napaka pri shranjevanju zadržanja.",
+      "set": "Nastavi zadržanje",
+      "until": "Zadržano do {date}"
+    },
+    "info": {
+      "collapsePanel": "Strni ploščo",
+      "expandPanel": "Razširi ploščo",
+      "title": "Informacije"
+    },
+    "loadError": "Napaka pri nalaganju leada.",
+    "nip": {
+      "countryCodeRequired": "Vnesite kodo države (2 črki), npr. PL",
+      "duplicate": "Ta davčna številka je že dodeljena drugemu zapisu.",
+      "numberRequired": "Vnesite številko za kodo države",
+      "plTenDigits": "Za PL je zahtevanih 10 števk za kodo države",
+      "required": "Davčna številka je obvezna"
+    },
+    "notFound": "Leada ni bilo mogoče najti.",
+    "onboarding": {
+      "completed": "Uvajanje zaključeno",
+      "completedPartnerActive": "Uvajanje zaključeno — partner aktiven",
+      "contractSigned": "Datum podpisa pogodbe",
+      "contractValue": "Vrednost pogodbe (PLN)",
+      "contractValuePlaceholder": "npr. 50000",
+      "goTo": "Pojdi na Uvajanje",
+      "hint": "Vnesite vrednost pogodbe in datum podpisa pogodbe, da leada prenesete v postopek uvajanja.",
+      "inProgress": "V uvajanju",
+      "inProgressHint": "Lead je v postopku uvajanja. Podrobnosti so v razdelku Uvajanje.",
+      "introAfter": "v postopek uvajanja. Lead se bo pojavil v razdelku Uvajanje. V Registru partnerjev se bo pojavil po sinhronizaciji z DWH.",
+      "introBefore": "Prenos leada",
+      "leadLocked": "Lead je zaklenjen za urejanje",
+      "panelLink": "Plošča Uvajanje",
+      "partnerAfterSync": "Partner se bo v Registru partnerjev pojavil po sinhronizaciji z DWH.",
+      "partnerInProgress": "partner v postopku uvajanja",
+      "partnerRegistryLink": "Register partnerjev",
+      "start": "Začni uvajanje",
+      "startedAt": "Začeto:"
+    },
+    "sections": {
+      "agent": "Agent",
+      "company": "Podjetje",
+      "contact": "Kontakt",
+      "extraContacts": "Dodatni kontakti",
+      "notes": "Zapiski",
+      "sales": "Prodaja"
+    },
+    "stage": {
+      "backToNew": "Vrni v fazo Nov",
+      "next": "Naslednja faza",
+      "previous": "Prejšnja faza"
+    },
+    "testAccount": {
+      "apiError": "Napaka pri povezavi z zunanjim API",
+      "choose": "— izberite —",
+      "countries": {
+        "cz": "Češka",
+        "de": "Nemčija",
+        "fr": "Francija",
+        "gb": "Združeno kraljestvo",
+        "hu": "Madžarska",
+        "pl": "Poljska",
+        "ro": "Romunija",
+        "ru": "Rusija",
+        "sk": "Slovaška",
+        "ua": "Ukrajina"
+      },
+      "create": "Ustvari testni račun",
+      "created": "Testni račun ustvarjen",
+      "creating": "Ustvarjanje računa…",
+      "fields": {
+        "adminEmail": "E-pošta skrbnika",
+        "billingCountry": "Država obračuna",
+        "billingEmail": "E-pošta za obračun",
+        "city": "Kraj",
+        "country": "Država",
+        "currency": "Valuta",
+        "firstName": "Ime",
+        "language": "Jezik",
+        "lastName": "Priimek",
+        "street": "Ulica in hišna številka",
+        "subdomain": "Poddomena",
+        "zip": "Poštna številka"
+      },
+      "fixAndRetry": "Popravite spodnje podatke in poskusite znova.",
+      "languages": {
+        "de": "Nemščina",
+        "en": "Angleščina",
+        "pl": "Poljščina",
+        "ro": "Romunščina",
+        "ru": "Ruščina"
+      },
+      "numberHint": "Ta številka bo ob prenosu posredovana kot št. partnerja.",
+      "numberLabel": "Št.:",
+      "openPriceList": "Odpri cenik v HTCD",
+      "openTooltip": "Ustvari testni račun v zunanjem sistemu",
+      "placeholders": {
+        "adminEmail": "admin@podjetje.si",
+        "billingEmail": "racuni@podjetje.si",
+        "city": "npr. Ljubljana",
+        "firstName": "Janez",
+        "lastName": "Novak",
+        "street": "npr. Slovenska cesta 1",
+        "subdomain": "npr. testno-podjetje",
+        "zip": "npr. 1000"
+      },
+      "previousError": "Prejšnji klic se je končal z napako",
+      "retry": "Poskusi znova",
+      "sections": {
+        "admin": "C — Skrbnik računa",
+        "billing": "B — Naslov za obračun",
+        "technical": "A — Tehnični podatki računa"
+      },
+      "title": "Testni račun"
+    }
+  },
+  "leadsList": {
+    "breadcrumb": "Leadi",
+    "detail": {
+      "addInDetails": "Dodajte v podrobnostih",
+      "closeDate": "Datum zaprtja",
+      "details": "Podrobnosti",
+      "industry": "Panoga",
+      "noActivities": "Ni aktivnosti.",
+      "note": "Zapisek",
+      "openDetails": "Odpri podrobnosti",
+      "pipeline": "Prodajni lijak",
+      "probability": "Verjetnost",
+      "stageValue": "Faza: {stage}",
+      "tabs": {
+        "history": "Zgodovina",
+        "info": "Informacije"
+      },
+      "tags": "Oznake",
+      "value": "Vrednost",
+      "weightedValue": "Ponderirana vrednost"
+    },
+    "fields": {
+      "annualTurnover": "Letni promet",
+      "company": "Podjetje",
+      "companyRole": "Vloga v podjetju",
+      "email": "E-pošta",
+      "firstContact": "Prvi stik",
+      "phone": "Telefon",
+      "salesRep": "Prodajalec",
+      "source": "Vir",
+      "stage": "Faza",
+      "website": "Spletna stran"
+    },
+    "filters": {
+      "all": "Vsi",
+      "allReps": "Vsi prodajalci",
+      "allSources": "Vsi viri",
+      "allStages": "Vse faze",
+      "groupChip": "Skupina: {name}",
+      "groupsGroup": "Skupine",
+      "holdOnly": "Samo zadržani",
+      "holdOnlyTitle": "Pokaži samo zadržane leade",
+      "hot": "Vroči",
+      "mine": "Moji",
+      "repChip": "Prodajalec: {name}",
+      "reportFilter": "Filter iz poročila: {label}",
+      "repsGroup": "Prodajalci",
+      "wholeGroup": "Celotna skupina: {group}"
+    },
+    "importCsv": "Uvoz CSV",
+    "kanban": {
+      "closed": "Zaprti",
+      "closedCount": "{won}D / {lost}I",
+      "closedEmpty": "Ni",
+      "empty": "Ni leadov",
+      "holdBadge": "Zadržano",
+      "onboardedTitle": "Uvajanje zaključeno — partner aktiven",
+      "partnerBadge": "Partner"
+    },
+    "loading": "Nalaganje leadov…",
+    "meeting": {
+      "addedBy": "Dodal(a)",
+      "dateTime": "Datum in ura",
+      "detailTitle": "Podrobnosti aktivnosti",
+      "duration": "Trajanje",
+      "durationMinutes": "Trajanje (min)",
+      "durationValue": "{count, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}",
+      "edit": "Uredi aktivnost",
+      "editTitle": "Urejanje aktivnosti",
+      "location": "Lokacija",
+      "locationPlaceholder": "npr. Pisarna stranke, Google Meet…",
+      "meetingTitle": "Naslov sestanka",
+      "notes": "Zapiski s sestanka",
+      "notesPlaceholder": "Obravnavane teme, sklepi, naslednji koraki…",
+      "openLead": "Odpri lead",
+      "openPartner": "Odpri partnerja",
+      "participants": "Udeleženci",
+      "participantsPlaceholder": "npr. Janez Novak, ana@podjetje.si",
+      "saveChanges": "Shrani spremembe",
+      "titlePlaceholder": "Tema sestanka"
+    },
+    "newLead": {
+      "addContact": "Dodaj kontakt",
+      "companyName": "Naziv podjetja",
+      "companyPlaceholder": "npr. Acme d.o.o.",
+      "contactName": "Ime in priimek kontakta",
+      "create": "Ustvari lead",
+      "emailPlaceholder": "janez@podjetje.si",
+      "enrichConfirm": "Da, pridobi",
+      "enrichDecline": "Ne",
+      "enrichDone": "Podatki pridobljeni — preverite spodnja polja in dopolnite manjkajoča",
+      "enrichPrompt": "Želite pridobiti podatke podjetja s spletne strani?",
+      "extraContacts": "Dodatni kontakti",
+      "fieldRequired": "Obvezno polje",
+      "fillRequired": "Izpolnite obvezna polja:",
+      "fullName": "Ime in priimek",
+      "hot": "Vroč lead",
+      "namePlaceholder": "Janez Novak",
+      "noExtraContacts": "Ni dodatnih kontaktov",
+      "notes": "Zapiski",
+      "notesPlaceholder": "Dodatne informacije…",
+      "optional": "(neobvezno)",
+      "requiredContactName": "Ime in priimek",
+      "select": "— izberite —",
+      "subtitle": "Dodajte novo prodajno priložnost",
+      "taxId": "Davčna številka",
+      "taxIdErrors": {
+        "countryCode": "Vnesite kodo države (2 črki), npr. PL",
+        "numberMissing": "Vnesite številko za kodo države",
+        "polishDigits": "Za PL je zahtevanih 10 števk za kodo države",
+        "required": "Davčna številka je obvezna"
+      },
+      "title": "Nov lead",
+      "unassigned": "— nedodeljen —",
+      "value": "Vrednost (PLN)",
+      "websitePlaceholder": "npr. acme.si"
+    },
+    "saving": "Shranjevanje…",
+    "searchPlaceholder": "Iščite podjetja, kontakte…",
+    "sourceGroups": {
+      "marketing": "Trženje"
+    },
+    "stats": {
+      "hot": "Vročih",
+      "lost": "Izgubljenih",
+      "opportunities": "Prodajnih priložnosti",
+      "pipeline": "Prodajni lijak (PLN)",
+      "won": "Dobljenih"
+    },
+    "table": {
+      "chance": "% verjetnosti",
+      "closeDateShort": "Zaprtje",
+      "companyContact": "Podjetje / Kontakt",
+      "empty": "Ni leadov, ki bi ustrezali merilom",
+      "firstContactShort": "Prvi stik",
+      "migrated": "Prenesen",
+      "next": "Naslednja",
+      "online": "% Online",
+      "pageOf": "Stran {page} od {pages}",
+      "previous": "Prejšnja"
+    },
+    "timeline": {
+      "allDay": "rok",
+      "durationShort": "{minutes}min",
+      "empty": "Ni sestankov",
+      "emptyHint": "Načrtujte prvi sestanek v podrobnostih leada ali partnerja",
+      "futureHint": "Pomaknite se navzdol za naslednje sestanke",
+      "loading": "Nalaganje sestankov…",
+      "pastHint": "Pomaknite se navzgor za prejšnje sestanke",
+      "subtitle": "Aktivnosti z datumom · kronološko",
+      "title": "Koledar aktivnosti",
+      "todayTag": "DANES",
+      "tomorrow": "Jutri · {date}",
+      "yesterday": "Včeraj · {date}"
+    },
+    "title": "Prodajni leadi",
+    "view": {
+      "kanban": "Kanban",
+      "table": "Tabela",
+      "timeline": "Časovnica"
+    }
+  },
+  "meetings": {
+    "durationMin": "Trajanje (min)",
+    "location": "Kraj",
+    "locationPlaceholder": "npr. Sejna soba A",
+    "meetingLocation": "Kraj sestanka",
+    "participantPlaceholder": "Vnesite e-pošto…",
+    "participants": "Udeleženci",
+    "participantsHint": "e-poštni naslovi, ločeni z vejico",
+    "titlePlaceholder": "Naslov sestanka",
+    "titleRequiredPlaceholder": "Naslov sestanka *"
+  },
+  "partnerDetail": {
+    "activity": {
+      "bodyPlaceholder": "Vsebina / opis…",
+      "dueDate": {
+        "businessDays": "{count} DD ({date})",
+        "today": "Danes ({date})",
+        "tomorrow": "Jutri ({date})"
+      },
+      "durationPlaceholder": "npr. 60",
+      "empty": "Ni aktivnosti.",
+      "meetingSubjectPlaceholder": "Tema sestanka *",
+      "ownerMeDefault": "— jaz (privzeto) —",
+      "participantPlaceholder": "Vnesite e-pošto ali ime…",
+      "participantsEmails": "Udeleženci (e-pošta)"
+    },
+    "calls": {
+      "agentNumber": "Agent: {phone}",
+      "billingNumber": "Obračun: {phone}",
+      "contactNumber": "Kontakt: {phone}"
+    },
+    "churn": {
+      "badge": {
+        "analyzedAt": "Analiza: {date}",
+        "daysSinceOrder": "Dni brez nar.: {days}",
+        "salesDrop": "Padec prodaje: {percent}%"
+      },
+      "daysSinceOrder": "Dni brez naročila",
+      "levels": {
+        "critical": "Kritično",
+        "high": "Visoko",
+        "low": "Nizko",
+        "medium": "Srednje"
+      },
+      "noRisk": "Ni tveganja odhoda",
+      "salesDrop": "Padec M-2→M-1",
+      "score": "{score} tč.",
+      "title": "Tveganje odhoda"
+    },
+    "commissionBasis": {
+      "bookings": "Število rezervacij",
+      "notApplicable": "Ni relevantno",
+      "segments": "Število segmentov",
+      "turnoverThresholds": "Pragovi prometa"
+    },
+    "documents": {
+      "empty": "Ni povezanih dokumentov",
+      "fallbackTitle": "Dokument #{id}",
+      "goTo": "Pojdi na dokument",
+      "noContractHint": "Dodajte dokument, da potrdite sodelovanje s partnerjem.",
+      "noContractTitle": "Ni povezane pogodbe.",
+      "pickerHint": "Poiščite dokumente po nazivu, številki ali subjektu (Entity). Vidni so samo dokumenti, do katerih imate dostop (najmanj Read).",
+      "unlink": "Odstrani povezavo"
+    },
+    "edit": {
+      "addContact": "Dodaj kontakt",
+      "billingContactIncomplete": "Priporočamo, da izpolnite vsa polja kontakta za obračun.",
+      "contactsSaveFailed": "Podatki partnerja so shranjeni, vendar dodatnih kontaktov ni bilo mogoče shraniti.",
+      "contractContactIncomplete": "Priporočamo, da izpolnite vsa polja kontakta za pogodbo.",
+      "dwhLockedHint": "Polja z oznako DWH se sinhronizirajo iz transakcijskega sistema in jih ni mogoče urejati.",
+      "managersOnly": "urejajo lahko samo vodje",
+      "noExtraContacts": "Ni dodatnih kontaktov",
+      "noGroup": "— brez skupine —",
+      "none": "— brez —",
+      "openTasksWarning": "{count, plural, one {# neopravljena uvajalna naloga} two {# neopravljeni uvajalni nalogi} few {# neopravljene uvajalne naloge} other {# neopravljenih uvajalnih nalog}} — statusa Aktiven ni mogoče nastaviti",
+      "partnerIdHint": "ID partnerja v transakcijskem sistemu",
+      "placeholders": {
+        "address": "Slovenska cesta 1",
+        "adminEmail": "admin@podjetje.si",
+        "adminFirstName": "npr. Janez",
+        "adminLastName": "npr. Novak",
+        "billingContactEmail": "obracun@podjetje.si",
+        "billingContactTitle": "Vodja obračuna",
+        "billingCountry": "Slovenija",
+        "billingEmail": "billing@podjetje.si",
+        "billingFullName": "Ana Kovač",
+        "city": "Ljubljana",
+        "commission": "npr. 0.05",
+        "country": "npr. Slovenija",
+        "creditLimit": "npr. 50000",
+        "deposit": "npr. 10000",
+        "email": "janez@podjetje.si",
+        "fullName": "Janez Novak",
+        "language": "npr. sl",
+        "notes": "Poljubni zapiski…",
+        "partnerId": "npr. 42",
+        "source": "npr. sejem, priporočilo, cold call",
+        "subdomain": "npr. acme",
+        "website": "https://podjetje.si"
+      },
+      "removeContact": "Odstrani kontakt",
+      "saveChanges": "Shrani spremembe",
+      "saveFailed": "Napaka pri shranjevanju",
+      "saving": "Shranjevanje…",
+      "sections": {
+        "basic": "Osnovno",
+        "contractAndFinance": "Pogodba in finance",
+        "managerAndGroup": "Skrbnik stranke in skupina",
+        "salesAndSource": "Prodaja in vir",
+        "tagsAndNotes": "Oznake in zapiski"
+      },
+      "subdomainHint": "Naslov poddomene v sistemu (izpolni se ob ustvarjanju testnega računa)",
+      "syncedWithDwh": "Sinhronizirano z DWH",
+      "title": "Uredi partnerja",
+      "unassigned": "— nedodeljen —"
+    },
+    "email": {
+      "empty": "Ni e-sporočil. Pošljite prvo sporočilo s klikom na „+ Novo e-sporočilo“."
+    },
+    "fields": {
+      "activeUsers": "Aktivni uporabniki",
+      "activeUsersShort": "Aktivni upor.",
+      "address": "Naslov",
+      "adminEmail": "E-pošta skrbnika",
+      "adminFirstName": "Ime skrbnika",
+      "adminLastName": "Priimek skrbnika",
+      "annualTurnover": "Letni promet",
+      "billingCountry": "Država obračuna",
+      "billingEmail": "E-pošta za obračun",
+      "city": "Kraj",
+      "commission": "Provizija WT/TM",
+      "commissionBasis": "Osnova",
+      "companyName": "Naziv podjetja",
+      "contactTitle": "Vloga v podjetju",
+      "contractExpires": "Datum izteka",
+      "contractFrom": "Pogodba od",
+      "contractSigned": "Datum podpisa",
+      "contractTo": "Pogodba do",
+      "country": "Država",
+      "creditLimit": "Kreditni limit",
+      "crmtreeId": "CRMtree ID",
+      "crmtreePartnerId": "CRMtree Partner ID",
+      "currency": "Valuta",
+      "depositAmount": "Znesek depozita",
+      "depositDateIn": "Datum vplačila",
+      "depositDateOut": "Datum vračila",
+      "email": "E-pošta",
+      "firstContact": "Prvi stik",
+      "firstName": "Ime",
+      "fullName": "Ime in priimek",
+      "industry": "Panoga",
+      "language": "Jezik",
+      "lastName": "Priimek",
+      "manager": "Skrbnik stranke",
+      "managerSalesperson": "Skrbnik stranke / Prodajalec",
+      "nip": "Davčna številka",
+      "note": "Zapisek",
+      "notes": "Zapiski",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Valuta partnerja",
+      "partnerGroup": "Skupina partnerjev",
+      "phone": "Telefon",
+      "source": "Vir",
+      "status": "Status",
+      "subdomain": "Poddomena",
+      "tags": "Oznake",
+      "tagsHint": "Oznake (ločene z vejico)",
+      "value": "Vrednost",
+      "website": "Spletna stran",
+      "zip": "Poštna številka"
+    },
+    "header": {
+      "activeSince": "Aktiven od {date}",
+      "backToPartners": "Partnerji",
+      "churn": "Tveganje odhoda: {level}",
+      "edit": "Uredi",
+      "noEditPermission": "Nimate pravic za urejanje tega partnerja"
+    },
+    "history": {
+      "created": "Partner ustvarjen",
+      "deleted": "Partner izbrisan",
+      "searchPlaceholder": "Iščite…",
+      "updated": "Partner posodobljen"
+    },
+    "info": {
+      "activeUsersCount": "{count, plural, one {# aktiven} two {# aktivna} few {# aktivni} other {# aktivnih}}",
+      "collapsePanel": "Strni ploščo",
+      "expandPanel": "Razširi ploščo",
+      "notSet": "ni nastavljeno",
+      "title": "Informacije"
+    },
+    "loadError": "Napaka pri nalaganju.",
+    "nip": {
+      "countryCodeRequired": "Vnesite kodo države (2 črki), npr. PL",
+      "numberRequired": "Vnesite številko za kodo države",
+      "plTenDigits": "Za PL je zahtevanih 10 števk za kodo države",
+      "required": "Davčna številka je obvezna"
+    },
+    "notFound": "Partnerja ni bilo mogoče najti.",
+    "onboarding": {
+      "addTask": "Dodaj nalogo",
+      "advanceFailed": "Faze ni mogoče zaključiti",
+      "deleteTaskConfirm": "Želite izbrisati nalogo „{title}“?",
+      "descriptionOptionalPlaceholder": "Opis (neobvezno)…",
+      "descriptionPlaceholder": "Opis…",
+      "empty": "Za to fazo ni nalog. Kliknite „+ Dodaj nalogo“.",
+      "finish": "Zaključi uvajanje",
+      "finishFailed": "Uvajanja ni mogoče zaključiti",
+      "nextStep": "Naslednja faza",
+      "overdue": "Zapadlo",
+      "responsiblePerson": "— odgovorna oseba —",
+      "steps": {
+        "contractSigned": "Pogodba podpisana",
+        "ready": "Pripravljen",
+        "systemSetup": "Konfiguracija sistema",
+        "userTraining": "Usposabljanje uporabnikov"
+      },
+      "taskTitlePlaceholder": "Naslov naloge *",
+      "tasksFor": "Naloge:"
+    },
+    "opportunities": {
+      "dueBy": "do {date}",
+      "status": "Status priložnosti",
+      "statuses": {
+        "closed": "Zaprta",
+        "in_progress": "V teku",
+        "new": "Nova"
+      },
+      "titleWithCount": "Prodajne priložnosti ({count})"
+    },
+    "sales": {
+      "kpi": {
+        "grossTurnover": "Bruto promet PLN",
+        "netRevenue": "Neto prihodek PLN",
+        "netTurnover": "Neto promet PLN",
+        "products": "Produkti",
+        "transactions": "Transakcije"
+      },
+      "noData": "Ni prodajnih podatkov",
+      "periods": {
+        "currentMonth": "Tekoči mes.",
+        "last12Months": "Zadnjih 12 mes.",
+        "last3Months": "Zadnji 3 mes.",
+        "last6Months": "Zadnjih 6 mes.",
+        "ytd": "YTD {year}"
+      },
+      "productBreakdown": "Razčlenitev po produktih",
+      "title": "Prodajni podatki DWH"
+    },
+    "sections": {
+      "additionalData": "Dodatni podatki",
+      "agent": "Podatki agenta",
+      "billingAddress": "Naslov za obračun",
+      "billingContact": "Kontakt za obračun",
+      "contractContact": "Kontakt za pogodbo",
+      "extraContacts": "Dodatni kontakti",
+      "financialTerms": "Finančni pogoji",
+      "partnerAdmin": "Partner Admin"
+    }
+  },
+  "partnersList": {
+    "card": {
+      "marginAmount": "{amount} PLN marže",
+      "onboardingStep": "Korak {step} / {total}",
+      "openOpportunities": "{count, plural, one {# priložnost} two {# priložnosti} few {# priložnosti} other {# priložnosti}}"
+    },
+    "churn": {
+      "levels": {
+        "critical": "Kritično",
+        "high": "Visoko",
+        "low": "Nizko",
+        "medium": "Srednje"
+      },
+      "points": "{score} tč.",
+      "risk": "Tveganje odhoda",
+      "riskWithLevel": "Tveganje odhoda: {level}"
+    },
+    "create": {
+      "companyPlaceholder": "Naziv podjetja",
+      "error": "Napaka pri ustvarjanju partnerja. Poskusite znova.",
+      "hint": "Partnerja lahko ustvarite brez povezanega leada.",
+      "saving": "Shranjevanje…",
+      "submit": "Ustvari partnerja",
+      "taxIdHint": "(neobvezno — za partnerje DWH se izpolni samodejno)",
+      "title": "Nov partner",
+      "unassigned": "— nedodeljen —"
+    },
+    "documents": {
+      "linkedCount": "{count, plural, one {Partner ima # povezan dokument} two {Partner ima # povezana dokumenta} few {Partner ima # povezane dokumente} other {Partner ima # povezanih dokumentov}}. Kliknite za ogled.",
+      "noContract": "Ni povezane pogodbe"
+    },
+    "empty": "Ni partnerjev, ki bi ustrezali merilom.",
+    "fields": {
+      "accountManager": "Skrbnik stranke / Prodajalec",
+      "annualTurnover": "Letni promet",
+      "company": "Podjetje",
+      "contact": "Kontakt",
+      "email": "E-pošta",
+      "group": "Skupina",
+      "industry": "Panoga",
+      "licenseCount": "Število licenc",
+      "salesRep": "Prodajalec",
+      "status": "Status",
+      "taxId": "Davčna številka"
+    },
+    "reportFilter": {
+      "clear": "Počisti filter",
+      "label": "Filter iz poročila:"
+    },
+    "table": {
+      "churn": "Churn",
+      "contractUntil": "Pogodba do",
+      "crmTurnover": "Promet CRM",
+      "dwhMargin": "DWH marža",
+      "dwhMarginHint": "Marža YTD iz DWH",
+      "dwhTurnover": "DWH promet",
+      "dwhTurnoverHint": "Bruto promet YTD iz DWH"
+    },
+    "taxIdErrors": {
+      "countryCode": "Vnesite kodo države (2 črki), npr. PL",
+      "duplicate": "Ta davčna številka je že dodeljena drugemu zapisu.",
+      "numberMissing": "Vnesite številko za kodo države",
+      "polishDigits": "Za PL je zahtevanih 10 števk za kodo države",
+      "required": "Davčna številka je obvezna"
+    },
+    "title": "Register partnerjev",
+    "toolbar": {
+      "allGroups": "Vse skupine",
+      "allIndustries": "Vse panoge",
+      "allSalesReps": "Vsi prodajalci",
+      "allStatuses": "Vsi statusi",
+      "clear": "Počisti",
+      "onlyMine": "Samo moji",
+      "searchPlaceholder": "Iščite podjetje, kontakt…"
+    },
+    "view": {
+      "cards": "Kartice",
+      "table": "Tabela"
+    }
+  },
+  "sms": {
+    "emptyConversation": "Ni sporočil — napišite prvo spodaj.",
+    "last": "zadnje:",
+    "loadFailed": "Napaka pri nalaganju sporočil SMS",
+    "messagePlaceholder": "Sporočilo…",
+    "noMessages": "Ni sporočil",
+    "noNumbers": "Ni telefonskih številk za SMS.",
+    "send": "Pošlji",
+    "sendFailed": "Napaka pri pošiljanju SMS",
+    "statuses": {
+      "delivered": "Dostavljeno",
+      "failed": "Napaka",
+      "received": "Prejeto",
+      "sent": "Poslano"
+    }
+  },
+  "whatsapp": {
+    "checkingConfig": "Preverjanje konfiguracije...",
+    "configuredNumber": "nastavljena številka",
+    "conversation": "Pogovor WhatsApp",
+    "empty": "Ni poslanih sporočil WhatsApp.",
+    "from": "Od:",
+    "lastMessage": "zadnje sporočilo:",
+    "loadingHistory": "Nalaganje zgodovine…",
+    "messageBody": "Vsebina sporočila",
+    "messagePlaceholder": "Vsebina sporočila...",
+    "missingCountryCode": "Vnesite številko s klicno kodo države, npr. +386 40 123 456.",
+    "newMessage": "Novo sporočilo WhatsApp",
+    "notConfigured": "WhatsApp za to organizacijo ni nastavljen. Obrnite se na skrbnika.",
+    "reply": {
+      "action": "Odgovori",
+      "placeholder": "Vsebina odgovora...",
+      "replyingVia": "Odgovarjate prek WhatsAppa",
+      "send": "Pošlji odgovor",
+      "sending": "Pošiljanje…"
+    },
+    "send": "Pošlji WhatsApp",
+    "sendFailed": "Napaka pri pošiljanju WhatsApp",
+    "sending": "Pošiljanje...",
+    "sent": "Sporočilo poslano.",
+    "to": "Za:",
+    "toField": "Za"
+  }
+}

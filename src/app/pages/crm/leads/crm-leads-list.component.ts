@@ -6,19 +6,25 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
-  CrmApiService, Lead, LEAD_STAGE_LABELS, LeadStage, LEAD_SOURCES, LEAD_SOURCE_LABELS, LeadSource, CrmUser, CrmGroup, CalendarMeeting,
+  CrmApiService, Lead, LeadStage, LEAD_SOURCES, LeadSource, CrmUser, CrmGroup, CalendarMeeting,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../../core/i18n/locale.service';
+import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
 
-const KANBAN_STAGES: { key: LeadStage; label: string; dot: string }[] = [
-  { key: 'new',           label: 'Nowy',        dot: '#94A3B8' },
-  { key: 'qualification', label: 'Kwalifikacja', dot: '#F59E0B' },
-  { key: 'presentation',  label: 'Prezentacja',  dot: '#3B82F6' },
-  { key: 'offer',         label: 'Oferta',       dot: '#A855F7' },
-  { key: 'negotiation',   label: 'Negocjacje',   dot: '#F97316' },
+const KANBAN_STAGES: { key: LeadStage; dot: string }[] = [
+  { key: 'new',           dot: '#94A3B8' },
+  { key: 'qualification', dot: '#F59E0B' },
+  { key: 'presentation',  dot: '#3B82F6' },
+  { key: 'offer',         dot: '#A855F7' },
+  { key: 'negotiation',   dot: '#F97316' },
 ];
+
+const ACTIVITY_TYPES_WITH_LABEL = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
+const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketing' };
 
 const PROB_MAP: Record<LeadStage, number> = {
   new: 10, qualification: 25, presentation: 50,
@@ -29,23 +35,25 @@ const PROB_MAP: Record<LeadStage, number> = {
   selector: 'wt-crm-leads-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div id="topbar">
-  <span class="page-title">Leady sprzedażowe</span>
+  <span class="page-title">{{ t('leadsList.title') }}</span>
   <span class="tsp"></span>
   <div class="srch-wrap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input class="srch" type="search" placeholder="Szukaj firm, kontaktów…"
+    <input class="srch" type="search" [placeholder]="t('leadsList.searchPlaceholder')"
            [(ngModel)]="search" (ngModelChange)="onSearch()">
   </div>
   <button class="btn btn-g btn-sm" routerLink="/crm/import">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Import CSV
+    {{ t('leadsList.importCsv') }}
   </button>
   <button class="btn btn-p" (click)="openNew()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Nowy lead
+    {{ t('leadsList.newLead.title') }}
   </button>
 </div>
 
@@ -55,77 +63,77 @@ const PROB_MAP: Record<LeadStage, number> = {
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-val">{{ stats.total }}</div>
-      <div class="stat-lbl">Okazji sprzedażowych</div>
+      <div class="stat-lbl">{{ t('leadsList.stats.opportunities') }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:#F59E0B">{{ stats.hot }}</div>
-      <div class="stat-lbl">🔥 Gorących</div>
+      <div class="stat-lbl">🔥 {{ t('leadsList.stats.hot') }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:var(--orange)">{{ formatPLN(stats.pipeline) }}</div>
-      <div class="stat-lbl">Pipeline (PLN)</div>
+      <div class="stat-lbl">{{ t('leadsList.stats.pipeline') }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:#16A34A">{{ stats.won }}</div>
-      <div class="stat-lbl">✓ Wygranych</div>
+      <div class="stat-lbl">✓ {{ t('leadsList.stats.won') }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:#DC2626">{{ stats.lost }}</div>
-      <div class="stat-lbl">✗ Przegranych</div>
+      <div class="stat-lbl">✗ {{ t('leadsList.stats.lost') }}</div>
     </div>
   </div>
 
   <!-- ── Toolbar ── -->
   <div *ngIf="reportFilterLabel" style="display:flex;align-items:center;gap:8px;padding:6px 0 0 0;margin-bottom:-4px">
     <span style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:20px;padding:3px 12px;font-size:11.5px;font-weight:600;color:#9A3412;display:flex;align-items:center;gap:6px">
-      📊 Filtr z raportu: {{ reportFilterLabel }}
+      📊 {{ t('leadsList.filters.reportFilter', { label: reportFilterLabel }) }}
       <span style="cursor:pointer;font-size:14px;color:#9A3412;line-height:1" (click)="clearReportFilter()">×</span>
     </span>
   </div>
   <!-- Persistent rep filter chip -->
   <div *ngIf="persistRepName" style="display:flex;align-items:center;gap:8px;padding:4px 0 0 0;margin-bottom:-4px">
     <span style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:20px;padding:3px 12px;font-size:11.5px;font-weight:600;color:#1D4ED8;display:flex;align-items:center;gap:6px">
-      👤 Handlowiec: {{ persistRepName }}
+      👤 {{ t('leadsList.filters.repChip', { name: persistRepName }) }}
       <span style="cursor:pointer;font-size:14px;line-height:1" (click)="clearPersistRepFilter()">×</span>
     </span>
   </div>
   <div class="toolbar">
-    <span class="fchip" [class.on]="scopeFilter==='all'"  (click)="setScope('all')">Wszystkie</span>
-    <span class="fchip" [class.on]="scopeFilter==='mine'" (click)="setScope('mine')">Moje</span>
-    <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()">🔥 Gorące</span>
-    <span class="fchip" [class.on]="filterHoldOnly"       (click)="filterHoldOnly=!filterHoldOnly; load()" title="Pokaż tylko leady na Holdzie">⏸️ Tylko Hold</span>
+    <span class="fchip" [class.on]="scopeFilter==='all'"  (click)="setScope('all')">{{ t('leadsList.filters.all') }}</span>
+    <span class="fchip" [class.on]="scopeFilter==='mine'" (click)="setScope('mine')">{{ t('leadsList.filters.mine') }}</span>
+    <span class="fchip" [class.on]="filterHot"            (click)="filterHot=!filterHot; load()">🔥 {{ t('leadsList.filters.hot') }}</span>
+    <span class="fchip" [class.on]="filterHoldOnly"       (click)="filterHoldOnly=!filterHoldOnly; load()" [title]="t('leadsList.filters.holdOnlyTitle')">⏸️ {{ t('leadsList.filters.holdOnly') }}</span>
     <span style="flex:1"></span>
     <select class="sel" [(ngModel)]="filterStageUI" (ngModelChange)="onStageFilterChange()">
-      <option value="">Wszystkie etapy</option>
-      <option value="new">Nowy</option>
-      <option value="qualification">Kwalifikacja</option>
-      <option value="presentation">Prezentacja</option>
-      <option value="offer">Oferta</option>
-      <option value="negotiation">Negocjacje</option>
-      <option value="closed_won">✓ Wygrany</option>
-      <option value="closed_lost">✗ Przegrany</option>
-      <option value="archived">🗄️ Archiwum</option>
+      <option value="">{{ t('leadsList.filters.allStages') }}</option>
+      <option value="new">{{ t('labels.stages.new') }}</option>
+      <option value="qualification">{{ t('labels.stages.qualification') }}</option>
+      <option value="presentation">{{ t('labels.stages.presentation') }}</option>
+      <option value="offer">{{ t('labels.stages.offer') }}</option>
+      <option value="negotiation">{{ t('labels.stages.negotiation') }}</option>
+      <option value="closed_won">✓ {{ t('labels.stages.closed_won') }}</option>
+      <option value="closed_lost">✗ {{ t('labels.stages.closed_lost') }}</option>
+      <option value="archived">🗄️ {{ t('labels.stages.archived') }}</option>
     </select>
     <select class="sel" [(ngModel)]="filterSource" (ngModelChange)="onSourceFilterChange()">
-      <option value="">Wszystkie źródła</option>
+      <option value="">{{ t('leadsList.filters.allSources') }}</option>
       @for (s of sourcesWithoutGroup(); track s.value) {
-        <option [value]="s.value">{{ s.label }}</option>
+        <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
       }
       @for (g of sourceGroups(); track g) {
-        <optgroup [label]="'── ' + g">
-          <option [value]="'__group__' + g">📂 Cała grupa: {{ g }}</option>
+        <optgroup [label]="'── ' + sourceGroupLabel(g)">
+          <option [value]="'__group__' + g">📂 {{ t('leadsList.filters.wholeGroup', { group: sourceGroupLabel(g) }) }}</option>
         </optgroup>
         @for (s of sourcesInGroup(g); track s.value) {
-          <option [value]="s.value">{{ s.label }}</option>
+          <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
         }
       }
     </select>
     <select class="sel" [(ngModel)]="filterUser" (ngModelChange)="onRepFilterChange($event)" *ngIf="isManager">
-      <option value="">Wszyscy handlowcy</option>
-      <optgroup label="── Handlowcy ──" *ngIf="crmUsers.length > 0">
+      <option value="">{{ t('leadsList.filters.allReps') }}</option>
+      <optgroup [label]="'── ' + t('leadsList.filters.repsGroup') + ' ──'" *ngIf="crmUsers.length > 0">
         <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
       </optgroup>
-      <optgroup label="── Grupy ──" *ngIf="crmGroups.length > 0">
+      <optgroup [label]="'── ' + t('leadsList.filters.groupsGroup') + ' ──'" *ngIf="crmGroups.length > 0">
         <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">📂 {{ g.name }}</option>
       </optgroup>
     </select>
@@ -135,16 +143,16 @@ const PROB_MAP: Record<LeadStage, number> = {
         <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
         <line x1="3" y1="10" x2="21" y2="10"/>
       </svg>
-      Time Line
+      {{ t('leadsList.view.timeline') }}
     </button>
     <button class="btn btn-g btn-sm" (click)="viewMode = viewMode==='kanban' ? 'table' : 'kanban'">
-      {{ isKanbanView ? '☰ Tabela' : '⊞ Kanban' }}
+      {{ isKanbanView ? '☰ ' + t('leadsList.view.table') : '⊞ ' + t('leadsList.view.kanban') }}
     </button>
   </div>
 
   <!-- Loading -->
   <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>Ładowanie leadów…
+    <div class="spinner"></div>{{ t('leadsList.loading') }}
   </div>
 
   <!-- ════ KANBAN ════ -->
@@ -155,7 +163,7 @@ const PROB_MAP: Record<LeadStage, number> = {
       <div *ngFor="let col of kanbanCols" class="kol">
         <div class="kol-head">
           <div class="kol-dot" [style.background]="col.dot"></div>
-          <span class="kol-title">{{ col.label }}</span>
+          <span class="kol-title">{{ t('labels.stages.' + col.key) }}</span>
           <span class="kol-cnt">{{ leadsFor(col.key).length }}</span>
           <span class="kol-val" *ngIf="valueFor(col.key)>0">{{ valueFor(col.key) }}k</span>
         </div>
@@ -165,7 +173,7 @@ const PROB_MAP: Record<LeadStage, number> = {
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ Hold</span><span *ngIf="lead.stage==='onboarded'" title="Onboarding zakończony — Partner aktywny" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 5px;margin-left:3px;font-weight:700;vertical-align:middle">✓ Partner</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 5px;margin-left:3px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
@@ -190,7 +198,7 @@ const PROB_MAP: Record<LeadStage, number> = {
             </div>
             <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
           </div>
-          <div *ngIf="leadsFor(col.key).length===0" class="kol-empty">Brak leadów</div>
+          <div *ngIf="leadsFor(col.key).length===0" class="kol-empty">{{ t('leadsList.kanban.empty') }}</div>
         </div>
       </div>
 
@@ -198,8 +206,8 @@ const PROB_MAP: Record<LeadStage, number> = {
       <div class="kol">
         <div class="kol-head">
           <div class="kol-dot" style="background:#22C55E"></div>
-          <span class="kol-title">Zamknięte</span>
-          <span class="kol-cnt">{{ leadsFor('closed_won').length }}W / {{ leadsFor('closed_lost').length }}L</span>
+          <span class="kol-title">{{ t('leadsList.kanban.closed') }}</span>
+          <span class="kol-cnt">{{ t('leadsList.kanban.closedCount', { won: leadsFor('closed_won').length, lost: leadsFor('closed_lost').length }) }}</span>
         </div>
         <div class="kol-cards">
           <div *ngFor="let lead of closedLeads(); trackBy:trackById"
@@ -210,7 +218,7 @@ const PROB_MAP: Record<LeadStage, number> = {
             <div class="lead-value" *ngIf="lead.value_pln">{{ lead.value_pln | number:'1.0-0' }} {{ lead.annual_turnover_currency || 'PLN' }}</div>
             <div class="lead-meta">
               <span class="tag" [class]="lead.stage==='closed_won' ? 'tag-green' : 'tag-red'">
-                {{ lead.stage==='closed_won' ? '✓ Wygrany' : '✗ Przegrany' }}
+                {{ lead.stage==='closed_won' ? '✓ ' + t('labels.stages.closed_won') : '✗ ' + t('labels.stages.closed_lost') }}
               </span>
             </div>
             <div class="pipe-bar">
@@ -218,7 +226,7 @@ const PROB_MAP: Record<LeadStage, number> = {
                    [style.background]="lead.stage==='closed_won' ? '#22C55E' : '#EF4444'"></div>
             </div>
           </div>
-          <div *ngIf="closedLeads().length===0" class="kol-empty">Brak</div>
+          <div *ngIf="closedLeads().length===0" class="kol-empty">{{ t('leadsList.kanban.closedEmpty') }}</div>
         </div>
       </div>
     </div>
@@ -242,55 +250,55 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="dp-actions">
           <button class="btn btn-g btn-sm" *ngIf="selected.phone" (click)="callPhone(selected.phone)">📞</button>
           <button class="btn btn-g btn-sm" *ngIf="selected.email" (click)="mailTo(selected.email)">✉</button>
-          <button class="btn btn-p btn-sm" [routerLink]="['/crm/leads',selected.id]" style="flex:1">Otwórz szczegóły →</button>
+          <button class="btn btn-p btn-sm" [routerLink]="['/crm/leads',selected.id]" style="flex:1">{{ t('leadsList.detail.openDetails') }} →</button>
         </div>
       </div>
 
       <div class="dp-body">
         <div class="tabs">
-          <button class="tab-btn" [class.active]="dpTab==='info'"     (click)="dpTab='info'">Informacje</button>
+          <button class="tab-btn" [class.active]="dpTab==='info'"     (click)="dpTab='info'">{{ t('leadsList.detail.tabs.info') }}</button>
           <button class="tab-btn" [class.active]="dpTab==='activity'" (click)="dpTab='activity'">
-            Historia<span *ngIf="selected.activities?.length" class="tab-cnt">{{ selected.activities!.length }}</span>
+            {{ t('leadsList.detail.tabs.history') }}<span *ngIf="selected.activities?.length" class="tab-cnt">{{ selected.activities!.length }}</span>
           </button>
         </div>
 
         <!-- Info -->
         <div *ngIf="dpTab==='info'">
-          <div class="sec-title">Szczegóły</div>
-          <div class="info-row"><span class="info-label">Firma</span><span class="info-val">{{ selected.company }}</span></div>
+          <div class="sec-title">{{ t('leadsList.detail.details') }}</div>
+          <div class="info-row"><span class="info-label">{{ t('leadsList.fields.company') }}</span><span class="info-val">{{ selected.company }}</span></div>
           <div class="info-row" *ngIf="selected.email">
-            <span class="info-label">Email</span>
+            <span class="info-label">{{ t('leadsList.fields.email') }}</span>
             <a class="info-val link" href="mailto:{{ selected.email }}">{{ selected.email }}</a>
           </div>
           <div class="info-row" *ngIf="selected.phone">
-            <span class="info-label">Telefon</span><span class="info-val">{{ selected.phone }}</span>
+            <span class="info-label">{{ t('leadsList.fields.phone') }}</span><span class="info-val">{{ selected.phone }}</span>
           </div>
           <div class="info-row" *ngIf="selected.source">
-            <span class="info-label">Źródło</span><span class="info-val">{{ srcLabel(selected.source) }}</span>
+            <span class="info-label">{{ t('leadsList.fields.source') }}</span><span class="info-val">{{ srcLabel(selected.source) }}</span>
           </div>
           <div class="info-row" *ngIf="selected.industry">
-            <span class="info-label">Branża</span><span class="info-val">{{ selected.industry }}</span>
+            <span class="info-label">{{ t('leadsList.detail.industry') }}</span><span class="info-val">{{ selected.industry }}</span>
           </div>
 
-          <div class="sec-title">Pipeline</div>
+          <div class="sec-title">{{ t('leadsList.detail.pipeline') }}</div>
           <div class="info-row">
-            <span class="info-label">Wartość</span>
+            <span class="info-label">{{ t('leadsList.detail.value') }}</span>
             <span class="info-val" style="color:var(--orange);font-family:'Sora',sans-serif;font-size:15px;font-weight:700">
               {{ (selected.value_pln||0) | number:'1.0-0' }} {{ selected.annual_turnover_currency || 'PLN' }}
             </span>
           </div>
           <div class="info-row">
-            <span class="info-label">Prawdopodob.</span>
+            <span class="info-label">{{ t('leadsList.detail.probability') }}</span>
             <span class="info-val">{{ selected.probability ?? prob(selected.stage) }}%</span>
           </div>
           <div class="info-row">
-            <span class="info-label">Ważona wartość</span>
+            <span class="info-label">{{ t('leadsList.detail.weightedValue') }}</span>
             <span class="info-val">
               {{ ((selected.value_pln||0) * (selected.probability ?? prob(selected.stage)) / 100) | number:'1.0-0' }} PLN
             </span>
           </div>
           <div class="info-row" *ngIf="selected.close_date">
-            <span class="info-label">Data zamknięcia</span>
+            <span class="info-label">{{ t('leadsList.detail.closeDate') }}</span>
             <span class="info-val">{{ selected.close_date | date:'dd.MM.yyyy' }}</span>
           </div>
           <div class="pipe-bar" style="margin-top:6px">
@@ -298,20 +306,20 @@ const PROB_MAP: Record<LeadStage, number> = {
                  [style.background]="selected.stage==='closed_won'?'#22C55E':selected.stage==='closed_lost'?'#EF4444':null">
             </div>
           </div>
-          <div style="font-size:10px;color:var(--gray-400);margin-top:3px">Etap: {{ stageLabel(selected.stage) }}</div>
+          <div style="font-size:10px;color:var(--gray-400);margin-top:3px">{{ t('leadsList.detail.stageValue', { stage: stageLabel(selected.stage) }) }}</div>
 
-          <div class="sec-title" *ngIf="selected.assigned_to_name">Handlowiec</div>
+          <div class="sec-title" *ngIf="selected.assigned_to_name">{{ t('leadsList.fields.salesRep') }}</div>
           <div *ngIf="selected.assigned_to_name" class="dp-user">
             <div class="avatar-sm" style="width:28px;height:28px;font-size:11px">{{ initials(selected.assigned_to_name) }}</div>
             <div style="font-size:13px;font-weight:600;color:var(--gray-900)">{{ selected.assigned_to_name }}</div>
           </div>
 
-          <div class="sec-title" *ngIf="selected.tags?.length">Tagi</div>
+          <div class="sec-title" *ngIf="selected.tags?.length">{{ t('leadsList.detail.tags') }}</div>
           <div *ngIf="selected.tags?.length" style="display:flex;flex-wrap:wrap;gap:6px">
             <span *ngFor="let t of selected.tags" class="tag tag-blue">{{ t }}</span>
           </div>
 
-          <div class="sec-title" *ngIf="selected.notes">Notatka</div>
+          <div class="sec-title" *ngIf="selected.notes">{{ t('leadsList.detail.note') }}</div>
           <div *ngIf="selected.notes" class="dp-note">{{ selected.notes }}</div>
         </div>
 
@@ -330,15 +338,15 @@ const PROB_MAP: Record<LeadStage, number> = {
               </div>
             </div>
             <div *ngIf="!(selected.activities?.length)" class="kol-empty" style="padding:20px 0">
-              Brak aktywności. <a [routerLink]="['/crm/leads',selected.id]" style="color:var(--orange)">Dodaj w szczegółach →</a>
+              {{ t('leadsList.detail.noActivities') }} <a [routerLink]="['/crm/leads',selected.id]" style="color:var(--orange)">{{ t('leadsList.detail.addInDetails') }} →</a>
             </div>
           </div>
         </div>
       </div>
 
       <div class="dp-foot">
-        <button class="btn btn-g btn-sm" (click)="selected=null; cdr.markForCheck()">Zamknij</button>
-        <button class="btn btn-p btn-sm" style="flex:1" [routerLink]="['/crm/leads',selected.id]">Otwórz szczegóły →</button>
+        <button class="btn btn-g btn-sm" (click)="selected=null; cdr.markForCheck()">{{ 'actions.close' | transloco }}</button>
+        <button class="btn btn-p btn-sm" style="flex:1" [routerLink]="['/crm/leads',selected.id]">{{ t('leadsList.detail.openDetails') }} →</button>
       </div>
     </div>
     </div><!-- /dp-overlay -->
@@ -347,15 +355,15 @@ const PROB_MAP: Record<LeadStage, number> = {
   <!-- ════ TABLE ════ -->
   <div *ngIf="!loading && !isKanbanView" class="tw">
     <div class="thead" style="grid-template-columns:2fr 90px 110px 70px 130px 70px 110px 100px 90px">
-      <div class="th sortable" (click)="sortBy('company')">Firma / Kontakt <span class="si">{{sortIcon('company')}}</span></div>
-      <div class="th sortable" (click)="sortBy('first_contact_date')" style="text-align:center">Pierw. kont. <span class="si">{{sortIcon('first_contact_date')}}</span></div>
-      <div class="th sortable" (click)="sortBy('stage')">Etap <span class="si">{{sortIcon('stage')}}</span></div>
-      <div class="th sortable" (click)="sortBy('probability')" style="text-align:center">% Szansa <span class="si">{{sortIcon('probability')}}</span></div>
-      <div class="th sortable" (click)="sortBy('value_pln')">Obrót roczny <span class="si">{{sortIcon('value_pln')}}</span></div>
-      <div class="th sortable" (click)="sortBy('online_pct')" style="text-align:center">% Online <span class="si">{{sortIcon('online_pct')}}</span></div>
-      <div class="th sortable" (click)="sortBy('assigned_to_name')">Handlowiec <span class="si">{{sortIcon('assigned_to_name')}}</span></div>
-      <div class="th sortable" (click)="sortBy('source')">Źródło <span class="si">{{sortIcon('source')}}</span></div>
-      <div class="th sortable" (click)="sortBy('close_date')">Zamkn. <span class="si">{{sortIcon('close_date')}}</span></div>
+      <div class="th sortable" (click)="sortBy('company')">{{ t('leadsList.table.companyContact') }} <span class="si">{{sortIcon('company')}}</span></div>
+      <div class="th sortable" (click)="sortBy('first_contact_date')" style="text-align:center">{{ t('leadsList.table.firstContactShort') }} <span class="si">{{sortIcon('first_contact_date')}}</span></div>
+      <div class="th sortable" (click)="sortBy('stage')">{{ t('leadsList.fields.stage') }} <span class="si">{{sortIcon('stage')}}</span></div>
+      <div class="th sortable" (click)="sortBy('probability')" style="text-align:center">{{ t('leadsList.table.chance') }} <span class="si">{{sortIcon('probability')}}</span></div>
+      <div class="th sortable" (click)="sortBy('value_pln')">{{ t('leadsList.fields.annualTurnover') }} <span class="si">{{sortIcon('value_pln')}}</span></div>
+      <div class="th sortable" (click)="sortBy('online_pct')" style="text-align:center">{{ t('leadsList.table.online') }} <span class="si">{{sortIcon('online_pct')}}</span></div>
+      <div class="th sortable" (click)="sortBy('assigned_to_name')">{{ t('leadsList.fields.salesRep') }} <span class="si">{{sortIcon('assigned_to_name')}}</span></div>
+      <div class="th sortable" (click)="sortBy('source')">{{ t('leadsList.fields.source') }} <span class="si">{{sortIcon('source')}}</span></div>
+      <div class="th sortable" (click)="sortBy('close_date')">{{ t('leadsList.table.closeDateShort') }} <span class="si">{{sortIcon('close_date')}}</span></div>
     </div>
     <div *ngFor="let lead of sortedLeads; trackBy:trackById"
          class="tr-row" [class.tr-row-held]="lead.hold_active" style="grid-template-columns:2fr 90px 110px 70px 130px 70px 110px 100px 90px"
@@ -363,7 +371,7 @@ const PROB_MAP: Record<LeadStage, number> = {
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
-          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ Hold</span>
+          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
             <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
                   style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
             <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"
@@ -375,8 +383,8 @@ const PROB_MAP: Record<LeadStage, number> = {
           </div>
           <div style="font-size:11px;color:var(--gray-400)">{{ lead.contact_name }}</div>
           <div *ngIf="lead.converted_at" style="font-size:10px;color:#7C3AED;font-weight:600;margin-top:2px">
-            ✦ Migrowany →
-            <a [routerLink]="['/crm/partners', lead.converted_partner_id]" style="color:#7C3AED" (click)="$event.stopPropagation()">Partner</a>
+            ✦ {{ t('leadsList.table.migrated') }} →
+            <a [routerLink]="['/crm/partners', lead.converted_partner_id]" style="color:#7C3AED" (click)="$event.stopPropagation()">{{ t('labels.sourceTypes.partner') }}</a>
           </div>
         </div>
       </div>
@@ -394,12 +402,12 @@ const PROB_MAP: Record<LeadStage, number> = {
       </div>
     </div>
     <div *ngIf="allLeads.length===0" class="empty-state">
-      <div style="font-size:32px">📋</div>Brak leadów spełniających kryteria
+      <div style="font-size:32px">📋</div>{{ t('leadsList.table.empty') }}
     </div>
     <div *ngIf="totalPages>1" class="pagination">
-      <button class="btn btn-g btn-sm" [disabled]="page===1" (click)="setPage(page-1)">← Poprzednia</button>
-      <span style="font-size:12.5px;color:var(--gray-500)">Strona {{ page }} z {{ totalPages }}</span>
-      <button class="btn btn-g btn-sm" [disabled]="page===totalPages" (click)="setPage(page+1)">Następna →</button>
+      <button class="btn btn-g btn-sm" [disabled]="page===1" (click)="setPage(page-1)">← {{ t('leadsList.table.previous') }}</button>
+      <span style="font-size:12.5px;color:var(--gray-500)">{{ t('leadsList.table.pageOf', { page: page, pages: totalPages }) }}</span>
+      <button class="btn btn-g btn-sm" [disabled]="page===totalPages" (click)="setPage(page+1)">{{ t('leadsList.table.next') }} →</button>
     </div>
   </div>
 
@@ -413,8 +421,8 @@ const PROB_MAP: Record<LeadStage, number> = {
         <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" width="18" height="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/><line x1="20" y1="8" x2="20" y2="14"/></svg>
       </div>
       <div>
-        <div class="modal-title">Nowy lead</div>
-        <div style="font-size:12px;color:var(--gray-400)">Dodaj nową szansę sprzedażową</div>
+        <div class="modal-title">{{ t('leadsList.newLead.title') }}</div>
+        <div style="font-size:12px;color:var(--gray-400)">{{ t('leadsList.newLead.subtitle') }}</div>
       </div>
       <button class="dp-close" style="margin-left:auto" (click)="showNew=false">✕</button>
     </div>
@@ -423,10 +431,10 @@ const PROB_MAP: Record<LeadStage, number> = {
         <!-- WWW field + hot checkbox -->
         <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
           <div>
-            <label class="fl">Strona WWW <span style="font-size:10px;color:var(--gray-400)">(opcjonalne)</span></label>
+            <label class="fl">{{ t('leadsList.fields.website') }} <span style="font-size:10px;color:var(--gray-400)">{{ t('leadsList.newLead.optional') }}</span></label>
             <div style="position:relative">
               <input class="fi" [(ngModel)]="newFormWebsite"
-                     placeholder="np. acme.pl"
+                     [placeholder]="t('leadsList.newLead.websitePlaceholder')"
                      (ngModelChange)="onWebsiteChange()"
                      style="padding-right:36px">
               <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)">⏳</span>
@@ -434,80 +442,80 @@ const PROB_MAP: Record<LeadStage, number> = {
           </div>
           <div style="display:flex;align-items:center;gap:6px;padding-bottom:1px">
             <input type="checkbox" [(ngModel)]="newForm.hot" id="hotchk" style="width:auto;margin:0">
-            <label for="hotchk" style="font-size:13px;cursor:pointer;font-weight:400;white-space:nowrap">🔥 Gorący lead</label>
+            <label for="hotchk" style="font-size:13px;cursor:pointer;font-weight:400;white-space:nowrap">🔥 {{ t('leadsList.newLead.hot') }}</label>
           </div>
         </div>
         <div class="fg" style="grid-column:1/-1">
           <div>
           <!-- Enrich prompt banner -->
           <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
-            <span>🔍 Pobierz dane firmy ze strony?</span>
-            <button style="background:var(--orange);color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">Tak, pobierz</button>
-            <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:11px" (click)="enrichPrompt=false">Nie</button>
+            <span>🔍 {{ t('leadsList.newLead.enrichPrompt') }}</span>
+            <button style="background:var(--orange);color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">{{ t('leadsList.newLead.enrichConfirm') }}</button>
+            <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:11px" (click)="enrichPrompt=false">{{ t('leadsList.newLead.enrichDecline') }}</button>
           </div>
           <!-- Enrich result badge -->
           <div *ngIf="enrichResult" style="margin-top:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 12px;font-size:11px;color:#15803d">
-            ✓ Dane pobrane — sprawdź pola poniżej i uzupełnij brakujące
+            ✓ {{ t('leadsList.newLead.enrichDone') }}
           </div>
           </div>
         </div>
 
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">Nazwa firmy <span style="color:var(--orange)">*</span></label>
-          <input class="fi" [(ngModel)]="newForm.company" placeholder="np. Acme Sp. z o.o."
+          <label class="fl">{{ t('leadsList.newLead.companyName') }} <span style="color:var(--orange)">*</span></label>
+          <input class="fi" [(ngModel)]="newForm.company" [placeholder]="t('leadsList.newLead.companyPlaceholder')"
                  [class.fi-err]="submitted&&!newForm.company">
-          <span class="ferr" *ngIf="submitted&&!newForm.company">Pole wymagane</span>
+          <span class="ferr" *ngIf="submitted&&!newForm.company">{{ t('leadsList.newLead.fieldRequired') }}</span>
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:3px">Imię i nazwisko kontaktu <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
-          <input class="fi" [(ngModel)]="newForm.contact_name" placeholder="Jan Kowalski"
+          <label class="fl" style="display:flex;align-items:center;gap:3px">{{ t('leadsList.newLead.contactName') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <input class="fi" [(ngModel)]="newForm.contact_name" [placeholder]="t('leadsList.newLead.namePlaceholder')"
                  [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_name">
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:3px">Rola w firmie <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:3px">{{ t('leadsList.fields.companyRole') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
           <select class="fi" [(ngModel)]="newForm.contact_title"
                   [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_title">
-            <option value="">— wybierz —</option>
+            <option value="">{{ t('leadsList.newLead.select') }}</option>
             <option *ngFor="let t of dictTitles" [value]="t">{{ t }}</option>
           </select>
         </div>
         <div class="fg">
-          <label class="fl">Email</label>
-          <input class="fi" type="email" [(ngModel)]="newForm.email" placeholder="jan@firma.pl">
+          <label class="fl">{{ t('leadsList.fields.email') }}</label>
+          <input class="fi" type="email" [(ngModel)]="newForm.email" [placeholder]="t('leadsList.newLead.emailPlaceholder')">
         </div>
         <div class="fg">
-          <label class="fl">Telefon</label>
+          <label class="fl">{{ t('leadsList.fields.phone') }}</label>
           <input class="fi" [(ngModel)]="newForm.phone" placeholder="+48 600 000 000">
         </div>
         <div class="fg" style="grid-column:1/-1">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <label class="fl" style="margin:0">Dodatkowe kontakty</label>
-            <button type="button" style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addNewExtraContact()">+ Dodaj kontakt</button>
+            <label class="fl" style="margin:0">{{ t('leadsList.newLead.extraContacts') }}</label>
+            <button type="button" style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addNewExtraContact()">+ {{ t('leadsList.newLead.addContact') }}</button>
           </div>
           @for (ec of newExtraContacts; track $index; let i = $index) {
             <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
               <button type="button" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeNewExtraContact(i)">✕</button>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-                <div class="fg"><label class="fl">Imię i nazwisko</label><input class="fi" [(ngModel)]="ec.contact_name" placeholder="Jan Kowalski"></div>
-                <div class="fg"><label class="fl">Rola w firmie</label>
+                <div class="fg"><label class="fl">{{ t('leadsList.newLead.fullName') }}</label><input class="fi" [(ngModel)]="ec.contact_name" [placeholder]="t('leadsList.newLead.namePlaceholder')"></div>
+                <div class="fg"><label class="fl">{{ t('leadsList.fields.companyRole') }}</label>
                   <select class="fi" [(ngModel)]="ec.contact_title">
-                    <option value="">— wybierz —</option>
+                    <option value="">{{ t('leadsList.newLead.select') }}</option>
                     <option *ngFor="let t of dictTitles" [value]="t">{{ t }}</option>
                   </select>
                 </div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                <div class="fg"><label class="fl">Email</label><input class="fi" type="email" [(ngModel)]="ec.email" placeholder="jan@firma.pl"></div>
-                <div class="fg"><label class="fl">Telefon</label><input class="fi" [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></div>
+                <div class="fg"><label class="fl">{{ t('leadsList.fields.email') }}</label><input class="fi" type="email" [(ngModel)]="ec.email" [placeholder]="t('leadsList.newLead.emailPlaceholder')"></div>
+                <div class="fg"><label class="fl">{{ t('leadsList.fields.phone') }}</label><input class="fi" [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></div>
               </div>
             </div>
           }
           @if (newExtraContacts.length === 0) {
-            <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:8px 0">Brak dodatkowych kontaktów</div>
+            <div style="font-size:12px;color:var(--gray-400);text-align:center;padding:8px 0">{{ t('leadsList.newLead.noExtraContacts') }}</div>
           }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:4px">NIP <span style="color:var(--orange)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.taxId') }} <span style="color:var(--orange)">*</span></label>
           <input class="fi" [(ngModel)]="newForm.nip"
                  placeholder="PL1234567890"
                  maxlength="14"
@@ -516,61 +524,61 @@ const PROB_MAP: Record<LeadStage, number> = {
           <span class="ferr" *ngIf="nipError">{{ nipError }}</span>
         </div>
         <div class="fg">
-          <label class="fl">Wartość (PLN)</label>
+          <label class="fl">{{ t('leadsList.newLead.value') }}</label>
           <input class="fi" type="number" [(ngModel)]="newForm.value_pln" placeholder="0" min="0">
         </div>
         <div class="fg">
-          <label class="fl">Źródło</label>
+          <label class="fl">{{ t('leadsList.fields.source') }}</label>
           <select class="fsel" [(ngModel)]="newForm.source">
-            <option value="">— wybierz —</option>
+            <option value="">{{ t('leadsList.newLead.select') }}</option>
             @for (s of sourcesWithoutGroup(); track s.value) {
-              <option [value]="s.value">{{ s.label }}</option>
+              <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
             }
             @for (g of sourceGroups(); track g) {
-              <optgroup [label]="g">
+              <optgroup [label]="sourceGroupLabel(g)">
                 @for (s of sourcesInGroup(g); track s.value) {
-                  <option [value]="s.value">{{ s.label }}</option>
+                  <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
                 }
               </optgroup>
             }
           </select>
         </div>
         <div class="fg">
-          <label class="fl">Pierwszy kontakt</label>
+          <label class="fl">{{ t('leadsList.fields.firstContact') }}</label>
           <input class="fi" type="date" [(ngModel)]="newForm.first_contact_date">
         </div>
         <div class="fg">
-          <label class="fl">Etap</label>
+          <label class="fl">{{ t('leadsList.fields.stage') }}</label>
           <select class="fsel" [(ngModel)]="newForm.stage">
-            <option value="new">Nowy</option>
-            <option value="qualification">Kwalifikacja</option>
-            <option value="presentation">Prezentacja</option>
-            <option value="offer">Oferta</option>
-            <option value="negotiation">Negocjacje</option>
+            <option value="new">{{ t('labels.stages.new') }}</option>
+            <option value="qualification">{{ t('labels.stages.qualification') }}</option>
+            <option value="presentation">{{ t('labels.stages.presentation') }}</option>
+            <option value="offer">{{ t('labels.stages.offer') }}</option>
+            <option value="negotiation">{{ t('labels.stages.negotiation') }}</option>
           </select>
         </div>
         <div class="fg" *ngIf="isManager">
-          <label class="fl">Handlowiec</label>
+          <label class="fl">{{ t('leadsList.fields.salesRep') }}</label>
           <select class="fsel" [(ngModel)]="newForm.assigned_to">
-            <option value="">— nieprzypisany —</option>
+            <option value="">{{ t('leadsList.newLead.unassigned') }}</option>
             <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
           </select>
         </div>
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">Notatki</label>
-          <textarea class="fta" [(ngModel)]="newForm.notes" rows="2" placeholder="Dodatkowe informacje…"></textarea>
+          <label class="fl">{{ t('leadsList.newLead.notes') }}</label>
+          <textarea class="fta" [(ngModel)]="newForm.notes" rows="2" [placeholder]="t('leadsList.newLead.notesPlaceholder')"></textarea>
         </div>
       </div>
     </div>
     @if (newFormErrors.length > 0) {
       <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin:8px 16px;font-size:12px;color:#991b1b">
-        <strong>Uzupełnij wymagane pola:</strong> {{ newFormErrors.join(', ') }}
+        <strong>{{ t('leadsList.newLead.fillRequired') }}</strong> {{ newFormErrors.join(', ') }}
       </div>
     }
     <div class="modal-foot">
-      <button class="btn btn-g" (click)="showNew=false">Anuluj</button>
+      <button class="btn btn-g" (click)="showNew=false">{{ 'actions.cancel' | transloco }}</button>
       <button class="btn btn-p" [disabled]="saving" (click)="createLead()">
-        {{ saving ? 'Zapisywanie…' : 'Utwórz lead' }}
+        {{ saving ? t('leadsList.saving') : t('leadsList.newLead.create') }}
       </button>
     </div>
   </div>
@@ -593,8 +601,8 @@ const PROB_MAP: Record<LeadStage, number> = {
           </svg>
         </div>
         <div>
-          <div class="tl-head-title">Kalendarz aktywności</div>
-          <div class="tl-head-sub">Aktywności z datą · chronologicznie</div>
+          <div class="tl-head-title">{{ t('leadsList.timeline.title') }}</div>
+          <div class="tl-head-sub">{{ t('leadsList.timeline.subtitle') }}</div>
         </div>
       </div>
       <button class="dp-close" style="font-size:18px;padding:4px" (click)="showTimeline=false; cdr.markForCheck()">✕</button>
@@ -604,7 +612,7 @@ const PROB_MAP: Record<LeadStage, number> = {
     <div class="tl-filter" *ngIf="isManager">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color:var(--gray-400);flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       <select class="sel" style="flex:1;font-size:12px" [(ngModel)]="timelineUser" (ngModelChange)="loadTimeline()">
-        <option value="">Wszyscy handlowcy</option>
+        <option value="">{{ t('leadsList.filters.allReps') }}</option>
         <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
       </select>
     </div>
@@ -614,14 +622,14 @@ const PROB_MAP: Record<LeadStage, number> = {
 
       <!-- Loading -->
       <div *ngIf="timelineLoading" class="loading-state" style="padding:48px 0">
-        <div class="spinner"></div>Ładowanie spotkań…
+        <div class="spinner"></div>{{ t('leadsList.timeline.loading') }}
       </div>
 
       <!-- Empty -->
       <div *ngIf="!timelineLoading && timelineMeetings.length===0" class="tl-empty">
         <div style="font-size:36px;margin-bottom:10px">📭</div>
-        <div style="font-weight:600;color:var(--gray-700)">Brak spotkań</div>
-        <div style="font-size:12px;color:var(--gray-400);margin-top:4px">Zaplanuj pierwsze spotkanie w szczegółach leadu lub partnera</div>
+        <div style="font-weight:600;color:var(--gray-700)">{{ t('leadsList.timeline.empty') }}</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('leadsList.timeline.emptyHint') }}</div>
       </div>
 
       <!-- Meeting groups -->
@@ -629,7 +637,7 @@ const PROB_MAP: Record<LeadStage, number> = {
 
         <!-- Past hint (only when there are past meetings) -->
         <div *ngIf="hasPastMeetings" class="tl-past-hint">
-          ↑ Przewiń w górę, aby zobaczyć poprzednie spotkania
+          ↑ {{ t('leadsList.timeline.pastHint') }}
         </div>
 
         <ng-container *ngFor="let group of timelineGroups; let gi = index">
@@ -644,7 +652,7 @@ const PROB_MAP: Record<LeadStage, number> = {
             <span class="tl-sep-badge">
               <span *ngIf="group.isToday" class="tl-today-dot"></span>
               {{ group.dateLabel }}
-              <span *ngIf="group.isToday" class="tl-today-tag">DZIŚ</span>
+              <span *ngIf="group.isToday" class="tl-today-tag">{{ t('leadsList.timeline.todayTag') }}</span>
             </span>
             <span class="tl-sep-line"></span>
           </div>
@@ -658,8 +666,8 @@ const PROB_MAP: Record<LeadStage, number> = {
 
             <!-- Time column -->
             <div class="tl-item-time-col">
-              <div class="tl-item-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}</div>
-              <div class="tl-item-dur" *ngIf="m.duration_min">{{ m.duration_min }}min</div>
+              <div class="tl-item-time">{{ m.all_day ? t('leadsList.timeline.allDay') : (m.activity_at | date:'HH:mm') }}</div>
+              <div class="tl-item-dur" *ngIf="m.duration_min">{{ t('leadsList.timeline.durationShort', { minutes: m.duration_min }) }}</div>
             </div>
 
             <!-- Connector dot -->
@@ -673,7 +681,7 @@ const PROB_MAP: Record<LeadStage, number> = {
             <div class="tl-item-card" [class.tl-card-today]="group.isToday">
               <div class="tl-item-header">
                 <span class="tl-src-badge" [class.tl-src-lead]="m.source_type==='lead'" [class.tl-src-partner]="m.source_type==='partner'">
-                  {{ m.source_type === 'lead' ? 'Lead' : m.source_type === 'project' ? 'Projekt' : 'Partner' }}
+                  {{ m.source_type === 'lead' ? t('labels.sourceTypes.lead') : m.source_type === 'project' ? t('labels.sourceTypes.project') : t('labels.sourceTypes.partner') }}
                 </span>
                 <span class="tl-item-company">{{ m.source_name }}</span>
               </div>
@@ -697,7 +705,7 @@ const PROB_MAP: Record<LeadStage, number> = {
 
         <!-- Future hint -->
         <div *ngIf="hasFutureMeetings" class="tl-future-hint">
-          ↓ Przewiń w dół, aby zobaczyć kolejne spotkania
+          ↓ {{ t('leadsList.timeline.futureHint') }}
         </div>
 
       </ng-container>
@@ -715,9 +723,9 @@ const PROB_MAP: Record<LeadStage, number> = {
     <div class="modal-head">
       <div class="modal-icon" style="background:#F0FDF4;font-size:18px">{{tlTypeIcon(selectedMeeting.type)}}</div>
       <div style="flex:1;min-width:0">
-        <div class="modal-title">{{ meetingEditMode ? 'Edycja aktywności' : 'Szczegóły aktywności' }}</div>
+        <div class="modal-title">{{ meetingEditMode ? t('leadsList.meeting.editTitle') : t('leadsList.meeting.detailTitle') }}</div>
         <div style="font-size:12px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-          {{ selectedMeeting.source_type === 'lead' ? '📋 Lead' : '🤝 Partner' }} · {{ selectedMeeting.source_name }}
+          {{ selectedMeeting.source_type === 'lead' ? '📋 ' + t('labels.sourceTypes.lead') : '🤝 ' + t('labels.sourceTypes.partner') }} · {{ selectedMeeting.source_name }}
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -725,13 +733,13 @@ const PROB_MAP: Record<LeadStage, number> = {
            [routerLink]="['/crm/leads', selectedMeeting.source_id]"
            class="btn btn-g btn-sm"
            (click)="selectedMeeting=null; meetingEditMode=false; cdr.markForCheck()">
-          Otwórz lead →
+          {{ t('leadsList.meeting.openLead') }} →
         </a>
         <a *ngIf="selectedMeeting.source_type==='partner'"
            [routerLink]="['/crm/partners', selectedMeeting.source_id]"
            class="btn btn-g btn-sm"
            (click)="selectedMeeting=null; meetingEditMode=false; cdr.markForCheck()">
-          Otwórz partnera →
+          {{ t('leadsList.meeting.openPartner') }} →
         </a>
         <button class="dp-close" style="font-size:18px" (click)="selectedMeeting=null; meetingEditMode=false; cdr.markForCheck()">✕</button>
       </div>
@@ -742,36 +750,36 @@ const PROB_MAP: Record<LeadStage, number> = {
 
       <div class="meet-detail-grid">
         <div class="meet-field">
-          <div class="meet-field-label">Tytuł spotkania</div>
+          <div class="meet-field-label">{{ t('leadsList.meeting.meetingTitle') }}</div>
           <div class="meet-field-val">{{ selectedMeeting.title }}</div>
         </div>
         <div class="meet-field">
-          <div class="meet-field-label">Data i godzina</div>
+          <div class="meet-field-label">{{ t('leadsList.meeting.dateTime') }}</div>
           <div class="meet-field-val" style="font-weight:600;color:var(--gray-900)">
-            {{ selectedMeeting.activity_at | date:'EEEE, dd MMMM yyyy':'':'pl' }}&nbsp;·&nbsp;{{ selectedMeeting.activity_at | date:'HH:mm' }}
+            {{ selectedMeeting.activity_at | date:'EEEE, dd MMMM yyyy' }}&nbsp;·&nbsp;{{ selectedMeeting.activity_at | date:'HH:mm' }}
           </div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.duration_min">
-          <div class="meet-field-label">Czas trwania</div>
-          <div class="meet-field-val">{{ selectedMeeting.duration_min }} minut</div>
+          <div class="meet-field-label">{{ t('leadsList.meeting.duration') }}</div>
+          <div class="meet-field-val">{{ t('leadsList.meeting.durationValue', { count: selectedMeeting.duration_min }) }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.meeting_location">
-          <div class="meet-field-label">📍 Lokalizacja</div>
+          <div class="meet-field-label">📍 {{ t('leadsList.meeting.location') }}</div>
           <div class="meet-field-val">{{ selectedMeeting.meeting_location }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.participants">
-          <div class="meet-field-label">👥 Uczestnicy</div>
+          <div class="meet-field-label">👥 {{ t('leadsList.meeting.participants') }}</div>
           <div class="meet-field-val" style="white-space:pre-line">{{ selectedMeeting.participants }}</div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.assigned_to_name">
-          <div class="meet-field-label">Handlowiec</div>
+          <div class="meet-field-label">{{ t('leadsList.fields.salesRep') }}</div>
           <div class="meet-field-val" style="display:flex;align-items:center;gap:6px">
             <span class="avatar-sm" style="width:20px;height:20px;font-size:8px">{{ initials(selectedMeeting.assigned_to_name) }}</span>
             {{ selectedMeeting.assigned_to_name }}
           </div>
         </div>
         <div class="meet-field" *ngIf="selectedMeeting.created_by_name">
-          <div class="meet-field-label">Dodał(a)</div>
+          <div class="meet-field-label">{{ t('leadsList.meeting.addedBy') }}</div>
           <div class="meet-field-val">{{ selectedMeeting.created_by_name }}</div>
         </div>
       </div>
@@ -783,48 +791,49 @@ const PROB_MAP: Record<LeadStage, number> = {
     <div *ngIf="meetingEditMode" class="modal-body">
       <div class="fgrid2">
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">Tytuł spotkania <span style="color:var(--orange)">*</span></label>
-          <input class="fi" [(ngModel)]="meetingForm.title" placeholder="Temat spotkania">
+          <label class="fl">{{ t('leadsList.meeting.meetingTitle') }} <span style="color:var(--orange)">*</span></label>
+          <input class="fi" [(ngModel)]="meetingForm.title" [placeholder]="t('leadsList.meeting.titlePlaceholder')">
         </div>
         <div class="fg">
-          <label class="fl">Data i godzina</label>
+          <label class="fl">{{ t('leadsList.meeting.dateTime') }}</label>
           <input class="fi" type="datetime-local" [(ngModel)]="meetingForm.activity_at">
         </div>
         <div class="fg">
-          <label class="fl">Czas trwania (min)</label>
+          <label class="fl">{{ t('leadsList.meeting.durationMinutes') }}</label>
           <input class="fi" type="number" [(ngModel)]="meetingForm.duration_min" placeholder="60" min="0">
         </div>
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">Lokalizacja</label>
-          <input class="fi" [(ngModel)]="meetingForm.meeting_location" placeholder="np. Biuro klienta, Google Meet…">
+          <label class="fl">{{ t('leadsList.meeting.location') }}</label>
+          <input class="fi" [(ngModel)]="meetingForm.meeting_location" [placeholder]="t('leadsList.meeting.locationPlaceholder')">
         </div>
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">Uczestnicy</label>
-          <input class="fi" [(ngModel)]="meetingForm.participants" placeholder="np. Jan Kowalski, anna@firma.pl">
+          <label class="fl">{{ t('leadsList.meeting.participants') }}</label>
+          <input class="fi" [(ngModel)]="meetingForm.participants" [placeholder]="t('leadsList.meeting.participantsPlaceholder')">
         </div>
         <div class="fg" style="grid-column:1/-1">
-          <label class="fl">Notatki ze spotkania</label>
-          <textarea class="fta" [(ngModel)]="meetingForm.body" rows="3" placeholder="Omówione tematy, wnioski, kolejne kroki…"></textarea>
+          <label class="fl">{{ t('leadsList.meeting.notes') }}</label>
+          <textarea class="fta" [(ngModel)]="meetingForm.body" rows="3" [placeholder]="t('leadsList.meeting.notesPlaceholder')"></textarea>
         </div>
       </div>
     </div>
 
     <div class="modal-foot">
       <ng-container *ngIf="!meetingEditMode">
-        <button class="btn btn-g" (click)="selectedMeeting=null; meetingEditMode=false; cdr.markForCheck()">Zamknij</button>
+        <button class="btn btn-g" (click)="selectedMeeting=null; meetingEditMode=false; cdr.markForCheck()">{{ 'actions.close' | transloco }}</button>
         <button class="btn btn-p" style="margin-left:auto" (click)="meetingEditMode=true; cdr.markForCheck()">
-          ✎ Edytuj aktywność
+          ✎ {{ t('leadsList.meeting.edit') }}
         </button>
       </ng-container>
       <ng-container *ngIf="meetingEditMode">
-        <button class="btn btn-g" (click)="meetingEditMode=false; cdr.markForCheck()">Anuluj</button>
+        <button class="btn btn-g" (click)="meetingEditMode=false; cdr.markForCheck()">{{ 'actions.cancel' | transloco }}</button>
         <button class="btn btn-p" style="margin-left:auto" [disabled]="savingMeeting" (click)="saveMeeting()">
-          {{ savingMeeting ? 'Zapisywanie…' : '✓ Zapisz zmiany' }}
+          {{ savingMeeting ? t('leadsList.saving') : '✓ ' + t('leadsList.meeting.saveChanges') }}
         </button>
       </ng-container>
     </div>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
@@ -1166,6 +1175,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   private api      = inject(CrmApiService);
   private auth     = inject(AuthService);
   private settings = inject(AppSettingsService);
+  private transloco = inject(TranslocoService);
+  private locale = inject(LocaleService);
 
   get hasPbxFeature(): boolean { return this.auth.hasFeature('pbx'); }
   get hasWhatsappFeature(): boolean { return this.auth.hasFeature('whatsapp'); }
@@ -1207,6 +1218,14 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   sourcesWithoutGroup(): LeadSource[] { return this.leadSources.filter(s => !s.group); }
   sourceGroups(): string[] { return [...new Set(this.leadSources.filter(s => s.group).map(s => s.group!))]; }
   sourcesInGroup(g: string): LeadSource[] { return this.leadSources.filter(s => s.group === g); }
+  sourceOptionLabel(source: LeadSource): string {
+    const key = leadSourceLabelKey(source.value);
+    return key ? this.transloco.translate('crm.' + key) : source.label;
+  }
+  sourceGroupLabel(group: string): string {
+    const key = DEFAULT_SOURCE_GROUP_KEYS[group];
+    return key ? this.transloco.translate('crm.leadsList.sourceGroups.' + key) : group;
+  }
 
   onSourceFilterChange(): void {
     if (this.filterSource.startsWith('__group__')) {
@@ -1254,33 +1273,33 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     if (!this.newFormRequiresFull) return [];
     const f = this.newForm;
     const errs: string[] = [];
-    if (!this.newFormWebsite)    errs.push('Strona WWW');
-    if (!f.contact_name)         errs.push('Imię i Nazwisko');
-    if (!f.contact_title)        errs.push('Rola w firmie');
-    if (!f.email)                errs.push('Email');
-    if (!f.phone)                errs.push('Telefon');
-    if (!f.value_pln && f.value_pln !== 0) errs.push('Obrót roczny');
-    if (!f.first_contact_date)   errs.push('Pierwszy kontakt');
-    if (!f.source)               errs.push('Źródło');
-    if (!f.assigned_to)          errs.push('Handlowiec');
+    if (!this.newFormWebsite)    errs.push(this.transloco.translate('crm.leadsList.fields.website'));
+    if (!f.contact_name)         errs.push(this.transloco.translate('crm.leadsList.newLead.requiredContactName'));
+    if (!f.contact_title)        errs.push(this.transloco.translate('crm.leadsList.fields.companyRole'));
+    if (!f.email)                errs.push(this.transloco.translate('crm.leadsList.fields.email'));
+    if (!f.phone)                errs.push(this.transloco.translate('crm.leadsList.fields.phone'));
+    if (!f.value_pln && f.value_pln !== 0) errs.push(this.transloco.translate('crm.leadsList.fields.annualTurnover'));
+    if (!f.first_contact_date)   errs.push(this.transloco.translate('crm.leadsList.fields.firstContact'));
+    if (!f.source)               errs.push(this.transloco.translate('crm.leadsList.fields.source'));
+    if (!f.assigned_to)          errs.push(this.transloco.translate('crm.leadsList.fields.salesRep'));
     return errs;
   }
 
   onNipChange(ctx: 'lead' | 'partner' = 'lead'): void {
     const val = (this.newForm.nip || '').trim().toUpperCase();
-    if (!val) { this.nipError = 'NIP jest wymagany'; return; }
+    if (!val) { this.nipError = this.transloco.translate('crm.leadsList.newLead.taxIdErrors.required'); return; }
     const cc = val.slice(0, 2);
     const digits = val.slice(2);
     if (!/^[A-Z]{2}$/.test(cc)) {
-      this.nipError = 'Podaj kod kraju (2 litery), np. PL';
+      this.nipError = this.transloco.translate('crm.leadsList.newLead.taxIdErrors.countryCode');
       return;
     }
     if (cc === 'PL' && !/^\d{10}$/.test(digits)) {
-      this.nipError = 'Dla PL wymagane 10 cyfr po kodzie kraju';
+      this.nipError = this.transloco.translate('crm.leadsList.newLead.taxIdErrors.polishDigits');
       return;
     }
     if (cc !== 'PL' && digits.length === 0) {
-      this.nipError = 'Podaj numer po kodzie kraju';
+      this.nipError = this.transloco.translate('crm.leadsList.newLead.taxIdErrors.numberMissing');
       return;
     }
     this.nipError = '';
@@ -1377,7 +1396,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
       let vb: any = (b as any)[col] ?? '';
       if (col === 'value_pln' || col === 'online_pct' || col === 'probability') { va = +(va||0); vb = +(vb||0); return dir==='asc' ? va-vb : vb-va; }
       if (col === 'close_date' || col === 'first_contact_date') { va = va?new Date(va).getTime():0; vb = vb?new Date(vb).getTime():0; return dir==='asc'?va-vb:vb-va; }
-      const cmp = String(va).localeCompare(String(vb), 'pl', { sensitivity: 'base' });
+      const cmp = String(va).localeCompare(String(vb), this.locale.activeLocale(), { sensitivity: 'base' });
       return dir==='asc' ? cmp : -cmp;
     });
   }
@@ -1421,7 +1440,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     if (filterVal.startsWith('__group__')) {
       const groupId = filterVal.replace('__group__', '');
       const group = this.crmGroups.find(g => g.id === groupId);
-      displayName = group ? `Grupa: ${group.name}` : '';
+      displayName = group ? this.transloco.translate('crm.leadsList.filters.groupChip', { name: group.name }) : '';
     } else {
       const user = this.crmUsers.find(u => u.id === filterVal);
       displayName = user?.display_name || '';
@@ -1758,13 +1777,13 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
 
     const fmt = (date: Date) =>
-      date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+      date.toLocaleDateString(this.locale.activeLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
 
     if (d.toDateString() === today.toDateString())     return fmt(d);
-    if (d.toDateString() === tomorrow.toDateString())  return 'Jutro · ' + fmt(d);
-    if (d.toDateString() === yesterday.toDateString()) return 'Wczoraj · ' + fmt(d);
+    if (d.toDateString() === tomorrow.toDateString())  return this.transloco.translate('crm.leadsList.timeline.tomorrow', { date: fmt(d) });
+    if (d.toDateString() === yesterday.toDateString()) return this.transloco.translate('crm.leadsList.timeline.yesterday', { date: fmt(d) });
 
-    return d.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    return d.toLocaleDateString(this.locale.activeLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
 
   // ─── Meeting detail / edit ───────────────────────────────────────
@@ -1773,7 +1792,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     // Project tasks are view-only here: a click opens them in the Projects module.
     if (m.source_type === 'project') {
       this.projectTaskNavigation.open(String(m.source_id), m.project_task_id ?? null, {
-        label: 'Leady', route: ['/crm/leads'],
+        label: this.transloco.translate('crm.leadsList.breadcrumb'), route: ['/crm/leads'],
       });
       return;
     }
@@ -1848,15 +1867,16 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
   // ── Helpers ──
   prob(stage: LeadStage)       { return PROB_MAP[stage] ?? 10; }
-  stageLabel(s: LeadStage)     { return LEAD_STAGE_LABELS[s] || s; }
-  srcLabel(val: string | null): string { if (!val) return ''; const f = this.leadSources.find(s => s.value === val) || LEAD_SOURCES.find(s => s.value === val); return f?.label ?? LEAD_SOURCE_LABELS[val] ?? val; }
+  stageLabel(s: LeadStage)     { return this.transloco.translate('crm.labels.stages.' + s); }
+  srcLabel(val: string | null): string {
+    if (!val) return '';
+    const key = leadSourceLabelKey(val);
+    if (key) return this.transloco.translate('crm.' + key);
+    return this.leadSources.find(s => s.value === val)?.label ?? val;
+  }
   initials(name: string)       { return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
   tlTypeName(type: string): string {
-    const map: Record<string,string> = {
-      call:'Połączenie', email:'Email', meeting:'Spotkanie', note:'Notatka',
-      training:'Szkolenie', qbr:'QBR', doc_sent:'Dokument', opportunity:'Szansa',
-    };
-    return map[type] || type;
+    return ACTIVITY_TYPES_WITH_LABEL.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
   tlTypeIcon(type: string): string {
     return { call:'📞', email:'📧', meeting:'🤝', note:'📝', training:'🎓', qbr:'📊', doc_sent:'📄', opportunity:'💡' }[type] || '💬';

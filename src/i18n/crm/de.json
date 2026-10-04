@@ -1,0 +1,1076 @@
+{
+  "activity": {
+    "add": "Aktivität hinzufügen",
+    "card": {
+      "closeTask": "Aufgabe schließen",
+      "collapse": "Einklappen",
+      "createdAt": "erstellt am {date}",
+      "delete": "Löschen",
+      "expand": "Ausklappen",
+      "reopen": "Wieder öffnen"
+    },
+    "communication": "Kommunikation",
+    "customDate": "Eigenes Datum…",
+    "deleteConfirm": "Aktivität „{title}“ löschen?",
+    "dueDate": {
+      "inOneWeek": "In einer Woche ({date})",
+      "inThreeBusinessDays": "In 3 Werktagen ({weekday})",
+      "inTwoBusinessDays": "In 2 Werktagen ({weekday})",
+      "inTwoWeeks": "In 2 Wochen ({date})",
+      "none": "Keiner",
+      "today": "Heute",
+      "tomorrow": "Morgen"
+    },
+    "empty": "Keine Aktivitäten in dieser Kategorie.",
+    "form": {
+      "bodyPlaceholder": "Inhalt / Notizen…",
+      "bodyShortPlaceholder": "Inhalt…",
+      "dateTime": "Datum und Uhrzeit",
+      "dueDate": "Termin",
+      "noOwner": "— ohne —",
+      "none": "— keine —",
+      "owner": "Verantwortlicher",
+      "priority": "Priorität",
+      "reminder": "Erinnerung"
+    },
+    "modal": {
+      "addedBy": "Hinzugefügt von",
+      "assignToSalesperson": "Vertriebsmitarbeiter zuweisen",
+      "assignedTo": "Zugewiesen an",
+      "comment": "Kommentar",
+      "dateTime": "Datum und Uhrzeit",
+      "description": "Beschreibung",
+      "descriptionNotes": "Beschreibung / Notizen",
+      "edit": "Bearbeiten",
+      "saveChanges": "Änderungen speichern",
+      "title": "Titel",
+      "type": "Typ",
+      "unassigned": "— ohne Zuweisung —"
+    },
+    "reminders": {
+      "atDue": "Am Fälligkeitsdatum der Aufgabe",
+      "day1Before": "1 Tag vorher",
+      "days2Before": "2 Tage vorher",
+      "days3Before": "3 Tage vorher",
+      "hour1Before": "1 Std. vorher",
+      "minutes30Before": "30 Min. vorher",
+      "none": "Keine Erinnerung"
+    },
+    "tabs": {
+      "all": "Alle",
+      "calls": "Anrufe",
+      "emails": "E-Mails",
+      "meetings": "Meetings",
+      "notes": "Notizen",
+      "tasks": "Aufgaben"
+    }
+  },
+  "calls": {
+    "call": "Anrufen",
+    "callNumber": "Anrufen: {phone}",
+    "contactFallback": "Kontakt",
+    "mainNumber": "Hauptnummer: {phone}",
+    "noNumber": "Keine Nummer"
+  },
+  "consents": {
+    "collapse": "einklappen",
+    "details": "Details",
+    "lastChange": "Letzte Änderung:",
+    "save": "Einwilligungen speichern",
+    "saved": "Gespeichert",
+    "saving": "Wird gespeichert…",
+    "title": "Marketing-Einwilligungen",
+    "values": {
+      "denied": "Abgelehnt",
+      "granted": "Erteilt",
+      "noData": "Keine Angabe"
+    }
+  },
+  "documents": {
+    "add": "Hinzufügen",
+    "linkFailed": "Dokument konnte nicht verknüpft werden. Prüfen Sie, ob Sie die erforderlichen Berechtigungen haben.",
+    "none": "Keine",
+    "open": "Dokument öffnen",
+    "picker": {
+      "added": "Hinzugefügt",
+      "hint": "Suchen Sie Dokumente nach Name, Nummer oder Rechtsträger.",
+      "noResults": "Keine Ergebnisse",
+      "readOnly": "Lesen",
+      "readOnlyTooltip": "Nur Lesen — keine Berechtigung zum Verknüpfen",
+      "searchPlaceholder": "Dokument suchen…",
+      "searching": "Suche läuft…",
+      "title": "Verknüpftes Dokument hinzufügen"
+    },
+    "titleWithCount": "Dokumente ({count})",
+    "unlinkConfirm": "Verknüpfung mit dem Dokument entfernen?",
+    "unlinkFailed": "Verknüpfung konnte nicht entfernt werden."
+  },
+  "email": {
+    "addressTooltip": "E-Mail: {email}",
+    "attachments": {
+      "download": "Herunterladen",
+      "downloadTooltip": "Datei herunterladen",
+      "preview": "Vorschau",
+      "previewTooltip": "Im Browser öffnen"
+    },
+    "cc": "CC:",
+    "checkNew": "Neue prüfen",
+    "checkNewTooltip": "Neue E-Mails prüfen (Debug)",
+    "connecting": "Verbindung mit Google wird hergestellt…",
+    "date": "Datum:",
+    "debug": {
+      "error": "Fehler: {message}",
+      "newMessages": "Neue Nachrichten: {count}"
+    },
+    "disconnect": "Trennen",
+    "disconnectConfirm": "Ihr E-Mail-Konto trennen? Um weiterhin E-Mails zu senden, müssen Sie es erneut verbinden.",
+    "driveDownloadFailed": "Fehler beim Herunterladen der Datei aus Drive",
+    "drivePickerTitle": "Dateien zum Anhängen auswählen",
+    "driveReauthRequired": "Das Gmail-Postfach muss erneut verbunden werden — wenden Sie sich an den Administrator.",
+    "empty": "Keine gesendeten E-Mails.",
+    "fields": {
+      "attachments": "Anhänge",
+      "body": "Inhalt",
+      "cc": "CC",
+      "subject": "Betreff",
+      "to": "An"
+    },
+    "from": "Von:",
+    "fromDrive": "Aus Drive",
+    "fromGoogleDrive": "Aus Google Drive",
+    "hideQuoted": "Zitierten Verlauf ausblenden",
+    "incomingReply": "Antwort",
+    "label": "E-Mail",
+    "messageFallbackTitle": "Nachricht",
+    "new": "Neue E-Mail",
+    "noAddress": "Keine Adresse",
+    "noTemplate": "— keine Vorlage —",
+    "notConfigured": "Für diese Organisation ist kein E-Mail-Versand konfiguriert. Wenden Sie sich an den Administrator.",
+    "placeholders": {
+      "body": "Inhalt der Nachricht…",
+      "cc": "cc@firma.de",
+      "ccShort": "CC…",
+      "recipient": "email@firma.de",
+      "replyBody": "Inhalt der Antwort…",
+      "subject": "Betreff der Nachricht",
+      "toShort": "An…"
+    },
+    "reply": {
+      "action": "Antworten",
+      "hideDetails": "Ausblenden",
+      "replyingTo": "Sie antworten an:",
+      "send": "Antwort senden",
+      "sendFailed": "Fehler beim Senden",
+      "showDetails": "Details"
+    },
+    "replyHeading": "Antwort",
+    "send": "E-Mail senden",
+    "sendAction": "Senden",
+    "sendFailed": "Fehler beim Senden der E-Mail",
+    "sending": "Wird gesendet…",
+    "showQuoted": "Zitierten Verlauf anzeigen",
+    "thread": {
+      "anotherUser": "einem anderen Benutzer",
+      "empty": "Keine Nachrichten im Thread.",
+      "loading": "Thread wird geladen…",
+      "notOwnerCompose": "Dieser Thread gehört {owner} — Sie können darin nicht antworten. Die folgende E-Mail wird als neue Nachricht von Ihrem Konto gesendet.",
+      "notOwnerComposeUnknown": "Sie können in diesem Thread nicht antworten. Die folgende E-Mail wird als neue Nachricht von Ihrem Konto gesendet.",
+      "notOwnerReply": "Dieser Thread gehört {owner} — Sie können darin nicht antworten. Diese Nachricht wird als neue Nachricht von Ihrem Konto gesendet.",
+      "notOwnerReplyUnknown": "Sie können in diesem Thread nicht antworten. Diese Nachricht wird als neue Nachricht von Ihrem Konto gesendet.",
+      "ownedByTooltip": "Der Thread gehört {owner} — Sie senden eine neue Nachricht von Ihrem Konto",
+      "title": "E-Mail-Thread"
+    },
+    "to": "An:",
+    "trainingMode": "Schulungsmodus",
+    "writeNew": "Neue E-Mail schreiben"
+  },
+  "history": {
+    "activityAdded": "Aktivität hinzugefügt: {title}",
+    "activityClosed": "Aktivität geschlossen: {title}",
+    "activityDeleted": "Aktivität gelöscht: {title}",
+    "activityUpdated": "Aktivität aktualisiert: {title}",
+    "changed": "Geändert: {changes}",
+    "consentChanged": "Einwilligung „{label}“: {from} → {to}",
+    "documentLinked": "Dokument verknüpft",
+    "empty": "Keine Einträge.",
+    "emptyValue": "(leer)",
+    "fields": {
+      "activeUsers": "Aktive Benutzer",
+      "agentName": "Agent",
+      "annualTurnoverCurrency": "Währung",
+      "assignedTo": "Vertriebsmitarbeiter",
+      "billingAddress": "Adresse",
+      "billingCity": "Stadt",
+      "billingEmail": "Rechn.-E-Mail",
+      "billingPhone": "Rechn.-Tel.",
+      "closeDate": "Abschlussdatum",
+      "commission": "Provision",
+      "company": "Firma",
+      "contactName": "Kontakt",
+      "contactTitle": "Position im Unternehmen",
+      "contractExpires": "Vertrag bis",
+      "contractSigned": "Vertrag ab",
+      "contractValue": "Umsatz",
+      "country": "Land",
+      "creditLimit": "Kreditlimit",
+      "deposit": "Kaution",
+      "dwhPartnerId": "CRMtree Partner ID",
+      "email": "E-Mail",
+      "firstContactDate": "Erstkontakt",
+      "group": "Gruppe",
+      "hot": "Heiß",
+      "industry": "Branche",
+      "language": "Sprache",
+      "lostReason": "Verlustgrund",
+      "nip": "Steuernummer",
+      "notes": "Notizen",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Währung",
+      "phone": "Telefon",
+      "probability": "Wahrscheinlichkeit %",
+      "source": "Quelle",
+      "stage": "Phase",
+      "status": "Status",
+      "subdomain": "Subdomain",
+      "tags": "Tags",
+      "valuePln": "Wert PLN",
+      "website": "Website"
+    },
+    "lostReason": "Grund: {reason}",
+    "no": "Nein",
+    "noResults": "Keine Ergebnisse.",
+    "searchPlaceholder": "Im Verlauf suchen…",
+    "showAll": "Alle anzeigen",
+    "stageChanged": "Phasenwechsel: {from} → {to}",
+    "systemUser": "System",
+    "title": "Änderungsverlauf",
+    "yes": "Ja"
+  },
+  "labels": {
+    "activityStatuses": {
+      "closed": "geschlossen",
+      "new": "neu",
+      "open": "offen"
+    },
+    "activityTypes": {
+      "call": "Anruf",
+      "doc_sent": "Dokument",
+      "email": "E-Mail",
+      "meeting": "Meeting",
+      "note": "Notiz",
+      "opportunity": "Verkaufschance",
+      "qbr": "QBR",
+      "task": "Aufgabe",
+      "training": "Schulung"
+    },
+    "partnerStatuses": {
+      "active": "Aktiv",
+      "churned": "Abgewandert",
+      "inactive": "Inaktiv",
+      "onboarding": "Onboarding"
+    },
+    "priorities": {
+      "asap": "ASAP",
+      "important": "Wichtig",
+      "low": "Niedrig",
+      "medium": "Mittel"
+    },
+    "productTypes": {
+      "car_rental": "Mietwagen",
+      "hotel": "Hotel",
+      "other": "Sonstiges",
+      "transfer": "Transfer",
+      "transport_bus": "Bus",
+      "transport_ferry": "Fähre",
+      "transport_flight": "Flug",
+      "transport_train": "Zug",
+      "travel_insurance": "Reiseversicherung",
+      "visa": "Visum"
+    },
+    "sourceTypes": {
+      "document": "Dokument",
+      "lead": "Lead",
+      "onboarding": "Onboarding",
+      "partner": "Partner",
+      "project": "Projekt"
+    },
+    "sources": {
+      "agent": "Agent",
+      "aliasHello": "Alias Hello",
+      "coldCall": "Cold Call",
+      "emailCampaign": "E-Mail-Kampagne",
+      "googleAdsAiSearch": "Google Ads AI Search",
+      "googleAdsPmax": "Google Ads PMax",
+      "googleAdsSeaBrand": "Google Ads SEA Brand",
+      "inbound": "Inbound",
+      "linkedin": "LinkedIn",
+      "linkedinInMail": "LinkedIn InMail",
+      "linkedinLeadForm": "LinkedIn Lead Form",
+      "onlineForm": "Online-Formular",
+      "other": "Sonstige",
+      "own": "Eigene",
+      "partner": "Partner",
+      "referral": "Empfehlung",
+      "tradeFair": "Messe / Veranstaltung",
+      "website": "Website"
+    },
+    "stages": {
+      "archived": "Archiv",
+      "closed_lost": "Verloren",
+      "closed_won": "Gewonnen",
+      "negotiation": "Verhandlung",
+      "new": "Neu",
+      "offer": "Angebot",
+      "onboarded": "Onboarding abgeschlossen",
+      "onboarding": "Im Onboarding",
+      "presentation": "Präsentation",
+      "qualification": "Qualifizierung"
+    }
+  },
+  "leadDetail": {
+    "archive": {
+      "action": "Archivieren",
+      "confirm": "Lead „{company}“ archivieren? Er verschwindet aus Listen, Dashboards und Berichten — sichtbar ist er nur noch mit dem Filter Phase = Archiv. Er bleibt bearbeitbar und kann von dort in die Phase „Neu“ zurückversetzt werden.",
+      "failed": "Fehler beim Archivieren des Leads.",
+      "tooltip": "Archivieren — der Lead verschwindet aus Listen, Dashboards und Berichten"
+    },
+    "edit": {
+      "addContact": "Kontakt hinzufügen",
+      "chooseReason": "— Grund auswählen —",
+      "noExtraContacts": "Keine weiteren Kontakte",
+      "noPermission": "Keine Berechtigung — der Vertriebsmitarbeiter gehört nicht zu Ihrer Gruppe",
+      "none": "— keine —",
+      "placeholders": {
+        "agentEmail": "agent@firma.de",
+        "email": "max@firma.de",
+        "fullName": "Max Mustermann",
+        "notes": "Beliebige Notizen…",
+        "website": "z. B. acme.de"
+      },
+      "requiredFields": "Füllen Sie die Pflichtfelder aus:",
+      "requiredForStage": "Füllen Sie die Pflichtfelder für die Phase „{stage}“ aus:",
+      "saveChanges": "Änderungen speichern",
+      "saving": "Wird gespeichert…",
+      "sections": {
+        "agent": "Agentendaten",
+        "basic": "Grunddaten",
+        "sales": "Vertriebsdetails"
+      },
+      "title": "Lead bearbeiten",
+      "unassigned": "— nicht zugewiesen —"
+    },
+    "enrich": {
+      "action": "Daten abrufen",
+      "done": "Daten abgerufen — prüfen Sie die Felder unten",
+      "loading": "Wird abgerufen…"
+    },
+    "fields": {
+      "annualTurnover": "Jahresumsatz",
+      "closeDate": "Abschlussdatum",
+      "companyName": "Firmenname",
+      "contactTitle": "Position im Unternehmen",
+      "email": "E-Mail",
+      "firstContact": "Erstkontakt",
+      "fullName": "Vor- und Nachname",
+      "hotLead": "Heißer Lead",
+      "industry": "Branche",
+      "lostReason": "Verlustgrund",
+      "name": "Name",
+      "nip": "Steuernummer",
+      "onlinePct": "% Online",
+      "person": "Person",
+      "phone": "Telefon",
+      "probability": "Wahrscheinlichkeit",
+      "probabilityPct": "% Wahrscheinlichkeit",
+      "salesperson": "Vertriebsmitarbeiter",
+      "source": "Quelle",
+      "stage": "Phase",
+      "tagsHint": "Tags (durch Kommas getrennt)",
+      "website": "Website",
+      "www": "WWW"
+    },
+    "header": {
+      "backToLeads": "Leads",
+      "edit": "Bearbeiten",
+      "hot": "Heiß"
+    },
+    "history": {
+      "converted": "Lead in Partner umgewandelt",
+      "created": "Lead erstellt",
+      "deleted": "Lead gelöscht",
+      "updated": "Lead aktualisiert"
+    },
+    "hold": {
+      "active": "Zurückstellung aktiv",
+      "activeUntil": "Aktiv bis",
+      "dateRequired": "Geben Sie ein Datum an",
+      "edit": "Zurückstellung bearbeiten",
+      "editTooltip": "Zurückgestellt bis {date} — zum Bearbeiten klicken",
+      "introAfter": "wird als zurückgestellt markiert — ohne Einfluss auf aktive KPIs und die Pipeline, solange die Zurückstellung andauert.",
+      "introBefore": "Der Lead",
+      "label": "Zurückgestellt",
+      "reason": "Grund",
+      "reasonRequired": "Wählen Sie einen Grund",
+      "remove": "Zurückstellung aufheben",
+      "removeFailed": "Fehler beim Aufheben der Zurückstellung.",
+      "saveFailed": "Fehler beim Speichern der Zurückstellung.",
+      "set": "Zurückstellen",
+      "until": "Zurückgestellt bis {date}"
+    },
+    "info": {
+      "collapsePanel": "Bereich einklappen",
+      "expandPanel": "Bereich ausklappen",
+      "title": "Informationen"
+    },
+    "loadError": "Fehler beim Laden des Leads.",
+    "nip": {
+      "countryCodeRequired": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
+      "duplicate": "Diese Steuernummer ist bereits einem anderen Datensatz zugeordnet.",
+      "numberRequired": "Geben Sie die Nummer nach dem Ländercode an",
+      "plTenDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
+      "required": "Die Steuernummer ist erforderlich"
+    },
+    "notFound": "Lead nicht gefunden.",
+    "onboarding": {
+      "completed": "Onboarding abgeschlossen",
+      "completedPartnerActive": "Onboarding abgeschlossen — Partner aktiv",
+      "contractSigned": "Datum der Vertragsunterzeichnung",
+      "contractValue": "Vertragswert (PLN)",
+      "contractValuePlaceholder": "z. B. 50000",
+      "goTo": "Zum Onboarding",
+      "hint": "Geben Sie den Vertragswert und das Datum der Vertragsunterzeichnung an, um den Lead in den Onboarding-Prozess zu überführen.",
+      "inProgress": "Im Onboarding",
+      "inProgressHint": "Der Lead befindet sich im Onboarding-Prozess. Details im Bereich Onboarding.",
+      "introAfter": "in den Onboarding-Prozess. Der Lead erscheint im Bereich Onboarding. Im Partnerregister erscheint er nach der Synchronisierung mit dem DWH.",
+      "introBefore": "Überführung des Leads",
+      "leadLocked": "Lead für die Bearbeitung gesperrt",
+      "panelLink": "Onboarding-Bereich",
+      "partnerAfterSync": "Der Partner erscheint nach der Synchronisierung mit dem DWH im Partnerregister.",
+      "partnerInProgress": "Partner im Onboarding-Prozess",
+      "partnerRegistryLink": "Partnerregister",
+      "start": "Onboarding starten",
+      "startedAt": "Gestartet:"
+    },
+    "sections": {
+      "agent": "Agent",
+      "company": "Firma",
+      "contact": "Kontakt",
+      "extraContacts": "Weitere Kontakte",
+      "notes": "Notizen",
+      "sales": "Vertrieb"
+    },
+    "stage": {
+      "backToNew": "Zurück zu „Neu“",
+      "next": "Nächste Phase",
+      "previous": "Vorherige Phase"
+    },
+    "testAccount": {
+      "apiError": "Fehler bei der Verbindung mit der externen API",
+      "choose": "— auswählen —",
+      "countries": {
+        "cz": "Tschechien",
+        "de": "Deutschland",
+        "fr": "Frankreich",
+        "gb": "Vereinigtes Königreich",
+        "hu": "Ungarn",
+        "pl": "Polen",
+        "ro": "Rumänien",
+        "ru": "Russland",
+        "sk": "Slowakei",
+        "ua": "Ukraine"
+      },
+      "create": "Testkonto anlegen",
+      "created": "Testkonto angelegt",
+      "creating": "Konto wird angelegt…",
+      "fields": {
+        "adminEmail": "E-Mail des Administrators",
+        "billingCountry": "Rechnungsland",
+        "billingEmail": "Rechnungs-E-Mail",
+        "city": "Stadt",
+        "country": "Land",
+        "currency": "Währung",
+        "firstName": "Vorname",
+        "language": "Sprache",
+        "lastName": "Nachname",
+        "street": "Straße und Hausnummer",
+        "subdomain": "Subdomain",
+        "zip": "Postleitzahl"
+      },
+      "fixAndRetry": "Korrigieren Sie die Daten unten und versuchen Sie es erneut.",
+      "languages": {
+        "de": "Deutsch",
+        "en": "Englisch",
+        "pl": "Polnisch",
+        "ro": "Rumänisch",
+        "ru": "Russisch"
+      },
+      "numberHint": "Diese Nummer wird bei der Migration als Partner-Nr. übergeben.",
+      "numberLabel": "Nr.:",
+      "openPriceList": "Preisliste in HTCD öffnen",
+      "openTooltip": "Testkonto im externen System anlegen",
+      "placeholders": {
+        "adminEmail": "admin@firma.de",
+        "billingEmail": "rechnungen@firma.de",
+        "city": "z. B. Berlin",
+        "firstName": "Max",
+        "lastName": "Mustermann",
+        "street": "z. B. Musterstraße 1",
+        "subdomain": "z. B. testfirma",
+        "zip": "z. B. 10115"
+      },
+      "previousError": "Der vorherige Aufruf ist fehlgeschlagen",
+      "retry": "Anlegen wiederholen",
+      "sections": {
+        "admin": "C — Kontoadministrator",
+        "billing": "B — Rechnungsadresse",
+        "technical": "A — Technische Kontodaten"
+      },
+      "title": "Testkonto"
+    }
+  },
+  "leadsList": {
+    "breadcrumb": "Leads",
+    "detail": {
+      "addInDetails": "In den Details hinzufügen",
+      "closeDate": "Abschlussdatum",
+      "details": "Details",
+      "industry": "Branche",
+      "noActivities": "Keine Aktivitäten.",
+      "note": "Notiz",
+      "openDetails": "Details öffnen",
+      "pipeline": "Pipeline",
+      "probability": "Wahrsch.",
+      "stageValue": "Phase: {stage}",
+      "tabs": {
+        "history": "Verlauf",
+        "info": "Informationen"
+      },
+      "tags": "Tags",
+      "value": "Wert",
+      "weightedValue": "Gewichteter Wert"
+    },
+    "fields": {
+      "annualTurnover": "Jahresumsatz",
+      "company": "Firma",
+      "companyRole": "Position im Unternehmen",
+      "email": "E-Mail",
+      "firstContact": "Erstkontakt",
+      "phone": "Telefon",
+      "salesRep": "Vertriebsmitarbeiter",
+      "source": "Quelle",
+      "stage": "Phase",
+      "website": "Website"
+    },
+    "filters": {
+      "all": "Alle",
+      "allReps": "Alle Vertriebsmitarbeiter",
+      "allSources": "Alle Quellen",
+      "allStages": "Alle Phasen",
+      "groupChip": "Gruppe: {name}",
+      "groupsGroup": "Gruppen",
+      "holdOnly": "Nur zurückgestellte",
+      "holdOnlyTitle": "Nur zurückgestellte Leads anzeigen",
+      "hot": "Heiße",
+      "mine": "Meine",
+      "repChip": "Vertriebsmitarbeiter: {name}",
+      "reportFilter": "Filter aus Bericht: {label}",
+      "repsGroup": "Vertriebsmitarbeiter",
+      "wholeGroup": "Ganze Gruppe: {group}"
+    },
+    "importCsv": "CSV-Import",
+    "kanban": {
+      "closed": "Geschlossen",
+      "closedCount": "{won}G / {lost}V",
+      "closedEmpty": "Keine",
+      "empty": "Keine Leads",
+      "holdBadge": "Zurückgestellt",
+      "onboardedTitle": "Onboarding abgeschlossen — Partner aktiv",
+      "partnerBadge": "Partner"
+    },
+    "loading": "Leads werden geladen…",
+    "meeting": {
+      "addedBy": "Hinzugefügt von",
+      "dateTime": "Datum und Uhrzeit",
+      "detailTitle": "Aktivitätsdetails",
+      "duration": "Dauer",
+      "durationMinutes": "Dauer (Min.)",
+      "durationValue": "{count, plural, one {# Minute} other {# Minuten}}",
+      "edit": "Aktivität bearbeiten",
+      "editTitle": "Aktivität bearbeiten",
+      "location": "Ort",
+      "locationPlaceholder": "z. B. Büro des Kunden, Google Meet…",
+      "meetingTitle": "Titel des Meetings",
+      "notes": "Notizen zum Meeting",
+      "notesPlaceholder": "Besprochene Themen, Ergebnisse, nächste Schritte…",
+      "openLead": "Lead öffnen",
+      "openPartner": "Partner öffnen",
+      "participants": "Teilnehmer",
+      "participantsPlaceholder": "z. B. Max Mustermann, anna@firma.de",
+      "saveChanges": "Änderungen speichern",
+      "titlePlaceholder": "Thema des Meetings"
+    },
+    "newLead": {
+      "addContact": "Kontakt hinzufügen",
+      "companyName": "Firmenname",
+      "companyPlaceholder": "z. B. Acme GmbH",
+      "contactName": "Vor- und Nachname des Kontakts",
+      "create": "Lead erstellen",
+      "emailPlaceholder": "max@firma.de",
+      "enrichConfirm": "Ja, abrufen",
+      "enrichDecline": "Nein",
+      "enrichDone": "Daten abgerufen — prüfen Sie die Felder unten und ergänzen Sie fehlende Angaben",
+      "enrichPrompt": "Firmendaten von der Website abrufen?",
+      "extraContacts": "Weitere Kontakte",
+      "fieldRequired": "Pflichtfeld",
+      "fillRequired": "Füllen Sie die Pflichtfelder aus:",
+      "fullName": "Vor- und Nachname",
+      "hot": "Heißer Lead",
+      "namePlaceholder": "Max Mustermann",
+      "noExtraContacts": "Keine weiteren Kontakte",
+      "notes": "Notizen",
+      "notesPlaceholder": "Zusätzliche Informationen…",
+      "optional": "(optional)",
+      "requiredContactName": "Vor- und Nachname",
+      "select": "— auswählen —",
+      "subtitle": "Neue Verkaufschance hinzufügen",
+      "taxId": "Steuernummer",
+      "taxIdErrors": {
+        "countryCode": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
+        "numberMissing": "Geben Sie die Nummer nach dem Ländercode an",
+        "polishDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
+        "required": "Die Steuernummer ist erforderlich"
+      },
+      "title": "Neuer Lead",
+      "unassigned": "— nicht zugewiesen —",
+      "value": "Wert (PLN)",
+      "websitePlaceholder": "z. B. acme.de"
+    },
+    "saving": "Wird gespeichert…",
+    "searchPlaceholder": "Firmen, Kontakte suchen…",
+    "sourceGroups": {
+      "marketing": "Marketing"
+    },
+    "stats": {
+      "hot": "Heiß",
+      "lost": "Verloren",
+      "opportunities": "Verkaufschancen",
+      "pipeline": "Pipeline (PLN)",
+      "won": "Gewonnen"
+    },
+    "table": {
+      "chance": "% Wahrsch.",
+      "closeDateShort": "Abschl.",
+      "companyContact": "Firma / Kontakt",
+      "empty": "Keine Leads, die den Kriterien entsprechen",
+      "firstContactShort": "Erstkont.",
+      "migrated": "Migriert",
+      "next": "Nächste",
+      "online": "% Online",
+      "pageOf": "Seite {page} von {pages}",
+      "previous": "Vorherige"
+    },
+    "timeline": {
+      "allDay": "fällig",
+      "durationShort": "{minutes}min",
+      "empty": "Keine Meetings",
+      "emptyHint": "Planen Sie das erste Meeting in den Details des Leads oder Partners",
+      "futureHint": "Scrollen Sie nach unten, um weitere Meetings zu sehen",
+      "loading": "Meetings werden geladen…",
+      "pastHint": "Scrollen Sie nach oben, um frühere Meetings zu sehen",
+      "subtitle": "Aktivitäten mit Datum · chronologisch",
+      "title": "Aktivitätenkalender",
+      "todayTag": "HEUTE",
+      "tomorrow": "Morgen · {date}",
+      "yesterday": "Gestern · {date}"
+    },
+    "title": "Vertriebs-Leads",
+    "view": {
+      "kanban": "Kanban",
+      "table": "Tabelle",
+      "timeline": "Zeitachse"
+    }
+  },
+  "meetings": {
+    "durationMin": "Dauer (Min.)",
+    "location": "Ort",
+    "locationPlaceholder": "z. B. Konferenzraum A",
+    "meetingLocation": "Ort des Meetings",
+    "participantPlaceholder": "E-Mail eingeben…",
+    "participants": "Teilnehmer",
+    "participantsHint": "E-Mail-Adressen, durch Kommas getrennt",
+    "titlePlaceholder": "Titel des Meetings",
+    "titleRequiredPlaceholder": "Titel des Meetings *"
+  },
+  "partnerDetail": {
+    "activity": {
+      "bodyPlaceholder": "Inhalt / Beschreibung…",
+      "dueDate": {
+        "businessDays": "{count} WT ({date})",
+        "today": "Heute ({date})",
+        "tomorrow": "Morgen ({date})"
+      },
+      "durationPlaceholder": "z. B. 60",
+      "empty": "Keine Aktivitäten.",
+      "meetingSubjectPlaceholder": "Thema des Meetings *",
+      "ownerMeDefault": "— ich (Standard) —",
+      "participantPlaceholder": "E-Mail oder Namen eingeben…",
+      "participantsEmails": "Teilnehmer (E-Mail-Adressen)"
+    },
+    "calls": {
+      "agentNumber": "Agent: {phone}",
+      "billingNumber": "Abrechnung: {phone}",
+      "contactNumber": "Kontakt: {phone}"
+    },
+    "churn": {
+      "badge": {
+        "analyzedAt": "Analyse: {date}",
+        "daysSinceOrder": "Tage ohne Best.: {days}",
+        "salesDrop": "Umsatzrückgang: {percent}%"
+      },
+      "daysSinceOrder": "Tage ohne Bestellung",
+      "levels": {
+        "critical": "Kritisch",
+        "high": "Hoch",
+        "low": "Niedrig",
+        "medium": "Mittel"
+      },
+      "noRisk": "Kein Abwanderungsrisiko",
+      "salesDrop": "Rückgang M-2→M-1",
+      "score": "{score} Pkt.",
+      "title": "Abwanderungsrisiko"
+    },
+    "commissionBasis": {
+      "bookings": "Anzahl der Buchungen",
+      "notApplicable": "Nicht zutreffend",
+      "segments": "Anzahl der Segmente",
+      "turnoverThresholds": "Umsatzschwellen"
+    },
+    "documents": {
+      "empty": "Keine verknüpften Dokumente",
+      "fallbackTitle": "Dokument #{id}",
+      "goTo": "Zum Dokument",
+      "noContractHint": "Fügen Sie ein Dokument hinzu, um die Zusammenarbeit mit dem Partner zu belegen.",
+      "noContractTitle": "Kein verknüpfter Vertrag.",
+      "pickerHint": "Suchen Sie Dokumente nach Name, Nummer oder Rechtsträger (Entity). Sichtbar sind nur Dokumente, auf die Sie Zugriff haben (mind. Read).",
+      "unlink": "Verknüpfung entfernen"
+    },
+    "edit": {
+      "addContact": "Kontakt hinzufügen",
+      "billingContactIncomplete": "Es wird empfohlen, alle Felder des Abrechnungskontakts auszufüllen.",
+      "contactsSaveFailed": "Die Partnerdaten wurden gespeichert, aber die weiteren Kontakte konnten nicht gespeichert werden.",
+      "contractContactIncomplete": "Es wird empfohlen, alle Felder des Vertragskontakts auszufüllen.",
+      "dwhLockedHint": "Mit DWH gekennzeichnete Felder werden aus dem Transaktionssystem synchronisiert und können nicht bearbeitet werden.",
+      "managersOnly": "nur Manager können bearbeiten",
+      "noExtraContacts": "Keine weiteren Kontakte",
+      "noGroup": "— keine Gruppe —",
+      "none": "— keine —",
+      "openTasksWarning": "{count, plural, one {# offene Onboarding-Aufgabe} other {# offene Onboarding-Aufgaben}} — der Status „Aktiv“ kann nicht gesetzt werden",
+      "partnerIdHint": "Partner-ID im Transaktionssystem",
+      "placeholders": {
+        "address": "Musterstraße 1",
+        "adminEmail": "admin@firma.de",
+        "adminFirstName": "z. B. Max",
+        "adminLastName": "z. B. Mustermann",
+        "billingContactEmail": "abrechnung@firma.de",
+        "billingContactTitle": "Leiter Abrechnung",
+        "billingCountry": "Deutschland",
+        "billingEmail": "billing@firma.de",
+        "billingFullName": "Erika Musterfrau",
+        "city": "Berlin",
+        "commission": "z. B. 0.05",
+        "country": "z. B. Deutschland",
+        "creditLimit": "z. B. 50000",
+        "deposit": "z. B. 10000",
+        "email": "max@firma.de",
+        "fullName": "Max Mustermann",
+        "language": "z. B. de",
+        "notes": "Beliebige Notizen…",
+        "partnerId": "z. B. 42",
+        "source": "z. B. Messe, Empfehlung, Cold Call",
+        "subdomain": "z. B. acme",
+        "website": "https://firma.de"
+      },
+      "removeContact": "Kontakt entfernen",
+      "saveChanges": "Änderungen speichern",
+      "saveFailed": "Fehler beim Speichern",
+      "saving": "Wird gespeichert…",
+      "sections": {
+        "basic": "Grunddaten",
+        "contractAndFinance": "Vertrag und Finanzen",
+        "managerAndGroup": "Betreuer und Gruppe",
+        "salesAndSource": "Vertrieb und Quelle",
+        "tagsAndNotes": "Tags und Notizen"
+      },
+      "subdomainHint": "Adresse der Subdomain im System (wird beim Anlegen des Testkontos ausgefüllt)",
+      "syncedWithDwh": "Mit DWH synchronisiert",
+      "title": "Partner bearbeiten",
+      "unassigned": "— nicht zugewiesen —"
+    },
+    "email": {
+      "empty": "Keine E-Mails. Senden Sie die erste Nachricht über „+ Neue E-Mail“."
+    },
+    "fields": {
+      "activeUsers": "Aktive Benutzer",
+      "activeUsersShort": "Akt. Benutzer",
+      "address": "Adresse",
+      "adminEmail": "E-Mail des Admins",
+      "adminFirstName": "Vorname des Admins",
+      "adminLastName": "Nachname des Admins",
+      "annualTurnover": "Jahresumsatz",
+      "billingCountry": "Rechnungsland",
+      "billingEmail": "Rechnungs-E-Mail",
+      "city": "Stadt",
+      "commission": "Provision WT/TM",
+      "commissionBasis": "Grundlage",
+      "companyName": "Firmenname",
+      "contactTitle": "Position im Unternehmen",
+      "contractExpires": "Ablaufdatum",
+      "contractFrom": "Vertrag ab",
+      "contractSigned": "Datum der Unterzeichnung",
+      "contractTo": "Vertrag bis",
+      "country": "Land",
+      "creditLimit": "Kreditlimit",
+      "crmtreeId": "CRMtree ID",
+      "crmtreePartnerId": "CRMtree Partner ID",
+      "currency": "Währung",
+      "depositAmount": "Kautionsbetrag",
+      "depositDateIn": "Einzahlungsdatum",
+      "depositDateOut": "Rückzahlungsdatum",
+      "email": "E-Mail",
+      "firstContact": "Erstkontakt",
+      "firstName": "Vorname",
+      "fullName": "Vor- und Nachname",
+      "industry": "Branche",
+      "language": "Sprache",
+      "lastName": "Nachname",
+      "manager": "Betreuer",
+      "managerSalesperson": "Betreuer / Vertriebsmitarbeiter",
+      "nip": "Steuernummer",
+      "note": "Notiz",
+      "notes": "Notizen",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Währung des Partners",
+      "partnerGroup": "Partnergruppe",
+      "phone": "Telefon",
+      "source": "Quelle",
+      "status": "Status",
+      "subdomain": "Subdomain",
+      "tags": "Tags",
+      "tagsHint": "Tags (durch Kommas getrennt)",
+      "value": "Wert",
+      "website": "Website",
+      "zip": "Postleitzahl"
+    },
+    "header": {
+      "activeSince": "Aktiv seit {date}",
+      "backToPartners": "Partner",
+      "churn": "Abwanderungsrisiko: {level}",
+      "edit": "Bearbeiten",
+      "noEditPermission": "Keine Berechtigung zum Bearbeiten dieses Partners"
+    },
+    "history": {
+      "created": "Partner erstellt",
+      "deleted": "Partner gelöscht",
+      "searchPlaceholder": "Suchen…",
+      "updated": "Partner aktualisiert"
+    },
+    "info": {
+      "activeUsersCount": "{count, plural, one {# aktiver} other {# aktive}}",
+      "collapsePanel": "Bereich einklappen",
+      "expandPanel": "Bereich ausklappen",
+      "notSet": "nicht festgelegt",
+      "title": "Informationen"
+    },
+    "loadError": "Fehler beim Laden.",
+    "nip": {
+      "countryCodeRequired": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
+      "numberRequired": "Geben Sie die Nummer nach dem Ländercode an",
+      "plTenDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
+      "required": "Die Steuernummer ist erforderlich"
+    },
+    "notFound": "Partner nicht gefunden.",
+    "onboarding": {
+      "addTask": "Aufgabe hinzufügen",
+      "advanceFailed": "Die Phase kann nicht abgeschlossen werden",
+      "deleteTaskConfirm": "Aufgabe „{title}“ löschen?",
+      "descriptionOptionalPlaceholder": "Beschreibung (optional)…",
+      "descriptionPlaceholder": "Beschreibung…",
+      "empty": "Keine Aufgaben für diese Phase. Klicken Sie auf „+ Aufgabe hinzufügen“.",
+      "finish": "Onboarding abschließen",
+      "finishFailed": "Das Onboarding kann nicht abgeschlossen werden",
+      "nextStep": "Nächste Phase",
+      "overdue": "Überfällig",
+      "responsiblePerson": "— verantwortliche Person —",
+      "steps": {
+        "contractSigned": "Vertrag unterzeichnet",
+        "ready": "Bereit",
+        "systemSetup": "Systemkonfiguration",
+        "userTraining": "Benutzerschulung"
+      },
+      "taskTitlePlaceholder": "Titel der Aufgabe *",
+      "tasksFor": "Aufgaben:"
+    },
+    "opportunities": {
+      "dueBy": "bis {date}",
+      "status": "Status der Verkaufschance",
+      "statuses": {
+        "closed": "Geschlossen",
+        "in_progress": "In Bearbeitung",
+        "new": "Neu"
+      },
+      "titleWithCount": "Verkaufschancen ({count})"
+    },
+    "sales": {
+      "kpi": {
+        "grossTurnover": "Bruttoumsatz PLN",
+        "netRevenue": "Nettoerlös PLN",
+        "netTurnover": "Nettoumsatz PLN",
+        "products": "Produkte",
+        "transactions": "Transaktionen"
+      },
+      "noData": "Keine Vertriebsdaten",
+      "periods": {
+        "currentMonth": "Lfd. Monat",
+        "last12Months": "Letzte 12 Mon.",
+        "last3Months": "Letzte 3 Mon.",
+        "last6Months": "Letzte 6 Mon.",
+        "ytd": "YTD {year}"
+      },
+      "productBreakdown": "Aufteilung nach Produkten",
+      "title": "Vertriebsdaten DWH"
+    },
+    "sections": {
+      "additionalData": "Zusätzliche Daten",
+      "agent": "Agentendaten",
+      "billingAddress": "Rechnungsadresse",
+      "billingContact": "Kontakt für Abrechnung",
+      "contractContact": "Kontakt für Vertragsfragen",
+      "extraContacts": "Weitere Kontakte",
+      "financialTerms": "Finanzielle Konditionen",
+      "partnerAdmin": "Partner-Admin"
+    }
+  },
+  "partnersList": {
+    "card": {
+      "marginAmount": "{amount} PLN Marge",
+      "onboardingStep": "Schritt {step} / {total}",
+      "openOpportunities": "{count, plural, one {# Verkaufschance} other {# Verkaufschancen}}"
+    },
+    "churn": {
+      "levels": {
+        "critical": "Kritisch",
+        "high": "Hoch",
+        "low": "Niedrig",
+        "medium": "Mittel"
+      },
+      "points": "{score} Pkt.",
+      "risk": "Abwanderungsrisiko",
+      "riskWithLevel": "Abwanderungsrisiko: {level}"
+    },
+    "create": {
+      "companyPlaceholder": "Firmenname",
+      "error": "Fehler beim Erstellen des Partners. Versuchen Sie es erneut.",
+      "hint": "Sie können einen Partner ohne verknüpften Lead erstellen.",
+      "saving": "Wird gespeichert…",
+      "submit": "Partner erstellen",
+      "taxIdHint": "(optional — bei DWH-Partnern automatisch ausgefüllt)",
+      "title": "Neuer Partner",
+      "unassigned": "— nicht zugewiesen —"
+    },
+    "documents": {
+      "linkedCount": "{count, plural, one {Der Partner hat # verknüpftes Dokument} other {Der Partner hat # verknüpfte Dokumente}}. Zum Anzeigen klicken.",
+      "noContract": "Kein verknüpfter Vertrag"
+    },
+    "empty": "Keine Partner, die den Kriterien entsprechen.",
+    "fields": {
+      "accountManager": "Betreuer / Vertriebsmitarbeiter",
+      "annualTurnover": "Jahresumsatz",
+      "company": "Firma",
+      "contact": "Kontakt",
+      "email": "E-Mail",
+      "group": "Gruppe",
+      "industry": "Branche",
+      "licenseCount": "Anzahl der Lizenzen",
+      "salesRep": "Vertriebsmitarbeiter",
+      "status": "Status",
+      "taxId": "Steuernummer"
+    },
+    "reportFilter": {
+      "clear": "Filter löschen",
+      "label": "Filter aus Bericht:"
+    },
+    "table": {
+      "churn": "Abwanderung",
+      "contractUntil": "Vertrag bis",
+      "crmTurnover": "CRM-Umsatz",
+      "dwhMargin": "DWH-Marge",
+      "dwhMarginHint": "Marge YTD aus dem DWH",
+      "dwhTurnover": "DWH-Umsatz",
+      "dwhTurnoverHint": "Bruttoumsatz YTD aus dem DWH"
+    },
+    "taxIdErrors": {
+      "countryCode": "Geben Sie den Ländercode an (2 Buchstaben), z. B. PL",
+      "duplicate": "Diese Steuernummer ist bereits einem anderen Datensatz zugeordnet.",
+      "numberMissing": "Geben Sie die Nummer nach dem Ländercode an",
+      "polishDigits": "Für PL sind 10 Ziffern nach dem Ländercode erforderlich",
+      "required": "Die Steuernummer ist erforderlich"
+    },
+    "title": "Partnerregister",
+    "toolbar": {
+      "allGroups": "Alle Gruppen",
+      "allIndustries": "Alle Branchen",
+      "allSalesReps": "Alle Vertriebsmitarbeiter",
+      "allStatuses": "Alle Status",
+      "clear": "Löschen",
+      "onlyMine": "Nur meine",
+      "searchPlaceholder": "Firma, Kontakt suchen…"
+    },
+    "view": {
+      "cards": "Karten",
+      "table": "Tabelle"
+    }
+  },
+  "sms": {
+    "emptyConversation": "Keine Nachrichten — schreiben Sie unten die erste.",
+    "last": "letzte:",
+    "loadFailed": "Fehler beim Abrufen der SMS",
+    "messagePlaceholder": "Nachricht…",
+    "noMessages": "Keine Nachrichten",
+    "noNumbers": "Keine Telefonnummern für SMS.",
+    "send": "Senden",
+    "sendFailed": "Fehler beim Senden der SMS",
+    "statuses": {
+      "delivered": "Zugestellt",
+      "failed": "Fehler",
+      "received": "Empfangen",
+      "sent": "Gesendet"
+    }
+  },
+  "whatsapp": {
+    "checkingConfig": "Konfiguration wird geprüft...",
+    "configuredNumber": "konfigurierte Nummer",
+    "conversation": "WhatsApp-Unterhaltung",
+    "empty": "Keine gesendeten WhatsApp-Nachrichten.",
+    "from": "Von:",
+    "lastMessage": "letzte Nachricht:",
+    "loadingHistory": "Verlauf wird geladen…",
+    "messageBody": "Inhalt der Nachricht",
+    "messagePlaceholder": "Inhalt der Nachricht...",
+    "missingCountryCode": "Geben Sie die Nummer mit Ländervorwahl an, z. B. +49 151 23456789.",
+    "newMessage": "Neue WhatsApp-Nachricht",
+    "notConfigured": "WhatsApp ist für diese Organisation nicht konfiguriert. Wenden Sie sich an den Administrator.",
+    "reply": {
+      "action": "Antworten",
+      "placeholder": "Inhalt der Antwort...",
+      "replyingVia": "Sie antworten über WhatsApp",
+      "send": "Antwort senden",
+      "sending": "Wird gesendet…"
+    },
+    "send": "WhatsApp senden",
+    "sendFailed": "Fehler beim Senden der WhatsApp-Nachricht",
+    "sending": "Wird gesendet...",
+    "sent": "Nachricht gesendet.",
+    "to": "An:",
+    "toField": "An"
+  }
+}

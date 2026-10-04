@@ -132,6 +132,17 @@ function checkScope(scope) {
   }
 }
 
+// Older files carry Polish code comments; only text the user can see matters
+// here. Comments are blanked out, keeping line breaks so line numbers stay right.
+function withoutComments(source) {
+  const blank = (comment) => comment.replace(/[^\r\n]/g, ' ');
+  return source
+    .replace(/<!--[\s\S]*?-->/g, blank)
+    .replace(/\/\*[\s\S]*?\*\//g, blank)
+    // "//" starts a comment only at the start of a line or after whitespace — not in "https://".
+    .replace(/(^|\s)\/\/[^\r\n]*/g, blank);
+}
+
 function checkTranslatedSourceFiles() {
   if (!existsSync(TRANSLATED_FILES_MANIFEST)) return;
   const files = JSON.parse(readFileSync(TRANSLATED_FILES_MANIFEST, 'utf8'));
@@ -140,7 +151,7 @@ function checkTranslatedSourceFiles() {
       report(`${TRANSLATED_FILES_MANIFEST}: ${path} does not exist`);
       continue;
     }
-    readFileSync(path, 'utf8').split(/\r?\n/).forEach((line, index) => {
+    withoutComments(readFileSync(path, 'utf8')).split(/\r?\n/).forEach((line, index) => {
       if (POLISH_LETTERS.test(line)) report(`${path}:${index + 1}: Polish text written in code — move it to ${I18N_DIR}`);
     });
   }

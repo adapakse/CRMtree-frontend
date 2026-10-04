@@ -3,6 +3,7 @@ import { Component, OnInit, OnDestroy, inject, NgZone, ChangeDetectorRef } from 
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser, PartnersReportPartner } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
@@ -11,51 +12,53 @@ type SortDir = 'asc' | 'desc';
 @Component({
   selector: 'wt-crm-partners-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="page">
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <h1>Rejestr Partnerów</h1>
+    <h1>{{ t('partnersList.title') }}</h1>
     <span style="flex:1"></span>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;white-space:nowrap;margin-right:8px">
       <input type="checkbox" style="width:auto;margin:0;cursor:pointer;accent-color:var(--orange)"
              [(ngModel)]="onlyMine" (ngModelChange)="onOnlyMineChange()">
-      Tylko moje
+      {{ t('partnersList.toolbar.onlyMine') }}
     </label>
-    <button class="btn-view" [class.active]="viewMode==='cards'" (click)="viewMode='cards'">⊞ Karty</button>
-    <button class="btn-view" [class.active]="viewMode==='table'" (click)="viewMode='table'">☰ Tabela</button>
-    <button class="btn-primary" (click)="openCreateForm()">+ Nowy partner</button>
+    <button class="btn-view" [class.active]="viewMode==='cards'" (click)="viewMode='cards'">⊞ {{ t('partnersList.view.cards') }}</button>
+    <button class="btn-view" [class.active]="viewMode==='table'" (click)="viewMode='table'">☰ {{ t('partnersList.view.table') }}</button>
+    <button class="btn-primary" (click)="openCreateForm()">+ {{ t('partnersList.create.title') }}</button>
   </div>
 
   <!-- TOOLBAR -->
   <div class="toolbar">
-    <input class="tb-search" [(ngModel)]="search" (ngModelChange)="onSearch()" placeholder="🔍 Szukaj firmy, kontaktu…">
+    <input class="tb-search" [(ngModel)]="search" (ngModelChange)="onSearch()" [placeholder]="'🔍 ' + t('partnersList.toolbar.searchPlaceholder')">
     <select class="sel" [(ngModel)]="filterStatus" (ngModelChange)="reload()">
-      <option value="">Wszystkie statusy</option>
-      <option *ngFor="let s of statusOptions" [value]="s.key">{{s.label}}</option>
+      <option value="">{{ t('partnersList.toolbar.allStatuses') }}</option>
+      <option *ngFor="let s of statusOptions" [value]="s.key">{{ t(s.labelKey) }}</option>
     </select>
     <select class="sel" [(ngModel)]="filterManager" (ngModelChange)="reload()" *ngIf="isManager">
-      <option value="">Wszyscy handlowcy</option>
+      <option value="">{{ t('partnersList.toolbar.allSalesReps') }}</option>
       <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
     </select>
     <select class="sel" [(ngModel)]="filterGroup" (ngModelChange)="reload()">
-      <option value="">Wszystkie grupy</option>
+      <option value="">{{ t('partnersList.toolbar.allGroups') }}</option>
       <option *ngFor="let g of partnerGroupNames" [value]="g">{{g}}</option>
     </select>
     <select class="sel" [(ngModel)]="filterIndustry" (ngModelChange)="reload()">
-      <option value="">Wszystkie branże</option>
+      <option value="">{{ t('partnersList.toolbar.allIndustries') }}</option>
       <option *ngFor="let i of industries" [value]="i">{{i}}</option>
     </select>
-    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()">✕ Wyczyść</button>
+    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()">✕ {{ t('partnersList.toolbar.clear') }}</button>
   </div>
 
   <!-- Banner filtru z raportu -->
   <div *ngIf="reportFilterLabel" style="background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:6px 20px;font-size:12px;color:var(--orange-dark);display:flex;align-items:center;gap:8px;flex-shrink:0">
     <span>📊</span>
-    <span>Filtr z raportu: <strong>{{reportFilterLabel}}</strong></span>
-    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:var(--orange-dark);font-size:12px;margin-left:4px">✕ Wyczyść filtr</button>
+    <span>{{ t('partnersList.reportFilter.label') }} <strong>{{reportFilterLabel}}</strong></span>
+    <button (click)="clearFilters()" style="background:none;border:none;cursor:pointer;color:var(--orange-dark);font-size:12px;margin-left:4px">✕ {{ t('partnersList.reportFilter.clear') }}</button>
   </div>
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac)"></div>
@@ -67,17 +70,17 @@ type SortDir = 'asc' | 'desc';
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
           <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
-          <span *ngIf="(p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
-                title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
+                [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
                 style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
                 (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
       </div>
       <div *ngIf="p.churn_risk && p.churn_risk !== 'none' && !p.churn_exempt" class="churn-badge churn-{{p.churn_risk}}">
-        🔥 Ryzyko churn: {{churnLabel(p.churn_risk)}}
-        <span *ngIf="p.churn_score != null"> · {{p.churn_score}} pkt</span>
+        🔥 {{ t('partnersList.churn.riskWithLevel', { level: churnLabel(p.churn_risk) }) }}
+        <span *ngIf="p.churn_score != null"> · {{ t('partnersList.churn.points', { score: p.churn_score }) }}</span>
       </div>
       <div class="pc-contact" *ngIf="p.contact_name">{{p.contact_name}}<span *ngIf="p.contact_title"> · {{p.contact_title}}</span></div>
       <div class="pc-meta">
@@ -95,37 +98,37 @@ type SortDir = 'asc' | 'desc';
         <span *ngIf="p.contract_value" class="pc-arr">{{p.contract_value | number:'1.0-0'}} {{p.annual_turnover_currency || 'PLN'}}<span *ngIf="p.online_pct != null" class="pc-online"> · {{p.online_pct}}% online</span></span>
         <span *ngIf="p.open_opp_count"
               class="pc-opp" [class.pc-opp-valued]="+(p.open_opp_value||0)>0">
-          💡 {{p.open_opp_count}} szans<span *ngIf="+(p.open_opp_value||0)>0"> · {{p.open_opp_value|number:'1.0-0'}} PLN</span>
+          💡 {{ t('partnersList.card.openOpportunities', { count: p.open_opp_count }) }}<span *ngIf="+(p.open_opp_value||0)>0"> · {{p.open_opp_value|number:'1.0-0'}} PLN</span>
         </span>
       </div>
       <ng-container *ngIf="partnerSales(p) as s">
         <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
           <span style="font-size:11px;font-weight:700;color:#f97316">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
-          <span style="font-size:11px;font-weight:600;color:#16a34a">▲ {{s.revenue_pln|number:'1.0-0'}} PLN marży</span>
+          <span style="font-size:11px;font-weight:600;color:#16a34a">▲ {{ t('partnersList.card.marginAmount', { amount: (s.revenue_pln|number:'1.0-0') }) }}</span>
           <span style="font-size:9px;color:#9ca3af">YTD</span>
         </div>
       </ng-container>
       <div class="pc-onboarding" *ngIf="p.status==='onboarding'">
         <div class="onb-bar"><div class="onb-fill" [style.width.%]="(p.onboarding_step/3)*100"></div></div>
-        <span class="onb-label">Krok {{p.onboarding_step}} / 3</span>
+        <span class="onb-label">{{ t('partnersList.card.onboardingStep', { step: p.onboarding_step, total: 3 }) }}</span>
       </div>
     </div>
-    <div class="no-data" *ngIf="partners.length===0">Brak partnerów spełniających kryteria.</div>
+    <div class="no-data" *ngIf="partners.length===0">{{ t('partnersList.empty') }}</div>
   </div>
 
   <!-- ══ TABELA ══ -->
   <div *ngIf="!loading && viewMode==='table'" class="table-wrap">
     <div class="tw-head" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 90px 95px">
-      <div class="th sortable" (click)="sortBy('company')">Firma <span class="si">{{sortIcon('company')}}</span></div>
-      <div class="th">Status</div>
-      <div class="th sortable" (click)="sortBy('industry')">Branża <span class="si">{{sortIcon('industry')}}</span></div>
-      <div class="th sortable" (click)="sortBy('group_name')">Grupa <span class="si">{{sortIcon('group_name')}}</span></div>
-      <div class="th sortable" (click)="sortBy('manager_name')">Handlowiec <span class="si">{{sortIcon('manager_name')}}</span></div>
-      <div class="th sortable" (click)="sortBy('contract_value')">Obrót CRM <span class="si">{{sortIcon('contract_value')}}</span></div>
-      <div class="th" title="Obrót brutto YTD z DWH">DWH Obrót</div>
-      <div class="th" title="Marża YTD z DWH">DWH Marża</div>
-      <div class="th" title="Ryzyko churn">Churn</div>
-      <div class="th sortable" (click)="sortBy('contract_expires')">Umowa do <span class="si">{{sortIcon('contract_expires')}}</span></div>
+      <div class="th sortable" (click)="sortBy('company')">{{ t('partnersList.fields.company') }} <span class="si">{{sortIcon('company')}}</span></div>
+      <div class="th">{{ t('partnersList.fields.status') }}</div>
+      <div class="th sortable" (click)="sortBy('industry')">{{ t('partnersList.fields.industry') }} <span class="si">{{sortIcon('industry')}}</span></div>
+      <div class="th sortable" (click)="sortBy('group_name')">{{ t('partnersList.fields.group') }} <span class="si">{{sortIcon('group_name')}}</span></div>
+      <div class="th sortable" (click)="sortBy('manager_name')">{{ t('partnersList.fields.salesRep') }} <span class="si">{{sortIcon('manager_name')}}</span></div>
+      <div class="th sortable" (click)="sortBy('contract_value')">{{ t('partnersList.table.crmTurnover') }} <span class="si">{{sortIcon('contract_value')}}</span></div>
+      <div class="th" [title]="t('partnersList.table.dwhTurnoverHint')">{{ t('partnersList.table.dwhTurnover') }}</div>
+      <div class="th" [title]="t('partnersList.table.dwhMarginHint')">{{ t('partnersList.table.dwhMargin') }}</div>
+      <div class="th" [title]="t('partnersList.churn.risk')">{{ t('partnersList.table.churn') }}</div>
+      <div class="th sortable" (click)="sortBy('contract_expires')">{{ t('partnersList.table.contractUntil') }} <span class="si">{{sortIcon('contract_expires')}}</span></div>
     </div>
     <div *ngFor="let p of partners" class="tw-row" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 90px 95px"
          (click)="goPartner(p.id, p.crm_uuid)">
@@ -140,9 +143,9 @@ type SortDir = 'asc' | 'desc';
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
           <span *ngIf="hasUnreadReply(p)"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
-          <span *ngIf="(p.doc_count??0)===0" title="Brak powiązanej umowy" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
-                title="Partner posiada {{p.doc_count}} powiązany/e dokument/y. Kliknij, aby zobaczyć."
+                [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
                 style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
                 (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </span>
@@ -172,7 +175,7 @@ type SortDir = 'asc' | 'desc';
         {{p.contract_expires?(p.contract_expires|date:'dd.MM.yy'):'—'}}
       </div>
     </div>
-    <div class="no-data" style="grid-column:1/-1" *ngIf="partners.length===0">Brak partnerów spełniających kryteria.</div>
+    <div class="no-data" style="grid-column:1/-1" *ngIf="partners.length===0">{{ t('partnersList.empty') }}</div>
   </div>
 
   <!-- Pager -->
@@ -185,35 +188,36 @@ type SortDir = 'asc' | 'desc';
   <!-- Create panel -->
   <div class="side-panel" *ngIf="showCreate" (click)="showCreate=false">
     <div class="side-panel-inner" (click)="$event.stopPropagation()">
-      <h3>Nowy partner</h3>
-      <p class="hint">Możesz utworzyć partnera bez powiązanego leada.</p>
-      <label>Firma *<input [(ngModel)]="newP.company" placeholder="Nazwa firmy"></label>
-      <label>NIP <span style="font-size:10px;color:#9ca3af">(opcjonalne — dla partnerów DWH wypełniane automatycznie)</span>
+      <h3>{{ t('partnersList.create.title') }}</h3>
+      <p class="hint">{{ t('partnersList.create.hint') }}</p>
+      <label>{{ t('partnersList.fields.company') }} *<input [(ngModel)]="newP.company" [placeholder]="t('partnersList.create.companyPlaceholder')"></label>
+      <label>{{ t('partnersList.fields.taxId') }} <span style="font-size:10px;color:#9ca3af">{{ t('partnersList.create.taxIdHint') }}</span>
         <input [(ngModel)]="newP.nip" placeholder="PL1234567890" maxlength="14"
                (ngModelChange)="onPartnerNipChange()"
                [style.border-color]="partnerNipError ? '#ef4444' : ''">
         <span *ngIf="partnerNipError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipError }}</span>
       </label>
-      <label>Kontakt<input [(ngModel)]="newP.contact_name"></label>
-      <label>Email<input [(ngModel)]="newP.email" type="email"></label>
-      <label>Branża<input [(ngModel)]="newP.industry"></label>
-      <label>Obrót roczny<div style="display:flex;gap:6px"><input [(ngModel)]="newP.contract_value" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="newP.annual_turnover_currency" style="width:70px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
-      <label>Liczba licencji<input [(ngModel)]="newP.license_count" type="number" min="0"></label>
-      <label *ngIf="isManager">Opiekun / Handlowiec
+      <label>{{ t('partnersList.fields.contact') }}<input [(ngModel)]="newP.contact_name"></label>
+      <label>{{ t('partnersList.fields.email') }}<input [(ngModel)]="newP.email" type="email"></label>
+      <label>{{ t('partnersList.fields.industry') }}<input [(ngModel)]="newP.industry"></label>
+      <label>{{ t('partnersList.fields.annualTurnover') }}<div style="display:flex;gap:6px"><input [(ngModel)]="newP.contract_value" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="newP.annual_turnover_currency" style="width:70px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
+      <label>{{ t('partnersList.fields.licenseCount') }}<input [(ngModel)]="newP.license_count" type="number" min="0"></label>
+      <label *ngIf="isManager">{{ t('partnersList.fields.accountManager') }}
         <select [(ngModel)]="newP.manager_id">
-          <option value="">— nieprzypisany —</option>
+          <option value="">{{ t('partnersList.create.unassigned') }}</option>
           <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
         </select>
       </label>
       <div class="panel-actions">
-        <button class="btn-outline" (click)="showCreate=false">Anuluj</button>
+        <button class="btn-outline" (click)="showCreate=false">{{ 'actions.cancel' | transloco }}</button>
         <button class="btn-primary" (click)="createPartner()" [disabled]="!newP.company||!!partnerNipError||saving">
-          {{saving?'Zapisywanie…':'Utwórz partnera'}}
+          {{ saving ? t('partnersList.create.saving') : t('partnersList.create.submit') }}
         </button>
       </div>
     </div>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
@@ -298,6 +302,7 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
   private auth   = inject(AuthService);
   private router = inject(Router);
   private route  = inject(ActivatedRoute);
+  private transloco = inject(TranslocoService);
 
   get hasPbxFeature(): boolean { return this.auth.hasFeature('pbx'); }
   get hasWhatsappFeature(): boolean { return this.auth.hasFeature('whatsapp'); }
@@ -328,28 +333,28 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
 
   onPartnerNipChange(): void {
     const val = (this.newP.nip || '').trim().toUpperCase();
-    if (!val) { this.partnerNipError = 'NIP jest wymagany'; return; }
+    if (!val) { this.partnerNipError = this.transloco.translate('crm.partnersList.taxIdErrors.required'); return; }
     const cc = val.slice(0, 2);
     const digits = val.slice(2);
     if (!/^[A-Z]{2}$/.test(cc)) {
-      this.partnerNipError = 'Podaj kod kraju (2 litery), np. PL';
+      this.partnerNipError = this.transloco.translate('crm.partnersList.taxIdErrors.countryCode');
       return;
     }
     if (cc === 'PL' && !/^\d{10}$/.test(digits)) {
-      this.partnerNipError = 'Dla PL wymagane 10 cyfr po kodzie kraju';
+      this.partnerNipError = this.transloco.translate('crm.partnersList.taxIdErrors.polishDigits');
       return;
     }
     if (cc !== 'PL' && digits.length === 0) {
-      this.partnerNipError = 'Podaj numer po kodzie kraju';
+      this.partnerNipError = this.transloco.translate('crm.partnersList.taxIdErrors.numberMissing');
       return;
     }
     this.partnerNipError = '';
   }
-  statusOptions = Object.entries(PARTNER_STATUS_LABELS).map(([key, label]) => ({ key: key as PartnerStatus, label }));
+  statusOptions = (Object.keys(PARTNER_STATUS_LABELS) as PartnerStatus[]).map(key => ({ key, labelKey: 'labels.partnerStatuses.' + key }));
 
   get totalPages() { return Math.ceil(this.total / this.pageSize); }
   get isManager() { const u = this.auth.user(); return !!(u?.is_admin || u?.crm_role === 'sales_manager'); }
-  statusLabel(s: PartnerStatus) { return PARTNER_STATUS_LABELS[s] || s; }
+  statusLabel(s: PartnerStatus) { return s in PARTNER_STATUS_LABELS ? this.transloco.translate('crm.labels.partnerStatuses.' + s) : s; }
 
   sortBy(col: string): void {
     if (this.sortCol === col) { this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc'; }
@@ -449,10 +454,10 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
 
   churnLabel(risk: string | null | undefined): string {
     switch (risk) {
-      case 'critical': return 'Krytyczne';
-      case 'high':     return 'Wysokie';
-      case 'medium':   return 'Średnie';
-      case 'low':      return 'Niskie';
+      case 'critical':
+      case 'high':
+      case 'medium':
+      case 'low':      return this.transloco.translate('crm.partnersList.churn.levels.' + risk);
       default:         return '';
     }
   }
@@ -508,9 +513,9 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           this.saving = false;
           if (err?.status === 409) {
-            this.partnerNipError = err?.error?.error || 'Ten Numer NIP jest już przypisany dla innego rekordu.';
+            this.partnerNipError = err?.error?.error || this.transloco.translate('crm.partnersList.taxIdErrors.duplicate');
           } else {
-            this.partnerNipError = 'Błąd tworzenia partnera. Spróbuj ponownie.';
+            this.partnerNipError = this.transloco.translate('crm.partnersList.create.error');
           }
           this.cdr.markForCheck();
         });

@@ -1,0 +1,1076 @@
+{
+  "activity": {
+    "add": "Añadir actividad",
+    "card": {
+      "closeTask": "Cerrar tarea",
+      "collapse": "Contraer",
+      "createdAt": "creada el {date}",
+      "delete": "Eliminar",
+      "expand": "Expandir",
+      "reopen": "Reabrir"
+    },
+    "communication": "Comunicación",
+    "customDate": "Fecha personalizada…",
+    "deleteConfirm": "¿Eliminar la actividad «{title}»?",
+    "dueDate": {
+      "inOneWeek": "Dentro de una semana ({date})",
+      "inThreeBusinessDays": "Dentro de 3 días hábiles ({weekday})",
+      "inTwoBusinessDays": "Dentro de 2 días hábiles ({weekday})",
+      "inTwoWeeks": "Dentro de 2 semanas ({date})",
+      "none": "Ninguna",
+      "today": "Hoy",
+      "tomorrow": "Mañana"
+    },
+    "empty": "No hay actividades en esta categoría.",
+    "form": {
+      "bodyPlaceholder": "Contenido / notas…",
+      "bodyShortPlaceholder": "Contenido…",
+      "dateTime": "Fecha y hora",
+      "dueDate": "Fecha",
+      "noOwner": "— sin asignar —",
+      "none": "— ninguno —",
+      "owner": "Propietario",
+      "priority": "Prioridad",
+      "reminder": "Recordatorio"
+    },
+    "modal": {
+      "addedBy": "Añadido por",
+      "assignToSalesperson": "Asignar a un comercial",
+      "assignedTo": "Asignado a",
+      "comment": "Comentario",
+      "dateTime": "Fecha y hora",
+      "description": "Descripción",
+      "descriptionNotes": "Descripción / notas",
+      "edit": "Editar",
+      "saveChanges": "Guardar cambios",
+      "title": "Título",
+      "type": "Tipo",
+      "unassigned": "— sin asignar —"
+    },
+    "reminders": {
+      "atDue": "En la fecha límite de la tarea",
+      "day1Before": "1 día antes",
+      "days2Before": "2 días antes",
+      "days3Before": "3 días antes",
+      "hour1Before": "1 h antes",
+      "minutes30Before": "30 min antes",
+      "none": "Sin recordatorio"
+    },
+    "tabs": {
+      "all": "Todas",
+      "calls": "Llamadas",
+      "emails": "Correos",
+      "meetings": "Reuniones",
+      "notes": "Notas",
+      "tasks": "Tareas"
+    }
+  },
+  "calls": {
+    "call": "Llamar",
+    "callNumber": "Llamar: {phone}",
+    "contactFallback": "Contacto",
+    "mainNumber": "Principal: {phone}",
+    "noNumber": "Sin número"
+  },
+  "consents": {
+    "collapse": "contraer",
+    "details": "detalles",
+    "lastChange": "Último cambio:",
+    "save": "Guardar consentimientos",
+    "saved": "Guardado",
+    "saving": "Guardando…",
+    "title": "Consentimientos de marketing",
+    "values": {
+      "denied": "Denegado",
+      "granted": "Concedido",
+      "noData": "Sin datos"
+    }
+  },
+  "documents": {
+    "add": "Añadir",
+    "linkFailed": "No se pudo vincular el documento. Comprueba que tienes los permisos necesarios.",
+    "none": "Ninguno",
+    "open": "Abrir documento",
+    "picker": {
+      "added": "Añadido",
+      "hint": "Busca documentos por nombre, número o entidad.",
+      "noResults": "Sin resultados",
+      "readOnly": "Lectura",
+      "readOnlyTooltip": "Solo lectura — sin permisos para vincular",
+      "searchPlaceholder": "Buscar documento…",
+      "searching": "Buscando…",
+      "title": "Añadir documento vinculado"
+    },
+    "titleWithCount": "Documentos ({count})",
+    "unlinkConfirm": "¿Quitar el vínculo con el documento?",
+    "unlinkFailed": "No se pudo quitar el vínculo."
+  },
+  "email": {
+    "addressTooltip": "Correo: {email}",
+    "attachments": {
+      "download": "Descargar",
+      "downloadTooltip": "Descargar archivo",
+      "preview": "Vista previa",
+      "previewTooltip": "Abrir en el navegador"
+    },
+    "cc": "CC:",
+    "checkNew": "Comprobar nuevos",
+    "checkNewTooltip": "Comprobar correos nuevos (debug)",
+    "connecting": "Conectando con Google…",
+    "date": "Fecha:",
+    "debug": {
+      "error": "Error: {message}",
+      "newMessages": "Mensajes nuevos: {count}"
+    },
+    "disconnect": "Desconectar",
+    "disconnectConfirm": "¿Desconectar tu cuenta de correo? Para seguir enviando correos tendrás que volver a conectarla.",
+    "driveDownloadFailed": "Error al descargar el archivo de Drive",
+    "drivePickerTitle": "Elige los archivos que quieres adjuntar",
+    "driveReauthRequired": "Hay que volver a conectar el buzón de Gmail — ponte en contacto con el administrador.",
+    "empty": "No hay correos enviados.",
+    "fields": {
+      "attachments": "Adjuntos",
+      "body": "Mensaje",
+      "cc": "CC",
+      "subject": "Asunto",
+      "to": "Para"
+    },
+    "from": "De:",
+    "fromDrive": "Desde Drive",
+    "fromGoogleDrive": "Desde Google Drive",
+    "hideQuoted": "Ocultar el historial citado",
+    "incomingReply": "Respuesta",
+    "label": "Correo",
+    "messageFallbackTitle": "Mensaje",
+    "new": "Nuevo correo",
+    "noAddress": "Sin dirección",
+    "noTemplate": "— sin plantilla —",
+    "notConfigured": "El correo no está configurado para esta organización. Ponte en contacto con el administrador.",
+    "placeholders": {
+      "body": "Texto del mensaje…",
+      "cc": "cc@empresa.es",
+      "ccShort": "CC…",
+      "recipient": "correo@empresa.es",
+      "replyBody": "Texto de la respuesta…",
+      "subject": "Asunto del mensaje",
+      "toShort": "Para…"
+    },
+    "reply": {
+      "action": "Responder",
+      "hideDetails": "Ocultar",
+      "replyingTo": "Respondes a:",
+      "send": "Enviar respuesta",
+      "sendFailed": "Error de envío",
+      "showDetails": "Detalles"
+    },
+    "replyHeading": "Respuesta",
+    "send": "Enviar correo",
+    "sendAction": "Enviar",
+    "sendFailed": "Error al enviar el correo",
+    "sending": "Enviando…",
+    "showQuoted": "Mostrar el historial citado",
+    "thread": {
+      "anotherUser": "otro usuario",
+      "empty": "No hay mensajes en el hilo.",
+      "loading": "Cargando el hilo…",
+      "notOwnerCompose": "Este hilo pertenece a {owner} — no puedes responder en él. El correo de abajo se enviará como mensaje nuevo desde tu cuenta.",
+      "notOwnerComposeUnknown": "No puedes responder en este hilo. El correo de abajo se enviará como mensaje nuevo desde tu cuenta.",
+      "notOwnerReply": "Este hilo pertenece a {owner} — no puedes responder en él. Este mensaje se enviará como nuevo, desde tu cuenta.",
+      "notOwnerReplyUnknown": "No puedes responder en este hilo. Este mensaje se enviará como nuevo, desde tu cuenta.",
+      "ownedByTooltip": "El hilo pertenece a {owner} — enviarás un mensaje nuevo desde tu cuenta",
+      "title": "Hilo de correo"
+    },
+    "to": "Para:",
+    "trainingMode": "Modo de formación",
+    "writeNew": "Escribir un correo nuevo"
+  },
+  "history": {
+    "activityAdded": "Actividad añadida: {title}",
+    "activityClosed": "Actividad cerrada: {title}",
+    "activityDeleted": "Actividad eliminada: {title}",
+    "activityUpdated": "Actividad actualizada: {title}",
+    "changed": "Cambiado: {changes}",
+    "consentChanged": "Consentimiento «{label}»: {from} → {to}",
+    "documentLinked": "Documento vinculado",
+    "empty": "No hay entradas.",
+    "emptyValue": "(vacío)",
+    "fields": {
+      "activeUsers": "Usuarios activos",
+      "agentName": "Agente",
+      "annualTurnoverCurrency": "Moneda",
+      "assignedTo": "Comercial",
+      "billingAddress": "Dirección",
+      "billingCity": "Ciudad",
+      "billingEmail": "Correo fact.",
+      "billingPhone": "Tel. fact.",
+      "closeDate": "Fecha cierre",
+      "commission": "Comisión",
+      "company": "Empresa",
+      "contactName": "Contacto",
+      "contactTitle": "Cargo en la empresa",
+      "contractExpires": "Contrato hasta",
+      "contractSigned": "Contrato desde",
+      "contractValue": "Volumen de negocio",
+      "country": "País",
+      "creditLimit": "Límite de crédito",
+      "deposit": "Depósito",
+      "dwhPartnerId": "CRMtree Partner ID",
+      "email": "Correo electrónico",
+      "firstContactDate": "Primer contacto",
+      "group": "Grupo",
+      "hot": "Caliente",
+      "industry": "Sector",
+      "language": "Idioma",
+      "lostReason": "Motivo de la pérdida",
+      "nip": "NIF",
+      "notes": "Notas",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Moneda",
+      "phone": "Teléfono",
+      "probability": "Probabilidad %",
+      "source": "Origen",
+      "stage": "Etapa",
+      "status": "Estado",
+      "subdomain": "Subdominio",
+      "tags": "Etiquetas",
+      "valuePln": "Valor PLN",
+      "website": "Sitio web"
+    },
+    "lostReason": "Motivo: {reason}",
+    "no": "No",
+    "noResults": "Sin resultados.",
+    "searchPlaceholder": "Buscar en el historial…",
+    "showAll": "Mostrar todo",
+    "stageChanged": "Cambio de etapa: {from} → {to}",
+    "systemUser": "Sistema",
+    "title": "Historial de cambios",
+    "yes": "Sí"
+  },
+  "labels": {
+    "activityStatuses": {
+      "closed": "cerrada",
+      "new": "nueva",
+      "open": "abierta"
+    },
+    "activityTypes": {
+      "call": "Llamada",
+      "doc_sent": "Documento",
+      "email": "Correo",
+      "meeting": "Reunión",
+      "note": "Nota",
+      "opportunity": "Oportunidad",
+      "qbr": "QBR",
+      "task": "Tarea",
+      "training": "Formación"
+    },
+    "partnerStatuses": {
+      "active": "Activo",
+      "churned": "Perdido",
+      "inactive": "Inactivo",
+      "onboarding": "Implantación"
+    },
+    "priorities": {
+      "asap": "ASAP",
+      "important": "Importante",
+      "low": "Baja",
+      "medium": "Media"
+    },
+    "productTypes": {
+      "car_rental": "Alquiler de coche",
+      "hotel": "Hotel",
+      "other": "Otros",
+      "transfer": "Traslado",
+      "transport_bus": "Autobús",
+      "transport_ferry": "Ferri",
+      "transport_flight": "Vuelo",
+      "transport_train": "Tren",
+      "travel_insurance": "Seguro de viaje",
+      "visa": "Visado"
+    },
+    "sourceTypes": {
+      "document": "Documento",
+      "lead": "Lead",
+      "onboarding": "Onboarding",
+      "partner": "Partner",
+      "project": "Proyecto"
+    },
+    "sources": {
+      "agent": "Agente",
+      "aliasHello": "Alias Hello",
+      "coldCall": "Cold Call",
+      "emailCampaign": "Campaña de correo",
+      "googleAdsAiSearch": "Google Ads AI Search",
+      "googleAdsPmax": "Google Ads PMax",
+      "googleAdsSeaBrand": "Google Ads SEA Brand",
+      "inbound": "Inbound",
+      "linkedin": "LinkedIn",
+      "linkedinInMail": "LinkedIn InMail",
+      "linkedinLeadForm": "LinkedIn Lead Form",
+      "onlineForm": "Formulario en línea",
+      "other": "Otro",
+      "own": "Propio",
+      "partner": "Partner",
+      "referral": "Recomendación",
+      "tradeFair": "Feria / Evento",
+      "website": "Sitio web"
+    },
+    "stages": {
+      "archived": "Archivo",
+      "closed_lost": "Perdido",
+      "closed_won": "Ganado",
+      "negotiation": "Negociación",
+      "new": "Nuevo",
+      "offer": "Oferta",
+      "onboarded": "Incorporado",
+      "onboarding": "En onboarding",
+      "presentation": "Presentación",
+      "qualification": "Cualificación"
+    }
+  },
+  "leadDetail": {
+    "archive": {
+      "action": "Archivar",
+      "confirm": "¿Archivar el lead «{company}»? Desaparecerá de las listas, los paneles y los informes — solo se verá al elegir el filtro Etapa = Archivo. Seguirá siendo editable y desde allí se podrá devolver a la etapa «Nuevo».",
+      "failed": "Error al archivar el lead.",
+      "tooltip": "Archivar — el lead desaparecerá de las listas, los paneles y los informes"
+    },
+    "edit": {
+      "addContact": "Añadir contacto",
+      "chooseReason": "— elige un motivo —",
+      "noExtraContacts": "Sin contactos adicionales",
+      "noPermission": "Sin permisos — el comercial no pertenece a tu grupo",
+      "none": "— ninguno —",
+      "placeholders": {
+        "agentEmail": "agente@empresa.es",
+        "email": "juan@empresa.es",
+        "fullName": "Juan García",
+        "notes": "Notas libres…",
+        "website": "p. ej., acme.es"
+      },
+      "requiredFields": "Completa los campos obligatorios:",
+      "requiredForStage": "Completa los campos obligatorios para la etapa «{stage}»:",
+      "saveChanges": "Guardar cambios",
+      "saving": "Guardando…",
+      "sections": {
+        "agent": "Datos del agente",
+        "basic": "Datos básicos",
+        "sales": "Detalles de venta"
+      },
+      "title": "Editar lead",
+      "unassigned": "— sin asignar —"
+    },
+    "enrich": {
+      "action": "Obtener datos",
+      "done": "Datos obtenidos — revisa los campos de abajo",
+      "loading": "Obteniendo…"
+    },
+    "fields": {
+      "annualTurnover": "Volumen de negocio anual",
+      "closeDate": "Fecha de cierre",
+      "companyName": "Nombre de la empresa",
+      "contactTitle": "Cargo en la empresa",
+      "email": "Correo electrónico",
+      "firstContact": "Primer contacto",
+      "fullName": "Nombre y apellidos",
+      "hotLead": "Lead caliente",
+      "industry": "Sector",
+      "lostReason": "Motivo de la pérdida",
+      "name": "Nombre",
+      "nip": "NIF",
+      "onlinePct": "% Online",
+      "person": "Persona",
+      "phone": "Teléfono",
+      "probability": "Probabilidad",
+      "probabilityPct": "% Probabilidad",
+      "salesperson": "Comercial",
+      "source": "Origen",
+      "stage": "Etapa",
+      "tagsHint": "Etiquetas (separadas por comas)",
+      "website": "Sitio web",
+      "www": "Web"
+    },
+    "header": {
+      "backToLeads": "Leads",
+      "edit": "Editar",
+      "hot": "Caliente"
+    },
+    "history": {
+      "converted": "Lead convertido en partner",
+      "created": "Lead creado",
+      "deleted": "Lead eliminado",
+      "updated": "Lead actualizado"
+    },
+    "hold": {
+      "active": "Espera activa",
+      "activeUntil": "Activa hasta",
+      "dateRequired": "Indica la fecha",
+      "edit": "Editar la espera",
+      "editTooltip": "En espera hasta {date} — haz clic para editar",
+      "introAfter": "se marcará como en espera — sin efecto en los KPI activos ni en el pipeline mientras dure la espera.",
+      "introBefore": "El lead",
+      "label": "En espera",
+      "reason": "Motivo",
+      "reasonRequired": "Elige un motivo",
+      "remove": "Quitar la espera",
+      "removeFailed": "Error al quitar la espera.",
+      "saveFailed": "Error al guardar la espera.",
+      "set": "Poner en espera",
+      "until": "En espera hasta {date}"
+    },
+    "info": {
+      "collapsePanel": "Contraer panel",
+      "expandPanel": "Expandir panel",
+      "title": "Información"
+    },
+    "loadError": "Error al cargar el lead.",
+    "nip": {
+      "countryCodeRequired": "Indica el código de país (2 letras), p. ej., PL",
+      "duplicate": "Este NIF ya está asignado a otro registro.",
+      "numberRequired": "Indica el número después del código de país",
+      "plTenDigits": "Para PL se requieren 10 dígitos después del código de país",
+      "required": "El NIF es obligatorio"
+    },
+    "notFound": "Lead no encontrado.",
+    "onboarding": {
+      "completed": "Onboarding finalizado",
+      "completedPartnerActive": "Onboarding finalizado — Partner activo",
+      "contractSigned": "Fecha de firma del contrato",
+      "contractValue": "Valor del contrato (PLN)",
+      "contractValuePlaceholder": "p. ej., 50000",
+      "goTo": "Ir a Onboarding",
+      "hint": "Indica el valor del contrato y la fecha de firma para pasar el lead al proceso de implantación.",
+      "inProgress": "En proceso de onboarding",
+      "inProgressHint": "El lead está en proceso de implantación. Detalles en la sección Onboarding.",
+      "introAfter": "al proceso de implantación. El lead aparecerá en la sección Onboarding. En el Registro de partners aparecerá tras la sincronización con el DWH.",
+      "introBefore": "Migración del lead",
+      "leadLocked": "Lead bloqueado para edición",
+      "panelLink": "Panel de Onboarding",
+      "partnerAfterSync": "El partner aparecerá en el Registro de partners tras la sincronización con el DWH.",
+      "partnerInProgress": "partner en proceso de implantación",
+      "partnerRegistryLink": "Registro de partners",
+      "start": "Iniciar onboarding",
+      "startedAt": "Iniciado:"
+    },
+    "sections": {
+      "agent": "Agente",
+      "company": "Empresa",
+      "contact": "Contacto",
+      "extraContacts": "Contactos adicionales",
+      "notes": "Notas",
+      "sales": "Ventas"
+    },
+    "stage": {
+      "backToNew": "Volver a Nuevo",
+      "next": "Etapa siguiente",
+      "previous": "Etapa anterior"
+    },
+    "testAccount": {
+      "apiError": "Error de conexión con la API externa",
+      "choose": "— elige —",
+      "countries": {
+        "cz": "Chequia",
+        "de": "Alemania",
+        "fr": "Francia",
+        "gb": "Reino Unido",
+        "hu": "Hungría",
+        "pl": "Polonia",
+        "ro": "Rumanía",
+        "ru": "Rusia",
+        "sk": "Eslovaquia",
+        "ua": "Ucrania"
+      },
+      "create": "Crear cuenta de prueba",
+      "created": "Cuenta de prueba creada",
+      "creating": "Creando la cuenta…",
+      "fields": {
+        "adminEmail": "Correo del administrador",
+        "billingCountry": "País de facturación",
+        "billingEmail": "Correo de facturación",
+        "city": "Ciudad",
+        "country": "País",
+        "currency": "Moneda",
+        "firstName": "Nombre",
+        "language": "Idioma",
+        "lastName": "Apellidos",
+        "street": "Calle y número",
+        "subdomain": "Subdominio",
+        "zip": "Código postal"
+      },
+      "fixAndRetry": "Corrige los datos de abajo e inténtalo de nuevo.",
+      "languages": {
+        "de": "Alemán",
+        "en": "Inglés",
+        "pl": "Polaco",
+        "ro": "Rumano",
+        "ru": "Ruso"
+      },
+      "numberHint": "Este número se transferirá como N.º de partner durante la migración.",
+      "numberLabel": "N.º:",
+      "openPriceList": "Abrir la lista de precios en HTCD",
+      "openTooltip": "Crear una cuenta de prueba en el sistema externo",
+      "placeholders": {
+        "adminEmail": "admin@empresa.es",
+        "billingEmail": "facturas@empresa.es",
+        "city": "p. ej., Madrid",
+        "firstName": "Juan",
+        "lastName": "García",
+        "street": "p. ej., Calle Ejemplo 1",
+        "subdomain": "p. ej., empresa-prueba",
+        "zip": "p. ej., 28001"
+      },
+      "previousError": "La llamada anterior terminó con un error",
+      "retry": "Reintentar la creación",
+      "sections": {
+        "admin": "C — Administrador de la cuenta",
+        "billing": "B — Dirección de facturación",
+        "technical": "A — Datos técnicos de la cuenta"
+      },
+      "title": "Cuenta de prueba"
+    }
+  },
+  "leadsList": {
+    "breadcrumb": "Leads",
+    "detail": {
+      "addInDetails": "Añadir en los detalles",
+      "closeDate": "Fecha de cierre",
+      "details": "Detalles",
+      "industry": "Sector",
+      "noActivities": "Sin actividades.",
+      "note": "Nota",
+      "openDetails": "Abrir detalles",
+      "pipeline": "Pipeline",
+      "probability": "Probab.",
+      "stageValue": "Etapa: {stage}",
+      "tabs": {
+        "history": "Historial",
+        "info": "Información"
+      },
+      "tags": "Etiquetas",
+      "value": "Valor",
+      "weightedValue": "Valor ponderado"
+    },
+    "fields": {
+      "annualTurnover": "Volumen de negocio anual",
+      "company": "Empresa",
+      "companyRole": "Cargo en la empresa",
+      "email": "Correo electrónico",
+      "firstContact": "Primer contacto",
+      "phone": "Teléfono",
+      "salesRep": "Comercial",
+      "source": "Origen",
+      "stage": "Etapa",
+      "website": "Sitio web"
+    },
+    "filters": {
+      "all": "Todos",
+      "allReps": "Todos los comerciales",
+      "allSources": "Todos los orígenes",
+      "allStages": "Todas las etapas",
+      "groupChip": "Grupo: {name}",
+      "groupsGroup": "Grupos",
+      "holdOnly": "Solo en espera",
+      "holdOnlyTitle": "Mostrar solo los leads en espera",
+      "hot": "Calientes",
+      "mine": "Míos",
+      "repChip": "Comercial: {name}",
+      "reportFilter": "Filtro del informe: {label}",
+      "repsGroup": "Comerciales",
+      "wholeGroup": "Todo el grupo: {group}"
+    },
+    "importCsv": "Importar CSV",
+    "kanban": {
+      "closed": "Cerrados",
+      "closedCount": "{won}G / {lost}P",
+      "closedEmpty": "Ninguno",
+      "empty": "Sin leads",
+      "holdBadge": "En espera",
+      "onboardedTitle": "Onboarding finalizado — Partner activo",
+      "partnerBadge": "Partner"
+    },
+    "loading": "Cargando leads…",
+    "meeting": {
+      "addedBy": "Añadido por",
+      "dateTime": "Fecha y hora",
+      "detailTitle": "Detalles de la actividad",
+      "duration": "Duración",
+      "durationMinutes": "Duración (min)",
+      "durationValue": "{count, plural, one {# minuto} other {# minutos}}",
+      "edit": "Editar actividad",
+      "editTitle": "Edición de la actividad",
+      "location": "Ubicación",
+      "locationPlaceholder": "p. ej., Oficina del cliente, Google Meet…",
+      "meetingTitle": "Título de la reunión",
+      "notes": "Notas de la reunión",
+      "notesPlaceholder": "Temas tratados, conclusiones, próximos pasos…",
+      "openLead": "Abrir lead",
+      "openPartner": "Abrir partner",
+      "participants": "Participantes",
+      "participantsPlaceholder": "p. ej., Juan García, ana@empresa.es",
+      "saveChanges": "Guardar cambios",
+      "titlePlaceholder": "Asunto de la reunión"
+    },
+    "newLead": {
+      "addContact": "Añadir contacto",
+      "companyName": "Nombre de la empresa",
+      "companyPlaceholder": "p. ej., Acme S.L.",
+      "contactName": "Nombre y apellidos del contacto",
+      "create": "Crear lead",
+      "emailPlaceholder": "juan@empresa.es",
+      "enrichConfirm": "Sí, obtener",
+      "enrichDecline": "No",
+      "enrichDone": "Datos obtenidos — revisa los campos de abajo y completa los que falten",
+      "enrichPrompt": "¿Obtener los datos de la empresa desde su web?",
+      "extraContacts": "Contactos adicionales",
+      "fieldRequired": "Campo obligatorio",
+      "fillRequired": "Completa los campos obligatorios:",
+      "fullName": "Nombre y apellidos",
+      "hot": "Lead caliente",
+      "namePlaceholder": "Juan García",
+      "noExtraContacts": "Sin contactos adicionales",
+      "notes": "Notas",
+      "notesPlaceholder": "Información adicional…",
+      "optional": "(opcional)",
+      "requiredContactName": "Nombre y apellidos",
+      "select": "— elige —",
+      "subtitle": "Añade una nueva oportunidad de venta",
+      "taxId": "NIF",
+      "taxIdErrors": {
+        "countryCode": "Indica el código de país (2 letras), p. ej., PL",
+        "numberMissing": "Indica el número después del código de país",
+        "polishDigits": "Para PL se requieren 10 dígitos después del código de país",
+        "required": "El NIF es obligatorio"
+      },
+      "title": "Nuevo lead",
+      "unassigned": "— sin asignar —",
+      "value": "Valor (PLN)",
+      "websitePlaceholder": "p. ej., acme.es"
+    },
+    "saving": "Guardando…",
+    "searchPlaceholder": "Buscar empresas, contactos…",
+    "sourceGroups": {
+      "marketing": "Marketing"
+    },
+    "stats": {
+      "hot": "Calientes",
+      "lost": "Perdidos",
+      "opportunities": "Oportunidades de venta",
+      "pipeline": "Pipeline (PLN)",
+      "won": "Ganados"
+    },
+    "table": {
+      "chance": "% Probabilidad",
+      "closeDateShort": "Cierre",
+      "companyContact": "Empresa / Contacto",
+      "empty": "No hay leads que cumplan los criterios",
+      "firstContactShort": "1.er cont.",
+      "migrated": "Migrado",
+      "next": "Siguiente",
+      "online": "% Online",
+      "pageOf": "Página {page} de {pages}",
+      "previous": "Anterior"
+    },
+    "timeline": {
+      "allDay": "vence",
+      "durationShort": "{minutes}min",
+      "empty": "Sin reuniones",
+      "emptyHint": "Programa la primera reunión en los detalles del lead o del partner",
+      "futureHint": "Desplázate hacia abajo para ver las próximas reuniones",
+      "loading": "Cargando reuniones…",
+      "pastHint": "Desplázate hacia arriba para ver las reuniones anteriores",
+      "subtitle": "Actividades con fecha · en orden cronológico",
+      "title": "Calendario de actividades",
+      "todayTag": "HOY",
+      "tomorrow": "Mañana · {date}",
+      "yesterday": "Ayer · {date}"
+    },
+    "title": "Leads de ventas",
+    "view": {
+      "kanban": "Kanban",
+      "table": "Tabla",
+      "timeline": "Cronología"
+    }
+  },
+  "meetings": {
+    "durationMin": "Duración (min)",
+    "location": "Lugar",
+    "locationPlaceholder": "p. ej., Sala de reuniones A",
+    "meetingLocation": "Lugar de la reunión",
+    "participantPlaceholder": "Escribe un correo…",
+    "participants": "Participantes",
+    "participantsHint": "correos separados por comas",
+    "titlePlaceholder": "Título de la reunión",
+    "titleRequiredPlaceholder": "Título de la reunión *"
+  },
+  "partnerDetail": {
+    "activity": {
+      "bodyPlaceholder": "Contenido / descripción…",
+      "dueDate": {
+        "businessDays": "{count} d. háb. ({date})",
+        "today": "Hoy ({date})",
+        "tomorrow": "Mañana ({date})"
+      },
+      "durationPlaceholder": "p. ej., 60",
+      "empty": "Sin actividades.",
+      "meetingSubjectPlaceholder": "Asunto de la reunión *",
+      "ownerMeDefault": "— yo (por defecto) —",
+      "participantPlaceholder": "Escribe un correo o un nombre…",
+      "participantsEmails": "Participantes (correos)"
+    },
+    "calls": {
+      "agentNumber": "Agente: {phone}",
+      "billingNumber": "Facturación: {phone}",
+      "contactNumber": "Contacto: {phone}"
+    },
+    "churn": {
+      "badge": {
+        "analyzedAt": "Análisis: {date}",
+        "daysSinceOrder": "Días sin ped.: {days}",
+        "salesDrop": "Caída de ventas: {percent}%"
+      },
+      "daysSinceOrder": "Días sin pedido",
+      "levels": {
+        "critical": "Crítico",
+        "high": "Alto",
+        "low": "Bajo",
+        "medium": "Medio"
+      },
+      "noRisk": "Sin riesgo de churn",
+      "salesDrop": "Caída M-2→M-1",
+      "score": "{score} pts",
+      "title": "Riesgo de churn"
+    },
+    "commissionBasis": {
+      "bookings": "Número de reservas",
+      "notApplicable": "No aplica",
+      "segments": "Número de segmentos",
+      "turnoverThresholds": "Tramos de volumen de negocio"
+    },
+    "documents": {
+      "empty": "Sin documentos vinculados",
+      "fallbackTitle": "Documento #{id}",
+      "goTo": "Ir al documento",
+      "noContractHint": "Añade un documento para confirmar la colaboración con el partner.",
+      "noContractTitle": "Sin contrato vinculado.",
+      "pickerHint": "Busca documentos por nombre, número o entidad (Entity). Solo se muestran los documentos a los que tienes acceso (mín. Read).",
+      "unlink": "Quitar vínculo"
+    },
+    "edit": {
+      "addContact": "Añadir contacto",
+      "billingContactIncomplete": "Se recomienda completar todos los campos del contacto de facturación.",
+      "contactsSaveFailed": "Los datos del partner se han guardado, pero no se pudieron guardar los contactos adicionales.",
+      "contractContactIncomplete": "Se recomienda completar todos los campos del contacto para el contrato.",
+      "dwhLockedHint": "Los campos marcados con DWH se sincronizan desde el sistema transaccional y no se pueden editar.",
+      "managersOnly": "solo los gerentes pueden editar",
+      "noExtraContacts": "Sin contactos adicionales",
+      "noGroup": "— sin grupo —",
+      "none": "— ninguno —",
+      "openTasksWarning": "{count, plural, one {# tarea de implantación pendiente} other {# tareas de implantación pendientes}} — no se puede establecer el estado Activo",
+      "partnerIdHint": "ID del partner en el sistema transaccional",
+      "placeholders": {
+        "address": "Calle Ejemplo 1",
+        "adminEmail": "admin@empresa.es",
+        "adminFirstName": "p. ej., Juan",
+        "adminLastName": "p. ej., García",
+        "billingContactEmail": "facturacion@empresa.es",
+        "billingContactTitle": "Responsable de facturación",
+        "billingCountry": "España",
+        "billingEmail": "billing@empresa.es",
+        "billingFullName": "Ana Martínez",
+        "city": "Madrid",
+        "commission": "p. ej., 0.05",
+        "country": "p. ej., España",
+        "creditLimit": "p. ej., 50000",
+        "deposit": "p. ej., 10000",
+        "email": "juan@empresa.es",
+        "fullName": "Juan García",
+        "language": "p. ej., es",
+        "notes": "Notas libres…",
+        "partnerId": "p. ej., 42",
+        "source": "p. ej., feria, recomendación, cold call",
+        "subdomain": "p. ej., acme",
+        "website": "https://empresa.es"
+      },
+      "removeContact": "Eliminar contacto",
+      "saveChanges": "Guardar cambios",
+      "saveFailed": "Error al guardar",
+      "saving": "Guardando…",
+      "sections": {
+        "basic": "Datos básicos",
+        "contractAndFinance": "Contrato y finanzas",
+        "managerAndGroup": "Responsable y grupo",
+        "salesAndSource": "Ventas y origen",
+        "tagsAndNotes": "Etiquetas y notas"
+      },
+      "subdomainHint": "Dirección del subdominio en el sistema (se rellena al crear la cuenta de prueba)",
+      "syncedWithDwh": "Sincronizado con el DWH",
+      "title": "Editar partner",
+      "unassigned": "— sin asignar —"
+    },
+    "email": {
+      "empty": "No hay correos. Envía el primer mensaje haciendo clic en «+ Nuevo correo»."
+    },
+    "fields": {
+      "activeUsers": "Usuarios activos",
+      "activeUsersShort": "Usuarios act.",
+      "address": "Dirección",
+      "adminEmail": "Correo del admin",
+      "adminFirstName": "Nombre del admin",
+      "adminLastName": "Apellidos del admin",
+      "annualTurnover": "Volumen de negocio anual",
+      "billingCountry": "País de facturación",
+      "billingEmail": "Correo de facturación",
+      "city": "Ciudad",
+      "commission": "Comisión WT/TM",
+      "commissionBasis": "Base",
+      "companyName": "Nombre de la empresa",
+      "contactTitle": "Cargo en la empresa",
+      "contractExpires": "Fecha de vencimiento",
+      "contractFrom": "Contrato desde",
+      "contractSigned": "Fecha de firma",
+      "contractTo": "Contrato hasta",
+      "country": "País",
+      "creditLimit": "Límite de crédito",
+      "crmtreeId": "CRMtree ID",
+      "crmtreePartnerId": "CRMtree Partner ID",
+      "currency": "Moneda",
+      "depositAmount": "Importe del depósito",
+      "depositDateIn": "Fecha de ingreso",
+      "depositDateOut": "Fecha de devolución",
+      "email": "Correo electrónico",
+      "firstContact": "Primer contacto",
+      "firstName": "Nombre",
+      "fullName": "Nombre y apellidos",
+      "industry": "Sector",
+      "language": "Idioma",
+      "lastName": "Apellidos",
+      "manager": "Responsable",
+      "managerSalesperson": "Responsable / Comercial",
+      "nip": "NIF",
+      "note": "Nota",
+      "notes": "Notas",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Moneda del partner",
+      "partnerGroup": "Grupo de partners",
+      "phone": "Teléfono",
+      "source": "Origen",
+      "status": "Estado",
+      "subdomain": "Subdominio",
+      "tags": "Etiquetas",
+      "tagsHint": "Etiquetas (separadas por comas)",
+      "value": "Valor",
+      "website": "Sitio web",
+      "zip": "Código postal"
+    },
+    "header": {
+      "activeSince": "Activo desde {date}",
+      "backToPartners": "Partners",
+      "churn": "Churn: {level}",
+      "edit": "Editar",
+      "noEditPermission": "No tienes permisos para editar este partner"
+    },
+    "history": {
+      "created": "Partner creado",
+      "deleted": "Partner eliminado",
+      "searchPlaceholder": "Buscar…",
+      "updated": "Partner actualizado"
+    },
+    "info": {
+      "activeUsersCount": "{count, plural, one {# activo} other {# activos}}",
+      "collapsePanel": "Contraer panel",
+      "expandPanel": "Expandir panel",
+      "notSet": "sin definir",
+      "title": "Información"
+    },
+    "loadError": "Error de carga.",
+    "nip": {
+      "countryCodeRequired": "Indica el código de país (2 letras), p. ej., PL",
+      "numberRequired": "Indica el número después del código de país",
+      "plTenDigits": "Para PL se requieren 10 dígitos después del código de país",
+      "required": "El NIF es obligatorio"
+    },
+    "notFound": "Partner no encontrado.",
+    "onboarding": {
+      "addTask": "Añadir tarea",
+      "advanceFailed": "No se puede finalizar la etapa",
+      "deleteTaskConfirm": "¿Eliminar la tarea «{title}»?",
+      "descriptionOptionalPlaceholder": "Descripción (opcional)…",
+      "descriptionPlaceholder": "Descripción…",
+      "empty": "No hay tareas para esta etapa. Haz clic en «+ Añadir tarea».",
+      "finish": "Finalizar la implantación",
+      "finishFailed": "No se puede finalizar la implantación",
+      "nextStep": "Etapa siguiente",
+      "overdue": "Vencida",
+      "responsiblePerson": "— persona responsable —",
+      "steps": {
+        "contractSigned": "Contrato firmado",
+        "ready": "Listo",
+        "systemSetup": "Configuración del sistema",
+        "userTraining": "Formación de usuarios"
+      },
+      "taskTitlePlaceholder": "Título de la tarea *",
+      "tasksFor": "Tareas:"
+    },
+    "opportunities": {
+      "dueBy": "hasta el {date}",
+      "status": "Estado de la oportunidad",
+      "statuses": {
+        "closed": "Cerrada",
+        "in_progress": "En curso",
+        "new": "Nueva"
+      },
+      "titleWithCount": "Oportunidades de venta ({count})"
+    },
+    "sales": {
+      "kpi": {
+        "grossTurnover": "Volumen de negocio bruto PLN",
+        "netRevenue": "Ingresos netos PLN",
+        "netTurnover": "Volumen de negocio neto PLN",
+        "products": "Productos",
+        "transactions": "Transacciones"
+      },
+      "noData": "Sin datos de ventas",
+      "periods": {
+        "currentMonth": "Mes actual",
+        "last12Months": "Últimos 12 meses",
+        "last3Months": "Últimos 3 meses",
+        "last6Months": "Últimos 6 meses",
+        "ytd": "YTD {year}"
+      },
+      "productBreakdown": "Desglose por producto",
+      "title": "Datos de ventas del DWH"
+    },
+    "sections": {
+      "additionalData": "Datos adicionales",
+      "agent": "Datos del agente",
+      "billingAddress": "Dirección de facturación",
+      "billingContact": "Contacto de facturación",
+      "contractContact": "Contacto para el contrato",
+      "extraContacts": "Contactos adicionales",
+      "financialTerms": "Condiciones financieras",
+      "partnerAdmin": "Administrador del partner"
+    }
+  },
+  "partnersList": {
+    "card": {
+      "marginAmount": "{amount} PLN de margen",
+      "onboardingStep": "Paso {step} / {total}",
+      "openOpportunities": "{count, plural, one {# oportunidad} other {# oportunidades}}"
+    },
+    "churn": {
+      "levels": {
+        "critical": "Crítico",
+        "high": "Alto",
+        "low": "Bajo",
+        "medium": "Medio"
+      },
+      "points": "{score} pts",
+      "risk": "Riesgo de churn",
+      "riskWithLevel": "Riesgo de churn: {level}"
+    },
+    "create": {
+      "companyPlaceholder": "Nombre de la empresa",
+      "error": "Error al crear el partner. Inténtalo de nuevo.",
+      "hint": "Puedes crear un partner sin un lead vinculado.",
+      "saving": "Guardando…",
+      "submit": "Crear partner",
+      "taxIdHint": "(opcional — para los partners del DWH se rellena automáticamente)",
+      "title": "Nuevo partner",
+      "unassigned": "— sin asignar —"
+    },
+    "documents": {
+      "linkedCount": "{count, plural, one {El partner tiene # documento vinculado} other {El partner tiene # documentos vinculados}}. Haz clic para ver.",
+      "noContract": "Sin contrato vinculado"
+    },
+    "empty": "No hay partners que cumplan los criterios.",
+    "fields": {
+      "accountManager": "Responsable / Comercial",
+      "annualTurnover": "Volumen de negocio anual",
+      "company": "Empresa",
+      "contact": "Contacto",
+      "email": "Correo electrónico",
+      "group": "Grupo",
+      "industry": "Sector",
+      "licenseCount": "Número de licencias",
+      "salesRep": "Comercial",
+      "status": "Estado",
+      "taxId": "NIF"
+    },
+    "reportFilter": {
+      "clear": "Borrar filtro",
+      "label": "Filtro del informe:"
+    },
+    "table": {
+      "churn": "Churn",
+      "contractUntil": "Contrato hasta",
+      "crmTurnover": "Volumen CRM",
+      "dwhMargin": "Margen DWH",
+      "dwhMarginHint": "Margen YTD del DWH",
+      "dwhTurnover": "Volumen DWH",
+      "dwhTurnoverHint": "Volumen de negocio bruto YTD del DWH"
+    },
+    "taxIdErrors": {
+      "countryCode": "Indica el código de país (2 letras), p. ej., PL",
+      "duplicate": "Este NIF ya está asignado a otro registro.",
+      "numberMissing": "Indica el número después del código de país",
+      "polishDigits": "Para PL se requieren 10 dígitos después del código de país",
+      "required": "El NIF es obligatorio"
+    },
+    "title": "Registro de partners",
+    "toolbar": {
+      "allGroups": "Todos los grupos",
+      "allIndustries": "Todos los sectores",
+      "allSalesReps": "Todos los comerciales",
+      "allStatuses": "Todos los estados",
+      "clear": "Borrar",
+      "onlyMine": "Solo los míos",
+      "searchPlaceholder": "Buscar empresa, contacto…"
+    },
+    "view": {
+      "cards": "Tarjetas",
+      "table": "Tabla"
+    }
+  },
+  "sms": {
+    "emptyConversation": "No hay mensajes — escribe el primero abajo.",
+    "last": "último:",
+    "loadFailed": "Error al cargar los SMS",
+    "messagePlaceholder": "Mensaje…",
+    "noMessages": "Sin mensajes",
+    "noNumbers": "No hay números de teléfono para enviar SMS.",
+    "send": "Enviar",
+    "sendFailed": "Error al enviar el SMS",
+    "statuses": {
+      "delivered": "Entregado",
+      "failed": "Error",
+      "received": "Recibido",
+      "sent": "Enviado"
+    }
+  },
+  "whatsapp": {
+    "checkingConfig": "Comprobando la configuración...",
+    "configuredNumber": "número configurado",
+    "conversation": "Conversación de WhatsApp",
+    "empty": "No hay mensajes de WhatsApp enviados.",
+    "from": "De:",
+    "lastMessage": "último mensaje:",
+    "loadingHistory": "Cargando el historial…",
+    "messageBody": "Texto del mensaje",
+    "messagePlaceholder": "Texto del mensaje...",
+    "missingCountryCode": "Indica el número con el prefijo del país, p. ej., +34 612 345 678.",
+    "newMessage": "Nuevo mensaje de WhatsApp",
+    "notConfigured": "WhatsApp no está configurado para esta organización. Ponte en contacto con el administrador.",
+    "reply": {
+      "action": "Responder",
+      "placeholder": "Texto de la respuesta...",
+      "replyingVia": "Respondes por WhatsApp",
+      "send": "Enviar respuesta",
+      "sending": "Enviando…"
+    },
+    "send": "Enviar WhatsApp",
+    "sendFailed": "Error al enviar el WhatsApp",
+    "sending": "Enviando...",
+    "sent": "Mensaje enviado.",
+    "to": "Para:",
+    "toField": "Para"
+  }
+}

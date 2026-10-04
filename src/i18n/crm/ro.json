@@ -1,0 +1,1076 @@
+{
+  "activity": {
+    "add": "Adăugare activitate",
+    "card": {
+      "closeTask": "Închidere sarcină",
+      "collapse": "Restrângere",
+      "createdAt": "creat la {date}",
+      "delete": "Ștergere",
+      "expand": "Extindere",
+      "reopen": "Redeschidere"
+    },
+    "communication": "Comunicare",
+    "customDate": "Dată personalizată…",
+    "deleteConfirm": "Ștergeți activitatea „{title}”?",
+    "dueDate": {
+      "inOneWeek": "Peste o săptămână ({date})",
+      "inThreeBusinessDays": "Peste 3 zile lucrătoare ({weekday})",
+      "inTwoBusinessDays": "Peste 2 zile lucrătoare ({weekday})",
+      "inTwoWeeks": "Peste 2 săptămâni ({date})",
+      "none": "Fără",
+      "today": "Azi",
+      "tomorrow": "Mâine"
+    },
+    "empty": "Nicio activitate în această categorie.",
+    "form": {
+      "bodyPlaceholder": "Conținut / notițe…",
+      "bodyShortPlaceholder": "Conținut…",
+      "dateTime": "Data și ora",
+      "dueDate": "Data",
+      "noOwner": "— fără —",
+      "none": "— niciunul —",
+      "owner": "Proprietar",
+      "priority": "Prioritate",
+      "reminder": "Memento"
+    },
+    "modal": {
+      "addedBy": "Adăugat de",
+      "assignToSalesperson": "Atribuire unui agent de vânzări",
+      "assignedTo": "Atribuit către",
+      "comment": "Comentariu",
+      "dateTime": "Data și ora",
+      "description": "Descriere",
+      "descriptionNotes": "Descriere / notițe",
+      "edit": "Editare",
+      "saveChanges": "Salvare modificări",
+      "title": "Titlu",
+      "type": "Tip",
+      "unassigned": "— neatribuit —"
+    },
+    "reminders": {
+      "atDue": "La termenul sarcinii",
+      "day1Before": "Cu 1 zi înainte",
+      "days2Before": "Cu 2 zile înainte",
+      "days3Before": "Cu 3 zile înainte",
+      "hour1Before": "Cu 1 oră înainte",
+      "minutes30Before": "Cu 30 min înainte",
+      "none": "Fără memento"
+    },
+    "tabs": {
+      "all": "Toate",
+      "calls": "Apeluri",
+      "emails": "E-mailuri",
+      "meetings": "Întâlniri",
+      "notes": "Notițe",
+      "tasks": "Sarcini"
+    }
+  },
+  "calls": {
+    "call": "Apelare",
+    "callNumber": "Apelare: {phone}",
+    "contactFallback": "Contact",
+    "mainNumber": "Principal: {phone}",
+    "noNumber": "Niciun număr"
+  },
+  "consents": {
+    "collapse": "restrângere",
+    "details": "detalii",
+    "lastChange": "Ultima modificare:",
+    "save": "Salvare acorduri",
+    "saved": "Salvat",
+    "saving": "Se salvează…",
+    "title": "Acorduri de marketing",
+    "values": {
+      "denied": "Acord refuzat",
+      "granted": "Acord acordat",
+      "noData": "Fără date"
+    }
+  },
+  "documents": {
+    "add": "Adăugare",
+    "linkFailed": "Documentul nu a putut fi asociat. Verificați dacă aveți permisiunile necesare.",
+    "none": "Niciunul",
+    "open": "Deschidere document",
+    "picker": {
+      "added": "Adăugat",
+      "hint": "Căutați documente după denumire, număr sau entitate.",
+      "noResults": "Niciun rezultat",
+      "readOnly": "Citire",
+      "readOnlyTooltip": "Doar citire — fără permisiuni de asociere",
+      "searchPlaceholder": "Căutare document…",
+      "searching": "Se caută…",
+      "title": "Adăugare document asociat"
+    },
+    "titleWithCount": "Documente ({count})",
+    "unlinkConfirm": "Eliminați asocierea cu documentul?",
+    "unlinkFailed": "Asocierea nu a putut fi eliminată."
+  },
+  "email": {
+    "addressTooltip": "E-mail: {email}",
+    "attachments": {
+      "download": "Descărcare",
+      "downloadTooltip": "Descărcare fișier",
+      "preview": "Previzualizare",
+      "previewTooltip": "Deschidere în browser"
+    },
+    "cc": "CC:",
+    "checkNew": "Verificare mesaje noi",
+    "checkNewTooltip": "Verificare e-mailuri noi (debug)",
+    "connecting": "Conectare la Google…",
+    "date": "Data:",
+    "debug": {
+      "error": "Eroare: {message}",
+      "newMessages": "Mesaje noi: {count}"
+    },
+    "disconnect": "Deconectare",
+    "disconnectConfirm": "Deconectați contul dumneavoastră de e-mail? Pentru a trimite în continuare e-mailuri, va trebui să îl conectați din nou.",
+    "driveDownloadFailed": "Eroare la descărcarea fișierului din Drive",
+    "drivePickerTitle": "Selectați fișierele de atașat",
+    "driveReauthRequired": "Este necesară reconectarea căsuței Gmail — contactați administratorul.",
+    "empty": "Niciun e-mail trimis.",
+    "fields": {
+      "attachments": "Atașamente",
+      "body": "Conținut",
+      "cc": "CC",
+      "subject": "Subiect",
+      "to": "Către"
+    },
+    "from": "De la:",
+    "fromDrive": "Din Drive",
+    "fromGoogleDrive": "Din Google Drive",
+    "hideQuoted": "Ascundere istoric citat",
+    "incomingReply": "Răspuns",
+    "label": "E-mail",
+    "messageFallbackTitle": "Mesaj",
+    "new": "E-mail nou",
+    "noAddress": "Nicio adresă",
+    "noTemplate": "— fără șablon —",
+    "notConfigured": "E-mailul nu este configurat pentru această organizație. Contactați administratorul.",
+    "placeholders": {
+      "body": "Conținutul mesajului…",
+      "cc": "cc@firma.ro",
+      "ccShort": "CC…",
+      "recipient": "email@firma.ro",
+      "replyBody": "Conținutul răspunsului…",
+      "subject": "Subiectul mesajului",
+      "toShort": "Către…"
+    },
+    "reply": {
+      "action": "Răspundere",
+      "hideDetails": "Ascundere",
+      "replyingTo": "Răspundeți către:",
+      "send": "Trimitere răspuns",
+      "sendFailed": "Eroare la trimitere",
+      "showDetails": "Detalii"
+    },
+    "replyHeading": "Răspuns",
+    "send": "Trimitere e-mail",
+    "sendAction": "Trimitere",
+    "sendFailed": "Eroare la trimiterea e-mailului",
+    "sending": "Se trimite…",
+    "showQuoted": "Afișare istoric citat",
+    "thread": {
+      "anotherUser": "alt utilizator",
+      "empty": "Niciun mesaj în conversație.",
+      "loading": "Se încarcă conversația…",
+      "notOwnerCompose": "Proprietarul acestei conversații este {owner} — nu puteți răspunde în cadrul ei. E-mailul de mai jos va fi trimis ca mesaj nou din contul dumneavoastră.",
+      "notOwnerComposeUnknown": "Nu puteți răspunde în această conversație. E-mailul de mai jos va fi trimis ca mesaj nou din contul dumneavoastră.",
+      "notOwnerReply": "Proprietarul acestei conversații este {owner} — nu puteți răspunde în cadrul ei. Acest mesaj va fi trimis ca mesaj nou, din contul dumneavoastră.",
+      "notOwnerReplyUnknown": "Nu puteți răspunde în această conversație. Acest mesaj va fi trimis ca mesaj nou, din contul dumneavoastră.",
+      "ownedByTooltip": "Proprietarul conversației este {owner} — veți trimite un mesaj nou din contul dumneavoastră",
+      "title": "Conversație e-mail"
+    },
+    "to": "Către:",
+    "trainingMode": "Mod de instruire",
+    "writeNew": "Scrieți un e-mail nou"
+  },
+  "history": {
+    "activityAdded": "Activitate adăugată: {title}",
+    "activityClosed": "Activitate închisă: {title}",
+    "activityDeleted": "Activitate ștearsă: {title}",
+    "activityUpdated": "Activitate actualizată: {title}",
+    "changed": "Modificat: {changes}",
+    "consentChanged": "Acordul „{label}”: {from} → {to}",
+    "documentLinked": "Document asociat",
+    "empty": "Nicio înregistrare.",
+    "emptyValue": "(gol)",
+    "fields": {
+      "activeUsers": "Utilizatori activi",
+      "agentName": "Agent",
+      "annualTurnoverCurrency": "Monedă",
+      "assignedTo": "Agent de vânzări",
+      "billingAddress": "Adresă",
+      "billingCity": "Oraș",
+      "billingEmail": "E-mail fact.",
+      "billingPhone": "Tel. fact.",
+      "closeDate": "Data închid.",
+      "commission": "Comision",
+      "company": "Companie",
+      "contactName": "Contact",
+      "contactTitle": "Rol în companie",
+      "contractExpires": "Contract până la",
+      "contractSigned": "Contract din",
+      "contractValue": "Cifră de afaceri",
+      "country": "Țară",
+      "creditLimit": "Limită de credit",
+      "deposit": "Depozit",
+      "dwhPartnerId": "CRMtree Partner ID",
+      "email": "E-mail",
+      "firstContactDate": "Primul contact",
+      "group": "Grup",
+      "hot": "Fierbinte",
+      "industry": "Domeniu",
+      "language": "Limbă",
+      "lostReason": "Motivul pierderii",
+      "nip": "Cod fiscal",
+      "notes": "Notițe",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Monedă",
+      "phone": "Telefon",
+      "probability": "Probabilitate %",
+      "source": "Sursă",
+      "stage": "Etapă",
+      "status": "Status",
+      "subdomain": "Subdomeniu",
+      "tags": "Etichete",
+      "valuePln": "Valoare PLN",
+      "website": "Site web"
+    },
+    "lostReason": "Motiv: {reason}",
+    "no": "Nu",
+    "noResults": "Niciun rezultat.",
+    "searchPlaceholder": "Căutare în istoric…",
+    "showAll": "Afișare completă",
+    "stageChanged": "Schimbare de etapă: {from} → {to}",
+    "systemUser": "Sistem",
+    "title": "Istoricul modificărilor",
+    "yes": "Da"
+  },
+  "labels": {
+    "activityStatuses": {
+      "closed": "închisă",
+      "new": "nouă",
+      "open": "deschisă"
+    },
+    "activityTypes": {
+      "call": "Apel",
+      "doc_sent": "Document",
+      "email": "E-mail",
+      "meeting": "Întâlnire",
+      "note": "Notiță",
+      "opportunity": "Oportunitate",
+      "qbr": "QBR",
+      "task": "Sarcină",
+      "training": "Instruire"
+    },
+    "partnerStatuses": {
+      "active": "Activ",
+      "churned": "Pierdut",
+      "inactive": "Inactiv",
+      "onboarding": "Implementare"
+    },
+    "priorities": {
+      "asap": "ASAP",
+      "important": "Important",
+      "low": "Scăzut",
+      "medium": "Mediu"
+    },
+    "productTypes": {
+      "car_rental": "Închiriere auto",
+      "hotel": "Hotel",
+      "other": "Altele",
+      "transfer": "Transfer",
+      "transport_bus": "Autobuz",
+      "transport_ferry": "Feribot",
+      "transport_flight": "Zbor",
+      "transport_train": "Tren",
+      "travel_insurance": "Asigurare",
+      "visa": "Viză"
+    },
+    "sourceTypes": {
+      "document": "Document",
+      "lead": "Lead",
+      "onboarding": "Onboarding",
+      "partner": "Partener",
+      "project": "Proiect"
+    },
+    "sources": {
+      "agent": "Agent",
+      "aliasHello": "Alias Hello",
+      "coldCall": "Cold Call",
+      "emailCampaign": "Campanie de e-mail",
+      "googleAdsAiSearch": "Google Ads AI Search",
+      "googleAdsPmax": "Google Ads PMax",
+      "googleAdsSeaBrand": "Google Ads SEA Brand",
+      "inbound": "Inbound",
+      "linkedin": "LinkedIn",
+      "linkedinInMail": "LinkedIn InMail",
+      "linkedinLeadForm": "LinkedIn Lead Form",
+      "onlineForm": "Formular online",
+      "other": "Altele",
+      "own": "Proprii",
+      "partner": "Partener",
+      "referral": "Recomandare",
+      "tradeFair": "Târg / Eveniment",
+      "website": "Site web"
+    },
+    "stages": {
+      "archived": "Arhivă",
+      "closed_lost": "Pierdut",
+      "closed_won": "Câștigat",
+      "negotiation": "Negociere",
+      "new": "Nou",
+      "offer": "Ofertă",
+      "onboarded": "Onboardat",
+      "onboarding": "În onboarding",
+      "presentation": "Prezentare",
+      "qualification": "Calificare"
+    }
+  },
+  "leadDetail": {
+    "archive": {
+      "action": "Arhivare",
+      "confirm": "Arhivați leadul „{company}”? Va dispărea din liste, panouri și rapoarte — va fi vizibil doar după selectarea filtrului Etapă = Arhivă. Va putea fi editat în continuare și poate fi readus de acolo în etapa „Nou”.",
+      "failed": "Eroare la arhivarea leadului.",
+      "tooltip": "Arhivare — leadul va dispărea din liste, panouri și rapoarte"
+    },
+    "edit": {
+      "addContact": "Adăugare contact",
+      "chooseReason": "— selectați motivul —",
+      "noExtraContacts": "Niciun contact suplimentar",
+      "noPermission": "Fără permisiuni — agentul de vânzări nu face parte din grupul dumneavoastră",
+      "none": "— niciunul —",
+      "placeholders": {
+        "agentEmail": "agent@firma.ro",
+        "email": "ion@firma.ro",
+        "fullName": "Ion Popescu",
+        "notes": "Notițe libere…",
+        "website": "de ex. acme.ro"
+      },
+      "requiredFields": "Completați câmpurile obligatorii:",
+      "requiredForStage": "Completați câmpurile obligatorii pentru etapa „{stage}”:",
+      "saveChanges": "Salvare modificări",
+      "saving": "Se salvează…",
+      "sections": {
+        "agent": "Datele agentului",
+        "basic": "Date de bază",
+        "sales": "Detalii de vânzare"
+      },
+      "title": "Editare lead",
+      "unassigned": "— neatribuit —"
+    },
+    "enrich": {
+      "action": "Preluare date",
+      "done": "Date preluate — verificați câmpurile de mai jos",
+      "loading": "Se preiau datele…"
+    },
+    "fields": {
+      "annualTurnover": "Cifră de afaceri anuală",
+      "closeDate": "Data închiderii",
+      "companyName": "Denumirea companiei",
+      "contactTitle": "Rol în companie",
+      "email": "E-mail",
+      "firstContact": "Primul contact",
+      "fullName": "Prenume și nume",
+      "hotLead": "Lead fierbinte",
+      "industry": "Domeniu",
+      "lostReason": "Motivul pierderii",
+      "name": "Denumire",
+      "nip": "Cod fiscal",
+      "onlinePct": "% Online",
+      "person": "Persoană",
+      "phone": "Telefon",
+      "probability": "Probabilitate",
+      "probabilityPct": "% Probabilitate",
+      "salesperson": "Agent de vânzări",
+      "source": "Sursă",
+      "stage": "Etapă",
+      "tagsHint": "Etichete (separate prin virgulă)",
+      "website": "Site web",
+      "www": "WWW"
+    },
+    "header": {
+      "backToLeads": "Leaduri",
+      "edit": "Editare",
+      "hot": "Fierbinte"
+    },
+    "history": {
+      "converted": "Lead convertit în Partener",
+      "created": "Lead creat",
+      "deleted": "Lead șters",
+      "updated": "Lead actualizat"
+    },
+    "hold": {
+      "active": "În așteptare — activ",
+      "activeUntil": "Activ până la",
+      "dateRequired": "Introduceți data",
+      "edit": "Editare așteptare",
+      "editTooltip": "În așteptare până la {date} — faceți clic pentru a edita",
+      "introAfter": "va fi marcat ca fiind în așteptare — fără impact asupra KPI-urilor active și a pipeline-ului, cât timp durează așteptarea.",
+      "introBefore": "Leadul",
+      "label": "În așteptare",
+      "reason": "Motiv",
+      "reasonRequired": "Selectați motivul",
+      "remove": "Scoatere din așteptare",
+      "removeFailed": "Eroare la scoaterea din așteptare.",
+      "saveFailed": "Eroare la salvarea stării de așteptare.",
+      "set": "Punere în așteptare",
+      "until": "În așteptare până la {date}"
+    },
+    "info": {
+      "collapsePanel": "Restrângere panou",
+      "expandPanel": "Extindere panou",
+      "title": "Informații"
+    },
+    "loadError": "Eroare la încărcarea leadului.",
+    "nip": {
+      "countryCodeRequired": "Introduceți codul de țară (2 litere), de ex. PL",
+      "duplicate": "Acest cod fiscal este deja atribuit unei alte înregistrări.",
+      "numberRequired": "Introduceți numărul după codul de țară",
+      "plTenDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
+      "required": "Codul fiscal este obligatoriu"
+    },
+    "notFound": "Leadul nu a fost găsit.",
+    "onboarding": {
+      "completed": "Onboarding finalizat",
+      "completedPartnerActive": "Onboarding finalizat — Partener activ",
+      "contractSigned": "Data semnării contractului",
+      "contractValue": "Valoarea contractului (PLN)",
+      "contractValuePlaceholder": "de ex. 50000",
+      "goTo": "Accesare Onboarding",
+      "hint": "Introduceți valoarea contractului și data semnării acestuia pentru a muta leadul în procesul de implementare.",
+      "inProgress": "Onboarding în curs",
+      "inProgressHint": "Leadul se află în procesul de implementare. Detalii în secțiunea Onboarding.",
+      "introAfter": "în procesul de implementare. Leadul va apărea în secțiunea Onboarding. În Registrul partenerilor va apărea după sincronizarea cu DWH.",
+      "introBefore": "Migrarea leadului",
+      "leadLocked": "Lead blocat pentru editare",
+      "panelLink": "Panoul Onboarding",
+      "partnerAfterSync": "Partenerul va apărea în Registrul partenerilor după sincronizarea cu DWH.",
+      "partnerInProgress": "partener în proces de implementare",
+      "partnerRegistryLink": "Registrul partenerilor",
+      "start": "Începere onboarding",
+      "startedAt": "Început la:"
+    },
+    "sections": {
+      "agent": "Agent",
+      "company": "Companie",
+      "contact": "Contact",
+      "extraContacts": "Contacte suplimentare",
+      "notes": "Notițe",
+      "sales": "Vânzări"
+    },
+    "stage": {
+      "backToNew": "Înapoi la Nou",
+      "next": "Etapa următoare",
+      "previous": "Etapa anterioară"
+    },
+    "testAccount": {
+      "apiError": "Eroare de conectare la API-ul extern",
+      "choose": "— selectați —",
+      "countries": {
+        "cz": "Cehia",
+        "de": "Germania",
+        "fr": "Franța",
+        "gb": "Regatul Unit",
+        "hu": "Ungaria",
+        "pl": "Polonia",
+        "ro": "România",
+        "ru": "Rusia",
+        "sk": "Slovacia",
+        "ua": "Ucraina"
+      },
+      "create": "Creare cont de test",
+      "created": "Cont de test creat",
+      "creating": "Se creează contul…",
+      "fields": {
+        "adminEmail": "E-mailul administratorului",
+        "billingCountry": "Țara de facturare",
+        "billingEmail": "E-mail de facturare",
+        "city": "Oraș",
+        "country": "Țară",
+        "currency": "Monedă",
+        "firstName": "Prenume",
+        "language": "Limbă",
+        "lastName": "Nume",
+        "street": "Strada și numărul",
+        "subdomain": "Subdomeniu",
+        "zip": "Cod poștal"
+      },
+      "fixAndRetry": "Corectați datele de mai jos și încercați din nou.",
+      "languages": {
+        "de": "Germană",
+        "en": "Engleză",
+        "pl": "Poloneză",
+        "ro": "Română",
+        "ru": "Rusă"
+      },
+      "numberHint": "Acest număr va fi transmis ca Nr. partenerului în timpul migrării.",
+      "numberLabel": "Nr.:",
+      "openPriceList": "Deschidere listă de prețuri în HTCD",
+      "openTooltip": "Creare cont de test în sistemul extern",
+      "placeholders": {
+        "adminEmail": "admin@firma.ro",
+        "billingEmail": "facturi@firma.ro",
+        "city": "de ex. București",
+        "firstName": "Ion",
+        "lastName": "Popescu",
+        "street": "de ex. Str. Exemplului nr. 1",
+        "subdomain": "de ex. firma-test",
+        "zip": "de ex. 010011"
+      },
+      "previousError": "Apelul anterior s-a încheiat cu o eroare",
+      "retry": "Reîncercare creare",
+      "sections": {
+        "admin": "C — Administratorul contului",
+        "billing": "B — Adresa de facturare",
+        "technical": "A — Datele tehnice ale contului"
+      },
+      "title": "Cont de test"
+    }
+  },
+  "leadsList": {
+    "breadcrumb": "Leaduri",
+    "detail": {
+      "addInDetails": "Adăugați în detalii",
+      "closeDate": "Data închiderii",
+      "details": "Detalii",
+      "industry": "Domeniu",
+      "noActivities": "Nicio activitate.",
+      "note": "Notiță",
+      "openDetails": "Deschidere detalii",
+      "pipeline": "Pipeline",
+      "probability": "Probabilitate",
+      "stageValue": "Etapă: {stage}",
+      "tabs": {
+        "history": "Istoric",
+        "info": "Informații"
+      },
+      "tags": "Etichete",
+      "value": "Valoare",
+      "weightedValue": "Valoare ponderată"
+    },
+    "fields": {
+      "annualTurnover": "Cifră de afaceri anuală",
+      "company": "Companie",
+      "companyRole": "Rol în companie",
+      "email": "E-mail",
+      "firstContact": "Primul contact",
+      "phone": "Telefon",
+      "salesRep": "Agent de vânzări",
+      "source": "Sursă",
+      "stage": "Etapă",
+      "website": "Site web"
+    },
+    "filters": {
+      "all": "Toate",
+      "allReps": "Toți agenții de vânzări",
+      "allSources": "Toate sursele",
+      "allStages": "Toate etapele",
+      "groupChip": "Grup: {name}",
+      "groupsGroup": "Grupuri",
+      "holdOnly": "Doar în așteptare",
+      "holdOnlyTitle": "Afișează doar leadurile în așteptare",
+      "hot": "Fierbinți",
+      "mine": "Ale mele",
+      "repChip": "Agent de vânzări: {name}",
+      "reportFilter": "Filtru din raport: {label}",
+      "repsGroup": "Agenți de vânzări",
+      "wholeGroup": "Tot grupul: {group}"
+    },
+    "importCsv": "Import CSV",
+    "kanban": {
+      "closed": "Închise",
+      "closedCount": "{won}C / {lost}P",
+      "closedEmpty": "Niciunul",
+      "empty": "Niciun lead",
+      "holdBadge": "În așteptare",
+      "onboardedTitle": "Onboarding finalizat — Partener activ",
+      "partnerBadge": "Partener"
+    },
+    "loading": "Se încarcă leadurile…",
+    "meeting": {
+      "addedBy": "Adăugat de",
+      "dateTime": "Data și ora",
+      "detailTitle": "Detaliile activității",
+      "duration": "Durată",
+      "durationMinutes": "Durată (min)",
+      "durationValue": "{count, plural, one {# minut} few {# minute} other {# de minute}}",
+      "edit": "Editare activitate",
+      "editTitle": "Editarea activității",
+      "location": "Locație",
+      "locationPlaceholder": "de ex. Biroul clientului, Google Meet…",
+      "meetingTitle": "Titlul întâlnirii",
+      "notes": "Notițe de la întâlnire",
+      "notesPlaceholder": "Subiecte discutate, concluzii, pașii următori…",
+      "openLead": "Deschidere lead",
+      "openPartner": "Deschidere partener",
+      "participants": "Participanți",
+      "participantsPlaceholder": "de ex. Ion Popescu, ana@firma.ro",
+      "saveChanges": "Salvare modificări",
+      "titlePlaceholder": "Subiectul întâlnirii"
+    },
+    "newLead": {
+      "addContact": "Adăugare contact",
+      "companyName": "Denumirea companiei",
+      "companyPlaceholder": "de ex. Acme S.R.L.",
+      "contactName": "Prenumele și numele persoanei de contact",
+      "create": "Creare lead",
+      "emailPlaceholder": "ion@firma.ro",
+      "enrichConfirm": "Da, preia datele",
+      "enrichDecline": "Nu",
+      "enrichDone": "Date preluate — verificați câmpurile de mai jos și completați ce lipsește",
+      "enrichPrompt": "Preluați datele companiei de pe site?",
+      "extraContacts": "Contacte suplimentare",
+      "fieldRequired": "Câmp obligatoriu",
+      "fillRequired": "Completați câmpurile obligatorii:",
+      "fullName": "Prenume și nume",
+      "hot": "Lead fierbinte",
+      "namePlaceholder": "Ion Popescu",
+      "noExtraContacts": "Niciun contact suplimentar",
+      "notes": "Notițe",
+      "notesPlaceholder": "Informații suplimentare…",
+      "optional": "(opțional)",
+      "requiredContactName": "Prenume și nume",
+      "select": "— selectați —",
+      "subtitle": "Adăugați o nouă oportunitate de vânzare",
+      "taxId": "Cod fiscal",
+      "taxIdErrors": {
+        "countryCode": "Introduceți codul de țară (2 litere), de ex. PL",
+        "numberMissing": "Introduceți numărul după codul de țară",
+        "polishDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
+        "required": "Codul fiscal este obligatoriu"
+      },
+      "title": "Lead nou",
+      "unassigned": "— neatribuit —",
+      "value": "Valoare (PLN)",
+      "websitePlaceholder": "de ex. acme.ro"
+    },
+    "saving": "Se salvează…",
+    "searchPlaceholder": "Căutare companii, contacte…",
+    "sourceGroups": {
+      "marketing": "Marketing"
+    },
+    "stats": {
+      "hot": "Fierbinți",
+      "lost": "Pierdute",
+      "opportunities": "Oportunități de vânzare",
+      "pipeline": "Pipeline (PLN)",
+      "won": "Câștigate"
+    },
+    "table": {
+      "chance": "% Probabilitate",
+      "closeDateShort": "Închid.",
+      "companyContact": "Companie / Contact",
+      "empty": "Niciun lead care să îndeplinească criteriile",
+      "firstContactShort": "Primul cont.",
+      "migrated": "Migrat",
+      "next": "Următoarea",
+      "online": "% Online",
+      "pageOf": "Pagina {page} din {pages}",
+      "previous": "Anterioara"
+    },
+    "timeline": {
+      "allDay": "termen",
+      "durationShort": "{minutes}min",
+      "empty": "Nicio întâlnire",
+      "emptyHint": "Planificați prima întâlnire în detaliile leadului sau ale partenerului",
+      "futureHint": "Derulați în jos pentru a vedea întâlnirile următoare",
+      "loading": "Se încarcă întâlnirile…",
+      "pastHint": "Derulați în sus pentru a vedea întâlnirile anterioare",
+      "subtitle": "Activități cu dată · cronologic",
+      "title": "Calendarul activităților",
+      "todayTag": "AZI",
+      "tomorrow": "Mâine · {date}",
+      "yesterday": "Ieri · {date}"
+    },
+    "title": "Leaduri de vânzări",
+    "view": {
+      "kanban": "Kanban",
+      "table": "Tabel",
+      "timeline": "Cronologie"
+    }
+  },
+  "meetings": {
+    "durationMin": "Durată (min)",
+    "location": "Loc",
+    "locationPlaceholder": "de ex. Sala de conferințe A",
+    "meetingLocation": "Locul întâlnirii",
+    "participantPlaceholder": "Introduceți e-mailul…",
+    "participants": "Participanți",
+    "participantsHint": "e-mailuri separate prin virgulă",
+    "titlePlaceholder": "Titlul întâlnirii",
+    "titleRequiredPlaceholder": "Titlul întâlnirii *"
+  },
+  "partnerDetail": {
+    "activity": {
+      "bodyPlaceholder": "Conținut / descriere…",
+      "dueDate": {
+        "businessDays": "{count} z.l. ({date})",
+        "today": "Azi ({date})",
+        "tomorrow": "Mâine ({date})"
+      },
+      "durationPlaceholder": "de ex. 60",
+      "empty": "Nicio activitate.",
+      "meetingSubjectPlaceholder": "Subiectul întâlnirii *",
+      "ownerMeDefault": "— eu (implicit) —",
+      "participantPlaceholder": "Introduceți e-mailul sau numele…",
+      "participantsEmails": "Participanți (e-mailuri)"
+    },
+    "calls": {
+      "agentNumber": "Agent: {phone}",
+      "billingNumber": "Facturare: {phone}",
+      "contactNumber": "Contact: {phone}"
+    },
+    "churn": {
+      "badge": {
+        "analyzedAt": "Analiză: {date}",
+        "daysSinceOrder": "Zile fără com.: {days}",
+        "salesDrop": "Scăderea vânzărilor: {percent}%"
+      },
+      "daysSinceOrder": "Zile fără comandă",
+      "levels": {
+        "critical": "Critic",
+        "high": "Ridicat",
+        "low": "Scăzut",
+        "medium": "Mediu"
+      },
+      "noRisk": "Fără risc de pierdere a clientului",
+      "salesDrop": "Scădere L-2→L-1",
+      "score": "{score} pct.",
+      "title": "Risc de churn"
+    },
+    "commissionBasis": {
+      "bookings": "Număr de rezervări",
+      "notApplicable": "Nu se aplică",
+      "segments": "Număr de segmente",
+      "turnoverThresholds": "Praguri de cifră de afaceri"
+    },
+    "documents": {
+      "empty": "Niciun document asociat",
+      "fallbackTitle": "Document #{id}",
+      "goTo": "Accesare document",
+      "noContractHint": "Adăugați un document pentru a confirma colaborarea cu partenerul.",
+      "noContractTitle": "Niciun contract asociat.",
+      "pickerHint": "Căutați documente după denumire, număr sau entitate (Entity). Sunt vizibile doar documentele la care aveți acces (min. Read).",
+      "unlink": "Eliminare asociere"
+    },
+    "edit": {
+      "addContact": "Adăugare contact",
+      "billingContactIncomplete": "Se recomandă completarea tuturor câmpurilor persoanei de contact pentru facturare.",
+      "contactsSaveFailed": "Datele partenerului au fost salvate, dar contactele suplimentare nu au putut fi salvate.",
+      "contractContactIncomplete": "Se recomandă completarea tuturor câmpurilor persoanei de contact pentru contract.",
+      "dwhLockedHint": "Câmpurile marcate cu DWH sunt sincronizate din sistemul tranzacțional și nu pot fi editate.",
+      "managersOnly": "doar managerii pot edita",
+      "noExtraContacts": "Niciun contact suplimentar",
+      "noGroup": "— fără grup —",
+      "none": "— niciunul —",
+      "openTasksWarning": "{count, plural, one {# sarcină de implementare nefinalizată} few {# sarcini de implementare nefinalizate} other {# de sarcini de implementare nefinalizate}} — nu se poate seta statusul Activ",
+      "partnerIdHint": "ID-ul partenerului în sistemul tranzacțional",
+      "placeholders": {
+        "address": "Str. Exemplului nr. 1",
+        "adminEmail": "admin@firma.ro",
+        "adminFirstName": "de ex. Ion",
+        "adminLastName": "de ex. Popescu",
+        "billingContactEmail": "facturare@firma.ro",
+        "billingContactTitle": "Șef departament facturare",
+        "billingCountry": "România",
+        "billingEmail": "billing@firma.ro",
+        "billingFullName": "Ana Ionescu",
+        "city": "București",
+        "commission": "de ex. 0.05",
+        "country": "de ex. România",
+        "creditLimit": "de ex. 50000",
+        "deposit": "de ex. 10000",
+        "email": "ion@firma.ro",
+        "fullName": "Ion Popescu",
+        "language": "de ex. ro",
+        "notes": "Notițe libere…",
+        "partnerId": "de ex. 42",
+        "source": "de ex. târg, recomandare, cold call",
+        "subdomain": "de ex. acme",
+        "website": "https://firma.ro"
+      },
+      "removeContact": "Eliminare contact",
+      "saveChanges": "Salvare modificări",
+      "saveFailed": "Eroare la salvare",
+      "saving": "Se salvează…",
+      "sections": {
+        "basic": "Date de bază",
+        "contractAndFinance": "Contract și date financiare",
+        "managerAndGroup": "Responsabil de cont și grup",
+        "salesAndSource": "Vânzări și sursă",
+        "tagsAndNotes": "Etichete și notițe"
+      },
+      "subdomainHint": "Adresa subdomeniului în sistem (completată la crearea contului de test)",
+      "syncedWithDwh": "Sincronizat cu DWH",
+      "title": "Editare partener",
+      "unassigned": "— neatribuit —"
+    },
+    "email": {
+      "empty": "Niciun e-mail. Trimiteți primul mesaj făcând clic pe „+ E-mail nou”."
+    },
+    "fields": {
+      "activeUsers": "Utilizatori activi",
+      "activeUsersShort": "Utiliz. activi",
+      "address": "Adresă",
+      "adminEmail": "E-mailul adminului",
+      "adminFirstName": "Prenumele adminului",
+      "adminLastName": "Numele adminului",
+      "annualTurnover": "Cifră de afaceri anuală",
+      "billingCountry": "Țara de facturare",
+      "billingEmail": "E-mail de facturare",
+      "city": "Oraș",
+      "commission": "Comision WT/TM",
+      "commissionBasis": "Bază",
+      "companyName": "Denumirea companiei",
+      "contactTitle": "Rol în companie",
+      "contractExpires": "Data expirării",
+      "contractFrom": "Contract din",
+      "contractSigned": "Data semnării",
+      "contractTo": "Contract până la",
+      "country": "Țară",
+      "creditLimit": "Limită de credit",
+      "crmtreeId": "CRMtree ID",
+      "crmtreePartnerId": "CRMtree Partner ID",
+      "currency": "Monedă",
+      "depositAmount": "Suma depozitului",
+      "depositDateIn": "Data plății",
+      "depositDateOut": "Data restituirii",
+      "email": "E-mail",
+      "firstContact": "Primul contact",
+      "firstName": "Prenume",
+      "fullName": "Prenume și nume",
+      "industry": "Domeniu",
+      "language": "Limbă",
+      "lastName": "Nume",
+      "manager": "Responsabil de cont",
+      "managerSalesperson": "Responsabil de cont / Agent de vânzări",
+      "nip": "Cod fiscal",
+      "note": "Notiță",
+      "notes": "Notițe",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Moneda partenerului",
+      "partnerGroup": "Grup de parteneri",
+      "phone": "Telefon",
+      "source": "Sursă",
+      "status": "Status",
+      "subdomain": "Subdomeniu",
+      "tags": "Etichete",
+      "tagsHint": "Etichete (separate prin virgulă)",
+      "value": "Valoare",
+      "website": "Site web",
+      "zip": "Cod poștal"
+    },
+    "header": {
+      "activeSince": "Activ din {date}",
+      "backToPartners": "Parteneri",
+      "churn": "Churn: {level}",
+      "edit": "Editare",
+      "noEditPermission": "Nu aveți permisiunea de a edita acest partener"
+    },
+    "history": {
+      "created": "Partener creat",
+      "deleted": "Partener șters",
+      "searchPlaceholder": "Căutare…",
+      "updated": "Partener actualizat"
+    },
+    "info": {
+      "activeUsersCount": "{count, plural, one {# activ} few {# activi} other {# de activi}}",
+      "collapsePanel": "Restrângere panou",
+      "expandPanel": "Extindere panou",
+      "notSet": "nesetat",
+      "title": "Informații"
+    },
+    "loadError": "Eroare la încărcare.",
+    "nip": {
+      "countryCodeRequired": "Introduceți codul de țară (2 litere), de ex. PL",
+      "numberRequired": "Introduceți numărul după codul de țară",
+      "plTenDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
+      "required": "Codul fiscal este obligatoriu"
+    },
+    "notFound": "Partenerul nu a fost găsit.",
+    "onboarding": {
+      "addTask": "Adăugare sarcină",
+      "advanceFailed": "Etapa nu poate fi finalizată",
+      "deleteTaskConfirm": "Ștergeți sarcina „{title}”?",
+      "descriptionOptionalPlaceholder": "Descriere (opțional)…",
+      "descriptionPlaceholder": "Descriere…",
+      "empty": "Nicio sarcină pentru această etapă. Faceți clic pe „+ Adăugare sarcină”.",
+      "finish": "Finalizare implementare",
+      "finishFailed": "Implementarea nu poate fi finalizată",
+      "nextStep": "Etapa următoare",
+      "overdue": "Termen depășit",
+      "responsiblePerson": "— persoana responsabilă —",
+      "steps": {
+        "contractSigned": "Contract semnat",
+        "ready": "Gata",
+        "systemSetup": "Configurarea sistemului",
+        "userTraining": "Instruirea utilizatorilor"
+      },
+      "taskTitlePlaceholder": "Titlul sarcinii *",
+      "tasksFor": "Sarcini:"
+    },
+    "opportunities": {
+      "dueBy": "până la {date}",
+      "status": "Statusul oportunității",
+      "statuses": {
+        "closed": "Închisă",
+        "in_progress": "În curs",
+        "new": "Nouă"
+      },
+      "titleWithCount": "Oportunități de vânzare ({count})"
+    },
+    "sales": {
+      "kpi": {
+        "grossTurnover": "Cifră de afaceri brută PLN",
+        "netRevenue": "Venit net PLN",
+        "netTurnover": "Cifră de afaceri netă PLN",
+        "products": "Produse",
+        "transactions": "Tranzacții"
+      },
+      "noData": "Nu există date de vânzări",
+      "periods": {
+        "currentMonth": "Luna curentă",
+        "last12Months": "Ultimele 12 luni",
+        "last3Months": "Ultimele 3 luni",
+        "last6Months": "Ultimele 6 luni",
+        "ytd": "YTD {year}"
+      },
+      "productBreakdown": "Defalcare pe produse",
+      "title": "Date de vânzări DWH"
+    },
+    "sections": {
+      "additionalData": "Date suplimentare",
+      "agent": "Datele agentului",
+      "billingAddress": "Adresă de facturare",
+      "billingContact": "Persoană de contact pentru facturare",
+      "contractContact": "Persoană de contact pentru contract",
+      "extraContacts": "Contacte suplimentare",
+      "financialTerms": "Condiții financiare",
+      "partnerAdmin": "Partner Admin"
+    }
+  },
+  "partnersList": {
+    "card": {
+      "marginAmount": "{amount} PLN marjă",
+      "onboardingStep": "Pasul {step} / {total}",
+      "openOpportunities": "{count, plural, one {# oportunitate} few {# oportunități} other {# de oportunități}}"
+    },
+    "churn": {
+      "levels": {
+        "critical": "Critic",
+        "high": "Ridicat",
+        "low": "Scăzut",
+        "medium": "Mediu"
+      },
+      "points": "{score} pct.",
+      "risk": "Risc de churn",
+      "riskWithLevel": "Risc de churn: {level}"
+    },
+    "create": {
+      "companyPlaceholder": "Denumirea companiei",
+      "error": "Eroare la crearea partenerului. Încercați din nou.",
+      "hint": "Puteți crea un partener fără un lead asociat.",
+      "saving": "Se salvează…",
+      "submit": "Creare partener",
+      "taxIdHint": "(opțional — pentru partenerii DWH se completează automat)",
+      "title": "Partener nou",
+      "unassigned": "— neatribuit —"
+    },
+    "documents": {
+      "linkedCount": "{count, plural, one {Partenerul are # document asociat} few {Partenerul are # documente asociate} other {Partenerul are # de documente asociate}}. Faceți clic pentru a vedea.",
+      "noContract": "Niciun contract asociat"
+    },
+    "empty": "Niciun partener care să îndeplinească criteriile.",
+    "fields": {
+      "accountManager": "Responsabil de cont / Agent de vânzări",
+      "annualTurnover": "Cifră de afaceri anuală",
+      "company": "Companie",
+      "contact": "Contact",
+      "email": "E-mail",
+      "group": "Grup",
+      "industry": "Domeniu",
+      "licenseCount": "Număr de licențe",
+      "salesRep": "Agent de vânzări",
+      "status": "Status",
+      "taxId": "Cod fiscal"
+    },
+    "reportFilter": {
+      "clear": "Ștergere filtru",
+      "label": "Filtru din raport:"
+    },
+    "table": {
+      "churn": "Churn",
+      "contractUntil": "Contract până la",
+      "crmTurnover": "Cifră de afaceri CRM",
+      "dwhMargin": "Marjă DWH",
+      "dwhMarginHint": "Marjă YTD din DWH",
+      "dwhTurnover": "Cifră de afaceri DWH",
+      "dwhTurnoverHint": "Cifră de afaceri brută YTD din DWH"
+    },
+    "taxIdErrors": {
+      "countryCode": "Introduceți codul de țară (2 litere), de ex. PL",
+      "duplicate": "Acest cod fiscal este deja atribuit unei alte înregistrări.",
+      "numberMissing": "Introduceți numărul după codul de țară",
+      "polishDigits": "Pentru PL sunt necesare 10 cifre după codul de țară",
+      "required": "Codul fiscal este obligatoriu"
+    },
+    "title": "Registrul partenerilor",
+    "toolbar": {
+      "allGroups": "Toate grupurile",
+      "allIndustries": "Toate domeniile",
+      "allSalesReps": "Toți agenții de vânzări",
+      "allStatuses": "Toate statusurile",
+      "clear": "Ștergere",
+      "onlyMine": "Doar ai mei",
+      "searchPlaceholder": "Căutare companie, contact…"
+    },
+    "view": {
+      "cards": "Carduri",
+      "table": "Tabel"
+    }
+  },
+  "sms": {
+    "emptyConversation": "Niciun mesaj — scrieți primul mai jos.",
+    "last": "ultimul:",
+    "loadFailed": "Eroare la preluarea SMS-urilor",
+    "messagePlaceholder": "Mesaj…",
+    "noMessages": "Niciun mesaj",
+    "noNumbers": "Niciun număr de telefon pentru SMS.",
+    "send": "Trimitere",
+    "sendFailed": "Eroare la trimiterea SMS-ului",
+    "statuses": {
+      "delivered": "Livrat",
+      "failed": "Eroare",
+      "received": "Primit",
+      "sent": "Trimis"
+    }
+  },
+  "whatsapp": {
+    "checkingConfig": "Se verifică configurația...",
+    "configuredNumber": "numărul configurat",
+    "conversation": "Conversație WhatsApp",
+    "empty": "Niciun mesaj WhatsApp trimis.",
+    "from": "De la:",
+    "lastMessage": "ultimul mesaj:",
+    "loadingHistory": "Se încarcă istoricul…",
+    "messageBody": "Conținutul mesajului",
+    "messagePlaceholder": "Conținutul mesajului...",
+    "missingCountryCode": "Introduceți numărul cu prefixul de țară, de ex. +40 712 345 678.",
+    "newMessage": "Mesaj WhatsApp nou",
+    "notConfigured": "WhatsApp nu este configurat pentru această organizație. Contactați administratorul.",
+    "reply": {
+      "action": "Răspundere",
+      "placeholder": "Conținutul răspunsului...",
+      "replyingVia": "Răspundeți prin WhatsApp",
+      "send": "Trimitere răspuns",
+      "sending": "Se trimite…"
+    },
+    "send": "Trimitere WhatsApp",
+    "sendFailed": "Eroare la trimiterea mesajului WhatsApp",
+    "sending": "Se trimite...",
+    "sent": "Mesaj trimis.",
+    "to": "Către:",
+    "toField": "Către"
+  }
+}
