@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { UserService, GroupService } from '../../core/services/api.services';
 import { ToastService } from '../../core/services/toast.service';
 import { AppSettingsService } from '../../core/services/app-settings.service';
-import { User, GroupProfile } from '../../core/models/models';
+import { User, GroupProfile, VisibilityGrant } from '../../core/models/models';
 import { AvatarComponent, GroupPillComponent } from '../../shared/components/badges.components';
 import { CrmApiService, SalesBudget } from '../../core/services/crm-api.service';
 import { AuthService } from '../../core/auth/auth.service';
@@ -77,6 +77,15 @@ import { AuthService } from '../../core/auth/auth.service';
                 }
                 @if (rolesOverflow(user) > 0) {
                   <span style="font-size:11px;color:var(--gray-400)">+{{ rolesOverflow(user) }}</span>
+                }
+                <!-- Grant widoczności NIE jest przynależnością do grupy — osobna
+                     pigułka, żeby admin nie pomylił jej z rolą grupową. -->
+                @for (grant of user.visibility_grants ?? []; track grant.id) {
+                  <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
+                        [title]="grantTooltip(grant)">
+                    👁 {{ grant.group_display || grant.group_name }}
+                    <span style="opacity:.7">{{ grant.access_level }}</span>
+                  </span>
                 }
               </div>
             </div>
@@ -443,6 +452,51 @@ import { AuthService } from '../../core/auth/auth.service';
                 <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">Przypisz</button>
               </div>
 
+              <!-- Granty widoczności CRM — celowo osobno od „Role w grupach":
+                   grant nie dodaje usera do grupy, tylko rozszerza jego widok
+                   na rekordy AKTUALNYCH członków grupy docelowej. -->
+              <div class="sec-title" style="margin-top:24px">
+                Granty widoczności CRM ({{ (selected()!.visibility_grants ?? []).length }})
+              </div>
+              @for (grant of selected()!.visibility_grants ?? []; track grant.id) {
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+                  <wt-group-pill [name]="grant.group_display || grant.group_name" />
+                  <span style="font-size:11px;color:var(--gray-600)">{{ moduleLabel(grant.module) }}</span>
+                  <span class="badge" [class]="grant.access_level === 'full' ? 's-signed' : 's-new'">{{ grant.access_level }}</span>
+                  <span style="flex:1"></span>
+                  <button class="btn btn-d btn-sm" (click)="removeVisibilityGrant(grant.id)">Usuń</button>
+                </div>
+              }
+
+              <div class="sec-title" style="margin-top:20px">Nadaj grant widoczności</div>
+              <div style="display:flex;gap:8px;align-items:flex-end">
+                <div class="fg" style="flex:1">
+                  <label class="fl">Grupa (czyje rekordy)</label>
+                  <select class="fsel" [(ngModel)]="newGrantGroup">
+                    <option value="">Wybierz grupę...</option>
+                    @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
+                  </select>
+                </div>
+                <div class="fg" style="width:120px">
+                  <label class="fl">Moduł</label>
+                  <select class="fsel" [(ngModel)]="newGrantModule">
+                    <option value="leads">Prospekty</option>
+                    <option value="partners">Partnerzy</option>
+                  </select>
+                </div>
+                <div class="fg" style="width:110px">
+                  <label class="fl">Dostęp</label>
+                  <select class="fsel" [(ngModel)]="newGrantAccess">
+                    <option value="read">Odczyt</option>
+                    <option value="full">Pełny</option>
+                  </select>
+                </div>
+                <button class="btn btn-p" [disabled]="!newGrantGroup" (click)="addVisibilityGrant()">Nadaj</button>
+              </div>
+              <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+                Grant nie dodaje użytkownika do grupy. „Pełny" pozwala też edytować rekordy tej grupy.
+              </div>
+
               @if (tenantHasProspects()) {
                 <div class="sec-title" style="margin-top:24px">Dostęp do funkcji</div>
                 <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
@@ -594,6 +648,10 @@ export class UsersComponent implements OnInit {
 
   newRoleGroup  = '';
   newRoleAccess: 'read' | 'full' = 'read';
+
+  newGrantGroup  = '';
+  newGrantModule: 'leads' | 'partners' = 'leads';
+  newGrantAccess: 'read' | 'full' = 'read';
 
   newFirst       = '';
   newLast        = '';
@@ -833,6 +891,9 @@ export class UsersComponent implements OnInit {
         this.passwordError     = '';
         this.newRoleGroup  = '';
         this.newRoleAccess = 'read';
+        this.newGrantGroup  = '';
+        this.newGrantModule = 'leads';
+        this.newGrantAccess = 'read';
         if (this.isSalesManager() && (u as any).crm_role === 'salesperson') {
           this._budgetDraft = {}; this.budgetDirty = false;
           this.loadBudgets();
@@ -920,6 +981,62 @@ export class UsersComponent implements OnInit {
       },
       error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć roli'),
     });
+  }
+
+  moduleLabel(module: 'leads' | 'partners'): string {
+    return module === 'leads' ? 'Prospekty' : 'Partnerzy';
+  }
+
+  grantTooltip(grant: VisibilityGrant): string {
+    const access = grant.access_level === 'full' ? 'odczyt i edycja' : 'tylko odczyt';
+    return `Widzi rekordy grupy „${grant.group_display || grant.group_name}" w module ${this.moduleLabel(grant.module)} (${access})`;
+  }
+
+  addVisibilityGrant(): void {
+    const u = this.selected();
+    if (!u || !this.newGrantGroup) return;
+    this.userSvc
+      .addVisibilityGrant(u.id, this.newGrantGroup, this.newGrantModule, this.newGrantAccess)
+      .subscribe({
+        next: grant => {
+          const group = this.groups().find(g => g.id === this.newGrantGroup);
+          const saved: VisibilityGrant = {
+            ...grant,
+            group_name:    grant.group_name    ?? group?.name ?? '',
+            group_display: grant.group_display ?? group?.display_name ?? null,
+          };
+          // Upsert po stronie serwera (ON CONFLICT) — ta sama para grupa+moduł
+          // podmienia poziom dostępu, nie tworzy drugiego wiersza.
+          this.applyGrants(u.id, prev => [
+            ...prev.filter(g => !(g.target_group_id === saved.target_group_id && g.module === saved.module)),
+            saved,
+          ]);
+          this.newGrantGroup = '';
+          this.toast.success('Grant widoczności nadany');
+        },
+        error: err => this.toast.error(err?.error?.error ?? 'Nie udało się nadać grantu'),
+      });
+  }
+
+  removeVisibilityGrant(grantId: string): void {
+    const u = this.selected();
+    if (!u) return;
+    this.userSvc.removeVisibilityGrant(u.id, grantId).subscribe({
+      next: () => {
+        this.applyGrants(u.id, prev => prev.filter(g => g.id !== grantId));
+        this.toast.success('Grant widoczności usunięty');
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć grantu'),
+    });
+  }
+
+  // Granty są pokazywane i w panelu, i jako pigułki na liście — obie kopie muszą
+  // się zmienić, inaczej lista zostaje z nieaktualnym stanem do przeładowania.
+  private applyGrants(userId: string, fn: (prev: VisibilityGrant[]) => VisibilityGrant[]): void {
+    this.selected.update(s => s && s.id === userId ? { ...s, visibility_grants: fn(s.visibility_grants ?? []) } : s);
+    this.users.update(list => list.map(x =>
+      x.id === userId ? { ...x, visibility_grants: fn(x.visibility_grants ?? []) } : x,
+    ));
   }
 
   // "Feature Access" to przyjazny checkbox nad tym samym mechanizmem co Group

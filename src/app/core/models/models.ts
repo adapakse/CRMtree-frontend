@@ -7,6 +7,19 @@ export interface UserRole {
   access_level: 'read' | 'full';
 }
 
+// Grant widoczności CRM: grantee widzi rekordy CAŁEJ grupy docelowej w danym
+// module. Grant NIE oznacza przynależności do tej grupy (osobny mechanizm).
+export interface VisibilityGrant {
+  id: string;
+  target_group_id: string;
+  group_name: string;
+  group_display: string | null;
+  module: 'leads' | 'partners';
+  access_level: 'read' | 'full';
+  granted_at?: string;
+  note?: string | null;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -28,6 +41,7 @@ export interface User {
   last_login_at?: string;
   created_at?: string;
   roles?: UserRole[];
+  visibility_grants?: VisibilityGrant[];
 }
 
 // ── Tenant ────────────────────────────────────────────────
