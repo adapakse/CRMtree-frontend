@@ -125,8 +125,10 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
               </div>
             </div>
 
-            @if (fields().length > 0) {
+            @if (fields().length > 0 || canAddFields()) {
               <div class="sec-title">Pola dodatkowe</div>
+            }
+            @if (fields().length > 0) {
               <div class="fgrid">
                 @for (field of fields(); track field.field_definition_id) {
                   <div class="fg">
@@ -161,6 +163,25 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                   </div>
                 }
               </div>
+            }
+
+            @if (canAddFields()) {
+              @if (availableFieldDefinitions().length > 0) {
+                <div class="add-field">
+                  <select class="fsel" [(ngModel)]="newFieldId">
+                    <option [ngValue]="null">— wybierz pole —</option>
+                    @for (definition of availableFieldDefinitions(); track definition.id) {
+                      <option [ngValue]="definition.id">{{ definition.name }}</option>
+                    }
+                  </select>
+                  <button class="btn btn-g btn-sm" [disabled]="!newFieldId" (click)="addField()">+ Dodaj pole</button>
+                </div>
+                <div class="field-hint">Pole zostanie dodane do wszystkich zadań tego projektu.</div>
+              } @else {
+                <div class="field-hint">
+                  Brak pól do dodania. Pola definiuje administrator w Ustawienia → Projekty → Pola dodatkowe zadań.
+                </div>
+              }
             }
 
             @if (taskId(); as existingTaskId) {
@@ -210,6 +231,9 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
     .assignee-list { display:flex; flex-wrap:wrap; gap:6px 16px; }
     .assignee { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-700); }
     .money { display:grid; grid-template-columns:1fr 90px; gap:8px; }
+    .add-field { display:flex; gap:8px; align-items:center; }
+    .add-field .fsel { max-width:280px; }
+    .field-hint { font-size:12px; color:var(--gray-400); }
     .history-toggle { align-self:flex-start; border:none; background:none; color:var(--gray-600); font-size:12.5px; font-weight:600; cursor:pointer; padding:0; font-family:inherit; }
     .history { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--gray-700); }
     input:disabled, select:disabled, textarea:disabled { opacity:.75; cursor:not-allowed; }
@@ -231,6 +255,8 @@ export class ProjectTaskPanelComponent implements OnInit {
 
   readonly closed = output<void>();
   readonly saved = output<void>();
+  /** Emitted after the PM adds a custom field to the project from this panel. */
+  readonly fieldsChanged = output<void>();
 
   readonly currencies = CURRENCIES;
   readonly isLoading = signal(true);
@@ -261,12 +287,18 @@ export class ProjectTaskPanelComponent implements OnInit {
     const excluded = this.descendantIdsOf(this.taskId());
     return this.tasks().filter(task => !excluded.has(task.id));
   });
+  readonly canAddFields = computed(() => this.isProjectOpen() && this.permissions().can_edit_structure);
+  readonly availableFieldDefinitions = computed(() => {
+    const attachedIds = new Set(this.fields().map(field => field.field_definition_id));
+    return this.config().field_definitions.filter(definition => definition.is_active && !attachedIds.has(definition.id));
+  });
   readonly canSave = computed(() => {
     const permissions = this.permissions();
     return permissions.can_edit_content || permissions.can_edit_structure || permissions.allowed_status_ids.length > 0;
   });
 
   form: TaskForm = this.emptyForm();
+  newFieldId: string | null = null;
 
   ngOnInit(): void {
     const taskId = this.taskId();
@@ -295,6 +327,23 @@ export class ProjectTaskPanelComponent implements OnInit {
   toggleAssignee(userId: string): void {
     const selected = this.form.assignee_ids;
     this.form.assignee_ids = selected.includes(userId) ? selected.filter(id => id !== userId) : [...selected, userId];
+  }
+
+  addField(): void {
+    const fieldId = this.newFieldId;
+    if (!fieldId) return;
+    const fields = [
+      ...this.fields().map(field => ({ field_definition_id: field.field_definition_id, is_required: field.is_required })),
+      { field_definition_id: fieldId, is_required: false },
+    ];
+    this.api.replaceProjectFields(this.projectId(), fields).subscribe({
+      next: () => {
+        this.newFieldId = null;
+        this.form.currencies[fieldId] = DEFAULT_CURRENCY;
+        this.fieldsChanged.emit();
+      },
+      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się dodać pola'),
+    });
   }
 
   toggleHistory(): void {

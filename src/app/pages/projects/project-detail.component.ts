@@ -77,7 +77,7 @@ const NEW_TASK = 'new';
               [taskId]="taskId === newTask ? null : taskId"
               [config]="loadedConfig" [members]="loaded.members" [fields]="loaded.fields" [tasks]="tasks()"
               [isProjectOpen]="loaded.project.status === 'open'"
-              (closed)="closeTask()" (saved)="onTaskSaved()" />
+              (closed)="closeTask()" (saved)="onTaskSaved()" (fieldsChanged)="loadProject()" />
           }
         }
       } @else {

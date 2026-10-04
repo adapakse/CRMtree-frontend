@@ -165,6 +165,10 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
             <label class="required-toggle"><input type="checkbox" [(ngModel)]="isNewFieldRequired"> wymagane</label>
             <button class="btn btn-p btn-sm" [disabled]="!newFieldId" (click)="addField()">Dodaj pole</button>
           </div>
+        } @else if (canEditMembers()) {
+          <p class="muted">
+            Brak pól do dodania. Pola definiuje administrator w Ustawienia → Projekty → Pola dodatkowe zadań.
+          </p>
         }
       </section>
     }
