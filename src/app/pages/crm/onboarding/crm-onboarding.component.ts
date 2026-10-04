@@ -12,6 +12,8 @@ import {
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { CalendarEntry, dueDateCalendarEntry } from '../../../shared/utils/calendar-export.util';
 
 const STEP_LABELS = ['Podpisanie umowy', 'Konfiguracja', 'Szkolenie', 'Uruchomienie'];
 const STEP_ICONS  = ['📝', '⚙️', '🎓', '🚀'];
@@ -28,7 +30,7 @@ const TYPE_LABELS: Record<string, string> = {
   selector: 'wt-crm-onboarding',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent],
   template: `
 <div id="topbar">
   <span class="page-title">🚀 Onboarding partnerów</span>
@@ -218,6 +220,7 @@ const TYPE_LABELS: Record<string, string> = {
                       📅 {{ t.due_date | date:'dd.MM' }}
                       @if (t.due_time) { {{ t.due_time.slice(0,5) }} }
                       @else { 09:00 }
+                      <wt-add-to-calendar [entry]="calendarEntryOf(t)" (click)="$event.stopPropagation()" />
                     </div>
                   }
                   @if (t.assigned_to_name) {
@@ -812,6 +815,16 @@ export class CrmOnboardingComponent implements OnInit {
   nextMonth(): void {
     if (this.calMonth() === 11) { this.calMonth.set(0); this.calYear.update(y => y + 1); }
     else this.calMonth.update(m => m + 1);
+  }
+
+  calendarEntryOf(task: OnboardingTask): CalendarEntry | null {
+    return dueDateCalendarEntry({
+      title: task.partner_name ? `${task.title} — ${task.partner_name}` : task.title,
+      description: task.body ?? '',
+      path: `/crm/onboarding?partner=${task.partner_id}`,
+      dueDate: task.due_date,
+      dueTime: task.due_time,
+    });
   }
 
   isOverdue(t: OnboardingTask): boolean {

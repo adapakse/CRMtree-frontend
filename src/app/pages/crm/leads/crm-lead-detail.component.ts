@@ -14,6 +14,9 @@ import {
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
+import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { LinkedProjectTasksComponent } from '../../../shared/components/linked-project-tasks/linked-project-tasks.component';
+import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
 import { PbxService } from '../../../core/services/pbx.service';
 import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
@@ -41,7 +44,8 @@ interface WhatsappConvUiState {
 @Component({
   selector: 'wt-crm-lead-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule],
+  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
+            AddToCalendarComponent, LinkedProjectTasksComponent],
   providers: [EmailOauthListenerService],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden" *ngIf="lead">
@@ -307,6 +311,9 @@ interface WhatsappConvUiState {
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
 
+        <wt-linked-project-tasks *ngIf="midTab==='tasks' || midTab==='all'"
+                                 sourceType="lead" [sourceId]="lead.id" [sourceName]="lead.company"></wt-linked-project-tasks>
+
         <!-- Nowa aktywność form -->
         <div *ngIf="showNewActivity" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">
@@ -410,6 +417,8 @@ interface WhatsappConvUiState {
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
               <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">utworzono {{a.created_at|date:'dd.MM.yyyy HH:mm'}}</span>
+              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'note'"
+                                  [entry]="calendarEntryOf(a)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
             </div>
             <div style="font-size:12.5px;font-weight:600;color:#111827;margin-bottom:2px">{{a.title}}</div>
             <div class="act-meta" style="margin-bottom:4px">
@@ -2146,6 +2155,13 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     { value: 'meeting',  icon: '🤝', label: 'Spotkanie'  },
     { value: 'doc_sent', icon: '📄', label: 'Dokument'   },
   ];
+
+  calendarEntryOf(activity: any): CalendarEntry | null {
+    if (!this.lead) return null;
+    return activityCalendarEntry({
+      ...activity, source_type: 'lead', source_id: this.lead.id, source_name: this.lead.company,
+    });
+  }
 
   get filteredActivities(): any[] {
     const all = (this.lead?.activities || [])

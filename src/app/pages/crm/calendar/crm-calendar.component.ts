@@ -7,6 +7,9 @@ import { RouterModule } from '@angular/router';
 import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser, CrmGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
+import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 
 type ViewMode = 'month' | 'week' | 'day' | 'tasks';
 
@@ -20,7 +23,7 @@ interface CalendarDay {
 @Component({
   selector: 'wt-crm-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent],
   template: `
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
@@ -110,8 +113,9 @@ interface CalendarDay {
           <div *ngFor="let m of day.meetings.slice(0,3)" class="event-chip"
                [class.lead-chip]="m.source_type === 'lead'"
                [class.partner-chip]="m.source_type === 'partner'"
+               [class.project-chip]="m.source_type === 'project'"
                (click)="openMeeting(m)">
-            <span class="event-time">{{ m.activity_at | date:'HH:mm' }}</span>
+            <span class="event-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}</span>
             <span class="event-title">{{ m.title }}</span>
           </div>
           <div *ngIf="day.meetings.length > 3" class="event-more"
@@ -140,8 +144,9 @@ interface CalendarDay {
           <div *ngFor="let m of getMeetingsAtHour(day, h)" class="week-event"
                [class.lead-event]="m.source_type === 'lead'"
                [class.partner-event]="m.source_type === 'partner'"
+               [class.project-event]="m.source_type === 'project'"
                (click)="openMeeting(m)">
-            <div class="we-time">{{ m.activity_at | date:'HH:mm' }}</div>
+            <div class="we-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}</div>
             <div class="we-title">{{ m.title }}</div>
             <div class="we-source">{{ m.source_name }}</div>
           </div>
@@ -159,13 +164,15 @@ interface CalendarDay {
           <div *ngFor="let m of getMeetingsOnDayAtHour(currentDate, h)" class="day-event"
                [class.lead-event]="m.source_type === 'lead'"
                [class.partner-event]="m.source_type === 'partner'"
+               [class.project-event]="m.source_type === 'project'"
                (click)="openMeeting(m)">
             <div class="de-header">
-              <span class="de-time">{{ m.activity_at | date:'HH:mm' }}
+              <span class="de-time">{{ m.all_day ? 'termin' : (m.activity_at | date:'HH:mm') }}
                 <span *ngIf="m.duration_min"> ({{ m.duration_min }} min)</span>
               </span>
-              <span class="de-badge" [class.lead-badge]="m.source_type==='lead'" [class.partner-badge]="m.source_type==='partner'">
-                {{ m.source_type === 'lead' ? 'Lead' : 'Partner' }}
+              <span class="de-badge" [class.lead-badge]="m.source_type==='lead'" [class.partner-badge]="m.source_type==='partner'"
+                    [class.project-badge]="m.source_type==='project'">
+                {{ sourceLabel(m.source_type) }}
               </span>
             </div>
             <div class="de-title">{{ m.title }}</div>
@@ -210,14 +217,14 @@ interface CalendarDay {
          [class.task-today]="t.activity_at && isTaskToday(t.activity_at)"
          [class.task-overdue]="t.status !== 'closed' && t.activity_at && isTaskOverdue(t.activity_at)"
          [class.task-closed]="t.status === 'closed'"
-         [class.task-readonly]="isTaskReadOnly(t)"
+         [class.task-readonly]="t.source_type !== 'project' && isTaskReadOnly(t)"
          [class.task-expanded]="isExpanded(t)"
          (click)="onTaskClick(t)" style="cursor:pointer">
 
       <!-- Główny wiersz -->
       <div style="display:flex;align-items:stretch;gap:0">
         <!-- Checkbox (tryb masowy, tylko dla zadań) -->
-        <div *ngIf="bulkSelectMode && t.type==='task'"
+        <div *ngIf="bulkSelectMode && t.type==='task' && t.source_type !== 'project'"
              style="display:flex;align-items:center;padding-right:10px;flex-shrink:0"
              (click)="$event.stopPropagation()">
           <input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:#3BAA5D"
@@ -230,7 +237,7 @@ interface CalendarDay {
           <ng-container *ngIf="t.activity_at; else noDate">
             <span class="task-date-day">{{t.activity_at | date:'d'}}</span>
             <span class="task-date-mon">{{t.activity_at | date:'MMM'}}</span>
-            <span class="task-date-time">{{t.activity_at | date:'HH:mm'}}</span>
+            <span class="task-date-time" *ngIf="!t.all_day">{{t.activity_at | date:'HH:mm'}}</span>
           </ng-container>
           <ng-template #noDate><span class="task-date-none">brak daty</span></ng-template>
         </div>
@@ -241,14 +248,16 @@ interface CalendarDay {
             <strong style="font-size:13px;color:#18181b">
               <span style="color:#6b7280;font-weight:500">{{taskTypeName(t.type)}}:</span> {{t.title}}
             </strong>
-            <span class="task-status-badge task-st-{{t.status}}">{{taskStatusLabel(t.status)}}</span>
+            <span class="task-status-badge task-st-{{t.status}}">{{t.status_label || taskStatusLabel(t.status)}}</span>
             <span *ngIf="t.priority" class="priority-badge priority-{{t.priority}}">{{priorityLabel(t.priority)}}</span>
-            <span class="task-source-badge task-src-{{t.source_type}}">{{t.source_type === 'lead' ? 'Lead' : 'Partner'}}</span>
-            <span *ngIf="isTaskReadOnly(t)" style="font-size:9px;color:#9ca3af;font-style:italic">tylko odczyt</span>
+            <span class="task-source-badge task-src-{{t.source_type}}">{{sourceLabel(t.source_type)}}</span>
+            <wt-add-to-calendar [entry]="calendarEntryOf(t)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
+            <span *ngIf="t.source_type !== 'project' && isTaskReadOnly(t)" style="font-size:9px;color:#9ca3af;font-style:italic">tylko odczyt</span>
           </div>
           <div style="font-size:11px;color:#9ca3af;margin-top:2px">
             <a *ngIf="t.source_type === 'lead'"    [routerLink]="['/crm/leads', t.source_id]"    class="task-link" (click)="$event.stopPropagation()">{{t.source_name}}</a>
             <a *ngIf="t.source_type === 'partner'" [routerLink]="['/crm/partners', t.source_id]" class="task-link" (click)="$event.stopPropagation()">{{t.source_name}}</a>
+            <span *ngIf="t.source_type === 'project'" class="task-link">{{t.source_name}}</span>
             <span *ngIf="t.act_assigned_to_name"> → {{t.act_assigned_to_name}}</span>
             <span *ngIf="!t.act_assigned_to_name && t.assigned_to_name"> → {{t.assigned_to_name}}</span>
           </div>
@@ -260,7 +269,7 @@ interface CalendarDay {
         </div>
 
         <!-- Przyciski akcji (tylko dla zadań) -->
-        <div *ngIf="t.type === 'task' && !isTaskReadOnly(t)"
+        <div *ngIf="t.type === 'task' && t.source_type !== 'project' && !isTaskReadOnly(t)"
              style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;padding-left:8px"
              (click)="$event.stopPropagation()">
           <button *ngIf="t.status !== 'closed'" class="nav-btn"
@@ -466,6 +475,8 @@ interface CalendarDay {
     .task-item { border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px;background:white;border-left:4px solid #e5e7eb;transition:box-shadow .15s; }
     .task-item:hover { box-shadow:0 2px 8px rgba(0,0,0,.07); }
     .task-item.task-today { background:#eff6ff;border-left-color:#3b82f6; }
+    .project-chip, .project-event { background:#f5f3ff !important; border-left-color:#8b5cf6 !important; color:#5b21b6 !important; }
+    .project-badge, .task-src-project { background:#ede9fe; color:#5b21b6; }
     .task-item.task-overdue { background:#fef2f2;border-left-color:#dc2626; }
     .task-item.task-closed { opacity:.6;background:#f9fafb; }
     .task-item.task-readonly { opacity:.55;background:#f9fafb;cursor:default; }
@@ -497,6 +508,7 @@ export class CrmCalendarComponent implements OnInit {
   private cdr  = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
   private toast = inject(ToastService);
+  private projectTaskNavigation = inject(ProjectTaskNavigationService);
 
   loading  = false;
   saving   = false;
@@ -635,7 +647,23 @@ export class CrmCalendarComponent implements OnInit {
   isExpanded(t: ActivityTask): boolean { return this.expandedTaskKey === this.taskKey(t); }
 
   // ── Inline edit ───────────────────────────────────────────
+  calendarEntryOf(task: ActivityTask): CalendarEntry | null {
+    return activityCalendarEntry(task);
+  }
+
+  sourceLabel(sourceType: string): string {
+    return sourceType === 'lead' ? 'Lead' : sourceType === 'project' ? 'Projekt' : 'Partner';
+  }
+
+  // Project tasks are view-only here: a click opens them in the Projects module.
+  private openProjectTask(task: { source_id: number | string; project_task_id?: string }): void {
+    this.projectTaskNavigation.open(String(task.source_id), task.project_task_id ?? null, {
+      label: 'Kalendarz', route: ['/crm/calendar'],
+    });
+  }
+
   onTaskClick(t: ActivityTask): void {
+    if (t.source_type === 'project') { this.openProjectTask(t); return; }
     if (isTaskReadOnly(this, t)) return;
     const key = this.taskKey(t);
 
@@ -745,7 +773,7 @@ export class CrmCalendarComponent implements OnInit {
     this.bulkSelectMode = true;
     this.selectedTaskKeys = new Set(
       this.activities
-        .filter(t => t.type === 'task' && t.status !== 'closed' && t.activity_at && this.isTaskOverdue(t.activity_at))
+        .filter(t => t.type === 'task' && t.source_type !== 'project' && t.status !== 'closed' && t.activity_at && this.isTaskOverdue(t.activity_at))
         .map(t => this.taskKey(t))
     );
     this.cdr.markForCheck();
@@ -904,7 +932,10 @@ export class CrmCalendarComponent implements OnInit {
   }
 
   // ── Meeting detail / edit ─────────────────────────────────
-  openMeeting(m: CalendarMeeting): void { this.selectedMeeting = m; this.editMode = false; this.cdr.markForCheck(); }
+  openMeeting(m: CalendarMeeting): void {
+    if (m.source_type === 'project') { this.openProjectTask(m); return; }
+    this.selectedMeeting = m; this.editMode = false; this.cdr.markForCheck();
+  }
   closeMeeting(): void { this.selectedMeeting = null; this.editMode = false; this.cdr.markForCheck(); }
 
   canEdit(m: CalendarMeeting): boolean {
@@ -938,8 +969,8 @@ export class CrmCalendarComponent implements OnInit {
     };
     const m = this.selectedMeeting;
     const obs: Observable<any> = m.source_type === 'lead'
-      ? this.api.updateLeadActivity(m.source_id, m.id, payload)
-      : this.api.updatePartnerActivity(m.source_id, m.id, payload);
+      ? this.api.updateLeadActivity(+m.source_id, m.id, payload)
+      : this.api.updatePartnerActivity(+m.source_id, m.id, payload);
     obs.subscribe({
       next: () => this.zone.run(() => {
         const idx = this.meetings.findIndex(x => x.id === m.id && x.source_type === m.source_type);

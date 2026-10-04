@@ -3,19 +3,36 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../core/services/toast.service';
 import {
-  MoneyValue, ProjectConfig, ProjectCustomValue, ProjectField, ProjectMember, ProjectTask, ProjectTaskDetail,
-  ProjectTaskHistoryEntry, ProjectTaskPayload, ProjectTaskPermissions, ProjectsApiService,
+  MoneyValue, ProjectConfig, ProjectCustomValue, ProjectField, ProjectMember, ProjectReminderType, ProjectTask,
+  ProjectTaskDetail, ProjectTaskHistoryEntry, ProjectTaskPayload, ProjectTaskPermissions, ProjectsApiService,
 } from '../../core/services/projects-api.service';
+import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
+import { projectTaskCalendarEntry } from '../../shared/utils/calendar-export.util';
 import { ProjectChatComponent } from './project-chat.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK'];
 const DEFAULT_CURRENCY = 'PLN';
 
+const REMINDER_OPTIONS: { value: ProjectReminderType; label: string }[] = [
+  { value: 'at_due', label: 'W dniu terminu' },
+  { value: '1d_before', label: '1 dzień przed terminem' },
+  { value: '2d_before', label: '2 dni przed terminem' },
+  { value: '3d_before', label: '3 dni przed terminem' },
+  { value: 'custom', label: 'Własna data' },
+];
+
+// Value for <input type="datetime-local">: local time without a zone.
+function toLocalDateTimeInput(iso: string): string {
+  const date = new Date(iso);
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 const HISTORY_FIELD_LABELS: Record<string, string> = {
   name: 'nazwa', description: 'opis', type_id: 'typ', status_id: 'status', priority_id: 'priorytet',
   start_date: 'data początku', end_date: 'data zakończenia', parent_task_id: 'zadanie nadrzędne',
-  assignee_ids: 'przypisane osoby', custom_values: 'pola dodatkowe',
+  assignee_ids: 'przypisane osoby', custom_values: 'pola dodatkowe', reminder_type: 'przypomnienie',
 };
 
 interface TaskForm {
@@ -28,6 +45,9 @@ interface TaskForm {
   end_date: string | null;
   parent_task_id: string | null;
   assignee_ids: string[];
+  reminder_type: ProjectReminderType | null;
+  /** Only for the "custom" reminder; bound to a datetime-local input. */
+  reminder_at: string;
   // Keyed by field definition id. Money fields keep amount and currency apart
   // so each can be bound to its own input.
   values: Record<string, string | number | null>;
@@ -42,7 +62,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
 @Component({
   selector: 'wt-project-task-panel',
   standalone: true,
-  imports: [FormsModule, DatePipe, ProjectChatComponent],
+  imports: [FormsModule, DatePipe, ProjectChatComponent, AddToCalendarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="overlay" (click)="closed.emit()">
@@ -111,6 +131,29 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                 <input class="fi" type="date" [(ngModel)]="form.end_date" [disabled]="!permissions().can_edit_content">
               </div>
             </div>
+
+            <div class="fgrid">
+              <div class="fg">
+                <label class="fl">Przypomnienie e-mail</label>
+                <select class="fsel" [(ngModel)]="form.reminder_type" [disabled]="!permissions().can_edit_content">
+                  <option [ngValue]="null">Brak</option>
+                  @for (option of reminderOptions; track option.value) {
+                    <option [ngValue]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+              @if (form.reminder_type === 'custom') {
+                <div class="fg">
+                  <label class="fl">Data przypomnienia</label>
+                  <input class="fi" type="datetime-local" [(ngModel)]="form.reminder_at" [disabled]="!permissions().can_edit_content">
+                </div>
+              }
+            </div>
+            @if (form.reminder_type && form.reminder_type !== 'custom') {
+              <div class="field-hint">
+                Przypomnienie trafi do wszystkich przypisanych osób o 9:00 i wymaga daty zakończenia.
+              </div>
+            }
 
             <div class="fg">
               <label class="fl">Przypisane osoby</label>
@@ -210,6 +253,8 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
           </div>
 
           <footer class="panel-foot">
+            <wt-add-to-calendar [entry]="calendarEntry()" [showLabel]="true" />
+            <span class="foot-spacer"></span>
             <button class="btn btn-g" (click)="closed.emit()">Zamknij</button>
             @if (canSave()) {
               <button class="btn btn-p" [disabled]="!form.name.trim() || isSaving()" (click)="save()">
@@ -227,7 +272,9 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
     .panel { width:620px; max-width:100vw; height:100%; background:white; display:flex; flex-direction:column; box-shadow:var(--shadow-lg); }
     .panel-head { display:flex; align-items:flex-start; gap:12px; padding:18px 24px 14px; border-bottom:1px solid var(--gray-200); }
     .panel-body { flex:1; overflow-y:auto; padding:20px 24px; display:flex; flex-direction:column; gap:14px; }
-    .panel-foot { padding:14px 24px; border-top:1px solid var(--gray-200); display:flex; justify-content:flex-end; gap:8px; }
+    .panel-body > * { flex-shrink:0; }
+    .panel-foot { padding:14px 24px; border-top:1px solid var(--gray-200); display:flex; align-items:center; gap:8px; }
+    .foot-spacer { flex:1; }
     .assignee-list { display:flex; flex-wrap:wrap; gap:6px 16px; }
     .assignee { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-700); }
     .money { display:grid; grid-template-columns:1fr 90px; gap:8px; }
@@ -245,6 +292,7 @@ export class ProjectTaskPanelComponent implements OnInit {
 
   readonly projectId = input.required<string>();
   readonly projectKey = input.required<string>();
+  readonly projectName = input('');
   /** null opens the panel for a new task. */
   readonly taskId = input.required<string | null>();
   readonly config = input.required<ProjectConfig>();
@@ -259,6 +307,7 @@ export class ProjectTaskPanelComponent implements OnInit {
   readonly fieldsChanged = output<void>();
 
   readonly currencies = CURRENCIES;
+  readonly reminderOptions = REMINDER_OPTIONS;
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
   readonly isHistoryOpen = signal(false);
@@ -291,6 +340,15 @@ export class ProjectTaskPanelComponent implements OnInit {
   readonly availableFieldDefinitions = computed(() => {
     const attachedIds = new Set(this.fields().map(field => field.field_definition_id));
     return this.config().field_definitions.filter(definition => definition.is_active && !attachedIds.has(definition.id));
+  });
+  // Built from the saved task, not the form: the export reflects what is stored.
+  readonly calendarEntry = computed(() => {
+    const task = this.loadedTask();
+    if (!task) return null;
+    return projectTaskCalendarEntry({
+      projectId: this.projectId(), projectKey: this.projectKey(), projectName: this.projectName(),
+      taskId: task.id, taskNumber: task.task_number, name: task.name, endDate: task.end_date,
+    });
   });
   readonly canSave = computed(() => {
     const permissions = this.permissions();
@@ -384,6 +442,7 @@ export class ProjectTaskPanelComponent implements OnInit {
     return {
       name: '', description: '', type_id: null, status_id: null, priority_id: null,
       start_date: null, end_date: null, parent_task_id: null, assignee_ids: [],
+      reminder_type: null, reminder_at: '',
       values: {}, currencies: {},
     };
   }
@@ -411,6 +470,8 @@ export class ProjectTaskPanelComponent implements OnInit {
       end_date: task.end_date,
       parent_task_id: task.parent_task_id,
       assignee_ids: task.assignees.map(assignee => assignee.user_id),
+      reminder_type: task.reminder_type,
+      reminder_at: task.reminder_type === 'custom' && task.reminder_at ? toLocalDateTimeInput(task.reminder_at) : '',
       values,
       currencies,
     };
@@ -429,6 +490,10 @@ export class ProjectTaskPanelComponent implements OnInit {
       payload.start_date = this.form.start_date || null;
       payload.end_date = this.form.end_date || null;
       payload.custom_values = this.collectCustomValues();
+      payload.reminder_type = this.form.reminder_type;
+      if (this.form.reminder_type === 'custom') {
+        payload.reminder_at = this.form.reminder_at ? new Date(this.form.reminder_at).toISOString() : null;
+      }
     }
     if (permissions.can_edit_structure) {
       payload.parent_task_id = this.form.parent_task_id;

@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { TypeaheadComponent, TypeaheadOption } from '../../shared/components/typeahead/typeahead.component';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../core/services/toast.service';
 import {
   PROJECT_ACCESS_LEVEL_LABELS, PROJECT_ROLE_LABELS, ProjectAccessLevel, ProjectConfig, ProjectDetail, ProjectField,
   ProjectMember, ProjectMemberCandidate, ProjectRole, ProjectsApiService,
 } from '../../core/services/projects-api.service';
+import { ProjectCrmLinkComponent } from './project-crm-link.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 
 const FIELD_TYPE_LABELS: Record<ProjectField['field_type'], string> = {
@@ -18,7 +22,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
 @Component({
   selector: 'wt-project-card',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ProjectCrmLinkComponent, TypeaheadComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="card block">
@@ -54,6 +58,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
         </div>
         <p class="description">{{ detail().project.description || 'Brak opisu.' }}</p>
       }
+      <wt-project-crm-link [detail]="detail()" (changed)="changed.emit()" />
     </section>
 
     <section class="card block">
@@ -103,18 +108,11 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
 
       @if (canEditMembers()) {
         <div class="add-row">
-          <input class="fi" placeholder="Szukaj osoby (imię, nazwisko, e-mail, firma)…"
-                 [(ngModel)]="candidateSearch" (ngModelChange)="searchCandidates()" (focus)="searchCandidates()">
-          <select class="fsel" [(ngModel)]="newMemberId" (ngModelChange)="onCandidateSelected()">
-            <option [ngValue]="null">— wybierz osobę —</option>
-            @for (candidate of candidates(); track candidate.id) {
-              <option [ngValue]="candidate.id">
-                {{ candidate.display_name }} · {{ candidate.email }}{{ candidate.is_external ? ' · zewnętrzny' : '' }}
-              </option>
-            }
-          </select>
+          <wt-typeahead #memberSearch [search]="searchCandidates"
+                        placeholder="Wpisz imię, nazwisko, e-mail lub firmę (min. 3 znaki)…"
+                        (picked)="onCandidatePicked($event)" />
           <select class="fsel" [(ngModel)]="newMemberRole">
-            @for (role of rolesFor(isSelectedCandidateExternal()); track role) {
+            @for (role of rolesFor(newMember()?.is_external ?? false); track role) {
               <option [ngValue]="role">{{ roleLabels[role] }}</option>
             }
           </select>
@@ -122,7 +120,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
             <option ngValue="full">{{ accessLabels.full }}</option>
             <option ngValue="read">{{ accessLabels.read }}</option>
           </select>
-          <button class="btn btn-p btn-sm" [disabled]="!newMemberId" (click)="addMember()">Dodaj</button>
+          <button class="btn btn-p btn-sm" [disabled]="!newMember()" (click)="addMember()">Dodaj</button>
         </div>
       }
     </section>
@@ -185,7 +183,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
     .compact { padding:4px 8px; font-size:12.5px; width:auto; }
     .row-action { text-align:right; }
     .link-danger { border:none; background:none; color:#B91C1C; font-size:12.5px; cursor:pointer; font-family:inherit; }
-    .add-row { display:grid; grid-template-columns:1.4fr 1.6fr 1fr .7fr auto; gap:8px; align-items:center; }
+    .add-row { display:grid; grid-template-columns:2.4fr 1fr .7fr auto; gap:8px; align-items:center; }
     .add-row.fields { grid-template-columns:1.6fr auto auto; justify-content:start; }
     .required-toggle { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-700); }
     a { color:var(--accent-blue, #3B82F6); text-decoration:none; }
@@ -205,7 +203,9 @@ export class ProjectCardComponent {
   readonly fieldTypeLabels = FIELD_TYPE_LABELS;
 
   readonly isEditing = signal(false);
-  readonly candidates = signal<ProjectMemberCandidate[]>([]);
+  /** The person picked in the search field, waiting for a role before being added. */
+  readonly newMember = signal<ProjectMemberCandidate | null>(null);
+  private readonly memberSearch = viewChild<TypeaheadComponent<ProjectMemberCandidate>>('memberSearch');
 
   readonly isOpen = computed(() => this.detail().project.status === 'open');
   readonly canEditMembers = computed(() => this.detail().can_manage && this.isOpen());
@@ -216,8 +216,6 @@ export class ProjectCardComponent {
 
   editedName = '';
   editedDescription = '';
-  candidateSearch = '';
-  newMemberId: string | null = null;
   newMemberRole: ProjectRole = 'internal_participant';
   newMemberAccessLevel: ProjectAccessLevel = 'full';
   newFieldId: string | null = null;
@@ -237,10 +235,6 @@ export class ProjectCardComponent {
 
   rolesFor(isExternalAccount: boolean): ProjectRole[] {
     return isExternalAccount ? ['external_participant', 'controller'] : ['pm', 'internal_participant', 'controller'];
-  }
-
-  isSelectedCandidateExternal(): boolean {
-    return this.candidates().find(candidate => candidate.id === this.newMemberId)?.is_external ?? false;
   }
 
   startEditing(): void {
@@ -272,25 +266,30 @@ export class ProjectCardComponent {
     });
   }
 
-  searchCandidates(): void {
-    this.api.listMemberCandidates(this.projectId, this.candidateSearch.trim()).subscribe({
-      next: candidates => this.candidates.set(candidates),
-      error: err => this.showError(err, 'Nie udało się pobrać listy osób'),
-    });
-  }
+  readonly searchCandidates = (term: string): Observable<TypeaheadOption<ProjectMemberCandidate>[]> =>
+    this.api.listMemberCandidates(this.projectId, term).pipe(
+      map(candidates => candidates.map(candidate => ({
+        id: candidate.id,
+        label: candidate.display_name,
+        hint: [candidate.email, candidate.company, candidate.is_external ? 'konto zewnętrzne' : null]
+          .filter(Boolean).join(' · '),
+        value: candidate,
+      }))),
+    );
 
-  onCandidateSelected(): void {
-    this.newMemberRole = this.isSelectedCandidateExternal() ? 'external_participant' : 'internal_participant';
+  onCandidatePicked(option: TypeaheadOption<ProjectMemberCandidate>): void {
+    this.newMember.set(option.value);
+    this.newMemberRole = option.value.is_external ? 'external_participant' : 'internal_participant';
   }
 
   addMember(): void {
-    if (!this.newMemberId) return;
-    const payload = { user_id: this.newMemberId, role: this.newMemberRole, access_level: this.newMemberAccessLevel };
+    const member = this.newMember();
+    if (!member) return;
+    const payload = { user_id: member.id, role: this.newMemberRole, access_level: this.newMemberAccessLevel };
     this.api.addMember(this.projectId, payload).subscribe({
       next: () => {
-        this.newMemberId = null;
-        this.candidates.set([]);
-        this.candidateSearch = '';
+        this.newMember.set(null);
+        this.memberSearch()?.clear();
         this.changed.emit();
       },
       error: err => this.showError(err, 'Nie udało się dodać osoby'),

@@ -4,6 +4,9 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { CrmApiService, ActivityTask, Lead, ChurnPartner, ChurnSettings } from '../../../core/services/crm-api.service';
+import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
+import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
@@ -20,7 +23,7 @@ interface PipelineRow {
 @Component({
   selector: 'wt-crm-sales-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent],
+  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent, AddToCalendarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <div class="crm-dash" *ngIf="!loading; else loadingTpl">
@@ -353,6 +356,7 @@ interface PipelineRow {
               <div class="task-sub">{{ t.source_name }}</div>
             </div>
             <span class="task-time" [class.task-overdue]="isOverdue(t)">{{ taskTime(t) }}</span>
+            <wt-add-to-calendar [entry]="calendarEntryOf(t)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
           </div>
           <div *ngIf="closingTask?.uid === t.uid" class="task-close-form" (click)="$event.stopPropagation()">
             <textarea class="task-close-ta" [(ngModel)]="taskCloseComment"
@@ -692,6 +696,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   private auth     = inject(AuthService);
   private cdr      = inject(ChangeDetectorRef);
   private router   = inject(Router);
+  private projectTaskNavigation = inject(ProjectTaskNavigationService);
   private route    = inject(ActivatedRoute);
   private settings = inject(AppSettingsService);
 
@@ -1030,7 +1035,12 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const tmrw  = new Date(today); tmrw.setDate(today.getDate() + 1);
     this.todayTasks = tasks
-      .filter(t => { if (!t.activity_at) return false; const d = new Date(t.activity_at); return d >= today && d < tmrw; })
+      // Project tasks have only a due date, so an open overdue one still belongs to "today".
+      .filter(t => {
+        if (!t.activity_at || (t.source_type === 'project' && t.status === 'closed')) return false;
+        const d = new Date(t.activity_at);
+        return d < tmrw && (d >= today || t.source_type === 'project');
+      })
       .sort((a, b) => new Date(a.activity_at!).getTime() - new Date(b.activity_at!).getTime())
       .slice(0, 6);
   }
@@ -1140,7 +1150,12 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   isOverdue(t: ActivityTask): boolean {
+    if (t.all_day) return !!t.activity_at && !this.isDueToday(t) && new Date(t.activity_at) < new Date();
     return !!t.activity_at && new Date(t.activity_at) < new Date();
+  }
+
+  private isDueToday(t: ActivityTask): boolean {
+    return !!t.activity_at && new Date(t.activity_at).toDateString() === new Date().toDateString();
   }
 
   fmtValue(v: number): string {
@@ -1155,7 +1170,12 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     return Math.round(v).toLocaleString('pl-PL') + ' zł';
   }
 
+  calendarEntryOf(task: ActivityTask): CalendarEntry | null {
+    return activityCalendarEntry(task);
+  }
+
   taskTime(t: ActivityTask): string {
+    if (t.all_day) return this.isOverdue(t) && !this.isDueToday(t) ? 'po terminie' : 'termin dziś';
     return t.activity_at
       ? new Date(t.activity_at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
       : '';
@@ -1215,6 +1235,11 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     if (t.source_type === 'partner')    this.router.navigate(['/crm/partners', t.source_id]);
     if (t.source_type === 'onboarding') this.router.navigate(['/crm/onboarding'], { queryParams: { partner: t.source_id } });
     if (t.source_type === 'document')   this.router.navigate(['/documents', t.source_id]);
+    if (t.source_type === 'project') {
+      this.projectTaskNavigation.open(String(t.source_id), t.project_task_id ?? null, {
+        label: 'Dashboard', route: ['/crm/dashboard'],
+      });
+    }
   }
 
   goToPipelineStage(row: PipelineRow) {

@@ -66,8 +66,50 @@ export interface Project {
   status: ProjectStatus;
   partner_id: string | null;
   partner_name: string | null;
+  lead_id: number | null;
+  lead_name: string | null;
   created_at: string;
   closed_at: string | null;
+}
+
+export type ProjectReminderType = 'at_due' | '1d_before' | '2d_before' | '3d_before' | 'custom';
+
+/** A task as shown outside its project: on a lead / partner card or in "my tasks". */
+export interface ProjectTaskSummary {
+  id: string;
+  task_number: number;
+  name: string;
+  start_date: string | null;
+  end_date: string | null;
+  parent_task_id: string | null;
+  status_id: string;
+  status_name: string;
+  status_color: string;
+  status_category: TaskStatusCategory;
+  priority_name: string | null;
+  priority_color: string | null;
+  assignees: ProjectTaskAssignee[];
+}
+
+export interface AssignedProjectTask extends ProjectTaskSummary {
+  project_id: string;
+  project_key: string;
+  project_name: string;
+  reminder_type: ProjectReminderType | null;
+  reminder_at: string | null;
+  updated_at: string;
+}
+
+export interface LinkedProject {
+  id: string;
+  key: string;
+  name: string;
+  status: ProjectStatus;
+  created_at: string;
+  closed_at: string | null;
+  /** False for a viewer who is not a project member: they see the tasks but cannot enter the project. */
+  can_open: boolean;
+  tasks: ProjectTaskSummary[];
 }
 
 export interface ProjectListItem extends Project {
@@ -145,6 +187,8 @@ export interface ProjectTask {
   parent_task_id: string | null;
   custom_values: Record<string, ProjectCustomValue>;
   assignees: ProjectTaskAssignee[];
+  reminder_type: ProjectReminderType | null;
+  reminder_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -170,6 +214,8 @@ export interface ProjectTaskPayload {
   parent_task_id?: string | null;
   assignee_ids?: string[];
   custom_values?: Record<string, ProjectCustomValue>;
+  reminder_type?: ProjectReminderType | null;
+  reminder_at?: string | null;
 }
 
 export interface ProjectTaskHistoryEntry {
@@ -261,6 +307,27 @@ export class ProjectsApiService {
 
   listTaskHistory(projectId: string, taskId: string): Observable<ProjectTaskHistoryEntry[]> {
     return this.http.get<ProjectTaskHistoryEntry[]>(`${this.base}/${projectId}/tasks/${taskId}/history`);
+  }
+
+  /** Links the project to one lead or one partner; an empty payload removes the link. */
+  setCrmLink(projectId: string, link: { lead_id?: number; partner_ref?: string }): Observable<unknown> {
+    return this.http.put(`${this.base}/${projectId}/crm-link`, link);
+  }
+
+  /** Open project tasks assigned to the given people (default: the signed-in user). */
+  listAssignedTasks(options: { assignedTo?: string; includeDone?: boolean } = {}): Observable<AssignedProjectTask[]> {
+    const params: Record<string, string> = {};
+    if (options.assignedTo) params['assigned_to'] = options.assignedTo;
+    if (options.includeDone) params['include_done'] = 'true';
+    return this.http.get<AssignedProjectTask[]>(`${this.base}/assigned-tasks`, { params });
+  }
+
+  listLeadProjects(leadId: number | string): Observable<LinkedProject[]> {
+    return this.http.get<LinkedProject[]>(`${environment.apiUrl}/crm/leads/${leadId}/projects`);
+  }
+
+  listPartnerProjects(partnerId: number | string): Observable<LinkedProject[]> {
+    return this.http.get<LinkedProject[]>(`${environment.apiUrl}/crm/partners/${partnerId}/projects`);
   }
 
   /** taskId = null addresses the general project thread. */

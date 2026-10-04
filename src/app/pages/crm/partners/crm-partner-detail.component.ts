@@ -10,6 +10,9 @@ import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
+import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { LinkedProjectTasksComponent } from '../../../shared/components/linked-project-tasks/linked-project-tasks.component';
+import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
@@ -49,7 +52,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
 @Component({
   selector: 'wt-crm-partner-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule],
+  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule,
+            AddToCalendarComponent, LinkedProjectTasksComponent],
   providers: [EmailOauthListenerService],
   template: `
 <div class="detail-page" *ngIf="partner">
@@ -428,6 +432,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div style="display:flex;justify-content:flex-end">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ Dodaj aktywność</button>
         </div>
+
+        <wt-linked-project-tasks *ngIf="partnerRouteId && (midTab==='tasks' || midTab==='all')"
+                                 sourceType="partner" [sourceId]="partnerRouteId" [sourceName]="partner.company"></wt-linked-project-tasks>
         <div class="new-activity-form" *ngIf="showNewActivity">
           <!-- Typ (ustalany kontekstem zakładki, nie wybierany ręcznie — jak w crm-lead-detail.component.ts) -->
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">
@@ -551,6 +558,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
               <span *ngIf="a.activity_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">{{a.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
               <span *ngIf="!a.activity_at && a.created_at" style="font-size:10px;color:#9ca3af;margin-left:auto;white-space:nowrap">utworzono {{a.created_at|date:'dd.MM.yyyy HH:mm'}}</span>
+              <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'note'"
+                                  [entry]="calendarEntryOf(a)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
             </div>
             <div class="act-card-title">{{a.title}}</div>
             <div class="act-meta">
@@ -2031,6 +2040,18 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   partner: Partner | null = null;
+
+  /** Id that both the partner API and the /crm/partners/:id route accept: CRM uuid, else the DWH id. */
+  get partnerRouteId(): string {
+    return this.partner?.crm_uuid || String(this.partner?.id ?? '');
+  }
+
+  calendarEntryOf(activity: any): CalendarEntry | null {
+    if (!this.partner) return null;
+    return activityCalendarEntry({
+      ...activity, source_type: 'partner', source_id: this.partnerRouteId, source_name: this.partner.company,
+    });
+  }
   loading        = false;
   loadError      = false;
   saving         = false;

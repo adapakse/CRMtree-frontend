@@ -1,8 +1,11 @@
 // src/app/core/services/crm-api.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, combineLatest, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { AuthService } from '../auth/auth.service';
+import { AssignedProjectTask, ProjectsApiService } from './projects-api.service';
+import { hasDueDate, projectTaskToActivityTask, projectTaskToCalendarMeeting } from './project-task-feed';
 import { environment } from '../../../environments/environment';
 
 // ─────────────────────────────────────────────────────────────────
@@ -113,13 +116,17 @@ export interface CalendarMeeting {
   created_by: string;
   status: 'new' | 'open' | 'closed';
   close_comment: string | null;
-  source_type: 'lead' | 'partner';
-  source_id: number;
+  source_type: 'lead' | 'partner' | 'project';
+  /** Lead / partner id, or the project uuid when source_type is 'project'. */
+  source_id: number | string;
   source_name: string;
   assigned_to_name: string | null;
   assigned_to_id: string | null;
   act_assigned_to_name: string | null;
   act_assigned_to_id: string | null;
+  /** Date-only entry (a project task's due date) — show no clock time. */
+  all_day?: boolean;
+  project_task_id?: string;
 }
 
 export interface ActivityTask {
@@ -138,7 +145,7 @@ export interface ActivityTask {
   close_comment: string | null;
   created_at: string;
   updated_at: string;
-  source_type: 'lead' | 'partner' | 'onboarding' | 'document';
+  source_type: 'lead' | 'partner' | 'onboarding' | 'document' | 'project';
   source_id: number | string;
   source_name: string;
   assigned_to_name: string | null;
@@ -146,6 +153,11 @@ export interface ActivityTask {
   act_assigned_to_name: string | null;
   act_assigned_to_id: string | null;
   priority?: string | null;
+  /** Date-only entry (a project task's due date) — show no clock time. */
+  all_day?: boolean;
+  /** Tenant-defined status name of a project task; CRM activities use `status`. */
+  status_label?: string;
+  project_task_id?: string;
 }
 
 
@@ -983,6 +995,15 @@ const BASE = `${environment.apiUrl}/crm`;
 @Injectable({ providedIn: 'root' })
 export class CrmApiService {
   private http = inject(HttpClient);
+  private auth = inject(AuthService);
+  private projectsApi = inject(ProjectsApiService);
+
+  // Project tasks join the CRM task feeds as one more source. The CRM lists
+  // must keep working when the Projects module is off or its API fails.
+  private assignedProjectTasks(options: { assignedTo?: string; includeDone?: boolean }): Observable<AssignedProjectTask[]> {
+    if (!this.auth.hasFeature('projects')) return of([]);
+    return this.projectsApi.listAssignedTasks(options).pipe(catchError(() => of([])));
+  }
 
   private toParams(obj: Record<string, any>): HttpParams {
     let p = new HttpParams();
@@ -1345,12 +1366,26 @@ export class CrmApiService {
 
   // ── Kalendarz ────────────────────────────────────────────────
   getCalendarMeetings(p: { date_from?: string; date_to?: string; assigned_to?: string } = {}): Observable<CalendarMeeting[]> {
-    return this.http.get<CalendarMeeting[]>(`${BASE}/leads/calendar`, { params: this.toParams(p) });
+    const isInRange = (date: string) => (!p.date_from || date >= p.date_from) && (!p.date_to || date <= p.date_to);
+    return combineLatest([
+      this.http.get<CalendarMeeting[]>(`${BASE}/leads/calendar`, { params: this.toParams(p) }),
+      this.assignedProjectTasks({ assignedTo: p.assigned_to }),
+    ]).pipe(
+      map(([meetings, projectTasks]) => [
+        ...meetings,
+        ...projectTasks.filter(hasDueDate).filter(task => isInRange(task.end_date)).map(projectTaskToCalendarMeeting),
+      ]),
+    );
   }
 
   // ── Unified task feed (dashboard) ─────────────────────────────
   getCrmTasks(): Observable<ActivityTask[]> {
-    return this.http.get<ActivityTask[]>(`${BASE}/dashboard/tasks`);
+    return combineLatest([
+      this.http.get<ActivityTask[]>(`${BASE}/dashboard/tasks`),
+      this.assignedProjectTasks({}),
+    ]).pipe(
+      map(([tasks, projectTasks]) => [...tasks, ...projectTasks.map(projectTaskToActivityTask)]),
+    );
   }
 
   // ── Zadania (zakładka Zadania w kalendarzu) ───────────────────
@@ -1361,12 +1396,22 @@ export class CrmApiService {
     if (p.include_closed !== undefined) combined['include_closed'] = String(p.include_closed);
     if (p.include_no_date !== undefined) combined['include_no_date'] = String(p.include_no_date);
 
+    // Project tasks are plain tasks: a filter for another activity type excludes them.
+    const projectTasks$ = !p.type || p.type === 'task'
+      ? this.assignedProjectTasks({ assignedTo: p.assigned_to, includeDone: p.include_closed })
+      : of([]);
+
     return combineLatest([
       this.http.get<ActivityTask[]>(`${BASE}/leads/tasks`, { params: combined }),
       this.http.get<ActivityTask[]>(`${BASE}/partners/tasks`, { params: combined }),
+      projectTasks$,
     ]).pipe(
-      map(([leads, partners]) =>
-        [...leads, ...partners].sort((a, b) => {
+      map(([leads, partners, projectTasks]) =>
+        [
+          ...leads,
+          ...partners,
+          ...projectTasks.filter(task => p.include_no_date || task.end_date !== null).map(projectTaskToActivityTask),
+        ].sort((a, b) => {
           if (!a.activity_at && !b.activity_at) return 0;
           if (!a.activity_at) return 1;
           if (!b.activity_at) return -1;

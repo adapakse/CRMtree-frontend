@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
+import { NavBackService } from '../../core/services/nav-back.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ProjectConfig, ProjectDetail, ProjectTask, ProjectsApiService } from '../../core/services/projects-api.service';
 import { ProjectCardComponent } from './project-card.component';
@@ -23,7 +24,11 @@ const NEW_TASK = 'new';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div id="topbar">
-      <a class="back" routerLink="/projects">← Projekty</a>
+      @if (navBack.ctx(); as origin) {
+        <a class="back" [routerLink]="origin.route" [queryParams]="origin.queryParams">← {{ origin.label }}</a>
+      } @else {
+        <a class="back" routerLink="/projects">← Projekty</a>
+      }
       @if (detail(); as loaded) {
         <span class="mono">{{ loaded.project.key }}</span>
         <span class="page-title">{{ loaded.project.name }}</span>
@@ -73,7 +78,7 @@ const NEW_TASK = 'new';
 
           @if (openTaskId(); as taskId) {
             <wt-project-task-panel
-              [projectId]="loaded.project.id" [projectKey]="loaded.project.key"
+              [projectId]="loaded.project.id" [projectKey]="loaded.project.key" [projectName]="loaded.project.name"
               [taskId]="taskId === newTask ? null : taskId"
               [config]="loadedConfig" [members]="loaded.members" [fields]="loaded.fields" [tasks]="tasks()"
               [isProjectOpen]="loaded.project.status === 'open'"
@@ -101,6 +106,8 @@ export class ProjectDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  /** Set when the user arrived from a lead / partner card, the calendar or the dashboard. */
+  readonly navBack = inject(NavBackService);
 
   readonly newTask = NEW_TASK;
 

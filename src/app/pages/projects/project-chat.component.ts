@@ -35,15 +35,16 @@ const MAX_MESSAGE_LENGTH = 4000;
     @if (canPost()) {
       <div class="composer">
         <textarea class="fta" rows="2" [(ngModel)]="draft" [maxlength]="maxLength" placeholder="Napisz wiadomość…"
-                  (keydown.control.enter)="send()"></textarea>
+                  (keydown.enter)="sendOnEnter($event)"></textarea>
         <button class="btn btn-p btn-sm" [disabled]="!draft.trim() || isSending()" (click)="send()">Wyślij</button>
       </div>
-      <div class="hint">Ctrl+Enter wysyła wiadomość.</div>
+      <div class="hint">Enter wysyła wiadomość, Shift+Enter dodaje nową linię.</div>
     }
   `,
   styles: [`
-    :host { display:flex; flex-direction:column; gap:8px; min-height:0; }
-    .thread { display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:420px; padding:4px 2px; }
+    :host { display:flex; flex-direction:column; gap:8px; flex-shrink:0; }
+    .thread { display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:420px; padding:4px 2px; flex-shrink:0; }
+    .message { flex-shrink:0; }
     .message { align-self:flex-start; max-width:80%; background:var(--gray-100); border-radius:10px; padding:8px 12px; }
     .message.own { align-self:flex-end; background:var(--orange-pale); }
     .meta { display:flex; gap:8px; font-size:11px; color:var(--gray-500); margin-bottom:2px; }
@@ -78,6 +79,12 @@ export class ProjectChatComponent implements OnInit {
     this.loadMessages();
     const timer = setInterval(() => this.loadMessages(), POLL_INTERVAL_MS);
     this.destroyRef.onDestroy(() => clearInterval(timer));
+  }
+
+  sendOnEnter(event: Event): void {
+    if ((event as KeyboardEvent).shiftKey) return;
+    event.preventDefault();
+    this.send();
   }
 
   send(): void {
