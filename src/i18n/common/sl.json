@@ -4,6 +4,12 @@
     "close": "Zapri",
     "save": "Shrani"
   },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Datoteka .ics (Apple in drugi)",
+    "outlook": "Outlook",
+    "title": "Dodaj v koledar"
+  },
   "language": {
     "changeFailed": "Jezika ni bilo mogoče spremeniti",
     "followTenant": "Privzeti jezik organizacije ({language})",
@@ -11,5 +17,13 @@
     "tenantHint": "Jezik za osebe, ki niso izbrale svojega. Sprememba bo znova naložila stran.",
     "tenantTitle": "Privzeti jezik organizacije",
     "title": "Jezik vmesnika"
+  },
+  "states": {
+    "loading": "Nalaganje…"
+  },
+  "typeahead": {
+    "minChars": "Vnesite vsaj toliko znakov: {count}…",
+    "noResults": "Ni rezultatov.",
+    "searching": "Iskanje…"
   }
 }

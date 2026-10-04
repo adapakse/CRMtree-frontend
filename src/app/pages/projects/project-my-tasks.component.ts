@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { AssignedProjectTask, ProjectsApiService } from '../../core/services/projects-api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
@@ -14,49 +15,56 @@ import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 @Component({
   selector: 'wt-project-my-tasks',
   standalone: true,
-  imports: [AddToCalendarComponent],
+  imports: [AddToCalendarComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (isLoading()) {
-      <div class="empty-state">Ładowanie…</div>
-    } @else if (tasks().length === 0) {
-      <div class="empty-state">
-        <div class="empty-title">Brak zadań</div>
-        Nie masz otwartych zadań w żadnym projekcie.
-      </div>
-    } @else {
-      <div class="tw">
-        <table class="grid">
-          <thead>
-            <tr><th>Termin</th><th>Zadanie</th><th>Projekt</th><th>Status</th><th>Priorytet</th><th></th></tr>
-          </thead>
-          <tbody>
-            @for (task of tasks(); track task.id) {
-              <tr class="task-row" (click)="open(task)">
-                <td class="due" [class.overdue]="isOverdue(task)" [class.today]="task.end_date === today">
-                  {{ task.end_date ?? 'bez terminu' }}
-                </td>
-                <td><span class="mono">{{ task.project_key }}-{{ task.task_number }}</span> {{ task.name }}</td>
-                <td class="muted-cell">{{ task.project_name }}</td>
-                <td>
-                  <span class="chip" [style.color]="task.status_color" [style.background]="task.status_color + '1F'">
-                    {{ task.status_name }}
-                  </span>
-                </td>
-                <td>
-                  @if (task.priority_name) {
-                    <span class="chip" [style.color]="task.priority_color" [style.background]="task.priority_color + '1F'">
-                      {{ task.priority_name }}
-                    </span>
-                  }
-                </td>
-                <td class="actions"><wt-add-to-calendar [entry]="calendarEntry(task)" (click)="$event.stopPropagation()" /></td>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      @if (isLoading()) {
+        <div class="empty-state">{{ 'states.loading' | transloco }}</div>
+      } @else if (tasks().length === 0) {
+        <div class="empty-state">
+          <div class="empty-title">{{ t('myTasks.empty.title') }}</div>
+          {{ t('myTasks.empty.description') }}
+        </div>
+      } @else {
+        <div class="tw">
+          <table class="grid">
+            <thead>
+              <tr>
+                <th>{{ t('myTasks.columns.dueDate') }}</th><th>{{ t('myTasks.columns.task') }}</th>
+                <th>{{ t('myTasks.columns.project') }}</th><th>{{ t('myTasks.columns.status') }}</th>
+                <th>{{ t('myTasks.columns.priority') }}</th><th></th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+            </thead>
+            <tbody>
+              @for (task of tasks(); track task.id) {
+                <tr class="task-row" (click)="open(task)">
+                  <td class="due" [class.overdue]="isOverdue(task)" [class.today]="task.end_date === today">
+                    {{ task.end_date ?? t('myTasks.noDueDate') }}
+                  </td>
+                  <td><span class="mono">{{ task.project_key }}-{{ task.task_number }}</span> {{ task.name }}</td>
+                  <td class="muted-cell">{{ task.project_name }}</td>
+                  <td>
+                    <span class="chip" [style.color]="task.status_color" [style.background]="task.status_color + '1F'">
+                      {{ task.status_name }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (task.priority_name) {
+                      <span class="chip" [style.color]="task.priority_color" [style.background]="task.priority_color + '1F'">
+                        {{ task.priority_name }}
+                      </span>
+                    }
+                  </td>
+                  <td class="actions"><wt-add-to-calendar [entry]="calendarEntry(task)" (click)="$event.stopPropagation()" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </ng-container>
   `,
   styles: [PROJECTS_SHARED_STYLES, `
     :host { display:block; height:auto; }
@@ -73,6 +81,7 @@ export class ProjectMyTasksComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly tasks = signal<AssignedProjectTask[]>([]);
   readonly isLoading = signal(true);
@@ -83,7 +92,7 @@ export class ProjectMyTasksComponent implements OnInit {
       next: tasks => { this.tasks.set(tasks); this.isLoading.set(false); },
       error: err => {
         this.isLoading.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się pobrać zadań');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.myTasks.loadFailed'));
       },
     });
   }

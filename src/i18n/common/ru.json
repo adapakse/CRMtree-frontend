@@ -4,6 +4,12 @@
     "close": "Закрыть",
     "save": "Сохранить"
   },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Файл .ics (Apple и другие)",
+    "outlook": "Outlook",
+    "title": "Добавить в календарь"
+  },
   "language": {
     "changeFailed": "Не удалось изменить язык",
     "followTenant": "Язык организации по умолчанию ({language})",
@@ -11,5 +17,13 @@
     "tenantHint": "Язык для тех, кто не выбрал собственный. При смене страница перезагрузится.",
     "tenantTitle": "Язык организации по умолчанию",
     "title": "Язык интерфейса"
+  },
+  "states": {
+    "loading": "Загрузка…"
+  },
+  "typeahead": {
+    "minChars": "Минимум символов для поиска: {count}…",
+    "noResults": "Нет результатов.",
+    "searching": "Поиск…"
   }
 }

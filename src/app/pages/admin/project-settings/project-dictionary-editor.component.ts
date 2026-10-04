@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { Observable } from 'rxjs';
 import { ToastService } from '../../../core/services/toast.service';
 import {
@@ -7,12 +8,6 @@ import {
 } from '../../../core/services/projects-api.service';
 
 const DEFAULT_COLOR = '#6B7280';
-
-export const STATUS_CATEGORY_LABELS: Record<TaskStatusCategory, string> = {
-  todo: 'Do zrobienia',
-  in_progress: 'W toku',
-  done: 'Zakończone',
-};
 
 /**
  * Editor of one task dictionary (statuses, types or priorities). Every change
@@ -22,44 +17,47 @@ export const STATUS_CATEGORY_LABELS: Record<TaskStatusCategory, string> = {
 @Component({
   selector: 'wt-project-dictionary-editor',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="rows">
-      @for (item of items(); track item.id; let index = $index; let isFirst = $first; let isLast = $last) {
-        <div class="row" [class.inactive]="!item.is_active">
-          <div class="order">
-            <button class="order-btn" [disabled]="isFirst" (click)="move(index, -1)" title="W górę">▲</button>
-            <button class="order-btn" [disabled]="isLast" (click)="move(index, 1)" title="W dół">▼</button>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      <div class="rows">
+        @for (item of items(); track item.id; let index = $index; let isFirst = $first; let isLast = $last) {
+          <div class="row" [class.inactive]="!item.is_active">
+            <div class="order">
+              <button class="order-btn" [disabled]="isFirst" (click)="move(index, -1)" [title]="t('settings.dictionary.moveUp')">▲</button>
+              <button class="order-btn" [disabled]="isLast" (click)="move(index, 1)" [title]="t('settings.dictionary.moveDown')">▼</button>
+            </div>
+            <input type="color" class="color" [ngModel]="item.color" (change)="update(item, { color: colorOf($event) })">
+            <input class="fi name" [ngModel]="item.name" maxlength="80" (change)="rename(item, $event)">
+            @if (hasCategory()) {
+              <select class="fsel category" [ngModel]="categoryOf(item)" (ngModelChange)="update(item, { category: $event })">
+                @for (category of categories; track category) {
+                  <option [ngValue]="category">{{ t('labels.statusCategories.' + category) }}</option>
+                }
+              </select>
+            }
+            <label class="active-toggle">
+              <input type="checkbox" [checked]="item.is_active" (change)="update(item, { is_active: !item.is_active })"> {{ t('settings.dictionary.active') }}
+            </label>
           </div>
-          <input type="color" class="color" [ngModel]="item.color" (change)="update(item, { color: colorOf($event) })">
-          <input class="fi name" [ngModel]="item.name" maxlength="80" (change)="rename(item, $event)">
-          @if (hasCategory()) {
-            <select class="fsel category" [ngModel]="categoryOf(item)" (ngModelChange)="update(item, { category: $event })">
-              @for (category of categories; track category) {
-                <option [ngValue]="category">{{ categoryLabels[category] }}</option>
-              }
-            </select>
-          }
-          <label class="active-toggle">
-            <input type="checkbox" [checked]="item.is_active" (change)="update(item, { is_active: !item.is_active })"> aktywny
-          </label>
-        </div>
-      }
-    </div>
+        }
+      </div>
 
-    <div class="row add">
-      <input type="color" class="color" [(ngModel)]="newColor">
-      <input class="fi name" [(ngModel)]="newName" maxlength="80" placeholder="Nowa pozycja…" (keyup.enter)="add()">
-      @if (hasCategory()) {
-        <select class="fsel category" [(ngModel)]="newCategory">
-          @for (category of categories; track category) {
-            <option [ngValue]="category">{{ categoryLabels[category] }}</option>
-          }
-        </select>
-      }
-      <button class="btn btn-p btn-sm" [disabled]="!newName.trim()" (click)="add()">Dodaj</button>
-    </div>
+      <div class="row add">
+        <input type="color" class="color" [(ngModel)]="newColor">
+        <input class="fi name" [(ngModel)]="newName" maxlength="80" [placeholder]="t('settings.dictionary.newItemPlaceholder')" (keyup.enter)="add()">
+        @if (hasCategory()) {
+          <select class="fsel category" [(ngModel)]="newCategory">
+            @for (category of categories; track category) {
+              <option [ngValue]="category">{{ t('labels.statusCategories.' + category) }}</option>
+            }
+          </select>
+        }
+        <button class="btn btn-p btn-sm" [disabled]="!newName.trim()" (click)="add()">{{ t('settings.dictionary.addButton') }}</button>
+      </div>
+    </ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; }
@@ -79,13 +77,13 @@ export const STATUS_CATEGORY_LABELS: Record<TaskStatusCategory, string> = {
 export class ProjectDictionaryEditorComponent {
   private readonly api = inject(ProjectsApiService);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly dictionary = input.required<ProjectDictionary>();
   readonly items = input.required<ProjectDictionaryItem[]>();
   readonly configChanged = output<ProjectConfig>();
 
   readonly categories: TaskStatusCategory[] = ['todo', 'in_progress', 'done'];
-  readonly categoryLabels = STATUS_CATEGORY_LABELS;
   readonly hasCategory = computed(() => this.dictionary() === 'statuses');
 
   newName = '';
@@ -138,7 +136,7 @@ export class ProjectDictionaryEditorComponent {
         onSuccess?.();
         this.configChanged.emit(config);
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się zapisać słownika'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.dictionary.saveFailed')),
     });
   }
 }

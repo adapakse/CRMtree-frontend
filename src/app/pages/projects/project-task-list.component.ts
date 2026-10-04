@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { NgStyle } from '@angular/common';
+import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { ProjectConfig, ProjectDictionaryItem, ProjectTask } from '../../core/services/projects-api.service';
 import { INDENT_PX_PER_LEVEL, buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
@@ -7,69 +8,73 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
 @Component({
   selector: 'wt-project-task-list',
   standalone: true,
-  imports: [NgStyle],
+  imports: [NgStyle, TranslocoDirective],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (rows().length === 0) {
-      <div class="empty-state">
-        <div class="empty-title">Brak zadań</div>
-        {{ emptyMessage() }}
-      </div>
-    } @else {
-      <div class="tw">
-        <table class="grid">
-          <thead>
-            <tr>
-              <th>Nr</th><th>Zadanie</th><th>Typ</th><th>Status</th><th>Priorytet</th>
-              <th>Osoby</th><th>Początek</th><th>Koniec</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of rows(); track row.task.id) {
-              <tr class="task-row" (click)="taskOpened.emit(row.task.id)">
-                <td class="mono">{{ projectKey() }}-{{ row.task.task_number }}</td>
-                <td>
-                  <div class="task-name" [style.padding-left.px]="row.depth * indentPx">
-                    @if (row.task.parent_task_id === null) {
-                      <svg class="parent-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                           stroke-linecap="round" stroke-linejoin="round" aria-label="Zadanie nadrzędne">
-                        <title>Zadanie nadrzędne</title>
-                        <path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/>
-                      </svg>
-                    } @else {
-                      <svg class="child-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                           stroke-linecap="round" stroke-linejoin="round" aria-label="Podzadanie">
-                        <title>Podzadanie</title>
-                        <path d="M6 4v8a3 3 0 0 0 3 3h9"/><path d="m14 11 4 4-4 4"/>
-                      </svg>
-                    }
-                    <span [class.root-name]="row.task.parent_task_id === null">{{ row.task.name }}</span>
-                  </div>
-                </td>
-                <td>
-                  @if (typeOf(row.task); as type) { <span class="chip" [ngStyle]="chipStyle(type.color)">{{ type.name }}</span> }
-                </td>
-                <td>
-                  @if (statusOf(row.task); as status) {
-                    <span class="chip" [ngStyle]="chipStyle(status.color)">
-                      <span class="chip-dot" [style.background]="status.color"></span>{{ status.name }}
-                    </span>
-                  }
-                </td>
-                <td>
-                  @if (priorityOf(row.task); as priority) {
-                    <span class="chip" [ngStyle]="chipStyle(priority.color)">{{ priority.name }}</span>
-                  }
-                </td>
-                <td class="assignees">{{ assigneeNames(row.task) }}</td>
-                <td class="date">{{ row.task.start_date ?? '—' }}</td>
-                <td class="date" [class.overdue]="isOverdue(row.task)">{{ row.task.end_date ?? '—' }}</td>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      @if (rows().length === 0) {
+        <div class="empty-state">
+          <div class="empty-title">{{ t('taskList.emptyTitle') }}</div>
+          {{ emptyMessage() || t('taskList.emptyMessage') }}
+        </div>
+      } @else {
+        <div class="tw">
+          <table class="grid">
+            <thead>
+              <tr>
+                <th>{{ t('taskList.columns.number') }}</th><th>{{ t('taskList.columns.task') }}</th><th>{{ t('taskList.columns.type') }}</th>
+                <th>{{ t('taskList.columns.status') }}</th><th>{{ t('taskList.columns.priority') }}</th>
+                <th>{{ t('taskList.columns.assignees') }}</th><th>{{ t('taskList.columns.startDate') }}</th><th>{{ t('taskList.columns.endDate') }}</th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+            </thead>
+            <tbody>
+              @for (row of rows(); track row.task.id) {
+                <tr class="task-row" (click)="taskOpened.emit(row.task.id)">
+                  <td class="mono">{{ projectKey() }}-{{ row.task.task_number }}</td>
+                  <td>
+                    <div class="task-name" [style.padding-left.px]="row.depth * indentPx">
+                      @if (row.task.parent_task_id === null) {
+                        <svg class="parent-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round" [attr.aria-label]="t('taskList.parentTask')">
+                          <title>{{ t('taskList.parentTask') }}</title>
+                          <path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/>
+                        </svg>
+                      } @else {
+                        <svg class="child-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round" [attr.aria-label]="t('taskList.subtask')">
+                          <title>{{ t('taskList.subtask') }}</title>
+                          <path d="M6 4v8a3 3 0 0 0 3 3h9"/><path d="m14 11 4 4-4 4"/>
+                        </svg>
+                      }
+                      <span [class.root-name]="row.task.parent_task_id === null">{{ row.task.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    @if (typeOf(row.task); as type) { <span class="chip" [ngStyle]="chipStyle(type.color)">{{ type.name }}</span> }
+                  </td>
+                  <td>
+                    @if (statusOf(row.task); as status) {
+                      <span class="chip" [ngStyle]="chipStyle(status.color)">
+                        <span class="chip-dot" [style.background]="status.color"></span>{{ status.name }}
+                      </span>
+                    }
+                  </td>
+                  <td>
+                    @if (priorityOf(row.task); as priority) {
+                      <span class="chip" [ngStyle]="chipStyle(priority.color)">{{ priority.name }}</span>
+                    }
+                  </td>
+                  <td class="assignees">{{ assigneeNames(row.task) }}</td>
+                  <td class="date">{{ row.task.start_date ?? '—' }}</td>
+                  <td class="date" [class.overdue]="isOverdue(row.task)">{{ row.task.end_date ?? '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </ng-container>
   `,
   styles: [PROJECTS_SHARED_STYLES, `
     :host { display:block; height:auto; }
@@ -88,7 +93,7 @@ export class ProjectTaskListComponent {
   readonly tasks = input.required<ProjectTask[]>();
   readonly config = input.required<ProjectConfig>();
   readonly projectKey = input.required<string>();
-  readonly emptyMessage = input('W tym projekcie nie ma jeszcze zadań.');
+  readonly emptyMessage = input('');
   readonly taskOpened = output<string>();
 
   readonly indentPx = INDENT_PX_PER_LEVEL;

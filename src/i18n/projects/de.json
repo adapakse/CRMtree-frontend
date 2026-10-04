@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "Projekt schließen? Ein geschlossenes Projekt ist schreibgeschützt und verschwindet aus der Standardliste.",
+    "closeProject": "Projekt schließen",
+    "closedBadge": "Geschlossen",
+    "description": "Beschreibung",
+    "edit": "Bearbeiten",
+    "errors": {
+      "addMemberFailed": "Person konnte nicht hinzugefügt werden",
+      "changeAccessLevelFailed": "Berechtigungen konnten nicht geändert werden",
+      "changeRoleFailed": "Rolle konnte nicht geändert werden",
+      "closeProjectFailed": "Projekt konnte nicht geschlossen werden",
+      "removeMemberFailed": "Person konnte nicht entfernt werden",
+      "reopenProjectFailed": "Projekt konnte nicht wieder geöffnet werden",
+      "saveFieldsFailed": "Felder konnten nicht gespeichert werden",
+      "saveProjectFailed": "Projekt konnte nicht gespeichert werden"
+    },
+    "fields": {
+      "add": "Feld hinzufügen",
+      "empty": "Das Projekt hat keine Zusatzfelder.",
+      "field": "Feld",
+      "noneAvailable": "Keine Felder zum Hinzufügen. Felder definiert der Administrator unter Einstellungen → Projekte → Zusatzfelder für Aufgaben.",
+      "remove": "Entfernen",
+      "removeConfirm": "Feld „{name}“ aus dem Projekt entfernen? Die in Aufgaben eingetragenen Werte bleiben erhalten.",
+      "required": "Erforderlich",
+      "requiredToggle": "erforderlich",
+      "selectPlaceholder": "— Feld auswählen —",
+      "title": "Zusatzfelder für Aufgaben",
+      "type": "Typ"
+    },
+    "members": {
+      "accessLevel": "Berechtigungen",
+      "add": "Hinzufügen",
+      "companyAndDepartment": "Firma / Abteilung",
+      "email": "E-Mail",
+      "externalAccount": "externes Konto",
+      "inactive": "(inaktiv)",
+      "person": "Person",
+      "phone": "Telefon",
+      "remove": "Entfernen",
+      "removeConfirm": "{name} aus dem Projekt entfernen? Die Person wird auch von ihren Aufgaben entfernt.",
+      "role": "Rolle",
+      "searchPlaceholder": "Vorname, Nachname, E-Mail oder Firma eingeben (mind. 3 Zeichen)…",
+      "title": "Personen im Projekt"
+    },
+    "name": "Name",
+    "noDescription": "Keine Beschreibung.",
+    "reopenProject": "Wieder öffnen",
+    "title": "Projektkarte"
+  },
+  "chat": {
+    "deletedUser": "Gelöschter Benutzer",
+    "empty": "Keine Nachrichten.",
+    "hint": "Enter sendet die Nachricht, Shift+Enter fügt eine neue Zeile ein.",
+    "placeholder": "Nachricht schreiben…",
+    "send": "Senden",
+    "sendFailed": "Nachricht konnte nicht gesendet werden"
+  },
+  "crmLink": {
+    "change": "Ändern",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Verknüpfen",
+    "linkFailed": "Projekt konnte nicht verknüpft werden",
+    "none": "keine",
+    "remove": "Verknüpfung entfernen",
+    "removeConfirm": "Verknüpfung des Projekts mit dem CRM entfernen? Die Projektaufgaben verschwinden von der Lead- bzw. Partnerkarte.",
+    "removeFailed": "Verknüpfung konnte nicht entfernt werden",
+    "searchHint": "Die Vorschläge umfassen nur Leads und Partner, auf die Sie im CRM Zugriff haben. Die Auswahl speichert die Verknüpfung sofort.",
+    "searchPlaceholder": "Name des Leads oder Partners eingeben (mind. 3 Zeichen)…",
+    "title": "Verknüpfung mit dem CRM"
+  },
+  "detail": {
+    "backToProjects": "Projekte",
+    "closedBadge": "Geschlossen",
+    "empty": {
+      "noAssignedTasks": "Ihnen sind in diesem Projekt keine Aufgaben zugewiesen.",
+      "noTasks": "In diesem Projekt gibt es noch keine Aufgaben."
+    },
+    "newTask": "Neue Aufgabe",
+    "openFailed": "Projekt konnte nicht geöffnet werden",
+    "refreshFailed": "Projekt konnte nicht aktualisiert werden",
+    "showOnlyMyTasks": "Meine Aufgaben anzeigen",
+    "tabs": {
+      "card": "Projektkarte",
+      "chat": "Chat",
+      "tasks": "Aufgaben ({count})",
+      "timeline": "Zeitachse"
+    },
+    "tasksLoadFailed": "Aufgaben konnten nicht geladen werden"
+  },
+  "gantt": {
+    "emptyTitle": "Keine Aufgaben",
+    "taskColumn": "Aufgabe",
+    "today": "Heute",
+    "undatedNote": "{count, plural, one {# Aufgabe ohne Datumsangaben hat keinen Balken auf der Zeitachse.} other {# Aufgaben ohne Datumsangaben haben keinen Balken auf der Zeitachse.}}",
+    "zoom": {
+      "day": "Tage",
+      "month": "Monate",
+      "week": "Wochen"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Vollzugriff",
+      "read": "Nur Lesen"
+    },
+    "fieldTypes": {
+      "date": "Datum",
+      "list": "Werteliste",
+      "money": "Betrag mit Währung",
+      "number": "Zahl",
+      "text": "Text"
+    },
+    "reminders": {
+      "1d_before": "1 Tag vor dem Fälligkeitsdatum",
+      "2d_before": "2 Tage vor dem Fälligkeitsdatum",
+      "3d_before": "3 Tage vor dem Fälligkeitsdatum",
+      "at_due": "Am Fälligkeitsdatum",
+      "custom": "Eigenes Datum"
+    },
+    "roles": {
+      "controller": "Prüfer",
+      "external_participant": "Externer Teilnehmer",
+      "internal_participant": "Interner Teilnehmer",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Erledigt",
+      "in_progress": "In Arbeit",
+      "todo": "Zu erledigen"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "geschlossen",
+    "lockedHint": "Vorschau — Sie sind kein Teilnehmer dieses Projekts",
+    "noDueDate": "ohne Fälligkeitsdatum",
+    "noTasks": "Das Projekt hat noch keine Aufgaben.",
+    "openOfTotal": "{open} von {total} offen",
+    "showClosedProjectTasks": "Aufgaben des geschlossenen Projekts anzeigen",
+    "title": "Projektaufgaben"
+  },
+  "list": {
+    "closedBadge": "Geschlossen",
+    "createFailed": "Projekt konnte nicht erstellt werden",
+    "createForm": {
+      "description": "Beschreibung",
+      "keyHint": "Das Präfix der Aufgabennummern wird automatisch aus dem Projektnamen gebildet.",
+      "name": "Name",
+      "namePlaceholder": "z. B. Einführung des CRM-Systems",
+      "saving": "Wird gespeichert…",
+      "submit": "Projekt erstellen"
+    },
+    "empty": {
+      "noOpenProjects": "Sie nehmen an keinem offenen Projekt teil.",
+      "noneForFilter": "Keine Projekte für den gewählten Filter.",
+      "title": "Keine Projekte"
+    },
+    "filters": {
+      "all": "Alle",
+      "closed": "Geschlossene",
+      "open": "Offene"
+    },
+    "loadFailed": "Projekte konnten nicht geladen werden",
+    "newProject": "Neues Projekt",
+    "stats": {
+      "members": "{count, plural, one {Person} other {Personen}}",
+      "myOpenTasks": "{count, plural, one {offen für mich} other {offen für mich}}",
+      "tasks": "{count, plural, one {Aufgabe} other {Aufgaben}}"
+    },
+    "title": "Projekte",
+    "views": {
+      "myTasks": "Meine Aufgaben",
+      "projects": "Projekte"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Fälligkeitsdatum",
+      "priority": "Priorität",
+      "project": "Projekt",
+      "status": "Status",
+      "task": "Aufgabe"
+    },
+    "empty": {
+      "description": "Sie haben in keinem Projekt offene Aufgaben.",
+      "title": "Keine Aufgaben"
+    },
+    "loadFailed": "Aufgaben konnten nicht geladen werden",
+    "noDueDate": "ohne Fälligkeitsdatum"
+  },
+  "panel": {
+    "chatTitle": "Unterhaltung zur Aufgabe",
+    "createTask": "Aufgabe erstellen",
+    "created": "Aufgabe erstellt",
+    "customFields": {
+      "addButton": "+ Feld hinzufügen",
+      "addFailed": "Feld konnte nicht hinzugefügt werden",
+      "addHint": "Das Feld wird allen Aufgaben dieses Projekts hinzugefügt.",
+      "noneAvailable": "Keine Felder zum Hinzufügen. Felder definiert der Administrator unter Einstellungen → Projekte → Zusatzfelder für Aufgaben.",
+      "selectField": "— Feld auswählen —",
+      "title": "Zusatzfelder"
+    },
+    "fields": {
+      "assignees": "Zugewiesene Personen",
+      "description": "Zusätzliche Beschreibung",
+      "endDate": "Enddatum",
+      "name": "Name",
+      "noParent": "— keine (Hauptaufgabe) —",
+      "parentTask": "Übergeordnete Aufgabe",
+      "priority": "Priorität",
+      "startDate": "Startdatum",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "history": {
+      "changed": "hat geändert: {fields}",
+      "changedWithStatus": "hat geändert: {fields} ({from} → {to})",
+      "created": "hat die Aufgabe erstellt",
+      "empty": "Keine Einträge.",
+      "fields": {
+        "assignees": "Zugewiesene Personen",
+        "customFields": "Zusatzfelder",
+        "description": "Beschreibung",
+        "endDate": "Enddatum",
+        "name": "Name",
+        "parentTask": "Übergeordnete Aufgabe",
+        "priority": "Priorität",
+        "reminder": "Erinnerung",
+        "startDate": "Startdatum",
+        "status": "Status",
+        "type": "Typ"
+      },
+      "loadFailed": "Verlauf konnte nicht geladen werden",
+      "systemUser": "System",
+      "title": "Änderungsverlauf"
+    },
+    "loadFailed": "Aufgabe konnte nicht geladen werden",
+    "newTask": "Neue Aufgabe",
+    "reminder": {
+      "customDate": "Datum der Erinnerung",
+      "hint": "Die Erinnerung geht um 9:00 Uhr an alle zugewiesenen Personen und setzt ein Enddatum voraus.",
+      "label": "E-Mail-Erinnerung",
+      "none": "Keine"
+    },
+    "saveFailed": "Aufgabe konnte nicht gespeichert werden",
+    "saved": "Aufgabe gespeichert",
+    "saving": "Wird gespeichert…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "aktiv",
+      "addButton": "Hinzufügen",
+      "moveDown": "Nach unten",
+      "moveUp": "Nach oben",
+      "newItemPlaceholder": "Neuer Eintrag…",
+      "saveFailed": "Wörterbuch konnte nicht gespeichert werden"
+    },
+    "fields": {
+      "active": "aktiv",
+      "addButton": "Feld hinzufügen",
+      "empty": "Keine Felder definiert.",
+      "hint": "Die hier definierten Felder kann der PM seinem Projekt hinzufügen (Projektkarte → Zusatzfelder für Aufgaben) und festlegen, ob sie erforderlich sind. Der Feldtyp kann nach dem Erstellen nicht mehr geändert werden.",
+      "newNamePlaceholder": "Name des neuen Feldes…",
+      "optionsPlaceholder": "Werte, durch Kommas getrennt",
+      "optionsRequired": "Die Liste muss mindestens einen Wert enthalten",
+      "saveFailed": "Feld konnte nicht gespeichert werden",
+      "title": "Zusatzfelder für Aufgaben"
+    },
+    "loadFailed": "Projektkonfiguration konnte nicht geladen werden",
+    "priorities": {
+      "title": "Prioritäten"
+    },
+    "statuses": {
+      "hint": "Die Kategorie sagt dem System, was der Status bedeutet — unabhängig vom Namen. Aufgaben mit einem Status der Kategorie „Erledigt“ zählen weder als offen noch als überfällig.",
+      "title": "Aufgabenstatus"
+    },
+    "transitions": {
+      "discardConfirm": "Sie haben nicht gespeicherte Änderungen an den Übergängen. Verwerfen?",
+      "hint": "Der PM kann den Status jederzeit beliebig ändern. Teilnehmer ändern den Status nur bei Aufgaben, denen sie zugewiesen sind und für die sie Vollzugriff haben. Der Prüfer ändert den Status bei jeder Aufgabe des Projekts.",
+      "matrixCorner": "Von Status ↓ / zu Status →",
+      "saveButton": "Übergänge speichern",
+      "saveFailed": "Übergänge konnten nicht gespeichert werden",
+      "saved": "Statusübergänge gespeichert",
+      "saving": "Wird gespeichert…",
+      "title": "Übergänge zwischen Status"
+    },
+    "types": {
+      "title": "Aufgabentypen"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Personen",
+      "endDate": "Ende",
+      "number": "Nr.",
+      "priority": "Priorität",
+      "startDate": "Beginn",
+      "status": "Status",
+      "task": "Aufgabe",
+      "type": "Typ"
+    },
+    "emptyMessage": "In diesem Projekt gibt es noch keine Aufgaben.",
+    "emptyTitle": "Keine Aufgaben",
+    "parentTask": "Übergeordnete Aufgabe",
+    "subtask": "Unteraufgabe"
+  }
+}

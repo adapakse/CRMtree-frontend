@@ -1,18 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../core/i18n/locale.service';
 import { ProjectConfig, ProjectTask } from '../../core/services/projects-api.service';
 import { INDENT_PX_PER_LEVEL, buildTaskRows } from './project-task-tree.util';
 
 type GanttZoom = 'day' | 'week' | 'month';
 
-const ZOOM_OPTIONS: { value: GanttZoom; label: string; dayWidthPx: number }[] = [
-  { value: 'day', label: 'Dni', dayWidthPx: 28 },
-  { value: 'week', label: 'Tygodnie', dayWidthPx: 10 },
-  { value: 'month', label: 'Miesiące', dayWidthPx: 4 },
+const ZOOM_OPTIONS: { value: GanttZoom; labelKey: string; dayWidthPx: number }[] = [
+  { value: 'day', labelKey: 'gantt.zoom.day', dayWidthPx: 28 },
+  { value: 'week', labelKey: 'gantt.zoom.week', dayWidthPx: 10 },
+  { value: 'month', labelKey: 'gantt.zoom.month', dayWidthPx: 4 },
 ];
 
 const MS_PER_DAY = 86_400_000;
 const FALLBACK_BAR_COLOR = '#6B7280';
-const MONTH_LABELS = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
 
 interface MonthSegment { label: string; leftPx: number; widthPx: number; }
 interface DayTick { label: number; leftPx: number; isWeekend: boolean; }
@@ -28,67 +29,71 @@ const todayIsoDate = (): string => new Date().toISOString().slice(0, 10);
 @Component({
   selector: 'wt-project-gantt',
   standalone: true,
+  imports: [TranslocoDirective],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (rows().length === 0) {
-      <div class="empty-state"><div class="empty-title">Brak zadań</div></div>
-    } @else {
-      <div class="zoom">
-        @for (option of zoomOptions; track option.value) {
-          <button class="zoom-btn" [class.active]="zoom() === option.value" (click)="zoom.set(option.value)">{{ option.label }}</button>
-        }
-        @if (undatedCount() > 0) {
-          <span class="undated-note">{{ undatedCount() }} zadań bez dat nie ma paska na osi czasu.</span>
-        }
-      </div>
-
-      <div class="gantt">
-        <div class="names">
-          <div class="names-head" [style.height.px]="headerHeightPx()">Zadanie</div>
-          @for (row of rows(); track row.task.id) {
-            <div class="name-cell" (click)="taskOpened.emit(row.task.id)" [title]="row.task.name">
-              <span [style.padding-left.px]="row.depth * indentPx" [class.root]="row.task.parent_task_id === null">
-                <span class="mono">{{ projectKey() }}-{{ row.task.task_number }}</span> {{ row.task.name }}
-              </span>
-            </div>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      @if (rows().length === 0) {
+        <div class="empty-state"><div class="empty-title">{{ t('gantt.emptyTitle') }}</div></div>
+      } @else {
+        <div class="zoom">
+          @for (option of zoomOptions; track option.value) {
+            <button class="zoom-btn" [class.active]="zoom() === option.value" (click)="zoom.set(option.value)">{{ t(option.labelKey) }}</button>
+          }
+          @if (undatedCount() > 0) {
+            <span class="undated-note">{{ t('gantt.undatedNote', { count: undatedCount() }) }}</span>
           }
         </div>
 
-        <div class="timeline">
-          <div class="canvas" [style.width.px]="timelineWidthPx()">
-            <div class="months">
-              @for (month of months(); track month.leftPx) {
-                <div class="month" [style.left.px]="month.leftPx" [style.width.px]="month.widthPx">{{ month.label }}</div>
-              }
-            </div>
-            @if (zoom() === 'day') {
-              <div class="days">
-                @for (day of days(); track day.leftPx) {
-                  <div class="day" [class.weekend]="day.isWeekend" [style.left.px]="day.leftPx" [style.width.px]="dayWidthPx()">{{ day.label }}</div>
-                }
+        <div class="gantt">
+          <div class="names">
+            <div class="names-head" [style.height.px]="headerHeightPx()">{{ t('gantt.taskColumn') }}</div>
+            @for (row of rows(); track row.task.id) {
+              <div class="name-cell" (click)="taskOpened.emit(row.task.id)" [title]="row.task.name">
+                <span [style.padding-left.px]="row.depth * indentPx" [class.root]="row.task.parent_task_id === null">
+                  <span class="mono">{{ projectKey() }}-{{ row.task.task_number }}</span> {{ row.task.name }}
+                </span>
               </div>
             }
+          </div>
 
-            <div class="body">
-              @for (month of months(); track month.leftPx) {
-                <div class="month-line" [style.left.px]="month.leftPx"></div>
-              }
-              @if (todayLeftPx() !== null) {
-                <div class="today-line" [style.left.px]="todayLeftPx()" title="Dziś"></div>
-              }
-              @for (row of rows(); track row.task.id) {
-                <div class="bar-row">
-                  @if (row.bar; as bar) {
-                    <div class="bar" [class.done]="bar.isDone" [style.left.px]="bar.leftPx" [style.width.px]="bar.widthPx"
-                         [style.background]="bar.color" [title]="bar.label" (click)="taskOpened.emit(row.task.id)"></div>
+          <div class="timeline">
+            <div class="canvas" [style.width.px]="timelineWidthPx()">
+              <div class="months">
+                @for (month of months(); track month.leftPx) {
+                  <div class="month" [style.left.px]="month.leftPx" [style.width.px]="month.widthPx">{{ month.label }}</div>
+                }
+              </div>
+              @if (zoom() === 'day') {
+                <div class="days">
+                  @for (day of days(); track day.leftPx) {
+                    <div class="day" [class.weekend]="day.isWeekend" [style.left.px]="day.leftPx" [style.width.px]="dayWidthPx()">{{ day.label }}</div>
                   }
                 </div>
               }
+
+              <div class="body">
+                @for (month of months(); track month.leftPx) {
+                  <div class="month-line" [style.left.px]="month.leftPx"></div>
+                }
+                @if (todayLeftPx() !== null) {
+                  <div class="today-line" [style.left.px]="todayLeftPx()" [title]="t('gantt.today')"></div>
+                }
+                @for (row of rows(); track row.task.id) {
+                  <div class="bar-row">
+                    @if (row.bar; as bar) {
+                      <div class="bar" [class.done]="bar.isDone" [style.left.px]="bar.leftPx" [style.width.px]="bar.widthPx"
+                           [style.background]="bar.color" [title]="bar.label" (click)="taskOpened.emit(row.task.id)"></div>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    }
+      }
+    </ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:10px; }
@@ -127,6 +132,8 @@ export class ProjectGanttComponent {
   readonly projectKey = input.required<string>();
   readonly taskOpened = output<string>();
 
+  private readonly monthFormatter = new Intl.DateTimeFormat(inject(LocaleService).activeLocale(), { month: 'short', timeZone: 'UTC' });
+
   readonly zoomOptions = ZOOM_OPTIONS;
   readonly indentPx = INDENT_PX_PER_LEVEL;
   readonly zoom = signal<GanttZoom>('week');
@@ -157,7 +164,7 @@ export class ProjectGanttComponent {
       const month = cursor.getUTCMonth();
       const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
       segments.push({
-        label: `${MONTH_LABELS[month]} ${year}`,
+        label: `${this.monthFormatter.format(cursor)} ${year}`,
         leftPx: (cursor.getTime() / MS_PER_DAY - startDay) * this.dayWidthPx(),
         widthPx: daysInMonth * this.dayWidthPx(),
       });

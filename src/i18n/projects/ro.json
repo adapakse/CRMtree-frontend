@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "Închideți proiectul? Un proiect închis poate fi doar citit și dispare din lista implicită.",
+    "closeProject": "Închidere proiect",
+    "closedBadge": "Închis",
+    "description": "Descriere",
+    "edit": "Editare",
+    "errors": {
+      "addMemberFailed": "Persoana nu a putut fi adăugată",
+      "changeAccessLevelFailed": "Permisiunile nu au putut fi modificate",
+      "changeRoleFailed": "Rolul nu a putut fi modificat",
+      "closeProjectFailed": "Proiectul nu a putut fi închis",
+      "removeMemberFailed": "Persoana nu a putut fi eliminată",
+      "reopenProjectFailed": "Proiectul nu a putut fi redeschis",
+      "saveFieldsFailed": "Câmpurile nu au putut fi salvate",
+      "saveProjectFailed": "Proiectul nu a putut fi salvat"
+    },
+    "fields": {
+      "add": "Adăugare câmp",
+      "empty": "Proiectul nu are câmpuri suplimentare.",
+      "field": "Câmp",
+      "noneAvailable": "Nu există câmpuri de adăugat. Câmpurile sunt definite de administrator în Setări → Proiecte → Câmpuri suplimentare ale sarcinilor.",
+      "remove": "Eliminare",
+      "removeConfirm": "Eliminați câmpul „{name}” din proiect? Valorile introduse în sarcini vor fi păstrate.",
+      "required": "Obligatoriu",
+      "requiredToggle": "obligatoriu",
+      "selectPlaceholder": "— selectați câmpul —",
+      "title": "Câmpuri suplimentare ale sarcinilor",
+      "type": "Tip"
+    },
+    "members": {
+      "accessLevel": "Permisiuni",
+      "add": "Adăugare",
+      "companyAndDepartment": "Companie / departament",
+      "email": "E-mail",
+      "externalAccount": "cont extern",
+      "inactive": "(inactiv)",
+      "person": "Persoană",
+      "phone": "Telefon",
+      "remove": "Eliminare",
+      "removeConfirm": "Eliminați {name} din proiect? Persoana va fi scoasă și din sarcinile care îi sunt atribuite.",
+      "role": "Rol",
+      "searchPlaceholder": "Introduceți prenumele, numele, e-mailul sau compania (min. 3 caractere)…",
+      "title": "Persoane în proiect"
+    },
+    "name": "Denumire",
+    "noDescription": "Fără descriere.",
+    "reopenProject": "Redeschidere",
+    "title": "Fișa proiectului"
+  },
+  "chat": {
+    "deletedUser": "Utilizator șters",
+    "empty": "Niciun mesaj.",
+    "hint": "Enter trimite mesajul, Shift+Enter adaugă o linie nouă.",
+    "placeholder": "Scrieți un mesaj…",
+    "send": "Trimitere",
+    "sendFailed": "Mesajul nu a putut fi trimis"
+  },
+  "crmLink": {
+    "change": "Modificare",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partener"
+    },
+    "link": "Asociere",
+    "linkFailed": "Proiectul nu a putut fi asociat",
+    "none": "niciuna",
+    "remove": "Eliminare asociere",
+    "removeConfirm": "Eliminați asocierea proiectului cu CRM? Sarcinile proiectului vor dispărea din fișa leadului sau a partenerului.",
+    "removeFailed": "Asocierea nu a putut fi eliminată",
+    "searchHint": "Sugestiile includ doar leadurile și partenerii la care aveți acces în CRM. Selectarea salvează imediat asocierea.",
+    "searchPlaceholder": "Introduceți numele leadului sau al partenerului (min. 3 caractere)…",
+    "title": "Asociere cu CRM"
+  },
+  "detail": {
+    "backToProjects": "Proiecte",
+    "closedBadge": "Închis",
+    "empty": {
+      "noAssignedTasks": "Nu aveți sarcini atribuite în acest proiect.",
+      "noTasks": "Acest proiect nu are încă sarcini."
+    },
+    "newTask": "Sarcină nouă",
+    "openFailed": "Proiectul nu a putut fi deschis",
+    "refreshFailed": "Proiectul nu a putut fi reîmprospătat",
+    "showOnlyMyTasks": "Afișează sarcinile mele",
+    "tabs": {
+      "card": "Fișa proiectului",
+      "chat": "Chat",
+      "tasks": "Sarcini ({count})",
+      "timeline": "Cronologie"
+    },
+    "tasksLoadFailed": "Sarcinile nu au putut fi încărcate"
+  },
+  "gantt": {
+    "emptyTitle": "Nicio sarcină",
+    "taskColumn": "Sarcină",
+    "today": "Azi",
+    "undatedNote": "{count, plural, one {# sarcină fără date nu are bară pe cronologie.} few {# sarcini fără date nu au bară pe cronologie.} other {# de sarcini fără date nu au bară pe cronologie.}}",
+    "zoom": {
+      "day": "Zile",
+      "month": "Luni",
+      "week": "Săptămâni"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Complete",
+      "read": "Citire"
+    },
+    "fieldTypes": {
+      "date": "Dată",
+      "list": "Listă de valori",
+      "money": "Sumă cu monedă",
+      "number": "Număr",
+      "text": "Text"
+    },
+    "reminders": {
+      "1d_before": "Cu 1 zi înainte de termen",
+      "2d_before": "Cu 2 zile înainte de termen",
+      "3d_before": "Cu 3 zile înainte de termen",
+      "at_due": "În ziua termenului",
+      "custom": "Dată personalizată"
+    },
+    "roles": {
+      "controller": "Verificator",
+      "external_participant": "Participant extern",
+      "internal_participant": "Participant intern",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Finalizate",
+      "in_progress": "În curs",
+      "todo": "De făcut"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partener {name}"
+    },
+    "closedBadge": "închis",
+    "lockedHint": "Previzualizare — nu sunteți participant la acest proiect",
+    "noDueDate": "fără termen",
+    "noTasks": "Proiectul nu are încă sarcini.",
+    "openOfTotal": "{open} deschise din {total}",
+    "showClosedProjectTasks": "Afișează sarcinile proiectului închis",
+    "title": "Sarcini de proiect"
+  },
+  "list": {
+    "closedBadge": "Închis",
+    "createFailed": "Proiectul nu a putut fi creat",
+    "createForm": {
+      "description": "Descriere",
+      "keyHint": "Prefixul numerelor de sarcini va fi generat automat din denumirea proiectului.",
+      "name": "Denumire",
+      "namePlaceholder": "de ex. Implementarea sistemului CRM",
+      "saving": "Se salvează…",
+      "submit": "Creare proiect"
+    },
+    "empty": {
+      "noOpenProjects": "Nu participați la niciun proiect deschis.",
+      "noneForFilter": "Niciun proiect pentru filtrul selectat.",
+      "title": "Niciun proiect"
+    },
+    "filters": {
+      "all": "Toate",
+      "closed": "Închise",
+      "open": "Deschise"
+    },
+    "loadFailed": "Proiectele nu au putut fi încărcate",
+    "newProject": "Proiect nou",
+    "stats": {
+      "members": "{count, plural, one {persoană} few {persoane} other {de persoane}}",
+      "myOpenTasks": "{count, plural, one {a mea deschisă} few {ale mele deschise} other {ale mele deschise}}",
+      "tasks": "{count, plural, one {sarcină} few {sarcini} other {de sarcini}}"
+    },
+    "title": "Proiecte",
+    "views": {
+      "myTasks": "Sarcinile mele",
+      "projects": "Proiecte"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Termen",
+      "priority": "Prioritate",
+      "project": "Proiect",
+      "status": "Status",
+      "task": "Sarcină"
+    },
+    "empty": {
+      "description": "Nu aveți sarcini deschise în niciun proiect.",
+      "title": "Nicio sarcină"
+    },
+    "loadFailed": "Sarcinile nu au putut fi încărcate",
+    "noDueDate": "fără termen"
+  },
+  "panel": {
+    "chatTitle": "Discuție despre sarcină",
+    "createTask": "Creare sarcină",
+    "created": "Sarcină creată",
+    "customFields": {
+      "addButton": "+ Adăugare câmp",
+      "addFailed": "Câmpul nu a putut fi adăugat",
+      "addHint": "Câmpul va fi adăugat la toate sarcinile acestui proiect.",
+      "noneAvailable": "Nu există câmpuri de adăugat. Câmpurile sunt definite de administrator în Setări → Proiecte → Câmpuri suplimentare ale sarcinilor.",
+      "selectField": "— selectați câmpul —",
+      "title": "Câmpuri suplimentare"
+    },
+    "fields": {
+      "assignees": "Persoane atribuite",
+      "description": "Descriere suplimentară",
+      "endDate": "Data de finalizare",
+      "name": "Denumire",
+      "noParent": "— niciuna (sarcină principală) —",
+      "parentTask": "Sarcină principală",
+      "priority": "Prioritate",
+      "startDate": "Data de început",
+      "status": "Status",
+      "type": "Tip"
+    },
+    "history": {
+      "changed": "a modificat: {fields}",
+      "changedWithStatus": "a modificat: {fields} ({from} → {to})",
+      "created": "a creat sarcina",
+      "empty": "Nicio înregistrare.",
+      "fields": {
+        "assignees": "persoane atribuite",
+        "customFields": "câmpuri suplimentare",
+        "description": "descriere",
+        "endDate": "data de finalizare",
+        "name": "denumire",
+        "parentTask": "sarcină principală",
+        "priority": "prioritate",
+        "reminder": "memento",
+        "startDate": "data de început",
+        "status": "status",
+        "type": "tip"
+      },
+      "loadFailed": "Istoricul nu a putut fi încărcat",
+      "systemUser": "Sistem",
+      "title": "Istoricul modificărilor"
+    },
+    "loadFailed": "Sarcina nu a putut fi încărcată",
+    "newTask": "Sarcină nouă",
+    "reminder": {
+      "customDate": "Data mementoului",
+      "hint": "Mementoul va fi trimis tuturor persoanelor atribuite la 9:00 și necesită o dată de finalizare.",
+      "label": "Memento prin e-mail",
+      "none": "Niciunul"
+    },
+    "saveFailed": "Sarcina nu a putut fi salvată",
+    "saved": "Sarcină salvată",
+    "saving": "Se salvează…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "activ",
+      "addButton": "Adăugare",
+      "moveDown": "În jos",
+      "moveUp": "În sus",
+      "newItemPlaceholder": "Element nou…",
+      "saveFailed": "Dicționarul nu a putut fi salvat"
+    },
+    "fields": {
+      "active": "activ",
+      "addButton": "Adăugare câmp",
+      "empty": "Niciun câmp definit.",
+      "hint": "Câmpurile definite aici pot fi adăugate de PM în proiectul său (Fișa proiectului → Câmpuri suplimentare ale sarcinilor), iar PM decide dacă sunt obligatorii. Tipul câmpului nu poate fi modificat după creare.",
+      "newNamePlaceholder": "Denumirea noului câmp…",
+      "optionsPlaceholder": "Valori separate prin virgulă",
+      "optionsRequired": "Lista trebuie să conțină cel puțin o valoare",
+      "saveFailed": "Câmpul nu a putut fi salvat",
+      "title": "Câmpuri suplimentare ale sarcinilor"
+    },
+    "loadFailed": "Configurația proiectelor nu a putut fi încărcată",
+    "priorities": {
+      "title": "Priorități"
+    },
+    "statuses": {
+      "hint": "Categoria îi spune sistemului ce înseamnă statusul — indiferent de denumire. Sarcinile cu un status din categoria „Finalizate” nu sunt considerate deschise sau întârziate.",
+      "title": "Statusurile sarcinilor"
+    },
+    "transitions": {
+      "discardConfirm": "Există modificări nesalvate ale tranzițiilor. Renunțați la ele?",
+      "hint": "PM poate schimba oricând statusul în oricare altul. Participanții schimbă statusul doar în sarcinile care le sunt atribuite și pentru care au permisiuni complete. Verificatorul schimbă statusul în orice sarcină a proiectului.",
+      "matrixCorner": "Din statusul ↓ / în statusul →",
+      "saveButton": "Salvare tranziții",
+      "saveFailed": "Tranzițiile nu au putut fi salvate",
+      "saved": "Tranzițiile dintre statusuri au fost salvate",
+      "saving": "Se salvează…",
+      "title": "Tranziții între statusuri"
+    },
+    "types": {
+      "title": "Tipuri de sarcini"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Persoane",
+      "endDate": "Sfârșit",
+      "number": "Nr.",
+      "priority": "Prioritate",
+      "startDate": "Început",
+      "status": "Status",
+      "task": "Sarcină",
+      "type": "Tip"
+    },
+    "emptyMessage": "Acest proiect nu are încă sarcini.",
+    "emptyTitle": "Nicio sarcină",
+    "parentTask": "Sarcină principală",
+    "subtask": "Subsarcină"
+  }
+}

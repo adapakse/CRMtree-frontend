@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "Chiudere il progetto? Un progetto chiuso è di sola lettura e scompare dall'elenco predefinito.",
+    "closeProject": "Chiudi progetto",
+    "closedBadge": "Chiuso",
+    "description": "Descrizione",
+    "edit": "Modifica",
+    "errors": {
+      "addMemberFailed": "Impossibile aggiungere la persona",
+      "changeAccessLevelFailed": "Impossibile modificare i permessi",
+      "changeRoleFailed": "Impossibile modificare il ruolo",
+      "closeProjectFailed": "Impossibile chiudere il progetto",
+      "removeMemberFailed": "Impossibile rimuovere la persona",
+      "reopenProjectFailed": "Impossibile riaprire il progetto",
+      "saveFieldsFailed": "Impossibile salvare i campi",
+      "saveProjectFailed": "Impossibile salvare il progetto"
+    },
+    "fields": {
+      "add": "Aggiungi campo",
+      "empty": "Il progetto non ha campi aggiuntivi.",
+      "field": "Campo",
+      "noneAvailable": "Nessun campo da aggiungere. I campi vengono definiti dall'amministratore in Impostazioni → Progetti → Campi aggiuntivi delle attività.",
+      "remove": "Rimuovi",
+      "removeConfirm": "Rimuovere il campo «{name}» dal progetto? I valori inseriti nelle attività verranno conservati.",
+      "required": "Obbligatorio",
+      "requiredToggle": "obbligatorio",
+      "selectPlaceholder": "— seleziona un campo —",
+      "title": "Campi aggiuntivi delle attività",
+      "type": "Tipo"
+    },
+    "members": {
+      "accessLevel": "Permessi",
+      "add": "Aggiungi",
+      "companyAndDepartment": "Azienda / reparto",
+      "email": "E-mail",
+      "externalAccount": "account esterno",
+      "inactive": "(inattivo)",
+      "person": "Persona",
+      "phone": "Telefono",
+      "remove": "Rimuovi",
+      "removeConfirm": "Rimuovere {name} dal progetto? La persona verrà anche scollegata dalle sue attività.",
+      "role": "Ruolo",
+      "searchPlaceholder": "Digita nome, cognome, e-mail o azienda (min. 3 caratteri)…",
+      "title": "Persone nel progetto"
+    },
+    "name": "Nome",
+    "noDescription": "Nessuna descrizione.",
+    "reopenProject": "Riapri",
+    "title": "Scheda progetto"
+  },
+  "chat": {
+    "deletedUser": "Utente eliminato",
+    "empty": "Nessun messaggio.",
+    "hint": "Invio manda il messaggio, Maiusc+Invio aggiunge una nuova riga.",
+    "placeholder": "Scrivi un messaggio…",
+    "send": "Invia",
+    "sendFailed": "Impossibile inviare il messaggio"
+  },
+  "crmLink": {
+    "change": "Cambia",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Collega",
+    "linkFailed": "Impossibile collegare il progetto",
+    "none": "nessuno",
+    "remove": "Rimuovi collegamento",
+    "removeConfirm": "Rimuovere il collegamento del progetto al CRM? Le attività del progetto scompariranno dalla scheda del lead o del partner.",
+    "removeFailed": "Impossibile rimuovere il collegamento",
+    "searchHint": "I suggerimenti includono solo i lead e i partner a cui hai accesso nel CRM. La selezione salva subito il collegamento.",
+    "searchPlaceholder": "Digita il nome del lead o del partner (min. 3 caratteri)…",
+    "title": "Collegamento al CRM"
+  },
+  "detail": {
+    "backToProjects": "Progetti",
+    "closedBadge": "Chiuso",
+    "empty": {
+      "noAssignedTasks": "Non hai attività assegnate in questo progetto.",
+      "noTasks": "In questo progetto non ci sono ancora attività."
+    },
+    "newTask": "Nuova attività",
+    "openFailed": "Impossibile aprire il progetto",
+    "refreshFailed": "Impossibile aggiornare il progetto",
+    "showOnlyMyTasks": "Mostra le mie attività",
+    "tabs": {
+      "card": "Scheda progetto",
+      "chat": "Chat",
+      "tasks": "Attività ({count})",
+      "timeline": "Timeline"
+    },
+    "tasksLoadFailed": "Impossibile caricare le attività"
+  },
+  "gantt": {
+    "emptyTitle": "Nessuna attività",
+    "taskColumn": "Attività",
+    "today": "Oggi",
+    "undatedNote": "{count, plural, one {# attività senza date non ha una barra sulla timeline.} other {# attività senza date non hanno una barra sulla timeline.}}",
+    "zoom": {
+      "day": "Giorni",
+      "month": "Mesi",
+      "week": "Settimane"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Completo",
+      "read": "Sola lettura"
+    },
+    "fieldTypes": {
+      "date": "Data",
+      "list": "Elenco di valori",
+      "money": "Importo con valuta",
+      "number": "Numero",
+      "text": "Testo"
+    },
+    "reminders": {
+      "1d_before": "1 giorno prima della scadenza",
+      "2d_before": "2 giorni prima della scadenza",
+      "3d_before": "3 giorni prima della scadenza",
+      "at_due": "Il giorno della scadenza",
+      "custom": "Data personalizzata"
+    },
+    "roles": {
+      "controller": "Revisore",
+      "external_participant": "Partecipante esterno",
+      "internal_participant": "Partecipante interno",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Completato",
+      "in_progress": "In corso",
+      "todo": "Da fare"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "chiuso",
+    "lockedHint": "Anteprima — non partecipi a questo progetto",
+    "noDueDate": "senza scadenza",
+    "noTasks": "Il progetto non ha ancora attività.",
+    "openOfTotal": "{open} aperte su {total}",
+    "showClosedProjectTasks": "Mostra le attività del progetto chiuso",
+    "title": "Attività di progetto"
+  },
+  "list": {
+    "closedBadge": "Chiuso",
+    "createFailed": "Impossibile creare il progetto",
+    "createForm": {
+      "description": "Descrizione",
+      "keyHint": "Il prefisso dei numeri delle attività verrà generato automaticamente dal nome del progetto.",
+      "name": "Nome",
+      "namePlaceholder": "es. Implementazione del sistema CRM",
+      "saving": "Salvataggio…",
+      "submit": "Crea progetto"
+    },
+    "empty": {
+      "noOpenProjects": "Non partecipi a nessun progetto aperto.",
+      "noneForFilter": "Nessun progetto per il filtro selezionato.",
+      "title": "Nessun progetto"
+    },
+    "filters": {
+      "all": "Tutti",
+      "closed": "Chiusi",
+      "open": "Aperti"
+    },
+    "loadFailed": "Impossibile caricare i progetti",
+    "newProject": "Nuovo progetto",
+    "stats": {
+      "members": "{count, plural, one {persona} other {persone}}",
+      "myOpenTasks": "{count, plural, one {mia aperta} other {mie aperte}}",
+      "tasks": "{count, plural, one {attività} other {attività}}"
+    },
+    "title": "Progetti",
+    "views": {
+      "myTasks": "Le mie attività",
+      "projects": "Progetti"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Scadenza",
+      "priority": "Priorità",
+      "project": "Progetto",
+      "status": "Stato",
+      "task": "Attività"
+    },
+    "empty": {
+      "description": "Non hai attività aperte in nessun progetto.",
+      "title": "Nessuna attività"
+    },
+    "loadFailed": "Impossibile caricare le attività",
+    "noDueDate": "senza scadenza"
+  },
+  "panel": {
+    "chatTitle": "Conversazione sull'attività",
+    "createTask": "Crea attività",
+    "created": "Attività creata",
+    "customFields": {
+      "addButton": "+ Aggiungi campo",
+      "addFailed": "Impossibile aggiungere il campo",
+      "addHint": "Il campo verrà aggiunto a tutte le attività di questo progetto.",
+      "noneAvailable": "Nessun campo da aggiungere. I campi vengono definiti dall'amministratore in Impostazioni → Progetti → Campi aggiuntivi delle attività.",
+      "selectField": "— seleziona un campo —",
+      "title": "Campi aggiuntivi"
+    },
+    "fields": {
+      "assignees": "Persone assegnate",
+      "description": "Descrizione aggiuntiva",
+      "endDate": "Data di fine",
+      "name": "Nome",
+      "noParent": "— nessuna (attività principale) —",
+      "parentTask": "Attività principale",
+      "priority": "Priorità",
+      "startDate": "Data di inizio",
+      "status": "Stato",
+      "type": "Tipo"
+    },
+    "history": {
+      "changed": "ha modificato: {fields}",
+      "changedWithStatus": "ha modificato: {fields} ({from} → {to})",
+      "created": "ha creato l'attività",
+      "empty": "Nessuna voce.",
+      "fields": {
+        "assignees": "persone assegnate",
+        "customFields": "campi aggiuntivi",
+        "description": "descrizione",
+        "endDate": "data di fine",
+        "name": "nome",
+        "parentTask": "attività principale",
+        "priority": "priorità",
+        "reminder": "promemoria",
+        "startDate": "data di inizio",
+        "status": "stato",
+        "type": "tipo"
+      },
+      "loadFailed": "Impossibile caricare la cronologia",
+      "systemUser": "Sistema",
+      "title": "Cronologia delle modifiche"
+    },
+    "loadFailed": "Impossibile caricare l'attività",
+    "newTask": "Nuova attività",
+    "reminder": {
+      "customDate": "Data del promemoria",
+      "hint": "Il promemoria verrà inviato a tutte le persone assegnate alle 9:00 e richiede una data di fine.",
+      "label": "Promemoria e-mail",
+      "none": "Nessuno"
+    },
+    "saveFailed": "Impossibile salvare l'attività",
+    "saved": "Attività salvata",
+    "saving": "Salvataggio…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "attivo",
+      "addButton": "Aggiungi",
+      "moveDown": "Giù",
+      "moveUp": "Su",
+      "newItemPlaceholder": "Nuova voce…",
+      "saveFailed": "Impossibile salvare il dizionario"
+    },
+    "fields": {
+      "active": "attivo",
+      "addButton": "Aggiungi campo",
+      "empty": "Nessun campo definito.",
+      "hint": "Il PM può aggiungere i campi definiti qui al proprio progetto (Scheda progetto → Campi aggiuntivi delle attività) e decidere se sono obbligatori. Il tipo di campo non può essere modificato dopo la creazione.",
+      "newNamePlaceholder": "Nome del nuovo campo…",
+      "optionsPlaceholder": "Valori separati da virgola",
+      "optionsRequired": "L'elenco deve avere almeno un valore",
+      "saveFailed": "Impossibile salvare il campo",
+      "title": "Campi aggiuntivi delle attività"
+    },
+    "loadFailed": "Impossibile caricare la configurazione dei progetti",
+    "priorities": {
+      "title": "Priorità"
+    },
+    "statuses": {
+      "hint": "La categoria indica al sistema che cosa significa lo stato, indipendentemente dal nome. Le attività con uno stato della categoria «Completato» non vengono conteggiate come aperte né come scadute.",
+      "title": "Stati delle attività"
+    },
+    "transitions": {
+      "discardConfirm": "Hai modifiche alle transizioni non salvate. Vuoi scartarle?",
+      "hint": "Il PM può sempre cambiare lo stato in uno qualsiasi. I partecipanti cambiano lo stato solo nelle attività a cui sono assegnati e per cui hanno permessi completi. Il revisore cambia lo stato in ogni attività del progetto.",
+      "matrixCorner": "Dallo stato ↓ / allo stato →",
+      "saveButton": "Salva transizioni",
+      "saveFailed": "Impossibile salvare le transizioni",
+      "saved": "Transizioni di stato salvate",
+      "saving": "Salvataggio…",
+      "title": "Transizioni tra stati"
+    },
+    "types": {
+      "title": "Tipi di attività"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Persone",
+      "endDate": "Fine",
+      "number": "N.",
+      "priority": "Priorità",
+      "startDate": "Inizio",
+      "status": "Stato",
+      "task": "Attività",
+      "type": "Tipo"
+    },
+    "emptyMessage": "In questo progetto non ci sono ancora attività.",
+    "emptyTitle": "Nessuna attività",
+    "parentTask": "Attività principale",
+    "subtask": "Sottoattività"
+  }
+}

@@ -4,6 +4,12 @@
     "close": "Închidere",
     "save": "Salvare"
   },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Fișier .ics (Apple și altele)",
+    "outlook": "Outlook",
+    "title": "Adăugare în calendar"
+  },
   "language": {
     "changeFailed": "Limba nu a putut fi schimbată",
     "followTenant": "Limba implicită a organizației ({language})",
@@ -11,5 +17,13 @@
     "tenantHint": "Limba pentru persoanele care nu și-au ales una proprie. Schimbarea reîncarcă pagina.",
     "tenantTitle": "Limba implicită a organizației",
     "title": "Limba interfeței"
+  },
+  "states": {
+    "loading": "Se încarcă…"
+  },
+  "typeahead": {
+    "minChars": "Introduceți cel puțin {count} caractere…",
+    "noResults": "Niciun rezultat.",
+    "searching": "Se caută…"
   }
 }

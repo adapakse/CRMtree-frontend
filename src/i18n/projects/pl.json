@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "Zamknąć projekt? Zamknięty projekt jest tylko do odczytu i znika z domyślnej listy.",
+    "closeProject": "Zamknij projekt",
+    "closedBadge": "Zamknięty",
+    "description": "Opis",
+    "edit": "Edytuj",
+    "errors": {
+      "addMemberFailed": "Nie udało się dodać osoby",
+      "changeAccessLevelFailed": "Nie udało się zmienić uprawnień",
+      "changeRoleFailed": "Nie udało się zmienić roli",
+      "closeProjectFailed": "Nie udało się zamknąć projektu",
+      "removeMemberFailed": "Nie udało się usunąć osoby",
+      "reopenProjectFailed": "Nie udało się otworzyć projektu",
+      "saveFieldsFailed": "Nie udało się zapisać pól",
+      "saveProjectFailed": "Nie udało się zapisać projektu"
+    },
+    "fields": {
+      "add": "Dodaj pole",
+      "empty": "Projekt nie ma pól dodatkowych.",
+      "field": "Pole",
+      "noneAvailable": "Brak pól do dodania. Pola definiuje administrator w Ustawienia → Projekty → Pola dodatkowe zadań.",
+      "remove": "Usuń",
+      "removeConfirm": "Usunąć pole „{name}” z projektu? Wartości wpisane w zadaniach zostaną zachowane.",
+      "required": "Wymagane",
+      "requiredToggle": "wymagane",
+      "selectPlaceholder": "— wybierz pole —",
+      "title": "Pola dodatkowe zadań",
+      "type": "Typ"
+    },
+    "members": {
+      "accessLevel": "Uprawnienia",
+      "add": "Dodaj",
+      "companyAndDepartment": "Firma / dział",
+      "email": "E-mail",
+      "externalAccount": "konto zewnętrzne",
+      "inactive": "(nieaktywny)",
+      "person": "Osoba",
+      "phone": "Telefon",
+      "remove": "Usuń",
+      "removeConfirm": "Usunąć {name} z projektu? Osoba zostanie też odpięta od swoich zadań.",
+      "role": "Rola",
+      "searchPlaceholder": "Wpisz imię, nazwisko, e-mail lub firmę (min. 3 znaki)…",
+      "title": "Osoby w projekcie"
+    },
+    "name": "Nazwa",
+    "noDescription": "Brak opisu.",
+    "reopenProject": "Otwórz ponownie",
+    "title": "Karta projektu"
+  },
+  "chat": {
+    "deletedUser": "Usunięty użytkownik",
+    "empty": "Brak wiadomości.",
+    "hint": "Enter wysyła wiadomość, Shift+Enter dodaje nową linię.",
+    "placeholder": "Napisz wiadomość…",
+    "send": "Wyślij",
+    "sendFailed": "Nie udało się wysłać wiadomości"
+  },
+  "crmLink": {
+    "change": "Zmień",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Powiąż",
+    "linkFailed": "Nie udało się powiązać projektu",
+    "none": "brak",
+    "remove": "Usuń powiązanie",
+    "removeConfirm": "Usunąć powiązanie projektu z CRM? Zadania projektu znikną z karty leada lub partnera.",
+    "removeFailed": "Nie udało się usunąć powiązania",
+    "searchHint": "Podpowiedzi obejmują tylko leady i partnerów, do których masz dostęp w CRM. Wybór od razu zapisuje powiązanie.",
+    "searchPlaceholder": "Wpisz nazwę leada lub partnera (min. 3 znaki)…",
+    "title": "Powiązanie z CRM"
+  },
+  "detail": {
+    "backToProjects": "Projekty",
+    "closedBadge": "Zamknięty",
+    "empty": {
+      "noAssignedTasks": "Nie masz przypisanych zadań w tym projekcie.",
+      "noTasks": "W tym projekcie nie ma jeszcze zadań."
+    },
+    "newTask": "Nowe zadanie",
+    "openFailed": "Nie udało się otworzyć projektu",
+    "refreshFailed": "Nie udało się odświeżyć projektu",
+    "showOnlyMyTasks": "Pokaż moje zadania",
+    "tabs": {
+      "card": "Karta projektu",
+      "chat": "Czat",
+      "tasks": "Zadania ({count})",
+      "timeline": "Oś czasu"
+    },
+    "tasksLoadFailed": "Nie udało się pobrać zadań"
+  },
+  "gantt": {
+    "emptyTitle": "Brak zadań",
+    "taskColumn": "Zadanie",
+    "today": "Dziś",
+    "undatedNote": "{count, plural, one {# zadanie bez dat nie ma paska na osi czasu.} few {# zadania bez dat nie mają paska na osi czasu.} many {# zadań bez dat nie ma paska na osi czasu.} other {# zadania bez dat nie ma paska na osi czasu.}}",
+    "zoom": {
+      "day": "Dni",
+      "month": "Miesiące",
+      "week": "Tygodnie"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Pełne",
+      "read": "Odczyt"
+    },
+    "fieldTypes": {
+      "date": "Data",
+      "list": "Lista wartości",
+      "money": "Kwota z walutą",
+      "number": "Liczba",
+      "text": "Tekst"
+    },
+    "reminders": {
+      "1d_before": "1 dzień przed terminem",
+      "2d_before": "2 dni przed terminem",
+      "3d_before": "3 dni przed terminem",
+      "at_due": "W dniu terminu",
+      "custom": "Własna data"
+    },
+    "roles": {
+      "controller": "Kontroler",
+      "external_participant": "Uczestnik zewnętrzny",
+      "internal_participant": "Uczestnik wewnętrzny",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Zakończone",
+      "in_progress": "W toku",
+      "todo": "Do zrobienia"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "zamknięty",
+    "lockedHint": "Podgląd — nie jesteś uczestnikiem tego projektu",
+    "noDueDate": "bez terminu",
+    "noTasks": "Projekt nie ma jeszcze zadań.",
+    "openOfTotal": "{open} otwartych z {total}",
+    "showClosedProjectTasks": "Pokaż zadania zamkniętego projektu",
+    "title": "Zadania projektowe"
+  },
+  "list": {
+    "closedBadge": "Zamknięty",
+    "createFailed": "Nie udało się utworzyć projektu",
+    "createForm": {
+      "description": "Opis",
+      "keyHint": "Prefiks numerów zadań powstanie automatycznie z nazwy projektu.",
+      "name": "Nazwa",
+      "namePlaceholder": "np. Wdrożenie systemu CRM",
+      "saving": "Zapisywanie…",
+      "submit": "Utwórz projekt"
+    },
+    "empty": {
+      "noOpenProjects": "Nie uczestniczysz w żadnym otwartym projekcie.",
+      "noneForFilter": "Brak projektów dla wybranego filtra.",
+      "title": "Brak projektów"
+    },
+    "filters": {
+      "all": "Wszystkie",
+      "closed": "Zamknięte",
+      "open": "Otwarte"
+    },
+    "loadFailed": "Nie udało się pobrać projektów",
+    "newProject": "Nowy projekt",
+    "stats": {
+      "members": "{count, plural, one {osoba} few {osoby} many {osób} other {osoby}}",
+      "myOpenTasks": "{count, plural, one {moje otwarte} few {moje otwarte} many {moich otwartych} other {moich otwartych}}",
+      "tasks": "{count, plural, one {zadanie} few {zadania} many {zadań} other {zadania}}"
+    },
+    "title": "Projekty",
+    "views": {
+      "myTasks": "Moje zadania",
+      "projects": "Projekty"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Termin",
+      "priority": "Priorytet",
+      "project": "Projekt",
+      "status": "Status",
+      "task": "Zadanie"
+    },
+    "empty": {
+      "description": "Nie masz otwartych zadań w żadnym projekcie.",
+      "title": "Brak zadań"
+    },
+    "loadFailed": "Nie udało się pobrać zadań",
+    "noDueDate": "bez terminu"
+  },
+  "panel": {
+    "chatTitle": "Rozmowa o zadaniu",
+    "createTask": "Utwórz zadanie",
+    "created": "Zadanie utworzone",
+    "customFields": {
+      "addButton": "+ Dodaj pole",
+      "addFailed": "Nie udało się dodać pola",
+      "addHint": "Pole zostanie dodane do wszystkich zadań tego projektu.",
+      "noneAvailable": "Brak pól do dodania. Pola definiuje administrator w Ustawienia → Projekty → Pola dodatkowe zadań.",
+      "selectField": "— wybierz pole —",
+      "title": "Pola dodatkowe"
+    },
+    "fields": {
+      "assignees": "Przypisane osoby",
+      "description": "Opis dodatkowy",
+      "endDate": "Data zakończenia",
+      "name": "Nazwa",
+      "noParent": "— brak (zadanie nadrzędne) —",
+      "parentTask": "Zadanie nadrzędne",
+      "priority": "Priorytet",
+      "startDate": "Data początku",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "history": {
+      "changed": "zmienił(a): {fields}",
+      "changedWithStatus": "zmienił(a): {fields} ({from} → {to})",
+      "created": "utworzył(a) zadanie",
+      "empty": "Brak wpisów.",
+      "fields": {
+        "assignees": "przypisane osoby",
+        "customFields": "pola dodatkowe",
+        "description": "opis",
+        "endDate": "data zakończenia",
+        "name": "nazwa",
+        "parentTask": "zadanie nadrzędne",
+        "priority": "priorytet",
+        "reminder": "przypomnienie",
+        "startDate": "data początku",
+        "status": "status",
+        "type": "typ"
+      },
+      "loadFailed": "Nie udało się pobrać historii",
+      "systemUser": "System",
+      "title": "Historia zmian"
+    },
+    "loadFailed": "Nie udało się pobrać zadania",
+    "newTask": "Nowe zadanie",
+    "reminder": {
+      "customDate": "Data przypomnienia",
+      "hint": "Przypomnienie trafi do wszystkich przypisanych osób o 9:00 i wymaga daty zakończenia.",
+      "label": "Przypomnienie e-mail",
+      "none": "Brak"
+    },
+    "saveFailed": "Nie udało się zapisać zadania",
+    "saved": "Zadanie zapisane",
+    "saving": "Zapisywanie…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "aktywny",
+      "addButton": "Dodaj",
+      "moveDown": "W dół",
+      "moveUp": "W górę",
+      "newItemPlaceholder": "Nowa pozycja…",
+      "saveFailed": "Nie udało się zapisać słownika"
+    },
+    "fields": {
+      "active": "aktywne",
+      "addButton": "Dodaj pole",
+      "empty": "Brak zdefiniowanych pól.",
+      "hint": "Pola zdefiniowane tutaj PM może dodać do swojego projektu (Karta projektu → Pola dodatkowe zadań) i zdecydować, czy są wymagane. Typu pola nie można zmienić po utworzeniu.",
+      "newNamePlaceholder": "Nazwa nowego pola…",
+      "optionsPlaceholder": "Wartości po przecinku",
+      "optionsRequired": "Lista musi mieć co najmniej jedną wartość",
+      "saveFailed": "Nie udało się zapisać pola",
+      "title": "Pola dodatkowe zadań"
+    },
+    "loadFailed": "Nie udało się pobrać konfiguracji projektów",
+    "priorities": {
+      "title": "Priorytety"
+    },
+    "statuses": {
+      "hint": "Kategoria mówi systemowi, co status oznacza — niezależnie od nazwy. Zadania w statusie kategorii „Zakończone” nie liczą się jako otwarte ani przeterminowane.",
+      "title": "Statusy zadań"
+    },
+    "transitions": {
+      "discardConfirm": "Masz niezapisane zmiany przejść. Porzucić je?",
+      "hint": "PM zawsze może zmienić status na dowolny. Uczestnicy zmieniają status tylko w zadaniach, do których są przypisani i mają pełne uprawnienia. Kontroler zmienia status w każdym zadaniu projektu.",
+      "matrixCorner": "Z statusu ↓ / na status →",
+      "saveButton": "Zapisz przejścia",
+      "saveFailed": "Nie udało się zapisać przejść",
+      "saved": "Zapisano przejścia statusów",
+      "saving": "Zapisywanie…",
+      "title": "Przejścia między statusami"
+    },
+    "types": {
+      "title": "Typy zadań"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Osoby",
+      "endDate": "Koniec",
+      "number": "Nr",
+      "priority": "Priorytet",
+      "startDate": "Początek",
+      "status": "Status",
+      "task": "Zadanie",
+      "type": "Typ"
+    },
+    "emptyMessage": "W tym projekcie nie ma jeszcze zadań.",
+    "emptyTitle": "Brak zadań",
+    "parentTask": "Zadanie nadrzędne",
+    "subtask": "Podzadanie"
+  }
+}

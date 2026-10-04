@@ -6,15 +6,18 @@
 //   1. every supported language has a file;
 //   2. every language has exactly the keys of the Polish file, none empty;
 //   3. every text uses the same {placeholders} as the Polish text;
-//   4. files are formatted canonically (sorted keys, 2 spaces) so diffs and
+//   4. every text is valid ICU message syntax for its language (a broken
+//      plural would otherwise only fail in the browser);
+//   5. files are formatted canonically (sorted keys, 2 spaces) so diffs and
 //      merges stay line-based.
 // And for the source files listed in src/i18n/translated-files.json:
-//   5. no Polish text is written directly in the file any more.
+//   6. no Polish text is written directly in the file any more.
 //
-// `--fix` rewrites the files into the canonical format instead of failing on 4.
+// `--fix` rewrites the files into the canonical format instead of failing on 5.
 
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import MessageFormat from '@messageformat/core';
 
 const I18N_DIR = 'src/i18n';
 const SOURCE_LOCALE = 'pl';
@@ -106,6 +109,15 @@ function checkScope(scope) {
     }
 
     const entries = flatten(file.content);
+    const messageFormat = new MessageFormat(locale);
+    for (const [key, text] of entries) {
+      if (typeof text !== 'string') continue;
+      try {
+        messageFormat.compile(text);
+      } catch (error) {
+        report(`${path}: "${key}" is not valid ICU syntax (${error.message})`);
+      }
+    }
     for (const [key, sourceText] of sourceEntries) {
       const text = entries.get(key);
       if (typeof text !== 'string' || text.trim() === '') {

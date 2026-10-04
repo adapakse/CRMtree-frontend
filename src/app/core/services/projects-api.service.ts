@@ -11,18 +11,6 @@ export type TaskStatusCategory = 'todo' | 'in_progress' | 'done';
 export type ProjectFieldType = 'text' | 'number' | 'list' | 'date' | 'money';
 export type ProjectDictionary = 'statuses' | 'types' | 'priorities';
 
-export const PROJECT_ROLE_LABELS: Record<ProjectRole, string> = {
-  pm: 'PM',
-  internal_participant: 'Uczestnik wewnętrzny',
-  external_participant: 'Uczestnik zewnętrzny',
-  controller: 'Kontroler',
-};
-
-export const PROJECT_ACCESS_LEVEL_LABELS: Record<ProjectAccessLevel, string> = {
-  full: 'Pełne',
-  read: 'Odczyt',
-};
-
 export interface ProjectDictionaryItem {
   id: string;
   name: string;

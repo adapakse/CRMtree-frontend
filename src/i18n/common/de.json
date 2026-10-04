@@ -4,6 +4,12 @@
     "close": "Schließen",
     "save": "Speichern"
   },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": ".ics-Datei (Apple und andere)",
+    "outlook": "Outlook",
+    "title": "Zum Kalender hinzufügen"
+  },
   "language": {
     "changeFailed": "Sprache konnte nicht geändert werden",
     "followTenant": "Standardsprache der Organisation ({language})",
@@ -11,5 +17,13 @@
     "tenantHint": "Sprache für Personen, die keine eigene gewählt haben. Beim Ändern wird die Seite neu geladen.",
     "tenantTitle": "Standardsprache der Organisation",
     "title": "Anzeigesprache"
+  },
+  "states": {
+    "loading": "Wird geladen…"
+  },
+  "typeahead": {
+    "minChars": "Geben Sie mindestens {count} Zeichen ein…",
+    "noResults": "Keine Ergebnisse.",
+    "searching": "Suche läuft…"
   }
 }

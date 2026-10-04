@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "Close the project? A closed project is read-only and disappears from the default list.",
+    "closeProject": "Close project",
+    "closedBadge": "Closed",
+    "description": "Description",
+    "edit": "Edit",
+    "errors": {
+      "addMemberFailed": "Couldn't add the person",
+      "changeAccessLevelFailed": "Couldn't change the access level",
+      "changeRoleFailed": "Couldn't change the role",
+      "closeProjectFailed": "Couldn't close the project",
+      "removeMemberFailed": "Couldn't remove the person",
+      "reopenProjectFailed": "Couldn't reopen the project",
+      "saveFieldsFailed": "Couldn't save the fields",
+      "saveProjectFailed": "Couldn't save the project"
+    },
+    "fields": {
+      "add": "Add field",
+      "empty": "The project has no custom fields.",
+      "field": "Field",
+      "noneAvailable": "No fields to add. Fields are defined by an administrator in Settings → Projects → Task custom fields.",
+      "remove": "Remove",
+      "removeConfirm": "Remove the field “{name}” from the project? Values entered in tasks will be kept.",
+      "required": "Required",
+      "requiredToggle": "required",
+      "selectPlaceholder": "— select a field —",
+      "title": "Task custom fields",
+      "type": "Type"
+    },
+    "members": {
+      "accessLevel": "Access level",
+      "add": "Add",
+      "companyAndDepartment": "Company / department",
+      "email": "Email",
+      "externalAccount": "external account",
+      "inactive": "(inactive)",
+      "person": "Person",
+      "phone": "Phone",
+      "remove": "Remove",
+      "removeConfirm": "Remove {name} from the project? The person will also be unassigned from their tasks.",
+      "role": "Role",
+      "searchPlaceholder": "Type a first name, last name, email or company (min. 3 characters)…",
+      "title": "People in the project"
+    },
+    "name": "Name",
+    "noDescription": "No description.",
+    "reopenProject": "Reopen",
+    "title": "Project card"
+  },
+  "chat": {
+    "deletedUser": "Deleted user",
+    "empty": "No messages.",
+    "hint": "Enter sends the message, Shift+Enter adds a new line.",
+    "placeholder": "Write a message…",
+    "send": "Send",
+    "sendFailed": "Couldn't send the message"
+  },
+  "crmLink": {
+    "change": "Change",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Link",
+    "linkFailed": "Couldn't link the project",
+    "none": "none",
+    "remove": "Remove link",
+    "removeConfirm": "Remove the project's link to the CRM? The project's tasks will disappear from the lead or partner card.",
+    "removeFailed": "Couldn't remove the link",
+    "searchHint": "Suggestions include only the leads and partners you have access to in the CRM. Selecting one saves the link immediately.",
+    "searchPlaceholder": "Type a lead or partner name (min. 3 characters)…",
+    "title": "CRM link"
+  },
+  "detail": {
+    "backToProjects": "Projects",
+    "closedBadge": "Closed",
+    "empty": {
+      "noAssignedTasks": "You have no assigned tasks in this project.",
+      "noTasks": "There are no tasks in this project yet."
+    },
+    "newTask": "New task",
+    "openFailed": "Couldn't open the project",
+    "refreshFailed": "Couldn't refresh the project",
+    "showOnlyMyTasks": "Show my tasks",
+    "tabs": {
+      "card": "Project card",
+      "chat": "Chat",
+      "tasks": "Tasks ({count})",
+      "timeline": "Timeline"
+    },
+    "tasksLoadFailed": "Couldn't load the tasks"
+  },
+  "gantt": {
+    "emptyTitle": "No tasks",
+    "taskColumn": "Task",
+    "today": "Today",
+    "undatedNote": "{count, plural, one {# task without dates has no bar on the timeline.} other {# tasks without dates have no bar on the timeline.}}",
+    "zoom": {
+      "day": "Days",
+      "month": "Months",
+      "week": "Weeks"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Full",
+      "read": "Read-only"
+    },
+    "fieldTypes": {
+      "date": "Date",
+      "list": "List of values",
+      "money": "Amount with currency",
+      "number": "Number",
+      "text": "Text"
+    },
+    "reminders": {
+      "1d_before": "1 day before the due date",
+      "2d_before": "2 days before the due date",
+      "3d_before": "3 days before the due date",
+      "at_due": "On the due date",
+      "custom": "Custom date"
+    },
+    "roles": {
+      "controller": "Reviewer",
+      "external_participant": "External participant",
+      "internal_participant": "Internal participant",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Done",
+      "in_progress": "In progress",
+      "todo": "To do"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "closed",
+    "lockedHint": "Preview — you are not a participant in this project",
+    "noDueDate": "no due date",
+    "noTasks": "The project has no tasks yet.",
+    "openOfTotal": "{open} open out of {total}",
+    "showClosedProjectTasks": "Show tasks of the closed project",
+    "title": "Project tasks"
+  },
+  "list": {
+    "closedBadge": "Closed",
+    "createFailed": "Couldn't create the project",
+    "createForm": {
+      "description": "Description",
+      "keyHint": "The task number prefix will be generated automatically from the project name.",
+      "name": "Name",
+      "namePlaceholder": "e.g. CRM system rollout",
+      "saving": "Saving…",
+      "submit": "Create project"
+    },
+    "empty": {
+      "noOpenProjects": "You are not a participant in any open project.",
+      "noneForFilter": "No projects match the selected filter.",
+      "title": "No projects"
+    },
+    "filters": {
+      "all": "All",
+      "closed": "Closed",
+      "open": "Open"
+    },
+    "loadFailed": "Couldn't load the projects",
+    "newProject": "New project",
+    "stats": {
+      "members": "{count, plural, one {person} other {people}}",
+      "myOpenTasks": "{count, plural, one {open for me} other {open for me}}",
+      "tasks": "{count, plural, one {task} other {tasks}}"
+    },
+    "title": "Projects",
+    "views": {
+      "myTasks": "My tasks",
+      "projects": "Projects"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Due date",
+      "priority": "Priority",
+      "project": "Project",
+      "status": "Status",
+      "task": "Task"
+    },
+    "empty": {
+      "description": "You have no open tasks in any project.",
+      "title": "No tasks"
+    },
+    "loadFailed": "Couldn't load the tasks",
+    "noDueDate": "no due date"
+  },
+  "panel": {
+    "chatTitle": "Task discussion",
+    "createTask": "Create task",
+    "created": "Task created",
+    "customFields": {
+      "addButton": "+ Add field",
+      "addFailed": "Couldn't add the field",
+      "addHint": "The field will be added to all tasks in this project.",
+      "noneAvailable": "No fields to add. Fields are defined by an administrator in Settings → Projects → Task custom fields.",
+      "selectField": "— select a field —",
+      "title": "Custom fields"
+    },
+    "fields": {
+      "assignees": "Assignees",
+      "description": "Additional description",
+      "endDate": "End date",
+      "name": "Name",
+      "noParent": "— none (top-level task) —",
+      "parentTask": "Parent task",
+      "priority": "Priority",
+      "startDate": "Start date",
+      "status": "Status",
+      "type": "Type"
+    },
+    "history": {
+      "changed": "changed: {fields}",
+      "changedWithStatus": "changed: {fields} ({from} → {to})",
+      "created": "created the task",
+      "empty": "No entries.",
+      "fields": {
+        "assignees": "assignees",
+        "customFields": "custom fields",
+        "description": "description",
+        "endDate": "end date",
+        "name": "name",
+        "parentTask": "parent task",
+        "priority": "priority",
+        "reminder": "reminder",
+        "startDate": "start date",
+        "status": "status",
+        "type": "type"
+      },
+      "loadFailed": "Couldn't load the history",
+      "systemUser": "System",
+      "title": "Change history"
+    },
+    "loadFailed": "Couldn't load the task",
+    "newTask": "New task",
+    "reminder": {
+      "customDate": "Reminder date",
+      "hint": "The reminder is sent to all assignees at 9:00 and requires an end date.",
+      "label": "Email reminder",
+      "none": "None"
+    },
+    "saveFailed": "Couldn't save the task",
+    "saved": "Task saved",
+    "saving": "Saving…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "active",
+      "addButton": "Add",
+      "moveDown": "Move down",
+      "moveUp": "Move up",
+      "newItemPlaceholder": "New item…",
+      "saveFailed": "Couldn't save the dictionary"
+    },
+    "fields": {
+      "active": "active",
+      "addButton": "Add field",
+      "empty": "No fields defined.",
+      "hint": "A PM can add the fields defined here to their project (Project card → Task custom fields) and decide whether they are required. The field type cannot be changed after creation.",
+      "newNamePlaceholder": "New field name…",
+      "optionsPlaceholder": "Comma-separated values",
+      "optionsRequired": "The list must have at least one value",
+      "saveFailed": "Couldn't save the field",
+      "title": "Task custom fields"
+    },
+    "loadFailed": "Couldn't load the project configuration",
+    "priorities": {
+      "title": "Priorities"
+    },
+    "statuses": {
+      "hint": "The category tells the system what a status means — regardless of its name. Tasks whose status is in the “Done” category do not count as open or overdue.",
+      "title": "Task statuses"
+    },
+    "transitions": {
+      "discardConfirm": "You have unsaved transition changes. Discard them?",
+      "hint": "A PM can always change the status to any other. Participants change the status only in tasks they are assigned to and have full access to. A reviewer changes the status in any task of the project.",
+      "matrixCorner": "From status ↓ / to status →",
+      "saveButton": "Save transitions",
+      "saveFailed": "Couldn't save the transitions",
+      "saved": "Status transitions saved",
+      "saving": "Saving…",
+      "title": "Status transitions"
+    },
+    "types": {
+      "title": "Task types"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "People",
+      "endDate": "End",
+      "number": "No.",
+      "priority": "Priority",
+      "startDate": "Start",
+      "status": "Status",
+      "task": "Task",
+      "type": "Type"
+    },
+    "emptyMessage": "There are no tasks in this project yet.",
+    "emptyTitle": "No tasks",
+    "parentTask": "Parent task",
+    "subtask": "Subtask"
+  }
+}

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { NavBackService } from '../../core/services/nav-back.service';
@@ -20,75 +21,81 @@ const NEW_TASK = 'new';
 @Component({
   selector: 'wt-project-detail',
   standalone: true,
-  imports: [RouterLink, ProjectCardComponent, ProjectChatComponent, ProjectGanttComponent, ProjectTaskListComponent, ProjectTaskPanelComponent],
+  imports: [
+    RouterLink, TranslocoDirective, TranslocoPipe,
+    ProjectCardComponent, ProjectChatComponent, ProjectGanttComponent, ProjectTaskListComponent, ProjectTaskPanelComponent,
+  ],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div id="topbar">
-      @if (navBack.ctx(); as origin) {
-        <a class="back" [routerLink]="origin.route" [queryParams]="origin.queryParams">← {{ origin.label }}</a>
-      } @else {
-        <a class="back" routerLink="/projects">← Projekty</a>
-      }
-      @if (detail(); as loaded) {
-        <span class="mono">{{ loaded.project.key }}</span>
-        <span class="page-title">{{ loaded.project.name }}</span>
-        @if (loaded.project.status === 'closed') { <span class="pill closed">Zamknięty</span> }
-      }
-      <span class="tsp"></span>
-      @if (canCreateTask()) {
-        <button class="btn btn-p" (click)="openTask(newTask)">+ Nowe zadanie</button>
-      }
-    </div>
-
-    <div id="content">
-      @if (detail(); as loaded) {
-        @if (config(); as loadedConfig) {
-          <div class="tab-bar">
-            <div class="tabs">
-              <button class="tab-btn" [class.active]="activeTab() === 'tasks'" (click)="selectTab('tasks')">
-                Zadania ({{ tasks().length }})
-              </button>
-              <button class="tab-btn" [class.active]="activeTab() === 'gantt'" (click)="selectTab('gantt')">Oś czasu</button>
-              <button class="tab-btn" [class.active]="activeTab() === 'chat'" (click)="selectTab('chat')">Czat</button>
-              <button class="tab-btn" [class.active]="activeTab() === 'card'" (click)="selectTab('card')">Karta projektu</button>
-            </div>
-            @if (activeTab() === 'tasks' || activeTab() === 'gantt') {
-              <label class="mine-toggle">
-                <input type="checkbox" [checked]="showsOnlyMyTasks()" (change)="showsOnlyMyTasks.set(!showsOnlyMyTasks())">
-                Pokaż moje zadania
-              </label>
-            }
-          </div>
-
-          @if (activeTab() === 'tasks') {
-            <wt-project-task-list
-              [tasks]="visibleTasks()" [config]="loadedConfig" [projectKey]="loaded.project.key"
-              [emptyMessage]="showsOnlyMyTasks() ? 'Nie masz przypisanych zadań w tym projekcie.' : 'W tym projekcie nie ma jeszcze zadań.'"
-              (taskOpened)="openTask($event)" />
-          } @else if (activeTab() === 'gantt') {
-            <wt-project-gantt [tasks]="visibleTasks()" [config]="loadedConfig" [projectKey]="loaded.project.key"
-                              (taskOpened)="openTask($event)" />
-          } @else if (activeTab() === 'chat') {
-            <section class="card chat-card">
-              <wt-project-chat [projectId]="loaded.project.id" [canPost]="loaded.project.status === 'open'" />
-            </section>
-          } @else {
-            <wt-project-card [detail]="loaded" [config]="loadedConfig" (changed)="loadProject()" />
-          }
-
-          @if (openTaskId(); as taskId) {
-            <wt-project-task-panel
-              [projectId]="loaded.project.id" [projectKey]="loaded.project.key" [projectName]="loaded.project.name"
-              [taskId]="taskId === newTask ? null : taskId"
-              [config]="loadedConfig" [members]="loaded.members" [fields]="loaded.fields" [tasks]="tasks()"
-              [isProjectOpen]="loaded.project.status === 'open'"
-              (closed)="closeTask()" (saved)="onTaskSaved()" (fieldsChanged)="loadProject()" />
-          }
+    <ng-container *transloco="let t; prefix: 'projects'">
+      <div id="topbar">
+        @if (navBack.ctx(); as origin) {
+          <a class="back" [routerLink]="origin.route" [queryParams]="origin.queryParams">← {{ origin.label }}</a>
+        } @else {
+          <a class="back" routerLink="/projects">← {{ t('detail.backToProjects') }}</a>
         }
-      } @else {
-        <div class="empty-state">Ładowanie…</div>
-      }
-    </div>
+        @if (detail(); as loaded) {
+          <span class="mono">{{ loaded.project.key }}</span>
+          <span class="page-title">{{ loaded.project.name }}</span>
+          @if (loaded.project.status === 'closed') { <span class="pill closed">{{ t('detail.closedBadge') }}</span> }
+        }
+        <span class="tsp"></span>
+        @if (canCreateTask()) {
+          <button class="btn btn-p" (click)="openTask(newTask)">+ {{ t('detail.newTask') }}</button>
+        }
+      </div>
+
+      <div id="content">
+        @if (detail(); as loaded) {
+          @if (config(); as loadedConfig) {
+            <div class="tab-bar">
+              <div class="tabs">
+                <button class="tab-btn" [class.active]="activeTab() === 'tasks'" (click)="selectTab('tasks')">
+                  {{ t('detail.tabs.tasks', { count: tasks().length }) }}
+                </button>
+                <button class="tab-btn" [class.active]="activeTab() === 'gantt'" (click)="selectTab('gantt')">{{ t('detail.tabs.timeline') }}</button>
+                <button class="tab-btn" [class.active]="activeTab() === 'chat'" (click)="selectTab('chat')">{{ t('detail.tabs.chat') }}</button>
+                <button class="tab-btn" [class.active]="activeTab() === 'card'" (click)="selectTab('card')">{{ t('detail.tabs.card') }}</button>
+              </div>
+              @if (activeTab() === 'tasks' || activeTab() === 'gantt') {
+                <label class="mine-toggle">
+                  <input type="checkbox" [checked]="showsOnlyMyTasks()" (change)="showsOnlyMyTasks.set(!showsOnlyMyTasks())">
+                  {{ t('detail.showOnlyMyTasks') }}
+                </label>
+              }
+            </div>
+
+            @if (activeTab() === 'tasks') {
+              <wt-project-task-list
+                [tasks]="visibleTasks()" [config]="loadedConfig" [projectKey]="loaded.project.key"
+                [emptyMessage]="t(showsOnlyMyTasks() ? 'detail.empty.noAssignedTasks' : 'detail.empty.noTasks')"
+                (taskOpened)="openTask($event)" />
+            } @else if (activeTab() === 'gantt') {
+              <wt-project-gantt [tasks]="visibleTasks()" [config]="loadedConfig" [projectKey]="loaded.project.key"
+                                (taskOpened)="openTask($event)" />
+            } @else if (activeTab() === 'chat') {
+              <section class="card chat-card">
+                <wt-project-chat [projectId]="loaded.project.id" [canPost]="loaded.project.status === 'open'" />
+              </section>
+            } @else {
+              <wt-project-card [detail]="loaded" [config]="loadedConfig" (changed)="loadProject()" />
+            }
+
+            @if (openTaskId(); as taskId) {
+              <wt-project-task-panel
+                [projectId]="loaded.project.id" [projectKey]="loaded.project.key" [projectName]="loaded.project.name"
+                [taskId]="taskId === newTask ? null : taskId"
+                [config]="loadedConfig" [members]="loaded.members" [fields]="loaded.fields" [tasks]="tasks()"
+                [isProjectOpen]="loaded.project.status === 'open'"
+                (closed)="closeTask()" (saved)="onTaskSaved()" (fieldsChanged)="loadProject()" />
+            }
+          }
+        } @else {
+          <div class="empty-state">{{ 'states.loading' | transloco }}</div>
+        }
+      </div>
+    </ng-container>
   `,
   styles: [PROJECTS_SHARED_STYLES, `
     .back { font-size:12.5px; color:var(--gray-500); text-decoration:none; margin-right:6px; }
@@ -106,6 +113,7 @@ export class ProjectDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
   /** Set when the user arrived from a lead / partner card, the calendar or the dashboard. */
   readonly navBack = inject(NavBackService);
 
@@ -150,7 +158,7 @@ export class ProjectDetailComponent implements OnInit {
         this.tasks.set(tasks);
       },
       error: err => {
-        this.toast.error(err?.error?.error ?? 'Nie udało się otworzyć projektu');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.detail.openFailed'));
         this.router.navigate(['/projects']);
       },
     });
@@ -179,7 +187,7 @@ export class ProjectDetailComponent implements OnInit {
   loadProject(): void {
     this.api.getProject(this.projectId).subscribe({
       next: detail => this.detail.set(detail),
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się odświeżyć projektu'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.detail.refreshFailed')),
     });
     // Removing a member unassigns them from tasks, so the task list may have changed too.
     this.loadTasks();
@@ -188,7 +196,7 @@ export class ProjectDetailComponent implements OnInit {
   private loadTasks(): void {
     this.api.listTasks(this.projectId, false).subscribe({
       next: tasks => this.tasks.set(tasks),
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się pobrać zadań'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.detail.tasksLoadFailed')),
     });
   }
 

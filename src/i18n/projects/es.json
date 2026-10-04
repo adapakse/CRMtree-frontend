@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "¿Cerrar el proyecto? Un proyecto cerrado es de solo lectura y desaparece de la lista predeterminada.",
+    "closeProject": "Cerrar proyecto",
+    "closedBadge": "Cerrado",
+    "description": "Descripción",
+    "edit": "Editar",
+    "errors": {
+      "addMemberFailed": "No se pudo añadir a la persona",
+      "changeAccessLevelFailed": "No se pudieron cambiar los permisos",
+      "changeRoleFailed": "No se pudo cambiar el rol",
+      "closeProjectFailed": "No se pudo cerrar el proyecto",
+      "removeMemberFailed": "No se pudo quitar a la persona",
+      "reopenProjectFailed": "No se pudo reabrir el proyecto",
+      "saveFieldsFailed": "No se pudieron guardar los campos",
+      "saveProjectFailed": "No se pudo guardar el proyecto"
+    },
+    "fields": {
+      "add": "Añadir campo",
+      "empty": "El proyecto no tiene campos adicionales.",
+      "field": "Campo",
+      "noneAvailable": "No hay campos para añadir. Los campos los define el administrador en Configuración → Proyectos → Campos adicionales de tareas.",
+      "remove": "Quitar",
+      "removeConfirm": "¿Quitar el campo «{name}» del proyecto? Los valores introducidos en las tareas se conservarán.",
+      "required": "Obligatorio",
+      "requiredToggle": "obligatorio",
+      "selectPlaceholder": "— elige un campo —",
+      "title": "Campos adicionales de tareas",
+      "type": "Tipo"
+    },
+    "members": {
+      "accessLevel": "Permisos",
+      "add": "Añadir",
+      "companyAndDepartment": "Empresa / departamento",
+      "email": "Correo electrónico",
+      "externalAccount": "cuenta externa",
+      "inactive": "(inactivo)",
+      "person": "Persona",
+      "phone": "Teléfono",
+      "remove": "Quitar",
+      "removeConfirm": "¿Quitar a {name} del proyecto? La persona también dejará de estar asignada a sus tareas.",
+      "role": "Rol",
+      "searchPlaceholder": "Escribe nombre, apellido, correo o empresa (mín. 3 caracteres)…",
+      "title": "Personas del proyecto"
+    },
+    "name": "Nombre",
+    "noDescription": "Sin descripción.",
+    "reopenProject": "Reabrir",
+    "title": "Ficha del proyecto"
+  },
+  "chat": {
+    "deletedUser": "Usuario eliminado",
+    "empty": "No hay mensajes.",
+    "hint": "Enter envía el mensaje, Shift+Enter añade una línea nueva.",
+    "placeholder": "Escribe un mensaje…",
+    "send": "Enviar",
+    "sendFailed": "No se pudo enviar el mensaje"
+  },
+  "crmLink": {
+    "change": "Cambiar",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Vincular",
+    "linkFailed": "No se pudo vincular el proyecto",
+    "none": "ninguno",
+    "remove": "Quitar vínculo",
+    "removeConfirm": "¿Quitar el vínculo del proyecto con el CRM? Las tareas del proyecto desaparecerán de la ficha del lead o del partner.",
+    "removeFailed": "No se pudo quitar el vínculo",
+    "searchHint": "Las sugerencias incluyen solo los leads y partners a los que tienes acceso en el CRM. Al elegir uno, el vínculo se guarda de inmediato.",
+    "searchPlaceholder": "Escribe el nombre del lead o del partner (mín. 3 caracteres)…",
+    "title": "Vínculo con el CRM"
+  },
+  "detail": {
+    "backToProjects": "Proyectos",
+    "closedBadge": "Cerrado",
+    "empty": {
+      "noAssignedTasks": "No tienes tareas asignadas en este proyecto.",
+      "noTasks": "Este proyecto aún no tiene tareas."
+    },
+    "newTask": "Nueva tarea",
+    "openFailed": "No se pudo abrir el proyecto",
+    "refreshFailed": "No se pudo actualizar el proyecto",
+    "showOnlyMyTasks": "Mostrar mis tareas",
+    "tabs": {
+      "card": "Ficha del proyecto",
+      "chat": "Chat",
+      "tasks": "Tareas ({count})",
+      "timeline": "Cronograma"
+    },
+    "tasksLoadFailed": "No se pudieron cargar las tareas"
+  },
+  "gantt": {
+    "emptyTitle": "Sin tareas",
+    "taskColumn": "Tarea",
+    "today": "Hoy",
+    "undatedNote": "{count, plural, one {# tarea sin fechas no tiene barra en el cronograma.} other {# tareas sin fechas no tienen barra en el cronograma.}}",
+    "zoom": {
+      "day": "Días",
+      "month": "Meses",
+      "week": "Semanas"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Completo",
+      "read": "Solo lectura"
+    },
+    "fieldTypes": {
+      "date": "Fecha",
+      "list": "Lista de valores",
+      "money": "Importe con moneda",
+      "number": "Número",
+      "text": "Texto"
+    },
+    "reminders": {
+      "1d_before": "1 día antes de la fecha límite",
+      "2d_before": "2 días antes de la fecha límite",
+      "3d_before": "3 días antes de la fecha límite",
+      "at_due": "El día de la fecha límite",
+      "custom": "Fecha personalizada"
+    },
+    "roles": {
+      "controller": "Revisor",
+      "external_participant": "Participante externo",
+      "internal_participant": "Participante interno",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Finalizado",
+      "in_progress": "En curso",
+      "todo": "Por hacer"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "cerrado",
+    "lockedHint": "Vista previa: no participas en este proyecto",
+    "noDueDate": "sin fecha límite",
+    "noTasks": "El proyecto aún no tiene tareas.",
+    "openOfTotal": "{open} abiertas de {total}",
+    "showClosedProjectTasks": "Mostrar las tareas del proyecto cerrado",
+    "title": "Tareas de proyectos"
+  },
+  "list": {
+    "closedBadge": "Cerrado",
+    "createFailed": "No se pudo crear el proyecto",
+    "createForm": {
+      "description": "Descripción",
+      "keyHint": "El prefijo de los números de tarea se generará automáticamente a partir del nombre del proyecto.",
+      "name": "Nombre",
+      "namePlaceholder": "p. ej., Implantación del sistema CRM",
+      "saving": "Guardando…",
+      "submit": "Crear proyecto"
+    },
+    "empty": {
+      "noOpenProjects": "No participas en ningún proyecto abierto.",
+      "noneForFilter": "No hay proyectos para el filtro seleccionado.",
+      "title": "Sin proyectos"
+    },
+    "filters": {
+      "all": "Todos",
+      "closed": "Cerrados",
+      "open": "Abiertos"
+    },
+    "loadFailed": "No se pudieron cargar los proyectos",
+    "newProject": "Nuevo proyecto",
+    "stats": {
+      "members": "{count, plural, one {persona} other {personas}}",
+      "myOpenTasks": "{count, plural, one {abierta mía} other {abiertas mías}}",
+      "tasks": "{count, plural, one {tarea} other {tareas}}"
+    },
+    "title": "Proyectos",
+    "views": {
+      "myTasks": "Mis tareas",
+      "projects": "Proyectos"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Fecha límite",
+      "priority": "Prioridad",
+      "project": "Proyecto",
+      "status": "Estado",
+      "task": "Tarea"
+    },
+    "empty": {
+      "description": "No tienes tareas abiertas en ningún proyecto.",
+      "title": "Sin tareas"
+    },
+    "loadFailed": "No se pudieron cargar las tareas",
+    "noDueDate": "sin fecha límite"
+  },
+  "panel": {
+    "chatTitle": "Conversación sobre la tarea",
+    "createTask": "Crear tarea",
+    "created": "Tarea creada",
+    "customFields": {
+      "addButton": "+ Añadir campo",
+      "addFailed": "No se pudo añadir el campo",
+      "addHint": "El campo se añadirá a todas las tareas de este proyecto.",
+      "noneAvailable": "No hay campos para añadir. Los campos los define el administrador en Configuración → Proyectos → Campos adicionales de tareas.",
+      "selectField": "— elige un campo —",
+      "title": "Campos adicionales"
+    },
+    "fields": {
+      "assignees": "Personas asignadas",
+      "description": "Descripción adicional",
+      "endDate": "Fecha de finalización",
+      "name": "Nombre",
+      "noParent": "— ninguna (tarea principal) —",
+      "parentTask": "Tarea principal",
+      "priority": "Prioridad",
+      "startDate": "Fecha de inicio",
+      "status": "Estado",
+      "type": "Tipo"
+    },
+    "history": {
+      "changed": "ha cambiado: {fields}",
+      "changedWithStatus": "ha cambiado: {fields} ({from} → {to})",
+      "created": "ha creado la tarea",
+      "empty": "No hay entradas.",
+      "fields": {
+        "assignees": "personas asignadas",
+        "customFields": "campos adicionales",
+        "description": "descripción",
+        "endDate": "fecha de finalización",
+        "name": "nombre",
+        "parentTask": "tarea principal",
+        "priority": "prioridad",
+        "reminder": "recordatorio",
+        "startDate": "fecha de inicio",
+        "status": "estado",
+        "type": "tipo"
+      },
+      "loadFailed": "No se pudo cargar el historial",
+      "systemUser": "Sistema",
+      "title": "Historial de cambios"
+    },
+    "loadFailed": "No se pudo cargar la tarea",
+    "newTask": "Nueva tarea",
+    "reminder": {
+      "customDate": "Fecha del recordatorio",
+      "hint": "El recordatorio se enviará a todas las personas asignadas a las 9:00 y requiere una fecha de finalización.",
+      "label": "Recordatorio por correo electrónico",
+      "none": "Ninguno"
+    },
+    "saveFailed": "No se pudo guardar la tarea",
+    "saved": "Tarea guardada",
+    "saving": "Guardando…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "activo",
+      "addButton": "Añadir",
+      "moveDown": "Bajar",
+      "moveUp": "Subir",
+      "newItemPlaceholder": "Nuevo elemento…",
+      "saveFailed": "No se pudo guardar el diccionario"
+    },
+    "fields": {
+      "active": "activo",
+      "addButton": "Añadir campo",
+      "empty": "No hay campos definidos.",
+      "hint": "El PM puede añadir a su proyecto los campos definidos aquí (Ficha del proyecto → Campos adicionales de tareas) y decidir si son obligatorios. El tipo de campo no se puede cambiar una vez creado.",
+      "newNamePlaceholder": "Nombre del nuevo campo…",
+      "optionsPlaceholder": "Valores separados por comas",
+      "optionsRequired": "La lista debe tener al menos un valor",
+      "saveFailed": "No se pudo guardar el campo",
+      "title": "Campos adicionales de tareas"
+    },
+    "loadFailed": "No se pudo cargar la configuración de proyectos",
+    "priorities": {
+      "title": "Prioridades"
+    },
+    "statuses": {
+      "hint": "La categoría indica al sistema qué significa el estado, independientemente de su nombre. Las tareas con un estado de la categoría «Finalizado» no cuentan como abiertas ni como vencidas.",
+      "title": "Estados de tareas"
+    },
+    "transitions": {
+      "discardConfirm": "Tienes cambios sin guardar en las transiciones. ¿Descartarlos?",
+      "hint": "El PM siempre puede cambiar el estado a cualquier otro. Los participantes cambian el estado solo en las tareas a las que están asignados y en las que tienen permisos completos. El revisor cambia el estado en cualquier tarea del proyecto.",
+      "matrixCorner": "Del estado ↓ / al estado →",
+      "saveButton": "Guardar transiciones",
+      "saveFailed": "No se pudieron guardar las transiciones",
+      "saved": "Transiciones de estado guardadas",
+      "saving": "Guardando…",
+      "title": "Transiciones entre estados"
+    },
+    "types": {
+      "title": "Tipos de tareas"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Personas",
+      "endDate": "Fin",
+      "number": "N.º",
+      "priority": "Prioridad",
+      "startDate": "Inicio",
+      "status": "Estado",
+      "task": "Tarea",
+      "type": "Tipo"
+    },
+    "emptyMessage": "Este proyecto aún no tiene tareas.",
+    "emptyTitle": "Sin tareas",
+    "parentTask": "Tarea principal",
+    "subtask": "Subtarea"
+  }
+}

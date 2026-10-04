@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../../core/services/toast.service';
-import {
-  PROJECT_ROLE_LABELS, ProjectConfig, ProjectRole, ProjectsApiService,
-} from '../../../core/services/projects-api.service';
+import { ProjectConfig, ProjectRole, ProjectsApiService } from '../../../core/services/projects-api.service';
 
 type TransitionRole = Exclude<ProjectRole, 'pm'>;
 
@@ -13,49 +12,50 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
 @Component({
   selector: 'wt-project-transitions-editor',
   standalone: true,
+  imports: [TranslocoDirective],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <p class="hint">
-      PM zawsze może zmienić status na dowolny. Uczestnicy zmieniają status tylko w zadaniach, do których są przypisani
-      i mają pełne uprawnienia. Kontroler zmienia status w każdym zadaniu projektu.
-    </p>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      <p class="hint">{{ t('settings.transitions.hint') }}</p>
 
-    <div class="roles">
-      @for (role of roles; track role) {
-        <button class="role-btn" [class.active]="selectedRole() === role" (click)="selectRole(role)">{{ roleLabels[role] }}</button>
-      }
-    </div>
+      <div class="roles">
+        @for (role of roles; track role) {
+          <button class="role-btn" [class.active]="selectedRole() === role" (click)="selectRole(role)">{{ t('labels.roles.' + role) }}</button>
+        }
+      </div>
 
-    <div class="matrix-wrap">
-      <table class="matrix">
-        <thead>
-          <tr>
-            <th class="corner">Z statusu ↓ / na status →</th>
-            @for (status of statuses(); track status.id) { <th>{{ status.name }}</th> }
-          </tr>
-        </thead>
-        <tbody>
-          @for (from of statuses(); track from.id) {
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <thead>
             <tr>
-              <th class="from">{{ from.name }}</th>
-              @for (to of statuses(); track to.id) {
-                <td>
-                  @if (from.id !== to.id) {
-                    <input type="checkbox" [checked]="isAllowed(from.id, to.id)" (change)="toggle(from.id, to.id)">
-                  } @else { <span class="same">—</span> }
-                </td>
-              }
+              <th class="corner">{{ t('settings.transitions.matrixCorner') }}</th>
+              @for (status of statuses(); track status.id) { <th>{{ status.name }}</th> }
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            @for (from of statuses(); track from.id) {
+              <tr>
+                <th class="from">{{ from.name }}</th>
+                @for (to of statuses(); track to.id) {
+                  <td>
+                    @if (from.id !== to.id) {
+                      <input type="checkbox" [checked]="isAllowed(from.id, to.id)" (change)="toggle(from.id, to.id)">
+                    } @else { <span class="same">—</span> }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
 
-    <div class="actions">
-      <button class="btn btn-p btn-sm" [disabled]="!isDirty() || isSaving()" (click)="save()">
-        {{ isSaving() ? 'Zapisywanie…' : 'Zapisz przejścia' }}
-      </button>
-    </div>
+      <div class="actions">
+        <button class="btn btn-p btn-sm" [disabled]="!isDirty() || isSaving()" (click)="save()">
+          {{ t(isSaving() ? 'settings.transitions.saving' : 'settings.transitions.saveButton') }}
+        </button>
+      </div>
+    </ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:12px; }
@@ -75,12 +75,12 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
 export class ProjectTransitionsEditorComponent {
   private readonly api = inject(ProjectsApiService);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly config = input.required<ProjectConfig>();
   readonly configChanged = output<ProjectConfig>();
 
   readonly roles = TRANSITION_ROLES;
-  readonly roleLabels = PROJECT_ROLE_LABELS;
 
   readonly selectedRole = signal<TransitionRole>('internal_participant');
   readonly isSaving = signal(false);
@@ -104,7 +104,7 @@ export class ProjectTransitionsEditorComponent {
   }
 
   selectRole(role: TransitionRole): void {
-    if (this.isDirty() && !confirm('Masz niezapisane zmiany przejść. Porzucić je?')) return;
+    if (this.isDirty() && !confirm(this.transloco.translate('projects.settings.transitions.discardConfirm'))) return;
     this.selectedRole.set(role);
   }
 
@@ -125,12 +125,12 @@ export class ProjectTransitionsEditorComponent {
     this.api.replaceRoleTransitions(this.selectedRole(), transitions).subscribe({
       next: config => {
         this.isSaving.set(false);
-        this.toast.success('Zapisano przejścia statusów');
+        this.toast.success(this.transloco.translate('projects.settings.transitions.saved'));
         this.configChanged.emit(config);
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się zapisać przejść');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.transitions.saveFailed'));
       },
     });
   }

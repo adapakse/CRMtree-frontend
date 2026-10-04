@@ -4,6 +4,12 @@
     "close": "Zamknij",
     "save": "Zapisz"
   },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Plik .ics (Apple i inne)",
+    "outlook": "Outlook",
+    "title": "Przekaż do kalendarza"
+  },
   "language": {
     "changeFailed": "Nie udało się zmienić języka",
     "followTenant": "Domyślny język organizacji ({language})",
@@ -11,5 +17,13 @@
     "tenantHint": "Język dla osób, które nie wybrały własnego. Zmiana przeładuje stronę.",
     "tenantTitle": "Domyślny język organizacji",
     "title": "Język interfejsu"
+  },
+  "states": {
+    "loading": "Ładowanie…"
+  },
+  "typeahead": {
+    "minChars": "Wpisz co najmniej {count} znaki…",
+    "noResults": "Brak wyników.",
+    "searching": "Szukam…"
   }
 }

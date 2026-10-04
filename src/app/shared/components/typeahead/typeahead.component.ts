@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, inject, input, output, signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective } from '@jsverse/transloco';
 import { Observable, Subject, of } from 'rxjs';
 import { catchError, debounceTime, switchMap, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -24,17 +25,17 @@ const SEARCH_DEBOUNCE_MS = 250;
 @Component({
   selector: 'wt-typeahead',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslocoDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <input class="fi" type="text" autocomplete="off" [placeholder]="placeholder()" [ngModel]="text()"
            (ngModelChange)="onTextChange($event)" (focus)="isOpen.set(true)" (keydown.escape)="isOpen.set(false)">
     @if (isOpen() && text().trim().length > 0) {
-      <div class="menu">
+      <div class="menu" *transloco="let t; prefix: 'typeahead'">
         @if (text().trim().length < minChars()) {
-          <div class="note">Wpisz co najmniej {{ minChars() }} znaki…</div>
+          <div class="note">{{ t('minChars', { count: minChars() }) }}</div>
         } @else if (isSearching()) {
-          <div class="note">Szukam…</div>
+          <div class="note">{{ t('searching') }}</div>
         } @else {
           @for (option of options(); track option.id) {
             <button type="button" class="option" (click)="pick(option)">
@@ -42,7 +43,7 @@ const SEARCH_DEBOUNCE_MS = 250;
               @if (option.hint) { <span class="hint">{{ option.hint }}</span> }
             </button>
           } @empty {
-            <div class="note">Brak wyników.</div>
+            <div class="note">{{ t('noResults') }}</div>
           }
         }
       </div>

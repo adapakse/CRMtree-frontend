@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { AuthService } from '../../../core/auth/auth.service';
 import { LinkedProject, ProjectTaskSummary, ProjectsApiService } from '../../../core/services/projects-api.service';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
@@ -14,46 +15,49 @@ import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-ex
 @Component({
   selector: 'wt-linked-project-tasks',
   standalone: true,
-  imports: [AddToCalendarComponent],
+  imports: [AddToCalendarComponent, TranslocoDirective],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (isEnabled && projects().length > 0) {
-      <section class="linked">
-        <div class="linked-title">Zadania projektowe</div>
-        @for (project of projects(); track project.id) {
-          <div class="project">
-            <button class="project-head" [class.locked]="!project.can_open" [title]="lockedHint(project)"
-                    (click)="open(project, null)">
-              <span class="key">{{ project.key }}</span>
-              <span class="name">{{ project.name }}</span>
-              @if (project.status === 'closed') { <span class="closed">zamknięty</span> }
-              <span class="count">{{ openTaskCount(project) }} otwartych z {{ project.tasks.length }}</span>
-            </button>
-            @if (project.status === 'open' || expandedClosedProjectId() === project.id) {
-              @for (task of project.tasks; track task.id) {
-                <div class="task" [class.done]="task.status_category === 'done'" [class.locked]="!project.can_open"
-                     [title]="lockedHint(project)" (click)="open(project, task)">
-                  <span class="task-number">{{ project.key }}-{{ task.task_number }}</span>
-                  <span class="task-name">{{ task.name }}</span>
-                  <span class="status" [style.color]="task.status_color" [style.background]="task.status_color + '1F'">
-                    {{ task.status_name }}
-                  </span>
-                  <span class="assignees">{{ assigneeNames(task) }}</span>
-                  <span class="due" [class.overdue]="isOverdue(task)">{{ task.end_date ?? 'bez terminu' }}</span>
-                  <wt-add-to-calendar [entry]="calendarEntry(project, task)" (click)="$event.stopPropagation()" />
-                </div>
-              } @empty {
-                <div class="empty">Projekt nie ma jeszcze zadań.</div>
-              }
-            } @else {
-              <button class="show-closed" (click)="expandedClosedProjectId.set(project.id)">
-                Pokaż zadania zamkniętego projektu
+    <ng-container *transloco="let t; prefix: 'projects'">
+      @if (isEnabled && projects().length > 0) {
+        <section class="linked">
+          <div class="linked-title">{{ t('linked.title') }}</div>
+          @for (project of projects(); track project.id) {
+            <div class="project">
+              <button class="project-head" [class.locked]="!project.can_open" [title]="lockedHint(project)"
+                      (click)="open(project, null)">
+                <span class="key">{{ project.key }}</span>
+                <span class="name">{{ project.name }}</span>
+                @if (project.status === 'closed') { <span class="closed">{{ t('linked.closedBadge') }}</span> }
+                <span class="count">{{ t('linked.openOfTotal', { open: openTaskCount(project), total: project.tasks.length }) }}</span>
               </button>
-            }
-          </div>
-        }
-      </section>
-    }
+              @if (project.status === 'open' || expandedClosedProjectId() === project.id) {
+                @for (task of project.tasks; track task.id) {
+                  <div class="task" [class.done]="task.status_category === 'done'" [class.locked]="!project.can_open"
+                       [title]="lockedHint(project)" (click)="open(project, task)">
+                    <span class="task-number">{{ project.key }}-{{ task.task_number }}</span>
+                    <span class="task-name">{{ task.name }}</span>
+                    <span class="status" [style.color]="task.status_color" [style.background]="task.status_color + '1F'">
+                      {{ task.status_name }}
+                    </span>
+                    <span class="assignees">{{ assigneeNames(task) }}</span>
+                    <span class="due" [class.overdue]="isOverdue(task)">{{ task.end_date ?? t('linked.noDueDate') }}</span>
+                    <wt-add-to-calendar [entry]="calendarEntry(project, task)" (click)="$event.stopPropagation()" />
+                  </div>
+                } @empty {
+                  <div class="empty">{{ t('linked.noTasks') }}</div>
+                }
+              } @else {
+                <button class="show-closed" (click)="expandedClosedProjectId.set(project.id)">
+                  {{ t('linked.showClosedProjectTasks') }}
+                </button>
+              }
+            </div>
+          }
+        </section>
+      }
+    </ng-container>
   `,
   styles: [`
     .linked { margin:12px 0; border:1px solid #e5e7eb; border-radius:10px; background:white; overflow:hidden; }
@@ -84,6 +88,7 @@ export class LinkedProjectTasksComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
   private readonly auth = inject(AuthService);
   private readonly projectTaskNavigation = inject(ProjectTaskNavigationService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly sourceType = input.required<'lead' | 'partner'>();
   readonly sourceId = input.required<number | string>();
@@ -97,7 +102,9 @@ export class LinkedProjectTasksComponent implements OnInit {
   private readonly origin = computed(() => {
     const isLead = this.sourceType() === 'lead';
     return {
-      label: `${isLead ? 'Lead' : 'Partner'} ${this.sourceName()}`.trim(),
+      label: this.transloco.translate(
+        isLead ? 'projects.linked.backLabel.lead' : 'projects.linked.backLabel.partner', { name: this.sourceName() },
+      ).trim(),
       route: [isLead ? '/crm/leads' : '/crm/partners', this.sourceId()],
     };
   });
@@ -117,7 +124,7 @@ export class LinkedProjectTasksComponent implements OnInit {
   }
 
   lockedHint(project: LinkedProject): string {
-    return project.can_open ? '' : 'Podgląd — nie jesteś uczestnikiem tego projektu';
+    return project.can_open ? '' : this.transloco.translate('projects.linked.lockedHint');
   }
 
   openTaskCount(project: LinkedProject): number {

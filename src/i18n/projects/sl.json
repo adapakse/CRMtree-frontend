@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "Želite zapreti projekt? Zaprt projekt je samo za branje in izgine s privzetega seznama.",
+    "closeProject": "Zapri projekt",
+    "closedBadge": "Zaprt",
+    "description": "Opis",
+    "edit": "Uredi",
+    "errors": {
+      "addMemberFailed": "Osebe ni bilo mogoče dodati",
+      "changeAccessLevelFailed": "Pravic ni bilo mogoče spremeniti",
+      "changeRoleFailed": "Vloge ni bilo mogoče spremeniti",
+      "closeProjectFailed": "Projekta ni bilo mogoče zapreti",
+      "removeMemberFailed": "Osebe ni bilo mogoče odstraniti",
+      "reopenProjectFailed": "Projekta ni bilo mogoče odpreti",
+      "saveFieldsFailed": "Polj ni bilo mogoče shraniti",
+      "saveProjectFailed": "Projekta ni bilo mogoče shraniti"
+    },
+    "fields": {
+      "add": "Dodaj polje",
+      "empty": "Projekt nima dodatnih polj.",
+      "field": "Polje",
+      "noneAvailable": "Ni polj za dodajanje. Polja določi skrbnik v Nastavitve → Projekti → Dodatna polja nalog.",
+      "remove": "Odstrani",
+      "removeConfirm": "Želite odstraniti polje „{name}“ iz projekta? Vrednosti, vnesene v nalogah, bodo ohranjene.",
+      "required": "Obvezno",
+      "requiredToggle": "obvezno",
+      "selectPlaceholder": "— izberite polje —",
+      "title": "Dodatna polja nalog",
+      "type": "Vrsta"
+    },
+    "members": {
+      "accessLevel": "Pravice",
+      "add": "Dodaj",
+      "companyAndDepartment": "Podjetje / oddelek",
+      "email": "E-pošta",
+      "externalAccount": "zunanji račun",
+      "inactive": "(neaktiven)",
+      "person": "Oseba",
+      "phone": "Telefon",
+      "remove": "Odstrani",
+      "removeConfirm": "Želite odstraniti osebo {name} iz projekta? Oseba bo odstranjena tudi iz svojih nalog.",
+      "role": "Vloga",
+      "searchPlaceholder": "Vnesite ime, priimek, e-pošto ali podjetje (najmanj 3 znaki)…",
+      "title": "Osebe v projektu"
+    },
+    "name": "Naziv",
+    "noDescription": "Ni opisa.",
+    "reopenProject": "Znova odpri",
+    "title": "Kartica projekta"
+  },
+  "chat": {
+    "deletedUser": "Izbrisan uporabnik",
+    "empty": "Ni sporočil.",
+    "hint": "Enter pošlje sporočilo, Shift+Enter doda novo vrstico.",
+    "placeholder": "Napišite sporočilo…",
+    "send": "Pošlji",
+    "sendFailed": "Sporočila ni bilo mogoče poslati"
+  },
+  "crmLink": {
+    "change": "Spremeni",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Poveži",
+    "linkFailed": "Projekta ni bilo mogoče povezati",
+    "none": "ni",
+    "remove": "Odstrani povezavo",
+    "removeConfirm": "Želite odstraniti povezavo projekta s CRM? Naloge projekta bodo izginile s kartice leada ali partnerja.",
+    "removeFailed": "Povezave ni bilo mogoče odstraniti",
+    "searchHint": "Predlogi zajemajo samo leade in partnerje, do katerih imate dostop v CRM. Izbira takoj shrani povezavo.",
+    "searchPlaceholder": "Vnesite naziv leada ali partnerja (najmanj 3 znaki)…",
+    "title": "Povezava s CRM"
+  },
+  "detail": {
+    "backToProjects": "Projekti",
+    "closedBadge": "Zaprt",
+    "empty": {
+      "noAssignedTasks": "V tem projektu nimate dodeljenih nalog.",
+      "noTasks": "V tem projektu še ni nalog."
+    },
+    "newTask": "Nova naloga",
+    "openFailed": "Projekta ni bilo mogoče odpreti",
+    "refreshFailed": "Projekta ni bilo mogoče osvežiti",
+    "showOnlyMyTasks": "Pokaži moje naloge",
+    "tabs": {
+      "card": "Kartica projekta",
+      "chat": "Klepet",
+      "tasks": "Naloge ({count})",
+      "timeline": "Časovnica"
+    },
+    "tasksLoadFailed": "Nalog ni bilo mogoče naložiti"
+  },
+  "gantt": {
+    "emptyTitle": "Ni nalog",
+    "taskColumn": "Naloga",
+    "today": "Danes",
+    "undatedNote": "{count, plural, one {# naloga brez datumov nima traku na časovnici.} two {# nalogi brez datumov nimata traku na časovnici.} few {# naloge brez datumov nimajo traku na časovnici.} other {# nalog brez datumov nima traku na časovnici.}}",
+    "zoom": {
+      "day": "Dnevi",
+      "month": "Meseci",
+      "week": "Tedni"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Polne",
+      "read": "Branje"
+    },
+    "fieldTypes": {
+      "date": "Datum",
+      "list": "Seznam vrednosti",
+      "money": "Znesek z valuto",
+      "number": "Število",
+      "text": "Besedilo"
+    },
+    "reminders": {
+      "1d_before": "1 dan pred rokom",
+      "2d_before": "2 dni pred rokom",
+      "3d_before": "3 dni pred rokom",
+      "at_due": "Na dan roka",
+      "custom": "Datum po meri"
+    },
+    "roles": {
+      "controller": "Pregledovalec",
+      "external_participant": "Zunanji udeleženec",
+      "internal_participant": "Notranji udeleženec",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Končano",
+      "in_progress": "V teku",
+      "todo": "Za opraviti"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "zaprt",
+    "lockedHint": "Predogled — niste udeleženec tega projekta",
+    "noDueDate": "brez roka",
+    "noTasks": "Projekt še nima nalog.",
+    "openOfTotal": "{open} odprtih od {total}",
+    "showClosedProjectTasks": "Pokaži naloge zaprtega projekta",
+    "title": "Projektne naloge"
+  },
+  "list": {
+    "closedBadge": "Zaprt",
+    "createFailed": "Projekta ni bilo mogoče ustvariti",
+    "createForm": {
+      "description": "Opis",
+      "keyHint": "Predpona številk nalog bo samodejno ustvarjena iz naziva projekta.",
+      "name": "Naziv",
+      "namePlaceholder": "npr. Uvedba sistema CRM",
+      "saving": "Shranjevanje…",
+      "submit": "Ustvari projekt"
+    },
+    "empty": {
+      "noOpenProjects": "Ne sodelujete v nobenem odprtem projektu.",
+      "noneForFilter": "Za izbrani filter ni projektov.",
+      "title": "Ni projektov"
+    },
+    "filters": {
+      "all": "Vsi",
+      "closed": "Zaprti",
+      "open": "Odprti"
+    },
+    "loadFailed": "Projektov ni bilo mogoče naložiti",
+    "newProject": "Nov projekt",
+    "stats": {
+      "members": "{count, plural, one {oseba} two {osebi} few {osebe} other {oseb}}",
+      "myOpenTasks": "{count, plural, one {moja odprta} two {moji odprti} few {moje odprte} other {mojih odprtih}}",
+      "tasks": "{count, plural, one {naloga} two {nalogi} few {naloge} other {nalog}}"
+    },
+    "title": "Projekti",
+    "views": {
+      "myTasks": "Moje naloge",
+      "projects": "Projekti"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Rok",
+      "priority": "Prioriteta",
+      "project": "Projekt",
+      "status": "Status",
+      "task": "Naloga"
+    },
+    "empty": {
+      "description": "V nobenem projektu nimate odprtih nalog.",
+      "title": "Ni nalog"
+    },
+    "loadFailed": "Nalog ni bilo mogoče naložiti",
+    "noDueDate": "brez roka"
+  },
+  "panel": {
+    "chatTitle": "Pogovor o nalogi",
+    "createTask": "Ustvari nalogo",
+    "created": "Naloga ustvarjena",
+    "customFields": {
+      "addButton": "+ Dodaj polje",
+      "addFailed": "Polja ni bilo mogoče dodati",
+      "addHint": "Polje bo dodano vsem nalogam tega projekta.",
+      "noneAvailable": "Ni polj za dodajanje. Polja določi skrbnik v Nastavitve → Projekti → Dodatna polja nalog.",
+      "selectField": "— izberite polje —",
+      "title": "Dodatna polja"
+    },
+    "fields": {
+      "assignees": "Dodeljene osebe",
+      "description": "Dodatni opis",
+      "endDate": "Datum konca",
+      "name": "Naziv",
+      "noParent": "— brez (nadrejena naloga) —",
+      "parentTask": "Nadrejena naloga",
+      "priority": "Prioriteta",
+      "startDate": "Datum začetka",
+      "status": "Status",
+      "type": "Vrsta"
+    },
+    "history": {
+      "changed": "je spremenil(a): {fields}",
+      "changedWithStatus": "je spremenil(a): {fields} ({from} → {to})",
+      "created": "je ustvaril(a) nalogo",
+      "empty": "Ni vnosov.",
+      "fields": {
+        "assignees": "dodeljene osebe",
+        "customFields": "dodatna polja",
+        "description": "opis",
+        "endDate": "datum konca",
+        "name": "naziv",
+        "parentTask": "nadrejena naloga",
+        "priority": "prioriteta",
+        "reminder": "opomnik",
+        "startDate": "datum začetka",
+        "status": "status",
+        "type": "vrsta"
+      },
+      "loadFailed": "Zgodovine ni bilo mogoče naložiti",
+      "systemUser": "Sistem",
+      "title": "Zgodovina sprememb"
+    },
+    "loadFailed": "Naloge ni bilo mogoče naložiti",
+    "newTask": "Nova naloga",
+    "reminder": {
+      "customDate": "Datum opomnika",
+      "hint": "Opomnik bo poslan vsem dodeljenim osebam ob 9:00 in zahteva datum konca.",
+      "label": "Opomnik po e-pošti",
+      "none": "Brez"
+    },
+    "saveFailed": "Naloge ni bilo mogoče shraniti",
+    "saved": "Naloga shranjena",
+    "saving": "Shranjevanje…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "aktivno",
+      "addButton": "Dodaj",
+      "moveDown": "Dol",
+      "moveUp": "Gor",
+      "newItemPlaceholder": "Nova postavka…",
+      "saveFailed": "Šifranta ni bilo mogoče shraniti"
+    },
+    "fields": {
+      "active": "aktivno",
+      "addButton": "Dodaj polje",
+      "empty": "Ni določenih polj.",
+      "hint": "Polja, določena tukaj, lahko PM doda v svoj projekt (Kartica projekta → Dodatna polja nalog) in odloči, ali so obvezna. Vrste polja po ustvarjanju ni mogoče spremeniti.",
+      "newNamePlaceholder": "Naziv novega polja…",
+      "optionsPlaceholder": "Vrednosti, ločene z vejico",
+      "optionsRequired": "Seznam mora imeti vsaj eno vrednost",
+      "saveFailed": "Polja ni bilo mogoče shraniti",
+      "title": "Dodatna polja nalog"
+    },
+    "loadFailed": "Konfiguracije projektov ni bilo mogoče naložiti",
+    "priorities": {
+      "title": "Prioritete"
+    },
+    "statuses": {
+      "hint": "Kategorija sistemu pove, kaj status pomeni — ne glede na naziv. Naloge v statusu kategorije „Končano“ se ne štejejo kot odprte ali zapadle.",
+      "title": "Statusi nalog"
+    },
+    "transitions": {
+      "discardConfirm": "Imate neshranjene spremembe prehodov. Jih želite zavreči?",
+      "hint": "PM lahko status vedno spremeni v katerega koli. Udeleženci spreminjajo status samo v nalogah, ki so jim dodeljene in v katerih imajo polne pravice. Pregledovalec spreminja status v vsaki nalogi projekta.",
+      "matrixCorner": "Iz statusa ↓ / v status →",
+      "saveButton": "Shrani prehode",
+      "saveFailed": "Prehodov ni bilo mogoče shraniti",
+      "saved": "Prehodi statusov so shranjeni",
+      "saving": "Shranjevanje…",
+      "title": "Prehodi med statusi"
+    },
+    "types": {
+      "title": "Vrste nalog"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Osebe",
+      "endDate": "Konec",
+      "number": "Št.",
+      "priority": "Prioriteta",
+      "startDate": "Začetek",
+      "status": "Status",
+      "task": "Naloga",
+      "type": "Vrsta"
+    },
+    "emptyMessage": "V tem projektu še ni nalog.",
+    "emptyTitle": "Ni nalog",
+    "parentTask": "Nadrejena naloga",
+    "subtask": "Podnaloga"
+  }
+}

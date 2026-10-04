@@ -1,0 +1,314 @@
+{
+  "card": {
+    "closeConfirm": "Clôturer le projet ? Un projet clôturé est en lecture seule et disparaît de la liste par défaut.",
+    "closeProject": "Clôturer le projet",
+    "closedBadge": "Clôturé",
+    "description": "Description",
+    "edit": "Modifier",
+    "errors": {
+      "addMemberFailed": "Impossible d’ajouter la personne",
+      "changeAccessLevelFailed": "Impossible de modifier les droits d’accès",
+      "changeRoleFailed": "Impossible de modifier le rôle",
+      "closeProjectFailed": "Impossible de clôturer le projet",
+      "removeMemberFailed": "Impossible de retirer la personne",
+      "reopenProjectFailed": "Impossible de rouvrir le projet",
+      "saveFieldsFailed": "Impossible d’enregistrer les champs",
+      "saveProjectFailed": "Impossible d’enregistrer le projet"
+    },
+    "fields": {
+      "add": "Ajouter un champ",
+      "empty": "Le projet n’a pas de champs supplémentaires.",
+      "field": "Champ",
+      "noneAvailable": "Aucun champ à ajouter. Les champs sont définis par l’administrateur dans Paramètres → Projets → Champs supplémentaires des tâches.",
+      "remove": "Supprimer",
+      "removeConfirm": "Supprimer le champ « {name} » du projet ? Les valeurs saisies dans les tâches seront conservées.",
+      "required": "Obligatoire",
+      "requiredToggle": "obligatoire",
+      "selectPlaceholder": "— choisissez un champ —",
+      "title": "Champs supplémentaires des tâches",
+      "type": "Type"
+    },
+    "members": {
+      "accessLevel": "Droits d’accès",
+      "add": "Ajouter",
+      "companyAndDepartment": "Société / service",
+      "email": "E-mail",
+      "externalAccount": "compte externe",
+      "inactive": "(inactif)",
+      "person": "Personne",
+      "phone": "Téléphone",
+      "remove": "Retirer",
+      "removeConfirm": "Retirer {name} du projet ? La personne sera aussi désassignée de ses tâches.",
+      "role": "Rôle",
+      "searchPlaceholder": "Saisissez un prénom, un nom, un e-mail ou une société (3 caractères min.)…",
+      "title": "Personnes du projet"
+    },
+    "name": "Nom",
+    "noDescription": "Aucune description.",
+    "reopenProject": "Rouvrir",
+    "title": "Fiche projet"
+  },
+  "chat": {
+    "deletedUser": "Utilisateur supprimé",
+    "empty": "Aucun message.",
+    "hint": "Entrée envoie le message, Maj+Entrée ajoute une nouvelle ligne.",
+    "placeholder": "Écrivez un message…",
+    "send": "Envoyer",
+    "sendFailed": "Impossible d’envoyer le message"
+  },
+  "crmLink": {
+    "change": "Modifier",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partenaire"
+    },
+    "link": "Associer",
+    "linkFailed": "Impossible d’associer le projet",
+    "none": "aucune",
+    "remove": "Supprimer l’association",
+    "removeConfirm": "Supprimer l’association du projet avec le CRM ? Les tâches du projet disparaîtront de la fiche du lead ou du partenaire.",
+    "removeFailed": "Impossible de supprimer l’association",
+    "searchHint": "Les suggestions ne comprennent que les leads et les partenaires auxquels vous avez accès dans le CRM. La sélection enregistre immédiatement l’association.",
+    "searchPlaceholder": "Saisissez le nom d’un lead ou d’un partenaire (3 caractères min.)…",
+    "title": "Association avec le CRM"
+  },
+  "detail": {
+    "backToProjects": "Projets",
+    "closedBadge": "Clôturé",
+    "empty": {
+      "noAssignedTasks": "Aucune tâche ne vous est assignée dans ce projet.",
+      "noTasks": "Ce projet ne contient pas encore de tâches."
+    },
+    "newTask": "Nouvelle tâche",
+    "openFailed": "Impossible d’ouvrir le projet",
+    "refreshFailed": "Impossible d’actualiser le projet",
+    "showOnlyMyTasks": "Afficher mes tâches",
+    "tabs": {
+      "card": "Fiche projet",
+      "chat": "Discussion",
+      "tasks": "Tâches ({count})",
+      "timeline": "Chronologie"
+    },
+    "tasksLoadFailed": "Impossible de charger les tâches"
+  },
+  "gantt": {
+    "emptyTitle": "Aucune tâche",
+    "taskColumn": "Tâche",
+    "today": "Aujourd’hui",
+    "undatedNote": "{count, plural, one {# tâche sans dates n’a pas de barre sur la chronologie.} other {# tâches sans dates n’ont pas de barre sur la chronologie.}}",
+    "zoom": {
+      "day": "Jours",
+      "month": "Mois",
+      "week": "Semaines"
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Complet",
+      "read": "Lecture seule"
+    },
+    "fieldTypes": {
+      "date": "Date",
+      "list": "Liste de valeurs",
+      "money": "Montant avec devise",
+      "number": "Nombre",
+      "text": "Texte"
+    },
+    "reminders": {
+      "1d_before": "1 jour avant l’échéance",
+      "2d_before": "2 jours avant l’échéance",
+      "3d_before": "3 jours avant l’échéance",
+      "at_due": "Le jour de l’échéance",
+      "custom": "Date personnalisée"
+    },
+    "roles": {
+      "controller": "Validateur",
+      "external_participant": "Participant externe",
+      "internal_participant": "Participant interne",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Terminé",
+      "in_progress": "En cours",
+      "todo": "À faire"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partenaire {name}"
+    },
+    "closedBadge": "clôturé",
+    "lockedHint": "Aperçu — vous ne participez pas à ce projet",
+    "noDueDate": "sans échéance",
+    "noTasks": "Le projet n’a pas encore de tâches.",
+    "openOfTotal": "{open} ouverte(s) sur {total}",
+    "showClosedProjectTasks": "Afficher les tâches du projet clôturé",
+    "title": "Tâches de projet"
+  },
+  "list": {
+    "closedBadge": "Clôturé",
+    "createFailed": "Impossible de créer le projet",
+    "createForm": {
+      "description": "Description",
+      "keyHint": "Le préfixe des numéros de tâches sera généré automatiquement à partir du nom du projet.",
+      "name": "Nom",
+      "namePlaceholder": "p. ex. Déploiement du système CRM",
+      "saving": "Enregistrement…",
+      "submit": "Créer le projet"
+    },
+    "empty": {
+      "noOpenProjects": "Vous ne participez à aucun projet ouvert.",
+      "noneForFilter": "Aucun projet pour le filtre sélectionné.",
+      "title": "Aucun projet"
+    },
+    "filters": {
+      "all": "Tous",
+      "closed": "Clôturés",
+      "open": "Ouverts"
+    },
+    "loadFailed": "Impossible de charger les projets",
+    "newProject": "Nouveau projet",
+    "stats": {
+      "members": "{count, plural, one {personne} other {personnes}}",
+      "myOpenTasks": "{count, plural, one {ouverte à ma charge} other {ouvertes à ma charge}}",
+      "tasks": "{count, plural, one {tâche} other {tâches}}"
+    },
+    "title": "Projets",
+    "views": {
+      "myTasks": "Mes tâches",
+      "projects": "Projets"
+    }
+  },
+  "myTasks": {
+    "columns": {
+      "dueDate": "Échéance",
+      "priority": "Priorité",
+      "project": "Projet",
+      "status": "Statut",
+      "task": "Tâche"
+    },
+    "empty": {
+      "description": "Vous n’avez aucune tâche ouverte dans aucun projet.",
+      "title": "Aucune tâche"
+    },
+    "loadFailed": "Impossible de charger les tâches",
+    "noDueDate": "sans échéance"
+  },
+  "panel": {
+    "chatTitle": "Discussion sur la tâche",
+    "createTask": "Créer la tâche",
+    "created": "Tâche créée",
+    "customFields": {
+      "addButton": "+ Ajouter un champ",
+      "addFailed": "Impossible d’ajouter le champ",
+      "addHint": "Le champ sera ajouté à toutes les tâches de ce projet.",
+      "noneAvailable": "Aucun champ à ajouter. Les champs sont définis par l’administrateur dans Paramètres → Projets → Champs supplémentaires des tâches.",
+      "selectField": "— choisissez un champ —",
+      "title": "Champs supplémentaires"
+    },
+    "fields": {
+      "assignees": "Personnes assignées",
+      "description": "Description complémentaire",
+      "endDate": "Date de fin",
+      "name": "Nom",
+      "noParent": "— aucune (tâche parente) —",
+      "parentTask": "Tâche parente",
+      "priority": "Priorité",
+      "startDate": "Date de début",
+      "status": "Statut",
+      "type": "Type"
+    },
+    "history": {
+      "changed": "a modifié : {fields}",
+      "changedWithStatus": "a modifié : {fields} ({from} → {to})",
+      "created": "a créé la tâche",
+      "empty": "Aucune entrée.",
+      "fields": {
+        "assignees": "personnes assignées",
+        "customFields": "champs supplémentaires",
+        "description": "description",
+        "endDate": "date de fin",
+        "name": "nom",
+        "parentTask": "tâche parente",
+        "priority": "priorité",
+        "reminder": "rappel",
+        "startDate": "date de début",
+        "status": "statut",
+        "type": "type"
+      },
+      "loadFailed": "Impossible de charger l’historique",
+      "systemUser": "Système",
+      "title": "Historique des modifications"
+    },
+    "loadFailed": "Impossible de charger la tâche",
+    "newTask": "Nouvelle tâche",
+    "reminder": {
+      "customDate": "Date du rappel",
+      "hint": "Le rappel sera envoyé à toutes les personnes assignées à 9:00 et nécessite une date de fin.",
+      "label": "Rappel par e-mail",
+      "none": "Aucun"
+    },
+    "saveFailed": "Impossible d’enregistrer la tâche",
+    "saved": "Tâche enregistrée",
+    "saving": "Enregistrement…"
+  },
+  "settings": {
+    "dictionary": {
+      "active": "actif",
+      "addButton": "Ajouter",
+      "moveDown": "Descendre",
+      "moveUp": "Monter",
+      "newItemPlaceholder": "Nouvel élément…",
+      "saveFailed": "Impossible d’enregistrer le dictionnaire"
+    },
+    "fields": {
+      "active": "actif",
+      "addButton": "Ajouter un champ",
+      "empty": "Aucun champ défini.",
+      "hint": "Le PM peut ajouter à son projet les champs définis ici (Fiche projet → Champs supplémentaires des tâches) et décider s’ils sont obligatoires. Le type d’un champ ne peut plus être modifié après sa création.",
+      "newNamePlaceholder": "Nom du nouveau champ…",
+      "optionsPlaceholder": "Valeurs séparées par des virgules",
+      "optionsRequired": "La liste doit contenir au moins une valeur",
+      "saveFailed": "Impossible d’enregistrer le champ",
+      "title": "Champs supplémentaires des tâches"
+    },
+    "loadFailed": "Impossible de charger la configuration des projets",
+    "priorities": {
+      "title": "Priorités"
+    },
+    "statuses": {
+      "hint": "La catégorie indique au système ce que le statut signifie, quel que soit son nom. Les tâches dont le statut appartient à la catégorie « Terminé » ne sont comptées ni comme ouvertes ni comme en retard.",
+      "title": "Statuts des tâches"
+    },
+    "transitions": {
+      "discardConfirm": "Vous avez des modifications de transitions non enregistrées. Les abandonner ?",
+      "hint": "Le PM peut toujours passer à n’importe quel statut. Les participants ne changent le statut que des tâches qui leur sont assignées et pour lesquelles ils ont des droits complets. Le validateur change le statut de toutes les tâches du projet.",
+      "matrixCorner": "Du statut ↓ / vers le statut →",
+      "saveButton": "Enregistrer les transitions",
+      "saveFailed": "Impossible d’enregistrer les transitions",
+      "saved": "Transitions de statuts enregistrées",
+      "saving": "Enregistrement…",
+      "title": "Transitions entre les statuts"
+    },
+    "types": {
+      "title": "Types de tâches"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Personnes",
+      "endDate": "Fin",
+      "number": "N°",
+      "priority": "Priorité",
+      "startDate": "Début",
+      "status": "Statut",
+      "task": "Tâche",
+      "type": "Type"
+    },
+    "emptyMessage": "Ce projet ne contient pas encore de tâches.",
+    "emptyTitle": "Aucune tâche",
+    "parentTask": "Tâche parente",
+    "subtask": "Sous-tâche"
+  }
+}

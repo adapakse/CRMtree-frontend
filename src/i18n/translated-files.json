@@ -1,5 +1,22 @@
 [
+  "src/app/core/services/projects-api.service.ts",
   "src/app/layout/shell/shell.component.ts",
+  "src/app/pages/admin/project-settings/project-dictionary-editor.component.ts",
+  "src/app/pages/admin/project-settings/project-fields-editor.component.ts",
+  "src/app/pages/admin/project-settings/project-settings.component.ts",
+  "src/app/pages/admin/project-settings/project-transitions-editor.component.ts",
   "src/app/pages/login/login.component.ts",
-  "src/app/shared/components/language-picker/language-picker.component.ts"
+  "src/app/pages/projects/project-card.component.ts",
+  "src/app/pages/projects/project-chat.component.ts",
+  "src/app/pages/projects/project-crm-link.component.ts",
+  "src/app/pages/projects/project-detail.component.ts",
+  "src/app/pages/projects/project-gantt.component.ts",
+  "src/app/pages/projects/project-my-tasks.component.ts",
+  "src/app/pages/projects/project-task-list.component.ts",
+  "src/app/pages/projects/project-task-panel.component.ts",
+  "src/app/pages/projects/projects-list.component.ts",
+  "src/app/shared/components/add-to-calendar/add-to-calendar.component.ts",
+  "src/app/shared/components/language-picker/language-picker.component.ts",
+  "src/app/shared/components/linked-project-tasks/linked-project-tasks.component.ts",
+  "src/app/shared/components/typeahead/typeahead.component.ts"
 ]
