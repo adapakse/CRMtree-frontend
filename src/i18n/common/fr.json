@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Enregistrer"
+  },
+  "language": {
+    "changeFailed": "Impossible de changer la langue",
+    "followTenant": "Langue par défaut de l’organisation ({language})",
+    "hint": "Le changement de langue recharge la page. Vous recevrez aussi les e-mails et les rappels dans cette langue.",
+    "tenantHint": "Langue des personnes qui n’ont pas choisi la leur. Le changement recharge la page.",
+    "tenantTitle": "Langue par défaut de l’organisation",
+    "title": "Langue de l’interface"
+  }
+}

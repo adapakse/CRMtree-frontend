@@ -1,0 +1,21 @@
+{
+  "login": {
+    "email": "E-pošta",
+    "emailPlaceholder": "ivan@tvrtka.hr",
+    "failed": "Prijava nije uspjela",
+    "hidePassword": "Sakrij",
+    "password": "Lozinka",
+    "passwordTab": "E-pošta i lozinka",
+    "platformName": "CRM platforma",
+    "profileLoadFailed": "Učitavanje profila nije uspjelo",
+    "redirecting": "Preusmjeravanje…",
+    "showPassword": "Prikaži",
+    "ssoFailed": "SSO prijava nije uspjela. Pokušajte ponovno.",
+    "ssoHint": "Prijavite se Google Workspace računom svoje organizacije.",
+    "ssoSubmit": "Prijava putem Google Workspace SSO-a",
+    "submit": "Prijava",
+    "submitting": "Prijava u tijeku…",
+    "tenantHostMismatch": "Ovaj račun ne pripada organizaciji na ovoj adresi. Prijavite se ponovno.",
+    "unknownTenant": "Organizacija na ovoj adresi nije prepoznata."
+  }
+}

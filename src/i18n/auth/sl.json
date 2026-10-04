@@ -1,0 +1,21 @@
+{
+  "login": {
+    "email": "E-pošta",
+    "emailPlaceholder": "janez@podjetje.si",
+    "failed": "Prijava ni uspela",
+    "hidePassword": "Skrij",
+    "password": "Geslo",
+    "passwordTab": "E-pošta in geslo",
+    "platformName": "Platforma CRM",
+    "profileLoadFailed": "Profila ni bilo mogoče naložiti",
+    "redirecting": "Preusmerjanje…",
+    "showPassword": "Pokaži",
+    "ssoFailed": "Prijava SSO ni uspela. Poskusite znova.",
+    "ssoHint": "Prijavite se z računom Google Workspace svoje organizacije.",
+    "ssoSubmit": "Prijava z Google Workspace SSO",
+    "submit": "Prijava",
+    "submitting": "Prijavljanje…",
+    "tenantHostMismatch": "Ta račun ne pripada organizaciji na tem naslovu. Prijavite se znova.",
+    "unknownTenant": "Organizacije na tem naslovu ni bilo mogoče prepoznati."
+  }
+}

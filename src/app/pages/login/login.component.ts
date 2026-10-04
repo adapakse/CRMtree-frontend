@@ -4,22 +4,25 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
 import { EnvironmentBannerService } from '../../core/services/environment-banner.service';
 import { TenantContextService } from '../../core/services/tenant-context.service';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LanguagePickerComponent } from '../../shared/components/language-picker/language-picker.component';
 
 type Tab = 'sso' | 'password';
 
 @Component({
   selector: 'wt-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslocoDirective, LanguagePickerComponent],
+  providers: [provideTranslocoScope('auth')],
   template: `
-    <div id="login-screen">
+    <div id="login-screen" *transloco="let t; prefix: 'auth.login'">
       <div class="login-card">
 
         <div class="login-top">
           <img class="login-logo-img" src="assets/crmtree-logo.png" alt="CRMtree">
-          <div class="login-sub">{{ tenantContext.tenantName() || 'Platforma CRM' }}</div>
+          <div class="login-sub">{{ tenantContext.tenantName() || t('platformName') }}</div>
           @if (tenantContext.isUnknownTenantHost()) {
-            <div class="login-tenant-warning">Nie rozpoznano organizacji pod tym adresem.</div>
+            <div class="login-tenant-warning">{{ t('unknownTenant') }}</div>
           }
         </div>
 
@@ -27,7 +30,7 @@ type Tab = 'sso' | 'password';
         @if (isDevDomain()) {
           <div class="l-tabs">
             <button class="l-tab" [class.active]="tab() === 'sso'"      (click)="tab.set('sso')">Google Workspace SSO</button>
-            <button class="l-tab" [class.active]="tab() === 'password'" (click)="tab.set('password')">Email i hasło</button>
+            <button class="l-tab" [class.active]="tab() === 'password'" (click)="tab.set('password')">{{ t('passwordTab') }}</button>
           </div>
         }
 
@@ -35,13 +38,13 @@ type Tab = 'sso' | 'password';
 
           <!-- SSO tab — tylko dev -->
           @if (isDevDomain() && tab() === 'sso') {
-            <p class="login-hint">Zaloguj się kontem Google Workspace swojej organizacji.</p>
+            <p class="login-hint">{{ t('ssoHint') }}</p>
             <button class="lbtn" (click)="loginSso()" [disabled]="loading()">
               @if (loading()) {
-                <span class="spinner"></span> Przekierowywanie…
+                <span class="spinner"></span> {{ t('redirecting') }}
               } @else {
                 <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#fff" d="M21.35 11.1H12v2.8h5.35c-.23 1.25-.97 2.3-2.07 3v2.5h3.35c1.96-1.8 3.1-4.47 3.1-7.6 0-.52-.05-1.03-.13-1.53-.01-.05-.02-.1-.03-.15-.07-.35-.17-.69-.3-1.02z"/><path fill="#fff" d="M12 22c2.7 0 4.96-.89 6.62-2.4l-3.35-2.5c-.89.6-2.03.95-3.27.95-2.51 0-4.64-1.7-5.4-3.98H3.18v2.57A9.99 9.99 0 0 0 12 22z"/><path fill="#fff" d="M6.6 14.07A5.97 5.97 0 0 1 6.28 12c0-.72.12-1.41.32-2.07V7.36H3.18A10.03 10.03 0 0 0 2 12c0 1.62.39 3.15 1.18 4.48l3.42-2.41z"/><path fill="#fff" d="M12 6.02c1.42 0 2.69.49 3.69 1.44l2.77-2.77C16.96 3.15 14.7 2.25 12 2.25A9.99 9.99 0 0 0 3.18 7.36l3.42 2.57C7.36 7.72 9.49 6.02 12 6.02z"/></svg>
-                Zaloguj się przez Google Workspace SSO
+                {{ t('ssoSubmit') }}
               }
             </button>
             <div class="login-note">🔒 <b>SAML 2.0</b> · Google Workspace</div>
@@ -51,28 +54,29 @@ type Tab = 'sso' | 'password';
           @if (!isDevDomain() || tab() === 'password') {
             <form (ngSubmit)="loginPassword()" #f="ngForm">
               <div class="field">
-                <label>Email</label>
-                <input type="email" [(ngModel)]="email" name="email" placeholder="jan@firma.pl" autocomplete="email" required>
+                <label>{{ t('email') }}</label>
+                <input type="email" [(ngModel)]="email" name="email" [placeholder]="t('emailPlaceholder')" autocomplete="email" required>
               </div>
               <div class="field">
-                <label>Hasło</label>
+                <label>{{ t('password') }}</label>
                 <input [type]="showPass() ? 'text' : 'password'" [(ngModel)]="password" name="password"
                        placeholder="••••••••" autocomplete="current-password" required>
                 <button type="button" class="pass-toggle" (click)="showPass.set(!showPass())">
-                  {{ showPass() ? 'Ukryj' : 'Pokaż' }}
+                  {{ t(showPass() ? 'hidePassword' : 'showPassword') }}
                 </button>
               </div>
               @if (errorMsg()) {
                 <div class="l-error">{{ errorMsg() }}</div>
               }
               <button class="lbtn" type="submit" [disabled]="loading() || !email || !password">
-                @if (loading()) { <span class="spinner"></span> Loguję… }
-                @else { Zaloguj się }
+                @if (loading()) { <span class="spinner"></span> {{ t('submitting') }} }
+                @else { {{ t('submit') }} }
               </button>
             </form>
           }
 
         </div>
+        <div class="login-language"><wt-language-picker mode="compact" /></div>
       </div>
     </div>
   `,
@@ -83,6 +87,7 @@ type Tab = 'sso' | 'password';
     .login-logo-img { width:340px; max-width:100%; height:auto; display:block; margin:0 auto 4px; }
     .login-sub { font-size:13px; color:#888; }
     .login-tenant-warning { font-size:11px; color:#f59e0b; margin-top:4px; }
+    .login-language { display:flex; justify-content:center; padding:0 32px 18px; }
 
     .l-tabs { display:flex; border-bottom:1px solid var(--gray-200); }
     .l-tab {
@@ -131,6 +136,7 @@ export class LoginComponent implements OnInit {
   // NOT by hostname — a tenant subdomain (acme.crmtree.pl) is still real
   // production and must not be treated as a dev domain.
   readonly isDevDomain = this.envBanner.isTestEnvironment;
+  private readonly transloco = inject(TranslocoService);
 
   tab      = signal<Tab>('password');
   loading  = signal(false);
@@ -151,8 +157,8 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) { this.router.navigate(['/dashboard']); return; }
     const err = this.route.snapshot.queryParamMap.get('error');
-    if (err === 'saml_failed') this.errorMsg.set('Logowanie SSO nie powiodło się. Spróbuj ponownie.');
-    if (err === 'tenant_host_mismatch') this.errorMsg.set('To konto nie należy do organizacji pod tym adresem. Zaloguj się ponownie.');
+    if (err === 'saml_failed') this.errorMsg.set(this.transloco.translate('auth.login.ssoFailed'));
+    if (err === 'tenant_host_mismatch') this.errorMsg.set(this.transloco.translate('auth.login.tenantHostMismatch'));
   }
 
   loginSso(): void {
@@ -178,12 +184,12 @@ export class LoginComponent implements OnInit {
               this.router.navigate([dest]);
             }
           },
-          error: () => { this.loading.set(false); this.errorMsg.set('Błąd ładowania profilu'); },
+          error: () => { this.loading.set(false); this.errorMsg.set(this.transloco.translate('auth.login.profileLoadFailed')); },
         });
       },
       error: err => {
         this.loading.set(false);
-        this.errorMsg.set(err?.error?.error ?? 'Błąd logowania');
+        this.errorMsg.set(err?.error?.error ?? this.transloco.translate('auth.login.failed'));
       },
     });
   }

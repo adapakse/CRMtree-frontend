@@ -1,0 +1,21 @@
+{
+  "login": {
+    "email": "Correo electrónico",
+    "emailPlaceholder": "juan@empresa.es",
+    "failed": "Error al iniciar sesión",
+    "hidePassword": "Ocultar",
+    "password": "Contraseña",
+    "passwordTab": "Correo y contraseña",
+    "platformName": "Plataforma CRM",
+    "profileLoadFailed": "Error al cargar el perfil",
+    "redirecting": "Redirigiendo…",
+    "showPassword": "Mostrar",
+    "ssoFailed": "No se pudo iniciar sesión con SSO. Inténtalo de nuevo.",
+    "ssoHint": "Inicia sesión con la cuenta de Google Workspace de tu organización.",
+    "ssoSubmit": "Iniciar sesión con Google Workspace SSO",
+    "submit": "Iniciar sesión",
+    "submitting": "Iniciando sesión…",
+    "tenantHostMismatch": "Esta cuenta no pertenece a la organización de esta dirección. Vuelve a iniciar sesión.",
+    "unknownTenant": "No se ha reconocido ninguna organización en esta dirección."
+  }
+}

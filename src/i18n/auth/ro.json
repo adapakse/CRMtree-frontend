@@ -1,0 +1,21 @@
+{
+  "login": {
+    "email": "E-mail",
+    "emailPlaceholder": "ion@firma.ro",
+    "failed": "Eroare la conectare",
+    "hidePassword": "Ascundere",
+    "password": "Parolă",
+    "passwordTab": "E-mail și parolă",
+    "platformName": "Platformă CRM",
+    "profileLoadFailed": "Eroare la încărcarea profilului",
+    "redirecting": "Se redirecționează…",
+    "showPassword": "Afișare",
+    "ssoFailed": "Conectarea prin SSO nu a reușit. Încercați din nou.",
+    "ssoHint": "Conectați-vă cu contul Google Workspace al organizației dvs.",
+    "ssoSubmit": "Conectare cu Google Workspace SSO",
+    "submit": "Conectare",
+    "submitting": "Se conectează…",
+    "tenantHostMismatch": "Acest cont nu aparține organizației de la această adresă. Conectați-vă din nou.",
+    "unknownTenant": "Organizația de la această adresă nu a fost recunoscută."
+  }
+}

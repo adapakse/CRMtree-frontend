@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Anulare",
+    "close": "Închidere",
+    "save": "Salvare"
+  },
+  "language": {
+    "changeFailed": "Limba nu a putut fi schimbată",
+    "followTenant": "Limba implicită a organizației ({language})",
+    "hint": "Schimbarea limbii reîncarcă pagina. E-mailurile și mementourile vor fi trimise tot în această limbă.",
+    "tenantHint": "Limba pentru persoanele care nu și-au ales una proprie. Schimbarea reîncarcă pagina.",
+    "tenantTitle": "Limba implicită a organizației",
+    "title": "Limba interfeței"
+  }
+}

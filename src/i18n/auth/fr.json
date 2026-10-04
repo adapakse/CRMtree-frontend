@@ -1,0 +1,21 @@
+{
+  "login": {
+    "email": "E-mail",
+    "emailPlaceholder": "jean@entreprise.fr",
+    "failed": "Échec de la connexion",
+    "hidePassword": "Masquer",
+    "password": "Mot de passe",
+    "passwordTab": "E-mail et mot de passe",
+    "platformName": "Plateforme CRM",
+    "profileLoadFailed": "Échec du chargement du profil",
+    "redirecting": "Redirection…",
+    "showPassword": "Afficher",
+    "ssoFailed": "La connexion SSO a échoué. Veuillez réessayer.",
+    "ssoHint": "Connectez-vous avec le compte Google Workspace de votre organisation.",
+    "ssoSubmit": "Se connecter avec Google Workspace SSO",
+    "submit": "Se connecter",
+    "submitting": "Connexion…",
+    "tenantHostMismatch": "Ce compte n’appartient pas à l’organisation associée à cette adresse. Veuillez vous reconnecter.",
+    "unknownTenant": "Aucune organisation reconnue à cette adresse."
+  }
+}

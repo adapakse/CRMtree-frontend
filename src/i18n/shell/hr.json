@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "activityCalendar": "Kalendar aktivnosti",
+    "analyticsDashboardTip": "Analitička nadzorna ploča",
+    "appSettings": "Postavke aplikacije",
+    "auditLogs": "Revizijski zapisi",
+    "billing": "Naplata",
+    "billingTip": "Računi i planovi tenanata",
+    "budgets": "Budžeti",
+    "callAnalysis": "Analiza poziva",
+    "csvImport": "Uvoz CSV-a",
+    "dashboard": "Nadzorna ploča",
+    "dataManagement": "Upravljanje podacima",
+    "documents": "Dokumenti",
+    "groupsAndRoles": "Grupe i uloge",
+    "leads": "Leadovi",
+    "mySettings": "Moje postavke",
+    "onboarding": "Onboarding",
+    "partnerAnalytics": "Analitika partnera",
+    "partnerGroups": "Grupe partnera",
+    "partnerRegistry": "Registar partnera",
+    "performance": "Rezultati",
+    "projects": "Projekti",
+    "prospects": "Potencijalni klijenti",
+    "prospectsDashboard": "Nadzorna ploča potencijalnih klijenata",
+    "salesBudgetsTip": "Budžeti prodavača",
+    "salesReports": "Izvješća o prodaji",
+    "seoBot": "SEObot",
+    "tenants": "Tenants",
+    "tenantsTip": "Upravljanje tenantima",
+    "users": "Korisnici",
+    "workflow": "Workflow"
+  },
+  "sections": {
+    "administration": "Administracija",
+    "crm": "CRM",
+    "documents": "Dokumenti",
+    "partners": "Partneri",
+    "projects": "Projekti",
+    "superAdmin": "Super Admin"
+  },
+  "sidebar": {
+    "collapse": "Sažmi izbornik",
+    "expand": "Proširi izbornik"
+  },
+  "user": {
+    "admin": "Administrator",
+    "logout": "Odjava",
+    "user": "Korisnik"
+  }
+}

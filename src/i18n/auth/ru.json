@@ -1,0 +1,21 @@
+{
+  "login": {
+    "email": "Email",
+    "emailPlaceholder": "ivan@company.com",
+    "failed": "Ошибка входа",
+    "hidePassword": "Скрыть",
+    "password": "Пароль",
+    "passwordTab": "Email и пароль",
+    "platformName": "CRM-платформа",
+    "profileLoadFailed": "Не удалось загрузить профиль",
+    "redirecting": "Перенаправление…",
+    "showPassword": "Показать",
+    "ssoFailed": "Не удалось войти через SSO. Повторите попытку.",
+    "ssoHint": "Войдите с аккаунтом Google Workspace вашей организации.",
+    "ssoSubmit": "Войти через Google Workspace SSO",
+    "submit": "Войти",
+    "submitting": "Вход…",
+    "tenantHostMismatch": "Этот аккаунт не относится к организации по этому адресу. Войдите снова.",
+    "unknownTenant": "Организация по этому адресу не найдена."
+  }
+}

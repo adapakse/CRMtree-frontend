@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save"
+  },
+  "language": {
+    "changeFailed": "Couldn't change the language",
+    "followTenant": "Organization default ({language})",
+    "hint": "Changing the language reloads the page. Emails and reminders will also be sent in this language.",
+    "tenantHint": "Language for people who haven't chosen their own. Changing it reloads the page.",
+    "tenantTitle": "Organization default language",
+    "title": "Interface language"
+  }
+}

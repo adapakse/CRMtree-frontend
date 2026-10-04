@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "save": "Speichern"
+  },
+  "language": {
+    "changeFailed": "Sprache konnte nicht geändert werden",
+    "followTenant": "Standardsprache der Organisation ({language})",
+    "hint": "Beim Ändern der Sprache wird die Seite neu geladen. In dieser Sprache erhalten Sie auch E-Mails und Erinnerungen.",
+    "tenantHint": "Sprache für Personen, die keine eigene gewählt haben. Beim Ändern wird die Seite neu geladen.",
+    "tenantTitle": "Standardsprache der Organisation",
+    "title": "Anzeigesprache"
+  }
+}

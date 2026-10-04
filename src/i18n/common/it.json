@@ -1,0 +1,15 @@
+{
+  "actions": {
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "save": "Salva"
+  },
+  "language": {
+    "changeFailed": "Impossibile cambiare la lingua",
+    "followTenant": "Lingua predefinita dell'organizzazione ({language})",
+    "hint": "Il cambio di lingua ricarica la pagina. Riceverai in questa lingua anche le e-mail e i promemoria.",
+    "tenantHint": "Lingua per chi non ne ha scelta una propria. Il cambio ricarica la pagina.",
+    "tenantTitle": "Lingua predefinita dell'organizzazione",
+    "title": "Lingua dell'interfaccia"
+  }
+}

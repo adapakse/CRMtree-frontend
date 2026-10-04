@@ -1,0 +1,21 @@
+{
+  "login": {
+    "email": "E-Mail",
+    "emailPlaceholder": "max@firma.de",
+    "failed": "Anmeldung fehlgeschlagen",
+    "hidePassword": "Verbergen",
+    "password": "Passwort",
+    "passwordTab": "E-Mail und Passwort",
+    "platformName": "CRM-Plattform",
+    "profileLoadFailed": "Profil konnte nicht geladen werden",
+    "redirecting": "Weiterleitung…",
+    "showPassword": "Anzeigen",
+    "ssoFailed": "SSO-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "ssoHint": "Melden Sie sich mit dem Google Workspace-Konto Ihrer Organisation an.",
+    "ssoSubmit": "Mit Google Workspace SSO anmelden",
+    "submit": "Anmelden",
+    "submitting": "Anmeldung läuft…",
+    "tenantHostMismatch": "Dieses Konto gehört nicht zur Organisation unter dieser Adresse. Bitte melden Sie sich erneut an.",
+    "unknownTenant": "Unter dieser Adresse wurde keine Organisation erkannt."
+  }
+}
