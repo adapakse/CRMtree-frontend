@@ -1193,7 +1193,7 @@
       }
     },
     "modules": {
-      "leads": "Prospect",
+      "leads": "Lead",
       "partners": "Partner"
     },
     "neverLoggedIn": "Mai",
