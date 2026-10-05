@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Kartica projekta",
       "chat": "Chat",
+      "finance": "Financije",
       "tasks": "Zadaci ({count})",
       "timeline": "Vremenska crta"
     },
     "tasksLoadFailed": "Dohvaćanje zadataka nije uspjelo"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Proračun kategorije {name}",
+      "columns": {
+        "budget": "Proračun",
+        "category": "Kategorija",
+        "incurred": "Nastali",
+        "planned": "Planirani",
+        "variance": "Odstupanje"
+      },
+      "empty": "Nema kategorija troškova. Administrator ih dodaje u Postavke → Projekti → Kategorije troškova.",
+      "hint": "Odstupanje je proračun umanjen za nastale troškove. Retci s prekoračenim proračunom su istaknuti.",
+      "inactive": "(neaktivna)",
+      "saveFailed": "Spremanje proračuna nije uspjelo",
+      "title": "Proračun po kategorijama",
+      "total": "Ukupno"
+    },
+    "costForm": {
+      "addTitle": "Novi trošak",
+      "amount": "Iznos",
+      "category": "Kategorija",
+      "conversionHint": "Iznos će biti preračunat u {currency} po srednjem tečaju NBP-a (Narodne banke Poljske) na radni dan koji prethodi datumu troška.",
+      "currency": "Valuta iznosa",
+      "date": "Datum",
+      "description": "Opis",
+      "documentNumber": "Broj dokumenta",
+      "editTitle": "Uređivanje troška",
+      "noTask": "— bez zadatka —",
+      "saveFailed": "Spremanje troška nije uspjelo",
+      "saved": "Trošak je spremljen",
+      "savedWithRate": "Trošak je spremljen: {amount} po tečaju {rate} na dan {date}",
+      "selectCategory": "— odaberite kategoriju —",
+      "status": "Status",
+      "storedConversion": "Spremljeno kao {amount} (tečaj {rate} na dan {date}).",
+      "supplier": "Dobavljač",
+      "task": "Zadatak"
+    },
+    "costStatuses": {
+      "incurred": "Nastao",
+      "planned": "Planiran"
+    },
+    "costs": {
+      "add": "Dodaj trošak",
+      "columns": {
+        "amount": "Iznos",
+        "category": "Kategorija",
+        "date": "Datum",
+        "description": "Opis",
+        "documentNumber": "Br. dokumenta",
+        "status": "Status",
+        "supplier": "Dobavljač",
+        "task": "Zadatak"
+      },
+      "deleteConfirm": "Izbrisati trošak ({item})?",
+      "deleteFailed": "Brisanje troška nije uspjelo",
+      "empty": "Projekt još nema troškova.",
+      "emptyForFilters": "Nema troškova za odabrane filtre.",
+      "filters": {
+        "allCategories": "Sve kategorije",
+        "allStatuses": "Svi statusi",
+        "allTasks": "Svi zadaci",
+        "withoutTask": "Bez zadatka"
+      },
+      "rateNote": "tečaj {rate} na dan {date}",
+      "title": "Troškovi",
+      "totalIncurred": "Ukupno nastali"
+    },
+    "delete": "Izbriši",
+    "edit": "Uredi",
+    "loadFailed": "Dohvaćanje financija projekta nije uspjelo",
+    "plan": {
+      "currency": "Valuta projekta",
+      "currencyLockedHint": "Valutu nije moguće promijeniti jer projekt već ima stavke troškova ili prihoda.",
+      "participantsCanAddCosts": "Sudionici mogu dodavati troškove svojim zadacima",
+      "participantsCanAddCostsHint": "Interni sudionik dodaje troškove samo u zadacima koji su mu dodijeljeni i vidi isključivo stavke koje je sam dodao.",
+      "plannedRevenue": "Planirani prihod ({currency})",
+      "saveFailed": "Spremanje plana nije uspjelo",
+      "suggestedHint": "Prijedlog je vrijednost povezanog leada preračunata u valutu projekta.",
+      "title": "Financijski plan",
+      "useSuggested": "Upotrijebi predloženu: {amount}"
+    },
+    "readOnlyNote": "Samo pregled — financije ovog projekta možete pregledavati, ali ih ne možete mijenjati.",
+    "revenueStatuses": {
+      "invoiced": "Fakturiran",
+      "paid": "Plaćen",
+      "planned": "Planiran"
+    },
+    "revenues": {
+      "add": "Dodaj prihod",
+      "addTitle": "Novi prihod",
+      "amountIn": "Iznos ({currency})",
+      "columns": {
+        "amount": "Iznos",
+        "date": "Datum",
+        "description": "Opis",
+        "status": "Status"
+      },
+      "deleteConfirm": "Izbrisati prihod ({item})?",
+      "deleteFailed": "Brisanje prihoda nije uspjelo",
+      "editTitle": "Uređivanje prihoda",
+      "empty": "Projekt još nema prihoda.",
+      "saveFailed": "Spremanje prihoda nije uspjelo",
+      "saved": "Prihod je spremljen",
+      "statusHint": "U ostvarenje prihoda ubrajaju se fakturirane i plaćene stavke.",
+      "title": "Prihodi"
+    },
+    "saving": "Spremanje…",
+    "summary": {
+      "budget": "Proračun",
+      "cost": "Trošak (nastali)",
+      "margin": "Marža (ostvarenje)",
+      "plan": "Plan",
+      "plannedItems": "Planirane stavke",
+      "remainingBudget": "Preostali proračun",
+      "remainingBudgetHint": "Proračun umanjen za nastale troškove",
+      "revenue": "Prihod (ostvarenje)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Nastali (vlastiti)",
+        "plannedCost": "Planirani trošak",
+        "task": "Zadatak",
+        "totalIncurred": "Nastali s podzadacima",
+        "totalPlanned": "Planirani s podzadacima"
+      },
+      "empty": "Nijedan zadatak još nema troškova ni planirani trošak.",
+      "hint": "Planirani trošak zadatka informativan je i ne ulazi u proračun projekta. Iznosi „s podzadacima” obuhvaćaju stavke zadatka i svih njegovih podzadataka.",
+      "plannedCostOf": "Planirani trošak zadatka {task}",
+      "saveFailed": "Spremanje planiranog troška nije uspjelo",
+      "title": "Troškovi zadataka",
+      "total": "Ukupno"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Ostvarenje / plan",
+      "cost": "Trošak",
+      "margin": "Marža",
+      "marginHint": "Marža iz ostvarenja: fakturirani i plaćeni prihod umanjen za nastale troškove",
+      "revenue": "Prihod"
+    }
   },
   "gantt": {
     "emptyTitle": "Nema zadataka",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Razgovor o zadatku",
+    "costs": {
+      "add": "Dodaj trošak",
+      "empty": "Zadatak još nema troškova.",
+      "loadFailed": "Dohvaćanje troškova zadatka nije uspjelo",
+      "ownOnlyHint": "Vidite samo troškove koje ste sami dodali.",
+      "title": "Troškovi",
+      "totalIncurred": "Ukupno nastali"
+    },
     "createTask": "Izradi zadatak",
     "created": "Zadatak je izrađen",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Spremanje…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "Kategoriju nije moguće izbrisati — onu koju ne koristite isključite. Isključenu kategoriju nije moguće odabrati u novom trošku, a postojeće stavke je zadržavaju.",
+      "title": "Kategorije troškova"
+    },
     "dictionary": {
       "active": "aktivno",
       "addButton": "Dodaj",
@@ -272,6 +425,13 @@
       "optionsRequired": "Popis mora imati barem jednu vrijednost",
       "saveFailed": "Spremanje polja nije uspjelo",
       "title": "Dodatna polja zadataka"
+    },
+    "finance": {
+      "disableConfirm": "Isključiti financije projekata? Podaci će ostati sačuvani, ali će nestati iz prikaza svih korisnika.",
+      "hint": "Nakon uključivanja PM i administrator u projektu vode proračun, troškove i prihode, a kontrolor ih može pregledavati. Sažetak financija projekta vidi i svatko tko ima pristup kartici povezanog leada ili partnera.",
+      "saveFailed": "Promjena postavke financija nije uspjela",
+      "title": "Financije projekata",
+      "toggle": "Uključi financije projekata"
     },
     "loadFailed": "Dohvaćanje konfiguracije projekata nije uspjelo",
     "priorities": {

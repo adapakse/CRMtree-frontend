@@ -9,14 +9,41 @@ export type ProjectStatus = 'open' | 'closed';
 export type ProjectStatusFilter = ProjectStatus | 'all';
 export type TaskStatusCategory = 'todo' | 'in_progress' | 'done';
 export type ProjectFieldType = 'text' | 'number' | 'list' | 'date' | 'money';
-export type ProjectDictionary = 'statuses' | 'types' | 'priorities';
+export type ProjectDictionary = 'statuses' | 'types' | 'priorities' | 'cost-categories';
 
-export interface ProjectDictionaryItem {
+/** What every tenant dictionary shares; cost categories are exactly this. */
+export interface ProjectDictionaryEntry {
   id: string;
   name: string;
-  color: string;
   sort_order: number;
   is_active: boolean;
+}
+
+export interface ProjectDictionaryItem extends ProjectDictionaryEntry {
+  color: string;
+}
+
+export type ProjectCostCategory = ProjectDictionaryEntry;
+
+export interface ProjectFinanceMargin {
+  amount: number | null;
+  percent: number | null;
+}
+
+/** Headline figures of one project, as shown on the project list and on lead / partner cards. */
+export interface ProjectFinanceTotals {
+  currency: string;
+  revenue: { planned: number | null; actual: number };
+  cost: { planned: number; actual: number };
+  margin: { planned: ProjectFinanceMargin; actual: ProjectFinanceMargin };
+}
+
+/** What the signed-in user may do with the finance of one project. */
+export interface ProjectFinanceAccess {
+  currency: string;
+  can_read: boolean;
+  can_write: boolean;
+  can_add_own_costs: boolean;
 }
 
 export interface ProjectTaskStatus extends ProjectDictionaryItem {
@@ -44,6 +71,9 @@ export interface ProjectConfig {
   priorities: ProjectDictionaryItem[];
   transitions: ProjectStatusTransition[];
   field_definitions: ProjectFieldDefinition[];
+  finance_enabled: boolean;
+  /** Empty while project finance is switched off. */
+  cost_categories: ProjectCostCategory[];
 }
 
 export interface Project {
@@ -98,6 +128,8 @@ export interface LinkedProject {
   /** False for a viewer who is not a project member: they see the tasks but cannot enter the project. */
   can_open: boolean;
   tasks: ProjectTaskSummary[];
+  /** Shown to everyone who sees the card, member or not; null while finance is switched off. */
+  finance: ProjectFinanceTotals | null;
 }
 
 export interface ProjectListItem extends Project {
@@ -106,6 +138,8 @@ export interface ProjectListItem extends Project {
   member_count: number;
   task_count: number;
   my_open_task_count: number;
+  /** Null unless the viewer is tenant admin, PM or controller of the project. */
+  finance: ProjectFinanceTotals | null;
 }
 
 export interface ProjectMember {
@@ -138,6 +172,8 @@ export interface ProjectDetail {
   my_role: ProjectRole | null;
   my_access_level: ProjectAccessLevel | null;
   can_manage: boolean;
+  /** Null when finance is switched off or the viewer has no finance rights in this project. */
+  finance: ProjectFinanceAccess | null;
 }
 
 export interface ProjectMemberCandidate {
@@ -333,7 +369,7 @@ export class ProjectsApiService {
       : `${this.base}/${projectId}/tasks/${taskId}/messages`;
   }
 
-  createDictionaryItem(dictionary: ProjectDictionary, payload: { name: string; color: string; category?: TaskStatusCategory }): Observable<ProjectConfig> {
+  createDictionaryItem(dictionary: ProjectDictionary, payload: { name: string; color?: string; category?: TaskStatusCategory }): Observable<ProjectConfig> {
     return this.http.post<ProjectConfig>(`${this.adminBase}/dictionaries/${dictionary}`, payload);
   }
 
@@ -347,6 +383,10 @@ export class ProjectsApiService {
 
   reorderDictionary(dictionary: ProjectDictionary, ids: string[]): Observable<ProjectConfig> {
     return this.http.put<ProjectConfig>(`${this.adminBase}/dictionaries/${dictionary}/order`, { ids });
+  }
+
+  setFinanceEnabled(isEnabled: boolean): Observable<ProjectConfig> {
+    return this.http.put<ProjectConfig>(`${this.adminBase}/finance`, { is_enabled: isEnabled });
   }
 
   replaceRoleTransitions(

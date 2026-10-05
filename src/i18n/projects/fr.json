@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Fiche projet",
       "chat": "Discussion",
+      "finance": "Finances",
       "tasks": "Tâches ({count})",
       "timeline": "Chronologie"
     },
     "tasksLoadFailed": "Impossible de charger les tâches"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Budget de la catégorie {name}",
+      "columns": {
+        "budget": "Budget",
+        "category": "Catégorie",
+        "incurred": "Encouru",
+        "planned": "Prévu",
+        "variance": "Écart"
+      },
+      "empty": "Aucune catégorie de coûts. L’administrateur les ajoute dans Paramètres → Projets → Catégories de coûts.",
+      "hint": "L’écart correspond au budget moins les coûts encourus. Les lignes dont le budget est dépassé sont mises en évidence.",
+      "inactive": "(inactive)",
+      "saveFailed": "Impossible d’enregistrer le budget",
+      "title": "Budget par catégorie",
+      "total": "Total"
+    },
+    "costForm": {
+      "addTitle": "Nouveau coût",
+      "amount": "Montant",
+      "category": "Catégorie",
+      "conversionHint": "Le montant sera converti en {currency} au cours moyen de la NBP (Banque nationale de Pologne) du jour ouvré précédant la date du coût.",
+      "currency": "Devise du montant",
+      "date": "Date",
+      "description": "Description",
+      "documentNumber": "Numéro du document",
+      "editTitle": "Modifier le coût",
+      "noTask": "— sans tâche —",
+      "saveFailed": "Impossible d’enregistrer le coût",
+      "saved": "Coût enregistré",
+      "savedWithRate": "Coût enregistré : {amount} au cours {rate} du {date}",
+      "selectCategory": "— choisissez une catégorie —",
+      "status": "Statut",
+      "storedConversion": "Enregistré comme {amount} (cours {rate} du {date}).",
+      "supplier": "Fournisseur",
+      "task": "Tâche"
+    },
+    "costStatuses": {
+      "incurred": "Encouru",
+      "planned": "Prévu"
+    },
+    "costs": {
+      "add": "Ajouter un coût",
+      "columns": {
+        "amount": "Montant",
+        "category": "Catégorie",
+        "date": "Date",
+        "description": "Description",
+        "documentNumber": "N° de document",
+        "status": "Statut",
+        "supplier": "Fournisseur",
+        "task": "Tâche"
+      },
+      "deleteConfirm": "Supprimer le coût ({item}) ?",
+      "deleteFailed": "Impossible de supprimer le coût",
+      "empty": "Le projet n’a pas encore de coûts.",
+      "emptyForFilters": "Aucun coût pour les filtres sélectionnés.",
+      "filters": {
+        "allCategories": "Toutes les catégories",
+        "allStatuses": "Tous les statuts",
+        "allTasks": "Toutes les tâches",
+        "withoutTask": "Sans tâche"
+      },
+      "rateNote": "cours {rate} du {date}",
+      "title": "Coûts",
+      "totalIncurred": "Total encouru"
+    },
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "loadFailed": "Impossible de charger les finances du projet",
+    "plan": {
+      "currency": "Devise du projet",
+      "currencyLockedHint": "La devise ne peut plus être modifiée, car le projet contient déjà des lignes de coûts ou de revenus.",
+      "participantsCanAddCosts": "Les participants peuvent ajouter des coûts à leurs tâches",
+      "participantsCanAddCostsHint": "Un participant interne n’ajoute des coûts que dans les tâches qui lui sont assignées et ne voit que les lignes qu’il a lui-même ajoutées.",
+      "plannedRevenue": "Revenu prévu ({currency})",
+      "saveFailed": "Impossible d’enregistrer le plan",
+      "suggestedHint": "La suggestion correspond à la valeur du lead associé, convertie dans la devise du projet.",
+      "title": "Plan financier",
+      "useSuggested": "Utiliser la valeur suggérée : {amount}"
+    },
+    "readOnlyNote": "Lecture seule — vous pouvez consulter les finances de ce projet, mais pas les modifier.",
+    "revenueStatuses": {
+      "invoiced": "Facturé",
+      "paid": "Payé",
+      "planned": "Prévu"
+    },
+    "revenues": {
+      "add": "Ajouter un revenu",
+      "addTitle": "Nouveau revenu",
+      "amountIn": "Montant ({currency})",
+      "columns": {
+        "amount": "Montant",
+        "date": "Date",
+        "description": "Description",
+        "status": "Statut"
+      },
+      "deleteConfirm": "Supprimer le revenu ({item}) ?",
+      "deleteFailed": "Impossible de supprimer le revenu",
+      "editTitle": "Modifier le revenu",
+      "empty": "Le projet n’a pas encore de revenus.",
+      "saveFailed": "Impossible d’enregistrer le revenu",
+      "saved": "Revenu enregistré",
+      "statusHint": "Les lignes facturées et payées comptent dans le revenu réalisé.",
+      "title": "Revenus"
+    },
+    "saving": "Enregistrement…",
+    "summary": {
+      "budget": "Budget",
+      "cost": "Coût (encouru)",
+      "margin": "Marge (réalisée)",
+      "plan": "Plan",
+      "plannedItems": "Lignes prévues",
+      "remainingBudget": "Budget restant",
+      "remainingBudgetHint": "Budget moins les coûts encourus",
+      "revenue": "Revenu (réalisé)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Encouru (propre)",
+        "plannedCost": "Coût prévu",
+        "task": "Tâche",
+        "totalIncurred": "Encouru avec sous-tâches",
+        "totalPlanned": "Prévu avec sous-tâches"
+      },
+      "empty": "Aucune tâche n’a encore de coûts ni de coût prévu.",
+      "hint": "Le coût prévu d’une tâche est indicatif et n’entre pas dans le budget du projet. Les montants « avec sous-tâches » comprennent les lignes de la tâche et de toutes ses sous-tâches.",
+      "plannedCostOf": "Coût prévu de la tâche {task}",
+      "saveFailed": "Impossible d’enregistrer le coût prévu",
+      "title": "Coûts des tâches",
+      "total": "Total"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Réalisé / plan",
+      "cost": "Coût",
+      "margin": "Marge",
+      "marginHint": "Marge réalisée : revenu facturé et payé moins les coûts encourus",
+      "revenue": "Revenu"
+    }
   },
   "gantt": {
     "emptyTitle": "Aucune tâche",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Discussion sur la tâche",
+    "costs": {
+      "add": "Ajouter un coût",
+      "empty": "La tâche n’a pas encore de coûts.",
+      "loadFailed": "Impossible de charger les coûts de la tâche",
+      "ownOnlyHint": "Vous ne voyez que les coûts que vous avez ajoutés vous-même.",
+      "title": "Coûts",
+      "totalIncurred": "Total encouru"
+    },
     "createTask": "Créer la tâche",
     "created": "Tâche créée",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Enregistrement…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "Une catégorie ne peut pas être supprimée — désactivez celle que vous n’utilisez plus. Une catégorie désactivée ne peut pas être choisie pour un nouveau coût, mais les lignes existantes la conservent.",
+      "title": "Catégories de coûts"
+    },
     "dictionary": {
       "active": "actif",
       "addButton": "Ajouter",
@@ -272,6 +425,13 @@
       "optionsRequired": "La liste doit contenir au moins une valeur",
       "saveFailed": "Impossible d’enregistrer le champ",
       "title": "Champs supplémentaires des tâches"
+    },
+    "finance": {
+      "disableConfirm": "Désactiver les finances des projets ? Les données seront conservées, mais disparaîtront de la vue de tous les utilisateurs.",
+      "hint": "Une fois l’option activée, le PM et l’administrateur gèrent dans le projet le budget, les coûts et les revenus, et le validateur peut les consulter. Le récapitulatif des finances du projet est également visible par toute personne ayant accès à la fiche du lead ou du partenaire associé.",
+      "saveFailed": "Impossible de modifier le paramètre des finances",
+      "title": "Finances des projets",
+      "toggle": "Activer les finances des projets"
     },
     "loadFailed": "Impossible de charger la configuration des projets",
     "priorities": {

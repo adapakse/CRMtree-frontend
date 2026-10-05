@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Scheda progetto",
       "chat": "Chat",
+      "finance": "Finanze",
       "tasks": "Attività ({count})",
       "timeline": "Timeline"
     },
     "tasksLoadFailed": "Impossibile caricare le attività"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Budget della categoria {name}",
+      "columns": {
+        "budget": "Budget",
+        "category": "Categoria",
+        "incurred": "Sostenuti",
+        "planned": "Pianificati",
+        "variance": "Scostamento"
+      },
+      "empty": "Nessuna categoria di costo. L'amministratore le aggiunge in Impostazioni → Progetti → Categorie di costo.",
+      "hint": "Lo scostamento è il budget meno i costi sostenuti. Le righe con il budget superato sono evidenziate.",
+      "inactive": "(inattiva)",
+      "saveFailed": "Impossibile salvare il budget",
+      "title": "Budget per categoria",
+      "total": "Totale"
+    },
+    "costForm": {
+      "addTitle": "Nuovo costo",
+      "amount": "Importo",
+      "category": "Categoria",
+      "conversionHint": "L’importo verrà convertito in {currency} al cambio medio della NBP (la Banca nazionale polacca) del giorno lavorativo precedente la data del costo.",
+      "currency": "Valuta dell'importo",
+      "date": "Data",
+      "description": "Descrizione",
+      "documentNumber": "Numero del documento",
+      "editTitle": "Modifica costo",
+      "noTask": "— senza attività —",
+      "saveFailed": "Impossibile salvare il costo",
+      "saved": "Costo salvato",
+      "savedWithRate": "Costo salvato: {amount} al cambio {rate} del {date}",
+      "selectCategory": "— seleziona una categoria —",
+      "status": "Stato",
+      "storedConversion": "Salvato come {amount} (cambio {rate} del {date}).",
+      "supplier": "Fornitore",
+      "task": "Attività"
+    },
+    "costStatuses": {
+      "incurred": "Sostenuto",
+      "planned": "Pianificato"
+    },
+    "costs": {
+      "add": "Aggiungi costo",
+      "columns": {
+        "amount": "Importo",
+        "category": "Categoria",
+        "date": "Data",
+        "description": "Descrizione",
+        "documentNumber": "N. documento",
+        "status": "Stato",
+        "supplier": "Fornitore",
+        "task": "Attività"
+      },
+      "deleteConfirm": "Eliminare il costo ({item})?",
+      "deleteFailed": "Impossibile eliminare il costo",
+      "empty": "Il progetto non ha ancora costi.",
+      "emptyForFilters": "Nessun costo per i filtri selezionati.",
+      "filters": {
+        "allCategories": "Tutte le categorie",
+        "allStatuses": "Tutti gli stati",
+        "allTasks": "Tutte le attività",
+        "withoutTask": "Senza attività"
+      },
+      "rateNote": "cambio {rate} del {date}",
+      "title": "Costi",
+      "totalIncurred": "Totale sostenuti"
+    },
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "loadFailed": "Impossibile caricare le finanze del progetto",
+    "plan": {
+      "currency": "Valuta del progetto",
+      "currencyLockedHint": "La valuta non può essere modificata perché il progetto ha già voci di costo o di ricavo.",
+      "participantsCanAddCosts": "I partecipanti possono aggiungere costi alle proprie attività",
+      "participantsCanAddCostsHint": "Il partecipante interno aggiunge costi solo nelle attività a cui è assegnato e vede esclusivamente le voci aggiunte da lui.",
+      "plannedRevenue": "Ricavo pianificato ({currency})",
+      "saveFailed": "Impossibile salvare il piano",
+      "suggestedHint": "Il suggerimento è il valore del lead collegato convertito nella valuta del progetto.",
+      "title": "Piano finanziario",
+      "useSuggested": "Usa il valore suggerito: {amount}"
+    },
+    "readOnlyNote": "Sola lettura — puoi consultare le finanze di questo progetto, ma non puoi modificarle.",
+    "revenueStatuses": {
+      "invoiced": "Fatturato",
+      "paid": "Pagato",
+      "planned": "Pianificato"
+    },
+    "revenues": {
+      "add": "Aggiungi ricavo",
+      "addTitle": "Nuovo ricavo",
+      "amountIn": "Importo ({currency})",
+      "columns": {
+        "amount": "Importo",
+        "date": "Data",
+        "description": "Descrizione",
+        "status": "Stato"
+      },
+      "deleteConfirm": "Eliminare il ricavo ({item})?",
+      "deleteFailed": "Impossibile eliminare il ricavo",
+      "editTitle": "Modifica ricavo",
+      "empty": "Il progetto non ha ancora ricavi.",
+      "saveFailed": "Impossibile salvare il ricavo",
+      "saved": "Ricavo salvato",
+      "statusHint": "Nel ricavo a consuntivo rientrano le voci fatturate e pagate.",
+      "title": "Ricavi"
+    },
+    "saving": "Salvataggio…",
+    "summary": {
+      "budget": "Budget",
+      "cost": "Costo (sostenuto)",
+      "margin": "Margine (consuntivo)",
+      "plan": "Piano",
+      "plannedItems": "Voci pianificate",
+      "remainingBudget": "Budget residuo",
+      "remainingBudgetHint": "Budget meno i costi sostenuti",
+      "revenue": "Ricavo (consuntivo)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Sostenuti (propri)",
+        "plannedCost": "Costo pianificato",
+        "task": "Attività",
+        "totalIncurred": "Sostenuti incl. sottoattività",
+        "totalPlanned": "Pianificati incl. sottoattività"
+      },
+      "empty": "Nessuna attività ha ancora costi né un costo pianificato.",
+      "hint": "Il costo pianificato dell'attività è informativo e non rientra nel budget del progetto. Gli importi «incl. sottoattività» comprendono le voci dell'attività e di tutte le sue sottoattività.",
+      "plannedCostOf": "Costo pianificato dell’attività {task}",
+      "saveFailed": "Impossibile salvare il costo pianificato",
+      "title": "Costi delle attività",
+      "total": "Totale"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Consuntivo / piano",
+      "cost": "Costo",
+      "margin": "Margine",
+      "marginHint": "Margine a consuntivo: ricavo fatturato e pagato meno i costi sostenuti",
+      "revenue": "Ricavo"
+    }
   },
   "gantt": {
     "emptyTitle": "Nessuna attività",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Conversazione sull'attività",
+    "costs": {
+      "add": "Aggiungi costo",
+      "empty": "L'attività non ha ancora costi.",
+      "loadFailed": "Impossibile caricare i costi dell'attività",
+      "ownOnlyHint": "Vedi solo i costi che hai aggiunto tu.",
+      "title": "Costi",
+      "totalIncurred": "Totale sostenuti"
+    },
     "createTask": "Crea attività",
     "created": "Attività creata",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Salvataggio…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "Una categoria non può essere eliminata — disattiva quella che non usi. Una categoria disattivata non può essere scelta per un nuovo costo, mentre le voci esistenti la conservano.",
+      "title": "Categorie di costo"
+    },
     "dictionary": {
       "active": "attivo",
       "addButton": "Aggiungi",
@@ -272,6 +425,13 @@
       "optionsRequired": "L'elenco deve avere almeno un valore",
       "saveFailed": "Impossibile salvare il campo",
       "title": "Campi aggiuntivi delle attività"
+    },
+    "finance": {
+      "disableConfirm": "Disattivare le finanze dei progetti? I dati verranno conservati, ma scompariranno dalla vista di tutti gli utenti.",
+      "hint": "Dopo l'attivazione il PM e l'amministratore gestiscono nel progetto budget, costi e ricavi, mentre il revisore può consultarli. Il riepilogo delle finanze del progetto è visibile anche a chiunque abbia accesso alla scheda del lead o del partner collegato.",
+      "saveFailed": "Impossibile modificare l'impostazione delle finanze",
+      "title": "Finanze dei progetti",
+      "toggle": "Attiva le finanze dei progetti"
     },
     "loadFailed": "Impossibile caricare la configurazione dei progetti",
     "priorities": {

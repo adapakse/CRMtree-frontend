@@ -4,15 +4,17 @@ import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@js
 import { Observable } from 'rxjs';
 import { ToastService } from '../../../core/services/toast.service';
 import {
-  ProjectConfig, ProjectDictionary, ProjectDictionaryItem, ProjectTaskStatus, ProjectsApiService, TaskStatusCategory,
+  ProjectConfig, ProjectDictionary, ProjectDictionaryEntry, ProjectDictionaryItem, ProjectTaskStatus, ProjectsApiService,
+  TaskStatusCategory,
 } from '../../../core/services/projects-api.service';
 
 const DEFAULT_COLOR = '#6B7280';
 
 /**
- * Editor of one task dictionary (statuses, types or priorities). Every change
- * is saved at once; the API answers with the whole configuration, which is
- * passed up so sibling editors stay in sync.
+ * Editor of one tenant dictionary: task statuses, types, priorities or cost
+ * categories (the only one without a colour). Every change is saved at once;
+ * the API answers with the whole configuration, which is passed up so sibling
+ * editors stay in sync.
  */
 @Component({
   selector: 'wt-project-dictionary-editor',
@@ -29,7 +31,9 @@ const DEFAULT_COLOR = '#6B7280';
               <button class="order-btn" [disabled]="isFirst" (click)="move(index, -1)" [title]="t('settings.dictionary.moveUp')">▲</button>
               <button class="order-btn" [disabled]="isLast" (click)="move(index, 1)" [title]="t('settings.dictionary.moveDown')">▼</button>
             </div>
-            <input type="color" class="color" [ngModel]="item.color" (change)="update(item, { color: colorOf($event) })">
+            @if (hasColor()) {
+              <input type="color" class="color" [ngModel]="storedColorOf(item)" (change)="update(item, { color: colorOf($event) })">
+            }
             <input class="fi name" [ngModel]="item.name" maxlength="80" (change)="rename(item, $event)">
             @if (hasCategory()) {
               <select class="fsel category" [ngModel]="categoryOf(item)" (ngModelChange)="update(item, { category: $event })">
@@ -46,7 +50,7 @@ const DEFAULT_COLOR = '#6B7280';
       </div>
 
       <div class="row add">
-        <input type="color" class="color" [(ngModel)]="newColor">
+        @if (hasColor()) { <input type="color" class="color" [(ngModel)]="newColor"> }
         <input class="fi name" [(ngModel)]="newName" maxlength="80" [placeholder]="t('settings.dictionary.newItemPlaceholder')" (keyup.enter)="add()">
         @if (hasCategory()) {
           <select class="fsel category" [(ngModel)]="newCategory">
@@ -80,25 +84,30 @@ export class ProjectDictionaryEditorComponent {
   private readonly transloco = inject(TranslocoService);
 
   readonly dictionary = input.required<ProjectDictionary>();
-  readonly items = input.required<ProjectDictionaryItem[]>();
+  readonly items = input.required<ProjectDictionaryEntry[]>();
   readonly configChanged = output<ProjectConfig>();
 
   readonly categories: TaskStatusCategory[] = ['todo', 'in_progress', 'done'];
   readonly hasCategory = computed(() => this.dictionary() === 'statuses');
+  readonly hasColor = computed(() => this.dictionary() !== 'cost-categories');
 
   newName = '';
   newColor = DEFAULT_COLOR;
   newCategory: TaskStatusCategory = 'todo';
 
-  categoryOf(item: ProjectDictionaryItem): TaskStatusCategory {
+  categoryOf(item: ProjectDictionaryEntry): TaskStatusCategory {
     return (item as ProjectTaskStatus).category;
+  }
+
+  storedColorOf(item: ProjectDictionaryEntry): string {
+    return (item as ProjectDictionaryItem).color;
   }
 
   colorOf(event: Event): string {
     return (event.target as HTMLInputElement).value;
   }
 
-  rename(item: ProjectDictionaryItem, event: Event): void {
+  rename(item: ProjectDictionaryEntry, event: Event): void {
     const input = event.target as HTMLInputElement;
     const name = input.value.trim();
     if (!name) {
@@ -108,7 +117,7 @@ export class ProjectDictionaryEditorComponent {
     if (name !== item.name) this.update(item, { name });
   }
 
-  update(item: ProjectDictionaryItem, changes: { name?: string; color?: string; category?: TaskStatusCategory; is_active?: boolean }): void {
+  update(item: ProjectDictionaryEntry, changes: { name?: string; color?: string; category?: TaskStatusCategory; is_active?: boolean }): void {
     this.save(this.api.updateDictionaryItem(this.dictionary(), item.id, changes));
   }
 
@@ -121,9 +130,11 @@ export class ProjectDictionaryEditorComponent {
   add(): void {
     const name = this.newName.trim();
     if (!name) return;
-    const payload = this.hasCategory()
-      ? { name, color: this.newColor, category: this.newCategory }
-      : { name, color: this.newColor };
+    const payload = {
+      name,
+      ...(this.hasColor() ? { color: this.newColor } : {}),
+      ...(this.hasCategory() ? { category: this.newCategory } : {}),
+    };
     this.save(this.api.createDictionaryItem(this.dictionary(), payload), () => {
       this.newName = '';
       this.newColor = DEFAULT_COLOR;

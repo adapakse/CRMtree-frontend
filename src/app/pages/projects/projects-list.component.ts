@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../core/services/toast.service';
 import { ProjectListItem, ProjectStatusFilter, ProjectsApiService } from '../../core/services/projects-api.service';
+import { ProjectFinanceTotalsComponent } from '../../shared/components/project-finance-totals/project-finance-totals.component';
 import { ProjectMyTasksComponent } from './project-my-tasks.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 
@@ -16,7 +17,7 @@ const STATUS_FILTERS: { value: ProjectStatusFilter; labelKey: string }[] = [
 @Component({
   selector: 'wt-projects-list',
   standalone: true,
-  imports: [FormsModule, ProjectMyTasksComponent, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, ProjectFinanceTotalsComponent, ProjectMyTasksComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -67,6 +68,7 @@ const STATUS_FILTERS: { value: ProjectStatusFilter; labelKey: string }[] = [
                     <span class="mine"><strong>{{ project.my_open_task_count }}</strong> {{ t('list.stats.myOpenTasks', { count: project.my_open_task_count }) }}</span>
                   }
                 </div>
+                @if (project.finance; as totals) { <wt-project-finance-totals class="project-finance" [totals]="totals" /> }
               </button>
             }
           </div>
@@ -115,6 +117,7 @@ const STATUS_FILTERS: { value: ProjectStatusFilter; labelKey: string }[] = [
     .project-description { font-size:12.5px; color:var(--gray-500); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .project-stats { display:flex; gap:14px; font-size:12px; color:var(--gray-500); margin-top:auto; }
     .project-stats .mine strong { color:var(--orange); }
+    .project-finance { padding-top:8px; border-top:1px solid var(--gray-100); }
     .pill.role { background:var(--orange-pale); color:var(--orange-dark); }
     .pill.closed { background:var(--gray-100); color:var(--gray-500); }
     .hint { font-size:11.5px; color:var(--gray-400); }

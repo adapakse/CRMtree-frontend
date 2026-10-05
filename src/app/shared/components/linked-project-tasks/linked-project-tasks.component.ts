@@ -4,18 +4,20 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { LinkedProject, ProjectTaskSummary, ProjectsApiService } from '../../../core/services/projects-api.service';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 import { AddToCalendarComponent } from '../add-to-calendar/add-to-calendar.component';
+import { ProjectFinanceTotalsComponent } from '../project-finance-totals/project-finance-totals.component';
 import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-export.util';
 
 /**
  * Read-only list of the projects linked to a lead or a partner, with their
  * tasks. Shown to everyone who can open the card — also to people who are not
- * members of the project. Clicking a task opens it in the Projects module;
- * the back button there returns to this card.
+ * members of the project, and that deliberately includes the finance totals
+ * of each project. Clicking a task opens it in the Projects module; the back
+ * button there returns to this card.
  */
 @Component({
   selector: 'wt-linked-project-tasks',
   standalone: true,
-  imports: [AddToCalendarComponent, TranslocoDirective],
+  imports: [AddToCalendarComponent, ProjectFinanceTotalsComponent, TranslocoDirective],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -32,6 +34,7 @@ import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-ex
                 @if (project.status === 'closed') { <span class="closed">{{ t('linked.closedBadge') }}</span> }
                 <span class="count">{{ t('linked.openOfTotal', { open: openTaskCount(project), total: project.tasks.length }) }}</span>
               </button>
+              @if (project.finance; as totals) { <wt-project-finance-totals class="finance" [totals]="totals" /> }
               @if (project.status === 'open' || expandedClosedProjectId() === project.id) {
                 @for (task of project.tasks; track task.id) {
                   <div class="task" [class.done]="task.status_category === 'done'" [class.locked]="!project.can_open"
@@ -69,6 +72,7 @@ import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-ex
     .name { font-size:13px; font-weight:700; color:#111827; flex:1; }
     .closed { font-size:11px; color:#6b7280; background:#f3f4f6; border-radius:10px; padding:1px 8px; }
     .count { font-size:11.5px; color:#6b7280; }
+    .finance { padding:7px 14px; border-top:1px solid #f3f4f6; }
     .task { display:grid; grid-template-columns:70px 1fr auto 150px 92px auto; align-items:center; gap:10px; padding:7px 14px; border-top:1px solid #f3f4f6; font-size:12.5px; cursor:pointer; }
     .task:hover { background:#f9fafb; }
     .locked { cursor:default !important; }

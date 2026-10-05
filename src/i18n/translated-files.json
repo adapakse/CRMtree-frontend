@@ -68,5 +68,18 @@
   "src/app/pages/crm/gmail-callback/gmail-callback.component.ts",
   "src/app/pages/crm/outlook-callback/outlook-callback.component.ts",
   "src/app/pages/crm/zoho-callback/zoho-callback.component.ts",
-  "src/app/shared/components/test-environment-banner/test-environment-banner.component.ts"
+  "src/app/shared/components/test-environment-banner/test-environment-banner.component.ts",
+  "src/app/core/services/project-finance-api.service.ts",
+  "src/app/core/services/project-finance-format.service.ts",
+  "src/app/pages/projects/project-cost-form.component.ts",
+  "src/app/pages/projects/project-finance-categories.component.ts",
+  "src/app/pages/projects/project-finance-costs.component.ts",
+  "src/app/pages/projects/project-finance-plan.component.ts",
+  "src/app/pages/projects/project-finance-revenues.component.ts",
+  "src/app/pages/projects/project-finance-summary.component.ts",
+  "src/app/pages/projects/project-finance-task-costs.component.ts",
+  "src/app/pages/projects/project-finance.component.ts",
+  "src/app/pages/projects/project-finance.styles.ts",
+  "src/app/pages/projects/project-task-costs.component.ts",
+  "src/app/shared/components/project-finance-totals/project-finance-totals.component.ts"
 ]

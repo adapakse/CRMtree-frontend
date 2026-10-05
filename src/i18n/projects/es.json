@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Ficha del proyecto",
       "chat": "Chat",
+      "finance": "Finanzas",
       "tasks": "Tareas ({count})",
       "timeline": "Cronograma"
     },
     "tasksLoadFailed": "No se pudieron cargar las tareas"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Presupuesto de la categoría {name}",
+      "columns": {
+        "budget": "Presupuesto",
+        "category": "Categoría",
+        "incurred": "Incurrido",
+        "planned": "Planificado",
+        "variance": "Desviación"
+      },
+      "empty": "No hay categorías de costes. El administrador las añade en Configuración → Proyectos → Categorías de costes.",
+      "hint": "La desviación es el presupuesto menos los costes incurridos. Las filas con el presupuesto superado aparecen resaltadas.",
+      "inactive": "(inactiva)",
+      "saveFailed": "No se pudo guardar el presupuesto",
+      "title": "Presupuesto por categoría",
+      "total": "Total"
+    },
+    "costForm": {
+      "addTitle": "Nuevo coste",
+      "amount": "Importe",
+      "category": "Categoría",
+      "conversionHint": "El importe se convertirá a {currency} al tipo de cambio medio del NBP (Banco Nacional de Polonia) del día hábil anterior a la fecha del coste.",
+      "currency": "Moneda del importe",
+      "date": "Fecha",
+      "description": "Descripción",
+      "documentNumber": "Número de documento",
+      "editTitle": "Editar coste",
+      "noTask": "— sin tarea —",
+      "saveFailed": "No se pudo guardar el coste",
+      "saved": "Coste guardado",
+      "savedWithRate": "Coste guardado: {amount} al tipo de cambio {rate} del {date}",
+      "selectCategory": "— elige una categoría —",
+      "status": "Estado",
+      "storedConversion": "Guardado como {amount} (tipo de cambio {rate} del {date}).",
+      "supplier": "Proveedor",
+      "task": "Tarea"
+    },
+    "costStatuses": {
+      "incurred": "Incurrido",
+      "planned": "Planificado"
+    },
+    "costs": {
+      "add": "Añadir coste",
+      "columns": {
+        "amount": "Importe",
+        "category": "Categoría",
+        "date": "Fecha",
+        "description": "Descripción",
+        "documentNumber": "N.º de documento",
+        "status": "Estado",
+        "supplier": "Proveedor",
+        "task": "Tarea"
+      },
+      "deleteConfirm": "¿Eliminar el coste ({item})?",
+      "deleteFailed": "No se pudo eliminar el coste",
+      "empty": "El proyecto aún no tiene costes.",
+      "emptyForFilters": "No hay costes para los filtros seleccionados.",
+      "filters": {
+        "allCategories": "Todas las categorías",
+        "allStatuses": "Todos los estados",
+        "allTasks": "Todas las tareas",
+        "withoutTask": "Sin tarea"
+      },
+      "rateNote": "tipo de cambio {rate} del {date}",
+      "title": "Costes",
+      "totalIncurred": "Total incurrido"
+    },
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loadFailed": "No se pudieron cargar las finanzas del proyecto",
+    "plan": {
+      "currency": "Moneda del proyecto",
+      "currencyLockedHint": "La moneda no se puede cambiar porque el proyecto ya tiene partidas de costes o de ingresos.",
+      "participantsCanAddCosts": "Los participantes pueden añadir costes a sus tareas",
+      "participantsCanAddCostsHint": "El participante interno añade costes solo en las tareas a las que está asignado y ve únicamente las partidas que él mismo ha añadido.",
+      "plannedRevenue": "Ingresos planificados ({currency})",
+      "saveFailed": "No se pudo guardar el plan",
+      "suggestedHint": "La sugerencia es el valor del lead vinculado convertido a la moneda del proyecto.",
+      "title": "Plan financiero",
+      "useSuggested": "Usar el sugerido: {amount}"
+    },
+    "readOnlyNote": "Solo lectura: puedes consultar las finanzas de este proyecto, pero no modificarlas.",
+    "revenueStatuses": {
+      "invoiced": "Facturado",
+      "paid": "Cobrado",
+      "planned": "Planificado"
+    },
+    "revenues": {
+      "add": "Añadir ingreso",
+      "addTitle": "Nuevo ingreso",
+      "amountIn": "Importe ({currency})",
+      "columns": {
+        "amount": "Importe",
+        "date": "Fecha",
+        "description": "Descripción",
+        "status": "Estado"
+      },
+      "deleteConfirm": "¿Eliminar el ingreso ({item})?",
+      "deleteFailed": "No se pudo eliminar el ingreso",
+      "editTitle": "Editar ingreso",
+      "empty": "El proyecto aún no tiene ingresos.",
+      "saveFailed": "No se pudo guardar el ingreso",
+      "saved": "Ingreso guardado",
+      "statusHint": "En los ingresos reales cuentan las partidas facturadas y cobradas.",
+      "title": "Ingresos"
+    },
+    "saving": "Guardando…",
+    "summary": {
+      "budget": "Presupuesto",
+      "cost": "Coste (incurrido)",
+      "margin": "Margen (real)",
+      "plan": "Plan",
+      "plannedItems": "Partidas planificadas",
+      "remainingBudget": "Presupuesto restante",
+      "remainingBudgetHint": "Presupuesto menos costes incurridos",
+      "revenue": "Ingresos (reales)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Incurrido (propio)",
+        "plannedCost": "Coste planificado",
+        "task": "Tarea",
+        "totalIncurred": "Incurrido incl. subtareas",
+        "totalPlanned": "Planificado incl. subtareas"
+      },
+      "empty": "Ninguna tarea tiene aún costes ni coste planificado.",
+      "hint": "El coste planificado de una tarea es informativo y no se incluye en el presupuesto del proyecto. Los importes «incl. subtareas» abarcan las partidas de la tarea y de todas sus subtareas.",
+      "plannedCostOf": "Coste planificado de la tarea {task}",
+      "saveFailed": "No se pudo guardar el coste planificado",
+      "title": "Costes de las tareas",
+      "total": "Total"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Real / plan",
+      "cost": "Coste",
+      "margin": "Margen",
+      "marginHint": "Margen real: ingresos facturados y cobrados menos costes incurridos",
+      "revenue": "Ingresos"
+    }
   },
   "gantt": {
     "emptyTitle": "Sin tareas",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Conversación sobre la tarea",
+    "costs": {
+      "add": "Añadir coste",
+      "empty": "La tarea aún no tiene costes.",
+      "loadFailed": "No se pudieron cargar los costes de la tarea",
+      "ownOnlyHint": "Solo ves los costes que tú has añadido.",
+      "title": "Costes",
+      "totalIncurred": "Total incurrido"
+    },
     "createTask": "Crear tarea",
     "created": "Tarea creada",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Guardando…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "Las categorías no se pueden eliminar: desactiva la que no uses. Una categoría desactivada no se puede elegir en un coste nuevo, y las partidas existentes la conservan.",
+      "title": "Categorías de costes"
+    },
     "dictionary": {
       "active": "activo",
       "addButton": "Añadir",
@@ -272,6 +425,13 @@
       "optionsRequired": "La lista debe tener al menos un valor",
       "saveFailed": "No se pudo guardar el campo",
       "title": "Campos adicionales de tareas"
+    },
+    "finance": {
+      "disableConfirm": "¿Desactivar las finanzas de proyectos? Los datos se conservarán, pero desaparecerán de la vista de todos los usuarios.",
+      "hint": "Una vez activadas, el PM y el administrador gestionan en el proyecto el presupuesto, los costes y los ingresos, y el revisor puede consultarlos. El resumen de las finanzas del proyecto también lo ve cualquier persona con acceso a la ficha del lead o del partner vinculado.",
+      "saveFailed": "No se pudo cambiar el ajuste de finanzas",
+      "title": "Finanzas de proyectos",
+      "toggle": "Activar las finanzas de proyectos"
     },
     "loadFailed": "No se pudo cargar la configuración de proyectos",
     "priorities": {

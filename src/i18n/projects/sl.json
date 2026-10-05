@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Kartica projekta",
       "chat": "Klepet",
+      "finance": "Finance",
       "tasks": "Naloge ({count})",
       "timeline": "Časovnica"
     },
     "tasksLoadFailed": "Nalog ni bilo mogoče naložiti"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Proračun kategorije {name}",
+      "columns": {
+        "budget": "Proračun",
+        "category": "Kategorija",
+        "incurred": "Nastalo",
+        "planned": "Načrtovano",
+        "variance": "Odstopanje"
+      },
+      "empty": "Ni kategorij stroškov. Skrbnik jih doda v Nastavitve → Projekti → Kategorije stroškov.",
+      "hint": "Odstopanje je proračun minus nastali stroški. Vrstice s preseženim proračunom so označene.",
+      "inactive": "(neaktivna)",
+      "saveFailed": "Proračuna ni bilo mogoče shraniti",
+      "title": "Proračun po kategorijah",
+      "total": "Skupaj"
+    },
+    "costForm": {
+      "addTitle": "Nov strošek",
+      "amount": "Znesek",
+      "category": "Kategorija",
+      "conversionHint": "Znesek bo preračunan v {currency} po srednjem tečaju NBP (Narodne banke Poljske) z delovnega dne pred datumom stroška.",
+      "currency": "Valuta zneska",
+      "date": "Datum",
+      "description": "Opis",
+      "documentNumber": "Številka dokumenta",
+      "editTitle": "Urejanje stroška",
+      "noTask": "— brez naloge —",
+      "saveFailed": "Stroška ni bilo mogoče shraniti",
+      "saved": "Strošek shranjen",
+      "savedWithRate": "Strošek shranjen: {amount} po tečaju {rate} z dne {date}",
+      "selectCategory": "— izberite kategorijo —",
+      "status": "Status",
+      "storedConversion": "Shranjeno kot {amount} (tečaj {rate} z dne {date}).",
+      "supplier": "Dobavitelj",
+      "task": "Naloga"
+    },
+    "costStatuses": {
+      "incurred": "Nastal",
+      "planned": "Načrtovan"
+    },
+    "costs": {
+      "add": "Dodaj strošek",
+      "columns": {
+        "amount": "Znesek",
+        "category": "Kategorija",
+        "date": "Datum",
+        "description": "Opis",
+        "documentNumber": "Št. dokumenta",
+        "status": "Status",
+        "supplier": "Dobavitelj",
+        "task": "Naloga"
+      },
+      "deleteConfirm": "Želite izbrisati strošek ({item})?",
+      "deleteFailed": "Stroška ni bilo mogoče izbrisati",
+      "empty": "Projekt še nima stroškov.",
+      "emptyForFilters": "Za izbrane filtre ni stroškov.",
+      "filters": {
+        "allCategories": "Vse kategorije",
+        "allStatuses": "Vsi statusi",
+        "allTasks": "Vse naloge",
+        "withoutTask": "Brez naloge"
+      },
+      "rateNote": "tečaj {rate} z dne {date}",
+      "title": "Stroški",
+      "totalIncurred": "Skupaj nastalo"
+    },
+    "delete": "Izbriši",
+    "edit": "Uredi",
+    "loadFailed": "Financ projekta ni bilo mogoče naložiti",
+    "plan": {
+      "currency": "Valuta projekta",
+      "currencyLockedHint": "Valute ni mogoče spremeniti, ker projekt že ima postavke stroškov ali prihodkov.",
+      "participantsCanAddCosts": "Udeleženci lahko dodajajo stroške svojim nalogam",
+      "participantsCanAddCostsHint": "Notranji udeleženec dodaja stroške samo v nalogah, ki so mu dodeljene, in vidi izključno postavke, ki jih je dodal sam.",
+      "plannedRevenue": "Načrtovani prihodek ({currency})",
+      "saveFailed": "Načrta ni bilo mogoče shraniti",
+      "suggestedHint": "Predlog je vrednost povezanega leada, preračunana v valuto projekta.",
+      "title": "Finančni načrt",
+      "useSuggested": "Uporabi predlagano: {amount}"
+    },
+    "readOnlyNote": "Samo predogled — finance tega projekta si lahko ogledate, ne morete pa jih spreminjati.",
+    "revenueStatuses": {
+      "invoiced": "Fakturiran",
+      "paid": "Plačan",
+      "planned": "Načrtovan"
+    },
+    "revenues": {
+      "add": "Dodaj prihodek",
+      "addTitle": "Nov prihodek",
+      "amountIn": "Znesek ({currency})",
+      "columns": {
+        "amount": "Znesek",
+        "date": "Datum",
+        "description": "Opis",
+        "status": "Status"
+      },
+      "deleteConfirm": "Želite izbrisati prihodek ({item})?",
+      "deleteFailed": "Prihodka ni bilo mogoče izbrisati",
+      "editTitle": "Urejanje prihodka",
+      "empty": "Projekt še nima prihodkov.",
+      "saveFailed": "Prihodka ni bilo mogoče shraniti",
+      "saved": "Prihodek shranjen",
+      "statusHint": "V prihodek po realizaciji se štejejo fakturirane in plačane postavke.",
+      "title": "Prihodki"
+    },
+    "saving": "Shranjevanje…",
+    "summary": {
+      "budget": "Proračun",
+      "cost": "Strošek (nastali)",
+      "margin": "Marža (realizacija)",
+      "plan": "Načrt",
+      "plannedItems": "Načrtovane postavke",
+      "remainingBudget": "Preostali proračun",
+      "remainingBudgetHint": "Proračun minus nastali stroški",
+      "revenue": "Prihodek (realizacija)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Nastalo (lastno)",
+        "plannedCost": "Načrtovani strošek",
+        "task": "Naloga",
+        "totalIncurred": "Nastalo s podnalogami",
+        "totalPlanned": "Načrtovano s podnalogami"
+      },
+      "empty": "Nobena naloga še nima stroškov ali načrtovanega stroška.",
+      "hint": "Načrtovani strošek naloge je informativen in se ne všteva v proračun projekta. Zneski „s podnalogami“ zajemajo postavke naloge in vseh njenih podnalog.",
+      "plannedCostOf": "Načrtovani strošek naloge {task}",
+      "saveFailed": "Načrtovanega stroška ni bilo mogoče shraniti",
+      "title": "Stroški nalog",
+      "total": "Skupaj"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Realizacija / načrt",
+      "cost": "Strošek",
+      "margin": "Marža",
+      "marginHint": "Marža po realizaciji: fakturirani in plačani prihodek minus nastali stroški",
+      "revenue": "Prihodek"
+    }
   },
   "gantt": {
     "emptyTitle": "Ni nalog",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Pogovor o nalogi",
+    "costs": {
+      "add": "Dodaj strošek",
+      "empty": "Naloga še nima stroškov.",
+      "loadFailed": "Stroškov naloge ni bilo mogoče naložiti",
+      "ownOnlyHint": "Vidite samo stroške, ki ste jih dodali sami.",
+      "title": "Stroški",
+      "totalIncurred": "Skupaj nastalo"
+    },
     "createTask": "Ustvari nalogo",
     "created": "Naloga ustvarjena",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Shranjevanje…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "Kategorije ni mogoče izbrisati — neuporabljeno izklopite. Izklopljene kategorije ni mogoče izbrati pri novem strošku, obstoječe postavke pa jo ohranijo.",
+      "title": "Kategorije stroškov"
+    },
     "dictionary": {
       "active": "aktivno",
       "addButton": "Dodaj",
@@ -272,6 +425,13 @@
       "optionsRequired": "Seznam mora imeti vsaj eno vrednost",
       "saveFailed": "Polja ni bilo mogoče shraniti",
       "title": "Dodatna polja nalog"
+    },
+    "finance": {
+      "disableConfirm": "Želite izklopiti finance projektov? Podatki bodo ohranjeni, vendar bodo izginili iz pogleda vseh uporabnikov.",
+      "hint": "Po vklopu PM in skrbnik v projektu vodita proračun, stroške in prihodke, pregledovalec pa ima vpogled vanje. Povzetek financ projekta vidi tudi vsak, ki ima dostop do kartice povezanega leada ali partnerja.",
+      "saveFailed": "Nastavitve financ ni bilo mogoče spremeniti",
+      "title": "Finance projektov",
+      "toggle": "Vklopi finance projektov"
     },
     "loadFailed": "Konfiguracije projektov ni bilo mogoče naložiti",
     "priorities": {

@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Karta projektu",
       "chat": "Czat",
+      "finance": "Finanse",
       "tasks": "Zadania ({count})",
       "timeline": "Oś czasu"
     },
     "tasksLoadFailed": "Nie udało się pobrać zadań"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Budżet kategorii {name}",
+      "columns": {
+        "budget": "Budżet",
+        "category": "Kategoria",
+        "incurred": "Poniesione",
+        "planned": "Planowane",
+        "variance": "Odchylenie"
+      },
+      "empty": "Brak kategorii kosztów. Administrator dodaje je w Ustawienia → Projekty → Kategorie kosztów.",
+      "hint": "Odchylenie to budżet minus koszty poniesione. Wiersze z przekroczonym budżetem są wyróżnione.",
+      "inactive": "(nieaktywna)",
+      "saveFailed": "Nie udało się zapisać budżetu",
+      "title": "Budżet według kategorii",
+      "total": "Razem"
+    },
+    "costForm": {
+      "addTitle": "Nowy koszt",
+      "amount": "Kwota",
+      "category": "Kategoria",
+      "conversionHint": "Kwota zostanie przeliczona na {currency} po kursie średnim NBP z dnia roboczego poprzedzającego datę kosztu.",
+      "currency": "Waluta kwoty",
+      "date": "Data",
+      "description": "Opis",
+      "documentNumber": "Numer dokumentu",
+      "editTitle": "Edycja kosztu",
+      "noTask": "— bez zadania —",
+      "saveFailed": "Nie udało się zapisać kosztu",
+      "saved": "Koszt zapisany",
+      "savedWithRate": "Koszt zapisany: {amount} po kursie {rate} z {date}",
+      "selectCategory": "— wybierz kategorię —",
+      "status": "Status",
+      "storedConversion": "Zapisano jako {amount} (kurs {rate} z {date}).",
+      "supplier": "Dostawca",
+      "task": "Zadanie"
+    },
+    "costStatuses": {
+      "incurred": "Poniesiony",
+      "planned": "Planowany"
+    },
+    "costs": {
+      "add": "Dodaj koszt",
+      "columns": {
+        "amount": "Kwota",
+        "category": "Kategoria",
+        "date": "Data",
+        "description": "Opis",
+        "documentNumber": "Nr dokumentu",
+        "status": "Status",
+        "supplier": "Dostawca",
+        "task": "Zadanie"
+      },
+      "deleteConfirm": "Usunąć koszt ({item})?",
+      "deleteFailed": "Nie udało się usunąć kosztu",
+      "empty": "Projekt nie ma jeszcze kosztów.",
+      "emptyForFilters": "Brak kosztów dla wybranych filtrów.",
+      "filters": {
+        "allCategories": "Wszystkie kategorie",
+        "allStatuses": "Wszystkie statusy",
+        "allTasks": "Wszystkie zadania",
+        "withoutTask": "Bez zadania"
+      },
+      "rateNote": "kurs {rate} z {date}",
+      "title": "Koszty",
+      "totalIncurred": "Razem poniesione"
+    },
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "loadFailed": "Nie udało się pobrać finansów projektu",
+    "plan": {
+      "currency": "Waluta projektu",
+      "currencyLockedHint": "Waluty nie można zmienić, bo projekt ma już pozycje kosztów lub przychodów.",
+      "participantsCanAddCosts": "Uczestnicy mogą dodawać koszty do swoich zadań",
+      "participantsCanAddCostsHint": "Uczestnik wewnętrzny dodaje koszty tylko w zadaniach, do których jest przypisany, i widzi wyłącznie pozycje dodane przez siebie.",
+      "plannedRevenue": "Planowany przychód ({currency})",
+      "saveFailed": "Nie udało się zapisać planu",
+      "suggestedHint": "Sugestia to wartość powiązanego leada przeliczona na walutę projektu.",
+      "title": "Plan finansowy",
+      "useSuggested": "Użyj sugerowanej: {amount}"
+    },
+    "readOnlyNote": "Tylko podgląd — finanse tego projektu możesz przeglądać, ale nie możesz ich zmieniać.",
+    "revenueStatuses": {
+      "invoiced": "Zafakturowany",
+      "paid": "Opłacony",
+      "planned": "Planowany"
+    },
+    "revenues": {
+      "add": "Dodaj przychód",
+      "addTitle": "Nowy przychód",
+      "amountIn": "Kwota ({currency})",
+      "columns": {
+        "amount": "Kwota",
+        "date": "Data",
+        "description": "Opis",
+        "status": "Status"
+      },
+      "deleteConfirm": "Usunąć przychód ({item})?",
+      "deleteFailed": "Nie udało się usunąć przychodu",
+      "editTitle": "Edycja przychodu",
+      "empty": "Projekt nie ma jeszcze przychodów.",
+      "saveFailed": "Nie udało się zapisać przychodu",
+      "saved": "Przychód zapisany",
+      "statusHint": "Do przychodu wykonanego liczą się pozycje zafakturowane i opłacone.",
+      "title": "Przychody"
+    },
+    "saving": "Zapisywanie…",
+    "summary": {
+      "budget": "Budżet",
+      "cost": "Koszt (poniesiony)",
+      "margin": "Marża (wykonanie)",
+      "plan": "Plan",
+      "plannedItems": "Pozycje planowane",
+      "remainingBudget": "Pozostały budżet",
+      "remainingBudgetHint": "Budżet minus koszty poniesione",
+      "revenue": "Przychód (wykonanie)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Poniesione (własne)",
+        "plannedCost": "Koszt planowany",
+        "task": "Zadanie",
+        "totalIncurred": "Poniesione z podzadaniami",
+        "totalPlanned": "Planowane z podzadaniami"
+      },
+      "empty": "Żadne zadanie nie ma jeszcze kosztów ani kosztu planowanego.",
+      "hint": "Koszt planowany zadania jest informacyjny i nie wlicza się do budżetu projektu. Kwoty „z podzadaniami” obejmują pozycje zadania i wszystkich jego podzadań.",
+      "plannedCostOf": "Koszt planowany zadania {task}",
+      "saveFailed": "Nie udało się zapisać kosztu planowanego",
+      "title": "Koszty zadań",
+      "total": "Razem"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Wykonanie / plan",
+      "cost": "Koszt",
+      "margin": "Marża",
+      "marginHint": "Marża z wykonania: przychód zafakturowany i opłacony minus koszty poniesione",
+      "revenue": "Przychód"
+    }
   },
   "gantt": {
     "emptyTitle": "Brak zadań",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Rozmowa o zadaniu",
+    "costs": {
+      "add": "Dodaj koszt",
+      "empty": "Zadanie nie ma jeszcze kosztów.",
+      "loadFailed": "Nie udało się pobrać kosztów zadania",
+      "ownOnlyHint": "Widzisz tylko koszty dodane przez siebie.",
+      "title": "Koszty",
+      "totalIncurred": "Razem poniesione"
+    },
     "createTask": "Utwórz zadanie",
     "created": "Zadanie utworzone",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Zapisywanie…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "Kategorii nie można usunąć — nieużywaną wyłącz. Wyłączonej kategorii nie da się wybrać w nowym koszcie, a istniejące pozycje ją zachowują.",
+      "title": "Kategorie kosztów"
+    },
     "dictionary": {
       "active": "aktywny",
       "addButton": "Dodaj",
@@ -272,6 +425,13 @@
       "optionsRequired": "Lista musi mieć co najmniej jedną wartość",
       "saveFailed": "Nie udało się zapisać pola",
       "title": "Pola dodatkowe zadań"
+    },
+    "finance": {
+      "disableConfirm": "Wyłączyć finanse projektów? Dane zostaną zachowane, ale znikną z widoku wszystkich użytkowników.",
+      "hint": "Po włączeniu PM i administrator prowadzą w projekcie budżet, koszty i przychody, a kontroler ma do nich podgląd. Podsumowanie finansów projektu widzi też każdy, kto ma dostęp do karty powiązanego leada lub partnera.",
+      "saveFailed": "Nie udało się zmienić ustawienia finansów",
+      "title": "Finanse projektów",
+      "toggle": "Włącz finanse projektów"
     },
     "loadFailed": "Nie udało się pobrać konfiguracji projektów",
     "priorities": {

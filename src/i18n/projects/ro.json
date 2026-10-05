@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Fișa proiectului",
       "chat": "Chat",
+      "finance": "Finanțe",
       "tasks": "Sarcini ({count})",
       "timeline": "Cronologie"
     },
     "tasksLoadFailed": "Sarcinile nu au putut fi încărcate"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Bugetul categoriei {name}",
+      "columns": {
+        "budget": "Buget",
+        "category": "Categorie",
+        "incurred": "Suportate",
+        "planned": "Planificate",
+        "variance": "Abatere"
+      },
+      "empty": "Nu există categorii de costuri. Administratorul le adaugă în Setări → Proiecte → Categorii de costuri.",
+      "hint": "Abaterea este bugetul minus costurile suportate. Rândurile cu bugetul depășit sunt evidențiate.",
+      "inactive": "(inactivă)",
+      "saveFailed": "Bugetul nu a putut fi salvat",
+      "title": "Buget pe categorii",
+      "total": "Total"
+    },
+    "costForm": {
+      "addTitle": "Cost nou",
+      "amount": "Sumă",
+      "category": "Categorie",
+      "conversionHint": "Suma va fi convertită în {currency} la cursul mediu NBP (Banca Națională a Poloniei) din ziua lucrătoare anterioară datei costului.",
+      "currency": "Moneda sumei",
+      "date": "Dată",
+      "description": "Descriere",
+      "documentNumber": "Numărul documentului",
+      "editTitle": "Editare cost",
+      "noTask": "— fără sarcină —",
+      "saveFailed": "Costul nu a putut fi salvat",
+      "saved": "Cost salvat",
+      "savedWithRate": "Cost salvat: {amount} la cursul {rate} din {date}",
+      "selectCategory": "— selectați categoria —",
+      "status": "Status",
+      "storedConversion": "Salvat ca {amount} (curs {rate} din {date}).",
+      "supplier": "Furnizor",
+      "task": "Sarcină"
+    },
+    "costStatuses": {
+      "incurred": "Suportat",
+      "planned": "Planificat"
+    },
+    "costs": {
+      "add": "Adăugare cost",
+      "columns": {
+        "amount": "Sumă",
+        "category": "Categorie",
+        "date": "Dată",
+        "description": "Descriere",
+        "documentNumber": "Nr. document",
+        "status": "Status",
+        "supplier": "Furnizor",
+        "task": "Sarcină"
+      },
+      "deleteConfirm": "Ștergeți costul ({item})?",
+      "deleteFailed": "Costul nu a putut fi șters",
+      "empty": "Proiectul nu are încă costuri.",
+      "emptyForFilters": "Niciun cost pentru filtrele selectate.",
+      "filters": {
+        "allCategories": "Toate categoriile",
+        "allStatuses": "Toate statusurile",
+        "allTasks": "Toate sarcinile",
+        "withoutTask": "Fără sarcină"
+      },
+      "rateNote": "curs {rate} din {date}",
+      "title": "Costuri",
+      "totalIncurred": "Total suportate"
+    },
+    "delete": "Ștergere",
+    "edit": "Editare",
+    "loadFailed": "Finanțele proiectului nu au putut fi încărcate",
+    "plan": {
+      "currency": "Moneda proiectului",
+      "currencyLockedHint": "Moneda nu poate fi modificată, deoarece proiectul are deja poziții de costuri sau de venituri.",
+      "participantsCanAddCosts": "Participanții pot adăuga costuri la sarcinile lor",
+      "participantsCanAddCostsHint": "Participantul intern adaugă costuri doar în sarcinile care îi sunt atribuite și vede exclusiv pozițiile adăugate de el.",
+      "plannedRevenue": "Venit planificat ({currency})",
+      "saveFailed": "Planul nu a putut fi salvat",
+      "suggestedHint": "Sugestia este valoarea leadului asociat, convertită în moneda proiectului.",
+      "title": "Plan financiar",
+      "useSuggested": "Utilizare valoare sugerată: {amount}"
+    },
+    "readOnlyNote": "Doar vizualizare — puteți consulta finanțele acestui proiect, dar nu le puteți modifica.",
+    "revenueStatuses": {
+      "invoiced": "Facturat",
+      "paid": "Încasat",
+      "planned": "Planificat"
+    },
+    "revenues": {
+      "add": "Adăugare venit",
+      "addTitle": "Venit nou",
+      "amountIn": "Sumă ({currency})",
+      "columns": {
+        "amount": "Sumă",
+        "date": "Dată",
+        "description": "Descriere",
+        "status": "Status"
+      },
+      "deleteConfirm": "Ștergeți venitul ({item})?",
+      "deleteFailed": "Venitul nu a putut fi șters",
+      "editTitle": "Editare venit",
+      "empty": "Proiectul nu are încă venituri.",
+      "saveFailed": "Venitul nu a putut fi salvat",
+      "saved": "Venit salvat",
+      "statusHint": "În venitul realizat intră pozițiile facturate și încasate.",
+      "title": "Venituri"
+    },
+    "saving": "Se salvează…",
+    "summary": {
+      "budget": "Buget",
+      "cost": "Cost (suportat)",
+      "margin": "Marjă (realizat)",
+      "plan": "Plan",
+      "plannedItems": "Poziții planificate",
+      "remainingBudget": "Buget rămas",
+      "remainingBudgetHint": "Bugetul minus costurile suportate",
+      "revenue": "Venit (realizat)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Suportate (proprii)",
+        "plannedCost": "Cost planificat",
+        "task": "Sarcină",
+        "totalIncurred": "Suportate cu subsarcini",
+        "totalPlanned": "Planificate cu subsarcini"
+      },
+      "empty": "Nicio sarcină nu are încă costuri sau un cost planificat.",
+      "hint": "Costul planificat al sarcinii este informativ și nu se include în bugetul proiectului. Sumele „cu subsarcini” cuprind pozițiile sarcinii și ale tuturor subsarcinilor sale.",
+      "plannedCostOf": "Costul planificat al sarcinii {task}",
+      "saveFailed": "Costul planificat nu a putut fi salvat",
+      "title": "Costurile sarcinilor",
+      "total": "Total"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Realizat / plan",
+      "cost": "Cost",
+      "margin": "Marjă",
+      "marginHint": "Marja din realizat: venitul facturat și încasat minus costurile suportate",
+      "revenue": "Venit"
+    }
   },
   "gantt": {
     "emptyTitle": "Nicio sarcină",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Discuție despre sarcină",
+    "costs": {
+      "add": "Adăugare cost",
+      "empty": "Sarcina nu are încă costuri.",
+      "loadFailed": "Costurile sarcinii nu au putut fi încărcate",
+      "ownOnlyHint": "Vedeți doar costurile adăugate de dumneavoastră.",
+      "title": "Costuri",
+      "totalIncurred": "Total suportate"
+    },
     "createTask": "Creare sarcină",
     "created": "Sarcină creată",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Se salvează…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "O categorie nu poate fi ștearsă — dezactivați-o pe cea nefolosită. O categorie dezactivată nu poate fi selectată într-un cost nou, iar pozițiile existente o păstrează.",
+      "title": "Categorii de costuri"
+    },
     "dictionary": {
       "active": "activ",
       "addButton": "Adăugare",
@@ -272,6 +425,13 @@
       "optionsRequired": "Lista trebuie să conțină cel puțin o valoare",
       "saveFailed": "Câmpul nu a putut fi salvat",
       "title": "Câmpuri suplimentare ale sarcinilor"
+    },
+    "finance": {
+      "disableConfirm": "Dezactivați finanțele proiectelor? Datele vor fi păstrate, dar vor dispărea din vizualizarea tuturor utilizatorilor.",
+      "hint": "După activare, PM și administratorul gestionează în proiect bugetul, costurile și veniturile, iar verificatorul le poate vizualiza. Rezumatul finanțelor proiectului este vizibil și pentru oricine are acces la fișa leadului sau a partenerului asociat.",
+      "saveFailed": "Setarea finanțelor nu a putut fi modificată",
+      "title": "Finanțele proiectelor",
+      "toggle": "Activare finanțe proiecte"
     },
     "loadFailed": "Configurația proiectelor nu a putut fi încărcată",
     "priorities": {

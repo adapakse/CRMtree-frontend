@@ -2,14 +2,16 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, ou
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import {
-  MoneyValue, ProjectConfig, ProjectCustomValue, ProjectField, ProjectMember, ProjectReminderType, ProjectTask,
+  MoneyValue, ProjectConfig, ProjectCustomValue, ProjectField, ProjectFinanceAccess, ProjectMember, ProjectReminderType, ProjectTask,
   ProjectTaskDetail, ProjectTaskHistoryEntry, ProjectTaskPayload, ProjectTaskPermissions, ProjectsApiService,
 } from '../../core/services/projects-api.service';
 import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
 import { projectTaskCalendarEntry } from '../../shared/utils/calendar-export.util';
 import { ProjectChatComponent } from './project-chat.component';
+import { ProjectTaskCostsComponent } from './project-task-costs.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK'];
@@ -66,7 +68,9 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
 @Component({
   selector: 'wt-project-task-panel',
   standalone: true,
-  imports: [FormsModule, DatePipe, ProjectChatComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe],
+  imports: [
+    FormsModule, DatePipe, ProjectChatComponent, ProjectTaskCostsComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe,
+  ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -233,6 +237,12 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                 }
               }
 
+              @if (costsAccess(); as financeAccess) {
+                <wt-project-task-costs
+                  [projectId]="projectId()" [projectKey]="projectKey()" [taskId]="taskId()!" [access]="financeAccess"
+                  [categories]="config().cost_categories" [tasks]="tasks()" (costsChanged)="costsChanged.emit()" />
+              }
+
               @if (taskId(); as existingTaskId) {
                 <div class="sec-title">{{ t('panel.chatTitle') }}</div>
                 <wt-project-chat [projectId]="projectId()" [taskId]="existingTaskId" [canPost]="isProjectOpen()" />
@@ -295,6 +305,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
 })
 export class ProjectTaskPanelComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
+  private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
@@ -308,11 +319,15 @@ export class ProjectTaskPanelComponent implements OnInit {
   readonly fields = input.required<ProjectField[]>();
   readonly tasks = input.required<ProjectTask[]>();
   readonly isProjectOpen = input(true);
+  /** The viewer's finance rights in this project; null hides every trace of costs. */
+  readonly finance = input<ProjectFinanceAccess | null>(null);
 
   readonly closed = output<void>();
   readonly saved = output<void>();
   /** Emitted after the PM adds a custom field to the project from this panel. */
   readonly fieldsChanged = output<void>();
+  /** Emitted after a cost item of this task was added, changed or deleted. */
+  readonly costsChanged = output<void>();
 
   readonly currencies = CURRENCIES;
   readonly reminderOptions = REMINDER_OPTIONS;
@@ -357,6 +372,18 @@ export class ProjectTaskPanelComponent implements OnInit {
       projectId: this.projectId(), projectKey: this.projectKey(), projectName: this.projectName(),
       taskId: task.id, taskNumber: task.task_number, name: task.name, endDate: task.end_date,
     });
+  });
+  // Costs are shown to finance readers on every saved task. A participant who
+  // may only add own costs gets the section just on tasks assigned to them —
+  // the API refuses their cost on any other task.
+  readonly costsAccess = computed(() => {
+    const finance = this.finance();
+    const task = this.loadedTask();
+    if (!finance || !task) return null;
+    if (finance.can_read) return finance;
+    const myId = this.auth.user()?.id;
+    const isAssignedToMe = task.assignees.some(assignee => assignee.user_id === myId);
+    return finance.can_add_own_costs && isAssignedToMe ? finance : null;
   });
   readonly canSave = computed(() => {
     const permissions = this.permissions();

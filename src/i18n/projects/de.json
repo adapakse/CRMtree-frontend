@@ -86,10 +86,151 @@
     "tabs": {
       "card": "Projektkarte",
       "chat": "Chat",
+      "finance": "Finanzen",
       "tasks": "Aufgaben ({count})",
       "timeline": "Zeitachse"
     },
     "tasksLoadFailed": "Aufgaben konnten nicht geladen werden"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Budget der Kategorie {name}",
+      "columns": {
+        "budget": "Budget",
+        "category": "Kategorie",
+        "incurred": "Angefallen",
+        "planned": "Geplant",
+        "variance": "Abweichung"
+      },
+      "empty": "Keine Kostenkategorien. Der Administrator fügt sie unter Einstellungen → Projekte → Kostenkategorien hinzu.",
+      "hint": "Die Abweichung ist das Budget minus der angefallenen Kosten. Zeilen mit überschrittenem Budget sind hervorgehoben.",
+      "inactive": "(inaktiv)",
+      "saveFailed": "Budget konnte nicht gespeichert werden",
+      "title": "Budget nach Kategorien",
+      "total": "Gesamt"
+    },
+    "costForm": {
+      "addTitle": "Neue Kosten",
+      "amount": "Betrag",
+      "category": "Kategorie",
+      "conversionHint": "Der Betrag wird zum Mittelkurs der NBP (Polnische Nationalbank) vom Geschäftstag vor dem Kostendatum in {currency} umgerechnet.",
+      "currency": "Währung des Betrags",
+      "date": "Datum",
+      "description": "Beschreibung",
+      "documentNumber": "Belegnummer",
+      "editTitle": "Kosten bearbeiten",
+      "noTask": "— ohne Aufgabe —",
+      "saveFailed": "Kosten konnten nicht gespeichert werden",
+      "saved": "Kosten gespeichert",
+      "savedWithRate": "Kosten gespeichert: {amount} zum Kurs {rate} vom {date}",
+      "selectCategory": "— Kategorie auswählen —",
+      "status": "Status",
+      "storedConversion": "Gespeichert als {amount} (Kurs {rate} vom {date}).",
+      "supplier": "Lieferant",
+      "task": "Aufgabe"
+    },
+    "costStatuses": {
+      "incurred": "Angefallen",
+      "planned": "Geplant"
+    },
+    "costs": {
+      "add": "Kosten hinzufügen",
+      "columns": {
+        "amount": "Betrag",
+        "category": "Kategorie",
+        "date": "Datum",
+        "description": "Beschreibung",
+        "documentNumber": "Beleg-Nr.",
+        "status": "Status",
+        "supplier": "Lieferant",
+        "task": "Aufgabe"
+      },
+      "deleteConfirm": "Kosten ({item}) löschen?",
+      "deleteFailed": "Kosten konnten nicht gelöscht werden",
+      "empty": "Das Projekt hat noch keine Kosten.",
+      "emptyForFilters": "Keine Kosten für die gewählten Filter.",
+      "filters": {
+        "allCategories": "Alle Kategorien",
+        "allStatuses": "Alle Status",
+        "allTasks": "Alle Aufgaben",
+        "withoutTask": "Ohne Aufgabe"
+      },
+      "rateNote": "Kurs {rate} vom {date}",
+      "title": "Kosten",
+      "totalIncurred": "Angefallen gesamt"
+    },
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loadFailed": "Projektfinanzen konnten nicht geladen werden",
+    "plan": {
+      "currency": "Projektwährung",
+      "currencyLockedHint": "Die Währung kann nicht geändert werden, da das Projekt bereits Kosten- oder Erlöspositionen hat.",
+      "participantsCanAddCosts": "Teilnehmer können Kosten zu ihren Aufgaben hinzufügen",
+      "participantsCanAddCostsHint": "Ein interner Teilnehmer fügt Kosten nur in Aufgaben hinzu, denen er zugewiesen ist, und sieht ausschließlich die von ihm selbst hinzugefügten Positionen.",
+      "plannedRevenue": "Geplanter Erlös ({currency})",
+      "saveFailed": "Plan konnte nicht gespeichert werden",
+      "suggestedHint": "Der Vorschlag ist der Wert des verknüpften Leads, umgerechnet in die Projektwährung.",
+      "title": "Finanzplan",
+      "useSuggested": "Vorschlag übernehmen: {amount}"
+    },
+    "readOnlyNote": "Nur Lesen — Sie können die Finanzen dieses Projekts einsehen, aber nicht ändern.",
+    "revenueStatuses": {
+      "invoiced": "Fakturiert",
+      "paid": "Bezahlt",
+      "planned": "Geplant"
+    },
+    "revenues": {
+      "add": "Erlös hinzufügen",
+      "addTitle": "Neuer Erlös",
+      "amountIn": "Betrag ({currency})",
+      "columns": {
+        "amount": "Betrag",
+        "date": "Datum",
+        "description": "Beschreibung",
+        "status": "Status"
+      },
+      "deleteConfirm": "Erlös ({item}) löschen?",
+      "deleteFailed": "Erlös konnte nicht gelöscht werden",
+      "editTitle": "Erlös bearbeiten",
+      "empty": "Das Projekt hat noch keine Erlöse.",
+      "saveFailed": "Erlös konnte nicht gespeichert werden",
+      "saved": "Erlös gespeichert",
+      "statusHint": "Zum Ist-Erlös zählen fakturierte und bezahlte Positionen.",
+      "title": "Erlöse"
+    },
+    "saving": "Wird gespeichert…",
+    "summary": {
+      "budget": "Budget",
+      "cost": "Kosten (angefallen)",
+      "margin": "Marge (Ist)",
+      "plan": "Plan",
+      "plannedItems": "Geplante Positionen",
+      "remainingBudget": "Restbudget",
+      "remainingBudgetHint": "Budget minus angefallene Kosten",
+      "revenue": "Erlös (Ist)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Angefallen (eigene)",
+        "plannedCost": "Geplante Kosten",
+        "task": "Aufgabe",
+        "totalIncurred": "Angefallen inkl. Unteraufgaben",
+        "totalPlanned": "Geplant inkl. Unteraufgaben"
+      },
+      "empty": "Noch keine Aufgabe hat Kosten oder geplante Kosten.",
+      "hint": "Die geplanten Kosten einer Aufgabe dienen nur zur Information und fließen nicht in das Projektbudget ein. Beträge „inkl. Unteraufgaben“ umfassen die Positionen der Aufgabe und aller ihrer Unteraufgaben.",
+      "plannedCostOf": "Geplante Kosten der Aufgabe {task}",
+      "saveFailed": "Geplante Kosten konnten nicht gespeichert werden",
+      "title": "Aufgabenkosten",
+      "total": "Gesamt"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Ist / Plan",
+      "cost": "Kosten",
+      "margin": "Marge",
+      "marginHint": "Ist-Marge: fakturierter und bezahlter Erlös minus angefallene Kosten",
+      "revenue": "Erlös"
+    }
   },
   "gantt": {
     "emptyTitle": "Keine Aufgaben",
@@ -197,6 +338,14 @@
   },
   "panel": {
     "chatTitle": "Unterhaltung zur Aufgabe",
+    "costs": {
+      "add": "Kosten hinzufügen",
+      "empty": "Die Aufgabe hat noch keine Kosten.",
+      "loadFailed": "Kosten der Aufgabe konnten nicht geladen werden",
+      "ownOnlyHint": "Sie sehen nur die von Ihnen selbst hinzugefügten Kosten.",
+      "title": "Kosten",
+      "totalIncurred": "Angefallen gesamt"
+    },
     "createTask": "Aufgabe erstellen",
     "created": "Aufgabe erstellt",
     "customFields": {
@@ -254,6 +403,10 @@
     "saving": "Wird gespeichert…"
   },
   "settings": {
+    "costCategories": {
+      "hint": "Kategorien können nicht gelöscht werden — deaktivieren Sie nicht verwendete. Eine deaktivierte Kategorie kann bei neuen Kosten nicht ausgewählt werden, bestehende Positionen behalten sie.",
+      "title": "Kostenkategorien"
+    },
     "dictionary": {
       "active": "aktiv",
       "addButton": "Hinzufügen",
@@ -272,6 +425,13 @@
       "optionsRequired": "Die Liste muss mindestens einen Wert enthalten",
       "saveFailed": "Feld konnte nicht gespeichert werden",
       "title": "Zusatzfelder für Aufgaben"
+    },
+    "finance": {
+      "disableConfirm": "Projektfinanzen deaktivieren? Die Daten bleiben erhalten, verschwinden aber aus der Ansicht aller Benutzer.",
+      "hint": "Nach der Aktivierung führen PM und Administrator im Projekt Budget, Kosten und Erlöse, der Prüfer kann sie einsehen. Die Zusammenfassung der Projektfinanzen sieht außerdem jeder, der Zugriff auf die Karte des verknüpften Leads oder Partners hat.",
+      "saveFailed": "Einstellung der Projektfinanzen konnte nicht geändert werden",
+      "title": "Projektfinanzen",
+      "toggle": "Projektfinanzen aktivieren"
     },
     "loadFailed": "Projektkonfiguration konnte nicht geladen werden",
     "priorities": {
