@@ -243,6 +243,219 @@
       "week": "Semanas"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "Factura de KSeF — ver detalles",
+      "title": "Factura de KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Añadir factura de KSeF",
+      "link": "Vincular factura KSeF",
+      "unlink": "Desvincular factura",
+      "unlinkConfirm": "¿Desvincular la factura {invoice} de este coste? El coste seguirá en la lista y la factura permanecerá en KSeF.",
+      "unlinkFailed": "No se pudo desvincular la factura"
+    },
+    "detail": {
+      "address": "Dirección",
+      "buyer": "Comprador",
+      "invoiceType": "Tipo de factura",
+      "issueDate": "Fecha de emisión",
+      "ksefNumber": "Número KSeF",
+      "lines": {
+        "empty": "La factura no contiene líneas.",
+        "name": "Nombre",
+        "netAmount": "Importe neto",
+        "number": "N.º",
+        "quantity": "Cantidad",
+        "title": "Líneas de la factura",
+        "unitNetPrice": "Precio neto",
+        "vatRate": "IVA"
+      },
+      "links": {
+        "empty": "La factura no está vinculada a ningún coste.",
+        "linkedTotal": "En total se han vinculado {linked} de {net} netos.",
+        "title": "Vinculaciones de la factura"
+      },
+      "loadFailed": "No se pudo cargar la factura",
+      "payment": {
+        "amountDue": "A pagar",
+        "bankAccounts": "Cuenta bancaria",
+        "dueDates": "Fecha de vencimiento",
+        "factor": "factor",
+        "form": "Forma de pago",
+        "paymentDate": "Fecha de pago",
+        "state": "Estado del pago",
+        "states": {
+          "paid": "Pagada",
+          "partiallyPaid": "Pagada parcialmente",
+          "unknown": "Sin información",
+          "unpaid": "No pagada"
+        },
+        "title": "Pago"
+      },
+      "saleDate": "Fecha de venta",
+      "seller": "Vendedor",
+      "title": "Factura {number}",
+      "titleLoading": "Factura de KSeF",
+      "totals": {
+        "gross": "Bruto",
+        "net": "Neto",
+        "vat": "IVA"
+      }
+    },
+    "errors": {
+      "forbidden": "No tienes acceso a las facturas de KSeF. El permiso lo concede el administrador en el panel de usuarios."
+    },
+    "invoiceTypes": {
+      "KOR": "Factura rectificativa",
+      "KOR_ROZ": "Rectificación de factura de liquidación",
+      "KOR_ZAL": "Rectificación de factura de anticipo",
+      "ROZ": "Factura de liquidación",
+      "UPR": "Factura simplificada",
+      "VAT": "Factura con IVA",
+      "ZAL": "Factura de anticipo"
+    },
+    "link": {
+      "alreadyLinkedHint": "Aun así puedes vincularla de nuevo; solo comprueba que el mismo coste no se cuente dos veces.",
+      "alreadyLinkedTitle": "Atención: esta factura ya está vinculada",
+      "amountHint": "Por defecto, todo el importe neto de la factura. Cámbialo si asignas a este coste solo una parte de la factura.",
+      "amountHintForeign": "La factura está en {invoiceCurrency} y el proyecto en {projectCurrency}. Deja el campo vacío y todo el importe neto ({net}) se convertirá al tipo de cambio medio del NBP del día hábil anterior a la fecha de emisión de la factura. También puedes introducir el importe directamente en {projectCurrency}.",
+      "amountIn": "Importe asignado ({currency})",
+      "attachNote": "La factura se vinculará al coste: {item}. El importe y los demás datos del coste no cambiarán.",
+      "back": "Volver a la lista",
+      "confirm": "Vincular factura",
+      "errors": {
+        "failed": "No se pudo vincular la factura",
+        "forbidden": "No tienes permisos para vincular facturas de KSeF en este proyecto.",
+        "noExchangeRate": "No hay tipo de cambio del NBP para la moneda de la factura. Introduce el importe en {currency}.",
+        "projectClosed": "El proyecto está cerrado: ya no se pueden vincular facturas."
+      },
+      "saved": "Factura vinculada",
+      "savedWithRate": "Factura vinculada: {amount} al tipo de cambio {rate} del {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Importe",
+        "linkedBy": "Vinculada por",
+        "project": "Proyecto",
+        "status": "Estado",
+        "task": "Tarea"
+      },
+      "wholeProject": "Todo el proyecto"
+    },
+    "list": {
+      "columns": {
+        "currency": "Moneda",
+        "gross": "Bruto",
+        "issueDate": "Fecha de emisión",
+        "net": "Neto",
+        "number": "Número",
+        "paymentDueDate": "Vencimiento",
+        "seller": "Vendedor"
+      }
+    },
+    "nip": "NIF",
+    "otherLinks": {
+      "intro": "Esta factura también está vinculada a:",
+      "overAllocated": "La suma de las vinculaciones supera el importe neto de la factura.",
+      "wholeProject": "{project} (todo el proyecto)"
+    },
+    "paymentForms": {
+      "card": "Tarjeta",
+      "cash": "Efectivo",
+      "cheque": "Cheque",
+      "credit": "Crédito",
+      "mobile": "Pago móvil",
+      "transfer": "Transferencia",
+      "voucher": "Vale"
+    },
+    "picker": {
+      "attachTitle": "Vincular factura de KSeF al coste",
+      "empty": "No hay facturas en el periodo seleccionado y para los filtros seleccionados.",
+      "filters": {
+        "dateFrom": "Fecha de emisión desde",
+        "dateTo": "Fecha de emisión hasta",
+        "invoiceNumber": "Número de factura",
+        "netMax": "Neto hasta",
+        "netMin": "Neto desde",
+        "seller": "Vendedor (nombre o NIF)"
+      },
+      "lastSync": "Última sincronización correcta: {time}.",
+      "linkedCount": "{count, plural, one {Ya vinculada: # vez} other {Ya vinculada: # veces}}",
+      "loadFailed": "No se pudo cargar la lista de facturas",
+      "nextPage": "Siguiente",
+      "noCompanies": "Aún no se ha añadido ninguna empresa a KSeF. El administrador lo hace en Configuración → Proyectos → KSeF.",
+      "notConfigured": "La integración con KSeF no está configurada en el servidor. La lista muestra solo las facturas descargadas anteriormente.",
+      "pageInfo": "Página {page} de {pages} · facturas: {total}",
+      "previousPage": "Anterior",
+      "search": "Buscar",
+      "select": "Elegir",
+      "syncHint": "Una factura recién emitida puede tardar unos minutos en aparecer en KSeF.",
+      "title": "Añadir factura de KSeF"
+    },
+    "settings": {
+      "addCompany": "Añadir empresa",
+      "columns": {
+        "lastAttempt": "Último intento",
+        "lastSynced": "Última sincronización correcta",
+        "name": "Nombre",
+        "status": "Estado",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Nueva empresa en KSeF",
+        "added": "Empresa añadida. Las facturas se descargarán en la próxima sincronización.",
+        "editTitle": "Empresa en KSeF",
+        "name": "Nombre (opcional)",
+        "saveFailed": "No se pudo guardar la empresa",
+        "saved": "Empresa guardada",
+        "token": "Token de KSeF",
+        "tokenHintAdd": "Token generado en KSeF para este NIF. Antes de guardarlo lo comprobamos en KSeF; una vez guardado, no se puede volver a leer.",
+        "tokenHintEdit": "Token actual: {hint}. Deja el campo vacío para no cambiarlo.",
+        "verifying": "Comprobando en KSeF…"
+      },
+      "edit": "Cambiar",
+      "environments": {
+        "production": "Entorno de producción",
+        "test": "Entorno de pruebas"
+      },
+      "errors": {
+        "companyNotFound": "Esta empresa ya no está en la configuración. Actualiza la página.",
+        "duplicateNip": "Ya se ha añadido una empresa con este NIF.",
+        "invalidNip": "NIF no válido.",
+        "notConfigured": "La integración con KSeF no está configurada en el servidor.",
+        "tokenRejected": "KSeF ha rechazado el token para este NIF. Comprueba que el token esté vigente y que se haya emitido para esta empresa.",
+        "unreachable": "No se pudo conectar con KSeF para comprobar el token. Inténtalo de nuevo más tarde."
+      },
+      "hint": "Las facturas de compra de las empresas añadidas a continuación se descargan del Sistema Nacional de Facturas Electrónicas de Polonia (KSeF) cada 30 minutos. Las personas con el permiso «Acceso a las facturas de KSeF» las vinculan a los costes de los proyectos.",
+      "initialSyncDays": "La primera sincronización abarca hacia atrás (días)",
+      "initialSyncDaysHint": "De {min} a {max} días. Se aplica a las empresas añadidas después de cambiar este ajuste.",
+      "loadFailed": "No se pudo cargar la configuración de KSeF",
+      "noCompanies": "Aún no se ha añadido ninguna empresa.",
+      "notConfigured": "La integración con KSeF no está configurada en el servidor, por lo que no se pueden añadir empresas ni descargar facturas.",
+      "remove": "Eliminar",
+      "removeConfirm": "¿Eliminar la empresa {company} de la configuración de KSeF? Dejarán de descargarse facturas nuevas. Las facturas ya descargadas y sus vinculaciones a costes se conservarán.",
+      "removeFailed": "No se pudo eliminar la empresa",
+      "saveFailed": "No se pudo guardar el ajuste",
+      "saved": "Ajuste guardado",
+      "statuses": {
+        "active": "Activa",
+        "error": "Error de sincronización",
+        "invalid": "Token rechazado"
+      },
+      "syncFailed": "La sincronización ha fallado: el motivo se muestra junto a la empresa.",
+      "testEnvironmentNote": "El servidor se conecta al entorno de pruebas de KSeF: las facturas no son documentos reales.",
+      "title": "KSeF — facturas de costes"
+    },
+    "sync": {
+      "failedForCompany": "La sincronización ha fallado para al menos una empresa. El administrador verá los detalles en Configuración → Proyectos → KSeF.",
+      "finished": "Sincronización finalizada",
+      "now": "Sincronizar ahora",
+      "running": "Sincronizando…",
+      "startFailed": "No se pudo iniciar la sincronización",
+      "stillRunning": "La sincronización sigue en curso: actualiza la lista en un momento."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Completo",

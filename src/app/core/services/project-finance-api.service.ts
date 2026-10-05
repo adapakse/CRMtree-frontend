@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ProjectFinanceMargin } from './projects-api.service';
+import type { KsefCostInvoice, KsefInvoiceLink } from './ksef-api.service';
 
 export type ProjectCostStatus = 'planned' | 'incurred';
 export type ProjectRevenueStatus = 'planned' | 'invoiced' | 'paid';
@@ -77,6 +78,11 @@ export interface ProjectCostItem {
   original_currency: string | null;
   exchange_rate: number | null;
   exchange_rate_date: string | null;
+  ksef_invoice_id: string | null;
+  /** Also null for a participant who sees only own cost items, even when the item is linked. */
+  ksef_invoice: KsefCostInvoice | null;
+  /** Every other cost item linked to the same invoice, in any project. */
+  other_links: KsefInvoiceLink[];
   created_by: string | null;
   created_by_name: string | null;
   created_at: string;
@@ -95,6 +101,8 @@ export interface ProjectCostItemPayload {
   description?: string | null;
   supplier_name?: string | null;
   document_number?: string | null;
+  /** Attaches the item to a KSeF invoice, moves it to another one, or detaches it with null. */
+  ksef_invoice_id?: string | null;
 }
 
 export interface ProjectRevenueItem {

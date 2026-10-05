@@ -1151,6 +1151,7 @@
       "accountType": "Тип учётной записи",
       "adminRole": "Роль администратора",
       "canCreateProjects": "Создание проектов",
+      "canViewKsefInvoices": "Доступ к счетам KSeF",
       "company": "Компания",
       "crmRole": "Роль CRM",
       "department": "Отдел",

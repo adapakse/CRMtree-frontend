@@ -243,6 +243,219 @@
       "week": "Săptămâni"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "Factură din KSeF — afișare detalii",
+      "title": "Factură din KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Adăugare factură din KSeF",
+      "link": "Asociere factură KSeF",
+      "unlink": "Disociere factură",
+      "unlinkConfirm": "Disociați factura {invoice} de acest cost? Costul rămâne în listă, iar factura rămâne în KSeF.",
+      "unlinkFailed": "Factura nu a putut fi disociată"
+    },
+    "detail": {
+      "address": "Adresă",
+      "buyer": "Cumpărător",
+      "invoiceType": "Tipul facturii",
+      "issueDate": "Data emiterii",
+      "ksefNumber": "Număr KSeF",
+      "lines": {
+        "empty": "Factura nu conține poziții.",
+        "name": "Denumire",
+        "netAmount": "Valoare netă",
+        "number": "Nr.",
+        "quantity": "Cantitate",
+        "title": "Pozițiile facturii",
+        "unitNetPrice": "Preț net",
+        "vatRate": "TVA"
+      },
+      "links": {
+        "empty": "Factura nu este asociată niciunui cost.",
+        "linkedTotal": "Total asociat: {linked} din {net} net.",
+        "title": "Asocierile facturii"
+      },
+      "loadFailed": "Factura nu a putut fi încărcată",
+      "payment": {
+        "amountDue": "De plată",
+        "bankAccounts": "Cont bancar",
+        "dueDates": "Termen de plată",
+        "factor": "factor",
+        "form": "Modalitate de plată",
+        "paymentDate": "Data plății",
+        "state": "Starea plății",
+        "states": {
+          "paid": "Plătită",
+          "partiallyPaid": "Plătită parțial",
+          "unknown": "Fără informații",
+          "unpaid": "Neplătită"
+        },
+        "title": "Plată"
+      },
+      "saleDate": "Data vânzării",
+      "seller": "Vânzător",
+      "title": "Factura {number}",
+      "titleLoading": "Factură din KSeF",
+      "totals": {
+        "gross": "Brut",
+        "net": "Net",
+        "vat": "TVA"
+      }
+    },
+    "errors": {
+      "forbidden": "Nu aveți acces la facturile KSeF. Permisiunea este acordată de administrator în panoul de utilizatori."
+    },
+    "invoiceTypes": {
+      "KOR": "Factură de corecție",
+      "KOR_ROZ": "Corecție a facturii de regularizare",
+      "KOR_ZAL": "Corecție a facturii de avans",
+      "ROZ": "Factură de regularizare",
+      "UPR": "Factură simplificată",
+      "VAT": "Factură cu TVA",
+      "ZAL": "Factură de avans"
+    },
+    "link": {
+      "alreadyLinkedHint": "O puteți totuși asocia din nou — verificați doar ca același cost să nu fie socotit de două ori.",
+      "alreadyLinkedTitle": "Atenție: această factură este deja asociată",
+      "amountHint": "Implicit, întreaga sumă netă a facturii. Modificați-o dacă acestui cost îi atribuiți doar o parte din factură.",
+      "amountHintForeign": "Factura este în {invoiceCurrency}, iar proiectul în {projectCurrency}. Lăsați câmpul gol, iar întreaga sumă netă ({net}) va fi convertită la cursul mediu NBP din ziua lucrătoare anterioară datei de emitere a facturii. Puteți introduce suma și direct în {projectCurrency}.",
+      "amountIn": "Sumă atribuită ({currency})",
+      "attachNote": "Factura va fi asociată costului: {item}. Suma și celelalte date ale costului nu se vor modifica.",
+      "back": "Înapoi la listă",
+      "confirm": "Asociere factură",
+      "errors": {
+        "failed": "Factura nu a putut fi asociată",
+        "forbidden": "Nu aveți permisiunea de a asocia facturi KSeF în acest proiect.",
+        "noExchangeRate": "Nu există curs NBP pentru moneda facturii. Introduceți suma în {currency}.",
+        "projectClosed": "Proiectul este închis — facturile nu mai pot fi asociate."
+      },
+      "saved": "Factură asociată",
+      "savedWithRate": "Factură asociată: {amount} la cursul {rate} din {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Sumă",
+        "linkedBy": "Asociată de",
+        "project": "Proiect",
+        "status": "Status",
+        "task": "Sarcină"
+      },
+      "wholeProject": "Întregul proiect"
+    },
+    "list": {
+      "columns": {
+        "currency": "Monedă",
+        "gross": "Brut",
+        "issueDate": "Data emiterii",
+        "net": "Net",
+        "number": "Număr",
+        "paymentDueDate": "Termen de plată",
+        "seller": "Vânzător"
+      }
+    },
+    "nip": "Cod fiscal",
+    "otherLinks": {
+      "intro": "Această factură este asociată și cu:",
+      "overAllocated": "Suma asocierilor depășește suma netă a facturii.",
+      "wholeProject": "{project} (întregul proiect)"
+    },
+    "paymentForms": {
+      "card": "Card",
+      "cash": "Numerar",
+      "cheque": "Cec",
+      "credit": "Credit",
+      "mobile": "Plată mobilă",
+      "transfer": "Transfer bancar",
+      "voucher": "Voucher"
+    },
+    "picker": {
+      "attachTitle": "Asociere factură KSeF la cost",
+      "empty": "Nicio factură în perioada selectată și pentru filtrele selectate.",
+      "filters": {
+        "dateFrom": "Data emiterii de la",
+        "dateTo": "Data emiterii până la",
+        "invoiceNumber": "Numărul facturii",
+        "netMax": "Net până la",
+        "netMin": "Net de la",
+        "seller": "Vânzător (denumire sau cod fiscal)"
+      },
+      "lastSync": "Ultima sincronizare reușită: {time}.",
+      "linkedCount": "{count, plural, one {Deja asociată: # dată} few {Deja asociată: # ori} other {Deja asociată: # de ori}}",
+      "loadFailed": "Lista de facturi nu a putut fi încărcată",
+      "nextPage": "Următoarea",
+      "noCompanies": "Nicio companie nu a fost încă adăugată în KSeF. Administratorul face acest lucru în Setări → Proiecte → KSeF.",
+      "notConfigured": "Integrarea cu KSeF nu este configurată pe server. Lista afișează doar facturile descărcate anterior.",
+      "pageInfo": "Pagina {page} din {pages} · facturi: {total}",
+      "previousPage": "Anterioara",
+      "search": "Căutare",
+      "select": "Selectare",
+      "syncHint": "O factură emisă recent poate apărea în KSeF abia după câteva minute.",
+      "title": "Adăugare factură din KSeF"
+    },
+    "settings": {
+      "addCompany": "Adăugare companie",
+      "columns": {
+        "lastAttempt": "Ultima încercare",
+        "lastSynced": "Ultima sincronizare reușită",
+        "name": "Denumire",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Companie nouă în KSeF",
+        "added": "Companie adăugată. Facturile vor fi descărcate la următoarea sincronizare.",
+        "editTitle": "Companie în KSeF",
+        "name": "Denumire (opțional)",
+        "saveFailed": "Compania nu a putut fi salvată",
+        "saved": "Companie salvată",
+        "token": "Token KSeF",
+        "tokenHintAdd": "Tokenul generat în KSeF pentru acest cod fiscal. Înainte de salvare este verificat în KSeF; după salvare nu mai poate fi citit.",
+        "tokenHintEdit": "Token actual: {hint}. Lăsați câmpul gol pentru a nu-l modifica.",
+        "verifying": "Se verifică în KSeF…"
+      },
+      "edit": "Modificare",
+      "environments": {
+        "production": "Mediu de producție",
+        "test": "Mediu de testare"
+      },
+      "errors": {
+        "companyNotFound": "Această companie nu mai există în configurație. Reîmprospătați pagina.",
+        "duplicateNip": "O companie cu acest cod fiscal este deja adăugată.",
+        "invalidNip": "Cod fiscal incorect.",
+        "notConfigured": "Integrarea cu KSeF nu este configurată pe server.",
+        "tokenRejected": "KSeF a respins tokenul pentru acest cod fiscal. Verificați dacă tokenul este valabil și emis pentru această companie.",
+        "unreachable": "Conectarea la KSeF pentru verificarea tokenului nu a reușit. Încercați din nou mai târziu."
+      },
+      "hint": "Facturile de achiziție ale companiilor adăugate mai jos sunt descărcate din KSeF, sistemul național polonez de facturare electronică, la fiecare 30 de minute. Persoanele cu permisiunea „Acces la facturile KSeF” le asociază costurilor proiectelor.",
+      "initialSyncDays": "Prima sincronizare merge înapoi (zile)",
+      "initialSyncDaysHint": "De la {min} la {max} zile. Se aplică companiilor adăugate după modificarea acestei setări.",
+      "loadFailed": "Configurația KSeF nu a putut fi încărcată",
+      "noCompanies": "Nicio companie nu a fost încă adăugată.",
+      "notConfigured": "Integrarea cu KSeF nu este configurată pe server, de aceea nu se pot adăuga companii și nici descărca facturi.",
+      "remove": "Eliminare",
+      "removeConfirm": "Eliminați compania {company} din configurația KSeF? Facturile noi nu vor mai fi descărcate. Facturile deja descărcate și asocierile lor cu costurile vor fi păstrate.",
+      "removeFailed": "Compania nu a putut fi eliminată",
+      "saveFailed": "Setarea nu a putut fi salvată",
+      "saved": "Setare salvată",
+      "statuses": {
+        "active": "Activă",
+        "error": "Eroare de sincronizare",
+        "invalid": "Token respins"
+      },
+      "syncFailed": "Sincronizarea nu a reușit — motivul este afișat în dreptul companiei.",
+      "testEnvironmentNote": "Serverul este conectat la mediul de testare KSeF — facturile nu sunt documente reale.",
+      "title": "KSeF — facturi de costuri"
+    },
+    "sync": {
+      "failedForCompany": "Sincronizarea nu a reușit pentru cel puțin o companie. Administratorul poate vedea detaliile în Setări → Proiecte → KSeF.",
+      "finished": "Sincronizare finalizată",
+      "now": "Sincronizare acum",
+      "running": "Se sincronizează…",
+      "startFailed": "Sincronizarea nu a putut fi pornită",
+      "stillRunning": "Sincronizarea este încă în curs — reîmprospătați lista peste câteva momente."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Complete",

@@ -20,6 +20,8 @@ export class AuthService {
   readonly isAdmin            = computed(() => this._user()?.is_admin ?? false);
   readonly isSuperAdmin       = computed(() => this._user()?.is_super_admin ?? false);
   readonly mustChangePassword = computed(() => this._user()?.must_change_password ?? false);
+  readonly canViewKsefInvoices = computed(() =>
+    this._user()?.is_admin === true || this._user()?.can_view_ksef_invoices === true);
   readonly isCrmUser          = computed(() =>
     this._user()?.is_admin === true ||
     this._user()?.crm_role === 'salesperson' ||

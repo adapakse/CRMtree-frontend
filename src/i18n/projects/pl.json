@@ -243,6 +243,219 @@
       "week": "Tygodnie"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "Faktura z KSeF — pokaż szczegóły",
+      "title": "Faktura z KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Dodaj fakturę z KSeF",
+      "link": "Podepnij fakturę KSeF",
+      "unlink": "Odepnij fakturę",
+      "unlinkConfirm": "Odpiąć fakturę {invoice} od tego kosztu? Koszt zostanie na liście, a faktura pozostanie w KSeF.",
+      "unlinkFailed": "Nie udało się odpiąć faktury"
+    },
+    "detail": {
+      "address": "Adres",
+      "buyer": "Nabywca",
+      "invoiceType": "Rodzaj faktury",
+      "issueDate": "Data wystawienia",
+      "ksefNumber": "Numer KSeF",
+      "lines": {
+        "empty": "Faktura nie zawiera pozycji.",
+        "name": "Nazwa",
+        "netAmount": "Wartość netto",
+        "number": "Lp.",
+        "quantity": "Ilość",
+        "title": "Pozycje faktury",
+        "unitNetPrice": "Cena netto",
+        "vatRate": "VAT"
+      },
+      "links": {
+        "empty": "Faktura nie jest podpięta do żadnego kosztu.",
+        "linkedTotal": "Łącznie podpięto {linked} z {net} netto.",
+        "title": "Podpięcia faktury"
+      },
+      "loadFailed": "Nie udało się pobrać faktury",
+      "payment": {
+        "amountDue": "Do zapłaty",
+        "bankAccounts": "Rachunek bankowy",
+        "dueDates": "Termin płatności",
+        "factor": "faktor",
+        "form": "Forma płatności",
+        "paymentDate": "Data zapłaty",
+        "state": "Stan płatności",
+        "states": {
+          "paid": "Opłacona",
+          "partiallyPaid": "Opłacona częściowo",
+          "unknown": "Brak informacji",
+          "unpaid": "Nieopłacona"
+        },
+        "title": "Płatność"
+      },
+      "saleDate": "Data sprzedaży",
+      "seller": "Sprzedawca",
+      "title": "Faktura {number}",
+      "titleLoading": "Faktura z KSeF",
+      "totals": {
+        "gross": "Brutto",
+        "net": "Netto",
+        "vat": "VAT"
+      }
+    },
+    "errors": {
+      "forbidden": "Nie masz dostępu do faktur KSeF. Uprawnienie nadaje administrator w panelu użytkowników."
+    },
+    "invoiceTypes": {
+      "KOR": "Faktura korygująca",
+      "KOR_ROZ": "Korekta faktury rozliczeniowej",
+      "KOR_ZAL": "Korekta faktury zaliczkowej",
+      "ROZ": "Faktura rozliczeniowa",
+      "UPR": "Faktura uproszczona",
+      "VAT": "Faktura VAT",
+      "ZAL": "Faktura zaliczkowa"
+    },
+    "link": {
+      "alreadyLinkedHint": "Możesz mimo to podpiąć ją ponownie — sprawdź tylko, czy ten sam koszt nie zostanie policzony dwa razy.",
+      "alreadyLinkedTitle": "Uwaga: ta faktura jest już podpięta",
+      "amountHint": "Domyślnie cała kwota netto faktury. Zmień ją, jeśli do tego kosztu przypisujesz tylko część faktury.",
+      "amountHintForeign": "Faktura jest w {invoiceCurrency}, a projekt w {projectCurrency}. Zostaw pole puste, a cała kwota netto ({net}) zostanie przeliczona po kursie średnim NBP z dnia roboczego poprzedzającego datę wystawienia faktury. Możesz też wpisać kwotę od razu w {projectCurrency}.",
+      "amountIn": "Kwota przypisana ({currency})",
+      "attachNote": "Faktura zostanie podpięta do kosztu: {item}. Kwota i pozostałe dane kosztu nie zmienią się.",
+      "back": "Wróć do listy",
+      "confirm": "Podepnij fakturę",
+      "errors": {
+        "failed": "Nie udało się podpiąć faktury",
+        "forbidden": "Nie masz uprawnień do podpinania faktur KSeF w tym projekcie.",
+        "noExchangeRate": "Brak kursu NBP dla waluty faktury. Wpisz kwotę w {currency}.",
+        "projectClosed": "Projekt jest zamknięty — nie można już podpinać faktur."
+      },
+      "saved": "Faktura podpięta",
+      "savedWithRate": "Faktura podpięta: {amount} po kursie {rate} z {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Kwota",
+        "linkedBy": "Podpiął(-ęła)",
+        "project": "Projekt",
+        "status": "Status",
+        "task": "Zadanie"
+      },
+      "wholeProject": "Cały projekt"
+    },
+    "list": {
+      "columns": {
+        "currency": "Waluta",
+        "gross": "Brutto",
+        "issueDate": "Data wystawienia",
+        "net": "Netto",
+        "number": "Numer",
+        "paymentDueDate": "Termin płatności",
+        "seller": "Sprzedawca"
+      }
+    },
+    "nip": "NIP",
+    "otherLinks": {
+      "intro": "Ta faktura jest podpięta także do:",
+      "overAllocated": "Suma podpięć przekracza kwotę netto faktury.",
+      "wholeProject": "{project} (cały projekt)"
+    },
+    "paymentForms": {
+      "card": "Karta",
+      "cash": "Gotówka",
+      "cheque": "Czek",
+      "credit": "Kredyt",
+      "mobile": "Płatność mobilna",
+      "transfer": "Przelew",
+      "voucher": "Bon"
+    },
+    "picker": {
+      "attachTitle": "Podepnij fakturę KSeF do kosztu",
+      "empty": "Brak faktur w wybranym okresie i dla wybranych filtrów.",
+      "filters": {
+        "dateFrom": "Data wystawienia od",
+        "dateTo": "Data wystawienia do",
+        "invoiceNumber": "Numer faktury",
+        "netMax": "Netto do",
+        "netMin": "Netto od",
+        "seller": "Sprzedawca (nazwa lub NIP)"
+      },
+      "lastSync": "Ostatnia udana synchronizacja: {time}.",
+      "linkedCount": "{count, plural, one {Już podpięta: # raz} few {Już podpięta: # razy} many {Już podpięta: # razy} other {Już podpięta: # razy}}",
+      "loadFailed": "Nie udało się pobrać listy faktur",
+      "nextPage": "Następna",
+      "noCompanies": "Nie dodano jeszcze żadnej firmy do KSeF. Administrator robi to w Ustawienia → Projekty → KSeF.",
+      "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze. Lista pokazuje tylko faktury pobrane wcześniej.",
+      "pageInfo": "Strona {page} z {pages} · faktur: {total}",
+      "previousPage": "Poprzednia",
+      "search": "Szukaj",
+      "select": "Wybierz",
+      "syncHint": "Świeżo wystawiona faktura może pojawić się w KSeF dopiero po kilku minutach.",
+      "title": "Dodaj fakturę z KSeF"
+    },
+    "settings": {
+      "addCompany": "Dodaj firmę",
+      "columns": {
+        "lastAttempt": "Ostatnia próba",
+        "lastSynced": "Ostatnia udana synchronizacja",
+        "name": "Nazwa",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Nowa firma w KSeF",
+        "added": "Firma dodana. Faktury zostaną pobrane przy najbliższej synchronizacji.",
+        "editTitle": "Firma w KSeF",
+        "name": "Nazwa (opcjonalnie)",
+        "saveFailed": "Nie udało się zapisać firmy",
+        "saved": "Firma zapisana",
+        "token": "Token KSeF",
+        "tokenHintAdd": "Token wygenerowany w KSeF dla tego NIP-u. Przed zapisaniem sprawdzamy go w KSeF; po zapisaniu nie da się go odczytać.",
+        "tokenHintEdit": "Obecny token: {hint}. Zostaw pole puste, aby go nie zmieniać.",
+        "verifying": "Sprawdzanie w KSeF…"
+      },
+      "edit": "Zmień",
+      "environments": {
+        "production": "Środowisko produkcyjne",
+        "test": "Środowisko testowe"
+      },
+      "errors": {
+        "companyNotFound": "Tej firmy nie ma już w konfiguracji. Odśwież stronę.",
+        "duplicateNip": "Firma z tym NIP-em jest już dodana.",
+        "invalidNip": "Nieprawidłowy NIP.",
+        "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze.",
+        "tokenRejected": "KSeF odrzucił token dla tego NIP-u. Sprawdź, czy token jest aktualny i wystawiony dla tej firmy.",
+        "unreachable": "Nie udało się połączyć z KSeF, aby sprawdzić token. Spróbuj ponownie później."
+      },
+      "hint": "Faktury zakupowe firm dodanych poniżej są pobierane z Krajowego Systemu e-Faktur co 30 minut. Osoby z uprawnieniem „Dostęp do faktur KSeF” podpinają je do kosztów projektów.",
+      "initialSyncDays": "Pierwsza synchronizacja sięga wstecz (dni)",
+      "initialSyncDaysHint": "Od {min} do {max} dni. Dotyczy firm dodanych po zmianie tego ustawienia.",
+      "loadFailed": "Nie udało się pobrać konfiguracji KSeF",
+      "noCompanies": "Nie dodano jeszcze żadnej firmy.",
+      "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze, dlatego nie można dodawać firm ani pobierać faktur.",
+      "remove": "Usuń",
+      "removeConfirm": "Usunąć firmę {company} z konfiguracji KSeF? Nowe faktury przestaną być pobierane. Faktury już pobrane i ich podpięcia do kosztów zostaną.",
+      "removeFailed": "Nie udało się usunąć firmy",
+      "saveFailed": "Nie udało się zapisać ustawienia",
+      "saved": "Ustawienie zapisane",
+      "statuses": {
+        "active": "Aktywna",
+        "error": "Błąd synchronizacji",
+        "invalid": "Token odrzucony"
+      },
+      "syncFailed": "Synchronizacja nie powiodła się — powód jest widoczny przy firmie.",
+      "testEnvironmentNote": "Serwer łączy się z testowym środowiskiem KSeF — faktury nie są prawdziwymi dokumentami.",
+      "title": "KSeF — faktury kosztowe"
+    },
+    "sync": {
+      "failedForCompany": "Synchronizacja nie powiodła się dla co najmniej jednej firmy. Szczegóły zobaczy administrator w Ustawienia → Projekty → KSeF.",
+      "finished": "Synchronizacja zakończona",
+      "now": "Synchronizuj teraz",
+      "running": "Synchronizacja…",
+      "startFailed": "Nie udało się uruchomić synchronizacji",
+      "stillRunning": "Synchronizacja nadal trwa — odśwież listę za chwilę."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Pełne",

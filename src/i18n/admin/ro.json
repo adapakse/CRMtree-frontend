@@ -1151,6 +1151,7 @@
       "accountType": "Tip de cont",
       "adminRole": "Rol de administrator",
       "canCreateProjects": "Creare de proiecte",
+      "canViewKsefInvoices": "Acces la facturile KSeF",
       "company": "Companie",
       "crmRole": "Rol CRM",
       "department": "Departament",

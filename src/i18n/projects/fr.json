@@ -243,6 +243,219 @@
       "week": "Semaines"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "Facture KSeF — afficher les détails",
+      "title": "Facture KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Ajouter une facture KSeF",
+      "link": "Associer une facture KSeF",
+      "unlink": "Dissocier la facture",
+      "unlinkConfirm": "Dissocier la facture {invoice} de ce coût ? Le coût restera dans la liste et la facture restera dans KSeF.",
+      "unlinkFailed": "Impossible de dissocier la facture"
+    },
+    "detail": {
+      "address": "Adresse",
+      "buyer": "Acheteur",
+      "invoiceType": "Type de facture",
+      "issueDate": "Date d’émission",
+      "ksefNumber": "Numéro KSeF",
+      "lines": {
+        "empty": "La facture ne contient aucune ligne.",
+        "name": "Désignation",
+        "netAmount": "Montant HT",
+        "number": "N°",
+        "quantity": "Quantité",
+        "title": "Lignes de la facture",
+        "unitNetPrice": "Prix HT",
+        "vatRate": "TVA"
+      },
+      "links": {
+        "empty": "La facture n’est associée à aucun coût.",
+        "linkedTotal": "Total associé : {linked} sur {net} HT.",
+        "title": "Associations de la facture"
+      },
+      "loadFailed": "Impossible de charger la facture",
+      "payment": {
+        "amountDue": "Montant à payer",
+        "bankAccounts": "Compte bancaire",
+        "dueDates": "Échéance de paiement",
+        "factor": "affactureur",
+        "form": "Mode de paiement",
+        "paymentDate": "Date de paiement",
+        "state": "État du paiement",
+        "states": {
+          "paid": "Payée",
+          "partiallyPaid": "Partiellement payée",
+          "unknown": "Aucune information",
+          "unpaid": "Non payée"
+        },
+        "title": "Paiement"
+      },
+      "saleDate": "Date de vente",
+      "seller": "Vendeur",
+      "title": "Facture {number}",
+      "titleLoading": "Facture KSeF",
+      "totals": {
+        "gross": "TTC",
+        "net": "HT",
+        "vat": "TVA"
+      }
+    },
+    "errors": {
+      "forbidden": "Vous n’avez pas accès aux factures KSeF. Ce droit est accordé par l’administrateur dans la gestion des utilisateurs."
+    },
+    "invoiceTypes": {
+      "KOR": "Facture rectificative",
+      "KOR_ROZ": "Rectification d’une facture de solde",
+      "KOR_ZAL": "Rectification d’une facture d’acompte",
+      "ROZ": "Facture de solde",
+      "UPR": "Facture simplifiée",
+      "VAT": "Facture TVA",
+      "ZAL": "Facture d’acompte"
+    },
+    "link": {
+      "alreadyLinkedHint": "Vous pouvez tout de même l’associer à nouveau — vérifiez simplement que le même coût ne sera pas compté deux fois.",
+      "alreadyLinkedTitle": "Attention : cette facture est déjà associée",
+      "amountHint": "Par défaut, la totalité du montant HT de la facture. Modifiez-le si vous n’affectez à ce coût qu’une partie de la facture.",
+      "amountHintForeign": "La facture est en {invoiceCurrency} et le projet en {projectCurrency}. Laissez le champ vide et la totalité du montant HT ({net}) sera convertie au cours moyen de la NBP du jour ouvré précédant la date d’émission de la facture. Vous pouvez aussi saisir directement le montant en {projectCurrency}.",
+      "amountIn": "Montant affecté ({currency})",
+      "attachNote": "La facture sera associée au coût : {item}. Le montant et les autres données du coût ne changeront pas.",
+      "back": "Retour à la liste",
+      "confirm": "Associer la facture",
+      "errors": {
+        "failed": "Impossible d’associer la facture",
+        "forbidden": "Vous n’avez pas le droit d’associer des factures KSeF dans ce projet.",
+        "noExchangeRate": "Aucun cours NBP pour la devise de la facture. Saisissez le montant en {currency}.",
+        "projectClosed": "Le projet est clôturé — il n’est plus possible d’associer des factures."
+      },
+      "saved": "Facture associée",
+      "savedWithRate": "Facture associée : {amount} au cours {rate} du {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Montant",
+        "linkedBy": "Associée par",
+        "project": "Projet",
+        "status": "Statut",
+        "task": "Tâche"
+      },
+      "wholeProject": "Projet entier"
+    },
+    "list": {
+      "columns": {
+        "currency": "Devise",
+        "gross": "TTC",
+        "issueDate": "Date d’émission",
+        "net": "HT",
+        "number": "Numéro",
+        "paymentDueDate": "Échéance de paiement",
+        "seller": "Vendeur"
+      }
+    },
+    "nip": "Numéro fiscal",
+    "otherLinks": {
+      "intro": "Cette facture est également associée à :",
+      "overAllocated": "Le total des associations dépasse le montant HT de la facture.",
+      "wholeProject": "{project} (projet entier)"
+    },
+    "paymentForms": {
+      "card": "Carte",
+      "cash": "Espèces",
+      "cheque": "Chèque",
+      "credit": "Crédit",
+      "mobile": "Paiement mobile",
+      "transfer": "Virement",
+      "voucher": "Bon"
+    },
+    "picker": {
+      "attachTitle": "Associer une facture KSeF au coût",
+      "empty": "Aucune facture pour la période et les filtres sélectionnés.",
+      "filters": {
+        "dateFrom": "Date d’émission du",
+        "dateTo": "Date d’émission au",
+        "invoiceNumber": "Numéro de facture",
+        "netMax": "HT jusqu’à",
+        "netMin": "HT à partir de",
+        "seller": "Vendeur (nom ou numéro fiscal)"
+      },
+      "lastSync": "Dernière synchronisation réussie : {time}.",
+      "linkedCount": "{count, plural, one {Déjà associée : # fois} other {Déjà associée : # fois}}",
+      "loadFailed": "Impossible de charger la liste des factures",
+      "nextPage": "Suivante",
+      "noCompanies": "Aucune société n’a encore été ajoutée à KSeF. L’administrateur le fait dans Paramètres → Projets → KSeF.",
+      "notConfigured": "L’intégration avec KSeF n’est pas configurée sur le serveur. La liste n’affiche que les factures téléchargées auparavant.",
+      "pageInfo": "Page {page} sur {pages} · factures : {total}",
+      "previousPage": "Précédente",
+      "search": "Rechercher",
+      "select": "Choisir",
+      "syncHint": "Une facture tout juste émise peut n’apparaître dans KSeF qu’au bout de quelques minutes.",
+      "title": "Ajouter une facture KSeF"
+    },
+    "settings": {
+      "addCompany": "Ajouter une société",
+      "columns": {
+        "lastAttempt": "Dernière tentative",
+        "lastSynced": "Dernière synchronisation réussie",
+        "name": "Nom",
+        "status": "Statut",
+        "token": "Jeton"
+      },
+      "companyForm": {
+        "addTitle": "Nouvelle société dans KSeF",
+        "added": "Société ajoutée. Les factures seront téléchargées lors de la prochaine synchronisation.",
+        "editTitle": "Société dans KSeF",
+        "name": "Nom (facultatif)",
+        "saveFailed": "Impossible d’enregistrer la société",
+        "saved": "Société enregistrée",
+        "token": "Jeton KSeF",
+        "tokenHintAdd": "Jeton généré dans KSeF pour ce numéro fiscal. Nous le vérifions dans KSeF avant l’enregistrement ; une fois enregistré, il ne peut plus être consulté.",
+        "tokenHintEdit": "Jeton actuel : {hint}. Laissez le champ vide pour ne pas le modifier.",
+        "verifying": "Vérification dans KSeF…"
+      },
+      "edit": "Modifier",
+      "environments": {
+        "production": "Environnement de production",
+        "test": "Environnement de test"
+      },
+      "errors": {
+        "companyNotFound": "Cette société ne figure plus dans la configuration. Actualisez la page.",
+        "duplicateNip": "Une société avec ce numéro fiscal a déjà été ajoutée.",
+        "invalidNip": "Numéro fiscal invalide.",
+        "notConfigured": "L’intégration avec KSeF n’est pas configurée sur le serveur.",
+        "tokenRejected": "KSeF a rejeté le jeton pour ce numéro fiscal. Vérifiez que le jeton est valide et qu’il a été émis pour cette société.",
+        "unreachable": "Impossible de se connecter à KSeF pour vérifier le jeton. Réessayez plus tard."
+      },
+      "hint": "Les factures d’achat des sociétés ajoutées ci-dessous sont téléchargées depuis le système national polonais de facturation électronique (KSeF) toutes les 30 minutes. Les personnes disposant du droit « Accès aux factures KSeF » les associent aux coûts des projets.",
+      "initialSyncDays": "La première synchronisation remonte à (jours)",
+      "initialSyncDaysHint": "De {min} à {max} jours. S’applique aux sociétés ajoutées après la modification de ce paramètre.",
+      "loadFailed": "Impossible de charger la configuration KSeF",
+      "noCompanies": "Aucune société n’a encore été ajoutée.",
+      "notConfigured": "L’intégration avec KSeF n’est pas configurée sur le serveur ; il est donc impossible d’ajouter des sociétés ou de télécharger des factures.",
+      "remove": "Supprimer",
+      "removeConfirm": "Supprimer la société {company} de la configuration KSeF ? Les nouvelles factures ne seront plus téléchargées. Les factures déjà téléchargées et leurs associations aux coûts seront conservées.",
+      "removeFailed": "Impossible de supprimer la société",
+      "saveFailed": "Impossible d’enregistrer le paramètre",
+      "saved": "Paramètre enregistré",
+      "statuses": {
+        "active": "Active",
+        "error": "Erreur de synchronisation",
+        "invalid": "Jeton rejeté"
+      },
+      "syncFailed": "La synchronisation a échoué — la raison est indiquée à côté de la société.",
+      "testEnvironmentNote": "Le serveur se connecte à l’environnement de test de KSeF — les factures ne sont pas de vrais documents.",
+      "title": "KSeF — factures de coûts"
+    },
+    "sync": {
+      "failedForCompany": "La synchronisation a échoué pour au moins une société. L’administrateur verra les détails dans Paramètres → Projets → KSeF.",
+      "finished": "Synchronisation terminée",
+      "now": "Synchroniser maintenant",
+      "running": "Synchronisation…",
+      "startFailed": "Impossible de lancer la synchronisation",
+      "stillRunning": "La synchronisation est toujours en cours — actualisez la liste dans un instant."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Complet",

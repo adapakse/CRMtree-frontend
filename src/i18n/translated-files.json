@@ -81,5 +81,15 @@
   "src/app/pages/projects/project-finance.component.ts",
   "src/app/pages/projects/project-finance.styles.ts",
   "src/app/pages/projects/project-task-costs.component.ts",
-  "src/app/shared/components/project-finance-totals/project-finance-totals.component.ts"
+  "src/app/shared/components/project-finance-totals/project-finance-totals.component.ts",
+  "src/app/core/services/ksef-api.service.ts",
+  "src/app/pages/admin/project-settings/project-ksef-company-form.component.ts",
+  "src/app/pages/admin/project-settings/project-ksef-settings.component.ts",
+  "src/app/pages/projects/project-ksef-invoice-badge.component.ts",
+  "src/app/pages/projects/project-ksef-invoice-detail.component.ts",
+  "src/app/pages/projects/project-ksef-invoice-picker.component.ts",
+  "src/app/pages/projects/project-ksef-link-form.component.ts",
+  "src/app/pages/projects/project-ksef-links-table.component.ts",
+  "src/app/pages/projects/project-ksef-other-links.component.ts",
+  "src/app/pages/projects/project-ksef.styles.ts"
 ]

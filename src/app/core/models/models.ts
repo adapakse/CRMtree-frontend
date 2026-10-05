@@ -38,6 +38,8 @@ export interface User {
   department?: string | null;
   is_external?: boolean;
   can_create_projects?: boolean;
+  /** Raw flag; a tenant admin has the right regardless of it. */
+  can_view_ksef_invoices?: boolean;
   /** Interface language picked by the user; null = follow the tenant default. */
   locale?: string | null;
   tenant_default_locale?: string | null;

@@ -243,6 +243,219 @@
       "week": "Wochen"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "Rechnung aus KSeF — Details anzeigen",
+      "title": "Rechnung aus KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Rechnung aus KSeF hinzufügen",
+      "link": "KSeF-Rechnung verknüpfen",
+      "unlink": "Rechnung trennen",
+      "unlinkConfirm": "Verknüpfung der Rechnung {invoice} mit diesen Kosten lösen? Die Kosten bleiben in der Liste und die Rechnung bleibt in KSeF.",
+      "unlinkFailed": "Verknüpfung der Rechnung konnte nicht gelöst werden"
+    },
+    "detail": {
+      "address": "Adresse",
+      "buyer": "Käufer",
+      "invoiceType": "Rechnungsart",
+      "issueDate": "Ausstellungsdatum",
+      "ksefNumber": "KSeF-Nummer",
+      "lines": {
+        "empty": "Die Rechnung enthält keine Positionen.",
+        "name": "Bezeichnung",
+        "netAmount": "Nettobetrag",
+        "number": "Nr.",
+        "quantity": "Menge",
+        "title": "Rechnungspositionen",
+        "unitNetPrice": "Nettopreis",
+        "vatRate": "USt."
+      },
+      "links": {
+        "empty": "Die Rechnung ist mit keinen Kosten verknüpft.",
+        "linkedTotal": "Insgesamt verknüpft: {linked} von {net} netto.",
+        "title": "Verknüpfungen der Rechnung"
+      },
+      "loadFailed": "Rechnung konnte nicht geladen werden",
+      "payment": {
+        "amountDue": "Zu zahlen",
+        "bankAccounts": "Bankkonto",
+        "dueDates": "Zahlungsfrist",
+        "factor": "Factor",
+        "form": "Zahlungsart",
+        "paymentDate": "Zahlungsdatum",
+        "state": "Zahlungsstatus",
+        "states": {
+          "paid": "Bezahlt",
+          "partiallyPaid": "Teilweise bezahlt",
+          "unknown": "Keine Angabe",
+          "unpaid": "Unbezahlt"
+        },
+        "title": "Zahlung"
+      },
+      "saleDate": "Verkaufsdatum",
+      "seller": "Verkäufer",
+      "title": "Rechnung {number}",
+      "titleLoading": "Rechnung aus KSeF",
+      "totals": {
+        "gross": "Brutto",
+        "net": "Netto",
+        "vat": "USt."
+      }
+    },
+    "errors": {
+      "forbidden": "Sie haben keinen Zugriff auf KSeF-Rechnungen. Die Berechtigung vergibt der Administrator in der Benutzerverwaltung."
+    },
+    "invoiceTypes": {
+      "KOR": "Korrekturrechnung",
+      "KOR_ROZ": "Korrektur der Schlussrechnung",
+      "KOR_ZAL": "Korrektur der Anzahlungsrechnung",
+      "ROZ": "Schlussrechnung",
+      "UPR": "Vereinfachte Rechnung",
+      "VAT": "Umsatzsteuerrechnung",
+      "ZAL": "Anzahlungsrechnung"
+    },
+    "link": {
+      "alreadyLinkedHint": "Sie können sie trotzdem erneut verknüpfen — prüfen Sie nur, ob dieselben Kosten nicht doppelt gezählt werden.",
+      "alreadyLinkedTitle": "Achtung: Diese Rechnung ist bereits verknüpft",
+      "amountHint": "Standardmäßig der gesamte Nettobetrag der Rechnung. Ändern Sie ihn, wenn Sie diesen Kosten nur einen Teil der Rechnung zuordnen.",
+      "amountHintForeign": "Die Rechnung lautet auf {invoiceCurrency}, das Projekt auf {projectCurrency}. Lassen Sie das Feld leer, dann wird der gesamte Nettobetrag ({net}) zum Mittelkurs der NBP vom Geschäftstag vor dem Ausstellungsdatum der Rechnung umgerechnet. Sie können den Betrag auch direkt in {projectCurrency} eingeben.",
+      "amountIn": "Zugeordneter Betrag ({currency})",
+      "attachNote": "Die Rechnung wird mit den Kosten verknüpft: {item}. Betrag und übrige Angaben der Kosten ändern sich nicht.",
+      "back": "Zurück zur Liste",
+      "confirm": "Rechnung verknüpfen",
+      "errors": {
+        "failed": "Rechnung konnte nicht verknüpft werden",
+        "forbidden": "Sie sind nicht berechtigt, in diesem Projekt KSeF-Rechnungen zu verknüpfen.",
+        "noExchangeRate": "Kein NBP-Kurs für die Währung der Rechnung. Geben Sie den Betrag in {currency} ein.",
+        "projectClosed": "Das Projekt ist geschlossen — Rechnungen können nicht mehr verknüpft werden."
+      },
+      "saved": "Rechnung verknüpft",
+      "savedWithRate": "Rechnung verknüpft: {amount} zum Kurs {rate} vom {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Betrag",
+        "linkedBy": "Verknüpft von",
+        "project": "Projekt",
+        "status": "Status",
+        "task": "Aufgabe"
+      },
+      "wholeProject": "Gesamtes Projekt"
+    },
+    "list": {
+      "columns": {
+        "currency": "Währung",
+        "gross": "Brutto",
+        "issueDate": "Ausstellungsdatum",
+        "net": "Netto",
+        "number": "Nummer",
+        "paymentDueDate": "Zahlungsfrist",
+        "seller": "Verkäufer"
+      }
+    },
+    "nip": "Steuernummer",
+    "otherLinks": {
+      "intro": "Diese Rechnung ist außerdem verknüpft mit:",
+      "overAllocated": "Die Summe der Verknüpfungen übersteigt den Nettobetrag der Rechnung.",
+      "wholeProject": "{project} (gesamtes Projekt)"
+    },
+    "paymentForms": {
+      "card": "Karte",
+      "cash": "Bargeld",
+      "cheque": "Scheck",
+      "credit": "Kredit",
+      "mobile": "Mobile Zahlung",
+      "transfer": "Überweisung",
+      "voucher": "Gutschein"
+    },
+    "picker": {
+      "attachTitle": "KSeF-Rechnung mit Kosten verknüpfen",
+      "empty": "Keine Rechnungen im gewählten Zeitraum und für die gewählten Filter.",
+      "filters": {
+        "dateFrom": "Ausstellungsdatum von",
+        "dateTo": "Ausstellungsdatum bis",
+        "invoiceNumber": "Rechnungsnummer",
+        "netMax": "Netto bis",
+        "netMin": "Netto von",
+        "seller": "Verkäufer (Name oder Steuernummer)"
+      },
+      "lastSync": "Letzte erfolgreiche Synchronisierung: {time}.",
+      "linkedCount": "{count, plural, one {Bereits #-mal verknüpft} other {Bereits #-mal verknüpft}}",
+      "loadFailed": "Rechnungsliste konnte nicht geladen werden",
+      "nextPage": "Weiter",
+      "noCompanies": "Es wurde noch keine Firma für KSeF hinzugefügt. Das erledigt der Administrator unter Einstellungen → Projekte → KSeF.",
+      "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert. Die Liste zeigt nur früher abgerufene Rechnungen.",
+      "pageInfo": "Seite {page} von {pages} · Rechnungen: {total}",
+      "previousPage": "Zurück",
+      "search": "Suchen",
+      "select": "Auswählen",
+      "syncHint": "Eine frisch ausgestellte Rechnung kann erst nach einigen Minuten in KSeF erscheinen.",
+      "title": "Rechnung aus KSeF hinzufügen"
+    },
+    "settings": {
+      "addCompany": "Firma hinzufügen",
+      "columns": {
+        "lastAttempt": "Letzter Versuch",
+        "lastSynced": "Letzte erfolgreiche Synchronisierung",
+        "name": "Name",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Neue Firma in KSeF",
+        "added": "Firma hinzugefügt. Die Rechnungen werden bei der nächsten Synchronisierung abgerufen.",
+        "editTitle": "Firma in KSeF",
+        "name": "Name (optional)",
+        "saveFailed": "Firma konnte nicht gespeichert werden",
+        "saved": "Firma gespeichert",
+        "token": "KSeF-Token",
+        "tokenHintAdd": "In KSeF für diese Steuernummer erzeugtes Token. Vor dem Speichern prüfen wir es in KSeF; nach dem Speichern kann es nicht mehr ausgelesen werden.",
+        "tokenHintEdit": "Aktuelles Token: {hint}. Lassen Sie das Feld leer, um es nicht zu ändern.",
+        "verifying": "Prüfung in KSeF…"
+      },
+      "edit": "Ändern",
+      "environments": {
+        "production": "Produktionsumgebung",
+        "test": "Testumgebung"
+      },
+      "errors": {
+        "companyNotFound": "Diese Firma ist nicht mehr in der Konfiguration vorhanden. Aktualisieren Sie die Seite.",
+        "duplicateNip": "Eine Firma mit dieser Steuernummer wurde bereits hinzugefügt.",
+        "invalidNip": "Ungültige Steuernummer.",
+        "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert.",
+        "tokenRejected": "KSeF hat das Token für diese Steuernummer abgelehnt. Prüfen Sie, ob das Token gültig ist und für diese Firma ausgestellt wurde.",
+        "unreachable": "Die Verbindung zu KSeF zur Prüfung des Tokens ist fehlgeschlagen. Versuchen Sie es später erneut."
+      },
+      "hint": "Die Eingangsrechnungen der unten hinzugefügten Firmen werden alle 30 Minuten aus dem polnischen Landessystem für E-Rechnungen (KSeF) abgerufen. Personen mit der Berechtigung „Zugriff auf KSeF-Rechnungen“ verknüpfen sie mit Projektkosten.",
+      "initialSyncDays": "Erste Synchronisierung reicht zurück (Tage)",
+      "initialSyncDaysHint": "Von {min} bis {max} Tagen. Gilt für Firmen, die nach der Änderung dieser Einstellung hinzugefügt werden.",
+      "loadFailed": "KSeF-Konfiguration konnte nicht geladen werden",
+      "noCompanies": "Es wurde noch keine Firma hinzugefügt.",
+      "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert, daher können weder Firmen hinzugefügt noch Rechnungen abgerufen werden.",
+      "remove": "Entfernen",
+      "removeConfirm": "Firma {company} aus der KSeF-Konfiguration entfernen? Neue Rechnungen werden nicht mehr abgerufen. Bereits abgerufene Rechnungen und ihre Verknüpfungen mit Kosten bleiben erhalten.",
+      "removeFailed": "Firma konnte nicht entfernt werden",
+      "saveFailed": "Einstellung konnte nicht gespeichert werden",
+      "saved": "Einstellung gespeichert",
+      "statuses": {
+        "active": "Aktiv",
+        "error": "Synchronisierungsfehler",
+        "invalid": "Token abgelehnt"
+      },
+      "syncFailed": "Die Synchronisierung ist fehlgeschlagen — der Grund wird bei der Firma angezeigt.",
+      "testEnvironmentNote": "Der Server ist mit der KSeF-Testumgebung verbunden — die Rechnungen sind keine echten Belege.",
+      "title": "KSeF — Eingangsrechnungen"
+    },
+    "sync": {
+      "failedForCompany": "Die Synchronisierung ist für mindestens eine Firma fehlgeschlagen. Details sieht der Administrator unter Einstellungen → Projekte → KSeF.",
+      "finished": "Synchronisierung abgeschlossen",
+      "now": "Jetzt synchronisieren",
+      "running": "Synchronisierung…",
+      "startFailed": "Synchronisierung konnte nicht gestartet werden",
+      "stillRunning": "Die Synchronisierung läuft noch — aktualisieren Sie die Liste in Kürze."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Vollzugriff",

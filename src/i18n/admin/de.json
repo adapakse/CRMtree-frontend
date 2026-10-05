@@ -1151,6 +1151,7 @@
       "accountType": "Kontotyp",
       "adminRole": "Administratorrolle",
       "canCreateProjects": "Projekte anlegen",
+      "canViewKsefInvoices": "Zugriff auf KSeF-Rechnungen",
       "company": "Firma",
       "crmRole": "CRM-Rolle",
       "department": "Abteilung",

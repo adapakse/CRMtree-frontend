@@ -1151,6 +1151,7 @@
       "accountType": "Vrsta računa",
       "adminRole": "Uloga administratora",
       "canCreateProjects": "Otvaranje projekata",
+      "canViewKsefInvoices": "Pristup računima iz KSeF-a",
       "company": "Tvrtka",
       "crmRole": "CRM uloga",
       "department": "Odjel",

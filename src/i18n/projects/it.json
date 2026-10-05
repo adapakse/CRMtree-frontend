@@ -243,6 +243,219 @@
       "week": "Settimane"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "Fattura da KSeF — mostra i dettagli",
+      "title": "Fattura da KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Aggiungi fattura da KSeF",
+      "link": "Collega fattura KSeF",
+      "unlink": "Scollega fattura",
+      "unlinkConfirm": "Scollegare la fattura {invoice} da questo costo? Il costo resterà nell’elenco e la fattura rimarrà in KSeF.",
+      "unlinkFailed": "Impossibile scollegare la fattura"
+    },
+    "detail": {
+      "address": "Indirizzo",
+      "buyer": "Acquirente",
+      "invoiceType": "Tipo di fattura",
+      "issueDate": "Data di emissione",
+      "ksefNumber": "Numero KSeF",
+      "lines": {
+        "empty": "La fattura non contiene righe.",
+        "name": "Nome",
+        "netAmount": "Importo netto",
+        "number": "N.",
+        "quantity": "Quantità",
+        "title": "Righe della fattura",
+        "unitNetPrice": "Prezzo netto",
+        "vatRate": "IVA"
+      },
+      "links": {
+        "empty": "La fattura non è collegata a nessun costo.",
+        "linkedTotal": "In totale collegati {linked} su {net} netti.",
+        "title": "Collegamenti della fattura"
+      },
+      "loadFailed": "Impossibile caricare la fattura",
+      "payment": {
+        "amountDue": "Da pagare",
+        "bankAccounts": "Conto bancario",
+        "dueDates": "Scadenza del pagamento",
+        "factor": "factor",
+        "form": "Modalità di pagamento",
+        "paymentDate": "Data del pagamento",
+        "state": "Stato del pagamento",
+        "states": {
+          "paid": "Pagata",
+          "partiallyPaid": "Pagata in parte",
+          "unknown": "Nessuna informazione",
+          "unpaid": "Non pagata"
+        },
+        "title": "Pagamento"
+      },
+      "saleDate": "Data di vendita",
+      "seller": "Venditore",
+      "title": "Fattura {number}",
+      "titleLoading": "Fattura da KSeF",
+      "totals": {
+        "gross": "Lordo",
+        "net": "Netto",
+        "vat": "IVA"
+      }
+    },
+    "errors": {
+      "forbidden": "Non hai accesso alle fatture KSeF. Il permesso viene assegnato dall'amministratore nel pannello utenti."
+    },
+    "invoiceTypes": {
+      "KOR": "Fattura correttiva",
+      "KOR_ROZ": "Correzione della fattura di saldo",
+      "KOR_ZAL": "Correzione della fattura di acconto",
+      "ROZ": "Fattura di saldo",
+      "UPR": "Fattura semplificata",
+      "VAT": "Fattura IVA",
+      "ZAL": "Fattura di acconto"
+    },
+    "link": {
+      "alreadyLinkedHint": "Puoi comunque collegarla di nuovo — verifica solo che lo stesso costo non venga conteggiato due volte.",
+      "alreadyLinkedTitle": "Attenzione: questa fattura è già collegata",
+      "amountHint": "Per impostazione predefinita è l'intero importo netto della fattura. Modificalo se a questo costo attribuisci solo una parte della fattura.",
+      "amountHintForeign": "La fattura è in {invoiceCurrency}, mentre il progetto è in {projectCurrency}. Lascia il campo vuoto e l’intero importo netto ({net}) verrà convertito al cambio medio della NBP del giorno lavorativo precedente la data di emissione della fattura. Puoi anche inserire direttamente l’importo in {projectCurrency}.",
+      "amountIn": "Importo attribuito ({currency})",
+      "attachNote": "La fattura verrà collegata al costo: {item}. L’importo e gli altri dati del costo non cambieranno.",
+      "back": "Torna all'elenco",
+      "confirm": "Collega fattura",
+      "errors": {
+        "failed": "Impossibile collegare la fattura",
+        "forbidden": "Non hai i permessi per collegare fatture KSeF in questo progetto.",
+        "noExchangeRate": "Nessun cambio NBP per la valuta della fattura. Inserisci l’importo in {currency}.",
+        "projectClosed": "Il progetto è chiuso — non è più possibile collegare fatture."
+      },
+      "saved": "Fattura collegata",
+      "savedWithRate": "Fattura collegata: {amount} al cambio {rate} del {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Importo",
+        "linkedBy": "Collegata da",
+        "project": "Progetto",
+        "status": "Stato",
+        "task": "Attività"
+      },
+      "wholeProject": "Intero progetto"
+    },
+    "list": {
+      "columns": {
+        "currency": "Valuta",
+        "gross": "Lordo",
+        "issueDate": "Data di emissione",
+        "net": "Netto",
+        "number": "Numero",
+        "paymentDueDate": "Scadenza pagamento",
+        "seller": "Venditore"
+      }
+    },
+    "nip": "Partita IVA",
+    "otherLinks": {
+      "intro": "Questa fattura è collegata anche a:",
+      "overAllocated": "La somma dei collegamenti supera l'importo netto della fattura.",
+      "wholeProject": "{project} (intero progetto)"
+    },
+    "paymentForms": {
+      "card": "Carta",
+      "cash": "Contanti",
+      "cheque": "Assegno",
+      "credit": "Credito",
+      "mobile": "Pagamento mobile",
+      "transfer": "Bonifico",
+      "voucher": "Buono"
+    },
+    "picker": {
+      "attachTitle": "Collega una fattura KSeF al costo",
+      "empty": "Nessuna fattura nel periodo selezionato e per i filtri selezionati.",
+      "filters": {
+        "dateFrom": "Data di emissione dal",
+        "dateTo": "Data di emissione al",
+        "invoiceNumber": "Numero della fattura",
+        "netMax": "Netto fino a",
+        "netMin": "Netto da",
+        "seller": "Venditore (nome o partita IVA)"
+      },
+      "lastSync": "Ultima sincronizzazione riuscita: {time}.",
+      "linkedCount": "{count, plural, one {Già collegata: # volta} other {Già collegata: # volte}}",
+      "loadFailed": "Impossibile caricare l'elenco delle fatture",
+      "nextPage": "Successiva",
+      "noCompanies": "Nessuna azienda è stata ancora aggiunta a KSeF. L'amministratore lo fa in Impostazioni → Progetti → KSeF.",
+      "notConfigured": "L'integrazione con KSeF non è configurata sul server. L'elenco mostra solo le fatture scaricate in precedenza.",
+      "pageInfo": "Pagina {page} di {pages} · fatture: {total}",
+      "previousPage": "Precedente",
+      "search": "Cerca",
+      "select": "Seleziona",
+      "syncHint": "Una fattura appena emessa può comparire in KSeF solo dopo alcuni minuti.",
+      "title": "Aggiungi fattura da KSeF"
+    },
+    "settings": {
+      "addCompany": "Aggiungi azienda",
+      "columns": {
+        "lastAttempt": "Ultimo tentativo",
+        "lastSynced": "Ultima sincronizzazione riuscita",
+        "name": "Nome",
+        "status": "Stato",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Nuova azienda in KSeF",
+        "added": "Azienda aggiunta. Le fatture verranno scaricate alla prossima sincronizzazione.",
+        "editTitle": "Azienda in KSeF",
+        "name": "Nome (facoltativo)",
+        "saveFailed": "Impossibile salvare l'azienda",
+        "saved": "Azienda salvata",
+        "token": "Token KSeF",
+        "tokenHintAdd": "Token generato in KSeF per questa partita IVA. Prima di salvarlo lo verifichiamo in KSeF; dopo il salvataggio non è più possibile leggerlo.",
+        "tokenHintEdit": "Token attuale: {hint}. Lascia il campo vuoto per non modificarlo.",
+        "verifying": "Verifica in KSeF…"
+      },
+      "edit": "Modifica",
+      "environments": {
+        "production": "Ambiente di produzione",
+        "test": "Ambiente di test"
+      },
+      "errors": {
+        "companyNotFound": "Questa azienda non è più presente nella configurazione. Aggiorna la pagina.",
+        "duplicateNip": "Un'azienda con questa partita IVA è già stata aggiunta.",
+        "invalidNip": "Partita IVA non valida.",
+        "notConfigured": "L'integrazione con KSeF non è configurata sul server.",
+        "tokenRejected": "KSeF ha rifiutato il token per questa partita IVA. Verifica che il token sia valido e rilasciato per questa azienda.",
+        "unreachable": "Impossibile connettersi a KSeF per verificare il token. Riprova più tardi."
+      },
+      "hint": "Le fatture di acquisto delle aziende aggiunte qui sotto vengono scaricate dal Sistema nazionale polacco di fatturazione elettronica (KSeF) ogni 30 minuti. Le persone con il permesso «Accesso alle fatture KSeF» le collegano ai costi dei progetti.",
+      "initialSyncDays": "Periodo coperto dalla prima sincronizzazione (giorni)",
+      "initialSyncDaysHint": "Da {min} a {max} giorni. Si applica alle aziende aggiunte dopo la modifica di questa impostazione.",
+      "loadFailed": "Impossibile caricare la configurazione di KSeF",
+      "noCompanies": "Nessuna azienda è stata ancora aggiunta.",
+      "notConfigured": "L'integrazione con KSeF non è configurata sul server, perciò non è possibile aggiungere aziende né scaricare fatture.",
+      "remove": "Rimuovi",
+      "removeConfirm": "Rimuovere l’azienda {company} dalla configurazione di KSeF? Le nuove fatture non verranno più scaricate. Le fatture già scaricate e i loro collegamenti ai costi verranno conservati.",
+      "removeFailed": "Impossibile rimuovere l'azienda",
+      "saveFailed": "Impossibile salvare l'impostazione",
+      "saved": "Impostazione salvata",
+      "statuses": {
+        "active": "Attiva",
+        "error": "Errore di sincronizzazione",
+        "invalid": "Token rifiutato"
+      },
+      "syncFailed": "Sincronizzazione non riuscita — il motivo è indicato accanto all'azienda.",
+      "testEnvironmentNote": "Il server è collegato all'ambiente di test di KSeF — le fatture non sono documenti reali.",
+      "title": "KSeF — fatture di costo"
+    },
+    "sync": {
+      "failedForCompany": "Sincronizzazione non riuscita per almeno un'azienda. L'amministratore può vedere i dettagli in Impostazioni → Progetti → KSeF.",
+      "finished": "Sincronizzazione completata",
+      "now": "Sincronizza ora",
+      "running": "Sincronizzazione…",
+      "startFailed": "Impossibile avviare la sincronizzazione",
+      "stillRunning": "La sincronizzazione è ancora in corso — aggiorna l'elenco tra poco."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Completo",

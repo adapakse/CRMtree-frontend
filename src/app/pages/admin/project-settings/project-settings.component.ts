@@ -4,15 +4,16 @@ import { ToastService } from '../../../core/services/toast.service';
 import { ProjectConfig, ProjectsApiService } from '../../../core/services/projects-api.service';
 import { ProjectDictionaryEditorComponent } from './project-dictionary-editor.component';
 import { ProjectFieldsEditorComponent } from './project-fields-editor.component';
+import { ProjectKsefSettingsComponent } from './project-ksef-settings.component';
 import { ProjectTransitionsEditorComponent } from './project-transitions-editor.component';
 
-/** "Projekty" tab of the tenant settings: task dictionaries, status transitions, custom fields and project finance. */
+/** "Projekty" tab of the tenant settings: task dictionaries, status transitions, custom fields, project finance and KSeF. */
 @Component({
   selector: 'wt-project-settings',
   standalone: true,
   imports: [
     ProjectDictionaryEditorComponent, ProjectTransitionsEditorComponent, ProjectFieldsEditorComponent,
-    TranslocoDirective, TranslocoPipe,
+    ProjectKsefSettingsComponent, TranslocoDirective, TranslocoPipe,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +61,10 @@ import { ProjectTransitionsEditorComponent } from './project-transitions-editor.
                                           (configChanged)="config.set($event)" />
           }
         </section>
+
+        @if (loaded.finance_enabled) {
+          <section class="card block"><wt-project-ksef-settings /></section>
+        }
       } @else {
         <div class="empty-state">{{ 'states.loading' | transloco }}</div>
       }

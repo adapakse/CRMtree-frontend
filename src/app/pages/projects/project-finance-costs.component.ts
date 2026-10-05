@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ProjectCostItem, ProjectCostStatus, ProjectFinanceApiService } from '../../core/services/project-finance-api.service';
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectCostCategory, ProjectTask } from '../../core/services/projects-api.service';
 import { ProjectCostFormComponent } from './project-cost-form.component';
+import { ProjectKsefInvoiceBadgeComponent } from './project-ksef-invoice-badge.component';
+import { ProjectKsefInvoicePickerComponent } from './project-ksef-invoice-picker.component';
+import { ProjectKsefOtherLinksComponent } from './project-ksef-other-links.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 
@@ -17,11 +21,18 @@ interface FilterOption {
   label: string;
 }
 
-/** Cost items of the whole project with filters; add / edit / delete for those who may write. */
+/**
+ * Cost items of the whole project with filters; add / edit / delete for those
+ * who may write, and linking to KSeF invoices for those who also hold the KSeF
+ * permission. The note about an invoice linked elsewhere is shown to every reader.
+ */
 @Component({
   selector: 'wt-project-finance-costs',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, ProjectCostFormComponent],
+  imports: [
+    FormsModule, TranslocoDirective, ProjectCostFormComponent,
+    ProjectKsefInvoiceBadgeComponent, ProjectKsefInvoicePickerComponent, ProjectKsefOtherLinksComponent,
+  ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -50,6 +61,9 @@ interface FilterOption {
         @if (canWrite()) {
           <button class="btn btn-p btn-sm" (click)="openForm(null)">+ {{ t('finance.costs.add') }}</button>
         }
+        @if (canLinkKsefInvoices()) {
+          <button class="btn btn-g btn-sm" (click)="openPicker(null)">+ {{ t('ksef.costs.addFromKsef') }}</button>
+        }
       </div>
 
       @if (costs().length === 0) {
@@ -74,7 +88,7 @@ interface FilterOption {
             </thead>
             <tbody>
               @for (item of visibleCosts(); track item.id) {
-                <tr>
+                <tr [class.has-note]="item.other_links.length > 0">
                   <td class="nowrap">{{ format.date(item.date) }}</td>
                   <td>{{ item.category_name }}</td>
                   <td class="description">{{ item.description }}</td>
@@ -86,7 +100,16 @@ interface FilterOption {
                     }
                   </td>
                   <td>{{ item.supplier_name }}</td>
-                  <td>{{ item.document_number }}</td>
+                  <td>
+                    @if (item.ksef_invoice; as invoice) {
+                      <wt-project-ksef-invoice-badge [invoice]="invoice" />
+                      @if (item.document_number && item.document_number !== invoice.invoice_number) {
+                        <span class="secondary">{{ item.document_number }}</span>
+                      }
+                    } @else {
+                      {{ item.document_number }}
+                    }
+                  </td>
                   <td><span class="pill status-pill" [class]="item.status">{{ t('finance.costStatuses.' + item.status) }}</span></td>
                   <td class="amount">
                     {{ format.money(item.amount, currency()) }}
@@ -101,11 +124,23 @@ interface FilterOption {
                   </td>
                   @if (canWrite()) {
                     <td class="row-action">
+                      @if (canLinkKsefInvoices()) {
+                        @if (item.ksef_invoice_id) {
+                          <button class="link ksef-action" (click)="unlinkInvoice(item)">{{ t('ksef.costs.unlink') }}</button>
+                        } @else {
+                          <button class="link ksef-action" (click)="openPicker(item)">{{ t('ksef.costs.link') }}</button>
+                        }
+                      }
                       <button class="link" (click)="openForm(item)">{{ t('finance.edit') }}</button>
                       <button class="link-danger" (click)="remove(item)">{{ t('finance.delete') }}</button>
                     </td>
                   }
                 </tr>
+                @if (item.other_links.length > 0) {
+                  <tr class="note-row">
+                    <td [attr.colspan]="canWrite() ? 9 : 8"><wt-project-ksef-other-links [item]="item" /></td>
+                  </tr>
+                }
               }
             </tbody>
             <tfoot>
@@ -125,15 +160,25 @@ interface FilterOption {
           [categories]="categories()" [tasks]="tasks()" [item]="editedItem()"
           (closed)="isFormOpen.set(false)" (saved)="onSaved()" />
       }
+      @if (isPickerOpen()) {
+        <wt-project-ksef-invoice-picker
+          [projectId]="projectId()" [projectKey]="projectKey()" [projectCurrency]="currency()"
+          [categories]="categories()" [tasks]="tasks()" [attachTo]="pickerTarget()"
+          (closed)="isPickerOpen.set(false)" (saved)="onInvoiceLinked()" />
+      }
     </section>
   `,
   styles: [PROJECTS_SHARED_STYLES, PROJECT_FINANCE_STYLES, `
     .filter { width:auto; max-width:200px; padding:5px 8px; font-size:12.5px; }
     .description { max-width:280px; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .ksef-action { margin-right:10px; }
+    table.grid tr.has-note td { border-bottom:none; padding-bottom:3px; }
+    table.grid tr.note-row td { padding-top:0; }
   `],
 })
 export class ProjectFinanceCostsComponent {
   private readonly api = inject(ProjectFinanceApiService);
+  private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
   readonly format = inject(ProjectFinanceFormatService);
@@ -156,6 +201,10 @@ export class ProjectFinanceCostsComponent {
   readonly taskFilter = signal<string | null>(null);
   readonly isFormOpen = signal(false);
   readonly editedItem = signal<ProjectCostItem | null>(null);
+  readonly isPickerOpen = signal(false);
+  /** Cost item the picked invoice is attached to; null makes the picker create a new cost item. */
+  readonly pickerTarget = signal<ProjectCostItem | null>(null);
+  readonly canLinkKsefInvoices = computed(() => this.canWrite() && this.auth.canViewKsefInvoices());
 
   // Filters offer only what occurs in the list, so no choice leads to an empty table.
   readonly categoryOptions = computed(() => uniqueOptions(
@@ -185,6 +234,25 @@ export class ProjectFinanceCostsComponent {
   onSaved(): void {
     this.isFormOpen.set(false);
     this.changed.emit();
+  }
+
+  openPicker(item: ProjectCostItem | null): void {
+    this.pickerTarget.set(item);
+    this.isPickerOpen.set(true);
+  }
+
+  onInvoiceLinked(): void {
+    this.isPickerOpen.set(false);
+    this.changed.emit();
+  }
+
+  unlinkInvoice(item: ProjectCostItem): void {
+    const invoice = item.ksef_invoice?.invoice_number ?? item.ksef_invoice?.ksef_number ?? '';
+    if (!confirm(this.transloco.translate('projects.ksef.costs.unlinkConfirm', { invoice }))) return;
+    this.api.updateCost(this.projectId(), item.id, { ksef_invoice_id: null }).subscribe({
+      next: () => this.changed.emit(),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.ksef.costs.unlinkFailed')),
+    });
   }
 
   remove(item: ProjectCostItem): void {

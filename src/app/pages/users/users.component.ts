@@ -211,6 +211,11 @@ import { LocaleService } from '../../core/i18n/locale.service';
                     <option [ngValue]="true">{{ t('users.yes') }}</option>
                   </select>
                 </div>
+                @if (!newExternal) {
+                  <label class="check-field">
+                    <input type="checkbox" [(ngModel)]="newCanViewKsefInvoices"> {{ t('users.fields.canViewKsefInvoices') }}
+                  </label>
+                }
               }
               <div class="fg" style="grid-column:1/-1">
                 <label class="fl">{{ t('users.create.assignGroup') }}</label>
@@ -333,6 +338,11 @@ import { LocaleService } from '../../core/i18n/locale.service';
                       <option [ngValue]="true">{{ t('users.yes') }}</option>
                     </select>
                   </div>
+                  @if (!editExternal) {
+                    <label class="check-field">
+                      <input type="checkbox" [(ngModel)]="editCanViewKsefInvoices"> {{ t('users.fields.canViewKsefInvoices') }}
+                    </label>
+                  }
                 }
               </div>
               <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">{{ t('users.edit.saveChanges') }}</button>
@@ -563,6 +573,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
     .mox:hover { background:var(--gray-100); }
     .fgrid { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
     .fg { display:flex;flex-direction:column;gap:4px; }
+    .check-field { grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-800);cursor:pointer; }
     .fl { font-size:12px;font-weight:600;color:var(--gray-600); }
     .fi { border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;transition:border .15s; }
     .fi:focus { border-color:var(--orange); }
@@ -671,11 +682,13 @@ export class UsersComponent implements OnInit {
   newDepartment  = '';
   newExternal    = false;
   newCanCreateProjects = false;
+  newCanViewKsefInvoices = false;
   editPhone      = '';
   editCompany    = '';
   editDepartment = '';
   editExternal   = false;
   editCanCreateProjects = false;
+  editCanViewKsefInvoices = false;
   readonly hasProjectsFeature = computed(() => this.auth.hasFeature('projects'));
   newGroup       = '';
   newGroupAccess: 'read' | 'full' = 'read';
@@ -816,7 +829,7 @@ export class UsersComponent implements OnInit {
     this.newFirst = ''; this.newLast = ''; this.newEmail = '';
     this.newActive = true; this.newAdmin = false; this.newCrmRole = '';
     this.newPhone = ''; this.newCompany = ''; this.newDepartment = '';
-    this.newExternal = false; this.newCanCreateProjects = false;
+    this.newExternal = false; this.newCanCreateProjects = false; this.newCanViewKsefInvoices = false;
     this.newGroup = ''; this.newGroupAccess = 'read';
     this.submitted = false;
     this.showNew.set(true);
@@ -838,6 +851,7 @@ export class UsersComponent implements OnInit {
       department: this.newDepartment.trim() || null,
       is_external: this.newExternal,
       can_create_projects: this.newCanCreateProjects && !this.newExternal,
+      can_view_ksef_invoices: this.newCanViewKsefInvoices && !this.newExternal,
     } as any).subscribe({
       next: (user) => {
         if (this.newGroup) {
@@ -892,6 +906,7 @@ export class UsersComponent implements OnInit {
         this.editDepartment = u.department ?? '';
         this.editExternal   = u.is_external ?? false;
         this.editCanCreateProjects = u.can_create_projects ?? false;
+        this.editCanViewKsefInvoices = u.can_view_ksef_invoices ?? false;
         this.emailError        = '';
         this.newPasswordVal    = '';
         this.newPasswordConfirm = '';
@@ -948,6 +963,7 @@ export class UsersComponent implements OnInit {
       department: this.editDepartment.trim() || null,
       is_external: this.editExternal,
       can_create_projects: this.editCanCreateProjects && !this.editExternal,
+      can_view_ksef_invoices: this.editCanViewKsefInvoices && !this.editExternal,
     } as any).subscribe({
       next: updated => {
         this.selected.set({ ...u, ...updated });

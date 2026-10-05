@@ -243,6 +243,219 @@
       "week": "Tedni"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "Račun iz KSeF — pokaži podrobnosti",
+      "title": "Račun iz KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Dodaj račun iz KSeF",
+      "link": "Poveži račun KSeF",
+      "unlink": "Odveži račun",
+      "unlinkConfirm": "Želite prekiniti povezavo računa {invoice} s tem stroškom? Strošek bo ostal na seznamu, račun pa ostane v KSeF.",
+      "unlinkFailed": "Povezave z računom ni bilo mogoče prekiniti"
+    },
+    "detail": {
+      "address": "Naslov",
+      "buyer": "Kupec",
+      "invoiceType": "Vrsta računa",
+      "issueDate": "Datum izdaje",
+      "ksefNumber": "Številka KSeF",
+      "lines": {
+        "empty": "Račun ne vsebuje postavk.",
+        "name": "Naziv",
+        "netAmount": "Neto vrednost",
+        "number": "Št.",
+        "quantity": "Količina",
+        "title": "Postavke računa",
+        "unitNetPrice": "Neto cena",
+        "vatRate": "DDV"
+      },
+      "links": {
+        "empty": "Račun ni povezan z nobenim stroškom.",
+        "linkedTotal": "Skupaj povezano {linked} od {net} neto.",
+        "title": "Povezave računa"
+      },
+      "loadFailed": "Računa ni bilo mogoče naložiti",
+      "payment": {
+        "amountDue": "Za plačilo",
+        "bankAccounts": "Bančni račun",
+        "dueDates": "Rok plačila",
+        "factor": "faktor",
+        "form": "Način plačila",
+        "paymentDate": "Datum plačila",
+        "state": "Stanje plačila",
+        "states": {
+          "paid": "Plačan",
+          "partiallyPaid": "Delno plačan",
+          "unknown": "Ni podatka",
+          "unpaid": "Neplačan"
+        },
+        "title": "Plačilo"
+      },
+      "saleDate": "Datum prodaje",
+      "seller": "Prodajalec",
+      "title": "Račun {number}",
+      "titleLoading": "Račun iz KSeF",
+      "totals": {
+        "gross": "Bruto",
+        "net": "Neto",
+        "vat": "DDV"
+      }
+    },
+    "errors": {
+      "forbidden": "Nimate dostopa do računov KSeF. Pravico dodeli skrbnik v upravljanju uporabnikov."
+    },
+    "invoiceTypes": {
+      "KOR": "Popravek računa",
+      "KOR_ROZ": "Popravek končnega računa",
+      "KOR_ZAL": "Popravek avansnega računa",
+      "ROZ": "Končni račun",
+      "UPR": "Poenostavljeni račun",
+      "VAT": "Račun z DDV",
+      "ZAL": "Avansni račun"
+    },
+    "link": {
+      "alreadyLinkedHint": "Kljub temu ga lahko povežete znova — preverite le, da isti strošek ne bo štet dvakrat.",
+      "alreadyLinkedTitle": "Pozor: ta račun je že povezan",
+      "amountHint": "Privzeto celoten neto znesek računa. Spremenite ga, če temu strošku pripisujete samo del računa.",
+      "amountHintForeign": "Račun je v valuti {invoiceCurrency}, projekt pa v valuti {projectCurrency}. Pustite polje prazno in celoten neto znesek ({net}) bo preračunan po srednjem tečaju NBP z delovnega dne pred datumom izdaje računa. Znesek lahko vnesete tudi neposredno v valuti {projectCurrency}.",
+      "amountIn": "Pripisani znesek ({currency})",
+      "attachNote": "Račun bo povezan s stroškom: {item}. Znesek in drugi podatki stroška se ne bodo spremenili.",
+      "back": "Nazaj na seznam",
+      "confirm": "Poveži račun",
+      "errors": {
+        "failed": "Računa ni bilo mogoče povezati",
+        "forbidden": "Nimate pravic za povezovanje računov KSeF v tem projektu.",
+        "noExchangeRate": "Za valuto računa ni tečaja NBP. Vnesite znesek v valuti {currency}.",
+        "projectClosed": "Projekt je zaprt — računov ni več mogoče povezovati."
+      },
+      "saved": "Račun povezan",
+      "savedWithRate": "Račun povezan: {amount} po tečaju {rate} z dne {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Znesek",
+        "linkedBy": "Povezal(a)",
+        "project": "Projekt",
+        "status": "Status",
+        "task": "Naloga"
+      },
+      "wholeProject": "Celoten projekt"
+    },
+    "list": {
+      "columns": {
+        "currency": "Valuta",
+        "gross": "Bruto",
+        "issueDate": "Datum izdaje",
+        "net": "Neto",
+        "number": "Številka",
+        "paymentDueDate": "Rok plačila",
+        "seller": "Prodajalec"
+      }
+    },
+    "nip": "Davčna številka",
+    "otherLinks": {
+      "intro": "Druge povezave tega računa:",
+      "overAllocated": "Vsota povezav presega neto znesek računa.",
+      "wholeProject": "{project} (celoten projekt)"
+    },
+    "paymentForms": {
+      "card": "Kartica",
+      "cash": "Gotovina",
+      "cheque": "Ček",
+      "credit": "Kredit",
+      "mobile": "Mobilno plačilo",
+      "transfer": "Nakazilo",
+      "voucher": "Bon"
+    },
+    "picker": {
+      "attachTitle": "Poveži račun KSeF s stroškom",
+      "empty": "V izbranem obdobju in za izbrane filtre ni računov.",
+      "filters": {
+        "dateFrom": "Datum izdaje od",
+        "dateTo": "Datum izdaje do",
+        "invoiceNumber": "Številka računa",
+        "netMax": "Neto do",
+        "netMin": "Neto od",
+        "seller": "Prodajalec (naziv ali davčna številka)"
+      },
+      "lastSync": "Zadnja uspešna sinhronizacija: {time}.",
+      "linkedCount": "{count, plural, one {Že povezan: #-krat} two {Že povezan: #-krat} few {Že povezan: #-krat} other {Že povezan: #-krat}}",
+      "loadFailed": "Seznama računov ni bilo mogoče naložiti",
+      "nextPage": "Naslednja",
+      "noCompanies": "V KSeF še ni dodano nobeno podjetje. Skrbnik to stori v Nastavitve → Projekti → KSeF.",
+      "notConfigured": "Integracija s KSeF na strežniku ni konfigurirana. Seznam prikazuje samo prej prenesene račune.",
+      "pageInfo": "Stran {page} od {pages} · računov: {total}",
+      "previousPage": "Prejšnja",
+      "search": "Išči",
+      "select": "Izberi",
+      "syncHint": "Pravkar izdan račun se lahko v KSeF pojavi šele po nekaj minutah.",
+      "title": "Dodaj račun iz KSeF"
+    },
+    "settings": {
+      "addCompany": "Dodaj podjetje",
+      "columns": {
+        "lastAttempt": "Zadnji poskus",
+        "lastSynced": "Zadnja uspešna sinhronizacija",
+        "name": "Naziv",
+        "status": "Status",
+        "token": "Žeton"
+      },
+      "companyForm": {
+        "addTitle": "Novo podjetje v KSeF",
+        "added": "Podjetje dodano. Računi bodo preneseni ob naslednji sinhronizaciji.",
+        "editTitle": "Podjetje v KSeF",
+        "name": "Naziv (neobvezno)",
+        "saveFailed": "Podjetja ni bilo mogoče shraniti",
+        "saved": "Podjetje shranjeno",
+        "token": "Žeton KSeF",
+        "tokenHintAdd": "Žeton, ustvarjen v KSeF za to davčno številko. Pred shranjevanjem ga preverimo v KSeF; po shranjevanju ga ni več mogoče prebrati.",
+        "tokenHintEdit": "Trenutni žeton: {hint}. Pustite polje prazno, če ga ne želite spremeniti.",
+        "verifying": "Preverjanje v KSeF…"
+      },
+      "edit": "Spremeni",
+      "environments": {
+        "production": "Produkcijsko okolje",
+        "test": "Testno okolje"
+      },
+      "errors": {
+        "companyNotFound": "Tega podjetja ni več v konfiguraciji. Osvežite stran.",
+        "duplicateNip": "Podjetje s to davčno številko je že dodano.",
+        "invalidNip": "Neveljavna davčna številka.",
+        "notConfigured": "Integracija s KSeF na strežniku ni konfigurirana.",
+        "tokenRejected": "KSeF je zavrnil žeton za to davčno številko. Preverite, ali je žeton veljaven in izdan za to podjetje.",
+        "unreachable": "Povezave s KSeF za preverjanje žetona ni bilo mogoče vzpostaviti. Poskusite znova pozneje."
+      },
+      "hint": "Prejeti računi spodaj dodanih podjetij se vsakih 30 minut prenašajo iz KSeF, poljskega nacionalnega sistema e-računov. Osebe s pravico „Dostop do računov KSeF“ jih povezujejo s stroški projektov.",
+      "initialSyncDays": "Prva sinhronizacija sega nazaj (dni)",
+      "initialSyncDaysHint": "Od {min} do {max} dni. Velja za podjetja, dodana po spremembi te nastavitve.",
+      "loadFailed": "Konfiguracije KSeF ni bilo mogoče naložiti",
+      "noCompanies": "Dodano še ni nobeno podjetje.",
+      "notConfigured": "Integracija s KSeF na strežniku ni konfigurirana, zato ni mogoče dodajati podjetij niti prenašati računov.",
+      "remove": "Odstrani",
+      "removeConfirm": "Želite odstraniti podjetje {company} iz konfiguracije KSeF? Novi računi se ne bodo več prenašali. Že preneseni računi in njihove povezave s stroški bodo ohranjeni.",
+      "removeFailed": "Podjetja ni bilo mogoče odstraniti",
+      "saveFailed": "Nastavitve ni bilo mogoče shraniti",
+      "saved": "Nastavitev shranjena",
+      "statuses": {
+        "active": "Aktivno",
+        "error": "Napaka sinhronizacije",
+        "invalid": "Žeton zavrnjen"
+      },
+      "syncFailed": "Sinhronizacija ni uspela — razlog je prikazan pri podjetju.",
+      "testEnvironmentNote": "Strežnik se povezuje s testnim okoljem KSeF — računi niso pravi dokumenti.",
+      "title": "KSeF — stroškovni računi"
+    },
+    "sync": {
+      "failedForCompany": "Sinhronizacija ni uspela za vsaj eno podjetje. Podrobnosti vidi skrbnik v Nastavitve → Projekti → KSeF.",
+      "finished": "Sinhronizacija končana",
+      "now": "Sinhroniziraj zdaj",
+      "running": "Sinhronizacija…",
+      "startFailed": "Sinhronizacije ni bilo mogoče zagnati",
+      "stillRunning": "Sinhronizacija še poteka — čez trenutek osvežite seznam."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Polne",

@@ -243,6 +243,219 @@
       "week": "Weeks"
     }
   },
+  "ksef": {
+    "badge": {
+      "openTitle": "KSeF invoice — show details",
+      "title": "KSeF invoice"
+    },
+    "costs": {
+      "addFromKsef": "Add invoice from KSeF",
+      "link": "Link KSeF invoice",
+      "unlink": "Unlink invoice",
+      "unlinkConfirm": "Unlink invoice {invoice} from this cost? The cost stays on the list and the invoice stays in KSeF.",
+      "unlinkFailed": "Could not unlink the invoice"
+    },
+    "detail": {
+      "address": "Address",
+      "buyer": "Buyer",
+      "invoiceType": "Invoice type",
+      "issueDate": "Issue date",
+      "ksefNumber": "KSeF number",
+      "lines": {
+        "empty": "The invoice has no lines.",
+        "name": "Name",
+        "netAmount": "Net value",
+        "number": "No.",
+        "quantity": "Quantity",
+        "title": "Invoice lines",
+        "unitNetPrice": "Net price",
+        "vatRate": "VAT"
+      },
+      "links": {
+        "empty": "The invoice is not linked to any cost.",
+        "linkedTotal": "Linked in total: {linked} of {net} net.",
+        "title": "Links of the invoice"
+      },
+      "loadFailed": "Could not load the invoice",
+      "payment": {
+        "amountDue": "Amount due",
+        "bankAccounts": "Bank account",
+        "dueDates": "Payment due",
+        "factor": "factor",
+        "form": "Payment method",
+        "paymentDate": "Payment date",
+        "state": "Payment state",
+        "states": {
+          "paid": "Paid",
+          "partiallyPaid": "Partially paid",
+          "unknown": "No information",
+          "unpaid": "Unpaid"
+        },
+        "title": "Payment"
+      },
+      "saleDate": "Sale date",
+      "seller": "Seller",
+      "title": "Invoice {number}",
+      "titleLoading": "KSeF invoice",
+      "totals": {
+        "gross": "Gross",
+        "net": "Net",
+        "vat": "VAT"
+      }
+    },
+    "errors": {
+      "forbidden": "You have no access to KSeF invoices. An administrator grants it in the users panel."
+    },
+    "invoiceTypes": {
+      "KOR": "Correction invoice",
+      "KOR_ROZ": "Correction of a settlement invoice",
+      "KOR_ZAL": "Correction of an advance invoice",
+      "ROZ": "Settlement invoice",
+      "UPR": "Simplified invoice",
+      "VAT": "VAT invoice",
+      "ZAL": "Advance invoice"
+    },
+    "link": {
+      "alreadyLinkedHint": "You can still link it again — just make sure the same cost is not counted twice.",
+      "alreadyLinkedTitle": "Note: this invoice is already linked",
+      "amountHint": "By default the whole net amount of the invoice. Change it if only a part of the invoice belongs to this cost.",
+      "amountHintForeign": "The invoice is in {invoiceCurrency} and the project in {projectCurrency}. Leave the field empty and the whole net amount ({net}) is converted at the NBP average rate of the business day before the invoice issue date. You can also enter the amount directly in {projectCurrency}.",
+      "amountIn": "Assigned amount ({currency})",
+      "attachNote": "The invoice will be linked to the cost: {item}. The amount and the other data of the cost stay unchanged.",
+      "back": "Back to the list",
+      "confirm": "Link invoice",
+      "errors": {
+        "failed": "Could not link the invoice",
+        "forbidden": "You are not allowed to link KSeF invoices in this project.",
+        "noExchangeRate": "No NBP exchange rate for the invoice currency. Enter the amount in {currency}.",
+        "projectClosed": "The project is closed — invoices can no longer be linked."
+      },
+      "saved": "Invoice linked",
+      "savedWithRate": "Invoice linked: {amount} at the rate {rate} of {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Amount",
+        "linkedBy": "Linked by",
+        "project": "Project",
+        "status": "Status",
+        "task": "Task"
+      },
+      "wholeProject": "Whole project"
+    },
+    "list": {
+      "columns": {
+        "currency": "Currency",
+        "gross": "Gross",
+        "issueDate": "Issue date",
+        "net": "Net",
+        "number": "Number",
+        "paymentDueDate": "Payment due",
+        "seller": "Seller"
+      }
+    },
+    "nip": "Tax ID",
+    "otherLinks": {
+      "intro": "This invoice is also linked to:",
+      "overAllocated": "The links add up to more than the net amount of the invoice.",
+      "wholeProject": "{project} (whole project)"
+    },
+    "paymentForms": {
+      "card": "Card",
+      "cash": "Cash",
+      "cheque": "Cheque",
+      "credit": "Credit",
+      "mobile": "Mobile payment",
+      "transfer": "Bank transfer",
+      "voucher": "Voucher"
+    },
+    "picker": {
+      "attachTitle": "Link a KSeF invoice to the cost",
+      "empty": "No invoices in the selected period and for the selected filters.",
+      "filters": {
+        "dateFrom": "Issued from",
+        "dateTo": "Issued to",
+        "invoiceNumber": "Invoice number",
+        "netMax": "Net to",
+        "netMin": "Net from",
+        "seller": "Seller (name or tax ID)"
+      },
+      "lastSync": "Last successful sync: {time}.",
+      "linkedCount": "{count, plural, one {Already linked: # time} other {Already linked: # times}}",
+      "loadFailed": "Could not load the invoice list",
+      "nextPage": "Next",
+      "noCompanies": "No company has been added to KSeF yet. An administrator does it in Settings → Projects → KSeF.",
+      "notConfigured": "The KSeF integration is not configured on the server. The list shows only invoices downloaded earlier.",
+      "pageInfo": "Page {page} of {pages} · invoices: {total}",
+      "previousPage": "Previous",
+      "search": "Search",
+      "select": "Select",
+      "syncHint": "A freshly issued invoice can take a few minutes to appear in KSeF.",
+      "title": "Add invoice from KSeF"
+    },
+    "settings": {
+      "addCompany": "Add company",
+      "columns": {
+        "lastAttempt": "Last attempt",
+        "lastSynced": "Last successful sync",
+        "name": "Name",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "New company in KSeF",
+        "added": "Company added. Its invoices will be downloaded with the next sync.",
+        "editTitle": "Company in KSeF",
+        "name": "Name (optional)",
+        "saveFailed": "Could not save the company",
+        "saved": "Company saved",
+        "token": "KSeF token",
+        "tokenHintAdd": "The token generated in KSeF for this tax ID. It is verified in KSeF before saving; once saved it cannot be read back.",
+        "tokenHintEdit": "Current token: {hint}. Leave the field empty to keep it.",
+        "verifying": "Verifying in KSeF…"
+      },
+      "edit": "Change",
+      "environments": {
+        "production": "Production environment",
+        "test": "Test environment"
+      },
+      "errors": {
+        "companyNotFound": "This company is no longer in the configuration. Refresh the page.",
+        "duplicateNip": "A company with this tax ID has already been added.",
+        "invalidNip": "Invalid tax ID.",
+        "notConfigured": "The KSeF integration is not configured on the server.",
+        "tokenRejected": "KSeF rejected the token for this tax ID. Check that the token is valid and was issued for this company.",
+        "unreachable": "KSeF could not be reached to verify the token. Try again later."
+      },
+      "hint": "Purchase invoices of the companies added below are downloaded from KSeF, the Polish national e-invoice system, every 30 minutes. People with the “Access to KSeF invoices” permission link them to project costs.",
+      "initialSyncDays": "First sync goes back (days)",
+      "initialSyncDaysHint": "From {min} to {max} days. Applies to companies added after this setting is changed.",
+      "loadFailed": "Could not load the KSeF configuration",
+      "noCompanies": "No company has been added yet.",
+      "notConfigured": "The KSeF integration is not configured on the server, so companies cannot be added and invoices are not downloaded.",
+      "remove": "Remove",
+      "removeConfirm": "Remove company {company} from the KSeF configuration? New invoices will no longer be downloaded. Invoices already downloaded and their links to costs stay.",
+      "removeFailed": "Could not remove the company",
+      "saveFailed": "Could not save the setting",
+      "saved": "Setting saved",
+      "statuses": {
+        "active": "Active",
+        "error": "Sync error",
+        "invalid": "Token rejected"
+      },
+      "syncFailed": "The sync failed — the reason is shown next to the company.",
+      "testEnvironmentNote": "The server is connected to the KSeF test environment — the invoices are not real documents.",
+      "title": "KSeF — cost invoices"
+    },
+    "sync": {
+      "failedForCompany": "The sync failed for at least one company. An administrator can see the details in Settings → Projects → KSeF.",
+      "finished": "Sync finished",
+      "now": "Sync now",
+      "running": "Syncing…",
+      "startFailed": "Could not start the sync",
+      "stillRunning": "The sync is still running — refresh the list in a moment."
+    }
+  },
   "labels": {
     "accessLevels": {
       "full": "Full",
