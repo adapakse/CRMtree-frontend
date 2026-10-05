@@ -149,6 +149,29 @@ Projekty z zespołem, zadaniami, osią czasu i czatem. Osobny moduł poza CRM, z
 - `shared/components/typeahead` — jedno pole z podpowiedziami od 3 znaków (wybór leada lub
   partnera, wybór osób do projektu).
 
+### Finanse projektu, faktury KSeF, typ dokumentu „Faktura” (2026-10-05)
+
+Reguły biznesowe (kto co widzi, kwoty netto, kursy NBP, zasady podpinania faktur) są w
+`CRMtree-backend/CLAUDE.md` — to decyzje Adama, nie zmieniaj ich bez pytania.
+
+- **Zakładka Finanse** (`?tab=finance`) — `pages/projects/project-finance*.ts`: kafelki, plan,
+  budżet per kategoria, koszty, przychody, koszty zadań. Widoczna, gdy `detail.finance?.can_read`
+  (`finance` leży obok `project` w odpowiedzi, nie w nim). Koszty zadania:
+  `project-task-costs.component.ts` w panelu zadania; wspólny formularz `project-cost-form`.
+- **Sumy finansowe** (`shared/components/project-finance-totals`) są na kartach listy projektów
+  oraz na karcie leada i partnera — tam celowo także dla osób spoza projektu.
+- **KSeF** — `pages/projects/project-ksef-*.ts`: okno wyboru faktury za okres, potwierdzenie
+  podpięcia, podgląd faktury. **Czerwony tekst o innych powiązaniach faktury**
+  (`project-ksef-other-links`) ma być widoczny zawsze pod pozycją kosztową, nie tylko przy
+  podpinaniu — to wymóg Adama. Prawo do podpinania:
+  `finance.can_write && auth.canViewKsefInvoices()`.
+- **Ustawienia → Projekty**: przełącznik finansów, kategorie kosztów, blok KSeF (firmy „NIP +
+  token”, grupa dostępu dla dokumentów faktur) — `pages/admin/project-settings/`.
+- **Dokumenty, typ `invoice`**: pola faktury w `pages/documents/invoice-fields`, powiązania z
+  projektami w `pages/documents/project-links`. Dla faktury `signing_date` to data wystawienia,
+  a `expiration_date` to termin płatności — etykiety przełączają się po `doc_type === 'invoice'`.
+  Podpis elektroniczny jest dla faktur ukryty (nadpisałby datę wystawienia).
+
 ### Pułapki
 
 - `pages/projects/projects-shared.styles.ts` trzyma wspólne style topbara, modala i tabel
