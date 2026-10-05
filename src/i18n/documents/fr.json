@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Rechercher par nom ou e-mail…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Numéro de compte bancaire",
+      "currency": "Devise",
+      "grossAmount": "Montant TTC",
+      "invoiceNumber": "Numéro de facture",
+      "netAmount": "Montant HT",
+      "paymentStatus": "État du paiement",
+      "title": "Données de la facture",
+      "vatAmount": "Montant de la TVA"
+    },
+    "ksefVisualisationNote": "Ceci est une visualisation des données téléchargées depuis KSeF, et non le document original.",
+    "projectLinks": {
+      "backLabel": "Document {number}",
+      "costStatuses": {
+        "incurred": "Encouru",
+        "planned": "Prévu"
+      },
+      "empty": "Cette facture n’est associée à aucun coût de projet.",
+      "linkedAt": "Association : {date}",
+      "linkedBy": "Association : {name}, {date}",
+      "severalLinks": "Cette facture est associée à plusieurs projets ou tâches.",
+      "title": "Associations aux projets",
+      "wholeProject": "projet entier"
+    }
+  },
   "labels": {
     "activeTasks": "Tâches actives",
     "addTag": "Ajouter un tag",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Contrat de travail",
+      "invoice": "Facture",
       "it_supplier_agreement": "Contrat avec un fournisseur IT",
       "nda": "NDA",
       "operator_agreement": "Contrat d’opérateur",
       "partner_agreement": "Contrat de partenariat"
     },
     "fields": {
+      "buyer": "Acheteur",
       "contactName": "Prénom et nom",
       "contactSection": "Contact pour le contrat",
       "contractSubject": "Objet du contrat",
@@ -200,8 +228,12 @@
       "expirationDate": "Date d’expiration",
       "gdprClassification": "Classification RGPD",
       "group": "Groupe",
+      "issueDate": "Date d’émission",
       "owner": "Propriétaire",
+      "paymentDueDate": "Échéance de paiement",
       "phone": "Téléphone",
+      "seller": "Vendeur",
+      "sellerTaxId": "Numéro fiscal du vendeur",
       "signingDate": "Date de signature",
       "status": "Statut"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Date déterminée",
       "indefinite": "Durée indéterminée",
       "unassigned": "— non attribué —"
+    },
+    "paymentStatuses": {
+      "overdue": "En retard",
+      "paid": "Payée",
+      "partially_paid": "Partiellement payée",
+      "unpaid": "Non payée"
     },
     "placeholders": {
       "contactEmail": "p. ex. jean.dupont@entreprise.fr",
@@ -335,6 +373,8 @@
       "emptyHint": "Les documents apparaîtront ici une fois créés",
       "expired": "Expiré",
       "expires": "Expire le {date}",
+      "paymentDue": "Paiement dû le {date}",
+      "paymentOverdue": "Paiement en retard",
       "soon": "BIENTÔT",
       "taskCount": "Tâches : {count}"
     },

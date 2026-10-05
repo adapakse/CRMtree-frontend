@@ -47,6 +47,13 @@ export class DocumentService {
     if (payload.contact_name)      fd.append('contact_name', payload.contact_name);
     if (payload.contact_email)     fd.append('contact_email', payload.contact_email);
     if (payload.contact_phone)     fd.append('contact_phone', payload.contact_phone);
+    if (payload.invoice_number)    fd.append('invoice_number', payload.invoice_number);
+    if (payload.net_amount != null)   fd.append('net_amount', String(payload.net_amount));
+    if (payload.vat_amount != null)   fd.append('vat_amount', String(payload.vat_amount));
+    if (payload.gross_amount != null) fd.append('gross_amount', String(payload.gross_amount));
+    if (payload.currency)          fd.append('currency', payload.currency);
+    if (payload.bank_account)      fd.append('bank_account', payload.bank_account);
+    if (payload.payment_status)    fd.append('payment_status', payload.payment_status);
     (payload.entities ?? []).forEach(e => fd.append('entities[]', e));
     (payload.tags ?? []).forEach((t, i) => {
       fd.append(`tags[${i}][key]`, t.key);

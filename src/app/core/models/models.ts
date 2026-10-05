@@ -182,7 +182,7 @@ export interface GroupMember {
 
 // ── Document ──────────────────────────────────────────────
 export type DocStatus    = 'new'|'being_edited'|'being_signed'|'being_approved'|'signed'|'hold'|'completed'|'rejected';
-export type DocType      = 'partner_agreement'|'it_supplier_agreement'|'employee_agreement'|'nda'|'operator_agreement';
+export type DocType      = 'partner_agreement'|'it_supplier_agreement'|'employee_agreement'|'nda'|'operator_agreement'|'invoice';
 export type GdprType     = 'data_processing_entrustment'|'data_administration'|'no_gdpr';
 export type AccessLevel  = 'read' | 'full';
 
@@ -217,6 +217,27 @@ export interface ActiveTaskInfo {
   message?: string;
 }
 
+/** One project cost item an invoice document is linked to. */
+export interface DocumentProjectLink {
+  cost_item_id: string;
+  project_id: string;
+  project_key: string;
+  project_name: string;
+  /** null = the cost belongs to the whole project. */
+  task_id: string | null;
+  task_number: number | null;
+  task_name: string | null;
+  amount: number;
+  /** Currency of the linked project. */
+  currency: string;
+  status: 'planned' | 'incurred';
+  linked_by: string | null;
+  linked_by_name: string | null;
+  linked_at: string;
+  /** Whether the viewer may open the project. */
+  can_open: boolean;
+}
+
 export interface Document {
   id: string;
   doc_number: string;
@@ -243,6 +264,23 @@ export interface Document {
   contact_name?: string;
   contact_email?: string;
   contact_phone?: string;
+  // Invoice documents only (doc_type 'invoice'); null on every other type. For
+  // an invoice signing_date is the issue date, expiration_date the payment due
+  // date, entities are [buyer, seller] and nip is the seller's tax ID.
+  invoice_number?: string | null;
+  net_amount?: number | null;
+  vat_amount?: number | null;
+  gross_amount?: number | null;
+  currency?: string | null;
+  bank_account?: string | null;
+  /** A code of the tenant dictionary doc_payment_statuses. */
+  payment_status?: string | null;
+  /** Set when the document was registered from a KSeF invoice. */
+  ksef_invoice_id?: string | null;
+  /** Due date passed and the status is not "paid". */
+  is_payment_overdue?: boolean;
+  /** Present only in the detail of an invoice. */
+  project_links?: DocumentProjectLink[];
   blob_name?: string;
   blob_size_bytes?: number;
   signus_envelope_id?: string;
@@ -287,6 +325,13 @@ export interface CreateDocumentPayload {
   contact_name?: string;
   contact_email?: string;
   contact_phone?: string;
+  invoice_number?: string;
+  net_amount?: number | null;
+  vat_amount?: number | null;
+  gross_amount?: number | null;
+  currency?: string;
+  bank_account?: string;
+  payment_status?: string;
   tags?: { key: string; value: string }[];
   file?: File;
 }

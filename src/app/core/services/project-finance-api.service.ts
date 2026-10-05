@@ -60,6 +60,16 @@ export interface ProjectFinancePlanPayload {
   category_budgets?: ProjectCategoryBudget[];
 }
 
+/** The invoice document (Documents module) a cost item points at. */
+export interface ProjectCostDocument {
+  id: string;
+  doc_number: string;
+  name: string;
+  invoice_number: string | null;
+  /** Whether the viewer may open the document. */
+  can_open: boolean;
+}
+
 export interface ProjectCostItem {
   id: string;
   project_id: string;
@@ -81,7 +91,13 @@ export interface ProjectCostItem {
   ksef_invoice_id: string | null;
   /** Also null for a participant who sees only own cost items, even when the item is linked. */
   ksef_invoice: KsefCostInvoice | null;
-  /** Every other cost item linked to the same invoice, in any project. */
+  document_id: string | null;
+  /**
+   * For a KSeF-linked item this is the invoice's own document. Also null for
+   * a participant who sees only own cost items.
+   */
+  document: ProjectCostDocument | null;
+  /** Every other cost item linked to the same KSeF invoice or the same document, in any project. */
   other_links: KsefInvoiceLink[];
   created_by: string | null;
   created_by_name: string | null;
@@ -103,6 +119,8 @@ export interface ProjectCostItemPayload {
   document_number?: string | null;
   /** Attaches the item to a KSeF invoice, moves it to another one, or detaches it with null. */
   ksef_invoice_id?: string | null;
+  /** A hand-entered invoice document; ignored on an item linked to a KSeF invoice. null detaches it. */
+  document_id?: string | null;
 }
 
 export interface ProjectRevenueItem {

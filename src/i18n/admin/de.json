@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Arbeitsvertrag",
+        "invoice": "Rechnung",
         "it_supplier_agreement": "IT-Lieferantenvertrag",
         "nda": "NDA",
         "partner_agreement": "Partnervertrag"
@@ -874,6 +875,12 @@
         "churned": "Abgewandert",
         "inactive": "Inaktiv",
         "onboarding": "Onboarding"
+      },
+      "paymentStatuses": {
+        "overdue": "Überfällig",
+        "paid": "Bezahlt",
+        "partially_paid": "Teilweise bezahlt",
+        "unpaid": "Unbezahlt"
       },
       "productTypes": {
         "car_rental": "Mietwagen",

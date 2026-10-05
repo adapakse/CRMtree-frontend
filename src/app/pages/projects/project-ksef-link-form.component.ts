@@ -54,6 +54,10 @@ const OPTION_INDENT = '   ';
           </div>
         }
 
+        @if (!invoice().document_id && !invoice().is_document_group_configured) {
+          <p class="hint">{{ t('ksef.document.notRegisteredOnLink') }}</p>
+        }
+
         @if (attachTo(); as cost) {
           <p class="attach-note">{{ t('ksef.link.attachNote', { item: costLabel(cost) }) }}</p>
         } @else {

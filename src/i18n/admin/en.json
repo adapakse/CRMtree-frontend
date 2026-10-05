@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Employment agreement",
+        "invoice": "Invoice",
         "it_supplier_agreement": "IT supplier agreement",
         "nda": "NDA",
         "partner_agreement": "Partner agreement"
@@ -874,6 +875,12 @@
         "churned": "Churned",
         "inactive": "Inactive",
         "onboarding": "Onboarding"
+      },
+      "paymentStatuses": {
+        "overdue": "Overdue",
+        "paid": "Paid",
+        "partially_paid": "Partially paid",
+        "unpaid": "Unpaid"
       },
       "productTypes": {
         "car_rental": "Car rental",

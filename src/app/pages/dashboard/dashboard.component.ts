@@ -114,7 +114,8 @@ import { isExpiringSoon } from '../../core/services/helpers';
                   </div>
                   <div class="td" style="padding-top:14px"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
                   <div class="td" style="padding-top:14px"><wt-status-badge [status]="doc.status" /></div>
-                  <div class="td" style="padding-top:14px" [style.color]="isExpiring(doc.expiration_date) ? '#DC2626' : ''">
+                  <div class="td" style="padding-top:14px" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? '#DC2626' : ''"
+                       [title]="doc.doc_type === 'invoice' ? t('labels.fields.paymentDueDate') : ''">
                     {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
                   </div>
                 </div>

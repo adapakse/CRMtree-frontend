@@ -6,6 +6,7 @@ import { ProjectCostItem, ProjectFinanceApiService } from '../../core/services/p
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectCostCategory, ProjectFinanceAccess, ProjectTask } from '../../core/services/projects-api.service';
 import { ProjectCostFormComponent } from './project-cost-form.component';
+import { ProjectDocumentLinkComponent } from './project-document-link.component';
 import { ProjectKsefInvoiceBadgeComponent } from './project-ksef-invoice-badge.component';
 import { ProjectKsefInvoicePickerComponent } from './project-ksef-invoice-picker.component';
 import { ProjectKsefOtherLinksComponent } from './project-ksef-other-links.component';
@@ -22,7 +23,7 @@ import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
   selector: 'wt-project-task-costs',
   standalone: true,
   imports: [
-    TranslocoDirective, ProjectCostFormComponent,
+    TranslocoDirective, ProjectCostFormComponent, ProjectDocumentLinkComponent,
     ProjectKsefInvoiceBadgeComponent, ProjectKsefInvoicePickerComponent, ProjectKsefOtherLinksComponent,
   ],
   providers: [provideTranslocoScope('projects')],
@@ -52,6 +53,7 @@ import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
                 @if (item.status === 'planned') { <span class="pill status-pill">{{ t('finance.costStatuses.planned') }}</span> }
                 @if (details(item); as text) { <span class="secondary">{{ text }}</span> }
                 @if (item.ksef_invoice; as invoice) { <wt-project-ksef-invoice-badge class="invoice" [invoice]="invoice" /> }
+                @if (item.document; as document) { <wt-project-document-link class="invoice" [document]="document" /> }
               </span>
               <span class="amount">
                 {{ format.money(item.amount, access().currency) }}
@@ -88,7 +90,7 @@ import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
         <wt-project-cost-form
           [projectId]="projectId()" [projectKey]="projectKey()" [projectCurrency]="access().currency"
           [categories]="categories()" [tasks]="tasks()" [item]="editedItem()"
-          [taskId]="taskId()" [isTaskLocked]="!access().can_write"
+          [taskId]="taskId()" [isTaskLocked]="!access().can_write" [canLinkDocument]="access().can_write"
           (closed)="isFormOpen.set(false)" (saved)="onSaved()" />
       }
       @if (isPickerOpen()) {

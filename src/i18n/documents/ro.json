@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Căutare după nume sau e-mail…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Numărul contului bancar",
+      "currency": "Monedă",
+      "grossAmount": "Valoare brută",
+      "invoiceNumber": "Numărul facturii",
+      "netAmount": "Valoare netă",
+      "paymentStatus": "Starea plății",
+      "title": "Datele facturii",
+      "vatAmount": "Valoare TVA"
+    },
+    "ksefVisualisationNote": "Aceasta este o vizualizare a datelor descărcate din KSeF, nu documentul original.",
+    "projectLinks": {
+      "backLabel": "Document {number}",
+      "costStatuses": {
+        "incurred": "Suportat",
+        "planned": "Planificat"
+      },
+      "empty": "Această factură nu este asociată niciunui cost de proiect.",
+      "linkedAt": "Asociere: {date}",
+      "linkedBy": "Asociere: {name}, {date}",
+      "severalLinks": "Această factură este asociată cu mai multe proiecte sau sarcini.",
+      "title": "Asocieri cu proiecte",
+      "wholeProject": "întregul proiect"
+    }
+  },
   "labels": {
     "activeTasks": "Sarcini active",
     "addTag": "Adăugare tag",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Contract de muncă",
+      "invoice": "Factură",
       "it_supplier_agreement": "Contract cu furnizor IT",
       "nda": "NDA",
       "operator_agreement": "Contract cu operator",
       "partner_agreement": "Contract de parteneriat"
     },
     "fields": {
+      "buyer": "Cumpărător",
       "contactName": "Nume și prenume",
       "contactSection": "Date de contact pentru contract",
       "contractSubject": "Obiectul contractului",
@@ -200,8 +228,12 @@
       "expirationDate": "Data expirării",
       "gdprClassification": "Clasificare GDPR",
       "group": "Grup",
+      "issueDate": "Data emiterii",
       "owner": "Proprietar",
+      "paymentDueDate": "Termen de plată",
       "phone": "Telefon",
+      "seller": "Vânzător",
+      "sellerTaxId": "Codul fiscal al vânzătorului",
       "signingDate": "Data semnării",
       "status": "Status"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Dată stabilită",
       "indefinite": "Perioadă nedeterminată",
       "unassigned": "— neatribuit —"
+    },
+    "paymentStatuses": {
+      "overdue": "Restantă",
+      "paid": "Plătită",
+      "partially_paid": "Plătită parțial",
+      "unpaid": "Neplătită"
     },
     "placeholders": {
       "contactEmail": "ex. ion.popescu@firma.ro",
@@ -335,6 +373,8 @@
       "emptyHint": "Documentele vor apărea aici după ce sunt create",
       "expired": "Expirat",
       "expires": "Expiră la {date}",
+      "paymentDue": "Plată până la {date}",
+      "paymentOverdue": "Termen de plată depășit",
       "soon": "CURÂND",
       "taskCount": "Sarcini: {count}"
     },

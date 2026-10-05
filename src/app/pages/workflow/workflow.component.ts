@@ -155,9 +155,9 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                       <div style="font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px"
                            [style.color]="expirationColor(doc.expiration_date)">
                         @if (isExpired(doc.expiration_date)) {
-                          <span [title]="t('workflow.kanban.expired')">⚠️</span>
+                          <span [title]="t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentOverdue' : 'workflow.kanban.expired')">⚠️</span>
                         }
-                        {{ t('workflow.kanban.expires', { date: (doc.expiration_date | date:'dd.MM.yy') }) }}
+                        {{ t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentDue' : 'workflow.kanban.expires', { date: (doc.expiration_date | date:'dd.MM.yy') }) }}
                         @if (isExpiringSoon(doc.expiration_date) && !isExpired(doc.expiration_date)) {
                           <span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 4px;font-weight:600">{{ t('workflow.kanban.soon') }}</span>
                         }

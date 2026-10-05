@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Search by name or email…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Bank account number",
+      "currency": "Currency",
+      "grossAmount": "Gross amount",
+      "invoiceNumber": "Invoice number",
+      "netAmount": "Net amount",
+      "paymentStatus": "Payment status",
+      "title": "Invoice data",
+      "vatAmount": "VAT amount"
+    },
+    "ksefVisualisationNote": "This is a visualisation of the data downloaded from KSeF, not the original document.",
+    "projectLinks": {
+      "backLabel": "Document {number}",
+      "costStatuses": {
+        "incurred": "Incurred",
+        "planned": "Planned"
+      },
+      "empty": "This invoice is not linked to any project cost.",
+      "linkedAt": "Linked {date}",
+      "linkedBy": "Linked by {name}, {date}",
+      "severalLinks": "This invoice is linked to several projects or tasks.",
+      "title": "Links to projects",
+      "wholeProject": "whole project"
+    }
+  },
   "labels": {
     "activeTasks": "Active tasks",
     "addTag": "Add tag",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Employment agreement",
+      "invoice": "Invoice",
       "it_supplier_agreement": "IT supplier agreement",
       "nda": "NDA",
       "operator_agreement": "Operator agreement",
       "partner_agreement": "Partner agreement"
     },
     "fields": {
+      "buyer": "Buyer",
       "contactName": "Full name",
       "contactSection": "Contract contact details",
       "contractSubject": "Contract subject",
@@ -200,8 +228,12 @@
       "expirationDate": "Expiry date",
       "gdprClassification": "GDPR classification",
       "group": "Group",
+      "issueDate": "Issue date",
       "owner": "Owner",
+      "paymentDueDate": "Payment due date",
       "phone": "Phone",
+      "seller": "Seller",
+      "sellerTaxId": "Seller tax ID",
       "signingDate": "Signing date",
       "status": "Status"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Fixed date",
       "indefinite": "Indefinite term",
       "unassigned": "— unassigned —"
+    },
+    "paymentStatuses": {
+      "overdue": "Overdue",
+      "paid": "Paid",
+      "partially_paid": "Partially paid",
+      "unpaid": "Unpaid"
     },
     "placeholders": {
       "contactEmail": "e.g. john.smith@company.com",
@@ -335,6 +373,8 @@
       "emptyHint": "Documents will appear here once they are created",
       "expired": "Expired",
       "expires": "Expires {date}",
+      "paymentDue": "Payment due {date}",
+      "paymentOverdue": "Payment overdue",
       "soon": "SOON",
       "taskCount": "Tasks: {count}"
     },

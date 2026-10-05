@@ -3,16 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { DocumentService } from '@core/services/document.service';
-import { GroupProfile, Document, DocType, GdprType } from '@core/models/models';
+import { GroupProfile, Document, DocType, GdprType, CreateDocumentPayload } from '@core/models/models';
 import { ToastService } from '@core/services/toast.service';
 import { AppSettingsService } from '@core/services/app-settings.service';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { LocaleService } from '@core/i18n/locale.service';
 import { DEFAULT_LOCALE } from '@core/i18n/locales';
+import { INVOICE_DOC_TYPE } from '@core/services/helpers';
+import {
+  InvoiceFieldsComponent, invoiceFieldsPayload, newInvoiceFieldsDraft, paymentStatusCodes,
+} from '../invoice-fields/invoice-fields.component';
 
 // Built-in values have translated names; any other value comes from App
 // Settings and is its own display name.
-const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement'];
+const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement', 'invoice'];
 const BUILT_IN_GDPR_TYPES = ['data_processing_entrustment', 'data_administration', 'no_gdpr'];
 
 // Dictionaries offered when the tenant has not configured its own
@@ -25,7 +29,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-new-document-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, InvoiceFieldsComponent],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -95,30 +99,37 @@ interface SelectOption { value: string; label: string; }
             </div>
 
             <div class="fg">
-              <label class="fl">{{ t('labels.fields.signingDate') }}</label>
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.issueDate' : 'labels.fields.signingDate') }}</label>
               <input class="fi" type="date" [(ngModel)]="form.signing_date">
             </div>
             <div class="fg">
-              <label class="fl">{{ t('labels.fields.expirationDate') }}</label>
-              <select class="fsel" [(ngModel)]="form.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
-                <option value="indefinite">{{ t('labels.options.indefinite') }}</option>
-                <option value="fixed">{{ t('labels.options.fixedDate') }}</option>
-              </select>
-              <input *ngIf="form.expiration_date_mode==='fixed'" class="fi" type="date" [(ngModel)]="form.expiration_date" style="margin-top:6px">
+              @if (isInvoice) {
+                <label class="fl">{{ t('labels.fields.paymentDueDate') }}</label>
+                <input class="fi" type="date" [(ngModel)]="form.expiration_date">
+              } @else {
+                <label class="fl">{{ t('labels.fields.expirationDate') }}</label>
+                <select class="fsel" [(ngModel)]="form.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
+                  <option value="indefinite">{{ t('labels.options.indefinite') }}</option>
+                  <option value="fixed">{{ t('labels.options.fixedDate') }}</option>
+                </select>
+                <input *ngIf="form.expiration_date_mode==='fixed'" class="fi" type="date" [(ngModel)]="form.expiration_date" style="margin-top:6px">
+              }
             </div>
 
-            <div class="fg">
-              <label class="fl">{{ t('labels.fields.contractSubject') }} <span class="req">*</span></label>
-              <select class="fsel" [(ngModel)]="form.contract_subject">
-                <option value="">{{ t('labels.options.choose') }}</option>
-                @for (subject of contractSubjectOptions; track subject.value) {
-                  <option [value]="subject.value">{{ subject.label }}</option>
-                }
-              </select>
-            </div>
+            @if (!isInvoice) {
+              <div class="fg">
+                <label class="fl">{{ t('labels.fields.contractSubject') }} <span class="req">*</span></label>
+                <select class="fsel" [(ngModel)]="form.contract_subject">
+                  <option value="">{{ t('labels.options.choose') }}</option>
+                  @for (subject of contractSubjectOptions; track subject.value) {
+                    <option [value]="subject.value">{{ subject.label }}</option>
+                  }
+                </select>
+              </div>
+            }
 
             <div class="fg">
-              <label class="fl">{{ t('labels.fields.entity1') }} <span class="req">*</span></label>
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.buyer' : 'labels.fields.entity1') }} <span class="req">*</span></label>
               @if (entity1Options.length > 0) {
                 <select class="fsel" [(ngModel)]="entity1">
                   <option value="">{{ t('newDocument.chooseEntity') }}</option>
@@ -131,11 +142,11 @@ interface SelectOption { value: string; label: string; }
               }
             </div>
             <div class="fg">
-              <label class="fl">{{ t('labels.fields.entity2') }}</label>
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.seller' : 'labels.fields.entity2') }}</label>
               <input class="fi" [placeholder]="t('labels.placeholders.entity2')" [(ngModel)]="entity2">
             </div>
             <div class="fg">
-              <label class="fl">{{ t('labels.fields.counterpartyTaxId') }} <span class="req">*</span></label>
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.sellerTaxId' : 'labels.fields.counterpartyTaxId') }} <span class="req">*</span></label>
               <input class="fi" [placeholder]="t('labels.placeholders.taxId')" maxlength="15" [(ngModel)]="form.nip">
             </div>
             <div class="fg">
@@ -149,6 +160,8 @@ interface SelectOption { value: string; label: string; }
             </div>
 
           </div>
+
+          @if (isInvoice) { <wt-invoice-fields [(value)]="invoice" /> }
 
           <!-- Dane kontaktowe ds. umowy -->
           <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.contactSection') }}</div>
@@ -307,6 +320,9 @@ export class NewDocumentPanelComponent implements OnInit {
   entity2 = '';
   ownerId      = '';
   users = signal<any[]>([]);
+  invoice = newInvoiceFieldsDraft(paymentStatusCodes(this.settingsSvc.settings()));
+
+  get isInvoice(): boolean { return this.form.doc_type === INVOICE_DOC_TYPE; }
 
   ngOnInit(): void {
     this.crmApi.getCrmUsers().subscribe(users => this.users.set(users));
@@ -333,7 +349,7 @@ export class NewDocumentPanelComponent implements OnInit {
     return !!(
       this.form.name.trim() && this.form.doc_type && this.form.gdpr_type &&
       this.form.group_id && this.entity1.trim() &&
-      this.form.nip.trim() && this.form.country && this.form.contract_subject
+      this.form.nip.trim() && this.form.country && (this.isInvoice || this.form.contract_subject)
     );
   }
 
@@ -371,10 +387,11 @@ export class NewDocumentPanelComponent implements OnInit {
       group_id:         this.form.group_id,
       entities:         [this.entity1, this.entity2].filter(s => !!s.trim()).map(s => s.trim()),
       signing_date:     this.form.signing_date || undefined,
-      expiration_date:  this.form.expiration_date_mode === 'fixed' ? (this.form.expiration_date || undefined) : undefined,
+      expiration_date:  this.isInvoice || this.form.expiration_date_mode === 'fixed' ? (this.form.expiration_date || undefined) : undefined,
       nip:              this.form.nip.trim() || undefined,
       country:          this.form.country || undefined,
-      contract_subject: this.form.contract_subject,
+      contract_subject: this.isInvoice ? undefined : this.form.contract_subject,
+      ...(this.isInvoice ? this.newInvoicePayload() : {}),
       contact_name:     this.form.contact_name.trim() || undefined,
       contact_email:    this.form.contact_email.trim() || undefined,
       contact_phone:    this.form.contact_phone.trim() || undefined,
@@ -385,5 +402,19 @@ export class NewDocumentPanelComponent implements OnInit {
       next: doc => { this.saving.set(false); this.created.emit(doc); },
       error: () => { this.saving.set(false); this.toast.error(this.transloco.translate('documents.newDocument.createFailed')); },
     });
+  }
+
+  // Empty fields are left out, so the API applies its defaults (currency, payment status).
+  private newInvoicePayload(): Partial<CreateDocumentPayload> {
+    const fields = invoiceFieldsPayload(this.invoice);
+    return {
+      invoice_number: fields.invoice_number ?? undefined,
+      bank_account:   fields.bank_account ?? undefined,
+      payment_status: fields.payment_status ?? undefined,
+      currency:       fields.currency ?? undefined,
+      net_amount:     fields.net_amount,
+      vat_amount:     fields.vat_amount,
+      gross_amount:   fields.gross_amount,
+    };
   }
 }

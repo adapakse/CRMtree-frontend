@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Szukaj po nazwisku lub e-mailu…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Numer rachunku bankowego",
+      "currency": "Waluta",
+      "grossAmount": "Kwota brutto",
+      "invoiceNumber": "Numer faktury",
+      "netAmount": "Kwota netto",
+      "paymentStatus": "Status płatności",
+      "title": "Dane faktury",
+      "vatAmount": "Kwota VAT"
+    },
+    "ksefVisualisationNote": "To wizualizacja danych pobranych z KSeF, a nie oryginalny dokument.",
+    "projectLinks": {
+      "backLabel": "Dokument {number}",
+      "costStatuses": {
+        "incurred": "Poniesiony",
+        "planned": "Planowany"
+      },
+      "empty": "Ta faktura nie jest podpięta do żadnego kosztu projektu.",
+      "linkedAt": "Podpięcie: {date}",
+      "linkedBy": "Podpięcie: {name}, {date}",
+      "severalLinks": "Ta faktura jest podpięta do kilku projektów lub zadań.",
+      "title": "Powiązania z projektami",
+      "wholeProject": "cały projekt"
+    }
+  },
   "labels": {
     "activeTasks": "Aktywne zadania",
     "addTag": "Dodaj tag",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Umowa pracownicza",
+      "invoice": "Faktura",
       "it_supplier_agreement": "Umowa z dostawcą IT",
       "nda": "NDA",
       "operator_agreement": "Umowa operatorska",
       "partner_agreement": "Umowa partnerska"
     },
     "fields": {
+      "buyer": "Nabywca",
       "contactName": "Imię i Nazwisko",
       "contactSection": "Dane kontaktowe ds. umowy",
       "contractSubject": "Przedmiot umowy",
@@ -200,8 +228,12 @@
       "expirationDate": "Data wygaśnięcia",
       "gdprClassification": "Klasyfikacja GDPR",
       "group": "Grupa",
+      "issueDate": "Data wystawienia",
       "owner": "Właściciel",
+      "paymentDueDate": "Data płatności",
       "phone": "Telefon",
+      "seller": "Sprzedawca",
+      "sellerTaxId": "NIP sprzedawcy",
       "signingDate": "Data podpisania",
       "status": "Status"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Data określona",
       "indefinite": "Czas nieokreślony",
       "unassigned": "— nieprzypisany —"
+    },
+    "paymentStatuses": {
+      "overdue": "Po terminie",
+      "paid": "Opłacona",
+      "partially_paid": "Opłacona częściowo",
+      "unpaid": "Nieopłacona"
     },
     "placeholders": {
       "contactEmail": "np. jan.kowalski@firma.pl",
@@ -335,6 +373,8 @@
       "emptyHint": "Dokumenty pojawią się tutaj po ich utworzeniu",
       "expired": "Wygasł",
       "expires": "Wygasa {date}",
+      "paymentDue": "Płatność do {date}",
+      "paymentOverdue": "Termin płatności minął",
       "soon": "WKRÓTCE",
       "taskCount": "Zadania: {count}"
     },

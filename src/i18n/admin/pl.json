@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Umowa pracownicza",
+        "invoice": "Faktura",
         "it_supplier_agreement": "Umowa z dostawcą IT",
         "nda": "NDA",
         "partner_agreement": "Umowa partnerska"
@@ -874,6 +875,12 @@
         "churned": "Utracony",
         "inactive": "Nieaktywny",
         "onboarding": "Wdrożenie"
+      },
+      "paymentStatuses": {
+        "overdue": "Po terminie",
+        "paid": "Opłacona",
+        "partially_paid": "Opłacona częściowo",
+        "unpaid": "Nieopłacona"
       },
       "productTypes": {
         "car_rental": "Wynajem auta",

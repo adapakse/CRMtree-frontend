@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Pogodba o zaposlitvi",
+        "invoice": "Račun",
         "it_supplier_agreement": "Pogodba z dobaviteljem IT",
         "nda": "NDA",
         "partner_agreement": "Partnerska pogodba"
@@ -874,6 +875,12 @@
         "churned": "Izgubljen",
         "inactive": "Neaktiven",
         "onboarding": "Uvajanje"
+      },
+      "paymentStatuses": {
+        "overdue": "Zapadel",
+        "paid": "Plačan",
+        "partially_paid": "Delno plačan",
+        "unpaid": "Neplačan"
       },
       "productTypes": {
         "car_rental": "Najem avtomobila",

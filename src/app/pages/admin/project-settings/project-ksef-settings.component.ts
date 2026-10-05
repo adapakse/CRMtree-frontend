@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../../core/services/toast.service';
-import { KsefAdminConfig, KsefApiService, KsefCompany } from '../../../core/services/ksef-api.service';
+import { KsefAdminConfig, KsefApiService, KsefCompany, KsefDocumentGroup } from '../../../core/services/ksef-api.service';
 import { ProjectFinanceFormatService } from '../../../core/services/project-finance-format.service';
 import { PROJECTS_SHARED_STYLES } from '../../projects/projects-shared.styles';
 import { ProjectKsefCompanyFormComponent, describeKsefAdminError } from './project-ksef-company-form.component';
@@ -12,8 +12,9 @@ const MAX_SYNC_DAYS = 365;
 
 /**
  * "KSeF" block of the project settings: which KSeF environment the server
- * uses, how far back the first sync of a company reaches, and the companies
- * (NIP + token) whose cost invoices are downloaded.
+ * uses, how far back the first sync of a company reaches, the Documents access
+ * group that invoice documents go to, and the companies (NIP + token) whose
+ * cost invoices are downloaded.
  */
 @Component({
   selector: 'wt-project-ksef-settings',
@@ -45,6 +46,19 @@ const MAX_SYNC_DAYS = 365;
           <button class="btn btn-g btn-sm" [disabled]="!canSaveSyncDays(loaded)" (click)="saveSyncDays()">{{ 'actions.save' | transloco }}</button>
         </div>
         <p class="hint">{{ t('ksef.settings.initialSyncDaysHint', { min: minSyncDays, max: maxSyncDays }) }}</p>
+
+        <div class="sync-days">
+          <label class="fl" for="ksef-invoice-documents-group">{{ t('ksef.settings.invoiceDocumentsGroup') }}</label>
+          <select id="ksef-invoice-documents-group" class="fsel group" [(ngModel)]="invoiceDocumentsGroupId">
+            <option [ngValue]="null">{{ t('ksef.settings.noInvoiceDocumentsGroup') }}</option>
+            @for (group of groupOptions(); track group.id) {
+              <option [ngValue]="group.id">{{ group.display_name ?? group.name }}</option>
+            }
+          </select>
+          <button class="btn btn-g btn-sm" [disabled]="invoiceDocumentsGroupId === (loaded.invoice_documents_group?.id ?? null)"
+                  (click)="saveInvoiceDocumentsGroup()">{{ 'actions.save' | transloco }}</button>
+        </div>
+        <p class="hint">{{ t('ksef.settings.invoiceDocumentsGroupHint') }}</p>
 
         @if (loaded.companies.length === 0) {
           <p class="hint">{{ t('ksef.settings.noCompanies') }}</p>
@@ -110,6 +124,7 @@ const MAX_SYNC_DAYS = 365;
     .sync-days { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .sync-days .fl { margin:0; }
     .days { width:90px; }
+    .group { width:auto; min-width:220px; max-width:100%; }
     .nowrap { white-space:nowrap; }
     .status { background:var(--orange-pale); color:var(--orange-dark); white-space:nowrap; }
     .status.invalid, .status.error { background:#FEE2E2; color:#B91C1C; }
@@ -135,9 +150,23 @@ export class ProjectKsefSettingsComponent implements OnInit {
   readonly editedCompany = signal<KsefCompany | null>(null);
   readonly syncingCompanyId = signal<string | null>(null);
   initialSyncDays: number | null = null;
+  invoiceDocumentsGroupId: string | null = null;
+
+  private readonly activeGroups = signal<KsefDocumentGroup[]>([]);
+  // The chosen group stays in the list even when the group list could not be loaded.
+  readonly groupOptions = computed(() => {
+    const chosen = this.config()?.invoice_documents_group;
+    const groups = this.activeGroups();
+    return chosen && !groups.some(group => group.id === chosen.id) ? [...groups, chosen] : groups;
+  });
 
   ngOnInit(): void {
     this.load();
+    // Without the list the select still shows the chosen group and "none".
+    this.api.listDocumentGroups().subscribe({
+      next: groups => this.activeGroups.set(groups.filter(group => group.is_active)),
+      error: () => this.activeGroups.set([]),
+    });
   }
 
   canSaveSyncDays(config: KsefAdminConfig): boolean {
@@ -147,6 +176,16 @@ export class ProjectKsefSettingsComponent implements OnInit {
 
   saveSyncDays(): void {
     this.api.setInitialSyncDays(Number(this.initialSyncDays)).subscribe({
+      next: config => {
+        this.applyConfig(config);
+        this.toast.success(this.transloco.translate('projects.ksef.settings.saved'));
+      },
+      error: err => this.toast.error(describeKsefAdminError(err, this.transloco, 'projects.ksef.settings.saveFailed')),
+    });
+  }
+
+  saveInvoiceDocumentsGroup(): void {
+    this.api.setInvoiceDocumentsGroup(this.invoiceDocumentsGroupId).subscribe({
       next: config => {
         this.applyConfig(config);
         this.toast.success(this.transloco.translate('projects.ksef.settings.saved'));
@@ -203,5 +242,6 @@ export class ProjectKsefSettingsComponent implements OnInit {
     this.config.set(config);
     this.hasLoadFailed.set(false);
     this.initialSyncDays = config.initial_sync_days;
+    this.invoiceDocumentsGroupId = config.invoice_documents_group?.id ?? null;
   }
 }

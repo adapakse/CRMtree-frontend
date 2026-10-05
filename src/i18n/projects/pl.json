@@ -113,12 +113,16 @@
       "addTitle": "Nowy koszt",
       "amount": "Kwota",
       "category": "Kategoria",
+      "clearInvoiceDocument": "Odepnij dokument",
       "conversionHint": "Kwota zostanie przeliczona na {currency} po kursie średnim NBP z dnia roboczego poprzedzającego datę kosztu.",
       "currency": "Waluta kwoty",
       "date": "Data",
       "description": "Opis",
       "documentNumber": "Numer dokumentu",
       "editTitle": "Edycja kosztu",
+      "invoiceDocument": "Dokument faktury (opcjonalnie)",
+      "invoiceDocumentHint": "Dokumenty typu Faktura, do których masz dostęp w module Dokumenty. Faktury pobrane z KSeF podpina się osobno.",
+      "invoiceDocumentPlaceholder": "Szukaj faktury po numerze lub nazwie…",
       "noTask": "— bez zadania —",
       "saveFailed": "Nie udało się zapisać kosztu",
       "saved": "Koszt zapisany",
@@ -160,6 +164,10 @@
       "totalIncurred": "Razem poniesione"
     },
     "delete": "Usuń",
+    "document": {
+      "lockedTitle": "Dokument faktury — nie masz do niego dostępu w module Dokumenty",
+      "openTitle": "Dokument faktury — otwórz w module Dokumenty"
+    },
     "edit": "Edytuj",
     "loadFailed": "Nie udało się pobrać finansów projektu",
     "plan": {
@@ -303,6 +311,19 @@
         "vat": "VAT"
       }
     },
+    "document": {
+      "groupMissing": "Nie wybrano grupy dostępu dla dokumentów faktur, więc faktur nie można rejestrować w Dokumentach. Administrator wybiera ją w Ustawienia → Projekty → KSeF.",
+      "noAccessTitle": "Nie należysz do grupy dostępu tego dokumentu, więc nie możesz go otworzyć.",
+      "notRegisteredOnLink": "Faktura zostanie podpięta, ale nie trafi do modułu Dokumenty: nie wybrano grupy dostępu dla dokumentów faktur (Ustawienia → Projekty → KSeF).",
+      "open": "Otwórz dokument",
+      "register": "Zarejestruj w Dokumentach",
+      "registerFailed": "Nie udało się zarejestrować faktury w Dokumentach",
+      "registerHint": "Faktura nie ma jeszcze dokumentu w module Dokumenty. Podpięcie jej do kosztu zarejestruje ją automatycznie.",
+      "registered": "Zarejestrowana: {number}",
+      "registeredToast": "Faktura zarejestrowana w Dokumentach jako {number}",
+      "registering": "Rejestrowanie…",
+      "title": "Dokument w module Dokumenty"
+    },
     "errors": {
       "forbidden": "Nie masz dostępu do faktur KSeF. Uprawnienie nadaje administrator w panelu użytkowników."
     },
@@ -346,6 +367,7 @@
     "list": {
       "columns": {
         "currency": "Waluta",
+        "document": "Dokument",
         "gross": "Brutto",
         "issueDate": "Data wystawienia",
         "net": "Netto",
@@ -425,13 +447,17 @@
         "invalidNip": "Nieprawidłowy NIP.",
         "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze.",
         "tokenRejected": "KSeF odrzucił token dla tego NIP-u. Sprawdź, czy token jest aktualny i wystawiony dla tej firmy.",
+        "unknownGroup": "Ta grupa nie istnieje albo jest nieaktywna. Odśwież stronę i wybierz inną.",
         "unreachable": "Nie udało się połączyć z KSeF, aby sprawdzić token. Spróbuj ponownie później."
       },
       "hint": "Faktury zakupowe firm dodanych poniżej są pobierane z Krajowego Systemu e-Faktur co 30 minut. Osoby z uprawnieniem „Dostęp do faktur KSeF” podpinają je do kosztów projektów.",
       "initialSyncDays": "Pierwsza synchronizacja sięga wstecz (dni)",
       "initialSyncDaysHint": "Od {min} do {max} dni. Dotyczy firm dodanych po zmianie tego ustawienia.",
+      "invoiceDocumentsGroup": "Grupa dostępu dla dokumentów faktur",
+      "invoiceDocumentsGroupHint": "Do tej grupy trafiają dokumenty faktur rejestrowane z KSeF. Bez wybranej grupy faktury podpinane do projektów nie są rejestrowane w module Dokumenty.",
       "loadFailed": "Nie udało się pobrać konfiguracji KSeF",
       "noCompanies": "Nie dodano jeszcze żadnej firmy.",
+      "noInvoiceDocumentsGroup": "— brak —",
       "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze, dlatego nie można dodawać firm ani pobierać faktur.",
       "remove": "Usuń",
       "removeConfirm": "Usunąć firmę {company} z konfiguracji KSeF? Nowe faktury przestaną być pobierane. Faktury już pobrane i ich podpięcia do kosztów zostaną.",

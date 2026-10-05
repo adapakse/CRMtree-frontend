@@ -148,7 +148,7 @@ const TOOLTIP_CATALOG: TooltipCatalogEntry[] = [
 // Kategorie globalnej aplikacji
 const GLOBAL_CATEGORIES = ['documents', 'workflow', 'general'];
 // Klucze słownikowe dokumentów - pokazywane tylko w zakładce 'Słowniki dokumentów'
-const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_entity1_options', 'doc_contract_subjects'];
+const DOC_DICT_KEYS = ['doc_types', 'doc_statuses', 'doc_gdpr_types', 'doc_payment_statuses', 'doc_entity1_options', 'doc_contract_subjects'];
 const CRM_DICT_KEYS = ['onboarding_task_templates', 'crm_lead_sources'];
 
 const CATEGORY_LABELS: Record<string, { labelKey: string; icon: string }> = {
@@ -189,7 +189,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
   // Słowniki dokumentów
   doc_types: {
     group: 'documentTypes',
-    codes: ['partner_agreement', 'nda', 'it_supplier_agreement', 'employee_agreement'],
+    codes: ['partner_agreement', 'nda', 'it_supplier_agreement', 'employee_agreement', 'invoice'],
   },
   doc_gdpr_types: {
     group: 'gdprTypes',
@@ -198,6 +198,10 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
   doc_statuses: {
     group: 'documentStatuses',
     codes: ['new', 'being_edited', 'being_approved', 'being_signed', 'signed', 'completed', 'rejected'],
+  },
+  doc_payment_statuses: {
+    group: 'paymentStatuses',
+    codes: ['unpaid', 'partially_paid', 'paid', 'overdue'],
   },
 };
 

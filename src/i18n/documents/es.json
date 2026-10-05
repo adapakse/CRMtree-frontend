@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Buscar por apellido o correo…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Número de cuenta bancaria",
+      "currency": "Moneda",
+      "grossAmount": "Importe bruto",
+      "invoiceNumber": "Número de factura",
+      "netAmount": "Importe neto",
+      "paymentStatus": "Estado del pago",
+      "title": "Datos de la factura",
+      "vatAmount": "Importe del IVA"
+    },
+    "ksefVisualisationNote": "Esta es una visualización de los datos descargados de KSeF, no el documento original.",
+    "projectLinks": {
+      "backLabel": "Documento {number}",
+      "costStatuses": {
+        "incurred": "Incurrido",
+        "planned": "Planificado"
+      },
+      "empty": "Esta factura no está vinculada a ningún coste de proyecto.",
+      "linkedAt": "Vinculación: {date}",
+      "linkedBy": "Vinculación: {name}, {date}",
+      "severalLinks": "Esta factura está vinculada a varios proyectos o tareas.",
+      "title": "Vinculaciones con proyectos",
+      "wholeProject": "todo el proyecto"
+    }
+  },
   "labels": {
     "activeTasks": "Tareas activas",
     "addTag": "Añadir etiqueta",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Contrato laboral",
+      "invoice": "Factura",
       "it_supplier_agreement": "Contrato con proveedor de TI",
       "nda": "NDA",
       "operator_agreement": "Contrato de operador",
       "partner_agreement": "Contrato de partner"
     },
     "fields": {
+      "buyer": "Comprador",
       "contactName": "Nombre y apellidos",
       "contactSection": "Datos de contacto para el contrato",
       "contractSubject": "Objeto del contrato",
@@ -200,8 +228,12 @@
       "expirationDate": "Fecha de vencimiento",
       "gdprClassification": "Clasificación RGPD",
       "group": "Grupo",
+      "issueDate": "Fecha de emisión",
       "owner": "Propietario",
+      "paymentDueDate": "Fecha de vencimiento del pago",
       "phone": "Teléfono",
+      "seller": "Vendedor",
+      "sellerTaxId": "NIF del vendedor",
       "signingDate": "Fecha de firma",
       "status": "Estado"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Fecha determinada",
       "indefinite": "Duración indefinida",
       "unassigned": "— sin asignar —"
+    },
+    "paymentStatuses": {
+      "overdue": "Vencida",
+      "paid": "Pagada",
+      "partially_paid": "Pagada parcialmente",
+      "unpaid": "No pagada"
     },
     "placeholders": {
       "contactEmail": "p. ej. juan.garcia@empresa.es",
@@ -335,6 +373,8 @@
       "emptyHint": "Los documentos aparecerán aquí cuando se creen",
       "expired": "Vencido",
       "expires": "Vence el {date}",
+      "paymentDue": "Pago hasta el {date}",
+      "paymentOverdue": "Pago vencido",
       "soon": "PRONTO",
       "taskCount": "Tareas: {count}"
     },

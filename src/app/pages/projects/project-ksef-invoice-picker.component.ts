@@ -8,6 +8,7 @@ import {
 import { ProjectCostItem } from '../../core/services/project-finance-api.service';
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectCostCategory, ProjectTask } from '../../core/services/projects-api.service';
+import { ProjectKsefInvoiceDocumentComponent } from './project-ksef-invoice-document.component';
 import { ProjectKsefLinkFormComponent } from './project-ksef-link-form.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
@@ -36,7 +37,7 @@ interface InvoiceFilters {
 @Component({
   selector: 'wt-project-ksef-invoice-picker',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe, ProjectKsefLinkFormComponent],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, ProjectKsefLinkFormComponent, ProjectKsefInvoiceDocumentComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -106,6 +107,9 @@ interface InvoiceFilters {
               @if (loaded.items.length === 0) {
                 <p class="hint empty">{{ t('ksef.picker.empty') }}</p>
               } @else {
+                @if (!loaded.is_document_group_configured) {
+                  <div class="notice">{{ t('ksef.document.groupMissing') }}</div>
+                }
                 <div class="tw">
                   <table class="grid">
                     <thead>
@@ -117,6 +121,7 @@ interface InvoiceFilters {
                         <th class="amount">{{ t('ksef.list.columns.gross') }}</th>
                         <th>{{ t('ksef.list.columns.currency') }}</th>
                         <th>{{ t('ksef.list.columns.paymentDueDate') }}</th>
+                        <th>{{ t('ksef.list.columns.document') }}</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -135,6 +140,11 @@ interface InvoiceFilters {
                           <td class="amount">{{ format.plainAmount(row.gross_amount) }}</td>
                           <td>{{ row.currency }}</td>
                           <td class="nowrap">{{ format.date(row.payment_due_date) }}</td>
+                          <td>
+                            <wt-project-ksef-invoice-document
+                              [invoiceId]="row.id" [documentId]="row.document_id"
+                              [isGroupConfigured]="loaded.is_document_group_configured" />
+                          </td>
                           <td class="row-action">
                             <button class="btn btn-g btn-sm" [disabled]="openingInvoiceId() !== null" (click)="select(row)">
                               {{ openingInvoiceId() === row.id ? ('states.loading' | transloco) : t('ksef.picker.select') }}

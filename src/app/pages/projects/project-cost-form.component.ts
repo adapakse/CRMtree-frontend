@@ -1,17 +1,24 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { Observable, map } from 'rxjs';
+import { Document } from '../../core/models/models';
+import { DocumentService } from '../../core/services/document.service';
+import { INVOICE_DOC_TYPE } from '../../core/services/helpers';
 import { ToastService } from '../../core/services/toast.service';
 import {
-  ProjectCostItem, ProjectCostItemPayload, ProjectCostStatus, ProjectFinanceApiService,
+  ProjectCostDocument, ProjectCostItem, ProjectCostItemPayload, ProjectCostStatus, ProjectFinanceApiService,
 } from '../../core/services/project-finance-api.service';
 import { PROJECT_CURRENCIES, ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectCostCategory, ProjectTask } from '../../core/services/projects-api.service';
+import { TypeaheadComponent, TypeaheadOption } from '../../shared/components/typeahead/typeahead.component';
+import { ProjectDocumentLinkComponent } from './project-document-link.component';
 import { buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 
 const COST_STATUSES: ProjectCostStatus[] = ['incurred', 'planned'];
+const DOCUMENT_SEARCH_LIMIT = 10;
 // A <select> option cannot be indented with CSS, so the tree depth is drawn with non-breaking spaces.
 const OPTION_INDENT = '   ';
 
@@ -30,7 +37,7 @@ interface CostForm {
 @Component({
   selector: 'wt-project-cost-form',
   standalone: true,
-  imports: [FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, TranslocoDirective, TranslocoPipe, TypeaheadComponent, ProjectDocumentLinkComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -102,6 +109,21 @@ interface CostForm {
               <input class="fi" [(ngModel)]="form.document_number" maxlength="100">
             </div>
           </div>
+          @if (canPickDocument()) {
+            <div class="fg">
+              <label class="fl">{{ t('finance.costForm.invoiceDocument') }}</label>
+              @if (document(); as picked) {
+                <div class="picked-document">
+                  <wt-project-document-link [document]="picked" />
+                  <button type="button" class="link-danger" (click)="document.set(null)">{{ t('finance.costForm.clearInvoiceDocument') }}</button>
+                </div>
+              } @else {
+                <wt-typeahead [search]="searchInvoiceDocuments" [placeholder]="t('finance.costForm.invoiceDocumentPlaceholder')"
+                              (picked)="pickDocument($event.value)" />
+                <p class="hint">{{ t('finance.costForm.invoiceDocumentHint') }}</p>
+              }
+            </div>
+          }
           <div class="fg">
             <label class="fl">{{ t('finance.costForm.description') }}</label>
             <textarea class="fta" rows="3" [(ngModel)]="form.description" maxlength="2000"></textarea>
@@ -120,10 +142,12 @@ interface CostForm {
     .mo { width:620px; max-height:92vh; display:flex; flex-direction:column; }
     .mob { overflow-y:auto; }
     .money { display:grid; grid-template-columns:1fr 90px; gap:8px; }
+    .picked-document { display:flex; align-items:baseline; gap:4px; flex-wrap:wrap; }
   `],
 })
 export class ProjectCostFormComponent implements OnInit {
   private readonly api = inject(ProjectFinanceApiService);
+  private readonly documents = inject(DocumentService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
   private readonly format = inject(ProjectFinanceFormatService);
@@ -135,6 +159,8 @@ export class ProjectCostFormComponent implements OnInit {
   readonly tasks = input<ProjectTask[]>([]);
   /** null opens the form for a new cost item. */
   readonly item = input<ProjectCostItem | null>(null);
+  /** Whether the user may write the project finance; only then an invoice document can be attached. */
+  readonly canLinkDocument = input(false);
   /** Task preselected for a new item. */
   readonly taskId = input<string | null>(null);
   /** A participant adds costs only to the task the form was opened from. */
@@ -147,12 +173,17 @@ export class ProjectCostFormComponent implements OnInit {
   readonly isSaving = signal(false);
   /** Currency the amount is typed in; a signal because the hints below follow it. */
   readonly currency = signal('');
+  /** Hand-entered invoice document of the cost item. */
+  readonly document = signal<ProjectCostDocument | null>(null);
+
+  // The document of an item linked to a KSeF invoice follows that invoice and is not chosen here.
+  readonly canPickDocument = computed(() => this.canLinkDocument() && !this.item()?.ksef_invoice_id);
 
   // A deactivated category stays selectable only for the item that already uses it.
   readonly selectableCategories = computed(() =>
     this.categories().filter(category => category.is_active || category.id === this.item()?.category_id));
   readonly currencies = computed(() =>
-    [...new Set([this.projectCurrency(), ...PROJECT_CURRENCIES, this.item()?.original_currency ?? this.projectCurrency()])]);
+    [...new Set([this.projectCurrency(), ...PROJECT_CURRENCIES, this.item()?.original_currency ?? this.projectCurrency(), this.currency()])]);
   readonly isForeignCurrency = computed(() => this.currency() !== this.projectCurrency());
   readonly taskOptions = computed(() => buildTaskRows(this.tasks()).map(row => ({
     id: row.task.id,
@@ -190,6 +221,34 @@ export class ProjectCostFormComponent implements OnInit {
       document_number: item.document_number ?? '',
       description: item.description ?? '',
     };
+    if (this.canPickDocument()) this.document.set(item.document);
+  }
+
+  // Only invoices the user can see in the Documents module; the list endpoint applies the access rules.
+  readonly searchInvoiceDocuments = (term: string): Observable<TypeaheadOption<Document>[]> =>
+    this.documents.list({ doc_type: INVOICE_DOC_TYPE, search: term, limit: DOCUMENT_SEARCH_LIMIT }).pipe(
+      map(page => page.data.map(found => ({
+        id: found.id,
+        label: found.invoice_number || found.doc_number,
+        hint: [found.doc_number, found.name].join(' · '),
+        value: found,
+      }))),
+    );
+
+  pickDocument(picked: Document): void {
+    this.document.set({
+      id: picked.id, doc_number: picked.doc_number, name: picked.name,
+      invoice_number: picked.invoice_number ?? null, can_open: true,
+    });
+    if (this.item()) return;
+    // A new cost item takes what the invoice already says, without overwriting anything typed in.
+    const seller = picked.entities?.[1];
+    if (!this.form.supplier_name.trim() && seller) this.form.supplier_name = seller;
+    if (!this.form.document_number.trim() && picked.invoice_number) this.form.document_number = picked.invoice_number;
+    if (this.form.amount === null && picked.net_amount) {
+      this.form.amount = picked.net_amount;
+      this.currency.set(picked.currency ?? this.projectCurrency());
+    }
   }
 
   isValid(): boolean {
@@ -227,6 +286,8 @@ export class ProjectCostFormComponent implements OnInit {
       document_number: this.form.document_number.trim() || null,
       description: this.form.description.trim() || null,
     };
+    const documentId = this.document()?.id ?? null;
+    if (this.canPickDocument() && documentId !== (item?.document_id ?? null)) payload.document_id = documentId;
     const amount = Number(this.form.amount);
     const currency = this.currency();
     // Money is sent only when it was touched: the API recalculates the exchange

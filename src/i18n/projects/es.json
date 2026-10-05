@@ -113,12 +113,16 @@
       "addTitle": "Nuevo coste",
       "amount": "Importe",
       "category": "Categoría",
+      "clearInvoiceDocument": "Desvincular documento",
       "conversionHint": "El importe se convertirá a {currency} al tipo de cambio medio del NBP (Banco Nacional de Polonia) del día hábil anterior a la fecha del coste.",
       "currency": "Moneda del importe",
       "date": "Fecha",
       "description": "Descripción",
       "documentNumber": "Número de documento",
       "editTitle": "Editar coste",
+      "invoiceDocument": "Documento de la factura (opcional)",
+      "invoiceDocumentHint": "Documentos de tipo Factura a los que tienes acceso en el módulo Documentos. Las facturas descargadas de KSeF se vinculan por separado.",
+      "invoiceDocumentPlaceholder": "Busca una factura por número o nombre…",
       "noTask": "— sin tarea —",
       "saveFailed": "No se pudo guardar el coste",
       "saved": "Coste guardado",
@@ -160,6 +164,10 @@
       "totalIncurred": "Total incurrido"
     },
     "delete": "Eliminar",
+    "document": {
+      "lockedTitle": "Documento de la factura — no tienes acceso a él en el módulo Documentos",
+      "openTitle": "Documento de la factura — abrir en el módulo Documentos"
+    },
     "edit": "Editar",
     "loadFailed": "No se pudieron cargar las finanzas del proyecto",
     "plan": {
@@ -303,6 +311,19 @@
         "vat": "IVA"
       }
     },
+    "document": {
+      "groupMissing": "No se ha elegido ningún grupo de acceso para los documentos de facturas, por lo que las facturas no se pueden registrar en Documentos. El administrador lo elige en Configuración → Proyectos → KSeF.",
+      "noAccessTitle": "No perteneces al grupo de acceso de este documento, por lo que no puedes abrirlo.",
+      "notRegisteredOnLink": "La factura se vinculará, pero no aparecerá en el módulo Documentos: no se ha elegido ningún grupo de acceso para los documentos de facturas (Configuración → Proyectos → KSeF).",
+      "open": "Abrir documento",
+      "register": "Registrar en Documentos",
+      "registerFailed": "No se pudo registrar la factura en Documentos",
+      "registerHint": "La factura aún no tiene documento en el módulo Documentos. Al vincularla a un coste se registrará automáticamente.",
+      "registered": "Registrada: {number}",
+      "registeredToast": "Factura registrada en Documentos como {number}",
+      "registering": "Registrando…",
+      "title": "Documento en el módulo Documentos"
+    },
     "errors": {
       "forbidden": "No tienes acceso a las facturas de KSeF. El permiso lo concede el administrador en el panel de usuarios."
     },
@@ -346,6 +367,7 @@
     "list": {
       "columns": {
         "currency": "Moneda",
+        "document": "Documento",
         "gross": "Bruto",
         "issueDate": "Fecha de emisión",
         "net": "Neto",
@@ -425,13 +447,17 @@
         "invalidNip": "NIF no válido.",
         "notConfigured": "La integración con KSeF no está configurada en el servidor.",
         "tokenRejected": "KSeF ha rechazado el token para este NIF. Comprueba que el token esté vigente y que se haya emitido para esta empresa.",
+        "unknownGroup": "Este grupo no existe o está inactivo. Actualiza la página y elige otro.",
         "unreachable": "No se pudo conectar con KSeF para comprobar el token. Inténtalo de nuevo más tarde."
       },
       "hint": "Las facturas de compra de las empresas añadidas a continuación se descargan del Sistema Nacional de Facturas Electrónicas de Polonia (KSeF) cada 30 minutos. Las personas con el permiso «Acceso a las facturas de KSeF» las vinculan a los costes de los proyectos.",
       "initialSyncDays": "La primera sincronización abarca hacia atrás (días)",
       "initialSyncDaysHint": "De {min} a {max} días. Se aplica a las empresas añadidas después de cambiar este ajuste.",
+      "invoiceDocumentsGroup": "Grupo de acceso para los documentos de facturas",
+      "invoiceDocumentsGroupHint": "A este grupo van los documentos de facturas registrados desde KSeF. Si no se elige un grupo, las facturas vinculadas a proyectos no se registran en el módulo Documentos.",
       "loadFailed": "No se pudo cargar la configuración de KSeF",
       "noCompanies": "Aún no se ha añadido ninguna empresa.",
+      "noInvoiceDocumentsGroup": "— ninguno —",
       "notConfigured": "La integración con KSeF no está configurada en el servidor, por lo que no se pueden añadir empresas ni descargar facturas.",
       "remove": "Eliminar",
       "removeConfirm": "¿Eliminar la empresa {company} de la configuración de KSeF? Dejarán de descargarse facturas nuevas. Las facturas ya descargadas y sus vinculaciones a costes se conservarán.",

@@ -23,11 +23,20 @@ export interface KsefCompany {
   updated_at: string;
 }
 
+/** A Documents access group, as offered for the invoice documents registered from KSeF. */
+export interface KsefDocumentGroup {
+  id: string;
+  name: string;
+  display_name: string | null;
+}
+
 export interface KsefAdminConfig {
   /** False when the server has no KSeF environment set; companies cannot be added then. */
   is_configured: boolean;
   environment: KsefEnvironment | null;
   initial_sync_days: number;
+  /** Group the invoice documents go to; without it invoices are not registered in Documents. */
+  invoice_documents_group: KsefDocumentGroup | null;
   companies: KsefCompany[];
 }
 
@@ -76,6 +85,18 @@ export interface KsefInvoiceRow {
   currency: string;
   payment_due_date: string | null;
   links_count: number;
+  /** The invoice's document in the Documents module; null while it is not registered there. */
+  document_id: string | null;
+}
+
+/** Answer to registering an invoice in Documents; `is_new` is false when it already had a document. */
+export interface KsefInvoiceDocument {
+  document_id: string;
+  doc_number: string;
+  name: string;
+  is_new: boolean;
+  /** Whether the caller belongs to the access group and may open the document. */
+  can_open: boolean;
 }
 
 /** Invoice summary carried by a linked cost item. */
@@ -147,6 +168,8 @@ export interface KsefInvoiceDetail extends KsefCostInvoice {
   created_at: string;
   has_xml: boolean;
   links: KsefInvoiceLink[];
+  /** False while the tenant admin has not chosen the access group for invoice documents. */
+  is_document_group_configured: boolean;
 }
 
 export interface KsefInvoiceQuery {
@@ -170,6 +193,8 @@ export interface KsefInvoicePage {
   page_size: number;
   date_from: string;
   date_to: string;
+  /** False while the tenant admin has not chosen the access group for invoice documents. */
+  is_document_group_configured: boolean;
 }
 
 const SYNC_POLL_INTERVAL_MS = 3000;
@@ -188,6 +213,16 @@ export class KsefApiService {
 
   setInitialSyncDays(days: number): Observable<KsefAdminConfig> {
     return this.http.put<KsefAdminConfig>(`${this.adminUrl}/settings`, { initial_sync_days: days });
+  }
+
+  /** null clears the choice: invoices linked to projects are then no longer registered in Documents. */
+  setInvoiceDocumentsGroup(groupId: string | null): Observable<KsefAdminConfig> {
+    return this.http.put<KsefAdminConfig>(`${this.adminUrl}/settings`, { invoice_documents_group_id: groupId });
+  }
+
+  /** Every access group of the tenant, inactive ones included (tenant admin only). */
+  listDocumentGroups(): Observable<(KsefDocumentGroup & { is_active: boolean })[]> {
+    return this.http.get<(KsefDocumentGroup & { is_active: boolean })[]>(`${environment.apiUrl}/admin/settings/groups`);
   }
 
   createCompany(payload: KsefCompanyCreatePayload): Observable<KsefCompany> {
@@ -212,6 +247,11 @@ export class KsefApiService {
 
   getInvoice(invoiceId: string): Observable<KsefInvoiceDetail> {
     return this.http.get<KsefInvoiceDetail>(`${this.url}/invoices/${invoiceId}`);
+  }
+
+  /** Registers the invoice in the Documents module, or returns the document it already has. */
+  registerInvoiceDocument(invoiceId: string): Observable<KsefInvoiceDocument> {
+    return this.http.post<KsefInvoiceDocument>(`${this.url}/invoices/${invoiceId}/document`, {});
   }
 
   getSyncState(): Observable<KsefSyncState> {

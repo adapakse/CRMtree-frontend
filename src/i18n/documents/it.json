@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Cerca per cognome o e-mail…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Numero di conto bancario",
+      "currency": "Valuta",
+      "grossAmount": "Importo lordo",
+      "invoiceNumber": "Numero della fattura",
+      "netAmount": "Importo netto",
+      "paymentStatus": "Stato del pagamento",
+      "title": "Dati della fattura",
+      "vatAmount": "Importo IVA"
+    },
+    "ksefVisualisationNote": "Questa è una visualizzazione dei dati scaricati da KSeF, non il documento originale.",
+    "projectLinks": {
+      "backLabel": "Documento {number}",
+      "costStatuses": {
+        "incurred": "Sostenuto",
+        "planned": "Pianificato"
+      },
+      "empty": "Questa fattura non è collegata a nessun costo di progetto.",
+      "linkedAt": "Collegamento: {date}",
+      "linkedBy": "Collegamento: {name}, {date}",
+      "severalLinks": "Questa fattura è collegata a più progetti o attività.",
+      "title": "Collegamenti ai progetti",
+      "wholeProject": "intero progetto"
+    }
+  },
   "labels": {
     "activeTasks": "Attività attive",
     "addTag": "Aggiungi tag",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Contratto di lavoro",
+      "invoice": "Fattura",
       "it_supplier_agreement": "Contratto con fornitore IT",
       "nda": "NDA",
       "operator_agreement": "Contratto con operatore",
       "partner_agreement": "Contratto di partnership"
     },
     "fields": {
+      "buyer": "Acquirente",
       "contactName": "Nome e cognome",
       "contactSection": "Dati di contatto per il contratto",
       "contractSubject": "Oggetto del contratto",
@@ -200,8 +228,12 @@
       "expirationDate": "Data di scadenza",
       "gdprClassification": "Classificazione GDPR",
       "group": "Gruppo",
+      "issueDate": "Data di emissione",
       "owner": "Proprietario",
+      "paymentDueDate": "Scadenza del pagamento",
       "phone": "Telefono",
+      "seller": "Venditore",
+      "sellerTaxId": "Partita IVA del venditore",
       "signingDate": "Data di firma",
       "status": "Stato"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Data definita",
       "indefinite": "Tempo indeterminato",
       "unassigned": "— non assegnato —"
+    },
+    "paymentStatuses": {
+      "overdue": "Scaduta",
+      "paid": "Pagata",
+      "partially_paid": "Pagata in parte",
+      "unpaid": "Non pagata"
     },
     "placeholders": {
       "contactEmail": "es. mario.rossi@azienda.it",
@@ -335,6 +373,8 @@
       "emptyHint": "I documenti compariranno qui dopo la loro creazione",
       "expired": "Scaduto",
       "expires": "Scade il {date}",
+      "paymentDue": "Pagamento entro il {date}",
+      "paymentOverdue": "Pagamento scaduto",
       "soon": "A BREVE",
       "taskCount": "Attività: {count}"
     },

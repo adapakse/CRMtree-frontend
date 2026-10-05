@@ -91,5 +91,10 @@
   "src/app/pages/projects/project-ksef-link-form.component.ts",
   "src/app/pages/projects/project-ksef-links-table.component.ts",
   "src/app/pages/projects/project-ksef-other-links.component.ts",
-  "src/app/pages/projects/project-ksef.styles.ts"
+  "src/app/pages/projects/project-ksef.styles.ts",
+  "src/app/shared/components/payment-status-badge/payment-status-badge.component.ts",
+  "src/app/pages/documents/invoice-fields/invoice-fields.component.ts",
+  "src/app/pages/documents/project-links/document-project-links.component.ts",
+  "src/app/pages/projects/project-document-link.component.ts",
+  "src/app/pages/projects/project-ksef-invoice-document.component.ts"
 ]

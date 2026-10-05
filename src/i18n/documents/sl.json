@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Iščite po priimku ali e-pošti…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Številka bančnega računa",
+      "currency": "Valuta",
+      "grossAmount": "Bruto znesek",
+      "invoiceNumber": "Številka računa",
+      "netAmount": "Neto znesek",
+      "paymentStatus": "Stanje plačila",
+      "title": "Podatki računa",
+      "vatAmount": "Znesek DDV"
+    },
+    "ksefVisualisationNote": "To je vizualizacija podatkov, prenesenih iz KSeF, in ne izvirni dokument.",
+    "projectLinks": {
+      "backLabel": "Dokument {number}",
+      "costStatuses": {
+        "incurred": "Nastal",
+        "planned": "Načrtovan"
+      },
+      "empty": "Ta račun ni povezan z nobenim stroškom projekta.",
+      "linkedAt": "Povezava: {date}",
+      "linkedBy": "Povezava: {name}, {date}",
+      "severalLinks": "Ta račun je povezan z več projekti ali nalogami.",
+      "title": "Povezave s projekti",
+      "wholeProject": "celoten projekt"
+    }
+  },
   "labels": {
     "activeTasks": "Aktivne naloge",
     "addTag": "Dodaj oznako",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Pogodba o zaposlitvi",
+      "invoice": "Račun",
       "it_supplier_agreement": "Pogodba z dobaviteljem IT",
       "nda": "NDA",
       "operator_agreement": "Operaterska pogodba",
       "partner_agreement": "Partnerska pogodba"
     },
     "fields": {
+      "buyer": "Kupec",
       "contactName": "Ime in priimek",
       "contactSection": "Kontaktni podatki za pogodbo",
       "contractSubject": "Predmet pogodbe",
@@ -200,8 +228,12 @@
       "expirationDate": "Datum poteka",
       "gdprClassification": "Klasifikacija GDPR",
       "group": "Skupina",
+      "issueDate": "Datum izdaje",
       "owner": "Lastnik",
+      "paymentDueDate": "Rok plačila",
       "phone": "Telefon",
+      "seller": "Prodajalec",
+      "sellerTaxId": "Davčna številka prodajalca",
       "signingDate": "Datum podpisa",
       "status": "Status"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Določen datum",
       "indefinite": "Nedoločen čas",
       "unassigned": "— nedodeljen —"
+    },
+    "paymentStatuses": {
+      "overdue": "Zapadel",
+      "paid": "Plačan",
+      "partially_paid": "Delno plačan",
+      "unpaid": "Neplačan"
     },
     "placeholders": {
       "contactEmail": "npr. janez.novak@podjetje.si",
@@ -335,6 +373,8 @@
       "emptyHint": "Dokumenti se bodo prikazali tukaj, ko bodo ustvarjeni",
       "expired": "Potekel",
       "expires": "Poteče {date}",
+      "paymentDue": "Plačilo do {date}",
+      "paymentOverdue": "Rok plačila je potekel",
       "soon": "KMALU",
       "taskCount": "Naloge: {count}"
     },

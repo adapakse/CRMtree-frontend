@@ -113,12 +113,16 @@
       "addTitle": "New cost",
       "amount": "Amount",
       "category": "Category",
+      "clearInvoiceDocument": "Detach document",
       "conversionHint": "The amount will be converted to {currency} at the average rate of NBP (the National Bank of Poland) from the business day before the cost date.",
       "currency": "Amount currency",
       "date": "Date",
       "description": "Description",
       "documentNumber": "Document number",
       "editTitle": "Edit cost",
+      "invoiceDocument": "Invoice document (optional)",
+      "invoiceDocumentHint": "Documents of type Invoice that you can access in the Documents module. Invoices downloaded from KSeF are linked separately.",
+      "invoiceDocumentPlaceholder": "Search invoices by number or name…",
       "noTask": "— no task —",
       "saveFailed": "Couldn't save the cost",
       "saved": "Cost saved",
@@ -160,6 +164,10 @@
       "totalIncurred": "Total incurred"
     },
     "delete": "Delete",
+    "document": {
+      "lockedTitle": "Invoice document — you have no access to it in the Documents module",
+      "openTitle": "Invoice document — open in the Documents module"
+    },
     "edit": "Edit",
     "loadFailed": "Couldn't load the project finance",
     "plan": {
@@ -303,6 +311,19 @@
         "vat": "VAT"
       }
     },
+    "document": {
+      "groupMissing": "No access group for invoice documents has been chosen, so invoices cannot be registered in Documents. An administrator chooses it in Settings → Projects → KSeF.",
+      "noAccessTitle": "You are not in the access group of this document, so you cannot open it.",
+      "notRegisteredOnLink": "The invoice will be linked but will not appear in the Documents module: no access group for invoice documents has been chosen (Settings → Projects → KSeF).",
+      "open": "Open document",
+      "register": "Register in Documents",
+      "registerFailed": "Could not register the invoice in Documents",
+      "registerHint": "This invoice has no document in the Documents module yet. Linking it to a cost registers it automatically.",
+      "registered": "Registered: {number}",
+      "registeredToast": "Invoice registered in Documents as {number}",
+      "registering": "Registering…",
+      "title": "Document in the Documents module"
+    },
     "errors": {
       "forbidden": "You have no access to KSeF invoices. An administrator grants it in the users panel."
     },
@@ -346,6 +367,7 @@
     "list": {
       "columns": {
         "currency": "Currency",
+        "document": "Document",
         "gross": "Gross",
         "issueDate": "Issue date",
         "net": "Net",
@@ -425,13 +447,17 @@
         "invalidNip": "Invalid tax ID.",
         "notConfigured": "The KSeF integration is not configured on the server.",
         "tokenRejected": "KSeF rejected the token for this tax ID. Check that the token is valid and was issued for this company.",
+        "unknownGroup": "This group does not exist or is inactive. Refresh the page and choose another one.",
         "unreachable": "KSeF could not be reached to verify the token. Try again later."
       },
       "hint": "Purchase invoices of the companies added below are downloaded from KSeF, the Polish national e-invoice system, every 30 minutes. People with the “Access to KSeF invoices” permission link them to project costs.",
       "initialSyncDays": "First sync goes back (days)",
       "initialSyncDaysHint": "From {min} to {max} days. Applies to companies added after this setting is changed.",
+      "invoiceDocumentsGroup": "Access group for invoice documents",
+      "invoiceDocumentsGroupHint": "Invoice documents registered from KSeF go to this group. Without a group, invoices linked to projects are not registered in the Documents module.",
       "loadFailed": "Could not load the KSeF configuration",
       "noCompanies": "No company has been added yet.",
+      "noInvoiceDocumentsGroup": "— none —",
       "notConfigured": "The KSeF integration is not configured on the server, so companies cannot be added and invoices are not downloaded.",
       "remove": "Remove",
       "removeConfirm": "Remove company {company} from the KSeF configuration? New invoices will no longer be downloaded. Invoices already downloaded and their links to costs stay.",

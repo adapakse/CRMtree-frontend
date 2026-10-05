@@ -113,12 +113,16 @@
       "addTitle": "Nov strošek",
       "amount": "Znesek",
       "category": "Kategorija",
+      "clearInvoiceDocument": "Odveži dokument",
       "conversionHint": "Znesek bo preračunan v {currency} po srednjem tečaju NBP (Narodne banke Poljske) z delovnega dne pred datumom stroška.",
       "currency": "Valuta zneska",
       "date": "Datum",
       "description": "Opis",
       "documentNumber": "Številka dokumenta",
       "editTitle": "Urejanje stroška",
+      "invoiceDocument": "Dokument računa (neobvezno)",
+      "invoiceDocumentHint": "Dokumenti vrste Račun, do katerih imate dostop v modulu Dokumenti. Računi, preneseni iz KSeF, se povezujejo posebej.",
+      "invoiceDocumentPlaceholder": "Iščite račun po številki ali nazivu…",
       "noTask": "— brez naloge —",
       "saveFailed": "Stroška ni bilo mogoče shraniti",
       "saved": "Strošek shranjen",
@@ -160,6 +164,10 @@
       "totalIncurred": "Skupaj nastalo"
     },
     "delete": "Izbriši",
+    "document": {
+      "lockedTitle": "Dokument računa — v modulu Dokumenti nimate dostopa do njega",
+      "openTitle": "Dokument računa — odpri v modulu Dokumenti"
+    },
     "edit": "Uredi",
     "loadFailed": "Financ projekta ni bilo mogoče naložiti",
     "plan": {
@@ -303,6 +311,19 @@
         "vat": "DDV"
       }
     },
+    "document": {
+      "groupMissing": "Skupina za dostop do dokumentov računov ni izbrana, zato računov ni mogoče evidentirati v Dokumentih. Skrbnik jo izbere v Nastavitve → Projekti → KSeF.",
+      "noAccessTitle": "Niste član skupine za dostop do tega dokumenta, zato ga ne morete odpreti.",
+      "notRegisteredOnLink": "Račun bo povezan, vendar ne bo dodan v modul Dokumenti: skupina za dostop do dokumentov računov ni izbrana (Nastavitve → Projekti → KSeF).",
+      "open": "Odpri dokument",
+      "register": "Evidentiraj v Dokumentih",
+      "registerFailed": "Računa ni bilo mogoče evidentirati v Dokumentih",
+      "registerHint": "Račun še nima dokumenta v modulu Dokumenti. Ob povezavi s stroškom bo evidentiran samodejno.",
+      "registered": "Evidentiran: {number}",
+      "registeredToast": "Račun je v Dokumentih evidentiran kot {number}",
+      "registering": "Evidentiranje…",
+      "title": "Dokument v modulu Dokumenti"
+    },
     "errors": {
       "forbidden": "Nimate dostopa do računov KSeF. Pravico dodeli skrbnik v upravljanju uporabnikov."
     },
@@ -346,6 +367,7 @@
     "list": {
       "columns": {
         "currency": "Valuta",
+        "document": "Dokument",
         "gross": "Bruto",
         "issueDate": "Datum izdaje",
         "net": "Neto",
@@ -425,13 +447,17 @@
         "invalidNip": "Neveljavna davčna številka.",
         "notConfigured": "Integracija s KSeF na strežniku ni konfigurirana.",
         "tokenRejected": "KSeF je zavrnil žeton za to davčno številko. Preverite, ali je žeton veljaven in izdan za to podjetje.",
+        "unknownGroup": "Ta skupina ne obstaja ali ni aktivna. Osvežite stran in izberite drugo.",
         "unreachable": "Povezave s KSeF za preverjanje žetona ni bilo mogoče vzpostaviti. Poskusite znova pozneje."
       },
       "hint": "Prejeti računi spodaj dodanih podjetij se vsakih 30 minut prenašajo iz KSeF, poljskega nacionalnega sistema e-računov. Osebe s pravico „Dostop do računov KSeF“ jih povezujejo s stroški projektov.",
       "initialSyncDays": "Prva sinhronizacija sega nazaj (dni)",
       "initialSyncDaysHint": "Od {min} do {max} dni. Velja za podjetja, dodana po spremembi te nastavitve.",
+      "invoiceDocumentsGroup": "Skupina za dostop do dokumentov računov",
+      "invoiceDocumentsGroupHint": "V to skupino se uvrstijo dokumenti računov, evidentirani iz KSeF. Če skupina ni izbrana, se računi, povezani s projekti, ne evidentirajo v modulu Dokumenti.",
       "loadFailed": "Konfiguracije KSeF ni bilo mogoče naložiti",
       "noCompanies": "Dodano še ni nobeno podjetje.",
+      "noInvoiceDocumentsGroup": "— brez —",
       "notConfigured": "Integracija s KSeF na strežniku ni konfigurirana, zato ni mogoče dodajati podjetij niti prenašati računov.",
       "remove": "Odstrani",
       "removeConfirm": "Želite odstraniti podjetje {company} iz konfiguracije KSeF? Novi računi se ne bodo več prenašali. Že preneseni računi in njihove povezave s stroški bodo ohranjeni.",

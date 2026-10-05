@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Трудовой договор",
+        "invoice": "Счёт",
         "it_supplier_agreement": "Договор с ИТ-поставщиком",
         "nda": "NDA",
         "partner_agreement": "Партнёрский договор"
@@ -874,6 +875,12 @@
         "churned": "Потерян",
         "inactive": "Неактивный",
         "onboarding": "Внедрение"
+      },
+      "paymentStatuses": {
+        "overdue": "Просрочен",
+        "paid": "Оплачен",
+        "partially_paid": "Оплачен частично",
+        "unpaid": "Не оплачен"
       },
       "productTypes": {
         "car_rental": "Аренда авто",

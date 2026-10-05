@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Contratto di lavoro",
+        "invoice": "Fattura",
         "it_supplier_agreement": "Contratto con fornitore IT",
         "nda": "NDA",
         "partner_agreement": "Contratto di partnership"
@@ -874,6 +875,12 @@
         "churned": "Perso",
         "inactive": "Inattivo",
         "onboarding": "Onboarding"
+      },
+      "paymentStatuses": {
+        "overdue": "Scaduta",
+        "paid": "Pagata",
+        "partially_paid": "Pagata in parte",
+        "unpaid": "Non pagata"
       },
       "productTypes": {
         "car_rental": "Noleggio auto",

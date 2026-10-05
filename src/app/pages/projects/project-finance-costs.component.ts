@@ -7,6 +7,7 @@ import { ProjectCostItem, ProjectCostStatus, ProjectFinanceApiService } from '..
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectCostCategory, ProjectTask } from '../../core/services/projects-api.service';
 import { ProjectCostFormComponent } from './project-cost-form.component';
+import { ProjectDocumentLinkComponent } from './project-document-link.component';
 import { ProjectKsefInvoiceBadgeComponent } from './project-ksef-invoice-badge.component';
 import { ProjectKsefInvoicePickerComponent } from './project-ksef-invoice-picker.component';
 import { ProjectKsefOtherLinksComponent } from './project-ksef-other-links.component';
@@ -24,13 +25,14 @@ interface FilterOption {
 /**
  * Cost items of the whole project with filters; add / edit / delete for those
  * who may write, and linking to KSeF invoices for those who also hold the KSeF
- * permission. The note about an invoice linked elsewhere is shown to every reader.
+ * permission. The invoice document of a cost item and the note about an invoice
+ * linked elsewhere are shown to every reader.
  */
 @Component({
   selector: 'wt-project-finance-costs',
   standalone: true,
   imports: [
-    FormsModule, TranslocoDirective, ProjectCostFormComponent,
+    FormsModule, TranslocoDirective, ProjectCostFormComponent, ProjectDocumentLinkComponent,
     ProjectKsefInvoiceBadgeComponent, ProjectKsefInvoicePickerComponent, ProjectKsefOtherLinksComponent,
   ],
   providers: [provideTranslocoScope('projects')],
@@ -109,6 +111,7 @@ interface FilterOption {
                     } @else {
                       {{ item.document_number }}
                     }
+                    @if (item.document; as document) { <wt-project-document-link class="document" [document]="document" /> }
                   </td>
                   <td><span class="pill status-pill" [class]="item.status">{{ t('finance.costStatuses.' + item.status) }}</span></td>
                   <td class="amount">
@@ -157,7 +160,7 @@ interface FilterOption {
       @if (isFormOpen()) {
         <wt-project-cost-form
           [projectId]="projectId()" [projectKey]="projectKey()" [projectCurrency]="currency()"
-          [categories]="categories()" [tasks]="tasks()" [item]="editedItem()"
+          [categories]="categories()" [tasks]="tasks()" [item]="editedItem()" [canLinkDocument]="canWrite()"
           (closed)="isFormOpen.set(false)" (saved)="onSaved()" />
       }
       @if (isPickerOpen()) {
@@ -172,6 +175,7 @@ interface FilterOption {
     .filter { width:auto; max-width:200px; padding:5px 8px; font-size:12.5px; }
     .description { max-width:280px; white-space:pre-wrap; overflow-wrap:anywhere; }
     .ksef-action { margin-right:10px; }
+    .document { display:block; margin-top:3px; }
     table.grid tr.has-note td { border-bottom:none; padding-bottom:3px; }
     table.grid tr.note-row td { padding-top:0; }
   `],

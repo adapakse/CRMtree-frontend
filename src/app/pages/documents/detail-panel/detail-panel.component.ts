@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
-import { Document, WorkflowTask, DocumentVersion, User, DocStatus, DocType, GdprType } from '../../../core/models/models';
+import { Document, DocumentProjectLink, WorkflowTask, DocumentVersion, User, DocStatus, DocType, GdprType } from '../../../core/models/models';
 import { DocumentService } from '../../../core/services/document.service';
 import { WorkflowService, GroupService, UserService } from '../../../core/services/api.services';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -11,7 +11,12 @@ import { ToastService } from '../../../core/services/toast.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent } from '../../../shared/components/badges.components';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
-import { fileSizeLabel, triggerDownload } from '../../../core/services/helpers';
+import { fileSizeLabel, triggerDownload, INVOICE_DOC_TYPE } from '../../../core/services/helpers';
+import { PaymentStatusBadgeComponent } from '../../../shared/components/payment-status-badge/payment-status-badge.component';
+import {
+  InvoiceFieldsComponent, InvoiceFieldsDraft, invoiceFieldsDraftOf, invoiceFieldsPayload,
+} from '../invoice-fields/invoice-fields.component';
+import { DocumentProjectLinksComponent } from '../project-links/document-project-links.component';
 import { environment } from '../../../../environments/environment';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { LocaleService } from '../../../core/i18n/locale.service';
@@ -19,7 +24,7 @@ import { DEFAULT_LOCALE } from '../../../core/i18n/locales';
 
 // Built-in values have translated names; any other value comes from App
 // Settings and is its own display name.
-const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement'];
+const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement', 'invoice'];
 const BUILT_IN_GDPR_TYPES = ['data_processing_entrustment', 'data_administration', 'no_gdpr'];
 const BUILT_IN_STATUSES = ['new', 'being_edited', 'being_approved', 'being_signed', 'signed', 'hold', 'completed', 'rejected'];
 
@@ -42,7 +47,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -53,7 +58,10 @@ interface SelectOption { value: string; label: string; }
         <div class="ph">
           <div>
             <div class="pt">{{ doc.name }}</div>
-            <div class="ps">{{ doc.doc_number }} · <wt-status-badge [status]="doc.status" /></div>
+            <div class="ps">
+              {{ doc.doc_number }} · <wt-status-badge [status]="doc.status" />
+              @if (isStoredInvoice) { <wt-payment-status-badge [status]="doc.payment_status" [isOverdue]="doc.is_payment_overdue" /> }
+            </div>
           </div>
           <div class="pc" (click)="close.emit()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -97,7 +105,7 @@ interface SelectOption { value: string; label: string; }
               <div class="fg">
                 <label class="fl">{{ t('labels.fields.documentType') }}</label>
                 @if (doc._access === 'full') {
-                  <select class="fsel" [(ngModel)]="draft.doc_type">
+                  <select class="fsel" [(ngModel)]="draft.doc_type" [disabled]="isTypeLocked">
                     <option value="">{{ t('detail.overview.chooseType') }}</option>
                     @for (option of docTypeOptions; track option.value) {
                       <option [value]="option.value">{{ option.label }}</option>
@@ -148,7 +156,7 @@ interface SelectOption { value: string; label: string; }
                 }
               </div>
               <div class="fg">
-                <label class="fl">{{ t('labels.fields.entity1') }}</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.buyer' : 'labels.fields.entity1') }}</label>
                 @if (doc._access === 'full') {
                   @if (entity1Options.length > 0) {
                   <select class="fsel" [(ngModel)]="draft.entity1">
@@ -165,19 +173,21 @@ interface SelectOption { value: string; label: string; }
                 }
               </div>
               <div class="fg">
-                <label class="fl">{{ t('labels.fields.entity2') }}</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.seller' : 'labels.fields.entity2') }}</label>
                 <input class="fi" [(ngModel)]="draft.entity2"
                        [readOnly]="doc._access !== 'full'" [placeholder]="t('labels.placeholders.entity2')">
               </div>
               <div class="fg">
-                <label class="fl">{{ t('labels.fields.signingDate') }}</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.issueDate' : 'labels.fields.signingDate') }}</label>
                 <input class="fi" type="date" [(ngModel)]="draft.signing_date"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''">
               </div>
               <div class="fg">
-                <label class="fl">{{ t('labels.fields.expirationDate') }}</label>
-                @if (doc._access === 'full') {
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.paymentDueDate' : 'labels.fields.expirationDate') }}</label>
+                @if (doc._access === 'full' && isInvoice) {
+                  <input class="fi" type="date" [(ngModel)]="draft.expiration_date">
+                } @else if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
                     <option value="indefinite">{{ t('labels.options.indefinite') }}</option>
                     <option value="fixed">{{ t('labels.options.fixedDate') }}</option>
@@ -187,10 +197,11 @@ interface SelectOption { value: string; label: string; }
                   }
                 } @else {
                   <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">
-                    {{ draft.expiration_date ? (draft.expiration_date | date:'dd.MM.yyyy') : t('labels.options.indefinite') }}
+                    {{ draft.expiration_date ? (draft.expiration_date | date:'dd.MM.yyyy') : (isInvoice ? '—' : t('labels.options.indefinite')) }}
                   </div>
                 }
               </div>
+              @if (!isInvoice) {
               <div class="fg">
                 <label class="fl">{{ t('labels.fields.contractSubject') }} <span class="req">*</span></label>
                 @if (doc._access === 'full') {
@@ -204,8 +215,9 @@ interface SelectOption { value: string; label: string; }
                   <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ optionLabel(contractSubjectOptions, draft.contract_subject) || '—' }}</div>
                 }
               </div>
+              }
               <div class="fg">
-                <label class="fl">{{ t('labels.fields.counterpartyTaxId') }}</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.sellerTaxId' : 'labels.fields.counterpartyTaxId') }}</label>
                 <input class="fi" [(ngModel)]="draft.nip" maxlength="15"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
@@ -225,6 +237,10 @@ interface SelectOption { value: string; label: string; }
                 }
               </div>
             </div>
+
+            @if (isInvoice) {
+              <wt-invoice-fields [(value)]="invoiceDraft" [isReadOnly]="doc._access !== 'full'" [isOverdue]="doc.is_payment_overdue" />
+            }
 
             <!-- Dane kontaktowe ds. umowy -->
             <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.contactSection') }}</div>
@@ -329,6 +345,10 @@ interface SelectOption { value: string; label: string; }
               }
             }
 
+            @if (shownProjectLinks; as projectLinks) {
+              <wt-document-project-links [links]="projectLinks" [documentId]="doc.id" [documentNumber]="doc.doc_number" />
+            }
+
             @if (doc.document_group_name) {
               <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--orange-dark)">
                 📎 {{ t('detail.overview.packagePart') }} <strong>{{ doc.document_group_name }}</strong>
@@ -338,6 +358,11 @@ interface SelectOption { value: string; label: string; }
 
           <!-- DOKUMENT GŁÓWNY -->
           @if (activeTab === 'preview') {
+            @if (isStoredInvoice && doc.ksef_invoice_id && doc.blob_name) {
+              <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.5;color:#92400E">
+                {{ t('invoice.ksefVisualisationNote') }}
+              </div>
+            }
             @if (doc.blob_name) {
               @if (!isPdf) {
                 <div class="empty-state">
@@ -546,7 +571,7 @@ interface SelectOption { value: string; label: string; }
               </button>
             }
 
-            @if (doc._access === 'full' && doc.blob_name) {
+            @if (doc._access === 'full' && doc.blob_name && !isStoredInvoice) {
               <div class="sec-title" style="margin-top:24px">{{ t('detail.signus.sectionTitle') }}</div>
               <button class="btn btn-p" (click)="openSignus()">
                 ✍ {{ t('detail.signus.start') }}
@@ -740,6 +765,25 @@ export class DetailPanelComponent implements OnChanges {
 
   doc!: Document;
 
+  /** Follows the type chosen in the form, so the fields switch as soon as the type is changed. */
+  get isInvoice(): boolean { return this.draft.doc_type === INVOICE_DOC_TYPE; }
+  get isStoredInvoice(): boolean { return this.doc?.doc_type === INVOICE_DOC_TYPE; }
+
+  // The API refuses to change the type of an invoice that came from KSeF or is linked to project costs.
+  get isTypeLocked(): boolean {
+    return this.isStoredInvoice && (!!this.doc.ksef_invoice_id || (this.doc.project_links?.length ?? 0) > 0);
+  }
+
+  /**
+   * Links of an invoice to project costs; null hides the section. An invoice
+   * without links gets the "not linked" line only where the Projects module is on.
+   */
+  get shownProjectLinks(): DocumentProjectLink[] | null {
+    const links = this.doc?.project_links;
+    if (!this.isStoredInvoice || !links) return null;
+    return links.length > 0 || this.auth.hasFeature('projects') ? links : null;
+  }
+
   /**
    * Stable getter — avoids NG0100 caused by `doc.tags ?? []` creating
    * a new array reference on every change-detection cycle.
@@ -794,8 +838,10 @@ export class DetailPanelComponent implements OnChanges {
     nip: string; country: string; contract_subject: string;
     contact_name: string; contact_email: string; contact_phone: string;
   } = {} as any;
+  invoiceDraft!: InvoiceFieldsDraft;
 
   initDraft(): void {
+    this.invoiceDraft = invoiceFieldsDraftOf(this.doc);
     const expDate = this.toDateInput(this.doc.expiration_date);
     this.draft = {
       name:                 this.doc.name ?? '',
@@ -821,6 +867,7 @@ export class DetailPanelComponent implements OnChanges {
   saveDoc(): void {
     if (this.doc._access !== 'full') return;
     const access = this.doc._access;
+    const isInvoice = this.isInvoice;
     const entities = [this.draft.entity1, this.draft.entity2]
       .map(s => s.trim()).filter(s => !!s);
     this.docSvc.update(this.doc.id, {
@@ -831,18 +878,23 @@ export class DetailPanelComponent implements OnChanges {
       group_id:         this.draft.group_id,
       owner_id:         this.draft.owner_id,
       entities,
-      expiration_date:  this.draft.expiration_date_mode === 'fixed'
-                          ? (this.draft.expiration_date || undefined)
-                          : null as any,
+      expiration_date:  isInvoice
+                          ? (this.draft.expiration_date || null) as any
+                          : this.draft.expiration_date_mode === 'fixed'
+                            ? (this.draft.expiration_date || undefined)
+                            : null as any,
       signing_date:     this.draft.signing_date || undefined,
       nip:              (this.draft.nip || null) as any,
       country:          (this.draft.country || null) as any,
-      contract_subject: (this.draft.contract_subject || null) as any,
+      contract_subject: isInvoice ? undefined : (this.draft.contract_subject || null) as any,
       contact_name:     (this.draft.contact_name || null) as any,
       contact_email:    (this.draft.contact_email || null) as any,
       contact_phone:    (this.draft.contact_phone || null) as any,
+      ...(isInvoice ? invoiceFieldsPayload(this.invoiceDraft, this.doc) : {}),
     }).subscribe(updated => {
-      this.doc = { ...updated, _access: access };
+      // The answer to a save carries no project links; they cannot have changed, so the loaded ones stay.
+      const projectLinks = updated.doc_type === INVOICE_DOC_TYPE ? (this.doc.project_links ?? []) : undefined;
+      this.doc = { ...updated, _access: access, project_links: projectLinks };
       this.initDraft();
       this.cdr.markForCheck();
       this.updated.emit(this.doc);

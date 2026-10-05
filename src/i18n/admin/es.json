@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Contrato laboral",
+        "invoice": "Factura",
         "it_supplier_agreement": "Contrato con proveedor de TI",
         "nda": "NDA",
         "partner_agreement": "Contrato de partner"
@@ -874,6 +875,12 @@
         "churned": "Perdido",
         "inactive": "Inactivo",
         "onboarding": "Implantación"
+      },
+      "paymentStatuses": {
+        "overdue": "Vencida",
+        "paid": "Pagada",
+        "partially_paid": "Pagada parcialmente",
+        "unpaid": "No pagada"
       },
       "productTypes": {
         "car_rental": "Alquiler de coche",

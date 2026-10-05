@@ -113,12 +113,16 @@
       "addTitle": "Cost nou",
       "amount": "Sumă",
       "category": "Categorie",
+      "clearInvoiceDocument": "Disociere document",
       "conversionHint": "Suma va fi convertită în {currency} la cursul mediu NBP (Banca Națională a Poloniei) din ziua lucrătoare anterioară datei costului.",
       "currency": "Moneda sumei",
       "date": "Dată",
       "description": "Descriere",
       "documentNumber": "Numărul documentului",
       "editTitle": "Editare cost",
+      "invoiceDocument": "Documentul facturii (opțional)",
+      "invoiceDocumentHint": "Documente de tip Factură la care aveți acces în modulul Documente. Facturile descărcate din KSeF se asociază separat.",
+      "invoiceDocumentPlaceholder": "Căutați factura după număr sau denumire…",
       "noTask": "— fără sarcină —",
       "saveFailed": "Costul nu a putut fi salvat",
       "saved": "Cost salvat",
@@ -160,6 +164,10 @@
       "totalIncurred": "Total suportate"
     },
     "delete": "Ștergere",
+    "document": {
+      "lockedTitle": "Documentul facturii — nu aveți acces la el în modulul Documente",
+      "openTitle": "Documentul facturii — deschidere în modulul Documente"
+    },
     "edit": "Editare",
     "loadFailed": "Finanțele proiectului nu au putut fi încărcate",
     "plan": {
@@ -303,6 +311,19 @@
         "vat": "TVA"
       }
     },
+    "document": {
+      "groupMissing": "Nu a fost ales niciun grup de acces pentru documentele de factură, așa că facturile nu pot fi înregistrate în Documente. Administratorul îl alege în Setări → Proiecte → KSeF.",
+      "noAccessTitle": "Nu faceți parte din grupul de acces al acestui document, așa că nu îl puteți deschide.",
+      "notRegisteredOnLink": "Factura va fi asociată, dar nu va apărea în modulul Documente: nu a fost ales niciun grup de acces pentru documentele de factură (Setări → Proiecte → KSeF).",
+      "open": "Deschidere document",
+      "register": "Înregistrare în Documente",
+      "registerFailed": "Factura nu a putut fi înregistrată în Documente",
+      "registerHint": "Factura nu are încă un document în modulul Documente. Asocierea ei cu un cost o va înregistra automat.",
+      "registered": "Înregistrată: {number}",
+      "registeredToast": "Factură înregistrată în Documente ca {number}",
+      "registering": "Se înregistrează…",
+      "title": "Document în modulul Documente"
+    },
     "errors": {
       "forbidden": "Nu aveți acces la facturile KSeF. Permisiunea este acordată de administrator în panoul de utilizatori."
     },
@@ -346,6 +367,7 @@
     "list": {
       "columns": {
         "currency": "Monedă",
+        "document": "Document",
         "gross": "Brut",
         "issueDate": "Data emiterii",
         "net": "Net",
@@ -425,13 +447,17 @@
         "invalidNip": "Cod fiscal incorect.",
         "notConfigured": "Integrarea cu KSeF nu este configurată pe server.",
         "tokenRejected": "KSeF a respins tokenul pentru acest cod fiscal. Verificați dacă tokenul este valabil și emis pentru această companie.",
+        "unknownGroup": "Acest grup nu există sau este inactiv. Reîmprospătați pagina și alegeți altul.",
         "unreachable": "Conectarea la KSeF pentru verificarea tokenului nu a reușit. Încercați din nou mai târziu."
       },
       "hint": "Facturile de achiziție ale companiilor adăugate mai jos sunt descărcate din KSeF, sistemul național polonez de facturare electronică, la fiecare 30 de minute. Persoanele cu permisiunea „Acces la facturile KSeF” le asociază costurilor proiectelor.",
       "initialSyncDays": "Prima sincronizare merge înapoi (zile)",
       "initialSyncDaysHint": "De la {min} la {max} zile. Se aplică companiilor adăugate după modificarea acestei setări.",
+      "invoiceDocumentsGroup": "Grup de acces pentru documentele de factură",
+      "invoiceDocumentsGroupHint": "În acest grup ajung documentele de factură înregistrate din KSeF. Fără un grup ales, facturile asociate proiectelor nu sunt înregistrate în modulul Documente.",
       "loadFailed": "Configurația KSeF nu a putut fi încărcată",
       "noCompanies": "Nicio companie nu a fost încă adăugată.",
+      "noInvoiceDocumentsGroup": "— niciunul —",
       "notConfigured": "Integrarea cu KSeF nu este configurată pe server, de aceea nu se pot adăuga companii și nici descărca facturi.",
       "remove": "Eliminare",
       "removeConfirm": "Eliminați compania {company} din configurația KSeF? Facturile noi nu vor mai fi descărcate. Facturile deja descărcate și asocierile lor cu costurile vor fi păstrate.",

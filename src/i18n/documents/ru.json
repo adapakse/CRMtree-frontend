@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Поиск по фамилии или e-mail…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Номер банковского счёта",
+      "currency": "Валюта",
+      "grossAmount": "Сумма брутто",
+      "invoiceNumber": "Номер счёта",
+      "netAmount": "Сумма нетто",
+      "paymentStatus": "Состояние оплаты",
+      "title": "Данные счёта",
+      "vatAmount": "Сумма НДС"
+    },
+    "ksefVisualisationNote": "Это визуализация данных, загруженных из KSeF, а не оригинал документа.",
+    "projectLinks": {
+      "backLabel": "Документ {number}",
+      "costStatuses": {
+        "incurred": "Понесённый",
+        "planned": "Плановый"
+      },
+      "empty": "Этот счёт не привязан ни к одному расходу проекта.",
+      "linkedAt": "Привязка: {date}",
+      "linkedBy": "Привязка: {name}, {date}",
+      "severalLinks": "Этот счёт привязан к нескольким проектам или задачам.",
+      "title": "Связи с проектами",
+      "wholeProject": "весь проект"
+    }
+  },
   "labels": {
     "activeTasks": "Активные задачи",
     "addTag": "Добавить тег",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Трудовой договор",
+      "invoice": "Счёт",
       "it_supplier_agreement": "Договор с ИТ-поставщиком",
       "nda": "NDA",
       "operator_agreement": "Операторский договор",
       "partner_agreement": "Партнёрский договор"
     },
     "fields": {
+      "buyer": "Покупатель",
       "contactName": "Имя и фамилия",
       "contactSection": "Контактные данные по вопросам договора",
       "contractSubject": "Предмет договора",
@@ -200,8 +228,12 @@
       "expirationDate": "Дата окончания",
       "gdprClassification": "Классификация GDPR",
       "group": "Группа",
+      "issueDate": "Дата выставления",
       "owner": "Владелец",
+      "paymentDueDate": "Срок оплаты",
       "phone": "Телефон",
+      "seller": "Продавец",
+      "sellerTaxId": "ИНН продавца",
       "signingDate": "Дата подписания",
       "status": "Статус"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Определённая дата",
       "indefinite": "Бессрочно",
       "unassigned": "— не назначен —"
+    },
+    "paymentStatuses": {
+      "overdue": "Просрочен",
+      "paid": "Оплачен",
+      "partially_paid": "Оплачен частично",
+      "unpaid": "Не оплачен"
     },
     "placeholders": {
       "contactEmail": "напр. ivan.petrov@firma.ru",
@@ -335,6 +373,8 @@
       "emptyHint": "Документы появятся здесь после их создания",
       "expired": "Истёк",
       "expires": "Истекает {date}",
+      "paymentDue": "Оплата до {date}",
+      "paymentOverdue": "Срок оплаты истёк",
       "soon": "СКОРО",
       "taskCount": "Задачи: {count}"
     },

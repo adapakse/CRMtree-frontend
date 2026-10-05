@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Traži po prezimenu ili e-pošti…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Broj bankovnog računa",
+      "currency": "Valuta",
+      "grossAmount": "Bruto iznos",
+      "invoiceNumber": "Broj računa",
+      "netAmount": "Neto iznos",
+      "paymentStatus": "Stanje plaćanja",
+      "title": "Podaci računa",
+      "vatAmount": "Iznos PDV-a"
+    },
+    "ksefVisualisationNote": "Ovo je vizualizacija podataka preuzetih iz KSeF-a, a ne izvorni dokument.",
+    "projectLinks": {
+      "backLabel": "Dokument {number}",
+      "costStatuses": {
+        "incurred": "Nastao",
+        "planned": "Planiran"
+      },
+      "empty": "Ovaj račun nije povezan ni s jednim troškom projekta.",
+      "linkedAt": "Povezivanje: {date}",
+      "linkedBy": "Povezivanje: {name}, {date}",
+      "severalLinks": "Ovaj je račun povezan s više projekata ili zadataka.",
+      "title": "Veze s projektima",
+      "wholeProject": "cijeli projekt"
+    }
+  },
   "labels": {
     "activeTasks": "Aktivni zadaci",
     "addTag": "Dodaj oznaku",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Ugovor sa zaposlenikom",
+      "invoice": "Račun",
       "it_supplier_agreement": "Ugovor s IT dobavljačem",
       "nda": "NDA",
       "operator_agreement": "Ugovor s operatorom",
       "partner_agreement": "Partnerski ugovor"
     },
     "fields": {
+      "buyer": "Kupac",
       "contactName": "Ime i prezime",
       "contactSection": "Kontakt podaci za ugovor",
       "contractSubject": "Predmet ugovora",
@@ -200,8 +228,12 @@
       "expirationDate": "Datum isteka",
       "gdprClassification": "GDPR klasifikacija",
       "group": "Grupa",
+      "issueDate": "Datum izdavanja",
       "owner": "Vlasnik",
+      "paymentDueDate": "Rok plaćanja",
       "phone": "Telefon",
+      "seller": "Prodavatelj",
+      "sellerTaxId": "Porezni broj prodavatelja",
       "signingDate": "Datum potpisivanja",
       "status": "Status"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Određeni datum",
       "indefinite": "Neodređeno vrijeme",
       "unassigned": "— nedodijeljeno —"
+    },
+    "paymentStatuses": {
+      "overdue": "Dospio",
+      "paid": "Plaćen",
+      "partially_paid": "Djelomično plaćen",
+      "unpaid": "Neplaćen"
     },
     "placeholders": {
       "contactEmail": "npr. ivan.horvat@tvrtka.hr",
@@ -335,6 +373,8 @@
       "emptyHint": "Dokumenti će se pojaviti ovdje nakon što budu izrađeni",
       "expired": "Istekao",
       "expires": "Istječe {date}",
+      "paymentDue": "Plaćanje do {date}",
+      "paymentOverdue": "Rok plaćanja je istekao",
       "soon": "USKORO",
       "taskCount": "Zadaci: {count}"
     },

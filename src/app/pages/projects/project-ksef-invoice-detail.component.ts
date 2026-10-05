@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, input, output, sign
 import { TranslocoDirective, TranslocoPipe, provideTranslocoScope } from '@jsverse/transloco';
 import { KsefApiService, KsefInvoiceDetail, KsefInvoiceLine } from '../../core/services/ksef-api.service';
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
+import { ProjectKsefInvoiceDocumentComponent } from './project-ksef-invoice-document.component';
 import { ProjectKsefLinksTableComponent } from './project-ksef-links-table.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
@@ -20,7 +21,7 @@ type PaidState = 'paid' | 'partiallyPaid' | 'unpaid' | 'unknown';
 @Component({
   selector: 'wt-project-ksef-invoice-detail',
   standalone: true,
-  imports: [TranslocoDirective, TranslocoPipe, ProjectKsefLinksTableComponent],
+  imports: [TranslocoDirective, TranslocoPipe, ProjectKsefLinksTableComponent, ProjectKsefInvoiceDocumentComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -133,6 +134,18 @@ type PaidState = 'paid' | 'partiallyPaid' | 'unpaid' | 'unknown';
                 </p>
               }
             }
+
+            <div class="sec-title">{{ t('ksef.document.title') }}</div>
+            <div class="document">
+              <wt-project-ksef-invoice-document
+                [invoiceId]="loaded.id" [documentId]="loaded.document_id"
+                [isGroupConfigured]="loaded.is_document_group_configured" />
+              @if (!loaded.document_id) {
+                <span class="hint">
+                  {{ t(loaded.is_document_group_configured ? 'ksef.document.registerHint' : 'ksef.document.groupMissing') }}
+                </span>
+              }
+            </div>
           } @else if (loadError(); as error) {
             <div class="notice error">{{ t(error === 'forbidden' ? 'ksef.errors.forbidden' : 'ksef.detail.loadFailed') }}</div>
           } @else {
@@ -153,6 +166,8 @@ type PaidState = 'paid' | 'partiallyPaid' | 'unpaid' | 'unknown';
     .parties { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .party { padding:12px 14px; border:1px solid var(--gray-200); border-radius:9px; align-content:start; }
     .line-name { overflow-wrap:anywhere; }
+    .document { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .document .hint { flex:1; min-width:220px; }
     .totals { display:flex; justify-content:flex-end; gap:22px; flex-wrap:wrap; font-size:13px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .totals strong { color:var(--gray-900); margin-left:4px; }
     @media (max-width: 700px) { .parties { grid-template-columns:1fr; } }

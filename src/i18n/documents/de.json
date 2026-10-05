@@ -150,6 +150,32 @@
       "userSearchPlaceholder": "Nach Nachname oder E-Mail suchen…"
     }
   },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Bankkontonummer",
+      "currency": "Währung",
+      "grossAmount": "Bruttobetrag",
+      "invoiceNumber": "Rechnungsnummer",
+      "netAmount": "Nettobetrag",
+      "paymentStatus": "Zahlungsstatus",
+      "title": "Rechnungsdaten",
+      "vatAmount": "USt.-Betrag"
+    },
+    "ksefVisualisationNote": "Dies ist eine Visualisierung der aus KSeF abgerufenen Daten, nicht das Originaldokument.",
+    "projectLinks": {
+      "backLabel": "Dokument {number}",
+      "costStatuses": {
+        "incurred": "Angefallen",
+        "planned": "Geplant"
+      },
+      "empty": "Diese Rechnung ist mit keinen Projektkosten verknüpft.",
+      "linkedAt": "Verknüpft: {date}",
+      "linkedBy": "Verknüpft: {name}, {date}",
+      "severalLinks": "Diese Rechnung ist mit mehreren Projekten oder Aufgaben verknüpft.",
+      "title": "Verknüpfungen mit Projekten",
+      "wholeProject": "gesamtes Projekt"
+    }
+  },
   "labels": {
     "activeTasks": "Aktive Aufgaben",
     "addTag": "Tag hinzufügen",
@@ -181,12 +207,14 @@
     },
     "docTypes": {
       "employee_agreement": "Arbeitsvertrag",
+      "invoice": "Rechnung",
       "it_supplier_agreement": "Vertrag mit IT-Lieferant",
       "nda": "NDA",
       "operator_agreement": "Betreibervertrag",
       "partner_agreement": "Partnervertrag"
     },
     "fields": {
+      "buyer": "Käufer",
       "contactName": "Vor- und Nachname",
       "contactSection": "Kontaktdaten zum Vertrag",
       "contractSubject": "Vertragsgegenstand",
@@ -200,8 +228,12 @@
       "expirationDate": "Ablaufdatum",
       "gdprClassification": "DSGVO-Klassifizierung",
       "group": "Gruppe",
+      "issueDate": "Ausstellungsdatum",
       "owner": "Eigentümer",
+      "paymentDueDate": "Zahlungsfrist",
       "phone": "Telefon",
+      "seller": "Verkäufer",
+      "sellerTaxId": "Steuernummer des Verkäufers",
       "signingDate": "Unterzeichnungsdatum",
       "status": "Status"
     },
@@ -220,6 +252,12 @@
       "fixedDate": "Festes Datum",
       "indefinite": "Unbefristet",
       "unassigned": "— nicht zugewiesen —"
+    },
+    "paymentStatuses": {
+      "overdue": "Überfällig",
+      "paid": "Bezahlt",
+      "partially_paid": "Teilweise bezahlt",
+      "unpaid": "Unbezahlt"
     },
     "placeholders": {
       "contactEmail": "z. B. max.mustermann@firma.de",
@@ -335,6 +373,8 @@
       "emptyHint": "Dokumente erscheinen hier, sobald sie erstellt wurden",
       "expired": "Abgelaufen",
       "expires": "Läuft ab am {date}",
+      "paymentDue": "Zahlbar bis {date}",
+      "paymentOverdue": "Zahlung überfällig",
       "soon": "BALD",
       "taskCount": "Aufgaben: {count}"
     },

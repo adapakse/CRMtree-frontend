@@ -18,6 +18,7 @@ const ERROR_KEY_BY_BAD_REQUEST_MESSAGE: Record<string, string> = {
   'Invalid NIP': 'invalidNip',
   'KSeF rejected the token for this NIP': 'tokenRejected',
   'KSeF integration is not configured': 'notConfigured',
+  'Unknown or inactive group': 'unknownGroup',
 };
 
 /**

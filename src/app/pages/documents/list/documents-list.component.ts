@@ -11,7 +11,8 @@ import { ToastService } from '../../../core/services/toast.service';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { Document, DocStatus, DocType, GroupProfile, ActiveTaskInfo } from '../../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent } from '../../../shared/components/badges.components';
-import { triggerDownload, isExpiringSoon } from '../../../core/services/helpers';
+import { triggerDownload, isExpiringSoon, INVOICE_DOC_TYPE } from '../../../core/services/helpers';
+import { PaymentStatusBadgeComponent } from '../../../shared/components/payment-status-badge/payment-status-badge.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { DetailPanelComponent } from '../detail-panel/detail-panel.component';
@@ -29,7 +30,7 @@ const STATUSES: { key: DocStatus | 'all'; labelKey: string }[] = [
 
 // Built-in document types have translated names; any other type comes from
 // App Settings and its value is the display name.
-const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement'];
+const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement', 'invoice'];
 
 const BACKEND_SORT_COLS = new Set(['doc_number','name','status','expiration_date']);
 type SortDir = 'asc' | 'desc';
@@ -40,7 +41,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
 @Component({
   selector: 'wt-documents-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoDirective, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent, DetailPanelComponent, NewDocumentPanelComponent],
+  imports: [CommonModule, FormsModule, TranslocoDirective, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent, DetailPanelComponent, NewDocumentPanelComponent, PaymentStatusBadgeComponent],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -128,7 +129,10 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
             <div class="td"><wt-type-badge [type]="doc.doc_type" /></div>
             <div class="td"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
             <div class="td"><wt-gdpr-badge [gdpr]="doc.gdpr_type" /></div>
-            <div class="td"><wt-status-badge [status]="doc.status" /></div>
+            <div class="td td-status">
+              <wt-status-badge [status]="doc.status" />
+              @if (doc.doc_type === invoiceDocType) { <wt-payment-status-badge [status]="doc.payment_status" [isOverdue]="doc.is_payment_overdue" /> }
+            </div>
 
             <!-- ★ Active Tasks column -->
             <div class="td task-col">
@@ -150,7 +154,8 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
               }
             </div>
 
-            <div class="td" [style.color]="isExpiring(doc.expiration_date) ? '#DC2626' : ''">
+            <div class="td" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? '#DC2626' : ''"
+                 [title]="doc.doc_type === invoiceDocType ? t('labels.fields.paymentDueDate') : ''">
               {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
             </div>
             <div class="td">
@@ -223,6 +228,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     .td-n { font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .no-partner-tri { font-size: 13px; color: #f97316; cursor: default; line-height: 1; width: fit-content; }
     .td-num { font-family: 'Sora', monospace; font-size: 11px; color: var(--gray-500); font-weight: 600; }
+    .td-status { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
 
     /* ── Active Tasks column ── */
     .task-col { display: flex; flex-direction: column; gap: 4px; overflow: visible; }
@@ -267,6 +273,7 @@ export class DocumentsListComponent implements OnInit {
   partnerFilterName: string        = '';
 
   readonly grid  = GRID;
+  readonly invoiceDocType = INVOICE_DOC_TYPE;
   statuses       = STATUSES;
   private settingsSvc = inject(AppSettingsService);
 

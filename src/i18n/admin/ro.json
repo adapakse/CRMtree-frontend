@@ -828,6 +828,7 @@
       },
       "documentTypes": {
         "employee_agreement": "Contract de muncă",
+        "invoice": "Factură",
         "it_supplier_agreement": "Contract cu furnizor IT",
         "nda": "NDA",
         "partner_agreement": "Contract de parteneriat"
@@ -874,6 +875,12 @@
         "churned": "Pierdut",
         "inactive": "Inactiv",
         "onboarding": "Implementare"
+      },
+      "paymentStatuses": {
+        "overdue": "Restantă",
+        "paid": "Plătită",
+        "partially_paid": "Plătită parțial",
+        "unpaid": "Neplătită"
       },
       "productTypes": {
         "car_rental": "Închiriere auto",

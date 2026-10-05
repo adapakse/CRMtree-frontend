@@ -113,12 +113,16 @@
       "addTitle": "Neue Kosten",
       "amount": "Betrag",
       "category": "Kategorie",
+      "clearInvoiceDocument": "Dokument trennen",
       "conversionHint": "Der Betrag wird zum Mittelkurs der NBP (Polnische Nationalbank) vom Geschäftstag vor dem Kostendatum in {currency} umgerechnet.",
       "currency": "Währung des Betrags",
       "date": "Datum",
       "description": "Beschreibung",
       "documentNumber": "Belegnummer",
       "editTitle": "Kosten bearbeiten",
+      "invoiceDocument": "Rechnungsdokument (optional)",
+      "invoiceDocumentHint": "Dokumente vom Typ Rechnung, auf die Sie im Modul Dokumente Zugriff haben. Aus KSeF abgerufene Rechnungen werden separat verknüpft.",
+      "invoiceDocumentPlaceholder": "Rechnung nach Nummer oder Name suchen…",
       "noTask": "— ohne Aufgabe —",
       "saveFailed": "Kosten konnten nicht gespeichert werden",
       "saved": "Kosten gespeichert",
@@ -160,6 +164,10 @@
       "totalIncurred": "Angefallen gesamt"
     },
     "delete": "Löschen",
+    "document": {
+      "lockedTitle": "Rechnungsdokument — Sie haben im Modul Dokumente keinen Zugriff darauf",
+      "openTitle": "Rechnungsdokument — im Modul Dokumente öffnen"
+    },
     "edit": "Bearbeiten",
     "loadFailed": "Projektfinanzen konnten nicht geladen werden",
     "plan": {
@@ -303,6 +311,19 @@
         "vat": "USt."
       }
     },
+    "document": {
+      "groupMissing": "Es wurde keine Zugriffsgruppe für Rechnungsdokumente ausgewählt, daher können Rechnungen nicht in Dokumenten erfasst werden. Der Administrator wählt sie unter Einstellungen → Projekte → KSeF aus.",
+      "noAccessTitle": "Sie gehören nicht zur Zugriffsgruppe dieses Dokuments und können es daher nicht öffnen.",
+      "notRegisteredOnLink": "Die Rechnung wird verknüpft, erscheint aber nicht im Modul Dokumente: Es wurde keine Zugriffsgruppe für Rechnungsdokumente ausgewählt (Einstellungen → Projekte → KSeF).",
+      "open": "Dokument öffnen",
+      "register": "In Dokumenten erfassen",
+      "registerFailed": "Rechnung konnte nicht in Dokumenten erfasst werden",
+      "registerHint": "Die Rechnung hat noch kein Dokument im Modul Dokumente. Beim Verknüpfen mit Kosten wird sie automatisch erfasst.",
+      "registered": "Erfasst: {number}",
+      "registeredToast": "Rechnung in Dokumenten als {number} erfasst",
+      "registering": "Wird erfasst…",
+      "title": "Dokument im Modul Dokumente"
+    },
     "errors": {
       "forbidden": "Sie haben keinen Zugriff auf KSeF-Rechnungen. Die Berechtigung vergibt der Administrator in der Benutzerverwaltung."
     },
@@ -346,6 +367,7 @@
     "list": {
       "columns": {
         "currency": "Währung",
+        "document": "Dokument",
         "gross": "Brutto",
         "issueDate": "Ausstellungsdatum",
         "net": "Netto",
@@ -425,13 +447,17 @@
         "invalidNip": "Ungültige Steuernummer.",
         "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert.",
         "tokenRejected": "KSeF hat das Token für diese Steuernummer abgelehnt. Prüfen Sie, ob das Token gültig ist und für diese Firma ausgestellt wurde.",
+        "unknownGroup": "Diese Gruppe existiert nicht oder ist inaktiv. Aktualisieren Sie die Seite und wählen Sie eine andere.",
         "unreachable": "Die Verbindung zu KSeF zur Prüfung des Tokens ist fehlgeschlagen. Versuchen Sie es später erneut."
       },
       "hint": "Die Eingangsrechnungen der unten hinzugefügten Firmen werden alle 30 Minuten aus dem polnischen Landessystem für E-Rechnungen (KSeF) abgerufen. Personen mit der Berechtigung „Zugriff auf KSeF-Rechnungen“ verknüpfen sie mit Projektkosten.",
       "initialSyncDays": "Erste Synchronisierung reicht zurück (Tage)",
       "initialSyncDaysHint": "Von {min} bis {max} Tagen. Gilt für Firmen, die nach der Änderung dieser Einstellung hinzugefügt werden.",
+      "invoiceDocumentsGroup": "Zugriffsgruppe für Rechnungsdokumente",
+      "invoiceDocumentsGroupHint": "In diese Gruppe gelangen die aus KSeF erfassten Rechnungsdokumente. Ohne ausgewählte Gruppe werden mit Projekten verknüpfte Rechnungen nicht im Modul Dokumente erfasst.",
       "loadFailed": "KSeF-Konfiguration konnte nicht geladen werden",
       "noCompanies": "Es wurde noch keine Firma hinzugefügt.",
+      "noInvoiceDocumentsGroup": "— keine —",
       "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert, daher können weder Firmen hinzugefügt noch Rechnungen abgerufen werden.",
       "remove": "Entfernen",
       "removeConfirm": "Firma {company} aus der KSeF-Konfiguration entfernen? Neue Rechnungen werden nicht mehr abgerufen. Bereits abgerufene Rechnungen und ihre Verknüpfungen mit Kosten bleiben erhalten.",
