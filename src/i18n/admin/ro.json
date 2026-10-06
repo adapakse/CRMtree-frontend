@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Anulează",
+      "changeToken": "Schimbă token",
+      "delete": "Șterge",
+      "deleting": "Se șterge…",
+      "hide": "Ascunde",
+      "save": "Salvează",
+      "saving": "Se salvează…",
+      "setToken": "Setează token",
+      "show": "Arată"
+    },
+    "columns": {
+      "crmRole": "Rol CRM",
+      "directPhone": "Număr direct (DPN)",
+      "status": "Status",
+      "updatedAt": "Actualizat",
+      "user": "Utilizator"
+    },
+    "deleteModal": {
+      "body": "Sigur ștergi tokenul PBX pentru {name}? Utilizatorul nu va mai putea folosi softphone-ul.",
+      "title": "Șterge tokenul PBX"
+    },
+    "loadError": "Eroare la încărcarea datelor.",
+    "loading": "Se încarcă…",
+    "modal": {
+      "hintBody": "Autentifică-te în panoul ip-pbx.eu ca acel utilizator sau cere-i tokenul. Panou → dă clic pe avatar/nume în colțul din dreapta sus → API sau Personal Access Token → Creează / Copiază tokenul.",
+      "hintTitle": "De unde iau tokenul?",
+      "patHint": "După salvare, sistemul va prelua automat datele SIP și numărul direct din ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Lipește tokenul din ip-pbx.eu",
+      "title": "Token PBX — {name}"
+    },
+    "noPhoneInPbx": "Fără număr în PBX",
+    "roles": {
+      "salesManager": "Manager de vânzări",
+      "salesperson": "Agent de vânzări"
+    },
+    "searchPlaceholder": "Caută utilizator…",
+    "status": {
+      "configured": "Configurat",
+      "noToken": "Fără token"
+    },
+    "subtitle": "Atribuie fiecărui agent de vânzări Personal Access Token-ul său din ip-pbx.eu. Sistemul va prelua automat datele SIP și numărul direct (DPN).",
+    "title": "Numere de telefon PBX",
+    "toast": {
+      "deleteError": "Eroare la ștergerea tokenului.",
+      "deleted": "Token șters.",
+      "saveError": "Eroare la salvarea tokenului.",
+      "saved": "Token salvat.",
+      "savedWithPhone": "Token salvat. Număr: {phone}."
+    },
+    "userCount": "Utilizatori: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Adăugare",

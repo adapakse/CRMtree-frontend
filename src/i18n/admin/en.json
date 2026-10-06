@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Cancel",
+      "changeToken": "Change token",
+      "delete": "Delete",
+      "deleting": "Deleting…",
+      "hide": "Hide",
+      "save": "Save",
+      "saving": "Saving…",
+      "setToken": "Set token",
+      "show": "Show"
+    },
+    "columns": {
+      "crmRole": "CRM role",
+      "directPhone": "Direct number (DPN)",
+      "status": "Status",
+      "updatedAt": "Updated",
+      "user": "User"
+    },
+    "deleteModal": {
+      "body": "Are you sure you want to delete the PBX token for {name}? The user will not be able to use the softphone.",
+      "title": "Delete PBX token"
+    },
+    "loadError": "Failed to load data.",
+    "loading": "Loading…",
+    "modal": {
+      "hintBody": "Sign in to the ip-pbx.eu panel as that user or ask them for the token. Panel → click the avatar/name in the top right corner → API or Personal Access Token → Create / Copy token.",
+      "hintTitle": "Where do I get the token?",
+      "patHint": "After saving, the system will automatically fetch the SIP details and the direct number from ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Paste the token from ip-pbx.eu",
+      "title": "PBX token — {name}"
+    },
+    "noPhoneInPbx": "No number in PBX",
+    "roles": {
+      "salesManager": "Sales Manager",
+      "salesperson": "Salesperson"
+    },
+    "searchPlaceholder": "Search for a user…",
+    "status": {
+      "configured": "Configured",
+      "noToken": "No token"
+    },
+    "subtitle": "Assign each salesperson their Personal Access Token from ip-pbx.eu. The system will automatically fetch the SIP details and the direct phone number (DPN).",
+    "title": "PBX phone numbers",
+    "toast": {
+      "deleteError": "Failed to delete the token.",
+      "deleted": "Token deleted.",
+      "saveError": "Failed to save the token.",
+      "saved": "Token saved.",
+      "savedWithPhone": "Token saved. Number: {phone}."
+    },
+    "userCount": "Users: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Add",

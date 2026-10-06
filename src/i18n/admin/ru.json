@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Отмена",
+      "changeToken": "Изменить токен",
+      "delete": "Удалить",
+      "deleting": "Удаление…",
+      "hide": "Скрыть",
+      "save": "Сохранить",
+      "saving": "Сохранение…",
+      "setToken": "Задать токен",
+      "show": "Показать"
+    },
+    "columns": {
+      "crmRole": "Роль в CRM",
+      "directPhone": "Прямой номер (DPN)",
+      "status": "Статус",
+      "updatedAt": "Обновлено",
+      "user": "Пользователь"
+    },
+    "deleteModal": {
+      "body": "Удалить токен PBX для {name}? Пользователь не сможет пользоваться софтфоном.",
+      "title": "Удалить токен PBX"
+    },
+    "loadError": "Ошибка загрузки данных.",
+    "loading": "Загрузка…",
+    "modal": {
+      "hintBody": "Войдите в панель ip-pbx.eu от имени этого пользователя или попросите у него токен. Панель → нажмите на аватар/имя в правом верхнем углу → API или Personal Access Token → Создать / Скопировать токен.",
+      "hintTitle": "Где взять токен?",
+      "patHint": "После сохранения система автоматически загрузит данные SIP и прямой номер из ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Вставьте токен из ip-pbx.eu",
+      "title": "Токен PBX — {name}"
+    },
+    "noPhoneInPbx": "Нет номера в PBX",
+    "roles": {
+      "salesManager": "Руководитель продаж",
+      "salesperson": "Менеджер по продажам"
+    },
+    "searchPlaceholder": "Поиск пользователя…",
+    "status": {
+      "configured": "Настроен",
+      "noToken": "Нет токена"
+    },
+    "subtitle": "Назначьте каждому менеджеру по продажам его Personal Access Token из ip-pbx.eu. Система автоматически загрузит данные SIP и прямой номер телефона (DPN).",
+    "title": "Телефонные номера PBX",
+    "toast": {
+      "deleteError": "Ошибка удаления токена.",
+      "deleted": "Токен удалён.",
+      "saveError": "Ошибка сохранения токена.",
+      "saved": "Токен сохранён.",
+      "savedWithPhone": "Токен сохранён. Номер: {phone}."
+    },
+    "userCount": "Пользователи: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Добавить",

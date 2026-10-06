@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Cancelar",
+      "changeToken": "Cambiar token",
+      "delete": "Eliminar",
+      "deleting": "Eliminando…",
+      "hide": "Ocultar",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "setToken": "Establecer token",
+      "show": "Mostrar"
+    },
+    "columns": {
+      "crmRole": "Rol CRM",
+      "directPhone": "Número directo (DPN)",
+      "status": "Estado",
+      "updatedAt": "Actualizado",
+      "user": "Usuario"
+    },
+    "deleteModal": {
+      "body": "¿Seguro que quieres eliminar el token PBX de {name}? El usuario no podrá usar el softphone.",
+      "title": "Eliminar token PBX"
+    },
+    "loadError": "Error al cargar los datos.",
+    "loading": "Cargando…",
+    "modal": {
+      "hintBody": "Inicia sesión en el panel de ip-pbx.eu como ese usuario o pídele el token. Panel → haz clic en el avatar/nombre en la esquina superior derecha → API o Personal Access Token → Crear / Copiar token.",
+      "hintTitle": "¿Dónde obtener el token?",
+      "patHint": "Tras guardar, el sistema obtendrá automáticamente los datos SIP y el número directo de ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Pega el token de ip-pbx.eu",
+      "title": "Token PBX — {name}"
+    },
+    "noPhoneInPbx": "Sin número en el PBX",
+    "roles": {
+      "salesManager": "Jefe de ventas",
+      "salesperson": "Comercial"
+    },
+    "searchPlaceholder": "Buscar usuario…",
+    "status": {
+      "configured": "Configurado",
+      "noToken": "Sin token"
+    },
+    "subtitle": "Asigna a cada comercial su Personal Access Token de ip-pbx.eu. El sistema obtendrá automáticamente los datos SIP y el número directo (DPN).",
+    "title": "Números de teléfono PBX",
+    "toast": {
+      "deleteError": "Error al eliminar el token.",
+      "deleted": "Token eliminado.",
+      "saveError": "Error al guardar el token.",
+      "saved": "Token guardado.",
+      "savedWithPhone": "Token guardado. Número: {phone}."
+    },
+    "userCount": "Usuarios: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Añadir",

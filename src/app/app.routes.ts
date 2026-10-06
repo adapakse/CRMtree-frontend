@@ -112,6 +112,11 @@ export const routes: Routes = withI18nScopes([
         loadComponent: () => import('./pages/admin/data-management/data-management.component').then(m => m.DataManagementComponent),
       },
       {
+        path: 'admin/pbx',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./pages/admin/pbx/admin-pbx.component').then(m => m.AdminPbxComponent),
+      },
+      {
         path: 'admin/tenants',
         canActivate: [superAdminGuard],
         loadComponent: () => import('./pages/admin/tenants/tenants.component').then(m => m.TenantsComponent),

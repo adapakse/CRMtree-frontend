@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Anuluj",
+      "changeToken": "Zmień token",
+      "delete": "Usuń",
+      "deleting": "Usuwanie…",
+      "hide": "Ukryj",
+      "save": "Zapisz",
+      "saving": "Zapisywanie…",
+      "setToken": "Ustaw token",
+      "show": "Pokaż"
+    },
+    "columns": {
+      "crmRole": "Rola CRM",
+      "directPhone": "Numer bezpośredni (DPN)",
+      "status": "Status",
+      "updatedAt": "Zaktualizowano",
+      "user": "Użytkownik"
+    },
+    "deleteModal": {
+      "body": "Czy na pewno usunąć token PBX dla {name}? Użytkownik nie będzie mógł korzystać z softphone.",
+      "title": "Usuń token PBX"
+    },
+    "loadError": "Błąd ładowania danych.",
+    "loading": "Ładowanie…",
+    "modal": {
+      "hintBody": "Zaloguj się do panelu ip-pbx.eu jako ten użytkownik lub poproś go o token. Panel → kliknij awatar/imię w prawym górnym rogu → API lub Personal Access Token → Utwórz / Skopiuj token.",
+      "hintTitle": "Skąd wziąć token?",
+      "patHint": "Po zapisaniu system automatycznie pobierze dane SIP i numer bezpośredni z ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Wklej token z ip-pbx.eu",
+      "title": "Token PBX — {name}"
+    },
+    "noPhoneInPbx": "Brak numeru w PBX",
+    "roles": {
+      "salesManager": "Sales Manager",
+      "salesperson": "Handlowiec"
+    },
+    "searchPlaceholder": "Szukaj użytkownika…",
+    "status": {
+      "configured": "Skonfigurowany",
+      "noToken": "Brak tokenu"
+    },
+    "subtitle": "Przypisz każdemu handlowcowi jego Personal Access Token z ip-pbx.eu. System automatycznie pobierze dane SIP i bezpośredni numer telefonu (DPN).",
+    "title": "Numery telefoniczne PBX",
+    "toast": {
+      "deleteError": "Błąd usuwania tokenu.",
+      "deleted": "Token usunięty.",
+      "saveError": "Błąd zapisu tokenu.",
+      "saved": "Token zapisany.",
+      "savedWithPhone": "Token zapisany. Numer: {phone}."
+    },
+    "userCount": "Użytkownicy: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Dodaj",
