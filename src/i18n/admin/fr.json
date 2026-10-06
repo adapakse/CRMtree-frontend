@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Annuler",
+      "changeToken": "Modifier le token",
+      "delete": "Supprimer",
+      "deleting": "Suppression…",
+      "hide": "Masquer",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "setToken": "Définir le token",
+      "show": "Afficher"
+    },
+    "columns": {
+      "crmRole": "Rôle CRM",
+      "directPhone": "Numéro direct (DPN)",
+      "status": "Statut",
+      "updatedAt": "Mis à jour",
+      "user": "Utilisateur"
+    },
+    "deleteModal": {
+      "body": "Voulez-vous vraiment supprimer le token PBX de {name} ? L'utilisateur ne pourra plus utiliser le softphone.",
+      "title": "Supprimer le token PBX"
+    },
+    "loadError": "Erreur lors du chargement des données.",
+    "loading": "Chargement…",
+    "modal": {
+      "hintBody": "Connectez-vous au panneau ip-pbx.eu en tant que cet utilisateur ou demandez-lui le token. Panneau → cliquez sur l'avatar/le nom en haut à droite → API ou Personal Access Token → Créer / Copier le token.",
+      "hintTitle": "Où obtenir le token ?",
+      "patHint": "Après l'enregistrement, le système récupérera automatiquement les données SIP et le numéro direct depuis ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Collez le token depuis ip-pbx.eu",
+      "title": "Token PBX — {name}"
+    },
+    "noPhoneInPbx": "Aucun numéro dans le PBX",
+    "roles": {
+      "salesManager": "Responsable commercial",
+      "salesperson": "Commercial"
+    },
+    "searchPlaceholder": "Rechercher un utilisateur…",
+    "status": {
+      "configured": "Configuré",
+      "noToken": "Aucun token"
+    },
+    "subtitle": "Attribuez à chaque commercial son Personal Access Token depuis ip-pbx.eu. Le système récupérera automatiquement les données SIP et le numéro direct (DPN).",
+    "title": "Numéros de téléphone PBX",
+    "toast": {
+      "deleteError": "Erreur lors de la suppression du token.",
+      "deleted": "Token supprimé.",
+      "saveError": "Erreur lors de l'enregistrement du token.",
+      "saved": "Token enregistré.",
+      "savedWithPhone": "Token enregistré. Numéro : {phone}."
+    },
+    "userCount": "Utilisateurs : {count}"
+  },
   "settings": {
     "actions": {
       "add": "Ajouter",
