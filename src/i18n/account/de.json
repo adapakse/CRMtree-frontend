@@ -40,6 +40,12 @@
       "tokenSaved": "Token gespeichert",
       "tokenSavedWithPhone": "Token gespeichert — Nummer: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Umfasst: die tägliche Zusammenfassung überfälliger Aufgaben, Änderungen der Fälligkeitsdaten von Aufgaben sowie Projekte, die in Verzug geraten sind.",
+      "saveFailed": "Benachrichtigungseinstellung konnte nicht geändert werden",
+      "title": "Benachrichtigungen zu Projektterminen",
+      "toggle": "E-Mails zu Terminen in Projekten"
+    },
     "saveFailed": "Fehler beim Speichern — bitte erneut versuchen",
     "saving": "Wird gespeichert…",
     "signature": {

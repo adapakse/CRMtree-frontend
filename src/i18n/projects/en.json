@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "At risk",
+    "key": "open · overdue · at risk",
+    "open": "Open tasks",
+    "overdue": "Overdue"
+  },
   "card": {
     "closeConfirm": "Close the project? A closed project is read-only and disappears from the default list.",
     "closeProject": "Close project",
     "closedBadge": "Closed",
+    "datesHint": "A project is marked as delayed when an unfinished task ends after the project's end date, or when that date has passed and unfinished tasks remain.",
     "description": "Description",
     "edit": "Edit",
+    "endDate": "Project end date",
     "errors": {
       "addMemberFailed": "Couldn't add the person",
       "changeAccessLevelFailed": "Couldn't change the access level",
       "changeRoleFailed": "Couldn't change the role",
       "closeProjectFailed": "Couldn't close the project",
+      "endBeforeStart": "The project end date cannot be earlier than its start.",
       "removeMemberFailed": "Couldn't remove the person",
       "reopenProjectFailed": "Couldn't reopen the project",
       "saveFieldsFailed": "Couldn't save the fields",
@@ -46,6 +55,7 @@
     "name": "Name",
     "noDescription": "No description.",
     "reopenProject": "Reopen",
+    "startDate": "Project start",
     "title": "Project card"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Type a lead or partner name (min. 3 characters)…",
     "title": "CRM link"
   },
+  "deadlines": {
+    "atRisk": "At risk",
+    "atRiskHint": "The end date is near and work has not started.",
+    "completedLate": "Completed late",
+    "completedLateHint": "The task was completed after its end date.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "at risk (to do, due within {days, plural, one {# day} other {# days}})",
+      "beyondProjectEnd": "past the project's end date",
+      "completedLate": "completed late",
+      "originalEndDate": "original end date",
+      "overdue": "overdue",
+      "overdueSubtasks": "overdue subtasks",
+      "projectEndDate": "project end date"
+    },
+    "originalEndDateHint": "Original end date and the shift in days",
+    "overdue": "Overdue",
+    "overdueDays": "Overdue {days} d",
+    "overdueHint": "The end date has passed and the task is not done.",
+    "overdueSubtasks": "Overdue subtasks",
+    "overdueSubtasksHint": "At least one subtask is overdue.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Delayed",
+    "reasons": {
+      "endPassed": "The project's end date passed {days, plural, one {# day} other {# days}} ago, open tasks: {count}",
+      "taskAfterEnd": "Tasks ending after the project's end date: {count} (the latest by {days, plural, one {# day} other {# days}})"
+    }
+  },
   "detail": {
     "backToProjects": "Projects",
     "closedBadge": "Closed",
@@ -91,6 +132,72 @@
       "timeline": "Timeline"
     },
     "tasksLoadFailed": "Couldn't load the tasks"
+  },
+  "filters": {
+    "assignee": "Assignee",
+    "atRiskCount": "Tasks at risk",
+    "cost": "Cost",
+    "delayReason": "Reason for the delay",
+    "delayReasonValues": {
+      "end_passed": "The project's end date has passed",
+      "task_after_end": "A task ends after the project's end date"
+    },
+    "delayed": "Delay",
+    "delayedValues": {
+      "no": "Not delayed",
+      "yes": "Delayed"
+    },
+    "endDate": "End date",
+    "manager": "PM",
+    "myRole": "My role",
+    "myRoleValues": {
+      "controller": "Controller",
+      "participant": "Participant",
+      "pm": "PM"
+    },
+    "name": "Task name",
+    "number": "Number",
+    "originalEndDate": "Original end date",
+    "overdueCount": "Overdue tasks",
+    "priority": "Priority",
+    "progress": "Progress (%)",
+    "project": "Project",
+    "projectCost": "Incurred cost",
+    "projectEndDate": "Project end date",
+    "projectName": "Project name or key",
+    "projectRevenue": "Revenue",
+    "projectSort": {
+      "at_risk": "Tasks at risk",
+      "cost": "Incurred cost",
+      "delay": "Delay",
+      "end_date": "End date",
+      "key": "Key",
+      "name": "Name",
+      "overdue": "Overdue tasks",
+      "pm": "PM",
+      "progress": "Progress",
+      "revenue": "Revenue",
+      "start_date": "Start date",
+      "status": "Status"
+    },
+    "projectStartDate": "Project start",
+    "slip": "Shift (days)",
+    "startDate": "Start date",
+    "status": "Status",
+    "statusCategory": "Stage",
+    "taskSort": {
+      "original_end_date": "Original end date",
+      "parent": "Parent task",
+      "slip_days": "Shift"
+    },
+    "timeliness": "Timeliness",
+    "timelinessValues": {
+      "at_risk": "At risk",
+      "on_time": "On time",
+      "overdue": "Overdue"
+    },
+    "type": "Type",
+    "unassigned": "Unassigned"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Ends after the project's end date",
     "emptyTitle": "No tasks",
+    "loadFailed": "Could not load the timeline",
+    "originalEndDate": "Original end date: {date} ({slip})",
+    "projectEndDate": "Project end date: {date}",
     "taskColumn": "Task",
     "today": "Today",
+    "truncated": "The timeline shows the first {limit} tasks. Narrow the filters to see the rest.",
     "undatedNote": "{count, plural, one {# task without dates has no bar on the timeline.} other {# tasks without dates have no bar on the timeline.}}",
     "zoom": {
       "day": "Days",
@@ -550,30 +662,27 @@
     "loadFailed": "Couldn't load the projects",
     "newProject": "New project",
     "stats": {
+      "atRisk": "at risk",
+      "doneOfTotalHint": "Tasks done / all tasks",
       "members": "{count, plural, one {person} other {people}}",
       "myOpenTasks": "{count, plural, one {open for me} other {open for me}}",
+      "overdue": "overdue",
       "tasks": "{count, plural, one {task} other {tasks}}"
     },
     "title": "Projects",
     "views": {
       "myTasks": "My tasks",
+      "portfolio": "Project overview",
       "projects": "Projects"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Due date",
-      "priority": "Priority",
-      "project": "Project",
-      "status": "Status",
-      "task": "Task"
-    },
     "empty": {
       "description": "You have no open tasks in any project.",
       "title": "No tasks"
     },
-    "loadFailed": "Couldn't load the tasks",
-    "noDueDate": "no due date"
+    "includeDone": "Include done",
+    "loadFailed": "Couldn't load the tasks"
   },
   "panel": {
     "chatTitle": "Task discussion",
@@ -595,6 +704,11 @@
       "selectField": "— select a field —",
       "title": "Custom fields"
     },
+    "endDateChange": {
+      "hint": "Optional. The PM will see the reason in the e-mail about the changed end date; it is also saved in the task's history.",
+      "placeholder": "e.g. late delivery from the client",
+      "reason": "Reason for the change of the end date"
+    },
     "fields": {
       "assignees": "Assignees",
       "description": "Additional description",
@@ -612,6 +726,7 @@
       "changedWithStatus": "changed: {fields} ({from} → {to})",
       "created": "created the task",
       "empty": "No entries.",
+      "endDateChangeReason": "Reason for the end date change: {reason}",
       "fields": {
         "assignees": "assignees",
         "customFields": "custom fields",
@@ -641,10 +756,40 @@
     "saved": "Task saved",
     "saving": "Saving…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "At risk",
+      "cost": "Incurred cost",
+      "delay": "Delay",
+      "endDate": "End date",
+      "overdue": "Overdue",
+      "progress": "Progress",
+      "project": "Project",
+      "projectManagers": "PM",
+      "revenue": "Revenue",
+      "startDate": "Start"
+    },
+    "loadFailed": "Could not open the project overview",
+    "noProjects": "You are not the PM or controller of any open project.",
+    "noTasks": "There are no tasks in your projects.",
+    "tabs": {
+      "projects": "Projects",
+      "tasks": "Tasks",
+      "timeline": "Timeline"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "A category cannot be deleted — deactivate one you no longer use. A deactivated category cannot be chosen for a new cost, while existing items keep it.",
       "title": "Cost categories"
+    },
+    "deadlines": {
+      "hint": "A task that has not been started is marked as at risk when no more days than this threshold remain until its end date (0–30; 0 means the end date itself).",
+      "invalid": "Enter a whole number from 0 to 30.",
+      "saveFailed": "Could not save the threshold",
+      "saved": "At-risk threshold saved",
+      "threshold": "At-risk threshold (days)",
+      "title": "Deadline control"
     },
     "dictionary": {
       "active": "active",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "People",
+      "cost": "Cost",
       "endDate": "End",
       "number": "No.",
       "priority": "Priority",
+      "project": "Project",
       "startDate": "Start",
       "status": "Status",
       "task": "Task",
+      "timeliness": "Timeliness",
       "type": "Type"
     },
+    "emptyForFilters": "No task matches the filters.",
     "emptyMessage": "There are no tasks in this project yet.",
     "emptyTitle": "No tasks",
+    "flatList": "Flat list",
     "parentTask": "Parent task",
     "subtask": "Subtask"
   }

@@ -40,6 +40,8 @@ export interface User {
   can_create_projects?: boolean;
   /** Raw flag; a tenant admin has the right regardless of it. */
   can_view_ksef_invoices?: boolean;
+  /** E-mails about project deadlines (daily overdue summary, moved end dates, delayed projects); on unless switched off. */
+  project_deadline_notifications_enabled?: boolean;
   /** Interface language picked by the user; null = follow the tenant default. */
   locale?: string | null;
   tenant_default_locale?: string | null;

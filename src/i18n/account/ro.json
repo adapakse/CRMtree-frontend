@@ -40,6 +40,12 @@
       "tokenSaved": "Token salvat",
       "tokenSavedWithPhone": "Token salvat — număr: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Include: rezumatul zilnic al sarcinilor cu termen depășit, modificările termenelor sarcinilor și proiectele care au devenit întârziate.",
+      "saveFailed": "Setarea notificărilor nu a putut fi modificată",
+      "title": "Notificări despre termenele proiectelor",
+      "toggle": "E-mailuri despre termenele din proiecte"
+    },
     "saveFailed": "Eroare la salvare — încercați din nou",
     "saving": "Se salvează…",
     "signature": {

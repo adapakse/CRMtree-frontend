@@ -40,6 +40,12 @@
       "tokenSaved": "Jeton enregistré",
       "tokenSavedWithPhone": "Jeton enregistré — numéro : {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Comprend : le récapitulatif quotidien des tâches en retard, les modifications d’échéance des tâches et les projets devenus retardés.",
+      "saveFailed": "Impossible de modifier le paramètre des notifications",
+      "title": "Notifications sur les échéances des projets",
+      "toggle": "E-mails sur les échéances des projets"
+    },
     "saveFailed": "Échec de l’enregistrement — veuillez réessayer",
     "saving": "Enregistrement…",
     "signature": {

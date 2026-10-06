@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "A rischio",
+    "key": "aperte · scadute · a rischio",
+    "open": "Attività aperte",
+    "overdue": "Scadute"
+  },
   "card": {
     "closeConfirm": "Chiudere il progetto? Un progetto chiuso è di sola lettura e scompare dall'elenco predefinito.",
     "closeProject": "Chiudi progetto",
     "closedBadge": "Chiuso",
+    "datesHint": "Il progetto viene contrassegnato come in ritardo quando un'attività non completata termina dopo la scadenza del progetto oppure quando la scadenza del progetto è passata e restano attività non completate.",
     "description": "Descrizione",
     "edit": "Modifica",
+    "endDate": "Scadenza del progetto",
     "errors": {
       "addMemberFailed": "Impossibile aggiungere la persona",
       "changeAccessLevelFailed": "Impossibile modificare i permessi",
       "changeRoleFailed": "Impossibile modificare il ruolo",
       "closeProjectFailed": "Impossibile chiudere il progetto",
+      "endBeforeStart": "La scadenza del progetto non può essere anteriore al suo inizio.",
       "removeMemberFailed": "Impossibile rimuovere la persona",
       "reopenProjectFailed": "Impossibile riaprire il progetto",
       "saveFieldsFailed": "Impossibile salvare i campi",
@@ -46,6 +55,7 @@
     "name": "Nome",
     "noDescription": "Nessuna descrizione.",
     "reopenProject": "Riapri",
+    "startDate": "Inizio del progetto",
     "title": "Scheda progetto"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Digita il nome del lead o del partner (min. 3 caratteri)…",
     "title": "Collegamento al CRM"
   },
+  "deadlines": {
+    "atRisk": "A rischio",
+    "atRiskHint": "La scadenza è vicina e i lavori non sono ancora iniziati.",
+    "completedLate": "Completata dopo la scadenza",
+    "completedLateHint": "L'attività è stata completata dopo la sua scadenza.",
+    "daysShort": "{days} gg",
+    "legend": {
+      "atRisk": "a rischio (da fare, scadenza entro {days, plural, one {# giorno} other {# giorni}})",
+      "beyondProjectEnd": "oltre la scadenza del progetto",
+      "completedLate": "completate dopo la scadenza",
+      "originalEndDate": "scadenza originale",
+      "overdue": "scadute",
+      "overdueSubtasks": "sottoattività scadute",
+      "projectEndDate": "scadenza del progetto"
+    },
+    "originalEndDateHint": "Scadenza originale e slittamento in giorni",
+    "overdue": "Scaduta",
+    "overdueDays": "Scaduta da {days} gg",
+    "overdueHint": "La scadenza è passata e l'attività non è completata.",
+    "overdueSubtasks": "Sottoattività scadute",
+    "overdueSubtasksHint": "Almeno una sottoattività è scaduta.",
+    "slipEarlier": "−{days} gg",
+    "slipLater": "+{days} gg"
+  },
+  "delay": {
+    "badge": "In ritardo",
+    "reasons": {
+      "endPassed": "La scadenza del progetto è passata da {days, plural, one {# giorno} other {# giorni}}, attività aperte: {count}",
+      "taskAfterEnd": "Attività che terminano dopo la scadenza del progetto: {count} (la più tardiva di {days, plural, one {# giorno} other {# giorni}})"
+    }
+  },
   "detail": {
     "backToProjects": "Progetti",
     "closedBadge": "Chiuso",
@@ -91,6 +132,72 @@
       "timeline": "Timeline"
     },
     "tasksLoadFailed": "Impossibile caricare le attività"
+  },
+  "filters": {
+    "assignee": "Persona",
+    "atRiskCount": "Attività a rischio",
+    "cost": "Costo",
+    "delayReason": "Motivo del ritardo",
+    "delayReasonValues": {
+      "end_passed": "Scadenza del progetto passata",
+      "task_after_end": "Un'attività termina dopo la scadenza del progetto"
+    },
+    "delayed": "Ritardo",
+    "delayedValues": {
+      "no": "Senza ritardo",
+      "yes": "In ritardo"
+    },
+    "endDate": "Fine",
+    "manager": "PM",
+    "myRole": "Il mio ruolo",
+    "myRoleValues": {
+      "controller": "Revisore",
+      "participant": "Partecipante",
+      "pm": "PM"
+    },
+    "name": "Nome dell'attività",
+    "number": "Numero",
+    "originalEndDate": "Scadenza originale",
+    "overdueCount": "Attività scadute",
+    "priority": "Priorità",
+    "progress": "Avanzamento (%)",
+    "project": "Progetto",
+    "projectCost": "Costo sostenuto",
+    "projectEndDate": "Scadenza del progetto",
+    "projectName": "Nome o chiave del progetto",
+    "projectRevenue": "Ricavo",
+    "projectSort": {
+      "at_risk": "Attività a rischio",
+      "cost": "Costo sostenuto",
+      "delay": "Ritardo",
+      "end_date": "Scadenza",
+      "key": "Chiave",
+      "name": "Nome",
+      "overdue": "Attività scadute",
+      "pm": "PM",
+      "progress": "Avanzamento",
+      "revenue": "Ricavo",
+      "start_date": "Inizio",
+      "status": "Stato"
+    },
+    "projectStartDate": "Inizio del progetto",
+    "slip": "Slittamento (giorni)",
+    "startDate": "Inizio",
+    "status": "Stato",
+    "statusCategory": "Fase",
+    "taskSort": {
+      "original_end_date": "Scadenza originale",
+      "parent": "Attività principale",
+      "slip_days": "Slittamento"
+    },
+    "timeliness": "Puntualità",
+    "timelinessValues": {
+      "at_risk": "A rischio",
+      "on_time": "Nei tempi",
+      "overdue": "Scadute"
+    },
+    "type": "Tipo",
+    "unassigned": "Non assegnate"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Termina dopo la scadenza del progetto",
     "emptyTitle": "Nessuna attività",
+    "loadFailed": "Impossibile caricare la timeline",
+    "originalEndDate": "Scadenza originale: {date} ({slip})",
+    "projectEndDate": "Scadenza del progetto: {date}",
     "taskColumn": "Attività",
     "today": "Oggi",
+    "truncated": "La timeline mostra le prime {limit} attività. Restringi i filtri per vedere le altre.",
     "undatedNote": "{count, plural, one {# attività senza date non ha una barra sulla timeline.} other {# attività senza date non hanno una barra sulla timeline.}}",
     "zoom": {
       "day": "Giorni",
@@ -550,30 +662,27 @@
     "loadFailed": "Impossibile caricare i progetti",
     "newProject": "Nuovo progetto",
     "stats": {
+      "atRisk": "a rischio",
+      "doneOfTotalHint": "Attività completate / tutte",
       "members": "{count, plural, one {persona} other {persone}}",
       "myOpenTasks": "{count, plural, one {mia aperta} other {mie aperte}}",
+      "overdue": "scadute",
       "tasks": "{count, plural, one {attività} other {attività}}"
     },
     "title": "Progetti",
     "views": {
       "myTasks": "Le mie attività",
+      "portfolio": "Panoramica progetti",
       "projects": "Progetti"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Scadenza",
-      "priority": "Priorità",
-      "project": "Progetto",
-      "status": "Stato",
-      "task": "Attività"
-    },
     "empty": {
       "description": "Non hai attività aperte in nessun progetto.",
       "title": "Nessuna attività"
     },
-    "loadFailed": "Impossibile caricare le attività",
-    "noDueDate": "senza scadenza"
+    "includeDone": "Mostra completate",
+    "loadFailed": "Impossibile caricare le attività"
   },
   "panel": {
     "chatTitle": "Conversazione sull'attività",
@@ -595,6 +704,11 @@
       "selectField": "— seleziona un campo —",
       "title": "Campi aggiuntivi"
     },
+    "endDateChange": {
+      "hint": "Facoltativo. Il PM vedrà il motivo nell'e-mail sulla modifica della scadenza; verrà salvato anche nella cronologia dell'attività.",
+      "placeholder": "es. consegna tardiva da parte del cliente",
+      "reason": "Motivo della modifica della scadenza"
+    },
     "fields": {
       "assignees": "Persone assegnate",
       "description": "Descrizione aggiuntiva",
@@ -612,6 +726,7 @@
       "changedWithStatus": "ha modificato: {fields} ({from} → {to})",
       "created": "ha creato l'attività",
       "empty": "Nessuna voce.",
+      "endDateChangeReason": "Motivo della modifica della scadenza: {reason}",
       "fields": {
         "assignees": "persone assegnate",
         "customFields": "campi aggiuntivi",
@@ -641,10 +756,40 @@
     "saved": "Attività salvata",
     "saving": "Salvataggio…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "A rischio",
+      "cost": "Costo sostenuto",
+      "delay": "Ritardo",
+      "endDate": "Scadenza",
+      "overdue": "Scadute",
+      "progress": "Avanzamento",
+      "project": "Progetto",
+      "projectManagers": "PM",
+      "revenue": "Ricavo",
+      "startDate": "Inizio"
+    },
+    "loadFailed": "Impossibile aprire la panoramica dei progetti",
+    "noProjects": "Non sei PM né revisore di alcun progetto aperto.",
+    "noTasks": "Nei tuoi progetti non ci sono attività.",
+    "tabs": {
+      "projects": "Progetti",
+      "tasks": "Attività",
+      "timeline": "Timeline"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Una categoria non può essere eliminata — disattiva quella che non usi. Una categoria disattivata non può essere scelta per un nuovo costo, mentre le voci esistenti la conservano.",
       "title": "Categorie di costo"
+    },
+    "deadlines": {
+      "hint": "Un'attività non ancora iniziata viene contrassegnata come a rischio quando alla sua scadenza manca un numero di giorni non superiore a questa soglia (0–30; 0 indica il giorno stesso della scadenza).",
+      "invalid": "Inserisci un numero intero da 0 a 30.",
+      "saveFailed": "Impossibile salvare la soglia",
+      "saved": "Soglia di rischio per la scadenza salvata",
+      "threshold": "Soglia di rischio per la scadenza (giorni)",
+      "title": "Controllo delle scadenze"
     },
     "dictionary": {
       "active": "attivo",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Persone",
+      "cost": "Costo",
       "endDate": "Fine",
       "number": "N.",
       "priority": "Priorità",
+      "project": "Progetto",
       "startDate": "Inizio",
       "status": "Stato",
       "task": "Attività",
+      "timeliness": "Puntualità",
       "type": "Tipo"
     },
+    "emptyForFilters": "Nessuna attività corrisponde ai filtri.",
     "emptyMessage": "In questo progetto non ci sono ancora attività.",
     "emptyTitle": "Nessuna attività",
+    "flatList": "Elenco semplice",
     "parentTask": "Attività principale",
     "subtask": "Sottoattività"
   }

@@ -40,6 +40,12 @@
       "tokenSaved": "Token zapisany",
       "tokenSavedWithPhone": "Token zapisany — numer: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Obejmuje: codzienne podsumowanie zadań po terminie, zmiany terminów zadań oraz projekty, które stały się opóźnione.",
+      "saveFailed": "Nie udało się zmienić ustawienia powiadomień",
+      "title": "Powiadomienia o terminach projektów",
+      "toggle": "E-maile o terminach w projektach"
+    },
     "saveFailed": "Błąd zapisu — spróbuj ponownie",
     "saving": "Zapisywanie…",
     "signature": {

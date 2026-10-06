@@ -40,6 +40,12 @@
       "tokenSaved": "Token saved",
       "tokenSavedWithPhone": "Token saved — number: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Covers: the daily summary of overdue tasks, changes of task end dates and projects that became delayed.",
+      "saveFailed": "Could not change the notification setting",
+      "title": "Project deadline notifications",
+      "toggle": "E-mails about project deadlines"
+    },
     "saveFailed": "Couldn't save — try again",
     "saving": "Saving…",
     "signature": {

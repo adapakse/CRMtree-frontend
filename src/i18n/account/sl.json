@@ -40,6 +40,12 @@
       "tokenSaved": "Žeton shranjen",
       "tokenSavedWithPhone": "Žeton shranjen — številka: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Zajema: dnevni povzetek nalog po roku, spremembe rokov nalog in projekte, ki so prešli v zamudo.",
+      "saveFailed": "Nastavitve obvestil ni bilo mogoče spremeniti",
+      "title": "Obvestila o rokih projektov",
+      "toggle": "E-pošta o rokih v projektih"
+    },
     "saveFailed": "Napaka pri shranjevanju — poskusite znova",
     "saving": "Shranjevanje…",
     "signature": {

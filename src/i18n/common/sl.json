@@ -18,6 +18,26 @@
     "tenantTitle": "Privzeti jezik organizacije",
     "title": "Jezik vmesnika"
   },
+  "list": {
+    "activeFilters": "{count, plural, one {# aktiven filter} two {# aktivna filtra} few {# aktivni filtri} other {# aktivnih filtrov}}",
+    "anyValue": "Vse",
+    "ascending": "Naraščajoče",
+    "clearFilter": "Počisti",
+    "clearFilters": "Počisti filtre",
+    "defaultSort": "Privzeto",
+    "descending": "Padajoče",
+    "filterBy": "Filtriraj: {name}",
+    "from": "od",
+    "noOptions": "Ni možnosti za izbiro.",
+    "pager": {
+      "next": "Naslednja stran",
+      "previous": "Prejšnja stran",
+      "range": "{from}–{to} od {total}"
+    },
+    "sort": "Razvrščanje",
+    "sortBy": "Razvrsti: {name}",
+    "to": "do"
+  },
   "states": {
     "loading": "Nalaganje…"
   },

@@ -172,6 +172,27 @@ Reguły biznesowe (kto co widzi, kwoty netto, kursy NBP, zasady podpinania faktu
   a `expiration_date` to termin płatności — etykiety przełączają się po `doc_type === 'invoice'`.
   Podpis elektroniczny jest dla faktur ukryty (nadpisałby datę wystawienia).
 
+### Kontrola terminów i listy (2026-10-06)
+
+Reguły (co jest „po terminie”, „zagrożone”, kiedy projekt jest opóźniony, kto dostaje maile) są
+w `CRMtree-backend/CLAUDE.md` → „Kontrola terminów”. To decyzje Adama.
+
+- **Zasada ogólna Adama: każdy ekran z listą ma filtry (także w nagłówku każdej kolumny) i
+  stronicowanie po maks. 50 elementów.** Służą do tego wspólne elementy w `shared/list/`
+  (`ListQueryState`, `createListLoader`, `wt-list-filter-bar`, `th[wtListColumn]`,
+  `wt-list-pager`) — używaj ich w każdej nowej liście zamiast pisać własne. Filtrowanie,
+  sortowanie i strony są po stronie serwera; stan filtrów siedzi w adresie strony.
+- Znaczniki terminowości: `shared/components/project-deadlines/` (po terminie, zagrożone,
+  zakończone po terminie, opóźnione podzadania, pierwotny termin z przesunięciem, znacznik
+  opóźnionego projektu). „Po terminie” dotyczy zadania, „opóźniony” projektu — nie mieszaj.
+- Zakładka Zadania projektu: bez filtrów drzewo (`project-task-list`), z filtrem / sortowaniem
+  / przełącznikiem „Lista płaska” stronicowana tabela (`project-task-table`, trasa
+  `/tasks/search`). Gantt (`project-gantt-view`) bierze płaskie wiersze z `/tasks/gantt`
+  (limit 500) i sam buduje drzewo po `parent_task_id`.
+- Widok wielu projektów: `/projects/portfolio` (`project-portfolio*.ts`), tylko gdy
+  `config.has_cross_project_view`; wejście przełącznikiem na ekranie Projekty.
+- `GET /api/projects` zwraca `{ items, total, page, page_size, can_create, can_filter_finance }`.
+
 ### Pułapki
 
 - `pages/projects/projects-shared.styles.ts` trzyma wspólne style topbara, modala i tabel

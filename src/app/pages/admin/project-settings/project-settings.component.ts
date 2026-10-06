@@ -7,7 +7,10 @@ import { ProjectFieldsEditorComponent } from './project-fields-editor.component'
 import { ProjectKsefSettingsComponent } from './project-ksef-settings.component';
 import { ProjectTransitionsEditorComponent } from './project-transitions-editor.component';
 
-/** "Projekty" tab of the tenant settings: task dictionaries, status transitions, custom fields, project finance and KSeF. */
+const MIN_AT_RISK_DAYS = 0;
+const MAX_AT_RISK_DAYS = 30;
+
+/** "Projekty" tab of the tenant settings: task dictionaries, status transitions, custom fields, deadline control, project finance and KSeF. */
 @Component({
   selector: 'wt-project-settings',
   standalone: true,
@@ -48,6 +51,16 @@ import { ProjectTransitionsEditorComponent } from './project-transitions-editor.
         </section>
 
         <section class="card block">
+          <div class="sec-title">{{ t('settings.deadlines.title') }}</div>
+          <label class="threshold">
+            {{ t('settings.deadlines.threshold') }}
+            <input class="fi" type="number" min="0" max="30" step="1" [value]="loaded.at_risk_threshold_days"
+                   (change)="saveAtRiskThreshold($event, loaded.at_risk_threshold_days)">
+          </label>
+          <p class="hint">{{ t('settings.deadlines.hint') }}</p>
+        </section>
+
+        <section class="card block">
           <div class="sec-title">{{ t('settings.finance.title') }}</div>
           <label class="finance-toggle">
             <input type="checkbox" [checked]="loaded.finance_enabled" (change)="toggleFinance($event)">
@@ -76,6 +89,8 @@ import { ProjectTransitionsEditorComponent } from './project-transitions-editor.
     .block .sec-title { margin:0 0 4px; }
     .hint { margin:0; font-size:12.5px; color:var(--gray-500); line-height:1.6; }
     .block .sec-title.sub { margin-top:8px; }
+    .threshold { display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:600; color:var(--gray-800); }
+    .threshold .fi { width:80px; }
     .finance-toggle { display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:var(--gray-800); cursor:pointer; }
     .two-columns { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     @media (max-width: 900px) { .two-columns { grid-template-columns:1fr; } }
@@ -92,6 +107,26 @@ export class ProjectSettingsComponent implements OnInit {
     this.api.getConfig().subscribe({
       next: config => this.config.set(config),
       error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.loadFailed')),
+    });
+  }
+
+  saveAtRiskThreshold(event: Event, storedDays: number): void {
+    const input = event.target as HTMLInputElement;
+    const days = Number(input.value);
+    if (input.value.trim() === '' || !Number.isInteger(days) || days < MIN_AT_RISK_DAYS || days > MAX_AT_RISK_DAYS) {
+      input.value = String(storedDays);
+      this.toast.error(this.transloco.translate('projects.settings.deadlines.invalid'));
+      return;
+    }
+    this.api.setAtRiskThreshold(days).subscribe({
+      next: config => {
+        this.config.set(config);
+        this.toast.success(this.transloco.translate('projects.settings.deadlines.saved'));
+      },
+      error: err => {
+        input.value = String(storedDays);
+        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.deadlines.saveFailed'));
+      },
     });
   }
 

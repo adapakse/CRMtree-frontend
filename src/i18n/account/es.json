@@ -40,6 +40,12 @@
       "tokenSaved": "Token guardado",
       "tokenSavedWithPhone": "Token guardado — número: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Incluye: el resumen diario de tareas vencidas, los cambios de fecha límite de las tareas y los proyectos que han pasado a estar retrasados.",
+      "saveFailed": "No se pudo cambiar el ajuste de notificaciones",
+      "title": "Notificaciones sobre plazos de proyectos",
+      "toggle": "Correos sobre plazos en los proyectos"
+    },
     "saveFailed": "Error al guardar — inténtalo de nuevo",
     "saving": "Guardando…",
     "signature": {

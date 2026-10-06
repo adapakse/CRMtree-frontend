@@ -18,6 +18,26 @@
     "tenantTitle": "Domyślny język organizacji",
     "title": "Język interfejsu"
   },
+  "list": {
+    "activeFilters": "{count, plural, one {# aktywny filtr} few {# aktywne filtry} many {# aktywnych filtrów} other {# aktywnego filtra}}",
+    "anyValue": "Wszystkie",
+    "ascending": "Rosnąco",
+    "clearFilter": "Wyczyść",
+    "clearFilters": "Wyczyść filtry",
+    "defaultSort": "Domyślne",
+    "descending": "Malejąco",
+    "filterBy": "Filtruj: {name}",
+    "from": "od",
+    "noOptions": "Brak pozycji do wyboru.",
+    "pager": {
+      "next": "Następna strona",
+      "previous": "Poprzednia strona",
+      "range": "{from}–{to} z {total}"
+    },
+    "sort": "Sortowanie",
+    "sortBy": "Sortuj: {name}",
+    "to": "do"
+  },
   "states": {
     "loading": "Ładowanie…"
   },

@@ -10,6 +10,7 @@ import { environment } from '../../../environments/environment';
 import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitutions.component';
+import { MyProjectNotificationsComponent } from './my-project-notifications.component';
 import { MyDevicesComponent } from './my-devices.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
@@ -18,7 +19,7 @@ const BASE = environment.apiUrl;
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, MyProjectNotificationsComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('account')],
   template: `
 <ng-container *transloco="let t; prefix: 'account'">
@@ -238,6 +239,10 @@ const BASE = environment.apiUrl;
         </ng-container>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="auth.hasFeature('projects')" style="margin-top:20px">
+    <wt-my-project-notifications></wt-my-project-notifications>
   </div>
 
   <!-- ── Zastępstwa podczas nieobecności ─────────────────────────────────── -->

@@ -18,6 +18,26 @@
     "tenantTitle": "Limba implicită a organizației",
     "title": "Limba interfeței"
   },
+  "list": {
+    "activeFilters": "{count, plural, one {# filtru activ} few {# filtre active} other {# de filtre active}}",
+    "anyValue": "Toate",
+    "ascending": "Crescător",
+    "clearFilter": "Resetare",
+    "clearFilters": "Resetare filtre",
+    "defaultSort": "Implicită",
+    "descending": "Descrescător",
+    "filterBy": "Filtrare: {name}",
+    "from": "de la",
+    "noOptions": "Nicio opțiune disponibilă.",
+    "pager": {
+      "next": "Pagina următoare",
+      "previous": "Pagina anterioară",
+      "range": "{from}–{to} din {total}"
+    },
+    "sort": "Sortare",
+    "sortBy": "Sortare: {name}",
+    "to": "până la"
+  },
   "states": {
     "loading": "Se încarcă…"
   },

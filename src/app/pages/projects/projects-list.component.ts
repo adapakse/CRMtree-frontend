@@ -1,12 +1,24 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
+import { catchError, of } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { apiErrorMessage } from '../../core/services/api-error.util';
 import { ToastService } from '../../core/services/toast.service';
-import { ProjectListItem, ProjectStatusFilter, ProjectsApiService } from '../../core/services/projects-api.service';
-import { ProjectFinanceTotalsComponent } from '../../shared/components/project-finance-totals/project-finance-totals.component';
+import {
+  ProjectConfig, ProjectListItem, ProjectStatusFilter, ProjectTaskAssignee, ProjectsApiService,
+} from '../../core/services/projects-api.service';
+import { ListFilterBarComponent } from '../../shared/list/list-filter-bar.component';
+import { ListPagerComponent } from '../../shared/list/list-pager.component';
+import { ListParams, ListQueryState, createListLoader } from '../../shared/list/list-query';
+import { ProjectListCardComponent } from './project-list-card.component';
+import { ProjectListFiltersService } from './project-list-filters.service';
 import { ProjectMyTasksComponent } from './project-my-tasks.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
+import { ProjectsView, ProjectsViewSwitchComponent } from './projects-view-switch.component';
+
+const DEFAULT_STATUS_FILTER: ProjectStatusFilter = 'open';
 
 const STATUS_FILTERS: { value: ProjectStatusFilter; labelKey: string }[] = [
   { value: 'open', labelKey: 'list.filters.open' },
@@ -14,64 +26,57 @@ const STATUS_FILTERS: { value: ProjectStatusFilter; labelKey: string }[] = [
   { value: 'all', labelKey: 'list.filters.all' },
 ];
 
+// Query parameters of this screen that are not filters of the project list.
+const SCREEN_PARAMS = ['view', 'status'];
+
 @Component({
   selector: 'wt-projects-list',
   standalone: true,
-  imports: [FormsModule, ProjectFinanceTotalsComponent, ProjectMyTasksComponent, TranslocoDirective, TranslocoPipe],
+  imports: [
+    FormsModule, TranslocoDirective, TranslocoPipe, ListFilterBarComponent, ListPagerComponent, ProjectListCardComponent,
+    ProjectMyTasksComponent, ProjectsViewSwitchComponent,
+  ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <ng-container *transloco="let t; prefix: 'projects'">
       <div id="topbar">
         <span class="page-title">{{ t('list.title') }}</span>
-        <div class="filter">
-          <button class="filter-btn" [class.active]="view() === 'projects'" (click)="view.set('projects')">{{ t('list.views.projects') }}</button>
-          <button class="filter-btn" [class.active]="view() === 'my-tasks'" (click)="view.set('my-tasks')">{{ t('list.views.myTasks') }}</button>
-        </div>
+        <wt-projects-view-switch [active]="view()" [showsPortfolio]="config()?.has_cross_project_view === true" />
         <span class="tsp"></span>
-        <div class="filter" [class.is-hidden]="view() !== 'projects'">
-          @for (filter of statusFilters; track filter.value) {
-            <button class="filter-btn" [class.active]="statusFilter() === filter.value"
-                    (click)="setStatusFilter(filter.value)">{{ t(filter.labelKey) }}</button>
+        @if (view() === 'projects') {
+          <div class="filter">
+            @for (filter of statusFilters; track filter.value) {
+              <button class="filter-btn" [class.active]="statusFilter() === filter.value"
+                      (click)="setStatusFilter(filter.value)">{{ t(filter.labelKey) }}</button>
+            }
+          </div>
+          @if (canCreate()) {
+            <button class="btn btn-p" (click)="openCreateForm()">+ {{ t('list.newProject') }}</button>
           }
-        </div>
-        @if (canCreate() && view() === 'projects') {
-          <button class="btn btn-p" (click)="openCreateForm()">+ {{ t('list.newProject') }}</button>
         }
       </div>
 
       <div id="content">
         @if (view() === 'my-tasks') {
           <wt-project-my-tasks />
-        } @else if (isLoading()) {
-          <div class="empty-state">{{ 'states.loading' | transloco }}</div>
-        } @else if (projects().length === 0) {
-          <div class="empty-state">
-            <div class="empty-title">{{ t('list.empty.title') }}</div>
-            {{ t(statusFilter() === 'open' ? 'list.empty.noOpenProjects' : 'list.empty.noneForFilter') }}
-          </div>
         } @else {
-          <div class="project-grid">
-            @for (project of projects(); track project.id) {
-              <button class="card project-card" (click)="openProject(project)">
-                <div class="project-head">
-                  <span class="mono">{{ project.key }}</span>
-                  @if (project.status === 'closed') { <span class="pill closed">{{ t('list.closedBadge') }}</span> }
-                  @if (project.my_role) { <span class="pill role">{{ t('labels.roles.' + project.my_role) }}</span> }
-                </div>
-                <div class="project-name">{{ project.name }}</div>
-                @if (project.description) { <div class="project-description">{{ project.description }}</div> }
-                <div class="project-stats">
-                  <span><strong>{{ project.task_count }}</strong> {{ t('list.stats.tasks', { count: project.task_count }) }}</span>
-                  <span><strong>{{ project.member_count }}</strong> {{ t('list.stats.members', { count: project.member_count }) }}</span>
-                  @if (project.my_open_task_count > 0) {
-                    <span class="mine"><strong>{{ project.my_open_task_count }}</strong> {{ t('list.stats.myOpenTasks', { count: project.my_open_task_count }) }}</span>
-                  }
-                </div>
-                @if (project.finance; as totals) { <wt-project-finance-totals class="project-finance" [totals]="totals" /> }
-              </button>
-            }
-          </div>
+          <wt-list-filter-bar class="list-bar" [filters]="filters().all" [query]="query" [sortOptions]="sortOptions()" />
+          @if (projects().length > 0) {
+            <div class="project-grid" [class.is-loading]="loader.isLoading()">
+              @for (project of projects(); track project.id) {
+                <wt-project-list-card [project]="project" (opened)="openProject(project)" />
+              }
+            </div>
+            <wt-list-pager class="list-pager" [query]="query" [total]="loader.result()?.total ?? 0" />
+          } @else if (loader.isLoading()) {
+            <div class="empty-state">{{ 'states.loading' | transloco }}</div>
+          } @else {
+            <div class="empty-state">
+              <div class="empty-title">{{ t('list.empty.title') }}</div>
+              {{ t(hasNarrowedList() ? 'list.empty.noneForFilter' : 'list.empty.noOpenProjects') }}
+            </div>
+          }
         }
       </div>
 
@@ -92,10 +97,21 @@ const STATUS_FILTERS: { value: ProjectStatusFilter; labelKey: string }[] = [
                 <label class="fl">{{ t('list.createForm.description') }}</label>
                 <textarea class="fta" [(ngModel)]="newDescription" rows="4"></textarea>
               </div>
+              <div class="fgrid">
+                <div class="fg">
+                  <label class="fl">{{ t('card.startDate') }}</label>
+                  <input class="fi" type="date" [(ngModel)]="newStartDate">
+                </div>
+                <div class="fg">
+                  <label class="fl">{{ t('card.endDate') }}</label>
+                  <input class="fi" type="date" [(ngModel)]="newEndDate" [min]="newStartDate">
+                </div>
+              </div>
+              @if (hasInvalidNewDates()) { <span class="hint danger">{{ t('card.errors.endBeforeStart') }}</span> }
             </div>
             <div class="mof">
               <button class="btn btn-g" (click)="isCreateFormOpen.set(false)">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn btn-p" [disabled]="!newName.trim() || isSaving()" (click)="createProject()">
+              <button class="btn btn-p" [disabled]="!newName.trim() || hasInvalidNewDates() || isSaving()" (click)="createProject()">
                 {{ t(isSaving() ? 'list.createForm.saving' : 'list.createForm.submit') }}
               </button>
             </div>
@@ -107,48 +123,109 @@ const STATUS_FILTERS: { value: ProjectStatusFilter; labelKey: string }[] = [
   styles: [PROJECTS_SHARED_STYLES, `
     .filter { display:flex; gap:2px; background:var(--gray-100); border-radius:9px; padding:3px; }
     .filter-btn { border:none; background:transparent; padding:6px 12px; border-radius:7px; font-size:12.5px; color:var(--gray-500); cursor:pointer; font-family:inherit; }
-    .filter.is-hidden { display:none; }
     .filter-btn.active { background:white; color:var(--orange); font-weight:600; box-shadow:var(--shadow-sm); }
-    .project-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
-    .project-card { text-align:left; padding:16px; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; gap:8px; transition:box-shadow .15s, border-color .15s; }
-    .project-card:hover { box-shadow:var(--shadow); border-color:var(--orange-muted); }
-    .project-head { display:flex; align-items:center; gap:6px; }
-    .project-name { font-size:15px; font-weight:700; color:var(--gray-900); }
-    .project-description { font-size:12.5px; color:var(--gray-500); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .project-stats { display:flex; gap:14px; font-size:12px; color:var(--gray-500); margin-top:auto; }
-    .project-stats .mine strong { color:var(--orange); }
-    .project-finance { padding-top:8px; border-top:1px solid var(--gray-100); }
-    .pill.role { background:var(--orange-pale); color:var(--orange-dark); }
-    .pill.closed { background:var(--gray-100); color:var(--gray-500); }
+    .list-bar { margin-bottom:14px; }
+    .list-pager { margin-top:14px; }
+    .project-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px; }
+    .project-grid.is-loading { opacity:.55; }
     .hint { font-size:11.5px; color:var(--gray-400); }
+    .hint.danger { color:#DC2626; }
   `],
 })
 export class ProjectsListComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
+  private readonly filterDefinitions = inject(ProjectListFiltersService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
   readonly statusFilters = STATUS_FILTERS;
+  readonly query = new ListQueryState();
 
-  readonly projects = signal<ProjectListItem[]>([]);
-  readonly canCreate = signal(false);
-  readonly isLoading = signal(true);
-  readonly statusFilter = signal<ProjectStatusFilter>('open');
-  readonly view = signal<'projects' | 'my-tasks'>('projects');
+  readonly config = signal<ProjectConfig | null>(null);
+  readonly statusFilter = signal<ProjectStatusFilter>(DEFAULT_STATUS_FILTER);
   readonly isCreateFormOpen = signal(false);
   readonly isSaving = signal(false);
 
+  private readonly queryParamMap = toSignal(this.route.queryParamMap, { initialValue: this.route.snapshot.queryParamMap });
+  readonly view = computed<ProjectsView>(() => (this.queryParamMap().get('view') === 'my-tasks' ? 'my-tasks' : 'projects'));
+
+  /** People of the cross-project scope; stays empty for a viewer without one. */
+  private readonly scopePeople = signal<ProjectTaskAssignee[]>([]);
+
+  // Someone without a cross-project scope has no people list to ask for, so the project manager
+  // filter offers the managers of the projects on the page (and keeps the chosen one selectable).
+  private readonly managerOptions = computed(() => {
+    const people = new Map(this.scopePeople().map(person => [person.user_id, person.display_name]));
+    for (const project of this.projects()) {
+      for (const manager of project.project_managers) people.set(manager.user_id, manager.display_name);
+    }
+    return [...people]
+      .map(([value, label]) => ({ value, label }))
+      .sort((first, second) => first.label.localeCompare(second.label));
+  });
+
+  readonly canFilterFinance = computed(() => this.loader.result()?.can_filter_finance === true);
+  readonly filters = computed(() =>
+    this.filterDefinitions.projectFilters({ managers: this.managerOptions(), includesFinance: this.canFilterFinance() }));
+  readonly sortOptions = computed(() => this.filterDefinitions.projectSortOptions({ includesFinance: this.canFilterFinance() }));
+
+  private readonly requestParams = computed<ListParams | null>(() =>
+    (this.view() === 'projects' ? { ...this.query.params(), status: this.statusFilter() } : null));
+
+  readonly loader = createListLoader(
+    this.requestParams,
+    params => this.api.listProjects(params),
+    error => this.toast.error(apiErrorMessage(error) ?? this.transloco.translate('projects.list.loadFailed')),
+  );
+
+  readonly projects = computed<ProjectListItem[]>(() => this.loader.result()?.items ?? []);
+  readonly canCreate = computed(() => this.loader.result()?.can_create === true);
+  readonly hasNarrowedList = computed(() => this.query.activeFilterCount() > 0 || this.statusFilter() !== DEFAULT_STATUS_FILTER);
+
   newName = '';
   newDescription = '';
+  newStartDate = '';
+  newEndDate = '';
+
+  constructor() {
+    const initialParams = this.route.snapshot.queryParamMap;
+    this.query.restore(initialParams, SCREEN_PARAMS);
+    const requestedStatus = initialParams.get('status');
+    if (requestedStatus === 'closed' || requestedStatus === 'all') this.statusFilter.set(requestedStatus);
+
+    // Keeps the filtered list in the address, so it survives a reload and can be bookmarked.
+    effect(() => {
+      if (this.view() !== 'projects') return;
+      const queryParams: ListParams = { ...this.query.queryParams() };
+      if (this.statusFilter() !== DEFAULT_STATUS_FILTER) queryParams['status'] = this.statusFilter();
+      untracked(() => this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true }));
+    });
+  }
 
   ngOnInit(): void {
-    this.loadProjects();
+    // The list works without the configuration; it only decides which extras are offered.
+    this.api.getConfig().subscribe({
+      next: config => {
+        this.config.set(config);
+        if (config.has_cross_project_view) this.loadScopePeople();
+      },
+      error: () => this.config.set(null),
+    });
+  }
+
+  private loadScopePeople(): void {
+    this.api.listPortfolioPeople().pipe(catchError(() => of({ people: [] }))).subscribe(result => this.scopePeople.set(result.people));
   }
 
   setStatusFilter(filter: ProjectStatusFilter): void {
     this.statusFilter.set(filter);
-    this.loadProjects();
+    this.query.page.set(1);
+  }
+
+  hasInvalidNewDates(): boolean {
+    return !!this.newStartDate && !!this.newEndDate && this.newEndDate < this.newStartDate;
   }
 
   openProject(project: ProjectListItem): void {
@@ -158,34 +235,26 @@ export class ProjectsListComponent implements OnInit {
   openCreateForm(): void {
     this.newName = '';
     this.newDescription = '';
+    this.newStartDate = '';
+    this.newEndDate = '';
     this.isCreateFormOpen.set(true);
   }
 
   createProject(): void {
     this.isSaving.set(true);
-    this.api.createProject({ name: this.newName.trim(), description: this.newDescription.trim() || null }).subscribe({
+    this.api.createProject({
+      name: this.newName.trim(),
+      description: this.newDescription.trim() || null,
+      start_date: this.newStartDate || null,
+      end_date: this.newEndDate || null,
+    }).subscribe({
       next: project => {
         this.isSaving.set(false);
         this.router.navigate(['/projects', project.id], { queryParams: { tab: 'card' } });
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.list.createFailed'));
-      },
-    });
-  }
-
-  private loadProjects(): void {
-    this.isLoading.set(true);
-    this.api.listProjects(this.statusFilter()).subscribe({
-      next: result => {
-        this.projects.set(result.projects);
-        this.canCreate.set(result.can_create);
-        this.isLoading.set(false);
-      },
-      error: err => {
-        this.isLoading.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.list.loadFailed'));
+        this.toast.error(apiErrorMessage(err) ?? this.transloco.translate('projects.list.createFailed'));
       },
     });
   }

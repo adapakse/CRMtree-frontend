@@ -18,6 +18,26 @@
     "tenantTitle": "Язык организации по умолчанию",
     "title": "Язык интерфейса"
   },
+  "list": {
+    "activeFilters": "{count, plural, one {# активный фильтр} few {# активных фильтра} many {# активных фильтров} other {# активного фильтра}}",
+    "anyValue": "Все",
+    "ascending": "По возрастанию",
+    "clearFilter": "Сбросить",
+    "clearFilters": "Сбросить фильтры",
+    "defaultSort": "По умолчанию",
+    "descending": "По убыванию",
+    "filterBy": "Фильтр: {name}",
+    "from": "от",
+    "noOptions": "Нет вариантов для выбора.",
+    "pager": {
+      "next": "Следующая страница",
+      "previous": "Предыдущая страница",
+      "range": "{from}–{to} из {total}"
+    },
+    "sort": "Сортировка",
+    "sortBy": "Сортировка: {name}",
+    "to": "до"
+  },
   "states": {
     "loading": "Загрузка…"
   },

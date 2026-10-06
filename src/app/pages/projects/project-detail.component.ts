@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { forkJoin } from 'rxjs';
@@ -6,12 +6,16 @@ import { AuthService } from '../../core/auth/auth.service';
 import { NavBackService } from '../../core/services/nav-back.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ProjectConfig, ProjectDetail, ProjectTask, ProjectsApiService } from '../../core/services/projects-api.service';
+import { ProjectDelayBadgeComponent } from '../../shared/components/project-deadlines/project-delay-badge.component';
+import { ListParams, ListQueryState } from '../../shared/list/list-query';
 import { ProjectCardComponent } from './project-card.component';
 import { ProjectChatComponent } from './project-chat.component';
 import { ProjectFinanceComponent } from './project-finance.component';
-import { ProjectGanttComponent } from './project-gantt.component';
-import { ProjectTaskListComponent } from './project-task-list.component';
+import { ProjectGanttViewComponent } from './project-gantt-view.component';
+import { GanttProject } from './project-gantt.util';
+import { FilterSet, ProjectListFiltersService, TaskFilterId } from './project-list-filters.service';
 import { ProjectTaskPanelComponent } from './project-task-panel.component';
+import { ProjectTasksTabComponent } from './project-tasks-tab.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 
 type ProjectTab = 'tasks' | 'gantt' | 'chat' | 'finance' | 'card';
@@ -19,13 +23,16 @@ type ProjectTab = 'tasks' | 'gantt' | 'chat' | 'finance' | 'card';
 // Marks the task panel as open for a task that does not exist yet.
 const NEW_TASK = 'new';
 
+// Query parameters that belong to the screen, not to the task filters.
+const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
+
 @Component({
   selector: 'wt-project-detail',
   standalone: true,
   imports: [
     RouterLink, TranslocoDirective, TranslocoPipe,
-    ProjectCardComponent, ProjectChatComponent, ProjectFinanceComponent, ProjectGanttComponent, ProjectTaskListComponent,
-    ProjectTaskPanelComponent,
+    ProjectCardComponent, ProjectChatComponent, ProjectDelayBadgeComponent, ProjectFinanceComponent, ProjectGanttViewComponent,
+    ProjectTaskPanelComponent, ProjectTasksTabComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,6 +48,7 @@ const NEW_TASK = 'new';
           <span class="mono">{{ loaded.project.key }}</span>
           <span class="page-title">{{ loaded.project.name }}</span>
           @if (loaded.project.status === 'closed') { <span class="pill closed">{{ t('detail.closedBadge') }}</span> }
+          <wt-project-delay-badge [schedule]="loaded.project" />
         }
         <span class="tsp"></span>
         @if (canCreateTask()) {
@@ -65,20 +73,24 @@ const NEW_TASK = 'new';
               </div>
               @if (activeTab() === 'tasks' || activeTab() === 'gantt') {
                 <label class="mine-toggle">
-                  <input type="checkbox" [checked]="showsOnlyMyTasks()" (change)="showsOnlyMyTasks.set(!showsOnlyMyTasks())">
+                  <input type="checkbox" [checked]="showsOnlyMyTasks()" (change)="toggleOnlyMyTasks()">
                   {{ t('detail.showOnlyMyTasks') }}
                 </label>
               }
             </div>
 
             @if (activeTab() === 'tasks') {
-              <wt-project-task-list
-                [tasks]="visibleTasks()" [config]="loadedConfig" [projectKey]="loaded.project.key"
+              <wt-project-tasks-tab
+                [detail]="loaded" [config]="loadedConfig" [treeTasks]="visibleTasks()" [showsOnlyMyTasks]="showsOnlyMyTasks()"
+                [query]="taskQuery" [filters]="taskFilters()"
                 [emptyMessage]="t(showsOnlyMyTasks() ? 'detail.empty.noAssignedTasks' : 'detail.empty.noTasks')"
                 (taskOpened)="openTask($event)" />
             } @else if (activeTab() === 'gantt') {
-              <wt-project-gantt [tasks]="visibleTasks()" [config]="loadedConfig" [projectKey]="loaded.project.key"
-                                (taskOpened)="openTask($event)" />
+              <wt-project-gantt-view
+                [query]="taskQuery" [filters]="taskFilters()" [fetch]="fetchGantt" [projects]="ganttProjects()"
+                [extraParams]="ganttExtraParams()" [atRiskThresholdDays]="loadedConfig.at_risk_threshold_days"
+                [emptyMessage]="t(showsOnlyMyTasks() ? 'detail.empty.noAssignedTasks' : 'detail.empty.noTasks')"
+                (taskOpened)="openTask($event.id)" />
             } @else if (activeTab() === 'chat') {
               <section class="card chat-card">
                 <wt-project-chat [projectId]="loaded.project.id" [canPost]="loaded.project.status === 'open'" />
@@ -122,6 +134,7 @@ const NEW_TASK = 'new';
 export class ProjectDetailComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
   private readonly auth = inject(AuthService);
+  private readonly filterDefinitions = inject(ProjectListFiltersService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -139,6 +152,37 @@ export class ProjectDetailComponent implements OnInit {
   readonly openTaskId = signal<string | null>(null);
   // Present only while the Finance tab is shown; refreshed after a cost changed in the task panel.
   readonly financeTab = viewChild(ProjectFinanceComponent);
+  private readonly tasksTab = viewChild(ProjectTasksTabComponent);
+  private readonly ganttTab = viewChild(ProjectGanttViewComponent);
+
+  /** Shared by the Tasks and the Timeline tab, so switching between them keeps the filters. */
+  readonly taskQuery = new ListQueryState();
+
+  readonly taskFilters = computed<FilterSet<TaskFilterId>>(() => {
+    const detail = this.detail();
+    const config = this.config();
+    // Read by the template only once both are loaded.
+    if (!detail || !config) return { all: [], byId: {} };
+    return this.filterDefinitions.taskFilters({
+      config,
+      // An external participant is shown only their own tasks, so choosing a person makes no sense for them.
+      assignees: detail.my_role === 'external_participant'
+        ? undefined
+        : detail.members.map(member => ({ value: member.user_id, label: member.display_name })),
+      includesCost: detail.finance?.can_read === true,
+    });
+  });
+
+  readonly fetchGantt = (params: ListParams) => this.api.getProjectGantt(this.projectId, params);
+  readonly ganttProjects = computed<GanttProject[]>(() => {
+    const project = this.detail()?.project;
+    return project ? [{ id: project.id, key: project.key, name: project.name, end_date: project.end_date }] : [];
+  });
+  readonly ganttExtraParams = computed(() => {
+    const params: ListParams = {};
+    if (this.showsOnlyMyTasks()) params['mine'] = 'true';
+    return params;
+  });
 
   // Without finance read rights the tab does not exist at all, also when the address asks for it.
   readonly canReadFinance = computed(() => this.detail()?.finance?.can_read === true);
@@ -158,13 +202,33 @@ export class ProjectDetailComponent implements OnInit {
     return this.route.snapshot.paramMap.get('id') ?? '';
   }
 
-  ngOnInit(): void {
+  // What the address carries: the tab, the open task (links from e-mails lead to ?task=…) and, on
+  // the Tasks and Timeline tabs, the task filters — so a filtered view survives a reload.
+  private readonly addressParams = computed(() => {
+    const tab = this.activeTab();
+    const params: ListParams = tab === 'tasks' || tab === 'gantt' ? { ...this.taskQuery.queryParams() } : {};
+    if (tab !== 'tasks') params['tab'] = tab;
+    const taskId = this.openTaskId();
+    if (taskId && taskId !== NEW_TASK) params['task'] = taskId;
+    return params;
+  });
+
+  constructor() {
     const query = this.route.snapshot.queryParamMap;
     const requestedTab = query.get('tab');
     if (requestedTab === 'card' || requestedTab === 'gantt' || requestedTab === 'chat' || requestedTab === 'finance') {
       this.activeTab.set(requestedTab);
     }
     this.openTaskId.set(query.get('task'));
+    if (this.activeTab() === 'tasks' || this.activeTab() === 'gantt') this.taskQuery.restore(query, ADDRESS_PARAMS_OF_THE_SCREEN);
+
+    effect(() => {
+      const queryParams = this.addressParams();
+      untracked(() => this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true }));
+    });
+  }
+
+  ngOnInit(): void {
 
     forkJoin({
       config: this.api.getConfig(),
@@ -188,20 +252,23 @@ export class ProjectDetailComponent implements OnInit {
     this.activeTab.set(tab);
   }
 
-  // The open task lives in the URL (?task=…) so the link from the assignment email opens it.
+  toggleOnlyMyTasks(): void {
+    this.showsOnlyMyTasks.update(isOn => !isOn);
+    this.taskQuery.page.set(1);
+  }
+
   openTask(taskId: string): void {
     this.openTaskId.set(taskId);
-    this.syncTaskQueryParam(taskId === NEW_TASK ? null : taskId);
   }
 
   closeTask(): void {
     this.openTaskId.set(null);
-    this.syncTaskQueryParam(null);
   }
 
+  // A moved or finished task can change whether the project counts as delayed, so the project is reloaded too.
   onTaskSaved(): void {
     this.closeTask();
-    this.loadTasks();
+    this.loadProject();
   }
 
   loadProject(): void {
@@ -217,18 +284,11 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   private loadTasks(): void {
+    this.tasksTab()?.reload();
+    this.ganttTab()?.reload();
     this.api.listTasks(this.projectId, false).subscribe({
       next: tasks => this.tasks.set(tasks),
       error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.detail.tasksLoadFailed')),
-    });
-  }
-
-  private syncTaskQueryParam(taskId: string | null): void {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { task: taskId },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
     });
   }
 }

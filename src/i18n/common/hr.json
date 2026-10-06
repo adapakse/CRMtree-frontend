@@ -18,6 +18,26 @@
     "tenantTitle": "Zadani jezik organizacije",
     "title": "Jezik sučelja"
   },
+  "list": {
+    "activeFilters": "{count, plural, one {# aktivan filtar} few {# aktivna filtra} other {# aktivnih filtara}}",
+    "anyValue": "Sve",
+    "ascending": "Uzlazno",
+    "clearFilter": "Očisti",
+    "clearFilters": "Očisti filtre",
+    "defaultSort": "Zadano",
+    "descending": "Silazno",
+    "filterBy": "Filtriraj: {name}",
+    "from": "od",
+    "noOptions": "Nema stavki za odabir.",
+    "pager": {
+      "next": "Sljedeća stranica",
+      "previous": "Prethodna stranica",
+      "range": "{from}–{to} od {total}"
+    },
+    "sort": "Sortiranje",
+    "sortBy": "Sortiraj: {name}",
+    "to": "do"
+  },
   "states": {
     "loading": "Učitavanje…"
   },

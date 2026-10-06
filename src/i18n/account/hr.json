@@ -40,6 +40,12 @@
       "tokenSaved": "Token je spremljen",
       "tokenSavedWithPhone": "Token je spremljen — broj: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Obuhvaća: dnevni sažetak zadataka izvan roka, promjene rokova zadataka te projekte koji su počeli kasniti.",
+      "saveFailed": "Promjena postavke obavijesti nije uspjela",
+      "title": "Obavijesti o rokovima projekata",
+      "toggle": "E-poruke o rokovima u projektima"
+    },
     "saveFailed": "Pogreška pri spremanju — pokušajte ponovno",
     "saving": "Spremanje…",
     "signature": {

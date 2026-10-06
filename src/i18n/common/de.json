@@ -18,6 +18,26 @@
     "tenantTitle": "Standardsprache der Organisation",
     "title": "Anzeigesprache"
   },
+  "list": {
+    "activeFilters": "{count, plural, one {# aktiver Filter} other {# aktive Filter}}",
+    "anyValue": "Alle",
+    "ascending": "Aufsteigend",
+    "clearFilter": "Löschen",
+    "clearFilters": "Filter löschen",
+    "defaultSort": "Standard",
+    "descending": "Absteigend",
+    "filterBy": "Filtern: {name}",
+    "from": "von",
+    "noOptions": "Keine Einträge zur Auswahl.",
+    "pager": {
+      "next": "Nächste Seite",
+      "previous": "Vorherige Seite",
+      "range": "{from}–{to} von {total}"
+    },
+    "sort": "Sortierung",
+    "sortBy": "Sortieren: {name}",
+    "to": "bis"
+  },
   "states": {
     "loading": "Wird geladen…"
   },

@@ -1,14 +1,26 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
+import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ProjectConfig, ProjectDictionaryItem, ProjectTask } from '../../core/services/projects-api.service';
+import { ProjectTaskDueDateComponent } from '../../shared/components/project-deadlines/project-task-due-date.component';
+import { ProjectTaskTimelinessComponent } from '../../shared/components/project-deadlines/project-task-timeliness.component';
+import { ListColumnHeaderComponent } from '../../shared/list/list-column-header.component';
+import { ListQueryState } from '../../shared/list/list-query';
+import { FilterSet, ProjectListFiltersService, TaskFilterId } from './project-list-filters.service';
 import { INDENT_PX_PER_LEVEL, buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
 
+/**
+ * The whole project as a task tree — the default look of the Tasks tab. Its
+ * column headers carry the same filters and sorting as the flat list; using
+ * one makes the parent switch to that list, because a filtered or sorted
+ * result is no longer a tree.
+ */
 @Component({
   selector: 'wt-project-task-list',
   standalone: true,
-  imports: [NgStyle, TranslocoDirective],
+  imports: [NgStyle, TranslocoDirective, ListColumnHeaderComponent, ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -19,13 +31,21 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
           {{ emptyMessage() || t('taskList.emptyMessage') }}
         </div>
       } @else {
-        <div class="tw">
+        <div class="tw scroll">
           <table class="grid">
             <thead>
               <tr>
-                <th>{{ t('taskList.columns.number') }}</th><th>{{ t('taskList.columns.task') }}</th><th>{{ t('taskList.columns.type') }}</th>
-                <th>{{ t('taskList.columns.status') }}</th><th>{{ t('taskList.columns.priority') }}</th>
-                <th>{{ t('taskList.columns.assignees') }}</th><th>{{ t('taskList.columns.startDate') }}</th><th>{{ t('taskList.columns.endDate') }}</th>
+                <th [wtListColumn]="t('taskList.columns.number')" [query]="query()" sortKey="number" [filter]="filters().byId.number"></th>
+                <th [wtListColumn]="t('taskList.columns.task')" [query]="query()" sortKey="name" [filter]="filters().byId.name"
+                    [moreSorts]="taskColumnSorts"></th>
+                <th [wtListColumn]="t('taskList.columns.type')" [query]="query()" sortKey="type" [filter]="filters().byId.type"></th>
+                <th [wtListColumn]="t('taskList.columns.status')" [query]="query()" sortKey="status" [filter]="filters().byId.status"></th>
+                <th [wtListColumn]="t('taskList.columns.priority')" [query]="query()" sortKey="priority" [filter]="filters().byId.priority"></th>
+                <th [wtListColumn]="t('taskList.columns.assignees')" [query]="query()" sortKey="assignee" [filter]="filters().byId.assignee"></th>
+                <th [wtListColumn]="t('taskList.columns.startDate')" [query]="query()" sortKey="start_date" [filter]="filters().byId.startDate"></th>
+                <th [wtListColumn]="t('taskList.columns.endDate')" [query]="query()" sortKey="end_date" [filter]="filters().byId.endDate"
+                    [moreFilters]="[filters().byId.originalEndDate, filters().byId.slip]" [moreSorts]="endColumnSorts"></th>
+                <th [wtListColumn]="t('taskList.columns.timeliness')" [query]="query()" sortKey="days_overdue" [filter]="filters().byId.timeliness"></th>
               </tr>
             </thead>
             <tbody>
@@ -66,8 +86,9 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
                     }
                   </td>
                   <td class="assignees">{{ assigneeNames(row.task) }}</td>
-                  <td class="date">{{ row.task.start_date ?? '—' }}</td>
-                  <td class="date" [class.overdue]="isOverdue(row.task)">{{ row.task.end_date ?? '—' }}</td>
+                  <td class="date">{{ format.date(row.task.start_date) }}</td>
+                  <td><wt-project-task-due-date [task]="row.task" /></td>
+                  <td><wt-project-task-timeliness [task]="row.task" /></td>
                 </tr>
               }
             </tbody>
@@ -78,6 +99,7 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
   `,
   styles: [PROJECTS_SHARED_STYLES, `
     :host { display:block; height:auto; }
+    .scroll { overflow-x:auto; }
     .task-row { cursor:pointer; }
     .task-row:hover td { background:var(--gray-50); }
     .task-name { display:flex; align-items:center; gap:7px; }
@@ -85,14 +107,23 @@ import { PROJECTS_SHARED_STYLES, chipStyle } from './projects-shared.styles';
     .child-icon { width:14px; height:14px; color:var(--gray-400); flex-shrink:0; }
     .root-name { font-weight:600; }
     .assignees { color:var(--gray-600); font-size:12.5px; }
-    .date { white-space:nowrap; font-size:12.5px; color:var(--gray-600); }
-    .date.overdue { color:#DC2626; font-weight:600; }
+    .date { white-space:nowrap; font-size:12.5px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
   `],
 })
 export class ProjectTaskListComponent {
+  readonly format = inject(ProjectFinanceFormatService);
+  private readonly filterDefinitions = inject(ProjectListFiltersService);
+
+  readonly taskColumnSorts = [this.filterDefinitions.taskSortOption('parent')];
+  readonly endColumnSorts = [
+    this.filterDefinitions.taskSortOption('original_end_date'), this.filterDefinitions.taskSortOption('slip_days'),
+  ];
+
   readonly tasks = input.required<ProjectTask[]>();
   readonly config = input.required<ProjectConfig>();
   readonly projectKey = input.required<string>();
+  readonly query = input.required<ListQueryState>();
+  readonly filters = input.required<FilterSet<TaskFilterId>>();
   readonly emptyMessage = input('');
   readonly taskOpened = output<string>();
 
@@ -103,7 +134,6 @@ export class ProjectTaskListComponent {
   private readonly statusById = computed(() => new Map(this.config().statuses.map(status => [status.id, status])));
   private readonly typeById = computed(() => new Map(this.config().types.map(type => [type.id, type])));
   private readonly priorityById = computed(() => new Map(this.config().priorities.map(priority => [priority.id, priority])));
-  private readonly today = new Date().toISOString().slice(0, 10);
 
   statusOf(task: ProjectTask) {
     return this.statusById().get(task.status_id);
@@ -119,9 +149,5 @@ export class ProjectTaskListComponent {
 
   assigneeNames(task: ProjectTask): string {
     return task.assignees.map(assignee => assignee.display_name).join(', ') || '—';
-  }
-
-  isOverdue(task: ProjectTask): boolean {
-    return task.end_date !== null && task.end_date < this.today && this.statusOf(task)?.category !== 'done';
   }
 }

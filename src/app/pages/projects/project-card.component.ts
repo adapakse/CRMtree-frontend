@@ -4,11 +4,13 @@ import { map } from 'rxjs/operators';
 import { TypeaheadComponent, TypeaheadOption } from '../../shared/components/typeahead/typeahead.component';
 import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { ToastService } from '../../core/services/toast.service';
 import {
   ProjectAccessLevel, ProjectConfig, ProjectDetail, ProjectField,
   ProjectMember, ProjectMemberCandidate, ProjectRole, ProjectsApiService,
 } from '../../core/services/projects-api.service';
+import { ProjectDelayBadgeComponent } from '../../shared/components/project-deadlines/project-delay-badge.component';
 import { ProjectCrmLinkComponent } from './project-crm-link.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 
@@ -19,7 +21,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
 @Component({
   selector: 'wt-project-card',
   standalone: true,
-  imports: [FormsModule, ProjectCrmLinkComponent, TypeaheadComponent, TranslocoDirective, TranslocoPipe],
+  imports: [FormsModule, ProjectCrmLinkComponent, ProjectDelayBadgeComponent, TypeaheadComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -46,9 +48,21 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
           <label class="fl">{{ t('card.description') }}</label>
           <textarea class="fta" rows="5" [(ngModel)]="editedDescription"></textarea>
         </div>
+        <div class="fgrid dates-form">
+          <div class="fg">
+            <label class="fl">{{ t('card.startDate') }}</label>
+            <input class="fi" type="date" [(ngModel)]="editedStartDate">
+          </div>
+          <div class="fg">
+            <label class="fl">{{ t('card.endDate') }}</label>
+            <input class="fi" type="date" [(ngModel)]="editedEndDate" [min]="editedStartDate">
+          </div>
+        </div>
+        @if (hasInvalidDates()) { <p class="date-error">{{ t('card.errors.endBeforeStart') }}</p> }
+        <p class="muted hint">{{ t('card.datesHint') }}</p>
         <div class="actions">
           <button class="btn btn-g btn-sm" (click)="isEditing.set(false)">{{ 'actions.cancel' | transloco }}</button>
-          <button class="btn btn-p btn-sm" [disabled]="!editedName.trim()" (click)="saveProject()">{{ 'actions.save' | transloco }}</button>
+          <button class="btn btn-p btn-sm" [disabled]="!editedName.trim() || hasInvalidDates()" (click)="saveProject()">{{ 'actions.save' | transloco }}</button>
         </div>
       } @else {
         <div class="project-name">
@@ -56,6 +70,11 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
           @if (!isOpen()) { <span class="pill closed">{{ t('card.closedBadge') }}</span> }
         </div>
         <p class="description">{{ detail().project.description || t('card.noDescription') }}</p>
+        <div class="dates">
+          <span><span class="date-label">{{ t('card.startDate') }}</span> {{ format.date(detail().project.start_date) }}</span>
+          <span><span class="date-label">{{ t('card.endDate') }}</span> {{ format.date(detail().project.end_date) }}</span>
+          <wt-project-delay-badge [schedule]="detail().project" display="both" />
+        </div>
       }
       <wt-project-crm-link [detail]="detail()" (changed)="changed.emit()" />
     </section>
@@ -183,6 +202,11 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
     .project-name { font-size:17px; font-weight:700; color:var(--gray-900); display:flex; align-items:center; gap:8px; }
     .description { margin:0; font-size:13.5px; color:var(--gray-700); white-space:pre-wrap; }
     .actions { display:flex; justify-content:flex-end; gap:8px; }
+    .dates { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 20px; font-size:13px; color:var(--gray-800); }
+    .date-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); margin-right:4px; }
+    .dates-form { max-width:420px; }
+    .date-error { margin:0; font-size:12px; color:#DC2626; }
+    .hint { margin:0; font-size:12px; }
     .pill.closed { background:var(--gray-100); color:var(--gray-500); }
     .compact { padding:4px 8px; font-size:12.5px; width:auto; }
     .row-action { text-align:right; }
@@ -195,6 +219,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
 })
 export class ProjectCardComponent {
   private readonly api = inject(ProjectsApiService);
+  readonly format = inject(ProjectFinanceFormatService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
@@ -217,6 +242,8 @@ export class ProjectCardComponent {
 
   editedName = '';
   editedDescription = '';
+  editedStartDate = '';
+  editedEndDate = '';
   newMemberRole: ProjectRole = 'internal_participant';
   newMemberAccessLevel: ProjectAccessLevel = 'full';
   newFieldId: string | null = null;
@@ -241,11 +268,22 @@ export class ProjectCardComponent {
   startEditing(): void {
     this.editedName = this.detail().project.name;
     this.editedDescription = this.detail().project.description ?? '';
+    this.editedStartDate = this.detail().project.start_date ?? '';
+    this.editedEndDate = this.detail().project.end_date ?? '';
     this.isEditing.set(true);
   }
 
+  hasInvalidDates(): boolean {
+    return !!this.editedStartDate && !!this.editedEndDate && this.editedEndDate < this.editedStartDate;
+  }
+
   saveProject(): void {
-    const payload = { name: this.editedName.trim(), description: this.editedDescription.trim() || null };
+    const payload = {
+      name: this.editedName.trim(),
+      description: this.editedDescription.trim() || null,
+      start_date: this.editedStartDate || null,
+      end_date: this.editedEndDate || null,
+    };
     this.api.updateProject(this.projectId, payload).subscribe({
       next: () => { this.isEditing.set(false); this.changed.emit(); },
       error: err => this.showError(err, 'projects.card.errors.saveProjectFailed'),

@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "Gefährdet",
+    "key": "offen · überfällig · gefährdet",
+    "open": "Offene Aufgaben",
+    "overdue": "Überfällig"
+  },
   "card": {
     "closeConfirm": "Projekt schließen? Ein geschlossenes Projekt ist schreibgeschützt und verschwindet aus der Standardliste.",
     "closeProject": "Projekt schließen",
     "closedBadge": "Geschlossen",
+    "datesHint": "Ein Projekt wird als verzögert markiert, wenn eine nicht erledigte Aufgabe nach dem Fälligkeitsdatum des Projekts endet oder wenn dieses Datum verstrichen ist und noch nicht erledigte Aufgaben offen sind.",
     "description": "Beschreibung",
     "edit": "Bearbeiten",
+    "endDate": "Fälligkeitsdatum des Projekts",
     "errors": {
       "addMemberFailed": "Person konnte nicht hinzugefügt werden",
       "changeAccessLevelFailed": "Berechtigungen konnten nicht geändert werden",
       "changeRoleFailed": "Rolle konnte nicht geändert werden",
       "closeProjectFailed": "Projekt konnte nicht geschlossen werden",
+      "endBeforeStart": "Das Fälligkeitsdatum des Projekts darf nicht vor dem Projektbeginn liegen.",
       "removeMemberFailed": "Person konnte nicht entfernt werden",
       "reopenProjectFailed": "Projekt konnte nicht wieder geöffnet werden",
       "saveFieldsFailed": "Felder konnten nicht gespeichert werden",
@@ -46,6 +55,7 @@
     "name": "Name",
     "noDescription": "Keine Beschreibung.",
     "reopenProject": "Wieder öffnen",
+    "startDate": "Projektbeginn",
     "title": "Projektkarte"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Name des Leads oder Partners eingeben (mind. 3 Zeichen)…",
     "title": "Verknüpfung mit dem CRM"
   },
+  "deadlines": {
+    "atRisk": "Gefährdet",
+    "atRiskHint": "Das Fälligkeitsdatum rückt näher und die Arbeit hat noch nicht begonnen.",
+    "completedLate": "Verspätet erledigt",
+    "completedLateHint": "Die Aufgabe wurde nach ihrem Fälligkeitsdatum erledigt.",
+    "daysShort": "{days} T.",
+    "legend": {
+      "atRisk": "gefährdet (zu erledigen, fällig innerhalb von {days, plural, one {# Tag} other {# Tagen}})",
+      "beyondProjectEnd": "nach dem Fälligkeitsdatum des Projekts",
+      "completedLate": "verspätet erledigt",
+      "originalEndDate": "ursprüngliches Fälligkeitsdatum",
+      "overdue": "überfällig",
+      "overdueSubtasks": "überfällige Unteraufgaben",
+      "projectEndDate": "Fälligkeitsdatum des Projekts"
+    },
+    "originalEndDateHint": "Ursprüngliches Fälligkeitsdatum und Verschiebung in Tagen",
+    "overdue": "Überfällig",
+    "overdueDays": "Überfällig {days} T.",
+    "overdueHint": "Das Fälligkeitsdatum ist verstrichen und die Aufgabe ist nicht erledigt.",
+    "overdueSubtasks": "Überfällige Unteraufgaben",
+    "overdueSubtasksHint": "Mindestens eine Unteraufgabe ist überfällig.",
+    "slipEarlier": "−{days} T.",
+    "slipLater": "+{days} T."
+  },
+  "delay": {
+    "badge": "Verzögert",
+    "reasons": {
+      "endPassed": "Das Fälligkeitsdatum des Projekts ist seit {days, plural, one {# Tag} other {# Tagen}} verstrichen, offene Aufgaben: {count}",
+      "taskAfterEnd": "Aufgaben, die nach dem Fälligkeitsdatum des Projekts enden: {count} (die späteste um {days, plural, one {# Tag} other {# Tage}})"
+    }
+  },
   "detail": {
     "backToProjects": "Projekte",
     "closedBadge": "Geschlossen",
@@ -91,6 +132,72 @@
       "timeline": "Zeitachse"
     },
     "tasksLoadFailed": "Aufgaben konnten nicht geladen werden"
+  },
+  "filters": {
+    "assignee": "Person",
+    "atRiskCount": "Gefährdete Aufgaben",
+    "cost": "Kosten",
+    "delayReason": "Grund der Verzögerung",
+    "delayReasonValues": {
+      "end_passed": "Fälligkeitsdatum des Projekts verstrichen",
+      "task_after_end": "Aufgabe endet nach dem Fälligkeitsdatum des Projekts"
+    },
+    "delayed": "Verzögerung",
+    "delayedValues": {
+      "no": "Nicht verzögert",
+      "yes": "Verzögert"
+    },
+    "endDate": "Ende",
+    "manager": "PM",
+    "myRole": "Meine Rolle",
+    "myRoleValues": {
+      "controller": "Prüfer",
+      "participant": "Teilnehmer",
+      "pm": "PM"
+    },
+    "name": "Aufgabenname",
+    "number": "Nummer",
+    "originalEndDate": "Urspr. Fälligkeit",
+    "overdueCount": "Überfällige Aufgaben",
+    "priority": "Priorität",
+    "progress": "Fortschritt (%)",
+    "project": "Projekt",
+    "projectCost": "Angefallene Kosten",
+    "projectEndDate": "Projektfälligkeit",
+    "projectName": "Projektname oder Schlüssel",
+    "projectRevenue": "Erlös",
+    "projectSort": {
+      "at_risk": "Gefährdete Aufgaben",
+      "cost": "Angefallene Kosten",
+      "delay": "Verzögerung",
+      "end_date": "Fälligkeit",
+      "key": "Schlüssel",
+      "name": "Name",
+      "overdue": "Überfällige Aufgaben",
+      "pm": "PM",
+      "progress": "Fortschritt",
+      "revenue": "Erlös",
+      "start_date": "Beginn",
+      "status": "Status"
+    },
+    "projectStartDate": "Projektbeginn",
+    "slip": "Verschiebung (Tage)",
+    "startDate": "Beginn",
+    "status": "Status",
+    "statusCategory": "Phase",
+    "taskSort": {
+      "original_end_date": "Urspr. Fälligkeit",
+      "parent": "Übergeordnete Aufgabe",
+      "slip_days": "Verschiebung"
+    },
+    "timeliness": "Termintreue",
+    "timelinessValues": {
+      "at_risk": "Gefährdet",
+      "on_time": "Termingerecht",
+      "overdue": "Überfällig"
+    },
+    "type": "Typ",
+    "unassigned": "Nicht zugewiesen"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Endet nach dem Fälligkeitsdatum des Projekts",
     "emptyTitle": "Keine Aufgaben",
+    "loadFailed": "Zeitachse konnte nicht geladen werden",
+    "originalEndDate": "Ursprüngliches Fälligkeitsdatum: {date} ({slip})",
+    "projectEndDate": "Fälligkeitsdatum des Projekts: {date}",
     "taskColumn": "Aufgabe",
     "today": "Heute",
+    "truncated": "Die Zeitachse zeigt die ersten {limit} Aufgaben. Grenzen Sie die Filter ein, um die übrigen zu sehen.",
     "undatedNote": "{count, plural, one {# Aufgabe ohne Datumsangaben hat keinen Balken auf der Zeitachse.} other {# Aufgaben ohne Datumsangaben haben keinen Balken auf der Zeitachse.}}",
     "zoom": {
       "day": "Tage",
@@ -550,30 +662,27 @@
     "loadFailed": "Projekte konnten nicht geladen werden",
     "newProject": "Neues Projekt",
     "stats": {
+      "atRisk": "gefährdet",
+      "doneOfTotalHint": "Erledigte Aufgaben / alle Aufgaben",
       "members": "{count, plural, one {Person} other {Personen}}",
       "myOpenTasks": "{count, plural, one {offen für mich} other {offen für mich}}",
+      "overdue": "überfällig",
       "tasks": "{count, plural, one {Aufgabe} other {Aufgaben}}"
     },
     "title": "Projekte",
     "views": {
       "myTasks": "Meine Aufgaben",
+      "portfolio": "Projektübersicht",
       "projects": "Projekte"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Fälligkeitsdatum",
-      "priority": "Priorität",
-      "project": "Projekt",
-      "status": "Status",
-      "task": "Aufgabe"
-    },
     "empty": {
       "description": "Sie haben in keinem Projekt offene Aufgaben.",
       "title": "Keine Aufgaben"
     },
-    "loadFailed": "Aufgaben konnten nicht geladen werden",
-    "noDueDate": "ohne Fälligkeitsdatum"
+    "includeDone": "Erledigte anzeigen",
+    "loadFailed": "Aufgaben konnten nicht geladen werden"
   },
   "panel": {
     "chatTitle": "Unterhaltung zur Aufgabe",
@@ -595,6 +704,11 @@
       "selectField": "— Feld auswählen —",
       "title": "Zusatzfelder"
     },
+    "endDateChange": {
+      "hint": "Optional. Der PM sieht den Grund in der E-Mail über die Änderung des Fälligkeitsdatums; er wird außerdem im Verlauf der Aufgabe gespeichert.",
+      "placeholder": "z. B. verspätete Lieferung des Kunden",
+      "reason": "Grund für die Änderung des Fälligkeitsdatums"
+    },
     "fields": {
       "assignees": "Zugewiesene Personen",
       "description": "Zusätzliche Beschreibung",
@@ -612,6 +726,7 @@
       "changedWithStatus": "hat geändert: {fields} ({from} → {to})",
       "created": "hat die Aufgabe erstellt",
       "empty": "Keine Einträge.",
+      "endDateChangeReason": "Grund für die Änderung des Fälligkeitsdatums: {reason}",
       "fields": {
         "assignees": "Zugewiesene Personen",
         "customFields": "Zusatzfelder",
@@ -641,10 +756,40 @@
     "saved": "Aufgabe gespeichert",
     "saving": "Wird gespeichert…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "Gefährdet",
+      "cost": "Angefallene Kosten",
+      "delay": "Verzögerung",
+      "endDate": "Fälligkeit",
+      "overdue": "Überfällig",
+      "progress": "Fortschritt",
+      "project": "Projekt",
+      "projectManagers": "PM",
+      "revenue": "Erlös",
+      "startDate": "Beginn"
+    },
+    "loadFailed": "Projektübersicht konnte nicht geöffnet werden",
+    "noProjects": "Sie sind bei keinem offenen Projekt PM oder Prüfer.",
+    "noTasks": "In Ihren Projekten gibt es keine Aufgaben.",
+    "tabs": {
+      "projects": "Projekte",
+      "tasks": "Aufgaben",
+      "timeline": "Zeitachse"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Kategorien können nicht gelöscht werden — deaktivieren Sie nicht verwendete. Eine deaktivierte Kategorie kann bei neuen Kosten nicht ausgewählt werden, bestehende Positionen behalten sie.",
       "title": "Kostenkategorien"
+    },
+    "deadlines": {
+      "hint": "Eine Aufgabe, mit der noch nicht begonnen wurde, wird als gefährdet markiert, wenn bis zu ihrem Fälligkeitsdatum nicht mehr Tage verbleiben als dieser Schwellenwert (0–30; 0 bedeutet nur der Fälligkeitstag selbst).",
+      "invalid": "Geben Sie eine ganze Zahl von 0 bis 30 ein.",
+      "saveFailed": "Schwellenwert konnte nicht gespeichert werden",
+      "saved": "Schwellenwert für gefährdete Aufgaben gespeichert",
+      "threshold": "Schwellenwert für gefährdete Aufgaben (Tage)",
+      "title": "Terminkontrolle"
     },
     "dictionary": {
       "active": "aktiv",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Personen",
+      "cost": "Kosten",
       "endDate": "Ende",
       "number": "Nr.",
       "priority": "Priorität",
+      "project": "Projekt",
       "startDate": "Beginn",
       "status": "Status",
       "task": "Aufgabe",
+      "timeliness": "Termintreue",
       "type": "Typ"
     },
+    "emptyForFilters": "Keine Aufgabe entspricht den Filtern.",
     "emptyMessage": "In diesem Projekt gibt es noch keine Aufgaben.",
     "emptyTitle": "Keine Aufgaben",
+    "flatList": "Flache Liste",
     "parentTask": "Übergeordnete Aufgabe",
     "subtask": "Unteraufgabe"
   }

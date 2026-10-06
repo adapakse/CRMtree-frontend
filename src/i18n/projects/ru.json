@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "Под угрозой",
+    "key": "открытые · просроченные · под угрозой",
+    "open": "Открытые задачи",
+    "overdue": "Просрочено"
+  },
   "card": {
     "closeConfirm": "Закрыть проект? Закрытый проект доступен только для чтения и исчезает из списка по умолчанию.",
     "closeProject": "Закрыть проект",
     "closedBadge": "Закрыт",
+    "datesHint": "Проект отмечается как задерживающийся, если незавершённая задача заканчивается после срока проекта либо срок проекта истёк, а незавершённые задачи остались.",
     "description": "Описание",
     "edit": "Редактировать",
+    "endDate": "Срок проекта",
     "errors": {
       "addMemberFailed": "Не удалось добавить участника",
       "changeAccessLevelFailed": "Не удалось изменить права доступа",
       "changeRoleFailed": "Не удалось изменить роль",
       "closeProjectFailed": "Не удалось закрыть проект",
+      "endBeforeStart": "Срок проекта не может быть раньше его начала.",
       "removeMemberFailed": "Не удалось удалить участника",
       "reopenProjectFailed": "Не удалось открыть проект",
       "saveFieldsFailed": "Не удалось сохранить поля",
@@ -46,6 +55,7 @@
     "name": "Название",
     "noDescription": "Нет описания.",
     "reopenProject": "Открыть снова",
+    "startDate": "Начало проекта",
     "title": "Карточка проекта"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Введите название лида или партнёра (мин. 3 символа)…",
     "title": "Связь с CRM"
   },
+  "deadlines": {
+    "atRisk": "Под угрозой",
+    "atRiskHint": "Срок близко, а работа ещё не начата.",
+    "completedLate": "Завершено после срока",
+    "completedLateHint": "Задача завершена после её срока.",
+    "daysShort": "{days} дн.",
+    "legend": {
+      "atRisk": "под угрозой (к выполнению, срок в течение {days, plural, one {# дня} few {# дней} many {# дней} other {# дня}})",
+      "beyondProjectEnd": "после срока проекта",
+      "completedLate": "завершено после срока",
+      "originalEndDate": "исходный срок",
+      "overdue": "просрочено",
+      "overdueSubtasks": "просроченные подзадачи",
+      "projectEndDate": "срок проекта"
+    },
+    "originalEndDateHint": "Исходный срок и сдвиг в днях",
+    "overdue": "Просрочено",
+    "overdueDays": "Просрочено на {days} дн.",
+    "overdueHint": "Срок истёк, а задача не завершена.",
+    "overdueSubtasks": "Просроченные подзадачи",
+    "overdueSubtasksHint": "Как минимум одна подзадача просрочена.",
+    "slipEarlier": "−{days} дн.",
+    "slipLater": "+{days} дн."
+  },
+  "delay": {
+    "badge": "Задерживается",
+    "reasons": {
+      "endPassed": "Срок проекта истёк {days, plural, one {# день} few {# дня} many {# дней} other {# дня}} назад, открытые задачи: {count}",
+      "taskAfterEnd": "Задачи, заканчивающиеся после срока проекта: {count} (самая поздняя — на {days, plural, one {# день} few {# дня} many {# дней} other {# дня}} позже)"
+    }
+  },
   "detail": {
     "backToProjects": "Проекты",
     "closedBadge": "Закрыт",
@@ -91,6 +132,72 @@
       "timeline": "Шкала времени"
     },
     "tasksLoadFailed": "Не удалось загрузить задачи"
+  },
+  "filters": {
+    "assignee": "Исполнитель",
+    "atRiskCount": "Задачи под угрозой",
+    "cost": "Расход",
+    "delayReason": "Причина задержки",
+    "delayReasonValues": {
+      "end_passed": "Срок проекта истёк",
+      "task_after_end": "Задача заканчивается после срока проекта"
+    },
+    "delayed": "Задержка",
+    "delayedValues": {
+      "no": "Без задержки",
+      "yes": "С задержкой"
+    },
+    "endDate": "Окончание",
+    "manager": "PM",
+    "myRole": "Моя роль",
+    "myRoleValues": {
+      "controller": "Контролёр",
+      "participant": "Участник",
+      "pm": "PM"
+    },
+    "name": "Название задачи",
+    "number": "Номер",
+    "originalEndDate": "Исходный срок",
+    "overdueCount": "Просроченные задачи",
+    "priority": "Приоритет",
+    "progress": "Прогресс (%)",
+    "project": "Проект",
+    "projectCost": "Понесённый расход",
+    "projectEndDate": "Срок проекта",
+    "projectName": "Название или ключ проекта",
+    "projectRevenue": "Доход",
+    "projectSort": {
+      "at_risk": "Задачи под угрозой",
+      "cost": "Понесённый расход",
+      "delay": "Задержка",
+      "end_date": "Срок",
+      "key": "Ключ",
+      "name": "Название",
+      "overdue": "Просроченные задачи",
+      "pm": "PM",
+      "progress": "Прогресс",
+      "revenue": "Доход",
+      "start_date": "Начало",
+      "status": "Статус"
+    },
+    "projectStartDate": "Начало проекта",
+    "slip": "Сдвиг (дней)",
+    "startDate": "Начало",
+    "status": "Статус",
+    "statusCategory": "Этап",
+    "taskSort": {
+      "original_end_date": "Исходный срок",
+      "parent": "Родительская задача",
+      "slip_days": "Сдвиг"
+    },
+    "timeliness": "Соблюдение сроков",
+    "timelinessValues": {
+      "at_risk": "Под угрозой",
+      "on_time": "В срок",
+      "overdue": "Просрочено"
+    },
+    "type": "Тип",
+    "unassigned": "Без исполнителя"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Заканчивается после срока проекта",
     "emptyTitle": "Нет задач",
+    "loadFailed": "Не удалось загрузить шкалу времени",
+    "originalEndDate": "Исходный срок: {date} ({slip})",
+    "projectEndDate": "Срок проекта: {date}",
     "taskColumn": "Задача",
     "today": "Сегодня",
+    "truncated": "На шкале времени показаны первые задачи ({limit}). Уточните фильтры, чтобы увидеть остальные.",
     "undatedNote": "{count, plural, one {# задача без дат не имеет полосы на шкале времени.} few {# задачи без дат не имеют полосы на шкале времени.} many {# задач без дат не имеют полосы на шкале времени.} other {# задачи без дат не имеют полосы на шкале времени.}}",
     "zoom": {
       "day": "Дни",
@@ -550,30 +662,27 @@
     "loadFailed": "Не удалось загрузить проекты",
     "newProject": "Новый проект",
     "stats": {
+      "atRisk": "под угрозой",
+      "doneOfTotalHint": "Завершённые задачи / все",
       "members": "{count, plural, one {участник} few {участника} many {участников} other {участника}}",
       "myOpenTasks": "{count, plural, one {моя открытая} few {мои открытые} many {моих открытых} other {моих открытых}}",
+      "overdue": "просрочено",
       "tasks": "{count, plural, one {задача} few {задачи} many {задач} other {задачи}}"
     },
     "title": "Проекты",
     "views": {
       "myTasks": "Мои задачи",
+      "portfolio": "Обзор проектов",
       "projects": "Проекты"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Срок",
-      "priority": "Приоритет",
-      "project": "Проект",
-      "status": "Статус",
-      "task": "Задача"
-    },
     "empty": {
       "description": "У вас нет открытых задач ни в одном проекте.",
       "title": "Нет задач"
     },
-    "loadFailed": "Не удалось загрузить задачи",
-    "noDueDate": "без срока"
+    "includeDone": "Показать завершённые",
+    "loadFailed": "Не удалось загрузить задачи"
   },
   "panel": {
     "chatTitle": "Обсуждение задачи",
@@ -595,6 +704,11 @@
       "selectField": "— выберите поле —",
       "title": "Дополнительные поля"
     },
+    "endDateChange": {
+      "hint": "Необязательно. PM увидит причину в письме об изменении срока; она также будет сохранена в истории задачи.",
+      "placeholder": "напр. задержка поставки от клиента",
+      "reason": "Причина изменения срока"
+    },
     "fields": {
       "assignees": "Исполнители",
       "description": "Дополнительное описание",
@@ -612,6 +726,7 @@
       "changedWithStatus": "изменил(а): {fields} ({from} → {to})",
       "created": "создал(а) задачу",
       "empty": "Нет записей.",
+      "endDateChangeReason": "Причина изменения срока: {reason}",
       "fields": {
         "assignees": "исполнители",
         "customFields": "дополнительные поля",
@@ -641,10 +756,40 @@
     "saved": "Задача сохранена",
     "saving": "Сохранение…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "Под угрозой",
+      "cost": "Понесённый расход",
+      "delay": "Задержка",
+      "endDate": "Срок",
+      "overdue": "Просрочено",
+      "progress": "Прогресс",
+      "project": "Проект",
+      "projectManagers": "PM",
+      "revenue": "Доход",
+      "startDate": "Начало"
+    },
+    "loadFailed": "Не удалось открыть обзор проектов",
+    "noProjects": "Вы не ведёте и не контролируете ни одного открытого проекта.",
+    "noTasks": "В ваших проектах нет задач.",
+    "tabs": {
+      "projects": "Проекты",
+      "tasks": "Задачи",
+      "timeline": "Шкала времени"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Категорию нельзя удалить — неиспользуемую отключите. Отключённую категорию нельзя выбрать в новом расходе, а существующие позиции её сохраняют.",
       "title": "Категории расходов"
+    },
+    "deadlines": {
+      "hint": "Задача, работа над которой ещё не начата, отмечается как находящаяся под угрозой, если до её срока осталось не больше дней, чем этот порог (0–30; 0 означает сам день срока).",
+      "invalid": "Введите целое число от 0 до 30.",
+      "saveFailed": "Не удалось сохранить порог",
+      "saved": "Порог угрозы срока сохранён",
+      "threshold": "Порог угрозы срока (дней)",
+      "title": "Контроль сроков"
     },
     "dictionary": {
       "active": "активен",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Исполнители",
+      "cost": "Расход",
       "endDate": "Окончание",
       "number": "№",
       "priority": "Приоритет",
+      "project": "Проект",
       "startDate": "Начало",
       "status": "Статус",
       "task": "Задача",
+      "timeliness": "Соблюдение сроков",
       "type": "Тип"
     },
+    "emptyForFilters": "Ни одна задача не соответствует фильтрам.",
     "emptyMessage": "В этом проекте пока нет задач.",
     "emptyTitle": "Нет задач",
+    "flatList": "Плоский список",
     "parentTask": "Родительская задача",
     "subtask": "Подзадача"
   }

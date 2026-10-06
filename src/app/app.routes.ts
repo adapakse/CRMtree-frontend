@@ -215,6 +215,11 @@ export const routes: Routes = withI18nScopes([
         path: 'projects',
         loadComponent: () => import('./pages/projects/projects-list.component').then(m => m.ProjectsListComponent),
       },
+      // Must stay before 'projects/:id', which would otherwise take "portfolio" for a project id.
+      {
+        path: 'projects/portfolio',
+        loadComponent: () => import('./pages/projects/project-portfolio.component').then(m => m.ProjectPortfolioComponent),
+      },
       {
         path: 'projects/:id',
         loadComponent: () => import('./pages/projects/project-detail.component').then(m => m.ProjectDetailComponent),

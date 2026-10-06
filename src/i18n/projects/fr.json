@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "À risque",
+    "key": "ouvertes · en retard · à risque",
+    "open": "Tâches ouvertes",
+    "overdue": "En retard"
+  },
   "card": {
     "closeConfirm": "Clôturer le projet ? Un projet clôturé est en lecture seule et disparaît de la liste par défaut.",
     "closeProject": "Clôturer le projet",
     "closedBadge": "Clôturé",
+    "datesHint": "Un projet est signalé comme retardé lorsqu’une tâche non terminée se termine après l’échéance du projet, ou lorsque l’échéance du projet est dépassée et qu’il reste des tâches non terminées.",
     "description": "Description",
     "edit": "Modifier",
+    "endDate": "Échéance du projet",
     "errors": {
       "addMemberFailed": "Impossible d’ajouter la personne",
       "changeAccessLevelFailed": "Impossible de modifier les droits d’accès",
       "changeRoleFailed": "Impossible de modifier le rôle",
       "closeProjectFailed": "Impossible de clôturer le projet",
+      "endBeforeStart": "L’échéance du projet ne peut pas être antérieure à son début.",
       "removeMemberFailed": "Impossible de retirer la personne",
       "reopenProjectFailed": "Impossible de rouvrir le projet",
       "saveFieldsFailed": "Impossible d’enregistrer les champs",
@@ -46,6 +55,7 @@
     "name": "Nom",
     "noDescription": "Aucune description.",
     "reopenProject": "Rouvrir",
+    "startDate": "Début du projet",
     "title": "Fiche projet"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Saisissez le nom d’un lead ou d’un partenaire (3 caractères min.)…",
     "title": "Association avec le CRM"
   },
+  "deadlines": {
+    "atRisk": "À risque",
+    "atRiskHint": "L’échéance est proche et le travail n’a pas encore commencé.",
+    "completedLate": "Terminée en retard",
+    "completedLateHint": "La tâche a été terminée après son échéance.",
+    "daysShort": "{days} j",
+    "legend": {
+      "atRisk": "à risque (à faire, échéance sous {days, plural, one {# jour} other {# jours}})",
+      "beyondProjectEnd": "après l’échéance du projet",
+      "completedLate": "terminée en retard",
+      "originalEndDate": "échéance initiale",
+      "overdue": "en retard",
+      "overdueSubtasks": "sous-tâches en retard",
+      "projectEndDate": "échéance du projet"
+    },
+    "originalEndDateHint": "Échéance initiale et décalage en jours",
+    "overdue": "En retard",
+    "overdueDays": "En retard de {days} j",
+    "overdueHint": "L’échéance est dépassée et la tâche n’est pas terminée.",
+    "overdueSubtasks": "Sous-tâches en retard",
+    "overdueSubtasksHint": "Au moins une sous-tâche est en retard.",
+    "slipEarlier": "−{days} j",
+    "slipLater": "+{days} j"
+  },
+  "delay": {
+    "badge": "Retardé",
+    "reasons": {
+      "endPassed": "Échéance du projet dépassée depuis {days, plural, one {# jour} other {# jours}}, tâches ouvertes : {count}",
+      "taskAfterEnd": "Tâches se terminant après l’échéance du projet : {count} (la plus tardive de {days, plural, one {# jour} other {# jours}})"
+    }
+  },
   "detail": {
     "backToProjects": "Projets",
     "closedBadge": "Clôturé",
@@ -91,6 +132,72 @@
       "timeline": "Chronologie"
     },
     "tasksLoadFailed": "Impossible de charger les tâches"
+  },
+  "filters": {
+    "assignee": "Personne",
+    "atRiskCount": "Tâches à risque",
+    "cost": "Coût",
+    "delayReason": "Motif du retard",
+    "delayReasonValues": {
+      "end_passed": "Échéance du projet dépassée",
+      "task_after_end": "Une tâche se termine après l’échéance du projet"
+    },
+    "delayed": "Retard du projet",
+    "delayedValues": {
+      "no": "Non retardés",
+      "yes": "Retardés"
+    },
+    "endDate": "Fin",
+    "manager": "PM",
+    "myRole": "Mon rôle",
+    "myRoleValues": {
+      "controller": "Validateur",
+      "participant": "Participant",
+      "pm": "PM"
+    },
+    "name": "Nom de la tâche",
+    "number": "Numéro",
+    "originalEndDate": "Échéance initiale",
+    "overdueCount": "Tâches en retard",
+    "priority": "Priorité",
+    "progress": "Avancement (%)",
+    "project": "Projet",
+    "projectCost": "Coût encouru",
+    "projectEndDate": "Échéance du projet",
+    "projectName": "Nom ou clé du projet",
+    "projectRevenue": "Revenu",
+    "projectSort": {
+      "at_risk": "Tâches à risque",
+      "cost": "Coût encouru",
+      "delay": "Retard du projet",
+      "end_date": "Échéance",
+      "key": "Clé",
+      "name": "Nom",
+      "overdue": "Tâches en retard",
+      "pm": "PM",
+      "progress": "Avancement",
+      "revenue": "Revenu",
+      "start_date": "Début",
+      "status": "Statut"
+    },
+    "projectStartDate": "Début du projet",
+    "slip": "Décalage (jours)",
+    "startDate": "Début",
+    "status": "Statut",
+    "statusCategory": "Étape",
+    "taskSort": {
+      "original_end_date": "Échéance initiale",
+      "parent": "Tâche parente",
+      "slip_days": "Décalage"
+    },
+    "timeliness": "Ponctualité",
+    "timelinessValues": {
+      "at_risk": "À risque",
+      "on_time": "Dans les délais",
+      "overdue": "En retard"
+    },
+    "type": "Type",
+    "unassigned": "Non assignées"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Se termine après l’échéance du projet",
     "emptyTitle": "Aucune tâche",
+    "loadFailed": "Impossible de charger la chronologie",
+    "originalEndDate": "Échéance initiale : {date} ({slip})",
+    "projectEndDate": "Échéance du projet : {date}",
     "taskColumn": "Tâche",
     "today": "Aujourd’hui",
+    "truncated": "La chronologie affiche les {limit} premières tâches. Affinez les filtres pour voir les autres.",
     "undatedNote": "{count, plural, one {# tâche sans dates n’a pas de barre sur la chronologie.} other {# tâches sans dates n’ont pas de barre sur la chronologie.}}",
     "zoom": {
       "day": "Jours",
@@ -550,30 +662,27 @@
     "loadFailed": "Impossible de charger les projets",
     "newProject": "Nouveau projet",
     "stats": {
+      "atRisk": "à risque",
+      "doneOfTotalHint": "Tâches terminées / toutes les tâches",
       "members": "{count, plural, one {personne} other {personnes}}",
       "myOpenTasks": "{count, plural, one {ouverte à ma charge} other {ouvertes à ma charge}}",
+      "overdue": "en retard",
       "tasks": "{count, plural, one {tâche} other {tâches}}"
     },
     "title": "Projets",
     "views": {
       "myTasks": "Mes tâches",
+      "portfolio": "Vue des projets",
       "projects": "Projets"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Échéance",
-      "priority": "Priorité",
-      "project": "Projet",
-      "status": "Statut",
-      "task": "Tâche"
-    },
     "empty": {
       "description": "Vous n’avez aucune tâche ouverte dans aucun projet.",
       "title": "Aucune tâche"
     },
-    "loadFailed": "Impossible de charger les tâches",
-    "noDueDate": "sans échéance"
+    "includeDone": "Afficher les terminées",
+    "loadFailed": "Impossible de charger les tâches"
   },
   "panel": {
     "chatTitle": "Discussion sur la tâche",
@@ -595,6 +704,11 @@
       "selectField": "— choisissez un champ —",
       "title": "Champs supplémentaires"
     },
+    "endDateChange": {
+      "hint": "Facultatif. Le PM verra le motif dans l’e-mail sur la modification de l’échéance ; il sera aussi enregistré dans l’historique de la tâche.",
+      "placeholder": "p. ex. livraison tardive du client",
+      "reason": "Motif de la modification de l’échéance"
+    },
     "fields": {
       "assignees": "Personnes assignées",
       "description": "Description complémentaire",
@@ -612,6 +726,7 @@
       "changedWithStatus": "a modifié : {fields} ({from} → {to})",
       "created": "a créé la tâche",
       "empty": "Aucune entrée.",
+      "endDateChangeReason": "Motif de la modification de l’échéance : {reason}",
       "fields": {
         "assignees": "personnes assignées",
         "customFields": "champs supplémentaires",
@@ -641,10 +756,40 @@
     "saved": "Tâche enregistrée",
     "saving": "Enregistrement…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "À risque",
+      "cost": "Coût encouru",
+      "delay": "Retard projet",
+      "endDate": "Échéance",
+      "overdue": "En retard",
+      "progress": "Avancement",
+      "project": "Projet",
+      "projectManagers": "PM",
+      "revenue": "Revenu",
+      "startDate": "Début"
+    },
+    "loadFailed": "Impossible d’ouvrir la vue des projets",
+    "noProjects": "Vous n’êtes ni PM ni validateur d’aucun projet ouvert.",
+    "noTasks": "Vos projets ne contiennent aucune tâche.",
+    "tabs": {
+      "projects": "Projets",
+      "tasks": "Tâches",
+      "timeline": "Chronologie"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Une catégorie ne peut pas être supprimée — désactivez celle que vous n’utilisez plus. Une catégorie désactivée ne peut pas être choisie pour un nouveau coût, mais les lignes existantes la conservent.",
       "title": "Catégories de coûts"
+    },
+    "deadlines": {
+      "hint": "Une tâche à faire, dont le travail n’a pas encore commencé, est signalée comme à risque lorsqu’il ne reste pas plus de jours que ce seuil avant son échéance (0–30 ; 0 signifie le jour même de l’échéance).",
+      "invalid": "Saisissez un nombre entier de 0 à 30.",
+      "saveFailed": "Impossible d’enregistrer le seuil",
+      "saved": "Seuil de risque enregistré",
+      "threshold": "Seuil de risque pour l’échéance (jours)",
+      "title": "Contrôle des échéances"
     },
     "dictionary": {
       "active": "actif",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Personnes",
+      "cost": "Coût",
       "endDate": "Fin",
       "number": "N°",
       "priority": "Priorité",
+      "project": "Projet",
       "startDate": "Début",
       "status": "Statut",
       "task": "Tâche",
+      "timeliness": "Ponctualité",
       "type": "Type"
     },
+    "emptyForFilters": "Aucune tâche ne correspond aux filtres.",
     "emptyMessage": "Ce projet ne contient pas encore de tâches.",
     "emptyTitle": "Aucune tâche",
+    "flatList": "Liste à plat",
     "parentTask": "Tâche parente",
     "subtask": "Sous-tâche"
   }

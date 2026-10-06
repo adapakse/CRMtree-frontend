@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "Zagrożone",
+    "key": "otwarte · po terminie · zagrożone",
+    "open": "Otwarte zadania",
+    "overdue": "Po terminie"
+  },
   "card": {
     "closeConfirm": "Zamknąć projekt? Zamknięty projekt jest tylko do odczytu i znika z domyślnej listy.",
     "closeProject": "Zamknij projekt",
     "closedBadge": "Zamknięty",
+    "datesHint": "Projekt jest oznaczany jako opóźniony, gdy niezakończone zadanie kończy się po terminie projektu albo termin projektu minął, a zostały niezakończone zadania.",
     "description": "Opis",
     "edit": "Edytuj",
+    "endDate": "Termin projektu",
     "errors": {
       "addMemberFailed": "Nie udało się dodać osoby",
       "changeAccessLevelFailed": "Nie udało się zmienić uprawnień",
       "changeRoleFailed": "Nie udało się zmienić roli",
       "closeProjectFailed": "Nie udało się zamknąć projektu",
+      "endBeforeStart": "Termin projektu nie może być wcześniejszy niż jego początek.",
       "removeMemberFailed": "Nie udało się usunąć osoby",
       "reopenProjectFailed": "Nie udało się otworzyć projektu",
       "saveFieldsFailed": "Nie udało się zapisać pól",
@@ -46,6 +55,7 @@
     "name": "Nazwa",
     "noDescription": "Brak opisu.",
     "reopenProject": "Otwórz ponownie",
+    "startDate": "Początek projektu",
     "title": "Karta projektu"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Wpisz nazwę leada lub partnera (min. 3 znaki)…",
     "title": "Powiązanie z CRM"
   },
+  "deadlines": {
+    "atRisk": "Zagrożone",
+    "atRiskHint": "Termin jest blisko, a prace jeszcze się nie zaczęły.",
+    "completedLate": "Zakończone po terminie",
+    "completedLateHint": "Zadanie zakończono po jego terminie.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "zagrożone (do zrobienia, termin w ciągu {days, plural, one {# dnia} few {# dni} many {# dni} other {# dnia}})",
+      "beyondProjectEnd": "po terminie projektu",
+      "completedLate": "zakończone po terminie",
+      "originalEndDate": "pierwotny termin",
+      "overdue": "po terminie",
+      "overdueSubtasks": "podzadania po terminie",
+      "projectEndDate": "termin projektu"
+    },
+    "originalEndDateHint": "Pierwotny termin i przesunięcie w dniach",
+    "overdue": "Po terminie",
+    "overdueDays": "Po terminie {days} d",
+    "overdueHint": "Termin minął, a zadanie nie jest zakończone.",
+    "overdueSubtasks": "Podzadania po terminie",
+    "overdueSubtasksHint": "Co najmniej jedno podzadanie jest po terminie.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Opóźniony",
+    "reasons": {
+      "endPassed": "Termin projektu minął {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} temu, otwarte zadania: {count}",
+      "taskAfterEnd": "Zadania kończące się po terminie projektu: {count} (najpóźniejsze o {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}})"
+    }
+  },
   "detail": {
     "backToProjects": "Projekty",
     "closedBadge": "Zamknięty",
@@ -91,6 +132,72 @@
       "timeline": "Oś czasu"
     },
     "tasksLoadFailed": "Nie udało się pobrać zadań"
+  },
+  "filters": {
+    "assignee": "Osoba",
+    "atRiskCount": "Zadania zagrożone",
+    "cost": "Koszt",
+    "delayReason": "Powód opóźnienia",
+    "delayReasonValues": {
+      "end_passed": "Termin projektu minął",
+      "task_after_end": "Zadanie kończy się po terminie projektu"
+    },
+    "delayed": "Opóźnienie",
+    "delayedValues": {
+      "no": "Bez opóźnienia",
+      "yes": "Opóźnione"
+    },
+    "endDate": "Koniec",
+    "manager": "PM",
+    "myRole": "Moja rola",
+    "myRoleValues": {
+      "controller": "Kontroler",
+      "participant": "Uczestnik",
+      "pm": "PM"
+    },
+    "name": "Nazwa zadania",
+    "number": "Numer",
+    "originalEndDate": "Pierwotny termin",
+    "overdueCount": "Zadania po terminie",
+    "priority": "Priorytet",
+    "progress": "Postęp (%)",
+    "project": "Projekt",
+    "projectCost": "Koszt poniesiony",
+    "projectEndDate": "Termin projektu",
+    "projectName": "Nazwa lub klucz projektu",
+    "projectRevenue": "Przychód",
+    "projectSort": {
+      "at_risk": "Zadania zagrożone",
+      "cost": "Koszt poniesiony",
+      "delay": "Opóźnienie",
+      "end_date": "Termin",
+      "key": "Klucz",
+      "name": "Nazwa",
+      "overdue": "Zadania po terminie",
+      "pm": "PM",
+      "progress": "Postęp",
+      "revenue": "Przychód",
+      "start_date": "Początek",
+      "status": "Status"
+    },
+    "projectStartDate": "Początek projektu",
+    "slip": "Przesunięcie (dni)",
+    "startDate": "Początek",
+    "status": "Status",
+    "statusCategory": "Etap",
+    "taskSort": {
+      "original_end_date": "Pierwotny termin",
+      "parent": "Zadanie nadrzędne",
+      "slip_days": "Przesunięcie"
+    },
+    "timeliness": "Terminowość",
+    "timelinessValues": {
+      "at_risk": "Zagrożone",
+      "on_time": "W terminie",
+      "overdue": "Po terminie"
+    },
+    "type": "Typ",
+    "unassigned": "Nieprzypisane"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Kończy się po terminie projektu",
     "emptyTitle": "Brak zadań",
+    "loadFailed": "Nie udało się pobrać osi czasu",
+    "originalEndDate": "Pierwotny termin: {date} ({slip})",
+    "projectEndDate": "Termin projektu: {date}",
     "taskColumn": "Zadanie",
     "today": "Dziś",
+    "truncated": "Oś czasu pokazuje pierwsze {limit} zadań. Zawęź filtry, aby zobaczyć pozostałe.",
     "undatedNote": "{count, plural, one {# zadanie bez dat nie ma paska na osi czasu.} few {# zadania bez dat nie mają paska na osi czasu.} many {# zadań bez dat nie ma paska na osi czasu.} other {# zadania bez dat nie ma paska na osi czasu.}}",
     "zoom": {
       "day": "Dni",
@@ -550,30 +662,27 @@
     "loadFailed": "Nie udało się pobrać projektów",
     "newProject": "Nowy projekt",
     "stats": {
+      "atRisk": "zagrożone",
+      "doneOfTotalHint": "Zadania zakończone / wszystkie",
       "members": "{count, plural, one {osoba} few {osoby} many {osób} other {osoby}}",
       "myOpenTasks": "{count, plural, one {moje otwarte} few {moje otwarte} many {moich otwartych} other {moich otwartych}}",
+      "overdue": "po terminie",
       "tasks": "{count, plural, one {zadanie} few {zadania} many {zadań} other {zadania}}"
     },
     "title": "Projekty",
     "views": {
       "myTasks": "Moje zadania",
+      "portfolio": "Przegląd projektów",
       "projects": "Projekty"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Termin",
-      "priority": "Priorytet",
-      "project": "Projekt",
-      "status": "Status",
-      "task": "Zadanie"
-    },
     "empty": {
       "description": "Nie masz otwartych zadań w żadnym projekcie.",
       "title": "Brak zadań"
     },
-    "loadFailed": "Nie udało się pobrać zadań",
-    "noDueDate": "bez terminu"
+    "includeDone": "Pokaż zakończone",
+    "loadFailed": "Nie udało się pobrać zadań"
   },
   "panel": {
     "chatTitle": "Rozmowa o zadaniu",
@@ -595,6 +704,11 @@
       "selectField": "— wybierz pole —",
       "title": "Pola dodatkowe"
     },
+    "endDateChange": {
+      "hint": "Opcjonalnie. PM zobaczy powód w e-mailu o zmianie terminu; zostanie też zapisany w historii zadania.",
+      "placeholder": "np. opóźniona dostawa od klienta",
+      "reason": "Powód zmiany terminu"
+    },
     "fields": {
       "assignees": "Przypisane osoby",
       "description": "Opis dodatkowy",
@@ -612,6 +726,7 @@
       "changedWithStatus": "zmienił(a): {fields} ({from} → {to})",
       "created": "utworzył(a) zadanie",
       "empty": "Brak wpisów.",
+      "endDateChangeReason": "Powód zmiany terminu: {reason}",
       "fields": {
         "assignees": "przypisane osoby",
         "customFields": "pola dodatkowe",
@@ -641,10 +756,40 @@
     "saved": "Zadanie zapisane",
     "saving": "Zapisywanie…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "Zagrożone",
+      "cost": "Koszt poniesiony",
+      "delay": "Opóźnienie",
+      "endDate": "Termin",
+      "overdue": "Po terminie",
+      "progress": "Postęp",
+      "project": "Projekt",
+      "projectManagers": "PM",
+      "revenue": "Przychód",
+      "startDate": "Początek"
+    },
+    "loadFailed": "Nie udało się otworzyć przeglądu projektów",
+    "noProjects": "Nie prowadzisz ani nie kontrolujesz żadnego otwartego projektu.",
+    "noTasks": "W Twoich projektach nie ma zadań.",
+    "tabs": {
+      "projects": "Projekty",
+      "tasks": "Zadania",
+      "timeline": "Oś czasu"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Kategorii nie można usunąć — nieużywaną wyłącz. Wyłączonej kategorii nie da się wybrać w nowym koszcie, a istniejące pozycje ją zachowują.",
       "title": "Kategorie kosztów"
+    },
+    "deadlines": {
+      "hint": "Zadanie, nad którym prace jeszcze się nie zaczęły, jest oznaczane jako zagrożone, gdy do jego terminu zostało nie więcej dni niż ten próg (0–30; 0 oznacza sam dzień terminu).",
+      "invalid": "Podaj liczbę całkowitą od 0 do 30.",
+      "saveFailed": "Nie udało się zapisać progu",
+      "saved": "Zapisano próg zagrożenia terminu",
+      "threshold": "Próg zagrożenia terminu (dni)",
+      "title": "Kontrola terminów"
     },
     "dictionary": {
       "active": "aktywny",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Osoby",
+      "cost": "Koszt",
       "endDate": "Koniec",
       "number": "Nr",
       "priority": "Priorytet",
+      "project": "Projekt",
       "startDate": "Początek",
       "status": "Status",
       "task": "Zadanie",
+      "timeliness": "Terminowość",
       "type": "Typ"
     },
+    "emptyForFilters": "Żadne zadanie nie pasuje do filtrów.",
     "emptyMessage": "W tym projekcie nie ma jeszcze zadań.",
     "emptyTitle": "Brak zadań",
+    "flatList": "Lista płaska",
     "parentTask": "Zadanie nadrzędne",
     "subtask": "Podzadanie"
   }

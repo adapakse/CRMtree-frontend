@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "En riesgo",
+    "key": "abiertas · vencidas · en riesgo",
+    "open": "Tareas abiertas",
+    "overdue": "Vencidas"
+  },
   "card": {
     "closeConfirm": "¿Cerrar el proyecto? Un proyecto cerrado es de solo lectura y desaparece de la lista predeterminada.",
     "closeProject": "Cerrar proyecto",
     "closedBadge": "Cerrado",
+    "datesHint": "El proyecto se marca como retrasado cuando una tarea sin finalizar termina después de la fecha límite del proyecto, o cuando esa fecha ya ha pasado y quedan tareas sin finalizar.",
     "description": "Descripción",
     "edit": "Editar",
+    "endDate": "Fecha límite del proyecto",
     "errors": {
       "addMemberFailed": "No se pudo añadir a la persona",
       "changeAccessLevelFailed": "No se pudieron cambiar los permisos",
       "changeRoleFailed": "No se pudo cambiar el rol",
       "closeProjectFailed": "No se pudo cerrar el proyecto",
+      "endBeforeStart": "La fecha límite del proyecto no puede ser anterior a su inicio.",
       "removeMemberFailed": "No se pudo quitar a la persona",
       "reopenProjectFailed": "No se pudo reabrir el proyecto",
       "saveFieldsFailed": "No se pudieron guardar los campos",
@@ -46,6 +55,7 @@
     "name": "Nombre",
     "noDescription": "Sin descripción.",
     "reopenProject": "Reabrir",
+    "startDate": "Inicio del proyecto",
     "title": "Ficha del proyecto"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Escribe el nombre del lead o del partner (mín. 3 caracteres)…",
     "title": "Vínculo con el CRM"
   },
+  "deadlines": {
+    "atRisk": "En riesgo",
+    "atRiskHint": "La fecha límite está cerca y el trabajo aún no ha empezado.",
+    "completedLate": "Finalizada tarde",
+    "completedLateHint": "La tarea se finalizó después de su fecha límite.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "en riesgo (por hacer, fecha límite dentro de {days, plural, one {# día} other {# días}})",
+      "beyondProjectEnd": "después de la fecha límite del proyecto",
+      "completedLate": "finalizada tarde",
+      "originalEndDate": "fecha límite original",
+      "overdue": "vencida",
+      "overdueSubtasks": "subtareas vencidas",
+      "projectEndDate": "fecha límite del proyecto"
+    },
+    "originalEndDateHint": "Fecha límite original y desplazamiento en días",
+    "overdue": "Vencida",
+    "overdueDays": "Vencida {days} d",
+    "overdueHint": "La fecha límite ha pasado y la tarea no está finalizada.",
+    "overdueSubtasks": "Subtareas vencidas",
+    "overdueSubtasksHint": "Al menos una subtarea está vencida.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Retrasado",
+    "reasons": {
+      "endPassed": "La fecha límite del proyecto pasó hace {days, plural, one {# día} other {# días}}, tareas abiertas: {count}",
+      "taskAfterEnd": "Tareas que terminan después de la fecha límite del proyecto: {count} (la más tardía, {days, plural, one {# día} other {# días}} después)"
+    }
+  },
   "detail": {
     "backToProjects": "Proyectos",
     "closedBadge": "Cerrado",
@@ -91,6 +132,72 @@
       "timeline": "Cronograma"
     },
     "tasksLoadFailed": "No se pudieron cargar las tareas"
+  },
+  "filters": {
+    "assignee": "Persona",
+    "atRiskCount": "Tareas en riesgo",
+    "cost": "Coste",
+    "delayReason": "Motivo del retraso",
+    "delayReasonValues": {
+      "end_passed": "La fecha límite del proyecto ha pasado",
+      "task_after_end": "Una tarea termina después de la fecha límite del proyecto"
+    },
+    "delayed": "Retraso",
+    "delayedValues": {
+      "no": "Sin retraso",
+      "yes": "Retrasados"
+    },
+    "endDate": "Fin",
+    "manager": "PM",
+    "myRole": "Mi rol",
+    "myRoleValues": {
+      "controller": "Revisor",
+      "participant": "Participante",
+      "pm": "PM"
+    },
+    "name": "Nombre de la tarea",
+    "number": "Número",
+    "originalEndDate": "Fecha límite original",
+    "overdueCount": "Tareas vencidas",
+    "priority": "Prioridad",
+    "progress": "Progreso (%)",
+    "project": "Proyecto",
+    "projectCost": "Coste incurrido",
+    "projectEndDate": "Fecha límite del proyecto",
+    "projectName": "Nombre o clave del proyecto",
+    "projectRevenue": "Ingresos",
+    "projectSort": {
+      "at_risk": "Tareas en riesgo",
+      "cost": "Coste incurrido",
+      "delay": "Retraso",
+      "end_date": "Fecha límite",
+      "key": "Clave",
+      "name": "Nombre",
+      "overdue": "Tareas vencidas",
+      "pm": "PM",
+      "progress": "Progreso",
+      "revenue": "Ingresos",
+      "start_date": "Inicio",
+      "status": "Estado"
+    },
+    "projectStartDate": "Inicio del proyecto",
+    "slip": "Desplazamiento (días)",
+    "startDate": "Inicio",
+    "status": "Estado",
+    "statusCategory": "Etapa",
+    "taskSort": {
+      "original_end_date": "Fecha límite original",
+      "parent": "Tarea principal",
+      "slip_days": "Desplazamiento"
+    },
+    "timeliness": "Puntualidad",
+    "timelinessValues": {
+      "at_risk": "En riesgo",
+      "on_time": "En plazo",
+      "overdue": "Vencidas"
+    },
+    "type": "Tipo",
+    "unassigned": "Sin asignar"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Termina después de la fecha límite del proyecto",
     "emptyTitle": "Sin tareas",
+    "loadFailed": "No se pudo cargar el cronograma",
+    "originalEndDate": "Fecha límite original: {date} ({slip})",
+    "projectEndDate": "Fecha límite del proyecto: {date}",
     "taskColumn": "Tarea",
     "today": "Hoy",
+    "truncated": "El cronograma muestra las primeras {limit} tareas. Acota los filtros para ver las demás.",
     "undatedNote": "{count, plural, one {# tarea sin fechas no tiene barra en el cronograma.} other {# tareas sin fechas no tienen barra en el cronograma.}}",
     "zoom": {
       "day": "Días",
@@ -550,30 +662,27 @@
     "loadFailed": "No se pudieron cargar los proyectos",
     "newProject": "Nuevo proyecto",
     "stats": {
+      "atRisk": "en riesgo",
+      "doneOfTotalHint": "Tareas finalizadas / todas",
       "members": "{count, plural, one {persona} other {personas}}",
       "myOpenTasks": "{count, plural, one {abierta mía} other {abiertas mías}}",
+      "overdue": "vencidas",
       "tasks": "{count, plural, one {tarea} other {tareas}}"
     },
     "title": "Proyectos",
     "views": {
       "myTasks": "Mis tareas",
+      "portfolio": "Resumen de proyectos",
       "projects": "Proyectos"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Fecha límite",
-      "priority": "Prioridad",
-      "project": "Proyecto",
-      "status": "Estado",
-      "task": "Tarea"
-    },
     "empty": {
       "description": "No tienes tareas abiertas en ningún proyecto.",
       "title": "Sin tareas"
     },
-    "loadFailed": "No se pudieron cargar las tareas",
-    "noDueDate": "sin fecha límite"
+    "includeDone": "Mostrar finalizadas",
+    "loadFailed": "No se pudieron cargar las tareas"
   },
   "panel": {
     "chatTitle": "Conversación sobre la tarea",
@@ -595,6 +704,11 @@
       "selectField": "— elige un campo —",
       "title": "Campos adicionales"
     },
+    "endDateChange": {
+      "hint": "Opcional. El PM verá el motivo en el correo sobre el cambio de fecha límite; también se guardará en el historial de la tarea.",
+      "placeholder": "p. ej., entrega retrasada del cliente",
+      "reason": "Motivo del cambio de fecha límite"
+    },
     "fields": {
       "assignees": "Personas asignadas",
       "description": "Descripción adicional",
@@ -612,6 +726,7 @@
       "changedWithStatus": "ha cambiado: {fields} ({from} → {to})",
       "created": "ha creado la tarea",
       "empty": "No hay entradas.",
+      "endDateChangeReason": "Motivo del cambio de fecha límite: {reason}",
       "fields": {
         "assignees": "personas asignadas",
         "customFields": "campos adicionales",
@@ -641,10 +756,40 @@
     "saved": "Tarea guardada",
     "saving": "Guardando…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "En riesgo",
+      "cost": "Coste incurrido",
+      "delay": "Retraso",
+      "endDate": "Fecha límite",
+      "overdue": "Vencidas",
+      "progress": "Progreso",
+      "project": "Proyecto",
+      "projectManagers": "PM",
+      "revenue": "Ingresos",
+      "startDate": "Inicio"
+    },
+    "loadFailed": "No se pudo abrir el resumen de proyectos",
+    "noProjects": "No diriges ni revisas ningún proyecto abierto.",
+    "noTasks": "No hay tareas en tus proyectos.",
+    "tabs": {
+      "projects": "Proyectos",
+      "tasks": "Tareas",
+      "timeline": "Cronograma"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Las categorías no se pueden eliminar: desactiva la que no uses. Una categoría desactivada no se puede elegir en un coste nuevo, y las partidas existentes la conservan.",
       "title": "Categorías de costes"
+    },
+    "deadlines": {
+      "hint": "Una tarea cuyo trabajo aún no ha empezado se marca como en riesgo cuando faltan para su fecha límite como máximo los días de este umbral (0–30; 0 significa el propio día de la fecha límite).",
+      "invalid": "Introduce un número entero de 0 a 30.",
+      "saveFailed": "No se pudo guardar el umbral",
+      "saved": "Umbral de riesgo de plazo guardado",
+      "threshold": "Umbral de riesgo de plazo (días)",
+      "title": "Control de plazos"
     },
     "dictionary": {
       "active": "activo",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Personas",
+      "cost": "Coste",
       "endDate": "Fin",
       "number": "N.º",
       "priority": "Prioridad",
+      "project": "Proyecto",
       "startDate": "Inicio",
       "status": "Estado",
       "task": "Tarea",
+      "timeliness": "Puntualidad",
       "type": "Tipo"
     },
+    "emptyForFilters": "Ninguna tarea coincide con los filtros.",
     "emptyMessage": "Este proyecto aún no tiene tareas.",
     "emptyTitle": "Sin tareas",
+    "flatList": "Lista plana",
     "parentTask": "Tarea principal",
     "subtask": "Subtarea"
   }

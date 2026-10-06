@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "La risc",
+    "key": "deschise · termen depășit · la risc",
+    "open": "Sarcini deschise",
+    "overdue": "Termen depășit"
+  },
   "card": {
     "closeConfirm": "Închideți proiectul? Un proiect închis poate fi doar citit și dispare din lista implicită.",
     "closeProject": "Închidere proiect",
     "closedBadge": "Închis",
+    "datesHint": "Proiectul este marcat ca întârziat atunci când o sarcină nefinalizată se încheie după termenul proiectului sau când termenul proiectului a trecut și au rămas sarcini nefinalizate.",
     "description": "Descriere",
     "edit": "Editare",
+    "endDate": "Termenul proiectului",
     "errors": {
       "addMemberFailed": "Persoana nu a putut fi adăugată",
       "changeAccessLevelFailed": "Permisiunile nu au putut fi modificate",
       "changeRoleFailed": "Rolul nu a putut fi modificat",
       "closeProjectFailed": "Proiectul nu a putut fi închis",
+      "endBeforeStart": "Termenul proiectului nu poate fi anterior începutului său.",
       "removeMemberFailed": "Persoana nu a putut fi eliminată",
       "reopenProjectFailed": "Proiectul nu a putut fi redeschis",
       "saveFieldsFailed": "Câmpurile nu au putut fi salvate",
@@ -46,6 +55,7 @@
     "name": "Denumire",
     "noDescription": "Fără descriere.",
     "reopenProject": "Redeschidere",
+    "startDate": "Începutul proiectului",
     "title": "Fișa proiectului"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Introduceți numele leadului sau al partenerului (min. 3 caractere)…",
     "title": "Asociere cu CRM"
   },
+  "deadlines": {
+    "atRisk": "La risc",
+    "atRiskHint": "Termenul este aproape, iar lucrul nu a început încă.",
+    "completedLate": "Finalizată după termen",
+    "completedLateHint": "Sarcina a fost finalizată după termenul ei.",
+    "daysShort": "{days} z",
+    "legend": {
+      "atRisk": "la risc (de făcut, termen în cel mult {days, plural, one {# zi} few {# zile} other {# de zile}})",
+      "beyondProjectEnd": "după termenul proiectului",
+      "completedLate": "finalizate după termen",
+      "originalEndDate": "termen inițial",
+      "overdue": "termen depășit",
+      "overdueSubtasks": "subsarcini cu termen depășit",
+      "projectEndDate": "termenul proiectului"
+    },
+    "originalEndDateHint": "Termenul inițial și decalarea în zile",
+    "overdue": "Termen depășit",
+    "overdueDays": "Depășit cu {days} z",
+    "overdueHint": "Termenul a trecut, iar sarcina nu este finalizată.",
+    "overdueSubtasks": "Subsarcini cu termen depășit",
+    "overdueSubtasksHint": "Cel puțin o subsarcină are termenul depășit.",
+    "slipEarlier": "−{days} z",
+    "slipLater": "+{days} z"
+  },
+  "delay": {
+    "badge": "Întârziat",
+    "reasons": {
+      "endPassed": "Termenul proiectului a trecut acum {days, plural, one {# zi} few {# zile} other {# de zile}}, sarcini deschise: {count}",
+      "taskAfterEnd": "Sarcini care se încheie după termenul proiectului: {count} (cea mai târzie cu {days, plural, one {# zi} few {# zile} other {# de zile}})"
+    }
+  },
   "detail": {
     "backToProjects": "Proiecte",
     "closedBadge": "Închis",
@@ -91,6 +132,72 @@
       "timeline": "Cronologie"
     },
     "tasksLoadFailed": "Sarcinile nu au putut fi încărcate"
+  },
+  "filters": {
+    "assignee": "Persoană",
+    "atRiskCount": "Sarcini la risc",
+    "cost": "Cost",
+    "delayReason": "Motivul întârzierii",
+    "delayReasonValues": {
+      "end_passed": "Termenul proiectului a trecut",
+      "task_after_end": "O sarcină se încheie după termenul proiectului"
+    },
+    "delayed": "Întârziere",
+    "delayedValues": {
+      "no": "Fără întârziere",
+      "yes": "Întârziate"
+    },
+    "endDate": "Sfârșit",
+    "manager": "PM",
+    "myRole": "Rolul meu",
+    "myRoleValues": {
+      "controller": "Verificator",
+      "participant": "Participant",
+      "pm": "PM"
+    },
+    "name": "Denumirea sarcinii",
+    "number": "Număr",
+    "originalEndDate": "Termen inițial",
+    "overdueCount": "Sarcini cu termen depășit",
+    "priority": "Prioritate",
+    "progress": "Progres (%)",
+    "project": "Proiect",
+    "projectCost": "Cost suportat",
+    "projectEndDate": "Termenul proiectului",
+    "projectName": "Denumirea sau cheia proiectului",
+    "projectRevenue": "Venit",
+    "projectSort": {
+      "at_risk": "Sarcini la risc",
+      "cost": "Cost suportat",
+      "delay": "Întârziere",
+      "end_date": "Termen",
+      "key": "Cheie",
+      "name": "Denumire",
+      "overdue": "Sarcini cu termen depășit",
+      "pm": "PM",
+      "progress": "Progres",
+      "revenue": "Venit",
+      "start_date": "Început",
+      "status": "Status"
+    },
+    "projectStartDate": "Începutul proiectului",
+    "slip": "Decalare (zile)",
+    "startDate": "Început",
+    "status": "Status",
+    "statusCategory": "Etapă",
+    "taskSort": {
+      "original_end_date": "Termen inițial",
+      "parent": "Sarcină principală",
+      "slip_days": "Decalare"
+    },
+    "timeliness": "Punctualitate",
+    "timelinessValues": {
+      "at_risk": "La risc",
+      "on_time": "În termen",
+      "overdue": "Termen depășit"
+    },
+    "type": "Tip",
+    "unassigned": "Neatribuite"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Se încheie după termenul proiectului",
     "emptyTitle": "Nicio sarcină",
+    "loadFailed": "Cronologia nu a putut fi încărcată",
+    "originalEndDate": "Termen inițial: {date} ({slip})",
+    "projectEndDate": "Termenul proiectului: {date}",
     "taskColumn": "Sarcină",
     "today": "Azi",
+    "truncated": "Cronologia afișează doar primele sarcini (maximum {limit}). Restrângeți filtrele pentru a le vedea pe celelalte.",
     "undatedNote": "{count, plural, one {# sarcină fără date nu are bară pe cronologie.} few {# sarcini fără date nu au bară pe cronologie.} other {# de sarcini fără date nu au bară pe cronologie.}}",
     "zoom": {
       "day": "Zile",
@@ -550,30 +662,27 @@
     "loadFailed": "Proiectele nu au putut fi încărcate",
     "newProject": "Proiect nou",
     "stats": {
+      "atRisk": "la risc",
+      "doneOfTotalHint": "Sarcini finalizate / toate",
       "members": "{count, plural, one {persoană} few {persoane} other {de persoane}}",
       "myOpenTasks": "{count, plural, one {a mea deschisă} few {ale mele deschise} other {ale mele deschise}}",
+      "overdue": "cu termen depășit",
       "tasks": "{count, plural, one {sarcină} few {sarcini} other {de sarcini}}"
     },
     "title": "Proiecte",
     "views": {
       "myTasks": "Sarcinile mele",
+      "portfolio": "Prezentare proiecte",
       "projects": "Proiecte"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Termen",
-      "priority": "Prioritate",
-      "project": "Proiect",
-      "status": "Status",
-      "task": "Sarcină"
-    },
     "empty": {
       "description": "Nu aveți sarcini deschise în niciun proiect.",
       "title": "Nicio sarcină"
     },
-    "loadFailed": "Sarcinile nu au putut fi încărcate",
-    "noDueDate": "fără termen"
+    "includeDone": "Afișează finalizatele",
+    "loadFailed": "Sarcinile nu au putut fi încărcate"
   },
   "panel": {
     "chatTitle": "Discuție despre sarcină",
@@ -595,6 +704,11 @@
       "selectField": "— selectați câmpul —",
       "title": "Câmpuri suplimentare"
     },
+    "endDateChange": {
+      "hint": "Opțional. PM va vedea motivul în e-mailul despre modificarea termenului; acesta va fi salvat și în istoricul sarcinii.",
+      "placeholder": "de ex. livrare întârziată din partea clientului",
+      "reason": "Motivul modificării termenului"
+    },
     "fields": {
       "assignees": "Persoane atribuite",
       "description": "Descriere suplimentară",
@@ -612,6 +726,7 @@
       "changedWithStatus": "a modificat: {fields} ({from} → {to})",
       "created": "a creat sarcina",
       "empty": "Nicio înregistrare.",
+      "endDateChangeReason": "Motivul modificării termenului: {reason}",
       "fields": {
         "assignees": "persoane atribuite",
         "customFields": "câmpuri suplimentare",
@@ -641,10 +756,40 @@
     "saved": "Sarcină salvată",
     "saving": "Se salvează…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "La risc",
+      "cost": "Cost suportat",
+      "delay": "Întârziere",
+      "endDate": "Termen",
+      "overdue": "Termen depășit",
+      "progress": "Progres",
+      "project": "Proiect",
+      "projectManagers": "PM",
+      "revenue": "Venit",
+      "startDate": "Început"
+    },
+    "loadFailed": "Prezentarea proiectelor nu a putut fi deschisă",
+    "noProjects": "Nu sunteți PM sau verificator în niciun proiect deschis.",
+    "noTasks": "Nu există sarcini în proiectele dvs.",
+    "tabs": {
+      "projects": "Proiecte",
+      "tasks": "Sarcini",
+      "timeline": "Cronologie"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "O categorie nu poate fi ștearsă — dezactivați-o pe cea nefolosită. O categorie dezactivată nu poate fi selectată într-un cost nou, iar pozițiile existente o păstrează.",
       "title": "Categorii de costuri"
+    },
+    "deadlines": {
+      "hint": "O sarcină la care lucrul nu a început încă este marcată ca fiind la risc atunci când până la termenul ei au rămas cel mult atâtea zile cât indică acest prag (0–30; 0 înseamnă chiar ziua termenului).",
+      "invalid": "Introduceți un număr întreg de la 0 la 30.",
+      "saveFailed": "Pragul nu a putut fi salvat",
+      "saved": "Pragul de risc al termenului a fost salvat",
+      "threshold": "Prag de risc al termenului (zile)",
+      "title": "Controlul termenelor"
     },
     "dictionary": {
       "active": "activ",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Persoane",
+      "cost": "Cost",
       "endDate": "Sfârșit",
       "number": "Nr.",
       "priority": "Prioritate",
+      "project": "Proiect",
       "startDate": "Început",
       "status": "Status",
       "task": "Sarcină",
+      "timeliness": "Punctualitate",
       "type": "Tip"
     },
+    "emptyForFilters": "Nicio sarcină nu corespunde filtrelor.",
     "emptyMessage": "Acest proiect nu are încă sarcini.",
     "emptyTitle": "Nicio sarcină",
+    "flatList": "Listă plată",
     "parentTask": "Sarcină principală",
     "subtask": "Subsarcină"
   }

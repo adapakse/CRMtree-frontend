@@ -18,6 +18,26 @@
     "tenantTitle": "Idioma predeterminado de la organización",
     "title": "Idioma de la interfaz"
   },
+  "list": {
+    "activeFilters": "{count, plural, one {# filtro activo} other {# filtros activos}}",
+    "anyValue": "Todos",
+    "ascending": "Ascendente",
+    "clearFilter": "Borrar",
+    "clearFilters": "Borrar filtros",
+    "defaultSort": "Predeterminado",
+    "descending": "Descendente",
+    "filterBy": "Filtrar: {name}",
+    "from": "desde",
+    "noOptions": "No hay elementos para elegir.",
+    "pager": {
+      "next": "Página siguiente",
+      "previous": "Página anterior",
+      "range": "{from}–{to} de {total}"
+    },
+    "sort": "Orden",
+    "sortBy": "Ordenar: {name}",
+    "to": "hasta"
+  },
   "states": {
     "loading": "Cargando…"
   },

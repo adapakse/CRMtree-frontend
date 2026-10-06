@@ -40,6 +40,12 @@
       "tokenSaved": "Token salvato",
       "tokenSavedWithPhone": "Token salvato — numero: {phone}"
     },
+    "projectDeadlines": {
+      "hint": "Comprende: il riepilogo giornaliero delle attività scadute, le modifiche alle scadenze delle attività e i progetti che sono andati in ritardo.",
+      "saveFailed": "Impossibile modificare l'impostazione delle notifiche",
+      "title": "Notifiche sulle scadenze dei progetti",
+      "toggle": "E-mail sulle scadenze nei progetti"
+    },
     "saveFailed": "Errore di salvataggio — riprova",
     "saving": "Salvataggio…",
     "signature": {

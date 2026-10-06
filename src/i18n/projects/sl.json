@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "Ogrožene",
+    "key": "odprte · po roku · ogrožene",
+    "open": "Odprte naloge",
+    "overdue": "Po roku"
+  },
   "card": {
     "closeConfirm": "Želite zapreti projekt? Zaprt projekt je samo za branje in izgine s privzetega seznama.",
     "closeProject": "Zapri projekt",
     "closedBadge": "Zaprt",
+    "datesHint": "Projekt je označen kot v zamudi, ko se nedokončana naloga konča po roku projekta ali ko je rok projekta potekel, nedokončane naloge pa so ostale.",
     "description": "Opis",
     "edit": "Uredi",
+    "endDate": "Rok projekta",
     "errors": {
       "addMemberFailed": "Osebe ni bilo mogoče dodati",
       "changeAccessLevelFailed": "Pravic ni bilo mogoče spremeniti",
       "changeRoleFailed": "Vloge ni bilo mogoče spremeniti",
       "closeProjectFailed": "Projekta ni bilo mogoče zapreti",
+      "endBeforeStart": "Rok projekta ne sme biti pred njegovim začetkom.",
       "removeMemberFailed": "Osebe ni bilo mogoče odstraniti",
       "reopenProjectFailed": "Projekta ni bilo mogoče odpreti",
       "saveFieldsFailed": "Polj ni bilo mogoče shraniti",
@@ -46,6 +55,7 @@
     "name": "Naziv",
     "noDescription": "Ni opisa.",
     "reopenProject": "Znova odpri",
+    "startDate": "Začetek projekta",
     "title": "Kartica projekta"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Vnesite naziv leada ali partnerja (najmanj 3 znaki)…",
     "title": "Povezava s CRM"
   },
+  "deadlines": {
+    "atRisk": "Ogroženo",
+    "atRiskHint": "Rok je blizu, delo pa se še ni začelo.",
+    "completedLate": "Končano po roku",
+    "completedLateHint": "Naloga je bila končana po svojem roku.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "ogroženo (za opraviti, rok v {days, plural, one {# dnevu} two {# dneh} few {# dneh} other {# dneh}})",
+      "beyondProjectEnd": "po roku projekta",
+      "completedLate": "končano po roku",
+      "originalEndDate": "prvotni rok",
+      "overdue": "po roku",
+      "overdueSubtasks": "podnaloge po roku",
+      "projectEndDate": "rok projekta"
+    },
+    "originalEndDateHint": "Prvotni rok in zamik v dnevih",
+    "overdue": "Po roku",
+    "overdueDays": "Po roku {days} d",
+    "overdueHint": "Rok je potekel, naloga pa ni končana.",
+    "overdueSubtasks": "Podnaloge po roku",
+    "overdueSubtasksHint": "Vsaj ena podnaloga je po roku.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "V zamudi",
+    "reasons": {
+      "endPassed": "Rok projekta je potekel pred {days, plural, one {# dnem} two {# dnevoma} few {# dnevi} other {# dnevi}}, odprte naloge: {count}",
+      "taskAfterEnd": "Naloge, ki se končajo po roku projekta: {count} (najpoznejša za {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}})"
+    }
+  },
   "detail": {
     "backToProjects": "Projekti",
     "closedBadge": "Zaprt",
@@ -91,6 +132,72 @@
       "timeline": "Časovnica"
     },
     "tasksLoadFailed": "Nalog ni bilo mogoče naložiti"
+  },
+  "filters": {
+    "assignee": "Oseba",
+    "atRiskCount": "Ogrožene naloge",
+    "cost": "Strošek",
+    "delayReason": "Razlog zamude",
+    "delayReasonValues": {
+      "end_passed": "Rok projekta je potekel",
+      "task_after_end": "Naloga se konča po roku projekta"
+    },
+    "delayed": "Zamuda",
+    "delayedValues": {
+      "no": "Brez zamude",
+      "yes": "V zamudi"
+    },
+    "endDate": "Konec",
+    "manager": "PM",
+    "myRole": "Moja vloga",
+    "myRoleValues": {
+      "controller": "Pregledovalec",
+      "participant": "Udeleženec",
+      "pm": "PM"
+    },
+    "name": "Naziv naloge",
+    "number": "Številka",
+    "originalEndDate": "Prvotni rok",
+    "overdueCount": "Naloge po roku",
+    "priority": "Prioriteta",
+    "progress": "Napredek (%)",
+    "project": "Projekt",
+    "projectCost": "Nastali stroški",
+    "projectEndDate": "Rok projekta",
+    "projectName": "Naziv ali ključ projekta",
+    "projectRevenue": "Prihodek",
+    "projectSort": {
+      "at_risk": "Ogrožene naloge",
+      "cost": "Nastali stroški",
+      "delay": "Zamuda",
+      "end_date": "Rok",
+      "key": "Ključ",
+      "name": "Naziv",
+      "overdue": "Naloge po roku",
+      "pm": "PM",
+      "progress": "Napredek",
+      "revenue": "Prihodek",
+      "start_date": "Začetek",
+      "status": "Status"
+    },
+    "projectStartDate": "Začetek projekta",
+    "slip": "Zamik (dni)",
+    "startDate": "Začetek",
+    "status": "Status",
+    "statusCategory": "Faza",
+    "taskSort": {
+      "original_end_date": "Prvotni rok",
+      "parent": "Nadrejena naloga",
+      "slip_days": "Zamik"
+    },
+    "timeliness": "Pravočasnost",
+    "timelinessValues": {
+      "at_risk": "Ogroženo",
+      "on_time": "Pravočasno",
+      "overdue": "Po roku"
+    },
+    "type": "Vrsta",
+    "unassigned": "Nedodeljene"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Konča se po roku projekta",
     "emptyTitle": "Ni nalog",
+    "loadFailed": "Časovnice ni bilo mogoče naložiti",
+    "originalEndDate": "Prvotni rok: {date} ({slip})",
+    "projectEndDate": "Rok projekta: {date}",
     "taskColumn": "Naloga",
     "today": "Danes",
+    "truncated": "Časovnica prikazuje prvih {limit} nalog. Zožite filtre, da vidite preostale.",
     "undatedNote": "{count, plural, one {# naloga brez datumov nima traku na časovnici.} two {# nalogi brez datumov nimata traku na časovnici.} few {# naloge brez datumov nimajo traku na časovnici.} other {# nalog brez datumov nima traku na časovnici.}}",
     "zoom": {
       "day": "Dnevi",
@@ -550,30 +662,27 @@
     "loadFailed": "Projektov ni bilo mogoče naložiti",
     "newProject": "Nov projekt",
     "stats": {
+      "atRisk": "ogrožene",
+      "doneOfTotalHint": "Končane naloge / vse",
       "members": "{count, plural, one {oseba} two {osebi} few {osebe} other {oseb}}",
       "myOpenTasks": "{count, plural, one {moja odprta} two {moji odprti} few {moje odprte} other {mojih odprtih}}",
+      "overdue": "po roku",
       "tasks": "{count, plural, one {naloga} two {nalogi} few {naloge} other {nalog}}"
     },
     "title": "Projekti",
     "views": {
       "myTasks": "Moje naloge",
+      "portfolio": "Pregled projektov",
       "projects": "Projekti"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Rok",
-      "priority": "Prioriteta",
-      "project": "Projekt",
-      "status": "Status",
-      "task": "Naloga"
-    },
     "empty": {
       "description": "V nobenem projektu nimate odprtih nalog.",
       "title": "Ni nalog"
     },
-    "loadFailed": "Nalog ni bilo mogoče naložiti",
-    "noDueDate": "brez roka"
+    "includeDone": "Pokaži končane",
+    "loadFailed": "Nalog ni bilo mogoče naložiti"
   },
   "panel": {
     "chatTitle": "Pogovor o nalogi",
@@ -595,6 +704,11 @@
       "selectField": "— izberite polje —",
       "title": "Dodatna polja"
     },
+    "endDateChange": {
+      "hint": "Neobvezno. PM bo razlog videl v e-pošti o spremembi roka; shranjen bo tudi v zgodovini naloge.",
+      "placeholder": "npr. zamuda pri dobavi s strani stranke",
+      "reason": "Razlog za spremembo roka"
+    },
     "fields": {
       "assignees": "Dodeljene osebe",
       "description": "Dodatni opis",
@@ -612,6 +726,7 @@
       "changedWithStatus": "je spremenil(a): {fields} ({from} → {to})",
       "created": "je ustvaril(a) nalogo",
       "empty": "Ni vnosov.",
+      "endDateChangeReason": "Razlog za spremembo roka: {reason}",
       "fields": {
         "assignees": "dodeljene osebe",
         "customFields": "dodatna polja",
@@ -641,10 +756,40 @@
     "saved": "Naloga shranjena",
     "saving": "Shranjevanje…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "Ogrožene",
+      "cost": "Nastali stroški",
+      "delay": "Zamuda",
+      "endDate": "Rok",
+      "overdue": "Po roku",
+      "progress": "Napredek",
+      "project": "Projekt",
+      "projectManagers": "PM",
+      "revenue": "Prihodek",
+      "startDate": "Začetek"
+    },
+    "loadFailed": "Pregleda projektov ni bilo mogoče odpreti",
+    "noProjects": "Ne vodite in ne pregledujete nobenega odprtega projekta.",
+    "noTasks": "V vaših projektih ni nalog.",
+    "tabs": {
+      "projects": "Projekti",
+      "tasks": "Naloge",
+      "timeline": "Časovnica"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Kategorije ni mogoče izbrisati — neuporabljeno izklopite. Izklopljene kategorije ni mogoče izbrati pri novem strošku, obstoječe postavke pa jo ohranijo.",
       "title": "Kategorije stroškov"
+    },
+    "deadlines": {
+      "hint": "Naloga, na kateri se delo še ni začelo, je označena kot ogrožena, ko do njenega roka ostane največ toliko dni, kolikor znaša ta prag (0–30; 0 pomeni sam dan roka).",
+      "invalid": "Vnesite celo število od 0 do 30.",
+      "saveFailed": "Praga ni bilo mogoče shraniti",
+      "saved": "Prag ogroženosti roka je shranjen",
+      "threshold": "Prag ogroženosti roka (dni)",
+      "title": "Nadzor rokov"
     },
     "dictionary": {
       "active": "aktivno",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Osebe",
+      "cost": "Strošek",
       "endDate": "Konec",
       "number": "Št.",
       "priority": "Prioriteta",
+      "project": "Projekt",
       "startDate": "Začetek",
       "status": "Status",
       "task": "Naloga",
+      "timeliness": "Pravočasnost",
       "type": "Vrsta"
     },
+    "emptyForFilters": "Nobena naloga ne ustreza filtrom.",
     "emptyMessage": "V tem projektu še ni nalog.",
     "emptyTitle": "Ni nalog",
+    "flatList": "Ploski seznam",
     "parentTask": "Nadrejena naloga",
     "subtask": "Podnaloga"
   }

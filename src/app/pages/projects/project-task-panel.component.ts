@@ -9,6 +9,8 @@ import {
   ProjectTaskDetail, ProjectTaskHistoryEntry, ProjectTaskPayload, ProjectTaskPermissions, ProjectsApiService,
 } from '../../core/services/projects-api.service';
 import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
+import { ProjectTaskDueDateComponent } from '../../shared/components/project-deadlines/project-task-due-date.component';
+import { ProjectTaskTimelinessComponent } from '../../shared/components/project-deadlines/project-task-timeliness.component';
 import { projectTaskCalendarEntry } from '../../shared/utils/calendar-export.util';
 import { ProjectChatComponent } from './project-chat.component';
 import { ProjectTaskCostsComponent } from './project-task-costs.component';
@@ -70,6 +72,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
   standalone: true,
   imports: [
     FormsModule, DatePipe, ProjectChatComponent, ProjectTaskCostsComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe,
+    ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -81,6 +84,15 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
             <div>
               <div class="mono">{{ taskLabel() }}</div>
               <div class="mot">{{ isCreating() ? t('panel.newTask') : form.name }}</div>
+              @if (savedTask(); as saved) {
+                <div class="deadline">
+                  <wt-project-task-timeliness [task]="saved" />
+                  @if (saved.end_date) {
+                    <span class="deadline-label">{{ t('panel.fields.endDate') }}</span>
+                    <wt-project-task-due-date class="inline" [task]="saved" />
+                  }
+                </div>
+              }
             </div>
             <button class="mox" (click)="closed.emit()">✕</button>
           </header>
@@ -140,6 +152,14 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                   <label class="fl">{{ t('panel.fields.endDate') }}</label>
                   <input class="fi" type="date" [(ngModel)]="form.end_date" [disabled]="!permissions().can_edit_content">
                 </div>
+                @if (isEndDateChanged()) {
+                  <div class="fg full">
+                    <label class="fl">{{ t('panel.endDateChange.reason') }}</label>
+                    <input class="fi" [(ngModel)]="endDateChangeReason" maxlength="500"
+                           [placeholder]="t('panel.endDateChange.placeholder')">
+                    <span class="field-hint">{{ t('panel.endDateChange.hint') }}</span>
+                  </div>
+                }
               </div>
 
               <div class="fgrid">
@@ -259,6 +279,9 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
                         <span class="muted">{{ entry.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
                         <strong>{{ entry.user_name ?? t('panel.history.systemUser') }}</strong>
                         {{ describeHistoryEntry(entry) }}
+                        @if (entry.end_date_change_reason; as reason) {
+                          <div class="history-reason">{{ t('panel.history.endDateChangeReason', { reason }) }}</div>
+                        }
                       </li>
                     } @empty {
                       <li class="muted">{{ t('panel.history.empty') }}</li>
@@ -290,6 +313,9 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
     .panel-head { display:flex; align-items:flex-start; gap:12px; padding:18px 24px 14px; border-bottom:1px solid var(--gray-200); }
     .panel-body { flex:1; overflow-y:auto; padding:20px 24px; display:flex; flex-direction:column; gap:14px; }
     .panel-body > * { flex-shrink:0; }
+    .deadline { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:6px; }
+    .deadline-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); }
+    .history-reason { color:var(--gray-500); font-style:italic; margin-top:1px; }
     .panel-foot { padding:14px 24px; border-top:1px solid var(--gray-200); display:flex; align-items:center; gap:8px; }
     .foot-spacer { flex:1; }
     .assignee-list { display:flex; flex-wrap:wrap; gap:6px 16px; }
@@ -336,6 +362,8 @@ export class ProjectTaskPanelComponent implements OnInit {
   readonly isHistoryOpen = signal(false);
   readonly history = signal<ProjectTaskHistoryEntry[]>([]);
   private readonly loadedTask = signal<ProjectTaskDetail | null>(null);
+  /** The task as stored — the header shows its deadline state, not what is being typed. */
+  readonly savedTask = this.loadedTask.asReadonly();
 
   readonly isCreating = computed(() => this.taskId() === null);
   readonly permissions = computed(() => this.loadedTask()?.permissions ?? CREATE_PERMISSIONS);
@@ -392,6 +420,7 @@ export class ProjectTaskPanelComponent implements OnInit {
 
   form: TaskForm = this.emptyForm();
   newFieldId: string | null = null;
+  endDateChangeReason = '';
 
   ngOnInit(): void {
     const taskId = this.taskId();
@@ -415,6 +444,12 @@ export class ProjectTaskPanelComponent implements OnInit {
         this.closed.emit();
       },
     });
+  }
+
+  // A reason is asked for only when an end date that already existed is moved or removed.
+  isEndDateChanged(): boolean {
+    const storedEndDate = this.loadedTask()?.end_date ?? null;
+    return storedEndDate !== null && (this.form.end_date || null) !== storedEndDate;
   }
 
   toggleAssignee(userId: string): void {
@@ -531,6 +566,7 @@ export class ProjectTaskPanelComponent implements OnInit {
       payload.priority_id = this.form.priority_id;
       payload.start_date = this.form.start_date || null;
       payload.end_date = this.form.end_date || null;
+      if (this.isEndDateChanged()) payload.end_date_change_reason = this.endDateChangeReason.trim() || null;
       payload.custom_values = this.collectCustomValues();
       payload.reminder_type = this.form.reminder_type;
       if (this.form.reminder_type === 'custom') {

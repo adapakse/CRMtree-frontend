@@ -1,15 +1,24 @@
 {
+  "assigneeSummary": {
+    "atRisk": "U riziku",
+    "key": "otvoreni · izvan roka · u riziku",
+    "open": "Otvoreni zadaci",
+    "overdue": "Izvan roka"
+  },
   "card": {
     "closeConfirm": "Zatvoriti projekt? Zatvoreni projekt dostupan je samo za čitanje i nestaje sa zadanog popisa.",
     "closeProject": "Zatvori projekt",
     "closedBadge": "Zatvoren",
+    "datesHint": "Projekt dobiva oznaku „Kasni” kada nezavršeni zadatak završava nakon roka projekta ili kada je rok projekta istekao, a ostali su nezavršeni zadaci.",
     "description": "Opis",
     "edit": "Uredi",
+    "endDate": "Rok projekta",
     "errors": {
       "addMemberFailed": "Dodavanje osobe nije uspjelo",
       "changeAccessLevelFailed": "Promjena ovlasti nije uspjela",
       "changeRoleFailed": "Promjena uloge nije uspjela",
       "closeProjectFailed": "Zatvaranje projekta nije uspjelo",
+      "endBeforeStart": "Rok projekta ne može biti prije njegova početka.",
       "removeMemberFailed": "Uklanjanje osobe nije uspjelo",
       "reopenProjectFailed": "Ponovno otvaranje projekta nije uspjelo",
       "saveFieldsFailed": "Spremanje polja nije uspjelo",
@@ -46,6 +55,7 @@
     "name": "Naziv",
     "noDescription": "Nema opisa.",
     "reopenProject": "Ponovno otvori",
+    "startDate": "Početak projekta",
     "title": "Kartica projekta"
   },
   "chat": {
@@ -72,6 +82,37 @@
     "searchPlaceholder": "Upišite naziv leada ili partnera (najmanje 3 znaka)…",
     "title": "Veza s CRM-om"
   },
+  "deadlines": {
+    "atRisk": "U riziku",
+    "atRiskHint": "Rok je blizu, a rad još nije započeo.",
+    "completedLate": "Završeno izvan roka",
+    "completedLateHint": "Zadatak je završen nakon svojeg roka.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "u riziku (za obaviti, rok unutar {days, plural, one {# dana} few {# dana} other {# dana}})",
+      "beyondProjectEnd": "nakon roka projekta",
+      "completedLate": "završeno izvan roka",
+      "originalEndDate": "izvorni rok",
+      "overdue": "izvan roka",
+      "overdueSubtasks": "podzadaci izvan roka",
+      "projectEndDate": "rok projekta"
+    },
+    "originalEndDateHint": "Izvorni rok i pomak u danima",
+    "overdue": "Izvan roka",
+    "overdueDays": "Izvan roka {days} d",
+    "overdueHint": "Rok je istekao, a zadatak nije završen.",
+    "overdueSubtasks": "Podzadaci izvan roka",
+    "overdueSubtasksHint": "Barem je jedan podzadatak izvan roka.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Kasni",
+    "reasons": {
+      "endPassed": "Rok projekta istekao je prije {days, plural, one {# dan} few {# dana} other {# dana}}, otvoreni zadaci: {count}",
+      "taskAfterEnd": "Zadaci koji završavaju nakon roka projekta: {count} (najkasniji za {days, plural, one {# dan} few {# dana} other {# dana}})"
+    }
+  },
   "detail": {
     "backToProjects": "Projekti",
     "closedBadge": "Zatvoren",
@@ -91,6 +132,72 @@
       "timeline": "Vremenska crta"
     },
     "tasksLoadFailed": "Dohvaćanje zadataka nije uspjelo"
+  },
+  "filters": {
+    "assignee": "Osoba",
+    "atRiskCount": "Zadaci u riziku",
+    "cost": "Trošak",
+    "delayReason": "Razlog kašnjenja",
+    "delayReasonValues": {
+      "end_passed": "Rok projekta je istekao",
+      "task_after_end": "Zadatak završava nakon roka projekta"
+    },
+    "delayed": "Kašnjenje",
+    "delayedValues": {
+      "no": "Bez kašnjenja",
+      "yes": "Kasni"
+    },
+    "endDate": "Završetak",
+    "manager": "PM",
+    "myRole": "Moja uloga",
+    "myRoleValues": {
+      "controller": "Kontrolor",
+      "participant": "Sudionik",
+      "pm": "PM"
+    },
+    "name": "Naziv zadatka",
+    "number": "Broj",
+    "originalEndDate": "Izvorni rok",
+    "overdueCount": "Zadaci izvan roka",
+    "priority": "Prioritet",
+    "progress": "Napredak (%)",
+    "project": "Projekt",
+    "projectCost": "Nastali trošak",
+    "projectEndDate": "Rok projekta",
+    "projectName": "Naziv ili ključ projekta",
+    "projectRevenue": "Prihod",
+    "projectSort": {
+      "at_risk": "Zadaci u riziku",
+      "cost": "Nastali trošak",
+      "delay": "Kašnjenje",
+      "end_date": "Rok",
+      "key": "Ključ",
+      "name": "Naziv",
+      "overdue": "Zadaci izvan roka",
+      "pm": "PM",
+      "progress": "Napredak",
+      "revenue": "Prihod",
+      "start_date": "Početak",
+      "status": "Status"
+    },
+    "projectStartDate": "Početak projekta",
+    "slip": "Pomak (dani)",
+    "startDate": "Početak",
+    "status": "Status",
+    "statusCategory": "Faza",
+    "taskSort": {
+      "original_end_date": "Izvorni rok",
+      "parent": "Nadređeni zadatak",
+      "slip_days": "Pomak"
+    },
+    "timeliness": "Pravodobnost",
+    "timelinessValues": {
+      "at_risk": "U riziku",
+      "on_time": "U roku",
+      "overdue": "Izvan roka"
+    },
+    "type": "Vrsta",
+    "unassigned": "Nedodijeljeno"
   },
   "finance": {
     "categories": {
@@ -241,9 +348,14 @@
     }
   },
   "gantt": {
+    "beyondProjectEnd": "Završava nakon roka projekta",
     "emptyTitle": "Nema zadataka",
+    "loadFailed": "Dohvaćanje vremenske crte nije uspjelo",
+    "originalEndDate": "Izvorni rok: {date} ({slip})",
+    "projectEndDate": "Rok projekta: {date}",
     "taskColumn": "Zadatak",
     "today": "Danas",
+    "truncated": "Vremenska crta prikazuje prvih {limit} zadataka. Suzite filtre da biste vidjeli ostale.",
     "undatedNote": "{count, plural, one {# zadatak bez datuma nema traku na vremenskoj crti.} few {# zadatka bez datuma nemaju traku na vremenskoj crti.} other {# zadataka bez datuma nema traku na vremenskoj crti.}}",
     "zoom": {
       "day": "Dani",
@@ -550,30 +662,27 @@
     "loadFailed": "Dohvaćanje projekata nije uspjelo",
     "newProject": "Novi projekt",
     "stats": {
+      "atRisk": "u riziku",
+      "doneOfTotalHint": "Završeni zadaci / svi",
       "members": "{count, plural, one {osoba} few {osobe} other {osoba}}",
       "myOpenTasks": "{count, plural, one {moj otvoreni} few {moja otvorena} other {mojih otvorenih}}",
+      "overdue": "izvan roka",
       "tasks": "{count, plural, one {zadatak} few {zadatka} other {zadataka}}"
     },
     "title": "Projekti",
     "views": {
       "myTasks": "Moji zadaci",
+      "portfolio": "Pregled projekata",
       "projects": "Projekti"
     }
   },
   "myTasks": {
-    "columns": {
-      "dueDate": "Rok",
-      "priority": "Prioritet",
-      "project": "Projekt",
-      "status": "Status",
-      "task": "Zadatak"
-    },
     "empty": {
       "description": "Nemate otvorenih zadataka ni u jednom projektu.",
       "title": "Nema zadataka"
     },
-    "loadFailed": "Dohvaćanje zadataka nije uspjelo",
-    "noDueDate": "bez roka"
+    "includeDone": "Prikaži završene",
+    "loadFailed": "Dohvaćanje zadataka nije uspjelo"
   },
   "panel": {
     "chatTitle": "Razgovor o zadatku",
@@ -595,6 +704,11 @@
       "selectField": "— odaberite polje —",
       "title": "Dodatna polja"
     },
+    "endDateChange": {
+      "hint": "Neobavezno. PM će razlog vidjeti u e-poruci o promjeni roka; bit će spremljen i u povijesti zadatka.",
+      "placeholder": "npr. kasna isporuka od klijenta",
+      "reason": "Razlog promjene roka"
+    },
     "fields": {
       "assignees": "Dodijeljene osobe",
       "description": "Dodatni opis",
@@ -612,6 +726,7 @@
       "changedWithStatus": "je izmijenio/la: {fields} ({from} → {to})",
       "created": "je izradio/la zadatak",
       "empty": "Nema zapisa.",
+      "endDateChangeReason": "Razlog promjene roka: {reason}",
       "fields": {
         "assignees": "dodijeljene osobe",
         "customFields": "dodatna polja",
@@ -641,10 +756,40 @@
     "saved": "Zadatak je spremljen",
     "saving": "Spremanje…"
   },
+  "portfolio": {
+    "columns": {
+      "atRisk": "U riziku",
+      "cost": "Nastali trošak",
+      "delay": "Kašnjenje",
+      "endDate": "Rok",
+      "overdue": "Izvan roka",
+      "progress": "Napredak",
+      "project": "Projekt",
+      "projectManagers": "PM",
+      "revenue": "Prihod",
+      "startDate": "Početak"
+    },
+    "loadFailed": "Otvaranje pregleda projekata nije uspjelo",
+    "noProjects": "Ne vodite niti kontrolirate nijedan otvoreni projekt.",
+    "noTasks": "U vašim projektima nema zadataka.",
+    "tabs": {
+      "projects": "Projekti",
+      "tasks": "Zadaci",
+      "timeline": "Vremenska crta"
+    }
+  },
   "settings": {
     "costCategories": {
       "hint": "Kategoriju nije moguće izbrisati — onu koju ne koristite isključite. Isključenu kategoriju nije moguće odabrati u novom trošku, a postojeće stavke je zadržavaju.",
       "title": "Kategorije troškova"
+    },
+    "deadlines": {
+      "hint": "Zadatak na kojem rad još nije započeo označava se kao zadatak u riziku kada do njegova roka nije ostalo više dana od ovog praga (0–30; 0 znači sam dan roka).",
+      "invalid": "Unesite cijeli broj od 0 do 30.",
+      "saveFailed": "Spremanje praga nije uspjelo",
+      "saved": "Prag rizika roka je spremljen",
+      "threshold": "Prag rizika roka (dani)",
+      "title": "Kontrola rokova"
     },
     "dictionary": {
       "active": "aktivno",
@@ -697,16 +842,21 @@
   "taskList": {
     "columns": {
       "assignees": "Osobe",
+      "cost": "Trošak",
       "endDate": "Završetak",
       "number": "Br.",
       "priority": "Prioritet",
+      "project": "Projekt",
       "startDate": "Početak",
       "status": "Status",
       "task": "Zadatak",
+      "timeliness": "Pravodobnost",
       "type": "Vrsta"
     },
+    "emptyForFilters": "Nijedan zadatak ne odgovara filtrima.",
     "emptyMessage": "U ovom projektu još nema zadataka.",
     "emptyTitle": "Nema zadataka",
+    "flatList": "Plošni popis",
     "parentTask": "Nadređeni zadatak",
     "subtask": "Podzadatak"
   }
