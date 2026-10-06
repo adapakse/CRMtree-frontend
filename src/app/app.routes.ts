@@ -61,6 +61,10 @@ export const routes: Routes = withI18nScopes([
     loadComponent: () => import('./pages/crm/zoho-callback/zoho-callback.component').then(m => m.ZohoCallbackComponent),
   },
   {
+    path: 'crm/yandex/callback',
+    loadComponent: () => import('./pages/crm/yandex-callback/yandex-callback.component').then(m => m.YandexCallbackComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],

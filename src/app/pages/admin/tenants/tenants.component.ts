@@ -46,7 +46,7 @@ interface TenantUser {
   last_login_at?: string | null;
 }
 
-type EmailProviderKey = 'gmail' | 'outlook' | 'zoho';
+type EmailProviderKey = 'gmail' | 'outlook' | 'zoho' | 'yandex';
 
 interface EmailProvider {
   id: string;
@@ -68,6 +68,13 @@ interface OutlookForm {
   redirect_uri: string;
 }
 interface ZohoForm {
+  client_id: string; client_secret: string;
+  redirect_uri: string;
+}
+// Same three fields as Zoho — Yandex needs no Pub/Sub topic (Gmail's push
+// mechanism) and no directory id (Azure's), and serves every regional mailbox
+// from one set of endpoints, so there is no data centre to pick either.
+interface YandexForm {
   client_id: string; client_secret: string;
   redirect_uri: string;
 }
@@ -617,6 +624,64 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     <button class="btn-primary" [disabled]="saving() || !zohoForm.client_id || (!zohoForm.client_secret && !zohoProvider())"
                                             (click)="saveEmailProvider(t.id, 'zoho')">
                                       {{ saving() ? 'Zapisuję...' : (zohoProvider() ? 'Aktualizuj' : 'Zapisz') }}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <!-- Yandex -->
+                              <div class="provider-card">
+                                <div class="provider-header">
+                                  <div class="provider-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,14 22,4"/></svg>
+                                    <span>Yandex Mail</span>
+                                  </div>
+                                  <div class="provider-header-right">
+                                    @if (yandexProvider()) {
+                                      <span class="badge badge-on">Skonfigurowany</span>
+                                    } @else {
+                                      <span class="badge badge-off">Nieskonfigurowany</span>
+                                    }
+                                    <label class="radio-option" [class.disabled]="!yandexProvider()">
+                                      <input type="radio" name="active-provider-{{t.id}}" [checked]="activeProvider() === 'yandex'"
+                                             [disabled]="!yandexProvider()" (change)="setActiveProvider(t.id, 'yandex')">
+                                      Używaj tego providera
+                                    </label>
+                                  </div>
+                                </div>
+                                @if (yandexProvider()) {
+                                  <div class="provider-meta">
+                                    Client ID: <code>{{ yandexProvider()!.client_id }}</code>
+                                    · zaktualizowany {{ yandexProvider()!.updated_at | date:'dd.MM.yyyy' }}
+                                  </div>
+                                }
+                                <div class="provider-form">
+                                  <div class="provider-meta">
+                                    Aplikację zarejestruj na <code>oauth.yandex.com</code> z uprawnieniami
+                                    <code>login:email</code>, <code>mail:imap_ro</code>, <code>mail:smtp</code>.
+                                    Odbieranie i wysyłka poczty są w przygotowaniu — na razie działa samo podłączenie skrzynki.
+                                  </div>
+                                  <div class="edit-grid">
+                                    <div class="field">
+                                      <label>Client ID <span class="req">*</span></label>
+                                      <input [(ngModel)]="yandexForm.client_id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                                    </div>
+                                    <div class="field">
+                                      <label>Client Secret {{ yandexProvider() ? '(zostaw puste = bez zmian)' : '' }} <span class="req">*</span></label>
+                                      <input [(ngModel)]="yandexForm.client_secret" type="password" placeholder="{{ yandexProvider() ? '••••••••' : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' }}">
+                                    </div>
+                                    <div class="field">
+                                      <label>Redirect URI <span class="hint-inline">(opcjonalne — nadpisuje domyślne)</span></label>
+                                      <input [(ngModel)]="yandexForm.redirect_uri" placeholder="https://app.example.com/api/crm/yandex/oauth/callback">
+                                    </div>
+                                  </div>
+                                  <div class="provider-actions">
+                                    @if (yandexProvider()) {
+                                      <button class="btn-danger-sm" [disabled]="saving()" (click)="deleteEmailProvider(t.id, 'yandex')">Usuń</button>
+                                    }
+                                    <button class="btn-primary" [disabled]="saving() || !yandexForm.client_id || (!yandexForm.client_secret && !yandexProvider())"
+                                            (click)="saveEmailProvider(t.id, 'yandex')">
+                                      {{ saving() ? 'Zapisuję...' : (yandexProvider() ? 'Aktualizuj' : 'Zapisz') }}
                                     </button>
                                   </div>
                                 </div>
@@ -1288,6 +1353,7 @@ export class TenantsComponent implements OnInit {
   gmailProvider   = signal<EmailProvider | null>(null);
   outlookProvider = signal<EmailProvider | null>(null);
   zohoProvider    = signal<EmailProvider | null>(null);
+  yandexProvider  = signal<EmailProvider | null>(null);
   activeProvider  = signal<EmailProviderKey | null>(null);
 
   whatsappConfig          = signal<WhatsappConfig | null>(null);
@@ -1321,6 +1387,7 @@ export class TenantsComponent implements OnInit {
   gmailForm:   GmailForm   = this.emptyGmailForm();
   outlookForm: OutlookForm = this.emptyOutlookForm();
   zohoForm:    ZohoForm    = this.emptyZohoForm();
+  yandexForm:  YandexForm  = this.emptyYandexForm();
   whatsappForm: WhatsappConfigForm = this.emptyWhatsappForm();
   readonly whatsappWebhookUrl = WHATSAPP_WEBHOOK_URL;
 
@@ -1796,12 +1863,15 @@ export class TenantsComponent implements OnInit {
         const gmail   = providers.find(p => p.provider === 'gmail')   ?? null;
         const outlook = providers.find(p => p.provider === 'outlook') ?? null;
         const zoho    = providers.find(p => p.provider === 'zoho')    ?? null;
+        const yandex  = providers.find(p => p.provider === 'yandex')  ?? null;
         this.gmailProvider.set(gmail);
         this.outlookProvider.set(outlook);
         this.zohoProvider.set(zoho);
+        this.yandexProvider.set(yandex);
         this.gmailForm   = gmail   ? this.providerToGmailForm(gmail)     : this.emptyGmailForm();
         this.outlookForm = outlook ? this.providerToOutlookForm(outlook) : this.emptyOutlookForm();
         this.zohoForm    = zoho    ? this.providerToZohoForm(zoho)       : this.emptyZohoForm();
+        this.yandexForm  = yandex  ? this.providerToYandexForm(yandex)   : this.emptyYandexForm();
         this.emailLoading.set(false);
       },
       error: () => { this.toast.error('Błąd ładowania konfiguracji email'); this.emailLoading.set(false); },
@@ -1809,7 +1879,7 @@ export class TenantsComponent implements OnInit {
   }
 
   private static readonly PROVIDER_LABELS: Record<EmailProviderKey, string> = {
-    gmail: 'Gmail', outlook: 'Outlook', zoho: 'Zoho',
+    gmail: 'Gmail', outlook: 'Outlook', zoho: 'Zoho', yandex: 'Yandex',
   };
 
   saveEmailProvider(tenantId: string, provider: EmailProviderKey): void {
@@ -1839,11 +1909,19 @@ export class TenantsComponent implements OnInit {
           : {},
         is_enabled: true,
       };
-    } else {
+    } else if (provider === 'zoho') {
       body = {
         client_id:    this.zohoForm.client_id,
         client_secret: this.zohoForm.client_secret || undefined,
         redirect_uri:  this.zohoForm.redirect_uri  || undefined,
+        extra_config: {},
+        is_enabled: true,
+      };
+    } else {
+      body = {
+        client_id:    this.yandexForm.client_id,
+        client_secret: this.yandexForm.client_secret || undefined,
+        redirect_uri:  this.yandexForm.redirect_uri  || undefined,
         extra_config: {},
         is_enabled: true,
       };
@@ -1855,7 +1933,8 @@ export class TenantsComponent implements OnInit {
       next: saved => {
         if (provider === 'gmail')        { this.gmailProvider.set(saved);   this.gmailForm.client_secret = ''; }
         else if (provider === 'outlook') { this.outlookProvider.set(saved); this.outlookForm.client_secret = ''; }
-        else                              { this.zohoProvider.set(saved);   this.zohoForm.client_secret = ''; }
+        else if (provider === 'zoho')    { this.zohoProvider.set(saved);    this.zohoForm.client_secret = ''; }
+        else                              { this.yandexProvider.set(saved); this.yandexForm.client_secret = ''; }
 
         // Backend auto-activates this provider when the tenant had none yet —
         // reflect that here so the header radio updates without a page reload.
@@ -1880,7 +1959,8 @@ export class TenantsComponent implements OnInit {
       next: () => {
         if (provider === 'gmail')        { this.gmailProvider.set(null);   this.gmailForm = this.emptyGmailForm(); }
         else if (provider === 'outlook') { this.outlookProvider.set(null); this.outlookForm = this.emptyOutlookForm(); }
-        else                              { this.zohoProvider.set(null);   this.zohoForm = this.emptyZohoForm(); }
+        else if (provider === 'zoho')    { this.zohoProvider.set(null);    this.zohoForm = this.emptyZohoForm(); }
+        else                              { this.yandexProvider.set(null); this.yandexForm = this.emptyYandexForm(); }
         // Deleting the active provider's config deactivates it tenant-wide (mirrors backend).
         if (this.activeProvider() === provider) { this.activeProvider.set(null); }
         this.tenants.update(ts => ts.map(t => t.id === tenantId
@@ -2023,9 +2103,16 @@ export class TenantsComponent implements OnInit {
       redirect_uri: p.redirect_uri ?? '',
     };
   }
+  private providerToYandexForm(p: EmailProvider): YandexForm {
+    return {
+      client_id: p.client_id, client_secret: '',
+      redirect_uri: p.redirect_uri ?? '',
+    };
+  }
   private emptyGmailForm():   GmailForm   { return { client_id: '', client_secret: '', redirect_uri: '', pubsub_topic: '', pubsub_subscription: '' }; }
   private emptyOutlookForm(): OutlookForm { return { client_id: '', client_secret: '', azure_tenant_id: '', redirect_uri: '' }; }
   private emptyZohoForm():    ZohoForm    { return { client_id: '', client_secret: '', redirect_uri: '' }; }
+  private emptyYandexForm():  YandexForm  { return { client_id: '', client_secret: '', redirect_uri: '' }; }
   private emptyWhatsappForm(): WhatsappConfigForm {
     return { waba_id: '', phone_number_id: '', access_token: '', app_secret: '', is_enabled: true };
   }
