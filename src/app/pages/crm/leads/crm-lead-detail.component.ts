@@ -182,6 +182,7 @@ interface WhatsappConvUiState {
         </div>
         <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">{{ t('leadDetail.fields.onlinePct') }}</span><span class="val">{{lead.online_pct}}%</span></div>
         <div class="info-kv" *ngIf="lead.source"><span class="lbl">{{ t('leadDetail.fields.source') }}</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
+        <div class="info-kv" *ngIf="lead.created_at"><span class="lbl">{{ t('leadDetail.fields.addedOn') }}</span><span class="val">{{lead.created_at|date:'dd.MM.yyyy HH:mm'}}</span></div>
         <div class="info-kv" *ngIf="lead.first_contact_date"><span class="lbl">{{ t('leadDetail.fields.firstContact') }}</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
         <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">{{ t('leadDetail.fields.closeDate') }}</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
         <div class="info-kv" *ngIf="lead.assigned_to_name"><span class="lbl">{{ t('leadDetail.fields.salesperson') }}</span><span class="val fw">{{lead.assigned_to_name}}</span></div>

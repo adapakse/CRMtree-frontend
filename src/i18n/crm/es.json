@@ -706,6 +706,7 @@
       "loading": "Obteniendo…"
     },
     "fields": {
+      "addedOn": "Añadido",
       "annualTurnover": "Volumen de negocio anual",
       "closeDate": "Fecha de cierre",
       "companyName": "Nombre de la empresa",
@@ -891,6 +892,7 @@
       "weightedValue": "Valor ponderado"
     },
     "fields": {
+      "addedOn": "Añadido",
       "annualTurnover": "Volumen de negocio anual",
       "company": "Empresa",
       "companyRole": "Cargo en la empresa",
@@ -903,10 +905,12 @@
       "website": "Sitio web"
     },
     "filters": {
+      "addedRangeTitle": "Filtrar por fecha de creación del lead",
       "all": "Todos",
       "allReps": "Todos los comerciales",
       "allSources": "Todos los orígenes",
       "allStages": "Todas las etapas",
+      "clearDates": "Borrar rango de fechas",
       "groupChip": "Grupo: {name}",
       "groupsGroup": "Grupos",
       "holdOnly": "Solo en espera",
