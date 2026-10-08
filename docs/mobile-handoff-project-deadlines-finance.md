@@ -83,8 +83,8 @@ opóźniony” (do PM-ów, raz). Jeden przełącznik na użytkownika wyłącza w
 `project_deadline_notifications_enabled` w `GET /api/auth/me`, zmiana przez
 `PUT /api/profile/project-deadline-notifications` `{ is_enabled: boolean }`.
 
-**Powiadomień push dla tych zdarzeń backend nie wysyła** — to do decyzji Adama (pytanie 3 na
-końcu).
+**Powiadomień push dla tych zdarzeń backend nie wysyła i nie będzie** — Adam zdecydował, że
+maile wystarczą. W aplikacji potrzebny jest tylko przełącznik maili w profilu.
 
 ### 2.4 API
 
@@ -225,11 +225,12 @@ czerwony tekst „ta faktura jest podpięta również pod …”). Błąd 422 pr
 
 W webie admin tenanta konfiguruje KSeF, uprawnione osoby wybierają faktury z listy za okres i
 podpinają je do kosztów, a faktura jest rejestrowana w module Dokumenty z wizualizacją PDF.
-Aplikacja mobilna nie ma modułu Dokumenty, więc rekomendacja to **nie budować podpinania
-faktur w telefonie**; wystarczy przy pozycji kosztowej pokazać numer faktury i — gdy
-`other_links` nie jest puste — ostrzeżenie o innych powiązaniach. Trasy, gdyby Adam zdecydował
-inaczej: `GET /api/ksef/invoices`, `GET /api/ksef/invoices/:id`, `POST …/finance/costs` z
-`ksef_invoice_id` (wymaga `can_view_ksef_invoices` z `/api/auth/me` albo admina).
+**Decyzja Adama: KSeF jest tylko w webie** — w telefonie nie ma listy faktur ani podpinania.
+Na liście kosztów (odczyt) wystarczy przy pozycji pokazać numer faktury i — gdy `other_links`
+nie jest puste — ostrzeżenie, że faktura jest podpięta także pod inne projekty lub zadania.
+
+Ponieważ w telefonie nie dodaje się ani nie edytuje kosztów (sekcja 4), z tras w 3.2 aplikacja
+używa tylko odczytu: `GET /api/projects/:id/finance` i `GET …/finance/costs`.
 
 ---
 
@@ -245,21 +246,34 @@ koszty.
    przesunięciem. Na projekcie: daty, znacznik „opóźniony” z powodem, liczniki zadań
    (zakończone/wszystkie, po terminie, zagrożone).
 2. **Filtry i listy.** Zasada ogólna Adama dla CRMtree: *każda lista ma filtry i stronicowanie
-   po maks. 50*. Zapisana dla webu — dla aplikacji mobilnej potwierdź u Adama formę (pytanie 1).
-   Minimum w telefonie: wyszukiwanie po nazwie, status, terminowość, przedział dat zakończenia,
-   a w widokach PM-a osoba. Lista zadań projektu z filtrem → `/tasks/search`; „moje zadania” →
-   `/projects/my-tasks`.
+   po maks. 50* — w telefonie obowiązuje tak samo: **pełny zestaw filtrów z webu** (tabele w
+   2.4: zadania — nazwa, numer, status, kategoria statusu, priorytet, typ, osoba, daty
+   rozpoczęcia i zakończenia, pierwotny termin, przesunięcie, terminowość, koszt; projekty —
+   nazwa/klucz, status, daty, opóźnienie i jego powód, moja rola, PM, postęp, liczba zadań po
+   terminie i zagrożonych, koszt i przychód) oraz sortowanie. Stronicowanie jako **doładowanie
+   kolejnej strony przy przewijaniu** (strony po 50). Filtr kosztu / przychodu pokazuj tylko,
+   gdy użytkownik ma do nich prawo (`can_filter_finance` z listy projektów; dla zadań — gdy
+   wiersze mają `cost_total`). Lista zadań projektu z filtrem → `/tasks/search`; „moje zadania”
+   → `/projects/my-tasks` (bez filtra po osobie i bez kosztu).
 3. **Widok wielu projektów** (gdy `has_cross_project_view`): przegląd projektów (postęp,
-   opóźnione, zagrożone, znacznik opóźnienia) i lista zadań ze wszystkich projektów z filtrami.
-   Oś czasu (Gantt) na telefonie — do decyzji Adama (pytanie 2).
+   opóźnione, zagrożone, znacznik opóźnienia), lista zadań ze wszystkich projektów z filtrami
+   oraz **oś czasu (Gantt)**.
+   **Gantt w telefonie budujemy** — w pojedynczym projekcie (`/tasks/gantt`) i w widoku wielu
+   projektów (`/portfolio/gantt`, grupowanie po projekcie). Wiersze przychodzą płaskie, w
+   kolejności klucz projektu → numer zadania; drzewo zbuduj po `parent_task_id`. Bez stron,
+   limit 500 zadań — gdy `truncated`, pokaż informację. Na osi: znacznik „po terminie” i
+   „zagrożone”, szary ślad między pierwotnym a obecnym terminem, linia daty końca projektu i
+   wyróżnienie części zadania wystającej za nią (wzór: `project-gantt-view.component.ts` i
+   `project-gantt.util.ts` w webie). Te same filtry co na liście.
 4. **Zmiana terminu z powodem**: w formularzu zadania pole powodu, gdy zmienia się istniejąca
    data zakończenia; powód w historii. Przełącznik maili o terminach w profilu.
 5. **Finanse — odczyt**: sumy na karcie projektu oraz na karcie leada i partnera (gdy `finance`
    nie jest `null`); dla `can_read` podsumowanie projektu i lista kosztów; koszt zadania w
    listach.
-6. **Finanse — dodanie kosztu z telefonu**: formularz kosztu (data, kategoria, kwota lub kwota
-   w walucie obcej, zadanie, dostawca, numer dokumentu) dla `can_write` oraz dla
-   `can_add_own_costs` przy własnym zadaniu. Budżet, przychody i KSeF zostają w webie.
+
+**Poza zakresem aplikacji mobilnej (decyzje Adama, 2026-10-08):** dodawanie i edycja kosztów,
+budżet, przychody, faktury KSeF i dokument „Faktura” — to zostaje wyłącznie w webie. W
+telefonie finanse są tylko do odczytu. Powiadomień push o terminach nie ma — wystarczają maile.
 
 ---
 
@@ -283,17 +297,15 @@ koszty.
 
 ---
 
-## 6. Pytania do Adama przed startem
+## 6. Decyzje Adama dla aplikacji mobilnej (2026-10-08)
 
-1. **Filtry i stronicowanie w telefonie**: pełny zestaw filtrów z webu (także koszt, pierwotny
-   termin, przesunięcie, typ, priorytet) czy zestaw minimalny z punktu 4.2? Stronicowanie jako
-   doładowanie przy przewijaniu?
-2. **Oś czasu (Gantt)** na telefonie: budować (pozioma, przewijana) czy pominąć i zostać przy
-   listach?
-3. **Powiadomienia push** o zadaniach po terminie, zmianie terminu i opóźnionym projekcie:
-   backend dziś wysyła tylko maile. Dodać push (wymaga pracy w backendzie) i czy ma go
-   obejmować ten sam przełącznik co maile?
-4. **Dodawanie kosztu z telefonu** (punkt 4.6): tak / nie? Jeśli tak — czy ze zdjęciem
-   paragonu? (Załączników moduł Projekty dziś nie ma, to byłaby nowa funkcja także w backendzie.)
-5. **Faktury KSeF w telefonie**: zostają tylko w webie (rekomendacja) czy potrzebna choćby
-   lista i podpinanie?
+Odpowiedzi na pytania zadane przy przygotowaniu tego dokumentu — obowiązują, nie pytaj ponownie:
+
+| Pytanie | Decyzja |
+|---|---|
+| Filtry w telefonie: pełny zestaw z webu czy minimalny? | **Pełny zestaw**, jak w webie. |
+| Stronicowanie | **Doładowanie przy przewijaniu**, strony po 50. |
+| Oś czasu (Gantt) w telefonie | **Budować** — w projekcie i w widoku wielu projektów. |
+| Powiadomienia push o terminach | **Nie** — maile wystarczą; w backendzie nic nie dochodzi. |
+| Dodawanie kosztu z telefonu | **Nie** — finanse w telefonie tylko do odczytu. |
+| Faktury KSeF w telefonie | **Nie** — tylko w webie. |
