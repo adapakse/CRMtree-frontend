@@ -706,6 +706,7 @@
       "loading": "Dohvaćanje…"
     },
     "fields": {
+      "addedOn": "Dodano",
       "annualTurnover": "Godišnji promet",
       "closeDate": "Datum zatvaranja",
       "companyName": "Naziv tvrtke",
@@ -891,6 +892,7 @@
       "weightedValue": "Ponderirana vrijednost"
     },
     "fields": {
+      "addedOn": "Dodano",
       "annualTurnover": "Godišnji promet",
       "company": "Tvrtka",
       "companyRole": "Uloga u tvrtki",
@@ -903,10 +905,12 @@
       "website": "Web-stranica"
     },
     "filters": {
+      "addedRangeTitle": "Filtriraj po datumu dodavanja leada",
       "all": "Svi",
       "allReps": "Svi prodavači",
       "allSources": "Svi izvori",
       "allStages": "Sve faze",
+      "clearDates": "Očisti raspon datuma",
       "groupChip": "Grupa: {name}",
       "groupsGroup": "Grupe",
       "holdOnly": "Samo na čekanju",

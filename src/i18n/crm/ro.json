@@ -706,6 +706,7 @@
       "loading": "Se preiau datele…"
     },
     "fields": {
+      "addedOn": "Adăugat",
       "annualTurnover": "Cifră de afaceri anuală",
       "closeDate": "Data închiderii",
       "companyName": "Denumirea companiei",
@@ -891,6 +892,7 @@
       "weightedValue": "Valoare ponderată"
     },
     "fields": {
+      "addedOn": "Adăugat",
       "annualTurnover": "Cifră de afaceri anuală",
       "company": "Companie",
       "companyRole": "Rol în companie",
@@ -903,10 +905,12 @@
       "website": "Site web"
     },
     "filters": {
+      "addedRangeTitle": "Filtrează după data adăugării lead-ului",
       "all": "Toate",
       "allReps": "Toți agenții de vânzări",
       "allSources": "Toate sursele",
       "allStages": "Toate etapele",
+      "clearDates": "Șterge intervalul de date",
       "groupChip": "Grup: {name}",
       "groupsGroup": "Grupuri",
       "holdOnly": "Doar în așteptare",

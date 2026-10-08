@@ -14,6 +14,34 @@ export interface AppSettingsMeta {
   updated_by_name: string | null;
 }
 
+/**
+ * One configurable lead stage of the tenant (backend: tenant_lead_stages).
+ * `key` is immutable and is what sits in the lead's `stage` field; `label` is
+ * the tenant's own name for it, or null when the built-in translation
+ * (`crm.labels.stages.<key>`) should be used. Resolve labels through
+ * LeadStagesService, never by reading `label` directly.
+ */
+export interface LeadStageConfig {
+  id: string | null;
+  key: string;
+  label: string | null;
+  /**
+   * What the stage IS, not whether it may be changed — there are no "system"
+   * stages. `open` is a funnel step, `won`/`lost` are closings (both fully
+   * removable), `converted`/`archived` are states the app writes itself
+   * (converting a lead to a partner, archiving it) and so cannot be removed,
+   * though they can be renamed.
+   */
+  kind: 'open' | 'won' | 'lost' | 'converted' | 'archived';
+  probability: number | null;
+  color: string | null;
+  active: boolean;
+  sort_order: number;
+  lead_count?: number;
+  /** Stage the leads of this stage move to if it gets removed (server-computed). */
+  delete_target_key?: string | null;
+}
+
 export interface AppSettings {
   expiration_red_days:            number;
   expiration_soon_days:           number;
@@ -49,6 +77,14 @@ export class AppSettingsService {
   /** Full meta rows — used by the admin settings panel */
   readonly meta = signal<AppSettingsMeta[]>([]);
 
+  /**
+   * Configurable lead stages of the tenant, ordered. Rides along with the
+   * settings payload because every CRM screen needs stage names, and this is
+   * the one request the app already makes for every signed-in user. Read it
+   * through LeadStagesService.
+   */
+  readonly leadStages = signal<LeadStageConfig[]>([]);
+
   private loaded = false;
 
   /** Called once during app initialisation (see app.config.ts) */
@@ -56,12 +92,13 @@ export class AppSettingsService {
     if (this.loaded) return;
     try {
       const res = await firstValueFrom(
-        this.http.get<{ settings: AppSettings; meta: AppSettingsMeta[] }>(
+        this.http.get<{ settings: AppSettings; meta: AppSettingsMeta[]; lead_stages?: LeadStageConfig[] }>(
           `${environment.apiUrl}/admin/settings`
         )
       );
       this.settings.set({ ...DEFAULTS, ...res.settings });
       this.meta.set(res.meta);
+      if (res.lead_stages) this.leadStages.set(res.lead_stages);
       this.loaded = true;
     } catch {
       // Non-fatal — fall back to defaults (e.g. before login)

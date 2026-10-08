@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 
 @Component({
   selector: 'wt-crm-import',
@@ -31,7 +32,7 @@ import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@js
         <span>contact_name</span><span>contact_title</span>
         <span>email</span><span>phone</span>
         <span title="strona_www|polecenie|cold_call|linkedin|targi|partner|agent|kampania|inbound|inne" class="hint">source 🔤</span>
-        <span title="new|qualification|presentation|offer|negotiation|closed_won|closed_lost" class="hint">stage 🔤</span>
+        <span [title]="stageCodesHint" class="hint">stage 🔤</span>
         <span>value_pln</span>
         <span title="PLN|EUR|USD|GBP|CHF" class="hint">annual_turnover_currency 🔤</span>
         <span>probability</span><span>close_date</span>
@@ -331,6 +332,12 @@ export class CrmImportComponent implements OnInit {
   private zone = inject(NgZone);
   private cdr  = inject(ChangeDetectorRef);
   private toast = inject(ToastService);
+  private stages = inject(LeadStagesService);
+
+  /** Kody etapów, które import faktycznie przyjmie — zależą od konfiguracji tenanta. */
+  get stageCodesHint(): string {
+    return this.stages.selectable().map(s => s.key).join('|');
+  }
   private transloco = inject(TranslocoService);
 
   leadsResult:    ImportResult | null = null;

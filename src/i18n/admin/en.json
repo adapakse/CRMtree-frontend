@@ -949,6 +949,29 @@
         "visa": "Visa"
       }
     },
+    "leadStages": {
+      "addStage": "Add stage",
+      "cardTitle": "Lead stages",
+      "codeWrittenHint": "This is not a funnel step but a state the app sets itself (archiving a lead, converting to a partner), so it cannot be removed. You can rename it.",
+      "confirmDelete": "Remove the stage \"{name}\"?",
+      "confirmDeleteWithLeads": "Remove the stage \"{name}\"?\n\nThe {count} lead(s) on it will move to \"{target}\".",
+      "intro": "Your own names for the funnel stages — rename the existing ones, add a step or remove one you do not need. The stage code stays the same, so a new name shows up across the app while reports and lead records are untouched. An empty name goes back to the built-in one.",
+      "kinds": {
+        "archived": "archive",
+        "converted": "converted to partner",
+        "lost": "lost",
+        "open": "funnel",
+        "won": "won"
+      },
+      "lastStageHint": "This is the last funnel step — new leads have to start somewhere.",
+      "limitReached": "Limit of {max} funnel stages reached.",
+      "loadFailedTitle": "Could not load the lead stages.",
+      "loading": "Loading stages…",
+      "movedLeads": "Moved {count} lead(s) to {stage}.",
+      "newStagePlaceholder": "Name of the new stage",
+      "otherSectionHint": "The app sets archiving and conversion to a partner itself, so they cannot be removed — the name can.",
+      "saveFailed": "Could not save the stage change."
+    },
     "onboarding": {
       "intro": "— define the standard tasks for each step of the onboarding process. Templates are suggested automatically when tasks are created in the Onboarding panel.",
       "introTitle": "Onboarding task templates",

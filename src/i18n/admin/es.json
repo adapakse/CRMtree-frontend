@@ -949,6 +949,29 @@
         "visa": "Visado"
       }
     },
+    "leadStages": {
+      "addStage": "Añadir etapa",
+      "cardTitle": "Etapas del lead",
+      "codeWrittenHint": "No es un paso del embudo, sino un estado que la aplicación establece por sí misma (archivar el lead, convertirlo en socio), por lo que no se puede eliminar. Sí se puede renombrar.",
+      "confirmDelete": "¿Eliminar la etapa «{name}»?",
+      "confirmDeleteWithLeads": "¿Eliminar la etapa «{name}»?\n\nLos {count} lead(s) que hay pasarán a «{target}».",
+      "intro": "Nombres propios para las etapas del embudo: renombra las existentes, añade un paso o elimina el que no necesites. El código de la etapa no cambia, así que el nuevo nombre aparece en toda la aplicación mientras los informes y los datos de los leads quedan intactos. Un nombre vacío vuelve al integrado.",
+      "kinds": {
+        "archived": "archivo",
+        "converted": "convertido en socio",
+        "lost": "perdido",
+        "open": "embudo",
+        "won": "ganado"
+      },
+      "lastStageHint": "Es el último paso del embudo: los nuevos leads tienen que empezar en algún sitio.",
+      "limitReached": "Se ha alcanzado el límite de {max} etapas del embudo.",
+      "loadFailedTitle": "No se han podido cargar las etapas del lead.",
+      "loading": "Cargando etapas…",
+      "movedLeads": "Se han movido {count} lead(s) a {stage}.",
+      "newStagePlaceholder": "Nombre de la nueva etapa",
+      "otherSectionHint": "El archivado y la conversión en socio los establece la aplicación, así que no se pueden eliminar — el nombre sí.",
+      "saveFailed": "No se ha podido guardar el cambio de la etapa."
+    },
     "onboarding": {
       "intro": "— define las tareas estándar de cada paso del proceso de implantación. Las plantillas se sugieren automáticamente al crear tareas en el panel de Onboarding.",
       "introTitle": "Plantillas de tareas de onboarding",

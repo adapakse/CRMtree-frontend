@@ -949,6 +949,29 @@
         "visa": "Viza"
       }
     },
+    "leadStages": {
+      "addStage": "Dodaj fazu",
+      "cardTitle": "Faze potencijalnog klijenta",
+      "codeWrittenHint": "Ovo nije korak prodajnog toka nego stanje koje aplikacija postavlja sama (arhiviranje, pretvaranje u partnera), pa se ne može izbrisati. Preimenovanje je moguće.",
+      "confirmDelete": "Želite li ukloniti fazu „{name}”?",
+      "confirmDeleteWithLeads": "Želite li ukloniti fazu „{name}”?\n\n{count} potencijalnih klijenata na njoj prelazi u „{target}”.",
+      "intro": "Vlastiti nazivi faza prodajnog toka — preimenujte postojeće, dodajte korak ili uklonite nepotreban. Kod faze ostaje isti, pa se novo ime pojavljuje u cijeloj aplikaciji, a izvještaji i podaci o potencijalnim klijentima ostaju nedirnuti. Prazan naziv vraća ugrađeni.",
+      "kinds": {
+        "archived": "arhiva",
+        "converted": "pretvoreno u partnera",
+        "lost": "izgubljeno",
+        "open": "prodajni tok",
+        "won": "dobiveno"
+      },
+      "lastStageHint": "Ovo je posljednji korak prodajnog toka — novi potencijalni klijenti moraju negdje početi.",
+      "limitReached": "Dosegnuto je ograničenje od {max} faza prodajnog toka.",
+      "loadFailedTitle": "Faze potencijalnog klijenta nije bilo moguće učitati.",
+      "loading": "Učitavanje faza…",
+      "movedLeads": "Premješteno potencijalnih klijenata: {count} u {stage}.",
+      "newStagePlaceholder": "Naziv nove faze",
+      "otherSectionHint": "Arhiviranje i pretvaranje u partnera postavlja aplikacija sama, pa se ne mogu izbrisati — naziv može.",
+      "saveFailed": "Promjenu faze nije bilo moguće spremiti."
+    },
     "onboarding": {
       "intro": "— definirajte standardne zadatke za svaki korak procesa uvođenja. Predlošci se automatski predlažu pri izradi zadataka na ploči Onboarding.",
       "introTitle": "Predlošci onboarding zadataka",
