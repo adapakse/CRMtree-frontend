@@ -137,6 +137,13 @@ const PROB_MAP: Record<LeadStage, number> = {
         <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">📂 {{ g.name }}</option>
       </optgroup>
     </select>
+    <div class="date-range" [class.on]="filterCreatedFrom || filterCreatedTo" [title]="t('leadsList.filters.addedRangeTitle')">
+      <span class="date-range-lbl">{{ t('leadsList.fields.addedOn') }}</span>
+      <input type="date" class="sel" [(ngModel)]="filterCreatedFrom" (ngModelChange)="load()" [max]="filterCreatedTo || null">
+      <span class="date-range-sep">–</span>
+      <input type="date" class="sel" [(ngModel)]="filterCreatedTo" (ngModelChange)="load()" [min]="filterCreatedFrom || null">
+      <span *ngIf="filterCreatedFrom || filterCreatedTo" class="date-range-x" (click)="filterCreatedFrom=''; filterCreatedTo=''; load()" [title]="t('leadsList.filters.clearDates')">×</span>
+    </div>
     <button class="btn btn-g btn-sm" (click)="openTimeline()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -195,6 +202,7 @@ const PROB_MAP: Record<LeadStage, number> = {
               <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">💬 {{lead.unread_sms_count}}</span>
               <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
               <span *ngIf="hasUnreadReply(lead)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
+              <span *ngIf="lead.created_at" class="lead-added">{{ t('leadsList.fields.addedOn') }} {{ lead.created_at | date:'dd.MM.yy' }}</span>
             </div>
             <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
           </div>
@@ -220,6 +228,7 @@ const PROB_MAP: Record<LeadStage, number> = {
               <span class="tag" [class]="lead.stage==='closed_won' ? 'tag-green' : 'tag-red'">
                 {{ lead.stage==='closed_won' ? '✓ ' + t('labels.stages.closed_won') : '✗ ' + t('labels.stages.closed_lost') }}
               </span>
+              <span *ngIf="lead.created_at" class="lead-added">{{ t('leadsList.fields.addedOn') }} {{ lead.created_at | date:'dd.MM.yy' }}</span>
             </div>
             <div class="pipe-bar">
               <div class="pipe-fill" style="width:100%"
@@ -278,6 +287,9 @@ const PROB_MAP: Record<LeadStage, number> = {
           </div>
           <div class="info-row" *ngIf="selected.industry">
             <span class="info-label">{{ t('leadsList.detail.industry') }}</span><span class="info-val">{{ selected.industry }}</span>
+          </div>
+          <div class="info-row" *ngIf="selected.created_at">
+            <span class="info-label">{{ t('leadsList.fields.addedOn') }}</span><span class="info-val">{{ selected.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
           </div>
 
           <div class="sec-title">{{ t('leadsList.detail.pipeline') }}</div>
@@ -887,6 +899,14 @@ const PROB_MAP: Record<LeadStage, number> = {
     .lead-contact { font-size:11px; color:var(--gray-500); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .lead-value { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:var(--orange); margin-bottom:3px; }
     .lead-meta { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+    .lead-added { margin-left:auto; font-size:10px; color:var(--gray-400); white-space:nowrap; }
+    .date-range { display:inline-flex; align-items:center; gap:4px; }
+    .date-range .sel { padding:5px 6px; width:128px; }
+    .date-range.on .sel { border-color:var(--orange); }
+    .date-range-lbl { font-size:12px; font-weight:500; color:var(--gray-500); }
+    .date-range-sep { color:var(--gray-400); font-size:12px; }
+    .date-range-x { cursor:pointer; font-size:15px; line-height:1; color:var(--gray-400); padding:0 2px; }
+    .date-range-x:hover { color:var(--orange); }
     .hot-dot { font-size:11px; }
     .lead-card-held { opacity:.55; filter:grayscale(.6); }
     .tr-row-held { opacity:.55; filter:grayscale(.6); }

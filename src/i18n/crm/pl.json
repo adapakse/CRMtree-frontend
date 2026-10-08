@@ -706,6 +706,7 @@
       "loading": "Pobieranie…"
     },
     "fields": {
+      "addedOn": "Dodano",
       "annualTurnover": "Obrót roczny",
       "closeDate": "Data zamknięcia",
       "companyName": "Nazwa firmy",
@@ -891,6 +892,7 @@
       "weightedValue": "Ważona wartość"
     },
     "fields": {
+      "addedOn": "Dodano",
       "annualTurnover": "Obrót roczny",
       "company": "Firma",
       "companyRole": "Rola w firmie",
@@ -903,10 +905,12 @@
       "website": "Strona WWW"
     },
     "filters": {
+      "addedRangeTitle": "Filtruj po dacie dodania leada",
       "all": "Wszystkie",
       "allReps": "Wszyscy handlowcy",
       "allSources": "Wszystkie źródła",
       "allStages": "Wszystkie etapy",
+      "clearDates": "Wyczyść zakres dat",
       "groupChip": "Grupa: {name}",
       "groupsGroup": "Grupy",
       "holdOnly": "Tylko Hold",

@@ -706,6 +706,7 @@
       "loading": "Recupero in corso…"
     },
     "fields": {
+      "addedOn": "Aggiunto",
       "annualTurnover": "Fatturato annuo",
       "closeDate": "Data di chiusura",
       "companyName": "Nome dell’azienda",
@@ -891,6 +892,7 @@
       "weightedValue": "Valore ponderato"
     },
     "fields": {
+      "addedOn": "Aggiunto",
       "annualTurnover": "Fatturato annuo",
       "company": "Azienda",
       "companyRole": "Ruolo in azienda",
@@ -903,10 +905,12 @@
       "website": "Sito web"
     },
     "filters": {
+      "addedRangeTitle": "Filtra per data di creazione del lead",
       "all": "Tutti",
       "allReps": "Tutti i commerciali",
       "allSources": "Tutte le fonti",
       "allStages": "Tutte le fasi",
+      "clearDates": "Cancella intervallo di date",
       "groupChip": "Gruppo: {name}",
       "groupsGroup": "Gruppi",
       "holdOnly": "Solo in sospeso",

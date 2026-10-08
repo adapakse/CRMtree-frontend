@@ -706,6 +706,7 @@
       "loading": "Fetching…"
     },
     "fields": {
+      "addedOn": "Added",
       "annualTurnover": "Annual turnover",
       "closeDate": "Close date",
       "companyName": "Company name",
@@ -891,6 +892,7 @@
       "weightedValue": "Weighted value"
     },
     "fields": {
+      "addedOn": "Added",
       "annualTurnover": "Annual turnover",
       "company": "Company",
       "companyRole": "Role in company",
@@ -903,10 +905,12 @@
       "website": "Website"
     },
     "filters": {
+      "addedRangeTitle": "Filter by lead creation date",
       "all": "All",
       "allReps": "All salespeople",
       "allSources": "All sources",
       "allStages": "All stages",
+      "clearDates": "Clear date range",
       "groupChip": "Group: {name}",
       "groupsGroup": "Groups",
       "holdOnly": "On hold only",

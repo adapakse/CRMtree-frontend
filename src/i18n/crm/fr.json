@@ -706,6 +706,7 @@
       "loading": "Récupération…"
     },
     "fields": {
+      "addedOn": "Ajouté",
       "annualTurnover": "Chiffre d’affaires annuel",
       "closeDate": "Date de clôture",
       "companyName": "Nom de la société",
@@ -891,6 +892,7 @@
       "weightedValue": "Valeur pondérée"
     },
     "fields": {
+      "addedOn": "Ajouté",
       "annualTurnover": "Chiffre d’affaires annuel",
       "company": "Société",
       "companyRole": "Fonction dans la société",
@@ -903,10 +905,12 @@
       "website": "Site web"
     },
     "filters": {
+      "addedRangeTitle": "Filtrer par date de création du lead",
       "all": "Tous",
       "allReps": "Tous les commerciaux",
       "allSources": "Toutes les sources",
       "allStages": "Toutes les étapes",
+      "clearDates": "Effacer la plage de dates",
       "groupChip": "Groupe : {name}",
       "groupsGroup": "Groupes",
       "holdOnly": "En attente uniquement",

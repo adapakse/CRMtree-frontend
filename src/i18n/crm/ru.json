@@ -706,6 +706,7 @@
       "loading": "Загрузка…"
     },
     "fields": {
+      "addedOn": "Добавлено",
       "annualTurnover": "Годовой оборот",
       "closeDate": "Дата закрытия",
       "companyName": "Название компании",
@@ -891,6 +892,7 @@
       "weightedValue": "Взвешенная сумма"
     },
     "fields": {
+      "addedOn": "Добавлено",
       "annualTurnover": "Годовой оборот",
       "company": "Компания",
       "companyRole": "Должность в компании",
@@ -903,10 +905,12 @@
       "website": "Сайт"
     },
     "filters": {
+      "addedRangeTitle": "Фильтр по дате создания лида",
       "all": "Все",
       "allReps": "Все менеджеры по продажам",
       "allSources": "Все источники",
       "allStages": "Все этапы",
+      "clearDates": "Очистить диапазон дат",
       "groupChip": "Группа: {name}",
       "groupsGroup": "Группы",
       "holdOnly": "Только на паузе",

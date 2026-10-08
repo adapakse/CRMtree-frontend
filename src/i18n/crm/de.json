@@ -706,6 +706,7 @@
       "loading": "Wird abgerufen…"
     },
     "fields": {
+      "addedOn": "Hinzugefügt",
       "annualTurnover": "Jahresumsatz",
       "closeDate": "Abschlussdatum",
       "companyName": "Firmenname",
@@ -891,6 +892,7 @@
       "weightedValue": "Gewichteter Wert"
     },
     "fields": {
+      "addedOn": "Hinzugefügt",
       "annualTurnover": "Jahresumsatz",
       "company": "Firma",
       "companyRole": "Position im Unternehmen",
@@ -903,10 +905,12 @@
       "website": "Website"
     },
     "filters": {
+      "addedRangeTitle": "Nach Erstellungsdatum des Leads filtern",
       "all": "Alle",
       "allReps": "Alle Vertriebsmitarbeiter",
       "allSources": "Alle Quellen",
       "allStages": "Alle Phasen",
+      "clearDates": "Datumsbereich löschen",
       "groupChip": "Gruppe: {name}",
       "groupsGroup": "Gruppen",
       "holdOnly": "Nur zurückgestellte",
