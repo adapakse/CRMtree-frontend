@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Abbrechen",
+      "changeToken": "Token ändern",
+      "delete": "Löschen",
+      "deleting": "Wird gelöscht…",
+      "hide": "Verbergen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "setToken": "Token festlegen",
+      "show": "Anzeigen"
+    },
+    "columns": {
+      "crmRole": "CRM-Rolle",
+      "directPhone": "Durchwahl (DPN)",
+      "status": "Status",
+      "updatedAt": "Aktualisiert",
+      "user": "Benutzer"
+    },
+    "deleteModal": {
+      "body": "Soll das PBX-Token für {name} wirklich gelöscht werden? Der Benutzer kann das Softphone dann nicht mehr verwenden.",
+      "title": "PBX-Token löschen"
+    },
+    "loadError": "Fehler beim Laden der Daten.",
+    "loading": "Wird geladen…",
+    "modal": {
+      "hintBody": "Melden Sie sich im ip-pbx.eu-Panel als dieser Benutzer an oder fragen Sie ihn nach dem Token. Panel → Avatar/Name oben rechts anklicken → API oder Personal Access Token → Token erstellen / kopieren.",
+      "hintTitle": "Woher bekomme ich das Token?",
+      "patHint": "Nach dem Speichern ruft das System die SIP-Daten und die Durchwahl automatisch von ip-pbx.eu ab.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Token von ip-pbx.eu einfügen",
+      "title": "PBX-Token — {name}"
+    },
+    "noPhoneInPbx": "Keine Nummer in der PBX",
+    "roles": {
+      "salesManager": "Vertriebsleiter",
+      "salesperson": "Vertriebsmitarbeiter"
+    },
+    "searchPlaceholder": "Benutzer suchen…",
+    "status": {
+      "configured": "Konfiguriert",
+      "noToken": "Kein Token"
+    },
+    "subtitle": "Weisen Sie jedem Vertriebsmitarbeiter sein Personal Access Token von ip-pbx.eu zu. Das System ruft die SIP-Daten und die Durchwahl (DPN) automatisch ab.",
+    "title": "PBX-Telefonnummern",
+    "toast": {
+      "deleteError": "Fehler beim Löschen des Tokens.",
+      "deleted": "Token gelöscht.",
+      "saveError": "Fehler beim Speichern des Tokens.",
+      "saved": "Token gespeichert.",
+      "savedWithPhone": "Token gespeichert. Nummer: {phone}."
+    },
+    "userCount": "Benutzer: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Hinzufügen",

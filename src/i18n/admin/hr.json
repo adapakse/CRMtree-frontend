@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Odustani",
+      "changeToken": "Promijeni token",
+      "delete": "Izbriši",
+      "deleting": "Brisanje…",
+      "hide": "Sakrij",
+      "save": "Spremi",
+      "saving": "Spremanje…",
+      "setToken": "Postavi token",
+      "show": "Prikaži"
+    },
+    "columns": {
+      "crmRole": "CRM rola",
+      "directPhone": "Direktni broj (DPN)",
+      "status": "Status",
+      "updatedAt": "Ažurirano",
+      "user": "Korisnik"
+    },
+    "deleteModal": {
+      "body": "Jeste li sigurni da želite izbrisati PBX token za {name}? Korisnik neće moći koristiti softphone.",
+      "title": "Izbriši PBX token"
+    },
+    "loadError": "Pogreška pri učitavanju podataka.",
+    "loading": "Učitavanje…",
+    "modal": {
+      "hintBody": "Prijavite se u panel ip-pbx.eu kao taj korisnik ili ga zamolite za token. Panel → kliknite avatar/ime u gornjem desnom kutu → API ili Personal Access Token → Kreiraj / Kopiraj token.",
+      "hintTitle": "Gdje dobiti token?",
+      "patHint": "Nakon spremanja sustav će automatski preuzeti SIP podatke i direktni broj s ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Zalijepite token s ip-pbx.eu",
+      "title": "PBX token — {name}"
+    },
+    "noPhoneInPbx": "Nema broja u PBX-u",
+    "roles": {
+      "salesManager": "Menadžer prodaje",
+      "salesperson": "Prodavač"
+    },
+    "searchPlaceholder": "Traži korisnika…",
+    "status": {
+      "configured": "Konfigurirano",
+      "noToken": "Nema tokena"
+    },
+    "subtitle": "Svakom prodavaču dodijelite njegov Personal Access Token s ip-pbx.eu. Sustav će automatski preuzeti SIP podatke i direktni telefonski broj (DPN).",
+    "title": "PBX telefonski brojevi",
+    "toast": {
+      "deleteError": "Pogreška pri brisanju tokena.",
+      "deleted": "Token izbrisan.",
+      "saveError": "Pogreška pri spremanju tokena.",
+      "saved": "Token spremljen.",
+      "savedWithPhone": "Token spremljen. Broj: {phone}."
+    },
+    "userCount": "Korisnici: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Dodaj",

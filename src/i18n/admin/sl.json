@@ -660,6 +660,60 @@
       }
     }
   },
+  "pbx": {
+    "actions": {
+      "cancel": "Prekliči",
+      "changeToken": "Spremeni žeton",
+      "delete": "Izbriši",
+      "deleting": "Brisanje…",
+      "hide": "Skrij",
+      "save": "Shrani",
+      "saving": "Shranjevanje…",
+      "setToken": "Nastavi žeton",
+      "show": "Pokaži"
+    },
+    "columns": {
+      "crmRole": "Vloga v CRM",
+      "directPhone": "Neposredna številka (DPN)",
+      "status": "Status",
+      "updatedAt": "Posodobljeno",
+      "user": "Uporabnik"
+    },
+    "deleteModal": {
+      "body": "Res želite izbrisati žeton PBX za {name}? Uporabnik ne bo mogel uporabljati softphona.",
+      "title": "Izbriši žeton PBX"
+    },
+    "loadError": "Napaka pri nalaganju podatkov.",
+    "loading": "Nalaganje…",
+    "modal": {
+      "hintBody": "Prijavite se v ploščo ip-pbx.eu kot ta uporabnik ali ga prosite za žeton. Plošča → kliknite avatar/ime v zgornjem desnem kotu → API ali Personal Access Token → Ustvari / Kopiraj žeton.",
+      "hintTitle": "Kje dobim žeton?",
+      "patHint": "Po shranjevanju bo sistem samodejno pridobil podatke SIP in neposredno številko iz ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Prilepite žeton iz ip-pbx.eu",
+      "title": "Žeton PBX — {name}"
+    },
+    "noPhoneInPbx": "Ni številke v PBX",
+    "roles": {
+      "salesManager": "Vodja prodaje",
+      "salesperson": "Prodajnik"
+    },
+    "searchPlaceholder": "Iskanje uporabnika…",
+    "status": {
+      "configured": "Nastavljeno",
+      "noToken": "Ni žetona"
+    },
+    "subtitle": "Vsakemu prodajniku dodelite njegov Personal Access Token iz ip-pbx.eu. Sistem bo samodejno pridobil podatke SIP in neposredno telefonsko številko (DPN).",
+    "title": "Telefonske številke PBX",
+    "toast": {
+      "deleteError": "Napaka pri brisanju žetona.",
+      "deleted": "Žeton izbrisan.",
+      "saveError": "Napaka pri shranjevanju žetona.",
+      "saved": "Žeton shranjen.",
+      "savedWithPhone": "Žeton shranjen. Številka: {phone}."
+    },
+    "userCount": "Uporabniki: {count}"
+  },
   "settings": {
     "actions": {
       "add": "Dodaj",

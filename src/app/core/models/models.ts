@@ -71,7 +71,7 @@ export interface Tenant {
   total_users?: number;
   features?: TenantFeature[];
   auth_configs?: { provider: string; is_enabled: boolean }[];
-  active_email_provider?: 'gmail' | 'outlook' | 'zoho' | null;
+  active_email_provider?: 'gmail' | 'outlook' | 'zoho' | 'yandex' | null;
   crm_training_mode?: boolean;
   subscription?: TenantSubscription | null;
   billing_details?: TenantBillingDetails | null;

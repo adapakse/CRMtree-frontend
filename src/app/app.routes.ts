@@ -61,6 +61,10 @@ export const routes: Routes = withI18nScopes([
     loadComponent: () => import('./pages/crm/zoho-callback/zoho-callback.component').then(m => m.ZohoCallbackComponent),
   },
   {
+    path: 'crm/yandex/callback',
+    loadComponent: () => import('./pages/crm/yandex-callback/yandex-callback.component').then(m => m.YandexCallbackComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],
@@ -110,6 +114,11 @@ export const routes: Routes = withI18nScopes([
         path: 'admin/data',
         canActivate: [adminGuard],
         loadComponent: () => import('./pages/admin/data-management/data-management.component').then(m => m.DataManagementComponent),
+      },
+      {
+        path: 'admin/pbx',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./pages/admin/pbx/admin-pbx.component').then(m => m.AdminPbxComponent),
       },
       {
         path: 'admin/tenants',
