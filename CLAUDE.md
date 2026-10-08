@@ -1,12 +1,15 @@
 # CRMtree Frontend
 
 ## Projekt
-Angular 17+ SPA — generyczny CRM dla przedsiębiorstw różnych branż, skupiony na
+Angular 21 SPA — generyczny CRM dla przedsiębiorstw różnych branż, skupiony na
 dynamicznej pracy handlowców oraz zarządzaniu lejkiem sprzedażowym, upsellem i cross-sellem.
-Katalog: `C:\Users\Adam\Documents\crmtree-frontend`
+Katalog: `C:\Users\apt\Documents\crmtree-frontend`
+
+Powiązane repozytoria (obok tego katalogu): `crmtree-backend` (API; reguły biznesowe modułów są
+w jego `CLAUDE.md`), `crmtree-mobile` (aplikacja Flutter), `crmtree-landing` (strona crmtree.pl).
 
 ## Stack
-- Angular 17+ (standalone components, signals, ChangeDetectionStrategy.OnPush)
+- Angular 21 (standalone components, signals, ChangeDetectionStrategy.OnPush)
 - Custom SCSS (CSS variables w `src/styles/global.scss`)
 - Brak Tailwind, brak Angular Material — tylko własne komponenty
 
@@ -23,29 +26,57 @@ Katalog: `C:\Users\Adam\Documents\crmtree-frontend`
 - `src/proxy.conf.json` — proxy `/api` → `http://127.0.0.1:3001`
 
 ## Git workflow
-- Branch roboczy: `develop`
-- Nie twórz gałęzi o automatycznej nazwie (np. `claude/...`) — zapytaj Adama o nazwę
-  gałęzi przed pierwszym commitem i używaj dokładnie tej, którą poda.
-- Push TYLKO do `develop`: `git push crmtree develop`
-- Merge do `master` robi Adam ręcznie po testach (master = deploy na Azure)
-- Remote `crmtree` = GitHub (`git@github-crmtree:adapakse/CRMtree-frontend.git`)
-- Remote `origin` = martwy (stary projekt), ignoruj komunikaty o rozbieżności
+- Remote `origin` = GitHub (`git@github-crmtree:adapakse/CRMtree-frontend.git`) — to jedyny
+  i właściwy remote; osobnego remote `crmtree` nie ma.
+- Branch roboczy: `develop` (push na `develop` wdraża środowisko INT). Większą zmianę rób na
+  gałęzi `feature/<opisowa-nazwa>` i scalaj do `develop` po sprawdzeniu.
+- Nazwy gałęzi: opisowe, bez numerów zgłoszeń; nie używaj nazw automatycznych
+  (np. `claude/...`). Adam pozwala dobrać nazwę samodzielnie.
+- **W tym repozytorium pracuje równolegle kilka sesji.** Przed pushem zawsze `git fetch` i
+  scal `origin/develop`; po scaleniu uruchom `npm run i18n:check` i build. Commituj tylko
+  swoje pliki.
+- Merge do `master` robi Adam ręcznie po testach (master = deploy produkcyjny na Azure).
+- Commit i push dopiero na prośbę Adama.
 
 ## Uruchomienie lokalne
 ```bash
 npm start   # http://localhost:4201
 ```
-Backend musi działać na porcie 3001.
+Backend musi działać na porcie 3001. Serwery deweloperskie (frontend i backend) Adam uruchamia
+sam w osobnym terminalu — nie startuj ich w tle z sesji. Do weryfikacji używaj
+`npm run build` (wcześniej sam uruchamia `npm run i18n:check`).
 
 ## Deploy (CI/CD)
-- GitHub Actions workflow: `.github/workflows/deploy.yml`
-- Odpala się automatycznie po pushu do `master`
+- GitHub Actions: `.github/workflows/deploy.yml` (push do `master` → produkcja) oraz
+  `deploy-int.yml` (push do `develop` → środowisko INT, `crmtree-frontend-int`)
 - Pipeline: Docker build → push do ACR → Azure Container App update
 - Azure Container App: `crmtree-frontend.salmonsmoke-415d1384.polandcentral.azurecontainerapps.io`
 
 ## Projekty NIE mylić
 - `worktrips-doc-frontend` — osobna aplikacja, inne kolory (pomarańczowe), inne logo
 - Zawsze sprawdź w jakim katalogu pracujesz przed edycją
+
+---
+
+## Zasady ogólne interfejsu (decyzje Adama — obowiązują w każdym module)
+
+- **Każdy ekran z listą wielu elementów ma filtry i stronicowanie** (2026-10-06): pasek
+  filtrów, filtr w nagłówku każdej kolumny tabeli, sortowanie oraz strony po maks. 50 elementów
+  („poprzednia / następna” z licznikiem „1–50 z 230”). Filtrowanie, sortowanie i strony są po
+  stronie serwera. Używaj gotowych elementów z `src/app/shared/list/` (`ListQueryState`,
+  `createListLoader`, `wt-list-filter-bar`, `th[wtListColumn]`, `wt-list-pager`); stan
+  filtrów trzymaj w adresie strony. Dla list zadań projektowych zestaw filtrów to: nazwa,
+  status, przedziały dat rozpoczęcia i zakończenia, przedział kosztu, a w widokach PM-a,
+  multi-PM-a i kontrolera — osoba. Buduj tak każdą nową listę bez czekania na prośbę. Starsze
+  listy (leady, partnerzy, dokumenty) nie były jeszcze przeglądane pod tym kątem.
+- **Każdy tekst widoczny dla użytkownika idzie przez tłumaczenia w 10 językach** — patrz
+  „Wielojęzyczność (i18n)”.
+- **Komunikaty z API są po angielsku** (decyzja z 2026-10-05, backend ich nie tłumaczy). Tam,
+  gdzie znasz przyczynę błędu (status HTTP, kontekst akcji), pokaż własny, przetłumaczony tekst;
+  surowy komunikat z API zostaw tylko jako ostateczność.
+- **Aplikacja mobilna** (`crmtree-mobile`) powtarza funkcje webu własnym kodem. Gdy zmieniasz
+  kształt odpowiedzi API, sprawdź, czy korzysta z niej telefon. Opis kontroli terminów i
+  finansów projektu dla sesji mobilnej: `docs/mobile-handoff-project-deadlines-finance.md`.
 
 ---
 
@@ -214,9 +245,16 @@ przed dodaniem jakiegokolwiek tekstu widocznego dla użytkownika.
 - `npm run i18n:check` pilnuje kompletu kluczy, parametrów i formatu; uruchamia się też przed
   `npm run build`. Pliki z listy `src/i18n/translated-files.json` nie mogą już zawierać polskiego
   tekstu wpisanego na sztywno.
-- Wdrażanie idzie modułami; nieprzetłumaczone moduły działają po polsku. Zakres „Polish is only
-  acceptable in user-facing UI strings” poniżej dotyczy już tylko modułów jeszcze nieprzetłumaczonych.
-- Panel superadmina zostaje po polsku. Danych wpisanych przez tenanta nie tłumaczymy.
+- **Stan na 2026-10-08:** cała część aplikacji dla tenantów jest przetłumaczona. Zakresy:
+  `common` (wspólne, w tym kontrolki list), `shell` (menu), `auth`, `crm` (leady, partnerzy,
+  kalendarz, raporty, softphone, analiza rozmów, SEObot), `projects` (projekty, finanse, KSeF,
+  terminy), `documents`, `admin` (ustawienia, użytkownicy, grupy, logi, dane, ankieta),
+  `account` (moje ustawienia). Nowy ekran dopisz do `SCOPES_BY_PATH_PREFIX` w
+  `src/app/core/i18n/i18n-scope.guard.ts`.
+- **Po polsku zostają celowo:** panel superadmina (Tenants, rozliczenia), moduł Prospekty
+  (przerabiany osobno) i publiczne strony (blog, strona główna, regulamin, polityka prywatności).
+  Danych wpisanych przez tenanta nie tłumaczymy.
+- Maile i wizualizację faktury KSeF tłumaczy backend (język odbiorcy / tenanta).
 
 ---
 
@@ -225,7 +263,9 @@ przed dodaniem jakiegokolwiek tekstu widocznego dla użytkownika.
 ### Language
 - **All code must be written in English**: variable names, method names, class names,
   interface names, type aliases, enum values, and inline comments.
-- Polish is only acceptable in user-facing UI strings (labels, messages, tooltips).
+- No hardcoded user-facing text: every label, message and tooltip goes through Transloco keys
+  in all 10 languages (see "Wielojęzyczność (i18n)"). Polish literals remain only in the parts
+  deliberately left untranslated (super-admin panel, Prospects, public pages).
 
 ### Naming conventions
 - Use descriptive, self-explanatory names — a reader should understand intent without
