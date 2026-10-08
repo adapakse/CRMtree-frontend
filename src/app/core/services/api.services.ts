@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
-  GroupProfile, User, UserRole, WorkflowTask,
+  GroupProfile, User, UserRole, VisibilityGrant, WorkflowTask,
   AuditLog, AuditLogFilters, DocumentGroup,
   PaginatedResponse
 } from '../models/models';
@@ -72,6 +72,26 @@ export class UserService {
 
   removeRole(userId: string, roleId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${userId}/roles/${roleId}`);
+  }
+
+  getVisibilityGrants(userId: string): Observable<VisibilityGrant[]> {
+    return this.http.get<VisibilityGrant[]>(`${this.base}/${userId}/visibility-grants`);
+  }
+
+  addVisibilityGrant(
+    userId: string,
+    targetGroupId: string,
+    module: 'leads' | 'partners',
+    accessLevel: 'read' | 'full',
+    note?: string,
+  ): Observable<VisibilityGrant> {
+    return this.http.post<VisibilityGrant>(`${this.base}/${userId}/visibility-grants`, {
+      target_group_id: targetGroupId, module, access_level: accessLevel, note: note ?? null,
+    });
+  }
+
+  removeVisibilityGrant(userId: string, grantId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${userId}/visibility-grants/${grantId}`);
   }
 
   setPassword(id: string, password: string): Observable<{ ok: boolean }> {

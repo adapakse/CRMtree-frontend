@@ -1,0 +1,863 @@
+{
+  "assigneeSummary": {
+    "atRisk": "At risk",
+    "key": "open · overdue · at risk",
+    "open": "Open tasks",
+    "overdue": "Overdue"
+  },
+  "card": {
+    "closeConfirm": "Close the project? A closed project is read-only and disappears from the default list.",
+    "closeProject": "Close project",
+    "closedBadge": "Closed",
+    "datesHint": "A project is marked as delayed when an unfinished task ends after the project's end date, or when that date has passed and unfinished tasks remain.",
+    "description": "Description",
+    "edit": "Edit",
+    "endDate": "Project end date",
+    "errors": {
+      "addMemberFailed": "Couldn't add the person",
+      "changeAccessLevelFailed": "Couldn't change the access level",
+      "changeRoleFailed": "Couldn't change the role",
+      "closeProjectFailed": "Couldn't close the project",
+      "endBeforeStart": "The project end date cannot be earlier than its start.",
+      "removeMemberFailed": "Couldn't remove the person",
+      "reopenProjectFailed": "Couldn't reopen the project",
+      "saveFieldsFailed": "Couldn't save the fields",
+      "saveProjectFailed": "Couldn't save the project"
+    },
+    "fields": {
+      "add": "Add field",
+      "empty": "The project has no custom fields.",
+      "field": "Field",
+      "noneAvailable": "No fields to add. Fields are defined by an administrator in Settings → Projects → Task custom fields.",
+      "remove": "Remove",
+      "removeConfirm": "Remove the field “{name}” from the project? Values entered in tasks will be kept.",
+      "required": "Required",
+      "requiredToggle": "required",
+      "selectPlaceholder": "— select a field —",
+      "title": "Task custom fields",
+      "type": "Type"
+    },
+    "members": {
+      "accessLevel": "Access level",
+      "add": "Add",
+      "companyAndDepartment": "Company / department",
+      "email": "Email",
+      "externalAccount": "external account",
+      "inactive": "(inactive)",
+      "person": "Person",
+      "phone": "Phone",
+      "remove": "Remove",
+      "removeConfirm": "Remove {name} from the project? The person will also be unassigned from their tasks.",
+      "role": "Role",
+      "searchPlaceholder": "Type a first name, last name, email or company (min. 3 characters)…",
+      "title": "People in the project"
+    },
+    "name": "Name",
+    "noDescription": "No description.",
+    "reopenProject": "Reopen",
+    "startDate": "Project start",
+    "title": "Project card"
+  },
+  "chat": {
+    "deletedUser": "Deleted user",
+    "empty": "No messages.",
+    "hint": "Enter sends the message, Shift+Enter adds a new line.",
+    "placeholder": "Write a message…",
+    "send": "Send",
+    "sendFailed": "Couldn't send the message"
+  },
+  "crmLink": {
+    "change": "Change",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Link",
+    "linkFailed": "Couldn't link the project",
+    "none": "none",
+    "remove": "Remove link",
+    "removeConfirm": "Remove the project's link to the CRM? The project's tasks will disappear from the lead or partner card.",
+    "removeFailed": "Couldn't remove the link",
+    "searchHint": "Suggestions include only the leads and partners you have access to in the CRM. Selecting one saves the link immediately.",
+    "searchPlaceholder": "Type a lead or partner name (min. 3 characters)…",
+    "title": "CRM link"
+  },
+  "deadlines": {
+    "atRisk": "At risk",
+    "atRiskHint": "The end date is near and work has not started.",
+    "completedLate": "Completed late",
+    "completedLateHint": "The task was completed after its end date.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "at risk (to do, due within {days, plural, one {# day} other {# days}})",
+      "beyondProjectEnd": "past the project's end date",
+      "completedLate": "completed late",
+      "originalEndDate": "original end date",
+      "overdue": "overdue",
+      "overdueSubtasks": "overdue subtasks",
+      "projectEndDate": "project end date"
+    },
+    "originalEndDateHint": "Original end date and the shift in days",
+    "overdue": "Overdue",
+    "overdueDays": "Overdue {days} d",
+    "overdueHint": "The end date has passed and the task is not done.",
+    "overdueSubtasks": "Overdue subtasks",
+    "overdueSubtasksHint": "At least one subtask is overdue.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Delayed",
+    "reasons": {
+      "endPassed": "The project's end date passed {days, plural, one {# day} other {# days}} ago, open tasks: {count}",
+      "taskAfterEnd": "Tasks ending after the project's end date: {count} (the latest by {days, plural, one {# day} other {# days}})"
+    }
+  },
+  "detail": {
+    "backToProjects": "Projects",
+    "closedBadge": "Closed",
+    "empty": {
+      "noAssignedTasks": "You have no assigned tasks in this project.",
+      "noTasks": "There are no tasks in this project yet."
+    },
+    "newTask": "New task",
+    "openFailed": "Couldn't open the project",
+    "refreshFailed": "Couldn't refresh the project",
+    "showOnlyMyTasks": "Show my tasks",
+    "tabs": {
+      "card": "Project card",
+      "chat": "Chat",
+      "finance": "Finance",
+      "tasks": "Tasks ({count})",
+      "timeline": "Timeline"
+    },
+    "tasksLoadFailed": "Couldn't load the tasks"
+  },
+  "filters": {
+    "assignee": "Assignee",
+    "atRiskCount": "Tasks at risk",
+    "cost": "Cost",
+    "delayReason": "Reason for the delay",
+    "delayReasonValues": {
+      "end_passed": "The project's end date has passed",
+      "task_after_end": "A task ends after the project's end date"
+    },
+    "delayed": "Delay",
+    "delayedValues": {
+      "no": "Not delayed",
+      "yes": "Delayed"
+    },
+    "endDate": "End date",
+    "manager": "PM",
+    "myRole": "My role",
+    "myRoleValues": {
+      "controller": "Controller",
+      "participant": "Participant",
+      "pm": "PM"
+    },
+    "name": "Task name",
+    "number": "Number",
+    "originalEndDate": "Original end date",
+    "overdueCount": "Overdue tasks",
+    "priority": "Priority",
+    "progress": "Progress (%)",
+    "project": "Project",
+    "projectCost": "Incurred cost",
+    "projectEndDate": "Project end date",
+    "projectName": "Project name or key",
+    "projectRevenue": "Revenue",
+    "projectSort": {
+      "at_risk": "Tasks at risk",
+      "cost": "Incurred cost",
+      "delay": "Delay",
+      "end_date": "End date",
+      "key": "Key",
+      "name": "Name",
+      "overdue": "Overdue tasks",
+      "pm": "PM",
+      "progress": "Progress",
+      "revenue": "Revenue",
+      "start_date": "Start date",
+      "status": "Status"
+    },
+    "projectStartDate": "Project start",
+    "slip": "Shift (days)",
+    "startDate": "Start date",
+    "status": "Status",
+    "statusCategory": "Stage",
+    "taskSort": {
+      "original_end_date": "Original end date",
+      "parent": "Parent task",
+      "slip_days": "Shift"
+    },
+    "timeliness": "Timeliness",
+    "timelinessValues": {
+      "at_risk": "At risk",
+      "on_time": "On time",
+      "overdue": "Overdue"
+    },
+    "type": "Type",
+    "unassigned": "Unassigned"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Budget of category {name}",
+      "columns": {
+        "budget": "Budget",
+        "category": "Category",
+        "incurred": "Incurred",
+        "planned": "Planned",
+        "variance": "Variance"
+      },
+      "empty": "No cost categories yet. An administrator adds them in Settings → Projects → Cost categories.",
+      "hint": "Variance is the budget minus incurred costs. Rows over budget are highlighted.",
+      "inactive": "(inactive)",
+      "saveFailed": "Couldn't save the budget",
+      "title": "Budget by category",
+      "total": "Total"
+    },
+    "costForm": {
+      "addTitle": "New cost",
+      "amount": "Amount",
+      "category": "Category",
+      "clearInvoiceDocument": "Detach document",
+      "conversionHint": "The amount will be converted to {currency} at the average rate of NBP (the National Bank of Poland) from the business day before the cost date.",
+      "currency": "Amount currency",
+      "date": "Date",
+      "description": "Description",
+      "documentNumber": "Document number",
+      "editTitle": "Edit cost",
+      "invoiceDocument": "Invoice document (optional)",
+      "invoiceDocumentHint": "Documents of type Invoice that you can access in the Documents module. Invoices downloaded from KSeF are linked separately.",
+      "invoiceDocumentPlaceholder": "Search invoices by number or name…",
+      "noTask": "— no task —",
+      "saveFailed": "Couldn't save the cost",
+      "saved": "Cost saved",
+      "savedWithRate": "Cost saved: {amount} at the rate {rate} of {date}",
+      "selectCategory": "— select a category —",
+      "status": "Status",
+      "storedConversion": "Stored as {amount} (rate {rate} of {date}).",
+      "supplier": "Supplier",
+      "task": "Task"
+    },
+    "costStatuses": {
+      "incurred": "Incurred",
+      "planned": "Planned"
+    },
+    "costs": {
+      "add": "Add cost",
+      "columns": {
+        "amount": "Amount",
+        "category": "Category",
+        "date": "Date",
+        "description": "Description",
+        "documentNumber": "Document no.",
+        "status": "Status",
+        "supplier": "Supplier",
+        "task": "Task"
+      },
+      "deleteConfirm": "Delete the cost ({item})?",
+      "deleteFailed": "Couldn't delete the cost",
+      "empty": "The project has no costs yet.",
+      "emptyForFilters": "No costs match the selected filters.",
+      "filters": {
+        "allCategories": "All categories",
+        "allStatuses": "All statuses",
+        "allTasks": "All tasks",
+        "withoutTask": "No task"
+      },
+      "rateNote": "rate {rate} of {date}",
+      "title": "Costs",
+      "totalIncurred": "Total incurred"
+    },
+    "delete": "Delete",
+    "document": {
+      "lockedTitle": "Invoice document — you have no access to it in the Documents module",
+      "openTitle": "Invoice document — open in the Documents module"
+    },
+    "edit": "Edit",
+    "loadFailed": "Couldn't load the project finance",
+    "plan": {
+      "currency": "Project currency",
+      "currencyLockedHint": "The currency can no longer be changed because the project already has cost or revenue items.",
+      "participantsCanAddCosts": "Participants may add costs to their own tasks",
+      "participantsCanAddCostsHint": "An internal participant adds costs only to tasks assigned to them and sees only the items they added themselves.",
+      "plannedRevenue": "Planned revenue ({currency})",
+      "saveFailed": "Couldn't save the plan",
+      "suggestedHint": "The suggestion is the value of the linked lead converted to the project currency.",
+      "title": "Financial plan",
+      "useSuggested": "Use suggested: {amount}"
+    },
+    "readOnlyNote": "View only — you can see the finance of this project but cannot change it.",
+    "revenueStatuses": {
+      "invoiced": "Invoiced",
+      "paid": "Paid",
+      "planned": "Planned"
+    },
+    "revenues": {
+      "add": "Add revenue",
+      "addTitle": "New revenue item",
+      "amountIn": "Amount ({currency})",
+      "columns": {
+        "amount": "Amount",
+        "date": "Date",
+        "description": "Description",
+        "status": "Status"
+      },
+      "deleteConfirm": "Delete the revenue item ({item})?",
+      "deleteFailed": "Couldn't delete the revenue item",
+      "editTitle": "Edit revenue item",
+      "empty": "The project has no revenue yet.",
+      "saveFailed": "Couldn't save the revenue item",
+      "saved": "Revenue saved",
+      "statusHint": "Invoiced and paid items count as actual revenue.",
+      "title": "Revenue"
+    },
+    "saving": "Saving…",
+    "summary": {
+      "budget": "Budget",
+      "cost": "Cost (incurred)",
+      "margin": "Margin (actual)",
+      "plan": "Plan",
+      "plannedItems": "Planned items",
+      "remainingBudget": "Remaining budget",
+      "remainingBudgetHint": "Budget minus incurred costs",
+      "revenue": "Revenue (actual)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Incurred (own)",
+        "plannedCost": "Planned cost",
+        "task": "Task",
+        "totalIncurred": "Incurred incl. subtasks",
+        "totalPlanned": "Planned incl. subtasks"
+      },
+      "empty": "No task has costs or a planned cost yet.",
+      "hint": "A task's planned cost is informational and is not part of the project budget. Amounts \"incl. subtasks\" cover the items of the task and of all its subtasks.",
+      "plannedCostOf": "Planned cost of task {task}",
+      "saveFailed": "Couldn't save the planned cost",
+      "title": "Task costs",
+      "total": "Total"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Actual / plan",
+      "cost": "Cost",
+      "margin": "Margin",
+      "marginHint": "Actual margin: invoiced and paid revenue minus incurred costs",
+      "revenue": "Revenue"
+    }
+  },
+  "gantt": {
+    "beyondProjectEnd": "Ends after the project's end date",
+    "emptyTitle": "No tasks",
+    "loadFailed": "Could not load the timeline",
+    "originalEndDate": "Original end date: {date} ({slip})",
+    "projectEndDate": "Project end date: {date}",
+    "taskColumn": "Task",
+    "today": "Today",
+    "truncated": "The timeline shows the first {limit} tasks. Narrow the filters to see the rest.",
+    "undatedNote": "{count, plural, one {# task without dates has no bar on the timeline.} other {# tasks without dates have no bar on the timeline.}}",
+    "zoom": {
+      "day": "Days",
+      "month": "Months",
+      "week": "Weeks"
+    }
+  },
+  "ksef": {
+    "badge": {
+      "openTitle": "KSeF invoice — show details",
+      "title": "KSeF invoice"
+    },
+    "costs": {
+      "addFromKsef": "Add invoice from KSeF",
+      "link": "Link KSeF invoice",
+      "unlink": "Unlink invoice",
+      "unlinkConfirm": "Unlink invoice {invoice} from this cost? The cost stays on the list and the invoice stays in KSeF.",
+      "unlinkFailed": "Could not unlink the invoice"
+    },
+    "detail": {
+      "address": "Address",
+      "buyer": "Buyer",
+      "invoiceType": "Invoice type",
+      "issueDate": "Issue date",
+      "ksefNumber": "KSeF number",
+      "lines": {
+        "empty": "The invoice has no lines.",
+        "name": "Name",
+        "netAmount": "Net value",
+        "number": "No.",
+        "quantity": "Quantity",
+        "title": "Invoice lines",
+        "unitNetPrice": "Net price",
+        "vatRate": "VAT"
+      },
+      "links": {
+        "empty": "The invoice is not linked to any cost.",
+        "linkedTotal": "Linked in total: {linked} of {net} net.",
+        "title": "Links of the invoice"
+      },
+      "loadFailed": "Could not load the invoice",
+      "payment": {
+        "amountDue": "Amount due",
+        "bankAccounts": "Bank account",
+        "dueDates": "Payment due",
+        "factor": "factor",
+        "form": "Payment method",
+        "paymentDate": "Payment date",
+        "state": "Payment state",
+        "states": {
+          "paid": "Paid",
+          "partiallyPaid": "Partially paid",
+          "unknown": "No information",
+          "unpaid": "Unpaid"
+        },
+        "title": "Payment"
+      },
+      "saleDate": "Sale date",
+      "seller": "Seller",
+      "title": "Invoice {number}",
+      "titleLoading": "KSeF invoice",
+      "totals": {
+        "gross": "Gross",
+        "net": "Net",
+        "vat": "VAT"
+      }
+    },
+    "document": {
+      "groupMissing": "No access group for invoice documents has been chosen, so invoices cannot be registered in Documents. An administrator chooses it in Settings → Projects → KSeF.",
+      "noAccessTitle": "You are not in the access group of this document, so you cannot open it.",
+      "notRegisteredOnLink": "The invoice will be linked but will not appear in the Documents module: no access group for invoice documents has been chosen (Settings → Projects → KSeF).",
+      "open": "Open document",
+      "register": "Register in Documents",
+      "registerFailed": "Could not register the invoice in Documents",
+      "registerHint": "This invoice has no document in the Documents module yet. Linking it to a cost registers it automatically.",
+      "registered": "Registered: {number}",
+      "registeredToast": "Invoice registered in Documents as {number}",
+      "registering": "Registering…",
+      "title": "Document in the Documents module"
+    },
+    "errors": {
+      "forbidden": "You have no access to KSeF invoices. An administrator grants it in the users panel."
+    },
+    "invoiceTypes": {
+      "KOR": "Correction invoice",
+      "KOR_ROZ": "Correction of a settlement invoice",
+      "KOR_ZAL": "Correction of an advance invoice",
+      "ROZ": "Settlement invoice",
+      "UPR": "Simplified invoice",
+      "VAT": "VAT invoice",
+      "ZAL": "Advance invoice"
+    },
+    "link": {
+      "alreadyLinkedHint": "You can still link it again — just make sure the same cost is not counted twice.",
+      "alreadyLinkedTitle": "Note: this invoice is already linked",
+      "amountHint": "By default the whole net amount of the invoice. Change it if only a part of the invoice belongs to this cost.",
+      "amountHintForeign": "The invoice is in {invoiceCurrency} and the project in {projectCurrency}. Leave the field empty and the whole net amount ({net}) is converted at the NBP average rate of the business day before the invoice issue date. You can also enter the amount directly in {projectCurrency}.",
+      "amountIn": "Assigned amount ({currency})",
+      "attachNote": "The invoice will be linked to the cost: {item}. The amount and the other data of the cost stay unchanged.",
+      "back": "Back to the list",
+      "confirm": "Link invoice",
+      "errors": {
+        "failed": "Could not link the invoice",
+        "forbidden": "You are not allowed to link KSeF invoices in this project.",
+        "noExchangeRate": "No NBP exchange rate for the invoice currency. Enter the amount in {currency}.",
+        "projectClosed": "The project is closed — invoices can no longer be linked."
+      },
+      "saved": "Invoice linked",
+      "savedWithRate": "Invoice linked: {amount} at the rate {rate} of {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Amount",
+        "linkedBy": "Linked by",
+        "project": "Project",
+        "status": "Status",
+        "task": "Task"
+      },
+      "wholeProject": "Whole project"
+    },
+    "list": {
+      "columns": {
+        "currency": "Currency",
+        "document": "Document",
+        "gross": "Gross",
+        "issueDate": "Issue date",
+        "net": "Net",
+        "number": "Number",
+        "paymentDueDate": "Payment due",
+        "seller": "Seller"
+      }
+    },
+    "nip": "Tax ID",
+    "otherLinks": {
+      "intro": "This invoice is also linked to:",
+      "overAllocated": "The links add up to more than the net amount of the invoice.",
+      "wholeProject": "{project} (whole project)"
+    },
+    "paymentForms": {
+      "card": "Card",
+      "cash": "Cash",
+      "cheque": "Cheque",
+      "credit": "Credit",
+      "mobile": "Mobile payment",
+      "transfer": "Bank transfer",
+      "voucher": "Voucher"
+    },
+    "picker": {
+      "attachTitle": "Link a KSeF invoice to the cost",
+      "empty": "No invoices in the selected period and for the selected filters.",
+      "filters": {
+        "dateFrom": "Issued from",
+        "dateTo": "Issued to",
+        "invoiceNumber": "Invoice number",
+        "netMax": "Net to",
+        "netMin": "Net from",
+        "seller": "Seller (name or tax ID)"
+      },
+      "lastSync": "Last successful sync: {time}.",
+      "linkedCount": "{count, plural, one {Already linked: # time} other {Already linked: # times}}",
+      "loadFailed": "Could not load the invoice list",
+      "nextPage": "Next",
+      "noCompanies": "No company has been added to KSeF yet. An administrator does it in Settings → Projects → KSeF.",
+      "notConfigured": "The KSeF integration is not configured on the server. The list shows only invoices downloaded earlier.",
+      "pageInfo": "Page {page} of {pages} · invoices: {total}",
+      "previousPage": "Previous",
+      "search": "Search",
+      "select": "Select",
+      "syncHint": "A freshly issued invoice can take a few minutes to appear in KSeF.",
+      "title": "Add invoice from KSeF"
+    },
+    "settings": {
+      "addCompany": "Add company",
+      "columns": {
+        "lastAttempt": "Last attempt",
+        "lastSynced": "Last successful sync",
+        "name": "Name",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "New company in KSeF",
+        "added": "Company added. Its invoices will be downloaded with the next sync.",
+        "editTitle": "Company in KSeF",
+        "name": "Name (optional)",
+        "saveFailed": "Could not save the company",
+        "saved": "Company saved",
+        "token": "KSeF token",
+        "tokenHintAdd": "The token generated in KSeF for this tax ID. It is verified in KSeF before saving; once saved it cannot be read back.",
+        "tokenHintEdit": "Current token: {hint}. Leave the field empty to keep it.",
+        "verifying": "Verifying in KSeF…"
+      },
+      "edit": "Change",
+      "environments": {
+        "production": "Production environment",
+        "test": "Test environment"
+      },
+      "errors": {
+        "companyNotFound": "This company is no longer in the configuration. Refresh the page.",
+        "duplicateNip": "A company with this tax ID has already been added.",
+        "invalidNip": "Invalid tax ID.",
+        "notConfigured": "The KSeF integration is not configured on the server.",
+        "tokenRejected": "KSeF rejected the token for this tax ID. Check that the token is valid and was issued for this company.",
+        "unknownGroup": "This group does not exist or is inactive. Refresh the page and choose another one.",
+        "unreachable": "KSeF could not be reached to verify the token. Try again later."
+      },
+      "hint": "Purchase invoices of the companies added below are downloaded from KSeF, the Polish national e-invoice system, every 30 minutes. People with the “Access to KSeF invoices” permission link them to project costs.",
+      "initialSyncDays": "First sync goes back (days)",
+      "initialSyncDaysHint": "From {min} to {max} days. Applies to companies added after this setting is changed.",
+      "invoiceDocumentsGroup": "Access group for invoice documents",
+      "invoiceDocumentsGroupHint": "Invoice documents registered from KSeF go to this group. Without a group, invoices linked to projects are not registered in the Documents module.",
+      "loadFailed": "Could not load the KSeF configuration",
+      "noCompanies": "No company has been added yet.",
+      "noInvoiceDocumentsGroup": "— none —",
+      "notConfigured": "The KSeF integration is not configured on the server, so companies cannot be added and invoices are not downloaded.",
+      "remove": "Remove",
+      "removeConfirm": "Remove company {company} from the KSeF configuration? New invoices will no longer be downloaded. Invoices already downloaded and their links to costs stay.",
+      "removeFailed": "Could not remove the company",
+      "saveFailed": "Could not save the setting",
+      "saved": "Setting saved",
+      "statuses": {
+        "active": "Active",
+        "error": "Sync error",
+        "invalid": "Token rejected"
+      },
+      "syncFailed": "The sync failed — the reason is shown next to the company.",
+      "testEnvironmentNote": "The server is connected to the KSeF test environment — the invoices are not real documents.",
+      "title": "KSeF — cost invoices"
+    },
+    "sync": {
+      "failedForCompany": "The sync failed for at least one company. An administrator can see the details in Settings → Projects → KSeF.",
+      "finished": "Sync finished",
+      "now": "Sync now",
+      "running": "Syncing…",
+      "startFailed": "Could not start the sync",
+      "stillRunning": "The sync is still running — refresh the list in a moment."
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Full",
+      "read": "Read-only"
+    },
+    "fieldTypes": {
+      "date": "Date",
+      "list": "List of values",
+      "money": "Amount with currency",
+      "number": "Number",
+      "text": "Text"
+    },
+    "reminders": {
+      "1d_before": "1 day before the due date",
+      "2d_before": "2 days before the due date",
+      "3d_before": "3 days before the due date",
+      "at_due": "On the due date",
+      "custom": "Custom date"
+    },
+    "roles": {
+      "controller": "Reviewer",
+      "external_participant": "External participant",
+      "internal_participant": "Internal participant",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Done",
+      "in_progress": "In progress",
+      "todo": "To do"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "closed",
+    "lockedHint": "Preview — you are not a participant in this project",
+    "noDueDate": "no due date",
+    "noTasks": "The project has no tasks yet.",
+    "openOfTotal": "{open} open out of {total}",
+    "showClosedProjectTasks": "Show tasks of the closed project",
+    "title": "Project tasks"
+  },
+  "list": {
+    "closedBadge": "Closed",
+    "createFailed": "Couldn't create the project",
+    "createForm": {
+      "description": "Description",
+      "keyHint": "The task number prefix will be generated automatically from the project name.",
+      "name": "Name",
+      "namePlaceholder": "e.g. CRM system rollout",
+      "saving": "Saving…",
+      "submit": "Create project"
+    },
+    "empty": {
+      "noOpenProjects": "You are not a participant in any open project.",
+      "noneForFilter": "No projects match the selected filter.",
+      "title": "No projects"
+    },
+    "filters": {
+      "all": "All",
+      "closed": "Closed",
+      "open": "Open"
+    },
+    "loadFailed": "Couldn't load the projects",
+    "newProject": "New project",
+    "stats": {
+      "atRisk": "at risk",
+      "doneOfTotalHint": "Tasks done / all tasks",
+      "members": "{count, plural, one {person} other {people}}",
+      "myOpenTasks": "{count, plural, one {open for me} other {open for me}}",
+      "overdue": "overdue",
+      "tasks": "{count, plural, one {task} other {tasks}}"
+    },
+    "title": "Projects",
+    "views": {
+      "myTasks": "My tasks",
+      "portfolio": "Project overview",
+      "projects": "Projects"
+    }
+  },
+  "myTasks": {
+    "empty": {
+      "description": "You have no open tasks in any project.",
+      "title": "No tasks"
+    },
+    "includeDone": "Include done",
+    "loadFailed": "Couldn't load the tasks"
+  },
+  "panel": {
+    "chatTitle": "Task discussion",
+    "costs": {
+      "add": "Add cost",
+      "empty": "This task has no costs yet.",
+      "loadFailed": "Couldn't load the task costs",
+      "ownOnlyHint": "You see only the costs you added yourself.",
+      "title": "Costs",
+      "totalIncurred": "Total incurred"
+    },
+    "createTask": "Create task",
+    "created": "Task created",
+    "customFields": {
+      "addButton": "+ Add field",
+      "addFailed": "Couldn't add the field",
+      "addHint": "The field will be added to all tasks in this project.",
+      "noneAvailable": "No fields to add. Fields are defined by an administrator in Settings → Projects → Task custom fields.",
+      "selectField": "— select a field —",
+      "title": "Custom fields"
+    },
+    "endDateChange": {
+      "hint": "Optional. The PM will see the reason in the e-mail about the changed end date; it is also saved in the task's history.",
+      "placeholder": "e.g. late delivery from the client",
+      "reason": "Reason for the change of the end date"
+    },
+    "fields": {
+      "assignees": "Assignees",
+      "description": "Additional description",
+      "endDate": "End date",
+      "name": "Name",
+      "noParent": "— none (top-level task) —",
+      "parentTask": "Parent task",
+      "priority": "Priority",
+      "startDate": "Start date",
+      "status": "Status",
+      "type": "Type"
+    },
+    "history": {
+      "changed": "changed: {fields}",
+      "changedWithStatus": "changed: {fields} ({from} → {to})",
+      "created": "created the task",
+      "empty": "No entries.",
+      "endDateChangeReason": "Reason for the end date change: {reason}",
+      "fields": {
+        "assignees": "assignees",
+        "customFields": "custom fields",
+        "description": "description",
+        "endDate": "end date",
+        "name": "name",
+        "parentTask": "parent task",
+        "priority": "priority",
+        "reminder": "reminder",
+        "startDate": "start date",
+        "status": "status",
+        "type": "type"
+      },
+      "loadFailed": "Couldn't load the history",
+      "systemUser": "System",
+      "title": "Change history"
+    },
+    "loadFailed": "Couldn't load the task",
+    "newTask": "New task",
+    "reminder": {
+      "customDate": "Reminder date",
+      "hint": "The reminder is sent to all assignees at 9:00 and requires an end date.",
+      "label": "Email reminder",
+      "none": "None"
+    },
+    "saveFailed": "Couldn't save the task",
+    "saved": "Task saved",
+    "saving": "Saving…"
+  },
+  "portfolio": {
+    "columns": {
+      "atRisk": "At risk",
+      "cost": "Incurred cost",
+      "delay": "Delay",
+      "endDate": "End date",
+      "overdue": "Overdue",
+      "progress": "Progress",
+      "project": "Project",
+      "projectManagers": "PM",
+      "revenue": "Revenue",
+      "startDate": "Start"
+    },
+    "loadFailed": "Could not open the project overview",
+    "noProjects": "You are not the PM or controller of any open project.",
+    "noTasks": "There are no tasks in your projects.",
+    "tabs": {
+      "projects": "Projects",
+      "tasks": "Tasks",
+      "timeline": "Timeline"
+    }
+  },
+  "settings": {
+    "costCategories": {
+      "hint": "A category cannot be deleted — deactivate one you no longer use. A deactivated category cannot be chosen for a new cost, while existing items keep it.",
+      "title": "Cost categories"
+    },
+    "deadlines": {
+      "hint": "A task that has not been started is marked as at risk when no more days than this threshold remain until its end date (0–30; 0 means the end date itself).",
+      "invalid": "Enter a whole number from 0 to 30.",
+      "saveFailed": "Could not save the threshold",
+      "saved": "At-risk threshold saved",
+      "threshold": "At-risk threshold (days)",
+      "title": "Deadline control"
+    },
+    "dictionary": {
+      "active": "active",
+      "addButton": "Add",
+      "moveDown": "Move down",
+      "moveUp": "Move up",
+      "newItemPlaceholder": "New item…",
+      "saveFailed": "Couldn't save the dictionary"
+    },
+    "fields": {
+      "active": "active",
+      "addButton": "Add field",
+      "empty": "No fields defined.",
+      "hint": "A PM can add the fields defined here to their project (Project card → Task custom fields) and decide whether they are required. The field type cannot be changed after creation.",
+      "newNamePlaceholder": "New field name…",
+      "optionsPlaceholder": "Comma-separated values",
+      "optionsRequired": "The list must have at least one value",
+      "saveFailed": "Couldn't save the field",
+      "title": "Task custom fields"
+    },
+    "finance": {
+      "disableConfirm": "Disable project finance? The data is kept but disappears from view for all users.",
+      "hint": "When enabled, the PM and the administrator keep the budget, costs and revenue of a project, and the controller can view them. The finance totals of a project are also visible to everyone with access to the card of the linked lead or partner.",
+      "saveFailed": "Couldn't change the finance setting",
+      "title": "Project finance",
+      "toggle": "Enable project finance"
+    },
+    "loadFailed": "Couldn't load the project configuration",
+    "priorities": {
+      "title": "Priorities"
+    },
+    "statuses": {
+      "hint": "The category tells the system what a status means — regardless of its name. Tasks whose status is in the “Done” category do not count as open or overdue.",
+      "title": "Task statuses"
+    },
+    "transitions": {
+      "discardConfirm": "You have unsaved transition changes. Discard them?",
+      "hint": "A PM can always change the status to any other. Participants change the status only in tasks they are assigned to and have full access to. A reviewer changes the status in any task of the project.",
+      "matrixCorner": "From status ↓ / to status →",
+      "saveButton": "Save transitions",
+      "saveFailed": "Couldn't save the transitions",
+      "saved": "Status transitions saved",
+      "saving": "Saving…",
+      "title": "Status transitions"
+    },
+    "types": {
+      "title": "Task types"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "People",
+      "cost": "Cost",
+      "endDate": "End",
+      "number": "No.",
+      "priority": "Priority",
+      "project": "Project",
+      "startDate": "Start",
+      "status": "Status",
+      "task": "Task",
+      "timeliness": "Timeliness",
+      "type": "Type"
+    },
+    "emptyForFilters": "No task matches the filters.",
+    "emptyMessage": "There are no tasks in this project yet.",
+    "emptyTitle": "No tasks",
+    "flatList": "Flat list",
+    "parentTask": "Parent task",
+    "subtask": "Subtask"
+  }
+}

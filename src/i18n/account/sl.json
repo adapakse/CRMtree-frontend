@@ -1,0 +1,77 @@
+{
+  "myDevices": {
+    "empty": "Ni prijavljenih telefonov.",
+    "hint": "Telefoni, na katerih ste prijavljeni v mobilno aplikacijo CRMtree. Če telefon izgubite ali zamenjate, ga odjavite tukaj — aplikacija na njem bo izgubila dostop najpozneje v približno petnajstih minutah.",
+    "lastActive": "zadnja aktivnost {date}",
+    "signOut": "Odjavi",
+    "signOutConfirm": "Odjava iz aplikacije CRMtree: {name}. Želite nadaljevati?",
+    "signOutFailed": "Naprave ni bilo mogoče odjaviti.",
+    "signedInSince": "prijavljen od {date}",
+    "signedOut": "Odjavljeno: {name}.",
+    "signingOut": "Odjavljanje…",
+    "thisDevice": "ta naprava",
+    "title": "Prijavljeni telefoni",
+    "unknownDevice": "Neznana naprava"
+  },
+  "mySettings": {
+    "delete": "Izbriši",
+    "pbx": {
+      "configured": "Žeton je nastavljen",
+      "directPhone": "Vaša direktna številka:",
+      "hideToken": "Skrij",
+      "hint": "Za uporabo vgrajenega telefona prilepite svoj Personal Access Token iz plošče ip-pbx.eu. Žeton aplikaciji omogoča pridobitev vaših podatkov SIP. Stranke, ki vidijo vašo direktno številko, vas lahko pokličejo nazaj neposredno.",
+      "noDirectPhone": "Direktna številka v PBX ni dodeljena",
+      "notConfigured": "Ni žetona — softphone ne bo deloval.",
+      "notifications": {
+        "blocked": "Obvestila so blokirana — ročno jih odblokirajte v nastavitvah brskalnika:",
+        "enable": "Vklopi obvestila",
+        "enabled": "Obvestila so vklopljena",
+        "hint": "Prikaže sistemsko obvestilo, ko kliče stranka — tudi ko je brskalnik v ozadju ali delate v drugem programu.",
+        "permissionHint": "Brskalnik bo vprašal za dovoljenje",
+        "title": "Obvestila o klicih",
+        "unblockPath": "Ključavnica ob naslovu strani → Obvestila → Dovoli"
+      },
+      "saveToken": "Shrani žeton",
+      "showToken": "Pokaži",
+      "title": "Softphone — žeton PBX",
+      "tokenHelpEnd": "kopirajte in prilepite sem.",
+      "tokenHelpStart": "Plošča ip-pbx.eu → kliknite svoje ime (zgornji desni kot)",
+      "tokenPlaceholder": "Prilepite žeton iz ip-pbx.eu…",
+      "tokenSaved": "Žeton shranjen",
+      "tokenSavedWithPhone": "Žeton shranjen — številka: {phone}"
+    },
+    "projectDeadlines": {
+      "hint": "Zajema: dnevni povzetek nalog po roku, spremembe rokov nalog in projekte, ki so prešli v zamudo.",
+      "saveFailed": "Nastavitve obvestil ni bilo mogoče spremeniti",
+      "title": "Obvestila o rokih projektov",
+      "toggle": "E-pošta o rokih v projektih"
+    },
+    "saveFailed": "Napaka pri shranjevanju — poskusite znova",
+    "saving": "Shranjevanje…",
+    "signature": {
+      "deleteConfirm": "Želite izbrisati shranjeni podpis? Ne bo se več dodajal e-poštnim sporočilom.",
+      "empty": "Ni podpisa — prilepite HTML na levi",
+      "hint": "Spodaj prilepite kodo HTML svojega podpisa. Samodejno bo dodan vsakemu e-poštnemu sporočilu, poslanemu iz sistema (Leadi in Register partnerjev). Uporabite lahko pripravljen HTML iz odjemalca e-pošte ali orodja za izdelavo podpisov — npr. HubSpot Email Signature Generator.",
+      "htmlLabel": "Koda HTML podpisa",
+      "htmlPlaceholder": "Sem prilepite kodo HTML podpisa…",
+      "preview": "Predogled",
+      "save": "Shrani podpis",
+      "saved": "Podpis shranjen",
+      "title": "Moj e-poštni podpis"
+    },
+    "templates": {
+      "bodyLabel": "Vsebina",
+      "bodyPlaceholder": "Vsebina predloge…",
+      "deleteConfirm": "Želite izbrisati predlogo „{name}“?",
+      "edit": "Uredi",
+      "editTitle": "Urejanje predloge",
+      "empty": "Ni predlog. Kliknite „+ Nova predloga“, da dodate prvo.",
+      "hint": "Shranite pripravljena besedila sporočil, ki jih lahko hitro vstavite med pisanjem e-pošte leadu ali partnerju.",
+      "nameLabel": "Ime predloge",
+      "namePlaceholder": "npr. Uvodni sestanek, Follow-up po predstavitvi…",
+      "new": "Nova predloga",
+      "title": "E-poštne predloge"
+    },
+    "title": "Moje nastavitve"
+  }
+}

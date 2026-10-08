@@ -6,17 +6,20 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { GroupProfile } from '../../core/models/models';
 import { groupCssClass } from '../../core/services/helpers';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'wt-groups',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('admin')],
   template: `
+<ng-container *transloco="let t; prefix: 'admin'">
     <div id="topbar">
-      <span class="page-title">Grupy i role</span>
+      <span class="page-title">{{ t('userGroups.title') }}</span>
       <span class="tsp"></span>
       @if (auth.isAdmin()) {
-        <button class="btn btn-p" (click)="openNew = true">+ Nowa grupa</button>
+        <button class="btn btn-p" (click)="openNew = true">+ {{ t('userGroups.newGroup') }}</button>
       }
     </div>
 
@@ -36,23 +39,23 @@ import { groupCssClass } from '../../core/services/helpers';
               <div>
                 <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
                 @if (g.has_owner_restriction) {
-                  <span style="font-size:10.5px;font-weight:600;background:#EFF6FF;color:#1D4ED8;padding:1px 7px;border-radius:10px">Ograniczenie właściciela</span>
+                  <span style="font-size:10.5px;font-weight:600;background:#EFF6FF;color:#1D4ED8;padding:1px 7px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
                 }
               </div>
               <span style="margin-left:auto">
                 @if (!g.is_active) {
-                  <span style="font-size:10.5px;font-weight:600;background:var(--gray-100);color:var(--gray-400);padding:2px 8px;border-radius:10px">Nieaktywna</span>
+                  <span style="font-size:10.5px;font-weight:600;background:var(--gray-100);color:var(--gray-400);padding:2px 8px;border-radius:10px">{{ t('userGroups.inactive') }}</span>
                 }
               </span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px">
                 <div style="font-size:18px;font-weight:700;font-family:'Sora',sans-serif;color:var(--gray-900)">{{ g.member_count ?? 0 }}</div>
-                <div style="font-size:11px;color:var(--gray-400)">Członkowie</div>
+                <div style="font-size:11px;color:var(--gray-400)">{{ t('userGroups.members') }}</div>
               </div>
               <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px">
                 <div style="font-size:18px;font-weight:700;font-family:'Sora',sans-serif;color:var(--gray-900)">{{ g.document_count ?? 0 }}</div>
-                <div style="font-size:11px;color:var(--gray-400)">Dokumenty</div>
+                <div style="font-size:11px;color:var(--gray-400)">{{ t('userGroups.documents') }}</div>
               </div>
             </div>
             @if (g.description) {
@@ -70,7 +73,7 @@ import { groupCssClass } from '../../core/services/helpers';
           <div class="ph">
             <div>
               <div class="pt">{{ selected()!.display_name }}</div>
-              <div class="ps">{{ selected()!.member_count ?? 0 }} członków · {{ selected()!.document_count ?? 0 }} dokumentów</div>
+              <div class="ps">{{ t('userGroups.membersCount', { count: selected()!.member_count ?? 0 }) }} · {{ t('userGroups.documentsCount', { count: selected()!.document_count ?? 0 }) }}</div>
             </div>
             <div class="pc" (click)="selected.set(null)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -78,28 +81,28 @@ import { groupCssClass } from '../../core/services/helpers';
           </div>
           <div class="pb">
             @if (auth.isAdmin()) {
-              <div class="sec-title">Edycja grupy</div>
+              <div class="sec-title">{{ t('userGroups.edit.title') }}</div>
               <div class="fgrid">
                 <div class="fg">
-                  <label class="fl">Nazwa wyświetlana</label>
+                  <label class="fl">{{ t('userGroups.fields.displayName') }}</label>
                   <input class="fi" [(ngModel)]="editName">
                 </div>
                 <div class="fg">
-                  <label class="fl">Ograniczenie właściciela</label>
+                  <label class="fl">{{ t('userGroups.ownerRestriction') }}</label>
                   <select class="fsel" [(ngModel)]="editOwnerRestriction">
-                    <option [value]="false">Bez ograniczenia</option>
-                    <option [value]="true">Tylko właściciel (Sprzedaż)</option>
+                    <option [value]="false">{{ t('userGroups.ownerRestrictionOptions.none') }}</option>
+                    <option [value]="true">{{ t('userGroups.ownerRestrictionOptions.ownerOnly') }}</option>
                   </select>
                 </div>
                 <div class="fg full">
-                  <label class="fl">Opis</label>
+                  <label class="fl">{{ t('userGroups.fields.description') }}</label>
                   <textarea class="fta" [(ngModel)]="editDescription"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p btn-sm" style="margin-top:16px" (click)="saveGroup()">Zapisz zmiany</button>
+              <button class="btn btn-p btn-sm" style="margin-top:16px" (click)="saveGroup()">{{ t('userGroups.edit.saveChanges') }}</button>
             }
 
-            <div class="sec-title" style="margin-top:24px">Członkowie</div>
+            <div class="sec-title" style="margin-top:24px">{{ t('userGroups.members') }}</div>
             @for (m of selected()!.members ?? []; track m.user_id) {
               <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)">
                 <div class="av" style="width:32px;height:32px;font-size:12px">
@@ -110,18 +113,18 @@ import { groupCssClass } from '../../core/services/helpers';
                   <div style="font-size:11.5px;color:var(--gray-400)">{{ m.email }}</div>
                 </div>
                 <span class="badge" [class]="m.access_level === 'full' ? 's-signed' : 's-new'">
-                  {{ m.access_level === 'full' ? 'Pełny dostęp' : 'Tylko odczyt' }}
+                  {{ m.access_level === 'full' ? t('userGroups.accessLevels.full') : t('userGroups.accessLevels.read') }}
                 </span>
               </div>
             }
             @empty {
-              <div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">Brak członków</div></div>
+              <div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">{{ t('userGroups.noMembers') }}</div></div>
             }
           </div>
           @if (auth.isAdmin()) {
             <div class="pf">
-              <button class="btn btn-d" (click)="deactivateGroup()">Dezaktywuj grupę</button>
-              <button class="btn btn-g" (click)="selected.set(null)">Zamknij</button>
+              <button class="btn btn-d" (click)="deactivateGroup()">{{ t('userGroups.deactivate.action') }}</button>
+              <button class="btn btn-g" (click)="selected.set(null)">{{ 'actions.close' | transloco }}</button>
             </div>
           }
         </div>
@@ -134,33 +137,34 @@ import { groupCssClass } from '../../core/services/helpers';
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
             <div class="moico" style="background:var(--orange-pale);font-size:18px">👥</div>
-            <div><div class="mot">Utwórz grupę</div><div class="mos">Dodaj nową grupę ról</div></div>
+            <div><div class="mot">{{ t('userGroups.create.title') }}</div><div class="mos">{{ t('userGroups.create.subtitle') }}</div></div>
           </div>
           <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
             <div class="fg">
-              <label class="fl">Nazwa grupy (wewnętrzna) <span class="req">*</span></label>
-              <input class="fi" placeholder="np. Sprzedaz" [(ngModel)]="newGroup.name">
+              <label class="fl">{{ t('userGroups.fields.internalName') }} <span class="req">*</span></label>
+              <input class="fi" [placeholder]="t('userGroups.create.internalNamePlaceholder')" [(ngModel)]="newGroup.name">
             </div>
             <div class="fg">
-              <label class="fl">Nazwa wyświetlana <span class="req">*</span></label>
-              <input class="fi" placeholder="np. Sprzedaż" [(ngModel)]="newGroup.display_name">
+              <label class="fl">{{ t('userGroups.fields.displayName') }} <span class="req">*</span></label>
+              <input class="fi" [placeholder]="t('userGroups.create.displayNamePlaceholder')" [(ngModel)]="newGroup.display_name">
             </div>
             <div class="fg">
-              <label class="fl">Opis</label>
+              <label class="fl">{{ t('userGroups.fields.description') }}</label>
               <textarea class="fta" style="min-height:60px" [(ngModel)]="newGroup.description"></textarea>
             </div>
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
               <input type="checkbox" [(ngModel)]="newGroup.has_owner_restriction">
-              Ograniczenie właściciela (użytkownik widzi tylko swoje dokumenty)
+              {{ t('userGroups.create.ownerRestrictionCheckbox') }}
             </label>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
-            <button class="btn btn-g" (click)="openNew=false">Anuluj</button>
-            <button class="btn btn-p" [disabled]="!newGroup.name.trim()" (click)="createGroup()">Utwórz grupę</button>
+            <button class="btn btn-g" (click)="openNew=false">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn btn-p" [disabled]="!newGroup.name.trim()" (click)="createGroup()">{{ t('userGroups.create.title') }}</button>
           </div>
         </div>
       </div>
     }
+</ng-container>
   `,
   styles: [`
     #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
@@ -189,6 +193,7 @@ export class GroupsComponent implements OnInit {
   private groupSvc = inject(GroupService);
   toast            = inject(ToastService);
   auth             = inject(AuthService);
+  private transloco = inject(TranslocoService);
 
   loading  = signal(true);
   groups   = signal<GroupProfile[]>([]);
@@ -224,17 +229,17 @@ export class GroupsComponent implements OnInit {
     this.groupSvc.update(g.id, { display_name: this.editName, description: this.editDescription, has_owner_restriction: this.editOwnerRestriction }).subscribe(updated => {
       this.groups.update(gs => gs.map(x => x.id === updated.id ? { ...x, ...updated } : x));
       this.selected.set({ ...g, ...updated });
-      this.toast.success('Zaktualizowano grupę');
+      this.toast.success(this.transloco.translate('admin.userGroups.edit.saved'));
     });
   }
 
   deactivateGroup(): void {
     const g = this.selected();
-    if (!g || !confirm(`Dezaktywować grupę „${g.display_name}"?`)) return;
+    if (!g || !confirm(this.transloco.translate('admin.userGroups.deactivate.confirm', { name: g.display_name }))) return;
     this.groupSvc.delete(g.id).subscribe(() => {
       this.selected.set(null);
       this.loadGroups();
-      this.toast.success('Dezaktywowano grupę');
+      this.toast.success(this.transloco.translate('admin.userGroups.deactivate.done'));
     });
   }
 
@@ -243,7 +248,7 @@ export class GroupsComponent implements OnInit {
       this.groups.update(gs => [...gs, g]);
       this.openNew = false;
       this.newGroup = { name: '', display_name: '', description: '', has_owner_restriction: false };
-      this.toast.success(`Utworzono grupę „${g.display_name}"`);
+      this.toast.success(this.transloco.translate('admin.userGroups.create.done', { name: g.display_name }));
     });
   }
 
@@ -252,7 +257,9 @@ export class GroupsComponent implements OnInit {
   }
 
   groupIcon(name: string): string {
-    const m: Record<string, string> = { Management: '🏢', Zarząd: '🏢', Sales: '💼', Sprzedaż: '💼', Marketing: '📣', HR: '👥', Accounting: '💰', Operations: '⚙️' };
+    // Group names stored by tenants; the two Polish ones are spelled with escapes
+    // because the i18n check rejects Polish letters in translated source files.
+    const m: Record<string, string> = { Management: '🏢', 'Zarz\u0105d': '🏢', Sales: '💼', 'Sprzeda\u017c': '💼', Marketing: '📣', HR: '👥', Accounting: '💰', Operations: '⚙️' };
     return m[name] ?? '📋';
   }
 

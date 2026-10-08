@@ -1,12 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule, CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SeoCalendarConfig, SeoCalendarArticle, SeoCalendarWeek, SeoAuthor } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { LocaleService } from '../../../core/i18n/locale.service';
 import { mondayOf, addDays, toDateStr } from '../../../shared/utils/iso-week.util';
 
 const WEEKDAY_FIELDS = ['monday_count', 'tuesday_count', 'wednesday_count', 'thursday_count', 'friday_count', 'saturday_count', 'sunday_count'] as const;
-const WEEKDAY_LABELS = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
+// 2024-01-01 was a Monday, so adding the index of a WEEKDAY_FIELDS entry gives a date on that weekday.
+const REFERENCE_MONDAY = { year: 2024, monthIndex: 0, day: 1 };
 
 const EMPTY_CONFIG: SeoCalendarConfig = {
   is_enabled: false, monday_count: 0, tuesday_count: 0, wednesday_count: 0,
@@ -17,19 +20,21 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
   selector: 'wt-seo-publishing-calendar',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DragDropModule],
+  imports: [FormsModule, DragDropModule, TranslocoDirective],
+  providers: [provideTranslocoScope('crm')],
   template: `
+    <ng-container *transloco="let t; prefix: 'crm'">
     <div class="calendar-box">
       <div class="config-panel">
         <div class="config-header">
-          <h3>Harmonogram automatyczny</h3>
+          <h3>{{ t('seo.publishingCalendar.config.title') }}</h3>
           <label class="enable-toggle">
             <input type="checkbox" [checked]="config().is_enabled" (change)="toggleEnabled()" [disabled]="savingConfig()">
-            Tryb automatyczny (bez ręcznego review)
+            {{ t('seo.publishingCalendar.config.autoMode') }}
           </label>
         </div>
         @if (config().is_enabled) {
-          <p class="warning-note">Artykuły w tym trybie publikują się automatycznie o wyznaczonej dacie — bez ręcznej akceptacji redaktora.</p>
+          <p class="warning-note">{{ t('seo.publishingCalendar.config.autoModeWarning') }}</p>
         }
         <div class="weekday-grid">
           @for (field of weekdayFields; track field; let i = $index) {
@@ -42,20 +47,20 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
         <div class="end-date-row">
           <label class="end-date-checkbox">
             <input type="checkbox" [(ngModel)]="noEndDate">
-            Bez limitu czasu (harmonogram rolluje się w nieskończoność)
+            {{ t('seo.publishingCalendar.config.noEndDate') }}
           </label>
           @if (!noEndDate) {
             <input type="date" class="field-input end-date-input" [(ngModel)]="endDateInput">
           }
         </div>
         <button type="button" class="btn-ghost btn-sm" (click)="saveConfig()" [disabled]="savingConfig()">
-          @if (savingConfig()) { Zapisuję… } @else { Zapisz harmonogram }
+          @if (savingConfig()) { {{ t('seo.publishingCalendar.config.saving') }} } @else { {{ t('seo.publishingCalendar.config.save') }} }
         </button>
       </div>
 
       <div class="calendar-grid">
         <div class="week-column">
-          <h4 class="week-title">Ten tydzień (w toku, zablokowany) @if (currentWeek()) { — {{ currentWeek()!.week_start }} }</h4>
+          <h4 class="week-title">{{ t('seo.publishingCalendar.weeks.current') }} @if (currentWeek()) { — {{ currentWeek()!.week_start }} }</h4>
           <div class="days-row">
             @for (day of currentWeek()?.days ?? []; track day.date) {
               <div class="day-card locked">
@@ -72,7 +77,7 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
         </div>
 
         <div class="week-column">
-          <h4 class="week-title">Następny tydzień (edytowalny) @if (nextWeek()) { — {{ nextWeek()!.week_start }} }</h4>
+          <h4 class="week-title">{{ t('seo.publishingCalendar.weeks.next') }} @if (nextWeek()) { — {{ nextWeek()!.week_start }} }</h4>
           <div class="days-row">
             @for (day of nextWeek()?.days ?? []; track day.date) {
               <div class="day-card"
@@ -94,7 +99,7 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
         </div>
 
         <div class="unassigned-column">
-          <h4 class="week-title">Nieprzypisane ({{ unassigned().length }})</h4>
+          <h4 class="week-title">{{ t('seo.publishingCalendar.unassigned.title', { count: unassigned().length }) }}</h4>
           <div class="day-card unassigned-card"
                cdkDropList
                [cdkDropListData]="unassigned()"
@@ -107,11 +112,12 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
                 <span class="article-author">{{ authorName(a.author_id) }}</span>
               </div>
             }
-            @if (unassigned().length === 0) { <p class="empty">Brak nieprzypisanych artykułów.</p> }
+            @if (unassigned().length === 0) { <p class="empty">{{ t('seo.publishingCalendar.unassigned.empty') }}</p> }
           </div>
         </div>
       </div>
     </div>
+    </ng-container>
   `,
   styles: [`
     .calendar-box { display: flex; flex-direction: column; gap: 1rem; }
@@ -155,9 +161,11 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
 export class SeoPublishingCalendarComponent implements OnInit {
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
+  private locale = inject(LocaleService);
 
   readonly weekdayFields = WEEKDAY_FIELDS;
-  readonly weekdayLabels = WEEKDAY_LABELS;
+  readonly weekdayLabels = this.buildWeekdayLabels();
 
   readonly config = signal<SeoCalendarConfig>(EMPTY_CONFIG);
   readonly savingConfig = signal(false);
@@ -174,6 +182,16 @@ export class SeoPublishingCalendarComponent implements OnInit {
   // that's the actual lock mechanism for the UI side (the backend enforces
   // it independently in PATCH /calendar/content/:id/assign).
   dropListIds: string[] = [];
+
+  private buildWeekdayLabels(): string[] {
+    const locale = this.locale.activeLocale();
+    const formatter = new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' });
+    const { year, monthIndex, day } = REFERENCE_MONDAY;
+    return WEEKDAY_FIELDS.map((_, index) => {
+      const name = formatter.format(new Date(Date.UTC(year, monthIndex, day + index)));
+      return name.charAt(0).toLocaleUpperCase(locale) + name.slice(1);
+    });
+  }
 
   ngOnInit(): void {
     this.loadConfig();
@@ -207,17 +225,17 @@ export class SeoPublishingCalendarComponent implements OnInit {
 
   toggleEnabled(): void {
     const next = !this.config().is_enabled;
-    if (next && !confirm('Tryb automatyczny publikuje artykuły bez ręcznej akceptacji redaktora — kontynuować?')) return;
+    if (next && !confirm(this.transloco.translate('crm.seo.publishingCalendar.enableConfirm'))) return;
     this.savingConfig.set(true);
     this.seoService.updateCalendarConfig({ is_enabled: next }).subscribe({
       next: (c) => {
         this.config.set(c);
         this.savingConfig.set(false);
-        this.toast.success(next ? 'Tryb automatyczny włączony.' : 'Tryb automatyczny wyłączony.');
+        this.toast.success(this.transloco.translate(next ? 'crm.seo.publishingCalendar.toasts.enabled' : 'crm.seo.publishingCalendar.toasts.disabled'));
       },
       error: (err) => {
         this.savingConfig.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się zapisać.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.publishingCalendar.toasts.saveFailed'));
       },
     });
   }
@@ -234,11 +252,11 @@ export class SeoPublishingCalendarComponent implements OnInit {
       next: (c) => {
         this.config.set(c);
         this.savingConfig.set(false);
-        this.toast.success('Harmonogram zapisany.');
+        this.toast.success(this.transloco.translate('crm.seo.publishingCalendar.toasts.configSaved'));
       },
       error: (err) => {
         this.savingConfig.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się zapisać harmonogramu.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.publishingCalendar.toasts.configSaveFailed'));
       },
     });
   }
@@ -255,10 +273,12 @@ export class SeoPublishingCalendarComponent implements OnInit {
         // The backend may have just round-robin-assigned an author — reflect
         // that on the moved chip immediately instead of waiting for a reload.
         article.author_id = updated.author_id;
-        this.toast.success(targetDate ? `Przeniesiono na ${targetDate}.` : 'Cofnięto do kolejki nieprzypisanych.');
+        this.toast.success(targetDate
+          ? this.transloco.translate('crm.seo.publishingCalendar.toasts.movedTo', { date: targetDate })
+          : this.transloco.translate('crm.seo.publishingCalendar.toasts.movedToUnassigned'));
       },
       error: (err) => {
-        this.toast.error(err?.error?.error ?? 'Nie udało się przenieść artykułu.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.publishingCalendar.toasts.moveFailed'));
         transferArrayItem(event.container.data, previousContainer.data, currentIndex, previousIndex);
       },
     });

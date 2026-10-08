@@ -1,0 +1,394 @@
+{
+  "badges": {
+    "gdpr": {
+      "data_administration": "Zajedničko vođenje",
+      "data_processing_entrustment": "Povjeravanje",
+      "no_gdpr": "Bez GDPR-a"
+    }
+  },
+  "dashboard": {
+    "recentDocuments": "Nedavni dokumenti",
+    "seeAll": "Prikaži sve",
+    "stats": {
+      "expiring": "Istječu za 30 dana",
+      "expiringHint": "Zahtijevaju pozornost",
+      "inWorkflow": "U optjecaju",
+      "myTasksHint": "Čekaju na radnju",
+      "signed": "Potpisani / Završeni",
+      "signedHint": "Potpisani + Završeni",
+      "total": "Svi dokumenti",
+      "totalHint": "Svi dostupni"
+    },
+    "taskStrip": {
+      "assigneePrefix": "kod:"
+    },
+    "title": "Nadzorna ploča"
+  },
+  "detail": {
+    "actions": {
+      "delete": "Izbriši",
+      "download": "Preuzmi",
+      "saveChanges": "Spremi promjene"
+    },
+    "attachments": {
+      "add": "Dodaj privitak",
+      "addFirst": "Dodaj prvi privitak",
+      "deleteConfirm": "Izbrisati ovaj privitak zajedno sa svim verzijama?",
+      "deleted": "Privitak izbrisan",
+      "empty": "Nema privitaka",
+      "events": {
+        "deleted": "Privitak izbrisan: {name}",
+        "newVersion": "Nova verzija privitka: {name}"
+      },
+      "newVersion": "Nova verzija",
+      "uploadFailed": "Pogreška pri učitavanju privitka",
+      "uploaded": "Privitak učitan",
+      "versionCount": "{count, plural, one {# verzija} few {# verzije} other {# verzija}}",
+      "versionUploadFailed": "Pogreška pri učitavanju nove verzije"
+    },
+    "deleteConfirm": "Izbrisati „{name}”?",
+    "history": {
+      "actions": {
+        "attachment_deleted": "Privitak izbrisan",
+        "attachment_uploaded": "Privitak dodan: {name}",
+        "attachment_version_uploaded": "Nova verzija privitka (v{version})",
+        "document_created": "Dokument izrađen",
+        "document_deleted": "Dokument izbrisan",
+        "document_downloaded": "Dokument preuzet",
+        "document_updated": "Dokument ažuriran",
+        "metadata_updated": "Metapodaci ažurirani",
+        "signing_completed": "Elektroničko potpisivanje završeno",
+        "signing_failed": "Elektroničko potpisivanje nije uspjelo",
+        "signing_initiated": "Elektroničko potpisivanje pokrenuto",
+        "status_changed": "Status promijenjen u: {status}",
+        "tag_added": "Oznaka dodana: {key}",
+        "tag_removed": "Oznaka uklonjena: {key}",
+        "tag_updated": "Oznaka izmijenjena: {key}",
+        "version_uploaded": "Učitana nova verzija dokumenta (v{version})",
+        "workflow_task_cancelled": "Zadatak workflowa otkazan",
+        "workflow_task_completed": "Zadatak workflowa dovršen",
+        "workflow_task_created": "Zadatak workflowa dodijeljen"
+      },
+      "empty": "Nema povijesti"
+    },
+    "overview": {
+      "chooseEntity": "— odaberite subjekt —",
+      "chooseType": "— odaberite vrstu —",
+      "metadata": "Metapodaci dokumenta",
+      "packagePart": "Dio paketa dokumenata:"
+    },
+    "partners": {
+      "empty": "Nema povezanih partnera.",
+      "linkFailed": "Pogreška pri povezivanju s partnerom",
+      "linked": "Povezano s: {company}",
+      "searchPlaceholder": "Traži partnera po nazivu…",
+      "taxId": "Porezni broj: {nip}",
+      "title": "Povezani partneri",
+      "unlink": "Odspoji",
+      "unlinkConfirm": "Odspojiti partnera „{company}”?",
+      "unlinkFailed": "Pogreška pri odspajanju partnera",
+      "unlinked": "Partner odspojen"
+    },
+    "preview": {
+      "downloadFile": "Preuzmi datoteku",
+      "fileUploaded": "Datoteka učitana",
+      "frameTitle": "Pregled PDF-a",
+      "loadFailed": "Učitavanje PDF-a nije uspjelo",
+      "noFile": "Nema priložene datoteke",
+      "unavailable": "Pregled nije dostupan",
+      "unavailableFormat": "Pregled nije dostupan za formate koji nisu PDF.",
+      "unavailableHint": "Preuzmite datoteku na disk kako biste je pregledali.",
+      "uploadFile": "Učitaj datoteku"
+    },
+    "signus": {
+      "emailsPlaceholder": "ana@tvrtka.hr, partner@example.com",
+      "info": "Dokument će biti poslan u Signus API. Svaki potpisnik dobit će e-poruku. Potpisane verzije automatski se arhiviraju.",
+      "modalTitle": "Pokreni elektroničko potpisivanje",
+      "sectionTitle": "Elektronički potpis (Signus)",
+      "send": "Pošalji u Signus",
+      "sendFailed": "Pogreška pri slanju u Signus",
+      "sentRedirect": "Dokument poslan u Signus — preusmjeravanje…",
+      "sentTraining": "Dokument je poslan na potpis (simulacija). Potpisana verzija pojavit će se za ~10 sekundi.",
+      "signatories": "Potpisnici (adrese e-pošte odvojene zarezom)",
+      "start": "Pokreni potpisivanje putem Signusa"
+    },
+    "tabs": {
+      "attachments": "Privici",
+      "history": "Povijest",
+      "overview": "Pojedinosti",
+      "preview": "Glavni dokument",
+      "versions": "Verzije",
+      "workflow": "Workflow"
+    },
+    "tags": {
+      "added": "Oznaka dodana",
+      "empty": "Nema oznaka.",
+      "key": "Ključ",
+      "keyPlaceholder": "Ključ (npr. contract_id)",
+      "title": "Oznake"
+    },
+    "toasts": {
+      "saved": "Dokument spremljen"
+    },
+    "versions": {
+      "empty": "Nema verzija",
+      "signedBy": "Potpis: {name}",
+      "uploadNew": "Učitaj novu verziju",
+      "uploaded": "Nova verzija učitana"
+    },
+    "workflow": {
+      "assign": "Dodijeli i pošalji e-poruku",
+      "assignTitle": "Dodijeli zadatak",
+      "assignTo": "Dodijeli korisniku",
+      "assigned": "Zadatak dodijeljen — obavijest poslana e-poštom",
+      "cancelled": "Zadatak otkazan",
+      "dueDate": "Rok",
+      "message": "Poruka",
+      "messagePlaceholder": "Neobavezna poruka za dodijeljenu osobu…",
+      "selected": "Odabrano: {name}",
+      "taskType": "Vrsta zadatka",
+      "userSearchPlaceholder": "Traži po prezimenu ili e-pošti…"
+    }
+  },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Broj bankovnog računa",
+      "currency": "Valuta",
+      "grossAmount": "Bruto iznos",
+      "invoiceNumber": "Broj računa",
+      "netAmount": "Neto iznos",
+      "paymentStatus": "Stanje plaćanja",
+      "title": "Podaci računa",
+      "vatAmount": "Iznos PDV-a"
+    },
+    "ksefVisualisationNote": "Ovo je vizualizacija podataka preuzetih iz KSeF-a, a ne izvorni dokument.",
+    "projectLinks": {
+      "backLabel": "Dokument {number}",
+      "costStatuses": {
+        "incurred": "Nastao",
+        "planned": "Planiran"
+      },
+      "empty": "Ovaj račun nije povezan ni s jednim troškom projekta.",
+      "linkedAt": "Povezivanje: {date}",
+      "linkedBy": "Povezivanje: {name}, {date}",
+      "severalLinks": "Ovaj je račun povezan s više projekata ili zadataka.",
+      "title": "Veze s projektima",
+      "wholeProject": "cijeli projekt"
+    }
+  },
+  "labels": {
+    "activeTasks": "Aktivni zadaci",
+    "addTag": "Dodaj oznaku",
+    "columns": {
+      "name": "Naziv",
+      "number": "Broj",
+      "validity": "Valjanost"
+    },
+    "contractSubjects": {
+      "accommodation": "Smještaj",
+      "businessTravel": "Poslovna putovanja",
+      "conferences": "Konferencije/Sastanci",
+      "other": "Ostalo",
+      "system": "Sustav"
+    },
+    "countries": {
+      "at": "Austrija",
+      "ch": "Švicarska",
+      "cz": "Češka",
+      "de": "Njemačka",
+      "fr": "Francuska",
+      "gb": "Ujedinjena Kraljevina",
+      "hu": "Mađarska",
+      "pl": "Poljska",
+      "ro": "Rumunjska",
+      "ru": "Rusija",
+      "sk": "Slovačka",
+      "ua": "Ukrajina"
+    },
+    "docTypes": {
+      "employee_agreement": "Ugovor sa zaposlenikom",
+      "invoice": "Račun",
+      "it_supplier_agreement": "Ugovor s IT dobavljačem",
+      "nda": "NDA",
+      "operator_agreement": "Ugovor s operatorom",
+      "partner_agreement": "Partnerski ugovor"
+    },
+    "fields": {
+      "buyer": "Kupac",
+      "contactName": "Ime i prezime",
+      "contactSection": "Kontakt podaci za ugovor",
+      "contractSubject": "Predmet ugovora",
+      "counterpartyCountry": "Država ugovorne strane",
+      "counterpartyTaxId": "Porezni broj ugovorne strane",
+      "documentName": "Naziv dokumenta",
+      "documentType": "Vrsta dokumenta",
+      "email": "E-pošta",
+      "entity1": "Subjekt 1",
+      "entity2": "Subjekt 2",
+      "expirationDate": "Datum isteka",
+      "gdprClassification": "GDPR klasifikacija",
+      "group": "Grupa",
+      "issueDate": "Datum izdavanja",
+      "owner": "Vlasnik",
+      "paymentDueDate": "Rok plaćanja",
+      "phone": "Telefon",
+      "seller": "Prodavatelj",
+      "sellerTaxId": "Porezni broj prodavatelja",
+      "signingDate": "Datum potpisivanja",
+      "status": "Status"
+    },
+    "from": "Od: {name}",
+    "gdprTypes": {
+      "data_administration": "Zajedničko vođenje obrade podataka",
+      "data_processing_entrustment": "Povjeravanje obrade podataka",
+      "no_gdpr": "Bez GDPR-a"
+    },
+    "myTasks": "Moji zadaci",
+    "noDocuments": "Nema dokumenata",
+    "noPendingTasks": "Nema zadataka na čekanju",
+    "options": {
+      "choose": "— Odaberite —",
+      "chooseCountry": "— Odaberite državu —",
+      "fixedDate": "Određeni datum",
+      "indefinite": "Neodređeno vrijeme",
+      "unassigned": "— nedodijeljeno —"
+    },
+    "paymentStatuses": {
+      "overdue": "Dospio",
+      "paid": "Plaćen",
+      "partially_paid": "Djelomično plaćen",
+      "unpaid": "Neplaćen"
+    },
+    "placeholders": {
+      "contactEmail": "npr. ivan.horvat@tvrtka.hr",
+      "contactName": "npr. Ivan Horvat",
+      "contactPhone": "npr. +385 91 000 0000",
+      "entity1": "npr. CRMtree d.o.o.",
+      "entity2": "npr. Partner Ltd.",
+      "taxId": "npr. 12345678901"
+    },
+    "statuses": {
+      "being_approved": "Na odobrenju",
+      "being_edited": "U uređivanju",
+      "being_signed": "U potpisivanju",
+      "completed": "Završen",
+      "hold": "Na čekanju",
+      "new": "Novi",
+      "rejected": "Odbijen",
+      "signed": "Potpisan"
+    },
+    "taskTypes": {
+      "approve": "Odobrenje",
+      "edit": "Uređivanje",
+      "read": "Čitanje",
+      "sign": "Potpis"
+    }
+  },
+  "list": {
+    "columns": {
+      "gdpr": "GDPR",
+      "newBadge": "NOVO",
+      "type": "Vrsta"
+    },
+    "empty": {
+      "hint": "Promijenite filtre ili traženi pojam",
+      "title": "Nema pronađenih dokumenata"
+    },
+    "filters": {
+      "allGroups": "Sve grupe",
+      "allTypes": "Sve vrste",
+      "noFiles": "Prikaži dokumente bez priloženog skena"
+    },
+    "newDocument": "Novi dokument",
+    "noPartnerWarning": "Dokument nije povezan s partnerom",
+    "pagination": {
+      "next": "Dalje",
+      "page": "Stranica {page} od {total}",
+      "previous": "Preth."
+    },
+    "partnerFilter": {
+      "clear": "Prikaži sve",
+      "label": "Dokumenti partnera:"
+    },
+    "searchPlaceholder": "Traži dokumente, oznake…",
+    "statusFilters": {
+      "all": "Svi",
+      "being_edited": "U uređivanju",
+      "being_signed": "U potpisivanju",
+      "completed": "Završeni",
+      "new": "Novi",
+      "rejected": "Odbijeni",
+      "signed": "Potpisani"
+    },
+    "taskTooltip": {
+      "assignee": "Izvršava: {name}",
+      "assigner": "Dodijelio/la: {name}",
+      "dueDate": "Rok: {date}",
+      "message": "Poruka: {message}",
+      "type": "Vrsta: {type}"
+    },
+    "title": "Dokumenti",
+    "toasts": {
+      "created": "Dokument {number} izrađen",
+      "deleted": "Dokument izbrisan",
+      "updated": "Dokument ažuriran"
+    }
+  },
+  "newDocument": {
+    "basicInfo": "Osnovne informacije",
+    "chooseEntity": "— Odaberite subjekt —",
+    "chooseGdpr": "— Odaberite klasifikaciju —",
+    "chooseGroup": "— Odaberite grupu —",
+    "chooseType": "— Odaberite vrstu —",
+    "create": "Izradi dokument",
+    "createFailed": "Izrada dokumenta nije uspjela",
+    "file": {
+      "dropHint": "Ispustite datoteku ovdje ili kliknite za odabir",
+      "formats": "PDF, DOCX — najviše 50 MB",
+      "remove": "Ukloni",
+      "title": "Privitak (neobavezno)"
+    },
+    "namePlaceholder": "npr. Partnerski ugovor — ABC d.o.o.",
+    "subtitle": "Ispunite metapodatke i po želji dodajte datoteku",
+    "tags": {
+      "keyPlaceholder": "ključ",
+      "title": "Oznake (neobavezno)"
+    },
+    "title": "Novi dokument"
+  },
+  "workflow": {
+    "autoRefresh": "Automatsko osvježavanje: {seconds} s",
+    "calendar": {
+      "documentFallback": "Dokument"
+    },
+    "columns": {
+      "cancelled": "Otkazani",
+      "completed": "Završeni",
+      "in_progress": "U tijeku",
+      "pending": "Na čekanju"
+    },
+    "kanban": {
+      "assignedBy": "Dodijelio/la: {name}",
+      "emptyColumn": "Prazno",
+      "emptyHint": "Dokumenti će se pojaviti ovdje nakon što budu izrađeni",
+      "expired": "Istekao",
+      "expires": "Istječe {date}",
+      "paymentDue": "Plaćanje do {date}",
+      "paymentOverdue": "Rok plaćanja je istekao",
+      "soon": "USKORO",
+      "taskCount": "Zadaci: {count}"
+    },
+    "kanbanTab": "Kanban ploča",
+    "mine": {
+      "allDone": "Sve je riješeno!",
+      "complete": "Završi",
+      "openDocument": "Otvori dokument",
+      "start": "Započni"
+    },
+    "title": "Workflow",
+    "toasts": {
+      "completed": "Zadatak označen kao završen",
+      "updateFailed": "Ažuriranje zadatka nije uspjelo — pokušajte ponovno"
+    }
+  }
+}

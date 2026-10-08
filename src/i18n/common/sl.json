@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Prekliči",
+    "close": "Zapri",
+    "save": "Shrani"
+  },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Datoteka .ics (Apple in drugi)",
+    "outlook": "Outlook",
+    "title": "Dodaj v koledar"
+  },
+  "language": {
+    "changeFailed": "Jezika ni bilo mogoče spremeniti",
+    "followTenant": "Privzeti jezik organizacije ({language})",
+    "hint": "Sprememba jezika bo znova naložila stran. V tem jeziku boste prejemali tudi e-pošto in opomnike.",
+    "tenantHint": "Jezik za osebe, ki niso izbrale svojega. Sprememba bo znova naložila stran.",
+    "tenantTitle": "Privzeti jezik organizacije",
+    "title": "Jezik vmesnika"
+  },
+  "list": {
+    "activeFilters": "{count, plural, one {# aktiven filter} two {# aktivna filtra} few {# aktivni filtri} other {# aktivnih filtrov}}",
+    "anyValue": "Vse",
+    "ascending": "Naraščajoče",
+    "clearFilter": "Počisti",
+    "clearFilters": "Počisti filtre",
+    "defaultSort": "Privzeto",
+    "descending": "Padajoče",
+    "filterBy": "Filtriraj: {name}",
+    "from": "od",
+    "noOptions": "Ni možnosti za izbiro.",
+    "pager": {
+      "next": "Naslednja stran",
+      "previous": "Prejšnja stran",
+      "range": "{from}–{to} od {total}"
+    },
+    "sort": "Razvrščanje",
+    "sortBy": "Razvrsti: {name}",
+    "to": "do"
+  },
+  "states": {
+    "loading": "Nalaganje…"
+  },
+  "testEnvironmentBanner": {
+    "title": "Testna različica — to ni produkcijsko okolje"
+  },
+  "typeahead": {
+    "minChars": "Vnesite vsaj toliko znakov: {count}…",
+    "noResults": "Ni rezultatov.",
+    "searching": "Iskanje…"
+  }
+}

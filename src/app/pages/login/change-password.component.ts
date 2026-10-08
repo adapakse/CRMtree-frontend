@@ -2,37 +2,39 @@ import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'wt-change-password',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('auth')],
   template: `
-    <div id="login-screen">
+    <div id="login-screen" *transloco="let t; prefix: 'auth'">
       <div class="login-card">
         <div class="login-top">
           <img class="login-logo-img" src="assets/crmtree-logo.png" alt="CRMtree">
-          <div class="login-sub">Platforma CRM</div>
+          <div class="login-sub">{{ t('login.platformName') }}</div>
         </div>
         <div class="login-body">
-          <div class="cp-title">Ustaw nowe hasło</div>
-          <p class="cp-hint">Twoje hasło tymczasowe wygasło. Ustaw własne hasło przed kontynuowaniem.</p>
+          <div class="cp-title">{{ t('changePassword.title') }}</div>
+          <p class="cp-hint">{{ t('changePassword.hint') }}</p>
           <form (ngSubmit)="submit()">
             <div class="field">
-              <label>Nowe hasło</label>
+              <label>{{ t('changePassword.newPassword') }}</label>
               <input [type]="show() ? 'text' : 'password'" [(ngModel)]="newPass" name="newPass"
-                     placeholder="min. 8 znaków" autocomplete="new-password">
-              <button type="button" class="pass-toggle" (click)="show.set(!show())">{{ show() ? 'Ukryj' : 'Pokaż' }}</button>
+                     [placeholder]="t('changePassword.newPasswordPlaceholder')" autocomplete="new-password">
+              <button type="button" class="pass-toggle" (click)="show.set(!show())">{{ t(show() ? 'login.hidePassword' : 'login.showPassword') }}</button>
             </div>
             <div class="field">
-              <label>Powtórz hasło</label>
+              <label>{{ t('changePassword.repeatPassword') }}</label>
               <input [type]="show() ? 'text' : 'password'" [(ngModel)]="confirmPass" name="confirmPass"
                      placeholder="••••••••" autocomplete="new-password">
             </div>
             @if (errorMsg()) { <div class="l-error">{{ errorMsg() }}</div> }
             <button class="lbtn" type="submit" [disabled]="loading() || !newPass || !confirmPass">
-              @if (loading()) { <span class="spinner"></span> Zapisuję… }
-              @else { Ustaw hasło i zaloguj }
+              @if (loading()) { <span class="spinner"></span> {{ t('changePassword.submitting') }} }
+              @else { {{ t('changePassword.submit') }} }
             </button>
           </form>
         </div>
@@ -64,6 +66,7 @@ import { AuthService } from '../../core/auth/auth.service';
 export class ChangePasswordComponent {
   private auth   = inject(AuthService);
   private router = inject(Router);
+  private transloco = inject(TranslocoService);
 
   loading     = signal(false);
   show        = signal(false);
@@ -73,8 +76,8 @@ export class ChangePasswordComponent {
 
   submit(): void {
     this.errorMsg.set('');
-    if (this.newPass.length < 8)            { this.errorMsg.set('Hasło musi mieć minimum 8 znaków'); return; }
-    if (this.newPass !== this.confirmPass)   { this.errorMsg.set('Hasła nie są identyczne'); return; }
+    if (this.newPass.length < 8)            { this.errorMsg.set(this.transloco.translate('auth.changePassword.errors.tooShort')); return; }
+    if (this.newPass !== this.confirmPass)   { this.errorMsg.set(this.transloco.translate('auth.changePassword.errors.mismatch')); return; }
 
     this.loading.set(true);
     this.auth.changePassword(null, this.newPass).subscribe({
@@ -89,7 +92,7 @@ export class ChangePasswordComponent {
           error: () => { this.loading.set(false); this.router.navigate(['/dashboard']); },
         });
       },
-      error: err => { this.loading.set(false); this.errorMsg.set(err?.error?.error ?? 'Błąd zmiany hasła'); },
+      error: err => { this.loading.set(false); this.errorMsg.set(err?.error?.error ?? this.transloco.translate('auth.changePassword.errors.failed')); },
     });
   }
 }

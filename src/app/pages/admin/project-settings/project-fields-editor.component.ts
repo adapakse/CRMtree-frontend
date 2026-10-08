@@ -1,17 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { Observable } from 'rxjs';
 import { ToastService } from '../../../core/services/toast.service';
 import {
   ProjectConfig, ProjectFieldDefinition, ProjectFieldType, ProjectsApiService,
 } from '../../../core/services/projects-api.service';
 
-const FIELD_TYPE_OPTIONS: { value: ProjectFieldType; label: string }[] = [
-  { value: 'text', label: 'Tekst' },
-  { value: 'number', label: 'Liczba' },
-  { value: 'list', label: 'Lista wartości' },
-  { value: 'date', label: 'Data' },
-  { value: 'money', label: 'Kwota z walutą' },
+const FIELD_TYPE_OPTIONS: { value: ProjectFieldType; labelKey: string }[] = [
+  { value: 'text', labelKey: 'labels.fieldTypes.text' },
+  { value: 'number', labelKey: 'labels.fieldTypes.number' },
+  { value: 'list', labelKey: 'labels.fieldTypes.list' },
+  { value: 'date', labelKey: 'labels.fieldTypes.date' },
+  { value: 'money', labelKey: 'labels.fieldTypes.money' },
 ];
 
 const OPTION_SEPARATOR = ',';
@@ -24,41 +25,41 @@ function parseOptions(text: string): string[] {
 @Component({
   selector: 'wt-project-fields-editor',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <p class="hint">
-      Pola zdefiniowane tutaj PM może dodać do swojego projektu (Karta projektu → Pola dodatkowe zadań) i zdecydować,
-      czy są wymagane. Typu pola nie można zmienić po utworzeniu.
-    </p>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      <p class="hint">{{ t('settings.fields.hint') }}</p>
 
-    @for (definition of definitions(); track definition.id) {
-      <div class="row" [class.inactive]="!definition.is_active">
-        <input class="fi name" [ngModel]="definition.name" maxlength="120" (change)="rename(definition, $event)">
-        <span class="type">{{ typeLabel(definition.field_type) }}</span>
-        @if (definition.field_type === 'list') {
-          <input class="fi options" [ngModel]="definition.options.join(', ')" placeholder="Wartości po przecinku"
-                 (change)="changeOptions(definition, $event)">
+      @for (definition of definitions(); track definition.id) {
+        <div class="row" [class.inactive]="!definition.is_active">
+          <input class="fi name" [ngModel]="definition.name" maxlength="120" (change)="rename(definition, $event)">
+          <span class="type">{{ t('labels.fieldTypes.' + definition.field_type) }}</span>
+          @if (definition.field_type === 'list') {
+            <input class="fi options" [ngModel]="definition.options.join(', ')" [placeholder]="t('settings.fields.optionsPlaceholder')"
+                   (change)="changeOptions(definition, $event)">
+          } @else { <span class="options"></span> }
+          <label class="active-toggle">
+            <input type="checkbox" [checked]="definition.is_active"
+                   (change)="update(definition, { is_active: !definition.is_active })"> {{ t('settings.fields.active') }}
+          </label>
+        </div>
+      } @empty {
+        <p class="muted">{{ t('settings.fields.empty') }}</p>
+      }
+
+      <div class="row add">
+        <input class="fi name" [(ngModel)]="newName" maxlength="120" [placeholder]="t('settings.fields.newNamePlaceholder')">
+        <select class="fsel type-select" [(ngModel)]="newType">
+          @for (option of typeOptions; track option.value) { <option [ngValue]="option.value">{{ t(option.labelKey) }}</option> }
+        </select>
+        @if (newType === 'list') {
+          <input class="fi options" [(ngModel)]="newOptions" [placeholder]="t('settings.fields.optionsPlaceholder')">
         } @else { <span class="options"></span> }
-        <label class="active-toggle">
-          <input type="checkbox" [checked]="definition.is_active"
-                 (change)="update(definition, { is_active: !definition.is_active })"> aktywne
-        </label>
+        <button class="btn btn-p btn-sm" [disabled]="!canAdd()" (click)="add()">{{ t('settings.fields.addButton') }}</button>
       </div>
-    } @empty {
-      <p class="muted">Brak zdefiniowanych pól.</p>
-    }
-
-    <div class="row add">
-      <input class="fi name" [(ngModel)]="newName" maxlength="120" placeholder="Nazwa nowego pola…">
-      <select class="fsel type-select" [(ngModel)]="newType">
-        @for (option of typeOptions; track option.value) { <option [ngValue]="option.value">{{ option.label }}</option> }
-      </select>
-      @if (newType === 'list') {
-        <input class="fi options" [(ngModel)]="newOptions" placeholder="Wartości po przecinku">
-      } @else { <span class="options"></span> }
-      <button class="btn btn-p btn-sm" [disabled]="!canAdd()" (click)="add()">Dodaj pole</button>
-    </div>
+    </ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; }
@@ -77,6 +78,7 @@ function parseOptions(text: string): string[] {
 export class ProjectFieldsEditorComponent {
   private readonly api = inject(ProjectsApiService);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly definitions = input.required<ProjectFieldDefinition[]>();
   readonly configChanged = output<ProjectConfig>();
@@ -86,10 +88,6 @@ export class ProjectFieldsEditorComponent {
   newName = '';
   newType: ProjectFieldType = 'text';
   newOptions = '';
-
-  typeLabel(fieldType: ProjectFieldType): string {
-    return FIELD_TYPE_OPTIONS.find(option => option.value === fieldType)?.label ?? fieldType;
-  }
 
   canAdd(): boolean {
     if (!this.newName.trim()) return false;
@@ -111,7 +109,7 @@ export class ProjectFieldsEditorComponent {
     const options = parseOptions(input.value);
     if (!options.length) {
       input.value = definition.options.join(', ');
-      this.toast.error('Lista musi mieć co najmniej jedną wartość');
+      this.toast.error(this.transloco.translate('projects.settings.fields.optionsRequired'));
       return;
     }
     this.update(definition, { options });
@@ -139,7 +137,7 @@ export class ProjectFieldsEditorComponent {
         onSuccess?.();
         this.configChanged.emit(config);
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się zapisać pola'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.fields.saveFailed')),
     });
   }
 }

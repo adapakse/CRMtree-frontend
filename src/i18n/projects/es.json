@@ -1,0 +1,863 @@
+{
+  "assigneeSummary": {
+    "atRisk": "En riesgo",
+    "key": "abiertas · vencidas · en riesgo",
+    "open": "Tareas abiertas",
+    "overdue": "Vencidas"
+  },
+  "card": {
+    "closeConfirm": "¿Cerrar el proyecto? Un proyecto cerrado es de solo lectura y desaparece de la lista predeterminada.",
+    "closeProject": "Cerrar proyecto",
+    "closedBadge": "Cerrado",
+    "datesHint": "El proyecto se marca como retrasado cuando una tarea sin finalizar termina después de la fecha límite del proyecto, o cuando esa fecha ya ha pasado y quedan tareas sin finalizar.",
+    "description": "Descripción",
+    "edit": "Editar",
+    "endDate": "Fecha límite del proyecto",
+    "errors": {
+      "addMemberFailed": "No se pudo añadir a la persona",
+      "changeAccessLevelFailed": "No se pudieron cambiar los permisos",
+      "changeRoleFailed": "No se pudo cambiar el rol",
+      "closeProjectFailed": "No se pudo cerrar el proyecto",
+      "endBeforeStart": "La fecha límite del proyecto no puede ser anterior a su inicio.",
+      "removeMemberFailed": "No se pudo quitar a la persona",
+      "reopenProjectFailed": "No se pudo reabrir el proyecto",
+      "saveFieldsFailed": "No se pudieron guardar los campos",
+      "saveProjectFailed": "No se pudo guardar el proyecto"
+    },
+    "fields": {
+      "add": "Añadir campo",
+      "empty": "El proyecto no tiene campos adicionales.",
+      "field": "Campo",
+      "noneAvailable": "No hay campos para añadir. Los campos los define el administrador en Configuración → Proyectos → Campos adicionales de tareas.",
+      "remove": "Quitar",
+      "removeConfirm": "¿Quitar el campo «{name}» del proyecto? Los valores introducidos en las tareas se conservarán.",
+      "required": "Obligatorio",
+      "requiredToggle": "obligatorio",
+      "selectPlaceholder": "— elige un campo —",
+      "title": "Campos adicionales de tareas",
+      "type": "Tipo"
+    },
+    "members": {
+      "accessLevel": "Permisos",
+      "add": "Añadir",
+      "companyAndDepartment": "Empresa / departamento",
+      "email": "Correo electrónico",
+      "externalAccount": "cuenta externa",
+      "inactive": "(inactivo)",
+      "person": "Persona",
+      "phone": "Teléfono",
+      "remove": "Quitar",
+      "removeConfirm": "¿Quitar a {name} del proyecto? La persona también dejará de estar asignada a sus tareas.",
+      "role": "Rol",
+      "searchPlaceholder": "Escribe nombre, apellido, correo o empresa (mín. 3 caracteres)…",
+      "title": "Personas del proyecto"
+    },
+    "name": "Nombre",
+    "noDescription": "Sin descripción.",
+    "reopenProject": "Reabrir",
+    "startDate": "Inicio del proyecto",
+    "title": "Ficha del proyecto"
+  },
+  "chat": {
+    "deletedUser": "Usuario eliminado",
+    "empty": "No hay mensajes.",
+    "hint": "Enter envía el mensaje, Shift+Enter añade una línea nueva.",
+    "placeholder": "Escribe un mensaje…",
+    "send": "Enviar",
+    "sendFailed": "No se pudo enviar el mensaje"
+  },
+  "crmLink": {
+    "change": "Cambiar",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Vincular",
+    "linkFailed": "No se pudo vincular el proyecto",
+    "none": "ninguno",
+    "remove": "Quitar vínculo",
+    "removeConfirm": "¿Quitar el vínculo del proyecto con el CRM? Las tareas del proyecto desaparecerán de la ficha del lead o del partner.",
+    "removeFailed": "No se pudo quitar el vínculo",
+    "searchHint": "Las sugerencias incluyen solo los leads y partners a los que tienes acceso en el CRM. Al elegir uno, el vínculo se guarda de inmediato.",
+    "searchPlaceholder": "Escribe el nombre del lead o del partner (mín. 3 caracteres)…",
+    "title": "Vínculo con el CRM"
+  },
+  "deadlines": {
+    "atRisk": "En riesgo",
+    "atRiskHint": "La fecha límite está cerca y el trabajo aún no ha empezado.",
+    "completedLate": "Finalizada tarde",
+    "completedLateHint": "La tarea se finalizó después de su fecha límite.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "en riesgo (por hacer, fecha límite dentro de {days, plural, one {# día} other {# días}})",
+      "beyondProjectEnd": "después de la fecha límite del proyecto",
+      "completedLate": "finalizada tarde",
+      "originalEndDate": "fecha límite original",
+      "overdue": "vencida",
+      "overdueSubtasks": "subtareas vencidas",
+      "projectEndDate": "fecha límite del proyecto"
+    },
+    "originalEndDateHint": "Fecha límite original y desplazamiento en días",
+    "overdue": "Vencida",
+    "overdueDays": "Vencida {days} d",
+    "overdueHint": "La fecha límite ha pasado y la tarea no está finalizada.",
+    "overdueSubtasks": "Subtareas vencidas",
+    "overdueSubtasksHint": "Al menos una subtarea está vencida.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Retrasado",
+    "reasons": {
+      "endPassed": "La fecha límite del proyecto pasó hace {days, plural, one {# día} other {# días}}, tareas abiertas: {count}",
+      "taskAfterEnd": "Tareas que terminan después de la fecha límite del proyecto: {count} (la más tardía, {days, plural, one {# día} other {# días}} después)"
+    }
+  },
+  "detail": {
+    "backToProjects": "Proyectos",
+    "closedBadge": "Cerrado",
+    "empty": {
+      "noAssignedTasks": "No tienes tareas asignadas en este proyecto.",
+      "noTasks": "Este proyecto aún no tiene tareas."
+    },
+    "newTask": "Nueva tarea",
+    "openFailed": "No se pudo abrir el proyecto",
+    "refreshFailed": "No se pudo actualizar el proyecto",
+    "showOnlyMyTasks": "Mostrar mis tareas",
+    "tabs": {
+      "card": "Ficha del proyecto",
+      "chat": "Chat",
+      "finance": "Finanzas",
+      "tasks": "Tareas ({count})",
+      "timeline": "Cronograma"
+    },
+    "tasksLoadFailed": "No se pudieron cargar las tareas"
+  },
+  "filters": {
+    "assignee": "Persona",
+    "atRiskCount": "Tareas en riesgo",
+    "cost": "Coste",
+    "delayReason": "Motivo del retraso",
+    "delayReasonValues": {
+      "end_passed": "La fecha límite del proyecto ha pasado",
+      "task_after_end": "Una tarea termina después de la fecha límite del proyecto"
+    },
+    "delayed": "Retraso",
+    "delayedValues": {
+      "no": "Sin retraso",
+      "yes": "Retrasados"
+    },
+    "endDate": "Fin",
+    "manager": "PM",
+    "myRole": "Mi rol",
+    "myRoleValues": {
+      "controller": "Revisor",
+      "participant": "Participante",
+      "pm": "PM"
+    },
+    "name": "Nombre de la tarea",
+    "number": "Número",
+    "originalEndDate": "Fecha límite original",
+    "overdueCount": "Tareas vencidas",
+    "priority": "Prioridad",
+    "progress": "Progreso (%)",
+    "project": "Proyecto",
+    "projectCost": "Coste incurrido",
+    "projectEndDate": "Fecha límite del proyecto",
+    "projectName": "Nombre o clave del proyecto",
+    "projectRevenue": "Ingresos",
+    "projectSort": {
+      "at_risk": "Tareas en riesgo",
+      "cost": "Coste incurrido",
+      "delay": "Retraso",
+      "end_date": "Fecha límite",
+      "key": "Clave",
+      "name": "Nombre",
+      "overdue": "Tareas vencidas",
+      "pm": "PM",
+      "progress": "Progreso",
+      "revenue": "Ingresos",
+      "start_date": "Inicio",
+      "status": "Estado"
+    },
+    "projectStartDate": "Inicio del proyecto",
+    "slip": "Desplazamiento (días)",
+    "startDate": "Inicio",
+    "status": "Estado",
+    "statusCategory": "Etapa",
+    "taskSort": {
+      "original_end_date": "Fecha límite original",
+      "parent": "Tarea principal",
+      "slip_days": "Desplazamiento"
+    },
+    "timeliness": "Puntualidad",
+    "timelinessValues": {
+      "at_risk": "En riesgo",
+      "on_time": "En plazo",
+      "overdue": "Vencidas"
+    },
+    "type": "Tipo",
+    "unassigned": "Sin asignar"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Presupuesto de la categoría {name}",
+      "columns": {
+        "budget": "Presupuesto",
+        "category": "Categoría",
+        "incurred": "Incurrido",
+        "planned": "Planificado",
+        "variance": "Desviación"
+      },
+      "empty": "No hay categorías de costes. El administrador las añade en Configuración → Proyectos → Categorías de costes.",
+      "hint": "La desviación es el presupuesto menos los costes incurridos. Las filas con el presupuesto superado aparecen resaltadas.",
+      "inactive": "(inactiva)",
+      "saveFailed": "No se pudo guardar el presupuesto",
+      "title": "Presupuesto por categoría",
+      "total": "Total"
+    },
+    "costForm": {
+      "addTitle": "Nuevo coste",
+      "amount": "Importe",
+      "category": "Categoría",
+      "clearInvoiceDocument": "Desvincular documento",
+      "conversionHint": "El importe se convertirá a {currency} al tipo de cambio medio del NBP (Banco Nacional de Polonia) del día hábil anterior a la fecha del coste.",
+      "currency": "Moneda del importe",
+      "date": "Fecha",
+      "description": "Descripción",
+      "documentNumber": "Número de documento",
+      "editTitle": "Editar coste",
+      "invoiceDocument": "Documento de la factura (opcional)",
+      "invoiceDocumentHint": "Documentos de tipo Factura a los que tienes acceso en el módulo Documentos. Las facturas descargadas de KSeF se vinculan por separado.",
+      "invoiceDocumentPlaceholder": "Busca una factura por número o nombre…",
+      "noTask": "— sin tarea —",
+      "saveFailed": "No se pudo guardar el coste",
+      "saved": "Coste guardado",
+      "savedWithRate": "Coste guardado: {amount} al tipo de cambio {rate} del {date}",
+      "selectCategory": "— elige una categoría —",
+      "status": "Estado",
+      "storedConversion": "Guardado como {amount} (tipo de cambio {rate} del {date}).",
+      "supplier": "Proveedor",
+      "task": "Tarea"
+    },
+    "costStatuses": {
+      "incurred": "Incurrido",
+      "planned": "Planificado"
+    },
+    "costs": {
+      "add": "Añadir coste",
+      "columns": {
+        "amount": "Importe",
+        "category": "Categoría",
+        "date": "Fecha",
+        "description": "Descripción",
+        "documentNumber": "N.º de documento",
+        "status": "Estado",
+        "supplier": "Proveedor",
+        "task": "Tarea"
+      },
+      "deleteConfirm": "¿Eliminar el coste ({item})?",
+      "deleteFailed": "No se pudo eliminar el coste",
+      "empty": "El proyecto aún no tiene costes.",
+      "emptyForFilters": "No hay costes para los filtros seleccionados.",
+      "filters": {
+        "allCategories": "Todas las categorías",
+        "allStatuses": "Todos los estados",
+        "allTasks": "Todas las tareas",
+        "withoutTask": "Sin tarea"
+      },
+      "rateNote": "tipo de cambio {rate} del {date}",
+      "title": "Costes",
+      "totalIncurred": "Total incurrido"
+    },
+    "delete": "Eliminar",
+    "document": {
+      "lockedTitle": "Documento de la factura — no tienes acceso a él en el módulo Documentos",
+      "openTitle": "Documento de la factura — abrir en el módulo Documentos"
+    },
+    "edit": "Editar",
+    "loadFailed": "No se pudieron cargar las finanzas del proyecto",
+    "plan": {
+      "currency": "Moneda del proyecto",
+      "currencyLockedHint": "La moneda no se puede cambiar porque el proyecto ya tiene partidas de costes o de ingresos.",
+      "participantsCanAddCosts": "Los participantes pueden añadir costes a sus tareas",
+      "participantsCanAddCostsHint": "El participante interno añade costes solo en las tareas a las que está asignado y ve únicamente las partidas que él mismo ha añadido.",
+      "plannedRevenue": "Ingresos planificados ({currency})",
+      "saveFailed": "No se pudo guardar el plan",
+      "suggestedHint": "La sugerencia es el valor del lead vinculado convertido a la moneda del proyecto.",
+      "title": "Plan financiero",
+      "useSuggested": "Usar el sugerido: {amount}"
+    },
+    "readOnlyNote": "Solo lectura: puedes consultar las finanzas de este proyecto, pero no modificarlas.",
+    "revenueStatuses": {
+      "invoiced": "Facturado",
+      "paid": "Cobrado",
+      "planned": "Planificado"
+    },
+    "revenues": {
+      "add": "Añadir ingreso",
+      "addTitle": "Nuevo ingreso",
+      "amountIn": "Importe ({currency})",
+      "columns": {
+        "amount": "Importe",
+        "date": "Fecha",
+        "description": "Descripción",
+        "status": "Estado"
+      },
+      "deleteConfirm": "¿Eliminar el ingreso ({item})?",
+      "deleteFailed": "No se pudo eliminar el ingreso",
+      "editTitle": "Editar ingreso",
+      "empty": "El proyecto aún no tiene ingresos.",
+      "saveFailed": "No se pudo guardar el ingreso",
+      "saved": "Ingreso guardado",
+      "statusHint": "En los ingresos reales cuentan las partidas facturadas y cobradas.",
+      "title": "Ingresos"
+    },
+    "saving": "Guardando…",
+    "summary": {
+      "budget": "Presupuesto",
+      "cost": "Coste (incurrido)",
+      "margin": "Margen (real)",
+      "plan": "Plan",
+      "plannedItems": "Partidas planificadas",
+      "remainingBudget": "Presupuesto restante",
+      "remainingBudgetHint": "Presupuesto menos costes incurridos",
+      "revenue": "Ingresos (reales)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Incurrido (propio)",
+        "plannedCost": "Coste planificado",
+        "task": "Tarea",
+        "totalIncurred": "Incurrido incl. subtareas",
+        "totalPlanned": "Planificado incl. subtareas"
+      },
+      "empty": "Ninguna tarea tiene aún costes ni coste planificado.",
+      "hint": "El coste planificado de una tarea es informativo y no se incluye en el presupuesto del proyecto. Los importes «incl. subtareas» abarcan las partidas de la tarea y de todas sus subtareas.",
+      "plannedCostOf": "Coste planificado de la tarea {task}",
+      "saveFailed": "No se pudo guardar el coste planificado",
+      "title": "Costes de las tareas",
+      "total": "Total"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Real / plan",
+      "cost": "Coste",
+      "margin": "Margen",
+      "marginHint": "Margen real: ingresos facturados y cobrados menos costes incurridos",
+      "revenue": "Ingresos"
+    }
+  },
+  "gantt": {
+    "beyondProjectEnd": "Termina después de la fecha límite del proyecto",
+    "emptyTitle": "Sin tareas",
+    "loadFailed": "No se pudo cargar el cronograma",
+    "originalEndDate": "Fecha límite original: {date} ({slip})",
+    "projectEndDate": "Fecha límite del proyecto: {date}",
+    "taskColumn": "Tarea",
+    "today": "Hoy",
+    "truncated": "El cronograma muestra las primeras {limit} tareas. Acota los filtros para ver las demás.",
+    "undatedNote": "{count, plural, one {# tarea sin fechas no tiene barra en el cronograma.} other {# tareas sin fechas no tienen barra en el cronograma.}}",
+    "zoom": {
+      "day": "Días",
+      "month": "Meses",
+      "week": "Semanas"
+    }
+  },
+  "ksef": {
+    "badge": {
+      "openTitle": "Factura de KSeF — ver detalles",
+      "title": "Factura de KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Añadir factura de KSeF",
+      "link": "Vincular factura KSeF",
+      "unlink": "Desvincular factura",
+      "unlinkConfirm": "¿Desvincular la factura {invoice} de este coste? El coste seguirá en la lista y la factura permanecerá en KSeF.",
+      "unlinkFailed": "No se pudo desvincular la factura"
+    },
+    "detail": {
+      "address": "Dirección",
+      "buyer": "Comprador",
+      "invoiceType": "Tipo de factura",
+      "issueDate": "Fecha de emisión",
+      "ksefNumber": "Número KSeF",
+      "lines": {
+        "empty": "La factura no contiene líneas.",
+        "name": "Nombre",
+        "netAmount": "Importe neto",
+        "number": "N.º",
+        "quantity": "Cantidad",
+        "title": "Líneas de la factura",
+        "unitNetPrice": "Precio neto",
+        "vatRate": "IVA"
+      },
+      "links": {
+        "empty": "La factura no está vinculada a ningún coste.",
+        "linkedTotal": "En total se han vinculado {linked} de {net} netos.",
+        "title": "Vinculaciones de la factura"
+      },
+      "loadFailed": "No se pudo cargar la factura",
+      "payment": {
+        "amountDue": "A pagar",
+        "bankAccounts": "Cuenta bancaria",
+        "dueDates": "Fecha de vencimiento",
+        "factor": "factor",
+        "form": "Forma de pago",
+        "paymentDate": "Fecha de pago",
+        "state": "Estado del pago",
+        "states": {
+          "paid": "Pagada",
+          "partiallyPaid": "Pagada parcialmente",
+          "unknown": "Sin información",
+          "unpaid": "No pagada"
+        },
+        "title": "Pago"
+      },
+      "saleDate": "Fecha de venta",
+      "seller": "Vendedor",
+      "title": "Factura {number}",
+      "titleLoading": "Factura de KSeF",
+      "totals": {
+        "gross": "Bruto",
+        "net": "Neto",
+        "vat": "IVA"
+      }
+    },
+    "document": {
+      "groupMissing": "No se ha elegido ningún grupo de acceso para los documentos de facturas, por lo que las facturas no se pueden registrar en Documentos. El administrador lo elige en Configuración → Proyectos → KSeF.",
+      "noAccessTitle": "No perteneces al grupo de acceso de este documento, por lo que no puedes abrirlo.",
+      "notRegisteredOnLink": "La factura se vinculará, pero no aparecerá en el módulo Documentos: no se ha elegido ningún grupo de acceso para los documentos de facturas (Configuración → Proyectos → KSeF).",
+      "open": "Abrir documento",
+      "register": "Registrar en Documentos",
+      "registerFailed": "No se pudo registrar la factura en Documentos",
+      "registerHint": "La factura aún no tiene documento en el módulo Documentos. Al vincularla a un coste se registrará automáticamente.",
+      "registered": "Registrada: {number}",
+      "registeredToast": "Factura registrada en Documentos como {number}",
+      "registering": "Registrando…",
+      "title": "Documento en el módulo Documentos"
+    },
+    "errors": {
+      "forbidden": "No tienes acceso a las facturas de KSeF. El permiso lo concede el administrador en el panel de usuarios."
+    },
+    "invoiceTypes": {
+      "KOR": "Factura rectificativa",
+      "KOR_ROZ": "Rectificación de factura de liquidación",
+      "KOR_ZAL": "Rectificación de factura de anticipo",
+      "ROZ": "Factura de liquidación",
+      "UPR": "Factura simplificada",
+      "VAT": "Factura con IVA",
+      "ZAL": "Factura de anticipo"
+    },
+    "link": {
+      "alreadyLinkedHint": "Aun así puedes vincularla de nuevo; solo comprueba que el mismo coste no se cuente dos veces.",
+      "alreadyLinkedTitle": "Atención: esta factura ya está vinculada",
+      "amountHint": "Por defecto, todo el importe neto de la factura. Cámbialo si asignas a este coste solo una parte de la factura.",
+      "amountHintForeign": "La factura está en {invoiceCurrency} y el proyecto en {projectCurrency}. Deja el campo vacío y todo el importe neto ({net}) se convertirá al tipo de cambio medio del NBP del día hábil anterior a la fecha de emisión de la factura. También puedes introducir el importe directamente en {projectCurrency}.",
+      "amountIn": "Importe asignado ({currency})",
+      "attachNote": "La factura se vinculará al coste: {item}. El importe y los demás datos del coste no cambiarán.",
+      "back": "Volver a la lista",
+      "confirm": "Vincular factura",
+      "errors": {
+        "failed": "No se pudo vincular la factura",
+        "forbidden": "No tienes permisos para vincular facturas de KSeF en este proyecto.",
+        "noExchangeRate": "No hay tipo de cambio del NBP para la moneda de la factura. Introduce el importe en {currency}.",
+        "projectClosed": "El proyecto está cerrado: ya no se pueden vincular facturas."
+      },
+      "saved": "Factura vinculada",
+      "savedWithRate": "Factura vinculada: {amount} al tipo de cambio {rate} del {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Importe",
+        "linkedBy": "Vinculada por",
+        "project": "Proyecto",
+        "status": "Estado",
+        "task": "Tarea"
+      },
+      "wholeProject": "Todo el proyecto"
+    },
+    "list": {
+      "columns": {
+        "currency": "Moneda",
+        "document": "Documento",
+        "gross": "Bruto",
+        "issueDate": "Fecha de emisión",
+        "net": "Neto",
+        "number": "Número",
+        "paymentDueDate": "Vencimiento",
+        "seller": "Vendedor"
+      }
+    },
+    "nip": "NIF",
+    "otherLinks": {
+      "intro": "Esta factura también está vinculada a:",
+      "overAllocated": "La suma de las vinculaciones supera el importe neto de la factura.",
+      "wholeProject": "{project} (todo el proyecto)"
+    },
+    "paymentForms": {
+      "card": "Tarjeta",
+      "cash": "Efectivo",
+      "cheque": "Cheque",
+      "credit": "Crédito",
+      "mobile": "Pago móvil",
+      "transfer": "Transferencia",
+      "voucher": "Vale"
+    },
+    "picker": {
+      "attachTitle": "Vincular factura de KSeF al coste",
+      "empty": "No hay facturas en el periodo seleccionado y para los filtros seleccionados.",
+      "filters": {
+        "dateFrom": "Fecha de emisión desde",
+        "dateTo": "Fecha de emisión hasta",
+        "invoiceNumber": "Número de factura",
+        "netMax": "Neto hasta",
+        "netMin": "Neto desde",
+        "seller": "Vendedor (nombre o NIF)"
+      },
+      "lastSync": "Última sincronización correcta: {time}.",
+      "linkedCount": "{count, plural, one {Ya vinculada: # vez} other {Ya vinculada: # veces}}",
+      "loadFailed": "No se pudo cargar la lista de facturas",
+      "nextPage": "Siguiente",
+      "noCompanies": "Aún no se ha añadido ninguna empresa a KSeF. El administrador lo hace en Configuración → Proyectos → KSeF.",
+      "notConfigured": "La integración con KSeF no está configurada en el servidor. La lista muestra solo las facturas descargadas anteriormente.",
+      "pageInfo": "Página {page} de {pages} · facturas: {total}",
+      "previousPage": "Anterior",
+      "search": "Buscar",
+      "select": "Elegir",
+      "syncHint": "Una factura recién emitida puede tardar unos minutos en aparecer en KSeF.",
+      "title": "Añadir factura de KSeF"
+    },
+    "settings": {
+      "addCompany": "Añadir empresa",
+      "columns": {
+        "lastAttempt": "Último intento",
+        "lastSynced": "Última sincronización correcta",
+        "name": "Nombre",
+        "status": "Estado",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Nueva empresa en KSeF",
+        "added": "Empresa añadida. Las facturas se descargarán en la próxima sincronización.",
+        "editTitle": "Empresa en KSeF",
+        "name": "Nombre (opcional)",
+        "saveFailed": "No se pudo guardar la empresa",
+        "saved": "Empresa guardada",
+        "token": "Token de KSeF",
+        "tokenHintAdd": "Token generado en KSeF para este NIF. Antes de guardarlo lo comprobamos en KSeF; una vez guardado, no se puede volver a leer.",
+        "tokenHintEdit": "Token actual: {hint}. Deja el campo vacío para no cambiarlo.",
+        "verifying": "Comprobando en KSeF…"
+      },
+      "edit": "Cambiar",
+      "environments": {
+        "production": "Entorno de producción",
+        "test": "Entorno de pruebas"
+      },
+      "errors": {
+        "companyNotFound": "Esta empresa ya no está en la configuración. Actualiza la página.",
+        "duplicateNip": "Ya se ha añadido una empresa con este NIF.",
+        "invalidNip": "NIF no válido.",
+        "notConfigured": "La integración con KSeF no está configurada en el servidor.",
+        "tokenRejected": "KSeF ha rechazado el token para este NIF. Comprueba que el token esté vigente y que se haya emitido para esta empresa.",
+        "unknownGroup": "Este grupo no existe o está inactivo. Actualiza la página y elige otro.",
+        "unreachable": "No se pudo conectar con KSeF para comprobar el token. Inténtalo de nuevo más tarde."
+      },
+      "hint": "Las facturas de compra de las empresas añadidas a continuación se descargan del Sistema Nacional de Facturas Electrónicas de Polonia (KSeF) cada 30 minutos. Las personas con el permiso «Acceso a las facturas de KSeF» las vinculan a los costes de los proyectos.",
+      "initialSyncDays": "La primera sincronización abarca hacia atrás (días)",
+      "initialSyncDaysHint": "De {min} a {max} días. Se aplica a las empresas añadidas después de cambiar este ajuste.",
+      "invoiceDocumentsGroup": "Grupo de acceso para los documentos de facturas",
+      "invoiceDocumentsGroupHint": "A este grupo van los documentos de facturas registrados desde KSeF. Si no se elige un grupo, las facturas vinculadas a proyectos no se registran en el módulo Documentos.",
+      "loadFailed": "No se pudo cargar la configuración de KSeF",
+      "noCompanies": "Aún no se ha añadido ninguna empresa.",
+      "noInvoiceDocumentsGroup": "— ninguno —",
+      "notConfigured": "La integración con KSeF no está configurada en el servidor, por lo que no se pueden añadir empresas ni descargar facturas.",
+      "remove": "Eliminar",
+      "removeConfirm": "¿Eliminar la empresa {company} de la configuración de KSeF? Dejarán de descargarse facturas nuevas. Las facturas ya descargadas y sus vinculaciones a costes se conservarán.",
+      "removeFailed": "No se pudo eliminar la empresa",
+      "saveFailed": "No se pudo guardar el ajuste",
+      "saved": "Ajuste guardado",
+      "statuses": {
+        "active": "Activa",
+        "error": "Error de sincronización",
+        "invalid": "Token rechazado"
+      },
+      "syncFailed": "La sincronización ha fallado: el motivo se muestra junto a la empresa.",
+      "testEnvironmentNote": "El servidor se conecta al entorno de pruebas de KSeF: las facturas no son documentos reales.",
+      "title": "KSeF — facturas de costes"
+    },
+    "sync": {
+      "failedForCompany": "La sincronización ha fallado para al menos una empresa. El administrador verá los detalles en Configuración → Proyectos → KSeF.",
+      "finished": "Sincronización finalizada",
+      "now": "Sincronizar ahora",
+      "running": "Sincronizando…",
+      "startFailed": "No se pudo iniciar la sincronización",
+      "stillRunning": "La sincronización sigue en curso: actualiza la lista en un momento."
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Completo",
+      "read": "Solo lectura"
+    },
+    "fieldTypes": {
+      "date": "Fecha",
+      "list": "Lista de valores",
+      "money": "Importe con moneda",
+      "number": "Número",
+      "text": "Texto"
+    },
+    "reminders": {
+      "1d_before": "1 día antes de la fecha límite",
+      "2d_before": "2 días antes de la fecha límite",
+      "3d_before": "3 días antes de la fecha límite",
+      "at_due": "El día de la fecha límite",
+      "custom": "Fecha personalizada"
+    },
+    "roles": {
+      "controller": "Revisor",
+      "external_participant": "Participante externo",
+      "internal_participant": "Participante interno",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Finalizado",
+      "in_progress": "En curso",
+      "todo": "Por hacer"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "cerrado",
+    "lockedHint": "Vista previa: no participas en este proyecto",
+    "noDueDate": "sin fecha límite",
+    "noTasks": "El proyecto aún no tiene tareas.",
+    "openOfTotal": "{open} abiertas de {total}",
+    "showClosedProjectTasks": "Mostrar las tareas del proyecto cerrado",
+    "title": "Tareas de proyectos"
+  },
+  "list": {
+    "closedBadge": "Cerrado",
+    "createFailed": "No se pudo crear el proyecto",
+    "createForm": {
+      "description": "Descripción",
+      "keyHint": "El prefijo de los números de tarea se generará automáticamente a partir del nombre del proyecto.",
+      "name": "Nombre",
+      "namePlaceholder": "p. ej., Implantación del sistema CRM",
+      "saving": "Guardando…",
+      "submit": "Crear proyecto"
+    },
+    "empty": {
+      "noOpenProjects": "No participas en ningún proyecto abierto.",
+      "noneForFilter": "No hay proyectos para el filtro seleccionado.",
+      "title": "Sin proyectos"
+    },
+    "filters": {
+      "all": "Todos",
+      "closed": "Cerrados",
+      "open": "Abiertos"
+    },
+    "loadFailed": "No se pudieron cargar los proyectos",
+    "newProject": "Nuevo proyecto",
+    "stats": {
+      "atRisk": "en riesgo",
+      "doneOfTotalHint": "Tareas finalizadas / todas",
+      "members": "{count, plural, one {persona} other {personas}}",
+      "myOpenTasks": "{count, plural, one {abierta mía} other {abiertas mías}}",
+      "overdue": "vencidas",
+      "tasks": "{count, plural, one {tarea} other {tareas}}"
+    },
+    "title": "Proyectos",
+    "views": {
+      "myTasks": "Mis tareas",
+      "portfolio": "Resumen de proyectos",
+      "projects": "Proyectos"
+    }
+  },
+  "myTasks": {
+    "empty": {
+      "description": "No tienes tareas abiertas en ningún proyecto.",
+      "title": "Sin tareas"
+    },
+    "includeDone": "Mostrar finalizadas",
+    "loadFailed": "No se pudieron cargar las tareas"
+  },
+  "panel": {
+    "chatTitle": "Conversación sobre la tarea",
+    "costs": {
+      "add": "Añadir coste",
+      "empty": "La tarea aún no tiene costes.",
+      "loadFailed": "No se pudieron cargar los costes de la tarea",
+      "ownOnlyHint": "Solo ves los costes que tú has añadido.",
+      "title": "Costes",
+      "totalIncurred": "Total incurrido"
+    },
+    "createTask": "Crear tarea",
+    "created": "Tarea creada",
+    "customFields": {
+      "addButton": "+ Añadir campo",
+      "addFailed": "No se pudo añadir el campo",
+      "addHint": "El campo se añadirá a todas las tareas de este proyecto.",
+      "noneAvailable": "No hay campos para añadir. Los campos los define el administrador en Configuración → Proyectos → Campos adicionales de tareas.",
+      "selectField": "— elige un campo —",
+      "title": "Campos adicionales"
+    },
+    "endDateChange": {
+      "hint": "Opcional. El PM verá el motivo en el correo sobre el cambio de fecha límite; también se guardará en el historial de la tarea.",
+      "placeholder": "p. ej., entrega retrasada del cliente",
+      "reason": "Motivo del cambio de fecha límite"
+    },
+    "fields": {
+      "assignees": "Personas asignadas",
+      "description": "Descripción adicional",
+      "endDate": "Fecha de finalización",
+      "name": "Nombre",
+      "noParent": "— ninguna (tarea principal) —",
+      "parentTask": "Tarea principal",
+      "priority": "Prioridad",
+      "startDate": "Fecha de inicio",
+      "status": "Estado",
+      "type": "Tipo"
+    },
+    "history": {
+      "changed": "ha cambiado: {fields}",
+      "changedWithStatus": "ha cambiado: {fields} ({from} → {to})",
+      "created": "ha creado la tarea",
+      "empty": "No hay entradas.",
+      "endDateChangeReason": "Motivo del cambio de fecha límite: {reason}",
+      "fields": {
+        "assignees": "personas asignadas",
+        "customFields": "campos adicionales",
+        "description": "descripción",
+        "endDate": "fecha de finalización",
+        "name": "nombre",
+        "parentTask": "tarea principal",
+        "priority": "prioridad",
+        "reminder": "recordatorio",
+        "startDate": "fecha de inicio",
+        "status": "estado",
+        "type": "tipo"
+      },
+      "loadFailed": "No se pudo cargar el historial",
+      "systemUser": "Sistema",
+      "title": "Historial de cambios"
+    },
+    "loadFailed": "No se pudo cargar la tarea",
+    "newTask": "Nueva tarea",
+    "reminder": {
+      "customDate": "Fecha del recordatorio",
+      "hint": "El recordatorio se enviará a todas las personas asignadas a las 9:00 y requiere una fecha de finalización.",
+      "label": "Recordatorio por correo electrónico",
+      "none": "Ninguno"
+    },
+    "saveFailed": "No se pudo guardar la tarea",
+    "saved": "Tarea guardada",
+    "saving": "Guardando…"
+  },
+  "portfolio": {
+    "columns": {
+      "atRisk": "En riesgo",
+      "cost": "Coste incurrido",
+      "delay": "Retraso",
+      "endDate": "Fecha límite",
+      "overdue": "Vencidas",
+      "progress": "Progreso",
+      "project": "Proyecto",
+      "projectManagers": "PM",
+      "revenue": "Ingresos",
+      "startDate": "Inicio"
+    },
+    "loadFailed": "No se pudo abrir el resumen de proyectos",
+    "noProjects": "No diriges ni revisas ningún proyecto abierto.",
+    "noTasks": "No hay tareas en tus proyectos.",
+    "tabs": {
+      "projects": "Proyectos",
+      "tasks": "Tareas",
+      "timeline": "Cronograma"
+    }
+  },
+  "settings": {
+    "costCategories": {
+      "hint": "Las categorías no se pueden eliminar: desactiva la que no uses. Una categoría desactivada no se puede elegir en un coste nuevo, y las partidas existentes la conservan.",
+      "title": "Categorías de costes"
+    },
+    "deadlines": {
+      "hint": "Una tarea cuyo trabajo aún no ha empezado se marca como en riesgo cuando faltan para su fecha límite como máximo los días de este umbral (0–30; 0 significa el propio día de la fecha límite).",
+      "invalid": "Introduce un número entero de 0 a 30.",
+      "saveFailed": "No se pudo guardar el umbral",
+      "saved": "Umbral de riesgo de plazo guardado",
+      "threshold": "Umbral de riesgo de plazo (días)",
+      "title": "Control de plazos"
+    },
+    "dictionary": {
+      "active": "activo",
+      "addButton": "Añadir",
+      "moveDown": "Bajar",
+      "moveUp": "Subir",
+      "newItemPlaceholder": "Nuevo elemento…",
+      "saveFailed": "No se pudo guardar el diccionario"
+    },
+    "fields": {
+      "active": "activo",
+      "addButton": "Añadir campo",
+      "empty": "No hay campos definidos.",
+      "hint": "El PM puede añadir a su proyecto los campos definidos aquí (Ficha del proyecto → Campos adicionales de tareas) y decidir si son obligatorios. El tipo de campo no se puede cambiar una vez creado.",
+      "newNamePlaceholder": "Nombre del nuevo campo…",
+      "optionsPlaceholder": "Valores separados por comas",
+      "optionsRequired": "La lista debe tener al menos un valor",
+      "saveFailed": "No se pudo guardar el campo",
+      "title": "Campos adicionales de tareas"
+    },
+    "finance": {
+      "disableConfirm": "¿Desactivar las finanzas de proyectos? Los datos se conservarán, pero desaparecerán de la vista de todos los usuarios.",
+      "hint": "Una vez activadas, el PM y el administrador gestionan en el proyecto el presupuesto, los costes y los ingresos, y el revisor puede consultarlos. El resumen de las finanzas del proyecto también lo ve cualquier persona con acceso a la ficha del lead o del partner vinculado.",
+      "saveFailed": "No se pudo cambiar el ajuste de finanzas",
+      "title": "Finanzas de proyectos",
+      "toggle": "Activar las finanzas de proyectos"
+    },
+    "loadFailed": "No se pudo cargar la configuración de proyectos",
+    "priorities": {
+      "title": "Prioridades"
+    },
+    "statuses": {
+      "hint": "La categoría indica al sistema qué significa el estado, independientemente de su nombre. Las tareas con un estado de la categoría «Finalizado» no cuentan como abiertas ni como vencidas.",
+      "title": "Estados de tareas"
+    },
+    "transitions": {
+      "discardConfirm": "Tienes cambios sin guardar en las transiciones. ¿Descartarlos?",
+      "hint": "El PM siempre puede cambiar el estado a cualquier otro. Los participantes cambian el estado solo en las tareas a las que están asignados y en las que tienen permisos completos. El revisor cambia el estado en cualquier tarea del proyecto.",
+      "matrixCorner": "Del estado ↓ / al estado →",
+      "saveButton": "Guardar transiciones",
+      "saveFailed": "No se pudieron guardar las transiciones",
+      "saved": "Transiciones de estado guardadas",
+      "saving": "Guardando…",
+      "title": "Transiciones entre estados"
+    },
+    "types": {
+      "title": "Tipos de tareas"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Personas",
+      "cost": "Coste",
+      "endDate": "Fin",
+      "number": "N.º",
+      "priority": "Prioridad",
+      "project": "Proyecto",
+      "startDate": "Inicio",
+      "status": "Estado",
+      "task": "Tarea",
+      "timeliness": "Puntualidad",
+      "type": "Tipo"
+    },
+    "emptyForFilters": "Ninguna tarea coincide con los filtros.",
+    "emptyMessage": "Este proyecto aún no tiene tareas.",
+    "emptyTitle": "Sin tareas",
+    "flatList": "Lista plana",
+    "parentTask": "Tarea principal",
+    "subtask": "Subtarea"
+  }
+}

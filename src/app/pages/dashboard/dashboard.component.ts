@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { DocumentService } from '../../core/services/document.service';
 import { WorkflowService } from '../../core/services/api.services';
 import { AuthService } from '../../core/auth/auth.service';
@@ -11,10 +12,12 @@ import { isExpiringSoon } from '../../core/services/helpers';
 @Component({
   selector: 'wt-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, StatusBadgeComponent, TypeBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent],
+  imports: [CommonModule, RouterLink, StatusBadgeComponent, TypeBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TranslocoDirective],
+  providers: [provideTranslocoScope('documents')],
   template: `
+    <ng-container *transloco="let t; prefix: 'documents'">
     <div id="topbar">
-      <span class="page-title">Dashboard</span>
+      <span class="page-title">{{ t('dashboard.title') }}</span>
       <span class="tsp"></span>
       <span style="font-size:12px;color:var(--gray-400)">{{ today }}</span>
     </div>
@@ -24,33 +27,33 @@ import { isExpiringSoon } from '../../core/services/helpers';
       <div class="stats-bar">
         <div class="stat-card">
           <div class="stat-ico ico-or">📄</div>
-          <div class="stat-lbl">Wszystkie dokumenty</div>
+          <div class="stat-lbl">{{ t('dashboard.stats.total') }}</div>
           <div class="stat-val">{{ stats().total }}</div>
-          <div class="stat-sub">Wszystkie dostępne</div>
+          <div class="stat-sub">{{ t('dashboard.stats.totalHint') }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-bl">⚡</div>
-          <div class="stat-lbl">W obiegu</div>
+          <div class="stat-lbl">{{ t('dashboard.stats.inWorkflow') }}</div>
           <div class="stat-val">{{ stats().inWorkflow }}</div>
-          <div class="stat-sub">Aktywne zadania</div>
+          <div class="stat-sub">{{ t('labels.activeTasks') }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-gr">✔</div>
-          <div class="stat-lbl">Podpisane / Zakończone</div>
+          <div class="stat-lbl">{{ t('dashboard.stats.signed') }}</div>
           <div class="stat-val">{{ stats().signed }}</div>
-          <div class="stat-sub">Podpisane + Zakończone</div>
+          <div class="stat-sub">{{ t('dashboard.stats.signedHint') }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-re">⚠</div>
-          <div class="stat-lbl">Wygasają w 30 dni</div>
+          <div class="stat-lbl">{{ t('dashboard.stats.expiring') }}</div>
           <div class="stat-val">{{ stats().expiring }}</div>
-          <div class="stat-sub">Wymagają uwagi</div>
+          <div class="stat-sub">{{ t('dashboard.stats.expiringHint') }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-ico ico-pu">📋</div>
-          <div class="stat-lbl">Moje zadania</div>
+          <div class="stat-lbl">{{ t('labels.myTasks') }}</div>
           <div class="stat-val">{{ myTasks().length }}</div>
-          <div class="stat-sub">Oczekują na działanie</div>
+          <div class="stat-sub">{{ t('dashboard.stats.myTasksHint') }}</div>
         </div>
       </div>
 
@@ -59,19 +62,19 @@ import { isExpiringSoon } from '../../core/services/helpers';
         <!-- Recent Documents -->
         <div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">Ostatnie dokumenty</h3>
-            <a routerLink="/documents" class="btn btn-g btn-sm">Zobacz wszystkie</a>
+            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ t('dashboard.recentDocuments') }}</h3>
+            <a routerLink="/documents" class="btn btn-g btn-sm">{{ t('dashboard.seeAll') }}</a>
           </div>
           @if (loading()) {
             <div class="loading-overlay"><div class="spinner"></div></div>
           } @else {
             <div class="tw">
               <div class="thead" style="grid-template-columns:130px 1fr 130px 110px 80px">
-                <div class="th">Numer</div>
-                <div class="th">Nazwa</div>
-                <div class="th">Grupa</div>
-                <div class="th">Status</div>
-                <div class="th">Ważność</div>
+                <div class="th">{{ t('labels.columns.number') }}</div>
+                <div class="th">{{ t('labels.columns.name') }}</div>
+                <div class="th">{{ t('labels.fields.group') }}</div>
+                <div class="th">{{ t('labels.fields.status') }}</div>
+                <div class="th">{{ t('labels.columns.validity') }}</div>
               </div>
               @for (doc of recentDocs(); track doc.id) {
                 <div class="tr" style="grid-template-columns:130px 1fr 130px 110px 80px;align-items:start"
@@ -92,11 +95,11 @@ import { isExpiringSoon } from '../../core/services/helpers';
                                 <span class="tbadge" [class]="'tbadge-' + task.task_type">
                                   {{ task.task_type.toUpperCase() }}
                                 </span>
-                                &nbsp;u: <strong>{{ task.assignee_name }}</strong>
+                                &nbsp;{{ t('dashboard.taskStrip.assigneePrefix') }} <strong>{{ task.assignee_name }}</strong>
                               </div>
                               <div class="task-strip-line2">
                                 <wt-avatar [name]="task.assignee_name" [size]="14" />
-                                Od: {{ task.assigner_name }}
+                                {{ t('labels.from', { name: task.assigner_name }) }}
                                 @if (task.due_date) {
                                   <span class="task-due" [class.overdue]="isDue(task.due_date)">
                                     ⏰ {{ task.due_date | date:'dd.MM.yy' }}
@@ -111,13 +114,14 @@ import { isExpiringSoon } from '../../core/services/helpers';
                   </div>
                   <div class="td" style="padding-top:14px"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
                   <div class="td" style="padding-top:14px"><wt-status-badge [status]="doc.status" /></div>
-                  <div class="td" style="padding-top:14px" [style.color]="isExpiring(doc.expiration_date) ? '#DC2626' : ''">
+                  <div class="td" style="padding-top:14px" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? '#DC2626' : ''"
+                       [title]="doc.doc_type === 'invoice' ? t('labels.fields.paymentDueDate') : ''">
                     {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
                   </div>
                 </div>
               }
               @empty {
-                <div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">Brak dokumentów</div></div>
+                <div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">{{ t('labels.noDocuments') }}</div></div>
               }
             </div>
           }
@@ -126,8 +130,8 @@ import { isExpiringSoon } from '../../core/services/helpers';
         <!-- My Tasks -->
         <div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">Moje zadania</h3>
-            <a routerLink="/workflow" class="btn btn-g btn-sm">Zobacz wszystkie</a>
+            <h3 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ t('labels.myTasks') }}</h3>
+            <a routerLink="/workflow" class="btn btn-g btn-sm">{{ t('dashboard.seeAll') }}</a>
           </div>
           <div class="tw">
             @for (task of myTasks(); track task.id) {
@@ -147,20 +151,21 @@ import { isExpiringSoon } from '../../core/services/helpers';
                   {{ task.document_name }}
                 </div>
                 <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
-                  Od: {{ task.assigner_name }}
+                  {{ t('labels.from', { name: task.assigner_name }) }}
                 </div>
               </div>
             }
             @empty {
               <div class="empty-state" style="padding:28px 16px">
                 <div class="empty-icon">✅</div>
-                <div class="empty-title">Brak oczekujących zadań</div>
+                <div class="empty-title">{{ t('labels.noPendingTasks') }}</div>
               </div>
             }
           </div>
         </div>
       </div>
     </div>
+    </ng-container>
   `,
   styles: [`
     #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }

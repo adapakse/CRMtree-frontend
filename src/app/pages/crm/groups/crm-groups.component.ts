@@ -6,19 +6,22 @@ import { FormsModule } from '@angular/forms';
 import { CrmApiService, PartnerGroup } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'wt-crm-groups',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="page">
   <div class="topbar">
-    <h1>Grupy partnerskie</h1>
-    <button class="btn-primary" *ngIf="isManager" (click)="openCreate()">+ Nowa grupa</button>
+    <h1>{{ t('partnerGroups.title') }}</h1>
+    <button class="btn-primary" *ngIf="isManager" (click)="openCreate()">+ {{ t('partnerGroups.newGroup') }}</button>
   </div>
 
-  <div *ngIf="loading" class="loading">Ładowanie…</div>
+  <div *ngIf="loading" class="loading">{{ 'states.loading' | transloco }}</div>
 
   <div *ngIf="!loading" class="groups-grid">
     <div *ngFor="let g of groups" class="group-card"
@@ -37,7 +40,7 @@ import { ToastService } from '../../../core/services/toast.service';
         </div>
       </div>
       <div class="gc-stats">
-        <span class="gc-stat"><strong>{{g.partner_count}}</strong> partnerów</span>
+        <span class="gc-stat"><strong>{{g.partner_count}}</strong> {{ t('partnerGroups.card.partnersNoun', { count: g.partner_count }) }}</span>
         <span class="gc-stat accent"><strong>{{(g.total_arr || 0) | number:'1.0-0'}} PLN</strong> ARR</span>
       </div>
       <div class="gc-mgr" *ngIf="g.manager_name">👤 {{g.manager_name}}</div>
@@ -46,10 +49,10 @@ import { ToastService } from '../../../core/services/toast.service';
         <span class="partner-chip" *ngFor="let p of g.partners.slice(0,4)">
           {{p.company}}
         </span>
-        <span class="partner-chip more" *ngIf="g.partners.length > 4">+{{g.partners.length - 4}} więcej</span>
+        <span class="partner-chip more" *ngIf="g.partners.length > 4">{{ t('partnerGroups.card.morePartners', { count: g.partners.length - 4 }) }}</span>
       </div>
     </div>
-    <div class="no-groups" *ngIf="groups.length === 0">Brak grup partnerskich.</div>
+    <div class="no-groups" *ngIf="groups.length === 0">{{ t('partnerGroups.empty') }}</div>
   </div>
 
   <!-- ── Panel szczegółów grupy ── -->
@@ -70,7 +73,7 @@ import { ToastService } from '../../../core/services/toast.service';
       <div class="vp-stats">
         <div class="vp-stat">
           <div class="vp-stat-val">{{viewingGroup.partner_count}}</div>
-          <div class="vp-stat-lbl">Partnerów</div>
+          <div class="vp-stat-lbl">{{ t('partnerGroups.details.partnersStat') }}</div>
         </div>
         <div class="vp-stat">
           <div class="vp-stat-val accent">{{(viewingGroup.total_arr || 0) | number:'1.0-0'}}</div>
@@ -78,12 +81,12 @@ import { ToastService } from '../../../core/services/toast.service';
         </div>
       </div>
 
-      <div *ngIf="viewingGroup.manager_name" class="vp-mgr">👤 Opiekun: <strong>{{viewingGroup.manager_name}}</strong></div>
+      <div *ngIf="viewingGroup.manager_name" class="vp-mgr">👤 {{ t('partnerGroups.details.manager') }} <strong>{{viewingGroup.manager_name}}</strong></div>
       <div *ngIf="viewingGroup.description" class="vp-desc">{{viewingGroup.description}}</div>
 
       <div class="vp-partners-section">
-        <div class="vp-section-title">Partnerzy w grupie ({{viewingGroup.partners.length}})</div>
-        <div *ngIf="viewingGroup.partners.length === 0" class="vp-empty">Brak partnerów w tej grupie.</div>
+        <div class="vp-section-title">{{ t('partnerGroups.details.partnersInGroup', { count: viewingGroup.partners.length }) }}</div>
+        <div *ngIf="viewingGroup.partners.length === 0" class="vp-empty">{{ t('partnerGroups.details.empty') }}</div>
         <div *ngFor="let p of viewingGroup.partners" class="vp-partner-row" (click)="goToPartner(p.id!)">
           <div class="vp-partner-name">{{p.company}}</div>
           <svg class="vp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -97,20 +100,21 @@ import { ToastService } from '../../../core/services/toast.service';
   <!-- ── Panel tworzenia/edycji grupy ── -->
   <div class="side-panel" *ngIf="showCreate || editingGroup" (click)="closePanel()">
     <div class="side-panel-inner" (click)="$event.stopPropagation()">
-      <h3>{{editingGroup ? 'Edytuj grupę' : 'Nowa grupa'}}</h3>
-      <label>Nazwa *<input [(ngModel)]="form.name" placeholder="Nazwa grupy"></label>
-      <label>Branża<input [(ngModel)]="form.industry"></label>
-      <label>Opis<textarea [(ngModel)]="form.description" rows="3"></textarea></label>
+      <h3>{{editingGroup ? t('partnerGroups.form.editTitle') : t('partnerGroups.newGroup')}}</h3>
+      <label>{{ t('partnerGroups.form.name') }} *<input [(ngModel)]="form.name" [placeholder]="t('partnerGroups.form.namePlaceholder')"></label>
+      <label>{{ t('partnerGroups.form.industry') }}<input [(ngModel)]="form.industry"></label>
+      <label>{{ t('partnerGroups.form.description') }}<textarea [(ngModel)]="form.description" rows="3"></textarea></label>
       <div class="panel-actions">
-        <button class="btn-outline" (click)="closePanel()">Anuluj</button>
+        <button class="btn-outline" (click)="closePanel()">{{ 'actions.cancel' | transloco }}</button>
         <button class="btn-primary" (click)="saveGroup()" [disabled]="!form.name || saving">
-          {{saving ? '…' : (editingGroup ? 'Zapisz' : 'Utwórz')}}
+          {{saving ? '…' : (editingGroup ? ('actions.save' | transloco) : t('partnerGroups.form.create'))}}
         </button>
-        <button class="btn-danger" *ngIf="editingGroup" (click)="deleteGroup()" [disabled]="saving">Usuń</button>
+        <button class="btn-danger" *ngIf="editingGroup" (click)="deleteGroup()" [disabled]="saving">{{ t('partnerGroups.form.delete') }}</button>
       </div>
     </div>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
@@ -181,6 +185,7 @@ export class CrmGroupsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   groups: PartnerGroup[] = [];
   loading = false;
@@ -261,13 +266,13 @@ export class CrmGroupsComponent implements OnInit {
     const obs = this.editingGroup
       ? this.api.updateGroup(this.editingGroup.id!, data)
       : this.api.createGroup(data);
-    obs.subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; this.toast.error('Nie udało się zapisać grupy'); } });
+    obs.subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; this.toast.error(this.transloco.translate('crm.partnerGroups.messages.saveFailed')); } });
   }
 
   deleteGroup() {
     if (!this.editingGroup) return;
-    if (!confirm(`Usunąć grupę "${this.editingGroup.name}"? Partnerzy zostaną odłączeni.`)) return;
+    if (!confirm(this.transloco.translate('crm.partnerGroups.messages.deleteConfirm', { name: this.editingGroup.name }))) return;
     this.saving = true;
-    this.api.deleteGroup(this.editingGroup.id!).subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; this.toast.error('Nie udało się usunąć grupy'); } });
+    this.api.deleteGroup(this.editingGroup.id!).subscribe({ next: () => { this.saving = false; this.closePanel(); this.loadGroups(); }, error: () => { this.saving = false; this.toast.error(this.transloco.translate('crm.partnerGroups.messages.deleteFailed')); } });
   }
 }

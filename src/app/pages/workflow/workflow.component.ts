@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { WorkflowService } from '../../core/services/api.services';
 import { WorkflowTask, TaskStatus, DocStatus } from '../../core/models/models';
 import { StatusBadgeComponent, TaskBadgeComponent, AvatarComponent } from '../../shared/components/badges.components';
@@ -22,29 +23,31 @@ const STATUS_COLUMN: Record<string, 'pending' | 'in_progress' | 'completed' | 'c
   rejected:        'cancelled',
 };
 
-const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: string }[] = [
-  { id: 'pending',     label: 'Oczekujące' },
-  { id: 'in_progress', label: 'W toku' },
-  { id: 'completed',   label: 'Zakończone' },
-  { id: 'cancelled',   label: 'Anulowane' },
+const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: string }[] = [
+  { id: 'pending',     labelKey: 'workflow.columns.pending' },
+  { id: 'in_progress', labelKey: 'workflow.columns.in_progress' },
+  { id: 'completed',   labelKey: 'workflow.columns.completed' },
+  { id: 'cancelled',   labelKey: 'workflow.columns.cancelled' },
 ];
 
 @Component({
   selector: 'wt-workflow',
   standalone: true,
-  imports: [CommonModule, RouterLink, StatusBadgeComponent, TaskBadgeComponent, AvatarComponent, AddToCalendarComponent],
+  imports: [CommonModule, RouterLink, StatusBadgeComponent, TaskBadgeComponent, AvatarComponent, AddToCalendarComponent, TranslocoDirective],
+  providers: [provideTranslocoScope('documents')],
   template: `
+    <ng-container *transloco="let t; prefix: 'documents'">
     <div id="topbar">
-      <span class="page-title">Workflow</span>
+      <span class="page-title">{{ t('workflow.title') }}</span>
       <span class="tsp"></span>
       @if (view === 'kanban' && refreshIntervalSec() > 0) {
         <span style="font-size:11.5px;color:var(--gray-400);margin-right:4px">
-          Auto-odświeżanie: {{ refreshIntervalSec() }} s
+          {{ t('workflow.autoRefresh', { seconds: refreshIntervalSec() }) }}
         </span>
       }
       <div class="tabs" style="margin-bottom:0;width:320px">
-        <button class="tab-btn" [class.active]="view==='mine'"   (click)="switchView('mine')">Moje zadania</button>
-        <button class="tab-btn" [class.active]="view==='kanban'" (click)="switchView('kanban')">Tablica Kanban</button>
+        <button class="tab-btn" [class.active]="view==='mine'"   (click)="switchView('mine')">{{ t('labels.myTasks') }}</button>
+        <button class="tab-btn" [class.active]="view==='kanban'" (click)="switchView('kanban')">{{ t('workflow.kanbanTab') }}</button>
       </div>
     </div>
 
@@ -58,8 +61,8 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
         @if (myTasks().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
             <div class="empty-icon">✅</div>
-            <div class="empty-title">Brak oczekujących zadań</div>
-            <div>Wszystko załatwione!</div>
+            <div class="empty-title">{{ t('labels.noPendingTasks') }}</div>
+            <div>{{ t('workflow.mine.allDone') }}</div>
           </div>
         }
         <div style="display:flex;flex-direction:column;gap:10px">
@@ -73,7 +76,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                 <div style="font-size:12px;color:var(--gray-400);display:flex;align-items:center;gap:8px">
                   <span class="mono">{{ task.doc_number }}</span>
                   <span>·</span>
-                  <span>Od: {{ task.assigner_name }}</span>
+                  <span>{{ t('labels.from', { name: task.assigner_name }) }}</span>
                   @if (task.group_name) { <span>· {{ task.group_name }}</span> }
                   @if (task.due_date) {
                     <span [style.color]="isDue(task.due_date) ? '#DC2626' : '#065F46'">
@@ -88,10 +91,10 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
               </div>
               <div style="display:flex;gap:8px;flex-shrink:0">
                 @if (task.task_status === 'pending') {
-                  <button class="btn btn-g btn-sm" (click)="setStatus(task, 'in_progress')">Rozpocznij</button>
+                  <button class="btn btn-g btn-sm" (click)="setStatus(task, 'in_progress')">{{ t('workflow.mine.start') }}</button>
                 }
-                <button class="btn btn-p btn-sm" (click)="setStatus(task, 'completed')">Zakończ</button>
-                <a class="btn btn-g btn-sm" [routerLink]="['/documents']" [queryParams]="{open: task.document_id}">Otwórz dokument</a>
+                <button class="btn btn-p btn-sm" (click)="setStatus(task, 'completed')">{{ t('workflow.mine.complete') }}</button>
+                <a class="btn btn-g btn-sm" [routerLink]="['/documents']" [queryParams]="{open: task.document_id}">{{ t('workflow.mine.openDocument') }}</a>
               </div>
             </div>
           }
@@ -103,8 +106,8 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
         @if (kanbanDocs().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
             <div class="empty-icon">📋</div>
-            <div class="empty-title">Brak dokumentów</div>
-            <div>Dokumenty pojawią się tutaj po ich utworzeniu</div>
+            <div class="empty-title">{{ t('labels.noDocuments') }}</div>
+            <div>{{ t('workflow.kanban.emptyHint') }}</div>
           </div>
         }
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start">
@@ -112,7 +115,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
             <div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
                 <div class="coldot" [class]="'dot-' + col.id"></div>
-                <span style="font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px">{{ col.label }}</span>
+                <span style="font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px">{{ t(col.labelKey) }}</span>
                 <span style="margin-left:auto;background:var(--gray-100);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600;color:var(--gray-500)">
                   {{ docsByColumn(col.id).length }}
                 </span>
@@ -127,7 +130,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                       <span style="flex:1"></span>
                       @if (doc.active_task_count > 0) {
                         <span style="font-size:10px;background:var(--orange-pale);color:var(--orange-dark);border-radius:8px;padding:1px 6px;font-weight:600">
-                          Zadania: {{ doc.active_task_count }}
+                          {{ t('workflow.kanban.taskCount', { count: doc.active_task_count }) }}
                         </span>
                       }
                     </div>
@@ -152,11 +155,11 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                       <div style="font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px"
                            [style.color]="expirationColor(doc.expiration_date)">
                         @if (isExpired(doc.expiration_date)) {
-                          <span title="Wygasł">⚠️</span>
+                          <span [title]="t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentOverdue' : 'workflow.kanban.expired')">⚠️</span>
                         }
-                        Wygasa {{ doc.expiration_date | date:'dd.MM.yy' }}
+                        {{ t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentDue' : 'workflow.kanban.expires', { date: (doc.expiration_date | date:'dd.MM.yy') }) }}
                         @if (isExpiringSoon(doc.expiration_date) && !isExpired(doc.expiration_date)) {
-                          <span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 4px;font-weight:600">WKRÓTCE</span>
+                          <span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 4px;font-weight:600">{{ t('workflow.kanban.soon') }}</span>
                         }
                       </div>
                     }
@@ -164,17 +167,17 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                     <!-- ★ Active task details -->
                     @if (doc.active_tasks?.length > 0) {
                       <div style="border-top:1px solid var(--gray-100);margin-top:8px;padding-top:8px;display:flex;flex-direction:column;gap:4px">
-                        @for (t of doc.active_tasks; track t.id) {
+                        @for (activeTask of doc.active_tasks; track activeTask.id) {
                           <div class="ktask-row">
-                            <wt-avatar [name]="t.assignee_name ?? ''" [size]="16" />
-                            <span class="kbadge" [class]="'kbadge-' + t.task_type">{{ t.task_type.toUpperCase() }}</span>
-                            <span class="ktask-name">{{ t.assignee_name }}</span>
-                            @if (t.assigner_name) {
-                              <span class="ktask-from" title="Przydzielone przez {{ t.assigner_name }}">← {{ t.assigner_name }}</span>
+                            <wt-avatar [name]="activeTask.assignee_name ?? ''" [size]="16" />
+                            <span class="kbadge" [class]="'kbadge-' + activeTask.task_type">{{ activeTask.task_type.toUpperCase() }}</span>
+                            <span class="ktask-name">{{ activeTask.assignee_name }}</span>
+                            @if (activeTask.assigner_name) {
+                              <span class="ktask-from" [title]="t('workflow.kanban.assignedBy', { name: activeTask.assigner_name })">← {{ activeTask.assigner_name }}</span>
                             }
-                            @if (t.due_date) {
-                              <span class="ktask-due" [class.overdue]="isDue(t.due_date)">
-                                {{ t.due_date | date:'dd.MM' }}
+                            @if (activeTask.due_date) {
+                              <span class="ktask-due" [class.overdue]="isDue(activeTask.due_date)">
+                                {{ activeTask.due_date | date:'dd.MM' }}
                               </span>
                             }
                           </div>
@@ -185,7 +188,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
                 }
                 @if (docsByColumn(col.id).length === 0) {
                   <div style="padding:20px;text-align:center;color:var(--gray-300);font-size:12px;border:1.5px dashed var(--gray-200);border-radius:8px">
-                    Empty
+                    {{ t('workflow.kanban.emptyColumn') }}
                   </div>
                 }
               </div>
@@ -194,6 +197,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; label: str
         </div>
       }
     </div>
+    </ng-container>
   `,
   styles: [`
     #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
@@ -230,6 +234,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   private http        = inject(HttpClient);
   private toast       = inject(ToastService);
   private appSettings = inject(AppSettingsService);
+  private transloco   = inject(TranslocoService);
 
   loading    = signal(true);
   myTasks    = signal<WorkflowTask[]>([]);
@@ -246,7 +251,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   calendarEntryOf(task: WorkflowTask): CalendarEntry | null {
     return dueDateCalendarEntry({
-      title: `${task.doc_number ?? 'Dokument'} — ${task.document_name ?? ''}`.trim(),
+      title: `${task.doc_number ?? this.transloco.translate('documents.workflow.calendar.documentFallback')} — ${task.document_name ?? ''}`.trim(),
       description: task.message ?? '',
       path: `/documents/${task.document_id}`,
       dueDate: task.due_date ?? null,
@@ -313,9 +318,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.wfSvc.updateTask(task.document_id, task.id, { task_status: status }).subscribe({
       next: updated => {
         this.myTasks.update(tasks => tasks.map(t => t.id === updated.id ? updated : t));
-        if (status === 'completed') this.toast.success('Zadanie oznaczone jako zakończone');
+        if (status === 'completed') this.toast.success(this.transloco.translate('documents.workflow.toasts.completed'));
       },
-      error: () => this.toast.error('Nie udało się zaktualizować zadania — spróbuj ponownie'),
+      error: () => this.toast.error(this.transloco.translate('documents.workflow.toasts.updateFailed')),
     });
   }
 }

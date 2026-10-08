@@ -1,105 +1,89 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AssignedProjectTask, ProjectsApiService } from '../../core/services/projects-api.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { apiErrorMessage } from '../../core/services/api-error.util';
+import { ProjectConfig, ProjectTaskRow, ProjectsApiService } from '../../core/services/projects-api.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
-import { CalendarEntry, projectTaskCalendarEntry } from '../../shared/utils/calendar-export.util';
-import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
+import { ListFilterBarComponent } from '../../shared/list/list-filter-bar.component';
+import { ListParams, ListQueryState, createListLoader } from '../../shared/list/list-query';
+import { ProjectDeadlineLegendComponent } from './project-deadline-legend.component';
+import { ProjectListFiltersService } from './project-list-filters.service';
+import { ProjectTaskTableComponent } from './project-task-table.component';
 
 /**
- * Open tasks assigned to the signed-in user across all their projects — the
+ * Tasks assigned to the signed-in user across all their open projects — the
  * "my tasks" view for people who have no CRM calendar (non-sales staff,
  * external accounts).
  */
 @Component({
   selector: 'wt-project-my-tasks',
   standalone: true,
-  imports: [AddToCalendarComponent],
+  imports: [TranslocoDirective, TranslocoPipe, ListFilterBarComponent, ProjectDeadlineLegendComponent, ProjectTaskTableComponent],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (isLoading()) {
-      <div class="empty-state">Ładowanie…</div>
-    } @else if (tasks().length === 0) {
-      <div class="empty-state">
-        <div class="empty-title">Brak zadań</div>
-        Nie masz otwartych zadań w żadnym projekcie.
-      </div>
-    } @else {
-      <div class="tw">
-        <table class="grid">
-          <thead>
-            <tr><th>Termin</th><th>Zadanie</th><th>Projekt</th><th>Status</th><th>Priorytet</th><th></th></tr>
-          </thead>
-          <tbody>
-            @for (task of tasks(); track task.id) {
-              <tr class="task-row" (click)="open(task)">
-                <td class="due" [class.overdue]="isOverdue(task)" [class.today]="task.end_date === today">
-                  {{ task.end_date ?? 'bez terminu' }}
-                </td>
-                <td><span class="mono">{{ task.project_key }}-{{ task.task_number }}</span> {{ task.name }}</td>
-                <td class="muted-cell">{{ task.project_name }}</td>
-                <td>
-                  <span class="chip" [style.color]="task.status_color" [style.background]="task.status_color + '1F'">
-                    {{ task.status_name }}
-                  </span>
-                </td>
-                <td>
-                  @if (task.priority_name) {
-                    <span class="chip" [style.color]="task.priority_color" [style.background]="task.priority_color + '1F'">
-                      {{ task.priority_name }}
-                    </span>
-                  }
-                </td>
-                <td class="actions"><wt-add-to-calendar [entry]="calendarEntry(task)" (click)="$event.stopPropagation()" /></td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+    <ng-container *transloco="let t; prefix: 'projects'">
+      @if (filters(); as taskFilters) {
+        <wt-list-filter-bar [filters]="taskFilters.all" [query]="query">
+          <label class="toggle">
+            <input type="checkbox" [checked]="includesDone()" (change)="toggleIncludesDone()">
+            {{ t('myTasks.includeDone') }}
+          </label>
+        </wt-list-filter-bar>
+        <wt-project-deadline-legend [atRiskThresholdDays]="config()!.at_risk_threshold_days" />
+        <wt-project-task-table
+          [rows]="loader.result()?.items ?? []" [total]="loader.result()?.total ?? 0" [isLoading]="loader.isLoading()"
+          [query]="query" [filters]="taskFilters" [showsProject]="true" [showsAssignees]="false" [showsCalendarExport]="true"
+          [emptyMessage]="t('myTasks.empty.description')" (taskOpened)="open($event)" />
+      } @else {
+        <div class="empty-state">{{ 'states.loading' | transloco }}</div>
+      }
+    </ng-container>
   `,
-  styles: [PROJECTS_SHARED_STYLES, `
-    :host { display:block; height:auto; }
-    .task-row { cursor:pointer; }
-    .task-row:hover td { background:var(--gray-50); }
-    .due { white-space:nowrap; font-size:12.5px; color:var(--gray-600); }
-    .due.today { color:#1d4ed8; font-weight:600; }
-    .due.overdue { color:#DC2626; font-weight:600; }
-    .muted-cell { color:var(--gray-500); font-size:12.5px; }
-    .actions { text-align:right; }
+  styles: [`
+    :host { display:flex; flex-direction:column; gap:12px; }
+    .toggle { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--gray-700); cursor:pointer; white-space:nowrap; }
   `],
 })
 export class ProjectMyTasksComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
+  private readonly filterDefinitions = inject(ProjectListFiltersService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
 
-  readonly tasks = signal<AssignedProjectTask[]>([]);
-  readonly isLoading = signal(true);
-  readonly today = new Date().toISOString().slice(0, 10);
+  readonly query = new ListQueryState();
+  readonly config = signal<ProjectConfig | null>(null);
+  readonly includesDone = signal(false);
+
+  // No assignee filter (the list is the viewer's own) and no cost: the endpoint spans projects with different rights.
+  readonly filters = computed(() => {
+    const config = this.config();
+    return config ? this.filterDefinitions.taskFilters({ config, includesCost: false }) : null;
+  });
+
+  private readonly requestParams = computed<ListParams>(() =>
+    (this.includesDone() ? { ...this.query.params(), include_done: 'true' } : this.query.params()));
+
+  readonly loader = createListLoader(
+    this.requestParams,
+    params => this.api.listMyTasks(params),
+    error => this.toast.error(apiErrorMessage(error) ?? this.transloco.translate('projects.myTasks.loadFailed')),
+  );
 
   ngOnInit(): void {
-    this.api.listAssignedTasks().subscribe({
-      next: tasks => { this.tasks.set(tasks); this.isLoading.set(false); },
-      error: err => {
-        this.isLoading.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się pobrać zadań');
-      },
+    this.api.getConfig().subscribe({
+      next: config => this.config.set(config),
+      error: error => this.toast.error(apiErrorMessage(error) ?? this.transloco.translate('projects.myTasks.loadFailed')),
     });
   }
 
-  open(task: AssignedProjectTask): void {
+  toggleIncludesDone(): void {
+    this.includesDone.update(isIncluded => !isIncluded);
+    this.query.page.set(1);
+  }
+
+  open(task: ProjectTaskRow): void {
     this.router.navigate(['/projects', task.project_id], { queryParams: { task: task.id } });
-  }
-
-  isOverdue(task: AssignedProjectTask): boolean {
-    return task.end_date !== null && task.end_date < this.today;
-  }
-
-  calendarEntry(task: AssignedProjectTask): CalendarEntry | null {
-    return projectTaskCalendarEntry({
-      projectId: task.project_id, projectKey: task.project_key, projectName: task.project_name,
-      taskId: task.id, taskNumber: task.task_number, name: task.name, endDate: task.end_date,
-    });
   }
 }

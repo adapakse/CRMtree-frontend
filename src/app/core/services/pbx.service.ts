@@ -5,7 +5,13 @@ import {
   Session, SessionState, UserAgent, TransportState,
 } from 'sip.js';
 import { Web } from 'sip.js';
+import { TranslocoService } from '@jsverse/transloco';
 import { CrmApiService } from './crm-api.service';
+
+// Sent to the API as the caller's number (call log, phone lookup) when the SIP
+// identity carries no user part. Existing call-log rows hold this exact value,
+// so it is a data value, not a display text — the displayed name is translated.
+const UNKNOWN_CALLER_NUMBER = 'nieznany';
 
 export type RegState = 'idle' | 'connecting' | 'registered' | 'error';
 
@@ -44,6 +50,7 @@ export interface ActiveCall {
 export class PbxService {
   private crmApi = inject(CrmApiService);
   private zone   = inject(NgZone);
+  private transloco = inject(TranslocoService);
 
   readonly regState$    = new BehaviorSubject<RegState>('idle');
   readonly activeCall$  = new BehaviorSubject<ActiveCall | null>(null);
@@ -93,8 +100,8 @@ export class PbxService {
       testStream.getTracks().forEach(t => t.stop()); // zwolnij — SIP.js pobierze mikrofon sam
     } catch (err: any) {
       const msg = err?.name === 'NotAllowedError'
-        ? 'Brak uprawnień do mikrofonu. Zezwól na dostęp w ustawieniach przeglądarki.'
-        : `Mikrofon niedostępny: ${err?.message || err}`;
+        ? this.transloco.translate('crm.pbx.errors.micPermissionDenied')
+        : this.transloco.translate('crm.pbx.errors.micUnavailable', { reason: err?.message || String(err) });
       console.error('[PBX] Microphone check failed:', err);
       this.micError$.next(msg);
       return;
@@ -107,7 +114,7 @@ export class PbxService {
       } catch (err: any) {
         console.error('[PBX] connect/register failed:', err);
         this.zone.run(() => this.micError$.next(
-          err?.error?.error ?? err?.message ?? 'Błąd połączenia SIP. Skonfiguruj token PBX w Moich ustawieniach.'
+          err?.error?.error ?? err?.message ?? this.transloco.translate('crm.pbx.errors.sipConnectionFailed')
         ));
         this.activeCall$.next(null);
         return;
@@ -150,12 +157,12 @@ export class PbxService {
               // wymuś reconnect przy następnej próbie — stare UA może mieć złe kredencjale
               if (this.ua) { this.ua.stop().catch(() => {}); this.ua = null; this.registerer = null; }
               this.regState$.next('idle');
-              this.micError$.next('Błąd autoryzacji SIP (401). Sprawdź swój token PBX w Moich ustawieniach → Softphone.');
+              this.micError$.next(this.transloco.translate('crm.pbx.errors.sipUnauthorized'));
             });
           } else if (code === 486 || code === 600) {
-            this.zone.run(() => this.micError$.next('Numer zajęty — spróbuj ponownie za chwilę.'));
+            this.zone.run(() => this.micError$.next(this.transloco.translate('crm.pbx.errors.numberBusy')));
           } else if (code === 403 || code === 404) {
-            this.zone.run(() => this.micError$.next(`Połączenie odrzucone (${code}). Sprawdź numer.`));
+            this.zone.run(() => this.micError$.next(this.transloco.translate('crm.pbx.errors.callRejected', { code })));
           }
           // SessionState.Terminated wyczyści activeCall$ przez onSessionState
         },
@@ -246,7 +253,7 @@ export class PbxService {
         const transport = (this.ua as any).transport;
         const connected  = transport?.isConnected?.() ?? true;
         if (!connected && this.regState$.value === 'registered') {
-          console.warn('[PBX keepalive] transport WebSocket down mimo regState=registered — full UA restart');
+          console.warn('[PBX keepalive] transport WebSocket down despite regState=registered — full UA restart');
           try { await this.ua.stop(); } catch {}
           this.ua = null;
           this.registerer = null;
@@ -350,16 +357,16 @@ export class PbxService {
     transport?.stateChange?.addListener((state: TransportState) => {
       this.zone.run(() => {
         if (state === TransportState.Disconnected) {
-          console.warn('[PBX] WebSocket rozłączony — keepalive zdecyduje o restarcie po 60s');
+          console.warn('[PBX] WebSocket disconnected — keepalive will decide about a restart after 60s');
           if (this.regState$.value === 'registered' && this.unregisteredSince == null) {
             this.unregisteredSince = Date.now();
           }
         } else if (state === TransportState.Connected && this.registerer) {
           // Transport wrócił (SIP.js auto-reconnect) — wymuś re-rejestrację jeśli potrzebna
           if (this.regState$.value !== 'registered') {
-            console.log('[PBX] WebSocket reconnected — próba re-rejestracji');
+            console.log('[PBX] WebSocket reconnected — trying to re-register');
             this.registerer.register().catch(err =>
-              console.warn('[PBX] re-register po reconnect nieudany:', err)
+              console.warn('[PBX] re-register after reconnect failed:', err)
             );
           }
         }
@@ -374,14 +381,14 @@ export class PbxService {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         sub.unsubscribe();
-        reject(new Error('Timeout rejestracji SIP (12s). Sprawdź połączenie i konfigurację PBX.'));
+        reject(new Error(this.transloco.translate('crm.pbx.errors.registrationTimeout')));
       }, timeoutMs);
       const sub = this.regState$.subscribe(state => {
         if (state === 'registered') {
           clearTimeout(timer); sub.unsubscribe(); resolve();
         } else if (state === 'error') {
           clearTimeout(timer); sub.unsubscribe();
-          reject(new Error('Rejestracja SIP nie powiodła się. Sprawdź token PBX.'));
+          reject(new Error(this.transloco.translate('crm.pbx.errors.registrationFailed')));
         }
       });
     });
@@ -412,12 +419,13 @@ export class PbxService {
     this.incomingNotif?.close();
 
     const body = `${displayName}${displayName !== number ? ' (' + number + ')' : ''}`;
+    const title = '📲 ' + this.transloco.translate('crm.softphone.incoming.title');
 
     // Chrome bez Service Workera nie pokazuje popup'u systemowego przez new Notification().
     // Użyj SW jeśli jest zarejestrowany, w p.p. fallback na new Notification().
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.ready.then(reg =>
-        reg.showNotification('📲 Połączenie przychodzące', {
+        reg.showNotification(title, {
           body,
           icon:               '/favicon.ico',
           tag:                'incoming-call',
@@ -427,7 +435,7 @@ export class PbxService {
       ).catch(err => console.error('[PBX] SW notification failed:', err));
     } else {
       try {
-        this.incomingNotif = new Notification('📲 Połączenie przychodzące', {
+        this.incomingNotif = new Notification(title, {
           body,
           icon:   '/favicon.ico',
           tag:    'incoming-call',
@@ -460,9 +468,10 @@ export class PbxService {
   private startTitleBlink(displayName: string): void {
     this.stopTitleBlink();
     this.originalTitle = document.title;
+    const callingTitle = '📲 ' + this.transloco.translate('crm.pbx.incomingTabTitle', { name: displayName });
     let on = true;
     this.titleBlinkInterval = setInterval(() => {
-      document.title = on ? `📲 ${displayName} dzwoni...` : this.originalTitle;
+      document.title = on ? callingTitle : this.originalTitle;
       on = !on;
     }, 800);
   }
@@ -531,10 +540,12 @@ export class PbxService {
       // Post-call (formularz notatki): zwalniamy linię dla nowego połączenia
       this.activeCall$.next(null);
     }
-    const user  = invitation.remoteIdentity.uri.user || 'nieznany';
-    const dname = invitation.remoteIdentity.displayName?.trim() || user;
+    const sipUser       = invitation.remoteIdentity.uri.user;
+    const unknownCaller = this.transloco.translate('crm.pbx.unknownCaller');
+    const user  = sipUser || UNKNOWN_CALLER_NUMBER;
+    const dname = invitation.remoteIdentity.displayName?.trim() || sipUser || unknownCaller;
 
-    this.showIncomingAlert(dname, user);
+    this.showIncomingAlert(dname, sipUser || unknownCaller);
 
     const coreTelCallId = invitation.request.getHeader('X-CoreTel-Call-ID')?.trim() || undefined;
 
@@ -605,7 +616,7 @@ export class PbxService {
             }
             this.remoteAudio.srcObject = stream;
             void this.remoteAudio.play().catch(err =>
-              console.error('[PBX] early media play() odrzucone:', err)
+              console.error('[PBX] early media play() rejected:', err)
             );
           }, { once: true });
         }
@@ -662,7 +673,7 @@ export class PbxService {
       partner_id: call.context?.entityType === 'partner' ? String(call.context.entityId) : undefined,
     };
     this.crmApi.postCallLog(payload).subscribe({
-      error: err => console.warn('[PBX call-log] zapis nieudany:', err.message),
+      error: err => console.warn('[PBX call-log] save failed:', err.message),
     });
   }
 
@@ -697,7 +708,7 @@ export class PbxService {
       const logIce = () => {
         const ice  = pc.iceConnectionState;
         if (ice === 'failed' || ice === 'disconnected') {
-          this.zone.run(() => this.micError$.next('Brak połączenia audio (ICE failed). Sprawdź sieć lub skontaktuj się z administratorem.'));
+          this.zone.run(() => this.micError$.next(this.transloco.translate('crm.pbx.errors.noAudio')));
         }
       };
 
@@ -731,7 +742,7 @@ export class PbxService {
     const handler = session.sessionDescriptionHandler as Web.SessionDescriptionHandler;
     const stream  = handler?.remoteMediaStream;
     if (!stream) {
-      console.error('[PBX] remoteMediaStream jest null po Established — klient nie będzie słyszany.');
+      console.error('[PBX] remoteMediaStream is null after Established — the client will not be heard.');
       return;
     }
     if (!this.remoteAudio) {
@@ -742,7 +753,7 @@ export class PbxService {
     }
     this.remoteAudio.srcObject = stream;
     void this.remoteAudio.play().catch((err) => {
-      console.error('[PBX] remoteAudio.play() odrzucone przez przeglądarkę:', err);
+      console.error('[PBX] remoteAudio.play() rejected by the browser:', err);
     });
   }
 
@@ -785,7 +796,7 @@ export class PbxService {
           content: `Signal=${tone}\r\nDuration=160`,
         },
       },
-    }).catch(err => console.error('[PBX DTMF] błąd SIP INFO:', err));
+    }).catch(err => console.error('[PBX DTMF] SIP INFO error:', err));
   }
 
   private playDtmfTone(tone: string): void {

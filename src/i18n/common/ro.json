@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Anulare",
+    "close": "Închidere",
+    "save": "Salvare"
+  },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Fișier .ics (Apple și altele)",
+    "outlook": "Outlook",
+    "title": "Adăugare în calendar"
+  },
+  "language": {
+    "changeFailed": "Limba nu a putut fi schimbată",
+    "followTenant": "Limba implicită a organizației ({language})",
+    "hint": "Schimbarea limbii reîncarcă pagina. E-mailurile și mementourile vor fi trimise tot în această limbă.",
+    "tenantHint": "Limba pentru persoanele care nu și-au ales una proprie. Schimbarea reîncarcă pagina.",
+    "tenantTitle": "Limba implicită a organizației",
+    "title": "Limba interfeței"
+  },
+  "list": {
+    "activeFilters": "{count, plural, one {# filtru activ} few {# filtre active} other {# de filtre active}}",
+    "anyValue": "Toate",
+    "ascending": "Crescător",
+    "clearFilter": "Resetare",
+    "clearFilters": "Resetare filtre",
+    "defaultSort": "Implicită",
+    "descending": "Descrescător",
+    "filterBy": "Filtrare: {name}",
+    "from": "de la",
+    "noOptions": "Nicio opțiune disponibilă.",
+    "pager": {
+      "next": "Pagina următoare",
+      "previous": "Pagina anterioară",
+      "range": "{from}–{to} din {total}"
+    },
+    "sort": "Sortare",
+    "sortBy": "Sortare: {name}",
+    "to": "până la"
+  },
+  "states": {
+    "loading": "Se încarcă…"
+  },
+  "testEnvironmentBanner": {
+    "title": "Versiune de test — acesta nu este mediul de producție"
+  },
+  "typeahead": {
+    "minChars": "Introduceți cel puțin {count} caractere…",
+    "noResults": "Niciun rezultat.",
+    "searching": "Se caută…"
+  }
+}

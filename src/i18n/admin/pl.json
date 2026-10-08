@@ -1,0 +1,1291 @@
+{
+  "dataManagement": {
+    "delete": {
+      "deleted": "Usunięto: {name}",
+      "document": {
+        "action": "Usuń dokument",
+        "description": "Usuwa: metadane, wszystkie wersje + pliki z Blob, tagi, zadania workflow, powiązania CRM, logi audytu",
+        "failed": "Błąd usuwania dokumentu",
+        "searchPlaceholder": "Wpisz nazwę lub numer dokumentu (min. 2 znaki)…",
+        "title": "Dokument"
+      },
+      "inProgress": "Usuwanie…",
+      "lead": {
+        "action": "Usuń lead",
+        "description": "Usuwa: lead, aktywności, powiązania dokumentów, historię. Nie usuwa partnera z konwersji.",
+        "failed": "Błąd usuwania leada",
+        "searchPlaceholder": "Wpisz nazwę firmy lub kontakt (min. 2 znaki)…",
+        "title": "Lead"
+      },
+      "partner": {
+        "action": "Usuń partnera",
+        "description": "Usuwa: partnera, aktywności, powiązania dokumentów, dane sprzedażowe, historię.",
+        "failed": "Błąd usuwania partnera",
+        "searchPlaceholder": "Wpisz nazwę firmy lub NIP (min. 2 znaki)…",
+        "title": "Partner"
+      },
+      "subtitle": "Trwałe usunięcie dokumentu, leada lub partnera wraz ze wszystkimi powiązanymi danymi i logami.",
+      "title": "Kasowanie rekordów"
+    },
+    "purge": {
+      "confirm": "Potwierdź",
+      "docs": {
+        "action": "Usuń wszystkie dokumenty",
+        "confirmPhrase": "USUŃ DOKUMENTY",
+        "description": "Usuwa: dokumenty, wersje, pliki z Blob, tagi, grupy dokumentów, zadania workflow, logi audytu dokumentów",
+        "title": "Wszystkie dokumenty"
+      },
+      "failed": "Błąd czyszczenia",
+      "leads": {
+        "action": "Usuń wszystkie leady",
+        "confirmPhrase": "USUŃ LEADY",
+        "description": "Usuwa: leady, aktywności leadów, powiązania dokumentów leadów, historię importów leadów, logi audytu leadów",
+        "title": "Wszystkie leady"
+      },
+      "partners": {
+        "action": "Usuń wszystkich partnerów",
+        "confirmPhrase": "USUŃ PARTNERÓW",
+        "description": "Usuwa: partnerów, aktywności partnerów, powiązania dokumentów, dane sprzedażowe, budżety, logi audytu partnerów",
+        "title": "Wszystkich partnerów"
+      },
+      "result": "Usunięto {deleted, plural, one {# rekord} few {# rekordy} many {# rekordów} other {# rekordu}}, {blobsDeleted, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}} z Blob",
+      "subtitle": "Usuń wszystkie rekordy wybranej kategorii. Zachowuje: użytkowników, role, profile grup, grupy partnerów, ustawienia aplikacji.",
+      "title": "Czyszczenie środowiska testowego",
+      "typePhrase": "Wpisz: {phrase}"
+    },
+    "settings": {
+      "export": {
+        "description": "Pobierz plik JSON ze wszystkimi słownikami, parametrami aplikacji i profilami grup dokumentowych.",
+        "download": "Pobierz settings.json",
+        "generating": "Generowanie…",
+        "title": "Eksport ustawień"
+      },
+      "import": {
+        "action": "Importuj ustawienia",
+        "description": "Wgraj plik JSON pobrany z innego środowiska. Istniejące ustawienia zostaną nadpisane. Nowe klucze zostaną dodane.",
+        "dropHint": "Przeciągnij plik JSON lub kliknij",
+        "failed": "Błąd importu",
+        "inProgress": "Importowanie…",
+        "invalidFile": "Nieprawidłowy plik JSON",
+        "result": "Zaimportowano: {settingsUpdated, plural, one {# ustawienie} few {# ustawienia} many {# ustawień} other {# ustawienia}}, {groupsUpdated, plural, one {# profil grup} few {# profile grup} many {# profili grup} other {# profilu grup}}",
+        "title": "Import ustawień"
+      },
+      "subtitle": "Przenoszenie konfiguracji między środowiskami. Eksport pobiera plik JSON z app_settings i group_profiles. Import nadpisuje istniejące wartości.",
+      "title": "Eksport / Import ustawień"
+    },
+    "subtitle": "Operacje administracyjne: usuwanie rekordów, czyszczenie środowiska, eksport/import ustawień. Dostępne tylko dla administratorów.",
+    "title": "Zarządzanie danymi"
+  },
+  "logs": {
+    "columns": {
+      "action": "Akcja",
+      "dateTime": "Data i godzina",
+      "details": "Szczegóły",
+      "document": "Dokument",
+      "user": "Użytkownik"
+    },
+    "count": "Wpisów: {count}",
+    "detail": {
+      "after": "Po:",
+      "before": "Przed:",
+      "document": "Dokument:"
+    },
+    "empty": "Nie znaleziono wpisów logu",
+    "filters": {
+      "actionType": "Typ akcji",
+      "allActions": "Wszystkie akcje",
+      "clear": "Wyczyść filtry",
+      "dateFrom": "Data od",
+      "dateTo": "Data do",
+      "userEmail": "Email użytkownika",
+      "userEmailPlaceholder": "user@firma.com"
+    },
+    "pagination": {
+      "next": "Dalej",
+      "page": "Strona {page} z {total}",
+      "previous": "Poprz."
+    },
+    "searchPlaceholder": "Szukaj użytkownika, dokumentu…",
+    "title": "Logi audytowe"
+  },
+  "onboardingSurvey": {
+    "answers": {
+      "copied": "Skopiowano",
+      "copySecret": "Kopiuj",
+      "hideSecret": "Ukryj",
+      "lastChange": "ostatnia zmiana {date}",
+      "loadFailed": "Błąd ładowania ankiety wdrożeniowej",
+      "loading": "Ładowanie...",
+      "notStarted": "Administrator tego tenanta nie rozpoczął jeszcze ankiety wdrożeniowej (Ustawienia aplikacji → Ankieta wdrożeniowa).",
+      "secretNotProvided": "— nie podano —",
+      "showSecret": "Pokaż",
+      "statusDraft": "Wersja robocza — jeszcze nie wysłana",
+      "statusSubmitted": "Wysłana"
+    },
+    "options": {
+      "aiLicence": {
+        "own": "Własna, dedykowana licencja / klucz API naszej firmy",
+        "shared": "Licencja CRMtree (współdzielona, rozliczana w ramach umowy)",
+        "undecided": "Jeszcze nie wiemy — prosimy o rekomendację"
+      },
+      "oauthAppOwner": {
+        "client": "Nasz dział IT zarejestruje aplikację i poda dane poniżej",
+        "needs_help": "Potrzebujemy pomocy CRMtree przy rejestracji aplikacji"
+      },
+      "yesNo": {
+        "no": "Nie",
+        "yes": "Tak"
+      }
+    },
+    "page": {
+      "backToSettings": "Ustawienia",
+      "choose": "— wybierz —",
+      "draftSaved": "Wersja robocza zapisana",
+      "fillRequired": "Uzupełnij wymagane pola",
+      "intro": {
+        "howItWorks": "Na podstawie tej ankiety zespół CRMtree skonfiguruje Państwa środowisko. Można ją wypełniać etapami — „Zapisz wersję roboczą” zachowuje odpowiedzi, a „Wyślij ankietę” przekazuje je do nas.",
+        "requiredAfter": "są wymagane do wysłania.",
+        "requiredBefore": "Pola oznaczone",
+        "secrets": "Hasła, tokeny i klucze API są zapisywane w formie zaszyfrowanej i po zapisaniu nie są już wyświetlane."
+      },
+      "loadFailed": "Nie udało się pobrać ankiety",
+      "missingRequiredTitle": "Uzupełnij wymagane pola, aby wysłać ankietę:",
+      "resubmit": "Wyślij ponownie",
+      "saveDraft": "Zapisz wersję roboczą",
+      "saveFailed": "Błąd zapisu ankiety",
+      "secretSavedPlaceholder": "zapisano — zostaw puste, aby nie zmieniać",
+      "statusDraft": "Wersja robocza",
+      "statusSubmitted": "Wysłana {date}",
+      "submit": "Wyślij ankietę",
+      "submitted": "Ankieta wysłana do zespołu CRMtree",
+      "title": "Ankieta wdrożeniowa"
+    },
+    "questions": {
+      "additional_notes": {
+        "label": "Inne wymagania, pytania lub ograniczenia"
+      },
+      "ai_data_processing_consent": {
+        "label": "Przetwarzanie danych przez dostawców modeli",
+        "options": {
+          "accepted": {
+            "label": "Akceptujemy przekazywanie treści (dane firm, notatki i transkrypcje rozmów) do wybranego dostawcy modelu AI"
+          },
+          "eu_only": {
+            "label": "Wymagamy przetwarzania wyłącznie na terenie UE"
+          }
+        }
+      },
+      "ai_monthly_budget": {
+        "hint": "Opcjonalnie — jeśli chcą Państwo ograniczyć zużycie.",
+        "label": "Miesięczny limit kosztów modeli AI",
+        "placeholder": "np. 200 EUR"
+      },
+      "billing_city": {
+        "label": "Miasto"
+      },
+      "billing_company_name": {
+        "label": "Pełna nazwa firmy (do faktury)",
+        "placeholder": "np. Acme Sp. z o.o."
+      },
+      "billing_country": {
+        "label": "Kraj",
+        "placeholder": "Polska"
+      },
+      "billing_cycle": {
+        "label": "Cykl rozliczeniowy",
+        "options": {
+          "annual": {
+            "label": "Roczny"
+          },
+          "monthly": {
+            "label": "Miesięczny"
+          }
+        }
+      },
+      "billing_invoice_email": {
+        "label": "E-mail, na który wysyłamy faktury",
+        "placeholder": "ksiegowosc@firma.pl"
+      },
+      "billing_nip": {
+        "label": "NIP"
+      },
+      "billing_plan": {
+        "label": "Wybrany plan",
+        "options": {
+          "lite": {
+            "label": "Lite"
+          },
+          "professional": {
+            "label": "Professional (wycena indywidualna)"
+          },
+          "standard": {
+            "label": "Standard"
+          },
+          "undecided": {
+            "label": "Do ustalenia"
+          }
+        }
+      },
+      "billing_postal_code": {
+        "label": "Kod pocztowy"
+      },
+      "billing_street": {
+        "label": "Ulica i numer"
+      },
+      "business_contact_email": {
+        "label": "Osoba decyzyjna — e-mail"
+      },
+      "business_contact_name": {
+        "label": "Osoba decyzyjna po stronie biznesu — imię i nazwisko"
+      },
+      "business_contact_phone": {
+        "label": "Osoba decyzyjna — telefon"
+      },
+      "call_analysis_api_key": {
+        "label": "Analiza rozmów — własny klucz API"
+      },
+      "call_analysis_buying_signals": {
+        "hint": "Typowe sygnały zainteresowania i typowe obiekcje. Dopasujemy do nich ocenę skłonności do zakupu.",
+        "label": "Analiza rozmów — po czym poznają Państwo klienta gotowego do zakupu?"
+      },
+      "call_analysis_licence": {
+        "hint": "Analiza rozmów korzysta z modelu DeepSeek.",
+        "label": "Analiza rozmów — licencja na model"
+      },
+      "call_analysis_monthly_volume": {
+        "label": "Analiza rozmów — szacowana liczba rozmów miesięcznie"
+      },
+      "company_display_name": {
+        "label": "Nazwa firmy widoczna w CRM",
+        "placeholder": "np. Acme"
+      },
+      "company_email_domain": {
+        "hint": "Domena, z której logują się Państwa pracownicy.",
+        "label": "Domena firmowej poczty e-mail",
+        "placeholder": "np. acme.pl"
+      },
+      "company_industry": {
+        "label": "Branża",
+        "placeholder": "np. logistyka, IT, produkcja"
+      },
+      "company_offer_description": {
+        "hint": "Krótki opis oferty i typowego klienta. Wykorzystujemy go do ustawienia słowników oraz podpowiedzi AI.",
+        "label": "Co Państwo sprzedają i komu?"
+      },
+      "currencies": {
+        "label": "Waluty, w których Państwo sprzedają",
+        "placeholder": "PLN, EUR"
+      },
+      "dwh_source": {
+        "hint": "System źródłowy (ERP / system sprzedażowy), format eksportu i częstotliwość.",
+        "label": "Dane sprzedażowe — z jakiego systemu i jak często mają być aktualizowane?"
+      },
+      "email_mailbox_count": {
+        "label": "Ile skrzynek będzie podłączonych?"
+      },
+      "email_oauth_app_owner": {
+        "label": "Kto zarejestruje aplikację u dostawcy poczty?"
+      },
+      "email_other_provider": {
+        "hint": "Obecnie obsługujemy Gmail, Microsoft 365 i Zoho — sprawdzimy możliwości dla innego dostawcy.",
+        "label": "Jaka to poczta?"
+      },
+      "email_provider": {
+        "label": "Z jakiej poczty firmowej Państwo korzystają?",
+        "options": {
+          "gmail": {
+            "label": "Gmail / Google Workspace"
+          },
+          "none": {
+            "label": "Nie chcemy integracji poczty"
+          },
+          "other": {
+            "label": "Inna"
+          },
+          "outlook": {
+            "label": "Outlook / Microsoft 365"
+          },
+          "zoho": {
+            "label": "Zoho Mail"
+          }
+        }
+      },
+      "enrichment_api_key": {
+        "label": "Enrichment — własny klucz API"
+      },
+      "enrichment_ideal_customer": {
+        "hint": "Branże, wielkość firmy, region, sygnały świadczące o dopasowaniu oraz firmy, których nie chcą Państwo pozyskiwać. Na tej podstawie skonfigurujemy sygnały i punktację.",
+        "label": "Enrichment — profil idealnego klienta (ICP)"
+      },
+      "enrichment_licence": {
+        "label": "Enrichment — licencja na model"
+      },
+      "enrichment_model": {
+        "label": "Enrichment — preferowany model",
+        "options": {
+          "anthropic": {
+            "label": "Anthropic Claude (wyższa jakość, wyższy koszt)"
+          },
+          "deepseek": {
+            "label": "DeepSeek (domyślny, niższy koszt)"
+          },
+          "undecided": {
+            "label": "Prosimy o rekomendację"
+          }
+        }
+      },
+      "enrichment_monthly_volume": {
+        "label": "Enrichment — ile firm miesięcznie planują Państwo analizować?"
+      },
+      "gmail_client_id": {
+        "label": "Google — Client ID",
+        "placeholder": "123456789.apps.googleusercontent.com"
+      },
+      "gmail_client_secret": {
+        "label": "Google — Client Secret"
+      },
+      "gmail_pubsub_topic": {
+        "hint": "Potrzebny do natychmiastowego odbioru nowych wiadomości.",
+        "label": "Google — Pub/Sub Topic",
+        "placeholder": "projects/moj-projekt/topics/gmail-push"
+      },
+      "go_live_date": {
+        "label": "Planowana data uruchomienia"
+      },
+      "import_scope": {
+        "label": "Jakie dane importujemy na start?",
+        "options": {
+          "contacts": {
+            "label": "Osoby kontaktowe"
+          },
+          "documents": {
+            "label": "Dokumenty / umowy"
+          },
+          "leads": {
+            "label": "Leady / szanse sprzedaży"
+          },
+          "partners": {
+            "label": "Obecni klienci / partnerzy"
+          }
+        }
+      },
+      "import_source": {
+        "hint": "Obecny system (Excel, inny CRM, ERP) i przybliżona liczba rekordów.",
+        "label": "Skąd pochodzą dane i ile ich jest?",
+        "placeholder": "np. Excel, ok. 2 000 leadów i 300 klientów"
+      },
+      "lead_sources": {
+        "label": "Źródła leadów",
+        "placeholder": "Strona www, polecenie, cold call, LinkedIn, targi…"
+      },
+      "modules": {
+        "label": "Które moduły mają być aktywne?",
+        "options": {
+          "call_analysis": {
+            "hint": "Ocena rozmów telefonicznych przez AI.",
+            "label": "Analiza rozmów"
+          },
+          "documents": {
+            "hint": "Rejestr umów, obieg akceptacji i podpis.",
+            "label": "Dokumenty"
+          },
+          "dwh_integration": {
+            "hint": "Zasilanie CRM obrotami z Państwa systemu sprzedażowego / ERP.",
+            "label": "Integracja z danymi sprzedażowymi (DWH)"
+          },
+          "leads": {
+            "hint": "Lejek sprzedażowy, aktywności, kalendarz.",
+            "label": "Leady"
+          },
+          "onboarding": {
+            "hint": "Szablony zadań wdrożeniowych dla nowych klientów.",
+            "label": "Onboarding klientów"
+          },
+          "partner_registry": {
+            "hint": "Obsługa obecnych klientów, upsell i cross-sell.",
+            "label": "Rejestr partnerów / klientów"
+          },
+          "pbx": {
+            "hint": "Dzwonienie do klientów bezpośrednio z CRM.",
+            "label": "Telefonia (softphone)"
+          },
+          "performance": {
+            "hint": "Health score i ryzyko odejścia klienta (churn).",
+            "label": "Performance"
+          },
+          "prospects": {
+            "hint": "Wyszukiwanie firm i ich automatyczna ocena przez AI (Enrichment / ICP).",
+            "label": "Prospekty"
+          },
+          "sales_reports": {
+            "label": "Raporty sprzedaży"
+          },
+          "seo_bot": {
+            "hint": "Automatyczne tworzenie i publikacja artykułów na blogu.",
+            "label": "SEObot"
+          },
+          "whatsapp": {
+            "hint": "Wspólny firmowy numer WhatsApp Business obsługiwany z kart leadów i klientów.",
+            "label": "WhatsApp"
+          }
+        }
+      },
+      "outlook_admin_consent": {
+        "label": "Czy administrator Microsoft 365 może udzielić zgody (admin consent) dla całej organizacji?"
+      },
+      "outlook_azure_tenant_id": {
+        "hint": "Opcjonalne.",
+        "label": "Microsoft — Directory (tenant) ID"
+      },
+      "outlook_client_id": {
+        "label": "Microsoft — Application (client) ID",
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      "outlook_client_secret": {
+        "label": "Microsoft — Client Secret"
+      },
+      "pbx_account_name": {
+        "label": "Nazwa firmy / konta w ip-pbx.eu"
+      },
+      "pbx_account_status": {
+        "label": "Czy mają Państwo konto firmowe w ip-pbx.eu?",
+        "options": {
+          "has_account": {
+            "label": "Tak"
+          },
+          "needs_account": {
+            "label": "Nie — prosimy o założenie konta przez CRMtree"
+          },
+          "other_provider": {
+            "label": "Nie — korzystamy z innej centrali / operatora"
+          }
+        }
+      },
+      "pbx_call_recording": {
+        "hint": "Nagrania i ich transkrypcje są podstawą modułu Analiza rozmów.",
+        "label": "Czy rozmowy mają być nagrywane?"
+      },
+      "pbx_current_provider": {
+        "label": "Obecna centrala / operator"
+      },
+      "pbx_extension_count": {
+        "label": "Ile osób będzie dzwonić z CRM?"
+      },
+      "pbx_phone_numbers": {
+        "hint": "Numer główny firmy oraz numery bezpośrednie, jeśli mają być przypisane do konkretnych osób. Zaznacz numery do przeniesienia od obecnego operatora.",
+        "label": "Numery, z których mają wychodzić połączenia"
+      },
+      "sales_stages": {
+        "hint": "Zostaw puste, jeśli odpowiada Państwu domyślny lejek.",
+        "label": "Etapy lejka sprzedażowego",
+        "placeholder": "Nowy → Kwalifikacja → Prezentacja → Oferta → Negocjacje → Wygrana / Przegrana"
+      },
+      "seo_articles_per_day": {
+        "label": "Ile artykułów dziennie?"
+      },
+      "seo_channels": {
+        "label": "Dodatkowe kanały i źródła danych",
+        "options": {
+          "facebook": {
+            "label": "Publikacja na firmowej stronie Facebook"
+          },
+          "gsc": {
+            "label": "Google Search Console (mamy dostęp właściciela do usługi)"
+          },
+          "linkedin": {
+            "label": "Publikacja na firmowym profilu LinkedIn"
+          }
+        }
+      },
+      "seo_publishing_platform": {
+        "label": "Gdzie publikujemy artykuły?",
+        "options": {
+          "other": {
+            "label": "Inny system"
+          },
+          "undecided": {
+            "label": "Do ustalenia"
+          },
+          "wordpress": {
+            "label": "WordPress"
+          }
+        }
+      },
+      "seo_website_url": {
+        "label": "Adres strony / bloga",
+        "placeholder": "https://firma.pl/blog"
+      },
+      "technical_contact_email": {
+        "label": "Osoba techniczna — e-mail"
+      },
+      "technical_contact_name": {
+        "hint": "Osoba, która ma dostęp administratora do poczty, telefonii i kont Meta.",
+        "label": "Osoba techniczna (IT) — imię i nazwisko"
+      },
+      "technical_contact_phone": {
+        "label": "Osoba techniczna — telefon"
+      },
+      "users_count": {
+        "label": "Planowana liczba użytkowników"
+      },
+      "users_global_read": {
+        "label": "Czy handlowcy mają widzieć leady i klientów innych handlowców?",
+        "options": {
+          "own_only": {
+            "label": "Nie — każdy widzi tylko swoje"
+          },
+          "read_all": {
+            "label": "Tak — wszyscy widzą wszystko (tylko odczyt)"
+          },
+          "undecided": {
+            "label": "Do ustalenia"
+          }
+        }
+      },
+      "users_list": {
+        "hint": "Jedna osoba w wierszu: imię i nazwisko; e-mail; rola (administrator / manager sprzedaży / handlowiec). Każdy dostanie jednorazowe hasło do zmiany przy pierwszym logowaniu.",
+        "label": "Lista użytkowników do założenia",
+        "placeholder": "Jan Kowalski; jan.kowalski@firma.pl; handlowiec\nAnna Nowak; anna.nowak@firma.pl; manager sprzedaży"
+      },
+      "users_team_structure": {
+        "hint": "Jakie są zespoły / regiony i kto komu podlega. Na tej podstawie ustawimy grupy i widoczność danych.",
+        "label": "Struktura zespołów sprzedaży"
+      },
+      "whatsapp_access_token": {
+        "hint": "Uprawnienia: whatsapp_business_messaging, whatsapp_business_management.",
+        "label": "Access Token (stały token użytkownika systemowego)"
+      },
+      "whatsapp_app_secret": {
+        "hint": "Meta App Dashboard → Settings → Basic.",
+        "label": "App Secret"
+      },
+      "whatsapp_display_name": {
+        "label": "Nazwa wyświetlana klientom w WhatsApp"
+      },
+      "whatsapp_meta_verified": {
+        "label": "Czy firma jest zweryfikowana w Meta Business Manager?",
+        "options": {
+          "unknown": {
+            "label": "Nie wiem"
+          }
+        }
+      },
+      "whatsapp_number_status": {
+        "label": "Czy mają Państwo numer do WhatsApp Business?",
+        "options": {
+          "has_number": {
+            "label": "Mamy numer, ale nie jest jeszcze zarejestrowany w Meta"
+          },
+          "needs_number": {
+            "label": "Nie — prosimy o zakup i konfigurację numeru przez CRMtree"
+          },
+          "ready": {
+            "label": "Tak — numer jest już w Meta WhatsApp Business Platform (Cloud API)"
+          }
+        }
+      },
+      "whatsapp_phone_number": {
+        "label": "Numer telefonu",
+        "placeholder": "+48 600 000 000"
+      },
+      "whatsapp_phone_number_id": {
+        "hint": "To identyfikator numeru w Meta, nie sam numer telefonu.",
+        "label": "Phone Number ID"
+      },
+      "whatsapp_waba_id": {
+        "hint": "Meta App Dashboard → WhatsApp → API Setup.",
+        "label": "WABA ID (WhatsApp Business Account ID)"
+      },
+      "zoho_client_id": {
+        "label": "Zoho — Client ID",
+        "placeholder": "1000.XXXXXXXX"
+      },
+      "zoho_client_secret": {
+        "label": "Zoho — Client Secret"
+      },
+      "zoho_data_center": {
+        "label": "Zoho — centrum danych",
+        "options": {
+          "com": {
+            "label": "US (zoho.com)"
+          },
+          "eu": {
+            "label": "EU (zoho.eu)"
+          },
+          "other": {
+            "label": "Inne"
+          }
+        }
+      }
+    },
+    "sections": {
+      "ai": {
+        "intro": "Moduły Prospekty (Enrichment) i Analiza rozmów wysyłają dane do zewnętrznych modeli językowych. Można korzystać z licencji CRMtree albo z własnej, dedykowanej licencji Państwa firmy.",
+        "title": "8. Modele AI — Enrichment i Analiza rozmów"
+      },
+      "billing": {
+        "title": "2. Plan i dane do faktury"
+      },
+      "company": {
+        "intro": "Podstawowe informacje, na podstawie których przygotujemy środowisko i ustalimy, z kim kontaktować się w trakcie wdrożenia.",
+        "title": "1. Firma i osoby kontaktowe"
+      },
+      "data": {
+        "title": "10. Dane i słowniki"
+      },
+      "email": {
+        "intro": "Każdy użytkownik łączy w CRM własną skrzynkę (wysyłka i odbiór wiadomości na kartach leadów i klientów). Wymaga to jednorazowej rejestracji aplikacji u dostawcy poczty — adres zwrotny (Redirect URI) przekażemy osobie technicznej.",
+        "title": "5. Poczta e-mail"
+      },
+      "modules": {
+        "intro": "Zaznaczone moduły włączymy w Państwa środowisku. Dla części z nich niżej pojawią się dodatkowe pytania.",
+        "title": "4. Moduły"
+      },
+      "notes": {
+        "title": "11. Uwagi"
+      },
+      "pbx": {
+        "intro": "Softphone w CRM działa z wirtualną centralą ip-pbx.eu. Każdy użytkownik wpisuje później swój osobisty token w „Moje ustawienia” — tutaj nie trzeba go podawać.",
+        "title": "7. Telefonia (softphone)"
+      },
+      "seo": {
+        "title": "9. SEObot"
+      },
+      "users": {
+        "title": "3. Użytkownicy i role"
+      },
+      "whatsapp": {
+        "intro": "CRM obsługuje jeden wspólny firmowy numer WhatsApp Business dla całej organizacji (Meta WhatsApp Business Platform). Numer podłączony do CRM nie może jednocześnie działać w zwykłej aplikacji WhatsApp na telefonie.",
+        "title": "6. WhatsApp Business"
+      }
+    }
+  },
+  "pbx": {
+    "actions": {
+      "cancel": "Anuluj",
+      "changeToken": "Zmień token",
+      "delete": "Usuń",
+      "deleting": "Usuwanie…",
+      "hide": "Ukryj",
+      "save": "Zapisz",
+      "saving": "Zapisywanie…",
+      "setToken": "Ustaw token",
+      "show": "Pokaż"
+    },
+    "columns": {
+      "crmRole": "Rola CRM",
+      "directPhone": "Numer bezpośredni (DPN)",
+      "status": "Status",
+      "updatedAt": "Zaktualizowano",
+      "user": "Użytkownik"
+    },
+    "deleteModal": {
+      "body": "Czy na pewno usunąć token PBX dla {name}? Użytkownik nie będzie mógł korzystać z softphone.",
+      "title": "Usuń token PBX"
+    },
+    "loadError": "Błąd ładowania danych.",
+    "loading": "Ładowanie…",
+    "modal": {
+      "hintBody": "Zaloguj się do panelu ip-pbx.eu jako ten użytkownik lub poproś go o token. Panel → kliknij awatar/imię w prawym górnym rogu → API lub Personal Access Token → Utwórz / Skopiuj token.",
+      "hintTitle": "Skąd wziąć token?",
+      "patHint": "Po zapisaniu system automatycznie pobierze dane SIP i numer bezpośredni z ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Wklej token z ip-pbx.eu",
+      "title": "Token PBX — {name}"
+    },
+    "noPhoneInPbx": "Brak numeru w PBX",
+    "roles": {
+      "salesManager": "Sales Manager",
+      "salesperson": "Handlowiec"
+    },
+    "searchPlaceholder": "Szukaj użytkownika…",
+    "status": {
+      "configured": "Skonfigurowany",
+      "noToken": "Brak tokenu"
+    },
+    "subtitle": "Przypisz każdemu handlowcowi jego Personal Access Token z ip-pbx.eu. System automatycznie pobierze dane SIP i bezpośredni numer telefonu (DPN).",
+    "title": "Numery telefoniczne PBX",
+    "toast": {
+      "deleteError": "Błąd usuwania tokenu.",
+      "deleted": "Token usunięty.",
+      "saveError": "Błąd zapisu tokenu.",
+      "saved": "Token zapisany.",
+      "savedWithPhone": "Token zapisany. Numer: {phone}."
+    },
+    "userCount": "Użytkownicy: {count}"
+  },
+  "settings": {
+    "actions": {
+      "add": "Dodaj",
+      "delete": "Usuń",
+      "discard": "Odrzuć",
+      "saveChanges": "Zapisz zmiany",
+      "saving": "Zapisywanie…"
+    },
+    "crm": {
+      "intro": "— słowniki i progi używane przez moduł CRM. Listy edytuj przez dodawanie / usuwanie elementów. Zmiany wchodzą w życie po zapisie.",
+      "scoring": {
+        "activityLast20Days": "Aktywność (ostatnie 20 dni)",
+        "churnTitle": "Algorytm Churn — parametry punktacji",
+        "description": "Opis",
+        "healthLevelThresholds": "Progi Health Level (punkty)",
+        "healthTitle": "Health Score — parametry punktacji",
+        "noOrdersDays": "Brak zamówień (dni)",
+        "parameter": "Parametr",
+        "revenueGrowth": "Wzrost przychodów (M-2→M-1)",
+        "riskThresholds": "Progi ryzyka (punkty)",
+        "salesDrop": "Spadek sprzedaży (M-2→M-1)",
+        "schedule": "Harmonogram",
+        "value": "Wartość"
+      }
+    },
+    "documents": {
+      "empty": "Brak słowników dokumentów. Uruchom migrację 0116.",
+      "intro": "— zarządzaj dostępnymi wartościami dla typów dokumentów, statusów i klasyfikacji GDPR. Uwaga: usunięcie wartości która jest już użyta w dokumentach może powodować problemy wyświetlania."
+    },
+    "errors": {
+      "saveFailed": "Błąd zapisu",
+      "settingsSaveFailed": "Błąd zapisu ustawień"
+    },
+    "fields": {
+      "changed": "Zmienione",
+      "changedBy": "Zmienione przez",
+      "disabled": "Wyłączone",
+      "emptyList": "— lista pusta —",
+      "enabled": "Włączone",
+      "errors": {
+        "nonNegativeNumber": "Musi być liczbą nieujemną",
+        "valueExists": "Wartość już istnieje"
+      },
+      "newValueCode": "Nowa wartość (kod, np. hotel)",
+      "newValueExample": "Nowa wartość (np. Wysoka cena)",
+      "newValueTechnicalKey": "Nowa wartość (klucz techniczny)"
+    },
+    "global": {
+      "categories": {
+        "crm": "CRM – parametry biznesowe",
+        "documents": "Dokumenty i terminy",
+        "general": "Ogólne / UI",
+        "workflow": "Workflow i Kanban"
+      },
+      "intro": "— ustawienia techniczne aplikacji widoczne dla wszystkich użytkowników. Zmiany wchodzą w życie natychmiast po zapisie.",
+      "preview": {
+        "expiringSoon": "dni → \"wygasa wkrótce\"",
+        "moreThan": "Więcej niż",
+        "noWarning": "dni → bez ostrzeżenia",
+        "title": "Podgląd kolorów terminów",
+        "urgent": "dni → czerwony (pilne)"
+      }
+    },
+    "groups": {
+      "addFailed": "Błąd dodawania grupy",
+      "addGroup": "Dodaj grupę",
+      "addTitle": "Dodaj nową grupę",
+      "added": "Grupa ''{name}'' została dodana",
+      "adding": "Dodawanie…",
+      "cannotDelete": "Nie można usunąć — ma przypisanych użytkowników lub dokumenty",
+      "deleteConfirm": "Usunąć grupę \"{name}\"?",
+      "deleteFailed": "Błąd usuwania grupy",
+      "deleteGroup": "Usuń grupę",
+      "deleted": "Grupa ''{name}'' usunięta",
+      "description": "Opis",
+      "descriptionPlaceholder": "Opcjonalny opis grupy",
+      "displayName": "Nazwa wyświetlana",
+      "displayNameHint": "Widoczna dla użytkowników (np. Obsługa Klienta, Zarząd).",
+      "displayNamePlaceholder": "np. Obsługa Klienta",
+      "documentCount": "{count, plural, one {# dokument} few {# dokumenty} many {# dokumentów} other {# dokumentu}}",
+      "empty": "Brak grup. Dodaj pierwszą grupę powyżej lub uruchom migrację 0127.",
+      "inactive": "Nieaktywna",
+      "intro": "— zarządzaj grupami do których można przypisywać użytkowników. Grupy kontrolują dostęp do dokumentów. Nie można usunąć grupy z przypisanymi użytkownikami lub dokumentami.",
+      "memberCount": "{count, plural, one {# użytkownik} few {# użytkowników} many {# użytkowników} other {# użytkownika}}",
+      "ownerRestriction": "Ograniczenie właściciela",
+      "ownerRestrictionOption": "Ograniczenie właściciela (Owner restriction)",
+      "technicalName": "Nazwa techniczna",
+      "technicalNameHint": "Unikalny identyfikator (np. Accounting, HR). Bez polskich znaków.",
+      "technicalNamePlaceholder": "np. Accounting"
+    },
+    "icp": {
+      "addSignal": "Dodaj sygnał",
+      "defaultConfig": "Konfiguracja domyślna — nie była jeszcze zmieniana.",
+      "deleteConfirm": "Usunąć sygnał \"{name}\"?",
+      "disableSignal": "Wyłącz sygnał",
+      "draftInvalid": "Konfiguracja robocza ma {score} / 100 pkt. Enrichment nadal korzysta z ostatniej poprawnej wersji.",
+      "edit": "Edytuj",
+      "editing": "Edytujesz:",
+      "enableSignal": "Włącz sygnał",
+      "errors": {
+        "conflict": "Ktoś inny zmienił konfigurację ICP w międzyczasie — odświeżam",
+        "fetchFailed": "Nie udało się pobrać konfiguracji ICP (błąd {status}).",
+        "forbidden": "Brak uprawnień do konfiguracji ICP tego tenanta.",
+        "loadFailed": "Błąd ładowania konfiguracji ICP",
+        "noConnection": "Brak połączenia z serwerem — sprawdź, czy backend działa, i spróbuj ponownie.",
+        "noTenant": "Twoje konto nie jest przypisane do żadnego tenanta, więc nie ma konfiguracji ICP do pokazania.",
+        "noTenantToast": "Brak przypisanego tenanta",
+        "notFound": "Konfiguracja ICP nie jest dostępna w tej wersji backendu (404).",
+        "sessionExpired": "Sesja wygasła. Zaloguj się ponownie.",
+        "unknownStatus": "nieznany"
+      },
+      "intro": "— konfiguracja punktowanych sygnałów używanych przez enrichment do oceny dopasowania firmy (ICP).",
+      "introTitle": "Sygnały ICP",
+      "lastUpdateVersion": "Ostatnia aktualizacja: wersja",
+      "loadFailedTitle": "Nie udało się wczytać konfiguracji ICP.",
+      "loading": "Ładowanie...",
+      "modal": {
+        "active": "Aktywny",
+        "definition": "Jak rozpoznać ten sygnał?",
+        "definitionHint": "Na podstawie tego opisu system ocenia, czy firma spełnia dany sygnał.",
+        "definitionPlaceholder": "Opisz, po czym poznać, że firma spełnia ten warunek — konkretne słowa/frazy na stronie, sekcje, stanowiska.",
+        "editTitle": "Edytuj sygnał",
+        "name": "Nazwa sygnału",
+        "namePlaceholder": "np. Własna flota transportowa",
+        "newTitle": "Nowy sygnał",
+        "points": "Punkty",
+        "saving": "Zapisuję...",
+        "shortDescription": "Tooltip / krótki opis dla użytkownika",
+        "shortDescriptionHint": "Pokazywany jako podpowiedź (?) przy sygnale w Prospektach. Krótkie, czytelne zdanie — nie techniczna instrukcja dla AI.",
+        "shortDescriptionPlaceholder": "Krótki, biznesowy opis 1–2 zdania — np. „Jawnie nazwany dział/zespół sprzedaży”."
+      },
+      "noSignals": "Brak sygnałów.",
+      "ownTenant": "Twój tenant",
+      "ownTenantSuffix": "(Twój)",
+      "pointsSum": "Suma punktów:",
+      "retry": "Spróbuj ponownie",
+      "signalAdded": "Sygnał dodany",
+      "signalDeleted": "Sygnał usunięty",
+      "signalDisabled": "Sygnał wyłączony (miał historię — zachowany do wyjaśnienia starych wyników)",
+      "signalUpdated": "Sygnał zaktualizowany",
+      "systemUpdate": "aktualizacja systemowa (wbudowane domyślne sygnały CRM Tree)",
+      "tenantConfig": "Konfiguracja tenanta"
+    },
+    "itemLabels": {
+      "commissionBasis": {
+        "nie_dotyczy": "Nie dotyczy",
+        "progi_obrotowe": "Progi obrotowe",
+        "rezerwacje": "Ilość rezerwacji",
+        "segmenty": "Ilość segmentów"
+      },
+      "contactTitles": {
+        "Director": "Dyrektor",
+        "Manager": "Manager",
+        "Other": "Inne",
+        "Owner": "Właściciel",
+        "Specialist": "Specjalista"
+      },
+      "documentStatuses": {
+        "being_approved": "Do akceptacji",
+        "being_edited": "W edycji",
+        "being_signed": "Do podpisu",
+        "completed": "Zakończony",
+        "new": "Nowy",
+        "rejected": "Odrzucony",
+        "signed": "Podpisany"
+      },
+      "documentTypes": {
+        "employee_agreement": "Umowa pracownicza",
+        "invoice": "Faktura",
+        "it_supplier_agreement": "Umowa z dostawcą IT",
+        "nda": "NDA",
+        "partner_agreement": "Umowa partnerska"
+      },
+      "gdprTypes": {
+        "data_administration": "Współadministrowanie",
+        "data_processing_entrustment": "Powierzenie przetwarzania",
+        "no_gdpr": "Brak GDPR"
+      },
+      "industries": {
+        "Education": "Edukacja",
+        "Finance": "Finanse",
+        "Healthcare": "Zdrowie",
+        "Legal": "Prawo",
+        "Manufacturing": "Produkcja",
+        "Other": "Inne",
+        "Retail": "Handel",
+        "Tourism": "Turystyka",
+        "Transport": "Transport"
+      },
+      "leadSources": {
+        "agent": "Agent",
+        "cold_call": "Cold call",
+        "inbound": "Inbound",
+        "inne": "Inne",
+        "kampania": "Kampania email",
+        "linkedin": "LinkedIn",
+        "partner": "Partner",
+        "polecenie": "Polecenie",
+        "strona_www": "Strona www",
+        "targi": "Targi / Wydarzenie"
+      },
+      "leadStages": {
+        "closed_lost": "Przegrana",
+        "closed_won": "Wygrana",
+        "negotiation": "Negocjacje",
+        "new": "Nowy",
+        "offer": "Oferta",
+        "presentation": "Prezentacja",
+        "qualification": "Kwalifikacja"
+      },
+      "partnerStatuses": {
+        "active": "Aktywny",
+        "churned": "Utracony",
+        "inactive": "Nieaktywny",
+        "onboarding": "Wdrożenie"
+      },
+      "paymentStatuses": {
+        "overdue": "Po terminie",
+        "paid": "Opłacona",
+        "partially_paid": "Opłacona częściowo",
+        "unpaid": "Nieopłacona"
+      },
+      "productTypes": {
+        "car_rental": "Wynajem auta",
+        "hotel": "Hotel",
+        "other": "Inne",
+        "transfer": "Transfer",
+        "transport_bus": "Autobus",
+        "transport_ferry": "Prom",
+        "transport_flight": "Lot",
+        "transport_train": "Pociąg",
+        "travel_insurance": "Ubezpieczenie",
+        "visa": "Wiza"
+      }
+    },
+    "onboarding": {
+      "intro": "— zdefiniuj standardowe zadania dla każdego kroku procesu wdrożenia. Szablony są automatycznie podpowiadane podczas tworzenia zadań w panelu Onboarding.",
+      "introTitle": "Szablony zadań onboardingowych",
+      "jsonFormat": "Format JSON:",
+      "leadSources": {
+        "add": "Dodaj źródło",
+        "group": "Grupa",
+        "groupHint": "Nazwa grupy lub puste — wartości z grupą wyświetlane w sekcji poniżej",
+        "label": "Etykieta (wyświetlana)",
+        "legend": "Niebieskie tło = wartość należy do grupy (wyświetlana w sekcji Marketingu w listach).",
+        "noGroup": "— brak grupy —",
+        "value": "Wartość (kod)"
+      },
+      "steps": {
+        "configuration": "Konfiguracja",
+        "contractSigning": "Podpisanie umowy",
+        "launch": "Uruchomienie",
+        "training": "Szkolenie"
+      },
+      "stepsLegend": "Kroki: 0=Podpisanie umowy, 1=Konfiguracja, 2=Szkolenie, 3=Uruchomienie.",
+      "taskTypes": {
+        "call": "Telefon",
+        "doc_sent": "Dokument",
+        "email": "Email",
+        "meeting": "Spotkanie",
+        "task": "Zadanie",
+        "training": "Szkolenie"
+      },
+      "templates": {
+        "add": "Dodaj szablon",
+        "assignee": "Przypisany",
+        "assigneeHint": "User automatycznie przypisany. Krok 0 zawsze → handlowiec leada",
+        "days": "Dni",
+        "daysHint": "Ile dni od daty migracji ustawić jako termin (null = brak terminu)",
+        "empty": "Brak szablonów. Uruchom migrację 0133.",
+        "leadOwner": "handlowiec leada",
+        "legend": "Zielone tło = zadanie standardowe (tworzone automatycznie przy migracji leada). Krok \"Podpisanie umowy\" zawsze przypisuje się do handlowca leada.",
+        "noAssignee": "— brak —",
+        "standard": "Standardowe",
+        "standardCheckboxHint": "Automatycznie tworzone przy migracji",
+        "standardHint": "Czy zadanie tworzy się automatycznie przy migracji leada",
+        "step": "Krok",
+        "title": "Tytuł",
+        "type": "Typ"
+      }
+    },
+    "saved": "{count, plural, one {# ustawienie zapisane} few {# ustawienia zapisane} many {# ustawień zapisanych} other {# ustawienia zapisanego}}",
+    "survey": {
+      "description": "— dane, na podstawie których zespół CRMtree konfiguruje Państwa środowisko (moduły, poczta, WhatsApp, telefonia, modele AI).",
+      "open": "Otwórz ankietę",
+      "title": "Ankieta wdrożeniowa"
+    },
+    "tabs": {
+      "crm": "Parametry biznesowe CRM",
+      "documents": "Słowniki dokumentów",
+      "global": "Parametry globalne",
+      "icp": "Enrichment / ICP",
+      "onboarding": "Szablony Onboarding",
+      "projects": "Projekty",
+      "tooltips": "Podpowiedzi",
+      "users": "Grupy użytkowników"
+    },
+    "title": "Ustawienia aplikacji",
+    "tooltips": {
+      "add": "Dodaj podpowiedź",
+      "added": "Tooltip dodany",
+      "catalog": {
+        "leadsFunnelActive": "Lejek: Aktywne leady",
+        "leadsFunnelAvgWon": "Lejek: Avg. wartość wygranego",
+        "leadsFunnelConversion": "Lejek: Konwersja do Wygranego",
+        "leadsFunnelHot": "Lejek: Gorące leady",
+        "leadsFunnelPct": "Lejek: % konwersji między etapami",
+        "leadsFunnelTitle": "Lejek sprzedażowy (tytuł)",
+        "leadsKpiAvgCycle": "KPI: Avg. cykl sprzedaży",
+        "leadsKpiBudget": "KPI: Planowany budżet (PLN)",
+        "leadsKpiPipeline": "KPI: Pipeline (PLN)",
+        "leadsKpiWinRate": "KPI: Win Rate",
+        "leadsKpiWon": "KPI: Zamknięte / Won (PLN)",
+        "leadsLostTitle": "Powody przegranej (tytuł)",
+        "leadsRepsColLeads": "Handlowcy: kolumna Leady",
+        "leadsRepsColPipeline": "Handlowcy: kolumna Pipeline",
+        "leadsRepsColProgress": "Handlowcy: kolumna Postęp",
+        "leadsRepsColWinRate": "Handlowcy: kolumna Win%",
+        "leadsRepsColWon": "Handlowcy: kolumna Won",
+        "leadsRepsTitle": "Wyniki handlowców (tytuł)",
+        "leadsSourcesQuality": "Źródła: Jakość po źródle (win rate)",
+        "leadsSourcesTitle": "Źródła leadów (tytuł)",
+        "leadsTrendTitle": "Trend miesięczny (tytuł)",
+        "leadsVelocityTitle": "Czas w etapie – avg dni (tytuł)",
+        "partnersKpiActivePartners": "Aktywnych partnerów",
+        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiGrossTurnover": "Obrót brutto (PLN)",
+        "partnersKpiRevenue": "Przychód / Marża (PLN)",
+        "partnersKpiTransactions": "Transakcje",
+        "partnersScorecardHealth": "Scorecard: Health",
+        "salesActivity": "Panel: Ostatnia aktywność",
+        "salesChart": "Panel: Wyniki sprzedażowe (wykres)",
+        "salesKpiNewCompanies": "KPI: Nowe firmy",
+        "salesKpiNewContacts": "KPI: Nowe kontakty",
+        "salesKpiNewLeads": "KPI: Nowe szanse (aktywny pipeline)",
+        "salesKpiPipelineValue": "KPI: Wartość szans (pipeline)",
+        "salesKpiWon": "KPI: Wygrane szanse",
+        "salesPipeline": "Panel: Pipeline sprzedaży",
+        "salesRecentLeads": "Panel: Najnowsze szanse (tabela)",
+        "salesTasks": "Panel: Zadania na dziś"
+      },
+      "chooseLabel": "— wybierz label —",
+      "chooseScreen": "— wybierz ekran —",
+      "content": "Treść podpowiedzi",
+      "contentPlaceholder": "Tekst który zobaczy użytkownik po najechaniu na ikonę ?.",
+      "deleteConfirm": "Usunąć tooltip \"{key}\"?",
+      "deleteFailed": "Błąd usuwania",
+      "deleted": "Tooltip \"{key}\" usunięty",
+      "empty": "Brak zdefiniowanych podpowiedzi. Dodaj pierwszą powyżej.",
+      "errors": {
+        "chooseLabel": "Wybierz ekran i label",
+        "contentRequired": "Treść podpowiedzi jest wymagana"
+      },
+      "introAfterIcon": "pojawi się automatycznie obok danej labelki gdy treść jest zdefiniowana.",
+      "introBeforeIcon": "— wybierz ekran i labelkę, wpisz tekst. Ikona",
+      "introTitle": "Podpowiedzi (Tooltips)",
+      "label": "Etykieta",
+      "other": "Inne",
+      "saved": "Tooltip \"{key}\" zapisany",
+      "screen": "Ekran",
+      "screens": {
+        "partnerPerformance": "Partner Performance",
+        "salesDashboard": "Sales Dashboard",
+        "salesReports": "Raporty sprzedaży"
+      }
+    },
+    "topbar": {
+      "unsavedChanges": "Niezapisane zmiany"
+    }
+  },
+  "userGroups": {
+    "accessLevels": {
+      "full": "Pełny dostęp",
+      "read": "Tylko odczyt"
+    },
+    "create": {
+      "displayNamePlaceholder": "np. Sprzedaż",
+      "done": "Utworzono grupę „{name}\"",
+      "internalNamePlaceholder": "np. Sprzedaz",
+      "ownerRestrictionCheckbox": "Ograniczenie właściciela (użytkownik widzi tylko swoje dokumenty)",
+      "subtitle": "Dodaj nową grupę ról",
+      "title": "Utwórz grupę"
+    },
+    "deactivate": {
+      "action": "Dezaktywuj grupę",
+      "confirm": "Dezaktywować grupę „{name}\"?",
+      "done": "Dezaktywowano grupę"
+    },
+    "documents": "Dokumenty",
+    "documentsCount": "{count, plural, one {# dokument} few {# dokumenty} many {# dokumentów} other {# dokumentu}}",
+    "edit": {
+      "saveChanges": "Zapisz zmiany",
+      "saved": "Zaktualizowano grupę",
+      "title": "Edycja grupy"
+    },
+    "fields": {
+      "description": "Opis",
+      "displayName": "Nazwa wyświetlana",
+      "internalName": "Nazwa grupy (wewnętrzna)"
+    },
+    "inactive": "Nieaktywna",
+    "members": "Członkowie",
+    "membersCount": "{count, plural, one {# członek} few {# członków} many {# członków} other {# członka}}",
+    "newGroup": "Nowa grupa",
+    "noMembers": "Brak członków",
+    "ownerRestriction": "Ograniczenie właściciela",
+    "ownerRestrictionOptions": {
+      "none": "Bez ograniczenia",
+      "ownerOnly": "Tylko właściciel (Sprzedaż)"
+    },
+    "title": "Grupy i role"
+  },
+  "users": {
+    "access": "Dostęp",
+    "accessLevels": {
+      "full": "Pełny",
+      "read": "Odczyt"
+    },
+    "accountTypes": {
+      "external": "Zewnętrzne (tylko Projekty)",
+      "internal": "Wewnętrzne"
+    },
+    "adminBadge": "ADMIN",
+    "adminRoles": {
+      "admin": "Administrator",
+      "regular": "Zwykły użytkownik"
+    },
+    "budgets": {
+      "annualTotal": "Suma roczna",
+      "changeTypeConfirm": "Zmiana typu okresu usunie istniejące budżety na rok {year}. Kontynuować?",
+      "currency": "Waluta",
+      "deleteFailed": "Błąd usuwania budżetów",
+      "monthly": "Miesięczny",
+      "periodType": "Typ okresu",
+      "quarterly": "Kwartalny",
+      "save": "Zapisz budżet",
+      "saveFailed": "Błąd zapisu",
+      "saved": "Budżet zapisany",
+      "title": "Planowane Budżety Sprzedażowe",
+      "year": "Rok"
+    },
+    "chooseGroup": "Wybierz grupę...",
+    "columns": {
+      "email": "Email",
+      "groupsAndRoles": "Grupy i role",
+      "lastLogin": "Ostatnie logowanie",
+      "user": "Użytkownik"
+    },
+    "count": "Użytkowników: {count}",
+    "create": {
+      "accessLevel": "Poziom dostępu",
+      "assignGroup": "Przypisz do grupy (opcjonalnie)",
+      "emailPlaceholder": "anna.kowalska@firma.com",
+      "failed": "Nie udało się utworzyć użytkownika",
+      "firstNamePlaceholder": "Anna",
+      "lastNamePlaceholder": "Kowalska",
+      "noGroup": "Brak grupy",
+      "ssoNoteLabel": "Uwaga:",
+      "ssoNoteText": "Użytkownik będzie mógł logować się przez SAML SSO przy użyciu tego adresu e-mail. Uwierzytelnianie jest w całości obsługiwane przez Google Workspace.",
+      "submit": "Utwórz użytkownika",
+      "subtitle": "Ręcznie utwórz nowe konto użytkownika",
+      "success": "Utworzono użytkownika {name}",
+      "title": "Dodaj nowego użytkownika"
+    },
+    "crmRoles": {
+      "managerShort": "Manager",
+      "none": "Brak roli CRM",
+      "salesManager": "Manager sprzedaży (sales_manager)",
+      "salesperson": "Handlowiec (salesperson)",
+      "salespersonShort": "Handlowiec"
+    },
+    "edit": {
+      "accountSettings": "Ustawienia konta",
+      "deleteConfirm": "Usunąć użytkownika {name} ({email})? Tej operacji nie można cofnąć.",
+      "deleteFailed": "Nie udało się usunąć użytkownika",
+      "deleteUser": "Usuń użytkownika",
+      "deleted": "Użytkownik usunięty",
+      "emailHint": "Zmiana e-maila wpływa na logowanie SAML — upewnij się, że adres odpowiada kontu Google Workspace.",
+      "emailInvalid": "Wprowadź prawidłowy adres e-mail",
+      "emailTaken": "Ten adres e-mail jest już zajęty",
+      "loadFailed": "Nie udało się wczytać użytkownika",
+      "saveChanges": "Zapisz zmiany",
+      "updateFailed": "Nie udało się zaktualizować użytkownika",
+      "updated": "Użytkownik zaktualizowany"
+    },
+    "empty": "Nie znaleziono użytkowników",
+    "featureAccess": {
+      "prospects": "Prospekty",
+      "prospectsDisabled": "Dostęp do Prospektów wyłączony",
+      "prospectsEnabled": "Dostęp do Prospektów włączony",
+      "prospectsGroupDescription": "Dostęp do modułu Prospektów (import CSV, enrichment, konwersja na lead).",
+      "prospectsHint": "Analiza i wzbogacanie prospektów firm (AI)",
+      "title": "Dostęp do funkcji"
+    },
+    "fields": {
+      "accountType": "Typ konta",
+      "adminRole": "Rola administratora",
+      "canCreateProjects": "Zakładanie projektów",
+      "canViewKsefInvoices": "Dostęp do faktur KSeF",
+      "company": "Firma",
+      "crmRole": "Rola CRM",
+      "department": "Dział",
+      "email": "Adres e-mail",
+      "firstName": "Imię",
+      "lastName": "Nazwisko",
+      "phone": "Telefon",
+      "required": "Wymagane",
+      "status": "Status"
+    },
+    "filters": {
+      "activeOnly": "Tylko aktywni",
+      "allGroups": "Wszystkie grupy",
+      "allUsers": "Wszyscy użytkownicy",
+      "inactiveOnly": "Tylko nieaktywni"
+    },
+    "grants": {
+      "add": "Nadaj",
+      "addFailed": "Nie udało się nadać grantu",
+      "addTitle": "Nadaj grant widoczności",
+      "added": "Grant widoczności nadany",
+      "group": "Grupa (czyje rekordy)",
+      "hint": "Grant nie dodaje użytkownika do grupy. „Pełny\" pozwala też edytować rekordy tej grupy.",
+      "module": "Moduł",
+      "removeFailed": "Nie udało się usunąć grantu",
+      "removed": "Grant widoczności usunięty",
+      "title": "Granty widoczności CRM ({count})",
+      "tooltip": "Widzi rekordy grupy „{group}\" w module {module} ({access})",
+      "tooltipAccess": {
+        "full": "odczyt i edycja",
+        "read": "tylko odczyt"
+      }
+    },
+    "modules": {
+      "leads": "Leady",
+      "partners": "Partnerzy"
+    },
+    "neverLoggedIn": "Nigdy",
+    "newUser": "Nowy użytkownik",
+    "no": "Nie",
+    "pagination": {
+      "next": "Dalej",
+      "page": "Strona {page} z {total}",
+      "previous": "Poprz."
+    },
+    "password": {
+      "mismatch": "Hasła nie są identyczne",
+      "new": "Nowe hasło",
+      "placeholder": "Min. 8 znaków",
+      "repeat": "Powtórz hasło",
+      "saveFailed": "Błąd zapisu hasła",
+      "saved": "Hasło zostało ustawione",
+      "submit": "Ustaw hasło",
+      "title": "Hasło do logowania",
+      "tooShort": "Hasło musi mieć minimum 8 znaków"
+    },
+    "remove": "Usuń",
+    "roles": {
+      "assign": "Przypisz",
+      "assignTitle": "Przypisz nową rolę",
+      "assigned": "Rola przypisana",
+      "group": "Grupa",
+      "removeFailed": "Nie udało się usunąć roli",
+      "removed": "Rola usunięta",
+      "title": "Role w grupach ({count})"
+    },
+    "saving": "Zapisywanie…",
+    "searchPlaceholder": "Szukaj użytkowników…",
+    "statuses": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny"
+    },
+    "title": "Zarządzanie użytkownikami",
+    "yes": "Tak"
+  }
+}

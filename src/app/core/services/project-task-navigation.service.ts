@@ -11,8 +11,8 @@ export interface ProjectTaskOrigin {
 
 /**
  * Opens a project task from outside the Projects module (lead / partner card,
- * calendar, dashboard) and remembers where the user came from, so the project
- * view can offer a way back to that exact place.
+ * calendar, dashboard, invoice document) and remembers where the user came
+ * from, so the project view can offer a way back to that exact place.
  */
 @Injectable({ providedIn: 'root' })
 export class ProjectTaskNavigationService {
@@ -20,12 +20,22 @@ export class ProjectTaskNavigationService {
   private readonly navBack = inject(NavBackService);
 
   open(projectId: string, taskId: string | null, origin: ProjectTaskOrigin): void {
+    this.rememberOrigin(origin);
+    this.router.navigate(['/projects', projectId], { queryParams: taskId ? { task: taskId } : {} });
+  }
+
+  /** Opens the Finance tab; the project view shows Tasks instead to someone who may not read the finance. */
+  openFinance(projectId: string, origin: ProjectTaskOrigin): void {
+    this.rememberOrigin(origin);
+    this.router.navigate(['/projects', projectId], { queryParams: { tab: 'finance' } });
+  }
+
+  private rememberOrigin(origin: ProjectTaskOrigin): void {
     this.navBack.set({
       label: origin.label,
       route: origin.route as any[],
       queryParams: origin.queryParams,
       targetUrlPrefix: '/projects',
     });
-    this.router.navigate(['/projects', projectId], { queryParams: taskId ? { task: taskId } : {} });
   }
 }

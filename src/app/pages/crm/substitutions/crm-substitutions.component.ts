@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { AuthService } from '../../../core/auth/auth.service';
 import {
   SubstitutionsService, Absence, AbsenceReason, CrmUserOption, CrmGroupOption,
@@ -25,28 +26,28 @@ interface FieldErrors {
 type ListState = 'loading' | 'error' | 'ready';
 
 const REASON_LABEL: Record<AbsenceReason, string> = {
-  vacation:   'Urlop',
-  sick_leave: 'Zwolnienie lekarskie (L4)',
-  other:      'Inna nieobecność',
+  vacation:   'crm.substitutions.reasons.vacation',
+  sick_leave: 'crm.substitutions.reasons.sick_leave',
+  other:      'crm.substitutions.reasons.other',
 };
 
 @Component({
   selector: 'wt-crm-substitutions',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="card">
-  <h2 class="card-title">🔄 Zastępstwo podczas nieobecności</h2>
+  <h2 class="card-title">🔄 {{ t('substitutions.title') }}</h2>
   <p class="card-hint">
-    Wskaż okres nieobecności i osobę, która Cię wtedy zastąpi.
-    Na ten czas zastępca zyska pełny dostęp do Twoich leadów i partnerów —
-    z tymi samymi uprawnieniami, które masz Ty.
+    {{ t('substitutions.hint') }}
   </p>
 
   <div class="form-grid">
       <label>
-        <span>Osoba nieobecna</span>
+        <span>{{ t('substitutions.fields.absentPerson') }}</span>
         <select *ngIf="canManageForOthers(); else absentSelf"
                 [(ngModel)]="form.absent_user_id" (ngModelChange)="onAbsentChange()">
           <option [value]="myId()">{{ myName() }}</option>
@@ -58,37 +59,37 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
       </label>
 
       <label>
-        <span>Powód</span>
+        <span>{{ t('substitutions.fields.reason') }}</span>
         <select [(ngModel)]="form.reason">
-          <option value="vacation">Urlop</option>
-          <option value="sick_leave">Zwolnienie lekarskie (L4)</option>
-          <option value="other">Inna nieobecność</option>
+          <option value="vacation">{{ t('substitutions.reasons.vacation') }}</option>
+          <option value="sick_leave">{{ t('substitutions.reasons.sick_leave') }}</option>
+          <option value="other">{{ t('substitutions.reasons.other') }}</option>
         </select>
       </label>
 
       <label>
-        <span>Data od</span>
+        <span>{{ t('substitutions.fields.dateFrom') }}</span>
         <input type="date" [(ngModel)]="form.starts_on"
                [class.invalid]="submitted() && !!errors().dateFrom">
         <span class="field-err" *ngIf="submitted() && errors().dateFrom">{{ errors().dateFrom }}</span>
       </label>
 
       <label>
-        <span>Data do</span>
+        <span>{{ t('substitutions.fields.dateTo') }}</span>
         <input type="date" [(ngModel)]="form.ends_on" [attr.min]="form.starts_on || null"
                [class.invalid]="(submitted() || !!form.ends_on) && !!errors().dateTo">
         <span class="field-err" *ngIf="(submitted() || !!form.ends_on) && errors().dateTo">{{ errors().dateTo }}</span>
       </label>
 
       <label>
-        <span>Zastępca</span>
+        <span>{{ t('substitutions.fields.substitute') }}</span>
         <select [(ngModel)]="form.substitute_user_id"
                 [class.invalid]="(submitted() && !!errors().substitute) || substituteAbsentConflict()">
-          <option value="">— wybierz —</option>
+          <option value="">{{ t('substitutions.form.choose') }}</option>
           <option *ngFor="let u of substituteOptions()" [value]="u.id">{{ u.display_name }}</option>
         </select>
         <span class="field-err" *ngIf="substituteAbsentConflict()">
-          Ta osoba jest nieobecna w wybranym terminie — wybierz innego zastępcę.
+          {{ t('substitutions.form.substituteAbsentHint') }}
         </span>
         <span class="field-err"
               *ngIf="submitted() && errors().substitute && !substituteAbsentConflict()">
@@ -97,52 +98,52 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
       </label>
 
       <label class="span-2">
-        <span>Notatka (opcjonalnie)</span>
+        <span>{{ t('substitutions.form.noteOptional') }}</span>
         <textarea rows="2" maxlength="2000" [(ngModel)]="form.note"
-                  placeholder="np. pilne sprawy kierować do…"></textarea>
+                  [placeholder]="t('substitutions.form.notePlaceholder')"></textarea>
       </label>
     </div>
 
     <div class="form-actions">
       <button class="btn btn-p" (click)="submit()" [disabled]="saving()">
-        {{ saving() ? 'Zapisywanie…' : 'Zapisz zastępstwo' }}
+        {{ saving() ? t('leadsList.saving') : t('substitutions.form.submit') }}
       </button>
       <span *ngIf="rangeConflict()" class="msg-error">{{ errors().range }}</span>
       <span *ngIf="submitted() && hasErrors() && !saving() && !rangeConflict()" class="msg-error">
-        Popraw zaznaczone pola i spróbuj ponownie.
+        {{ t('substitutions.form.fixErrors') }}
       </span>
       <span *ngIf="formError()" class="msg-error">{{ formError() }}</span>
       <span *ngIf="okMsg()" class="msg-ok">{{ okMsg() }}</span>
     </div>
 
   <div class="subs-section">
-    <h3 class="sub-title">Nieobecności {{ canManageForOthers() ? '(moje i zespołu)' : '(moje)' }}</h3>
+    <h3 class="sub-title">{{ canManageForOthers() ? t('substitutions.list.titleOwnAndTeam') : t('substitutions.list.titleOwn') }}</h3>
 
     <ng-container [ngSwitch]="listState()">
-      <div *ngSwitchCase="'loading'" class="state">Ładowanie…</div>
+      <div *ngSwitchCase="'loading'" class="state">{{ 'states.loading' | transloco }}</div>
 
       <div *ngSwitchCase="'error'" class="state state-error">
-        <span>Nie udało się pobrać danych.</span>
-        <button class="btn btn-g btn-sm" (click)="reload()">Spróbuj ponownie</button>
+        <span>{{ t('substitutions.list.loadFailed') }}</span>
+        <button class="btn btn-g btn-sm" (click)="reload()">{{ t('substitutions.list.retry') }}</button>
       </div>
 
       <ng-container *ngSwitchCase="'ready'">
         <div *ngIf="cancelError()" class="msg-error block">{{ cancelError() }}</div>
 
         <div *ngIf="ownCurrentAbsences().length === 0" class="state muted">
-          Brak trwających ani nadchodzących nieobecności.
+          {{ t('substitutions.list.empty') }}
         </div>
 
         <div *ngIf="ownCurrentAbsences().length" class="table-wrap">
           <table class="subs-table">
             <thead>
               <tr>
-                <th>Osoba nieobecna</th>
-                <th class="period">Okres</th>
-                <th>Zastępca</th>
-                <th>Powód</th>
-                <th>Status</th>
-                <th class="col-action">Akcja</th>
+                <th>{{ t('substitutions.fields.absentPerson') }}</th>
+                <th class="period">{{ t('substitutions.fields.period') }}</th>
+                <th>{{ t('substitutions.fields.substitute') }}</th>
+                <th>{{ t('substitutions.fields.reason') }}</th>
+                <th>{{ t('substitutions.fields.status') }}</th>
+                <th class="col-action">{{ t('substitutions.fields.action') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -155,7 +156,7 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
                 <td class="col-action">
                   <button *ngIf="canCancel(a); else noAction" type="button" class="btn btn-g btn-sm"
                           (click)="cancel(a)" [disabled]="cancellingId() === a.id">
-                    {{ cancellingId() === a.id ? 'Odwoływanie…' : 'Odwołaj' }}
+                    {{ cancellingId() === a.id ? t('substitutions.cancel.inProgress') : t('substitutions.cancel.action') }}
                   </button>
                   <ng-template #noAction><span class="dash">—</span></ng-template>
                 </td>
@@ -168,7 +169,7 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
           <button type="button" class="history-toggle"
                   (click)="toggleHistory()"
                   [attr.aria-expanded]="historyOpen()">
-            {{ historyOpen() ? '▾' : '▸' }} Historia ({{ ownHistoryAbsences().length }})
+            {{ historyOpen() ? '▾' : '▸' }} {{ t('substitutions.history.toggle', { count: ownHistoryAbsences().length }) }}
           </button>
 
           <ng-container *ngIf="historyOpen()">
@@ -176,11 +177,11 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
               <table class="subs-table">
                 <thead>
                   <tr>
-                    <th>Osoba nieobecna</th>
-                    <th class="period">Okres</th>
-                    <th>Zastępca</th>
-                    <th>Powód</th>
-                    <th>Status</th>
+                    <th>{{ t('substitutions.fields.absentPerson') }}</th>
+                    <th class="period">{{ t('substitutions.fields.period') }}</th>
+                    <th>{{ t('substitutions.fields.substitute') }}</th>
+                    <th>{{ t('substitutions.fields.reason') }}</th>
+                    <th>{{ t('substitutions.fields.status') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,13 +197,13 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
             </div>
 
             <div *ngIf="historyTotalPages() > 1" class="pager">
-              <button type="button" class="pager-btn" aria-label="Poprzednia strona"
+              <button type="button" class="pager-btn" [attr.aria-label]="t('substitutions.pager.previous')"
                       [disabled]="historyPageClamped() === 1"
                       (click)="historyGoto(historyPageClamped() - 1)">‹</button>
               <button type="button" class="pager-num" *ngFor="let p of historyPagesArray()"
                       [class.active]="p === historyPageClamped()"
                       (click)="historyGoto(p)">{{ p }}</button>
-              <button type="button" class="pager-btn" aria-label="Następna strona"
+              <button type="button" class="pager-btn" [attr.aria-label]="t('substitutions.pager.next')"
                       [disabled]="historyPageClamped() === historyTotalPages()"
                       (click)="historyGoto(historyPageClamped() + 1)">›</button>
             </div>
@@ -213,30 +214,30 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
   </div>
 
   <div class="subs-section">
-    <h3 class="sub-title">Osoby, które zastępuję</h3>
+    <h3 class="sub-title">{{ t('substitutions.covering.title') }}</h3>
 
     <ng-container [ngSwitch]="listState()">
-      <div *ngSwitchCase="'loading'" class="state">Ładowanie…</div>
+      <div *ngSwitchCase="'loading'" class="state">{{ 'states.loading' | transloco }}</div>
 
       <div *ngSwitchCase="'error'" class="state state-error">
-        <span>Nie udało się pobrać danych.</span>
-        <button class="btn btn-g btn-sm" (click)="reload()">Spróbuj ponownie</button>
+        <span>{{ t('substitutions.list.loadFailed') }}</span>
+        <button class="btn btn-g btn-sm" (click)="reload()">{{ t('substitutions.list.retry') }}</button>
       </div>
 
       <ng-container *ngSwitchCase="'ready'">
         <div *ngIf="coveringAbsences().length === 0" class="state muted">
-          Aktualnie nikogo nie zastępujesz.
+          {{ t('substitutions.covering.empty') }}
         </div>
 
         <div *ngIf="coveringAbsences().length" class="table-wrap">
           <table class="subs-table">
             <thead>
               <tr>
-                <th>Osoba nieobecna</th>
-                <th>Okres</th>
-                <th>Powód</th>
-                <th>Status</th>
-                <th class="col-note">Notatka</th>
+                <th>{{ t('substitutions.fields.absentPerson') }}</th>
+                <th>{{ t('substitutions.fields.period') }}</th>
+                <th>{{ t('substitutions.fields.reason') }}</th>
+                <th>{{ t('substitutions.fields.status') }}</th>
+                <th class="col-note">{{ t('substitutions.fields.note') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -249,7 +250,7 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
                   <ng-container *ngIf="a.note; else noNote">
                     <span class="note-text">{{ (isNoteExpanded(a.id) || !isLongNote(a.note)) ? a.note : (a.note | slice:0:90) + '…' }}</span>
                     <button *ngIf="isLongNote(a.note)" type="button" class="note-toggle" (click)="toggleNote(a.id)">
-                      {{ isNoteExpanded(a.id) ? 'zwiń' : 'rozwiń' }}
+                      {{ isNoteExpanded(a.id) ? t('substitutions.note.collapse') : t('substitutions.note.expand') }}
                     </button>
                   </ng-container>
                   <ng-template #noNote><span class="dash">—</span></ng-template>
@@ -263,6 +264,7 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
   </div>
 
 </div>
+</ng-container>
   `,
   styles: [`
     :host { display:block; }
@@ -349,6 +351,7 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
 export class CrmSubstitutionsComponent implements OnInit {
   private svc  = inject(SubstitutionsService);
   private auth = inject(AuthService);
+  private transloco = inject(TranslocoService);
 
   loading      = signal(true);
   loadError    = signal(false);
@@ -371,7 +374,7 @@ export class CrmSubstitutionsComponent implements OnInit {
   myId = computed(() => this.auth.currentUser?.id ?? '');
   myName = computed(() => {
     const u = this.auth.currentUser as any;
-    return u?.display_name || u?.email || 'Ja';
+    return u?.display_name || u?.email || this.transloco.translate('crm.substitutions.selfFallback');
   });
 
   // Mirrors the backend CRM roles — no separate permission system on the frontend.
@@ -500,25 +503,25 @@ export class CrmSubstitutionsComponent implements OnInit {
     const absentId = this.form.absent_user_id || this.myId();
 
     if (!this.form.substitute_user_id) {
-      e.substitute = 'Wybierz zastępcę.';
+      e.substitute = this.transloco.translate('crm.substitutions.errors.substituteRequired');
     } else if (this.form.substitute_user_id === absentId) {
-      e.substitute = 'Zastępca nie może być tą samą osobą co osoba nieobecna.';
+      e.substitute = this.transloco.translate('crm.substitutions.errors.substituteSameAsAbsent');
     } else if (this.substituteAbsentConflict()) {
-      e.substitute = 'Ta osoba jest nieobecna w wybranym terminie.';
+      e.substitute = this.transloco.translate('crm.substitutions.errors.substituteAbsent');
     }
 
-    if (!this.form.starts_on) e.dateFrom = 'Podaj datę od.';
+    if (!this.form.starts_on) e.dateFrom = this.transloco.translate('crm.substitutions.errors.dateFromRequired');
 
     if (!this.form.ends_on) {
-      e.dateTo = 'Podaj datę do.';
+      e.dateTo = this.transloco.translate('crm.substitutions.errors.dateToRequired');
     } else if (this.form.starts_on && this.form.ends_on < this.form.starts_on) {
-      e.dateTo = 'Data do nie może być wcześniejsza niż data od.';
+      e.dateTo = this.transloco.translate('crm.substitutions.errors.dateToBeforeFrom');
     } else if (this.form.ends_on < this.todayIso()) {
-      e.dateTo = 'Okno nieobecności nie może w całości leżeć w przeszłości.';
+      e.dateTo = this.transloco.translate('crm.substitutions.errors.rangeInPast');
     }
 
     if (this.rangeConflict()) {
-      e.range = 'Osoba nieobecna ma już zarejestrowaną nieobecność w nakładającym się terminie.';
+      e.range = this.transloco.translate('crm.substitutions.errors.rangeConflict');
     }
 
     return e;
@@ -567,7 +570,7 @@ export class CrmSubstitutionsComponent implements OnInit {
 
   cancel(a: Absence): void {
     if (this.cancellingId()) return;
-    if (!confirm('Odwołać tę nieobecność? Zastępca straci dostęp wynikający z tego zastępstwa.')) return;
+    if (!confirm(this.transloco.translate('crm.substitutions.cancel.confirm'))) return;
     this.cancellingId.set(a.id);
     this.cancelError.set('');
     this.svc.cancel(a.id).subscribe({
@@ -577,7 +580,7 @@ export class CrmSubstitutionsComponent implements OnInit {
       },
       error: err => {
         this.cancellingId.set(null);
-        this.cancelError.set(err.error?.error ?? 'Nie udało się odwołać nieobecności.');
+        this.cancelError.set(err.error?.error ?? this.transloco.translate('crm.substitutions.cancel.failed'));
       },
     });
   }
@@ -601,7 +604,7 @@ export class CrmSubstitutionsComponent implements OnInit {
       next: () => {
         this.saving.set(false);
         this.submitted.set(false);
-        this.okMsg.set('Zastępstwo zapisane — zastępca dostał powiadomienie.');
+        this.okMsg.set(this.transloco.translate('crm.substitutions.form.saved'));
         this.form = this.blankForm();
         this.form.absent_user_id = this.myId();
         this.reload();
@@ -609,12 +612,15 @@ export class CrmSubstitutionsComponent implements OnInit {
       },
       error: err => {
         this.saving.set(false);
-        this.formError.set(err.error?.error ?? 'Nie udało się zapisać zastępstwa.');
+        this.formError.set(err.error?.error ?? this.transloco.translate('crm.substitutions.form.saveFailed'));
       },
     });
   }
 
-  reasonLabel(r: AbsenceReason): string { return REASON_LABEL[r] ?? r; }
+  reasonLabel(r: AbsenceReason): string {
+    const key = REASON_LABEL[r];
+    return key ? this.transloco.translate(key) : r;
+  }
 
   // Date 'YYYY-MM-DD' → 'DD.MM.YYYY'
   fmtDate(s: string): string {
@@ -638,11 +644,7 @@ export class CrmSubstitutionsComponent implements OnInit {
   }
 
   statusLabel(a: Absence): string {
-    if (a.cancelled_at) return 'Odwołane';
-    const today = new Date().toISOString().slice(0, 10);
-    if (a.ends_on < today) return 'Zakończone';
-    if (a.starts_on > today) return 'Nadchodzące';
-    return 'Trwa';
+    return this.transloco.translate('crm.substitutions.statuses.' + this.statusClass(a));
   }
 
   statusClass(a: Absence): string {

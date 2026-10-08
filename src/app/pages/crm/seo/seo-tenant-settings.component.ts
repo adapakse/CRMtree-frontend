@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService } from '../../../core/services/crm-seo.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -8,53 +9,53 @@ import { ToastService } from '../../../core/services/toast.service';
   selector: 'wt-seo-tenant-settings',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  providers: [provideTranslocoScope('crm')],
+  imports: [FormsModule, TranslocoDirective],
   template: `
+    <ng-container *transloco="let t; prefix: 'crm'">
     <div class="settings-box">
-      <h3>Ustawienia SEO tenanta</h3>
+      <h3>{{ t('seo.tenantSettings.title') }}</h3>
       <p class="hint">
-        Zasila strategię (filary, słowa kluczowe) i każdy artykuł. SEObot pokazuje w tekście, jak problem rozwiązuje się
-        w produkcie, i opisuje tylko funkcje wymienione w opisie — im dokładniej je wypiszesz, tym konkretniejsze artykuły.
+        {{ t('seo.tenantSettings.hint') }}
       </p>
-      <label class="field-label" for="productName">Nazwa produktu</label>
-      <input id="productName" class="field-input" [(ngModel)]="productName" placeholder="np. CRMtree">
-      <label class="field-label" for="businessDescription">Opis produktu i biznesu</label>
-      <textarea id="businessDescription" class="field-input" [(ngModel)]="businessDescription" rows="8" placeholder="Czym zajmuje się firma, jakie funkcje ma produkt, kim są odbiorcy, jaka branża…"></textarea>
-      <label class="field-label">Branża (industry_vertical)</label>
-      <input class="field-input" [(ngModel)]="industryVertical" placeholder="np. yachting, saas_crm, personal_brand">
+      <label class="field-label" for="productName">{{ t('seo.tenantSettings.fields.productName') }}</label>
+      <input id="productName" class="field-input" [(ngModel)]="productName" [placeholder]="t('seo.tenantSettings.fields.productNamePlaceholder')">
+      <label class="field-label" for="businessDescription">{{ t('seo.tenantSettings.fields.businessDescription') }}</label>
+      <textarea id="businessDescription" class="field-input" [(ngModel)]="businessDescription" rows="8" [placeholder]="t('seo.tenantSettings.fields.businessDescriptionPlaceholder')"></textarea>
+      <label class="field-label">{{ t('seo.tenantSettings.fields.industry') }}</label>
+      <input class="field-input" [(ngModel)]="industryVertical" [placeholder]="t('seo.tenantSettings.fields.industryPlaceholder')">
 
       <button type="button" class="btn-ghost btn-sm" (click)="save()" [disabled]="saving()">
-        @if (saving()) { Zapisuję… } @else { Zapisz ustawienia }
+        @if (saving()) { {{ t('seo.tenantSettings.saving') }} } @else { {{ t('seo.tenantSettings.save') }} }
       </button>
 
       @if (auth.isSuperAdmin()) {
         <div class="superadmin-box">
-          <h4>Tryb publikacji WordPress <span class="sa-badge">SuperAdmin</span></h4>
-          <p class="hint">Decyzja podejmowana po rozmowie z klientem — czy artykuły mają iść od razu live na jego WordPressie, czy lądować jako szkic do ręcznej publikacji tam.</p>
+          <h4>{{ t('seo.tenantSettings.wordpressMode.title') }} <span class="sa-badge">SuperAdmin</span></h4>
+          <p class="hint">{{ t('seo.tenantSettings.wordpressMode.hint') }}</p>
           <div class="mode-row">
             <label class="radio-label">
               <input type="radio" name="wpMode" value="draft" [(ngModel)]="wpPublishMode" (ngModelChange)="saveWpMode($event)">
-              Szkic (bezpieczne, wymaga ręcznej publikacji w WP)
+              {{ t('seo.tenantSettings.wordpressMode.draft') }}
             </label>
             <label class="radio-label">
               <input type="radio" name="wpMode" value="publish" [(ngModel)]="wpPublishMode" (ngModelChange)="saveWpMode($event)">
-              Publikuj od razu (live, bez przystanku)
+              {{ t('seo.tenantSettings.wordpressMode.publish') }}
             </label>
           </div>
         </div>
 
         <div class="superadmin-box">
-          <h4>Właściwość Search Console <span class="sa-badge">SuperAdmin</span></h4>
+          <h4>{{ t('seo.tenantSettings.gscProperty.title') }} <span class="sa-badge">SuperAdmin</span></h4>
           <p class="hint">
-            Rzeczywista, zweryfikowana właściwość GSC do której podłączać się przy "Połącz Search Console" — URL-prefix
-            (np. https://klient.pl/) albo domenowa (sc-domain:klient.pl). Puste = zgadywanie po WordPressie albo
-            podane niżej.
+            {{ t('seo.tenantSettings.gscProperty.hint') }}
           </p>
-          <input class="field-input" [(ngModel)]="gscSiteUrl" placeholder="https://crmtree.pl/ albo sc-domain:crmtree.pl">
-          <button type="button" class="btn-ghost btn-sm" (click)="saveGscSiteUrl()">Zapisz właściwość GSC</button>
+          <input class="field-input" [(ngModel)]="gscSiteUrl" [placeholder]="t('seo.tenantSettings.gscProperty.placeholder')">
+          <button type="button" class="btn-ghost btn-sm" (click)="saveGscSiteUrl()">{{ t('seo.tenantSettings.gscProperty.save') }}</button>
         </div>
       }
     </div>
+    </ng-container>
   `,
   styles: [`
     .settings-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
@@ -74,6 +75,7 @@ import { ToastService } from '../../../core/services/toast.service';
 export class SeoTenantSettingsComponent implements OnInit {
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
   private cdr = inject(ChangeDetectorRef);
   readonly auth = inject(AuthService);
 
@@ -114,9 +116,9 @@ export class SeoTenantSettingsComponent implements OnInit {
       industry_vertical: this.industryVertical || null,
       product_name: this.productName || null,
     }).subscribe({
-      next: () => { this.toast.success('Zapisano ustawienia.'); this.saving.set(false); },
+      next: () => { this.toast.success(this.transloco.translate('crm.seo.tenantSettings.toasts.saved')); this.saving.set(false); },
       error: (err) => {
-        this.toast.error(err?.error?.details?.[0]?.message ?? err?.error?.error ?? 'Nie udało się zapisać ustawień.');
+        this.toast.error(err?.error?.details?.[0]?.message ?? err?.error?.error ?? this.transloco.translate('crm.seo.tenantSettings.toasts.saveFailed'));
         this.saving.set(false);
       },
     });
@@ -124,15 +126,15 @@ export class SeoTenantSettingsComponent implements OnInit {
 
   saveWpMode(mode: 'draft' | 'publish'): void {
     this.seoService.setWordpressPublishMode(mode).subscribe({
-      next: () => this.toast.success(mode === 'publish' ? 'WordPress: publikacja od razu live.' : 'WordPress: publikacja jako szkic.'),
-      error: () => this.toast.error('Nie udało się zapisać trybu.'),
+      next: () => this.toast.success(mode === 'publish' ? this.transloco.translate('crm.seo.tenantSettings.toasts.wordpressLive') : this.transloco.translate('crm.seo.tenantSettings.toasts.wordpressDraft')),
+      error: () => this.toast.error(this.transloco.translate('crm.seo.tenantSettings.toasts.modeSaveFailed')),
     });
   }
 
   saveGscSiteUrl(): void {
     this.seoService.setGscSiteUrl(this.gscSiteUrl || null).subscribe({
-      next: () => this.toast.success('Zapisano właściwość Search Console.'),
-      error: () => this.toast.error('Nie udało się zapisać właściwości GSC.'),
+      next: () => this.toast.success(this.transloco.translate('crm.seo.tenantSettings.toasts.gscPropertySaved')),
+      error: () => this.toast.error(this.transloco.translate('crm.seo.tenantSettings.toasts.gscPropertySaveFailed')),
     });
   }
 }

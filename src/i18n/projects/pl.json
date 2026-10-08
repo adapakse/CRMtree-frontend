@@ -1,0 +1,863 @@
+{
+  "assigneeSummary": {
+    "atRisk": "Zagrożone",
+    "key": "otwarte · po terminie · zagrożone",
+    "open": "Otwarte zadania",
+    "overdue": "Po terminie"
+  },
+  "card": {
+    "closeConfirm": "Zamknąć projekt? Zamknięty projekt jest tylko do odczytu i znika z domyślnej listy.",
+    "closeProject": "Zamknij projekt",
+    "closedBadge": "Zamknięty",
+    "datesHint": "Projekt jest oznaczany jako opóźniony, gdy niezakończone zadanie kończy się po terminie projektu albo termin projektu minął, a zostały niezakończone zadania.",
+    "description": "Opis",
+    "edit": "Edytuj",
+    "endDate": "Termin projektu",
+    "errors": {
+      "addMemberFailed": "Nie udało się dodać osoby",
+      "changeAccessLevelFailed": "Nie udało się zmienić uprawnień",
+      "changeRoleFailed": "Nie udało się zmienić roli",
+      "closeProjectFailed": "Nie udało się zamknąć projektu",
+      "endBeforeStart": "Termin projektu nie może być wcześniejszy niż jego początek.",
+      "removeMemberFailed": "Nie udało się usunąć osoby",
+      "reopenProjectFailed": "Nie udało się otworzyć projektu",
+      "saveFieldsFailed": "Nie udało się zapisać pól",
+      "saveProjectFailed": "Nie udało się zapisać projektu"
+    },
+    "fields": {
+      "add": "Dodaj pole",
+      "empty": "Projekt nie ma pól dodatkowych.",
+      "field": "Pole",
+      "noneAvailable": "Brak pól do dodania. Pola definiuje administrator w Ustawienia → Projekty → Pola dodatkowe zadań.",
+      "remove": "Usuń",
+      "removeConfirm": "Usunąć pole „{name}” z projektu? Wartości wpisane w zadaniach zostaną zachowane.",
+      "required": "Wymagane",
+      "requiredToggle": "wymagane",
+      "selectPlaceholder": "— wybierz pole —",
+      "title": "Pola dodatkowe zadań",
+      "type": "Typ"
+    },
+    "members": {
+      "accessLevel": "Uprawnienia",
+      "add": "Dodaj",
+      "companyAndDepartment": "Firma / dział",
+      "email": "E-mail",
+      "externalAccount": "konto zewnętrzne",
+      "inactive": "(nieaktywny)",
+      "person": "Osoba",
+      "phone": "Telefon",
+      "remove": "Usuń",
+      "removeConfirm": "Usunąć {name} z projektu? Osoba zostanie też odpięta od swoich zadań.",
+      "role": "Rola",
+      "searchPlaceholder": "Wpisz imię, nazwisko, e-mail lub firmę (min. 3 znaki)…",
+      "title": "Osoby w projekcie"
+    },
+    "name": "Nazwa",
+    "noDescription": "Brak opisu.",
+    "reopenProject": "Otwórz ponownie",
+    "startDate": "Początek projektu",
+    "title": "Karta projektu"
+  },
+  "chat": {
+    "deletedUser": "Usunięty użytkownik",
+    "empty": "Brak wiadomości.",
+    "hint": "Enter wysyła wiadomość, Shift+Enter dodaje nową linię.",
+    "placeholder": "Napisz wiadomość…",
+    "send": "Wyślij",
+    "sendFailed": "Nie udało się wysłać wiadomości"
+  },
+  "crmLink": {
+    "change": "Zmień",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Powiąż",
+    "linkFailed": "Nie udało się powiązać projektu",
+    "none": "brak",
+    "remove": "Usuń powiązanie",
+    "removeConfirm": "Usunąć powiązanie projektu z CRM? Zadania projektu znikną z karty leada lub partnera.",
+    "removeFailed": "Nie udało się usunąć powiązania",
+    "searchHint": "Podpowiedzi obejmują tylko leady i partnerów, do których masz dostęp w CRM. Wybór od razu zapisuje powiązanie.",
+    "searchPlaceholder": "Wpisz nazwę leada lub partnera (min. 3 znaki)…",
+    "title": "Powiązanie z CRM"
+  },
+  "deadlines": {
+    "atRisk": "Zagrożone",
+    "atRiskHint": "Termin jest blisko, a prace jeszcze się nie zaczęły.",
+    "completedLate": "Zakończone po terminie",
+    "completedLateHint": "Zadanie zakończono po jego terminie.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "zagrożone (do zrobienia, termin w ciągu {days, plural, one {# dnia} few {# dni} many {# dni} other {# dnia}})",
+      "beyondProjectEnd": "po terminie projektu",
+      "completedLate": "zakończone po terminie",
+      "originalEndDate": "pierwotny termin",
+      "overdue": "po terminie",
+      "overdueSubtasks": "podzadania po terminie",
+      "projectEndDate": "termin projektu"
+    },
+    "originalEndDateHint": "Pierwotny termin i przesunięcie w dniach",
+    "overdue": "Po terminie",
+    "overdueDays": "Po terminie {days} d",
+    "overdueHint": "Termin minął, a zadanie nie jest zakończone.",
+    "overdueSubtasks": "Podzadania po terminie",
+    "overdueSubtasksHint": "Co najmniej jedno podzadanie jest po terminie.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Opóźniony",
+    "reasons": {
+      "endPassed": "Termin projektu minął {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} temu, otwarte zadania: {count}",
+      "taskAfterEnd": "Zadania kończące się po terminie projektu: {count} (najpóźniejsze o {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}})"
+    }
+  },
+  "detail": {
+    "backToProjects": "Projekty",
+    "closedBadge": "Zamknięty",
+    "empty": {
+      "noAssignedTasks": "Nie masz przypisanych zadań w tym projekcie.",
+      "noTasks": "W tym projekcie nie ma jeszcze zadań."
+    },
+    "newTask": "Nowe zadanie",
+    "openFailed": "Nie udało się otworzyć projektu",
+    "refreshFailed": "Nie udało się odświeżyć projektu",
+    "showOnlyMyTasks": "Pokaż moje zadania",
+    "tabs": {
+      "card": "Karta projektu",
+      "chat": "Czat",
+      "finance": "Finanse",
+      "tasks": "Zadania ({count})",
+      "timeline": "Oś czasu"
+    },
+    "tasksLoadFailed": "Nie udało się pobrać zadań"
+  },
+  "filters": {
+    "assignee": "Osoba",
+    "atRiskCount": "Zadania zagrożone",
+    "cost": "Koszt",
+    "delayReason": "Powód opóźnienia",
+    "delayReasonValues": {
+      "end_passed": "Termin projektu minął",
+      "task_after_end": "Zadanie kończy się po terminie projektu"
+    },
+    "delayed": "Opóźnienie",
+    "delayedValues": {
+      "no": "Bez opóźnienia",
+      "yes": "Opóźnione"
+    },
+    "endDate": "Koniec",
+    "manager": "PM",
+    "myRole": "Moja rola",
+    "myRoleValues": {
+      "controller": "Kontroler",
+      "participant": "Uczestnik",
+      "pm": "PM"
+    },
+    "name": "Nazwa zadania",
+    "number": "Numer",
+    "originalEndDate": "Pierwotny termin",
+    "overdueCount": "Zadania po terminie",
+    "priority": "Priorytet",
+    "progress": "Postęp (%)",
+    "project": "Projekt",
+    "projectCost": "Koszt poniesiony",
+    "projectEndDate": "Termin projektu",
+    "projectName": "Nazwa lub klucz projektu",
+    "projectRevenue": "Przychód",
+    "projectSort": {
+      "at_risk": "Zadania zagrożone",
+      "cost": "Koszt poniesiony",
+      "delay": "Opóźnienie",
+      "end_date": "Termin",
+      "key": "Klucz",
+      "name": "Nazwa",
+      "overdue": "Zadania po terminie",
+      "pm": "PM",
+      "progress": "Postęp",
+      "revenue": "Przychód",
+      "start_date": "Początek",
+      "status": "Status"
+    },
+    "projectStartDate": "Początek projektu",
+    "slip": "Przesunięcie (dni)",
+    "startDate": "Początek",
+    "status": "Status",
+    "statusCategory": "Etap",
+    "taskSort": {
+      "original_end_date": "Pierwotny termin",
+      "parent": "Zadanie nadrzędne",
+      "slip_days": "Przesunięcie"
+    },
+    "timeliness": "Terminowość",
+    "timelinessValues": {
+      "at_risk": "Zagrożone",
+      "on_time": "W terminie",
+      "overdue": "Po terminie"
+    },
+    "type": "Typ",
+    "unassigned": "Nieprzypisane"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Budżet kategorii {name}",
+      "columns": {
+        "budget": "Budżet",
+        "category": "Kategoria",
+        "incurred": "Poniesione",
+        "planned": "Planowane",
+        "variance": "Odchylenie"
+      },
+      "empty": "Brak kategorii kosztów. Administrator dodaje je w Ustawienia → Projekty → Kategorie kosztów.",
+      "hint": "Odchylenie to budżet minus koszty poniesione. Wiersze z przekroczonym budżetem są wyróżnione.",
+      "inactive": "(nieaktywna)",
+      "saveFailed": "Nie udało się zapisać budżetu",
+      "title": "Budżet według kategorii",
+      "total": "Razem"
+    },
+    "costForm": {
+      "addTitle": "Nowy koszt",
+      "amount": "Kwota",
+      "category": "Kategoria",
+      "clearInvoiceDocument": "Odepnij dokument",
+      "conversionHint": "Kwota zostanie przeliczona na {currency} po kursie średnim NBP z dnia roboczego poprzedzającego datę kosztu.",
+      "currency": "Waluta kwoty",
+      "date": "Data",
+      "description": "Opis",
+      "documentNumber": "Numer dokumentu",
+      "editTitle": "Edycja kosztu",
+      "invoiceDocument": "Dokument faktury (opcjonalnie)",
+      "invoiceDocumentHint": "Dokumenty typu Faktura, do których masz dostęp w module Dokumenty. Faktury pobrane z KSeF podpina się osobno.",
+      "invoiceDocumentPlaceholder": "Szukaj faktury po numerze lub nazwie…",
+      "noTask": "— bez zadania —",
+      "saveFailed": "Nie udało się zapisać kosztu",
+      "saved": "Koszt zapisany",
+      "savedWithRate": "Koszt zapisany: {amount} po kursie {rate} z {date}",
+      "selectCategory": "— wybierz kategorię —",
+      "status": "Status",
+      "storedConversion": "Zapisano jako {amount} (kurs {rate} z {date}).",
+      "supplier": "Dostawca",
+      "task": "Zadanie"
+    },
+    "costStatuses": {
+      "incurred": "Poniesiony",
+      "planned": "Planowany"
+    },
+    "costs": {
+      "add": "Dodaj koszt",
+      "columns": {
+        "amount": "Kwota",
+        "category": "Kategoria",
+        "date": "Data",
+        "description": "Opis",
+        "documentNumber": "Nr dokumentu",
+        "status": "Status",
+        "supplier": "Dostawca",
+        "task": "Zadanie"
+      },
+      "deleteConfirm": "Usunąć koszt ({item})?",
+      "deleteFailed": "Nie udało się usunąć kosztu",
+      "empty": "Projekt nie ma jeszcze kosztów.",
+      "emptyForFilters": "Brak kosztów dla wybranych filtrów.",
+      "filters": {
+        "allCategories": "Wszystkie kategorie",
+        "allStatuses": "Wszystkie statusy",
+        "allTasks": "Wszystkie zadania",
+        "withoutTask": "Bez zadania"
+      },
+      "rateNote": "kurs {rate} z {date}",
+      "title": "Koszty",
+      "totalIncurred": "Razem poniesione"
+    },
+    "delete": "Usuń",
+    "document": {
+      "lockedTitle": "Dokument faktury — nie masz do niego dostępu w module Dokumenty",
+      "openTitle": "Dokument faktury — otwórz w module Dokumenty"
+    },
+    "edit": "Edytuj",
+    "loadFailed": "Nie udało się pobrać finansów projektu",
+    "plan": {
+      "currency": "Waluta projektu",
+      "currencyLockedHint": "Waluty nie można zmienić, bo projekt ma już pozycje kosztów lub przychodów.",
+      "participantsCanAddCosts": "Uczestnicy mogą dodawać koszty do swoich zadań",
+      "participantsCanAddCostsHint": "Uczestnik wewnętrzny dodaje koszty tylko w zadaniach, do których jest przypisany, i widzi wyłącznie pozycje dodane przez siebie.",
+      "plannedRevenue": "Planowany przychód ({currency})",
+      "saveFailed": "Nie udało się zapisać planu",
+      "suggestedHint": "Sugestia to wartość powiązanego leada przeliczona na walutę projektu.",
+      "title": "Plan finansowy",
+      "useSuggested": "Użyj sugerowanej: {amount}"
+    },
+    "readOnlyNote": "Tylko podgląd — finanse tego projektu możesz przeglądać, ale nie możesz ich zmieniać.",
+    "revenueStatuses": {
+      "invoiced": "Zafakturowany",
+      "paid": "Opłacony",
+      "planned": "Planowany"
+    },
+    "revenues": {
+      "add": "Dodaj przychód",
+      "addTitle": "Nowy przychód",
+      "amountIn": "Kwota ({currency})",
+      "columns": {
+        "amount": "Kwota",
+        "date": "Data",
+        "description": "Opis",
+        "status": "Status"
+      },
+      "deleteConfirm": "Usunąć przychód ({item})?",
+      "deleteFailed": "Nie udało się usunąć przychodu",
+      "editTitle": "Edycja przychodu",
+      "empty": "Projekt nie ma jeszcze przychodów.",
+      "saveFailed": "Nie udało się zapisać przychodu",
+      "saved": "Przychód zapisany",
+      "statusHint": "Do przychodu wykonanego liczą się pozycje zafakturowane i opłacone.",
+      "title": "Przychody"
+    },
+    "saving": "Zapisywanie…",
+    "summary": {
+      "budget": "Budżet",
+      "cost": "Koszt (poniesiony)",
+      "margin": "Marża (wykonanie)",
+      "plan": "Plan",
+      "plannedItems": "Pozycje planowane",
+      "remainingBudget": "Pozostały budżet",
+      "remainingBudgetHint": "Budżet minus koszty poniesione",
+      "revenue": "Przychód (wykonanie)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Poniesione (własne)",
+        "plannedCost": "Koszt planowany",
+        "task": "Zadanie",
+        "totalIncurred": "Poniesione z podzadaniami",
+        "totalPlanned": "Planowane z podzadaniami"
+      },
+      "empty": "Żadne zadanie nie ma jeszcze kosztów ani kosztu planowanego.",
+      "hint": "Koszt planowany zadania jest informacyjny i nie wlicza się do budżetu projektu. Kwoty „z podzadaniami” obejmują pozycje zadania i wszystkich jego podzadań.",
+      "plannedCostOf": "Koszt planowany zadania {task}",
+      "saveFailed": "Nie udało się zapisać kosztu planowanego",
+      "title": "Koszty zadań",
+      "total": "Razem"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Wykonanie / plan",
+      "cost": "Koszt",
+      "margin": "Marża",
+      "marginHint": "Marża z wykonania: przychód zafakturowany i opłacony minus koszty poniesione",
+      "revenue": "Przychód"
+    }
+  },
+  "gantt": {
+    "beyondProjectEnd": "Kończy się po terminie projektu",
+    "emptyTitle": "Brak zadań",
+    "loadFailed": "Nie udało się pobrać osi czasu",
+    "originalEndDate": "Pierwotny termin: {date} ({slip})",
+    "projectEndDate": "Termin projektu: {date}",
+    "taskColumn": "Zadanie",
+    "today": "Dziś",
+    "truncated": "Oś czasu pokazuje pierwsze {limit} zadań. Zawęź filtry, aby zobaczyć pozostałe.",
+    "undatedNote": "{count, plural, one {# zadanie bez dat nie ma paska na osi czasu.} few {# zadania bez dat nie mają paska na osi czasu.} many {# zadań bez dat nie ma paska na osi czasu.} other {# zadania bez dat nie ma paska na osi czasu.}}",
+    "zoom": {
+      "day": "Dni",
+      "month": "Miesiące",
+      "week": "Tygodnie"
+    }
+  },
+  "ksef": {
+    "badge": {
+      "openTitle": "Faktura z KSeF — pokaż szczegóły",
+      "title": "Faktura z KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Dodaj fakturę z KSeF",
+      "link": "Podepnij fakturę KSeF",
+      "unlink": "Odepnij fakturę",
+      "unlinkConfirm": "Odpiąć fakturę {invoice} od tego kosztu? Koszt zostanie na liście, a faktura pozostanie w KSeF.",
+      "unlinkFailed": "Nie udało się odpiąć faktury"
+    },
+    "detail": {
+      "address": "Adres",
+      "buyer": "Nabywca",
+      "invoiceType": "Rodzaj faktury",
+      "issueDate": "Data wystawienia",
+      "ksefNumber": "Numer KSeF",
+      "lines": {
+        "empty": "Faktura nie zawiera pozycji.",
+        "name": "Nazwa",
+        "netAmount": "Wartość netto",
+        "number": "Lp.",
+        "quantity": "Ilość",
+        "title": "Pozycje faktury",
+        "unitNetPrice": "Cena netto",
+        "vatRate": "VAT"
+      },
+      "links": {
+        "empty": "Faktura nie jest podpięta do żadnego kosztu.",
+        "linkedTotal": "Łącznie podpięto {linked} z {net} netto.",
+        "title": "Podpięcia faktury"
+      },
+      "loadFailed": "Nie udało się pobrać faktury",
+      "payment": {
+        "amountDue": "Do zapłaty",
+        "bankAccounts": "Rachunek bankowy",
+        "dueDates": "Termin płatności",
+        "factor": "faktor",
+        "form": "Forma płatności",
+        "paymentDate": "Data zapłaty",
+        "state": "Stan płatności",
+        "states": {
+          "paid": "Opłacona",
+          "partiallyPaid": "Opłacona częściowo",
+          "unknown": "Brak informacji",
+          "unpaid": "Nieopłacona"
+        },
+        "title": "Płatność"
+      },
+      "saleDate": "Data sprzedaży",
+      "seller": "Sprzedawca",
+      "title": "Faktura {number}",
+      "titleLoading": "Faktura z KSeF",
+      "totals": {
+        "gross": "Brutto",
+        "net": "Netto",
+        "vat": "VAT"
+      }
+    },
+    "document": {
+      "groupMissing": "Nie wybrano grupy dostępu dla dokumentów faktur, więc faktur nie można rejestrować w Dokumentach. Administrator wybiera ją w Ustawienia → Projekty → KSeF.",
+      "noAccessTitle": "Nie należysz do grupy dostępu tego dokumentu, więc nie możesz go otworzyć.",
+      "notRegisteredOnLink": "Faktura zostanie podpięta, ale nie trafi do modułu Dokumenty: nie wybrano grupy dostępu dla dokumentów faktur (Ustawienia → Projekty → KSeF).",
+      "open": "Otwórz dokument",
+      "register": "Zarejestruj w Dokumentach",
+      "registerFailed": "Nie udało się zarejestrować faktury w Dokumentach",
+      "registerHint": "Faktura nie ma jeszcze dokumentu w module Dokumenty. Podpięcie jej do kosztu zarejestruje ją automatycznie.",
+      "registered": "Zarejestrowana: {number}",
+      "registeredToast": "Faktura zarejestrowana w Dokumentach jako {number}",
+      "registering": "Rejestrowanie…",
+      "title": "Dokument w module Dokumenty"
+    },
+    "errors": {
+      "forbidden": "Nie masz dostępu do faktur KSeF. Uprawnienie nadaje administrator w panelu użytkowników."
+    },
+    "invoiceTypes": {
+      "KOR": "Faktura korygująca",
+      "KOR_ROZ": "Korekta faktury rozliczeniowej",
+      "KOR_ZAL": "Korekta faktury zaliczkowej",
+      "ROZ": "Faktura rozliczeniowa",
+      "UPR": "Faktura uproszczona",
+      "VAT": "Faktura VAT",
+      "ZAL": "Faktura zaliczkowa"
+    },
+    "link": {
+      "alreadyLinkedHint": "Możesz mimo to podpiąć ją ponownie — sprawdź tylko, czy ten sam koszt nie zostanie policzony dwa razy.",
+      "alreadyLinkedTitle": "Uwaga: ta faktura jest już podpięta",
+      "amountHint": "Domyślnie cała kwota netto faktury. Zmień ją, jeśli do tego kosztu przypisujesz tylko część faktury.",
+      "amountHintForeign": "Faktura jest w {invoiceCurrency}, a projekt w {projectCurrency}. Zostaw pole puste, a cała kwota netto ({net}) zostanie przeliczona po kursie średnim NBP z dnia roboczego poprzedzającego datę wystawienia faktury. Możesz też wpisać kwotę od razu w {projectCurrency}.",
+      "amountIn": "Kwota przypisana ({currency})",
+      "attachNote": "Faktura zostanie podpięta do kosztu: {item}. Kwota i pozostałe dane kosztu nie zmienią się.",
+      "back": "Wróć do listy",
+      "confirm": "Podepnij fakturę",
+      "errors": {
+        "failed": "Nie udało się podpiąć faktury",
+        "forbidden": "Nie masz uprawnień do podpinania faktur KSeF w tym projekcie.",
+        "noExchangeRate": "Brak kursu NBP dla waluty faktury. Wpisz kwotę w {currency}.",
+        "projectClosed": "Projekt jest zamknięty — nie można już podpinać faktur."
+      },
+      "saved": "Faktura podpięta",
+      "savedWithRate": "Faktura podpięta: {amount} po kursie {rate} z {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Kwota",
+        "linkedBy": "Podpiął(-ęła)",
+        "project": "Projekt",
+        "status": "Status",
+        "task": "Zadanie"
+      },
+      "wholeProject": "Cały projekt"
+    },
+    "list": {
+      "columns": {
+        "currency": "Waluta",
+        "document": "Dokument",
+        "gross": "Brutto",
+        "issueDate": "Data wystawienia",
+        "net": "Netto",
+        "number": "Numer",
+        "paymentDueDate": "Termin płatności",
+        "seller": "Sprzedawca"
+      }
+    },
+    "nip": "NIP",
+    "otherLinks": {
+      "intro": "Ta faktura jest podpięta także do:",
+      "overAllocated": "Suma podpięć przekracza kwotę netto faktury.",
+      "wholeProject": "{project} (cały projekt)"
+    },
+    "paymentForms": {
+      "card": "Karta",
+      "cash": "Gotówka",
+      "cheque": "Czek",
+      "credit": "Kredyt",
+      "mobile": "Płatność mobilna",
+      "transfer": "Przelew",
+      "voucher": "Bon"
+    },
+    "picker": {
+      "attachTitle": "Podepnij fakturę KSeF do kosztu",
+      "empty": "Brak faktur w wybranym okresie i dla wybranych filtrów.",
+      "filters": {
+        "dateFrom": "Data wystawienia od",
+        "dateTo": "Data wystawienia do",
+        "invoiceNumber": "Numer faktury",
+        "netMax": "Netto do",
+        "netMin": "Netto od",
+        "seller": "Sprzedawca (nazwa lub NIP)"
+      },
+      "lastSync": "Ostatnia udana synchronizacja: {time}.",
+      "linkedCount": "{count, plural, one {Już podpięta: # raz} few {Już podpięta: # razy} many {Już podpięta: # razy} other {Już podpięta: # razy}}",
+      "loadFailed": "Nie udało się pobrać listy faktur",
+      "nextPage": "Następna",
+      "noCompanies": "Nie dodano jeszcze żadnej firmy do KSeF. Administrator robi to w Ustawienia → Projekty → KSeF.",
+      "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze. Lista pokazuje tylko faktury pobrane wcześniej.",
+      "pageInfo": "Strona {page} z {pages} · faktur: {total}",
+      "previousPage": "Poprzednia",
+      "search": "Szukaj",
+      "select": "Wybierz",
+      "syncHint": "Świeżo wystawiona faktura może pojawić się w KSeF dopiero po kilku minutach.",
+      "title": "Dodaj fakturę z KSeF"
+    },
+    "settings": {
+      "addCompany": "Dodaj firmę",
+      "columns": {
+        "lastAttempt": "Ostatnia próba",
+        "lastSynced": "Ostatnia udana synchronizacja",
+        "name": "Nazwa",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Nowa firma w KSeF",
+        "added": "Firma dodana. Faktury zostaną pobrane przy najbliższej synchronizacji.",
+        "editTitle": "Firma w KSeF",
+        "name": "Nazwa (opcjonalnie)",
+        "saveFailed": "Nie udało się zapisać firmy",
+        "saved": "Firma zapisana",
+        "token": "Token KSeF",
+        "tokenHintAdd": "Token wygenerowany w KSeF dla tego NIP-u. Przed zapisaniem sprawdzamy go w KSeF; po zapisaniu nie da się go odczytać.",
+        "tokenHintEdit": "Obecny token: {hint}. Zostaw pole puste, aby go nie zmieniać.",
+        "verifying": "Sprawdzanie w KSeF…"
+      },
+      "edit": "Zmień",
+      "environments": {
+        "production": "Środowisko produkcyjne",
+        "test": "Środowisko testowe"
+      },
+      "errors": {
+        "companyNotFound": "Tej firmy nie ma już w konfiguracji. Odśwież stronę.",
+        "duplicateNip": "Firma z tym NIP-em jest już dodana.",
+        "invalidNip": "Nieprawidłowy NIP.",
+        "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze.",
+        "tokenRejected": "KSeF odrzucił token dla tego NIP-u. Sprawdź, czy token jest aktualny i wystawiony dla tej firmy.",
+        "unknownGroup": "Ta grupa nie istnieje albo jest nieaktywna. Odśwież stronę i wybierz inną.",
+        "unreachable": "Nie udało się połączyć z KSeF, aby sprawdzić token. Spróbuj ponownie później."
+      },
+      "hint": "Faktury zakupowe firm dodanych poniżej są pobierane z Krajowego Systemu e-Faktur co 30 minut. Osoby z uprawnieniem „Dostęp do faktur KSeF” podpinają je do kosztów projektów.",
+      "initialSyncDays": "Pierwsza synchronizacja sięga wstecz (dni)",
+      "initialSyncDaysHint": "Od {min} do {max} dni. Dotyczy firm dodanych po zmianie tego ustawienia.",
+      "invoiceDocumentsGroup": "Grupa dostępu dla dokumentów faktur",
+      "invoiceDocumentsGroupHint": "Do tej grupy trafiają dokumenty faktur rejestrowane z KSeF. Bez wybranej grupy faktury podpinane do projektów nie są rejestrowane w module Dokumenty.",
+      "loadFailed": "Nie udało się pobrać konfiguracji KSeF",
+      "noCompanies": "Nie dodano jeszcze żadnej firmy.",
+      "noInvoiceDocumentsGroup": "— brak —",
+      "notConfigured": "Integracja z KSeF nie jest skonfigurowana na serwerze, dlatego nie można dodawać firm ani pobierać faktur.",
+      "remove": "Usuń",
+      "removeConfirm": "Usunąć firmę {company} z konfiguracji KSeF? Nowe faktury przestaną być pobierane. Faktury już pobrane i ich podpięcia do kosztów zostaną.",
+      "removeFailed": "Nie udało się usunąć firmy",
+      "saveFailed": "Nie udało się zapisać ustawienia",
+      "saved": "Ustawienie zapisane",
+      "statuses": {
+        "active": "Aktywna",
+        "error": "Błąd synchronizacji",
+        "invalid": "Token odrzucony"
+      },
+      "syncFailed": "Synchronizacja nie powiodła się — powód jest widoczny przy firmie.",
+      "testEnvironmentNote": "Serwer łączy się z testowym środowiskiem KSeF — faktury nie są prawdziwymi dokumentami.",
+      "title": "KSeF — faktury kosztowe"
+    },
+    "sync": {
+      "failedForCompany": "Synchronizacja nie powiodła się dla co najmniej jednej firmy. Szczegóły zobaczy administrator w Ustawienia → Projekty → KSeF.",
+      "finished": "Synchronizacja zakończona",
+      "now": "Synchronizuj teraz",
+      "running": "Synchronizacja…",
+      "startFailed": "Nie udało się uruchomić synchronizacji",
+      "stillRunning": "Synchronizacja nadal trwa — odśwież listę za chwilę."
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Pełne",
+      "read": "Odczyt"
+    },
+    "fieldTypes": {
+      "date": "Data",
+      "list": "Lista wartości",
+      "money": "Kwota z walutą",
+      "number": "Liczba",
+      "text": "Tekst"
+    },
+    "reminders": {
+      "1d_before": "1 dzień przed terminem",
+      "2d_before": "2 dni przed terminem",
+      "3d_before": "3 dni przed terminem",
+      "at_due": "W dniu terminu",
+      "custom": "Własna data"
+    },
+    "roles": {
+      "controller": "Kontroler",
+      "external_participant": "Uczestnik zewnętrzny",
+      "internal_participant": "Uczestnik wewnętrzny",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Zakończone",
+      "in_progress": "W toku",
+      "todo": "Do zrobienia"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "zamknięty",
+    "lockedHint": "Podgląd — nie jesteś uczestnikiem tego projektu",
+    "noDueDate": "bez terminu",
+    "noTasks": "Projekt nie ma jeszcze zadań.",
+    "openOfTotal": "{open} otwartych z {total}",
+    "showClosedProjectTasks": "Pokaż zadania zamkniętego projektu",
+    "title": "Zadania projektowe"
+  },
+  "list": {
+    "closedBadge": "Zamknięty",
+    "createFailed": "Nie udało się utworzyć projektu",
+    "createForm": {
+      "description": "Opis",
+      "keyHint": "Prefiks numerów zadań powstanie automatycznie z nazwy projektu.",
+      "name": "Nazwa",
+      "namePlaceholder": "np. Wdrożenie systemu CRM",
+      "saving": "Zapisywanie…",
+      "submit": "Utwórz projekt"
+    },
+    "empty": {
+      "noOpenProjects": "Nie uczestniczysz w żadnym otwartym projekcie.",
+      "noneForFilter": "Brak projektów dla wybranego filtra.",
+      "title": "Brak projektów"
+    },
+    "filters": {
+      "all": "Wszystkie",
+      "closed": "Zamknięte",
+      "open": "Otwarte"
+    },
+    "loadFailed": "Nie udało się pobrać projektów",
+    "newProject": "Nowy projekt",
+    "stats": {
+      "atRisk": "zagrożone",
+      "doneOfTotalHint": "Zadania zakończone / wszystkie",
+      "members": "{count, plural, one {osoba} few {osoby} many {osób} other {osoby}}",
+      "myOpenTasks": "{count, plural, one {moje otwarte} few {moje otwarte} many {moich otwartych} other {moich otwartych}}",
+      "overdue": "po terminie",
+      "tasks": "{count, plural, one {zadanie} few {zadania} many {zadań} other {zadania}}"
+    },
+    "title": "Projekty",
+    "views": {
+      "myTasks": "Moje zadania",
+      "portfolio": "Przegląd projektów",
+      "projects": "Projekty"
+    }
+  },
+  "myTasks": {
+    "empty": {
+      "description": "Nie masz otwartych zadań w żadnym projekcie.",
+      "title": "Brak zadań"
+    },
+    "includeDone": "Pokaż zakończone",
+    "loadFailed": "Nie udało się pobrać zadań"
+  },
+  "panel": {
+    "chatTitle": "Rozmowa o zadaniu",
+    "costs": {
+      "add": "Dodaj koszt",
+      "empty": "Zadanie nie ma jeszcze kosztów.",
+      "loadFailed": "Nie udało się pobrać kosztów zadania",
+      "ownOnlyHint": "Widzisz tylko koszty dodane przez siebie.",
+      "title": "Koszty",
+      "totalIncurred": "Razem poniesione"
+    },
+    "createTask": "Utwórz zadanie",
+    "created": "Zadanie utworzone",
+    "customFields": {
+      "addButton": "+ Dodaj pole",
+      "addFailed": "Nie udało się dodać pola",
+      "addHint": "Pole zostanie dodane do wszystkich zadań tego projektu.",
+      "noneAvailable": "Brak pól do dodania. Pola definiuje administrator w Ustawienia → Projekty → Pola dodatkowe zadań.",
+      "selectField": "— wybierz pole —",
+      "title": "Pola dodatkowe"
+    },
+    "endDateChange": {
+      "hint": "Opcjonalnie. PM zobaczy powód w e-mailu o zmianie terminu; zostanie też zapisany w historii zadania.",
+      "placeholder": "np. opóźniona dostawa od klienta",
+      "reason": "Powód zmiany terminu"
+    },
+    "fields": {
+      "assignees": "Przypisane osoby",
+      "description": "Opis dodatkowy",
+      "endDate": "Data zakończenia",
+      "name": "Nazwa",
+      "noParent": "— brak (zadanie nadrzędne) —",
+      "parentTask": "Zadanie nadrzędne",
+      "priority": "Priorytet",
+      "startDate": "Data początku",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "history": {
+      "changed": "zmienił(a): {fields}",
+      "changedWithStatus": "zmienił(a): {fields} ({from} → {to})",
+      "created": "utworzył(a) zadanie",
+      "empty": "Brak wpisów.",
+      "endDateChangeReason": "Powód zmiany terminu: {reason}",
+      "fields": {
+        "assignees": "przypisane osoby",
+        "customFields": "pola dodatkowe",
+        "description": "opis",
+        "endDate": "data zakończenia",
+        "name": "nazwa",
+        "parentTask": "zadanie nadrzędne",
+        "priority": "priorytet",
+        "reminder": "przypomnienie",
+        "startDate": "data początku",
+        "status": "status",
+        "type": "typ"
+      },
+      "loadFailed": "Nie udało się pobrać historii",
+      "systemUser": "System",
+      "title": "Historia zmian"
+    },
+    "loadFailed": "Nie udało się pobrać zadania",
+    "newTask": "Nowe zadanie",
+    "reminder": {
+      "customDate": "Data przypomnienia",
+      "hint": "Przypomnienie trafi do wszystkich przypisanych osób o 9:00 i wymaga daty zakończenia.",
+      "label": "Przypomnienie e-mail",
+      "none": "Brak"
+    },
+    "saveFailed": "Nie udało się zapisać zadania",
+    "saved": "Zadanie zapisane",
+    "saving": "Zapisywanie…"
+  },
+  "portfolio": {
+    "columns": {
+      "atRisk": "Zagrożone",
+      "cost": "Koszt poniesiony",
+      "delay": "Opóźnienie",
+      "endDate": "Termin",
+      "overdue": "Po terminie",
+      "progress": "Postęp",
+      "project": "Projekt",
+      "projectManagers": "PM",
+      "revenue": "Przychód",
+      "startDate": "Początek"
+    },
+    "loadFailed": "Nie udało się otworzyć przeglądu projektów",
+    "noProjects": "Nie prowadzisz ani nie kontrolujesz żadnego otwartego projektu.",
+    "noTasks": "W Twoich projektach nie ma zadań.",
+    "tabs": {
+      "projects": "Projekty",
+      "tasks": "Zadania",
+      "timeline": "Oś czasu"
+    }
+  },
+  "settings": {
+    "costCategories": {
+      "hint": "Kategorii nie można usunąć — nieużywaną wyłącz. Wyłączonej kategorii nie da się wybrać w nowym koszcie, a istniejące pozycje ją zachowują.",
+      "title": "Kategorie kosztów"
+    },
+    "deadlines": {
+      "hint": "Zadanie, nad którym prace jeszcze się nie zaczęły, jest oznaczane jako zagrożone, gdy do jego terminu zostało nie więcej dni niż ten próg (0–30; 0 oznacza sam dzień terminu).",
+      "invalid": "Podaj liczbę całkowitą od 0 do 30.",
+      "saveFailed": "Nie udało się zapisać progu",
+      "saved": "Zapisano próg zagrożenia terminu",
+      "threshold": "Próg zagrożenia terminu (dni)",
+      "title": "Kontrola terminów"
+    },
+    "dictionary": {
+      "active": "aktywny",
+      "addButton": "Dodaj",
+      "moveDown": "W dół",
+      "moveUp": "W górę",
+      "newItemPlaceholder": "Nowa pozycja…",
+      "saveFailed": "Nie udało się zapisać słownika"
+    },
+    "fields": {
+      "active": "aktywne",
+      "addButton": "Dodaj pole",
+      "empty": "Brak zdefiniowanych pól.",
+      "hint": "Pola zdefiniowane tutaj PM może dodać do swojego projektu (Karta projektu → Pola dodatkowe zadań) i zdecydować, czy są wymagane. Typu pola nie można zmienić po utworzeniu.",
+      "newNamePlaceholder": "Nazwa nowego pola…",
+      "optionsPlaceholder": "Wartości po przecinku",
+      "optionsRequired": "Lista musi mieć co najmniej jedną wartość",
+      "saveFailed": "Nie udało się zapisać pola",
+      "title": "Pola dodatkowe zadań"
+    },
+    "finance": {
+      "disableConfirm": "Wyłączyć finanse projektów? Dane zostaną zachowane, ale znikną z widoku wszystkich użytkowników.",
+      "hint": "Po włączeniu PM i administrator prowadzą w projekcie budżet, koszty i przychody, a kontroler ma do nich podgląd. Podsumowanie finansów projektu widzi też każdy, kto ma dostęp do karty powiązanego leada lub partnera.",
+      "saveFailed": "Nie udało się zmienić ustawienia finansów",
+      "title": "Finanse projektów",
+      "toggle": "Włącz finanse projektów"
+    },
+    "loadFailed": "Nie udało się pobrać konfiguracji projektów",
+    "priorities": {
+      "title": "Priorytety"
+    },
+    "statuses": {
+      "hint": "Kategoria mówi systemowi, co status oznacza — niezależnie od nazwy. Zadania w statusie kategorii „Zakończone” nie liczą się jako otwarte ani przeterminowane.",
+      "title": "Statusy zadań"
+    },
+    "transitions": {
+      "discardConfirm": "Masz niezapisane zmiany przejść. Porzucić je?",
+      "hint": "PM zawsze może zmienić status na dowolny. Uczestnicy zmieniają status tylko w zadaniach, do których są przypisani i mają pełne uprawnienia. Kontroler zmienia status w każdym zadaniu projektu.",
+      "matrixCorner": "Z statusu ↓ / na status →",
+      "saveButton": "Zapisz przejścia",
+      "saveFailed": "Nie udało się zapisać przejść",
+      "saved": "Zapisano przejścia statusów",
+      "saving": "Zapisywanie…",
+      "title": "Przejścia między statusami"
+    },
+    "types": {
+      "title": "Typy zadań"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Osoby",
+      "cost": "Koszt",
+      "endDate": "Koniec",
+      "number": "Nr",
+      "priority": "Priorytet",
+      "project": "Projekt",
+      "startDate": "Początek",
+      "status": "Status",
+      "task": "Zadanie",
+      "timeliness": "Terminowość",
+      "type": "Typ"
+    },
+    "emptyForFilters": "Żadne zadanie nie pasuje do filtrów.",
+    "emptyMessage": "W tym projekcie nie ma jeszcze zadań.",
+    "emptyTitle": "Brak zadań",
+    "flatList": "Lista płaska",
+    "parentTask": "Zadanie nadrzędne",
+    "subtask": "Podzadanie"
+  }
+}

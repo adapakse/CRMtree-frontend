@@ -1,0 +1,394 @@
+{
+  "badges": {
+    "gdpr": {
+      "data_administration": "Contitolarità",
+      "data_processing_entrustment": "Affidamento",
+      "no_gdpr": "Nessun GDPR"
+    }
+  },
+  "dashboard": {
+    "recentDocuments": "Documenti recenti",
+    "seeAll": "Vedi tutti",
+    "stats": {
+      "expiring": "Scadono entro 30 giorni",
+      "expiringHint": "Richiedono attenzione",
+      "inWorkflow": "In lavorazione",
+      "myTasksHint": "In attesa di azione",
+      "signed": "Firmati / Completati",
+      "signedHint": "Firmati + Completati",
+      "total": "Tutti i documenti",
+      "totalHint": "Tutti quelli disponibili"
+    },
+    "taskStrip": {
+      "assigneePrefix": "a:"
+    },
+    "title": "Dashboard"
+  },
+  "detail": {
+    "actions": {
+      "delete": "Elimina",
+      "download": "Scarica",
+      "saveChanges": "Salva modifiche"
+    },
+    "attachments": {
+      "add": "Aggiungi allegato",
+      "addFirst": "Aggiungi il primo allegato",
+      "deleteConfirm": "Eliminare questo allegato con tutte le sue versioni?",
+      "deleted": "Allegato eliminato",
+      "empty": "Nessun allegato",
+      "events": {
+        "deleted": "Allegato eliminato: {name}",
+        "newVersion": "Nuova versione dell’allegato: {name}"
+      },
+      "newVersion": "Nuova versione",
+      "uploadFailed": "Errore durante il caricamento dell'allegato",
+      "uploaded": "Allegato caricato",
+      "versionCount": "{count, plural, one {# versione} other {# versioni}}",
+      "versionUploadFailed": "Errore durante il caricamento della nuova versione"
+    },
+    "deleteConfirm": "Eliminare «{name}»?",
+    "history": {
+      "actions": {
+        "attachment_deleted": "Allegato eliminato",
+        "attachment_uploaded": "Allegato aggiunto: {name}",
+        "attachment_version_uploaded": "Nuova versione dell’allegato (v{version})",
+        "document_created": "Documento creato",
+        "document_deleted": "Documento eliminato",
+        "document_downloaded": "Documento scaricato",
+        "document_updated": "Documento aggiornato",
+        "metadata_updated": "Metadati aggiornati",
+        "signing_completed": "Firma elettronica completata",
+        "signing_failed": "Firma elettronica non riuscita",
+        "signing_initiated": "Firma elettronica avviata",
+        "status_changed": "Stato modificato in: {status}",
+        "tag_added": "Tag aggiunto: {key}",
+        "tag_removed": "Tag rimosso: {key}",
+        "tag_updated": "Tag modificato: {key}",
+        "version_uploaded": "Caricata una nuova versione del documento (v{version})",
+        "workflow_task_cancelled": "Attività di workflow annullata",
+        "workflow_task_completed": "Attività di workflow completata",
+        "workflow_task_created": "Attività di workflow assegnata"
+      },
+      "empty": "Nessuna cronologia"
+    },
+    "overview": {
+      "chooseEntity": "— seleziona soggetto —",
+      "chooseType": "— seleziona tipo —",
+      "metadata": "Metadati del documento",
+      "packagePart": "Parte del pacchetto di documenti:"
+    },
+    "partners": {
+      "empty": "Nessun partner collegato.",
+      "linkFailed": "Errore durante il collegamento al partner",
+      "linked": "Collegato a {company}",
+      "searchPlaceholder": "Cerca partner per nome…",
+      "taxId": "Partita IVA: {nip}",
+      "title": "Partner collegati",
+      "unlink": "Scollega",
+      "unlinkConfirm": "Scollegare il partner «{company}»?",
+      "unlinkFailed": "Errore durante lo scollegamento del partner",
+      "unlinked": "Partner scollegato"
+    },
+    "preview": {
+      "downloadFile": "Scarica file",
+      "fileUploaded": "File caricato",
+      "frameTitle": "Anteprima PDF",
+      "loadFailed": "Impossibile caricare il PDF",
+      "noFile": "Nessun file allegato",
+      "unavailable": "Anteprima non disponibile",
+      "unavailableFormat": "Anteprima non disponibile per formati diversi dal PDF.",
+      "unavailableHint": "Scarica il file sul disco per visualizzarlo.",
+      "uploadFile": "Carica file"
+    },
+    "signus": {
+      "emailsPlaceholder": "anna@azienda.com, partner@example.com",
+      "info": "Il documento verrà inviato all'API di Signus. Ogni firmatario riceverà un'e-mail. Le versioni firmate vengono archiviate automaticamente.",
+      "modalTitle": "Avvia la firma elettronica",
+      "sectionTitle": "Firma elettronica (Signus)",
+      "send": "Invia a Signus",
+      "sendFailed": "Errore durante l'invio a Signus",
+      "sentRedirect": "Documento inviato a Signus — reindirizzamento…",
+      "sentTraining": "Documento inviato alla firma (simulazione). La versione firmata comparirà tra ~10 secondi.",
+      "signatories": "Firmatari (indirizzi e-mail separati da virgola)",
+      "start": "Avvia la firma con Signus"
+    },
+    "tabs": {
+      "attachments": "Allegati",
+      "history": "Cronologia",
+      "overview": "Dettagli",
+      "preview": "Documento principale",
+      "versions": "Versioni",
+      "workflow": "Workflow"
+    },
+    "tags": {
+      "added": "Tag aggiunto",
+      "empty": "Nessun tag.",
+      "key": "Chiave",
+      "keyPlaceholder": "Chiave (es. contract_id)",
+      "title": "Tag"
+    },
+    "toasts": {
+      "saved": "Documento salvato"
+    },
+    "versions": {
+      "empty": "Nessuna versione",
+      "signedBy": "Firmato da {name}",
+      "uploadNew": "Carica nuova versione",
+      "uploaded": "Nuova versione caricata"
+    },
+    "workflow": {
+      "assign": "Assegna e invia e-mail",
+      "assignTitle": "Assegna attività",
+      "assignTo": "Assegna all'utente",
+      "assigned": "Attività assegnata — notifica e-mail inviata",
+      "cancelled": "Attività annullata",
+      "dueDate": "Scadenza",
+      "message": "Messaggio",
+      "messagePlaceholder": "Messaggio facoltativo per la persona assegnata…",
+      "selected": "Selezionato: {name}",
+      "taskType": "Tipo di attività",
+      "userSearchPlaceholder": "Cerca per cognome o e-mail…"
+    }
+  },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Numero di conto bancario",
+      "currency": "Valuta",
+      "grossAmount": "Importo lordo",
+      "invoiceNumber": "Numero della fattura",
+      "netAmount": "Importo netto",
+      "paymentStatus": "Stato del pagamento",
+      "title": "Dati della fattura",
+      "vatAmount": "Importo IVA"
+    },
+    "ksefVisualisationNote": "Questa è una visualizzazione dei dati scaricati da KSeF, non il documento originale.",
+    "projectLinks": {
+      "backLabel": "Documento {number}",
+      "costStatuses": {
+        "incurred": "Sostenuto",
+        "planned": "Pianificato"
+      },
+      "empty": "Questa fattura non è collegata a nessun costo di progetto.",
+      "linkedAt": "Collegamento: {date}",
+      "linkedBy": "Collegamento: {name}, {date}",
+      "severalLinks": "Questa fattura è collegata a più progetti o attività.",
+      "title": "Collegamenti ai progetti",
+      "wholeProject": "intero progetto"
+    }
+  },
+  "labels": {
+    "activeTasks": "Attività attive",
+    "addTag": "Aggiungi tag",
+    "columns": {
+      "name": "Nome",
+      "number": "Numero",
+      "validity": "Validità"
+    },
+    "contractSubjects": {
+      "accommodation": "Alloggio",
+      "businessTravel": "Viaggi d'affari",
+      "conferences": "Conferenze/Riunioni",
+      "other": "Altro",
+      "system": "Sistema"
+    },
+    "countries": {
+      "at": "Austria",
+      "ch": "Svizzera",
+      "cz": "Repubblica Ceca",
+      "de": "Germania",
+      "fr": "Francia",
+      "gb": "Regno Unito",
+      "hu": "Ungheria",
+      "pl": "Polonia",
+      "ro": "Romania",
+      "ru": "Russia",
+      "sk": "Slovacchia",
+      "ua": "Ucraina"
+    },
+    "docTypes": {
+      "employee_agreement": "Contratto di lavoro",
+      "invoice": "Fattura",
+      "it_supplier_agreement": "Contratto con fornitore IT",
+      "nda": "NDA",
+      "operator_agreement": "Contratto con operatore",
+      "partner_agreement": "Contratto di partnership"
+    },
+    "fields": {
+      "buyer": "Acquirente",
+      "contactName": "Nome e cognome",
+      "contactSection": "Dati di contatto per il contratto",
+      "contractSubject": "Oggetto del contratto",
+      "counterpartyCountry": "Paese della controparte",
+      "counterpartyTaxId": "Partita IVA della controparte",
+      "documentName": "Nome del documento",
+      "documentType": "Tipo di documento",
+      "email": "E-mail",
+      "entity1": "Soggetto 1",
+      "entity2": "Soggetto 2",
+      "expirationDate": "Data di scadenza",
+      "gdprClassification": "Classificazione GDPR",
+      "group": "Gruppo",
+      "issueDate": "Data di emissione",
+      "owner": "Proprietario",
+      "paymentDueDate": "Scadenza del pagamento",
+      "phone": "Telefono",
+      "seller": "Venditore",
+      "sellerTaxId": "Partita IVA del venditore",
+      "signingDate": "Data di firma",
+      "status": "Stato"
+    },
+    "from": "Da: {name}",
+    "gdprTypes": {
+      "data_administration": "Contitolarità del trattamento dei dati",
+      "data_processing_entrustment": "Affidamento del trattamento dei dati",
+      "no_gdpr": "Nessun GDPR"
+    },
+    "myTasks": "Le mie attività",
+    "noDocuments": "Nessun documento",
+    "noPendingTasks": "Nessuna attività in attesa",
+    "options": {
+      "choose": "— Seleziona —",
+      "chooseCountry": "— Seleziona paese —",
+      "fixedDate": "Data definita",
+      "indefinite": "Tempo indeterminato",
+      "unassigned": "— non assegnato —"
+    },
+    "paymentStatuses": {
+      "overdue": "Scaduta",
+      "paid": "Pagata",
+      "partially_paid": "Pagata in parte",
+      "unpaid": "Non pagata"
+    },
+    "placeholders": {
+      "contactEmail": "es. mario.rossi@azienda.it",
+      "contactName": "es. Mario Rossi",
+      "contactPhone": "es. +39 333 000 0000",
+      "entity1": "es. CRMtree Sp. z o.o.",
+      "entity2": "es. Partner Ltd.",
+      "taxId": "es. 12345678901"
+    },
+    "statuses": {
+      "being_approved": "In approvazione",
+      "being_edited": "In modifica",
+      "being_signed": "In firma",
+      "completed": "Completato",
+      "hold": "In sospeso",
+      "new": "Nuovo",
+      "rejected": "Rifiutato",
+      "signed": "Firmato"
+    },
+    "taskTypes": {
+      "approve": "Approvazione",
+      "edit": "Modifica",
+      "read": "Lettura",
+      "sign": "Firma"
+    }
+  },
+  "list": {
+    "columns": {
+      "gdpr": "GDPR",
+      "newBadge": "NUOVO",
+      "type": "Tipo"
+    },
+    "empty": {
+      "hint": "Modifica i filtri o il testo cercato",
+      "title": "Nessun documento trovato"
+    },
+    "filters": {
+      "allGroups": "Tutti i gruppi",
+      "allTypes": "Tutti i tipi",
+      "noFiles": "Mostra i documenti senza scansione allegata"
+    },
+    "newDocument": "Nuovo documento",
+    "noPartnerWarning": "Documento non collegato a un partner",
+    "pagination": {
+      "next": "Avanti",
+      "page": "Pagina {page} di {total}",
+      "previous": "Prec."
+    },
+    "partnerFilter": {
+      "clear": "Mostra tutti",
+      "label": "Documenti del partner:"
+    },
+    "searchPlaceholder": "Cerca documenti, tag…",
+    "statusFilters": {
+      "all": "Tutti",
+      "being_edited": "In modifica",
+      "being_signed": "In firma",
+      "completed": "Completati",
+      "new": "Nuovi",
+      "rejected": "Rifiutati",
+      "signed": "Firmati"
+    },
+    "taskTooltip": {
+      "assignee": "Esecutore: {name}",
+      "assigner": "Assegnato da: {name}",
+      "dueDate": "Scadenza: {date}",
+      "message": "Messaggio: {message}",
+      "type": "Tipo: {type}"
+    },
+    "title": "Documenti",
+    "toasts": {
+      "created": "Documento {number} creato",
+      "deleted": "Documento eliminato",
+      "updated": "Documento aggiornato"
+    }
+  },
+  "newDocument": {
+    "basicInfo": "Informazioni di base",
+    "chooseEntity": "— Seleziona soggetto —",
+    "chooseGdpr": "— Seleziona classificazione —",
+    "chooseGroup": "— Seleziona gruppo —",
+    "chooseType": "— Seleziona tipo —",
+    "create": "Crea documento",
+    "createFailed": "Impossibile creare il documento",
+    "file": {
+      "dropHint": "Rilascia qui il file o clicca per selezionarlo",
+      "formats": "PDF, DOCX — max 50 MB",
+      "remove": "Rimuovi",
+      "title": "Allegato (facoltativo)"
+    },
+    "namePlaceholder": "es. Contratto di partnership — ABC S.r.l.",
+    "subtitle": "Compila i metadati e, se vuoi, aggiungi un file",
+    "tags": {
+      "keyPlaceholder": "chiave",
+      "title": "Tag (facoltativi)"
+    },
+    "title": "Nuovo documento"
+  },
+  "workflow": {
+    "autoRefresh": "Aggiornamento automatico: {seconds} s",
+    "calendar": {
+      "documentFallback": "Documento"
+    },
+    "columns": {
+      "cancelled": "Annullati",
+      "completed": "Completati",
+      "in_progress": "In corso",
+      "pending": "In attesa"
+    },
+    "kanban": {
+      "assignedBy": "Assegnato da {name}",
+      "emptyColumn": "Vuoto",
+      "emptyHint": "I documenti compariranno qui dopo la loro creazione",
+      "expired": "Scaduto",
+      "expires": "Scade il {date}",
+      "paymentDue": "Pagamento entro il {date}",
+      "paymentOverdue": "Pagamento scaduto",
+      "soon": "A BREVE",
+      "taskCount": "Attività: {count}"
+    },
+    "kanbanTab": "Bacheca Kanban",
+    "mine": {
+      "allDone": "Tutto fatto!",
+      "complete": "Completa",
+      "openDocument": "Apri documento",
+      "start": "Inizia"
+    },
+    "title": "Workflow",
+    "toasts": {
+      "completed": "Attività contrassegnata come completata",
+      "updateFailed": "Impossibile aggiornare l'attività — riprova"
+    }
+  }
+}

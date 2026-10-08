@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideTrash2 } from '@lucide/angular';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmSeoService, SeoAuthor } from '../../../core/services/crm-seo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
@@ -9,30 +10,32 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
   selector: 'wt-seo-authors-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, LucideTrash2],
+  imports: [FormsModule, LucideTrash2, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+    <ng-container *transloco="let t; prefix: 'crm'">
     <div class="author-grid">
       @for (a of authors(); track a.id) {
         <div class="author-card" [class.inactive]="!a.is_active">
           @if (editingId() === a.id) {
-            <label class="field-label">Imię i nazwisko <span class="required-star">*</span></label>
+            <label class="field-label">{{ t('seo.authors.fields.fullName') }} <span class="required-star">*</span></label>
             <input class="field-input" [(ngModel)]="editName">
-            <label class="field-label">Stanowisko</label>
-            <input class="field-input" [(ngModel)]="editJobTitle" placeholder="np. Head of Sales">
-            <label class="field-label">Opis kompetencji</label>
+            <label class="field-label">{{ t('seo.authors.fields.jobTitle') }}</label>
+            <input class="field-input" [(ngModel)]="editJobTitle" [placeholder]="t('seo.authors.placeholders.jobTitleEdit')">
+            <label class="field-label">{{ t('seo.authors.fields.bio') }}</label>
             <textarea class="field-input" rows="3" [(ngModel)]="editBio"></textarea>
-            <label class="field-label">Zdjęcie</label>
+            <label class="field-label">{{ t('seo.authors.fields.photo') }}</label>
             <div class="photo-upload-row">
               @if (photoSrc(a); as src) { <img class="author-photo" [src]="src" alt=""> }
               <input #photoInput type="file" accept="image/jpeg,image/png,image/webp" (change)="uploadPhoto(a.id, photoInput)" [disabled]="uploadingPhoto()">
             </div>
-            <label class="field-label">Profil LinkedIn</label>
+            <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
             <input class="field-input" [(ngModel)]="editLinkedinUrl" placeholder="https://linkedin.com/in/...">
             <div class="author-edit-actions">
               <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(a.id)" [disabled]="!editName.trim() || savingEdit()">
-                @if (savingEdit()) { Zapisuję… } @else { Zapisz }
+                @if (savingEdit()) { {{ t('seo.authors.actions.saving') }} } @else { {{ 'actions.save' | transloco }} }
               </button>
-              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">Anuluj</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
             <div class="author-card-top">
@@ -44,21 +47,21 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             </div>
             @if (a.bio) { <p class="author-bio">{{ a.bio }}</p> }
             @if (a.linkedin_url) {
-              <a class="author-linkedin" [href]="a.linkedin_url" target="_blank" rel="noopener noreferrer" title="Profil LinkedIn" aria-label="Profil LinkedIn">
+              <a class="author-linkedin" [href]="a.linkedin_url" target="_blank" rel="noopener noreferrer" [title]="t('seo.authors.fields.linkedinProfile')" [attr.aria-label]="t('seo.authors.fields.linkedinProfile')">
                 <svg class="linkedin-icon" viewBox="0 0 24 24" width="21" height="21" fill="currentColor" aria-hidden="true">
                   <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
                 </svg>
               </a>
             }
-            @if (!a.is_active) { <span class="author-inactive-badge">Nieaktywny</span> }
+            @if (!a.is_active) { <span class="author-inactive-badge">{{ t('seo.authors.inactiveBadge') }}</span> }
             <div class="author-card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(a)">Edytuj</button>
+              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(a)">{{ t('seo.authors.actions.edit') }}</button>
               @if (a.is_active) {
-                <button type="button" class="btn-warn btn-sm" (click)="toggleActive(a)">Dezaktywuj</button>
+                <button type="button" class="btn-warn btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.deactivate') }}</button>
               } @else {
-                <button type="button" class="btn-ghost btn-sm" (click)="toggleActive(a)">Aktywuj</button>
+                <button type="button" class="btn-ghost btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.activate') }}</button>
               }
-              <button type="button" class="btn-delete" (click)="remove(a.id)" title="Usuń autora" aria-label="Usuń autora">
+              <button type="button" class="btn-delete" (click)="remove(a.id)" [title]="t('seo.authors.actions.delete')" [attr.aria-label]="t('seo.authors.actions.delete')">
                 <svg lucideTrash2 [size]="14"></svg>
               </button>
             </div>
@@ -67,31 +70,32 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
       }
       <div class="author-card author-card-new">
         @if (adding()) {
-          <label class="field-label">Imię i nazwisko <span class="required-star">*</span></label>
-          <input class="field-input" [(ngModel)]="newName" placeholder="np. Beata Kowalska">
-          <label class="field-label">Stanowisko</label>
-          <input class="field-input" [(ngModel)]="newJobTitle" placeholder="np. Kierownik działu sprzedaży">
-          <label class="field-label">Opis kompetencji</label>
-          <textarea class="field-input" rows="3" [(ngModel)]="newBio" placeholder="Krótki opis doświadczenia i eksperckości"></textarea>
-          <label class="field-label">Zdjęcie</label>
+          <label class="field-label">{{ t('seo.authors.fields.fullName') }} <span class="required-star">*</span></label>
+          <input class="field-input" [(ngModel)]="newName" [placeholder]="t('seo.authors.placeholders.fullName')">
+          <label class="field-label">{{ t('seo.authors.fields.jobTitle') }}</label>
+          <input class="field-input" [(ngModel)]="newJobTitle" [placeholder]="t('seo.authors.placeholders.jobTitleNew')">
+          <label class="field-label">{{ t('seo.authors.fields.bio') }}</label>
+          <textarea class="field-input" rows="3" [(ngModel)]="newBio" [placeholder]="t('seo.authors.placeholders.bio')"></textarea>
+          <label class="field-label">{{ t('seo.authors.fields.photo') }}</label>
           <input #newPhotoInput type="file" accept="image/jpeg,image/png,image/webp"
                  (change)="onNewPhotoSelected(newPhotoInput)">
-          <label class="field-label">Profil LinkedIn</label>
+          <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
           <input class="field-input" [(ngModel)]="newLinkedinUrl" placeholder="https://linkedin.com/in/...">
           <div class="author-edit-actions">
             <button type="button" class="btn-ghost btn-sm" (click)="add()" [disabled]="!newName.trim() || savingNew()">
-              @if (savingNew()) { Dodaję… } @else { Dodaj autora }
+              @if (savingNew()) { {{ t('seo.authors.actions.adding') }} } @else { {{ t('seo.authors.actions.add') }} }
             </button>
-            <button type="button" class="btn-ghost btn-sm" (click)="adding.set(false)">Anuluj</button>
+            <button type="button" class="btn-ghost btn-sm" (click)="adding.set(false)">{{ 'actions.cancel' | transloco }}</button>
           </div>
         } @else {
-          <button type="button" class="btn-add-author" (click)="adding.set(true)">+ Dodaj autora</button>
+          <button type="button" class="btn-add-author" (click)="adding.set(true)">{{ t('seo.authors.actions.addNew') }}</button>
         }
       </div>
     </div>
     @if (authors().length === 0 && !adding()) {
-      <p class="empty">Brak autorów — dodaj pierwszego, żeby móc zatwierdzać artykuły (autor jest wymagany przed publikacją).</p>
+      <p class="empty">{{ t('seo.authors.empty') }}</p>
     }
+    </ng-container>
   `,
   styles: [`
     .author-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; align-items: start; }
@@ -142,6 +146,7 @@ export class SeoAuthorsPanelComponent implements OnInit {
 
   private seoService = inject(CrmSeoService);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   readonly authors = signal<SeoAuthor[]>([]);
 
@@ -194,12 +199,12 @@ export class SeoAuthorsPanelComponent implements OnInit {
         this.uploadingPhoto.set(false);
         input.value = '';
         this.authors.update((list) => list.map((a) => (a.id === id ? updated : a)));
-        this.toast.success('Zdjęcie przesłane.');
+        this.toast.success(this.transloco.translate('crm.seo.authors.toasts.photoUploaded'));
       },
       error: (err) => {
         this.uploadingPhoto.set(false);
         input.value = '';
-        this.toast.error(err?.error?.error ?? 'Nie udało się przesłać zdjęcia.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.authors.toasts.photoUploadFailed'));
       },
     });
   }
@@ -217,13 +222,13 @@ export class SeoAuthorsPanelComponent implements OnInit {
       next: () => {
         this.savingEdit.set(false);
         this.editingId.set(null);
-        this.toast.success('Autor zaktualizowany.');
+        this.toast.success(this.transloco.translate('crm.seo.authors.toasts.updated'));
         this.load();
         this.authorsChanged.emit();
       },
       error: (err) => {
         this.savingEdit.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się zapisać autora.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.authors.toasts.saveFailed'));
       },
     });
   }
@@ -231,14 +236,14 @@ export class SeoAuthorsPanelComponent implements OnInit {
   toggleActive(a: SeoAuthor): void {
     this.seoService.updateAuthor(a.id, { is_active: !a.is_active }).subscribe({
       next: () => { this.load(); this.authorsChanged.emit(); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się zmienić statusu.'),
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.authors.toasts.statusChangeFailed')),
     });
   }
 
   remove(id: number): void {
     this.seoService.deleteAuthor(id).subscribe({
-      next: () => { this.toast.info('Autor usunięty.'); this.load(); this.authorsChanged.emit(); },
-      error: (err) => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć autora.'),
+      next: () => { this.toast.info(this.transloco.translate('crm.seo.authors.toasts.deleted')); this.load(); this.authorsChanged.emit(); },
+      error: (err) => this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.authors.toasts.deleteFailed')),
     });
   }
 
@@ -265,13 +270,13 @@ export class SeoAuthorsPanelComponent implements OnInit {
         this.newBio = '';
         this.newLinkedinUrl = '';
         this.newPhotoFile = null;
-        this.toast.success('Autor dodany.');
+        this.toast.success(this.transloco.translate('crm.seo.authors.toasts.added'));
         this.load();
         this.authorsChanged.emit();
       },
       error: (err) => {
         this.savingNew.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się dodać autora.');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.seo.authors.toasts.addFailed'));
       },
     });
   }

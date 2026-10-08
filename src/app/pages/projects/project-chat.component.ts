@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ProjectMessage, ProjectsApiService } from '../../core/services/projects-api.service';
@@ -15,31 +16,34 @@ const MAX_MESSAGE_LENGTH = 4000;
 @Component({
   selector: 'wt-project-chat',
   standalone: true,
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="thread" #thread>
-      @for (message of messages(); track message.id) {
-        <div class="message" [class.own]="message.author_id === currentUserId">
-          <div class="meta">
-            <strong>{{ message.author_name ?? 'Usunięty użytkownik' }}</strong>
-            <span>{{ message.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      <div class="thread" #thread>
+        @for (message of messages(); track message.id) {
+          <div class="message" [class.own]="message.author_id === currentUserId">
+            <div class="meta">
+              <strong>{{ message.author_name ?? t('chat.deletedUser') }}</strong>
+              <span>{{ message.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
+            </div>
+            <div class="body">{{ message.body }}</div>
           </div>
-          <div class="body">{{ message.body }}</div>
-        </div>
-      } @empty {
-        <div class="empty">{{ isLoading() ? 'Ładowanie…' : 'Brak wiadomości.' }}</div>
-      }
-    </div>
-
-    @if (canPost()) {
-      <div class="composer">
-        <textarea class="fta" rows="2" [(ngModel)]="draft" [maxlength]="maxLength" placeholder="Napisz wiadomość…"
-                  (keydown.enter)="sendOnEnter($event)"></textarea>
-        <button class="btn btn-p btn-sm" [disabled]="!draft.trim() || isSending()" (click)="send()">Wyślij</button>
+        } @empty {
+          <div class="empty">{{ isLoading() ? ('states.loading' | transloco) : t('chat.empty') }}</div>
+        }
       </div>
-      <div class="hint">Enter wysyła wiadomość, Shift+Enter dodaje nową linię.</div>
-    }
+
+      @if (canPost()) {
+        <div class="composer">
+          <textarea class="fta" rows="2" [(ngModel)]="draft" [maxlength]="maxLength" [placeholder]="t('chat.placeholder')"
+                    (keydown.enter)="sendOnEnter($event)"></textarea>
+          <button class="btn btn-p btn-sm" [disabled]="!draft.trim() || isSending()" (click)="send()">{{ t('chat.send') }}</button>
+        </div>
+        <div class="hint">{{ t('chat.hint') }}</div>
+      }
+    </ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; flex-shrink:0; }
@@ -60,6 +64,7 @@ export class ProjectChatComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly projectId = input.required<string>();
@@ -100,7 +105,7 @@ export class ProjectChatComponent implements OnInit {
       },
       error: err => {
         this.isSending.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się wysłać wiadomości');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.chat.sendFailed'));
       },
     });
   }

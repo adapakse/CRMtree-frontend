@@ -1,0 +1,35 @@
+{
+  "changePassword": {
+    "errors": {
+      "failed": "Couldn't change the password",
+      "mismatch": "The passwords don't match",
+      "tooShort": "The password must be at least 8 characters long"
+    },
+    "hint": "Your temporary password has expired. Set your own password before continuing.",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "min. 8 characters",
+    "repeatPassword": "Repeat password",
+    "submit": "Set password and sign in",
+    "submitting": "Saving…",
+    "title": "Set a new password"
+  },
+  "login": {
+    "email": "Email",
+    "emailPlaceholder": "john@company.com",
+    "failed": "Sign-in failed",
+    "hidePassword": "Hide",
+    "password": "Password",
+    "passwordTab": "Email and password",
+    "platformName": "CRM Platform",
+    "profileLoadFailed": "Couldn't load your profile",
+    "redirecting": "Redirecting…",
+    "showPassword": "Show",
+    "ssoFailed": "SSO sign-in failed. Please try again.",
+    "ssoHint": "Sign in with your organization's Google Workspace account.",
+    "ssoSubmit": "Sign in with Google Workspace SSO",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "tenantHostMismatch": "This account doesn't belong to the organization at this address. Please sign in again.",
+    "unknownTenant": "No organization was found at this address."
+  }
+}

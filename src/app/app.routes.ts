@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
+import { withI18nScopes } from './core/i18n/i18n-scope.guard';
 import { authGuard, adminGuard, crmGuard, adminOrSalesManagerGuard, superAdminGuard, publicRootGuard, externalUserGuard } from './core/auth/guards';
 
-export const routes: Routes = [
+export const routes: Routes = withI18nScopes([
   // ── Public, SSR-rendered marketing surface (Faza 0 — SEO fundament) ──────
   {
     path: '',
@@ -60,6 +61,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/crm/zoho-callback/zoho-callback.component').then(m => m.ZohoCallbackComponent),
   },
   {
+    path: 'crm/yandex/callback',
+    loadComponent: () => import('./pages/crm/yandex-callback/yandex-callback.component').then(m => m.YandexCallbackComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],
@@ -109,6 +114,11 @@ export const routes: Routes = [
         path: 'admin/data',
         canActivate: [adminGuard],
         loadComponent: () => import('./pages/admin/data-management/data-management.component').then(m => m.DataManagementComponent),
+      },
+      {
+        path: 'admin/pbx',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./pages/admin/pbx/admin-pbx.component').then(m => m.AdminPbxComponent),
       },
       {
         path: 'admin/tenants',
@@ -214,6 +224,11 @@ export const routes: Routes = [
         path: 'projects',
         loadComponent: () => import('./pages/projects/projects-list.component').then(m => m.ProjectsListComponent),
       },
+      // Must stay before 'projects/:id', which would otherwise take "portfolio" for a project id.
+      {
+        path: 'projects/portfolio',
+        loadComponent: () => import('./pages/projects/project-portfolio.component').then(m => m.ProjectPortfolioComponent),
+      },
       {
         path: 'projects/:id',
         loadComponent: () => import('./pages/projects/project-detail.component').then(m => m.ProjectDetailComponent),
@@ -221,4 +236,4 @@ export const routes: Routes = [
     ],
   },
   { path: '**', redirectTo: '/dashboard' },
-];
+]);

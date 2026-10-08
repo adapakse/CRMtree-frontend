@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "save": "Zapisz"
+  },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Plik .ics (Apple i inne)",
+    "outlook": "Outlook",
+    "title": "Przekaż do kalendarza"
+  },
+  "language": {
+    "changeFailed": "Nie udało się zmienić języka",
+    "followTenant": "Domyślny język organizacji ({language})",
+    "hint": "Zmiana języka przeładuje stronę. W tym języku dostaniesz też e-maile i przypomnienia.",
+    "tenantHint": "Język dla osób, które nie wybrały własnego. Zmiana przeładuje stronę.",
+    "tenantTitle": "Domyślny język organizacji",
+    "title": "Język interfejsu"
+  },
+  "list": {
+    "activeFilters": "{count, plural, one {# aktywny filtr} few {# aktywne filtry} many {# aktywnych filtrów} other {# aktywnego filtra}}",
+    "anyValue": "Wszystkie",
+    "ascending": "Rosnąco",
+    "clearFilter": "Wyczyść",
+    "clearFilters": "Wyczyść filtry",
+    "defaultSort": "Domyślne",
+    "descending": "Malejąco",
+    "filterBy": "Filtruj: {name}",
+    "from": "od",
+    "noOptions": "Brak pozycji do wyboru.",
+    "pager": {
+      "next": "Następna strona",
+      "previous": "Poprzednia strona",
+      "range": "{from}–{to} z {total}"
+    },
+    "sort": "Sortowanie",
+    "sortBy": "Sortuj: {name}",
+    "to": "do"
+  },
+  "states": {
+    "loading": "Ładowanie…"
+  },
+  "testEnvironmentBanner": {
+    "title": "Wersja testowa — to nie jest środowisko produkcyjne"
+  },
+  "typeahead": {
+    "minChars": "Wpisz co najmniej {count} znaki…",
+    "noResults": "Brak wyników.",
+    "searching": "Szukam…"
+  }
+}

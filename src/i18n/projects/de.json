@@ -1,0 +1,863 @@
+{
+  "assigneeSummary": {
+    "atRisk": "Gefährdet",
+    "key": "offen · überfällig · gefährdet",
+    "open": "Offene Aufgaben",
+    "overdue": "Überfällig"
+  },
+  "card": {
+    "closeConfirm": "Projekt schließen? Ein geschlossenes Projekt ist schreibgeschützt und verschwindet aus der Standardliste.",
+    "closeProject": "Projekt schließen",
+    "closedBadge": "Geschlossen",
+    "datesHint": "Ein Projekt wird als verzögert markiert, wenn eine nicht erledigte Aufgabe nach dem Fälligkeitsdatum des Projekts endet oder wenn dieses Datum verstrichen ist und noch nicht erledigte Aufgaben offen sind.",
+    "description": "Beschreibung",
+    "edit": "Bearbeiten",
+    "endDate": "Fälligkeitsdatum des Projekts",
+    "errors": {
+      "addMemberFailed": "Person konnte nicht hinzugefügt werden",
+      "changeAccessLevelFailed": "Berechtigungen konnten nicht geändert werden",
+      "changeRoleFailed": "Rolle konnte nicht geändert werden",
+      "closeProjectFailed": "Projekt konnte nicht geschlossen werden",
+      "endBeforeStart": "Das Fälligkeitsdatum des Projekts darf nicht vor dem Projektbeginn liegen.",
+      "removeMemberFailed": "Person konnte nicht entfernt werden",
+      "reopenProjectFailed": "Projekt konnte nicht wieder geöffnet werden",
+      "saveFieldsFailed": "Felder konnten nicht gespeichert werden",
+      "saveProjectFailed": "Projekt konnte nicht gespeichert werden"
+    },
+    "fields": {
+      "add": "Feld hinzufügen",
+      "empty": "Das Projekt hat keine Zusatzfelder.",
+      "field": "Feld",
+      "noneAvailable": "Keine Felder zum Hinzufügen. Felder definiert der Administrator unter Einstellungen → Projekte → Zusatzfelder für Aufgaben.",
+      "remove": "Entfernen",
+      "removeConfirm": "Feld „{name}“ aus dem Projekt entfernen? Die in Aufgaben eingetragenen Werte bleiben erhalten.",
+      "required": "Erforderlich",
+      "requiredToggle": "erforderlich",
+      "selectPlaceholder": "— Feld auswählen —",
+      "title": "Zusatzfelder für Aufgaben",
+      "type": "Typ"
+    },
+    "members": {
+      "accessLevel": "Berechtigungen",
+      "add": "Hinzufügen",
+      "companyAndDepartment": "Firma / Abteilung",
+      "email": "E-Mail",
+      "externalAccount": "externes Konto",
+      "inactive": "(inaktiv)",
+      "person": "Person",
+      "phone": "Telefon",
+      "remove": "Entfernen",
+      "removeConfirm": "{name} aus dem Projekt entfernen? Die Person wird auch von ihren Aufgaben entfernt.",
+      "role": "Rolle",
+      "searchPlaceholder": "Vorname, Nachname, E-Mail oder Firma eingeben (mind. 3 Zeichen)…",
+      "title": "Personen im Projekt"
+    },
+    "name": "Name",
+    "noDescription": "Keine Beschreibung.",
+    "reopenProject": "Wieder öffnen",
+    "startDate": "Projektbeginn",
+    "title": "Projektkarte"
+  },
+  "chat": {
+    "deletedUser": "Gelöschter Benutzer",
+    "empty": "Keine Nachrichten.",
+    "hint": "Enter sendet die Nachricht, Shift+Enter fügt eine neue Zeile ein.",
+    "placeholder": "Nachricht schreiben…",
+    "send": "Senden",
+    "sendFailed": "Nachricht konnte nicht gesendet werden"
+  },
+  "crmLink": {
+    "change": "Ändern",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Verknüpfen",
+    "linkFailed": "Projekt konnte nicht verknüpft werden",
+    "none": "keine",
+    "remove": "Verknüpfung entfernen",
+    "removeConfirm": "Verknüpfung des Projekts mit dem CRM entfernen? Die Projektaufgaben verschwinden von der Lead- bzw. Partnerkarte.",
+    "removeFailed": "Verknüpfung konnte nicht entfernt werden",
+    "searchHint": "Die Vorschläge umfassen nur Leads und Partner, auf die Sie im CRM Zugriff haben. Die Auswahl speichert die Verknüpfung sofort.",
+    "searchPlaceholder": "Name des Leads oder Partners eingeben (mind. 3 Zeichen)…",
+    "title": "Verknüpfung mit dem CRM"
+  },
+  "deadlines": {
+    "atRisk": "Gefährdet",
+    "atRiskHint": "Das Fälligkeitsdatum rückt näher und die Arbeit hat noch nicht begonnen.",
+    "completedLate": "Verspätet erledigt",
+    "completedLateHint": "Die Aufgabe wurde nach ihrem Fälligkeitsdatum erledigt.",
+    "daysShort": "{days} T.",
+    "legend": {
+      "atRisk": "gefährdet (zu erledigen, fällig innerhalb von {days, plural, one {# Tag} other {# Tagen}})",
+      "beyondProjectEnd": "nach dem Fälligkeitsdatum des Projekts",
+      "completedLate": "verspätet erledigt",
+      "originalEndDate": "ursprüngliches Fälligkeitsdatum",
+      "overdue": "überfällig",
+      "overdueSubtasks": "überfällige Unteraufgaben",
+      "projectEndDate": "Fälligkeitsdatum des Projekts"
+    },
+    "originalEndDateHint": "Ursprüngliches Fälligkeitsdatum und Verschiebung in Tagen",
+    "overdue": "Überfällig",
+    "overdueDays": "Überfällig {days} T.",
+    "overdueHint": "Das Fälligkeitsdatum ist verstrichen und die Aufgabe ist nicht erledigt.",
+    "overdueSubtasks": "Überfällige Unteraufgaben",
+    "overdueSubtasksHint": "Mindestens eine Unteraufgabe ist überfällig.",
+    "slipEarlier": "−{days} T.",
+    "slipLater": "+{days} T."
+  },
+  "delay": {
+    "badge": "Verzögert",
+    "reasons": {
+      "endPassed": "Das Fälligkeitsdatum des Projekts ist seit {days, plural, one {# Tag} other {# Tagen}} verstrichen, offene Aufgaben: {count}",
+      "taskAfterEnd": "Aufgaben, die nach dem Fälligkeitsdatum des Projekts enden: {count} (die späteste um {days, plural, one {# Tag} other {# Tage}})"
+    }
+  },
+  "detail": {
+    "backToProjects": "Projekte",
+    "closedBadge": "Geschlossen",
+    "empty": {
+      "noAssignedTasks": "Ihnen sind in diesem Projekt keine Aufgaben zugewiesen.",
+      "noTasks": "In diesem Projekt gibt es noch keine Aufgaben."
+    },
+    "newTask": "Neue Aufgabe",
+    "openFailed": "Projekt konnte nicht geöffnet werden",
+    "refreshFailed": "Projekt konnte nicht aktualisiert werden",
+    "showOnlyMyTasks": "Meine Aufgaben anzeigen",
+    "tabs": {
+      "card": "Projektkarte",
+      "chat": "Chat",
+      "finance": "Finanzen",
+      "tasks": "Aufgaben ({count})",
+      "timeline": "Zeitachse"
+    },
+    "tasksLoadFailed": "Aufgaben konnten nicht geladen werden"
+  },
+  "filters": {
+    "assignee": "Person",
+    "atRiskCount": "Gefährdete Aufgaben",
+    "cost": "Kosten",
+    "delayReason": "Grund der Verzögerung",
+    "delayReasonValues": {
+      "end_passed": "Fälligkeitsdatum des Projekts verstrichen",
+      "task_after_end": "Aufgabe endet nach dem Fälligkeitsdatum des Projekts"
+    },
+    "delayed": "Verzögerung",
+    "delayedValues": {
+      "no": "Nicht verzögert",
+      "yes": "Verzögert"
+    },
+    "endDate": "Ende",
+    "manager": "PM",
+    "myRole": "Meine Rolle",
+    "myRoleValues": {
+      "controller": "Prüfer",
+      "participant": "Teilnehmer",
+      "pm": "PM"
+    },
+    "name": "Aufgabenname",
+    "number": "Nummer",
+    "originalEndDate": "Urspr. Fälligkeit",
+    "overdueCount": "Überfällige Aufgaben",
+    "priority": "Priorität",
+    "progress": "Fortschritt (%)",
+    "project": "Projekt",
+    "projectCost": "Angefallene Kosten",
+    "projectEndDate": "Projektfälligkeit",
+    "projectName": "Projektname oder Schlüssel",
+    "projectRevenue": "Erlös",
+    "projectSort": {
+      "at_risk": "Gefährdete Aufgaben",
+      "cost": "Angefallene Kosten",
+      "delay": "Verzögerung",
+      "end_date": "Fälligkeit",
+      "key": "Schlüssel",
+      "name": "Name",
+      "overdue": "Überfällige Aufgaben",
+      "pm": "PM",
+      "progress": "Fortschritt",
+      "revenue": "Erlös",
+      "start_date": "Beginn",
+      "status": "Status"
+    },
+    "projectStartDate": "Projektbeginn",
+    "slip": "Verschiebung (Tage)",
+    "startDate": "Beginn",
+    "status": "Status",
+    "statusCategory": "Phase",
+    "taskSort": {
+      "original_end_date": "Urspr. Fälligkeit",
+      "parent": "Übergeordnete Aufgabe",
+      "slip_days": "Verschiebung"
+    },
+    "timeliness": "Termintreue",
+    "timelinessValues": {
+      "at_risk": "Gefährdet",
+      "on_time": "Termingerecht",
+      "overdue": "Überfällig"
+    },
+    "type": "Typ",
+    "unassigned": "Nicht zugewiesen"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Budget der Kategorie {name}",
+      "columns": {
+        "budget": "Budget",
+        "category": "Kategorie",
+        "incurred": "Angefallen",
+        "planned": "Geplant",
+        "variance": "Abweichung"
+      },
+      "empty": "Keine Kostenkategorien. Der Administrator fügt sie unter Einstellungen → Projekte → Kostenkategorien hinzu.",
+      "hint": "Die Abweichung ist das Budget minus der angefallenen Kosten. Zeilen mit überschrittenem Budget sind hervorgehoben.",
+      "inactive": "(inaktiv)",
+      "saveFailed": "Budget konnte nicht gespeichert werden",
+      "title": "Budget nach Kategorien",
+      "total": "Gesamt"
+    },
+    "costForm": {
+      "addTitle": "Neue Kosten",
+      "amount": "Betrag",
+      "category": "Kategorie",
+      "clearInvoiceDocument": "Dokument trennen",
+      "conversionHint": "Der Betrag wird zum Mittelkurs der NBP (Polnische Nationalbank) vom Geschäftstag vor dem Kostendatum in {currency} umgerechnet.",
+      "currency": "Währung des Betrags",
+      "date": "Datum",
+      "description": "Beschreibung",
+      "documentNumber": "Belegnummer",
+      "editTitle": "Kosten bearbeiten",
+      "invoiceDocument": "Rechnungsdokument (optional)",
+      "invoiceDocumentHint": "Dokumente vom Typ Rechnung, auf die Sie im Modul Dokumente Zugriff haben. Aus KSeF abgerufene Rechnungen werden separat verknüpft.",
+      "invoiceDocumentPlaceholder": "Rechnung nach Nummer oder Name suchen…",
+      "noTask": "— ohne Aufgabe —",
+      "saveFailed": "Kosten konnten nicht gespeichert werden",
+      "saved": "Kosten gespeichert",
+      "savedWithRate": "Kosten gespeichert: {amount} zum Kurs {rate} vom {date}",
+      "selectCategory": "— Kategorie auswählen —",
+      "status": "Status",
+      "storedConversion": "Gespeichert als {amount} (Kurs {rate} vom {date}).",
+      "supplier": "Lieferant",
+      "task": "Aufgabe"
+    },
+    "costStatuses": {
+      "incurred": "Angefallen",
+      "planned": "Geplant"
+    },
+    "costs": {
+      "add": "Kosten hinzufügen",
+      "columns": {
+        "amount": "Betrag",
+        "category": "Kategorie",
+        "date": "Datum",
+        "description": "Beschreibung",
+        "documentNumber": "Beleg-Nr.",
+        "status": "Status",
+        "supplier": "Lieferant",
+        "task": "Aufgabe"
+      },
+      "deleteConfirm": "Kosten ({item}) löschen?",
+      "deleteFailed": "Kosten konnten nicht gelöscht werden",
+      "empty": "Das Projekt hat noch keine Kosten.",
+      "emptyForFilters": "Keine Kosten für die gewählten Filter.",
+      "filters": {
+        "allCategories": "Alle Kategorien",
+        "allStatuses": "Alle Status",
+        "allTasks": "Alle Aufgaben",
+        "withoutTask": "Ohne Aufgabe"
+      },
+      "rateNote": "Kurs {rate} vom {date}",
+      "title": "Kosten",
+      "totalIncurred": "Angefallen gesamt"
+    },
+    "delete": "Löschen",
+    "document": {
+      "lockedTitle": "Rechnungsdokument — Sie haben im Modul Dokumente keinen Zugriff darauf",
+      "openTitle": "Rechnungsdokument — im Modul Dokumente öffnen"
+    },
+    "edit": "Bearbeiten",
+    "loadFailed": "Projektfinanzen konnten nicht geladen werden",
+    "plan": {
+      "currency": "Projektwährung",
+      "currencyLockedHint": "Die Währung kann nicht geändert werden, da das Projekt bereits Kosten- oder Erlöspositionen hat.",
+      "participantsCanAddCosts": "Teilnehmer können Kosten zu ihren Aufgaben hinzufügen",
+      "participantsCanAddCostsHint": "Ein interner Teilnehmer fügt Kosten nur in Aufgaben hinzu, denen er zugewiesen ist, und sieht ausschließlich die von ihm selbst hinzugefügten Positionen.",
+      "plannedRevenue": "Geplanter Erlös ({currency})",
+      "saveFailed": "Plan konnte nicht gespeichert werden",
+      "suggestedHint": "Der Vorschlag ist der Wert des verknüpften Leads, umgerechnet in die Projektwährung.",
+      "title": "Finanzplan",
+      "useSuggested": "Vorschlag übernehmen: {amount}"
+    },
+    "readOnlyNote": "Nur Lesen — Sie können die Finanzen dieses Projekts einsehen, aber nicht ändern.",
+    "revenueStatuses": {
+      "invoiced": "Fakturiert",
+      "paid": "Bezahlt",
+      "planned": "Geplant"
+    },
+    "revenues": {
+      "add": "Erlös hinzufügen",
+      "addTitle": "Neuer Erlös",
+      "amountIn": "Betrag ({currency})",
+      "columns": {
+        "amount": "Betrag",
+        "date": "Datum",
+        "description": "Beschreibung",
+        "status": "Status"
+      },
+      "deleteConfirm": "Erlös ({item}) löschen?",
+      "deleteFailed": "Erlös konnte nicht gelöscht werden",
+      "editTitle": "Erlös bearbeiten",
+      "empty": "Das Projekt hat noch keine Erlöse.",
+      "saveFailed": "Erlös konnte nicht gespeichert werden",
+      "saved": "Erlös gespeichert",
+      "statusHint": "Zum Ist-Erlös zählen fakturierte und bezahlte Positionen.",
+      "title": "Erlöse"
+    },
+    "saving": "Wird gespeichert…",
+    "summary": {
+      "budget": "Budget",
+      "cost": "Kosten (angefallen)",
+      "margin": "Marge (Ist)",
+      "plan": "Plan",
+      "plannedItems": "Geplante Positionen",
+      "remainingBudget": "Restbudget",
+      "remainingBudgetHint": "Budget minus angefallene Kosten",
+      "revenue": "Erlös (Ist)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Angefallen (eigene)",
+        "plannedCost": "Geplante Kosten",
+        "task": "Aufgabe",
+        "totalIncurred": "Angefallen inkl. Unteraufgaben",
+        "totalPlanned": "Geplant inkl. Unteraufgaben"
+      },
+      "empty": "Noch keine Aufgabe hat Kosten oder geplante Kosten.",
+      "hint": "Die geplanten Kosten einer Aufgabe dienen nur zur Information und fließen nicht in das Projektbudget ein. Beträge „inkl. Unteraufgaben“ umfassen die Positionen der Aufgabe und aller ihrer Unteraufgaben.",
+      "plannedCostOf": "Geplante Kosten der Aufgabe {task}",
+      "saveFailed": "Geplante Kosten konnten nicht gespeichert werden",
+      "title": "Aufgabenkosten",
+      "total": "Gesamt"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Ist / Plan",
+      "cost": "Kosten",
+      "margin": "Marge",
+      "marginHint": "Ist-Marge: fakturierter und bezahlter Erlös minus angefallene Kosten",
+      "revenue": "Erlös"
+    }
+  },
+  "gantt": {
+    "beyondProjectEnd": "Endet nach dem Fälligkeitsdatum des Projekts",
+    "emptyTitle": "Keine Aufgaben",
+    "loadFailed": "Zeitachse konnte nicht geladen werden",
+    "originalEndDate": "Ursprüngliches Fälligkeitsdatum: {date} ({slip})",
+    "projectEndDate": "Fälligkeitsdatum des Projekts: {date}",
+    "taskColumn": "Aufgabe",
+    "today": "Heute",
+    "truncated": "Die Zeitachse zeigt die ersten {limit} Aufgaben. Grenzen Sie die Filter ein, um die übrigen zu sehen.",
+    "undatedNote": "{count, plural, one {# Aufgabe ohne Datumsangaben hat keinen Balken auf der Zeitachse.} other {# Aufgaben ohne Datumsangaben haben keinen Balken auf der Zeitachse.}}",
+    "zoom": {
+      "day": "Tage",
+      "month": "Monate",
+      "week": "Wochen"
+    }
+  },
+  "ksef": {
+    "badge": {
+      "openTitle": "Rechnung aus KSeF — Details anzeigen",
+      "title": "Rechnung aus KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Rechnung aus KSeF hinzufügen",
+      "link": "KSeF-Rechnung verknüpfen",
+      "unlink": "Rechnung trennen",
+      "unlinkConfirm": "Verknüpfung der Rechnung {invoice} mit diesen Kosten lösen? Die Kosten bleiben in der Liste und die Rechnung bleibt in KSeF.",
+      "unlinkFailed": "Verknüpfung der Rechnung konnte nicht gelöst werden"
+    },
+    "detail": {
+      "address": "Adresse",
+      "buyer": "Käufer",
+      "invoiceType": "Rechnungsart",
+      "issueDate": "Ausstellungsdatum",
+      "ksefNumber": "KSeF-Nummer",
+      "lines": {
+        "empty": "Die Rechnung enthält keine Positionen.",
+        "name": "Bezeichnung",
+        "netAmount": "Nettobetrag",
+        "number": "Nr.",
+        "quantity": "Menge",
+        "title": "Rechnungspositionen",
+        "unitNetPrice": "Nettopreis",
+        "vatRate": "USt."
+      },
+      "links": {
+        "empty": "Die Rechnung ist mit keinen Kosten verknüpft.",
+        "linkedTotal": "Insgesamt verknüpft: {linked} von {net} netto.",
+        "title": "Verknüpfungen der Rechnung"
+      },
+      "loadFailed": "Rechnung konnte nicht geladen werden",
+      "payment": {
+        "amountDue": "Zu zahlen",
+        "bankAccounts": "Bankkonto",
+        "dueDates": "Zahlungsfrist",
+        "factor": "Factor",
+        "form": "Zahlungsart",
+        "paymentDate": "Zahlungsdatum",
+        "state": "Zahlungsstatus",
+        "states": {
+          "paid": "Bezahlt",
+          "partiallyPaid": "Teilweise bezahlt",
+          "unknown": "Keine Angabe",
+          "unpaid": "Unbezahlt"
+        },
+        "title": "Zahlung"
+      },
+      "saleDate": "Verkaufsdatum",
+      "seller": "Verkäufer",
+      "title": "Rechnung {number}",
+      "titleLoading": "Rechnung aus KSeF",
+      "totals": {
+        "gross": "Brutto",
+        "net": "Netto",
+        "vat": "USt."
+      }
+    },
+    "document": {
+      "groupMissing": "Es wurde keine Zugriffsgruppe für Rechnungsdokumente ausgewählt, daher können Rechnungen nicht in Dokumenten erfasst werden. Der Administrator wählt sie unter Einstellungen → Projekte → KSeF aus.",
+      "noAccessTitle": "Sie gehören nicht zur Zugriffsgruppe dieses Dokuments und können es daher nicht öffnen.",
+      "notRegisteredOnLink": "Die Rechnung wird verknüpft, erscheint aber nicht im Modul Dokumente: Es wurde keine Zugriffsgruppe für Rechnungsdokumente ausgewählt (Einstellungen → Projekte → KSeF).",
+      "open": "Dokument öffnen",
+      "register": "In Dokumenten erfassen",
+      "registerFailed": "Rechnung konnte nicht in Dokumenten erfasst werden",
+      "registerHint": "Die Rechnung hat noch kein Dokument im Modul Dokumente. Beim Verknüpfen mit Kosten wird sie automatisch erfasst.",
+      "registered": "Erfasst: {number}",
+      "registeredToast": "Rechnung in Dokumenten als {number} erfasst",
+      "registering": "Wird erfasst…",
+      "title": "Dokument im Modul Dokumente"
+    },
+    "errors": {
+      "forbidden": "Sie haben keinen Zugriff auf KSeF-Rechnungen. Die Berechtigung vergibt der Administrator in der Benutzerverwaltung."
+    },
+    "invoiceTypes": {
+      "KOR": "Korrekturrechnung",
+      "KOR_ROZ": "Korrektur der Schlussrechnung",
+      "KOR_ZAL": "Korrektur der Anzahlungsrechnung",
+      "ROZ": "Schlussrechnung",
+      "UPR": "Vereinfachte Rechnung",
+      "VAT": "Umsatzsteuerrechnung",
+      "ZAL": "Anzahlungsrechnung"
+    },
+    "link": {
+      "alreadyLinkedHint": "Sie können sie trotzdem erneut verknüpfen — prüfen Sie nur, ob dieselben Kosten nicht doppelt gezählt werden.",
+      "alreadyLinkedTitle": "Achtung: Diese Rechnung ist bereits verknüpft",
+      "amountHint": "Standardmäßig der gesamte Nettobetrag der Rechnung. Ändern Sie ihn, wenn Sie diesen Kosten nur einen Teil der Rechnung zuordnen.",
+      "amountHintForeign": "Die Rechnung lautet auf {invoiceCurrency}, das Projekt auf {projectCurrency}. Lassen Sie das Feld leer, dann wird der gesamte Nettobetrag ({net}) zum Mittelkurs der NBP vom Geschäftstag vor dem Ausstellungsdatum der Rechnung umgerechnet. Sie können den Betrag auch direkt in {projectCurrency} eingeben.",
+      "amountIn": "Zugeordneter Betrag ({currency})",
+      "attachNote": "Die Rechnung wird mit den Kosten verknüpft: {item}. Betrag und übrige Angaben der Kosten ändern sich nicht.",
+      "back": "Zurück zur Liste",
+      "confirm": "Rechnung verknüpfen",
+      "errors": {
+        "failed": "Rechnung konnte nicht verknüpft werden",
+        "forbidden": "Sie sind nicht berechtigt, in diesem Projekt KSeF-Rechnungen zu verknüpfen.",
+        "noExchangeRate": "Kein NBP-Kurs für die Währung der Rechnung. Geben Sie den Betrag in {currency} ein.",
+        "projectClosed": "Das Projekt ist geschlossen — Rechnungen können nicht mehr verknüpft werden."
+      },
+      "saved": "Rechnung verknüpft",
+      "savedWithRate": "Rechnung verknüpft: {amount} zum Kurs {rate} vom {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Betrag",
+        "linkedBy": "Verknüpft von",
+        "project": "Projekt",
+        "status": "Status",
+        "task": "Aufgabe"
+      },
+      "wholeProject": "Gesamtes Projekt"
+    },
+    "list": {
+      "columns": {
+        "currency": "Währung",
+        "document": "Dokument",
+        "gross": "Brutto",
+        "issueDate": "Ausstellungsdatum",
+        "net": "Netto",
+        "number": "Nummer",
+        "paymentDueDate": "Zahlungsfrist",
+        "seller": "Verkäufer"
+      }
+    },
+    "nip": "Steuernummer",
+    "otherLinks": {
+      "intro": "Diese Rechnung ist außerdem verknüpft mit:",
+      "overAllocated": "Die Summe der Verknüpfungen übersteigt den Nettobetrag der Rechnung.",
+      "wholeProject": "{project} (gesamtes Projekt)"
+    },
+    "paymentForms": {
+      "card": "Karte",
+      "cash": "Bargeld",
+      "cheque": "Scheck",
+      "credit": "Kredit",
+      "mobile": "Mobile Zahlung",
+      "transfer": "Überweisung",
+      "voucher": "Gutschein"
+    },
+    "picker": {
+      "attachTitle": "KSeF-Rechnung mit Kosten verknüpfen",
+      "empty": "Keine Rechnungen im gewählten Zeitraum und für die gewählten Filter.",
+      "filters": {
+        "dateFrom": "Ausstellungsdatum von",
+        "dateTo": "Ausstellungsdatum bis",
+        "invoiceNumber": "Rechnungsnummer",
+        "netMax": "Netto bis",
+        "netMin": "Netto von",
+        "seller": "Verkäufer (Name oder Steuernummer)"
+      },
+      "lastSync": "Letzte erfolgreiche Synchronisierung: {time}.",
+      "linkedCount": "{count, plural, one {Bereits #-mal verknüpft} other {Bereits #-mal verknüpft}}",
+      "loadFailed": "Rechnungsliste konnte nicht geladen werden",
+      "nextPage": "Weiter",
+      "noCompanies": "Es wurde noch keine Firma für KSeF hinzugefügt. Das erledigt der Administrator unter Einstellungen → Projekte → KSeF.",
+      "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert. Die Liste zeigt nur früher abgerufene Rechnungen.",
+      "pageInfo": "Seite {page} von {pages} · Rechnungen: {total}",
+      "previousPage": "Zurück",
+      "search": "Suchen",
+      "select": "Auswählen",
+      "syncHint": "Eine frisch ausgestellte Rechnung kann erst nach einigen Minuten in KSeF erscheinen.",
+      "title": "Rechnung aus KSeF hinzufügen"
+    },
+    "settings": {
+      "addCompany": "Firma hinzufügen",
+      "columns": {
+        "lastAttempt": "Letzter Versuch",
+        "lastSynced": "Letzte erfolgreiche Synchronisierung",
+        "name": "Name",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Neue Firma in KSeF",
+        "added": "Firma hinzugefügt. Die Rechnungen werden bei der nächsten Synchronisierung abgerufen.",
+        "editTitle": "Firma in KSeF",
+        "name": "Name (optional)",
+        "saveFailed": "Firma konnte nicht gespeichert werden",
+        "saved": "Firma gespeichert",
+        "token": "KSeF-Token",
+        "tokenHintAdd": "In KSeF für diese Steuernummer erzeugtes Token. Vor dem Speichern prüfen wir es in KSeF; nach dem Speichern kann es nicht mehr ausgelesen werden.",
+        "tokenHintEdit": "Aktuelles Token: {hint}. Lassen Sie das Feld leer, um es nicht zu ändern.",
+        "verifying": "Prüfung in KSeF…"
+      },
+      "edit": "Ändern",
+      "environments": {
+        "production": "Produktionsumgebung",
+        "test": "Testumgebung"
+      },
+      "errors": {
+        "companyNotFound": "Diese Firma ist nicht mehr in der Konfiguration vorhanden. Aktualisieren Sie die Seite.",
+        "duplicateNip": "Eine Firma mit dieser Steuernummer wurde bereits hinzugefügt.",
+        "invalidNip": "Ungültige Steuernummer.",
+        "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert.",
+        "tokenRejected": "KSeF hat das Token für diese Steuernummer abgelehnt. Prüfen Sie, ob das Token gültig ist und für diese Firma ausgestellt wurde.",
+        "unknownGroup": "Diese Gruppe existiert nicht oder ist inaktiv. Aktualisieren Sie die Seite und wählen Sie eine andere.",
+        "unreachable": "Die Verbindung zu KSeF zur Prüfung des Tokens ist fehlgeschlagen. Versuchen Sie es später erneut."
+      },
+      "hint": "Die Eingangsrechnungen der unten hinzugefügten Firmen werden alle 30 Minuten aus dem polnischen Landessystem für E-Rechnungen (KSeF) abgerufen. Personen mit der Berechtigung „Zugriff auf KSeF-Rechnungen“ verknüpfen sie mit Projektkosten.",
+      "initialSyncDays": "Erste Synchronisierung reicht zurück (Tage)",
+      "initialSyncDaysHint": "Von {min} bis {max} Tagen. Gilt für Firmen, die nach der Änderung dieser Einstellung hinzugefügt werden.",
+      "invoiceDocumentsGroup": "Zugriffsgruppe für Rechnungsdokumente",
+      "invoiceDocumentsGroupHint": "In diese Gruppe gelangen die aus KSeF erfassten Rechnungsdokumente. Ohne ausgewählte Gruppe werden mit Projekten verknüpfte Rechnungen nicht im Modul Dokumente erfasst.",
+      "loadFailed": "KSeF-Konfiguration konnte nicht geladen werden",
+      "noCompanies": "Es wurde noch keine Firma hinzugefügt.",
+      "noInvoiceDocumentsGroup": "— keine —",
+      "notConfigured": "Die KSeF-Integration ist auf dem Server nicht konfiguriert, daher können weder Firmen hinzugefügt noch Rechnungen abgerufen werden.",
+      "remove": "Entfernen",
+      "removeConfirm": "Firma {company} aus der KSeF-Konfiguration entfernen? Neue Rechnungen werden nicht mehr abgerufen. Bereits abgerufene Rechnungen und ihre Verknüpfungen mit Kosten bleiben erhalten.",
+      "removeFailed": "Firma konnte nicht entfernt werden",
+      "saveFailed": "Einstellung konnte nicht gespeichert werden",
+      "saved": "Einstellung gespeichert",
+      "statuses": {
+        "active": "Aktiv",
+        "error": "Synchronisierungsfehler",
+        "invalid": "Token abgelehnt"
+      },
+      "syncFailed": "Die Synchronisierung ist fehlgeschlagen — der Grund wird bei der Firma angezeigt.",
+      "testEnvironmentNote": "Der Server ist mit der KSeF-Testumgebung verbunden — die Rechnungen sind keine echten Belege.",
+      "title": "KSeF — Eingangsrechnungen"
+    },
+    "sync": {
+      "failedForCompany": "Die Synchronisierung ist für mindestens eine Firma fehlgeschlagen. Details sieht der Administrator unter Einstellungen → Projekte → KSeF.",
+      "finished": "Synchronisierung abgeschlossen",
+      "now": "Jetzt synchronisieren",
+      "running": "Synchronisierung…",
+      "startFailed": "Synchronisierung konnte nicht gestartet werden",
+      "stillRunning": "Die Synchronisierung läuft noch — aktualisieren Sie die Liste in Kürze."
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Vollzugriff",
+      "read": "Nur Lesen"
+    },
+    "fieldTypes": {
+      "date": "Datum",
+      "list": "Werteliste",
+      "money": "Betrag mit Währung",
+      "number": "Zahl",
+      "text": "Text"
+    },
+    "reminders": {
+      "1d_before": "1 Tag vor dem Fälligkeitsdatum",
+      "2d_before": "2 Tage vor dem Fälligkeitsdatum",
+      "3d_before": "3 Tage vor dem Fälligkeitsdatum",
+      "at_due": "Am Fälligkeitsdatum",
+      "custom": "Eigenes Datum"
+    },
+    "roles": {
+      "controller": "Prüfer",
+      "external_participant": "Externer Teilnehmer",
+      "internal_participant": "Interner Teilnehmer",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Erledigt",
+      "in_progress": "In Arbeit",
+      "todo": "Zu erledigen"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "geschlossen",
+    "lockedHint": "Vorschau — Sie sind kein Teilnehmer dieses Projekts",
+    "noDueDate": "ohne Fälligkeitsdatum",
+    "noTasks": "Das Projekt hat noch keine Aufgaben.",
+    "openOfTotal": "{open} von {total} offen",
+    "showClosedProjectTasks": "Aufgaben des geschlossenen Projekts anzeigen",
+    "title": "Projektaufgaben"
+  },
+  "list": {
+    "closedBadge": "Geschlossen",
+    "createFailed": "Projekt konnte nicht erstellt werden",
+    "createForm": {
+      "description": "Beschreibung",
+      "keyHint": "Das Präfix der Aufgabennummern wird automatisch aus dem Projektnamen gebildet.",
+      "name": "Name",
+      "namePlaceholder": "z. B. Einführung des CRM-Systems",
+      "saving": "Wird gespeichert…",
+      "submit": "Projekt erstellen"
+    },
+    "empty": {
+      "noOpenProjects": "Sie nehmen an keinem offenen Projekt teil.",
+      "noneForFilter": "Keine Projekte für den gewählten Filter.",
+      "title": "Keine Projekte"
+    },
+    "filters": {
+      "all": "Alle",
+      "closed": "Geschlossene",
+      "open": "Offene"
+    },
+    "loadFailed": "Projekte konnten nicht geladen werden",
+    "newProject": "Neues Projekt",
+    "stats": {
+      "atRisk": "gefährdet",
+      "doneOfTotalHint": "Erledigte Aufgaben / alle Aufgaben",
+      "members": "{count, plural, one {Person} other {Personen}}",
+      "myOpenTasks": "{count, plural, one {offen für mich} other {offen für mich}}",
+      "overdue": "überfällig",
+      "tasks": "{count, plural, one {Aufgabe} other {Aufgaben}}"
+    },
+    "title": "Projekte",
+    "views": {
+      "myTasks": "Meine Aufgaben",
+      "portfolio": "Projektübersicht",
+      "projects": "Projekte"
+    }
+  },
+  "myTasks": {
+    "empty": {
+      "description": "Sie haben in keinem Projekt offene Aufgaben.",
+      "title": "Keine Aufgaben"
+    },
+    "includeDone": "Erledigte anzeigen",
+    "loadFailed": "Aufgaben konnten nicht geladen werden"
+  },
+  "panel": {
+    "chatTitle": "Unterhaltung zur Aufgabe",
+    "costs": {
+      "add": "Kosten hinzufügen",
+      "empty": "Die Aufgabe hat noch keine Kosten.",
+      "loadFailed": "Kosten der Aufgabe konnten nicht geladen werden",
+      "ownOnlyHint": "Sie sehen nur die von Ihnen selbst hinzugefügten Kosten.",
+      "title": "Kosten",
+      "totalIncurred": "Angefallen gesamt"
+    },
+    "createTask": "Aufgabe erstellen",
+    "created": "Aufgabe erstellt",
+    "customFields": {
+      "addButton": "+ Feld hinzufügen",
+      "addFailed": "Feld konnte nicht hinzugefügt werden",
+      "addHint": "Das Feld wird allen Aufgaben dieses Projekts hinzugefügt.",
+      "noneAvailable": "Keine Felder zum Hinzufügen. Felder definiert der Administrator unter Einstellungen → Projekte → Zusatzfelder für Aufgaben.",
+      "selectField": "— Feld auswählen —",
+      "title": "Zusatzfelder"
+    },
+    "endDateChange": {
+      "hint": "Optional. Der PM sieht den Grund in der E-Mail über die Änderung des Fälligkeitsdatums; er wird außerdem im Verlauf der Aufgabe gespeichert.",
+      "placeholder": "z. B. verspätete Lieferung des Kunden",
+      "reason": "Grund für die Änderung des Fälligkeitsdatums"
+    },
+    "fields": {
+      "assignees": "Zugewiesene Personen",
+      "description": "Zusätzliche Beschreibung",
+      "endDate": "Enddatum",
+      "name": "Name",
+      "noParent": "— keine (Hauptaufgabe) —",
+      "parentTask": "Übergeordnete Aufgabe",
+      "priority": "Priorität",
+      "startDate": "Startdatum",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "history": {
+      "changed": "hat geändert: {fields}",
+      "changedWithStatus": "hat geändert: {fields} ({from} → {to})",
+      "created": "hat die Aufgabe erstellt",
+      "empty": "Keine Einträge.",
+      "endDateChangeReason": "Grund für die Änderung des Fälligkeitsdatums: {reason}",
+      "fields": {
+        "assignees": "Zugewiesene Personen",
+        "customFields": "Zusatzfelder",
+        "description": "Beschreibung",
+        "endDate": "Enddatum",
+        "name": "Name",
+        "parentTask": "Übergeordnete Aufgabe",
+        "priority": "Priorität",
+        "reminder": "Erinnerung",
+        "startDate": "Startdatum",
+        "status": "Status",
+        "type": "Typ"
+      },
+      "loadFailed": "Verlauf konnte nicht geladen werden",
+      "systemUser": "System",
+      "title": "Änderungsverlauf"
+    },
+    "loadFailed": "Aufgabe konnte nicht geladen werden",
+    "newTask": "Neue Aufgabe",
+    "reminder": {
+      "customDate": "Datum der Erinnerung",
+      "hint": "Die Erinnerung geht um 9:00 Uhr an alle zugewiesenen Personen und setzt ein Enddatum voraus.",
+      "label": "E-Mail-Erinnerung",
+      "none": "Keine"
+    },
+    "saveFailed": "Aufgabe konnte nicht gespeichert werden",
+    "saved": "Aufgabe gespeichert",
+    "saving": "Wird gespeichert…"
+  },
+  "portfolio": {
+    "columns": {
+      "atRisk": "Gefährdet",
+      "cost": "Angefallene Kosten",
+      "delay": "Verzögerung",
+      "endDate": "Fälligkeit",
+      "overdue": "Überfällig",
+      "progress": "Fortschritt",
+      "project": "Projekt",
+      "projectManagers": "PM",
+      "revenue": "Erlös",
+      "startDate": "Beginn"
+    },
+    "loadFailed": "Projektübersicht konnte nicht geöffnet werden",
+    "noProjects": "Sie sind bei keinem offenen Projekt PM oder Prüfer.",
+    "noTasks": "In Ihren Projekten gibt es keine Aufgaben.",
+    "tabs": {
+      "projects": "Projekte",
+      "tasks": "Aufgaben",
+      "timeline": "Zeitachse"
+    }
+  },
+  "settings": {
+    "costCategories": {
+      "hint": "Kategorien können nicht gelöscht werden — deaktivieren Sie nicht verwendete. Eine deaktivierte Kategorie kann bei neuen Kosten nicht ausgewählt werden, bestehende Positionen behalten sie.",
+      "title": "Kostenkategorien"
+    },
+    "deadlines": {
+      "hint": "Eine Aufgabe, mit der noch nicht begonnen wurde, wird als gefährdet markiert, wenn bis zu ihrem Fälligkeitsdatum nicht mehr Tage verbleiben als dieser Schwellenwert (0–30; 0 bedeutet nur der Fälligkeitstag selbst).",
+      "invalid": "Geben Sie eine ganze Zahl von 0 bis 30 ein.",
+      "saveFailed": "Schwellenwert konnte nicht gespeichert werden",
+      "saved": "Schwellenwert für gefährdete Aufgaben gespeichert",
+      "threshold": "Schwellenwert für gefährdete Aufgaben (Tage)",
+      "title": "Terminkontrolle"
+    },
+    "dictionary": {
+      "active": "aktiv",
+      "addButton": "Hinzufügen",
+      "moveDown": "Nach unten",
+      "moveUp": "Nach oben",
+      "newItemPlaceholder": "Neuer Eintrag…",
+      "saveFailed": "Wörterbuch konnte nicht gespeichert werden"
+    },
+    "fields": {
+      "active": "aktiv",
+      "addButton": "Feld hinzufügen",
+      "empty": "Keine Felder definiert.",
+      "hint": "Die hier definierten Felder kann der PM seinem Projekt hinzufügen (Projektkarte → Zusatzfelder für Aufgaben) und festlegen, ob sie erforderlich sind. Der Feldtyp kann nach dem Erstellen nicht mehr geändert werden.",
+      "newNamePlaceholder": "Name des neuen Feldes…",
+      "optionsPlaceholder": "Werte, durch Kommas getrennt",
+      "optionsRequired": "Die Liste muss mindestens einen Wert enthalten",
+      "saveFailed": "Feld konnte nicht gespeichert werden",
+      "title": "Zusatzfelder für Aufgaben"
+    },
+    "finance": {
+      "disableConfirm": "Projektfinanzen deaktivieren? Die Daten bleiben erhalten, verschwinden aber aus der Ansicht aller Benutzer.",
+      "hint": "Nach der Aktivierung führen PM und Administrator im Projekt Budget, Kosten und Erlöse, der Prüfer kann sie einsehen. Die Zusammenfassung der Projektfinanzen sieht außerdem jeder, der Zugriff auf die Karte des verknüpften Leads oder Partners hat.",
+      "saveFailed": "Einstellung der Projektfinanzen konnte nicht geändert werden",
+      "title": "Projektfinanzen",
+      "toggle": "Projektfinanzen aktivieren"
+    },
+    "loadFailed": "Projektkonfiguration konnte nicht geladen werden",
+    "priorities": {
+      "title": "Prioritäten"
+    },
+    "statuses": {
+      "hint": "Die Kategorie sagt dem System, was der Status bedeutet — unabhängig vom Namen. Aufgaben mit einem Status der Kategorie „Erledigt“ zählen weder als offen noch als überfällig.",
+      "title": "Aufgabenstatus"
+    },
+    "transitions": {
+      "discardConfirm": "Sie haben nicht gespeicherte Änderungen an den Übergängen. Verwerfen?",
+      "hint": "Der PM kann den Status jederzeit beliebig ändern. Teilnehmer ändern den Status nur bei Aufgaben, denen sie zugewiesen sind und für die sie Vollzugriff haben. Der Prüfer ändert den Status bei jeder Aufgabe des Projekts.",
+      "matrixCorner": "Von Status ↓ / zu Status →",
+      "saveButton": "Übergänge speichern",
+      "saveFailed": "Übergänge konnten nicht gespeichert werden",
+      "saved": "Statusübergänge gespeichert",
+      "saving": "Wird gespeichert…",
+      "title": "Übergänge zwischen Status"
+    },
+    "types": {
+      "title": "Aufgabentypen"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Personen",
+      "cost": "Kosten",
+      "endDate": "Ende",
+      "number": "Nr.",
+      "priority": "Priorität",
+      "project": "Projekt",
+      "startDate": "Beginn",
+      "status": "Status",
+      "task": "Aufgabe",
+      "timeliness": "Termintreue",
+      "type": "Typ"
+    },
+    "emptyForFilters": "Keine Aufgabe entspricht den Filtern.",
+    "emptyMessage": "In diesem Projekt gibt es noch keine Aufgaben.",
+    "emptyTitle": "Keine Aufgaben",
+    "flatList": "Flache Liste",
+    "parentTask": "Übergeordnete Aufgabe",
+    "subtask": "Unteraufgabe"
+  }
+}

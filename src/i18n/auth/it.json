@@ -1,0 +1,35 @@
+{
+  "changePassword": {
+    "errors": {
+      "failed": "Errore nel cambio della password",
+      "mismatch": "Le password non coincidono",
+      "tooShort": "La password deve avere almeno 8 caratteri"
+    },
+    "hint": "La tua password temporanea è scaduta. Imposta una password personale prima di continuare.",
+    "newPassword": "Nuova password",
+    "newPasswordPlaceholder": "min. 8 caratteri",
+    "repeatPassword": "Ripeti la password",
+    "submit": "Imposta la password e accedi",
+    "submitting": "Salvataggio…",
+    "title": "Imposta una nuova password"
+  },
+  "login": {
+    "email": "Email",
+    "emailPlaceholder": "mario@azienda.it",
+    "failed": "Errore di accesso",
+    "hidePassword": "Nascondi",
+    "password": "Password",
+    "passwordTab": "Email e password",
+    "platformName": "Piattaforma CRM",
+    "profileLoadFailed": "Errore di caricamento del profilo",
+    "redirecting": "Reindirizzamento…",
+    "showPassword": "Mostra",
+    "ssoFailed": "Accesso SSO non riuscito. Riprova.",
+    "ssoHint": "Accedi con l'account Google Workspace della tua organizzazione.",
+    "ssoSubmit": "Accedi con Google Workspace SSO",
+    "submit": "Accedi",
+    "submitting": "Accesso in corso…",
+    "tenantHostMismatch": "Questo account non appartiene all'organizzazione di questo indirizzo. Accedi di nuovo.",
+    "unknownTenant": "Nessuna organizzazione riconosciuta a questo indirizzo."
+  }
+}

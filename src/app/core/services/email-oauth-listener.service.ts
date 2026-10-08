@@ -1,7 +1,7 @@
 // src/app/core/services/email-oauth-listener.service.ts
 //
-// Listens for the OAuth-result signal that crm/{gmail,outlook,zoho}/callback
-// pages broadcast after Google/Microsoft/Zoho redirects back from the
+// Listens for the OAuth-result signal that crm/{gmail,outlook,zoho,yandex}/callback
+// pages broadcast after Google/Microsoft/Zoho/Yandex redirects back from the
 // provider's consent screen. Three delivery mechanisms are raced because no
 // single one is reliable across browsers/redirect flows: BroadcastChannel,
 // a `storage` event on a `<provider>_oauth_connected` localStorage key, and
@@ -14,7 +14,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 
-const OAUTH_CHANNEL_NAMES = ['gmail-oauth', 'outlook-oauth', 'zoho-oauth'];
+const OAUTH_CHANNEL_NAMES = ['gmail-oauth', 'outlook-oauth', 'zoho-oauth', 'yandex-oauth'];
 
 @Injectable()
 export class EmailOauthListenerService implements OnDestroy {

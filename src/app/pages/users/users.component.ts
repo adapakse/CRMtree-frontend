@@ -4,28 +4,32 @@ import { FormsModule } from '@angular/forms';
 import { UserService, GroupService } from '../../core/services/api.services';
 import { ToastService } from '../../core/services/toast.service';
 import { AppSettingsService } from '../../core/services/app-settings.service';
-import { User, GroupProfile } from '../../core/models/models';
+import { User, GroupProfile, VisibilityGrant } from '../../core/models/models';
 import { AvatarComponent, GroupPillComponent } from '../../shared/components/badges.components';
 import { CrmApiService, SalesBudget } from '../../core/services/crm-api.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../core/i18n/locale.service';
 
 @Component({
   selector: 'wt-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, AvatarComponent, GroupPillComponent],
+  imports: [CommonModule, FormsModule, AvatarComponent, GroupPillComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('admin')],
   template: `
+<ng-container *transloco="let t; prefix: 'admin'">
     <div id="topbar">
-      <span class="page-title">Zarządzanie użytkownikami</span>
+      <span class="page-title">{{ t('users.title') }}</span>
       <span class="tsp"></span>
       <div class="srch-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="srch" type="search" placeholder="Szukaj użytkowników…"
+        <input class="srch" type="search" [placeholder]="t('users.searchPlaceholder')"
                [(ngModel)]="search" (ngModelChange)="onSearch()">
       </div>
       @if (isAdmin()) {
         <button class="btn btn-p" style="margin-left:8px" (click)="openNew()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nowy użytkownik
+          {{ t('users.newUser') }}
         </button>
       }
     </div>
@@ -33,26 +37,26 @@ import { AuthService } from '../../core/auth/auth.service';
     <div id="content">
       <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center">
         <select class="sel" [(ngModel)]="filterGroup" (ngModelChange)="load()">
-          <option value="">Wszystkie grupy</option>
+          <option value="">{{ t('users.filters.allGroups') }}</option>
           @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
         </select>
         <select class="sel" [(ngModel)]="filterActive" (ngModelChange)="load()">
-          <option value="">Wszyscy użytkownicy</option>
-          <option value="true">Tylko aktywni</option>
-          <option value="false">Tylko nieaktywni</option>
+          <option value="">{{ t('users.filters.allUsers') }}</option>
+          <option value="true">{{ t('users.filters.activeOnly') }}</option>
+          <option value="false">{{ t('users.filters.inactiveOnly') }}</option>
         </select>
-        <span style="font-size:12.5px;color:var(--gray-400)">Użytkowników: {{ total() }}</span>
+        <span style="font-size:12.5px;color:var(--gray-400)">{{ t('users.count', { count: total() }) }}</span>
       </div>
 
       <div class="tw">
         <div class="thead" style="grid-template-columns:40px 1fr 200px 1fr 110px 120px 80px">
           <div class="th"></div>
-          <div class="th sortable" (click)="sortBy('display_name')">Użytkownik <span class="si">{{ sortIcon('display_name') }}</span></div>
-          <div class="th sortable" (click)="sortBy('email')">Email <span class="si">{{ sortIcon('email') }}</span></div>
-          <div class="th">Grupy i role</div>
-          <div class="th sortable" (click)="sortBy('crm_role')">Rola CRM <span class="si">{{ sortIcon('crm_role') }}</span></div>
-          <div class="th sortable" (click)="sortBy('last_login')">Ostatnie logowanie <span class="si">{{ sortIcon('last_login') }}</span></div>
-          <div class="th sortable" (click)="sortBy('is_active')">Status <span class="si">{{ sortIcon('is_active') }}</span></div>
+          <div class="th sortable" (click)="sortBy('display_name')">{{ t('users.columns.user') }} <span class="si">{{ sortIcon('display_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('email')">{{ t('users.columns.email') }} <span class="si">{{ sortIcon('email') }}</span></div>
+          <div class="th">{{ t('users.columns.groupsAndRoles') }}</div>
+          <div class="th sortable" (click)="sortBy('crm_role')">{{ t('users.fields.crmRole') }} <span class="si">{{ sortIcon('crm_role') }}</span></div>
+          <div class="th sortable" (click)="sortBy('last_login')">{{ t('users.columns.lastLogin') }} <span class="si">{{ sortIcon('last_login') }}</span></div>
+          <div class="th sortable" (click)="sortBy('is_active')">{{ t('users.fields.status') }} <span class="si">{{ sortIcon('is_active') }}</span></div>
         </div>
 
         @if (loading()) {
@@ -64,7 +68,7 @@ import { AuthService } from '../../core/auth/auth.service';
             <div class="td"><wt-avatar [name]="user.display_name" [size]="28" /></div>
             <div class="td">
               <div style="font-weight:500;color:var(--gray-900)">{{ user.display_name }}</div>
-              @if (user.is_admin) { <span style="font-size:10px;background:var(--orange-pale);color:var(--orange-dark);padding:1px 6px;border-radius:4px;font-weight:600">ADMIN</span> }
+              @if (user.is_admin) { <span style="font-size:10px;background:var(--orange-pale);color:var(--orange-dark);padding:1px 6px;border-radius:4px;font-weight:600">{{ t('users.adminBadge') }}</span> }
             </div>
             <div class="td" style="font-size:12px;color:var(--gray-500)">{{ user.email }}</div>
             <div class="td">
@@ -78,39 +82,48 @@ import { AuthService } from '../../core/auth/auth.service';
                 @if (rolesOverflow(user) > 0) {
                   <span style="font-size:11px;color:var(--gray-400)">+{{ rolesOverflow(user) }}</span>
                 }
+                <!-- Grant widoczności NIE jest przynależnością do grupy — osobna
+                     pigułka, żeby admin nie pomylił jej z rolą grupową. -->
+                @for (grant of user.visibility_grants ?? []; track grant.id) {
+                  <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
+                        [title]="grantTooltip(grant)">
+                    👁 {{ grant.group_display || grant.group_name }}
+                    <span style="opacity:.7">{{ grant.access_level }}</span>
+                  </span>
+                }
               </div>
             </div>
             <div class="td">
               @if (user.crm_role === 'sales_manager') {
-                <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">Manager</span>
+                <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.managerShort') }}</span>
               } @else if (user.crm_role === 'salesperson') {
-                <span style="font-size:10px;background:#dcfce7;color:#166534;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">Handlowiec</span>
+                <span style="font-size:10px;background:#dcfce7;color:#166534;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.salespersonShort') }}</span>
               } @else {
                 <span style="font-size:11px;color:var(--gray-300)">—</span>
               }
             </div>
             <div class="td" style="font-size:12px;color:var(--gray-400)">
-              {{ user.last_login_at ? (user.last_login_at | date:'dd.MM.yy HH:mm') : 'Nigdy' }}
+              {{ user.last_login_at ? (user.last_login_at | date:'dd.MM.yy HH:mm') : t('users.neverLoggedIn') }}
             </div>
             <div class="td">
               <span class="badge" [class]="user.is_active ? 's-signed' : 's-rejected'">
-                <span class="bdot"></span>{{ user.is_active ? 'Aktywny' : 'Nieaktywny' }}
+                <span class="bdot"></span>{{ user.is_active ? t('users.statuses.active') : t('users.statuses.inactive') }}
               </span>
             </div>
           </div>
         }
         @empty {
           @if (!loading()) {
-            <div class="empty-state"><div class="empty-icon">&#128100;</div><div class="empty-title">Nie znaleziono użytkowników</div></div>
+            <div class="empty-state"><div class="empty-icon">&#128100;</div><div class="empty-title">{{ t('users.empty') }}</div></div>
           }
         }
       </div>
 
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">Poprz.</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">Strona {{ page() }} z {{ totalPages() }}</span>
-          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">Dalej</button>
+          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page()-1)">{{ t('users.pagination.previous') }}</button>
+          <span style="font-size:12.5px;color:var(--gray-500)">{{ t('users.pagination.page', { page: page(), total: totalPages() }) }}</span>
+          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page()+1)">{{ t('users.pagination.next') }}</button>
         </div>
       }
     </div>
@@ -124,8 +137,8 @@ import { AuthService } from '../../core/auth/auth.service';
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
             <div>
-              <div class="mot">Dodaj nowego użytkownika</div>
-              <div class="mos">Ręcznie utwórz nowe konto użytkownika</div>
+              <div class="mot">{{ t('users.create.title') }}</div>
+              <div class="mos">{{ t('users.create.subtitle') }}</div>
             </div>
             <div class="mox" (click)="showNew.set(false)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -135,95 +148,100 @@ import { AuthService } from '../../core/auth/auth.service';
           <div style="padding:24px">
             <div class="fgrid">
               <div class="fg">
-                <label class="fl">Imię <span style="color:var(--orange)">*</span></label>
-                <input class="fi" [(ngModel)]="newFirst" placeholder="Anna" [class.fi-err]="submitted && !newFirst">
-                @if (submitted && !newFirst) { <span class="ferr">Wymagane</span> }
+                <label class="fl">{{ t('users.fields.firstName') }} <span style="color:var(--orange)">*</span></label>
+                <input class="fi" [(ngModel)]="newFirst" [placeholder]="t('users.create.firstNamePlaceholder')" [class.fi-err]="submitted && !newFirst">
+                @if (submitted && !newFirst) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg">
-                <label class="fl">Nazwisko <span style="color:var(--orange)">*</span></label>
-                <input class="fi" [(ngModel)]="newLast" placeholder="Kowalska" [class.fi-err]="submitted && !newLast">
-                @if (submitted && !newLast) { <span class="ferr">Wymagane</span> }
+                <label class="fl">{{ t('users.fields.lastName') }} <span style="color:var(--orange)">*</span></label>
+                <input class="fi" [(ngModel)]="newLast" [placeholder]="t('users.create.lastNamePlaceholder')" [class.fi-err]="submitted && !newLast">
+                @if (submitted && !newLast) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Adres e-mail <span style="color:var(--orange)">*</span></label>
-                <input class="fi" type="email" [(ngModel)]="newEmail" placeholder="anna.kowalska@firma.com" [class.fi-err]="submitted && !newEmail">
-                @if (submitted && !newEmail) { <span class="ferr">Wymagane</span> }
+                <label class="fl">{{ t('users.fields.email') }} <span style="color:var(--orange)">*</span></label>
+                <input class="fi" type="email" [(ngModel)]="newEmail" [placeholder]="t('users.create.emailPlaceholder')" [class.fi-err]="submitted && !newEmail">
+                @if (submitted && !newEmail) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg">
-                <label class="fl">Status</label>
+                <label class="fl">{{ t('users.fields.status') }}</label>
                 <select class="fsel" [(ngModel)]="newActive">
-                  <option [ngValue]="true">Aktywny</option>
-                  <option [ngValue]="false">Nieaktywny</option>
+                  <option [ngValue]="true">{{ t('users.statuses.active') }}</option>
+                  <option [ngValue]="false">{{ t('users.statuses.inactive') }}</option>
                 </select>
               </div>
               <div class="fg">
-                <label class="fl">Rola administratora</label>
+                <label class="fl">{{ t('users.fields.adminRole') }}</label>
                 <select class="fsel" [(ngModel)]="newAdmin">
-                  <option [ngValue]="false">Zwykły użytkownik</option>
-                  <option [ngValue]="true">Administrator</option>
+                  <option [ngValue]="false">{{ t('users.adminRoles.regular') }}</option>
+                  <option [ngValue]="true">{{ t('users.adminRoles.admin') }}</option>
                 </select>
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Rola CRM</label>
+                <label class="fl">{{ t('users.fields.crmRole') }}</label>
                 <select class="fsel" [(ngModel)]="newCrmRole">
-                  <option value="">Brak roli CRM</option>
-                  <option value="salesperson">Handlowiec (salesperson)</option>
-                  <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
+                  <option value="">{{ t('users.crmRoles.none') }}</option>
+                  <option value="salesperson">{{ t('users.crmRoles.salesperson') }}</option>
+                  <option value="sales_manager">{{ t('users.crmRoles.salesManager') }}</option>
                 </select>
               </div>
               <div class="fg">
-                <label class="fl">Telefon</label>
+                <label class="fl">{{ t('users.fields.phone') }}</label>
                 <input class="fi" [(ngModel)]="newPhone" maxlength="40" placeholder="+48 600 100 200">
               </div>
               <div class="fg">
-                <label class="fl">Firma</label>
+                <label class="fl">{{ t('users.fields.company') }}</label>
                 <input class="fi" [(ngModel)]="newCompany" maxlength="200">
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Dział</label>
+                <label class="fl">{{ t('users.fields.department') }}</label>
                 <input class="fi" [(ngModel)]="newDepartment" maxlength="200">
               </div>
               @if (hasProjectsFeature()) {
                 <div class="fg">
-                  <label class="fl">Typ konta</label>
+                  <label class="fl">{{ t('users.fields.accountType') }}</label>
                   <select class="fsel" [(ngModel)]="newExternal">
-                    <option [ngValue]="false">Wewnętrzne</option>
-                    <option [ngValue]="true">Zewnętrzne (tylko Projekty)</option>
+                    <option [ngValue]="false">{{ t('users.accountTypes.internal') }}</option>
+                    <option [ngValue]="true">{{ t('users.accountTypes.external') }}</option>
                   </select>
                 </div>
                 <div class="fg">
-                  <label class="fl">Zakładanie projektów</label>
+                  <label class="fl">{{ t('users.fields.canCreateProjects') }}</label>
                   <select class="fsel" [(ngModel)]="newCanCreateProjects" [disabled]="newExternal">
-                    <option [ngValue]="false">Nie</option>
-                    <option [ngValue]="true">Tak</option>
+                    <option [ngValue]="false">{{ t('users.no') }}</option>
+                    <option [ngValue]="true">{{ t('users.yes') }}</option>
                   </select>
                 </div>
+                @if (!newExternal) {
+                  <label class="check-field">
+                    <input type="checkbox" [(ngModel)]="newCanViewKsefInvoices"> {{ t('users.fields.canViewKsefInvoices') }}
+                  </label>
+                }
               }
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">Przypisz do grupy (opcjonalnie)</label>
+                <label class="fl">{{ t('users.create.assignGroup') }}</label>
                 <select class="fsel" [(ngModel)]="newGroup">
-                  <option value="">Brak grupy</option>
+                  <option value="">{{ t('users.create.noGroup') }}</option>
                   @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
                 </select>
               </div>
               @if (newGroup) {
                 <div class="fg">
-                  <label class="fl">Poziom dostępu</label>
+                  <label class="fl">{{ t('users.create.accessLevel') }}</label>
                   <select class="fsel" [(ngModel)]="newGroupAccess">
-                    <option value="read">Odczyt</option>
-                    <option value="full">Pełny</option>
+                    <option value="read">{{ t('users.accessLevels.read') }}</option>
+                    <option value="full">{{ t('users.accessLevels.full') }}</option>
                   </select>
                 </div>
               }
             </div>
             <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--gray-500);line-height:1.6">
-              <strong style="color:var(--gray-700)">Uwaga:</strong> Użytkownik będzie mógł logować się przez SAML SSO przy użyciu tego adresu e-mail. Uwierzytelnianie jest w całości obsługiwane przez Google Workspace.
+              <strong style="color:var(--gray-700)">{{ t('users.create.ssoNoteLabel') }}</strong> {{ t('users.create.ssoNoteText') }}
             </div>
           </div>
 
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;background:var(--gray-50)">
-            <button class="btn btn-g" (click)="showNew.set(false)">Anuluj</button>
-            <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">Utwórz użytkownika</button>
+            <button class="btn btn-g" (click)="showNew.set(false)">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn btn-p" [disabled]="saving()" (click)="createUser()">{{ t('users.create.submit') }}</button>
           </div>
         </div>
       </div>
@@ -246,20 +264,20 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <div class="pb">
             @if (isAdmin()) {
-              <div class="sec-title">Ustawienia konta</div>
+              <div class="sec-title">{{ t('users.edit.accountSettings') }}</div>
               <div class="fgrid">
                 <div class="fg">
-                  <label class="fl">Imię</label>
+                  <label class="fl">{{ t('users.fields.firstName') }}</label>
                   <input class="fi" [(ngModel)]="editFirst">
                 </div>
                 <div class="fg">
-                  <label class="fl">Nazwisko</label>
+                  <label class="fl">{{ t('users.fields.lastName') }}</label>
                   <input class="fi" [(ngModel)]="editLast">
                 </div>
 
                 <!-- ★ Email edit -->
                 <div class="fg" style="grid-column:1/-1">
-                  <label class="fl">Adres e-mail</label>
+                  <label class="fl">{{ t('users.fields.email') }}</label>
                   <input class="fi" type="email" [(ngModel)]="editEmail"
                          [class.fi-err]="!!emailError"
                          (ngModelChange)="emailError = ''">
@@ -267,104 +285,109 @@ import { AuthService } from '../../core/auth/auth.service';
                     <span class="ferr">{{ emailError }}</span>
                   }
                   <span style="font-size:11px;color:var(--gray-400);margin-top:2px;line-height:1.5">
-                    Zmiana e-maila wpływa na logowanie SAML — upewnij się, że adres odpowiada kontu Google Workspace.
+                    {{ t('users.edit.emailHint') }}
                   </span>
                 </div>
 
                 <div class="fg">
-                  <label class="fl">Status</label>
+                  <label class="fl">{{ t('users.fields.status') }}</label>
                   <select class="fsel" [(ngModel)]="editActive">
-                    <option [ngValue]="true">Aktywny</option>
-                    <option [ngValue]="false">Nieaktywny</option>
+                    <option [ngValue]="true">{{ t('users.statuses.active') }}</option>
+                    <option [ngValue]="false">{{ t('users.statuses.inactive') }}</option>
                   </select>
                 </div>
                 <div class="fg">
-                  <label class="fl">Rola administratora</label>
+                  <label class="fl">{{ t('users.fields.adminRole') }}</label>
                   <select class="fsel" [(ngModel)]="editAdmin">
-                    <option [ngValue]="false">Zwykły użytkownik</option>
-                    <option [ngValue]="true">Administrator</option>
+                    <option [ngValue]="false">{{ t('users.adminRoles.regular') }}</option>
+                    <option [ngValue]="true">{{ t('users.adminRoles.admin') }}</option>
                   </select>
                 </div>
                 <div class="fg" style="grid-column:1/-1">
-                  <label class="fl">Rola CRM</label>
+                  <label class="fl">{{ t('users.fields.crmRole') }}</label>
                   <select class="fsel" [(ngModel)]="editCrmRole">
-                    <option value="">Brak roli CRM</option>
-                    <option value="salesperson">Handlowiec (salesperson)</option>
-                    <option value="sales_manager">Manager sprzedaży (sales_manager)</option>
+                    <option value="">{{ t('users.crmRoles.none') }}</option>
+                    <option value="salesperson">{{ t('users.crmRoles.salesperson') }}</option>
+                    <option value="sales_manager">{{ t('users.crmRoles.salesManager') }}</option>
                   </select>
                 </div>
                 <div class="fg">
-                  <label class="fl">Telefon</label>
+                  <label class="fl">{{ t('users.fields.phone') }}</label>
                   <input class="fi" [(ngModel)]="editPhone" maxlength="40" placeholder="+48 600 100 200">
                 </div>
                 <div class="fg">
-                  <label class="fl">Firma</label>
+                  <label class="fl">{{ t('users.fields.company') }}</label>
                   <input class="fi" [(ngModel)]="editCompany" maxlength="200">
                 </div>
                 <div class="fg" style="grid-column:1/-1">
-                  <label class="fl">Dział</label>
+                  <label class="fl">{{ t('users.fields.department') }}</label>
                   <input class="fi" [(ngModel)]="editDepartment" maxlength="200">
                 </div>
                 @if (hasProjectsFeature()) {
                   <div class="fg">
-                    <label class="fl">Typ konta</label>
+                    <label class="fl">{{ t('users.fields.accountType') }}</label>
                     <select class="fsel" [(ngModel)]="editExternal">
-                      <option [ngValue]="false">Wewnętrzne</option>
-                      <option [ngValue]="true">Zewnętrzne (tylko Projekty)</option>
+                      <option [ngValue]="false">{{ t('users.accountTypes.internal') }}</option>
+                      <option [ngValue]="true">{{ t('users.accountTypes.external') }}</option>
                     </select>
                   </div>
                   <div class="fg">
-                    <label class="fl">Zakładanie projektów</label>
+                    <label class="fl">{{ t('users.fields.canCreateProjects') }}</label>
                     <select class="fsel" [(ngModel)]="editCanCreateProjects" [disabled]="editExternal">
-                      <option [ngValue]="false">Nie</option>
-                      <option [ngValue]="true">Tak</option>
+                      <option [ngValue]="false">{{ t('users.no') }}</option>
+                      <option [ngValue]="true">{{ t('users.yes') }}</option>
                     </select>
                   </div>
+                  @if (!editExternal) {
+                    <label class="check-field">
+                      <input type="checkbox" [(ngModel)]="editCanViewKsefInvoices"> {{ t('users.fields.canViewKsefInvoices') }}
+                    </label>
+                  }
                 }
               </div>
-              <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">Zapisz zmiany</button>
+              <button class="btn btn-p" style="margin-top:4px" (click)="saveUser()">{{ t('users.edit.saveChanges') }}</button>
 
-              <div class="sec-title" style="margin-top:24px">Hasło do logowania</div>
+              <div class="sec-title" style="margin-top:24px">{{ t('users.password.title') }}</div>
               <div class="fgrid">
                 <div class="fg">
-                  <label class="fl">Nowe hasło</label>
-                  <input class="fi" type="password" [(ngModel)]="newPasswordVal" placeholder="Min. 8 znaków"
+                  <label class="fl">{{ t('users.password.new') }}</label>
+                  <input class="fi" type="password" [(ngModel)]="newPasswordVal" [placeholder]="t('users.password.placeholder')"
                          [class.fi-err]="passwordError">
                 </div>
                 <div class="fg">
-                  <label class="fl">Powtórz hasło</label>
-                  <input class="fi" type="password" [(ngModel)]="newPasswordConfirm" placeholder="Min. 8 znaków"
+                  <label class="fl">{{ t('users.password.repeat') }}</label>
+                  <input class="fi" type="password" [(ngModel)]="newPasswordConfirm" [placeholder]="t('users.password.placeholder')"
                          [class.fi-err]="passwordError">
                 </div>
               </div>
               @if (passwordError) { <span class="ferr">{{ passwordError }}</span> }
               <button class="btn btn-p btn-sm" style="margin-top:4px" [disabled]="passwordSaving()" (click)="setPassword()">
-                {{ passwordSaving() ? 'Zapisywanie…' : 'Ustaw hasło' }}
+                {{ passwordSaving() ? t('users.saving') : t('users.password.submit') }}
               </button>
             }
 
             <!-- ── Planowane Budżety Sprzedażowe ──────────────────────────────────── -->
             @if (isSalesManager() && selected()!.crm_role === 'salesperson') {
-              <div class="sec-title" style="margin-top:24px">💼 Planowane Budżety Sprzedażowe</div>
+              <div class="sec-title" style="margin-top:24px">💼 {{ t('users.budgets.title') }}</div>
 
               <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-end">
                 <div class="fg" style="flex:1">
-                  <label class="fl">Rok</label>
+                  <label class="fl">{{ t('users.budgets.year') }}</label>
                   <select class="fsel" [(ngModel)]="budgetYear" (ngModelChange)="loadBudgets()">
                     @for (y of budgetYears; track y) { <option [value]="y">{{ y }}</option> }
                   </select>
                 </div>
                 <div class="fg" style="flex:1">
-                  <label class="fl">Typ okresu</label>
+                  <label class="fl">{{ t('users.budgets.periodType') }}</label>
                   <select class="fsel" [(ngModel)]="budgetPeriodType" (ngModelChange)="onBudgetPeriodTypeChange()">
-                    <option value="month">Miesięczny</option>
-                    <option value="quarter">Kwartalny</option>
+                    <option value="month">{{ t('users.budgets.monthly') }}</option>
+                    <option value="quarter">{{ t('users.budgets.quarterly') }}</option>
                   </select>
                 </div>
               </div>
 
               @if (budgetsLoading) {
-                <div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px">Ładowanie…</div>
+                <div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px">{{ 'states.loading' | transloco }}</div>
               } @else {
 
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"
@@ -385,7 +408,7 @@ import { AuthService } from '../../core/auth/auth.service';
               <!-- Waluta + Suma roczna -->
               <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
                 <div class="fg" style="width:100px">
-                  <label class="fl">Waluta</label>
+                  <label class="fl">{{ t('users.budgets.currency') }}</label>
                   <select class="fsel" [(ngModel)]="budgetCurrency" style="font-size:12px;padding:5px 8px">
                     <option value="PLN">PLN</option>
                     <option value="EUR">EUR</option>
@@ -395,7 +418,7 @@ import { AuthService } from '../../core/auth/auth.service';
                   </select>
                 </div>
                 <div style="flex:1;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
-                  <span style="font-size:12px;font-weight:700;color:var(--orange-dark)">Suma roczna</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--orange-dark)">{{ t('users.budgets.annualTotal') }}</span>
                   <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--orange)">{{ budgetAnnualTotal | number:'1.0-0' }} {{ budgetCurrency }}</span>
                 </div>
               </div>
@@ -403,9 +426,9 @@ import { AuthService } from '../../core/auth/auth.service';
               @if (budgetDirty) {
                 <div style="display:flex;gap:8px">
                   <button class="btn btn-p btn-sm" style="flex:1" [disabled]="budgetSaving" (click)="saveBudgets()">
-                    {{ budgetSaving ? 'Zapisywanie…' : '💾 Zapisz budżet' }}
+                    {{ budgetSaving ? t('users.saving') : '💾 ' + t('users.budgets.save') }}
                   </button>
-                  <button class="btn btn-g btn-sm" (click)="loadBudgets()">Anuluj</button>
+                  <button class="btn btn-g btn-sm" (click)="loadBudgets()">{{ 'actions.cancel' | transloco }}</button>
                 </div>
               }
 
@@ -414,41 +437,86 @@ import { AuthService } from '../../core/auth/auth.service';
             <!-- ───────────────────────────────────────────────────────────────────────── -->
 
             @if (isAdmin()) {
-              <div class="sec-title" style="margin-top:24px">Role w grupach ({{ (selected()!.roles ?? []).length }})</div>
+              <div class="sec-title" style="margin-top:24px">{{ t('users.roles.title', { count: (selected()!.roles ?? []).length }) }}</div>
               @for (role of selected()!.roles ?? []; track role.role_id) {
                 <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
                   <wt-group-pill [name]="role.group_display || role.group_name" />
                   <span class="badge" [class]="role.access_level === 'full' ? 's-signed' : 's-new'">{{ role.access_level }}</span>
                   <span style="flex:1"></span>
-                  <button class="btn btn-d btn-sm" (click)="removeRole(role.role_id)">Usuń</button>
+                  <button class="btn btn-d btn-sm" (click)="removeRole(role.role_id)">{{ t('users.remove') }}</button>
                 </div>
               }
 
-              <div class="sec-title" style="margin-top:20px">Przypisz nową rolę</div>
+              <div class="sec-title" style="margin-top:20px">{{ t('users.roles.assignTitle') }}</div>
               <div style="display:flex;gap:8px;align-items:flex-end">
                 <div class="fg" style="flex:1">
-                  <label class="fl">Grupa</label>
+                  <label class="fl">{{ t('users.roles.group') }}</label>
                   <select class="fsel" [(ngModel)]="newRoleGroup">
-                    <option value="">Wybierz grupę...</option>
+                    <option value="">{{ t('users.chooseGroup') }}</option>
                     @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
                   </select>
                 </div>
                 <div class="fg" style="width:120px">
-                  <label class="fl">Dostęp</label>
+                  <label class="fl">{{ t('users.access') }}</label>
                   <select class="fsel" [(ngModel)]="newRoleAccess">
-                    <option value="read">Odczyt</option>
-                    <option value="full">Pełny</option>
+                    <option value="read">{{ t('users.accessLevels.read') }}</option>
+                    <option value="full">{{ t('users.accessLevels.full') }}</option>
                   </select>
                 </div>
-                <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">Przypisz</button>
+                <button class="btn btn-p" [disabled]="!newRoleGroup" (click)="assignRole()">{{ t('users.roles.assign') }}</button>
+              </div>
+
+              <!-- Granty widoczności CRM — celowo osobno od „Role w grupach":
+                   grant nie dodaje usera do grupy, tylko rozszerza jego widok
+                   na rekordy AKTUALNYCH członków grupy docelowej. -->
+              <div class="sec-title" style="margin-top:24px">
+                {{ t('users.grants.title', { count: (selected()!.visibility_grants ?? []).length }) }}
+              </div>
+              @for (grant of selected()!.visibility_grants ?? []; track grant.id) {
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+                  <wt-group-pill [name]="grant.group_display || grant.group_name" />
+                  <span style="font-size:11px;color:var(--gray-600)">{{ moduleLabel(grant.module) }}</span>
+                  <span class="badge" [class]="grant.access_level === 'full' ? 's-signed' : 's-new'">{{ grant.access_level }}</span>
+                  <span style="flex:1"></span>
+                  <button class="btn btn-d btn-sm" (click)="removeVisibilityGrant(grant.id)">{{ t('users.remove') }}</button>
+                </div>
+              }
+
+              <div class="sec-title" style="margin-top:20px">{{ t('users.grants.addTitle') }}</div>
+              <div style="display:flex;gap:8px;align-items:flex-end">
+                <div class="fg" style="flex:1">
+                  <label class="fl">{{ t('users.grants.group') }}</label>
+                  <select class="fsel" [(ngModel)]="newGrantGroup">
+                    <option value="">{{ t('users.chooseGroup') }}</option>
+                    @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.display_name }}</option> }
+                  </select>
+                </div>
+                <div class="fg" style="width:120px">
+                  <label class="fl">{{ t('users.grants.module') }}</label>
+                  <select class="fsel" [(ngModel)]="newGrantModule">
+                    <option value="leads">{{ t('users.modules.leads') }}</option>
+                    <option value="partners">{{ t('users.modules.partners') }}</option>
+                  </select>
+                </div>
+                <div class="fg" style="width:110px">
+                  <label class="fl">{{ t('users.access') }}</label>
+                  <select class="fsel" [(ngModel)]="newGrantAccess">
+                    <option value="read">{{ t('users.accessLevels.read') }}</option>
+                    <option value="full">{{ t('users.accessLevels.full') }}</option>
+                  </select>
+                </div>
+                <button class="btn btn-p" [disabled]="!newGrantGroup" (click)="addVisibilityGrant()">{{ t('users.grants.add') }}</button>
+              </div>
+              <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+                {{ t('users.grants.hint') }}
               </div>
 
               @if (tenantHasProspects()) {
-                <div class="sec-title" style="margin-top:24px">Dostęp do funkcji</div>
+                <div class="sec-title" style="margin-top:24px">{{ t('users.featureAccess.title') }}</div>
                 <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
                   <div style="flex:1">
-                    <div style="font-weight:600">Prospekty</div>
-                    <div style="font-size:12px;color:var(--gray-500)">Analiza i wzbogacanie prospektów firm (AI)</div>
+                    <div style="font-weight:600">{{ t('users.featureAccess.prospects') }}</div>
+                    <div style="font-size:12px;color:var(--gray-500)">{{ t('users.featureAccess.prospectsHint') }}</div>
                   </div>
                   <input type="checkbox"
                          [checked]="!!prospectsRole()"
@@ -459,14 +527,15 @@ import { AuthService } from '../../core/auth/auth.service';
           </div>
 
           <div class="pf">
-            <button class="btn btn-g" (click)="selected.set(null)">Zamknij</button>
+            <button class="btn btn-g" (click)="selected.set(null)">{{ 'actions.close' | transloco }}</button>
             @if (isAdmin() && selected()!.id !== currentUserId()) {
-              <button class="btn btn-d" style="margin-left:auto" (click)="deleteUser()">Usuń użytkownika</button>
+              <button class="btn btn-d" style="margin-left:auto" (click)="deleteUser()">{{ t('users.edit.deleteUser') }}</button>
             }
           </div>
         </div>
       </div>
     }
+</ng-container>
   `,
   styles: [`
     #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
@@ -504,6 +573,7 @@ import { AuthService } from '../../core/auth/auth.service';
     .mox:hover { background:var(--gray-100); }
     .fgrid { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
     .fg { display:flex;flex-direction:column;gap:4px; }
+    .check-field { grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-800);cursor:pointer; }
     .fl { font-size:12px;font-weight:600;color:var(--gray-600); }
     .fi { border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;transition:border .15s; }
     .fi:focus { border-color:var(--orange); }
@@ -522,6 +592,8 @@ export class UsersComponent implements OnInit {
   private auth        = inject(AuthService);
   private cdr         = inject(ChangeDetectorRef);
   private zone        = inject(NgZone);
+  private transloco   = inject(TranslocoService);
+  private locale      = inject(LocaleService);
 
   isSalesManager = computed(() => {
     const u = this.auth.user();
@@ -564,7 +636,7 @@ export class UsersComponent implements OnInit {
         case 'is_active':    av = a.is_active ? 1 : 0;  bv = b.is_active ? 1 : 0; break;
         default:             av = a.display_name ?? ''; bv = b.display_name ?? '';
       }
-      const cmp = typeof av === 'string' ? av.localeCompare(bv, 'pl', { sensitivity: 'base' }) : av - bv;
+      const cmp = typeof av === 'string' ? av.localeCompare(bv, this.locale.activeLocale(), { sensitivity: 'base' }) : av - bv;
       return dir === 'asc' ? cmp : -cmp;
     });
   });
@@ -595,6 +667,10 @@ export class UsersComponent implements OnInit {
   newRoleGroup  = '';
   newRoleAccess: 'read' | 'full' = 'read';
 
+  newGrantGroup  = '';
+  newGrantModule: 'leads' | 'partners' = 'leads';
+  newGrantAccess: 'read' | 'full' = 'read';
+
   newFirst       = '';
   newLast        = '';
   newEmail       = '';
@@ -606,11 +682,13 @@ export class UsersComponent implements OnInit {
   newDepartment  = '';
   newExternal    = false;
   newCanCreateProjects = false;
+  newCanViewKsefInvoices = false;
   editPhone      = '';
   editCompany    = '';
   editDepartment = '';
   editExternal   = false;
   editCanCreateProjects = false;
+  editCanViewKsefInvoices = false;
   readonly hasProjectsFeature = computed(() => this.auth.hasFeature('projects'));
   newGroup       = '';
   newGroupAccess: 'read' | 'full' = 'read';
@@ -629,8 +707,8 @@ export class UsersComponent implements OnInit {
 
   budgetPeriods() {
     if (this.budgetPeriodType === 'month') {
-      const lbl = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
-      return Array.from({ length: 12 }, (_, i) => ({ num: i + 1, label: lbl[i] }));
+      const shortMonth = new Intl.DateTimeFormat(this.locale.activeLocale(), { month: 'short' });
+      return Array.from({ length: 12 }, (_, i) => ({ num: i + 1, label: shortMonth.format(new Date(2000, i, 1)) }));
     }
     return [
       { num: 1, label: 'Q1 (I–III)' },
@@ -672,13 +750,13 @@ export class UsersComponent implements OnInit {
 
   onBudgetPeriodTypeChange(): void {
     if (this._budgetData.length && this._budgetData[0].period_type !== this.budgetPeriodType) {
-      if (!confirm(`Zmiana typu okresu usunie istniejące budżety na rok ${this.budgetYear}. Kontynuować?`)) {
+      if (!confirm(this.transloco.translate('admin.users.budgets.changeTypeConfirm', { year: this.budgetYear }))) {
         this.budgetPeriodType = this._budgetData[0].period_type; return;
       }
       const u = this.selected();
       if (u) this.crmApi.deleteSalesBudgetsByUser(u.id, this.budgetYear).subscribe({
         next: () => { this._budgetData = []; this._budgetDraft = {}; this.budgetDirty = false; },
-        error: () => this.toast.error('Błąd usuwania budżetów'),
+        error: () => this.toast.error(this.transloco.translate('admin.users.budgets.deleteFailed')),
       });
     } else { this._budgetDraft = {}; this.budgetDirty = false; }
   }
@@ -695,8 +773,8 @@ export class UsersComponent implements OnInit {
         period_type: this.budgetPeriodType, period_number: e.num,
         amount: e.amt, currency: this.budgetCurrency,
       }).subscribe({
-        next: () => { if (--pending === 0) { this.budgetSaving = false; this.budgetDirty = false; this.loadBudgets(); this.toast.success('Budżet zapisany'); } },
-        error: (err) => { this.budgetSaving = false; this.toast.error(err?.error?.error ?? 'Błąd zapisu'); },
+        next: () => { if (--pending === 0) { this.budgetSaving = false; this.budgetDirty = false; this.loadBudgets(); this.toast.success(this.transloco.translate('admin.users.budgets.saved')); } },
+        error: (err) => { this.budgetSaving = false; this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.budgets.saveFailed')); },
       });
     }
   }
@@ -751,7 +829,7 @@ export class UsersComponent implements OnInit {
     this.newFirst = ''; this.newLast = ''; this.newEmail = '';
     this.newActive = true; this.newAdmin = false; this.newCrmRole = '';
     this.newPhone = ''; this.newCompany = ''; this.newDepartment = '';
-    this.newExternal = false; this.newCanCreateProjects = false;
+    this.newExternal = false; this.newCanCreateProjects = false; this.newCanViewKsefInvoices = false;
     this.newGroup = ''; this.newGroupAccess = 'read';
     this.submitted = false;
     this.showNew.set(true);
@@ -773,6 +851,7 @@ export class UsersComponent implements OnInit {
       department: this.newDepartment.trim() || null,
       is_external: this.newExternal,
       can_create_projects: this.newCanCreateProjects && !this.newExternal,
+      can_view_ksef_invoices: this.newCanViewKsefInvoices && !this.newExternal,
     } as any).subscribe({
       next: (user) => {
         if (this.newGroup) {
@@ -782,11 +861,11 @@ export class UsersComponent implements OnInit {
         this.total.update(n => n + 1);
         this.showNew.set(false);
         this.saving.set(false);
-        this.toast.success('Utworzono użytkownika ' + user.display_name);
+        this.toast.success(this.transloco.translate('admin.users.create.success', { name: user.display_name }));
       },
       error: (err) => {
         this.saving.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się utworzyć użytkownika');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.create.failed'));
       },
     });
   }
@@ -795,19 +874,19 @@ export class UsersComponent implements OnInit {
     const u = this.selected();
     if (!u) return;
     this.passwordError = '';
-    if (this.newPasswordVal.length < 8) { this.passwordError = 'Hasło musi mieć minimum 8 znaków'; return; }
-    if (this.newPasswordVal !== this.newPasswordConfirm) { this.passwordError = 'Hasła nie są identyczne'; return; }
+    if (this.newPasswordVal.length < 8) { this.passwordError = this.transloco.translate('admin.users.password.tooShort'); return; }
+    if (this.newPasswordVal !== this.newPasswordConfirm) { this.passwordError = this.transloco.translate('admin.users.password.mismatch'); return; }
     this.passwordSaving.set(true);
     this.userSvc.setPassword(u.id, this.newPasswordVal).subscribe({
       next: () => {
         this.passwordSaving.set(false);
         this.newPasswordVal = '';
         this.newPasswordConfirm = '';
-        this.toast.success('Hasło zostało ustawione');
+        this.toast.success(this.transloco.translate('admin.users.password.saved'));
       },
       error: err => {
         this.passwordSaving.set(false);
-        this.passwordError = err?.error?.error ?? 'Błąd zapisu hasła';
+        this.passwordError = err?.error?.error ?? this.transloco.translate('admin.users.password.saveFailed');
       },
     });
   }
@@ -827,33 +906,37 @@ export class UsersComponent implements OnInit {
         this.editDepartment = u.department ?? '';
         this.editExternal   = u.is_external ?? false;
         this.editCanCreateProjects = u.can_create_projects ?? false;
+        this.editCanViewKsefInvoices = u.can_view_ksef_invoices ?? false;
         this.emailError        = '';
         this.newPasswordVal    = '';
         this.newPasswordConfirm = '';
         this.passwordError     = '';
         this.newRoleGroup  = '';
         this.newRoleAccess = 'read';
+        this.newGrantGroup  = '';
+        this.newGrantModule = 'leads';
+        this.newGrantAccess = 'read';
         if (this.isSalesManager() && (u as any).crm_role === 'salesperson') {
           this._budgetDraft = {}; this.budgetDirty = false;
           this.loadBudgets();
         }
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się wczytać użytkownika'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.edit.loadFailed')),
     });
   }
 
   deleteUser(): void {
     const u = this.selected();
     if (!u) return;
-    if (!confirm(`Usunąć użytkownika ${u.display_name} (${u.email})? Tej operacji nie można cofnąć.`)) return;
+    if (!confirm(this.transloco.translate('admin.users.edit.deleteConfirm', { name: u.display_name, email: u.email }))) return;
     this.userSvc.delete(u.id).subscribe({
       next: () => {
         this.users.update(list => list.filter(x => x.id !== u.id));
         this.total.update(n => n - 1);
         this.selected.set(null);
-        this.toast.success('Użytkownik usunięty');
+        this.toast.success(this.transloco.translate('admin.users.edit.deleted'));
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć użytkownika'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.edit.deleteFailed')),
     });
   }
 
@@ -863,7 +946,7 @@ export class UsersComponent implements OnInit {
 
     // Walidacja email
     if (!this.editEmail || !this.editEmail.includes('@')) {
-      this.emailError = 'Wprowadź prawidłowy adres e-mail';
+      this.emailError = this.transloco.translate('admin.users.edit.emailInvalid');
       return;
     }
     this.emailError = '';
@@ -880,19 +963,20 @@ export class UsersComponent implements OnInit {
       department: this.editDepartment.trim() || null,
       is_external: this.editExternal,
       can_create_projects: this.editCanCreateProjects && !this.editExternal,
+      can_view_ksef_invoices: this.editCanViewKsefInvoices && !this.editExternal,
     } as any).subscribe({
       next: updated => {
         this.selected.set({ ...u, ...updated });
         this.users.update(list => list.map(x => x.id === u.id ? { ...x, ...updated, crm_role: (updated as any).crm_role } : x));
-        this.toast.success('Użytkownik zaktualizowany');
+        this.toast.success(this.transloco.translate('admin.users.edit.updated'));
       },
       error: err => {
         const msg: string = err?.error?.error ?? '';
         // Backend zwraca błąd unique constraint jeśli email zajęty
         if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique')) {
-          this.emailError = 'Ten adres e-mail jest już zajęty';
+          this.emailError = this.transloco.translate('admin.users.edit.emailTaken');
         } else {
-          this.toast.error(msg || 'Nie udało się zaktualizować użytkownika');
+          this.toast.error(msg || this.transloco.translate('admin.users.edit.updateFailed'));
         }
       },
     });
@@ -906,7 +990,7 @@ export class UsersComponent implements OnInit {
       const newRole = { ...role, group_name: group?.name ?? '', group_display: group?.display_name ?? '' };
       this.selected.update(s => s ? { ...s, roles: [...(s.roles ?? []), newRole] } : s);
       this.newRoleGroup = '';
-      this.toast.success('Rola przypisana');
+      this.toast.success(this.transloco.translate('admin.users.roles.assigned'));
     });
   }
 
@@ -916,10 +1000,69 @@ export class UsersComponent implements OnInit {
     this.userSvc.removeRole(u.id, roleId).subscribe({
       next: () => {
         this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== roleId) } : s);
-        this.toast.success('Rola usunięta');
+        this.toast.success(this.transloco.translate('admin.users.roles.removed'));
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć roli'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.roles.removeFailed')),
     });
+  }
+
+  moduleLabel(module: 'leads' | 'partners'): string {
+    return this.transloco.translate('admin.users.modules.' + module);
+  }
+
+  grantTooltip(grant: VisibilityGrant): string {
+    return this.transloco.translate('admin.users.grants.tooltip', {
+      group: grant.group_display || grant.group_name,
+      module: this.moduleLabel(grant.module),
+      access: this.transloco.translate(grant.access_level === 'full' ? 'admin.users.grants.tooltipAccess.full' : 'admin.users.grants.tooltipAccess.read'),
+    });
+  }
+
+  addVisibilityGrant(): void {
+    const u = this.selected();
+    if (!u || !this.newGrantGroup) return;
+    this.userSvc
+      .addVisibilityGrant(u.id, this.newGrantGroup, this.newGrantModule, this.newGrantAccess)
+      .subscribe({
+        next: grant => {
+          const group = this.groups().find(g => g.id === this.newGrantGroup);
+          const saved: VisibilityGrant = {
+            ...grant,
+            group_name:    grant.group_name    ?? group?.name ?? '',
+            group_display: grant.group_display ?? group?.display_name ?? null,
+          };
+          // Upsert po stronie serwera (ON CONFLICT) — ta sama para grupa+moduł
+          // podmienia poziom dostępu, nie tworzy drugiego wiersza.
+          this.applyGrants(u.id, prev => [
+            ...prev.filter(g => !(g.target_group_id === saved.target_group_id && g.module === saved.module)),
+            saved,
+          ]);
+          this.newGrantGroup = '';
+          this.toast.success(this.transloco.translate('admin.users.grants.added'));
+        },
+        error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.grants.addFailed')),
+      });
+  }
+
+  removeVisibilityGrant(grantId: string): void {
+    const u = this.selected();
+    if (!u) return;
+    this.userSvc.removeVisibilityGrant(u.id, grantId).subscribe({
+      next: () => {
+        this.applyGrants(u.id, prev => prev.filter(g => g.id !== grantId));
+        this.toast.success(this.transloco.translate('admin.users.grants.removed'));
+      },
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.grants.removeFailed')),
+    });
+  }
+
+  // Granty są pokazywane i w panelu, i jako pigułki na liście — obie kopie muszą
+  // się zmienić, inaczej lista zostaje z nieaktualnym stanem do przeładowania.
+  private applyGrants(userId: string, fn: (prev: VisibilityGrant[]) => VisibilityGrant[]): void {
+    this.selected.update(s => s && s.id === userId ? { ...s, visibility_grants: fn(s.visibility_grants ?? []) } : s);
+    this.users.update(list => list.map(x =>
+      x.id === userId ? { ...x, visibility_grants: fn(x.visibility_grants ?? []) } : x,
+    ));
   }
 
   // "Feature Access" to przyjazny checkbox nad tym samym mechanizmem co Group
@@ -934,7 +1077,7 @@ export class UsersComponent implements OnInit {
         this.userSvc.assignRole(u.id, group.id, 'full').subscribe(role => {
           const newRole = { ...role, group_name: group.name, group_display: group.display_name };
           this.selected.update(s => s ? { ...s, roles: [...(s.roles ?? []), newRole] } : s);
-          this.toast.success('Dostęp do Prospektów włączony');
+          this.toast.success(this.transloco.translate('admin.users.featureAccess.prospectsEnabled'));
         });
       };
       if (existingGroup) {
@@ -945,7 +1088,7 @@ export class UsersComponent implements OnInit {
         this.groupSvc.create({
           name: 'Prospekty',
           display_name: 'Prospekty',
-          description: 'Dostęp do modułu Prospektów (import CSV, enrichment, konwersja na lead).',
+          description: this.transloco.translate('admin.users.featureAccess.prospectsGroupDescription'),
           is_active: true,
         }).subscribe(group => {
           this.groups.update(gs => [...gs, group]);
@@ -958,9 +1101,9 @@ export class UsersComponent implements OnInit {
       this.userSvc.removeRole(u.id, existing.role_id).subscribe({
         next: () => {
           this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== existing.role_id) } : s);
-          this.toast.success('Dostęp do Prospektów wyłączony');
+          this.toast.success(this.transloco.translate('admin.users.featureAccess.prospectsDisabled'));
         },
-        error: err => this.toast.error(err?.error?.error ?? 'Nie udało się usunąć roli'),
+        error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.roles.removeFailed')),
       });
     }
   }

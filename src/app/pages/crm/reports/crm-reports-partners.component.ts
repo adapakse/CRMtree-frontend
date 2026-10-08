@@ -8,10 +8,13 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import {
   CrmApiService, PartnersReport, PartnersReportKpi,
-  PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, CrmUser, ChurnPartner,
+  PRODUCT_TYPE_ICONS, CrmUser, ChurnPartner,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+
+const CHURN_RISK_LEVELS = ['critical', 'high', 'medium', 'low'];
 
 function ym(d: Date): string { return d.toISOString().substring(0, 7); }
 
@@ -52,45 +55,47 @@ function healthColor(engagement: number): string {
   selector: 'wt-crm-reports-partners',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, TooltipComponent],
+  imports: [CommonModule, FormsModule, RouterModule, TooltipComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
 <div id="topbar" style="min-height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b;flex-shrink:0">Partner Performance</span>
+  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b;flex-shrink:0">{{ t('reports.partners.title') }}</span>
   <span style="flex:1;min-width:8px"></span>
   <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
     <select class="sel" style="max-width:150px" [(ngModel)]="groupFilter" (ngModelChange)="load()">
-      <option value="">Wszystkie grupy</option>
+      <option value="">{{ t('partnersList.toolbar.allGroups') }}</option>
       <option *ngFor="let g of groupNames" [value]="g">{{ g }}</option>
     </select>
     <select class="sel" style="max-width:190px" [(ngModel)]="partnerFilter" (ngModelChange)="onPartnerFilterChange()">
-      <option value="">Wszyscy partnerzy</option>
+      <option value="">{{ t('reports.partners.filters.allPartners') }}</option>
       <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
     </select>
     <select class="sel" style="max-width:190px" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
-      <optgroup label="Bieżące">
-        <option value="1m">Bieżący miesiąc</option>
-        <option value="3m">Ostatnie 3 mies.</option>
-        <option value="6m">Ostatnie 6 mies.</option>
-        <option value="12m">Ostatnie 12 mies.</option>
-        <option value="ytd">YTD {{ currentYear }}</option>
+      <optgroup [label]="t('reports.partners.filters.currentGroup')">
+        <option value="1m">{{ t('reports.partners.filters.currentMonth') }}</option>
+        <option value="3m">{{ t('partnerDetail.sales.periods.last3Months') }}</option>
+        <option value="6m">{{ t('partnerDetail.sales.periods.last6Months') }}</option>
+        <option value="12m">{{ t('partnerDetail.sales.periods.last12Months') }}</option>
+        <option value="ytd">{{ t('partnerDetail.sales.periods.ytd', { year: currentYear }) }}</option>
       </optgroup>
-      <optgroup label="Poprzednie">
-        <option value="prev_1m">Poprzedni miesiąc</option>
-        <option value="prev_q">Poprzedni kwartał</option>
-        <option value="prev_year">Poprzedni rok ({{ currentYear - 1 }})</option>
+      <optgroup [label]="t('reports.partners.filters.previousGroup')">
+        <option value="prev_1m">{{ t('reports.partners.filters.previousMonth') }}</option>
+        <option value="prev_q">{{ t('reports.partners.filters.previousQuarter') }}</option>
+        <option value="prev_year">{{ t('reports.partners.filters.previousYear', { year: currentYear - 1 }) }}</option>
       </optgroup>
     </select>
     <select class="sel" style="max-width:160px" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
-      <option value="">Wszyscy handlowcy</option>
+      <option value="">{{ t('partnersList.toolbar.allSalesReps') }}</option>
       <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
     </select>
     <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap" (click)="clearRepFilter()">
       × {{ persistRepName }}
     </button>
-    <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer;white-space:nowrap;flex-shrink:0" (click)="load()">{{ loading ? '…' : '↻ Odśwież' }}</button>
+    <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer;white-space:nowrap;flex-shrink:0" (click)="load()">{{ loading ? '…' : '↻ ' + t('reports.partners.refresh') }}</button>
   </div>
 </div>
 
@@ -101,41 +106,41 @@ function healthColor(engagement: number): string {
 
   <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
     <div style="font-size:48px;margin-bottom:12px">📈</div>
-    <div style="font-size:15px;font-weight:600">Brak danych sprzedażowych</div>
-    <div style="font-size:13px;margin-top:4px">Zaimportuj dane przez Import CSV</div>
+    <div style="font-size:15px;font-weight:600">{{ t('partnerDetail.sales.noData') }}</div>
+    <div style="font-size:13px;margin-top:4px">{{ t('reports.partners.emptyHint') }}</div>
   </div>
 
   <ng-container *ngIf="kpi">
 
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
-    <div class="stat-card stat-clickable" style="border-top:3px solid #f26522" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #f26522" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#f26522;font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Obrót brutto (PLN)<wt-tooltip key="crm.partners.kpi.gross_turnover"></wt-tooltip></div>
+      <div class="stat-lbl">{{ t('reports.partners.grossTurnoverPln') }}<wt-tooltip key="crm.partners.kpi.gross_turnover"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? '#16a34a' : '#dc2626'">
-        {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }} vs poprzedni
+        {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ t('reports.partners.kpi.vsPrevious', { delta: deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }) }}
       </div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #22C55E" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #22C55E" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#22C55E;font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Przychód / Marża (PLN)<wt-tooltip key="crm.partners.kpi.revenue"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ kpi.margin_pct | number:'1.0-1' }}% marży</div>
+      <div class="stat-lbl">{{ t('reports.partners.kpi.revenueMarginPln') }}<wt-tooltip key="crm.partners.kpi.revenue"></wt-tooltip></div>
+      <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.marginShare', { percent: (kpi.margin_pct | number:'1.0-1') }) }}</div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #3B82F6" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #3B82F6" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#3B82F6;font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
-      <div class="stat-lbl">Fees (PLN)<wt-tooltip key="crm.partners.kpi.fees"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ kpi.fee_rate_pct | number:'1.0-1' }}% fee rate</div>
+      <div class="stat-lbl">{{ t('reports.partners.kpi.feesPln') }}<wt-tooltip key="crm.partners.kpi.fees"></wt-tooltip></div>
+      <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.kpi.feeRateShare', { percent: (kpi.fee_rate_pct | number:'1.0-1') }) }}</div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #A855F7" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #A855F7" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#A855F7;font-size:20px">{{ kpi.transactions_count | number }}</div>
-      <div class="stat-lbl">Transakcje<wt-tooltip key="crm.partners.kpi.transactions"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ kpi.pax_count | number }} Produkty</div>
+      <div class="stat-lbl">{{ t('partnerDetail.sales.kpi.transactions') }}<wt-tooltip key="crm.partners.kpi.transactions"></wt-tooltip></div>
+      <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.kpi.productsCount', { count: (kpi.pax_count | number) }) }}</div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #F59E0B" (click)="goToPartners()" title="Kliknij aby zobaczyć partnerów">
+    <div class="stat-card stat-clickable" style="border-top:3px solid #F59E0B" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#F59E0B;font-size:20px">{{ kpi.partners_count }}</div>
-      <div class="stat-lbl">Aktywnych partnerów<wt-tooltip key="crm.partners.kpi.active_partners"></wt-tooltip></div>
+      <div class="stat-lbl">{{ t('reports.partners.kpi.activePartners') }}<wt-tooltip key="crm.partners.kpi.active_partners"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '#16a34a' : '#dc2626'">
-        {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} trend przychodów
+        {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ t('reports.partners.kpi.revenueTrend') }}
       </div>
     </div>
   </div>
@@ -146,23 +151,23 @@ function healthColor(engagement: number): string {
     <!-- Partner scorecard table -->
     <div class="card" style="padding:0;overflow:hidden">
       <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Scorecard Partnerów</div>
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">{{ t('reports.partners.scorecard.title') }}</div>
         <div style="display:flex;gap:6px;font-size:11px">
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>dobrze</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>średnio</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>słabo</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.good') }}</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.medium') }}</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.poor') }}</span>
         </div>
       </div>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
           <thead>
             <tr style="background:#fafafa;border-bottom:1px solid #e4e4e7">
-              <th style="padding:8px 14px;text-align:left;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Partner</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px" *ngIf="isManager">Handlowiec</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Obrót brutto</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Marża</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Transakcje</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">Health<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
+              <th style="padding:8px 14px;text-align:left;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.partner') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px" *ngIf="isManager">{{ t('partnersList.fields.salesRep') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.grossTurnover') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.margin') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('partnerDetail.sales.kpi.transactions') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.health') }}<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
             </tr>
           </thead>
           <tbody>
@@ -171,7 +176,7 @@ function healthColor(engagement: number): string {
                 (click)="p.partner_id && goToPartner(p.partner_id)"
                 (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
                 (mouseleave)="$any($event.currentTarget).style.background=''"
-                [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
+                [title]="p.partner_id ? t('reports.partners.openPartnerTooltip') : ''">
               <td style="padding:10px 14px">
                 <div style="display:flex;align-items:center;gap:8px">
                   <div [style.background]="avatarColor(p.partner_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(p.partner_name) }}</div>
@@ -194,12 +199,12 @@ function healthColor(engagement: number): string {
                 <span [style.background]="healthBg(p.health_level)"
                       [style.color]="healthColor(p.health_level)"
                       style="font-size:11px;font-weight:700;border-radius:10px;padding:3px 10px;white-space:nowrap;display:inline-block">
-                  {{ p.health_score }} pkt
+                  {{ t('reports.partners.healthPoints', { score: p.health_score }) }}
                 </span>
               </td>
             </tr>
             <tr *ngIf="!topPartners.length">
-              <td [attr.colspan]="isManager ? 6 : 5" style="text-align:center;padding:20px;color:#a1a1aa;font-size:12px">Brak danych partnerów</td>
+              <td [attr.colspan]="isManager ? 6 : 5" style="text-align:center;padding:20px;color:#a1a1aa;font-size:12px">{{ t('reports.partners.scorecard.empty') }}</td>
             </tr>
           </tbody>
         </table>
@@ -209,7 +214,7 @@ function healthColor(engagement: number): string {
     <!-- Produkty -->
     <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
       <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7">
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Podział na produkty</div>
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">{{ t('reports.partners.products.title') }}</div>
       </div>
       <div style="padding:14px;display:flex;flex-direction:column;gap:10px;flex:1">
         <div *ngFor="let p of byProduct; let i = index">
@@ -220,9 +225,9 @@ function healthColor(engagement: number): string {
           <div style="height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden">
             <div [style.width.%]="barPct(p.gross_turnover_pln, byProduct[0]?.gross_turnover_pln)" [style.background]="PROD_COLORS[i % PROD_COLORS.length]" style="height:100%;border-radius:3px;opacity:.85"></div>
           </div>
-          <div style="font-size:10px;color:#a1a1aa;margin-top:1px;text-align:right">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}% marży</div>
+          <div style="font-size:10px;color:#a1a1aa;margin-top:1px;text-align:right">{{ t('reports.partners.marginShare', { percent: calcMargin(p.gross_turnover_pln, p.revenue_pln) }) }}</div>
         </div>
-        <div *ngIf="!byProduct.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">Brak danych</div>
+        <div *ngIf="!byProduct.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">{{ t('reports.partners.noData') }}</div>
       </div>
     </div>
   </div>
@@ -232,63 +237,63 @@ function healthColor(engagement: number): string {
 
     <!-- Revenue trend chart -->
     <div class="card" style="padding:18px">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:4px">Trend przychodów</div>
-      <div style="font-size:11px;color:#a1a1aa;margin-bottom:16px">Obrót brutto (PLN)</div>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:4px">{{ t('reports.partners.trend.title') }}</div>
+      <div style="font-size:11px;color:#a1a1aa;margin-bottom:16px">{{ t('reports.partners.grossTurnoverPln') }}</div>
       <div #revenueEl style="display:flex;align-items:flex-end;gap:4px;height:100px"></div>
       <div #revLabels style="display:flex;gap:4px;margin-top:4px"></div>
       <div style="margin-top:14px;padding-top:10px;border-top:1px solid #f4f4f5;display:flex;justify-content:space-between;font-size:12px">
-        <span style="color:#71717a">Łącznie obrót</span>
+        <span style="color:#71717a">{{ t('reports.partners.trend.totalTurnover') }}</span>
         <span style="font-weight:700;color:#f26522;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }} PLN</span>
       </div>
     </div>
 
     <!-- Handlowcy (manager) -->
     <div class="card" style="padding:18px" *ngIf="isManager">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Wyniki handlowców</div>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">{{ t('reports.partners.reps.title') }}</div>
       <div *ngFor="let r of byRep" style="margin-bottom:12px;cursor:pointer;border-radius:8px;padding:6px 8px;transition:background .12s"
            (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
            (mouseleave)="$any($event.currentTarget).style.background=''"
            (click)="goToPartnersByRep(r.salesperson_id, r.salesperson_name)"
-           title="Kliknij aby zobaczyć partnerów tego handlowca">
+           [title]="t('reports.partners.reps.showPartnersTooltip')">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <div [style.background]="avatarColor(r.salesperson_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(r.salesperson_name) }}</div>
           <div style="flex:1">
             <div style="font-size:12px;font-weight:600;color:#3f3f46">{{ r.salesperson_name }}</div>
-            <div style="font-size:10px;color:#a1a1aa">{{ r.partners_count }} partnerów</div>
+            <div style="font-size:10px;color:#a1a1aa">{{ t('reports.partners.partnersCount', { count: +r.partners_count }) }}</div>
           </div>
           <div style="text-align:right">
             <div style="font-size:12px;font-weight:700;color:#f26522">{{ (r.gross_turnover_pln/1000).toFixed(0) }}k</div>
-            <div style="font-size:10px;color:#22C55E">{{ calcMargin(r.gross_turnover_pln, r.revenue_pln) }}% marży</div>
+            <div style="font-size:10px;color:#22C55E">{{ t('reports.partners.marginShare', { percent: calcMargin(r.gross_turnover_pln, r.revenue_pln) }) }}</div>
           </div>
         </div>
         <div style="height:5px;background:#f4f4f5;border-radius:3px;overflow:hidden">
           <div [style.width.%]="barPct(r.gross_turnover_pln, byRep[0]?.gross_turnover_pln)" style="height:100%;background:#f26522;border-radius:3px"></div>
         </div>
       </div>
-      <div *ngIf="!byRep.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">Brak danych</div>
+      <div *ngIf="!byRep.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">{{ t('reports.partners.noData') }}</div>
     </div>
 
     <!-- Podsumowanie finansowe -->
     <div class="card" style="padding:18px">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">Podsumowanie finansowe</div>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">{{ t('reports.partners.summary.title') }}</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px">
-          <span style="font-size:12px;color:#9a3412">Obrót brutto</span>
+          <span style="font-size:12px;color:#9a3412">{{ t('reports.partners.columns.grossTurnover') }}</span>
           <span style="font-family:'Sora',sans-serif;font-weight:700;color:#f26522">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px">
-          <span style="font-size:12px;color:#166534">Przychód (marża)</span>
+          <span style="font-size:12px;color:#166534">{{ t('reports.partners.summary.revenueMargin') }}</span>
           <span style="font-family:'Sora',sans-serif;font-weight:700;color:#22C55E">{{ kpi.revenue_pln | number:'1.0-0' }}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px">
-          <span style="font-size:12px;color:#1d4ed8">Fees / Prowizje</span>
+          <span style="font-size:12px;color:#1d4ed8">{{ t('reports.partners.summary.feesCommissions') }}</span>
           <span style="font-family:'Sora',sans-serif;font-weight:700;color:#3B82F6">{{ kpi.fees_pln | number:'1.0-0' }}</span>
         </div>
         <div style="margin-top:4px;padding:12px;background:#fafafa;border-radius:8px;display:flex;flex-direction:column;gap:5px;font-size:12px">
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">% marży</span><span style="font-weight:700">{{ kpi.margin_pct | number:'1.0-1' }}%</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">Fee rate</span><span style="font-weight:700">{{ kpi.fee_rate_pct | number:'1.0-1' }}%</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">Transakcje</span><span style="font-weight:700">{{ kpi.transactions_count | number }}</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">Produkty</span><span style="font-weight:700">{{ kpi.pax_count | number }}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('reports.partners.summary.marginPct') }}</span><span style="font-weight:700">{{ kpi.margin_pct | number:'1.0-1' }}%</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('reports.partners.summary.feeRate') }}</span><span style="font-weight:700">{{ kpi.fee_rate_pct | number:'1.0-1' }}%</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('partnerDetail.sales.kpi.transactions') }}</span><span style="font-weight:700">{{ kpi.transactions_count | number }}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('partnerDetail.sales.kpi.products') }}</span><span style="font-weight:700">{{ kpi.pax_count | number }}</span></div>
         </div>
       </div>
     </div>
@@ -297,15 +302,15 @@ function healthColor(engagement: number): string {
   <!-- ROW CHURN: Widget ryzyka churn -->
   <div class="card" style="padding:18px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;flex:1">Ryzyko Churn partnerów</span>
+      <span style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;flex:1">{{ t('reports.partners.churn.title') }}</span>
       <span *ngIf="churnRows.filter(r => r.risk_level === 'critical').length > 0"
             style="background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px">
-        {{ churnRows.filter(r => r.risk_level === 'critical').length }} krytyczne
+        {{ t('reports.partners.churn.criticalCount', { count: churnRows.filter(r => r.risk_level === 'critical').length }) }}
       </span>
     </div>
-    <div *ngIf="churnLoading" style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">Ładowanie…</div>
+    <div *ngIf="churnLoading" style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">{{ 'states.loading' | transloco }}</div>
     <div *ngIf="!churnLoading && churnRows.length === 0"
-         style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">Brak partnerów z ryzykiem churn</div>
+         style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">{{ t('reports.partners.churn.empty') }}</div>
     <div *ngIf="!churnLoading && churnRows.length > 0" style="display:flex;flex-direction:column;gap:6px">
       <div *ngFor="let p of churnRows.slice(0, 5)"
            (click)="goToPartner(p.partner_id)"
@@ -318,37 +323,37 @@ function healthColor(engagement: number): string {
           {{ churnRiskLabel(p.risk_level) }}
         </span>
         <span style="flex:1;font-size:13px;font-weight:600;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
-        <span style="font-size:12px;font-weight:700;color:#52525b;flex-shrink:0">{{ p.total_score }} pkt</span>
-        <span style="font-size:11px;color:#a1a1aa;flex-shrink:0">{{ p.days_since_order }}d</span>
+        <span style="font-size:12px;font-weight:700;color:#52525b;flex-shrink:0">{{ t('partnersList.churn.points', { score: p.total_score }) }}</span>
+        <span style="font-size:11px;color:#a1a1aa;flex-shrink:0">{{ t('reports.partners.churn.daysShort', { days: p.days_since_order }) }}</span>
       </div>
     </div>
     <a routerLink="/crm/dashboard" [queryParams]="{tab: 'churn'}"
        style="display:block;margin-top:14px;font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none"
        (mouseenter)="$any($event.currentTarget).style.textDecoration='underline'"
        (mouseleave)="$any($event.currentTarget).style.textDecoration='none'">
-      Pokaż wszystkich partnerów z ryzykiem churn →
+      {{ t('reports.partners.churn.showAll') }} →
     </a>
   </div>
 
   <!-- ROW 4: Pełna tabela partnerów -->
   <div class="card" style="padding:0;overflow:hidden">
     <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">Wyniki wszystkich partnerów</div>
-      <span style="font-size:11px;color:#a1a1aa">{{ filteredByPartner.length }} partnerów</span>
+      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">{{ t('reports.partners.allPartners.title') }}</div>
+      <span style="font-size:11px;color:#a1a1aa">{{ t('reports.partners.partnersCount', { count: filteredByPartner.length }) }}</span>
     </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12.5px">
         <thead>
           <tr style="background:#fafafa;border-bottom:1px solid #e4e4e7">
-            <th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Partner</th>
-            <th *ngIf="isManager" style="padding:8px 10px;text-align:left;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Handlowiec</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Obrót brutto</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Obrót netto</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Fees</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Przychód</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Marża</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Trans.</th>
-            <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">Health</th>
+            <th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.partner') }}</th>
+            <th *ngIf="isManager" style="padding:8px 10px;text-align:left;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('partnersList.fields.salesRep') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.grossTurnover') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.netTurnover') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.fees') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.revenue') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.margin') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.transactionsShort') }}</th>
+            <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.health') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -357,7 +362,7 @@ function healthColor(engagement: number): string {
               (click)="p.partner_id && goToPartner(p.partner_id)"
               (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
               (mouseleave)="$any($event.currentTarget).style.background=''"
-              [title]="p.partner_id ? 'Kliknij aby przejść do karty partnera' : ''">
+              [title]="p.partner_id ? t('reports.partners.openPartnerTooltip') : ''">
             <td style="padding:9px 14px">
               <span *ngIf="p.partner_id" style="font-weight:600;color:#f26522">{{ p.partner_name }}</span>
               <span *ngIf="!p.partner_id" style="color:#71717a">{{ p.partner_name }}</span>
@@ -375,17 +380,17 @@ function healthColor(engagement: number): string {
               <span [style.background]="healthBg(p.health_level)"
                     [style.color]="healthColor(p.health_level)"
                     style="font-size:11px;font-weight:700;border-radius:10px;padding:2px 9px;white-space:nowrap;display:inline-block">
-                {{ p.health_score }} pkt
+                {{ t('reports.partners.healthPoints', { score: p.health_score }) }}
               </span>
             </td>
           </tr>
           <tr *ngIf="!filteredByPartner.length">
-            <td [attr.colspan]="isManager ? 9 : 8" style="text-align:center;padding:24px;color:#a1a1aa;font-size:12px">Brak danych dla wybranego okresu</td>
+            <td [attr.colspan]="isManager ? 9 : 8" style="text-align:center;padding:24px;color:#a1a1aa;font-size:12px">{{ t('reports.partners.allPartners.empty') }}</td>
           </tr>
         </tbody>
         <tfoot *ngIf="kpi && filteredByPartner.length">
           <tr style="background:#fafafa;border-top:2px solid #e4e4e7;font-weight:700">
-            <td style="padding:9px 14px">RAZEM</td>
+            <td style="padding:9px 14px">{{ t('reports.partners.allPartners.total') }}</td>
             <td *ngIf="isManager"></td>
             <td style="padding:9px 10px;text-align:right;color:#f26522;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</td>
             <td style="padding:9px 10px;text-align:right">{{ kpi.net_turnover_pln | number:'1.0-0' }}</td>
@@ -403,6 +408,7 @@ function healthColor(engagement: number): string {
   </ng-container>
 </div>
 </div>
+</ng-container>
   `,
   styles: [`
     .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
@@ -429,6 +435,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   private cdr    = inject(ChangeDetectorRef);
   private zone   = inject(NgZone);
   private router = inject(Router);
+  private transloco = inject(TranslocoService);
 
   loading       = false;
   periodPreset  = '12m';
@@ -519,7 +526,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   }
 
   churnRiskLabel(level: string): string {
-    return ({ critical: 'Krytyczne', high: 'Wysokie', medium: 'Średnie', low: 'Niskie' } as Record<string, string>)[level] || level;
+    return CHURN_RISK_LEVELS.includes(level) ? this.transloco.translate('crm.partnersList.churn.levels.' + level) : level;
   }
 
   ngAfterViewInit(): void {}
@@ -605,7 +612,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
 
   goToPartnersByRep(salespersonId: string | null, salespersonName: string): void {
     if (!salespersonId) return;
-    this.router.navigate(['/crm/partners'], { queryParams: { manager_id: salespersonId, label: 'Handlowiec: ' + salespersonName } });
+    this.router.navigate(['/crm/partners'], { queryParams: { manager_id: salespersonId, label: this.transloco.translate('crm.leadsList.filters.repChip', { name: salespersonName }) } });
   }
 
   barPct(val: number, max: number): number { return max > 0 ? Math.max(2, Math.round(val / max * 100)) : 0; }
@@ -620,9 +627,10 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
     return level === 'good' ? '#F0FDF4' : level === 'warning' ? '#FFFBEB' : '#FEF2F2';
   }
   healthLabel(level: 'good' | 'warning' | 'risk' | string): string {
-    return level === 'good' ? 'Zdrowy' : level === 'warning' ? 'Uwaga' : 'Ryzyko';
+    const healthKey = level === 'good' ? 'good' : level === 'warning' ? 'warning' : 'risk';
+    return this.transloco.translate('crm.reports.partners.health.' + healthKey);
   }
-  productLabel(pt: string): string { return (PRODUCT_TYPE_LABELS as Record<string,string>)[pt] || pt; }
+  productLabel(pt: string): string { return pt in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + pt) : pt; }
   productIcon(pt: string): string  { return (PRODUCT_TYPE_ICONS as Record<string,string>)[pt] || '📦'; }
   deltaLabel(a: number, b: number): string { if (!b) return '—'; return (Math.abs((a-b)/b*100)).toFixed(0) + '%'; }
   initials(name: string): string { return (name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase(); }

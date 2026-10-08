@@ -1,0 +1,2625 @@
+{
+  "activity": {
+    "add": "Añadir actividad",
+    "card": {
+      "closeTask": "Cerrar tarea",
+      "collapse": "Contraer",
+      "createdAt": "creada el {date}",
+      "delete": "Eliminar",
+      "expand": "Expandir",
+      "reopen": "Reabrir"
+    },
+    "communication": "Comunicación",
+    "customDate": "Fecha personalizada…",
+    "deleteConfirm": "¿Eliminar la actividad «{title}»?",
+    "dueDate": {
+      "inOneWeek": "Dentro de una semana ({date})",
+      "inThreeBusinessDays": "Dentro de 3 días hábiles ({weekday})",
+      "inTwoBusinessDays": "Dentro de 2 días hábiles ({weekday})",
+      "inTwoWeeks": "Dentro de 2 semanas ({date})",
+      "none": "Ninguna",
+      "today": "Hoy",
+      "tomorrow": "Mañana"
+    },
+    "empty": "No hay actividades en esta categoría.",
+    "form": {
+      "bodyPlaceholder": "Contenido / notas…",
+      "bodyShortPlaceholder": "Contenido…",
+      "dateTime": "Fecha y hora",
+      "dueDate": "Fecha",
+      "noOwner": "— sin asignar —",
+      "none": "— ninguno —",
+      "owner": "Propietario",
+      "priority": "Prioridad",
+      "reminder": "Recordatorio"
+    },
+    "modal": {
+      "addedBy": "Añadido por",
+      "assignToSalesperson": "Asignar a un comercial",
+      "assignedTo": "Asignado a",
+      "comment": "Comentario",
+      "dateTime": "Fecha y hora",
+      "description": "Descripción",
+      "descriptionNotes": "Descripción / notas",
+      "edit": "Editar",
+      "saveChanges": "Guardar cambios",
+      "title": "Título",
+      "type": "Tipo",
+      "unassigned": "— sin asignar —"
+    },
+    "reminders": {
+      "atDue": "En la fecha límite de la tarea",
+      "day1Before": "1 día antes",
+      "days2Before": "2 días antes",
+      "days3Before": "3 días antes",
+      "hour1Before": "1 h antes",
+      "minutes30Before": "30 min antes",
+      "none": "Sin recordatorio"
+    },
+    "tabs": {
+      "all": "Todas",
+      "calls": "Llamadas",
+      "emails": "Correos",
+      "meetings": "Reuniones",
+      "notes": "Notas",
+      "tasks": "Tareas"
+    }
+  },
+  "calendar": {
+    "allDay": "vence",
+    "breadcrumb": "Calendario",
+    "durationMinutes": "{minutes} min",
+    "filters": {
+      "allPriorities": "Todas las prioridades",
+      "allReps": "Todos los comerciales",
+      "allTypes": "Todos los tipos",
+      "groupsGroup": "Grupos",
+      "repsGroup": "Comerciales",
+      "showClosed": "mostrar cerradas",
+      "showNoDate": "mostrar sin fecha"
+    },
+    "meeting": {
+      "duration": "Duración",
+      "locationPlaceholder": "Sala A, Madrid",
+      "notes": "Notas",
+      "participantsPlaceholder": "correo1@empresa.es, correo2@empresa.es",
+      "salesperson": "Comercial"
+    },
+    "month": {
+      "more": "+{count} más"
+    },
+    "nav": {
+      "today": "Hoy"
+    },
+    "tasks": {
+      "bulk": {
+        "closeSelected": "Cerrar las tareas seleccionadas",
+        "selectOverdue": "Seleccionar todas las tareas vencidas",
+        "selectedCount": "{count, plural, one {# seleccionada} other {# seleccionadas}}"
+      },
+      "close": "Cerrar",
+      "count": "{count, plural, one {# actividad} other {# actividades}}",
+      "editMode": "modo de edición",
+      "empty": "No hay tareas que mostrar.",
+      "form": {
+        "assignTo": "Asignar a",
+        "descriptionPlaceholder": "Descripción…",
+        "titlePlaceholder": "Título…"
+      },
+      "loading": "Cargando tareas…",
+      "noDate": "sin fecha",
+      "readOnly": "solo lectura",
+      "reopen": "Reabrir",
+      "saveFailed": "No se pudieron guardar los cambios de la tarea"
+    },
+    "title": "Calendario de actividades",
+    "views": {
+      "day": "Día",
+      "month": "Mes",
+      "tasks": "Tareas",
+      "week": "Semana"
+    }
+  },
+  "callAnalysis": {
+    "actions": {
+      "archive": "Archivar",
+      "reanalyze": "Reanalizar"
+    },
+    "bulk": {
+      "deleteSelected": "Eliminar seleccionados",
+      "hold": "En espera",
+      "restore": "Restaurar",
+      "selected": "{count, plural, one {# seleccionado} other {# seleccionados}}"
+    },
+    "confirm": {
+      "deleteRow": "¿Eliminar el análisis de {name}?",
+      "deleteSelected": "{count, plural, one {¿Eliminar # registro?} other {¿Eliminar # registros?}}"
+    },
+    "details": {
+      "callsLabel": "Llamadas:",
+      "importedLabel": "Importación:",
+      "lastCallLabel": "Última:",
+      "objections": "Objeciones",
+      "positiveSignals": "Señales positivas"
+    },
+    "empty": {
+      "hint": "Las notas aparecerán tras importar un CSV o al terminar las llamadas telefónicas",
+      "noNotes": "No hay notas de llamadas",
+      "noResults": "No hay resultados para los filtros seleccionados"
+    },
+    "errors": {
+      "bulkFailed": "Error en la operación masiva",
+      "deleteFailed": "Error al eliminar",
+      "followUpUpdateFailed": "Error al actualizar el seguimiento",
+      "reanalyzeFailed": "Error al reanalizar",
+      "statusChangeFailed": "Error al cambiar el estado"
+    },
+    "filters": {
+      "allFollowUps": "Todos los seguimientos",
+      "allLinks": "Todas las vinculaciones",
+      "allSalespeople": "Todos los comerciales",
+      "allStatuses": "Todos los estados",
+      "firstCall": "Primera llamada:",
+      "followUpDate": "Fecha de seguimiento:",
+      "followUpDone": "Seguimiento hecho",
+      "followUpRequired": "Seguimiento necesario",
+      "lastCall": "Última llamada:",
+      "noLinks": "Sin vinculaciones",
+      "presets": {
+        "custom": "Otro…",
+        "nextTwoDays": "Próx. 2 días",
+        "thisWeek": "Esta semana",
+        "today": "Hoy",
+        "todayTomorrow": "Hoy+Mañana"
+      },
+      "score": "Score:",
+      "scoreMax": "máx",
+      "scoreMin": "mín",
+      "searchPlaceholder": "Buscar empresa o NIF...",
+      "statusAnalyzing": "Analizando",
+      "total": "{count, plural, one {# empresa} other {# empresas}}"
+    },
+    "followUp": {
+      "done": "Hecho",
+      "label": "Seguimiento",
+      "markDoneTitle": "Haz clic para marcar el seguimiento como hecho",
+      "notRequired": "No necesario",
+      "required": "Necesario",
+      "undoTitle": "Seguimiento hecho. Haz clic para deshacer."
+    },
+    "header": {
+      "analyze": "Analizar ({count})",
+      "analyzing": "Analizando...",
+      "importCsv": "Importar CSV"
+    },
+    "import": {
+      "failed": "Error de importación",
+      "resultCreated": "Importado: {created} nuevas, {appended} actualizadas de {totalRows} filas (columnas de notas: {note1} / {note2})",
+      "resultUpserted": "Importado: {upserted} empresas de {totalRows} filas (columnas de notas: {note1} / {note2})"
+    },
+    "inspect": {
+      "aiSummary": "Resumen de IA",
+      "analysisStatus": "Estado del análisis",
+      "basis": "Base del análisis — notas ({chars, plural, one {# carácter} other {# caracteres}} · {calls, plural, one {# llamada} other {# llamadas}})",
+      "noResults": "No hay resultados del análisis de IA para esta empresa.",
+      "noScore": "Sin puntuación",
+      "promptFailed": "Error al cargar el prompt.",
+      "promptLoading": "Cargando el prompt…",
+      "purchasePotential": "Potencial de compra",
+      "tabAnalysis": "Análisis de IA",
+      "tabPrompt": "Prompt de DeepSeek",
+      "title": "Inspección del analizador"
+    },
+    "links": {
+      "goToLead": "Ir al lead",
+      "goToPartner": "Ir al partner",
+      "goToProspect": "Ir al prospecto",
+      "prospect": "Prospecto"
+    },
+    "menu": {
+      "delete": "Eliminar",
+      "inspect": "Inspección",
+      "putOnHold": "Poner en espera",
+      "restoreFromArchive": "Restaurar del archivo",
+      "restoreFromHold": "Quitar de espera"
+    },
+    "potentialHelp": {
+      "description": "Valoración de la disposición de la empresa a comprar servicios de CRM.",
+      "footer": "El valor lo calcula un modelo de IA a partir de las notas de las llamadas.",
+      "title": "Potencial (0–100)"
+    },
+    "progress": {
+      "companies": "{done} / {total} empresas",
+      "errors": "{count, plural, one {# error} other {# errores}}",
+      "finished": "Finalizado",
+      "running": "Analizando...",
+      "runningOtherUser": "Analizando (otro usuario)..."
+    },
+    "scoreLabels": {
+      "lowInterest": "Interés bajo",
+      "moderateInterest": "Interés moderado",
+      "notInterested": "Sin interés",
+      "readyToBuy": "Lista para comprar",
+      "strongInterest": "Interés alto"
+    },
+    "statuses": {
+      "analyzing": "Analizando...",
+      "archived": "Archivo",
+      "done": "Listo",
+      "error": "Error",
+      "hold": "En espera",
+      "pending": "Pendiente"
+    },
+    "subtitle": "Análisis de las notas de llamadas telefónicas — disposición a comprar (DeepSeek AI)",
+    "table": {
+      "actions": "Acciones",
+      "analyzedAt": "Analizado",
+      "calls": "Llamadas",
+      "company": "Empresa",
+      "firstCall": "Primera llamada",
+      "lastCall": "Última llamada",
+      "links": "Vinculaciones",
+      "potential": "Potencial",
+      "salesperson": "Comercial",
+      "status": "Estado",
+      "taxId": "NIF"
+    },
+    "title": "Análisis de llamadas",
+    "transcript": {
+      "callNumber": "Llamada {number}",
+      "title": "Transcripción de llamadas ({count})"
+    }
+  },
+  "callSimulator": {
+    "activity": {
+      "demoTranscript": "[00:00] Comercial: Buenos días, soy Juan García, de CRMtree. ¿Podría hablar con la persona responsable de los viajes de empresa?\n\n[00:08] Cliente: Sí, dígame. Soy Marcos López.\n\n[00:10] Comercial: Buenos días, señor López. Le llamo para hablar de la optimización de los costes de los viajes de empresa en su compañía. ¿Tiene un momento?\n\n[00:18] Cliente: Sí, adelante. ¿Qué propone exactamente?\n\n[00:22] Comercial: Ofrecemos un sistema integral de gestión de viajes corporativos: reservas de vuelos, hoteles y transporte en un solo lugar. De media, nuestros clientes ahorran entre un 15 y un 25% en costes de viaje.\n\n[00:35] Cliente: Suena interesante. ¿Cuántas personas tienen que viajar al año para que merezca la pena?\n\n[00:40] Comercial: Nuestra plataforma resulta rentable a partir de unas pocas decenas de viajes al año. Puedo prepararle un cálculo personalizado para su empresa.\n\n[00:49] Cliente: De acuerdo. Envíeme la oferta por correo. Nuestro equipo la revisará.\n\n[00:54] Comercial: Por supuesto, se la envío hoy mismo. ¿Podemos concertar también una breve presentación en línea para mostrarle el sistema en funcionamiento?\n\n[01:02] Cliente: Sí, podemos. Le propondré una fecha cuando hayamos revisado la oferta.\n\n[01:06] Comercial: Perfecto. Gracias por su tiempo, hasta pronto.\n\n[01:09] Cliente: Adiós.",
+      "summary": "Llamada telefónica con {who} ({seconds}s)",
+      "title": "Llamada telefónica — {who}",
+      "transcriptHeading": "--- Transcripción ---"
+    },
+    "connected": "Conectado",
+    "connecting": "Estableciendo la llamada...",
+    "duration": "Duración: {time}",
+    "endCall": "Finalizar la llamada",
+    "ended": "Llamada finalizada",
+    "hangUp": "Colgar",
+    "noteSaved": "Nota guardada",
+    "savingNote": "Guardando la nota..."
+  },
+  "calls": {
+    "call": "Llamar",
+    "callNumber": "Llamar: {phone}",
+    "contactFallback": "Contacto",
+    "mainNumber": "Principal: {phone}",
+    "noNumber": "Sin número"
+  },
+  "consents": {
+    "collapse": "contraer",
+    "details": "detalles",
+    "lastChange": "Último cambio:",
+    "save": "Guardar consentimientos",
+    "saved": "Guardado",
+    "saving": "Guardando…",
+    "title": "Consentimientos de marketing",
+    "values": {
+      "denied": "Denegado",
+      "granted": "Concedido",
+      "noData": "Sin datos"
+    }
+  },
+  "crmDashboard": {
+    "activities": {
+      "title": "Actividades recientes"
+    },
+    "columns": {
+      "adoption": "Adopción",
+      "days": "Días",
+      "expires": "Vence",
+      "opportunities": "Oportunidades",
+      "partner": "Partner",
+      "revenue": "Ingresos"
+    },
+    "kpi": {
+      "activePartners": "Partners activos",
+      "avgArrPerPartner": "ARR medio / partner",
+      "inOnboarding": "En onboarding",
+      "partnerGroups": "Grupos de partners",
+      "totalArr": "ARR total"
+    },
+    "partnerScores": {
+      "title": "Partners por resultados ({period})"
+    },
+    "periods": {
+      "currentYear": "Año en curso",
+      "last12Months": "Últimos 12 meses",
+      "last30Days": "Últimos 30 días",
+      "last90Days": "Últimos 90 días"
+    },
+    "pipeline": {
+      "empty": "Sin datos",
+      "title": "Pipeline de leads"
+    },
+    "productMix": {
+      "title": "Mix de productos ({period})"
+    },
+    "renewals": {
+      "daysShort": "{days}d",
+      "title": "Próximas renovaciones"
+    },
+    "title": "Panel CRM"
+  },
+  "csvImport": {
+    "actions": {
+      "downloadTemplate": "Descargar plantilla",
+      "exportData": "Exportar datos"
+    },
+    "cards": {
+      "documents": {
+        "description": "Importación de metadatos de documentos. Los archivos físicos hay que añadirlos manualmente después de la importación. El número de documento se genera automáticamente.",
+        "title": "Documentos (metadatos)"
+      },
+      "leads": {
+        "title": "Leads de ventas"
+      },
+      "partners": {
+        "title": "Partners"
+      },
+      "sales": {
+        "description": "Datos a nivel de fila del sistema de ventas externo, al nivel Partner × Producto × Mes. La vinculación con el comercial la hace automáticamente el CRM (responsable del partner).",
+        "title": "Datos de ventas"
+      }
+    },
+    "dictionaries": {
+      "documentGroups": "Accounting|HR|Marketing|Obsługa Klienta|Operations|Sprzedaz|Zarzad"
+    },
+    "dropZone": {
+      "importing": "Importando…",
+      "prompt": "Arrastra un archivo CSV o haz clic"
+    },
+    "errorsTable": {
+      "company": "Empresa",
+      "error": "Error",
+      "field": "Campo",
+      "name": "Nombre",
+      "row": "Fila"
+    },
+    "files": {
+      "salesTemplate": "plantilla_datos_ventas.csv",
+      "template": "plantilla_{type}.csv"
+    },
+    "hints": {
+      "agentFields": "solo cuando source=agent",
+      "dictionaryValues": "valores de diccionario",
+      "dictionaryValuesHover": "valores de diccionario (pasa el cursor para verlos)",
+      "dictionaryValuesTooltip": "valores de diccionario — pasa el cursor para ver en el tooltip los valores disponibles",
+      "documentGroupName": "nombre del grupo de documentos",
+      "entitiesExample": "Empresa ABC|Juan García",
+      "entitiesSeparator": "entidades separadas por",
+      "example": "p. ej.,",
+      "otherProducts": "otros…",
+      "partnerNumber": "clave que enlaza con los datos de ventas",
+      "salesPartnerNumber": "clave que enlaza con la ficha del Partner en el CRM",
+      "tagsSeparator": "separadas por"
+    },
+    "history": {
+      "date": "Fecha",
+      "empty": "No hay historial de importaciones.",
+      "errors": "Errores",
+      "file": "Archivo",
+      "imported": "Importados",
+      "importedBy": "Por",
+      "status": "Estado",
+      "title": "Historial de importaciones",
+      "type": "Tipo"
+    },
+    "messages": {
+      "csvRequired": "Elige un archivo en formato CSV.",
+      "exportFailed": "No se pudieron exportar los datos.",
+      "serverError": "Error del servidor",
+      "templateDownloadFailed": "No se pudo descargar la plantilla."
+    },
+    "result": {
+      "errors": "{count, plural, one {# error} other {# errores}}",
+      "imported": "{count, plural, one {# importado} other {# importados}}",
+      "skipped": "{count, plural, one {# omitido} other {# omitidos}}",
+      "total": "Total: {count}"
+    },
+    "subtitle": "Importa leads, partners y datos de ventas de forma masiva desde un archivo CSV. Descarga la plantilla, rellénala y súbela.",
+    "title": "Importar CSV"
+  },
+  "documents": {
+    "add": "Añadir",
+    "linkFailed": "No se pudo vincular el documento. Comprueba que tienes los permisos necesarios.",
+    "none": "Ninguno",
+    "open": "Abrir documento",
+    "picker": {
+      "added": "Añadido",
+      "hint": "Busca documentos por nombre, número o entidad.",
+      "noResults": "Sin resultados",
+      "readOnly": "Lectura",
+      "readOnlyTooltip": "Solo lectura — sin permisos para vincular",
+      "searchPlaceholder": "Buscar documento…",
+      "searching": "Buscando…",
+      "title": "Añadir documento vinculado"
+    },
+    "titleWithCount": "Documentos ({count})",
+    "unlinkConfirm": "¿Quitar el vínculo con el documento?",
+    "unlinkFailed": "No se pudo quitar el vínculo."
+  },
+  "email": {
+    "addressTooltip": "Correo: {email}",
+    "attachments": {
+      "download": "Descargar",
+      "downloadTooltip": "Descargar archivo",
+      "preview": "Vista previa",
+      "previewTooltip": "Abrir en el navegador"
+    },
+    "cc": "CC:",
+    "checkNew": "Comprobar nuevos",
+    "checkNewTooltip": "Comprobar correos nuevos (debug)",
+    "connecting": "Conectando con Google…",
+    "date": "Fecha:",
+    "debug": {
+      "error": "Error: {message}",
+      "newMessages": "Mensajes nuevos: {count}"
+    },
+    "disconnect": "Desconectar",
+    "disconnectConfirm": "¿Desconectar tu cuenta de correo? Para seguir enviando correos tendrás que volver a conectarla.",
+    "driveDownloadFailed": "Error al descargar el archivo de Drive",
+    "drivePickerTitle": "Elige los archivos que quieres adjuntar",
+    "driveReauthRequired": "Hay que volver a conectar el buzón de Gmail — ponte en contacto con el administrador.",
+    "empty": "No hay correos enviados.",
+    "fields": {
+      "attachments": "Adjuntos",
+      "body": "Mensaje",
+      "cc": "CC",
+      "subject": "Asunto",
+      "to": "Para"
+    },
+    "from": "De:",
+    "fromDrive": "Desde Drive",
+    "fromGoogleDrive": "Desde Google Drive",
+    "hideQuoted": "Ocultar el historial citado",
+    "incomingReply": "Respuesta",
+    "label": "Correo",
+    "messageFallbackTitle": "Mensaje",
+    "new": "Nuevo correo",
+    "noAddress": "Sin dirección",
+    "noTemplate": "— sin plantilla —",
+    "notConfigured": "El correo no está configurado para esta organización. Ponte en contacto con el administrador.",
+    "placeholders": {
+      "body": "Texto del mensaje…",
+      "cc": "cc@empresa.es",
+      "ccShort": "CC…",
+      "recipient": "correo@empresa.es",
+      "replyBody": "Texto de la respuesta…",
+      "subject": "Asunto del mensaje",
+      "toShort": "Para…"
+    },
+    "reply": {
+      "action": "Responder",
+      "hideDetails": "Ocultar",
+      "replyingTo": "Respondes a:",
+      "send": "Enviar respuesta",
+      "sendFailed": "Error de envío",
+      "showDetails": "Detalles"
+    },
+    "replyHeading": "Respuesta",
+    "send": "Enviar correo",
+    "sendAction": "Enviar",
+    "sendFailed": "Error al enviar el correo",
+    "sending": "Enviando…",
+    "showQuoted": "Mostrar el historial citado",
+    "thread": {
+      "anotherUser": "otro usuario",
+      "empty": "No hay mensajes en el hilo.",
+      "loading": "Cargando el hilo…",
+      "notOwnerCompose": "Este hilo pertenece a {owner} — no puedes responder en él. El correo de abajo se enviará como mensaje nuevo desde tu cuenta.",
+      "notOwnerComposeUnknown": "No puedes responder en este hilo. El correo de abajo se enviará como mensaje nuevo desde tu cuenta.",
+      "notOwnerReply": "Este hilo pertenece a {owner} — no puedes responder en él. Este mensaje se enviará como nuevo, desde tu cuenta.",
+      "notOwnerReplyUnknown": "No puedes responder en este hilo. Este mensaje se enviará como nuevo, desde tu cuenta.",
+      "ownedByTooltip": "El hilo pertenece a {owner} — enviarás un mensaje nuevo desde tu cuenta",
+      "title": "Hilo de correo"
+    },
+    "to": "Para:",
+    "trainingMode": "Modo de formación",
+    "writeNew": "Escribir un correo nuevo"
+  },
+  "history": {
+    "activityAdded": "Actividad añadida: {title}",
+    "activityClosed": "Actividad cerrada: {title}",
+    "activityDeleted": "Actividad eliminada: {title}",
+    "activityUpdated": "Actividad actualizada: {title}",
+    "changed": "Cambiado: {changes}",
+    "consentChanged": "Consentimiento «{label}»: {from} → {to}",
+    "documentLinked": "Documento vinculado",
+    "empty": "No hay entradas.",
+    "emptyValue": "(vacío)",
+    "fields": {
+      "activeUsers": "Usuarios activos",
+      "agentName": "Agente",
+      "annualTurnoverCurrency": "Moneda",
+      "assignedTo": "Comercial",
+      "billingAddress": "Dirección",
+      "billingCity": "Ciudad",
+      "billingEmail": "Correo fact.",
+      "billingPhone": "Tel. fact.",
+      "closeDate": "Fecha cierre",
+      "commission": "Comisión",
+      "company": "Empresa",
+      "contactName": "Contacto",
+      "contactTitle": "Cargo en la empresa",
+      "contractExpires": "Contrato hasta",
+      "contractSigned": "Contrato desde",
+      "contractValue": "Volumen de negocio",
+      "country": "País",
+      "creditLimit": "Límite de crédito",
+      "deposit": "Depósito",
+      "dwhPartnerId": "CRMtree Partner ID",
+      "email": "Correo electrónico",
+      "firstContactDate": "Primer contacto",
+      "group": "Grupo",
+      "hot": "Caliente",
+      "industry": "Sector",
+      "language": "Idioma",
+      "lostReason": "Motivo de la pérdida",
+      "nip": "NIF",
+      "notes": "Notas",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Moneda",
+      "phone": "Teléfono",
+      "probability": "Probabilidad %",
+      "source": "Origen",
+      "stage": "Etapa",
+      "status": "Estado",
+      "subdomain": "Subdominio",
+      "tags": "Etiquetas",
+      "valuePln": "Valor PLN",
+      "website": "Sitio web"
+    },
+    "lostReason": "Motivo: {reason}",
+    "no": "No",
+    "noResults": "Sin resultados.",
+    "searchPlaceholder": "Buscar en el historial…",
+    "showAll": "Mostrar todo",
+    "stageChanged": "Cambio de etapa: {from} → {to}",
+    "systemUser": "Sistema",
+    "title": "Historial de cambios",
+    "yes": "Sí"
+  },
+  "labels": {
+    "activityStatuses": {
+      "closed": "cerrada",
+      "new": "nueva",
+      "open": "abierta"
+    },
+    "activityTypes": {
+      "call": "Llamada",
+      "doc_sent": "Documento",
+      "email": "Correo",
+      "meeting": "Reunión",
+      "note": "Nota",
+      "opportunity": "Oportunidad",
+      "qbr": "QBR",
+      "task": "Tarea",
+      "training": "Formación"
+    },
+    "partnerStatuses": {
+      "active": "Activo",
+      "churned": "Perdido",
+      "inactive": "Inactivo",
+      "onboarding": "Implantación"
+    },
+    "priorities": {
+      "asap": "ASAP",
+      "important": "Importante",
+      "low": "Baja",
+      "medium": "Media"
+    },
+    "productTypes": {
+      "car_rental": "Alquiler de coche",
+      "hotel": "Hotel",
+      "other": "Otros",
+      "transfer": "Traslado",
+      "transport_bus": "Autobús",
+      "transport_ferry": "Ferri",
+      "transport_flight": "Vuelo",
+      "transport_train": "Tren",
+      "travel_insurance": "Seguro de viaje",
+      "visa": "Visado"
+    },
+    "sourceTypes": {
+      "document": "Documento",
+      "lead": "Lead",
+      "onboarding": "Onboarding",
+      "partner": "Partner",
+      "project": "Proyecto"
+    },
+    "sources": {
+      "agent": "Agente",
+      "aliasHello": "Alias Hello",
+      "coldCall": "Cold Call",
+      "emailCampaign": "Campaña de correo",
+      "googleAdsAiSearch": "Google Ads AI Search",
+      "googleAdsPmax": "Google Ads PMax",
+      "googleAdsSeaBrand": "Google Ads SEA Brand",
+      "inbound": "Inbound",
+      "linkedin": "LinkedIn",
+      "linkedinInMail": "LinkedIn InMail",
+      "linkedinLeadForm": "LinkedIn Lead Form",
+      "onlineForm": "Formulario en línea",
+      "other": "Otro",
+      "own": "Propio",
+      "partner": "Partner",
+      "referral": "Recomendación",
+      "tradeFair": "Feria / Evento",
+      "website": "Sitio web"
+    },
+    "stages": {
+      "archived": "Archivo",
+      "closed_lost": "Perdido",
+      "closed_won": "Ganado",
+      "negotiation": "Negociación",
+      "new": "Nuevo",
+      "offer": "Oferta",
+      "onboarded": "Incorporado",
+      "onboarding": "En onboarding",
+      "presentation": "Presentación",
+      "qualification": "Cualificación"
+    }
+  },
+  "leadDetail": {
+    "archive": {
+      "action": "Archivar",
+      "confirm": "¿Archivar el lead «{company}»? Desaparecerá de las listas, los paneles y los informes — solo se verá al elegir el filtro Etapa = Archivo. Seguirá siendo editable y desde allí se podrá devolver a la etapa «Nuevo».",
+      "failed": "Error al archivar el lead.",
+      "tooltip": "Archivar — el lead desaparecerá de las listas, los paneles y los informes"
+    },
+    "edit": {
+      "addContact": "Añadir contacto",
+      "chooseReason": "— elige un motivo —",
+      "noExtraContacts": "Sin contactos adicionales",
+      "noPermission": "Sin permisos — el comercial no pertenece a tu grupo",
+      "none": "— ninguno —",
+      "placeholders": {
+        "agentEmail": "agente@empresa.es",
+        "email": "juan@empresa.es",
+        "fullName": "Juan García",
+        "notes": "Notas libres…",
+        "website": "p. ej., acme.es"
+      },
+      "requiredFields": "Completa los campos obligatorios:",
+      "requiredForStage": "Completa los campos obligatorios para la etapa «{stage}»:",
+      "saveChanges": "Guardar cambios",
+      "saving": "Guardando…",
+      "sections": {
+        "agent": "Datos del agente",
+        "basic": "Datos básicos",
+        "sales": "Detalles de venta"
+      },
+      "title": "Editar lead",
+      "unassigned": "— sin asignar —"
+    },
+    "enrich": {
+      "action": "Obtener datos",
+      "done": "Datos obtenidos — revisa los campos de abajo",
+      "loading": "Obteniendo…"
+    },
+    "fields": {
+      "addedOn": "Añadido",
+      "annualTurnover": "Volumen de negocio anual",
+      "closeDate": "Fecha de cierre",
+      "companyName": "Nombre de la empresa",
+      "contactTitle": "Cargo en la empresa",
+      "email": "Correo electrónico",
+      "firstContact": "Primer contacto",
+      "fullName": "Nombre y apellidos",
+      "hotLead": "Lead caliente",
+      "industry": "Sector",
+      "lostReason": "Motivo de la pérdida",
+      "name": "Nombre",
+      "nip": "NIF",
+      "onlinePct": "% Online",
+      "person": "Persona",
+      "phone": "Teléfono",
+      "probability": "Probabilidad",
+      "probabilityPct": "% Probabilidad",
+      "salesperson": "Comercial",
+      "source": "Origen",
+      "stage": "Etapa",
+      "tagsHint": "Etiquetas (separadas por comas)",
+      "website": "Sitio web",
+      "www": "Web"
+    },
+    "header": {
+      "backToLeads": "Leads",
+      "edit": "Editar",
+      "hot": "Caliente"
+    },
+    "history": {
+      "converted": "Lead convertido en partner",
+      "created": "Lead creado",
+      "deleted": "Lead eliminado",
+      "updated": "Lead actualizado"
+    },
+    "hold": {
+      "active": "Espera activa",
+      "activeUntil": "Activa hasta",
+      "dateRequired": "Indica la fecha",
+      "edit": "Editar la espera",
+      "editTooltip": "En espera hasta {date} — haz clic para editar",
+      "introAfter": "se marcará como en espera — sin efecto en los KPI activos ni en el pipeline mientras dure la espera.",
+      "introBefore": "El lead",
+      "label": "En espera",
+      "reason": "Motivo",
+      "reasonRequired": "Elige un motivo",
+      "remove": "Quitar la espera",
+      "removeFailed": "Error al quitar la espera.",
+      "saveFailed": "Error al guardar la espera.",
+      "set": "Poner en espera",
+      "until": "En espera hasta {date}"
+    },
+    "info": {
+      "collapsePanel": "Contraer panel",
+      "expandPanel": "Expandir panel",
+      "title": "Información"
+    },
+    "loadError": "Error al cargar el lead.",
+    "nip": {
+      "countryCodeRequired": "Indica el código de país (2 letras), p. ej., PL",
+      "duplicate": "Este NIF ya está asignado a otro registro.",
+      "numberRequired": "Indica el número después del código de país",
+      "plTenDigits": "Para PL se requieren 10 dígitos después del código de país",
+      "required": "El NIF es obligatorio"
+    },
+    "notFound": "Lead no encontrado.",
+    "onboarding": {
+      "completed": "Onboarding finalizado",
+      "completedPartnerActive": "Onboarding finalizado — Partner activo",
+      "contractSigned": "Fecha de firma del contrato",
+      "contractValue": "Valor del contrato (PLN)",
+      "contractValuePlaceholder": "p. ej., 50000",
+      "goTo": "Ir a Onboarding",
+      "hint": "Indica el valor del contrato y la fecha de firma para pasar el lead al proceso de implantación.",
+      "inProgress": "En proceso de onboarding",
+      "inProgressHint": "El lead está en proceso de implantación. Detalles en la sección Onboarding.",
+      "introAfter": "al proceso de implantación. El lead aparecerá en la sección Onboarding. En el Registro de partners aparecerá tras la sincronización con el DWH.",
+      "introBefore": "Migración del lead",
+      "leadLocked": "Lead bloqueado para edición",
+      "panelLink": "Panel de Onboarding",
+      "partnerAfterSync": "El partner aparecerá en el Registro de partners tras la sincronización con el DWH.",
+      "partnerInProgress": "partner en proceso de implantación",
+      "partnerRegistryLink": "Registro de partners",
+      "start": "Iniciar onboarding",
+      "startedAt": "Iniciado:"
+    },
+    "sections": {
+      "agent": "Agente",
+      "company": "Empresa",
+      "contact": "Contacto",
+      "extraContacts": "Contactos adicionales",
+      "notes": "Notas",
+      "sales": "Ventas"
+    },
+    "stage": {
+      "backToNew": "Volver a Nuevo",
+      "next": "Etapa siguiente",
+      "previous": "Etapa anterior"
+    },
+    "testAccount": {
+      "apiError": "Error de conexión con la API externa",
+      "choose": "— elige —",
+      "countries": {
+        "cz": "Chequia",
+        "de": "Alemania",
+        "fr": "Francia",
+        "gb": "Reino Unido",
+        "hu": "Hungría",
+        "pl": "Polonia",
+        "ro": "Rumanía",
+        "ru": "Rusia",
+        "sk": "Eslovaquia",
+        "ua": "Ucrania"
+      },
+      "create": "Crear cuenta de prueba",
+      "created": "Cuenta de prueba creada",
+      "creating": "Creando la cuenta…",
+      "fields": {
+        "adminEmail": "Correo del administrador",
+        "billingCountry": "País de facturación",
+        "billingEmail": "Correo de facturación",
+        "city": "Ciudad",
+        "country": "País",
+        "currency": "Moneda",
+        "firstName": "Nombre",
+        "language": "Idioma",
+        "lastName": "Apellidos",
+        "street": "Calle y número",
+        "subdomain": "Subdominio",
+        "zip": "Código postal"
+      },
+      "fixAndRetry": "Corrige los datos de abajo e inténtalo de nuevo.",
+      "languages": {
+        "de": "Alemán",
+        "en": "Inglés",
+        "pl": "Polaco",
+        "ro": "Rumano",
+        "ru": "Ruso"
+      },
+      "numberHint": "Este número se transferirá como N.º de partner durante la migración.",
+      "numberLabel": "N.º:",
+      "openPriceList": "Abrir la lista de precios en HTCD",
+      "openTooltip": "Crear una cuenta de prueba en el sistema externo",
+      "placeholders": {
+        "adminEmail": "admin@empresa.es",
+        "billingEmail": "facturas@empresa.es",
+        "city": "p. ej., Madrid",
+        "firstName": "Juan",
+        "lastName": "García",
+        "street": "p. ej., Calle Ejemplo 1",
+        "subdomain": "p. ej., empresa-prueba",
+        "zip": "p. ej., 28001"
+      },
+      "previousError": "La llamada anterior terminó con un error",
+      "retry": "Reintentar la creación",
+      "sections": {
+        "admin": "C — Administrador de la cuenta",
+        "billing": "B — Dirección de facturación",
+        "technical": "A — Datos técnicos de la cuenta"
+      },
+      "title": "Cuenta de prueba"
+    }
+  },
+  "leadsList": {
+    "breadcrumb": "Leads",
+    "detail": {
+      "addInDetails": "Añadir en los detalles",
+      "closeDate": "Fecha de cierre",
+      "details": "Detalles",
+      "industry": "Sector",
+      "noActivities": "Sin actividades.",
+      "note": "Nota",
+      "openDetails": "Abrir detalles",
+      "pipeline": "Pipeline",
+      "probability": "Probab.",
+      "stageValue": "Etapa: {stage}",
+      "tabs": {
+        "history": "Historial",
+        "info": "Información"
+      },
+      "tags": "Etiquetas",
+      "value": "Valor",
+      "weightedValue": "Valor ponderado"
+    },
+    "fields": {
+      "addedOn": "Añadido",
+      "annualTurnover": "Volumen de negocio anual",
+      "company": "Empresa",
+      "companyRole": "Cargo en la empresa",
+      "email": "Correo electrónico",
+      "firstContact": "Primer contacto",
+      "phone": "Teléfono",
+      "salesRep": "Comercial",
+      "source": "Origen",
+      "stage": "Etapa",
+      "website": "Sitio web"
+    },
+    "filters": {
+      "addedRangeTitle": "Filtrar por fecha de creación del lead",
+      "all": "Todos",
+      "allReps": "Todos los comerciales",
+      "allSources": "Todos los orígenes",
+      "allStages": "Todas las etapas",
+      "clearDates": "Borrar rango de fechas",
+      "groupChip": "Grupo: {name}",
+      "groupsGroup": "Grupos",
+      "holdOnly": "Solo en espera",
+      "holdOnlyTitle": "Mostrar solo los leads en espera",
+      "hot": "Calientes",
+      "mine": "Míos",
+      "repChip": "Comercial: {name}",
+      "reportFilter": "Filtro del informe: {label}",
+      "repsGroup": "Comerciales",
+      "wholeGroup": "Todo el grupo: {group}"
+    },
+    "importCsv": "Importar CSV",
+    "kanban": {
+      "closed": "Cerrados",
+      "closedCount": "{won}G / {lost}P",
+      "closedEmpty": "Ninguno",
+      "empty": "Sin leads",
+      "holdBadge": "En espera",
+      "onboardedTitle": "Onboarding finalizado — Partner activo",
+      "partnerBadge": "Partner"
+    },
+    "loading": "Cargando leads…",
+    "meeting": {
+      "addedBy": "Añadido por",
+      "dateTime": "Fecha y hora",
+      "detailTitle": "Detalles de la actividad",
+      "duration": "Duración",
+      "durationMinutes": "Duración (min)",
+      "durationValue": "{count, plural, one {# minuto} other {# minutos}}",
+      "edit": "Editar actividad",
+      "editTitle": "Edición de la actividad",
+      "location": "Ubicación",
+      "locationPlaceholder": "p. ej., Oficina del cliente, Google Meet…",
+      "meetingTitle": "Título de la reunión",
+      "notes": "Notas de la reunión",
+      "notesPlaceholder": "Temas tratados, conclusiones, próximos pasos…",
+      "openLead": "Abrir lead",
+      "openPartner": "Abrir partner",
+      "participants": "Participantes",
+      "participantsPlaceholder": "p. ej., Juan García, ana@empresa.es",
+      "saveChanges": "Guardar cambios",
+      "titlePlaceholder": "Asunto de la reunión"
+    },
+    "newLead": {
+      "addContact": "Añadir contacto",
+      "companyName": "Nombre de la empresa",
+      "companyPlaceholder": "p. ej., Acme S.L.",
+      "contactName": "Nombre y apellidos del contacto",
+      "create": "Crear lead",
+      "emailPlaceholder": "juan@empresa.es",
+      "enrichConfirm": "Sí, obtener",
+      "enrichDecline": "No",
+      "enrichDone": "Datos obtenidos — revisa los campos de abajo y completa los que falten",
+      "enrichPrompt": "¿Obtener los datos de la empresa desde su web?",
+      "extraContacts": "Contactos adicionales",
+      "fieldRequired": "Campo obligatorio",
+      "fillRequired": "Completa los campos obligatorios:",
+      "fullName": "Nombre y apellidos",
+      "hot": "Lead caliente",
+      "namePlaceholder": "Juan García",
+      "noExtraContacts": "Sin contactos adicionales",
+      "notes": "Notas",
+      "notesPlaceholder": "Información adicional…",
+      "optional": "(opcional)",
+      "requiredContactName": "Nombre y apellidos",
+      "select": "— elige —",
+      "subtitle": "Añade una nueva oportunidad de venta",
+      "taxId": "NIF",
+      "taxIdErrors": {
+        "countryCode": "Indica el código de país (2 letras), p. ej., PL",
+        "numberMissing": "Indica el número después del código de país",
+        "polishDigits": "Para PL se requieren 10 dígitos después del código de país",
+        "required": "El NIF es obligatorio"
+      },
+      "title": "Nuevo lead",
+      "unassigned": "— sin asignar —",
+      "value": "Valor (PLN)",
+      "websitePlaceholder": "p. ej., acme.es"
+    },
+    "saving": "Guardando…",
+    "searchPlaceholder": "Buscar empresas, contactos…",
+    "sourceGroups": {
+      "marketing": "Marketing"
+    },
+    "stats": {
+      "hot": "Calientes",
+      "lost": "Perdidos",
+      "opportunities": "Oportunidades de venta",
+      "pipeline": "Pipeline (PLN)",
+      "won": "Ganados"
+    },
+    "table": {
+      "chance": "% Probabilidad",
+      "closeDateShort": "Cierre",
+      "companyContact": "Empresa / Contacto",
+      "empty": "No hay leads que cumplan los criterios",
+      "firstContactShort": "1.er cont.",
+      "migrated": "Migrado",
+      "next": "Siguiente",
+      "online": "% Online",
+      "pageOf": "Página {page} de {pages}",
+      "previous": "Anterior"
+    },
+    "timeline": {
+      "allDay": "vence",
+      "durationShort": "{minutes}min",
+      "empty": "Sin reuniones",
+      "emptyHint": "Programa la primera reunión en los detalles del lead o del partner",
+      "futureHint": "Desplázate hacia abajo para ver las próximas reuniones",
+      "loading": "Cargando reuniones…",
+      "pastHint": "Desplázate hacia arriba para ver las reuniones anteriores",
+      "subtitle": "Actividades con fecha · en orden cronológico",
+      "title": "Calendario de actividades",
+      "todayTag": "HOY",
+      "tomorrow": "Mañana · {date}",
+      "yesterday": "Ayer · {date}"
+    },
+    "title": "Leads de ventas",
+    "view": {
+      "kanban": "Kanban",
+      "table": "Tabla",
+      "timeline": "Cronología"
+    }
+  },
+  "mailCallback": {
+    "closeHint": "Puedes cerrar esta ventana y volver a trabajar en el CRM.",
+    "closeWindow": "Cerrar ventana",
+    "connectedBody": "Tu cuenta de {provider} se ha conectado correctamente con la aplicación.",
+    "connectedTitle": "¡Conexión con {provider} establecida!",
+    "errorBody": "No se pudo conectar la cuenta de {provider}.",
+    "errorTitle": "Error de conexión",
+    "processing": "Procesando…",
+    "reasons": {
+      "email_already_connected": "Esta cuenta de Google ya está conectada a otro usuario del CRM. Usa otra cuenta de Google o ponte en contacto con el administrador."
+    }
+  },
+  "meetings": {
+    "durationMin": "Duración (min)",
+    "location": "Lugar",
+    "locationPlaceholder": "p. ej., Sala de reuniones A",
+    "meetingLocation": "Lugar de la reunión",
+    "participantPlaceholder": "Escribe un correo…",
+    "participants": "Participantes",
+    "participantsHint": "correos separados por comas",
+    "titlePlaceholder": "Título de la reunión",
+    "titleRequiredPlaceholder": "Título de la reunión *"
+  },
+  "onboardingBoard": {
+    "filters": {
+      "allAssignees": "Todos los asignados",
+      "allPartners": "Todos los partners",
+      "searchPlaceholder": "Buscar partner, NIF…"
+    },
+    "launch": {
+      "action": "Lanzamiento",
+      "actionShort": "Lanzar",
+      "confirm": "¿Lanzar el partner «{company}»? El partner pasará al estado Activo y será visible en el Registro de partners.",
+      "failed": "Error al lanzar el partner",
+      "inProgress": "Lanzando…",
+      "moveToRegistry": "Pasar al Registro de partners",
+      "partnerProfile": "Perfil del partner",
+      "remainingTasks": "{count, plural, one {Queda # tarea sin completar} other {Quedan # tareas sin completar}}",
+      "successHint": "El partner se ha pasado al Registro de partners y ya está activo.",
+      "successTitle": "{company} — ¡en marcha!"
+    },
+    "partners": {
+      "empty": "No hay partners en proceso de implantación",
+      "emptyHint": "Los partners llegan aquí tras la migración desde un lead",
+      "leadData": "Datos del lead",
+      "stepBadge": "Paso {step}/{total}",
+      "taskProgress": "{done}/{total} tareas"
+    },
+    "steps": {
+      "configuration": "Configuración",
+      "contractSigning": "Firma del contrato",
+      "launch": "Lanzamiento",
+      "training": "Formación"
+    },
+    "table": {
+      "action": "Acción",
+      "addedOn": "Añadido",
+      "step": "Paso",
+      "taskProgress": "Progreso de las tareas"
+    },
+    "taskForm": {
+      "assignedTo": "Asignado a",
+      "choosePerson": "— elige una persona —",
+      "create": "Crear tarea",
+      "done": "Tarea completada",
+      "dueDate": "Fecha de ejecución",
+      "newTask": "Nueva tarea",
+      "note": "Nota",
+      "notePlaceholder": "Información adicional…",
+      "step": "Paso del proceso",
+      "time": "Hora",
+      "timeHint": "(opcional, por def. 09:00)",
+      "title": "Título de la tarea",
+      "titlePlaceholder": "Nombre de la tarea"
+    },
+    "taskTypes": {
+      "call": "Llamada"
+    },
+    "tasks": {
+      "delete": "Eliminar tarea",
+      "empty": "Sin tareas"
+    },
+    "timeline": {
+      "empty": "No hay tareas con fecha de ejecución"
+    },
+    "title": "Onboarding de partners",
+    "toasts": {
+      "taskAdded": "Tarea añadida",
+      "taskDeleteFailed": "Error al eliminar la tarea",
+      "taskDeleted": "Tarea eliminada",
+      "taskSaveFailed": "Error al guardar la tarea",
+      "taskUpdated": "Tarea actualizada"
+    },
+    "views": {
+      "calendar": "Calendario",
+      "partners": "Partners",
+      "timeline": "Cronología"
+    }
+  },
+  "partnerDetail": {
+    "activity": {
+      "bodyPlaceholder": "Contenido / descripción…",
+      "dueDate": {
+        "businessDays": "{count} d. háb. ({date})",
+        "today": "Hoy ({date})",
+        "tomorrow": "Mañana ({date})"
+      },
+      "durationPlaceholder": "p. ej., 60",
+      "empty": "Sin actividades.",
+      "meetingSubjectPlaceholder": "Asunto de la reunión *",
+      "ownerMeDefault": "— yo (por defecto) —",
+      "participantPlaceholder": "Escribe un correo o un nombre…",
+      "participantsEmails": "Participantes (correos)"
+    },
+    "calls": {
+      "agentNumber": "Agente: {phone}",
+      "billingNumber": "Facturación: {phone}",
+      "contactNumber": "Contacto: {phone}"
+    },
+    "churn": {
+      "badge": {
+        "analyzedAt": "Análisis: {date}",
+        "daysSinceOrder": "Días sin ped.: {days}",
+        "salesDrop": "Caída de ventas: {percent}%"
+      },
+      "daysSinceOrder": "Días sin pedido",
+      "levels": {
+        "critical": "Crítico",
+        "high": "Alto",
+        "low": "Bajo",
+        "medium": "Medio"
+      },
+      "noRisk": "Sin riesgo de churn",
+      "salesDrop": "Caída M-2→M-1",
+      "score": "{score} pts",
+      "title": "Riesgo de churn"
+    },
+    "commissionBasis": {
+      "bookings": "Número de reservas",
+      "notApplicable": "No aplica",
+      "segments": "Número de segmentos",
+      "turnoverThresholds": "Tramos de volumen de negocio"
+    },
+    "documents": {
+      "empty": "Sin documentos vinculados",
+      "fallbackTitle": "Documento #{id}",
+      "goTo": "Ir al documento",
+      "noContractHint": "Añade un documento para confirmar la colaboración con el partner.",
+      "noContractTitle": "Sin contrato vinculado.",
+      "pickerHint": "Busca documentos por nombre, número o entidad (Entity). Solo se muestran los documentos a los que tienes acceso (mín. Read).",
+      "unlink": "Quitar vínculo"
+    },
+    "edit": {
+      "addContact": "Añadir contacto",
+      "billingContactIncomplete": "Se recomienda completar todos los campos del contacto de facturación.",
+      "contactsSaveFailed": "Los datos del partner se han guardado, pero no se pudieron guardar los contactos adicionales.",
+      "contractContactIncomplete": "Se recomienda completar todos los campos del contacto para el contrato.",
+      "dwhLockedHint": "Los campos marcados con DWH se sincronizan desde el sistema transaccional y no se pueden editar.",
+      "managersOnly": "solo los gerentes pueden editar",
+      "noExtraContacts": "Sin contactos adicionales",
+      "noGroup": "— sin grupo —",
+      "none": "— ninguno —",
+      "openTasksWarning": "{count, plural, one {# tarea de implantación pendiente} other {# tareas de implantación pendientes}} — no se puede establecer el estado Activo",
+      "partnerIdHint": "ID del partner en el sistema transaccional",
+      "placeholders": {
+        "address": "Calle Ejemplo 1",
+        "adminEmail": "admin@empresa.es",
+        "adminFirstName": "p. ej., Juan",
+        "adminLastName": "p. ej., García",
+        "billingContactEmail": "facturacion@empresa.es",
+        "billingContactTitle": "Responsable de facturación",
+        "billingCountry": "España",
+        "billingEmail": "billing@empresa.es",
+        "billingFullName": "Ana Martínez",
+        "city": "Madrid",
+        "commission": "p. ej., 0.05",
+        "country": "p. ej., España",
+        "creditLimit": "p. ej., 50000",
+        "deposit": "p. ej., 10000",
+        "email": "juan@empresa.es",
+        "fullName": "Juan García",
+        "language": "p. ej., es",
+        "notes": "Notas libres…",
+        "partnerId": "p. ej., 42",
+        "source": "p. ej., feria, recomendación, cold call",
+        "subdomain": "p. ej., acme",
+        "website": "https://empresa.es"
+      },
+      "removeContact": "Eliminar contacto",
+      "saveChanges": "Guardar cambios",
+      "saveFailed": "Error al guardar",
+      "saving": "Guardando…",
+      "sections": {
+        "basic": "Datos básicos",
+        "contractAndFinance": "Contrato y finanzas",
+        "managerAndGroup": "Responsable y grupo",
+        "salesAndSource": "Ventas y origen",
+        "tagsAndNotes": "Etiquetas y notas"
+      },
+      "subdomainHint": "Dirección del subdominio en el sistema (se rellena al crear la cuenta de prueba)",
+      "syncedWithDwh": "Sincronizado con el DWH",
+      "title": "Editar partner",
+      "unassigned": "— sin asignar —"
+    },
+    "email": {
+      "empty": "No hay correos. Envía el primer mensaje haciendo clic en «+ Nuevo correo»."
+    },
+    "fields": {
+      "activeUsers": "Usuarios activos",
+      "activeUsersShort": "Usuarios act.",
+      "address": "Dirección",
+      "adminEmail": "Correo del admin",
+      "adminFirstName": "Nombre del admin",
+      "adminLastName": "Apellidos del admin",
+      "annualTurnover": "Volumen de negocio anual",
+      "billingCountry": "País de facturación",
+      "billingEmail": "Correo de facturación",
+      "city": "Ciudad",
+      "commission": "Comisión WT/TM",
+      "commissionBasis": "Base",
+      "companyName": "Nombre de la empresa",
+      "contactTitle": "Cargo en la empresa",
+      "contractExpires": "Fecha de vencimiento",
+      "contractFrom": "Contrato desde",
+      "contractSigned": "Fecha de firma",
+      "contractTo": "Contrato hasta",
+      "country": "País",
+      "creditLimit": "Límite de crédito",
+      "crmtreeId": "CRMtree ID",
+      "crmtreePartnerId": "CRMtree Partner ID",
+      "currency": "Moneda",
+      "depositAmount": "Importe del depósito",
+      "depositDateIn": "Fecha de ingreso",
+      "depositDateOut": "Fecha de devolución",
+      "email": "Correo electrónico",
+      "firstContact": "Primer contacto",
+      "firstName": "Nombre",
+      "fullName": "Nombre y apellidos",
+      "industry": "Sector",
+      "language": "Idioma",
+      "lastName": "Apellidos",
+      "manager": "Responsable",
+      "managerSalesperson": "Responsable / Comercial",
+      "nip": "NIF",
+      "note": "Nota",
+      "notes": "Notas",
+      "onlinePct": "% Online",
+      "partnerCurrency": "Moneda del partner",
+      "partnerGroup": "Grupo de partners",
+      "phone": "Teléfono",
+      "source": "Origen",
+      "status": "Estado",
+      "subdomain": "Subdominio",
+      "tags": "Etiquetas",
+      "tagsHint": "Etiquetas (separadas por comas)",
+      "value": "Valor",
+      "website": "Sitio web",
+      "zip": "Código postal"
+    },
+    "header": {
+      "activeSince": "Activo desde {date}",
+      "backToPartners": "Partners",
+      "churn": "Churn: {level}",
+      "edit": "Editar",
+      "noEditPermission": "No tienes permisos para editar este partner"
+    },
+    "history": {
+      "created": "Partner creado",
+      "deleted": "Partner eliminado",
+      "searchPlaceholder": "Buscar…",
+      "updated": "Partner actualizado"
+    },
+    "info": {
+      "activeUsersCount": "{count, plural, one {# activo} other {# activos}}",
+      "collapsePanel": "Contraer panel",
+      "expandPanel": "Expandir panel",
+      "notSet": "sin definir",
+      "title": "Información"
+    },
+    "loadError": "Error de carga.",
+    "nip": {
+      "countryCodeRequired": "Indica el código de país (2 letras), p. ej., PL",
+      "numberRequired": "Indica el número después del código de país",
+      "plTenDigits": "Para PL se requieren 10 dígitos después del código de país",
+      "required": "El NIF es obligatorio"
+    },
+    "notFound": "Partner no encontrado.",
+    "onboarding": {
+      "addTask": "Añadir tarea",
+      "advanceFailed": "No se puede finalizar la etapa",
+      "deleteTaskConfirm": "¿Eliminar la tarea «{title}»?",
+      "descriptionOptionalPlaceholder": "Descripción (opcional)…",
+      "descriptionPlaceholder": "Descripción…",
+      "empty": "No hay tareas para esta etapa. Haz clic en «+ Añadir tarea».",
+      "finish": "Finalizar la implantación",
+      "finishFailed": "No se puede finalizar la implantación",
+      "nextStep": "Etapa siguiente",
+      "overdue": "Vencida",
+      "responsiblePerson": "— persona responsable —",
+      "steps": {
+        "contractSigned": "Contrato firmado",
+        "ready": "Listo",
+        "systemSetup": "Configuración del sistema",
+        "userTraining": "Formación de usuarios"
+      },
+      "taskTitlePlaceholder": "Título de la tarea *",
+      "tasksFor": "Tareas:"
+    },
+    "opportunities": {
+      "dueBy": "hasta el {date}",
+      "status": "Estado de la oportunidad",
+      "statuses": {
+        "closed": "Cerrada",
+        "in_progress": "En curso",
+        "new": "Nueva"
+      },
+      "titleWithCount": "Oportunidades de venta ({count})"
+    },
+    "sales": {
+      "kpi": {
+        "grossTurnover": "Volumen de negocio bruto PLN",
+        "netRevenue": "Ingresos netos PLN",
+        "netTurnover": "Volumen de negocio neto PLN",
+        "products": "Productos",
+        "transactions": "Transacciones"
+      },
+      "noData": "Sin datos de ventas",
+      "periods": {
+        "currentMonth": "Mes actual",
+        "last12Months": "Últimos 12 meses",
+        "last3Months": "Últimos 3 meses",
+        "last6Months": "Últimos 6 meses",
+        "ytd": "YTD {year}"
+      },
+      "productBreakdown": "Desglose por producto",
+      "title": "Datos de ventas del DWH"
+    },
+    "sections": {
+      "additionalData": "Datos adicionales",
+      "agent": "Datos del agente",
+      "billingAddress": "Dirección de facturación",
+      "billingContact": "Contacto de facturación",
+      "contractContact": "Contacto para el contrato",
+      "extraContacts": "Contactos adicionales",
+      "financialTerms": "Condiciones financieras",
+      "partnerAdmin": "Administrador del partner"
+    }
+  },
+  "partnerGroups": {
+    "card": {
+      "morePartners": "+{count} más",
+      "partnersNoun": "{count, plural, one {partner} other {partners}}"
+    },
+    "details": {
+      "empty": "No hay partners en este grupo.",
+      "manager": "Responsable:",
+      "partnersInGroup": "Partners del grupo ({count})",
+      "partnersStat": "Partners"
+    },
+    "empty": "No hay grupos de partners.",
+    "form": {
+      "create": "Crear",
+      "delete": "Eliminar",
+      "description": "Descripción",
+      "editTitle": "Editar grupo",
+      "industry": "Sector",
+      "name": "Nombre",
+      "namePlaceholder": "Nombre del grupo"
+    },
+    "messages": {
+      "deleteConfirm": "¿Eliminar el grupo «{name}»? Los partners quedarán desvinculados.",
+      "deleteFailed": "No se pudo eliminar el grupo",
+      "saveFailed": "No se pudo guardar el grupo"
+    },
+    "newGroup": "Nuevo grupo",
+    "title": "Grupos de partners"
+  },
+  "partnersList": {
+    "card": {
+      "marginAmount": "{amount} PLN de margen",
+      "onboardingStep": "Paso {step} / {total}",
+      "openOpportunities": "{count, plural, one {# oportunidad} other {# oportunidades}}"
+    },
+    "churn": {
+      "levels": {
+        "critical": "Crítico",
+        "high": "Alto",
+        "low": "Bajo",
+        "medium": "Medio"
+      },
+      "points": "{score} pts",
+      "risk": "Riesgo de churn",
+      "riskWithLevel": "Riesgo de churn: {level}"
+    },
+    "create": {
+      "companyPlaceholder": "Nombre de la empresa",
+      "error": "Error al crear el partner. Inténtalo de nuevo.",
+      "hint": "Puedes crear un partner sin un lead vinculado.",
+      "saving": "Guardando…",
+      "submit": "Crear partner",
+      "taxIdHint": "(opcional — para los partners del DWH se rellena automáticamente)",
+      "title": "Nuevo partner",
+      "unassigned": "— sin asignar —"
+    },
+    "documents": {
+      "linkedCount": "{count, plural, one {El partner tiene # documento vinculado} other {El partner tiene # documentos vinculados}}. Haz clic para ver.",
+      "noContract": "Sin contrato vinculado"
+    },
+    "empty": "No hay partners que cumplan los criterios.",
+    "fields": {
+      "accountManager": "Responsable / Comercial",
+      "annualTurnover": "Volumen de negocio anual",
+      "company": "Empresa",
+      "contact": "Contacto",
+      "email": "Correo electrónico",
+      "group": "Grupo",
+      "industry": "Sector",
+      "licenseCount": "Número de licencias",
+      "salesRep": "Comercial",
+      "status": "Estado",
+      "taxId": "NIF"
+    },
+    "reportFilter": {
+      "clear": "Borrar filtro",
+      "label": "Filtro del informe:"
+    },
+    "table": {
+      "churn": "Churn",
+      "contractUntil": "Contrato hasta",
+      "crmTurnover": "Volumen CRM",
+      "dwhMargin": "Margen DWH",
+      "dwhMarginHint": "Margen YTD del DWH",
+      "dwhTurnover": "Volumen DWH",
+      "dwhTurnoverHint": "Volumen de negocio bruto YTD del DWH"
+    },
+    "taxIdErrors": {
+      "countryCode": "Indica el código de país (2 letras), p. ej., PL",
+      "duplicate": "Este NIF ya está asignado a otro registro.",
+      "numberMissing": "Indica el número después del código de país",
+      "polishDigits": "Para PL se requieren 10 dígitos después del código de país",
+      "required": "El NIF es obligatorio"
+    },
+    "title": "Registro de partners",
+    "toolbar": {
+      "allGroups": "Todos los grupos",
+      "allIndustries": "Todos los sectores",
+      "allSalesReps": "Todos los comerciales",
+      "allStatuses": "Todos los estados",
+      "clear": "Borrar",
+      "onlyMine": "Solo los míos",
+      "searchPlaceholder": "Buscar empresa, contacto…"
+    },
+    "view": {
+      "cards": "Tarjetas",
+      "table": "Tabla"
+    }
+  },
+  "pbx": {
+    "errors": {
+      "callRejected": "Llamada rechazada ({code}). Comprueba el número.",
+      "micPermissionDenied": "Sin permiso para usar el micrófono. Permite el acceso en la configuración del navegador.",
+      "micUnavailable": "Micrófono no disponible: {reason}",
+      "noAudio": "Sin conexión de audio (ICE failed). Comprueba la red o ponte en contacto con el administrador.",
+      "numberBusy": "Número ocupado — inténtalo de nuevo en un momento.",
+      "registrationFailed": "El registro SIP ha fallado. Comprueba el token PBX.",
+      "registrationTimeout": "Tiempo de espera del registro SIP agotado (12s). Comprueba la conexión y la configuración del PBX.",
+      "sipConnectionFailed": "Error de conexión SIP. Configura el token PBX en Mi configuración.",
+      "sipUnauthorized": "Error de autorización SIP (401). Comprueba tu token PBX en Mi configuración → Softphone."
+    },
+    "incomingTabTitle": "{name} está llamando...",
+    "unknownCaller": "desconocido"
+  },
+  "periodFilter": {
+    "groups": {
+      "current": "Actuales",
+      "custom": "Personalizado",
+      "previous": "Anteriores"
+    },
+    "presets": {
+      "currentMonth": "Mes actual",
+      "currentQuarter": "Trimestre actual",
+      "currentYear": "Año actual (YTD {year})",
+      "customRange": "Intervalo personalizado…",
+      "previousMonth": "Mes anterior",
+      "previousQuarter": "Trimestre anterior",
+      "previousYear": "Año anterior ({year})"
+    }
+  },
+  "reports": {
+    "common": {
+      "columns": {
+        "leads": "Leads",
+        "pipeline": "Pipeline",
+        "progress": "Progreso",
+        "winRatePct": "Win%",
+        "won": "Ganados"
+      },
+      "days": "{count, plural, one {# día} other {# días}}",
+      "exportPdf": "Exportar PDF",
+      "funnel": {
+        "subtitle": "Número de leads y valor en PLN",
+        "title": "Embudo de ventas"
+      },
+      "kpi": {
+        "activeLeads": "Leads activos",
+        "avgSalesCycle": "Ciclo de venta medio",
+        "avgWonValue": "Valor medio ganado",
+        "winRate": "Win Rate",
+        "wonPln": "Cerrados / Ganados (PLN)"
+      },
+      "leadSources": {
+        "title": "Orígenes de los leads",
+        "totalCaption": "leads",
+        "winRate": "{value}% win rate"
+      },
+      "leadsShort": "{count} leads",
+      "lostReasons": "Motivos de la pérdida",
+      "noData": "Sin datos",
+      "periods": {
+        "currentMonth": "Mes actual",
+        "currentQuarter": "Trimestre actual",
+        "currentYear": "Año actual (YTD {year})",
+        "last3Months": "Últimos 3 meses",
+        "last6Months": "Últimos 6 meses"
+      },
+      "refresh": "Actualizar",
+      "salespeopleResults": "Resultados de los comerciales",
+      "title": "Informes de ventas"
+    },
+    "leads": {
+      "activity": {
+        "empty": "Sin datos de actividad",
+        "sourceAll": "Todas",
+        "sourceLeads": "Leads",
+        "sourcePartners": "Partners",
+        "title": "Actividad de los comerciales",
+        "types": {
+          "email": "Correos"
+        }
+      },
+      "drilldown": {
+        "funnel": "Embudo: {stage}",
+        "lost": "Perdidos: {reason}",
+        "pipelineAll": "Pipeline – todos los activos",
+        "plannedBudget": "Presupuesto previsto – leads del periodo",
+        "plannedInPeriod": "Cierre previsto en el periodo",
+        "source": "Origen: {source}",
+        "velocity": "Tiempo en la etapa: {stage}",
+        "won": "Cerrados / Ganados"
+      },
+      "empty": {
+        "hint": "Añade leads o cambia el intervalo de fechas",
+        "title": "Sin datos para el periodo seleccionado"
+      },
+      "funnel": {
+        "conversionToWon": "Conversión a Ganado"
+      },
+      "kpi": {
+        "activeCount": "{count, plural, one {# activo} other {# activos}}",
+        "budgetCompletion": "{value}% de cumplimiento",
+        "contractsCount": "{count, plural, one {# contrato} other {# contratos}}",
+        "noPlan": "Sin plan",
+        "plannedBudget": "Presupuesto previsto",
+        "plannedBudgetPln": "Presupuesto previsto (PLN)",
+        "plannedDelivery": "Cierre previsto"
+      },
+      "lostReasons": {
+        "empty": "No hay leads perdidos",
+        "leadsCount": "{count, plural, one {# lead} other {# leads}}",
+        "topReason": "Motivo principal:"
+      },
+      "sourceQuality": {
+        "title": "Calidad por origen (win rate)"
+      },
+      "tooltips": {
+        "goToOnboarding": "Haz clic para ir a la sección Onboarding",
+        "viewLeads": "Haz clic para ver los leads",
+        "viewLeadsClosingInPeriod": "Haz clic para ver los leads con fecha de cierre en este periodo",
+        "viewLeadsInPeriod": "Haz clic para ver los leads de este periodo",
+        "viewLostLeads": "Haz clic para ver los leads perdidos: {reason}",
+        "viewSalespersonLeads": "Haz clic para ver los leads del comercial",
+        "viewSourceLeads": "Haz clic para ver los leads del origen: {source}",
+        "viewStageLeads": "Haz clic para ver los leads de la etapa: {stage}",
+        "viewWonLeads": "Haz clic para ver los leads ganados"
+      },
+      "trend": {
+        "activeTooltip": "Activos (Cualificación–Negociación): {count}",
+        "new": "Nuevos",
+        "title": "Tendencia mensual",
+        "won": "Ganados",
+        "wonTooltip": "Ganados: {count}"
+      },
+      "velocity": {
+        "scale": "Escala: máx. {count, plural, one {# día} other {# días}}",
+        "title": "Tiempo en la etapa (media de días)"
+      }
+    },
+    "overview": {
+      "banner": {
+        "after": "de datos importados",
+        "before": "Los gráficos se basan en",
+        "manageImport": "Gestionar la importación",
+        "months": "{count, plural, one {# mes} other {# meses}}",
+        "partner": "partner:",
+        "product": "producto:"
+      },
+      "chart": {
+        "pipelineTooltip": "Pipeline: {value}k PLN",
+        "projectedWeighted": "Valor previsto (ponderado):",
+        "title": "Ingresos mensuales",
+        "wonTooltip": "Ganados: {value}k PLN"
+      },
+      "external": {
+        "feeRate": "Fee rate: {value}%",
+        "feesPln": "Fees (PLN)",
+        "grossTurnoverPln": "Volumen de negocio bruto (PLN)",
+        "margin": "Margen: {value}%",
+        "netTurnoverPln": "Volumen de negocio neto (PLN)",
+        "productsCount": "{count, plural, one {# producto} other {# productos}}",
+        "revenuePln": "Ingresos (PLN)",
+        "share": "Cuota: {value}%",
+        "source": "Datos externos",
+        "transactions": "Transacciones"
+      },
+      "filters": {
+        "allPartners": "Todos los partners",
+        "allProducts": "Todos los productos"
+      },
+      "funnel": {
+        "closed": "Cerrado",
+        "conversionNewToQualification": "Conversión Nuevo→Cualif.",
+        "conversionOfferToClosed": "Conversión Oferta→Cerr.",
+        "projectedValue": "Valor previsto"
+      },
+      "kpi": {
+        "aboveTarget": "Por encima del objetivo",
+        "activePipeline": "Pipeline activo",
+        "avgClosingTime": "Tiempo medio de cierre",
+        "belowTarget": "Por debajo del objetivo",
+        "hotCount": "{count, plural, one {# caliente} other {# calientes}}",
+        "noneInPeriod": "Ninguno en este periodo",
+        "wonContracts": "Contratos ganados"
+      },
+      "loading": "Cargando informes…",
+      "lostReasons": {
+        "choseCompetitor": "Eligió a la competencia",
+        "insight": "El {percent}% de las pérdidas se debe a «{reason}».",
+        "insightLabel": "Conclusión:",
+        "noBudget": "Sin presupuesto",
+        "priceTooHigh": "Precio demasiado alto",
+        "projectPostponed": "Proyecto aplazado"
+      },
+      "periods": {
+        "year": "Año {year}"
+      },
+      "sourceQuality": {
+        "title": "Calidad por origen"
+      },
+      "sources": {
+        "campaign": "Campaña",
+        "coldOutreach": "Cold outreach",
+        "referrals": "Recomendaciones",
+        "socialMedia": "Redes sociales",
+        "tradeFairs": "Ferias"
+      },
+      "table": {
+        "fees": "Fees",
+        "grossTurnover": "Volumen bruto",
+        "net": "Neto",
+        "partners": "Partners",
+        "revenue": "Ingresos"
+      },
+      "velocity": {
+        "demoToOffer": "Presentación → Oferta",
+        "negotiationToClosing": "Negociación → Cierre",
+        "newToQualification": "Nuevo → Cualificación",
+        "offerToNegotiation": "Oferta → Negociación",
+        "qualificationToDemo": "Cualificación → Presentación",
+        "title": "Tiempo en la etapa (media de días)"
+      }
+    },
+    "partnerAnalytics": {
+      "byProduct": {
+        "title": "Estructura por producto"
+      },
+      "columns": {
+        "grossA": "Bruto A",
+        "grossB": "Bruto B",
+        "grossDelta": "Δ Bruto",
+        "marginA": "Margen A",
+        "marginB": "Margen B",
+        "netA": "Neto A",
+        "netB": "Neto B",
+        "partner": "Partner",
+        "partnersShort": "Part.",
+        "productsA": "Prod. A",
+        "productsB": "Prod. B",
+        "productsDelta": "Δ Prod.",
+        "segment": "Segmento"
+      },
+      "emptyPeriod": "Sin datos para el periodo seleccionado",
+      "filterMode": "Filtro",
+      "kpi": {
+        "grossTurnoverPln": "Volumen de negocio bruto (PLN)",
+        "margin": "Margen",
+        "netTurnoverPln": "Volumen de negocio neto (PLN)",
+        "productsCount": "Número de productos"
+      },
+      "modes": {
+        "custom": "Personalizado",
+        "mom": "MoM",
+        "qoq": "QoQ",
+        "yoy": "YoY"
+      },
+      "noData": "Sin datos",
+      "partners": {
+        "allGroups": "Todos los grupos",
+        "allIndustries": "Todos los sectores",
+        "count": "{count, plural, one {# partner} other {# partners}}",
+        "searchPlaceholder": "Buscar partner…",
+        "showMore": "Mostrar más (quedan {count})",
+        "title": "Partners — Volumen de negocio bruto"
+      },
+      "percentagePoints": "{value} pp",
+      "period": {
+        "a": "Periodo A:",
+        "b": "Periodo B:",
+        "customB": "Periodo B personalizado:",
+        "summary": "{partners, plural, one {# partner} other {# partners}} · {products, plural, one {# producto} other {# productos}}",
+        "to": "a"
+      },
+      "refresh": "Actualizar",
+      "reps": {
+        "noSalesperson": "— ninguno —",
+        "subtitle": "Periodo A vs. Periodo B",
+        "title": "Resultados por comercial"
+      },
+      "title": "Panel analítico — Partners",
+      "trend": {
+        "countTooltip": "{period}: {count} uds.",
+        "title": "Tendencia mensual — {metric}"
+      },
+      "trendMetrics": {
+        "count": "Número de transacciones",
+        "gross": "Volumen bruto",
+        "margin": "Margen (valor)",
+        "net": "Volumen neto"
+      }
+    },
+    "partners": {
+      "allPartners": {
+        "empty": "Sin datos para el periodo seleccionado",
+        "title": "Resultados de todos los partners",
+        "total": "TOTAL"
+      },
+      "churn": {
+        "criticalCount": "{count, plural, one {# crítico} other {# críticos}}",
+        "daysShort": "{days}d",
+        "empty": "No hay partners con riesgo de churn",
+        "showAll": "Mostrar todos los partners con riesgo de churn",
+        "title": "Riesgo de churn de los partners"
+      },
+      "columns": {
+        "fees": "Fees",
+        "grossTurnover": "Volumen bruto",
+        "health": "Health",
+        "margin": "Margen",
+        "netTurnover": "Volumen neto",
+        "partner": "Partner",
+        "revenue": "Ingresos",
+        "transactionsShort": "Trans."
+      },
+      "emptyHint": "Importa los datos mediante Importar CSV",
+      "filters": {
+        "allPartners": "Todos los partners",
+        "currentGroup": "Actuales",
+        "currentMonth": "Mes actual",
+        "previousGroup": "Anteriores",
+        "previousMonth": "Mes anterior",
+        "previousQuarter": "Trimestre anterior",
+        "previousYear": "Año anterior ({year})"
+      },
+      "grossTurnoverPln": "Volumen de negocio bruto (PLN)",
+      "health": {
+        "good": "Sano",
+        "risk": "Riesgo",
+        "warning": "Atención"
+      },
+      "healthPoints": "{score} pts",
+      "kpi": {
+        "activePartners": "Partners activos",
+        "feeRateShare": "{percent}% fee rate",
+        "feesPln": "Fees (PLN)",
+        "productsCount": "{count} productos",
+        "revenueMarginPln": "Ingresos / Margen (PLN)",
+        "revenueTrend": "tendencia de ingresos",
+        "showPartnersTooltip": "Haz clic para ver los partners",
+        "vsPrevious": "{delta} vs. anterior"
+      },
+      "marginShare": "{percent}% de margen",
+      "noData": "Sin datos",
+      "openPartnerTooltip": "Haz clic para ir a la ficha del partner",
+      "partnersCount": "{count, plural, one {# partner} other {# partners}}",
+      "products": {
+        "title": "Desglose por producto"
+      },
+      "refresh": "Actualizar",
+      "reps": {
+        "showPartnersTooltip": "Haz clic para ver los partners de este comercial",
+        "title": "Resultados de los comerciales"
+      },
+      "scorecard": {
+        "empty": "Sin datos de partners",
+        "legend": {
+          "good": "bien",
+          "medium": "regular",
+          "poor": "mal"
+        },
+        "title": "Scorecard de partners"
+      },
+      "summary": {
+        "feeRate": "Fee rate",
+        "feesCommissions": "Fees / Comisiones",
+        "marginPct": "% de margen",
+        "revenueMargin": "Ingresos (margen)",
+        "title": "Resumen financiero"
+      },
+      "title": "Partner Performance",
+      "trend": {
+        "title": "Tendencia de ingresos",
+        "totalTurnover": "Volumen total"
+      }
+    }
+  },
+  "salesDashboard": {
+    "activity": {
+      "allLoaded": "Todas las actividades cargadas",
+      "empty": "Sin actividades",
+      "incomingEmail": "← Correo",
+      "refresh": "Actualizar",
+      "title": "Actividad reciente",
+      "yesterday": "Ayer"
+    },
+    "chart": {
+      "periods": {
+        "month": "Mes",
+        "quarter": "Trimestre",
+        "week": "Semana"
+      },
+      "title": "Resultados de ventas",
+      "vsPreviousPeriod": "vs. periodo anterior"
+    },
+    "churn": {
+      "allLevels": "Todos los niveles",
+      "daysSinceOrder": "días sin pedido",
+      "empty": "No hay partners con riesgo de churn que cumplan los criterios de los filtros.",
+      "generateResult": "{created, plural, one {Se ha creado # tarea} other {Se han creado # tareas}}, omitidas: {skipped} (ya existen).",
+      "generateTasks": "Generar tareas",
+      "generating": "Generando…",
+      "noRisk": "Sin riesgo de churn",
+      "salesDrop": "caída M-2→M-1",
+      "searchPlaceholder": "Buscar partner…",
+      "showAll": "Mostrar todos los partners con riesgo de churn →"
+    },
+    "currency": {
+      "pln": "{value} PLN",
+      "thousandsPln": "{value} k PLN"
+    },
+    "header": {
+      "fallbackName": "usuario",
+      "greeting": "¡Buenos días, {name}!",
+      "subtitle": "Este es el resumen de tus actividades y resultados."
+    },
+    "kpi": {
+      "filters": {
+        "activeOpportunities": "Oportunidades activas en el pipeline",
+        "newLeadsThisWeek": "Leads nuevos – semana actual",
+        "newLeadsValueThisWeek": "Leads nuevos – valor de la semana actual",
+        "pipelineValue": "Valor del pipeline"
+      },
+      "inPipeline": "en el pipeline",
+      "newLeads": "Leads nuevos",
+      "newLeadsValue": "Valor de leads nuevos",
+      "newOpportunities": "Oportunidades nuevas",
+      "opportunitiesValue": "Valor de las oportunidades",
+      "thisMonth": "este mes",
+      "vsPreviousMonth": "vs. mes anterior",
+      "vsPreviousWeek": "vs. semana anterior",
+      "wonOpportunities": "Oportunidades ganadas"
+    },
+    "opportunities": {
+      "empty": "Sin oportunidades",
+      "name": "Nombre de la oportunidad",
+      "probability": "Probabilidad",
+      "showAll": "Ver todas las oportunidades →",
+      "title": "Últimas oportunidades"
+    },
+    "pipeline": {
+      "empty": "Sin datos del pipeline",
+      "modeCount": "Cantidad",
+      "modeValue": "Valor",
+      "opportunityCount": "{count, plural, one {# oportunidad} other {# oportunidades}}",
+      "title": "Pipeline de ventas",
+      "total": "Valor total del pipeline:"
+    },
+    "stages": {
+      "closed_lost": "Perdidas",
+      "closed_won": "Ganadas",
+      "new": "Lead",
+      "onboarded": "Incorporado",
+      "onboarding": "Onboarding"
+    },
+    "tabs": {
+      "dashboard": "Panel"
+    },
+    "tasks": {
+      "calendar": "Calendario",
+      "closeCommentPlaceholder": "Comentario de cierre *",
+      "closedNote": "[Cerrada el {date}]: {comment}",
+      "dueToday": "vence hoy",
+      "empty": "No hay tareas para hoy",
+      "overdue": "vencida",
+      "showAll": "Ver todas las tareas →",
+      "title": "Tareas para hoy"
+    }
+  },
+  "seo": {
+    "authors": {
+      "actions": {
+        "activate": "Activar",
+        "add": "Añadir autor",
+        "addNew": "+ Añadir autor",
+        "adding": "Añadiendo…",
+        "deactivate": "Desactivar",
+        "delete": "Eliminar autor",
+        "edit": "Editar",
+        "saving": "Guardando…"
+      },
+      "empty": "No hay autores — añade el primero para poder aprobar artículos (el autor es obligatorio antes de publicar).",
+      "fields": {
+        "bio": "Descripción de competencias",
+        "fullName": "Nombre y apellidos",
+        "jobTitle": "Cargo",
+        "linkedinProfile": "Perfil de LinkedIn",
+        "photo": "Foto"
+      },
+      "inactiveBadge": "Inactivo",
+      "placeholders": {
+        "bio": "Breve descripción de la experiencia y la especialización",
+        "fullName": "p. ej. Beatriz García",
+        "jobTitleEdit": "p. ej. Head of Sales",
+        "jobTitleNew": "p. ej. Responsable del departamento de ventas"
+      },
+      "toasts": {
+        "addFailed": "No se pudo añadir el autor.",
+        "added": "Autor añadido.",
+        "deleteFailed": "No se pudo eliminar el autor.",
+        "deleted": "Autor eliminado.",
+        "photoUploadFailed": "No se pudo subir la foto.",
+        "photoUploaded": "Foto subida.",
+        "saveFailed": "No se pudo guardar el autor.",
+        "statusChangeFailed": "No se pudo cambiar el estado.",
+        "updated": "Autor actualizado."
+      }
+    },
+    "contentSlots": {
+      "actions": {
+        "fill": "Completar",
+        "insert": "Insertar en el artículo",
+        "remove": "Eliminar este espacio"
+      },
+      "fields": {
+        "caption": "Pie de imagen",
+        "comment": "Comentario",
+        "fullName": "Nombre y apellidos",
+        "quote": "Cita",
+        "quoteAuthor": "Autor (persona o institución)",
+        "role": "Rol",
+        "roleCompany": "Cargo / empresa",
+        "sourceTitle": "Título de la fuente",
+        "sourceUrl": "Enlace a la fuente (https://)"
+      },
+      "hint": "SEObot ha marcado en el texto los espacios donde el artículo necesita algo que la IA no puede inventar honestamente. Completa cada uno o elimínalo — solo entonces se podrá aprobar la entrada.",
+      "placeholders": {
+        "roleCompany": "p. ej. Head of Sales, CRMtree"
+      },
+      "removeConfirm": "¿Eliminar este espacio del artículo? El texto de alrededor no cambiará.",
+      "screenshots": {
+        "emptyLibrary": "La biblioteca de capturas está vacía — añade una captura abajo o en el panel «Capturas».",
+        "uploadNew": "Subir una captura nueva",
+        "uploadToLibrary": "Subir a la biblioteca"
+      },
+      "statuses": {
+        "filled": "Completado",
+        "removed": "Eliminado"
+      },
+      "suggestion": {
+        "label": "Propuesta de SEObot (comprobada en la página de la fuente):",
+        "use": "Usar esta cita"
+      },
+      "title": "Por completar antes de publicar",
+      "toasts": {
+        "checkField": "Revisa el campo: {field}",
+        "chooseScreenshot": "Elige una captura.",
+        "insertFailed": "No se pudo insertar.",
+        "inserted": "Insertado en el artículo.",
+        "removeFailed": "No se pudo eliminar.",
+        "screenshotUploadFailed": "No se pudo subir la captura.",
+        "screenshotUploaded": "Captura añadida a la biblioteca y seleccionada.",
+        "textAndAuthorRequired": "Completa el texto y el autor."
+      },
+      "types": {
+        "expert_comment": "Comentario de experto",
+        "quote": "Cita con fuente",
+        "screenshot": "Captura del producto"
+      }
+    },
+    "main": {
+      "actions": {
+        "approveAndPublish": "Aprobar y publicar",
+        "approveAndSchedule": "Aprobar y programar",
+        "cancelSchedule": "Cancelar programación",
+        "markForRefresh": "Marcar para actualizar",
+        "pendingSlotsHint": "Primero completa o elimina los espacios por completar",
+        "reject": "Rechazar",
+        "saveChanges": "Guardar cambios",
+        "unpublish": "Devolver a borrador"
+      },
+      "detail": {
+        "author": {
+          "choose": "— elige un autor —",
+          "inactive": "inactivo",
+          "label": "Autor",
+          "required": "Obligatorio antes de aprobar"
+        },
+        "empty": "Elige una entrada de la lista.",
+        "image": {
+          "reroll": "Otra al azar de Pexels",
+          "rerolling": "Buscando…",
+          "save": "Guardar imagen",
+          "urlPlaceholder": "URL de la imagen de cabecera"
+        },
+        "internalLinks": "Enlaces internos:",
+        "metaPlaceholder": "Meta description",
+        "metrics": {
+          "avgPosition": "posición media {position}",
+          "clicks": "{count, plural, one {# clic} other {# clics}}",
+          "impressions": "{count, plural, one {# impresión} other {# impresiones}}",
+          "note": "(últimos 28 días, datos de Search Console)"
+        }
+      },
+      "errors": {
+        "unknown": "error desconocido"
+      },
+      "filters": {
+        "all": "Todos",
+        "drafts": "Borradores",
+        "refresh": "Por actualizar"
+      },
+      "generate": {
+        "action": "Generar un artículo nuevo",
+        "inProgress": "Generando… (puede tardar unos minutos)"
+      },
+      "gsc": {
+        "connect": "Conectar Search Console",
+        "connected": "Search Console: conectado ({siteUrl})",
+        "disconnect": "Desconectar",
+        "syncNow": "Sincronizar ahora",
+        "syncing": "Sincronizando…"
+      },
+      "header": {
+        "authorsToggle": "Autores ({count})",
+        "screenshotsToggle": "Capturas",
+        "strategyToggle": "Estrategia de contenidos ({count, plural, one {# pilar} other {# pilares}})"
+      },
+      "list": {
+        "empty": "No hay entradas en este estado.",
+        "metrics": "{impressions} impr. · {clicks, plural, one {# clic} other {# clics}} (28 días)"
+      },
+      "refresh": {
+        "apply": "Aplicar en el sitio",
+        "applyConfirm": "¿Sustituir el contenido publicado por la nueva versión? El cambio llegará al sitio de inmediato.",
+        "dismissDraft": "Descartar propuesta",
+        "failed": "No se pudo preparar la propuesta: {error}",
+        "generatedInfo": "Generado el {date} · coste aprox. ${cost} · fuentes citadas: {facts}",
+        "generating": "Preparando la propuesta (análisis de consultas de GSC, datos actuales, reescritura) — tarda unos minutos, el panel se actualizará solo.",
+        "newBody": "Nuevo contenido",
+        "newMeta": "Nueva meta description",
+        "newTitle": "Nuevo título",
+        "noQueries": "No hay datos de consultas de GSC para esta página — la propuesta se centra en la actualidad y la estructura.",
+        "notNeeded": "No necesita actualización",
+        "prepare": "Preparar propuesta (IA)",
+        "publishedNote": "El artículo sigue publicado en todo momento. Los cambios llegarán al sitio solo después de hacer clic en «Aplicar en el sitio».",
+        "queriesLabel": "Consultas de GSC tenidas en cuenta:",
+        "queryStats": "({impressions} impr., pos. {position})",
+        "reasonDetails": {
+          "age": "sin actualizar desde hace más de 90 días.",
+          "manual": "marcado para actualizar por el editor.",
+          "positionDrop": "la posición ha bajado de {before} a {now} (últimos 14 días frente a los 14 anteriores).",
+          "strikingDistance": "posición media {position} con {impressions} impresiones en 28 días. La oportunidad más barata de entrar en el TOP 10."
+        },
+        "reasons": {
+          "age": "Sin actualizar 90+ días",
+          "manual": "Marcado manualmente",
+          "position_drop": "Caída de posición",
+          "striking_distance": "Cerca de la 1.ª página de Google"
+        },
+        "regenerate": "Generar de nuevo",
+        "title": "Actualización del artículo",
+        "validationWarning": "La propuesta no ha superado todas las comprobaciones automáticas:"
+      },
+      "schedule": {
+        "clear": "Quitar fecha",
+        "label": "Programar la publicación para:",
+        "scheduledNote": "Publicación programada: {date}"
+      },
+      "sections": {
+        "authors": "Autores",
+        "calendar": "Calendario de publicaciones",
+        "channels": "Canales sociales",
+        "screenshots": "Capturas del producto",
+        "settings": "Configuración",
+        "strategy": "Estrategia de contenidos"
+      },
+      "social": {
+        "copy": "Copiar",
+        "noChannels": "No hay canales conectados — conéctalos en «Canales sociales», arriba.",
+        "publishOn": "Publicar en {platform}",
+        "publishOrRetry": "Publicar / reintentar",
+        "publishing": "Publicando…",
+        "statuses": {
+          "draft": "Borrador",
+          "failed": "Error",
+          "published": "Publicado",
+          "queued": "Publicando…"
+        },
+        "title": "Publicación en redes",
+        "viewPost": "Ver publicación"
+      },
+      "socialConnect": {
+        "connected": "Conexión con {platform} establecida.",
+        "errors": {
+          "access_denied": "No se ha concedido el acceso.",
+          "callback_failed": "No se pudo completar la conexión. Asegúrate de que la cuenta que conectas es administradora de la página de empresa.",
+          "invalid_state": "La sesión de conexión ha caducado — inténtalo de nuevo.",
+          "unauthorized_scope_error": "La aplicación de LinkedIn no tiene aprobado el acceso para publicar en la página de empresa (producto Community Management API).",
+          "user_cancelled_authorize": "Se ha cancelado la concesión de acceso.",
+          "user_cancelled_login": "Se ha cancelado el inicio de sesión."
+        },
+        "fallbackPlatform": "canal social",
+        "unknownFailure": "no se pudo conectar ({reason})."
+      },
+      "statuses": {
+        "approved": "Aprobado",
+        "archived": "Archivado",
+        "draft": "Borrador",
+        "in_review": "Por aprobar",
+        "needs_update": "Por corregir",
+        "published": "Publicado",
+        "queued": "En cola (auto)",
+        "scheduled": "Programado"
+      },
+      "title": "SEObot — redacción de contenidos",
+      "toasts": {
+        "approveFailed": "No se pudo aprobar la entrada.",
+        "authorSaveFailed": "No se pudo guardar el autor.",
+        "authorSaved": "Autor guardado.",
+        "changesSaveFailed": "No se pudieron guardar los cambios.",
+        "changesSaved": "Cambios guardados.",
+        "copied": "Copiado al portapapeles.",
+        "copyFailed": "No se pudo copiar.",
+        "generationDone": "El nuevo artículo se ha generado y está pendiente de aprobación.",
+        "generationFailed": "No se pudo generar el artículo: {error}",
+        "generationStartFailed": "No se pudo iniciar la generación.",
+        "generationStarted": "Generando el artículo en segundo plano — tardará unos minutos. Puedes seguir trabajando.",
+        "gscDisconnectFailed": "No se pudo desconectar Search Console.",
+        "gscDisconnected": "Search Console desconectado — puedes volver a conectarlo con la cuenta de Google correcta.",
+        "gscSyncFailed": "No se pudieron sincronizar las métricas.",
+        "gscSynced": "Métricas de Search Console sincronizadas.",
+        "imageRerollFailed": "No se pudo obtener otra imagen.",
+        "imageRerolled": "Nueva imagen seleccionada al azar.",
+        "imageSaveFailed": "No se pudo guardar la imagen.",
+        "imageSaved": "Imagen guardada.",
+        "published": "Entrada publicada.",
+        "refreshApplied": "La versión actualizada ya está en el sitio.",
+        "refreshApplyFailed": "No se pudo aplicar la actualización.",
+        "refreshDismissFailed": "No se pudo quitar de la cola.",
+        "refreshDismissed": "Quitado de la cola de actualizaciones.",
+        "refreshGenerating": "Preparando la propuesta — tardará unos minutos.",
+        "refreshMarkFailed": "No se pudo marcar la entrada.",
+        "refreshMarked": "Marcado para actualizar.",
+        "rejectFailed": "No se pudo rechazar la entrada.",
+        "rejected": "Entrada rechazada, ha vuelto a borradores.",
+        "scheduleSaveFailed": "No se pudo guardar la fecha.",
+        "scheduleSaved": "Fecha de publicación guardada.",
+        "scheduled": "Publicación programada.",
+        "socialPostSaveFailed": "No se pudo guardar la publicación.",
+        "socialPostSaved": "Publicación guardada.",
+        "socialPublishFailed": "No se pudo publicar.",
+        "socialPublishFailedCheck": "No se pudo publicar — revisa el error.",
+        "socialPublished": "Publicado.",
+        "unpublishFailed": "No se pudo retirar la entrada.",
+        "unpublished": "Entrada devuelta a borradores."
+      }
+    },
+    "publishingCalendar": {
+      "config": {
+        "autoMode": "Modo automático (sin revisión manual)",
+        "autoModeWarning": "En este modo los artículos se publican automáticamente en la fecha fijada — sin la aprobación manual del editor.",
+        "noEndDate": "Sin límite de tiempo (la programación se renueva indefinidamente)",
+        "save": "Guardar programación",
+        "saving": "Guardando…",
+        "title": "Programación automática"
+      },
+      "enableConfirm": "El modo automático publica artículos sin la aprobación manual del editor — ¿continuar?",
+      "toasts": {
+        "configSaveFailed": "No se pudo guardar la programación.",
+        "configSaved": "Programación guardada.",
+        "disabled": "Modo automático desactivado.",
+        "enabled": "Modo automático activado.",
+        "moveFailed": "No se pudo mover el artículo.",
+        "movedTo": "Movido al {date}.",
+        "movedToUnassigned": "Devuelto a la cola de no asignados.",
+        "saveFailed": "No se pudo guardar."
+      },
+      "unassigned": {
+        "empty": "No hay artículos sin asignar.",
+        "title": "Sin asignar ({count})"
+      },
+      "weeks": {
+        "current": "Esta semana (en curso, bloqueada)",
+        "next": "Semana siguiente (editable)"
+      }
+    },
+    "screenshots": {
+      "actions": {
+        "add": "+ Añadir captura",
+        "delete": "Eliminar captura",
+        "edit": "Editar",
+        "uploading": "Subiendo…"
+      },
+      "deleteConfirm": "¿Eliminar esta captura de la biblioteca?",
+      "fields": {
+        "caption": "Pie",
+        "captionUnderImage": "Pie de imagen",
+        "feature": "Función",
+        "file": "Archivo (PNG, JPEG, WebP, máx. 8 MB)"
+      },
+      "hint": "Capturas de pantalla del producto, etiquetadas con la función (p. ej. «Prospectos», «Análisis de llamadas con IA»). SEObot inserta por sí mismo la captura adecuada en un artículo nuevo y, si no hay ninguna, deja en el texto un espacio por completar. No subas pantallas con datos reales de clientes.",
+      "placeholders": {
+        "caption": "p. ej. Lista de prospectos ordenada por scoring ICP",
+        "feature": "p. ej. Prospectos"
+      },
+      "toasts": {
+        "added": "Captura añadida.",
+        "deleteFailed": "No se pudo eliminar la captura.",
+        "deleted": "Captura eliminada.",
+        "saveFailed": "No se pudo guardar.",
+        "saved": "Guardado.",
+        "uploadFailed": "No se pudo subir la captura."
+      }
+    },
+    "socialChannels": {
+      "connect": "Conectar",
+      "connected": "Conexión activa",
+      "disconnect": "Desconectar",
+      "hint": "Al aprobar un artículo, este se publica a la vez en los canales conectados — con un solo clic. Instagram se conecta automáticamente junto con Facebook (la misma cuenta de Meta).",
+      "instagramHint": "Se conectará automáticamente al conectar Facebook, si la página tiene vinculada una cuenta de Instagram Business.",
+      "toasts": {
+        "connectStartFailed": "No se pudo iniciar la conexión con {platform}.",
+        "disconnectFailed": "No se pudo desconectar.",
+        "disconnected": "Se ha desconectado {platform}.",
+        "wordpressConnectFailed": "No se pudo conectar con WordPress.",
+        "wordpressConnected": "WordPress conectado."
+      },
+      "wordpress": {
+        "appPassword": "Contraseña de aplicación",
+        "appPasswordPlaceholder": "generada en WP: Usuarios → Perfil → Contraseñas de aplicación",
+        "connect": "Conectar WordPress",
+        "connecting": "Conectando…",
+        "siteUrl": "Dirección del sitio",
+        "siteUrlPlaceholder": "https://tu-sitio.es",
+        "username": "Nombre de usuario",
+        "usernamePlaceholder": "p. ej. admin"
+      },
+      "wordpressHint": "Publicación del artículo completo en el sitio WordPress propio del cliente (Application Password)."
+    },
+    "strategy": {
+      "backlinks": {
+        "accept": "Aceptar",
+        "empty": "No hay backlinks.",
+        "findCandidates": "Buscar candidatos",
+        "hint": "Intercambio opt-in de enlaces con otras organizaciones del mismo sector (industry_vertical), solo temáticamente relevante y sin reciprocidad forzada. El emparejamiento funciona únicamente cuando otra organización también se apunta — hoy eres la única.",
+        "optIn": "Consentimiento para intercambiar backlinks con otras organizaciones",
+        "reject": "Rechazar",
+        "searching": "Buscando…",
+        "statuses": {
+          "accepted": "Aceptado",
+          "rejected": "Rechazado",
+          "suggested": "Sugerido"
+        },
+        "title": "Backlinks entre organizaciones ({count})"
+      },
+      "competitors": {
+        "add": "Añadir",
+        "empty": "No hay competidores en la lista.",
+        "hint": "La lista influye en la generación de los pilares temáticos — cuanto mejor descrita esté, más acertada será la estrategia.",
+        "notesPlaceholder": "Nota (opcional)",
+        "removeAria": "Eliminar",
+        "title": "Competidores ({count})",
+        "urlPlaceholder": "https://competidor.es"
+      },
+      "pillars": {
+        "add": "Añadir pilar",
+        "addOwn": "+ Añadir pilar propio",
+        "adding": "Añadiendo…",
+        "articleCount": "{count} art.",
+        "description": "Descripción",
+        "descriptionPlaceholder": "De qué deben tratar los artículos de este pilar",
+        "edit": "Editar",
+        "keywordTheme": "Tema de palabras clave",
+        "keywordThemePlaceholder": "p. ej. alquiler de yates, puerto deportivo",
+        "name": "Nombre",
+        "namePlaceholder": "p. ej. Gestión de flotas de yates",
+        "removeAria": "Eliminar pilar",
+        "saving": "Guardando…"
+      },
+      "toasts": {
+        "backlinkAcceptFailed": "No se pudo aceptar.",
+        "backlinkAccepted": "Backlink aceptado.",
+        "backlinkRejectFailed": "No se pudo rechazar.",
+        "backlinkRejected": "Backlink rechazado.",
+        "candidatesFound": "{count, plural, one {Se ha encontrado # candidato.} other {Se han encontrado # candidatos.}}",
+        "candidatesSearchFailed": "No se pudieron buscar candidatos.",
+        "competitorAddFailed": "No se pudo añadir el competidor.",
+        "competitorAdded": "Competidor añadido.",
+        "competitorRemoveFailed": "No se pudo eliminar el competidor.",
+        "competitorRemoved": "Competidor eliminado.",
+        "noCandidates": "No hay candidatos — ninguna otra organización coincide todavía en sector y consentimiento.",
+        "optInDisabled": "Consentimiento para backlinks desactivado.",
+        "optInEnabled": "Consentimiento para backlinks activado.",
+        "optInSaveFailed": "No se pudo guardar el consentimiento.",
+        "pillarAddFailed": "No se pudo añadir el pilar.",
+        "pillarAdded": "Pilar añadido.",
+        "pillarRemoveFailed": "No se pudo eliminar el pilar.",
+        "pillarRemoved": "Pilar eliminado.",
+        "pillarSaveFailed": "No se pudo guardar el pilar.",
+        "pillarUpdated": "Pilar actualizado."
+      }
+    },
+    "tenantSettings": {
+      "fields": {
+        "businessDescription": "Descripción del producto y del negocio",
+        "businessDescriptionPlaceholder": "A qué se dedica la empresa, qué funciones tiene el producto, quiénes son los destinatarios, qué sector…",
+        "industry": "Sector (industry_vertical)",
+        "industryPlaceholder": "p. ej. yachting, saas_crm, personal_brand",
+        "productName": "Nombre del producto",
+        "productNamePlaceholder": "p. ej. CRMtree"
+      },
+      "gscProperty": {
+        "hint": "Propiedad de GSC real y verificada a la que conectarse con «Conectar Search Console» — de prefijo de URL (p. ej. https://cliente.es/) o de dominio (sc-domain:cliente.es). Vacío = se deduce de WordPress o de la indicada más abajo.",
+        "placeholder": "https://crmtree.pl/ o sc-domain:crmtree.pl",
+        "save": "Guardar propiedad de GSC",
+        "title": "Propiedad de Search Console"
+      },
+      "hint": "Alimenta la estrategia (pilares, palabras clave) y cada artículo. SEObot muestra en el texto cómo se resuelve el problema con el producto y describe solo las funciones mencionadas en la descripción — cuanto más detalladas las enumeres, más concretos serán los artículos.",
+      "save": "Guardar configuración",
+      "saving": "Guardando…",
+      "title": "Configuración SEO de la organización",
+      "toasts": {
+        "gscPropertySaveFailed": "No se pudo guardar la propiedad de GSC.",
+        "gscPropertySaved": "Propiedad de Search Console guardada.",
+        "modeSaveFailed": "No se pudo guardar el modo.",
+        "saveFailed": "No se pudo guardar la configuración.",
+        "saved": "Configuración guardada.",
+        "wordpressDraft": "WordPress: publicación como borrador.",
+        "wordpressLive": "WordPress: publicación directa en live."
+      },
+      "wordpressMode": {
+        "draft": "Borrador (seguro, requiere publicación manual en WP)",
+        "hint": "Decisión que se toma tras hablar con el cliente — si los artículos deben salir directamente en live en su WordPress o quedar como borrador para publicarlos allí manualmente.",
+        "publish": "Publicar de inmediato (live, sin paso intermedio)",
+        "title": "Modo de publicación en WordPress"
+      }
+    }
+  },
+  "sms": {
+    "emptyConversation": "No hay mensajes — escribe el primero abajo.",
+    "last": "último:",
+    "loadFailed": "Error al cargar los SMS",
+    "messagePlaceholder": "Mensaje…",
+    "noMessages": "Sin mensajes",
+    "noNumbers": "No hay números de teléfono para enviar SMS.",
+    "send": "Enviar",
+    "sendFailed": "Error al enviar el SMS",
+    "statuses": {
+      "delivered": "Entregado",
+      "failed": "Error",
+      "received": "Recibido",
+      "sent": "Enviado"
+    }
+  },
+  "softphone": {
+    "activity": {
+      "incomingTitle": "Llamada entrante de {number}",
+      "outgoingTitle": "Llamada saliente a {number}"
+    },
+    "confirm": {
+      "title": "¿Llamar?"
+    },
+    "hangUp": "Colgar",
+    "incoming": {
+      "answer": "Contestar",
+      "answering": "Contestando…",
+      "reject": "Rechazar",
+      "title": "Llamada entrante",
+      "unknownNumber": "Número desconocido"
+    },
+    "lookingUpContact": "Buscando el contacto…",
+    "mute": "Silenciar",
+    "muted": "Silenciado",
+    "phases": {
+      "active": "En llamada",
+      "dialing": "Marcando…",
+      "ringing": "Sonando…"
+    },
+    "postCall": {
+      "notePlaceholder": "Nota de la llamada (opcional)…",
+      "saveFailed": "Error al guardar — inténtalo de nuevo",
+      "saveWithNote": "Guardar con nota",
+      "savedOnLead": "La actividad se guardará en el Lead",
+      "savedOnPartner": "La actividad se guardará en el Partner",
+      "saving": "Guardando…",
+      "title": "Llamada finalizada",
+      "transcriptLoaded": "Transcripción cargada — puedes editarla",
+      "transcriptLoading": "Obteniendo la transcripción…",
+      "transcriptUnavailable": "Transcripción no disponible — escribe la nota manualmente",
+      "withoutNote": "Sin nota"
+    },
+    "transcript": {
+      "agent": "Comercial",
+      "client": "Cliente"
+    }
+  },
+  "substitutions": {
+    "cancel": {
+      "action": "Cancelar",
+      "confirm": "¿Cancelar esta ausencia? El sustituto perderá el acceso derivado de esta sustitución.",
+      "failed": "No se pudo cancelar la ausencia.",
+      "inProgress": "Cancelando…"
+    },
+    "covering": {
+      "empty": "Ahora mismo no sustituyes a nadie.",
+      "title": "Personas a las que sustituyo"
+    },
+    "errors": {
+      "dateFromRequired": "Indica la fecha desde.",
+      "dateToBeforeFrom": "La fecha hasta no puede ser anterior a la fecha desde.",
+      "dateToRequired": "Indica la fecha hasta.",
+      "rangeConflict": "La persona ausente ya tiene registrada una ausencia en fechas que se solapan.",
+      "rangeInPast": "El periodo de ausencia no puede estar por completo en el pasado.",
+      "substituteAbsent": "Esta persona está ausente en las fechas elegidas.",
+      "substituteRequired": "Elige un sustituto.",
+      "substituteSameAsAbsent": "El sustituto no puede ser la misma persona que la persona ausente."
+    },
+    "fields": {
+      "absentPerson": "Persona ausente",
+      "action": "Acción",
+      "dateFrom": "Fecha desde",
+      "dateTo": "Fecha hasta",
+      "note": "Nota",
+      "period": "Periodo",
+      "reason": "Motivo",
+      "status": "Estado",
+      "substitute": "Sustituto"
+    },
+    "form": {
+      "choose": "— elige —",
+      "fixErrors": "Corrige los campos marcados e inténtalo de nuevo.",
+      "noteOptional": "Nota (opcional)",
+      "notePlaceholder": "p. ej., los asuntos urgentes dirigirlos a…",
+      "saveFailed": "No se pudo guardar la sustitución.",
+      "saved": "Sustitución guardada — el sustituto ha recibido una notificación.",
+      "submit": "Guardar sustitución",
+      "substituteAbsentHint": "Esta persona está ausente en las fechas elegidas — elige otro sustituto."
+    },
+    "hint": "Indica el periodo de ausencia y la persona que te sustituirá. Durante ese tiempo, el sustituto tendrá acceso completo a tus leads y partners — con los mismos permisos que tienes tú.",
+    "history": {
+      "toggle": "Historial ({count})"
+    },
+    "list": {
+      "empty": "No hay ausencias en curso ni próximas.",
+      "loadFailed": "No se pudieron cargar los datos.",
+      "retry": "Reintentar",
+      "titleOwn": "Ausencias (mías)",
+      "titleOwnAndTeam": "Ausencias (mías y del equipo)"
+    },
+    "note": {
+      "collapse": "contraer",
+      "expand": "expandir"
+    },
+    "pager": {
+      "next": "Página siguiente",
+      "previous": "Página anterior"
+    },
+    "reasons": {
+      "other": "Otra ausencia",
+      "sick_leave": "Baja médica",
+      "vacation": "Vacaciones"
+    },
+    "selfFallback": "Yo",
+    "statuses": {
+      "active": "En curso",
+      "cancelled": "Cancelada",
+      "ended": "Finalizada",
+      "upcoming": "Próxima"
+    },
+    "title": "Sustitución durante la ausencia"
+  },
+  "transactions": {
+    "amounts": {
+      "commission": "Comisión",
+      "gross": "Bruto",
+      "margin": "Margen",
+      "net": "Neto"
+    },
+    "filters": {
+      "allStatuses": "Todos los estados",
+      "allTypes": "Todos los tipos",
+      "from": "Desde",
+      "resultCount": "{count, plural, one {# transacción} other {# transacciones}}",
+      "to": "Hasta"
+    },
+    "kpi": {
+      "count": "Transacciones",
+      "marginPct": "Margen %"
+    },
+    "products": {
+      "pax": "Pax",
+      "product": "Producto",
+      "routeOrPlace": "Ruta / Lugar",
+      "time": "Hora",
+      "type": "Tipo"
+    },
+    "statuses": {
+      "cancelled": "Cancelada",
+      "confirmed": "Confirmada",
+      "refunded": "Reembolso"
+    },
+    "table": {
+      "date": "Fecha",
+      "empty": "No hay transacciones que cumplan los criterios.",
+      "partner": "Partner",
+      "products": "Productos",
+      "reference": "Ref.",
+      "status": "Estado",
+      "traveler": "Viajero"
+    },
+    "title": "Transacciones"
+  },
+  "whatsapp": {
+    "checkingConfig": "Comprobando la configuración...",
+    "configuredNumber": "número configurado",
+    "conversation": "Conversación de WhatsApp",
+    "empty": "No hay mensajes de WhatsApp enviados.",
+    "from": "De:",
+    "lastMessage": "último mensaje:",
+    "loadingHistory": "Cargando el historial…",
+    "messageBody": "Texto del mensaje",
+    "messagePlaceholder": "Texto del mensaje...",
+    "missingCountryCode": "Indica el número con el prefijo del país, p. ej., +34 612 345 678.",
+    "newMessage": "Nuevo mensaje de WhatsApp",
+    "notConfigured": "WhatsApp no está configurado para esta organización. Ponte en contacto con el administrador.",
+    "reply": {
+      "action": "Responder",
+      "placeholder": "Texto de la respuesta...",
+      "replyingVia": "Respondes por WhatsApp",
+      "send": "Enviar respuesta",
+      "sending": "Enviando…"
+    },
+    "send": "Enviar WhatsApp",
+    "sendFailed": "Error al enviar el WhatsApp",
+    "sending": "Enviando...",
+    "sent": "Mensaje enviado.",
+    "to": "Para:",
+    "toField": "Para"
+  }
+}

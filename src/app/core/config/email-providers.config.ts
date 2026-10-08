@@ -6,7 +6,7 @@
 // so a future provider only needs one new entry here — no branching logic
 // elsewhere in the UI, since the active provider is resolved by the backend.
 
-export type EmailProviderKey = 'gmail' | 'outlook' | 'zoho';
+export type EmailProviderKey = 'gmail' | 'outlook' | 'zoho' | 'yandex';
 
 export interface EmailProviderMeta {
   key: EmailProviderKey;
@@ -19,4 +19,5 @@ export const EMAIL_PROVIDERS: Record<EmailProviderKey, EmailProviderMeta> = {
   gmail:   { key: 'gmail',   label: 'Gmail',   color: '#3BAA5D', bg: '#f0fdf4' },
   outlook: { key: 'outlook', label: 'Outlook', color: '#0078d4', bg: '#eff6ff' },
   zoho:    { key: 'zoho',    label: 'Zoho',    color: '#E42527', bg: '#fef2f2' },
+  yandex:  { key: 'yandex',  label: 'Yandex',  color: '#FC3F1D', bg: '#fef2f2' },
 };

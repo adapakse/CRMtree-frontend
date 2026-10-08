@@ -17,7 +17,15 @@ export const DOC_TYPE_MAP: Record<DocType, string> = {
   employee_agreement:     'Umowa pracownicza',
   nda:                    'NDA',
   operator_agreement:     'Umowa operatorska',
+  invoice:                'Faktura',
 };
+
+export const INVOICE_DOC_TYPE: DocType = 'invoice';
+
+// Payment statuses with a translated name (documents.labels.paymentStatuses.*);
+// a tenant may add its own codes, which are shown as entered.
+export const BUILT_IN_PAYMENT_STATUSES = ['unpaid', 'partially_paid', 'paid', 'overdue'];
+export const OVERDUE_PAYMENT_STATUS = 'overdue';
 
 export const GDPR_MAP: Record<GdprType, { label: string; cls: string }> = {
   data_processing_entrustment: { label: 'Powierzenie', cls: 'gp' },

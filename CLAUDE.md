@@ -149,6 +149,50 @@ Projekty z zespołem, zadaniami, osią czasu i czatem. Osobny moduł poza CRM, z
 - `shared/components/typeahead` — jedno pole z podpowiedziami od 3 znaków (wybór leada lub
   partnera, wybór osób do projektu).
 
+### Finanse projektu, faktury KSeF, typ dokumentu „Faktura” (2026-10-05)
+
+Reguły biznesowe (kto co widzi, kwoty netto, kursy NBP, zasady podpinania faktur) są w
+`CRMtree-backend/CLAUDE.md` — to decyzje Adama, nie zmieniaj ich bez pytania.
+
+- **Zakładka Finanse** (`?tab=finance`) — `pages/projects/project-finance*.ts`: kafelki, plan,
+  budżet per kategoria, koszty, przychody, koszty zadań. Widoczna, gdy `detail.finance?.can_read`
+  (`finance` leży obok `project` w odpowiedzi, nie w nim). Koszty zadania:
+  `project-task-costs.component.ts` w panelu zadania; wspólny formularz `project-cost-form`.
+- **Sumy finansowe** (`shared/components/project-finance-totals`) są na kartach listy projektów
+  oraz na karcie leada i partnera — tam celowo także dla osób spoza projektu.
+- **KSeF** — `pages/projects/project-ksef-*.ts`: okno wyboru faktury za okres, potwierdzenie
+  podpięcia, podgląd faktury. **Czerwony tekst o innych powiązaniach faktury**
+  (`project-ksef-other-links`) ma być widoczny zawsze pod pozycją kosztową, nie tylko przy
+  podpinaniu — to wymóg Adama. Prawo do podpinania:
+  `finance.can_write && auth.canViewKsefInvoices()`.
+- **Ustawienia → Projekty**: przełącznik finansów, kategorie kosztów, blok KSeF (firmy „NIP +
+  token”, grupa dostępu dla dokumentów faktur) — `pages/admin/project-settings/`.
+- **Dokumenty, typ `invoice`**: pola faktury w `pages/documents/invoice-fields`, powiązania z
+  projektami w `pages/documents/project-links`. Dla faktury `signing_date` to data wystawienia,
+  a `expiration_date` to termin płatności — etykiety przełączają się po `doc_type === 'invoice'`.
+  Podpis elektroniczny jest dla faktur ukryty (nadpisałby datę wystawienia).
+
+### Kontrola terminów i listy (2026-10-06)
+
+Reguły (co jest „po terminie”, „zagrożone”, kiedy projekt jest opóźniony, kto dostaje maile) są
+w `CRMtree-backend/CLAUDE.md` → „Kontrola terminów”. To decyzje Adama.
+
+- **Zasada ogólna Adama: każdy ekran z listą ma filtry (także w nagłówku każdej kolumny) i
+  stronicowanie po maks. 50 elementów.** Służą do tego wspólne elementy w `shared/list/`
+  (`ListQueryState`, `createListLoader`, `wt-list-filter-bar`, `th[wtListColumn]`,
+  `wt-list-pager`) — używaj ich w każdej nowej liście zamiast pisać własne. Filtrowanie,
+  sortowanie i strony są po stronie serwera; stan filtrów siedzi w adresie strony.
+- Znaczniki terminowości: `shared/components/project-deadlines/` (po terminie, zagrożone,
+  zakończone po terminie, opóźnione podzadania, pierwotny termin z przesunięciem, znacznik
+  opóźnionego projektu). „Po terminie” dotyczy zadania, „opóźniony” projektu — nie mieszaj.
+- Zakładka Zadania projektu: bez filtrów drzewo (`project-task-list`), z filtrem / sortowaniem
+  / przełącznikiem „Lista płaska” stronicowana tabela (`project-task-table`, trasa
+  `/tasks/search`). Gantt (`project-gantt-view`) bierze płaskie wiersze z `/tasks/gantt`
+  (limit 500) i sam buduje drzewo po `parent_task_id`.
+- Widok wielu projektów: `/projects/portfolio` (`project-portfolio*.ts`), tylko gdy
+  `config.has_cross_project_view`; wejście przełącznikiem na ekranie Projekty.
+- `GET /api/projects` zwraca `{ items, total, page, page_size, can_create, can_filter_finance }`.
+
 ### Pułapki
 
 - `pages/projects/projects-shared.styles.ts` trzyma wspólne style topbara, modala i tabel
@@ -156,6 +200,23 @@ Projekty z zespołem, zadaniami, osią czasu i czatem. Osobny moduł poza CRM, z
 - Czat w panelu zadania leży w przewijanej kolumnie flex: elementy panelu muszą mieć
   `flex-shrink: 0`, inaczej wątek kurczy się do zera, a pole wiadomości nachodzi na sekcję
   poniżej.
+
+---
+
+## Wielojęzyczność (i18n)
+
+Aplikacja jest tłumaczona na 10 języków (`pl, en, de, it, es, fr, ro, ru, sl, hr`), polski jest
+źródłowy. Pełne zasady, słowniczek i instrukcja dodawania tekstów: **`docs/i18n.md`** — przeczytaj
+przed dodaniem jakiegokolwiek tekstu widocznego dla użytkownika.
+
+- Mechanizm: Transloco, pliki `src/i18n/<zakres>/<język>.json`, kod w `src/app/core/i18n/`.
+- **Każdy nowy lub zmieniony tekst trafia od razu do wszystkich 10 plików** (zasada Adama).
+- `npm run i18n:check` pilnuje kompletu kluczy, parametrów i formatu; uruchamia się też przed
+  `npm run build`. Pliki z listy `src/i18n/translated-files.json` nie mogą już zawierać polskiego
+  tekstu wpisanego na sztywno.
+- Wdrażanie idzie modułami; nieprzetłumaczone moduły działają po polsku. Zakres „Polish is only
+  acceptable in user-facing UI strings” poniżej dotyczy już tylko modułów jeszcze nieprzetłumaczonych.
+- Panel superadmina zostaje po polsku. Danych wpisanych przez tenanta nie tłumaczymy.
 
 ---
 

@@ -1,0 +1,394 @@
+{
+  "badges": {
+    "gdpr": {
+      "data_administration": "Совм. управление",
+      "data_processing_entrustment": "Поручение",
+      "no_gdpr": "Без GDPR"
+    }
+  },
+  "dashboard": {
+    "recentDocuments": "Последние документы",
+    "seeAll": "Показать все",
+    "stats": {
+      "expiring": "Истекают за 30 дней",
+      "expiringHint": "Требуют внимания",
+      "inWorkflow": "На согласовании",
+      "myTasksHint": "Ожидают действия",
+      "signed": "Подписанные / Завершённые",
+      "signedHint": "Подписанные + Завершённые",
+      "total": "Все документы",
+      "totalHint": "Все доступные"
+    },
+    "taskStrip": {
+      "assigneePrefix": "у:"
+    },
+    "title": "Дашборд"
+  },
+  "detail": {
+    "actions": {
+      "delete": "Удалить",
+      "download": "Скачать",
+      "saveChanges": "Сохранить изменения"
+    },
+    "attachments": {
+      "add": "Добавить вложение",
+      "addFirst": "Добавить первое вложение",
+      "deleteConfirm": "Удалить это вложение вместе со всеми версиями?",
+      "deleted": "Вложение удалено",
+      "empty": "Нет вложений",
+      "events": {
+        "deleted": "Вложение удалено: {name}",
+        "newVersion": "Новая версия вложения: {name}"
+      },
+      "newVersion": "Новая версия",
+      "uploadFailed": "Ошибка загрузки вложения",
+      "uploaded": "Вложение загружено",
+      "versionCount": "{count, plural, one {# версия} few {# версии} many {# версий} other {# версии}}",
+      "versionUploadFailed": "Ошибка загрузки новой версии"
+    },
+    "deleteConfirm": "Удалить «{name}»?",
+    "history": {
+      "actions": {
+        "attachment_deleted": "Вложение удалено",
+        "attachment_uploaded": "Добавлено вложение: {name}",
+        "attachment_version_uploaded": "Новая версия вложения (v{version})",
+        "document_created": "Документ создан",
+        "document_deleted": "Документ удалён",
+        "document_downloaded": "Документ скачан",
+        "document_updated": "Документ обновлён",
+        "metadata_updated": "Метаданные обновлены",
+        "signing_completed": "Электронное подписание завершено",
+        "signing_failed": "Электронное подписание не удалось",
+        "signing_initiated": "Электронное подписание начато",
+        "status_changed": "Статус изменён на: {status}",
+        "tag_added": "Добавлен тег: {key}",
+        "tag_removed": "Удалён тег: {key}",
+        "tag_updated": "Изменён тег: {key}",
+        "version_uploaded": "Загружена новая версия документа (v{version})",
+        "workflow_task_cancelled": "Задача бизнес-процесса отменена",
+        "workflow_task_completed": "Задача бизнес-процесса выполнена",
+        "workflow_task_created": "Назначена задача бизнес-процесса"
+      },
+      "empty": "История пуста"
+    },
+    "overview": {
+      "chooseEntity": "— выберите сторону —",
+      "chooseType": "— выберите тип —",
+      "metadata": "Метаданные документа",
+      "packagePart": "Часть пакета документов:"
+    },
+    "partners": {
+      "empty": "Нет связанных партнёров.",
+      "linkFailed": "Ошибка связывания с партнёром",
+      "linked": "Связано с {company}",
+      "searchPlaceholder": "Поиск партнёра по названию…",
+      "taxId": "ИНН: {nip}",
+      "title": "Связанные партнёры",
+      "unlink": "Отвязать",
+      "unlinkConfirm": "Отвязать партнёра «{company}»?",
+      "unlinkFailed": "Ошибка отвязки партнёра",
+      "unlinked": "Партнёр отвязан"
+    },
+    "preview": {
+      "downloadFile": "Скачать файл",
+      "fileUploaded": "Файл загружен",
+      "frameTitle": "Просмотр PDF",
+      "loadFailed": "Не удалось загрузить PDF",
+      "noFile": "Файл не прикреплён",
+      "unavailable": "Просмотр недоступен",
+      "unavailableFormat": "Просмотр доступен только для формата PDF.",
+      "unavailableHint": "Скачайте файл на диск, чтобы его просмотреть.",
+      "uploadFile": "Загрузить файл"
+    },
+    "signus": {
+      "emailsPlaceholder": "anna@firma.com, partner@example.com",
+      "info": "Документ будет отправлен в API Signus. Каждый подписант получит e-mail. Подписанные версии архивируются автоматически.",
+      "modalTitle": "Начать электронное подписание",
+      "sectionTitle": "Электронная подпись (Signus)",
+      "send": "Отправить в Signus",
+      "sendFailed": "Ошибка отправки в Signus",
+      "sentRedirect": "Документ отправлен в Signus — перенаправление…",
+      "sentTraining": "Документ отправлен на подпись (симуляция). Подписанная версия появится через ~10 секунд.",
+      "signatories": "Подписанты (адреса e-mail через запятую)",
+      "start": "Начать подписание через Signus"
+    },
+    "tabs": {
+      "attachments": "Вложения",
+      "history": "История",
+      "overview": "Сведения",
+      "preview": "Основной документ",
+      "versions": "Версии",
+      "workflow": "Бизнес-процесс"
+    },
+    "tags": {
+      "added": "Тег добавлен",
+      "empty": "Нет тегов.",
+      "key": "Ключ",
+      "keyPlaceholder": "Ключ (напр. contract_id)",
+      "title": "Теги"
+    },
+    "toasts": {
+      "saved": "Документ сохранён"
+    },
+    "versions": {
+      "empty": "Нет версий",
+      "signedBy": "Подпись: {name}",
+      "uploadNew": "Загрузить новую версию",
+      "uploaded": "Новая версия загружена"
+    },
+    "workflow": {
+      "assign": "Назначить и отправить e-mail",
+      "assignTitle": "Назначить задачу",
+      "assignTo": "Назначить пользователю",
+      "assigned": "Задача назначена — уведомление отправлено по e-mail",
+      "cancelled": "Задача отменена",
+      "dueDate": "Срок",
+      "message": "Сообщение",
+      "messagePlaceholder": "Необязательное сообщение для исполнителя…",
+      "selected": "Выбрано: {name}",
+      "taskType": "Тип задачи",
+      "userSearchPlaceholder": "Поиск по фамилии или e-mail…"
+    }
+  },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Номер банковского счёта",
+      "currency": "Валюта",
+      "grossAmount": "Сумма брутто",
+      "invoiceNumber": "Номер счёта",
+      "netAmount": "Сумма нетто",
+      "paymentStatus": "Состояние оплаты",
+      "title": "Данные счёта",
+      "vatAmount": "Сумма НДС"
+    },
+    "ksefVisualisationNote": "Это визуализация данных, загруженных из KSeF, а не оригинал документа.",
+    "projectLinks": {
+      "backLabel": "Документ {number}",
+      "costStatuses": {
+        "incurred": "Понесённый",
+        "planned": "Плановый"
+      },
+      "empty": "Этот счёт не привязан ни к одному расходу проекта.",
+      "linkedAt": "Привязка: {date}",
+      "linkedBy": "Привязка: {name}, {date}",
+      "severalLinks": "Этот счёт привязан к нескольким проектам или задачам.",
+      "title": "Связи с проектами",
+      "wholeProject": "весь проект"
+    }
+  },
+  "labels": {
+    "activeTasks": "Активные задачи",
+    "addTag": "Добавить тег",
+    "columns": {
+      "name": "Название",
+      "number": "Номер",
+      "validity": "Срок действия"
+    },
+    "contractSubjects": {
+      "accommodation": "Проживание",
+      "businessTravel": "Командировки",
+      "conferences": "Конференции/Встречи",
+      "other": "Другое",
+      "system": "Система"
+    },
+    "countries": {
+      "at": "Австрия",
+      "ch": "Швейцария",
+      "cz": "Чехия",
+      "de": "Германия",
+      "fr": "Франция",
+      "gb": "Великобритания",
+      "hu": "Венгрия",
+      "pl": "Польша",
+      "ro": "Румыния",
+      "ru": "Россия",
+      "sk": "Словакия",
+      "ua": "Украина"
+    },
+    "docTypes": {
+      "employee_agreement": "Трудовой договор",
+      "invoice": "Счёт",
+      "it_supplier_agreement": "Договор с ИТ-поставщиком",
+      "nda": "NDA",
+      "operator_agreement": "Операторский договор",
+      "partner_agreement": "Партнёрский договор"
+    },
+    "fields": {
+      "buyer": "Покупатель",
+      "contactName": "Имя и фамилия",
+      "contactSection": "Контактные данные по вопросам договора",
+      "contractSubject": "Предмет договора",
+      "counterpartyCountry": "Страна контрагента",
+      "counterpartyTaxId": "ИНН контрагента",
+      "documentName": "Название документа",
+      "documentType": "Тип документа",
+      "email": "E-mail",
+      "entity1": "Сторона 1",
+      "entity2": "Сторона 2",
+      "expirationDate": "Дата окончания",
+      "gdprClassification": "Классификация GDPR",
+      "group": "Группа",
+      "issueDate": "Дата выставления",
+      "owner": "Владелец",
+      "paymentDueDate": "Срок оплаты",
+      "phone": "Телефон",
+      "seller": "Продавец",
+      "sellerTaxId": "ИНН продавца",
+      "signingDate": "Дата подписания",
+      "status": "Статус"
+    },
+    "from": "От: {name}",
+    "gdprTypes": {
+      "data_administration": "Совместное управление данными",
+      "data_processing_entrustment": "Поручение обработки данных",
+      "no_gdpr": "Без GDPR"
+    },
+    "myTasks": "Мои задачи",
+    "noDocuments": "Нет документов",
+    "noPendingTasks": "Нет ожидающих задач",
+    "options": {
+      "choose": "— Выберите —",
+      "chooseCountry": "— Выберите страну —",
+      "fixedDate": "Определённая дата",
+      "indefinite": "Бессрочно",
+      "unassigned": "— не назначен —"
+    },
+    "paymentStatuses": {
+      "overdue": "Просрочен",
+      "paid": "Оплачен",
+      "partially_paid": "Оплачен частично",
+      "unpaid": "Не оплачен"
+    },
+    "placeholders": {
+      "contactEmail": "напр. ivan.petrov@firma.ru",
+      "contactName": "напр. Иван Петров",
+      "contactPhone": "напр. +7 900 000 00 00",
+      "entity1": "напр. CRMtree Sp. z o.o.",
+      "entity2": "напр. Partner Ltd.",
+      "taxId": "напр. 1234567890"
+    },
+    "statuses": {
+      "being_approved": "На согласовании",
+      "being_edited": "На редактировании",
+      "being_signed": "На подписании",
+      "completed": "Завершён",
+      "hold": "На паузе",
+      "new": "Новый",
+      "rejected": "Отклонён",
+      "signed": "Подписан"
+    },
+    "taskTypes": {
+      "approve": "Согласование",
+      "edit": "Редактирование",
+      "read": "Ознакомление",
+      "sign": "Подписание"
+    }
+  },
+  "list": {
+    "columns": {
+      "gdpr": "GDPR",
+      "newBadge": "НОВОЕ",
+      "type": "Тип"
+    },
+    "empty": {
+      "hint": "Измените фильтры или поисковый запрос",
+      "title": "Документы не найдены"
+    },
+    "filters": {
+      "allGroups": "Все группы",
+      "allTypes": "Все типы",
+      "noFiles": "Показать документы без прикреплённого скана"
+    },
+    "newDocument": "Новый документ",
+    "noPartnerWarning": "Документ не связан с партнёром",
+    "pagination": {
+      "next": "Далее",
+      "page": "Страница {page} из {total}",
+      "previous": "Пред."
+    },
+    "partnerFilter": {
+      "clear": "Показать все",
+      "label": "Документы партнёра:"
+    },
+    "searchPlaceholder": "Поиск документов, тегов…",
+    "statusFilters": {
+      "all": "Все",
+      "being_edited": "На редактировании",
+      "being_signed": "На подписании",
+      "completed": "Завершённые",
+      "new": "Новые",
+      "rejected": "Отклонённые",
+      "signed": "Подписанные"
+    },
+    "taskTooltip": {
+      "assignee": "Исполнитель: {name}",
+      "assigner": "Назначил(а): {name}",
+      "dueDate": "Срок: {date}",
+      "message": "Сообщение: {message}",
+      "type": "Тип: {type}"
+    },
+    "title": "Документы",
+    "toasts": {
+      "created": "Создан документ {number}",
+      "deleted": "Документ удалён",
+      "updated": "Документ обновлён"
+    }
+  },
+  "newDocument": {
+    "basicInfo": "Основная информация",
+    "chooseEntity": "— Выберите сторону —",
+    "chooseGdpr": "— Выберите классификацию —",
+    "chooseGroup": "— Выберите группу —",
+    "chooseType": "— Выберите тип —",
+    "create": "Создать документ",
+    "createFailed": "Не удалось создать документ",
+    "file": {
+      "dropHint": "Перетащите файл сюда или нажмите, чтобы выбрать",
+      "formats": "PDF, DOCX — макс. 50 МБ",
+      "remove": "Удалить",
+      "title": "Вложение (необязательно)"
+    },
+    "namePlaceholder": "напр. Партнёрский договор — ООО «АБВ»",
+    "subtitle": "Заполните метаданные и при необходимости добавьте файл",
+    "tags": {
+      "keyPlaceholder": "ключ",
+      "title": "Теги (необязательно)"
+    },
+    "title": "Новый документ"
+  },
+  "workflow": {
+    "autoRefresh": "Автообновление: {seconds} с",
+    "calendar": {
+      "documentFallback": "Документ"
+    },
+    "columns": {
+      "cancelled": "Отменённые",
+      "completed": "Завершённые",
+      "in_progress": "В работе",
+      "pending": "Ожидающие"
+    },
+    "kanban": {
+      "assignedBy": "Назначено: {name}",
+      "emptyColumn": "Пусто",
+      "emptyHint": "Документы появятся здесь после их создания",
+      "expired": "Истёк",
+      "expires": "Истекает {date}",
+      "paymentDue": "Оплата до {date}",
+      "paymentOverdue": "Срок оплаты истёк",
+      "soon": "СКОРО",
+      "taskCount": "Задачи: {count}"
+    },
+    "kanbanTab": "Канбан-доска",
+    "mine": {
+      "allDone": "Все задачи выполнены!",
+      "complete": "Завершить",
+      "openDocument": "Открыть документ",
+      "start": "Начать"
+    },
+    "title": "Бизнес-процессы",
+    "toasts": {
+      "completed": "Задача отмечена как завершённая",
+      "updateFailed": "Не удалось обновить задачу — попробуйте ещё раз"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../../core/services/toast.service';
 import { environment } from '../../../../environments/environment';
 import {
@@ -13,43 +14,44 @@ import {
 @Component({
   selector: 'app-onboarding-survey-answers',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoDirective],
+  providers: [provideTranslocoScope('admin')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <ng-container *transloco="let t; prefix: 'admin'">
     @if (isLoading()) {
-      <div class="state-msg">Ładowanie...</div>
+      <div class="state-msg">{{ t('onboardingSurvey.answers.loading') }}</div>
     } @else if (!survey() || survey()!.status === 'not_started') {
       <div class="state-msg">
-        Administrator tego tenanta nie rozpoczął jeszcze ankiety wdrożeniowej
-        (Ustawienia aplikacji → Ankieta wdrożeniowa).
+        {{ t('onboardingSurvey.answers.notStarted') }}
       </div>
     } @else {
       <div class="survey-status">
         @if (survey()!.status === 'submitted') {
-          <span class="badge badge-on">Wysłana</span>
+          <span class="badge badge-on">{{ t('onboardingSurvey.answers.statusSubmitted') }}</span>
           <span>{{ survey()!.submitted_at | date:'dd.MM.yyyy HH:mm' }}
             @if (survey()!.submitted_by_name) { · {{ survey()!.submitted_by_name }} }
           </span>
         } @else {
-          <span class="badge badge-off">Wersja robocza — jeszcze nie wysłana</span>
+          <span class="badge badge-off">{{ t('onboardingSurvey.answers.statusDraft') }}</span>
         }
-        <span class="survey-updated">ostatnia zmiana {{ survey()!.updated_at | date:'dd.MM.yyyy HH:mm' }}</span>
+        <span class="survey-updated">{{ t('onboardingSurvey.answers.lastChange', { date: (survey()!.updated_at | date:'dd.MM.yyyy HH:mm') }) }}</span>
       </div>
 
       @for (section of sections(); track section.id) {
         <div class="answers-card">
-          <div class="answers-title">{{ section.title }}</div>
+          <div class="answers-title">{{ t(section.titleKey) }}</div>
           @for (field of fields(section); track field.key) {
             <div class="answer-row">
-              <div class="answer-label">{{ field.label }}</div>
+              <div class="answer-label">{{ t(field.labelKey) }}</div>
               <div class="answer-value">
                 @if (field.type === 'secret') {
                   @if (secretValue(field.key); as secret) {
                     <code>{{ isRevealed(field.key) ? secret : '••••••••••••' }}</code>
-                    <button class="btn-inline" (click)="toggleReveal(field.key)">{{ isRevealed(field.key) ? 'Ukryj' : 'Pokaż' }}</button>
-                    <button class="btn-inline" (click)="copySecret(secret)">Kopiuj</button>
+                    <button class="btn-inline" (click)="toggleReveal(field.key)">{{ isRevealed(field.key) ? t('onboardingSurvey.answers.hideSecret') : t('onboardingSurvey.answers.showSecret') }}</button>
+                    <button class="btn-inline" (click)="copySecret(secret)">{{ t('onboardingSurvey.answers.copySecret') }}</button>
                   } @else {
-                    <span class="answer-empty">— nie podano —</span>
+                    <span class="answer-empty">{{ t('onboardingSurvey.answers.secretNotProvided') }}</span>
                   }
                 } @else {
                   @if (displayValue(field); as value) { {{ value }} } @else { <span class="answer-empty">—</span> }
@@ -60,6 +62,7 @@ import {
         </div>
       }
     }
+    </ng-container>
   `,
   styles: [`
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
@@ -86,6 +89,7 @@ import {
 export class OnboardingSurveyAnswersComponent implements OnInit {
   private http  = inject(HttpClient);
   private toast = inject(ToastService);
+  private transloco = inject(TranslocoService);
 
   readonly tenantId = input.required<string>();
 
@@ -96,7 +100,7 @@ export class OnboardingSurveyAnswersComponent implements OnInit {
   ngOnInit(): void {
     this.http.get<OnboardingSurveyResponse>(`${environment.apiUrl}/admin/tenants/${this.tenantId()}/onboarding-survey`).subscribe({
       next: survey => { this.survey.set(survey); this.isLoading.set(false); },
-      error: () => { this.toast.error('Błąd ładowania ankiety wdrożeniowej'); this.isLoading.set(false); },
+      error: () => { this.toast.error(this.transloco.translate('admin.onboardingSurvey.answers.loadFailed')); this.isLoading.set(false); },
     });
   }
 
@@ -108,8 +112,10 @@ export class OnboardingSurveyAnswersComponent implements OnInit {
   displayValue(field: SurveyField): string {
     const value = this.survey()?.answers[field.key];
     if (value === undefined || value === '') return '';
-    const optionLabel = (optionValue: string) =>
-      field.options?.find(option => option.value === optionValue)?.label ?? optionValue;
+    const optionLabel = (optionValue: string) => {
+      const option = field.options?.find(candidate => candidate.value === optionValue);
+      return option ? this.transloco.translate(`admin.${option.labelKey}`) : optionValue;
+    };
     return Array.isArray(value) ? value.map(optionLabel).join(', ') : optionLabel(value);
   }
 
@@ -122,6 +128,6 @@ export class OnboardingSurveyAnswersComponent implements OnInit {
 
   copySecret(secret: string): void {
     navigator.clipboard.writeText(secret);
-    this.toast.success('Skopiowano');
+    this.toast.success(this.transloco.translate('admin.onboardingSurvey.answers.copied'));
   }
 }

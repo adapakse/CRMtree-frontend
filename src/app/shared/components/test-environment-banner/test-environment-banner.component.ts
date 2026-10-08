@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { TranslocoDirective } from '@jsverse/transloco';
 import { EnvironmentBannerService } from '../../../core/services/environment-banner.service';
 
 // Must match --test-banner-height below exactly — shell.component.ts and
@@ -10,11 +11,12 @@ const BANNER_HEIGHT = '28px';
 @Component({
   selector: 'wt-test-environment-banner',
   standalone: true,
+  imports: [TranslocoDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isTest()) {
-      <div class="test-banner" role="status">
-        Wersja testowa — to nie jest środowisko produkcyjne
+      <div class="test-banner" role="status" *transloco="let t">
+        {{ t('testEnvironmentBanner.title') }}
       </div>
     }
   `,

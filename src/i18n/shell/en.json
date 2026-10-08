@@ -1,0 +1,52 @@
+{
+  "nav": {
+    "activityCalendar": "Activity calendar",
+    "analyticsDashboardTip": "Analytics dashboard",
+    "appSettings": "App settings",
+    "auditLogs": "Audit logs",
+    "billing": "Billing",
+    "billingTip": "Tenant invoices and plans",
+    "budgets": "Budgets",
+    "callAnalysis": "Call analysis",
+    "csvImport": "CSV import",
+    "dashboard": "Dashboard",
+    "dataManagement": "Data management",
+    "documents": "Documents",
+    "groupsAndRoles": "Groups and roles",
+    "leads": "Leads",
+    "mySettings": "My settings",
+    "onboarding": "Onboarding",
+    "partnerAnalytics": "Partner analytics",
+    "partnerGroups": "Partner groups",
+    "partnerRegistry": "Partner registry",
+    "pbxNumbers": "PBX numbers",
+    "performance": "Performance",
+    "projects": "Projects",
+    "prospects": "Prospects",
+    "prospectsDashboard": "Prospects dashboard",
+    "salesBudgetsTip": "Salesperson budgets",
+    "salesReports": "Sales reports",
+    "seoBot": "SEObot",
+    "tenants": "Tenants",
+    "tenantsTip": "Tenant management",
+    "users": "Users",
+    "workflow": "Workflow"
+  },
+  "sections": {
+    "administration": "Administration",
+    "crm": "CRM",
+    "documents": "Documents",
+    "partners": "Partners",
+    "projects": "Projects",
+    "superAdmin": "Super Admin"
+  },
+  "sidebar": {
+    "collapse": "Collapse menu",
+    "expand": "Expand menu"
+  },
+  "user": {
+    "admin": "Administrator",
+    "logout": "Sign out",
+    "user": "User"
+  }
+}

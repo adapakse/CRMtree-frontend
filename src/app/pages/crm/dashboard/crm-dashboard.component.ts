@@ -3,47 +3,53 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CrmApiService, PRODUCT_TYPE_LABELS, PRODUCT_TYPE_ICONS, ProductType, CrmUser } from '../../../core/services/crm-api.service';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { CrmApiService, PRODUCT_TYPE_ICONS, ProductType, CrmUser } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+
+const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
+const PIPELINE_STAGES = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won', 'closed_lost'];
 
 @Component({
   selector: 'wt-crm-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="dash-page">
   <div class="dash-header">
-    <h1>Dashboard CRM</h1>
+    <h1>{{ t('crmDashboard.title') }}</h1>
     <span style="flex:1"></span>
     <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer;margin-right:4px" (click)="clearRepFilter()">
       × {{ persistRepName }}
     </button>
     <select *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)" class="period-sel">
-      <option value="">Wszyscy handlowcy</option>
+      <option value="">{{ t('leadsList.filters.allReps') }}</option>
       <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
     </select>
     <select [(ngModel)]="period" (ngModelChange)="loadPerformance()" class="period-sel">
-      <option value="30d">Ostatnie 30 dni</option>
-      <option value="90d">Ostatnie 90 dni</option>
-      <option value="12m">Ostatnie 12 m-cy</option>
-      <option value="ytd">Bieżący rok</option>
+      <option value="30d">{{ t('crmDashboard.periods.last30Days') }}</option>
+      <option value="90d">{{ t('crmDashboard.periods.last90Days') }}</option>
+      <option value="12m">{{ t('crmDashboard.periods.last12Months') }}</option>
+      <option value="ytd">{{ t('crmDashboard.periods.currentYear') }}</option>
     </select>
   </div>
 
   <!-- KPI cards (partner performance) -->
   <div class="kpi-row" *ngIf="perf">
-    <div class="kpi-card"><div class="kv">{{perf.kpis?.active_partners}}</div><div class="kl">Aktywnych partnerów</div></div>
-    <div class="kpi-card accent"><div class="kv">{{perf.kpis?.total_arr | number:'1.0-0'}} PLN</div><div class="kl">Łączne ARR</div></div>
-    <div class="kpi-card"><div class="kv">{{perf.kpis?.avg_arr | number:'1.0-0'}} PLN</div><div class="kl">Śr. ARR / partner</div></div>
-    <div class="kpi-card"><div class="kv">{{perf.kpis?.group_count}}</div><div class="kl">Grup partnerskich</div></div>
-    <div class="kpi-card"><div class="kv">{{perf.kpis?.in_onboarding}}</div><div class="kl">W onboardingu</div></div>
+    <div class="kpi-card"><div class="kv">{{perf.kpis?.active_partners}}</div><div class="kl">{{ t('crmDashboard.kpi.activePartners') }}</div></div>
+    <div class="kpi-card accent"><div class="kv">{{perf.kpis?.total_arr | number:'1.0-0'}} PLN</div><div class="kl">{{ t('crmDashboard.kpi.totalArr') }}</div></div>
+    <div class="kpi-card"><div class="kv">{{perf.kpis?.avg_arr | number:'1.0-0'}} PLN</div><div class="kl">{{ t('crmDashboard.kpi.avgArrPerPartner') }}</div></div>
+    <div class="kpi-card"><div class="kv">{{perf.kpis?.group_count}}</div><div class="kl">{{ t('crmDashboard.kpi.partnerGroups') }}</div></div>
+    <div class="kpi-card"><div class="kv">{{perf.kpis?.in_onboarding}}</div><div class="kl">{{ t('crmDashboard.kpi.inOnboarding') }}</div></div>
   </div>
 
   <div class="dash-body">
     <!-- Pipeline -->
     <div class="dash-panel">
-      <h3>Pipeline leadów</h3>
-      <div *ngIf="!pipelineData.length" class="empty">Brak danych</div>
+      <h3>{{ t('crmDashboard.pipeline.title') }}</h3>
+      <div *ngIf="!pipelineData.length" class="empty">{{ t('crmDashboard.pipeline.empty') }}</div>
       <div class="pipeline-bars" *ngIf="pipelineData.length">
         <div class="pipe-row" *ngFor="let s of pipelineData">
           <span class="pipe-label">{{stageName(s.stage)}}</span>
@@ -58,7 +64,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 
     <!-- Product mix -->
     <div class="dash-panel" *ngIf="perf?.product_mix?.length">
-      <h3>Mix produktowy ({{period}})</h3>
+      <h3>{{ t('crmDashboard.productMix.title', { period: period }) }}</h3>
       <div class="mix-list">
         <div class="mix-row" *ngFor="let m of perf.product_mix">
           <span class="mix-icon">{{productIcon(m.product_type)}}</span>
@@ -73,14 +79,14 @@ import { AuthService } from '../../../core/auth/auth.service';
 
     <!-- Renewals -->
     <div class="dash-panel" *ngIf="renewals.length">
-      <h3>Nadchodzące odnowienia</h3>
+      <h3>{{ t('crmDashboard.renewals.title') }}</h3>
       <table class="mini-table">
-        <thead><tr><th>Partner</th><th>Wygasa</th><th>Dni</th><th>Adopcja</th></tr></thead>
+        <thead><tr><th>{{ t('crmDashboard.columns.partner') }}</th><th>{{ t('crmDashboard.columns.expires') }}</th><th>{{ t('crmDashboard.columns.days') }}</th><th>{{ t('crmDashboard.columns.adoption') }}</th></tr></thead>
         <tbody>
           <tr *ngFor="let r of renewals.slice(0,8)">
             <td>{{r.company}}</td>
             <td class="muted">{{r.contract_expires | date:'dd.MM.yyyy'}}</td>
-            <td [class.urgent]="r.days_until_expiry <= 30">{{r.days_until_expiry}}d</td>
+            <td [class.urgent]="r.days_until_expiry <= 30">{{ t('crmDashboard.renewals.daysShort', { days: r.days_until_expiry }) }}</td>
             <td>{{r.adoption_pct}}%</td>
           </tr>
         </tbody>
@@ -89,11 +95,11 @@ import { AuthService } from '../../../core/auth/auth.service';
 
     <!-- Partner scores -->
     <div class="dash-panel wide" *ngIf="perf?.partner_scores?.length">
-      <h3>Partnerzy wg wyników ({{period}})</h3>
+      <h3>{{ t('crmDashboard.partnerScores.title', { period: period }) }}</h3>
       <table class="score-table">
         <thead>
-          <tr><th>Partner</th><th>Grupa</th><th>Status</th><th class="num">ARR</th>
-              <th class="num">Przychód</th><th class="num">Adopcja</th><th class="num">Szanse</th></tr>
+          <tr><th>{{ t('crmDashboard.columns.partner') }}</th><th>{{ t('partnersList.fields.group') }}</th><th>{{ t('partnersList.fields.status') }}</th><th class="num">ARR</th>
+              <th class="num">{{ t('crmDashboard.columns.revenue') }}</th><th class="num">{{ t('crmDashboard.columns.adoption') }}</th><th class="num">{{ t('crmDashboard.columns.opportunities') }}</th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let p of perf.partner_scores.slice(0,15)">
@@ -111,7 +117,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 
     <!-- Recent activities -->
     <div class="dash-panel" *ngIf="recentActivities.length">
-      <h3>Ostatnie aktywności</h3>
+      <h3>{{ t('crmDashboard.activities.title') }}</h3>
       <div class="activity-feed">
         <div class="act-item" *ngFor="let a of recentActivities">
           <span class="act-icon">{{actIcon(a.type)}}</span>
@@ -124,6 +130,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     </div>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
     .dash-page { padding:20px; overflow:auto; }
@@ -189,6 +196,7 @@ export class CrmDashboardComponent implements OnInit {
   private api = inject(CrmApiService);
   private cdr = inject(ChangeDetectorRef);
   private auth = inject(AuthService);
+  private transloco = inject(TranslocoService);
 
   pipelineData: any[] = [];
   recentActivities: any[] = [];
@@ -258,14 +266,13 @@ export class CrmDashboardComponent implements OnInit {
     return Math.round((gross / max) * 100);
   }
 
-  productLabel(t: string) { return PRODUCT_TYPE_LABELS[t as ProductType] || t; }
+  productLabel(t: string) { return t in PRODUCT_TYPE_ICONS ? this.transloco.translate('crm.labels.productTypes.' + t) : t; }
   productIcon(t: string)  { return PRODUCT_TYPE_ICONS[t as ProductType] || '📦'; }
   statusLabel(s: string) {
-    return { onboarding:'Wdrożenie', active:'Aktywny', inactive:'Nieaktywny', churned:'Utracony' }[s] || s;
+    return PARTNER_STATUSES.includes(s) ? this.transloco.translate('crm.labels.partnerStatuses.' + s) : s;
   }
   stageName(s: string) {
-    return { new:'Nowy', qualification:'Kwalifikacja', presentation:'Prezentacja',
-             offer:'Oferta', negotiation:'Negocjacje', closed_won:'Wygrany', closed_lost:'Przegrany' }[s] || s;
+    return PIPELINE_STAGES.includes(s) ? this.transloco.translate('crm.labels.stages.' + s) : s;
   }
   actIcon(type: string) {
     return { call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊' }[type] || '💬';

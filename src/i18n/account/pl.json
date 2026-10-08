@@ -1,0 +1,77 @@
+{
+  "myDevices": {
+    "empty": "Brak zalogowanych telefonów.",
+    "hint": "Telefony, na których jesteś zalogowany w aplikacji mobilnej CRMtree. Jeśli zgubisz telefon albo go wymienisz, wyloguj go tutaj — aplikacja na nim straci dostęp najpóźniej po kilkunastu minutach.",
+    "lastActive": "ostatnia aktywność {date}",
+    "signOut": "Wyloguj",
+    "signOutConfirm": "Wylogować {name} z aplikacji CRMtree?",
+    "signOutFailed": "Nie udało się wylogować urządzenia.",
+    "signedInSince": "zalogowany od {date}",
+    "signedOut": "Wylogowano {name}.",
+    "signingOut": "Wylogowuję…",
+    "thisDevice": "to urządzenie",
+    "title": "Zalogowane telefony",
+    "unknownDevice": "Nieznane urządzenie"
+  },
+  "mySettings": {
+    "delete": "Usuń",
+    "pbx": {
+      "configured": "Token skonfigurowany",
+      "directPhone": "Twój numer bezpośredni:",
+      "hideToken": "Ukryj",
+      "hint": "Aby korzystać z wbudowanego telefonu, wklej swój Personal Access Token z panelu ip-pbx.eu. Token umożliwia aplikacji pobranie Twoich danych SIP. Klienci widzący Twój numer bezpośredni mogą oddzwonić prosto do Ciebie.",
+      "noDirectPhone": "Numer bezpośredni nie jest przypisany w PBX",
+      "notConfigured": "Brak tokenu — softphone nie będzie działał.",
+      "notifications": {
+        "blocked": "Powiadomienia zablokowane — odblokuj ręcznie w ustawieniach przeglądarki:",
+        "enable": "Włącz powiadomienia",
+        "enabled": "Powiadomienia włączone",
+        "hint": "Wyświetla powiadomienie systemowe gdy dzwoni klient — nawet gdy przeglądarka jest w tle lub pracujesz w innym programie.",
+        "permissionHint": "Przeglądarka zapyta o zgodę",
+        "title": "Powiadomienia o połączeniach",
+        "unblockPath": "Kłódka przy adresie strony → Powiadomienia → Zezwalaj"
+      },
+      "saveToken": "Zapisz token",
+      "showToken": "Pokaż",
+      "title": "Softphone — token PBX",
+      "tokenHelpEnd": "skopiuj i wklej tutaj.",
+      "tokenHelpStart": "Panel ip-pbx.eu → kliknij swoje imię (prawy górny róg)",
+      "tokenPlaceholder": "Wklej token z ip-pbx.eu…",
+      "tokenSaved": "Token zapisany",
+      "tokenSavedWithPhone": "Token zapisany — numer: {phone}"
+    },
+    "projectDeadlines": {
+      "hint": "Obejmuje: codzienne podsumowanie zadań po terminie, zmiany terminów zadań oraz projekty, które stały się opóźnione.",
+      "saveFailed": "Nie udało się zmienić ustawienia powiadomień",
+      "title": "Powiadomienia o terminach projektów",
+      "toggle": "E-maile o terminach w projektach"
+    },
+    "saveFailed": "Błąd zapisu — spróbuj ponownie",
+    "saving": "Zapisywanie…",
+    "signature": {
+      "deleteConfirm": "Usunąć zapisaną stopkę? Nie będzie już doklejana do maili.",
+      "empty": "Brak stopki — wklej HTML po lewej",
+      "hint": "Wklej poniżej kod HTML swojej stopki. Zostanie ona automatycznie doklejona do każdego maila wysłanego z systemu (Leady i Rejestr partnerów). Możesz użyć gotowego HTML z klientem poczty lub narzędzia do budowania stopek — np. HubSpot Email Signature Generator.",
+      "htmlLabel": "Kod HTML stopki",
+      "htmlPlaceholder": "Wklej tutaj kod HTML stopki…",
+      "preview": "Podgląd",
+      "save": "Zapisz stopkę",
+      "saved": "Stopka zapisana",
+      "title": "Moja stopka email"
+    },
+    "templates": {
+      "bodyLabel": "Treść",
+      "bodyPlaceholder": "Treść szablonu…",
+      "deleteConfirm": "Usunąć szablon „{name}\"?",
+      "edit": "Edytuj",
+      "editTitle": "Edycja szablonu",
+      "empty": "Brak szablonów. Kliknij „+ Nowy szablon\", aby dodać pierwszy.",
+      "hint": "Zapisz gotowe treści wiadomości, które możesz szybko wstawić podczas pisania emaila do leada lub partnera.",
+      "nameLabel": "Nazwa szablonu",
+      "namePlaceholder": "np. Intro spotkanie, Follow-up po demo…",
+      "new": "Nowy szablon",
+      "title": "Szablony emaili"
+    },
+    "title": "Moje ustawienia"
+  }
+}

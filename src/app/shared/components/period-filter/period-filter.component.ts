@@ -4,6 +4,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { getPresetDates, PeriodDates } from '../../utils/period-dates';
+import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 
 export interface PeriodChangeEvent extends PeriodDates {
   preset: string;
@@ -12,24 +13,26 @@ export interface PeriodChangeEvent extends PeriodDates {
 @Component({
   selector: 'period-filter',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
 
   <select [ngStyle]="selStyle" [(ngModel)]="preset" (ngModelChange)="onPresetChange($event)">
-    <optgroup label="Bieżące">
-      <option value="cm"   style="color:#374151">Bieżący miesiąc</option>
-      <option value="cq"   style="color:#374151">Bieżący kwartał</option>
-      <option value="ytd"  style="color:#374151">Bieżący rok (YTD {{ year }})</option>
+    <optgroup [label]="t('periodFilter.groups.current')">
+      <option value="cm"   style="color:#374151">{{ t('periodFilter.presets.currentMonth') }}</option>
+      <option value="cq"   style="color:#374151">{{ t('periodFilter.presets.currentQuarter') }}</option>
+      <option value="ytd"  style="color:#374151">{{ t('periodFilter.presets.currentYear', { year: year }) }}</option>
     </optgroup>
-    <optgroup label="Poprzednie">
-      <option value="prev_1m"   style="color:#374151">Poprzedni miesiąc</option>
-      <option value="prev_q"    style="color:#374151">Poprzedni kwartał</option>
-      <option value="prev_year" style="color:#374151">Poprzedni rok ({{ year - 1 }})</option>
+    <optgroup [label]="t('periodFilter.groups.previous')">
+      <option value="prev_1m"   style="color:#374151">{{ t('periodFilter.presets.previousMonth') }}</option>
+      <option value="prev_q"    style="color:#374151">{{ t('periodFilter.presets.previousQuarter') }}</option>
+      <option value="prev_year" style="color:#374151">{{ t('periodFilter.presets.previousYear', { year: year - 1 }) }}</option>
     </optgroup>
-    <optgroup label="Własny">
-      <option value="custom" style="color:#374151">Własny przedział…</option>
+    <optgroup [label]="t('periodFilter.groups.custom')">
+      <option value="custom" style="color:#374151">{{ t('periodFilter.presets.customRange') }}</option>
     </optgroup>
   </select>
 
@@ -43,6 +46,7 @@ export interface PeriodChangeEvent extends PeriodDates {
   </ng-container>
 
 </div>
+</ng-container>
   `,
 })
 export class PeriodFilterComponent {

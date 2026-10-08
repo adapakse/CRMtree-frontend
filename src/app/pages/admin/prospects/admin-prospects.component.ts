@@ -211,6 +211,7 @@ interface DiscoveredCompany {
   nip_edit: string;
   website_edit: string;
   selected: boolean;
+  resolvingNip?: boolean;
 }
 
 @Component({
@@ -1629,6 +1630,16 @@ interface DiscoveredCompany {
                     @if (c.nip) {
                       <div style="font-size:9px;color:#f59e0b;margin-top:1px">⚠ nieweryfik.</div>
                     }
+                    <!-- Wyszukiwanie NIP-u w internecie jest płatne, więc odpala
+                         się tylko z tego przycisku — nigdy automatycznie dla
+                         całej listy wyników. -->
+                    <button class="btn btn-g"
+                      style="font-size:9px;padding:1px 5px;height:20px;margin-top:2px"
+                      [disabled]="c.resolvingNip"
+                      (click)="resolveNip($index)"
+                      title="Szukaj NIP-u w internecie (płatne wywołanie AI)">
+                      @if (c.resolvingNip) { ⏳ } @else { 🔍 Szukaj NIP }
+                    </button>
                   }
                 </div>
 
@@ -2351,17 +2362,53 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
 
   private filterTimer: any;
 
+  // Klucz nazwany po tożsamości komponentu, nie po etykiecie UI — etykiety
+  // ("Prospekty") potrafią się zmienić między wdrożeniami, klucz nie powinien.
+  private static readonly FILTERS_KEY_PREFIX = 'admin-prospects.filters';
+
+  // ...i zawężony do tenanta. app.crmtree.pl (oraz localhost w dev) to
+  // uniwersalny login dla WSZYSTKICH tenantów, a localStorage jest wspólny dla
+  // originu — bez tenanta w kluczu filtry wpisane u jednego klienta wracałyby
+  // na liście drugiego. Mechanizm pochodzi z worktrips-doc, gdzie problem nie
+  // istnieje, bo aplikacja jest jednotenantowa.
+  private filtersKey(): string {
+    return `${AdminProspectsComponent.FILTERS_KEY_PREFIX}.${this.auth.user()?.tenant_id ?? 'unknown'}`;
+  }
+
+  // Merge PER POLE: wartość z URL wygrywa tylko dla pól, które w URL faktycznie
+  // są. Reguła "URL ma cokolwiek → pomiń localStorage" gubiłaby cały zapisany
+  // stan przy wejściu z linku niosącego choćby jeden parametr (np. z dashboardu),
+  // a potem nadpisywałaby zapis tym zredukowanym stanem.
+  private restoreFilters(qp: { get(key: string): string | null }): void {
+    let stored: Record<string, unknown> = {};
+    try {
+      stored = JSON.parse(localStorage.getItem(this.filtersKey()) ?? '{}') ?? {};
+    } catch { stored = {}; }
+
+    for (const key of Object.keys(this.filters) as (keyof typeof this.filters)[]) {
+      const fromUrl = qp.get(key);
+      const fromStore = stored[key];
+      this.filters[key] = fromUrl ?? (typeof fromStore === 'string' ? fromStore : '');
+    }
+
+    const archivedFromUrl = qp.get('show_archived');
+    this.showArchived.set(archivedFromUrl !== null
+      ? archivedFromUrl === 'true'
+      : stored['show_archived'] === true);
+  }
+
+  private persistFilters(): void {
+    try {
+      localStorage.setItem(
+        this.filtersKey(),
+        JSON.stringify({ ...this.filters, show_archived: this.showArchived() }),
+      );
+    } catch { /* tryb prywatny / brak quoty — filtry po prostu się nie zapamiętają */ }
+  }
+
   ngOnInit() {
     const qp = this.route.snapshot.queryParamMap;
-    if (qp.get('search'))        this.filters.search        = qp.get('search')!;
-    if (qp.get('status'))        this.filters.status        = qp.get('status')!;
-    if (qp.get('score_min'))     this.filters.score_min     = qp.get('score_min')!;
-    if (qp.get('score_max'))     this.filters.score_max     = qp.get('score_max')!;
-    if (qp.get('imported_from')) this.filters.imported_from = qp.get('imported_from')!;
-    if (qp.get('imported_to'))   this.filters.imported_to   = qp.get('imported_to')!;
-    if (qp.get('enriched_from')) this.filters.enriched_from = qp.get('enriched_from')!;
-    if (qp.get('enriched_to'))   this.filters.enriched_to   = qp.get('enriched_to')!;
-    if (qp.get('show_archived') === 'true') this.showArchived.set(true);
+    this.restoreFilters(qp);
     const pg = parseInt(qp.get('page') ?? '', 10);
     if (!isNaN(pg) && pg > 0) this.page.set(pg);
     const validSorts = ['imported_at', 'enriched_at', 'icp_score', 'company_name'];
@@ -2476,7 +2523,9 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
                 this.discoveryLoading.set(false);
                 this.discoveryAbort = null;
               } else if (data.type === 'error') {
-                this.toast.error('Błąd wyszukiwania: ' + (data.message || ''));
+                this.toast.error(data.billing
+                  ? 'Brak środków na koncie AI'
+                  : 'Błąd wyszukiwania: ' + (data.message || ''));
                 this.discoveryLoading.set(false);
               }
             } catch { /* ignoruj niepoprawne linie */ }
@@ -2488,6 +2537,39 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         if (err.name !== 'AbortError') this.toast.error('Błąd wyszukiwania konkurencji');
         this.discoveryLoading.set(false);
       });
+  }
+
+  resolveNip(index: number) {
+    const company = this.discoveryResults()[index];
+    if (!company || company.resolvingNip) return;
+
+    this.discoveryResults.update(r => r.map((c, i) => i === index ? { ...c, resolvingNip: true } : c));
+
+    const params = new URLSearchParams({ company_name: company.company_name });
+    this.http.get<Partial<DiscoveredCompany>>(`${API}/discover-competitors/resolve-nip?${params}`).subscribe({
+      next: found => {
+        this.discoveryResults.update(r => r.map((c, i) => i === index ? {
+          ...c,
+          nip:          found.nip ?? c.nip,
+          nip_verified: !!found.nip_verified,
+          website_url:  found.website_url ?? c.website_url,
+          pkd_main:     found.pkd_main ?? c.pkd_main,
+          pkd_codes:    found.pkd_codes ?? c.pkd_codes,
+          regon:        found.regon ?? c.regon,
+          company_name: found.nip_verified ? (found.company_name ?? c.company_name) : c.company_name,
+          resolvingNip: false,
+        } : c));
+
+        if (!found.nip)              this.toast.error('Nie udało się znaleźć NIP-u tej firmy');
+        else if (!found.nip_verified) this.toast.error('Znaleziony NIP nie zgadza się z nazwą firmy w GUS — sprawdź ręcznie');
+      },
+      error: err => {
+        this.discoveryResults.update(r => r.map((c, i) => i === index ? { ...c, resolvingNip: false } : c));
+        this.toast.error(err?.error?.billing
+          ? 'Brak środków na koncie AI'
+          : 'Błąd wyszukiwania NIP-u');
+      },
+    });
   }
 
   toggleDiscoveryItem(index: number, checked: boolean) {
@@ -2546,6 +2628,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.grandTotal.set(r.grand_total ?? this.grandTotal());
         this.pages.set(r.pages);
         this.loading.set(false);
+        this.persistFilters();
       },
       error: () => this.loading.set(false),
     });
@@ -2581,6 +2664,9 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   resetFilters() {
     (Object.keys(this.filters) as (keyof typeof this.filters)[]).forEach(k => this.filters[k] = '');
     this.showArchived.set(false);
+    // Bez wyczyszczenia zapisu "Wyczyść filtry" działałoby tylko do następnego
+    // wejścia na ekran.
+    try { localStorage.removeItem(this.filtersKey()); } catch { /* jw. */ }
     this.page.set(1);
     this.load();
   }

@@ -1,0 +1,77 @@
+{
+  "myDevices": {
+    "empty": "No hay teléfonos con sesión iniciada.",
+    "hint": "Teléfonos en los que has iniciado sesión en la aplicación móvil de CRMtree. Si pierdes el teléfono o lo cambias, cierra aquí su sesión — la aplicación perderá el acceso en ese teléfono en unos quince minutos como máximo.",
+    "lastActive": "última actividad: {date}",
+    "signOut": "Cerrar sesión",
+    "signOutConfirm": "¿Cerrar la sesión de {name} en la aplicación CRMtree?",
+    "signOutFailed": "No se pudo cerrar la sesión del dispositivo.",
+    "signedInSince": "sesión iniciada: {date}",
+    "signedOut": "Se ha cerrado la sesión de {name}.",
+    "signingOut": "Cerrando sesión…",
+    "thisDevice": "este dispositivo",
+    "title": "Teléfonos con sesión iniciada",
+    "unknownDevice": "Dispositivo desconocido"
+  },
+  "mySettings": {
+    "delete": "Eliminar",
+    "pbx": {
+      "configured": "Token configurado",
+      "directPhone": "Tu número directo:",
+      "hideToken": "Ocultar",
+      "hint": "Para usar el teléfono integrado, pega tu Personal Access Token del panel de ip-pbx.eu. El token permite a la aplicación obtener tus datos SIP. Los clientes que vean tu número directo podrán devolverte la llamada directamente.",
+      "noDirectPhone": "No hay un número directo asignado en el PBX",
+      "notConfigured": "Sin token — el softphone no funcionará.",
+      "notifications": {
+        "blocked": "Notificaciones bloqueadas — desbloquéalas manualmente en la configuración del navegador:",
+        "enable": "Activar notificaciones",
+        "enabled": "Notificaciones activadas",
+        "hint": "Muestra una notificación del sistema cuando llama un cliente — incluso si el navegador está en segundo plano o trabajas en otro programa.",
+        "permissionHint": "El navegador pedirá permiso",
+        "title": "Notificaciones de llamadas",
+        "unblockPath": "Candado junto a la dirección de la página → Notificaciones → Permitir"
+      },
+      "saveToken": "Guardar token",
+      "showToken": "Mostrar",
+      "title": "Softphone — token PBX",
+      "tokenHelpEnd": "cópialo y pégalo aquí.",
+      "tokenHelpStart": "Panel de ip-pbx.eu → haz clic en tu nombre (esquina superior derecha)",
+      "tokenPlaceholder": "Pega el token de ip-pbx.eu…",
+      "tokenSaved": "Token guardado",
+      "tokenSavedWithPhone": "Token guardado — número: {phone}"
+    },
+    "projectDeadlines": {
+      "hint": "Incluye: el resumen diario de tareas vencidas, los cambios de fecha límite de las tareas y los proyectos que han pasado a estar retrasados.",
+      "saveFailed": "No se pudo cambiar el ajuste de notificaciones",
+      "title": "Notificaciones sobre plazos de proyectos",
+      "toggle": "Correos sobre plazos en los proyectos"
+    },
+    "saveFailed": "Error al guardar — inténtalo de nuevo",
+    "saving": "Guardando…",
+    "signature": {
+      "deleteConfirm": "¿Eliminar la firma guardada? Ya no se añadirá a los correos.",
+      "empty": "Sin firma — pega el HTML a la izquierda",
+      "hint": "Pega abajo el código HTML de tu firma. Se añadirá automáticamente a cada correo enviado desde el sistema (Leads y Registro de partners). Puedes usar el HTML ya preparado de tu cliente de correo o una herramienta para crear firmas — p. ej. HubSpot Email Signature Generator.",
+      "htmlLabel": "Código HTML de la firma",
+      "htmlPlaceholder": "Pega aquí el código HTML de la firma…",
+      "preview": "Vista previa",
+      "save": "Guardar firma",
+      "saved": "Firma guardada",
+      "title": "Mi firma de correo"
+    },
+    "templates": {
+      "bodyLabel": "Contenido",
+      "bodyPlaceholder": "Contenido de la plantilla…",
+      "deleteConfirm": "¿Eliminar la plantilla «{name}»?",
+      "edit": "Editar",
+      "editTitle": "Edición de la plantilla",
+      "empty": "No hay plantillas. Haz clic en «+ Nueva plantilla» para añadir la primera.",
+      "hint": "Guarda textos de mensajes ya preparados que podrás insertar rápidamente al escribir un correo a un lead o a un partner.",
+      "nameLabel": "Nombre de la plantilla",
+      "namePlaceholder": "p. ej. Reunión de presentación, Seguimiento tras la demo…",
+      "new": "Nueva plantilla",
+      "title": "Plantillas de correo"
+    },
+    "title": "Mi configuración"
+  }
+}

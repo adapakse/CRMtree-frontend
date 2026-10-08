@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "save": "Сохранить"
+  },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Файл .ics (Apple и другие)",
+    "outlook": "Outlook",
+    "title": "Добавить в календарь"
+  },
+  "language": {
+    "changeFailed": "Не удалось изменить язык",
+    "followTenant": "Язык организации по умолчанию ({language})",
+    "hint": "При смене языка страница перезагрузится. На этом языке вы также будете получать письма и напоминания.",
+    "tenantHint": "Язык для тех, кто не выбрал собственный. При смене страница перезагрузится.",
+    "tenantTitle": "Язык организации по умолчанию",
+    "title": "Язык интерфейса"
+  },
+  "list": {
+    "activeFilters": "{count, plural, one {# активный фильтр} few {# активных фильтра} many {# активных фильтров} other {# активного фильтра}}",
+    "anyValue": "Все",
+    "ascending": "По возрастанию",
+    "clearFilter": "Сбросить",
+    "clearFilters": "Сбросить фильтры",
+    "defaultSort": "По умолчанию",
+    "descending": "По убыванию",
+    "filterBy": "Фильтр: {name}",
+    "from": "от",
+    "noOptions": "Нет вариантов для выбора.",
+    "pager": {
+      "next": "Следующая страница",
+      "previous": "Предыдущая страница",
+      "range": "{from}–{to} из {total}"
+    },
+    "sort": "Сортировка",
+    "sortBy": "Сортировка: {name}",
+    "to": "до"
+  },
+  "states": {
+    "loading": "Загрузка…"
+  },
+  "testEnvironmentBanner": {
+    "title": "Тестовая версия — это не продуктивная среда"
+  },
+  "typeahead": {
+    "minChars": "Минимум символов для поиска: {count}…",
+    "noResults": "Нет результатов.",
+    "searching": "Поиск…"
+  }
+}

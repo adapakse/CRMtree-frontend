@@ -2,70 +2,50 @@
 import { Component, Input, Output, EventEmitter, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CrmApiService } from '../../../core/services/crm-api.service';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 type CallState = 'dialing' | 'connected' | 'ended';
-
-const LOREM_TRANSCRIPT = `[00:00] Handlowiec: Dzień dobry, tu Jan Nowak z CRMtree. Czy mogę rozmawiać z osobą odpowiedzialną za podróże służbowe?
-
-[00:08] Klient: Tak, słucham. Mówi Marek Kowalski.
-
-[00:10] Handlowiec: Dzień dobry, Panie Marku. Kontaktuję się w sprawie optymalizacji kosztów podróży służbowych w Państwa firmie. Czy ma Pan chwilę?
-
-[00:18] Klient: Tak, proszę mówić. Co konkretnie Pan proponuje?
-
-[00:22] Handlowiec: Oferujemy kompleksowy system zarządzania podróżami korporacyjnymi — rezerwacje lotów, hoteli i transportu w jednym miejscu. Średnio nasi klienci oszczędzają od 15 do 25% na kosztach podróży.
-
-[00:35] Klient: Brzmi interesująco. Ile osób podróżuje rocznie, żeby to miało sens?
-
-[00:40] Handlowiec: Nasza platforma opłaca się już od kilkudziesięciu podróży rocznie. Mogę przygotować indywidualną kalkulację dla Państwa firmy.
-
-[00:49] Klient: Dobrze. Proszę przesłać ofertę na maila. Nasz zespół to przejrzy.
-
-[00:54] Handlowiec: Oczywiście, wyślę jeszcze dzisiaj. Czy możemy też umówić się na krótką prezentację online, żeby pokazać system w działaniu?
-
-[01:02] Klient: Tak, możemy. Zaproponuję termin po przejrzeniu oferty.
-
-[01:06] Handlowiec: Świetnie. Dziękuję za rozmowę, do usłyszenia.
-
-[01:09] Klient: Do widzenia.`;
 
 @Component({
   selector: 'wt-phone-call-simulator',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoDirective],
+  providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="call-overlay">
   <div class="call-card">
     <!-- Dialing -->
     <ng-container *ngIf="state === 'dialing'">
       <div class="call-icon">📞</div>
-      <div class="call-label">Nawiązywanie połączenia...</div>
+      <div class="call-label">{{ t('callSimulator.connecting') }}</div>
       <div class="call-number">{{phoneNumber}}</div>
       <div class="call-dots"><span></span><span></span><span></span></div>
-      <button class="call-btn call-btn-end" (click)="hangUp()">Rozłącz</button>
+      <button class="call-btn call-btn-end" (click)="hangUp()">{{ t('callSimulator.hangUp') }}</button>
     </ng-container>
 
     <!-- Connected -->
     <ng-container *ngIf="state === 'connected'">
       <div class="call-icon call-icon-active">📞</div>
-      <div class="call-label call-connected">Połączono</div>
+      <div class="call-label call-connected">{{ t('callSimulator.connected') }}</div>
       <div class="call-number">{{phoneNumber}}</div>
       <div class="call-timer">{{timerLabel}}</div>
-      <button class="call-btn call-btn-end" (click)="hangUp()">Zakończ rozmowę</button>
+      <button class="call-btn call-btn-end" (click)="hangUp()">{{ t('callSimulator.endCall') }}</button>
     </ng-container>
 
     <!-- Ended -->
     <ng-container *ngIf="state === 'ended'">
       <div class="call-icon">📵</div>
-      <div class="call-label">Rozmowa zakończona</div>
+      <div class="call-label">{{ t('callSimulator.ended') }}</div>
       <div class="call-number">{{phoneNumber}}</div>
-      <div class="call-timer">Czas: {{timerLabel}}</div>
-      <div *ngIf="saving" class="call-saving">Zapisuję notatkę...</div>
-      <div *ngIf="saved" class="call-saved">✅ Notatka zapisana</div>
+      <div class="call-timer">{{ t('callSimulator.duration', { time: timerLabel }) }}</div>
+      <div *ngIf="saving" class="call-saving">{{ t('callSimulator.savingNote') }}</div>
+      <div *ngIf="saved" class="call-saved">✅ {{ t('callSimulator.noteSaved') }}</div>
     </ng-container>
   </div>
 </div>
+</ng-container>
   `,
   styles: [`
 .call-overlay {
@@ -110,6 +90,7 @@ export class PhoneCallSimulatorComponent implements OnDestroy {
 
   private api = inject(CrmApiService);
   private cdr = inject(ChangeDetectorRef);
+  private transloco = inject(TranslocoService);
 
   state: CallState = 'dialing';
   seconds = 0;
@@ -158,11 +139,14 @@ export class PhoneCallSimulatorComponent implements OnDestroy {
   private createCallActivity(durationSec: number): void {
     const who = this.contactName || this.phoneNumber;
     const durationMin = Math.max(1, Math.round(durationSec / 60));
-    const body = `Połączenie telefoniczne z ${who} (${durationSec}s)\n\n--- Transkrypcja ---\n${LOREM_TRANSCRIPT}`;
+    const summary = this.transloco.translate('crm.callSimulator.activity.summary', { who, seconds: durationSec });
+    const transcriptHeading = this.transloco.translate('crm.callSimulator.activity.transcriptHeading');
+    const demoTranscript = this.transloco.translate('crm.callSimulator.activity.demoTranscript');
+    const body = `${summary}\n\n${transcriptHeading}\n${demoTranscript}`;
 
     this.api.createLeadActivity(this.leadId, {
       type: 'call',
-      title: `Rozmowa telefoniczna — ${who}`,
+      title: this.transloco.translate('crm.callSimulator.activity.title', { who }),
       body,
       duration_min: durationMin,
       activity_at: new Date().toISOString(),

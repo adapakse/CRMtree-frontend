@@ -1,4 +1,5 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs';
@@ -12,9 +13,10 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
 @Component({
   selector: 'wt-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, AvatarComponent, SoftphoneOverlayComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, AvatarComponent, SoftphoneOverlayComponent, TranslocoDirective],
+  providers: [provideTranslocoScope('shell')],
   template: `
-    <div class="app-wrap">
+    <div class="app-wrap" *transloco="let t; prefix: 'shell'">
 
       <!-- SIDEBAR -->
       <nav id="sidebar" [class.collapsed]="collapsed">
@@ -25,7 +27,7 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
         </div>
 
         <!-- Toggle button — always visible -->
-        <button class="toggle-btn" (click)="toggleSidebar()" [attr.title]="collapsed ? 'Rozwiń menu' : 'Zwiń menu'">
+        <button class="toggle-btn" (click)="toggleSidebar()" [attr.title]="t(collapsed ? 'sidebar.expand' : 'sidebar.collapse')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline [attr.points]="collapsed ? '9,18 15,12 9,6' : '15,18 9,12 15,6'"/>
           </svg>
@@ -36,31 +38,31 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
 
           @if (!isExternalUser()) {
           <div class="s-sec">
-            <div class="s-lbl">Dokumenty</div>
+            <div class="s-lbl">{{ t('sections.documents') }}</div>
 
             <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              <span class="nav-label">Dashboard</span>
-              <span class="nav-tip">Dashboard</span>
+              <span class="nav-label">{{ t('nav.dashboard') }}</span>
+              <span class="nav-tip">{{ t('nav.dashboard') }}</span>
             </a>
 
             @if (auth.hasFeature('documents')) {
               <a class="nav-item" routerLink="/documents" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
-                <span class="nav-label">Dokumenty @if (docBadge() > 0) { <span class="nbadge">{{ docBadge() }}</span> }</span>
-                <span class="nav-tip">Dokumenty @if (docBadge() > 0) { <span class="nbadge">{{ docBadge() }}</span> }</span>
+                <span class="nav-label">{{ t('nav.documents') }} @if (docBadge() > 0) { <span class="nbadge">{{ docBadge() }}</span> }</span>
+                <span class="nav-tip">{{ t('nav.documents') }} @if (docBadge() > 0) { <span class="nbadge">{{ docBadge() }}</span> }</span>
               </a>
               <a class="nav-item" routerLink="/workflow" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
-                <span class="nav-label">Workflow @if (taskBadge() > 0) { <span class="nbadge">{{ taskBadge() }}</span> }</span>
-                <span class="nav-tip">Workflow @if (taskBadge() > 0) { <span class="nbadge">{{ taskBadge() }}</span> }</span>
+                <span class="nav-label">{{ t('nav.workflow') }} @if (taskBadge() > 0) { <span class="nbadge">{{ taskBadge() }}</span> }</span>
+                <span class="nav-tip">{{ t('nav.workflow') }} @if (taskBadge() > 0) { <span class="nbadge">{{ taskBadge() }}</span> }</span>
               </a>
             }
 
             <a class="nav-item" routerLink="/groups" routerLinkActive="active">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              <span class="nav-label">Grupy i role</span>
-              <span class="nav-tip">Grupy i role</span>
+              <span class="nav-label">{{ t('nav.groupsAndRoles') }}</span>
+              <span class="nav-tip">{{ t('nav.groupsAndRoles') }}</span>
             </a>
           </div>
           }
@@ -68,11 +70,11 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
           @if (auth.hasFeature('projects')) {
             @if (!isExternalUser()) { <div class="nav-sep"></div> }
             <div class="s-sec">
-              <div class="s-lbl">Projekty</div>
+              <div class="s-lbl">{{ t('sections.projects') }}</div>
               <a class="nav-item" routerLink="/projects" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="10" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/></svg>
-                <span class="nav-label">Projekty</span>
-                <span class="nav-tip">Projekty</span>
+                <span class="nav-label">{{ t('nav.projects') }}</span>
+                <span class="nav-tip">{{ t('nav.projects') }}</span>
               </a>
             </div>
           }
@@ -80,47 +82,47 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
           @if (hasCrmAccess()) {
             <div class="nav-sep"></div>
             <div class="s-sec">
-              <div class="s-lbl">CRM</div>
+              <div class="s-lbl">{{ t('sections.crm') }}</div>
 
               <a class="nav-item" routerLink="/crm/dashboard" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                <span class="nav-label">Dashboard</span>
-                <span class="nav-tip">Dashboard</span>
+                <span class="nav-label">{{ t('nav.dashboard') }}</span>
+                <span class="nav-tip">{{ t('nav.dashboard') }}</span>
               </a>
 
               @if (auth.hasFeature('leads')) {
                 <a class="nav-item" routerLink="/crm/leads" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  <span class="nav-label">Leady</span>
-                  <span class="nav-tip">Leady</span>
+                  <span class="nav-label">{{ t('nav.leads') }}</span>
+                  <span class="nav-tip">{{ t('nav.leads') }}</span>
                 </a>
                 <a class="nav-item" routerLink="/crm/calendar" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  <span class="nav-label">Kalendarz działań</span>
-                  <span class="nav-tip">Kalendarz działań</span>
+                  <span class="nav-label">{{ t('nav.activityCalendar') }}</span>
+                  <span class="nav-tip">{{ t('nav.activityCalendar') }}</span>
                 </a>
               }
 
               @if (auth.hasFeature('sales_reports')) {
                 <a class="nav-item" routerLink="/crm/reports/leads" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                  <span class="nav-label">Raporty sprzedaży</span>
-                  <span class="nav-tip">Raporty sprzedaży</span>
+                  <span class="nav-label">{{ t('nav.salesReports') }}</span>
+                  <span class="nav-tip">{{ t('nav.salesReports') }}</span>
                 </a>
               }
 
               @if (auth.hasFeature('prospects')) {
                 <a class="nav-item" routerLink="/admin/prospects" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
-                  <span class="nav-label">Prospekty</span>
-                  <span class="nav-tip">Prospekty</span>
+                  <span class="nav-label">{{ t('nav.prospects') }}</span>
+                  <span class="nav-tip">{{ t('nav.prospects') }}</span>
                 </a>
 
                 @if (isSalesManager() || auth.isAdmin()) {
                   <a class="nav-item" routerLink="/crm/prospects-dashboard" routerLinkActive="active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><circle cx="18" cy="8" r="2"/><circle cx="12" cy="2" r="2"/><circle cx="6" cy="12" r="2"/></svg>
-                    <span class="nav-label">Dashboard Prospekty</span>
-                    <span class="nav-tip">Dashboard Prospekty</span>
+                    <span class="nav-label">{{ t('nav.prospectsDashboard') }}</span>
+                    <span class="nav-tip">{{ t('nav.prospectsDashboard') }}</span>
                   </a>
                 }
               }
@@ -128,8 +130,8 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
               @if (auth.hasFeature('call_analysis')) {
                 <a class="nav-item" routerLink="/admin/call-analysis" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  <span class="nav-label">Analiza rozmów</span>
-                  <span class="nav-tip">Analiza rozmów</span>
+                  <span class="nav-label">{{ t('nav.callAnalysis') }}</span>
+                  <span class="nav-tip">{{ t('nav.callAnalysis') }}</span>
                 </a>
               }
             </div>
@@ -137,58 +139,58 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
             @if (auth.hasFeature('partner_registry') || auth.hasFeature('onboarding') || auth.hasFeature('performance')) {
               <div class="nav-sep"></div>
               <div class="s-sec">
-                <div class="s-lbl">Partnerzy</div>
+                <div class="s-lbl">{{ t('sections.partners') }}</div>
 
                 @if (auth.hasFeature('onboarding')) {
                   <a class="nav-item" routerLink="/crm/onboarding" routerLinkActive="active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                    <span class="nav-label">Onboarding</span>
-                    <span class="nav-tip">Onboarding</span>
+                    <span class="nav-label">{{ t('nav.onboarding') }}</span>
+                    <span class="nav-tip">{{ t('nav.onboarding') }}</span>
                   </a>
                 }
 
                 @if (auth.hasFeature('seo_bot')) {
                   <a class="nav-item" routerLink="/crm/seo" routerLinkActive="active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                    <span class="nav-label">SEObot</span>
-                    <span class="nav-tip">SEObot</span>
+                    <span class="nav-label">{{ t('nav.seoBot') }}</span>
+                    <span class="nav-tip">{{ t('nav.seoBot') }}</span>
                   </a>
                 }
 
                 @if (auth.hasFeature('partner_registry')) {
                   <a class="nav-item" routerLink="/crm/partners" [class.active]="partnersRegistryActive()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    <span class="nav-label">Rejestr Partnerów</span>
-                    <span class="nav-tip">Rejestr Partnerów</span>
+                    <span class="nav-label">{{ t('nav.partnerRegistry') }}</span>
+                    <span class="nav-tip">{{ t('nav.partnerRegistry') }}</span>
                   </a>
                   <a class="nav-item" routerLink="/crm/partner-groups" routerLinkActive="active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-                    <span class="nav-label">Grupy partnerów</span>
-                    <span class="nav-tip">Grupy partnerów</span>
+                    <span class="nav-label">{{ t('nav.partnerGroups') }}</span>
+                    <span class="nav-tip">{{ t('nav.partnerGroups') }}</span>
                   </a>
                 }
 
                 @if (auth.hasFeature('performance')) {
                   <a class="nav-item" routerLink="/crm/reports/partners" routerLinkActive="active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    <span class="nav-label">Wyniki</span>
-                    <span class="nav-tip">Wyniki</span>
+                    <span class="nav-label">{{ t('nav.performance') }}</span>
+                    <span class="nav-tip">{{ t('nav.performance') }}</span>
                   </a>
                 }
 
                 @if (auth.hasFeature('dwh_integration') && (isSalesManager() || auth.isAdmin())) {
                   <a class="nav-item" routerLink="/crm/partners/analytics" routerLinkActive="active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                    <span class="nav-label">Analityka partnerów</span>
-                    <span class="nav-tip">Dashboard analityczny</span>
+                    <span class="nav-label">{{ t('nav.partnerAnalytics') }}</span>
+                    <span class="nav-tip">{{ t('nav.analyticsDashboardTip') }}</span>
                   </a>
                 }
 
                 @if (isSalesManager() && !auth.isAdmin()) {
                   <a class="nav-item" routerLink="/users" routerLinkActive="active">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v1a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M4 22v-1a7 7 0 0 1 14 0v1"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg>
-                    <span class="nav-label">Budżety</span>
-                    <span class="nav-tip">Budżety handlowców</span>
+                    <span class="nav-label">{{ t('nav.budgets') }}</span>
+                    <span class="nav-tip">{{ t('nav.salesBudgetsTip') }}</span>
                   </a>
                 }
               </div>
@@ -199,16 +201,16 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
           @if (auth.isSuperAdmin()) {
             <div class="nav-sep"></div>
             <div class="s-sec">
-              <div class="s-lbl">Super Admin</div>
+              <div class="s-lbl">{{ t('sections.superAdmin') }}</div>
               <a class="nav-item" routerLink="/admin/tenants" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-                <span class="nav-label">Tenants</span>
-                <span class="nav-tip">Zarządzanie tenantami</span>
+                <span class="nav-label">{{ t('nav.tenants') }}</span>
+                <span class="nav-tip">{{ t('nav.tenantsTip') }}</span>
               </a>
               <a class="nav-item" routerLink="/admin/billing" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                <span class="nav-label">Rozliczenia</span>
-                <span class="nav-tip">Faktury i plany tenantów</span>
+                <span class="nav-label">{{ t('nav.billing') }}</span>
+                <span class="nav-tip">{{ t('nav.billingTip') }}</span>
               </a>
             </div>
           }
@@ -216,36 +218,44 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
           @if (auth.isAdmin()) {
             <div class="nav-sep"></div>
             <div class="s-sec">
-              <div class="s-lbl">Administracja</div>
+              <div class="s-lbl">{{ t('sections.administration') }}</div>
 
               <a class="nav-item" routerLink="/crm/import" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span class="nav-label">Import CSV</span>
-                <span class="nav-tip">Import CSV</span>
+                <span class="nav-label">{{ t('nav.csvImport') }}</span>
+                <span class="nav-tip">{{ t('nav.csvImport') }}</span>
               </a>
 
               <a class="nav-item" routerLink="/users" routerLinkActive="active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span class="nav-label">Użytkownicy</span>
-                <span class="nav-tip">Użytkownicy</span>
+                <span class="nav-label">{{ t('nav.users') }}</span>
+                <span class="nav-tip">{{ t('nav.users') }}</span>
               </a>
 
               <a class="nav-item" routerLink="/logs" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                  <span class="nav-label">Logi audytowe</span>
-                  <span class="nav-tip">Logi audytowe</span>
+                  <span class="nav-label">{{ t('nav.auditLogs') }}</span>
+                  <span class="nav-tip">{{ t('nav.auditLogs') }}</span>
                 </a>
+
+                @if (auth.hasFeature('pbx')) {
+                  <a class="nav-item" routerLink="/admin/pbx" routerLinkActive="active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 11.5 19.79 19.79 0 0 1 1 2.18 2 2 0 0 1 3 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 14h1a2 2 0 0 1 2 1.92z"/></svg>
+                    <span class="nav-label">{{ t('nav.pbxNumbers') }}</span>
+                    <span class="nav-tip">{{ t('nav.pbxNumbers') }}</span>
+                  </a>
+                }
 
                 <a class="nav-item" routerLink="/admin/settings" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                  <span class="nav-label">Ustawienia aplikacji</span>
-                  <span class="nav-tip">Ustawienia aplikacji</span>
+                  <span class="nav-label">{{ t('nav.appSettings') }}</span>
+                  <span class="nav-tip">{{ t('nav.appSettings') }}</span>
                 </a>
 
                 <a class="nav-item" routerLink="/admin/data" routerLinkActive="active">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-                  <span class="nav-label">Zarządzanie danymi</span>
-                  <span class="nav-tip">Zarządzanie danymi</span>
+                  <span class="nav-label">{{ t('nav.dataManagement') }}</span>
+                  <span class="nav-tip">{{ t('nav.dataManagement') }}</span>
                 </a>
             </div>
           }
@@ -256,14 +266,14 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
         <div class="s-bottom">
           <a class="nav-item settings-item" routerLink="/my-settings" routerLinkActive="active" style="margin-bottom:4px">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span class="nav-label">Moje ustawienia</span>
-            <span class="nav-tip">Moje ustawienia</span>
+            <span class="nav-label">{{ t('nav.mySettings') }}</span>
+            <span class="nav-tip">{{ t('nav.mySettings') }}</span>
           </a>
           <div class="u-card" (click)="auth.logout()">
             <wt-avatar [name]="auth.user()?.display_name ?? ''" [size]="32" />
             <div class="u-info">
               <div class="u-name">{{ auth.user()?.display_name }}</div>
-              <div class="u-role">{{ auth.isAdmin() ? 'Administrator' : 'Użytkownik' }} · Wyloguj się</div>
+              <div class="u-role">{{ t(auth.isAdmin() ? 'user.admin' : 'user.user') }} · {{ t('user.logout') }}</div>
             </div>
           </div>
         </div>

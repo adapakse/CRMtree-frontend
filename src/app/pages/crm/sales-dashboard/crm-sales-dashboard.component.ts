@@ -10,10 +10,17 @@ import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/cale
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../../core/i18n/locale.service';
+
+const CHURN_RISK_LEVELS = ['critical', 'high', 'medium', 'low'];
+// This dashboard words some stages differently than the shared CRM labels (e.g. "Lead", "Wygrane").
+const DASHBOARD_STAGE_LABELS = ['new', 'closed_won', 'closed_lost', 'onboarding', 'onboarded'];
+const SHARED_STAGE_LABELS = ['qualification', 'presentation', 'offer', 'negotiation'];
+const SHARED_ACTIVITY_TYPE_LABELS = ['call', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'task'];
 
 interface PipelineRow {
   stage: string;
-  label: string;
   count: number;
   value: number;
   color: string;
@@ -23,9 +30,11 @@ interface PipelineRow {
 @Component({
   selector: 'wt-crm-sales-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent, AddToCalendarComponent],
+  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div class="crm-dash" *ngIf="!loading; else loadingTpl">
 
   <!-- ── TABS ── -->
@@ -35,7 +44,7 @@ interface PipelineRow {
         <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
         <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
       </svg>
-      Dashboard
+      {{ t('salesDashboard.tabs.dashboard') }}
     </button>
     <button class="dash-tab" [class.active]="activeTab === 'churn'"
             (click)="activeTab = 'churn'; loadChurn()">
@@ -43,7 +52,7 @@ interface PipelineRow {
         <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/>
         <polyline points="16,7 22,7 22,13"/>
       </svg>
-      Ryzyko Churn
+      {{ t('partnerDetail.churn.title') }}
       <span class="tab-badge-red" *ngIf="churnCriticalCount > 0">{{ churnCriticalCount }}</span>
     </button>
   </div>
@@ -55,17 +64,17 @@ interface PipelineRow {
       <!-- Filtry -->
       <div class="churn-filters">
         <input class="churn-filter-inp" [(ngModel)]="churnFilterName"
-               (ngModelChange)="onChurnFilter()" placeholder="Szukaj partnera…"/>
+               (ngModelChange)="onChurnFilter()" [placeholder]="t('salesDashboard.churn.searchPlaceholder')"/>
         <select class="churn-filter-sel" [(ngModel)]="churnFilterRisk" (ngModelChange)="onChurnFilter()">
-          <option value="">Wszystkie poziomy</option>
-          <option value="critical">Krytyczne</option>
-          <option value="high">Wysokie</option>
-          <option value="medium">Średnie</option>
-          <option value="low">Niskie</option>
+          <option value="">{{ t('salesDashboard.churn.allLevels') }}</option>
+          <option value="critical">{{ t('partnerDetail.churn.levels.critical') }}</option>
+          <option value="high">{{ t('partnerDetail.churn.levels.high') }}</option>
+          <option value="medium">{{ t('partnerDetail.churn.levels.medium') }}</option>
+          <option value="low">{{ t('partnerDetail.churn.levels.low') }}</option>
         </select>
         <select class="churn-filter-sel" *ngIf="isCrmManager"
                 [(ngModel)]="churnFilterSalesperson" (ngModelChange)="onChurnFilter()">
-          <option value="">Wszyscy handlowcy</option>
+          <option value="">{{ t('leadsList.filters.allReps') }}</option>
           <option *ngFor="let u of churnSalespersons" [value]="u.id">{{ u.name }}</option>
         </select>
         <div class="churn-filter-spacer"></div>
@@ -77,7 +86,7 @@ interface PipelineRow {
             <line x1="12" y1="8" x2="12" y2="16"/>
             <line x1="8" y1="12" x2="16" y2="12"/>
           </svg>
-          {{ churnGenerating ? 'Generowanie…' : 'Generuj zadania' }}
+          {{ churnGenerating ? t('salesDashboard.churn.generating') : t('salesDashboard.churn.generateTasks') }}
         </button>
       </div>
 
@@ -86,15 +95,14 @@ interface PipelineRow {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
           <polyline points="20,6 9,17 4,12"/>
         </svg>
-        Utworzono {{ churnGenResult.created }} zadań,
-        pominięto {{ churnGenResult.skipped }} (już istnieją).
+        {{ t('salesDashboard.churn.generateResult', { created: churnGenResult.created, skipped: churnGenResult.skipped }) }}
         <button class="churn-gen-close" (click)="churnGenResult = null">✕</button>
       </div>
 
       <!-- Lista -->
       <div class="churn-list" *ngIf="!churnLoading; else churnLoadingTpl">
         <div class="churn-empty" *ngIf="churnFiltered.length === 0">
-          Brak partnerów z ryzykiem churn spełniających kryteria filtrów.
+          {{ t('salesDashboard.churn.empty') }}
         </div>
 
         <div class="churn-item" *ngFor="let p of churnFiltered" (click)="goToPartner(p.partner_id)">
@@ -114,11 +122,11 @@ interface PipelineRow {
           <div class="churn-stats">
             <div class="churn-stat" *ngIf="p.days_since_order !== null">
               <span class="churn-stat-val">{{ p.days_since_order }}</span>
-              <span class="churn-stat-lbl">dni bez zamówienia</span>
+              <span class="churn-stat-lbl">{{ t('salesDashboard.churn.daysSinceOrder') }}</span>
             </div>
             <div class="churn-stat" *ngIf="p.sales_drop_pct > 0">
               <span class="churn-stat-val churn-drop">−{{ p.sales_drop_pct }}%</span>
-              <span class="churn-stat-lbl">spadek M-2→M-1</span>
+              <span class="churn-stat-lbl">{{ t('salesDashboard.churn.salesDrop') }}</span>
             </div>
           </div>
 
@@ -126,7 +134,7 @@ interface PipelineRow {
             <div class="churn-badge" [class]="'risk-badge-' + p.risk_level">
               {{ riskLabel(p.risk_level) }}
             </div>
-            <div class="churn-score">{{ p.total_score }} pkt</div>
+            <div class="churn-score">{{ t('partnerDetail.churn.score', { score: p.total_score }) }}</div>
           </div>
 
           <svg class="churn-chevron" viewBox="0 0 24 24" fill="none"
@@ -148,8 +156,8 @@ interface PipelineRow {
   <!-- ── HEADER ── -->
   <div class="dash-top">
     <div class="dash-greeting">
-      <h1>Dzień dobry, {{ firstName }}!</h1>
-      <p>Oto podsumowanie Twoich działań i wyników.</p>
+      <h1>{{ t('salesDashboard.header.greeting', { name: firstName }) }}</h1>
+      <p>{{ t('salesDashboard.header.subtitle') }}</p>
     </div>
     <div class="date-chip">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -165,7 +173,7 @@ interface PipelineRow {
   <!-- ── KPI ── -->
   <div class="kpi-row">
 
-    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: 'Nowe leady – bieżący tydzień' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: t('salesDashboard.kpi.filters.newLeadsThisWeek') })">
       <div class="kpi-icon" style="background:#E6F4EA">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -175,17 +183,17 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe leady <wt-tooltip key="crm.sales.kpi.new_contacts"></wt-tooltip></div>
+        <div class="kpi-label">{{ t('salesDashboard.kpi.newLeads') }} <wt-tooltip key="crm.sales.kpi.new_contacts"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiNewLeads }}</div>
         <div class="kpi-trend" *ngIf="kpiNewLeadsChange !== null"
              [class.pos]="kpiNewLeadsChange >= 0" [class.neg]="kpiNewLeadsChange < 0">
           {{ kpiNewLeadsChange >= 0 ? '↑' : '↓' }} {{ kpiNewLeadsChange | number:'1.0-0' }}%
-          <span>vs poprzedni tydzień</span>
+          <span>{{ t('salesDashboard.kpi.vsPreviousWeek') }}</span>
         </div>
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: 'Nowe leady – wartość bieżący tydzień' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: t('salesDashboard.kpi.filters.newLeadsValueThisWeek') })">
       <div class="kpi-icon" style="background:#E6F4EA">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
           <line x1="12" y1="1" x2="12" y2="23"/>
@@ -193,17 +201,17 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe leady wartość <wt-tooltip key="crm.sales.kpi.new_leads_value"></wt-tooltip></div>
+        <div class="kpi-label">{{ t('salesDashboard.kpi.newLeadsValue') }} <wt-tooltip key="crm.sales.kpi.new_leads_value"></wt-tooltip></div>
         <div class="kpi-value kpi-value-sm">{{ fmtValue(kpiNewLeadsValue) }}</div>
         <div class="kpi-trend" *ngIf="kpiNewLeadsValueChange !== null"
              [class.pos]="kpiNewLeadsValueChange >= 0" [class.neg]="kpiNewLeadsValueChange < 0">
           {{ kpiNewLeadsValueChange >= 0 ? '↑' : '↓' }} {{ kpiNewLeadsValueChange | number:'1.0-0' }}%
-          <span>vs poprzedni tydzień</span>
+          <span>{{ t('salesDashboard.kpi.vsPreviousWeek') }}</span>
         </div>
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ label: 'Szanse aktywne w pipeline' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ label: t('salesDashboard.kpi.filters.activeOpportunities') })">
       <div class="kpi-icon" style="background:#EDE9FE">
         <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" width="22" height="22">
           <line x1="12" y1="1" x2="12" y2="23"/>
@@ -211,30 +219,30 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Nowe szanse <wt-tooltip key="crm.sales.kpi.new_leads"></wt-tooltip></div>
+        <div class="kpi-label">{{ t('salesDashboard.kpi.newOpportunities') }} <wt-tooltip key="crm.sales.kpi.new_leads"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiActiveLeads }}</div>
         <div class="kpi-trend pos" *ngIf="kpiActiveLeads > 0">
-          <span>w pipeline</span>
+          <span>{{ t('salesDashboard.kpi.inPipeline') }}</span>
         </div>
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ label: 'Wartość pipeline' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ label: t('salesDashboard.kpi.filters.pipelineValue') })">
       <div class="kpi-icon" style="background:#FEF3C7">
         <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" width="22" height="22">
           <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/>
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Wartość szans <wt-tooltip key="crm.sales.kpi.pipeline_value"></wt-tooltip></div>
+        <div class="kpi-label">{{ t('salesDashboard.kpi.opportunitiesValue') }} <wt-tooltip key="crm.sales.kpi.pipeline_value"></wt-tooltip></div>
         <div class="kpi-value kpi-value-sm">{{ fmtValue(kpiPipelineValue) }}</div>
         <div class="kpi-trend pos" *ngIf="chartChangePercent !== null && chartChangePercent > 0">
-          ↑ {{ chartChangePercent }}% <span>vs poprzedni miesiąc</span>
+          ↑ {{ chartChangePercent }}% <span>{{ t('salesDashboard.kpi.vsPreviousMonth') }}</span>
         </div>
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ stage: 'closed_won', label: 'Wygrane szanse' })">
+    <div class="kpi-card clickable" (click)="goToLeads({ stage: 'closed_won', label: t('salesDashboard.kpi.wonOpportunities') })">
       <div class="kpi-icon" style="background:#E6F4EA">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
           <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/>
@@ -242,10 +250,10 @@ interface PipelineRow {
         </svg>
       </div>
       <div class="kpi-info">
-        <div class="kpi-label">Wygrane szanse <wt-tooltip key="crm.sales.kpi.won"></wt-tooltip></div>
+        <div class="kpi-label">{{ t('salesDashboard.kpi.wonOpportunities') }} <wt-tooltip key="crm.sales.kpi.won"></wt-tooltip></div>
         <div class="kpi-value">{{ kpiWonCount }}</div>
         <div class="kpi-trend pos" *ngIf="kpiWonCount > 0">
-          <span>w tym miesiącu</span>
+          <span>{{ t('salesDashboard.kpi.thisMonth') }}</span>
         </div>
       </div>
     </div>
@@ -258,42 +266,42 @@ interface PipelineRow {
     <!-- Pipeline -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">Pipeline sprzedaży <wt-tooltip key="crm.sales.pipeline"></wt-tooltip></span>
+        <span class="panel-title">{{ t('salesDashboard.pipeline.title') }} <wt-tooltip key="crm.sales.pipeline"></wt-tooltip></span>
         <select class="mini-sel" [(ngModel)]="pipelineMode" (ngModelChange)="onPipelineModeChange()">
-          <option value="value">Wartość</option>
-          <option value="count">Ilość</option>
+          <option value="value">{{ t('salesDashboard.pipeline.modeValue') }}</option>
+          <option value="count">{{ t('salesDashboard.pipeline.modeCount') }}</option>
         </select>
       </div>
 
       <div class="pipeline-list" *ngIf="pipeline.length; else emptyPipe">
         <div class="pipe-row clickable" *ngFor="let row of pipeline" (click)="goToPipelineStage(row)">
           <div class="pipe-meta">
-            <span class="pipe-label">{{ row.label }}</span>
-            <span class="pipe-sub">{{ row.count }} szans</span>
+            <span class="pipe-label">{{ stageLabel(row.stage) }}</span>
+            <span class="pipe-sub">{{ t('salesDashboard.pipeline.opportunityCount', { count: row.count }) }}</span>
           </div>
           <div class="pipe-bar-wrap">
             <div class="pipe-bar" [style.width.%]="row.barPct" [style.background]="row.color"></div>
           </div>
           <span class="pipe-val">
-            {{ pipelineMode === 'value' ? (row.value | number:'1.0-0') + ' zł' : row.count }}
+            {{ pipelineMode === 'value' ? t('salesDashboard.currency.pln', { value: (row.value | number:'1.0-0') }) : row.count }}
           </span>
         </div>
       </div>
-      <ng-template #emptyPipe><div class="empty-msg">Brak danych pipeline</div></ng-template>
+      <ng-template #emptyPipe><div class="empty-msg">{{ t('salesDashboard.pipeline.empty') }}</div></ng-template>
 
       <div class="pipe-total">
-        Łączna wartość pipeline: <strong>{{ pipelineTotal | number:'1.0-0' }} zł</strong>
+        {{ t('salesDashboard.pipeline.total') }} <strong>{{ t('salesDashboard.currency.pln', { value: (pipelineTotal | number:'1.0-0') }) }}</strong>
       </div>
     </div>
 
     <!-- Wykres sprzedaży -->
     <div class="panel chart-panel">
       <div class="panel-head">
-        <span class="panel-title">Wyniki sprzedażowe <wt-tooltip key="crm.sales.chart"></wt-tooltip></span>
+        <span class="panel-title">{{ t('salesDashboard.chart.title') }} <wt-tooltip key="crm.sales.chart"></wt-tooltip></span>
         <select class="mini-sel" [(ngModel)]="chartPeriod" (ngModelChange)="onChartPeriodChange()">
-          <option value="7d">Tydzień</option>
-          <option value="30d">Miesiąc</option>
-          <option value="90d">Kwartał</option>
+          <option value="7d">{{ t('salesDashboard.chart.periods.week') }}</option>
+          <option value="30d">{{ t('salesDashboard.chart.periods.month') }}</option>
+          <option value="90d">{{ t('salesDashboard.chart.periods.quarter') }}</option>
         </select>
       </div>
 
@@ -301,11 +309,11 @@ interface PipelineRow {
         <div class="chart-main-val">{{ fmtValueShort(chartCurrentValue) }}</div>
         <div class="chart-change pos" *ngIf="chartChangePercent !== null && chartChangePercent > 0">
           ↑ {{ chartChangePercent }}%
-          <span class="chart-change-label">vs poprzedni okres</span>
+          <span class="chart-change-label">{{ t('salesDashboard.chart.vsPreviousPeriod') }}</span>
         </div>
         <div class="chart-change neg" *ngIf="chartChangePercent !== null && chartChangePercent <= 0">
           ↓ {{ chartChangePercent | number:'1.0-0' }}%
-          <span class="chart-change-label">vs poprzedni okres</span>
+          <span class="chart-change-label">{{ t('salesDashboard.chart.vsPreviousPeriod') }}</span>
         </div>
       </div>
 
@@ -320,7 +328,7 @@ interface PipelineRow {
         <polyline [attr.points]="chartPolyline" fill="none" stroke="#3BAA5D"
                   stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
       </svg>
-      <div class="chart-empty" *ngIf="!chartAreaPath">Brak danych sprzedażowych</div>
+      <div class="chart-empty" *ngIf="!chartAreaPath">{{ t('partnerDetail.sales.noData') }}</div>
 
       <div class="chart-x" *ngIf="chartXLabels.length">
         <span *ngFor="let lbl of chartXLabels">{{ lbl }}</span>
@@ -330,9 +338,9 @@ interface PipelineRow {
     <!-- Zadania na dziś -->
     <div class="panel tasks-panel">
       <div class="panel-head">
-        <span class="panel-title">Zadania na dziś <wt-tooltip key="crm.sales.tasks"></wt-tooltip></span>
+        <span class="panel-title">{{ t('salesDashboard.tasks.title') }} <wt-tooltip key="crm.sales.tasks"></wt-tooltip></span>
         <span class="count-badge" *ngIf="todayTasks.length">{{ todayTasks.length }}</span>
-        <a routerLink="/crm/calendar" class="icon-btn" title="Kalendarz">
+        <a routerLink="/crm/calendar" class="icon-btn" [title]="t('salesDashboard.tasks.calendar')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
@@ -360,20 +368,20 @@ interface PipelineRow {
           </div>
           <div *ngIf="closingTask?.uid === t.uid" class="task-close-form" (click)="$event.stopPropagation()">
             <textarea class="task-close-ta" [(ngModel)]="taskCloseComment"
-                      placeholder="Komentarz zamknięcia *" rows="2" autoFocus></textarea>
+                      [placeholder]="'crm.salesDashboard.tasks.closeCommentPlaceholder' | transloco" rows="2" autoFocus></textarea>
             <div class="task-close-btns">
-              <button class="task-close-cancel" (click)="cancelCloseTask()">Anuluj</button>
+              <button class="task-close-cancel" (click)="cancelCloseTask()">{{ 'actions.cancel' | transloco }}</button>
               <button class="task-close-confirm" [disabled]="!taskCloseComment.trim()"
-                      (click)="confirmCloseTaskDash()">Zamknij</button>
+                      (click)="confirmCloseTaskDash()">{{ 'actions.close' | transloco }}</button>
             </div>
           </div>
         </div>
       </div>
       <ng-template #emptyTasks>
-        <div class="empty-msg">Brak zadań na dziś</div>
+        <div class="empty-msg">{{ t('salesDashboard.tasks.empty') }}</div>
       </ng-template>
 
-      <a routerLink="/crm/calendar" class="panel-link">Zobacz wszystkie zadania →</a>
+      <a routerLink="/crm/calendar" class="panel-link">{{ t('salesDashboard.tasks.showAll') }}</a>
     </div>
 
   </div>
@@ -384,18 +392,18 @@ interface PipelineRow {
     <!-- Tabela szans -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">Najnowsze szanse <wt-tooltip key="crm.sales.recent_leads"></wt-tooltip></span>
+        <span class="panel-title">{{ t('salesDashboard.opportunities.title') }} <wt-tooltip key="crm.sales.recent_leads"></wt-tooltip></span>
       </div>
 
       <table class="leads-table" *ngIf="recentLeads.length; else emptyLeads">
         <thead>
           <tr>
-            <th>Nazwa szansy</th>
-            <th>Firma</th>
-            <th>Wartość</th>
-            <th>Etap</th>
-            <th>Data zamknięcia</th>
-            <th>Prawdopodobieństwo</th>
+            <th>{{ t('salesDashboard.opportunities.name') }}</th>
+            <th>{{ t('leadsList.fields.company') }}</th>
+            <th>{{ t('leadsList.detail.value') }}</th>
+            <th>{{ t('leadsList.fields.stage') }}</th>
+            <th>{{ t('leadsList.detail.closeDate') }}</th>
+            <th>{{ t('salesDashboard.opportunities.probability') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -405,7 +413,7 @@ interface PipelineRow {
             </td>
             <td class="text-muted">{{ lead.contact_name || lead.company }}</td>
             <td class="text-muted">
-              {{ lead.value_pln ? (lead.value_pln | number:'1.0-0') + ' zł' : '—' }}
+              {{ lead.value_pln ? t('salesDashboard.currency.pln', { value: (lead.value_pln | number:'1.0-0') }) : '—' }}
             </td>
             <td>
               <span class="stage-badge" [class]="stageClass(lead.stage)">
@@ -431,16 +439,16 @@ interface PipelineRow {
           </tr>
         </tbody>
       </table>
-      <ng-template #emptyLeads><div class="empty-msg">Brak szans</div></ng-template>
+      <ng-template #emptyLeads><div class="empty-msg">{{ t('salesDashboard.opportunities.empty') }}</div></ng-template>
 
-      <a routerLink="/crm/leads" class="panel-link">Zobacz wszystkie szanse →</a>
+      <a routerLink="/crm/leads" class="panel-link">{{ t('salesDashboard.opportunities.showAll') }}</a>
     </div>
 
     <!-- Feed aktywności -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">Ostatnia aktywność <wt-tooltip key="crm.sales.activity"></wt-tooltip></span>
-        <button class="panel-refresh-btn" (click)="refreshActivities()" title="Odśwież">↺</button>
+        <span class="panel-title">{{ t('salesDashboard.activity.title') }} <wt-tooltip key="crm.sales.activity"></wt-tooltip></span>
+        <button class="panel-refresh-btn" (click)="refreshActivities()" [title]="t('salesDashboard.activity.refresh')">↺</button>
       </div>
 
       <div class="activity-feed" *ngIf="recentActivities.length; else emptyAct"
@@ -459,20 +467,20 @@ interface PipelineRow {
           <div class="act-spinner"></div>
         </div>
         <div *ngIf="!activitiesHasMore && recentActivities.length > 0" class="act-end">
-          Wszystkie aktywności załadowane
+          {{ t('salesDashboard.activity.allLoaded') }}
         </div>
       </div>
-      <ng-template #emptyAct><div class="empty-msg">Brak aktywności</div></ng-template>
+      <ng-template #emptyAct><div class="empty-msg">{{ t('salesDashboard.activity.empty') }}</div></ng-template>
     </div>
 
     <!-- Widget: Ryzyko Churn -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">Ryzyko Churn</span>
+        <span class="panel-title">{{ t('partnerDetail.churn.title') }}</span>
         <span class="count-badge" *ngIf="churnCriticalCount > 0">{{ churnCriticalCount }}</span>
       </div>
-      <div *ngIf="churnLoading" class="empty-msg">Ładowanie…</div>
-      <div *ngIf="!churnLoading && churnRows.length === 0" class="empty-msg">Brak ryzyka churn</div>
+      <div *ngIf="churnLoading" class="empty-msg">{{ 'states.loading' | transloco }}</div>
+      <div *ngIf="!churnLoading && churnRows.length === 0" class="empty-msg">{{ t('salesDashboard.churn.noRisk') }}</div>
       <div *ngIf="!churnLoading && churnRows.length > 0"
            style="display:flex;flex-direction:column;gap:6px;flex:1">
         <div *ngFor="let p of churnRows.slice(0, 5)"
@@ -482,11 +490,11 @@ interface PipelineRow {
              (mouseleave)="$any($event.currentTarget).style.background=''">
           <span class="churn-badge" [class]="'risk-badge-' + p.risk_level">{{ riskLabel(p.risk_level) }}</span>
           <span style="flex:1;font-size:13px;font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
-          <span style="font-size:12px;font-weight:700;color:#6B7280;flex-shrink:0">{{ p.total_score }} pkt</span>
+          <span style="font-size:12px;font-weight:700;color:#6B7280;flex-shrink:0">{{ t('partnerDetail.churn.score', { score: p.total_score }) }}</span>
         </div>
       </div>
       <button class="panel-link" style="background:none;border:none;cursor:pointer;font-family:inherit;width:100%;text-align:left;padding:0"
-              (click)="activeTab = 'churn'">Pokaż wszystkich partnerów z ryzykiem churn →</button>
+              (click)="activeTab = 'churn'">{{ t('salesDashboard.churn.showAll') }}</button>
     </div>
 
   </div>
@@ -497,6 +505,7 @@ interface PipelineRow {
 <ng-template #loadingTpl>
   <div class="dash-loading"><div class="spinner"></div></div>
 </ng-template>
+</ng-container>
   `,
   styles: [`
     .crm-dash { padding: 24px; overflow: auto; display: flex; flex-direction: column; gap: 20px; min-height: 100%; box-sizing: border-box; }
@@ -699,6 +708,8 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   private projectTaskNavigation = inject(ProjectTaskNavigationService);
   private route    = inject(ActivatedRoute);
   private settings = inject(AppSettingsService);
+  private transloco = inject(TranslocoService);
+  private locale   = inject(LocaleService);
 
   private trainingRefreshInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -769,7 +780,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
 
   get firstName(): string {
     const name = this.auth.user()?.display_name || this.auth.user()?.email || '';
-    return name.split(' ')[0] || 'użytkowniku';
+    return name.split(' ')[0] || this.transloco.translate('crm.salesDashboard.header.fallbackName');
   }
 
   get weekRange(): string {
@@ -779,7 +790,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     mon.setDate(now.getDate() - day + 1);
     const sun = new Date(mon);
     sun.setDate(mon.getDate() + 6);
-    return `${mon.getDate()} – ${sun.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    return `${mon.getDate()} – ${sun.toLocaleDateString(this.locale.activeLocale(), { day: 'numeric', month: 'long', year: 'numeric' })}`;
   }
 
   get chartChangePercent(): number | null {
@@ -901,7 +912,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
       }
     }
     this.churnSalespersons = [...seen.entries()].map(([id, name]) => ({ id, name }))
-      .sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+      .sort((a, b) => a.name.localeCompare(b.name, this.locale.activeLocale()));
   }
 
   onChurnFilter() {
@@ -946,16 +957,16 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   riskLabel(level: string): string {
-    return ({ critical: 'Krytyczne', high: 'Wysokie', medium: 'Średnie', low: 'Niskie' } as Record<string,string>)[level] || level;
+    return CHURN_RISK_LEVELS.includes(level) ? this.transloco.translate('crm.partnerDetail.churn.levels.' + level) : level;
   }
 
   private processPipeline(raw: any[]) {
     const STAGES = [
-      { stage: 'new',           label: 'Lead',        color: '#3B82F6' },
-      { stage: 'qualification', label: 'Kwalifikacja', color: '#2563EB' },
-      { stage: 'offer',         label: 'Oferta',       color: '#7C3AED' },
-      { stage: 'negotiation',   label: 'Negocjacje',   color: '#F97316' },
-      { stage: 'closed_won',    label: 'Wygrane',      color: '#3BAA5D' },
+      { stage: 'new',           color: '#3B82F6' },
+      { stage: 'qualification', color: '#2563EB' },
+      { stage: 'offer',         color: '#7C3AED' },
+      { stage: 'negotiation',   color: '#F97316' },
+      { stage: 'closed_won',    color: '#3BAA5D' },
     ];
     const ACTIVE = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'onboarding', 'onboarded'];
 
@@ -1086,7 +1097,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
       const da = DAYS - 1 - Math.round(i * (DAYS - 1) / 4);
       const d  = new Date(today);
       d.setDate(today.getDate() - da);
-      return d.getDate() + ' ' + d.toLocaleDateString('pl-PL', { month: 'short' });
+      return d.getDate() + ' ' + d.toLocaleDateString(this.locale.activeLocale(), { month: 'short' });
     });
   }
 
@@ -1124,8 +1135,9 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     if (!t || !this.taskCloseComment.trim()) return;
     if (t.source_type !== 'lead' && t.source_type !== 'partner') return;
     const comment = this.taskCloseComment.trim();
-    const stamp = new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const newBody = t.body?.trim() ? `[Zamknięto ${stamp}]: ${comment}\n\n${t.body}` : `[Zamknięto ${stamp}]: ${comment}`;
+    const stamp = new Date().toLocaleString(this.locale.activeLocale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const closedNote = this.transloco.translate('crm.salesDashboard.tasks.closedNote', { date: stamp, comment });
+    const newBody = t.body?.trim() ? `${closedNote}\n\n${t.body}` : closedNote;
     const prev = t.status;
     t.status = 'closed';
     const call: Observable<any> = t.source_type === 'lead'
@@ -1159,15 +1171,17 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   fmtValue(v: number): string {
-    if (!v) return '0 zł';
-    if (v >= 1_000) return Math.round(v / 1_000).toLocaleString('pl-PL') + ' tys. zł';
-    return v.toLocaleString('pl-PL') + ' zł';
+    const locale = this.locale.activeLocale();
+    if (!v) return this.transloco.translate('crm.salesDashboard.currency.pln', { value: '0' });
+    if (v >= 1_000) return this.transloco.translate('crm.salesDashboard.currency.thousandsPln', { value: Math.round(v / 1_000).toLocaleString(locale) });
+    return this.transloco.translate('crm.salesDashboard.currency.pln', { value: v.toLocaleString(locale) });
   }
 
   fmtValueShort(v: number): string {
-    if (!v) return '0 zł';
-    if (v >= 1_000) return Math.round(v / 1_000).toLocaleString('pl-PL') + ' tys. zł';
-    return Math.round(v).toLocaleString('pl-PL') + ' zł';
+    const locale = this.locale.activeLocale();
+    if (!v) return this.transloco.translate('crm.salesDashboard.currency.pln', { value: '0' });
+    if (v >= 1_000) return this.transloco.translate('crm.salesDashboard.currency.thousandsPln', { value: Math.round(v / 1_000).toLocaleString(locale) });
+    return this.transloco.translate('crm.salesDashboard.currency.pln', { value: Math.round(v).toLocaleString(locale) });
   }
 
   calendarEntryOf(task: ActivityTask): CalendarEntry | null {
@@ -1175,9 +1189,9 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   taskTime(t: ActivityTask): string {
-    if (t.all_day) return this.isOverdue(t) && !this.isDueToday(t) ? 'po terminie' : 'termin dziś';
+    if (t.all_day) return this.transloco.translate(this.isOverdue(t) && !this.isDueToday(t) ? 'crm.salesDashboard.tasks.overdue' : 'crm.salesDashboard.tasks.dueToday');
     return t.activity_at
-      ? new Date(t.activity_at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
+      ? new Date(t.activity_at).toLocaleTimeString(this.locale.activeLocale(), { hour: '2-digit', minute: '2-digit' })
       : '';
   }
 
@@ -1186,9 +1200,9 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     const d   = new Date(a.activity_at);
     const tod = new Date(); tod.setHours(0, 0, 0, 0);
     const yes = new Date(tod); yes.setDate(tod.getDate() - 1);
-    if (d >= tod) return d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-    if (d >= yes) return 'Wczoraj';
-    return d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
+    if (d >= tod) return d.toLocaleTimeString(this.locale.activeLocale(), { hour: '2-digit', minute: '2-digit' });
+    if (d >= yes) return this.transloco.translate('crm.salesDashboard.activity.yesterday');
+    return d.toLocaleDateString(this.locale.activeLocale(), { day: '2-digit', month: '2-digit' });
   }
 
   actIcon(type: string): string {
@@ -1200,9 +1214,9 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   stageLabel(stage: string): string {
-    return ({ new:'Lead', qualification:'Kwalifikacja', presentation:'Prezentacja', offer:'Oferta',
-              negotiation:'Negocjacje', closed_won:'Wygrane', closed_lost:'Przegrane',
-              onboarding:'Onboarding', onboarded:'Onboarded' } as Record<string,string>)[stage] || stage;
+    if (DASHBOARD_STAGE_LABELS.includes(stage)) return this.transloco.translate('crm.salesDashboard.stages.' + stage);
+    if (SHARED_STAGE_LABELS.includes(stage)) return this.transloco.translate('crm.labels.stages.' + stage);
+    return stage;
   }
 
   stageClass(stage: string): string {
@@ -1237,25 +1251,24 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     if (t.source_type === 'document')   this.router.navigate(['/documents', t.source_id]);
     if (t.source_type === 'project') {
       this.projectTaskNavigation.open(String(t.source_id), t.project_task_id ?? null, {
-        label: 'Dashboard', route: ['/crm/dashboard'],
+        label: this.transloco.translate('crm.salesDashboard.tabs.dashboard'), route: ['/crm/dashboard'],
       });
     }
   }
 
   goToPipelineStage(row: PipelineRow) {
-    this.router.navigate(['/crm/leads'], { queryParams: { stage: row.stage, label: row.label } });
+    this.router.navigate(['/crm/leads'], { queryParams: { stage: row.stage, label: this.stageLabel(row.stage) } });
   }
 
   trackById(_: number, item: { uid?: string; id?: any }) { return item.uid ?? item.id; }
 
   actTypeName(type: string): string {
-    return ({ call:'Połączenie', email:'← Email', meeting:'Spotkanie',
-              note:'Notatka', training:'Szkolenie', qbr:'QBR',
-              doc_sent:'Dokument', task:'Zadanie' } as Record<string,string>)[type] || type;
+    if (type === 'email') return this.transloco.translate('crm.salesDashboard.activity.incomingEmail');
+    return SHARED_ACTIVITY_TYPE_LABELS.includes(type) ? this.transloco.translate('crm.labels.activityTypes.' + type) : type;
   }
 
   actStatusLabel(s: string): string {
-    return s === 'closed' ? 'zamknięta' : s === 'open' ? 'otwarta' : 'nowa';
+    return this.transloco.translate('crm.labels.activityStatuses.' + (s === 'closed' ? 'closed' : s === 'open' ? 'open' : 'new'));
   }
 
   stripHtml(html: string): string {

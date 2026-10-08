@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { DocumentService } from '../../../core/services/document.service';
 import { GroupService } from '../../../core/services/api.services';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -10,20 +11,26 @@ import { ToastService } from '../../../core/services/toast.service';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { Document, DocStatus, DocType, GroupProfile, ActiveTaskInfo } from '../../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent } from '../../../shared/components/badges.components';
-import { DOC_TYPE_MAP, triggerDownload, isExpiringSoon } from '../../../core/services/helpers';
+import { triggerDownload, isExpiringSoon, INVOICE_DOC_TYPE } from '../../../core/services/helpers';
+import { PaymentStatusBadgeComponent } from '../../../shared/components/payment-status-badge/payment-status-badge.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { LocaleService } from '../../../core/i18n/locale.service';
 import { DetailPanelComponent } from '../detail-panel/detail-panel.component';
 import { NewDocumentPanelComponent } from '../new-panel/new-document-panel.component';
 
-const STATUSES: { key: DocStatus | 'all'; label: string }[] = [
-  { key: 'all',          label: 'Wszystkie' },
-  { key: 'new',          label: 'Nowe' },
-  { key: 'being_edited', label: 'W edycji' },
-  { key: 'being_signed', label: 'W podpisywaniu' },
-  { key: 'signed',       label: 'Podpisane' },
-  { key: 'completed',    label: 'Zakończone' },
-  { key: 'rejected',     label: 'Odrzucone' },
+const STATUSES: { key: DocStatus | 'all'; labelKey: string }[] = [
+  { key: 'all',          labelKey: 'list.statusFilters.all' },
+  { key: 'new',          labelKey: 'list.statusFilters.new' },
+  { key: 'being_edited', labelKey: 'list.statusFilters.being_edited' },
+  { key: 'being_signed', labelKey: 'list.statusFilters.being_signed' },
+  { key: 'signed',       labelKey: 'list.statusFilters.signed' },
+  { key: 'completed',    labelKey: 'list.statusFilters.completed' },
+  { key: 'rejected',     labelKey: 'list.statusFilters.rejected' },
 ];
+
+// Built-in document types have translated names; any other type comes from
+// App Settings and its value is the display name.
+const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement', 'invoice'];
 
 const BACKEND_SORT_COLS = new Set(['doc_number','name','status','expiration_date']);
 type SortDir = 'asc' | 'desc';
@@ -34,28 +41,30 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
 @Component({
   selector: 'wt-documents-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent, DetailPanelComponent, NewDocumentPanelComponent],
+  imports: [CommonModule, FormsModule, TranslocoDirective, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, AvatarComponent, DetailPanelComponent, NewDocumentPanelComponent, PaymentStatusBadgeComponent],
+  providers: [provideTranslocoScope('documents')],
   template: `
+    <ng-container *transloco="let t; prefix: 'documents'">
     <!-- Topbar -->
     <div id="topbar">
-      <span class="page-title">Dokumenty</span>
+      <span class="page-title">{{ t('list.title') }}</span>
       <span class="tsp"></span>
       <div class="srch-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="srch" type="search" placeholder="Szukaj dokumentów, tagów…"
+        <input class="srch" type="search" [placeholder]="t('list.searchPlaceholder')"
                [(ngModel)]="searchQuery" (ngModelChange)="onSearch()">
       </div>
       <button class="btn btn-p" (click)="openNew = true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nowy dokument
+        {{ t('list.newDocument') }}
       </button>
     </div>
 
     @if (partnerFilterName) {
       <div style="display:flex;align-items:center;gap:8px;background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:6px 20px;font-size:12px;color:var(--orange-dark)">
         <span style="font-size:14px">🏢</span>
-        <span>Dokumenty partnera: <strong>{{partnerFilterName}}</strong></span>
-        <button (click)="clearPartnerFilter()" style="margin-left:auto;background:none;border:1px solid var(--orange-muted);border-radius:6px;color:var(--orange-dark);font-size:11px;padding:2px 8px;cursor:pointer">✕ Pokaż wszystkie</button>
+        <span>{{ t('list.partnerFilter.label') }} <strong>{{partnerFilterName}}</strong></span>
+        <button (click)="clearPartnerFilter()" style="margin-left:auto;background:none;border:1px solid var(--orange-muted);border-radius:6px;color:var(--orange-dark);font-size:11px;padding:2px 8px;cursor:pointer">✕ {{ t('list.partnerFilter.clear') }}</button>
       </div>
     }
 
@@ -63,24 +72,24 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       <!-- Toolbar -->
       <div class="toolbar">
         @for (s of statuses; track s.key) {
-          <span class="fchip" [class.on]="activeStatus === s.key" (click)="setStatus(s.key)">{{ s.label }}</span>
+          <span class="fchip" [class.on]="activeStatus === s.key" (click)="setStatus(s.key)">{{ t(s.labelKey) }}</span>
         }
         <span style="flex:1"></span>
         <select class="sel" [(ngModel)]="selectedGroup" (ngModelChange)="loadDocuments()">
-          <option value="">Wszystkie grupy</option>
+          <option value="">{{ t('list.filters.allGroups') }}</option>
           @for (g of groups(); track g.id) {
             <option [value]="g.id">{{ g.display_name }}</option>
           }
         </select>
         <select class="sel" [(ngModel)]="selectedType" (ngModelChange)="loadDocuments()">
-          <option value="">Wszystkie typy</option>
-          @for (t of docTypes; track t.key) {
-            <option [value]="t.key">{{ t.label }}</option>
+          <option value="">{{ t('list.filters.allTypes') }}</option>
+          @for (docType of docTypes; track docType.key) {
+            <option [value]="docType.key">{{ docType.label }}</option>
           }
         </select>
         <label class="chk-label">
           <input type="checkbox" [(ngModel)]="noFilesFilter" (ngModelChange)="onNoFilesChange()">
-          Pokaż dokumenty bez załączonego skanu
+          {{ t('list.filters.noFiles') }}
         </label>
       </div>
 
@@ -88,18 +97,18 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       <div class="tw">
         <div class="thead" [style.grid-template-columns]="grid">
           <div class="th"><input type="checkbox" class="chk"></div>
-          <div class="th sortable" (click)="sortBy('doc_number')">Numer <span class="sort-icon">{{ sortIcon('doc_number') }}</span></div>
-          <div class="th sortable" (click)="sortBy('name')">Nazwa <span class="sort-icon">{{ sortIcon('name') }}</span></div>
-          <div class="th sortable" (click)="sortBy('doc_type')">Typ <span class="sort-icon">{{ sortIcon('doc_type') }}</span></div>
-          <div class="th sortable" (click)="sortBy('group_name')">Grupa <span class="sort-icon">{{ sortIcon('group_name') }}</span></div>
-          <div class="th sortable" (click)="sortBy('gdpr_type')">GDPR <span class="sort-icon">{{ sortIcon('gdpr_type') }}</span></div>
-          <div class="th sortable" (click)="sortBy('status')">Status <span class="sort-icon">{{ sortIcon('status') }}</span></div>
+          <div class="th sortable" (click)="sortBy('doc_number')">{{ t('labels.columns.number') }} <span class="sort-icon">{{ sortIcon('doc_number') }}</span></div>
+          <div class="th sortable" (click)="sortBy('name')">{{ t('labels.columns.name') }} <span class="sort-icon">{{ sortIcon('name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('doc_type')">{{ t('list.columns.type') }} <span class="sort-icon">{{ sortIcon('doc_type') }}</span></div>
+          <div class="th sortable" (click)="sortBy('group_name')">{{ t('labels.fields.group') }} <span class="sort-icon">{{ sortIcon('group_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('gdpr_type')">{{ t('list.columns.gdpr') }} <span class="sort-icon">{{ sortIcon('gdpr_type') }}</span></div>
+          <div class="th sortable" (click)="sortBy('status')">{{ t('labels.fields.status') }} <span class="sort-icon">{{ sortIcon('status') }}</span></div>
           <div class="th" style="color:var(--orange)">
-            Aktywne zadania
-            <span style="font-size:8.5px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">NOWE</span>
+            {{ t('labels.activeTasks') }}
+            <span style="font-size:8.5px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">{{ t('list.columns.newBadge') }}</span>
           </div>
-          <div class="th sortable" (click)="sortBy('expiration_date')">Ważność <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
-          <div class="th sortable" (click)="sortBy('owner_name')">Właściciel <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
+          <div class="th sortable" (click)="sortBy('expiration_date')">{{ t('labels.columns.validity') }} <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
+          <div class="th sortable" (click)="sortBy('owner_name')">{{ t('labels.fields.owner') }} <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
         </div>
 
         @if (loading()) {
@@ -114,13 +123,16 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
             <div class="td td-n-wrap">
               <span class="td-n" [title]="doc.name">{{ doc.name }}</span>
               @if (doc.doc_type === 'partner_agreement' && !doc.has_partner) {
-                <span class="no-partner-tri" title="Dokument nie powiązany z partnerem">⚠️</span>
+                <span class="no-partner-tri" [title]="t('list.noPartnerWarning')">⚠️</span>
               }
             </div>
             <div class="td"><wt-type-badge [type]="doc.doc_type" /></div>
             <div class="td"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
             <div class="td"><wt-gdpr-badge [gdpr]="doc.gdpr_type" /></div>
-            <div class="td"><wt-status-badge [status]="doc.status" /></div>
+            <div class="td td-status">
+              <wt-status-badge [status]="doc.status" />
+              @if (doc.doc_type === invoiceDocType) { <wt-payment-status-badge [status]="doc.payment_status" [isOverdue]="doc.is_payment_overdue" /> }
+            </div>
 
             <!-- ★ Active Tasks column -->
             <div class="td task-col">
@@ -142,7 +154,8 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
               }
             </div>
 
-            <div class="td" [style.color]="isExpiring(doc.expiration_date) ? '#DC2626' : ''">
+            <div class="td" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? '#DC2626' : ''"
+                 [title]="doc.doc_type === invoiceDocType ? t('labels.fields.paymentDueDate') : ''">
               {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
             </div>
             <div class="td">
@@ -154,8 +167,8 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
         @if (displayedDocuments().length === 0 && !loading()) {
           <div class="empty-state">
             <div class="empty-icon">🔍</div>
-            <div class="empty-title">Nie znaleziono dokumentów</div>
-            <div>Zmień filtry lub wyszukiwaną frazę</div>
+            <div class="empty-title">{{ t('list.empty.title') }}</div>
+            <div>{{ t('list.empty.hint') }}</div>
           </div>
         }
       </div>
@@ -163,9 +176,9 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       <!-- Pagination -->
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page() - 1)">← Poprz.</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">Strona {{ page() }} z {{ totalPages() }}</span>
-          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">Dalej →</button>
+          <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page() - 1)">← {{ t('list.pagination.previous') }}</button>
+          <span style="font-size:12.5px;color:var(--gray-500)">{{ t('list.pagination.page', { page: page(), total: totalPages() }) }}</span>
+          <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">{{ t('list.pagination.next') }} →</button>
         </div>
       }
     </div>
@@ -188,6 +201,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
         (created)="onDocumentCreated($event)"
       />
     }
+    </ng-container>
   `,
   styles: [`
     #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
@@ -214,6 +228,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     .td-n { font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .no-partner-tri { font-size: 13px; color: #f97316; cursor: default; line-height: 1; width: fit-content; }
     .td-num { font-family: 'Sora', monospace; font-size: 11px; color: var(--gray-500); font-weight: 600; }
+    .td-status { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
 
     /* ── Active Tasks column ── */
     .task-col { display: flex; flex-direction: column; gap: 4px; overflow: visible; }
@@ -250,12 +265,15 @@ export class DocumentsListComponent implements OnInit {
   private route    = inject(ActivatedRoute);
   private toast    = inject(ToastService);
   private crmApi   = inject(CrmApiService);
+  private transloco = inject(TranslocoService);
+  private locale   = inject(LocaleService);
   auth             = inject(AuthService);
 
   partnerFilterId:   string | null = null;
   partnerFilterName: string        = '';
 
   readonly grid  = GRID;
+  readonly invoiceDocType = INVOICE_DOC_TYPE;
   statuses       = STATUSES;
   private settingsSvc = inject(AppSettingsService);
 
@@ -264,10 +282,16 @@ export class DocumentsListComponent implements OnInit {
       const raw = this.settingsSvc.settings()?.['doc_types'];
       if (raw) {
         const types: string[] = JSON.parse(String(raw));
-        return types.map(v => ({ key: v, label: (DOC_TYPE_MAP as Record<string, string>)[v] ?? v }));
+        return types.map(v => ({ key: v, label: this.docTypeLabel(v) }));
       }
     } catch { }
-    return Object.entries(DOC_TYPE_MAP).map(([key, label]) => ({ key, label }));
+    return BUILT_IN_DOC_TYPES.map(key => ({ key, label: this.docTypeLabel(key) }));
+  }
+
+  private docTypeLabel(docType: string): string {
+    return BUILT_IN_DOC_TYPES.includes(docType)
+      ? this.transloco.translate('documents.labels.docTypes.' + docType)
+      : docType;
   }
   groups         = signal<GroupProfile[]>([]);
   documents      = signal<Document[]>([]);
@@ -295,12 +319,12 @@ export class DocumentsListComponent implements OnInit {
 
   taskTooltip(task: ActiveTaskInfo): string {
     const lines = [
-      `Typ: ${task.task_type.toUpperCase()}`,
-      `Wykonuje: ${task.assignee_name}`,
-      `Przekazał: ${task.assigner_name}`,
+      this.transloco.translate('documents.list.taskTooltip.type', { type: task.task_type.toUpperCase() }),
+      this.transloco.translate('documents.list.taskTooltip.assignee', { name: task.assignee_name }),
+      this.transloco.translate('documents.list.taskTooltip.assigner', { name: task.assigner_name }),
     ];
-    if (task.due_date) lines.push(`Termin: ${new Date(task.due_date).toLocaleDateString('pl-PL')}`);
-    if (task.message)  lines.push(`Wiadomość: ${task.message}`);
+    if (task.due_date) lines.push(this.transloco.translate('documents.list.taskTooltip.dueDate', { date: new Date(task.due_date).toLocaleDateString(this.locale.activeLocale()) }));
+    if (task.message)  lines.push(this.transloco.translate('documents.list.taskTooltip.message', { message: task.message }));
     return lines.join('\n');
   }
 
@@ -317,7 +341,7 @@ export class DocumentsListComponent implements OnInit {
       if (col === 'group_name') { va = a.group_display ?? a.group_name ?? ''; vb = b.group_display ?? b.group_name ?? ''; }
       if (col === 'gdpr_type')  { va = a.gdpr_type ?? ''; vb = b.gdpr_type ?? ''; }
       if (col === 'owner_name') { va = a.owner_name ?? ''; vb = b.owner_name ?? ''; }
-      const cmp = va.localeCompare(vb, 'pl', { sensitivity: 'base' });
+      const cmp = va.localeCompare(vb, this.locale.activeLocale(), { sensitivity: 'base' });
       return dir === 'asc' ? cmp : -cmp;
     });
   });
@@ -410,18 +434,18 @@ export class DocumentsListComponent implements OnInit {
   onDocumentUpdated(doc: Document): void {
     this.documents.update(docs => docs.map(d => d.id === doc.id ? { ...d, ...doc } : d));
     this.selectedDoc.set(doc);
-    this.toast.success('Dokument zaktualizowany');
+    this.toast.success(this.transloco.translate('documents.list.toasts.updated'));
   }
 
   onDocumentDeleted(id: string): void {
     this.documents.update(docs => docs.filter(d => d.id !== id));
     this.selectedDoc.set(null);
-    this.toast.success('Dokument usunięty');
+    this.toast.success(this.transloco.translate('documents.list.toasts.deleted'));
   }
 
   onDocumentCreated(doc: Document): void {
     this.openNew = false;
     this.loadDocuments();
-    this.toast.success(`Utworzono dokument ${doc.doc_number}`);
+    this.toast.success(this.transloco.translate('documents.list.toasts.created', { number: doc.doc_number }));
   }
 }

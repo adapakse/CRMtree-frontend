@@ -1,0 +1,35 @@
+{
+  "changePassword": {
+    "errors": {
+      "failed": "Błąd zmiany hasła",
+      "mismatch": "Hasła nie są identyczne",
+      "tooShort": "Hasło musi mieć minimum 8 znaków"
+    },
+    "hint": "Twoje hasło tymczasowe wygasło. Ustaw własne hasło przed kontynuowaniem.",
+    "newPassword": "Nowe hasło",
+    "newPasswordPlaceholder": "min. 8 znaków",
+    "repeatPassword": "Powtórz hasło",
+    "submit": "Ustaw hasło i zaloguj",
+    "submitting": "Zapisuję…",
+    "title": "Ustaw nowe hasło"
+  },
+  "login": {
+    "email": "Email",
+    "emailPlaceholder": "jan@firma.pl",
+    "failed": "Błąd logowania",
+    "hidePassword": "Ukryj",
+    "password": "Hasło",
+    "passwordTab": "Email i hasło",
+    "platformName": "Platforma CRM",
+    "profileLoadFailed": "Błąd ładowania profilu",
+    "redirecting": "Przekierowywanie…",
+    "showPassword": "Pokaż",
+    "ssoFailed": "Logowanie SSO nie powiodło się. Spróbuj ponownie.",
+    "ssoHint": "Zaloguj się kontem Google Workspace swojej organizacji.",
+    "ssoSubmit": "Zaloguj się przez Google Workspace SSO",
+    "submit": "Zaloguj się",
+    "submitting": "Loguję…",
+    "tenantHostMismatch": "To konto nie należy do organizacji pod tym adresem. Zaloguj się ponownie.",
+    "unknownTenant": "Nie rozpoznano organizacji pod tym adresem."
+  }
+}

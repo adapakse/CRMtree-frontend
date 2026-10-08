@@ -1,25 +1,30 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import {
-  MoneyValue, ProjectConfig, ProjectCustomValue, ProjectField, ProjectMember, ProjectReminderType, ProjectTask,
+  MoneyValue, ProjectConfig, ProjectCustomValue, ProjectField, ProjectFinanceAccess, ProjectMember, ProjectReminderType, ProjectTask,
   ProjectTaskDetail, ProjectTaskHistoryEntry, ProjectTaskPayload, ProjectTaskPermissions, ProjectsApiService,
 } from '../../core/services/projects-api.service';
 import { AddToCalendarComponent } from '../../shared/components/add-to-calendar/add-to-calendar.component';
+import { ProjectTaskDueDateComponent } from '../../shared/components/project-deadlines/project-task-due-date.component';
+import { ProjectTaskTimelinessComponent } from '../../shared/components/project-deadlines/project-task-timeliness.component';
 import { projectTaskCalendarEntry } from '../../shared/utils/calendar-export.util';
 import { ProjectChatComponent } from './project-chat.component';
+import { ProjectTaskCostsComponent } from './project-task-costs.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK'];
 const DEFAULT_CURRENCY = 'PLN';
 
-const REMINDER_OPTIONS: { value: ProjectReminderType; label: string }[] = [
-  { value: 'at_due', label: 'W dniu terminu' },
-  { value: '1d_before', label: '1 dzień przed terminem' },
-  { value: '2d_before', label: '2 dni przed terminem' },
-  { value: '3d_before', label: '3 dni przed terminem' },
-  { value: 'custom', label: 'Własna data' },
+const REMINDER_OPTIONS: { value: ProjectReminderType; labelKey: string }[] = [
+  { value: 'at_due', labelKey: 'labels.reminders.at_due' },
+  { value: '1d_before', labelKey: 'labels.reminders.1d_before' },
+  { value: '2d_before', labelKey: 'labels.reminders.2d_before' },
+  { value: '3d_before', labelKey: 'labels.reminders.3d_before' },
+  { value: 'custom', labelKey: 'labels.reminders.custom' },
 ];
 
 // Value for <input type="datetime-local">: local time without a zone.
@@ -29,10 +34,13 @@ function toLocalDateTimeInput(iso: string): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-const HISTORY_FIELD_LABELS: Record<string, string> = {
-  name: 'nazwa', description: 'opis', type_id: 'typ', status_id: 'status', priority_id: 'priorytet',
-  start_date: 'data początku', end_date: 'data zakończenia', parent_task_id: 'zadanie nadrzędne',
-  assignee_ids: 'przypisane osoby', custom_values: 'pola dodatkowe', reminder_type: 'przypomnienie',
+const HISTORY_FIELD_LABEL_KEYS: Record<string, string> = {
+  name: 'panel.history.fields.name', description: 'panel.history.fields.description',
+  type_id: 'panel.history.fields.type', status_id: 'panel.history.fields.status',
+  priority_id: 'panel.history.fields.priority', start_date: 'panel.history.fields.startDate',
+  end_date: 'panel.history.fields.endDate', parent_task_id: 'panel.history.fields.parentTask',
+  assignee_ids: 'panel.history.fields.assignees', custom_values: 'panel.history.fields.customFields',
+  reminder_type: 'panel.history.fields.reminder',
 };
 
 interface TaskForm {
@@ -62,209 +70,241 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
 @Component({
   selector: 'wt-project-task-panel',
   standalone: true,
-  imports: [FormsModule, DatePipe, ProjectChatComponent, AddToCalendarComponent],
+  imports: [
+    FormsModule, DatePipe, ProjectChatComponent, ProjectTaskCostsComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe,
+    ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent,
+  ],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="overlay" (click)="closed.emit()">
-      <aside class="panel" (click)="$event.stopPropagation()">
-        <header class="panel-head">
-          <div>
-            <div class="mono">{{ taskLabel() }}</div>
-            <div class="mot">{{ isCreating() ? 'Nowe zadanie' : form.name }}</div>
-          </div>
-          <button class="mox" (click)="closed.emit()">✕</button>
-        </header>
-
-        @if (isLoading()) {
-          <div class="empty-state">Ładowanie…</div>
-        } @else {
-          <div class="panel-body">
-            <div class="fg">
-              <label class="fl">Nazwa <span class="req">*</span></label>
-              <input class="fi" [(ngModel)]="form.name" maxlength="300" [disabled]="!permissions().can_edit_content">
-            </div>
-            <div class="fg">
-              <label class="fl">Opis dodatkowy</label>
-              <textarea class="fta" rows="4" [(ngModel)]="form.description" [disabled]="!permissions().can_edit_content"></textarea>
-            </div>
-
-            <div class="fgrid">
-              <div class="fg">
-                <label class="fl">Status</label>
-                <select class="fsel" [(ngModel)]="form.status_id" [disabled]="selectableStatuses().length < 2">
-                  @for (status of selectableStatuses(); track status.id) {
-                    <option [ngValue]="status.id">{{ status.name }}</option>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      <div class="overlay" (click)="closed.emit()">
+        <aside class="panel" (click)="$event.stopPropagation()">
+          <header class="panel-head">
+            <div>
+              <div class="mono">{{ taskLabel() }}</div>
+              <div class="mot">{{ isCreating() ? t('panel.newTask') : form.name }}</div>
+              @if (savedTask(); as saved) {
+                <div class="deadline">
+                  <wt-project-task-timeliness [task]="saved" />
+                  @if (saved.end_date) {
+                    <span class="deadline-label">{{ t('panel.fields.endDate') }}</span>
+                    <wt-project-task-due-date class="inline" [task]="saved" />
                   }
-                </select>
-              </div>
-              <div class="fg">
-                <label class="fl">Typ</label>
-                <select class="fsel" [(ngModel)]="form.type_id" [disabled]="!permissions().can_edit_content">
-                  <option [ngValue]="null">—</option>
-                  @for (type of selectableTypes(); track type.id) { <option [ngValue]="type.id">{{ type.name }}</option> }
-                </select>
-              </div>
-              <div class="fg">
-                <label class="fl">Priorytet</label>
-                <select class="fsel" [(ngModel)]="form.priority_id" [disabled]="!permissions().can_edit_content">
-                  <option [ngValue]="null">—</option>
-                  @for (priority of selectablePriorities(); track priority.id) {
-                    <option [ngValue]="priority.id">{{ priority.name }}</option>
-                  }
-                </select>
-              </div>
-              <div class="fg">
-                <label class="fl">Zadanie nadrzędne</label>
-                <select class="fsel" [(ngModel)]="form.parent_task_id" [disabled]="!permissions().can_edit_structure">
-                  <option [ngValue]="null">— brak (zadanie nadrzędne) —</option>
-                  @for (candidate of parentCandidates(); track candidate.id) {
-                    <option [ngValue]="candidate.id">{{ projectKey() }}-{{ candidate.task_number }} {{ candidate.name }}</option>
-                  }
-                </select>
-              </div>
-              <div class="fg">
-                <label class="fl">Data początku</label>
-                <input class="fi" type="date" [(ngModel)]="form.start_date" [disabled]="!permissions().can_edit_content">
-              </div>
-              <div class="fg">
-                <label class="fl">Data zakończenia</label>
-                <input class="fi" type="date" [(ngModel)]="form.end_date" [disabled]="!permissions().can_edit_content">
-              </div>
-            </div>
-
-            <div class="fgrid">
-              <div class="fg">
-                <label class="fl">Przypomnienie e-mail</label>
-                <select class="fsel" [(ngModel)]="form.reminder_type" [disabled]="!permissions().can_edit_content">
-                  <option [ngValue]="null">Brak</option>
-                  @for (option of reminderOptions; track option.value) {
-                    <option [ngValue]="option.value">{{ option.label }}</option>
-                  }
-                </select>
-              </div>
-              @if (form.reminder_type === 'custom') {
-                <div class="fg">
-                  <label class="fl">Data przypomnienia</label>
-                  <input class="fi" type="datetime-local" [(ngModel)]="form.reminder_at" [disabled]="!permissions().can_edit_content">
                 </div>
               }
             </div>
-            @if (form.reminder_type && form.reminder_type !== 'custom') {
-              <div class="field-hint">
-                Przypomnienie trafi do wszystkich przypisanych osób o 9:00 i wymaga daty zakończenia.
-              </div>
-            }
+            <button class="mox" (click)="closed.emit()">✕</button>
+          </header>
 
-            <div class="fg">
-              <label class="fl">Przypisane osoby</label>
-              <div class="assignee-list">
-                @for (member of members(); track member.user_id) {
-                  <label class="assignee">
-                    <input type="checkbox" [checked]="form.assignee_ids.includes(member.user_id)"
-                           [disabled]="!permissions().can_edit_structure" (change)="toggleAssignee(member.user_id)">
-                    {{ member.display_name }}
-                  </label>
-                }
+          @if (isLoading()) {
+            <div class="empty-state">{{ 'states.loading' | transloco }}</div>
+          } @else {
+            <div class="panel-body">
+              <div class="fg">
+                <label class="fl">{{ t('panel.fields.name') }} <span class="req">*</span></label>
+                <input class="fi" [(ngModel)]="form.name" maxlength="300" [disabled]="!permissions().can_edit_content">
               </div>
-            </div>
+              <div class="fg">
+                <label class="fl">{{ t('panel.fields.description') }}</label>
+                <textarea class="fta" rows="4" [(ngModel)]="form.description" [disabled]="!permissions().can_edit_content"></textarea>
+              </div>
 
-            @if (fields().length > 0 || canAddFields()) {
-              <div class="sec-title">Pola dodatkowe</div>
-            }
-            @if (fields().length > 0) {
               <div class="fgrid">
-                @for (field of fields(); track field.field_definition_id) {
-                  <div class="fg">
-                    <label class="fl">{{ field.name }} @if (field.is_required) { <span class="req">*</span> }</label>
-                    @switch (field.field_type) {
-                      @case ('text') {
-                        <input class="fi" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
-                      }
-                      @case ('number') {
-                        <input class="fi" type="number" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
-                      }
-                      @case ('date') {
-                        <input class="fi" type="date" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
-                      }
-                      @case ('list') {
-                        <select class="fsel" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
-                          <option [ngValue]="null">—</option>
-                          @for (option of field.options; track option) { <option [ngValue]="option">{{ option }}</option> }
-                        </select>
-                      }
-                      @case ('money') {
-                        <div class="money">
-                          <input class="fi" type="number" step="0.01" [(ngModel)]="form.values[field.field_definition_id]"
-                                 [disabled]="!permissions().can_edit_content">
-                          <select class="fsel" [(ngModel)]="form.currencies[field.field_definition_id]"
-                                  [disabled]="!permissions().can_edit_content">
-                            @for (currency of currencies; track currency) { <option [ngValue]="currency">{{ currency }}</option> }
-                          </select>
-                        </div>
-                      }
+                <div class="fg">
+                  <label class="fl">{{ t('panel.fields.status') }}</label>
+                  <select class="fsel" [(ngModel)]="form.status_id" [disabled]="selectableStatuses().length < 2">
+                    @for (status of selectableStatuses(); track status.id) {
+                      <option [ngValue]="status.id">{{ status.name }}</option>
                     }
+                  </select>
+                </div>
+                <div class="fg">
+                  <label class="fl">{{ t('panel.fields.type') }}</label>
+                  <select class="fsel" [(ngModel)]="form.type_id" [disabled]="!permissions().can_edit_content">
+                    <option [ngValue]="null">—</option>
+                    @for (type of selectableTypes(); track type.id) { <option [ngValue]="type.id">{{ type.name }}</option> }
+                  </select>
+                </div>
+                <div class="fg">
+                  <label class="fl">{{ t('panel.fields.priority') }}</label>
+                  <select class="fsel" [(ngModel)]="form.priority_id" [disabled]="!permissions().can_edit_content">
+                    <option [ngValue]="null">—</option>
+                    @for (priority of selectablePriorities(); track priority.id) {
+                      <option [ngValue]="priority.id">{{ priority.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="fg">
+                  <label class="fl">{{ t('panel.fields.parentTask') }}</label>
+                  <select class="fsel" [(ngModel)]="form.parent_task_id" [disabled]="!permissions().can_edit_structure">
+                    <option [ngValue]="null">{{ t('panel.fields.noParent') }}</option>
+                    @for (candidate of parentCandidates(); track candidate.id) {
+                      <option [ngValue]="candidate.id">{{ projectKey() }}-{{ candidate.task_number }} {{ candidate.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="fg">
+                  <label class="fl">{{ t('panel.fields.startDate') }}</label>
+                  <input class="fi" type="date" [(ngModel)]="form.start_date" [disabled]="!permissions().can_edit_content">
+                </div>
+                <div class="fg">
+                  <label class="fl">{{ t('panel.fields.endDate') }}</label>
+                  <input class="fi" type="date" [(ngModel)]="form.end_date" [disabled]="!permissions().can_edit_content">
+                </div>
+                @if (isEndDateChanged()) {
+                  <div class="fg full">
+                    <label class="fl">{{ t('panel.endDateChange.reason') }}</label>
+                    <input class="fi" [(ngModel)]="endDateChangeReason" maxlength="500"
+                           [placeholder]="t('panel.endDateChange.placeholder')">
+                    <span class="field-hint">{{ t('panel.endDateChange.hint') }}</span>
                   </div>
                 }
               </div>
-            }
 
-            @if (canAddFields()) {
-              @if (availableFieldDefinitions().length > 0) {
-                <div class="add-field">
-                  <select class="fsel" [(ngModel)]="newFieldId">
-                    <option [ngValue]="null">— wybierz pole —</option>
-                    @for (definition of availableFieldDefinitions(); track definition.id) {
-                      <option [ngValue]="definition.id">{{ definition.name }}</option>
+              <div class="fgrid">
+                <div class="fg">
+                  <label class="fl">{{ t('panel.reminder.label') }}</label>
+                  <select class="fsel" [(ngModel)]="form.reminder_type" [disabled]="!permissions().can_edit_content">
+                    <option [ngValue]="null">{{ t('panel.reminder.none') }}</option>
+                    @for (option of reminderOptions; track option.value) {
+                      <option [ngValue]="option.value">{{ t(option.labelKey) }}</option>
                     }
                   </select>
-                  <button class="btn btn-g btn-sm" [disabled]="!newFieldId" (click)="addField()">+ Dodaj pole</button>
                 </div>
-                <div class="field-hint">Pole zostanie dodane do wszystkich zadań tego projektu.</div>
-              } @else {
+                @if (form.reminder_type === 'custom') {
+                  <div class="fg">
+                    <label class="fl">{{ t('panel.reminder.customDate') }}</label>
+                    <input class="fi" type="datetime-local" [(ngModel)]="form.reminder_at" [disabled]="!permissions().can_edit_content">
+                  </div>
+                }
+              </div>
+              @if (form.reminder_type && form.reminder_type !== 'custom') {
                 <div class="field-hint">
-                  Brak pól do dodania. Pola definiuje administrator w Ustawienia → Projekty → Pola dodatkowe zadań.
+                  {{ t('panel.reminder.hint') }}
                 </div>
               }
-            }
 
-            @if (taskId(); as existingTaskId) {
-              <div class="sec-title">Rozmowa o zadaniu</div>
-              <wt-project-chat [projectId]="projectId()" [taskId]="existingTaskId" [canPost]="isProjectOpen()" />
-            }
-
-            @if (!isCreating()) {
-              <button class="history-toggle" (click)="toggleHistory()">
-                {{ isHistoryOpen() ? '▾' : '▸' }} Historia zmian
-              </button>
-              @if (isHistoryOpen()) {
-                <ul class="history">
-                  @for (entry of history(); track entry.id) {
-                    <li>
-                      <span class="muted">{{ entry.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
-                      <strong>{{ entry.user_name ?? 'System' }}</strong>
-                      {{ describeHistoryEntry(entry) }}
-                    </li>
-                  } @empty {
-                    <li class="muted">Brak wpisów.</li>
+              <div class="fg">
+                <label class="fl">{{ t('panel.fields.assignees') }}</label>
+                <div class="assignee-list">
+                  @for (member of members(); track member.user_id) {
+                    <label class="assignee">
+                      <input type="checkbox" [checked]="form.assignee_ids.includes(member.user_id)"
+                             [disabled]="!permissions().can_edit_structure" (change)="toggleAssignee(member.user_id)">
+                      {{ member.display_name }}
+                    </label>
                   }
-                </ul>
-              }
-            }
-          </div>
+                </div>
+              </div>
 
-          <footer class="panel-foot">
-            <wt-add-to-calendar [entry]="calendarEntry()" [showLabel]="true" />
-            <span class="foot-spacer"></span>
-            <button class="btn btn-g" (click)="closed.emit()">Zamknij</button>
-            @if (canSave()) {
-              <button class="btn btn-p" [disabled]="!form.name.trim() || isSaving()" (click)="save()">
-                {{ isSaving() ? 'Zapisywanie…' : (isCreating() ? 'Utwórz zadanie' : 'Zapisz') }}
-              </button>
-            }
-          </footer>
-        }
-      </aside>
-    </div>
+              @if (fields().length > 0 || canAddFields()) {
+                <div class="sec-title">{{ t('panel.customFields.title') }}</div>
+              }
+              @if (fields().length > 0) {
+                <div class="fgrid">
+                  @for (field of fields(); track field.field_definition_id) {
+                    <div class="fg">
+                      <label class="fl">{{ field.name }} @if (field.is_required) { <span class="req">*</span> }</label>
+                      @switch (field.field_type) {
+                        @case ('text') {
+                          <input class="fi" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
+                        }
+                        @case ('number') {
+                          <input class="fi" type="number" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
+                        }
+                        @case ('date') {
+                          <input class="fi" type="date" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
+                        }
+                        @case ('list') {
+                          <select class="fsel" [(ngModel)]="form.values[field.field_definition_id]" [disabled]="!permissions().can_edit_content">
+                            <option [ngValue]="null">—</option>
+                            @for (option of field.options; track option) { <option [ngValue]="option">{{ option }}</option> }
+                          </select>
+                        }
+                        @case ('money') {
+                          <div class="money">
+                            <input class="fi" type="number" step="0.01" [(ngModel)]="form.values[field.field_definition_id]"
+                                   [disabled]="!permissions().can_edit_content">
+                            <select class="fsel" [(ngModel)]="form.currencies[field.field_definition_id]"
+                                    [disabled]="!permissions().can_edit_content">
+                              @for (currency of currencies; track currency) { <option [ngValue]="currency">{{ currency }}</option> }
+                            </select>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (canAddFields()) {
+                @if (availableFieldDefinitions().length > 0) {
+                  <div class="add-field">
+                    <select class="fsel" [(ngModel)]="newFieldId">
+                      <option [ngValue]="null">{{ t('panel.customFields.selectField') }}</option>
+                      @for (definition of availableFieldDefinitions(); track definition.id) {
+                        <option [ngValue]="definition.id">{{ definition.name }}</option>
+                      }
+                    </select>
+                    <button class="btn btn-g btn-sm" [disabled]="!newFieldId" (click)="addField()">{{ t('panel.customFields.addButton') }}</button>
+                  </div>
+                  <div class="field-hint">{{ t('panel.customFields.addHint') }}</div>
+                } @else {
+                  <div class="field-hint">
+                    {{ t('panel.customFields.noneAvailable') }}
+                  </div>
+                }
+              }
+
+              @if (costsAccess(); as financeAccess) {
+                <wt-project-task-costs
+                  [projectId]="projectId()" [projectKey]="projectKey()" [taskId]="taskId()!" [access]="financeAccess"
+                  [categories]="config().cost_categories" [tasks]="tasks()" (costsChanged)="costsChanged.emit()" />
+              }
+
+              @if (taskId(); as existingTaskId) {
+                <div class="sec-title">{{ t('panel.chatTitle') }}</div>
+                <wt-project-chat [projectId]="projectId()" [taskId]="existingTaskId" [canPost]="isProjectOpen()" />
+              }
+
+              @if (!isCreating()) {
+                <button class="history-toggle" (click)="toggleHistory()">
+                  {{ isHistoryOpen() ? '▾' : '▸' }} {{ t('panel.history.title') }}
+                </button>
+                @if (isHistoryOpen()) {
+                  <ul class="history">
+                    @for (entry of history(); track entry.id) {
+                      <li>
+                        <span class="muted">{{ entry.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
+                        <strong>{{ entry.user_name ?? t('panel.history.systemUser') }}</strong>
+                        {{ describeHistoryEntry(entry) }}
+                        @if (entry.end_date_change_reason; as reason) {
+                          <div class="history-reason">{{ t('panel.history.endDateChangeReason', { reason }) }}</div>
+                        }
+                      </li>
+                    } @empty {
+                      <li class="muted">{{ t('panel.history.empty') }}</li>
+                    }
+                  </ul>
+                }
+              }
+            </div>
+
+            <footer class="panel-foot">
+              <wt-add-to-calendar [entry]="calendarEntry()" [showLabel]="true" />
+              <span class="foot-spacer"></span>
+              <button class="btn btn-g" (click)="closed.emit()">{{ 'actions.close' | transloco }}</button>
+              @if (canSave()) {
+                <button class="btn btn-p" [disabled]="!form.name.trim() || isSaving()" (click)="save()">
+                  {{ isSaving() ? t('panel.saving') : (isCreating() ? t('panel.createTask') : ('actions.save' | transloco)) }}
+                </button>
+              }
+            </footer>
+          }
+        </aside>
+      </div>
+    </ng-container>
   `,
   styles: [PROJECTS_SHARED_STYLES, `
     :host { display:block; height:auto; }
@@ -273,6 +313,9 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
     .panel-head { display:flex; align-items:flex-start; gap:12px; padding:18px 24px 14px; border-bottom:1px solid var(--gray-200); }
     .panel-body { flex:1; overflow-y:auto; padding:20px 24px; display:flex; flex-direction:column; gap:14px; }
     .panel-body > * { flex-shrink:0; }
+    .deadline { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:6px; }
+    .deadline-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); }
+    .history-reason { color:var(--gray-500); font-style:italic; margin-top:1px; }
     .panel-foot { padding:14px 24px; border-top:1px solid var(--gray-200); display:flex; align-items:center; gap:8px; }
     .foot-spacer { flex:1; }
     .assignee-list { display:flex; flex-wrap:wrap; gap:6px 16px; }
@@ -288,7 +331,9 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
 })
 export class ProjectTaskPanelComponent implements OnInit {
   private readonly api = inject(ProjectsApiService);
+  private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly projectId = input.required<string>();
   readonly projectKey = input.required<string>();
@@ -300,11 +345,15 @@ export class ProjectTaskPanelComponent implements OnInit {
   readonly fields = input.required<ProjectField[]>();
   readonly tasks = input.required<ProjectTask[]>();
   readonly isProjectOpen = input(true);
+  /** The viewer's finance rights in this project; null hides every trace of costs. */
+  readonly finance = input<ProjectFinanceAccess | null>(null);
 
   readonly closed = output<void>();
   readonly saved = output<void>();
   /** Emitted after the PM adds a custom field to the project from this panel. */
   readonly fieldsChanged = output<void>();
+  /** Emitted after a cost item of this task was added, changed or deleted. */
+  readonly costsChanged = output<void>();
 
   readonly currencies = CURRENCIES;
   readonly reminderOptions = REMINDER_OPTIONS;
@@ -313,6 +362,8 @@ export class ProjectTaskPanelComponent implements OnInit {
   readonly isHistoryOpen = signal(false);
   readonly history = signal<ProjectTaskHistoryEntry[]>([]);
   private readonly loadedTask = signal<ProjectTaskDetail | null>(null);
+  /** The task as stored — the header shows its deadline state, not what is being typed. */
+  readonly savedTask = this.loadedTask.asReadonly();
 
   readonly isCreating = computed(() => this.taskId() === null);
   readonly permissions = computed(() => this.loadedTask()?.permissions ?? CREATE_PERMISSIONS);
@@ -350,6 +401,18 @@ export class ProjectTaskPanelComponent implements OnInit {
       taskId: task.id, taskNumber: task.task_number, name: task.name, endDate: task.end_date,
     });
   });
+  // Costs are shown to finance readers on every saved task. A participant who
+  // may only add own costs gets the section just on tasks assigned to them —
+  // the API refuses their cost on any other task.
+  readonly costsAccess = computed(() => {
+    const finance = this.finance();
+    const task = this.loadedTask();
+    if (!finance || !task) return null;
+    if (finance.can_read) return finance;
+    const myId = this.auth.user()?.id;
+    const isAssignedToMe = task.assignees.some(assignee => assignee.user_id === myId);
+    return finance.can_add_own_costs && isAssignedToMe ? finance : null;
+  });
   readonly canSave = computed(() => {
     const permissions = this.permissions();
     return permissions.can_edit_content || permissions.can_edit_structure || permissions.allowed_status_ids.length > 0;
@@ -357,6 +420,7 @@ export class ProjectTaskPanelComponent implements OnInit {
 
   form: TaskForm = this.emptyForm();
   newFieldId: string | null = null;
+  endDateChangeReason = '';
 
   ngOnInit(): void {
     const taskId = this.taskId();
@@ -376,10 +440,16 @@ export class ProjectTaskPanelComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: err => {
-        this.toast.error(err?.error?.error ?? 'Nie udało się pobrać zadania');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.loadFailed'));
         this.closed.emit();
       },
     });
+  }
+
+  // A reason is asked for only when an end date that already existed is moved or removed.
+  isEndDateChanged(): boolean {
+    const storedEndDate = this.loadedTask()?.end_date ?? null;
+    return storedEndDate !== null && (this.form.end_date || null) !== storedEndDate;
   }
 
   toggleAssignee(userId: string): void {
@@ -400,7 +470,7 @@ export class ProjectTaskPanelComponent implements OnInit {
         this.form.currencies[fieldId] = DEFAULT_CURRENCY;
         this.fieldsChanged.emit();
       },
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się dodać pola'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.customFields.addFailed')),
     });
   }
 
@@ -411,10 +481,17 @@ export class ProjectTaskPanelComponent implements OnInit {
   }
 
   describeHistoryEntry(entry: ProjectTaskHistoryEntry): string {
-    if (entry.action === 'project_task_created') return 'utworzył(a) zadanie';
-    const changedFields = Object.keys(entry.after_state ?? {}).map(field => HISTORY_FIELD_LABELS[field] ?? field);
+    if (entry.action === 'project_task_created') return this.transloco.translate('projects.panel.history.created');
+    const fields = Object.keys(entry.after_state ?? {})
+      .map(field => {
+        const labelKey = HISTORY_FIELD_LABEL_KEYS[field];
+        return labelKey ? this.transloco.translate(`projects.${labelKey}`) : field;
+      })
+      .join(', ');
     const statusChange = this.describeStatusChange(entry);
-    return `zmienił(a): ${changedFields.join(', ')}${statusChange}`;
+    return statusChange
+      ? this.transloco.translate('projects.panel.history.changedWithStatus', { fields, ...statusChange })
+      : this.transloco.translate('projects.panel.history.changed', { fields });
   }
 
   save(): void {
@@ -428,12 +505,12 @@ export class ProjectTaskPanelComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.toast.success(taskId === null ? 'Zadanie utworzone' : 'Zadanie zapisane');
+        this.toast.success(this.transloco.translate(taskId === null ? 'projects.panel.created' : 'projects.panel.saved'));
         this.saved.emit();
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err?.error?.error ?? 'Nie udało się zapisać zadania');
+        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.saveFailed'));
       },
     });
   }
@@ -489,6 +566,7 @@ export class ProjectTaskPanelComponent implements OnInit {
       payload.priority_id = this.form.priority_id;
       payload.start_date = this.form.start_date || null;
       payload.end_date = this.form.end_date || null;
+      if (this.isEndDateChanged()) payload.end_date_change_reason = this.endDateChangeReason.trim() || null;
       payload.custom_values = this.collectCustomValues();
       payload.reminder_type = this.form.reminder_type;
       if (this.form.reminder_type === 'custom') {
@@ -539,12 +617,12 @@ export class ProjectTaskPanelComponent implements OnInit {
     return excluded;
   }
 
-  private describeStatusChange(entry: ProjectTaskHistoryEntry): string {
+  private describeStatusChange(entry: ProjectTaskHistoryEntry): { from: string; to: string } | null {
     const fromId = entry.before_state?.['status_id'];
     const toId = entry.after_state?.['status_id'];
-    if (typeof fromId !== 'string' || typeof toId !== 'string') return '';
+    if (typeof fromId !== 'string' || typeof toId !== 'string') return null;
     const nameOf = (id: string) => this.config().statuses.find(status => status.id === id)?.name ?? '?';
-    return ` (${nameOf(fromId)} → ${nameOf(toId)})`;
+    return { from: nameOf(fromId), to: nameOf(toId) };
   }
 
   private loadHistory(): void {
@@ -552,7 +630,7 @@ export class ProjectTaskPanelComponent implements OnInit {
     if (taskId === null) return;
     this.api.listTaskHistory(this.projectId(), taskId).subscribe({
       next: history => this.history.set(history),
-      error: err => this.toast.error(err?.error?.error ?? 'Nie udało się pobrać historii'),
+      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.history.loadFailed')),
     });
   }
 }

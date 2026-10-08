@@ -1,0 +1,35 @@
+{
+  "changePassword": {
+    "errors": {
+      "failed": "Ошибка смены пароля",
+      "mismatch": "Пароли не совпадают",
+      "tooShort": "Пароль должен содержать не менее 8 символов"
+    },
+    "hint": "Срок действия вашего временного пароля истёк. Задайте собственный пароль, чтобы продолжить.",
+    "newPassword": "Новый пароль",
+    "newPasswordPlaceholder": "мин. 8 символов",
+    "repeatPassword": "Повторите пароль",
+    "submit": "Задать пароль и войти",
+    "submitting": "Сохранение…",
+    "title": "Задайте новый пароль"
+  },
+  "login": {
+    "email": "Email",
+    "emailPlaceholder": "ivan@company.com",
+    "failed": "Ошибка входа",
+    "hidePassword": "Скрыть",
+    "password": "Пароль",
+    "passwordTab": "Email и пароль",
+    "platformName": "CRM-платформа",
+    "profileLoadFailed": "Не удалось загрузить профиль",
+    "redirecting": "Перенаправление…",
+    "showPassword": "Показать",
+    "ssoFailed": "Не удалось войти через SSO. Повторите попытку.",
+    "ssoHint": "Войдите с аккаунтом Google Workspace вашей организации.",
+    "ssoSubmit": "Войти через Google Workspace SSO",
+    "submit": "Войти",
+    "submitting": "Вход…",
+    "tenantHostMismatch": "Этот аккаунт не относится к организации по этому адресу. Войдите снова.",
+    "unknownTenant": "Организация по этому адресу не найдена."
+  }
+}

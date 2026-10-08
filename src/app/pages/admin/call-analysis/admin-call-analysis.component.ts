@@ -7,6 +7,7 @@ import { Router, ActivatedRoute, NavigationStart } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { CrmApiService, CrmUser } from '../../../core/services/crm-api.service';
 import { NavBackService } from '../../../core/services/nav-back.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 const API = `${environment.apiUrl}/admin/call-analysis`;
 const ROW_POLL_TIMEOUT_MS = 120000;
@@ -43,28 +44,30 @@ interface CallAnalysisRow {
 @Component({
   selector: 'wt-admin-call-analysis',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('crm')],
   template: `
+<ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;flex-direction:column;height:100%;background:#f9fafb" (click)="closeMenu()">
 
   <!-- HEADER -->
   <div style="background:white;border-bottom:1px solid #e5e7eb;padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0">
     <div style="flex:1">
-      <div style="font-size:18px;font-weight:700;color:#18181b">Analiza rozmów</div>
-      <div style="font-size:12px;color:#6b7280;margin-top:1px">Analiza notatek z rozmów telefonicznych — skłonność do zakupu (DeepSeek AI)</div>
+      <div style="font-size:18px;font-weight:700;color:#18181b">{{ t('callAnalysis.title') }}</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:1px">{{ t('callAnalysis.subtitle') }}</div>
     </div>
 
     <button *ngIf="rows.length && !batchProgress.running && pendingCount > 0"
             (click)="startBatch()"
             style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:#3BAA5D;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
-      ▶ Analizuj ({{pendingCount}})
+      ▶ {{ t('callAnalysis.header.analyze', { count: pendingCount }) }}
     </button>
     <button *ngIf="batchProgress.running" disabled
             style="padding:8px 14px;background:#fed7aa;color:#9a3412;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:not-allowed">
-      ⏳ Analizuję...
+      ⏳ {{ t('callAnalysis.header.analyzing') }}
     </button>
     <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:#18181b;color:white;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
-      ⬆ Import CSV
+      ⬆ {{ t('callAnalysis.header.importCsv') }}
       <input type="file" accept=".csv" (change)="onFileChange($event)" style="display:none">
     </label>
   </div>
@@ -83,13 +86,13 @@ interface CallAnalysisRow {
        style="background:white;border-bottom:1px solid #e5e7eb;padding:10px 24px;flex-shrink:0">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="font-size:12px;color:#374151;font-weight:500">
-        <ng-container *ngIf="batchProgress.running && batchStartedHere">Analizowanie...</ng-container>
-        <ng-container *ngIf="batchProgress.running && !batchStartedHere">⚠ Analizowanie (inny użytkownik)...</ng-container>
-        <ng-container *ngIf="!batchProgress.running">Zakończono</ng-container>
-        &nbsp;{{batchProgress.done}} / {{batchProgress.total}} firm
+        <ng-container *ngIf="batchProgress.running && batchStartedHere">{{ t('callAnalysis.progress.running') }}</ng-container>
+        <ng-container *ngIf="batchProgress.running && !batchStartedHere">⚠ {{ t('callAnalysis.progress.runningOtherUser') }}</ng-container>
+        <ng-container *ngIf="!batchProgress.running">{{ t('callAnalysis.progress.finished') }}</ng-container>
+        &nbsp;{{ t('callAnalysis.progress.companies', { done: batchProgress.done, total: batchProgress.total }) }}
       </span>
       <span *ngIf="batchProgress.errors > 0" style="font-size:11px;color:#ef4444">
-        {{batchProgress.errors}} błędów
+        {{ t('callAnalysis.progress.errors', { count: batchProgress.errors }) }}
       </span>
     </div>
     <div style="height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden">
@@ -101,82 +104,82 @@ interface CallAnalysisRow {
   <!-- BULK ACTION BAR -->
   <div *ngIf="selectedCount > 0"
        style="background:#1e3a5f;color:white;padding:8px 24px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap">
-    <span style="font-size:13px;font-weight:600;margin-right:4px">{{selectedCount}} zaznaczonych</span>
+    <span style="font-size:13px;font-weight:600;margin-right:4px">{{ t('callAnalysis.bulk.selected', { count: selectedCount }) }}</span>
     <button (click)="bulkAction('set-status', 'hold')"
             style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
-      ⏸ Hold
+      ⏸ {{ t('callAnalysis.bulk.hold') }}
     </button>
     <button (click)="bulkAction('set-status', 'archived')"
             style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
-      📦 Archiwizuj
+      📦 {{ t('callAnalysis.actions.archive') }}
     </button>
     <button (click)="bulkAction('set-status', 'pending')"
             style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
-      ▶ Przywróć
+      ▶ {{ t('callAnalysis.bulk.restore') }}
     </button>
     <button (click)="bulkAction('re-analyze')"
             style="padding:5px 12px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
-      🔄 Re-analizuj
+      🔄 {{ t('callAnalysis.actions.reanalyze') }}
     </button>
     <button (click)="bulkAction('delete')"
             style="padding:5px 12px;background:rgba(239,68,68,0.3);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
-      🗑 Usuń zaznaczone
+      🗑 {{ t('callAnalysis.bulk.deleteSelected') }}
     </button>
     <button (click)="cancelSelection()"
             style="padding:5px 12px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);border-radius:6px;font-size:12px;cursor:pointer;margin-left:auto">
-      ✕ Anuluj
+      ✕ {{ 'actions.cancel' | transloco }}
     </button>
   </div>
 
   <!-- FILTRY -->
   <div style="background:white;border-bottom:1px solid #e5e7eb;padding:10px 24px;display:flex;gap:10px;align-items:center;flex-shrink:0;flex-wrap:wrap">
-    <input type="text" placeholder="Szukaj firmy lub NIP..." [(ngModel)]="filters.search"
+    <input type="text" [placeholder]="t('callAnalysis.filters.searchPlaceholder')" [(ngModel)]="filters.search"
            (ngModelChange)="onFilterChange()"
            style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;width:220px">
     <select [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()"
             style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-      <option value="">Wszystkie statusy</option>
-      <option value="pending">Oczekuje</option>
-      <option value="analyzing">Analizowanie</option>
-      <option value="done">Gotowe</option>
-      <option value="error">Błąd</option>
-      <option value="hold">Hold</option>
-      <option value="archived">Archiwum</option>
+      <option value="">{{ t('callAnalysis.filters.allStatuses') }}</option>
+      <option value="pending">{{ t('callAnalysis.statuses.pending') }}</option>
+      <option value="analyzing">{{ t('callAnalysis.filters.statusAnalyzing') }}</option>
+      <option value="done">{{ t('callAnalysis.statuses.done') }}</option>
+      <option value="error">{{ t('callAnalysis.statuses.error') }}</option>
+      <option value="hold">{{ t('callAnalysis.statuses.hold') }}</option>
+      <option value="archived">{{ t('callAnalysis.statuses.archived') }}</option>
     </select>
     <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151">
-      Score:
-      <input type="number" placeholder="min" [(ngModel)]="filters.score_min" (ngModelChange)="onFilterChange()"
+      {{ t('callAnalysis.filters.score') }}
+      <input type="number" [placeholder]="t('callAnalysis.filters.scoreMin')" [(ngModel)]="filters.score_min" (ngModelChange)="onFilterChange()"
              min="0" max="100" style="width:60px;padding:6px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
       –
-      <input type="number" placeholder="max" [(ngModel)]="filters.score_max" (ngModelChange)="onFilterChange()"
+      <input type="number" [placeholder]="t('callAnalysis.filters.scoreMax')" [(ngModel)]="filters.score_max" (ngModelChange)="onFilterChange()"
              min="0" max="100" style="width:60px;padding:6px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
     </div>
     <select [(ngModel)]="filters.follow_up" (ngModelChange)="onFilterChange()"
             style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-      <option value="">Wszystkie follow-upy</option>
-      <option value="required">📞 Follow-up wymagany</option>
-      <option value="done">✓ Follow-up zrobiony</option>
+      <option value="">{{ t('callAnalysis.filters.allFollowUps') }}</option>
+      <option value="required">📞 {{ t('callAnalysis.filters.followUpRequired') }}</option>
+      <option value="done">✓ {{ t('callAnalysis.filters.followUpDone') }}</option>
     </select>
     <select [(ngModel)]="filters.salesperson" (ngModelChange)="onFilterChange()"
             style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-      <option value="">Wszyscy handlowcy</option>
+      <option value="">{{ t('callAnalysis.filters.allSalespeople') }}</option>
       <option *ngFor="let u of crmUsers" [value]="u.display_name">{{u.display_name}}</option>
     </select>
     <select [(ngModel)]="filters.link" (ngModelChange)="onFilterChange()"
             style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-      <option value="">Wszystkie powiązania</option>
-      <option value="lead">🏷 Lead</option>
-      <option value="partner">🤝 Partner</option>
-      <option value="prospect">👁 Prospekt</option>
-      <option value="none">— Brak powiązań</option>
+      <option value="">{{ t('callAnalysis.filters.allLinks') }}</option>
+      <option value="lead">🏷 {{ t('labels.sourceTypes.lead') }}</option>
+      <option value="partner">🤝 {{ t('labels.sourceTypes.partner') }}</option>
+      <option value="prospect">👁 {{ t('callAnalysis.links.prospect') }}</option>
+      <option value="none">— {{ t('callAnalysis.filters.noLinks') }}</option>
     </select>
-    <span style="font-size:12px;color:#6b7280;white-space:nowrap">Pierwsza rozmowa:</span>
+    <span style="font-size:12px;color:#6b7280;white-space:nowrap">{{ t('callAnalysis.filters.firstCall') }}</span>
     <input type="date" [(ngModel)]="filters.first_call_from" (ngModelChange)="onFilterChange()"
            style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
     <span style="font-size:12px;color:#9ca3af">–</span>
     <input type="date" [(ngModel)]="filters.first_call_to" (ngModelChange)="onFilterChange()"
            style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
-    <span style="font-size:12px;color:#6b7280;white-space:nowrap">Ostatnia rozmowa:</span>
+    <span style="font-size:12px;color:#6b7280;white-space:nowrap">{{ t('callAnalysis.filters.lastCall') }}</span>
     <input type="date" [(ngModel)]="filters.last_call_from" (ngModelChange)="onFilterChange()"
            style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
     <span style="font-size:12px;color:#9ca3af">–</span>
@@ -185,14 +188,14 @@ interface CallAnalysisRow {
 
     <!-- Follow-up date preset filter -->
     <div style="display:flex;align-items:center;gap:4px;border-left:1px solid #e5e7eb;padding-left:10px">
-      <span style="font-size:12px;color:#6b7280;white-space:nowrap">Follow-up date:</span>
+      <span style="font-size:12px;color:#6b7280;white-space:nowrap">{{ t('callAnalysis.filters.followUpDate') }}</span>
       <button *ngFor="let p of followUpDatePresets"
               (click)="setFollowUpDatePreset(p.value)"
               [style.background]="filters.follow_up_date_preset===p.value?'#3BAA5D':'white'"
               [style.color]="filters.follow_up_date_preset===p.value?'white':'#374151'"
               [style.border]="filters.follow_up_date_preset===p.value?'1px solid #3BAA5D':'1px solid #d1d5db'"
               style="padding:5px 8px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">
-        {{p.label}}
+        {{ t(p.labelKey) }}
       </button>
       <ng-container *ngIf="filters.follow_up_date_preset==='custom'">
         <input type="date" [(ngModel)]="filters.follow_up_date_from" (ngModelChange)="onFilterChange()"
@@ -204,7 +207,7 @@ interface CallAnalysisRow {
     </div>
 
     <span *ngIf="total > 0" style="font-size:12px;color:#6b7280;margin-left:auto">
-      {{total}} firm
+      {{ t('callAnalysis.filters.total', { count: total }) }}
     </span>
   </div>
 
@@ -215,13 +218,11 @@ interface CallAnalysisRow {
        [style.color]="importResult.error ? '#dc2626' : '#15803d'">
     <span *ngIf="importResult.error">⚠ {{importResult.error}}</span>
     <span *ngIf="!importResult.error">
-      ✓ Zaimportowano:
-      <ng-container *ngIf="importResult.created !== undefined">
-        {{importResult.created}} nowych, {{importResult.appended}} zaktualizowanych
-      </ng-container>
-      <ng-container *ngIf="importResult.created === undefined">{{importResult.upserted}} firm</ng-container>
-      z {{importResult.total_rows}} wierszy
-      (kolumny notatek: {{importResult.note1_column_detected || '—'}} / {{importResult.note2_column_detected || '—'}})
+      ✓ {{ t(importResult.created !== undefined ? 'callAnalysis.import.resultCreated' : 'callAnalysis.import.resultUpserted', {
+          created: importResult.created, appended: importResult.appended, upserted: importResult.upserted,
+          totalRows: importResult.total_rows,
+          note1: importResult.note1_column_detected || '—', note2: importResult.note2_column_detected || '—'
+        }) }}
     </span>
   </div>
 
@@ -236,52 +237,52 @@ interface CallAnalysisRow {
           </th>
           <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('company_name')">
-            Firma {{sortIcon('company_name')}}
+            {{ t('callAnalysis.table.company') }} {{sortIcon('company_name')}}
           </th>
           <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap">
-            NIP
+            {{ t('callAnalysis.table.taxId') }}
           </th>
           <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('salesperson')">
-            Handlowiec {{sortIcon('salesperson')}}
+            {{ t('callAnalysis.table.salesperson') }} {{sortIcon('salesperson')}}
           </th>
           <th style="padding:10px 8px;text-align:right;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('calls_count')">
-            Rozmowy {{sortIcon('calls_count')}}
+            {{ t('callAnalysis.table.calls') }} {{sortIcon('calls_count')}}
           </th>
           <th style="padding:10px 8px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('first_call_date')">
-            Pierwsza rozmowa {{sortIcon('first_call_date')}}
+            {{ t('callAnalysis.table.firstCall') }} {{sortIcon('first_call_date')}}
           </th>
           <th style="padding:10px 8px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('last_call_end_date')">
-            Ostatnia rozmowa {{sortIcon('last_call_end_date')}}
+            {{ t('callAnalysis.table.lastCall') }} {{sortIcon('last_call_end_date')}}
           </th>
           <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('score')">
-            Potencjał {{sortIcon('score')}}
+            {{ t('callAnalysis.table.potential') }} {{sortIcon('score')}}
             <div class="ca-info-wrap" (click)="$event.stopPropagation()">
               <button class="ca-info">?</button>
               <div class="ca-info-tip">
-                <div class="ca-info-tip-title">Potencjał (0–100)</div>
-                Ocena skłonności firmy do zakupu usług CRM.<br><br>
-                0–20 ✗ Niezainteresowany<br>
-                21–40 ↓ Niskie zainteresowanie<br>
-                41–60 → Umiarkowane zainteresowanie<br>
-                61–80 ↑ Silne zainteresowanie<br>
-                81–100 ✓ Gotowy do zakupu<br><br>
-                Wartość oblicza model AI na podstawie notatek z rozmów.
+                <div class="ca-info-tip-title">{{ t('callAnalysis.potentialHelp.title') }}</div>
+                {{ t('callAnalysis.potentialHelp.description') }}<br><br>
+                0–20 ✗ {{ t('callAnalysis.scoreLabels.notInterested') }}<br>
+                21–40 ↓ {{ t('callAnalysis.scoreLabels.lowInterest') }}<br>
+                41–60 → {{ t('callAnalysis.scoreLabels.moderateInterest') }}<br>
+                61–80 ↑ {{ t('callAnalysis.scoreLabels.strongInterest') }}<br>
+                81–100 ✓ {{ t('callAnalysis.scoreLabels.readyToBuy') }}<br><br>
+                {{ t('callAnalysis.potentialHelp.footer') }}
               </div>
             </div>
           </th>
           <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap">
-            Status
+            {{ t('callAnalysis.table.status') }}
           </th>
           <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;cursor:pointer"
               (click)="setSort('analyzed_at')">
-            Analizowano {{sortIcon('analyzed_at')}}
+            {{ t('callAnalysis.table.analyzedAt') }} {{sortIcon('analyzed_at')}}
           </th>
-          <th style="padding:10px 8px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;width:120px">Powiązania</th>
+          <th style="padding:10px 8px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;white-space:nowrap;width:120px">{{ t('callAnalysis.table.links') }}</th>
           <th style="padding:10px 8px;text-align:center;width:44px"></th>
         </tr>
       </thead>
@@ -332,15 +333,15 @@ interface CallAnalysisRow {
               </span>
               <button *ngIf="r.follow_up_required && !r.follow_up_done"
                       (click)="toggleFollowUpDone(r, $event)"
-                      title="Kliknij aby oznaczyć follow-up jako zrobiony"
+                      [title]="t('callAnalysis.followUp.markDoneTitle')"
                       style="margin-left:6px;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;background:#fef3c7;color:#92400e;border:1px solid #fde68a;white-space:nowrap;cursor:pointer">
-                📞 Follow-up<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
+                📞 {{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
               </button>
               <button *ngIf="r.follow_up_done"
                       (click)="toggleFollowUpDone(r, $event)"
-                      title="Follow-up wykonany. Kliknij aby cofnąć."
+                      [title]="t('callAnalysis.followUp.undoTitle')"
                       style="margin-left:6px;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;background:#f3f4f6;color:#9ca3af;border:1px solid #e5e7eb;white-space:nowrap;cursor:pointer;text-decoration:line-through">
-                📞 Follow-up<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
+                📞 {{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
               </button>
             </td>
             <td style="padding:10px 16px;color:#9ca3af;font-size:12px">
@@ -350,21 +351,21 @@ interface CallAnalysisRow {
               <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
                 <button *ngIf="r.has_prospect"
                         (click)="goToProspect(r.nip, $event)"
-                        title="Przejdź do Prospekta"
+                        [title]="t('callAnalysis.links.goToProspect')"
                         style="padding:2px 7px;background:#fff7ed;border:1px solid #fbd0b6;color:#c2410c;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
-                  ↗ Prospekt
+                  ↗ {{ t('callAnalysis.links.prospect') }}
                 </button>
                 <button *ngIf="r.has_lead"
                         (click)="goToLead(r.lead_id, r.nip, $event)"
-                        title="Przejdź do Leada"
+                        [title]="t('callAnalysis.links.goToLead')"
                         style="padding:2px 7px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
-                  ↗ Lead
+                  ↗ {{ t('labels.sourceTypes.lead') }}
                 </button>
                 <button *ngIf="r.has_partner"
                         (click)="goToPartner(r.partner_nav_id, r.nip, $event)"
-                        title="Przejdź do Partnera"
+                        [title]="t('callAnalysis.links.goToPartner')"
                         style="padding:2px 7px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">
-                  ↗ Partner
+                  ↗ {{ t('labels.sourceTypes.partner') }}
                 </button>
               </div>
             </td>
@@ -373,7 +374,7 @@ interface CallAnalysisRow {
                       style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:16px;padding:2px 8px;border-radius:4px;line-height:1"
                       onmouseenter="this.style.color='#374151';this.style.background='#f3f4f6'"
                       onmouseleave="this.style.color='#9ca3af';this.style.background='none'"
-                      title="Akcje">⋮</button>
+                      [title]="t('callAnalysis.table.actions')">⋮</button>
             </td>
           </tr>
 
@@ -390,7 +391,7 @@ interface CallAnalysisRow {
                 </div>
                 <div style="display:flex;gap:24px;flex-wrap:wrap">
                   <div *ngIf="r.ai_signals?.length">
-                    <div style="font-size:11px;font-weight:700;color:#15803d;text-transform:uppercase;margin-bottom:6px">✓ Sygnały pozytywne</div>
+                    <div style="font-size:11px;font-weight:700;color:#15803d;text-transform:uppercase;margin-bottom:6px">✓ {{ t('callAnalysis.details.positiveSignals') }}</div>
                     <ul style="margin:0;padding:0 0 0 16px;list-style:none">
                       <li *ngFor="let s of r.ai_signals" style="font-size:12px;color:#374151;margin-bottom:3px;padding-left:4px">
                         <span style="color:#22c55e;margin-right:6px">●</span>{{s}}
@@ -398,7 +399,7 @@ interface CallAnalysisRow {
                     </ul>
                   </div>
                   <div *ngIf="r.ai_objections?.length">
-                    <div style="font-size:11px;font-weight:700;color:#dc2626;text-transform:uppercase;margin-bottom:6px">✗ Obiekcje</div>
+                    <div style="font-size:11px;font-weight:700;color:#dc2626;text-transform:uppercase;margin-bottom:6px">✗ {{ t('callAnalysis.details.objections') }}</div>
                     <ul style="margin:0;padding:0 0 0 16px;list-style:none">
                       <li *ngFor="let o of r.ai_objections" style="font-size:12px;color:#374151;margin-bottom:3px;padding-left:4px">
                         <span style="color:#ef4444;margin-right:6px">●</span>{{o}}
@@ -407,22 +408,22 @@ interface CallAnalysisRow {
                   </div>
                 </div>
                 <div style="margin-top:10px;font-size:11px;color:#9ca3af;display:flex;gap:16px">
-                  <span>Rozmów: {{r.calls_count}}</span>
-                  <span *ngIf="r.last_call_date">Ostatnia: {{r.last_call_date | date:'dd.MM.yyyy'}}</span>
-                  <span *ngIf="r.imported_at">Import: {{r.imported_at | date:'dd.MM.yyyy HH:mm'}}</span>
+                  <span>{{ t('callAnalysis.details.callsLabel') }} {{r.calls_count}}</span>
+                  <span *ngIf="r.last_call_date">{{ t('callAnalysis.details.lastCallLabel') }} {{r.last_call_date | date:'dd.MM.yyyy'}}</span>
+                  <span *ngIf="r.imported_at">{{ t('callAnalysis.details.importedLabel') }} {{r.imported_at | date:'dd.MM.yyyy HH:mm'}}</span>
                 </div>
 
                 <!-- Transkrypcja rozmów -->
                 <div *ngIf="r.notes_text" style="margin-top:16px">
                   <div (click)="toggleTranscript(r.nip, $event)" class="transcript-toggle">
                     <span style="font-size:10px;margin-right:4px">{{ transcriptExpanded.has(r.nip) ? '▼' : '▶' }}</span>
-                    📋 Transkrypcja rozmów ({{ getTranscripts(r).length }})
+                    📋 {{ t('callAnalysis.transcript.title', { count: getTranscripts(r).length }) }}
                   </div>
                   <div *ngIf="transcriptExpanded.has(r.nip)">
                     <div *ngFor="let chunk of getTranscripts(r); let i = index"
                          style="margin-bottom:12px;background:white;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
                       <div style="background:#f9fafb;border-bottom:1px solid #e5e7eb;padding:6px 12px;font-size:11px;font-weight:600;color:#6b7280">
-                        {{ chunk.label || ('Rozmowa ' + (i + 1)) }}
+                        {{ chunk.label || t('callAnalysis.transcript.callNumber', { number: i + 1 }) }}
                       </div>
                       <div class="transcript-body">{{ chunk.text }}</div>
                     </div>
@@ -436,14 +437,14 @@ interface CallAnalysisRow {
         <tr *ngIf="!loading && rows.length === 0">
           <td colspan="12" style="padding:60px 24px;text-align:center;color:#9ca3af">
             <div style="font-size:32px;margin-bottom:8px">{{ hasActiveFilters ? '🔍' : '📞' }}</div>
-            <div style="font-size:14px;font-weight:500">{{ hasActiveFilters ? 'Brak wyników dla wybranych filtrów' : 'Brak notatek z rozmów' }}</div>
-            <div *ngIf="!hasActiveFilters" style="font-size:12px;margin-top:4px">Notatki pojawią się po imporcie CSV lub po zakończeniu rozmów telefonicznych</div>
+            <div style="font-size:14px;font-weight:500">{{ hasActiveFilters ? t('callAnalysis.empty.noResults') : t('callAnalysis.empty.noNotes') }}</div>
+            <div *ngIf="!hasActiveFilters" style="font-size:12px;margin-top:4px">{{ t('callAnalysis.empty.hint') }}</div>
           </td>
         </tr>
 
         <tr *ngIf="loading">
           <td colspan="12" style="padding:40px 24px;text-align:center;color:#9ca3af;font-size:13px">
-            Ładowanie...
+            {{ 'states.loading' | transloco }}
           </td>
         </tr>
       </tbody>
@@ -473,32 +474,32 @@ interface CallAnalysisRow {
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
                 onmouseenter="this.style.background='#f9fafb'"
                 onmouseleave="this.style.background='none'">
-          {{r.analysis_status === 'hold' ? '▶ Przywróć z Hold' : '⏸ Wstrzymaj (Hold)'}}
+          {{r.analysis_status === 'hold' ? '▶ ' + t('callAnalysis.menu.restoreFromHold') : '⏸ ' + t('callAnalysis.menu.putOnHold')}}
         </button>
         <button (click)="setStatus(r.nip, r.analysis_status === 'archived' ? 'pending' : 'archived', $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
                 onmouseenter="this.style.background='#f9fafb'"
                 onmouseleave="this.style.background='none'">
-          {{r.analysis_status === 'archived' ? '📤 Przywróć z archiwum' : '📦 Archiwizuj'}}
+          {{r.analysis_status === 'archived' ? '📤 ' + t('callAnalysis.menu.restoreFromArchive') : '📦 ' + t('callAnalysis.actions.archive')}}
         </button>
         <button (click)="reAnalyze(r.nip, $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
                 onmouseenter="this.style.background='#f9fafb'"
                 onmouseleave="this.style.background='none'">
-          🔄 Re-analizuj
+          🔄 {{ t('callAnalysis.actions.reanalyze') }}
         </button>
         <button (click)="openInspect(r, $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#374151;cursor:pointer"
                 onmouseenter="this.style.background='#f9fafb'"
                 onmouseleave="this.style.background='none'">
-          🔍 Inspekcja
+          🔍 {{ t('callAnalysis.menu.inspect') }}
         </button>
         <div style="height:1px;background:#e5e7eb;margin:4px 0"></div>
         <button (click)="deleteRow(r, $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:13px;color:#dc2626;cursor:pointer"
                 onmouseenter="this.style.background='#fef2f2'"
                 onmouseleave="this.style.background='none'">
-          🗑 Usuń
+          🗑 {{ t('callAnalysis.menu.delete') }}
         </button>
       </ng-container>
     </ng-container>
@@ -521,7 +522,7 @@ interface CallAnalysisRow {
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid #e5e7eb;flex-shrink:0">
       <div style="display:flex;flex-direction:column;gap:3px">
-        <span style="font-size:10px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.6px">🔍 Inspekcja analizatora</span>
+        <span style="font-size:10px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.6px">🔍 {{ t('callAnalysis.inspect.title') }}</span>
         <span style="font-size:15px;font-weight:700;color:#3BAA5D">
           {{inspectRow.company_name || '—'}}
           <span style="font-size:12px;font-weight:400;color:#9ca3af;font-family:monospace"> · {{inspectRow.nip}}</span>
@@ -534,14 +535,14 @@ interface CallAnalysisRow {
                   [style.box-shadow]="inspectView==='analysis'?'0 1px 3px rgba(0,0,0,.1)':'none'"
                   [style.color]="inspectView==='analysis'?'#111827':'#6b7280'"
                   style="padding:4px 14px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500">
-            Analiza AI
+            {{ t('callAnalysis.inspect.tabAnalysis') }}
           </button>
           <button (click)="switchInspectToPrompt()"
                   [style.background]="inspectView==='prompt'?'white':'transparent'"
                   [style.box-shadow]="inspectView==='prompt'?'0 1px 3px rgba(0,0,0,.1)':'none'"
                   [style.color]="inspectView==='prompt'?'#111827':'#6b7280'"
                   style="padding:4px 14px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500">
-            Prompt DeepSeek
+            {{ t('callAnalysis.inspect.tabPrompt') }}
           </button>
         </div>
         <button (click)="closeInspect()"
@@ -559,7 +560,7 @@ interface CallAnalysisRow {
         <div style="padding:14px;border-right:1px solid #e5e7eb;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
           <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Potencjał zakupu</div>
+            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.purchasePotential') }}</div>
             <ng-container *ngIf="inspectRow.score !== null">
               <div style="display:flex;align-items:center;gap:10px">
                 <div style="flex:1;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">
@@ -572,24 +573,24 @@ interface CallAnalysisRow {
               </div>
               <div style="font-size:11px;color:#6b7280;margin-top:5px">{{scoreLabel(inspectRow.score)}}</div>
             </ng-container>
-            <div *ngIf="inspectRow.score === null" style="color:#9ca3af;font-size:13px">Brak oceny</div>
+            <div *ngIf="inspectRow.score === null" style="color:#9ca3af;font-size:13px">{{ t('callAnalysis.inspect.noScore') }}</div>
           </div>
 
           <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Follow-up</div>
+            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.followUp.label') }}</div>
             <div style="font-size:12px;display:flex;flex-direction:column;gap:5px">
               <span [style.color]="inspectRow.follow_up_required?'#15803d':'#6b7280'" style="font-weight:600">
-                {{inspectRow.follow_up_required ? '✓ Wymagany' : '— Nie wymagany'}}
+                {{inspectRow.follow_up_required ? '✓ ' + t('callAnalysis.followUp.required') : '— ' + t('callAnalysis.followUp.notRequired')}}
               </span>
               <span *ngIf="inspectRow.follow_up_date" style="color:#374151">
                 📅 {{inspectRow.follow_up_date | date:'dd.MM.yyyy'}}
               </span>
-              <span *ngIf="inspectRow.follow_up_done" style="color:#9ca3af;text-decoration:line-through;font-size:11px">✓ Wykonany</span>
+              <span *ngIf="inspectRow.follow_up_done" style="color:#9ca3af;text-decoration:line-through;font-size:11px">✓ {{ t('callAnalysis.followUp.done') }}</span>
             </div>
           </div>
 
           <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Status analizy</div>
+            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.analysisStatus') }}</div>
             <div style="display:flex;flex-direction:column;gap:5px">
               <span [class]="statusClass(inspectRow.analysis_status)" style="font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;align-self:flex-start">
                 {{statusLabel(inspectRow.analysis_status)}}
@@ -604,7 +605,7 @@ interface CallAnalysisRow {
         <!-- Prawa kolumna: summary + sygnały + obiekcje -->
         <div style="padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
           <div *ngIf="inspectRow.ai_summary">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Podsumowanie AI</div>
+            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">{{ t('callAnalysis.inspect.aiSummary') }}</div>
             <div style="font-size:13px;line-height:1.6;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px">
               {{inspectRow.ai_summary}}
             </div>
@@ -612,7 +613,7 @@ interface CallAnalysisRow {
 
           <div *ngIf="inspectRow.ai_signals?.length">
             <div style="font-size:10px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
-              ✓ Sygnały pozytywne ({{inspectRow.ai_signals.length}})
+              ✓ {{ t('callAnalysis.details.positiveSignals') }} ({{inspectRow.ai_signals.length}})
             </div>
             <div style="display:flex;flex-direction:column;gap:4px">
               <div *ngFor="let s of inspectRow.ai_signals"
@@ -624,7 +625,7 @@ interface CallAnalysisRow {
 
           <div *ngIf="inspectRow.ai_objections?.length">
             <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
-              ✗ Obiekcje ({{inspectRow.ai_objections.length}})
+              ✗ {{ t('callAnalysis.details.objections') }} ({{inspectRow.ai_objections.length}})
             </div>
             <div style="display:flex;flex-direction:column;gap:4px">
               <div *ngFor="let o of inspectRow.ai_objections"
@@ -636,7 +637,7 @@ interface CallAnalysisRow {
 
           <div *ngIf="!inspectRow.ai_summary && !inspectRow.ai_signals?.length && !inspectRow.ai_objections?.length"
                style="text-align:center;color:#9ca3af;font-size:13px;padding:32px">
-            Brak wyników analizy AI dla tej firmy.
+            {{ t('callAnalysis.inspect.noResults') }}
           </div>
         </div>
       </div>
@@ -646,7 +647,7 @@ interface CallAnalysisRow {
            style="border-top:1px solid #e5e7eb;background:#fafafa;flex-shrink:0;max-height:200px;overflow-y:auto">
         <div style="padding:10px 14px">
           <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
-            Podstawa analizy — notatki ({{inspectRow.notes_text.length}} znaków · {{getTranscripts(inspectRow).length}} rozmów)
+            {{ t('callAnalysis.inspect.basis', { chars: inspectRow.notes_text.length, calls: getTranscripts(inspectRow).length }) }}
           </div>
           <pre style="margin:0;font-family:monospace;font-size:11px;line-height:1.6;color:#374151;white-space:pre-wrap;word-break:break-word">{{inspectRow.notes_text}}</pre>
         </div>
@@ -658,7 +659,7 @@ interface CallAnalysisRow {
       <div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column">
         <div *ngIf="inspectPromptLoading"
              style="display:flex;align-items:center;justify-content:center;height:200px;gap:10px;color:#9ca3af;font-size:13px">
-          <span class="ca-spin"></span> Wczytuję prompt…
+          <span class="ca-spin"></span> {{ t('callAnalysis.inspect.promptLoading') }}
         </div>
         <pre *ngIf="!inspectPromptLoading && inspectPromptText"
              style="flex:1;overflow:auto;margin:0;padding:16px 20px;font-family:monospace;font-size:11.5px;line-height:1.6;color:#1f2937;white-space:pre-wrap;word-break:break-word;background:#f9fafb">{{inspectPromptText}}</pre>
@@ -668,6 +669,7 @@ interface CallAnalysisRow {
   </div>
 
 </div>
+</ng-container>
   `,
   styles: [`
     .status-pending   { background:#fef3c7;color:#92400e }
@@ -774,6 +776,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   private route   = inject(ActivatedRoute);
   private crmApi  = inject(CrmApiService);
   navBack         = inject(NavBackService);
+  private transloco = inject(TranslocoService);
 
   crmUsers: CrmUser[] = [];
 
@@ -797,11 +800,11 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   };
 
   readonly followUpDatePresets = [
-    { value: 'today',          label: 'Dziś' },
-    { value: 'today_tomorrow', label: 'Dziś+Jutro' },
-    { value: 'next_2_days',    label: 'Następne 2 dni' },
-    { value: 'this_week',      label: 'Ten tydzień' },
-    { value: 'custom',         label: 'Własny…' },
+    { value: 'today',          labelKey: 'callAnalysis.filters.presets.today' },
+    { value: 'today_tomorrow', labelKey: 'callAnalysis.filters.presets.todayTomorrow' },
+    { value: 'next_2_days',    labelKey: 'callAnalysis.filters.presets.nextTwoDays' },
+    { value: 'this_week',      labelKey: 'callAnalysis.filters.presets.thisWeek' },
+    { value: 'custom',         labelKey: 'callAnalysis.filters.presets.custom' },
   ];
 
   get hasActiveFilters(): boolean {
@@ -908,7 +911,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         this.loadBatchStatus();
       },
       error: e => {
-        this.importResult = { error: e.error?.error || 'Błąd importu' };
+        this.importResult = { error: e.error?.error || this.transloco.translate('crm.callAnalysis.import.failed') };
       },
     });
   }
@@ -935,14 +938,14 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
 
   goToProspect(nip: string, event: Event) {
     event.stopPropagation();
-    this.navBack.set({ label: 'Analiza rozmów', route: ['/admin/call-analysis'], queryParams: { search: nip }, targetUrlPrefix: '/admin/prospects' });
+    this.navBack.set({ label: this.transloco.translate('crm.callAnalysis.title'), route: ['/admin/call-analysis'], queryParams: { search: nip }, targetUrlPrefix: '/admin/prospects' });
     this.router.navigate(['/admin/prospects'], { queryParams: { search: nip } });
   }
 
   goToLead(id: number | null, nip: string, event: Event) {
     event.stopPropagation();
     if (id) {
-      this.navBack.set({ label: 'Analiza rozmów', route: ['/admin/call-analysis'], queryParams: { search: nip }, targetUrlPrefix: '/crm/leads' });
+      this.navBack.set({ label: this.transloco.translate('crm.callAnalysis.title'), route: ['/admin/call-analysis'], queryParams: { search: nip }, targetUrlPrefix: '/crm/leads' });
       this.router.navigate(['/crm/leads', id]);
     }
   }
@@ -950,7 +953,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   goToPartner(navId: string | null, nip: string, event: Event) {
     event.stopPropagation();
     if (navId) {
-      this.navBack.set({ label: 'Analiza rozmów', route: ['/admin/call-analysis'], queryParams: { search: nip }, targetUrlPrefix: '/crm/partners' });
+      this.navBack.set({ label: this.transloco.translate('crm.callAnalysis.title'), route: ['/admin/call-analysis'], queryParams: { search: nip }, targetUrlPrefix: '/crm/partners' });
       this.router.navigate(['/crm/partners', navId]);
     }
   }
@@ -1111,7 +1114,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   bulkAction(action: string, status?: string) {
     const nips = Array.from(this.selectedNips);
     if (!nips.length) return;
-    if (action === 'delete' && !confirm(`Usunąć ${nips.length} rekordów?`)) return;
+    if (action === 'delete' && !confirm(this.transloco.translate('crm.callAnalysis.confirm.deleteSelected', { count: nips.length }))) return;
 
     const body: any = { action, nips };
     if (status) body.status = status;
@@ -1130,7 +1133,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         }
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || 'Błąd operacji zbiorczej'),
+      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.bulkFailed')),
     });
   }
 
@@ -1176,7 +1179,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     this.http.get<{ promptText: string }>(`${API}/${r.nip}/inspect`).subscribe({
       next: d => { this.inspectPromptText = d.promptText; this.inspectPromptLoading = false; this.cdr.markForCheck(); },
-      error: () => { this.inspectPromptText = 'Błąd wczytywania promptu.'; this.inspectPromptLoading = false; this.cdr.markForCheck(); },
+      error: () => { this.inspectPromptText = this.transloco.translate('crm.callAnalysis.inspect.promptFailed'); this.inspectPromptLoading = false; this.cdr.markForCheck(); },
     });
   }
 
@@ -1188,7 +1191,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         r.follow_up_done = newDone;
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || 'Błąd aktualizacji follow-up'),
+      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.followUpUpdateFailed')),
     });
   }
 
@@ -1201,7 +1204,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         if (row) (row as any).analysis_status = status;
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || 'Błąd zmiany statusu'),
+      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.statusChangeFailed')),
     });
   }
 
@@ -1215,7 +1218,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         this.startRowPolling(nip);
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || 'Błąd re-analizy'),
+      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.reanalyzeFailed')),
     });
   }
 
@@ -1242,14 +1245,14 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   deleteRow(r: CallAnalysisRow, event: Event) {
     event.stopPropagation();
     this.openMenuNip = null;
-    if (!confirm(`Usuń analizę dla ${r.company_name || r.nip}?`)) return;
+    if (!confirm(this.transloco.translate('crm.callAnalysis.confirm.deleteRow', { name: r.company_name || r.nip }))) return;
     this.http.delete(`${API}/${r.nip}`).subscribe({
       next: () => {
         this.rows = this.rows.filter(x => x.nip !== r.nip);
         this.total--;
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || 'Błąd usuwania'),
+      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.deleteFailed')),
     });
   }
 
@@ -1268,15 +1271,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   }
 
   statusLabel(s: string): string {
-    const m: Record<string, string> = {
-      pending:   'Oczekuje',
-      analyzing: 'Analizuję...',
-      done:      'Gotowe',
-      error:     'Błąd',
-      hold:      'Hold',
-      archived:  'Archiwum',
-    };
-    return m[s] || s;
+    return this.statusClass(s) ? this.transloco.translate('crm.callAnalysis.statuses.' + s) : s;
   }
 
   statusClass(s: string): string {
@@ -1292,10 +1287,10 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
   }
 
   scoreLabel(score: number): string {
-    if (score >= 81) return '✓ Gotowy do zakupu';
-    if (score >= 61) return '↑ Silne zainteresowanie';
-    if (score >= 41) return '→ Umiarkowane zainteresowanie';
-    if (score >= 21) return '↓ Niskie zainteresowanie';
-    return '✗ Niezainteresowany';
+    if (score >= 81) return '✓ ' + this.transloco.translate('crm.callAnalysis.scoreLabels.readyToBuy');
+    if (score >= 61) return '↑ ' + this.transloco.translate('crm.callAnalysis.scoreLabels.strongInterest');
+    if (score >= 41) return '→ ' + this.transloco.translate('crm.callAnalysis.scoreLabels.moderateInterest');
+    if (score >= 21) return '↓ ' + this.transloco.translate('crm.callAnalysis.scoreLabels.lowInterest');
+    return '✗ ' + this.transloco.translate('crm.callAnalysis.scoreLabels.notInterested');
   }
 }

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
@@ -21,34 +22,37 @@ const RESULTS_PER_KIND = 10;
 @Component({
   selector: 'wt-project-crm-link',
   standalone: true,
-  imports: [RouterLink, TypeaheadComponent],
+  imports: [RouterLink, TypeaheadComponent, TranslocoDirective, TranslocoPipe],
+  providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="link-row">
-      <span class="label">Powiązanie z CRM</span>
-      @if (currentLink(); as link) {
-        @if (hasCrmAccess()) {
-          <a class="target" [routerLink]="link.route">{{ link.kind }}: {{ link.name }}</a>
+    <ng-container *transloco="let t; prefix: 'projects'">
+      <div class="link-row">
+        <span class="label">{{ t('crmLink.title') }}</span>
+        @if (currentLink(); as link) {
+          @if (hasCrmAccess()) {
+            <a class="target" [routerLink]="link.route">{{ t(link.kindKey) }}: {{ link.name }}</a>
+          } @else {
+            <span class="target plain">{{ t(link.kindKey) }}: {{ link.name }}</span>
+          }
         } @else {
-          <span class="target plain">{{ link.kind }}: {{ link.name }}</span>
+          <span class="none">{{ t('crmLink.none') }}</span>
         }
-      } @else {
-        <span class="none">brak</span>
-      }
-      @if (canChange() && !isEditing()) {
-        <button class="btn btn-g btn-sm" (click)="isEditing.set(true)">{{ currentLink() ? 'Zmień' : 'Powiąż' }}</button>
-        @if (currentLink()) { <button class="link-danger" (click)="removeLink()">Usuń powiązanie</button> }
-      }
-    </div>
-
-    @if (isEditing()) {
-      <div class="picker">
-        <wt-typeahead [search]="searchCrm" placeholder="Wpisz nazwę leada lub partnera (min. 3 znaki)…"
-                      (picked)="saveLink($event)" />
-        <button class="btn btn-g btn-sm" (click)="isEditing.set(false)">Anuluj</button>
+        @if (canChange() && !isEditing()) {
+          <button class="btn btn-g btn-sm" (click)="isEditing.set(true)">{{ t(currentLink() ? 'crmLink.change' : 'crmLink.link') }}</button>
+          @if (currentLink()) { <button class="link-danger" (click)="removeLink()">{{ t('crmLink.remove') }}</button> }
+        }
       </div>
-      <div class="hint">Podpowiedzi obejmują tylko leady i partnerów, do których masz dostęp w CRM. Wybór od razu zapisuje powiązanie.</div>
-    }
+
+      @if (isEditing()) {
+        <div class="picker">
+          <wt-typeahead [search]="searchCrm" [placeholder]="t('crmLink.searchPlaceholder')"
+                        (picked)="saveLink($event)" />
+          <button class="btn btn-g btn-sm" (click)="isEditing.set(false)">{{ 'actions.cancel' | transloco }}</button>
+        </div>
+        <div class="hint">{{ t('crmLink.searchHint') }}</div>
+      }
+    </ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; }
@@ -67,6 +71,7 @@ export class ProjectCrmLinkComponent {
   private readonly crmApi = inject(CrmApiService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly detail = input.required<ProjectDetail>();
   /** Emitted after the link changed so the parent reloads the project. */
@@ -81,10 +86,10 @@ export class ProjectCrmLinkComponent {
   readonly currentLink = computed(() => {
     const project = this.detail().project;
     if (project.lead_id) {
-      return { kind: 'Lead', name: project.lead_name ?? '', route: ['/crm/leads', project.lead_id] };
+      return { kindKey: 'crmLink.kinds.lead', name: project.lead_name ?? '', route: ['/crm/leads', project.lead_id] };
     }
     if (project.partner_id) {
-      return { kind: 'Partner', name: project.partner_name ?? '', route: ['/crm/partners', project.partner_id] };
+      return { kindKey: 'crmLink.kinds.partner', name: project.partner_name ?? '', route: ['/crm/partners', project.partner_id] };
     }
     return null;
   });
@@ -94,7 +99,7 @@ export class ProjectCrmLinkComponent {
     const params = { search: term, limit: RESULTS_PER_KIND, page: 1 };
     const leads$ = this.crmApi.getLeads(params).pipe(
       map(page => page.data.map((lead): TypeaheadOption<CrmLink> => ({
-        id: `lead-${lead.id}`, label: lead.company, hint: 'Lead', value: { lead_id: Number(lead.id) },
+        id: `lead-${lead.id}`, label: lead.company, hint: this.transloco.translate('projects.crmLink.kinds.lead'), value: { lead_id: Number(lead.id) },
       }))),
       catchError(() => of([])),
     );
@@ -103,7 +108,7 @@ export class ProjectCrmLinkComponent {
         .map(partner => ({ ref: partner.crm_uuid || String(partner.id ?? ''), name: partner.company }))
         .filter(partner => partner.ref !== '')
         .map((partner): TypeaheadOption<CrmLink> => ({
-          id: `partner-${partner.ref}`, label: partner.name, hint: 'Partner', value: { partner_ref: partner.ref },
+          id: `partner-${partner.ref}`, label: partner.name, hint: this.transloco.translate('projects.crmLink.kinds.partner'), value: { partner_ref: partner.ref },
         }))),
       catchError(() => of([])),
     );
@@ -111,12 +116,12 @@ export class ProjectCrmLinkComponent {
   };
 
   saveLink(option: TypeaheadOption<CrmLink>): void {
-    this.send(option.value, 'Nie udało się powiązać projektu');
+    this.send(option.value, this.transloco.translate('projects.crmLink.linkFailed'));
   }
 
   removeLink(): void {
-    if (!confirm('Usunąć powiązanie projektu z CRM? Zadania projektu znikną z karty leada lub partnera.')) return;
-    this.send({}, 'Nie udało się usunąć powiązania');
+    if (!confirm(this.transloco.translate('projects.crmLink.removeConfirm'))) return;
+    this.send({}, this.transloco.translate('projects.crmLink.removeFailed'));
   }
 
   private send(link: { lead_id?: number; partner_ref?: string }, fallbackError: string): void {

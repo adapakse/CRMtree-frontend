@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Enregistrer"
+  },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": "Fichier .ics (Apple et autres)",
+    "outlook": "Outlook",
+    "title": "Ajouter au calendrier"
+  },
+  "language": {
+    "changeFailed": "Impossible de changer la langue",
+    "followTenant": "Langue par défaut de l’organisation ({language})",
+    "hint": "Le changement de langue recharge la page. Vous recevrez aussi les e-mails et les rappels dans cette langue.",
+    "tenantHint": "Langue des personnes qui n’ont pas choisi la leur. Le changement recharge la page.",
+    "tenantTitle": "Langue par défaut de l’organisation",
+    "title": "Langue de l’interface"
+  },
+  "list": {
+    "activeFilters": "{count, plural, one {# filtre actif} other {# filtres actifs}}",
+    "anyValue": "Tous",
+    "ascending": "Croissant",
+    "clearFilter": "Effacer",
+    "clearFilters": "Effacer les filtres",
+    "defaultSort": "Par défaut",
+    "descending": "Décroissant",
+    "filterBy": "Filtrer : {name}",
+    "from": "du",
+    "noOptions": "Aucun élément à choisir.",
+    "pager": {
+      "next": "Page suivante",
+      "previous": "Page précédente",
+      "range": "{from}–{to} sur {total}"
+    },
+    "sort": "Tri",
+    "sortBy": "Trier : {name}",
+    "to": "au"
+  },
+  "states": {
+    "loading": "Chargement…"
+  },
+  "testEnvironmentBanner": {
+    "title": "Version de test — ce n’est pas l’environnement de production"
+  },
+  "typeahead": {
+    "minChars": "Saisissez au moins {count} caractères…",
+    "noResults": "Aucun résultat.",
+    "searching": "Recherche…"
+  }
+}

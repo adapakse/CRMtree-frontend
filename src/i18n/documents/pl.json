@@ -1,0 +1,394 @@
+{
+  "badges": {
+    "gdpr": {
+      "data_administration": "Współadministrowanie",
+      "data_processing_entrustment": "Powierzenie",
+      "no_gdpr": "Brak GDPR"
+    }
+  },
+  "dashboard": {
+    "recentDocuments": "Ostatnie dokumenty",
+    "seeAll": "Zobacz wszystkie",
+    "stats": {
+      "expiring": "Wygasają w 30 dni",
+      "expiringHint": "Wymagają uwagi",
+      "inWorkflow": "W obiegu",
+      "myTasksHint": "Oczekują na działanie",
+      "signed": "Podpisane / Zakończone",
+      "signedHint": "Podpisane + Zakończone",
+      "total": "Wszystkie dokumenty",
+      "totalHint": "Wszystkie dostępne"
+    },
+    "taskStrip": {
+      "assigneePrefix": "u:"
+    },
+    "title": "Dashboard"
+  },
+  "detail": {
+    "actions": {
+      "delete": "Usuń",
+      "download": "Pobierz",
+      "saveChanges": "Zapisz zmiany"
+    },
+    "attachments": {
+      "add": "Dodaj załącznik",
+      "addFirst": "Dodaj pierwszy załącznik",
+      "deleteConfirm": "Usunąć ten załącznik wraz ze wszystkimi wersjami?",
+      "deleted": "Usunięto załącznik",
+      "empty": "Brak załączników",
+      "events": {
+        "deleted": "Usunięto załącznik: {name}",
+        "newVersion": "Nowa wersja załącznika: {name}"
+      },
+      "newVersion": "Nowa wersja",
+      "uploadFailed": "Błąd uploadu załącznika",
+      "uploaded": "Wgrano załącznik",
+      "versionCount": "{count, plural, one {# wersja} few {# wersje} many {# wersji} other {# wersji}}",
+      "versionUploadFailed": "Błąd uploadu nowej wersji"
+    },
+    "deleteConfirm": "Usunąć „{name}\"?",
+    "history": {
+      "actions": {
+        "attachment_deleted": "Usunięto załącznik",
+        "attachment_uploaded": "Dodano załącznik: {name}",
+        "attachment_version_uploaded": "Nowa wersja załącznika (v{version})",
+        "document_created": "Utworzono dokument",
+        "document_deleted": "Usunięto dokument",
+        "document_downloaded": "Pobrano dokument",
+        "document_updated": "Zaktualizowano dokument",
+        "metadata_updated": "Zaktualizowano metadane",
+        "signing_completed": "Zakończono podpisywanie elektroniczne",
+        "signing_failed": "Podpisywanie elektroniczne nie powiodło się",
+        "signing_initiated": "Rozpoczęto podpisywanie elektroniczne",
+        "status_changed": "Zmieniono status na: {status}",
+        "tag_added": "Dodano tag: {key}",
+        "tag_removed": "Usunięto tag: {key}",
+        "tag_updated": "Zmieniono tag: {key}",
+        "version_uploaded": "Wgrano nową wersję dokumentu (v{version})",
+        "workflow_task_cancelled": "Anulowano zadanie workflow",
+        "workflow_task_completed": "Ukończono zadanie workflow",
+        "workflow_task_created": "Przypisano zadanie workflow"
+      },
+      "empty": "Brak historii"
+    },
+    "overview": {
+      "chooseEntity": "— wybierz podmiot —",
+      "chooseType": "— wybierz typ —",
+      "metadata": "Metadane dokumentu",
+      "packagePart": "Część pakietu dokumentów:"
+    },
+    "partners": {
+      "empty": "Brak powiązanych partnerów.",
+      "linkFailed": "Błąd powiązania z partnerem",
+      "linked": "Powiązano z {company}",
+      "searchPlaceholder": "Szukaj partnera po nazwie…",
+      "taxId": "NIP: {nip}",
+      "title": "Powiązani Partnerzy",
+      "unlink": "Odepnij",
+      "unlinkConfirm": "Odpiąć partnera \"{company}\"?",
+      "unlinkFailed": "Błąd odpinania partnera",
+      "unlinked": "Odpięto partnera"
+    },
+    "preview": {
+      "downloadFile": "Pobierz plik",
+      "fileUploaded": "Wgrano plik",
+      "frameTitle": "Podgląd PDF",
+      "loadFailed": "Nie udało się wczytać PDF",
+      "noFile": "Brak dołączonego pliku",
+      "unavailable": "Brak podglądu",
+      "unavailableFormat": "Brak podglądu dla formatu innego niż PDF.",
+      "unavailableHint": "Pobierz plik na dysk w celu podglądu.",
+      "uploadFile": "Wgraj plik"
+    },
+    "signus": {
+      "emailsPlaceholder": "anna@firma.com, partner@example.com",
+      "info": "Dokument zostanie wysłany do API Signus. Każda osoba podpisująca dostanie e-mail. Podpisane wersje są automatycznie archiwizowane.",
+      "modalTitle": "Rozpocznij podpisywanie elektroniczne",
+      "sectionTitle": "Podpis elektroniczny (Signus)",
+      "send": "Wyślij do Signus",
+      "sendFailed": "Błąd wysyłania do Signusa",
+      "sentRedirect": "Wysłano dokument do Signus — przekierowanie…",
+      "sentTraining": "Dokument wysłany do podpisu (symulacja). Podpisana wersja pojawi się za ~10 sekund.",
+      "signatories": "Osoby podpisujące (adresy e-mail po przecinku)",
+      "start": "Rozpocznij podpisywanie przez Signus"
+    },
+    "tabs": {
+      "attachments": "Załączniki",
+      "history": "Historia",
+      "overview": "Szczegóły",
+      "preview": "Dokument główny",
+      "versions": "Wersje",
+      "workflow": "Workflow"
+    },
+    "tags": {
+      "added": "Tag dodany",
+      "empty": "Brak tagów.",
+      "key": "Klucz",
+      "keyPlaceholder": "Klucz (np. contract_id)",
+      "title": "Tagi"
+    },
+    "toasts": {
+      "saved": "Zapisano dokument"
+    },
+    "versions": {
+      "empty": "Brak wersji",
+      "signedBy": "Podpisał(a) {name}",
+      "uploadNew": "Wgraj nową wersję",
+      "uploaded": "Wgrano nową wersję"
+    },
+    "workflow": {
+      "assign": "Przypisz i wyślij e-mail",
+      "assignTitle": "Przypisz zadanie",
+      "assignTo": "Przypisz do użytkownika",
+      "assigned": "Przypisano zadanie — wysłano powiadomienie e-mail",
+      "cancelled": "Anulowano zadanie",
+      "dueDate": "Termin",
+      "message": "Wiadomość",
+      "messagePlaceholder": "Opcjonalna wiadomość dla osoby przypisanej…",
+      "selected": "Wybrano: {name}",
+      "taskType": "Typ zadania",
+      "userSearchPlaceholder": "Szukaj po nazwisku lub e-mailu…"
+    }
+  },
+  "invoice": {
+    "fields": {
+      "bankAccount": "Numer rachunku bankowego",
+      "currency": "Waluta",
+      "grossAmount": "Kwota brutto",
+      "invoiceNumber": "Numer faktury",
+      "netAmount": "Kwota netto",
+      "paymentStatus": "Status płatności",
+      "title": "Dane faktury",
+      "vatAmount": "Kwota VAT"
+    },
+    "ksefVisualisationNote": "To wizualizacja danych pobranych z KSeF, a nie oryginalny dokument.",
+    "projectLinks": {
+      "backLabel": "Dokument {number}",
+      "costStatuses": {
+        "incurred": "Poniesiony",
+        "planned": "Planowany"
+      },
+      "empty": "Ta faktura nie jest podpięta do żadnego kosztu projektu.",
+      "linkedAt": "Podpięcie: {date}",
+      "linkedBy": "Podpięcie: {name}, {date}",
+      "severalLinks": "Ta faktura jest podpięta do kilku projektów lub zadań.",
+      "title": "Powiązania z projektami",
+      "wholeProject": "cały projekt"
+    }
+  },
+  "labels": {
+    "activeTasks": "Aktywne zadania",
+    "addTag": "Dodaj tag",
+    "columns": {
+      "name": "Nazwa",
+      "number": "Numer",
+      "validity": "Ważność"
+    },
+    "contractSubjects": {
+      "accommodation": "Zakwaterowanie",
+      "businessTravel": "Podróże służbowe",
+      "conferences": "Konferencje/Spotkania",
+      "other": "Inne",
+      "system": "System"
+    },
+    "countries": {
+      "at": "Austria",
+      "ch": "Szwajcaria",
+      "cz": "Czechy",
+      "de": "Niemcy",
+      "fr": "Francja",
+      "gb": "Wielka Brytania",
+      "hu": "Węgry",
+      "pl": "Polska",
+      "ro": "Rumunia",
+      "ru": "Rosja",
+      "sk": "Słowacja",
+      "ua": "Ukraina"
+    },
+    "docTypes": {
+      "employee_agreement": "Umowa pracownicza",
+      "invoice": "Faktura",
+      "it_supplier_agreement": "Umowa z dostawcą IT",
+      "nda": "NDA",
+      "operator_agreement": "Umowa operatorska",
+      "partner_agreement": "Umowa partnerska"
+    },
+    "fields": {
+      "buyer": "Nabywca",
+      "contactName": "Imię i Nazwisko",
+      "contactSection": "Dane kontaktowe ds. umowy",
+      "contractSubject": "Przedmiot umowy",
+      "counterpartyCountry": "Kraj kontrahenta",
+      "counterpartyTaxId": "NIP kontrahenta",
+      "documentName": "Nazwa dokumentu",
+      "documentType": "Typ dokumentu",
+      "email": "Email",
+      "entity1": "Podmiot 1",
+      "entity2": "Podmiot 2",
+      "expirationDate": "Data wygaśnięcia",
+      "gdprClassification": "Klasyfikacja GDPR",
+      "group": "Grupa",
+      "issueDate": "Data wystawienia",
+      "owner": "Właściciel",
+      "paymentDueDate": "Data płatności",
+      "phone": "Telefon",
+      "seller": "Sprzedawca",
+      "sellerTaxId": "NIP sprzedawcy",
+      "signingDate": "Data podpisania",
+      "status": "Status"
+    },
+    "from": "Od: {name}",
+    "gdprTypes": {
+      "data_administration": "Współadministrowanie danych",
+      "data_processing_entrustment": "Powierzenie przetwarzania danych",
+      "no_gdpr": "Brak GDPR"
+    },
+    "myTasks": "Moje zadania",
+    "noDocuments": "Brak dokumentów",
+    "noPendingTasks": "Brak oczekujących zadań",
+    "options": {
+      "choose": "— Wybierz —",
+      "chooseCountry": "— Wybierz kraj —",
+      "fixedDate": "Data określona",
+      "indefinite": "Czas nieokreślony",
+      "unassigned": "— nieprzypisany —"
+    },
+    "paymentStatuses": {
+      "overdue": "Po terminie",
+      "paid": "Opłacona",
+      "partially_paid": "Opłacona częściowo",
+      "unpaid": "Nieopłacona"
+    },
+    "placeholders": {
+      "contactEmail": "np. jan.kowalski@firma.pl",
+      "contactName": "np. Jan Kowalski",
+      "contactPhone": "np. +48 600 000 000",
+      "entity1": "np. CRMtree Sp. z o.o.",
+      "entity2": "np. Partner Ltd.",
+      "taxId": "np. 1234567890"
+    },
+    "statuses": {
+      "being_approved": "W akceptacji",
+      "being_edited": "W edycji",
+      "being_signed": "W podpisywaniu",
+      "completed": "Zakończony",
+      "hold": "Wstrzymany",
+      "new": "Nowy",
+      "rejected": "Odrzucony",
+      "signed": "Podpisany"
+    },
+    "taskTypes": {
+      "approve": "Akceptacja",
+      "edit": "Edycja",
+      "read": "Odczyt",
+      "sign": "Podpis"
+    }
+  },
+  "list": {
+    "columns": {
+      "gdpr": "GDPR",
+      "newBadge": "NOWE",
+      "type": "Typ"
+    },
+    "empty": {
+      "hint": "Zmień filtry lub wyszukiwaną frazę",
+      "title": "Nie znaleziono dokumentów"
+    },
+    "filters": {
+      "allGroups": "Wszystkie grupy",
+      "allTypes": "Wszystkie typy",
+      "noFiles": "Pokaż dokumenty bez załączonego skanu"
+    },
+    "newDocument": "Nowy dokument",
+    "noPartnerWarning": "Dokument nie powiązany z partnerem",
+    "pagination": {
+      "next": "Dalej",
+      "page": "Strona {page} z {total}",
+      "previous": "Poprz."
+    },
+    "partnerFilter": {
+      "clear": "Pokaż wszystkie",
+      "label": "Dokumenty partnera:"
+    },
+    "searchPlaceholder": "Szukaj dokumentów, tagów…",
+    "statusFilters": {
+      "all": "Wszystkie",
+      "being_edited": "W edycji",
+      "being_signed": "W podpisywaniu",
+      "completed": "Zakończone",
+      "new": "Nowe",
+      "rejected": "Odrzucone",
+      "signed": "Podpisane"
+    },
+    "taskTooltip": {
+      "assignee": "Wykonuje: {name}",
+      "assigner": "Przekazał: {name}",
+      "dueDate": "Termin: {date}",
+      "message": "Wiadomość: {message}",
+      "type": "Typ: {type}"
+    },
+    "title": "Dokumenty",
+    "toasts": {
+      "created": "Utworzono dokument {number}",
+      "deleted": "Dokument usunięty",
+      "updated": "Dokument zaktualizowany"
+    }
+  },
+  "newDocument": {
+    "basicInfo": "Podstawowe informacje",
+    "chooseEntity": "— Wybierz podmiot —",
+    "chooseGdpr": "— Wybierz klasyfikację —",
+    "chooseGroup": "— Wybierz grupę —",
+    "chooseType": "— Wybierz typ —",
+    "create": "Utwórz dokument",
+    "createFailed": "Nie udało się utworzyć dokumentu",
+    "file": {
+      "dropHint": "Upuść plik tutaj lub kliknij, aby wybrać",
+      "formats": "PDF, DOCX — maks. 50 MB",
+      "remove": "Usuń",
+      "title": "Załącznik (opcjonalnie)"
+    },
+    "namePlaceholder": "np. Umowa partnerska — ABC Sp. z o.o.",
+    "subtitle": "Uzupełnij metadane i opcjonalnie dodaj plik",
+    "tags": {
+      "keyPlaceholder": "klucz",
+      "title": "Tagi (opcjonalne)"
+    },
+    "title": "Nowy dokument"
+  },
+  "workflow": {
+    "autoRefresh": "Auto-odświeżanie: {seconds} s",
+    "calendar": {
+      "documentFallback": "Dokument"
+    },
+    "columns": {
+      "cancelled": "Anulowane",
+      "completed": "Zakończone",
+      "in_progress": "W toku",
+      "pending": "Oczekujące"
+    },
+    "kanban": {
+      "assignedBy": "Przydzielone przez {name}",
+      "emptyColumn": "Pusto",
+      "emptyHint": "Dokumenty pojawią się tutaj po ich utworzeniu",
+      "expired": "Wygasł",
+      "expires": "Wygasa {date}",
+      "paymentDue": "Płatność do {date}",
+      "paymentOverdue": "Termin płatności minął",
+      "soon": "WKRÓTCE",
+      "taskCount": "Zadania: {count}"
+    },
+    "kanbanTab": "Tablica Kanban",
+    "mine": {
+      "allDone": "Wszystko załatwione!",
+      "complete": "Zakończ",
+      "openDocument": "Otwórz dokument",
+      "start": "Rozpocznij"
+    },
+    "title": "Workflow",
+    "toasts": {
+      "completed": "Zadanie oznaczone jako zakończone",
+      "updateFailed": "Nie udało się zaktualizować zadania — spróbuj ponownie"
+    }
+  }
+}

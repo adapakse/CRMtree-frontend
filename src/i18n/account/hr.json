@@ -1,0 +1,77 @@
+{
+  "myDevices": {
+    "empty": "Nema prijavljenih telefona.",
+    "hint": "Telefoni na kojima ste prijavljeni u mobilnu aplikaciju CRMtree. Ako izgubite telefon ili ga zamijenite, odjavite ga ovdje — aplikacija na njemu izgubit će pristup najkasnije za petnaestak minuta.",
+    "lastActive": "zadnja aktivnost {date}",
+    "signOut": "Odjavi",
+    "signOutConfirm": "Odjaviti {name} iz aplikacije CRMtree?",
+    "signOutFailed": "Odjava uređaja nije uspjela.",
+    "signedInSince": "prijavljen od {date}",
+    "signedOut": "Odjavljeno: {name}.",
+    "signingOut": "Odjavljujem…",
+    "thisDevice": "ovaj uređaj",
+    "title": "Prijavljeni telefoni",
+    "unknownDevice": "Nepoznat uređaj"
+  },
+  "mySettings": {
+    "delete": "Izbriši",
+    "pbx": {
+      "configured": "Token je konfiguriran",
+      "directPhone": "Vaš izravni broj:",
+      "hideToken": "Sakrij",
+      "hint": "Da biste koristili ugrađeni telefon, zalijepite svoj Personal Access Token s panela ip-pbx.eu. Token aplikaciji omogućuje dohvaćanje vaših SIP podataka. Klijenti koji vide vaš izravni broj mogu uzvratiti poziv izravno vama.",
+      "noDirectPhone": "Izravni broj nije dodijeljen u PBX-u",
+      "notConfigured": "Nema tokena — softphone neće raditi.",
+      "notifications": {
+        "blocked": "Obavijesti su blokirane — odblokirajte ih ručno u postavkama preglednika:",
+        "enable": "Uključi obavijesti",
+        "enabled": "Obavijesti su uključene",
+        "hint": "Prikazuje sistemsku obavijest kada klijent zove — čak i kada je preglednik u pozadini ili radite u drugom programu.",
+        "permissionHint": "Preglednik će zatražiti dopuštenje",
+        "title": "Obavijesti o pozivima",
+        "unblockPath": "Lokot uz adresu stranice → Obavijesti → Dopusti"
+      },
+      "saveToken": "Spremi token",
+      "showToken": "Prikaži",
+      "title": "Softphone — PBX token",
+      "tokenHelpEnd": "kopirajte i zalijepite ovdje.",
+      "tokenHelpStart": "Panel ip-pbx.eu → kliknite svoje ime (gornji desni kut)",
+      "tokenPlaceholder": "Zalijepite token s ip-pbx.eu…",
+      "tokenSaved": "Token je spremljen",
+      "tokenSavedWithPhone": "Token je spremljen — broj: {phone}"
+    },
+    "projectDeadlines": {
+      "hint": "Obuhvaća: dnevni sažetak zadataka izvan roka, promjene rokova zadataka te projekte koji su počeli kasniti.",
+      "saveFailed": "Promjena postavke obavijesti nije uspjela",
+      "title": "Obavijesti o rokovima projekata",
+      "toggle": "E-poruke o rokovima u projektima"
+    },
+    "saveFailed": "Pogreška pri spremanju — pokušajte ponovno",
+    "saving": "Spremanje…",
+    "signature": {
+      "deleteConfirm": "Izbrisati spremljeni potpis? Više se neće dodavati e-porukama.",
+      "empty": "Nema potpisa — zalijepite HTML s lijeve strane",
+      "hint": "U nastavku zalijepite HTML kôd svojeg potpisa. Automatski će se dodati svakoj e-poruci poslanoj iz sustava (Leadovi i Registar partnera). Možete upotrijebiti gotov HTML iz klijenta e-pošte ili alata za izradu potpisa — npr. HubSpot Email Signature Generator.",
+      "htmlLabel": "HTML kôd potpisa",
+      "htmlPlaceholder": "Ovdje zalijepite HTML kôd potpisa…",
+      "preview": "Pregled",
+      "save": "Spremi potpis",
+      "saved": "Potpis je spremljen",
+      "title": "Moj potpis e-pošte"
+    },
+    "templates": {
+      "bodyLabel": "Sadržaj",
+      "bodyPlaceholder": "Sadržaj predloška…",
+      "deleteConfirm": "Izbrisati predložak „{name}”?",
+      "edit": "Uredi",
+      "editTitle": "Uređivanje predloška",
+      "empty": "Nema predložaka. Kliknite „+ Novi predložak” da biste dodali prvi.",
+      "hint": "Spremite gotove tekstove poruka koje možete brzo umetnuti dok pišete e-poruku leadu ili partneru.",
+      "nameLabel": "Naziv predloška",
+      "namePlaceholder": "npr. Uvodni sastanak, Follow-up nakon demoa…",
+      "new": "Novi predložak",
+      "title": "Predlošci e-poruka"
+    },
+    "title": "Moje postavke"
+  }
+}

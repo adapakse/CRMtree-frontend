@@ -1,0 +1,35 @@
+{
+  "changePassword": {
+    "errors": {
+      "failed": "Napaka pri spremembi gesla",
+      "mismatch": "Gesli se ne ujemata",
+      "tooShort": "Geslo mora imeti najmanj 8 znakov"
+    },
+    "hint": "Vaše začasno geslo je poteklo. Pred nadaljevanjem nastavite svoje geslo.",
+    "newPassword": "Novo geslo",
+    "newPasswordPlaceholder": "najm. 8 znakov",
+    "repeatPassword": "Ponovite geslo",
+    "submit": "Nastavi geslo in se prijavi",
+    "submitting": "Shranjevanje…",
+    "title": "Nastavite novo geslo"
+  },
+  "login": {
+    "email": "E-pošta",
+    "emailPlaceholder": "janez@podjetje.si",
+    "failed": "Prijava ni uspela",
+    "hidePassword": "Skrij",
+    "password": "Geslo",
+    "passwordTab": "E-pošta in geslo",
+    "platformName": "Platforma CRM",
+    "profileLoadFailed": "Profila ni bilo mogoče naložiti",
+    "redirecting": "Preusmerjanje…",
+    "showPassword": "Pokaži",
+    "ssoFailed": "Prijava SSO ni uspela. Poskusite znova.",
+    "ssoHint": "Prijavite se z računom Google Workspace svoje organizacije.",
+    "ssoSubmit": "Prijava z Google Workspace SSO",
+    "submit": "Prijava",
+    "submitting": "Prijavljanje…",
+    "tenantHostMismatch": "Ta račun ne pripada organizaciji na tem naslovu. Prijavite se znova.",
+    "unknownTenant": "Organizacije na tem naslovu ni bilo mogoče prepoznati."
+  }
+}

@@ -1,74 +1,87 @@
 import { Component, Input } from '@angular/core';
+import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
 import { DocStatus, DocType, GdprType, TaskType } from '../../core/models/models';
 import { STATUS_MAP, DOC_TYPE_MAP, GDPR_MAP, TASK_TYPE_MAP, groupCssClass, initials } from '../../core/services/helpers';
+
+// Each badge shows a translated label for the values the app knows; any other
+// value (custom entries from App Settings) is shown exactly as stored.
 
 // ── Status Badge ──────────────────────────────────────────
 @Component({
   selector: 'wt-status-badge',
   standalone: true,
+  imports: [TranslocoDirective],
+  providers: [provideTranslocoScope('documents')],
   template: `
+    <ng-container *transloco="let t; prefix: 'documents'">
     <span class="badge" [class]="cls">
-      <span class="bdot"></span>{{ label }}
+      <span class="bdot"></span>{{ labelKey ? t(labelKey) : rawValue }}
     </span>
+    </ng-container>
   `,
 })
 export class StatusBadgeComponent {
   @Input({ required: true }) set status(s: DocStatus) {
-    const m = STATUS_MAP[s] ?? { label: s, cls: '' };
-    this.label = m.label; this.cls = m.cls;
+    const known = STATUS_MAP[s];
+    this.labelKey = known ? 'labels.statuses.' + s : null;
+    this.rawValue = s;
+    this.cls = known?.cls ?? '';
   }
-  label = ''; cls = '';
+  labelKey: string | null = null; rawValue = ''; cls = '';
 }
 
 // ── Doc Type Badge ────────────────────────────────────────
-const DOC_TYPE_POLISH: Record<string, string> = {
-  partner_agreement:    'Umowa partnerska',
-  it_supplier_agreement:'Umowa z dostawcą IT',
-  employee_agreement:   'Umowa pracownicza',
-  nda:                  'NDA',
-  operator_agreement:   'Umowa operatorska',
-};
-
 @Component({
   selector: 'wt-type-badge',
   standalone: true,
-  template: `<span class="tbadge">{{ label }}</span>`,
+  imports: [TranslocoDirective],
+  providers: [provideTranslocoScope('documents')],
+  template: `<ng-container *transloco="let t; prefix: 'documents'"><span class="tbadge">{{ labelKey ? t(labelKey) : rawValue }}</span></ng-container>`,
 })
 export class TypeBadgeComponent {
   @Input({ required: true }) set type(t: DocType) {
-    // Polish label for known types; for custom types added via App Settings,
-    // the value IS the display name (e.g. "Dostawca Content Hotel")
-    this.label = DOC_TYPE_POLISH[t] ?? DOC_TYPE_MAP[t] ?? t;
+    // For custom types added via App Settings the value IS the display name
+    // (e.g. "Dostawca Content Hotel").
+    this.labelKey = DOC_TYPE_MAP[t] ? 'labels.docTypes.' + t : null;
+    this.rawValue = t;
   }
-  label = '';
+  labelKey: string | null = null; rawValue = '';
 }
 
 // ── GDPR Badge ────────────────────────────────────────────
 @Component({
   selector: 'wt-gdpr-badge',
   standalone: true,
-  template: `<span class="gbadge" [class]="cls">{{ label }}</span>`,
+  imports: [TranslocoDirective],
+  providers: [provideTranslocoScope('documents')],
+  template: `<ng-container *transloco="let t; prefix: 'documents'"><span class="gbadge" [class]="cls">{{ labelKey ? t(labelKey) : rawValue }}</span></ng-container>`,
 })
 export class GdprBadgeComponent {
   @Input({ required: true }) set gdpr(g: GdprType) {
-    const m = GDPR_MAP[g] ?? { label: g, cls: '' };
-    this.label = m.label; this.cls = m.cls;
+    const known = GDPR_MAP[g];
+    this.labelKey = known ? 'badges.gdpr.' + g : null;
+    this.rawValue = g;
+    this.cls = known?.cls ?? '';
   }
-  label = ''; cls = '';
+  labelKey: string | null = null; rawValue = ''; cls = '';
 }
 
 // ── Task Type Badge ───────────────────────────────────────
 @Component({
   selector: 'wt-task-badge',
   standalone: true,
-  template: `<span class="badge" [class]="cls">{{ label }}</span>`,
+  imports: [TranslocoDirective],
+  providers: [provideTranslocoScope('documents')],
+  template: `<ng-container *transloco="let t; prefix: 'documents'"><span class="badge" [class]="cls">{{ labelKey ? t(labelKey) : rawValue }}</span></ng-container>`,
 })
 export class TaskBadgeComponent {
   @Input({ required: true }) set taskType(t: TaskType) {
-    const m = TASK_TYPE_MAP[t] ?? { label: t, cls: '' };
-    this.label = m.label; this.cls = m.cls;
+    const known = TASK_TYPE_MAP[t];
+    this.labelKey = known ? 'labels.taskTypes.' + t : null;
+    this.rawValue = t;
+    this.cls = known?.cls ?? '';
   }
-  label = ''; cls = '';
+  labelKey: string | null = null; rawValue = ''; cls = '';
 }
 
 // ── Group Pill ────────────────────────────────────────────

@@ -1,0 +1,1291 @@
+{
+  "dataManagement": {
+    "delete": {
+      "deleted": "Izbrisano: {name}",
+      "document": {
+        "action": "Izbriši dokument",
+        "description": "Izbriše: metapodatke, vse različice + datoteke iz Blob, oznake, naloge poteka dela, povezave s CRM, revizijske dnevnike",
+        "failed": "Napaka pri brisanju dokumenta",
+        "searchPlaceholder": "Vnesite naziv ali številko dokumenta (najmanj 2 znaka)…",
+        "title": "Dokument"
+      },
+      "inProgress": "Brisanje…",
+      "lead": {
+        "action": "Izbriši lead",
+        "description": "Izbriše: lead, aktivnosti, povezave z dokumenti, zgodovino. Ne izbriše partnerja, nastalega s pretvorbo.",
+        "failed": "Napaka pri brisanju leada",
+        "searchPlaceholder": "Vnesite naziv podjetja ali kontakt (najmanj 2 znaka)…",
+        "title": "Lead"
+      },
+      "partner": {
+        "action": "Izbriši partnerja",
+        "description": "Izbriše: partnerja, aktivnosti, povezave z dokumenti, prodajne podatke, zgodovino.",
+        "failed": "Napaka pri brisanju partnerja",
+        "searchPlaceholder": "Vnesite naziv podjetja ali davčno številko (najmanj 2 znaka)…",
+        "title": "Partner"
+      },
+      "subtitle": "Trajno brisanje dokumenta, leada ali partnerja skupaj z vsemi povezanimi podatki in dnevniki.",
+      "title": "Brisanje zapisov"
+    },
+    "purge": {
+      "confirm": "Potrdi",
+      "docs": {
+        "action": "Izbriši vse dokumente",
+        "confirmPhrase": "IZBRIŠI DOKUMENTE",
+        "description": "Izbriše: dokumente, različice, datoteke iz Blob, oznake, skupine dokumentov, naloge poteka dela, revizijske dnevnike dokumentov",
+        "title": "Vse dokumente"
+      },
+      "failed": "Napaka pri čiščenju",
+      "leads": {
+        "action": "Izbriši vse leade",
+        "confirmPhrase": "IZBRIŠI LEADE",
+        "description": "Izbriše: leade, aktivnosti leadov, povezave leadov z dokumenti, zgodovino uvozov leadov, revizijske dnevnike leadov",
+        "title": "Vse leade"
+      },
+      "partners": {
+        "action": "Izbriši vse partnerje",
+        "confirmPhrase": "IZBRIŠI PARTNERJE",
+        "description": "Izbriše: partnerje, aktivnosti partnerjev, povezave z dokumenti, prodajne podatke, proračune, revizijske dnevnike partnerjev",
+        "title": "Vse partnerje"
+      },
+      "result": "Izbrisano: {deleted, plural, one {# zapis} two {# zapisa} few {# zapisi} other {# zapisov}}, {blobsDeleted, plural, one {# datoteka} two {# datoteki} few {# datoteke} other {# datotek}} iz Blob",
+      "subtitle": "Izbrišite vse zapise izbrane kategorije. Ohranijo se: uporabniki, vloge, profili skupin, skupine partnerjev, nastavitve aplikacije.",
+      "title": "Čiščenje testnega okolja",
+      "typePhrase": "Vnesite: {phrase}"
+    },
+    "settings": {
+      "export": {
+        "description": "Prenesite datoteko JSON z vsemi šifranti, parametri aplikacije in profili skupin dokumentov.",
+        "download": "Prenesi settings.json",
+        "generating": "Ustvarjanje…",
+        "title": "Izvoz nastavitev"
+      },
+      "import": {
+        "action": "Uvozi nastavitve",
+        "description": "Naložite datoteko JSON, preneseno iz drugega okolja. Obstoječe nastavitve bodo prepisane. Novi ključi bodo dodani.",
+        "dropHint": "Povlecite datoteko JSON ali kliknite",
+        "failed": "Napaka pri uvozu",
+        "inProgress": "Uvažanje…",
+        "invalidFile": "Neveljavna datoteka JSON",
+        "result": "Uvoženo: {settingsUpdated, plural, one {# nastavitev} two {# nastavitvi} few {# nastavitve} other {# nastavitev}}, {groupsUpdated, plural, one {# profil skupin} two {# profila skupin} few {# profili skupin} other {# profilov skupin}}",
+        "title": "Uvoz nastavitev"
+      },
+      "subtitle": "Prenos konfiguracije med okolji. Izvoz prenese datoteko JSON z app_settings in group_profiles. Uvoz prepiše obstoječe vrednosti.",
+      "title": "Izvoz / uvoz nastavitev"
+    },
+    "subtitle": "Skrbniška opravila: brisanje zapisov, čiščenje okolja, izvoz/uvoz nastavitev. Na voljo samo skrbnikom.",
+    "title": "Upravljanje podatkov"
+  },
+  "logs": {
+    "columns": {
+      "action": "Dejanje",
+      "dateTime": "Datum in ura",
+      "details": "Podrobnosti",
+      "document": "Dokument",
+      "user": "Uporabnik"
+    },
+    "count": "Vnosov: {count}",
+    "detail": {
+      "after": "Po:",
+      "before": "Prej:",
+      "document": "Dokument:"
+    },
+    "empty": "Ni najdenih vnosov dnevnika",
+    "filters": {
+      "actionType": "Vrsta dejanja",
+      "allActions": "Vsa dejanja",
+      "clear": "Počisti filtre",
+      "dateFrom": "Datum od",
+      "dateTo": "Datum do",
+      "userEmail": "E-pošta uporabnika",
+      "userEmailPlaceholder": "uporabnik@podjetje.si"
+    },
+    "pagination": {
+      "next": "Naprej",
+      "page": "Stran {page} od {total}",
+      "previous": "Prejš."
+    },
+    "searchPlaceholder": "Iščite uporabnika, dokument…",
+    "title": "Revizijski dnevniki"
+  },
+  "onboardingSurvey": {
+    "answers": {
+      "copied": "Kopirano",
+      "copySecret": "Kopiraj",
+      "hideSecret": "Skrij",
+      "lastChange": "zadnja sprememba {date}",
+      "loadFailed": "Napaka pri nalaganju vprašalnika za uvedbo",
+      "loading": "Nalaganje...",
+      "notStarted": "Skrbnik te organizacije še ni začel izpolnjevati vprašalnika za uvedbo (Nastavitve aplikacije → Vprašalnik za uvedbo).",
+      "secretNotProvided": "— ni navedeno —",
+      "showSecret": "Pokaži",
+      "statusDraft": "Osnutek — še ni poslan",
+      "statusSubmitted": "Poslan"
+    },
+    "options": {
+      "aiLicence": {
+        "own": "Lastna, namenska licenca / ključ API našega podjetja",
+        "shared": "Licenca CRMtree (deljena, obračunana v okviru pogodbe)",
+        "undecided": "Še ne vemo — prosimo za priporočilo"
+      },
+      "oauthAppOwner": {
+        "client": "Naš oddelek IT bo registriral aplikacijo in spodaj navedel podatke",
+        "needs_help": "Pri registraciji aplikacije potrebujemo pomoč CRMtree"
+      },
+      "yesNo": {
+        "no": "Ne",
+        "yes": "Da"
+      }
+    },
+    "page": {
+      "backToSettings": "Nastavitve",
+      "choose": "— izberite —",
+      "draftSaved": "Osnutek shranjen",
+      "fillRequired": "Izpolnite obvezna polja",
+      "intro": {
+        "howItWorks": "Na podlagi tega vprašalnika bo ekipa CRMtree nastavila vaše okolje. Izpolnjujete ga lahko po delih — „Shrani osnutek“ ohrani odgovore, „Pošlji vprašalnik“ pa jih posreduje nam.",
+        "requiredAfter": "so obvezna za pošiljanje.",
+        "requiredBefore": "Polja, označena z",
+        "secrets": "Gesla, žetoni in ključi API se shranjujejo v šifrirani obliki in po shranjevanju niso več prikazani."
+      },
+      "loadFailed": "Vprašalnika ni bilo mogoče naložiti",
+      "missingRequiredTitle": "Za pošiljanje vprašalnika izpolnite obvezna polja:",
+      "resubmit": "Pošlji znova",
+      "saveDraft": "Shrani osnutek",
+      "saveFailed": "Napaka pri shranjevanju vprašalnika",
+      "secretSavedPlaceholder": "shranjeno — pustite prazno, da ostane enako",
+      "statusDraft": "Osnutek",
+      "statusSubmitted": "Poslan {date}",
+      "submit": "Pošlji vprašalnik",
+      "submitted": "Vprašalnik je poslan ekipi CRMtree",
+      "title": "Vprašalnik za uvedbo"
+    },
+    "questions": {
+      "additional_notes": {
+        "label": "Druge zahteve, vprašanja ali omejitve"
+      },
+      "ai_data_processing_consent": {
+        "label": "Obdelava podatkov pri ponudnikih modelov",
+        "options": {
+          "accepted": {
+            "label": "Soglašamo s posredovanjem vsebin (podatki o podjetjih, zapiski in prepisi klicev) izbranemu ponudniku modela AI"
+          },
+          "eu_only": {
+            "label": "Zahtevamo obdelavo izključno na območju EU"
+          }
+        }
+      },
+      "ai_monthly_budget": {
+        "hint": "Neobvezno — če želite omejiti porabo.",
+        "label": "Mesečna omejitev stroškov modelov AI",
+        "placeholder": "npr. 200 EUR"
+      },
+      "billing_city": {
+        "label": "Kraj"
+      },
+      "billing_company_name": {
+        "label": "Polni naziv podjetja (za račun)",
+        "placeholder": "npr. Acme d.o.o."
+      },
+      "billing_country": {
+        "label": "Država",
+        "placeholder": "Slovenija"
+      },
+      "billing_cycle": {
+        "label": "Obračunsko obdobje",
+        "options": {
+          "annual": {
+            "label": "Letno"
+          },
+          "monthly": {
+            "label": "Mesečno"
+          }
+        }
+      },
+      "billing_invoice_email": {
+        "label": "E-pošta, na katero pošiljamo račune",
+        "placeholder": "racunovodstvo@podjetje.si"
+      },
+      "billing_nip": {
+        "label": "Davčna številka"
+      },
+      "billing_plan": {
+        "label": "Izbrani paket",
+        "options": {
+          "lite": {
+            "label": "Lite"
+          },
+          "professional": {
+            "label": "Professional (individualna ponudba)"
+          },
+          "standard": {
+            "label": "Standard"
+          },
+          "undecided": {
+            "label": "Še ni določeno"
+          }
+        }
+      },
+      "billing_postal_code": {
+        "label": "Poštna številka"
+      },
+      "billing_street": {
+        "label": "Ulica in hišna številka"
+      },
+      "business_contact_email": {
+        "label": "Odločevalec — e-pošta"
+      },
+      "business_contact_name": {
+        "label": "Odločevalec na poslovni strani — ime in priimek"
+      },
+      "business_contact_phone": {
+        "label": "Odločevalec — telefon"
+      },
+      "call_analysis_api_key": {
+        "label": "Analiza klicev — lastni ključ API"
+      },
+      "call_analysis_buying_signals": {
+        "hint": "Značilni znaki zanimanja in značilni ugovori. Po njih bomo prilagodili oceno pripravljenosti na nakup.",
+        "label": "Analiza klicev — po čem prepoznate stranko, ki je pripravljena na nakup?"
+      },
+      "call_analysis_licence": {
+        "hint": "Analiza klicev uporablja model DeepSeek.",
+        "label": "Analiza klicev — licenca za model"
+      },
+      "call_analysis_monthly_volume": {
+        "label": "Analiza klicev — ocenjeno število klicev na mesec"
+      },
+      "company_display_name": {
+        "label": "Naziv podjetja, prikazan v CRM",
+        "placeholder": "npr. Acme"
+      },
+      "company_email_domain": {
+        "hint": "Domena, s katero se prijavljajo vaši zaposleni.",
+        "label": "Domena službene e-pošte",
+        "placeholder": "npr. acme.si"
+      },
+      "company_industry": {
+        "label": "Panoga",
+        "placeholder": "npr. logistika, IT, proizvodnja"
+      },
+      "company_offer_description": {
+        "hint": "Kratek opis ponudbe in značilne stranke. Uporabimo ga za nastavitev šifrantov in namigov AI.",
+        "label": "Kaj prodajate in komu?"
+      },
+      "currencies": {
+        "label": "Valute, v katerih prodajate",
+        "placeholder": "PLN, EUR"
+      },
+      "dwh_source": {
+        "hint": "Izvorni sistem (ERP / prodajni sistem), oblika izvoza in pogostost.",
+        "label": "Prodajni podatki — iz katerega sistema in kako pogosto naj se posodabljajo?"
+      },
+      "email_mailbox_count": {
+        "label": "Koliko poštnih predalov bo povezanih?"
+      },
+      "email_oauth_app_owner": {
+        "label": "Kdo bo registriral aplikacijo pri ponudniku e-pošte?"
+      },
+      "email_other_provider": {
+        "hint": "Trenutno podpiramo Gmail, Microsoft 365 in Zoho — preverili bomo možnosti za drugega ponudnika.",
+        "label": "Katera e-pošta je to?"
+      },
+      "email_provider": {
+        "label": "Katero službeno e-pošto uporabljate?",
+        "options": {
+          "gmail": {
+            "label": "Gmail / Google Workspace"
+          },
+          "none": {
+            "label": "Integracije e-pošte ne želimo"
+          },
+          "other": {
+            "label": "Druga"
+          },
+          "outlook": {
+            "label": "Outlook / Microsoft 365"
+          },
+          "zoho": {
+            "label": "Zoho Mail"
+          }
+        }
+      },
+      "enrichment_api_key": {
+        "label": "Enrichment — lastni ključ API"
+      },
+      "enrichment_ideal_customer": {
+        "hint": "Panoge, velikost podjetja, regija, znaki ujemanja in podjetja, ki jih ne želite pridobivati. Na tej podlagi bomo nastavili signale in točkovanje.",
+        "label": "Enrichment — profil idealne stranke (ICP)"
+      },
+      "enrichment_licence": {
+        "label": "Enrichment — licenca za model"
+      },
+      "enrichment_model": {
+        "label": "Enrichment — želeni model",
+        "options": {
+          "anthropic": {
+            "label": "Anthropic Claude (višja kakovost, višji strošek)"
+          },
+          "deepseek": {
+            "label": "DeepSeek (privzeti, nižji strošek)"
+          },
+          "undecided": {
+            "label": "Prosimo za priporočilo"
+          }
+        }
+      },
+      "enrichment_monthly_volume": {
+        "label": "Enrichment — koliko podjetij na mesec nameravate analizirati?"
+      },
+      "gmail_client_id": {
+        "label": "Google — Client ID",
+        "placeholder": "123456789.apps.googleusercontent.com"
+      },
+      "gmail_client_secret": {
+        "label": "Google — Client Secret"
+      },
+      "gmail_pubsub_topic": {
+        "hint": "Potreben za takojšnje prejemanje novih sporočil.",
+        "label": "Google — Pub/Sub Topic",
+        "placeholder": "projects/moj-projekt/topics/gmail-push"
+      },
+      "go_live_date": {
+        "label": "Načrtovani datum zagona"
+      },
+      "import_scope": {
+        "label": "Katere podatke uvozimo na začetku?",
+        "options": {
+          "contacts": {
+            "label": "Kontaktne osebe"
+          },
+          "documents": {
+            "label": "Dokumenti / pogodbe"
+          },
+          "leads": {
+            "label": "Leadi / prodajne priložnosti"
+          },
+          "partners": {
+            "label": "Obstoječe stranke / partnerji"
+          }
+        }
+      },
+      "import_source": {
+        "hint": "Sedanji sistem (Excel, drug CRM, ERP) in približno število zapisov.",
+        "label": "Od kod izvirajo podatki in koliko jih je?",
+        "placeholder": "npr. Excel, pribl. 2.000 leadov in 300 strank"
+      },
+      "lead_sources": {
+        "label": "Viri leadov",
+        "placeholder": "Spletna stran, priporočilo, cold call, LinkedIn, sejmi…"
+      },
+      "modules": {
+        "label": "Kateri moduli naj bodo aktivni?",
+        "options": {
+          "call_analysis": {
+            "hint": "Ocenjevanje telefonskih klicev z AI.",
+            "label": "Analiza klicev"
+          },
+          "documents": {
+            "hint": "Register pogodb, potek odobritev in podpis.",
+            "label": "Dokumenti"
+          },
+          "dwh_integration": {
+            "hint": "Polnjenje CRM s prometom iz vašega prodajnega sistema / ERP.",
+            "label": "Integracija s prodajnimi podatki (DWH)"
+          },
+          "leads": {
+            "hint": "Prodajni lijak, aktivnosti, koledar.",
+            "label": "Leadi"
+          },
+          "onboarding": {
+            "hint": "Predloge uvajalnih nalog za nove stranke.",
+            "label": "Uvajanje strank"
+          },
+          "partner_registry": {
+            "hint": "Delo z obstoječimi strankami, upsell in cross-sell.",
+            "label": "Register partnerjev / strank"
+          },
+          "pbx": {
+            "hint": "Klicanje strank neposredno iz CRM.",
+            "label": "Telefonija (softphone)"
+          },
+          "performance": {
+            "hint": "Health score in tveganje odhoda stranke (churn).",
+            "label": "Rezultati"
+          },
+          "prospects": {
+            "hint": "Iskanje podjetij in njihovo samodejno ocenjevanje z AI (Enrichment / ICP).",
+            "label": "Potencialne stranke"
+          },
+          "sales_reports": {
+            "label": "Prodajna poročila"
+          },
+          "seo_bot": {
+            "hint": "Samodejno ustvarjanje in objavljanje člankov na blogu.",
+            "label": "SEObot"
+          },
+          "whatsapp": {
+            "hint": "Skupna službena številka WhatsApp Business, ki se uporablja s kartic leadov in strank.",
+            "label": "WhatsApp"
+          }
+        }
+      },
+      "outlook_admin_consent": {
+        "label": "Ali lahko skrbnik Microsoft 365 da soglasje (admin consent) za celotno organizacijo?"
+      },
+      "outlook_azure_tenant_id": {
+        "hint": "Neobvezno.",
+        "label": "Microsoft — Directory (tenant) ID"
+      },
+      "outlook_client_id": {
+        "label": "Microsoft — Application (client) ID",
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      "outlook_client_secret": {
+        "label": "Microsoft — Client Secret"
+      },
+      "pbx_account_name": {
+        "label": "Naziv podjetja / računa v ip-pbx.eu"
+      },
+      "pbx_account_status": {
+        "label": "Ali imate poslovni račun v ip-pbx.eu?",
+        "options": {
+          "has_account": {
+            "label": "Da"
+          },
+          "needs_account": {
+            "label": "Ne — prosimo, da račun odpre CRMtree"
+          },
+          "other_provider": {
+            "label": "Ne — uporabljamo drugo centralo / operaterja"
+          }
+        }
+      },
+      "pbx_call_recording": {
+        "hint": "Posnetki in njihovi prepisi so osnova modula Analiza klicev.",
+        "label": "Ali naj se klici snemajo?"
+      },
+      "pbx_current_provider": {
+        "label": "Sedanja centrala / operater"
+      },
+      "pbx_extension_count": {
+        "label": "Koliko oseb bo klicalo iz CRM?"
+      },
+      "pbx_phone_numbers": {
+        "hint": "Glavna številka podjetja in neposredne številke, če naj bodo dodeljene določenim osebam. Označite številke, ki jih je treba prenesti od sedanjega operaterja.",
+        "label": "Številke, s katerih naj potekajo odhodni klici"
+      },
+      "sales_stages": {
+        "hint": "Pustite prazno, če vam ustreza privzeti lijak.",
+        "label": "Faze prodajnega lijaka",
+        "placeholder": "Nov → Kvalifikacija → Predstavitev → Ponudba → Pogajanja → Dobljen / Izgubljen"
+      },
+      "seo_articles_per_day": {
+        "label": "Koliko člankov na dan?"
+      },
+      "seo_channels": {
+        "label": "Dodatni kanali in viri podatkov",
+        "options": {
+          "facebook": {
+            "label": "Objavljanje na Facebook strani podjetja"
+          },
+          "gsc": {
+            "label": "Google Search Console (imamo lastniški dostop do storitve)"
+          },
+          "linkedin": {
+            "label": "Objavljanje na LinkedIn profilu podjetja"
+          }
+        }
+      },
+      "seo_publishing_platform": {
+        "label": "Kje objavljamo članke?",
+        "options": {
+          "other": {
+            "label": "Drug sistem"
+          },
+          "undecided": {
+            "label": "Še ni določeno"
+          },
+          "wordpress": {
+            "label": "WordPress"
+          }
+        }
+      },
+      "seo_website_url": {
+        "label": "Naslov spletne strani / bloga",
+        "placeholder": "https://podjetje.si/blog"
+      },
+      "technical_contact_email": {
+        "label": "Tehnična oseba — e-pošta"
+      },
+      "technical_contact_name": {
+        "hint": "Oseba, ki ima skrbniški dostop do e-pošte, telefonije in računov Meta.",
+        "label": "Tehnična oseba (IT) — ime in priimek"
+      },
+      "technical_contact_phone": {
+        "label": "Tehnična oseba — telefon"
+      },
+      "users_count": {
+        "label": "Načrtovano število uporabnikov"
+      },
+      "users_global_read": {
+        "label": "Ali naj prodajalci vidijo leade in stranke drugih prodajalcev?",
+        "options": {
+          "own_only": {
+            "label": "Ne — vsak vidi samo svoje"
+          },
+          "read_all": {
+            "label": "Da — vsi vidijo vse (samo za branje)"
+          },
+          "undecided": {
+            "label": "Še ni določeno"
+          }
+        }
+      },
+      "users_list": {
+        "hint": "Ena oseba na vrstico: ime in priimek; e-pošta; vloga (skrbnik / vodja prodaje / prodajalec). Vsak bo prejel enkratno geslo, ki ga spremeni ob prvi prijavi.",
+        "label": "Seznam uporabnikov, ki jih je treba ustvariti",
+        "placeholder": "Janez Novak; janez.novak@podjetje.si; prodajalec\nAna Kovač; ana.kovac@podjetje.si; vodja prodaje"
+      },
+      "users_team_structure": {
+        "hint": "Katere ekipe / regije obstajajo in kdo je komu podrejen. Na tej podlagi bomo nastavili skupine in vidnost podatkov.",
+        "label": "Struktura prodajnih ekip"
+      },
+      "whatsapp_access_token": {
+        "hint": "Dovoljenja: whatsapp_business_messaging, whatsapp_business_management.",
+        "label": "Access Token (trajni žeton sistemskega uporabnika)"
+      },
+      "whatsapp_app_secret": {
+        "hint": "Meta App Dashboard → Settings → Basic.",
+        "label": "App Secret"
+      },
+      "whatsapp_display_name": {
+        "label": "Ime, prikazano strankam v WhatsApp"
+      },
+      "whatsapp_meta_verified": {
+        "label": "Ali je podjetje preverjeno v Meta Business Manager?",
+        "options": {
+          "unknown": {
+            "label": "Ne vem"
+          }
+        }
+      },
+      "whatsapp_number_status": {
+        "label": "Ali imate številko za WhatsApp Business?",
+        "options": {
+          "has_number": {
+            "label": "Številko imamo, vendar še ni registrirana v Meta"
+          },
+          "needs_number": {
+            "label": "Ne — prosimo, da številko kupi in nastavi CRMtree"
+          },
+          "ready": {
+            "label": "Da — številka je že v Meta WhatsApp Business Platform (Cloud API)"
+          }
+        }
+      },
+      "whatsapp_phone_number": {
+        "label": "Telefonska številka",
+        "placeholder": "+386 40 000 000"
+      },
+      "whatsapp_phone_number_id": {
+        "hint": "To je identifikator številke v Meta, ne sama telefonska številka.",
+        "label": "Phone Number ID"
+      },
+      "whatsapp_waba_id": {
+        "hint": "Meta App Dashboard → WhatsApp → API Setup.",
+        "label": "WABA ID (WhatsApp Business Account ID)"
+      },
+      "zoho_client_id": {
+        "label": "Zoho — Client ID",
+        "placeholder": "1000.XXXXXXXX"
+      },
+      "zoho_client_secret": {
+        "label": "Zoho — Client Secret"
+      },
+      "zoho_data_center": {
+        "label": "Zoho — podatkovni center",
+        "options": {
+          "com": {
+            "label": "US (zoho.com)"
+          },
+          "eu": {
+            "label": "EU (zoho.eu)"
+          },
+          "other": {
+            "label": "Drugo"
+          }
+        }
+      }
+    },
+    "sections": {
+      "ai": {
+        "intro": "Modula Potencialne stranke (Enrichment) in Analiza klicev pošiljata podatke zunanjim jezikovnim modelom. Uporabljate lahko licenco CRMtree ali lastno, namensko licenco svojega podjetja.",
+        "title": "8. Modeli AI — Enrichment in Analiza klicev"
+      },
+      "billing": {
+        "title": "2. Paket in podatki za račun"
+      },
+      "company": {
+        "intro": "Osnovni podatki, na podlagi katerih bomo pripravili okolje in določili, s kom naj bomo med uvedbo v stiku.",
+        "title": "1. Podjetje in kontaktne osebe"
+      },
+      "data": {
+        "title": "10. Podatki in šifranti"
+      },
+      "email": {
+        "intro": "Vsak uporabnik v CRM poveže svoj poštni predal (pošiljanje in prejemanje sporočil na karticah leadov in strank). Za to je potrebna enkratna registracija aplikacije pri ponudniku e-pošte — naslov za preusmeritev (Redirect URI) bomo posredovali tehnični osebi.",
+        "title": "5. E-pošta"
+      },
+      "modules": {
+        "intro": "Označene module bomo vklopili v vašem okolju. Za nekatere od njih se bodo spodaj prikazala dodatna vprašanja.",
+        "title": "4. Moduli"
+      },
+      "notes": {
+        "title": "11. Opombe"
+      },
+      "pbx": {
+        "intro": "Softphone v CRM deluje z virtualno centralo ip-pbx.eu. Vsak uporabnik pozneje vnese svoj osebni žeton v „Moje nastavitve“ — tukaj ga ni treba navajati.",
+        "title": "7. Telefonija (softphone)"
+      },
+      "seo": {
+        "title": "9. SEObot"
+      },
+      "users": {
+        "title": "3. Uporabniki in vloge"
+      },
+      "whatsapp": {
+        "intro": "CRM podpira eno skupno službeno številko WhatsApp Business za celotno organizacijo (Meta WhatsApp Business Platform). Številka, povezana s CRM, ne more hkrati delovati v običajni aplikaciji WhatsApp na telefonu.",
+        "title": "6. WhatsApp Business"
+      }
+    }
+  },
+  "pbx": {
+    "actions": {
+      "cancel": "Prekliči",
+      "changeToken": "Spremeni žeton",
+      "delete": "Izbriši",
+      "deleting": "Brisanje…",
+      "hide": "Skrij",
+      "save": "Shrani",
+      "saving": "Shranjevanje…",
+      "setToken": "Nastavi žeton",
+      "show": "Pokaži"
+    },
+    "columns": {
+      "crmRole": "Vloga v CRM",
+      "directPhone": "Neposredna številka (DPN)",
+      "status": "Status",
+      "updatedAt": "Posodobljeno",
+      "user": "Uporabnik"
+    },
+    "deleteModal": {
+      "body": "Res želite izbrisati žeton PBX za {name}? Uporabnik ne bo mogel uporabljati softphona.",
+      "title": "Izbriši žeton PBX"
+    },
+    "loadError": "Napaka pri nalaganju podatkov.",
+    "loading": "Nalaganje…",
+    "modal": {
+      "hintBody": "Prijavite se v ploščo ip-pbx.eu kot ta uporabnik ali ga prosite za žeton. Plošča → kliknite avatar/ime v zgornjem desnem kotu → API ali Personal Access Token → Ustvari / Kopiraj žeton.",
+      "hintTitle": "Kje dobim žeton?",
+      "patHint": "Po shranjevanju bo sistem samodejno pridobil podatke SIP in neposredno številko iz ip-pbx.eu.",
+      "patLabel": "Personal Access Token (PAT)",
+      "patPlaceholder": "Prilepite žeton iz ip-pbx.eu",
+      "title": "Žeton PBX — {name}"
+    },
+    "noPhoneInPbx": "Ni številke v PBX",
+    "roles": {
+      "salesManager": "Vodja prodaje",
+      "salesperson": "Prodajnik"
+    },
+    "searchPlaceholder": "Iskanje uporabnika…",
+    "status": {
+      "configured": "Nastavljeno",
+      "noToken": "Ni žetona"
+    },
+    "subtitle": "Vsakemu prodajniku dodelite njegov Personal Access Token iz ip-pbx.eu. Sistem bo samodejno pridobil podatke SIP in neposredno telefonsko številko (DPN).",
+    "title": "Telefonske številke PBX",
+    "toast": {
+      "deleteError": "Napaka pri brisanju žetona.",
+      "deleted": "Žeton izbrisan.",
+      "saveError": "Napaka pri shranjevanju žetona.",
+      "saved": "Žeton shranjen.",
+      "savedWithPhone": "Žeton shranjen. Številka: {phone}."
+    },
+    "userCount": "Uporabniki: {count}"
+  },
+  "settings": {
+    "actions": {
+      "add": "Dodaj",
+      "delete": "Izbriši",
+      "discard": "Zavrzi",
+      "saveChanges": "Shrani spremembe",
+      "saving": "Shranjevanje…"
+    },
+    "crm": {
+      "intro": "— šifranti in pragovi, ki jih uporablja modul CRM. Sezname urejajte z dodajanjem / odstranjevanjem elementov. Spremembe začnejo veljati po shranjevanju.",
+      "scoring": {
+        "activityLast20Days": "Aktivnost (zadnjih 20 dni)",
+        "churnTitle": "Algoritem Churn — parametri točkovanja",
+        "description": "Opis",
+        "healthLevelThresholds": "Pragovi Health Level (točke)",
+        "healthTitle": "Health Score — parametri točkovanja",
+        "noOrdersDays": "Brez naročil (dni)",
+        "parameter": "Parameter",
+        "revenueGrowth": "Rast prihodkov (M-2→M-1)",
+        "riskThresholds": "Pragovi tveganja (točke)",
+        "salesDrop": "Padec prodaje (M-2→M-1)",
+        "schedule": "Urnik",
+        "value": "Vrednost"
+      }
+    },
+    "documents": {
+      "empty": "Ni šifrantov dokumentov. Zaženite migracijo 0116.",
+      "intro": "— upravljajte razpoložljive vrednosti za vrste dokumentov, statuse in klasifikacijo GDPR. Opozorilo: odstranitev vrednosti, ki je že uporabljena v dokumentih, lahko povzroči težave pri prikazu."
+    },
+    "errors": {
+      "saveFailed": "Napaka pri shranjevanju",
+      "settingsSaveFailed": "Napaka pri shranjevanju nastavitev"
+    },
+    "fields": {
+      "changed": "Spremenjeno",
+      "changedBy": "Spremenil/a",
+      "disabled": "Izklopljeno",
+      "emptyList": "— seznam je prazen —",
+      "enabled": "Vklopljeno",
+      "errors": {
+        "nonNegativeNumber": "Vrednost mora biti nenegativno število",
+        "valueExists": "Vrednost že obstaja"
+      },
+      "newValueCode": "Nova vrednost (koda, npr. hotel)",
+      "newValueExample": "Nova vrednost (npr. Previsoka cena)",
+      "newValueTechnicalKey": "Nova vrednost (tehnični ključ)"
+    },
+    "global": {
+      "categories": {
+        "crm": "CRM – poslovni parametri",
+        "documents": "Dokumenti in roki",
+        "general": "Splošno / UI",
+        "workflow": "Workflow in Kanban"
+      },
+      "intro": "— tehnične nastavitve aplikacije, vidne vsem uporabnikom. Spremembe začnejo veljati takoj po shranjevanju.",
+      "preview": {
+        "expiringSoon": "dni → „poteče kmalu“",
+        "moreThan": "Več kot",
+        "noWarning": "dni → brez opozorila",
+        "title": "Predogled barv rokov",
+        "urgent": "dni → rdeče (nujno)"
+      }
+    },
+    "groups": {
+      "addFailed": "Napaka pri dodajanju skupine",
+      "addGroup": "Dodaj skupino",
+      "addTitle": "Dodaj novo skupino",
+      "added": "Skupina „{name}“ je bila dodana",
+      "adding": "Dodajanje…",
+      "cannotDelete": "Brisanje ni mogoče — skupina ima dodeljene uporabnike ali dokumente",
+      "deleteConfirm": "Želite izbrisati skupino „{name}“?",
+      "deleteFailed": "Napaka pri brisanju skupine",
+      "deleteGroup": "Izbriši skupino",
+      "deleted": "Skupina „{name}“ je izbrisana",
+      "description": "Opis",
+      "descriptionPlaceholder": "Neobvezen opis skupine",
+      "displayName": "Prikazno ime",
+      "displayNameHint": "Vidno uporabnikom (npr. Podpora strankam, Uprava).",
+      "displayNamePlaceholder": "npr. Podpora strankam",
+      "documentCount": "{count, plural, one {# dokument} two {# dokumenta} few {# dokumenti} other {# dokumentov}}",
+      "empty": "Ni skupin. Dodajte prvo skupino zgoraj ali zaženite migracijo 0127.",
+      "inactive": "Neaktivna",
+      "intro": "— upravljajte skupine, ki jim lahko dodelite uporabnike. Skupine nadzorujejo dostop do dokumentov. Skupine z dodeljenimi uporabniki ali dokumenti ni mogoče izbrisati.",
+      "memberCount": "{count, plural, one {# uporabnik} two {# uporabnika} few {# uporabniki} other {# uporabnikov}}",
+      "ownerRestriction": "Omejitev lastnika",
+      "ownerRestrictionOption": "Omejitev lastnika (Owner restriction)",
+      "technicalName": "Tehnično ime",
+      "technicalNameHint": "Enolični identifikator (npr. Accounting, HR). Brez šumnikov.",
+      "technicalNamePlaceholder": "npr. Accounting"
+    },
+    "icp": {
+      "addSignal": "Dodaj signal",
+      "defaultConfig": "Privzeta konfiguracija — še ni bila spremenjena.",
+      "deleteConfirm": "Želite izbrisati signal „{name}“?",
+      "disableSignal": "Izklopi signal",
+      "draftInvalid": "Delovna konfiguracija ima {score} / 100 točk. Enrichment še naprej uporablja zadnjo veljavno različico.",
+      "edit": "Uredi",
+      "editing": "Urejate:",
+      "enableSignal": "Vklopi signal",
+      "errors": {
+        "conflict": "Nekdo drug je medtem spremenil konfiguracijo ICP — osvežujem",
+        "fetchFailed": "Konfiguracije ICP ni bilo mogoče pridobiti (napaka {status}).",
+        "forbidden": "Nimate pravic za konfiguracijo ICP te organizacije.",
+        "loadFailed": "Napaka pri nalaganju konfiguracije ICP",
+        "noConnection": "Ni povezave s strežnikom — preverite, ali backend deluje, in poskusite znova.",
+        "noTenant": "Vaš račun ni dodeljen nobeni organizaciji, zato ni konfiguracije ICP za prikaz.",
+        "noTenantToast": "Ni dodeljene organizacije",
+        "notFound": "Konfiguracija ICP v tej različici backenda ni na voljo (404).",
+        "sessionExpired": "Seja je potekla. Prijavite se znova.",
+        "unknownStatus": "neznana"
+      },
+      "intro": "— konfiguracija točkovanih signalov, ki jih enrichment uporablja za oceno ustreznosti podjetja (ICP).",
+      "introTitle": "Signali ICP",
+      "lastUpdateVersion": "Zadnja posodobitev: različica",
+      "loadFailedTitle": "Konfiguracije ICP ni bilo mogoče naložiti.",
+      "loading": "Nalaganje...",
+      "modal": {
+        "active": "Aktiven",
+        "definition": "Kako prepoznati ta signal?",
+        "definitionHint": "Na podlagi tega opisa sistem oceni, ali podjetje izpolnjuje ta signal.",
+        "definitionPlaceholder": "Opišite, po čem je mogoče prepoznati, da podjetje izpolnjuje ta pogoj — konkretne besede/fraze na spletni strani, razdelki, delovna mesta.",
+        "editTitle": "Uredi signal",
+        "name": "Ime signala",
+        "namePlaceholder": "npr. Lasten vozni park",
+        "newTitle": "Nov signal",
+        "points": "Točke",
+        "saving": "Shranjujem...",
+        "shortDescription": "Namig / kratek opis za uporabnika",
+        "shortDescriptionHint": "Prikazan kot namig (?) ob signalu v Potencialnih strankah. Kratek, razumljiv stavek — ne tehnično navodilo za AI.",
+        "shortDescriptionPlaceholder": "Kratek poslovni opis v 1–2 stavkih — npr. „Izrecno poimenovan prodajni oddelek/ekipa“."
+      },
+      "noSignals": "Ni signalov.",
+      "ownTenant": "Vaša organizacija",
+      "ownTenantSuffix": "(Vaša)",
+      "pointsSum": "Vsota točk:",
+      "retry": "Poskusi znova",
+      "signalAdded": "Signal dodan",
+      "signalDeleted": "Signal izbrisan",
+      "signalDisabled": "Signal izklopljen (imel je zgodovino — ohranjen za pojasnitev starih rezultatov)",
+      "signalUpdated": "Signal posodobljen",
+      "systemUpdate": "sistemska posodobitev (vgrajeni privzeti signali CRM Tree)",
+      "tenantConfig": "Konfiguracija organizacije"
+    },
+    "itemLabels": {
+      "commissionBasis": {
+        "nie_dotyczy": "Ni relevantno",
+        "progi_obrotowe": "Prometni pragovi",
+        "rezerwacje": "Število rezervacij",
+        "segmenty": "Število segmentov"
+      },
+      "contactTitles": {
+        "Director": "Direktor",
+        "Manager": "Vodja",
+        "Other": "Drugo",
+        "Owner": "Lastnik",
+        "Specialist": "Strokovnjak"
+      },
+      "documentStatuses": {
+        "being_approved": "V odobritvi",
+        "being_edited": "V urejanju",
+        "being_signed": "V podpisu",
+        "completed": "Zaključen",
+        "new": "Nov",
+        "rejected": "Zavrnjen",
+        "signed": "Podpisan"
+      },
+      "documentTypes": {
+        "employee_agreement": "Pogodba o zaposlitvi",
+        "invoice": "Račun",
+        "it_supplier_agreement": "Pogodba z dobaviteljem IT",
+        "nda": "NDA",
+        "partner_agreement": "Partnerska pogodba"
+      },
+      "gdprTypes": {
+        "data_administration": "Skupno upravljanje",
+        "data_processing_entrustment": "Pogodbena obdelava",
+        "no_gdpr": "Brez GDPR"
+      },
+      "industries": {
+        "Education": "Izobraževanje",
+        "Finance": "Finance",
+        "Healthcare": "Zdravstvo",
+        "Legal": "Pravo",
+        "Manufacturing": "Proizvodnja",
+        "Other": "Drugo",
+        "Retail": "Trgovina",
+        "Tourism": "Turizem",
+        "Transport": "Transport"
+      },
+      "leadSources": {
+        "agent": "Agent",
+        "cold_call": "Cold call",
+        "inbound": "Inbound",
+        "inne": "Drugo",
+        "kampania": "E-poštna kampanja",
+        "linkedin": "LinkedIn",
+        "partner": "Partner",
+        "polecenie": "Priporočilo",
+        "strona_www": "Spletna stran",
+        "targi": "Sejem / Dogodek"
+      },
+      "leadStages": {
+        "closed_lost": "Izgubljen",
+        "closed_won": "Dobljen",
+        "negotiation": "Pogajanja",
+        "new": "Nov",
+        "offer": "Ponudba",
+        "presentation": "Predstavitev",
+        "qualification": "Kvalifikacija"
+      },
+      "partnerStatuses": {
+        "active": "Aktiven",
+        "churned": "Izgubljen",
+        "inactive": "Neaktiven",
+        "onboarding": "Uvajanje"
+      },
+      "paymentStatuses": {
+        "overdue": "Zapadel",
+        "paid": "Plačan",
+        "partially_paid": "Delno plačan",
+        "unpaid": "Neplačan"
+      },
+      "productTypes": {
+        "car_rental": "Najem avtomobila",
+        "hotel": "Hotel",
+        "other": "Drugo",
+        "transfer": "Transfer",
+        "transport_bus": "Avtobus",
+        "transport_ferry": "Trajekt",
+        "transport_flight": "Let",
+        "transport_train": "Vlak",
+        "travel_insurance": "Zavarovanje",
+        "visa": "Vizum"
+      }
+    },
+    "onboarding": {
+      "intro": "— določite standardne naloge za vsak korak postopka uvajanja. Predloge se samodejno predlagajo pri ustvarjanju nalog na plošči Uvajanje.",
+      "introTitle": "Predloge nalog uvajanja",
+      "jsonFormat": "Oblika JSON:",
+      "leadSources": {
+        "add": "Dodaj vir",
+        "group": "Skupina",
+        "groupHint": "Ime skupine ali prazno — vrednosti s skupino so prikazane v razdelku spodaj",
+        "label": "Oznaka (prikazana)",
+        "legend": "Modro ozadje = vrednost pripada skupini (na seznamih prikazana v razdelku Marketing).",
+        "noGroup": "— brez skupine —",
+        "value": "Vrednost (koda)"
+      },
+      "steps": {
+        "configuration": "Konfiguracija",
+        "contractSigning": "Podpis pogodbe",
+        "launch": "Zagon",
+        "training": "Usposabljanje"
+      },
+      "stepsLegend": "Koraki: 0=Podpis pogodbe, 1=Konfiguracija, 2=Usposabljanje, 3=Zagon.",
+      "taskTypes": {
+        "call": "Klic",
+        "doc_sent": "Dokument",
+        "email": "E-pošta",
+        "meeting": "Sestanek",
+        "task": "Naloga",
+        "training": "Usposabljanje"
+      },
+      "templates": {
+        "add": "Dodaj predlogo",
+        "assignee": "Dodeljeni",
+        "assigneeHint": "Samodejno dodeljeni uporabnik. Korak 0 vedno → prodajalec leada",
+        "days": "Dni",
+        "daysHint": "Koliko dni od datuma migracije nastaviti kot rok (null = brez roka)",
+        "empty": "Ni predlog. Zaženite migracijo 0133.",
+        "leadOwner": "prodajalec leada",
+        "legend": "Zeleno ozadje = standardna naloga (ustvarjena samodejno ob migraciji leada). Korak „Podpis pogodbe“ se vedno dodeli prodajalcu leada.",
+        "noAssignee": "— brez —",
+        "standard": "Standardna",
+        "standardCheckboxHint": "Samodejno ustvarjena ob migraciji",
+        "standardHint": "Ali se naloga ustvari samodejno ob migraciji leada",
+        "step": "Korak",
+        "title": "Naslov",
+        "type": "Vrsta"
+      }
+    },
+    "saved": "{count, plural, one {# nastavitev shranjena} two {# nastavitvi shranjeni} few {# nastavitve shranjene} other {# nastavitev shranjenih}}",
+    "survey": {
+      "description": "— podatki, na podlagi katerih ekipa CRMtree konfigurira vaše okolje (moduli, e-pošta, WhatsApp, telefonija, modeli AI).",
+      "open": "Odpri vprašalnik",
+      "title": "Vprašalnik za uvedbo"
+    },
+    "tabs": {
+      "crm": "Poslovni parametri CRM",
+      "documents": "Šifranti dokumentov",
+      "global": "Globalni parametri",
+      "icp": "Enrichment / ICP",
+      "onboarding": "Predloge uvajanja",
+      "projects": "Projekti",
+      "tooltips": "Namigi",
+      "users": "Skupine uporabnikov"
+    },
+    "title": "Nastavitve aplikacije",
+    "tooltips": {
+      "add": "Dodaj namig",
+      "added": "Namig dodan",
+      "catalog": {
+        "leadsFunnelActive": "Lijak: Aktivni leadi",
+        "leadsFunnelAvgWon": "Lijak: Povp. vrednost dobljenega",
+        "leadsFunnelConversion": "Lijak: Konverzija v Dobljen",
+        "leadsFunnelHot": "Lijak: Vroči leadi",
+        "leadsFunnelPct": "Lijak: % konverzije med fazami",
+        "leadsFunnelTitle": "Prodajni lijak (naslov)",
+        "leadsKpiAvgCycle": "KPI: Povp. prodajni cikel",
+        "leadsKpiBudget": "KPI: Načrtovani proračun (PLN)",
+        "leadsKpiPipeline": "KPI: Prodajni lijak (PLN)",
+        "leadsKpiWinRate": "KPI: Win Rate",
+        "leadsKpiWon": "KPI: Zaprto / Won (PLN)",
+        "leadsLostTitle": "Razlogi za izgubo (naslov)",
+        "leadsRepsColLeads": "Prodajalci: stolpec Leadi",
+        "leadsRepsColPipeline": "Prodajalci: stolpec Lijak",
+        "leadsRepsColProgress": "Prodajalci: stolpec Napredek",
+        "leadsRepsColWinRate": "Prodajalci: stolpec Win%",
+        "leadsRepsColWon": "Prodajalci: stolpec Won",
+        "leadsRepsTitle": "Rezultati prodajalcev (naslov)",
+        "leadsSourcesQuality": "Viri: Kakovost po viru (win rate)",
+        "leadsSourcesTitle": "Viri leadov (naslov)",
+        "leadsTrendTitle": "Mesečni trend (naslov)",
+        "leadsVelocityTitle": "Čas v fazi – povp. dni (naslov)",
+        "partnersKpiActivePartners": "Aktivnih partnerjev",
+        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiGrossTurnover": "Bruto promet (PLN)",
+        "partnersKpiRevenue": "Prihodek / Marža (PLN)",
+        "partnersKpiTransactions": "Transakcije",
+        "partnersScorecardHealth": "Scorecard: Health",
+        "salesActivity": "Panel: Zadnja aktivnost",
+        "salesChart": "Panel: Prodajni rezultati (grafikon)",
+        "salesKpiNewCompanies": "KPI: Nova podjetja",
+        "salesKpiNewContacts": "KPI: Novi kontakti",
+        "salesKpiNewLeads": "KPI: Nove priložnosti (aktivni prodajni lijak)",
+        "salesKpiPipelineValue": "KPI: Vrednost priložnosti (prodajni lijak)",
+        "salesKpiWon": "KPI: Dobljene priložnosti",
+        "salesPipeline": "Panel: Prodajni lijak",
+        "salesRecentLeads": "Panel: Najnovejše priložnosti (tabela)",
+        "salesTasks": "Panel: Naloge za danes"
+      },
+      "chooseLabel": "— izberite oznako —",
+      "chooseScreen": "— izberite zaslon —",
+      "content": "Vsebina namiga",
+      "contentPlaceholder": "Besedilo, ki ga uporabnik vidi, ko se z miško pomakne na ikono ?.",
+      "deleteConfirm": "Želite izbrisati namig „{key}“?",
+      "deleteFailed": "Napaka pri brisanju",
+      "deleted": "Namig „{key}“ je izbrisan",
+      "empty": "Ni določenih namigov. Dodajte prvega zgoraj.",
+      "errors": {
+        "chooseLabel": "Izberite zaslon in oznako",
+        "contentRequired": "Vsebina namiga je obvezna"
+      },
+      "introAfterIcon": "se samodejno prikaže ob izbrani oznaki, ko je vsebina določena.",
+      "introBeforeIcon": "— izberite zaslon in oznako ter vnesite besedilo. Ikona",
+      "introTitle": "Namigi (Tooltips)",
+      "label": "Oznaka",
+      "other": "Drugo",
+      "saved": "Namig „{key}“ je shranjen",
+      "screen": "Zaslon",
+      "screens": {
+        "partnerPerformance": "Partner Performance",
+        "salesDashboard": "Prodajna nadzorna plošča",
+        "salesReports": "Prodajna poročila"
+      }
+    },
+    "topbar": {
+      "unsavedChanges": "Neshranjene spremembe"
+    }
+  },
+  "userGroups": {
+    "accessLevels": {
+      "full": "Poln dostop",
+      "read": "Samo branje"
+    },
+    "create": {
+      "displayNamePlaceholder": "npr. Prodaja",
+      "done": "Skupina „{name}“ je ustvarjena",
+      "internalNamePlaceholder": "npr. Prodaja",
+      "ownerRestrictionCheckbox": "Omejitev lastnika (uporabnik vidi samo svoje dokumente)",
+      "subtitle": "Dodajte novo skupino vlog",
+      "title": "Ustvari skupino"
+    },
+    "deactivate": {
+      "action": "Deaktiviraj skupino",
+      "confirm": "Želite deaktivirati skupino „{name}“?",
+      "done": "Skupina deaktivirana"
+    },
+    "documents": "Dokumenti",
+    "documentsCount": "{count, plural, one {# dokument} two {# dokumenta} few {# dokumenti} other {# dokumentov}}",
+    "edit": {
+      "saveChanges": "Shrani spremembe",
+      "saved": "Skupina posodobljena",
+      "title": "Urejanje skupine"
+    },
+    "fields": {
+      "description": "Opis",
+      "displayName": "Prikazno ime",
+      "internalName": "Ime skupine (interno)"
+    },
+    "inactive": "Neaktivna",
+    "members": "Člani",
+    "membersCount": "{count, plural, one {# član} two {# člana} few {# člani} other {# članov}}",
+    "newGroup": "Nova skupina",
+    "noMembers": "Ni članov",
+    "ownerRestriction": "Omejitev lastnika",
+    "ownerRestrictionOptions": {
+      "none": "Brez omejitve",
+      "ownerOnly": "Samo lastnik (Prodaja)"
+    },
+    "title": "Skupine in vloge"
+  },
+  "users": {
+    "access": "Dostop",
+    "accessLevels": {
+      "full": "Poln",
+      "read": "Branje"
+    },
+    "accountTypes": {
+      "external": "Zunanji (samo Projekti)",
+      "internal": "Notranji"
+    },
+    "adminBadge": "ADMIN",
+    "adminRoles": {
+      "admin": "Administrator",
+      "regular": "Običajni uporabnik"
+    },
+    "budgets": {
+      "annualTotal": "Letna vsota",
+      "changeTypeConfirm": "Sprememba vrste obdobja bo izbrisala obstoječe proračune za leto {year}. Želite nadaljevati?",
+      "currency": "Valuta",
+      "deleteFailed": "Napaka pri brisanju proračunov",
+      "monthly": "Mesečni",
+      "periodType": "Vrsta obdobja",
+      "quarterly": "Četrtletni",
+      "save": "Shrani proračun",
+      "saveFailed": "Napaka pri shranjevanju",
+      "saved": "Proračun shranjen",
+      "title": "Načrtovani prodajni proračuni",
+      "year": "Leto"
+    },
+    "chooseGroup": "Izberite skupino...",
+    "columns": {
+      "email": "E-pošta",
+      "groupsAndRoles": "Skupine in vloge",
+      "lastLogin": "Zadnja prijava",
+      "user": "Uporabnik"
+    },
+    "count": "Uporabnikov: {count}",
+    "create": {
+      "accessLevel": "Raven dostopa",
+      "assignGroup": "Dodeli skupini (neobvezno)",
+      "emailPlaceholder": "ana.novak@podjetje.si",
+      "failed": "Uporabnika ni bilo mogoče ustvariti",
+      "firstNamePlaceholder": "Ana",
+      "lastNamePlaceholder": "Novak",
+      "noGroup": "Brez skupine",
+      "ssoNoteLabel": "Opomba:",
+      "ssoNoteText": "Uporabnik se bo lahko prijavljal prek SAML SSO s tem e-poštnim naslovom. Preverjanje pristnosti v celoti izvaja Google Workspace.",
+      "submit": "Ustvari uporabnika",
+      "subtitle": "Ročno ustvarite nov uporabniški račun",
+      "success": "Uporabnik {name} je ustvarjen",
+      "title": "Dodaj novega uporabnika"
+    },
+    "crmRoles": {
+      "managerShort": "Vodja",
+      "none": "Brez vloge CRM",
+      "salesManager": "Vodja prodaje (sales_manager)",
+      "salesperson": "Prodajalec (salesperson)",
+      "salespersonShort": "Prodajalec"
+    },
+    "edit": {
+      "accountSettings": "Nastavitve računa",
+      "deleteConfirm": "Želite izbrisati uporabnika {name} ({email})? Tega dejanja ni mogoče razveljaviti.",
+      "deleteFailed": "Uporabnika ni bilo mogoče izbrisati",
+      "deleteUser": "Izbriši uporabnika",
+      "deleted": "Uporabnik izbrisan",
+      "emailHint": "Sprememba e-pošte vpliva na prijavo SAML — prepričajte se, da naslov ustreza računu Google Workspace.",
+      "emailInvalid": "Vnesite veljaven e-poštni naslov",
+      "emailTaken": "Ta e-poštni naslov je že zaseden",
+      "loadFailed": "Uporabnika ni bilo mogoče naložiti",
+      "saveChanges": "Shrani spremembe",
+      "updateFailed": "Uporabnika ni bilo mogoče posodobiti",
+      "updated": "Uporabnik posodobljen"
+    },
+    "empty": "Ni najdenih uporabnikov",
+    "featureAccess": {
+      "prospects": "Potencialne stranke",
+      "prospectsDisabled": "Dostop do Potencialnih strank izklopljen",
+      "prospectsEnabled": "Dostop do Potencialnih strank vklopljen",
+      "prospectsGroupDescription": "Dostop do modula Potencialne stranke (uvoz CSV, enrichment, pretvorba v lead).",
+      "prospectsHint": "Analiza in obogatitev potencialnih strank – podjetij (AI)",
+      "title": "Dostop do funkcij"
+    },
+    "fields": {
+      "accountType": "Vrsta računa",
+      "adminRole": "Vloga administratorja",
+      "canCreateProjects": "Ustvarjanje projektov",
+      "canViewKsefInvoices": "Dostop do računov KSeF",
+      "company": "Podjetje",
+      "crmRole": "Vloga CRM",
+      "department": "Oddelek",
+      "email": "E-poštni naslov",
+      "firstName": "Ime",
+      "lastName": "Priimek",
+      "phone": "Telefon",
+      "required": "Obvezno",
+      "status": "Status"
+    },
+    "filters": {
+      "activeOnly": "Samo aktivni",
+      "allGroups": "Vse skupine",
+      "allUsers": "Vsi uporabniki",
+      "inactiveOnly": "Samo neaktivni"
+    },
+    "grants": {
+      "add": "Dodeli",
+      "addFailed": "Dovoljenja ni bilo mogoče dodeliti",
+      "addTitle": "Dodeli dovoljenje za vidnost",
+      "added": "Dovoljenje za vidnost dodeljeno",
+      "group": "Skupina (čigavi zapisi)",
+      "hint": "Dovoljenje uporabnika ne doda v skupino. „Poln“ omogoča tudi urejanje zapisov te skupine.",
+      "module": "Modul",
+      "removeFailed": "Dovoljenja ni bilo mogoče odstraniti",
+      "removed": "Dovoljenje za vidnost odstranjeno",
+      "title": "Dovoljenja za vidnost CRM ({count})",
+      "tooltip": "Vidi zapise skupine „{group}“ v modulu {module} ({access})",
+      "tooltipAccess": {
+        "full": "branje in urejanje",
+        "read": "samo branje"
+      }
+    },
+    "modules": {
+      "leads": "Leadi",
+      "partners": "Partnerji"
+    },
+    "neverLoggedIn": "Nikoli",
+    "newUser": "Nov uporabnik",
+    "no": "Ne",
+    "pagination": {
+      "next": "Naprej",
+      "page": "Stran {page} od {total}",
+      "previous": "Prejš."
+    },
+    "password": {
+      "mismatch": "Gesli se ne ujemata",
+      "new": "Novo geslo",
+      "placeholder": "Najm. 8 znakov",
+      "repeat": "Ponovite geslo",
+      "saveFailed": "Napaka pri shranjevanju gesla",
+      "saved": "Geslo je nastavljeno",
+      "submit": "Nastavi geslo",
+      "title": "Geslo za prijavo",
+      "tooShort": "Geslo mora imeti najmanj 8 znakov"
+    },
+    "remove": "Odstrani",
+    "roles": {
+      "assign": "Dodeli",
+      "assignTitle": "Dodeli novo vlogo",
+      "assigned": "Vloga dodeljena",
+      "group": "Skupina",
+      "removeFailed": "Vloge ni bilo mogoče odstraniti",
+      "removed": "Vloga odstranjena",
+      "title": "Vloge v skupinah ({count})"
+    },
+    "saving": "Shranjevanje…",
+    "searchPlaceholder": "Iščite uporabnike…",
+    "statuses": {
+      "active": "Aktiven",
+      "inactive": "Neaktiven"
+    },
+    "title": "Upravljanje uporabnikov",
+    "yes": "Da"
+  }
+}

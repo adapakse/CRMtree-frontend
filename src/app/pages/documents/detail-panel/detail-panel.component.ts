@@ -2,7 +2,8 @@ import { Component, inject, Input, Output, EventEmitter, OnChanges, OnInit, sign
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Document, WorkflowTask, DocumentVersion, User, DocStatus, DocType, GdprType } from '../../../core/models/models';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { Document, DocumentProjectLink, WorkflowTask, DocumentVersion, User, DocStatus, DocType, GdprType } from '../../../core/models/models';
 import { DocumentService } from '../../../core/services/document.service';
 import { WorkflowService, GroupService, UserService } from '../../../core/services/api.services';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -10,15 +11,46 @@ import { ToastService } from '../../../core/services/toast.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent } from '../../../shared/components/badges.components';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
-import { DOC_TYPE_MAP, fileSizeLabel, triggerDownload } from '../../../core/services/helpers';
+import { fileSizeLabel, triggerDownload, INVOICE_DOC_TYPE } from '../../../core/services/helpers';
+import { PaymentStatusBadgeComponent } from '../../../shared/components/payment-status-badge/payment-status-badge.component';
+import {
+  InvoiceFieldsComponent, InvoiceFieldsDraft, invoiceFieldsDraftOf, invoiceFieldsPayload,
+} from '../invoice-fields/invoice-fields.component';
+import { DocumentProjectLinksComponent } from '../project-links/document-project-links.component';
 import { environment } from '../../../../environments/environment';
 import { CrmApiService } from '../../../core/services/crm-api.service';
+import { LocaleService } from '../../../core/i18n/locale.service';
+import { DEFAULT_LOCALE } from '../../../core/i18n/locales';
+
+// Built-in values have translated names; any other value comes from App
+// Settings and is its own display name.
+const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement', 'invoice'];
+const BUILT_IN_GDPR_TYPES = ['data_processing_entrustment', 'data_administration', 'no_gdpr'];
+const BUILT_IN_STATUSES = ['new', 'being_edited', 'being_approved', 'being_signed', 'signed', 'hold', 'completed', 'rejected'];
+
+// Dictionaries offered when the tenant has not configured its own
+// (keys under documents.labels.countries / documents.labels.contractSubjects).
+const FALLBACK_COUNTRY_KEYS = ['pl', 'de', 'fr', 'gb', 'cz', 'sk', 'hu', 'ro', 'ua', 'ru', 'at', 'ch'];
+const FALLBACK_CONTRACT_SUBJECT_KEYS = ['businessTravel', 'conferences', 'accommodation', 'system', 'other'];
+
+// Audit actions that have a translated description (documents.detail.history.actions.*).
+const DESCRIBED_HISTORY_ACTIONS = new Set([
+  'document_created', 'document_updated', 'document_deleted', 'document_downloaded', 'metadata_updated',
+  'tag_added', 'tag_removed', 'tag_updated', 'status_changed', 'version_uploaded',
+  'workflow_task_created', 'workflow_task_completed', 'workflow_task_cancelled',
+  'signing_initiated', 'signing_completed', 'signing_failed',
+  'attachment_uploaded', 'attachment_version_uploaded', 'attachment_deleted',
+]);
+
+interface SelectOption { value: string; label: string; }
 
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent],
+  providers: [provideTranslocoScope('documents')],
   template: `
+    <ng-container *transloco="let t; prefix: 'documents'">
     <div class="overlay open" (click)="onOverlayClick($event)">
       <div class="panel" (click)="$event.stopPropagation()">
 
@@ -26,7 +58,10 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
         <div class="ph">
           <div>
             <div class="pt">{{ doc.name }}</div>
-            <div class="ps">{{ doc.doc_number }} · <wt-status-badge [status]="doc.status" /></div>
+            <div class="ps">
+              {{ doc.doc_number }} · <wt-status-badge [status]="doc.status" />
+              @if (isStoredInvoice) { <wt-payment-status-badge [status]="doc.payment_status" [isOverdue]="doc.is_payment_overdue" /> }
+            </div>
           </div>
           <div class="pc" (click)="close.emit()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -36,9 +71,9 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
         <!-- Tabs -->
         <div style="padding:16px 24px 0">
           <div class="tabs">
-            @for (t of tabs; track t.id) {
-              <button class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">
-                {{ t.label }}<wt-tooltip [key]="t.tooltip"></wt-tooltip>
+            @for (tab of tabs; track tab.id) {
+              <button class="tab-btn" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
+                {{ t(tab.labelKey) }}<wt-tooltip [key]="tab.tooltip"></wt-tooltip>
               </button>
             }
           </div>
@@ -49,18 +84,18 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
 
           <!-- OVERVIEW -->
           @if (activeTab === 'overview') {
-            <div class="sec-title">Metadane dokumentu</div>
+            <div class="sec-title">{{ t('detail.overview.metadata') }}</div>
             <div class="fgrid">
               <div class="fg">
-                <label class="fl">Nazwa dokumentu <span class="req">*</span></label>
+                <label class="fl">{{ t('labels.fields.documentName') }} <span class="req">*</span></label>
                 <input class="fi" [(ngModel)]="draft.name" [readOnly]="doc._access !== 'full'">
               </div>
               <div class="fg">
-                <label class="fl">Status</label>
+                <label class="fl">{{ t('labels.fields.status') }}</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.status">
-                    @for (t of docStatusOptions; track t.value) {
-                      <option [value]="t.value">{{ t.label }}</option>
+                    @for (option of docStatusOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
                     }
                   </select>
                 } @else {
@@ -68,12 +103,12 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Typ dokumentu</label>
+                <label class="fl">{{ t('labels.fields.documentType') }}</label>
                 @if (doc._access === 'full') {
-                  <select class="fsel" [(ngModel)]="draft.doc_type">
-                    <option value="">— wybierz typ —</option>
-                    @for (t of docTypeOptions; track t.value) {
-                      <option [value]="t.value">{{ t.label }}</option>
+                  <select class="fsel" [(ngModel)]="draft.doc_type" [disabled]="isTypeLocked">
+                    <option value="">{{ t('detail.overview.chooseType') }}</option>
+                    @for (option of docTypeOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
                     }
                   </select>
                 } @else {
@@ -81,11 +116,11 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Klasyfikacja GDPR</label>
+                <label class="fl">{{ t('labels.fields.gdprClassification') }}</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.gdpr_type">
-                    @for (t of gdprTypeOptions; track t.value) {
-                      <option [value]="t.value">{{ t.label }}</option>
+                    @for (option of gdprTypeOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
                     }
                   </select>
                 } @else {
@@ -93,7 +128,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Grupa</label>
+                <label class="fl">{{ t('labels.fields.group') }}</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.group_id">
                     @for (g of groups(); track g.id) {
@@ -105,10 +140,10 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Właściciel</label>
+                <label class="fl">{{ t('labels.fields.owner') }}</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.owner_id">
-                    <option value="">— nieprzypisany —</option>
+                    <option value="">{{ t('labels.options.unassigned') }}</option>
                     @for (u of users(); track u.id) {
                       <option [value]="u.id">{{ u.display_name }}</option>
                     }
@@ -121,117 +156,125 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 }
               </div>
               <div class="fg">
-                <label class="fl">Podmiot 1</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.buyer' : 'labels.fields.entity1') }}</label>
                 @if (doc._access === 'full') {
                   @if (entity1Options.length > 0) {
                   <select class="fsel" [(ngModel)]="draft.entity1">
-                    <option value="">— wybierz podmiot —</option>
+                    <option value="">{{ t('detail.overview.chooseEntity') }}</option>
                     @for (opt of entity1Options; track opt) {
                       <option [value]="opt">{{ opt }}</option>
                     }
                   </select>
                 } @else {
-                  <input class="fi" [(ngModel)]="draft.entity1" placeholder="np. CRMtree Sp. z o.o.">
+                  <input class="fi" [(ngModel)]="draft.entity1" [placeholder]="t('labels.placeholders.entity1')">
                 }
                 } @else {
                   <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.entity1 || '—' }}</div>
                 }
               </div>
               <div class="fg">
-                <label class="fl">Podmiot 2</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.seller' : 'labels.fields.entity2') }}</label>
                 <input class="fi" [(ngModel)]="draft.entity2"
-                       [readOnly]="doc._access !== 'full'" placeholder="np. Partner Ltd.">
+                       [readOnly]="doc._access !== 'full'" [placeholder]="t('labels.placeholders.entity2')">
               </div>
               <div class="fg">
-                <label class="fl">Data podpisania</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.issueDate' : 'labels.fields.signingDate') }}</label>
                 <input class="fi" type="date" [(ngModel)]="draft.signing_date"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''">
               </div>
               <div class="fg">
-                <label class="fl">Data wygaśnięcia</label>
-                @if (doc._access === 'full') {
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.paymentDueDate' : 'labels.fields.expirationDate') }}</label>
+                @if (doc._access === 'full' && isInvoice) {
+                  <input class="fi" type="date" [(ngModel)]="draft.expiration_date">
+                } @else if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
-                    <option value="indefinite">Czas nieokreślony</option>
-                    <option value="fixed">Data określona</option>
+                    <option value="indefinite">{{ t('labels.options.indefinite') }}</option>
+                    <option value="fixed">{{ t('labels.options.fixedDate') }}</option>
                   </select>
                   @if (draft.expiration_date_mode === 'fixed') {
                     <input class="fi" type="date" [(ngModel)]="draft.expiration_date" style="margin-top:6px">
                   }
                 } @else {
                   <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">
-                    {{ draft.expiration_date ? (draft.expiration_date | date:'dd.MM.yyyy') : 'Czas nieokreślony' }}
+                    {{ draft.expiration_date ? (draft.expiration_date | date:'dd.MM.yyyy') : (isInvoice ? '—' : t('labels.options.indefinite')) }}
                   </div>
                 }
               </div>
+              @if (!isInvoice) {
               <div class="fg">
-                <label class="fl">Przedmiot umowy <span class="req">*</span></label>
+                <label class="fl">{{ t('labels.fields.contractSubject') }} <span class="req">*</span></label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.contract_subject">
-                    <option value="">— Wybierz —</option>
-                    @for (s of contractSubjectOptions; track s) {
-                      <option [value]="s">{{ s }}</option>
+                    <option value="">{{ t('labels.options.choose') }}</option>
+                    @for (subject of contractSubjectOptions; track subject.value) {
+                      <option [value]="subject.value">{{ subject.label }}</option>
                     }
                   </select>
                 } @else {
-                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.contract_subject || '—' }}</div>
+                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ optionLabel(contractSubjectOptions, draft.contract_subject) || '—' }}</div>
                 }
               </div>
+              }
               <div class="fg">
-                <label class="fl">NIP kontrahenta</label>
+                <label class="fl">{{ t(isInvoice ? 'labels.fields.sellerTaxId' : 'labels.fields.counterpartyTaxId') }}</label>
                 <input class="fi" [(ngModel)]="draft.nip" maxlength="15"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
-                       placeholder="np. 1234567890">
+                       [placeholder]="t('labels.placeholders.taxId')">
               </div>
               <div class="fg">
-                <label class="fl">Kraj kontrahenta</label>
+                <label class="fl">{{ t('labels.fields.counterpartyCountry') }}</label>
                 @if (doc._access === 'full') {
                   <select class="fsel" [(ngModel)]="draft.country">
-                    <option value="">— Wybierz kraj —</option>
-                    @for (k of countryOptions; track k) {
-                      <option [value]="k">{{ k }}</option>
+                    <option value="">{{ t('labels.options.chooseCountry') }}</option>
+                    @for (country of countryOptions; track country.value) {
+                      <option [value]="country.value">{{ country.label }}</option>
                     }
                   </select>
                 } @else {
-                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ draft.country || '—' }}</div>
+                  <div class="fi" style="background:var(--gray-100);color:var(--gray-600)">{{ optionLabel(countryOptions, draft.country) || '—' }}</div>
                 }
               </div>
             </div>
 
+            @if (isInvoice) {
+              <wt-invoice-fields [(value)]="invoiceDraft" [isReadOnly]="doc._access !== 'full'" [isOverdue]="doc.is_payment_overdue" />
+            }
+
             <!-- Dane kontaktowe ds. umowy -->
-            <div class="sec-title" style="margin-top:20px">Dane kontaktowe ds. umowy</div>
+            <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.contactSection') }}</div>
             <div class="fgrid">
               <div class="fg full">
-                <label class="fl">Imię i Nazwisko</label>
+                <label class="fl">{{ t('labels.fields.contactName') }}</label>
                 <input class="fi" [(ngModel)]="draft.contact_name"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
-                       placeholder="np. Jan Kowalski">
+                       [placeholder]="t('labels.placeholders.contactName')">
               </div>
               <div class="fg">
-                <label class="fl">Email</label>
+                <label class="fl">{{ t('labels.fields.email') }}</label>
                 <input class="fi" type="email" [(ngModel)]="draft.contact_email"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
-                       placeholder="np. jan.kowalski@firma.pl">
+                       [placeholder]="t('labels.placeholders.contactEmail')">
               </div>
               <div class="fg">
-                <label class="fl">Telefon</label>
+                <label class="fl">{{ t('labels.fields.phone') }}</label>
                 <input class="fi" [(ngModel)]="draft.contact_phone"
                        [readOnly]="doc._access !== 'full'"
                        [style.background]="doc._access !== 'full' ? 'var(--gray-100)' : ''"
-                       placeholder="np. +48 600 000 000">
+                       [placeholder]="t('labels.placeholders.contactPhone')">
               </div>
             </div>
 
             <!-- Tags -->
-            <div class="sec-title" style="margin-top:20px">Tagi</div>
+            <div class="sec-title" style="margin-top:20px">{{ t('detail.tags.title') }}</div>
             @if (tags.length > 0) {
               <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:13px">
                 <thead>
                   <tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
-                    <th style="text-align:left;padding:6px 10px;font-weight:600;color:var(--gray-500);font-size:11px;text-transform:uppercase">Klucz</th>
+                    <th style="text-align:left;padding:6px 10px;font-weight:600;color:var(--gray-500);font-size:11px;text-transform:uppercase">{{ t('detail.tags.key') }}</th>
                     @if (doc._access === 'full') {
                       <th style="width:36px"></th>
                     }
@@ -251,19 +294,19 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 </tbody>
               </table>
             } @else {
-              <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:12px">Brak tagów.</div>
+              <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:12px">{{ t('detail.tags.empty') }}</div>
             }
             @if (doc._access === 'full') {
               <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-                <input class="fi" style="flex:1;min-width:0;padding:6px 10px;font-size:13px" placeholder="Klucz (np. contract_id)" [(ngModel)]="newTagKey">
-                <button class="btn btn-g btn-sm" style="white-space:nowrap" (click)="addTag()">+ Dodaj tag</button>
+                <input class="fi" style="flex:1;min-width:0;padding:6px 10px;font-size:13px" [placeholder]="t('detail.tags.keyPlaceholder')" [(ngModel)]="newTagKey">
+                <button class="btn btn-g btn-sm" style="white-space:nowrap" (click)="addTag()">+ {{ t('labels.addTag') }}</button>
               </div>
             }
 
             <!-- Powiązani Partnerzy -->
-            <div class="sec-title" style="margin-top:20px">Powiązani Partnerzy</div>
+            <div class="sec-title" style="margin-top:20px">{{ t('detail.partners.title') }}</div>
             @if (linkedPartnersLoading) {
-              <div style="font-size:12px;color:var(--gray-400)">Ładowanie…</div>
+              <div style="font-size:12px;color:var(--gray-400)">{{ 'states.loading' | transloco }}</div>
             } @else {
               @if (linkedPartners().length > 0) {
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
@@ -272,18 +315,18 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                       <span style="font-size:14px">🤝</span>
                       <span style="font-size:13px;font-weight:600;flex:1">{{ p.company }}</span>
                       @if (doc._access === 'full') {
-                        <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:14px;line-height:1" (click)="unlinkPartner(p)" title="Odepnij">✕</button>
+                        <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:14px;line-height:1" (click)="unlinkPartner(p)" [title]="t('detail.partners.unlink')">✕</button>
                       }
                     </div>
                   }
                 </div>
               } @else {
-                <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:8px">Brak powiązanych partnerów.</div>
+                <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:8px">{{ t('detail.partners.empty') }}</div>
               }
               @if (doc._access === 'full') {
                 <div style="position:relative;margin-bottom:12px">
                   <input class="fi" style="width:100%;box-sizing:border-box;padding:6px 10px;font-size:13px"
-                         placeholder="Szukaj partnera po nazwie…"
+                         [placeholder]="t('detail.partners.searchPlaceholder')"
                          [(ngModel)]="partnerSearch"
                          (ngModelChange)="onPartnerSearch($event)"
                          (blur)="hidePartnerDropdown()">
@@ -293,7 +336,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                         <div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--gray-100)"
                              (mousedown)="linkPartner(p)">
                           <div style="font-weight:500;font-size:13px">{{ p.company }}</div>
-                          @if (p.nip) { <div style="font-size:11px;color:var(--gray-400)">NIP: {{ p.nip }}</div> }
+                          @if (p.nip) { <div style="font-size:11px;color:var(--gray-400)">{{ t('detail.partners.taxId', { nip: p.nip }) }}</div> }
                         </div>
                       }
                     </div>
@@ -302,24 +345,33 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
               }
             }
 
+            @if (shownProjectLinks; as projectLinks) {
+              <wt-document-project-links [links]="projectLinks" [documentId]="doc.id" [documentNumber]="doc.doc_number" />
+            }
+
             @if (doc.document_group_name) {
               <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--orange-dark)">
-                📎 Część pakietu dokumentów: <strong>{{ doc.document_group_name }}</strong>
+                📎 {{ t('detail.overview.packagePart') }} <strong>{{ doc.document_group_name }}</strong>
               </div>
             }
           }
 
           <!-- DOKUMENT GŁÓWNY -->
           @if (activeTab === 'preview') {
+            @if (isStoredInvoice && doc.ksef_invoice_id && doc.blob_name) {
+              <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.5;color:#92400E">
+                {{ t('invoice.ksefVisualisationNote') }}
+              </div>
+            }
             @if (doc.blob_name) {
               @if (!isPdf) {
                 <div class="empty-state">
                   <div class="empty-icon">📄</div>
-                  <div class="empty-title">Brak podglądu</div>
+                  <div class="empty-title">{{ t('detail.preview.unavailable') }}</div>
                   <div style="font-size:12.5px;color:var(--gray-400);margin-top:6px;text-align:center;max-width:320px">
-                    Brak podglądu dla formatu innego niż PDF.<br>Pobierz plik na dysk w celu podglądu.
+                    {{ t('detail.preview.unavailableFormat') }}<br>{{ t('detail.preview.unavailableHint') }}
                   </div>
-                  <button class="btn btn-g" style="margin-top:14px" (click)="downloadDoc()">⬇ Pobierz plik</button>
+                  <button class="btn btn-g" style="margin-top:14px" (click)="downloadDoc()">⬇ {{ t('detail.preview.downloadFile') }}</button>
                 </div>
               } @else {
                 <div style="background:var(--gray-100);border-radius:8px;overflow:hidden;height:600px;position:relative">
@@ -335,17 +387,17 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                     </div>
                   }
                   @if (previewBlobUrl()) {
-                    <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" title="Podgląd PDF"></iframe>
+                    <iframe [src]="previewBlobUrl()!" style="width:100%;height:100%;border:none" [title]="t('detail.preview.frameTitle')"></iframe>
                   }
                 </div>
               }
             } @else {
               <div class="empty-state">
                 <div class="empty-icon">📎</div>
-                <div class="empty-title">Brak dołączonego pliku</div>
+                <div class="empty-title">{{ t('detail.preview.noFile') }}</div>
                 @if (doc._access === 'full') {
                   <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
-                    Wgraj plik
+                    {{ t('detail.preview.uploadFile') }}
                     <input type="file" hidden accept=".pdf,.docx,.doc" (change)="uploadFile($event)">
                   </label>
                 }
@@ -358,7 +410,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             @if (doc._access === 'full' && doc.blob_name) {
               <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
                 <label class="btn btn-p btn-sm" style="cursor:pointer">
-                  &#11014; Wgraj nową wersję
+                  &#11014; {{ t('detail.versions.uploadNew') }}
                   <input type="file" hidden accept=".pdf,.docx,.doc" (change)="uploadNewVersion($event)">
                 </label>
               </div>
@@ -372,15 +424,15 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                   <div style="font-size:13px;font-weight:600;color:var(--gray-900)">v{{ v.version_number }} · {{ v.label }}</div>
                   <div style="font-size:11.5px;color:var(--gray-400)">
                     {{ v.created_at | date:'dd.MM.yyyy HH:mm' }}
-                    @if (v.signatory_name) { · Podpisał(a) {{ v.signatory_name }} }
+                    @if (v.signatory_name) { · {{ t('detail.versions.signedBy', { name: v.signatory_name }) }} }
                     @if (v.blob_size_bytes) { · {{ formatSize(v.blob_size_bytes) }} }
                   </div>
                 </div>
-                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)">⬇ Pobierz</button>
+                <button class="btn btn-g btn-sm" (click)="downloadVersion(v)">⬇ {{ t('detail.actions.download') }}</button>
               </div>
             }
             @empty {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Brak wersji</div></div>
+              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('detail.versions.empty') }}</div></div>
             }
           }
 
@@ -389,7 +441,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             @if (doc._access === 'full') {
               <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
                 <label class="btn btn-p btn-sm" style="cursor:pointer">
-                  &#11014; Dodaj załącznik
+                  &#11014; {{ t('detail.attachments.add') }}
                   <input type="file" hidden (change)="uploadAttachment($event)">
                 </label>
               </div>
@@ -401,14 +453,14 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                   <div style="flex:1">
                     <div style="font-size:13px;font-weight:600;color:var(--gray-900)">{{ att.name }}</div>
                     <div style="font-size:11.5px;color:var(--gray-400)">
-                      {{ att.versions?.length ?? 0 }} wersji &middot; {{ att.mime_type }}
+                      {{ t('detail.attachments.versionCount', { count: att.versions?.length ?? 0 }) }} &middot; {{ att.mime_type }}
                       @if (att.blob_size_bytes) { &middot; {{ formatSize(att.blob_size_bytes) }} }
                     </div>
                   </div>
-                  <button class="btn btn-g btn-sm" (click)="downloadAttachment(att)">&#11015; Pobierz</button>
+                  <button class="btn btn-g btn-sm" (click)="downloadAttachment(att)">&#11015; {{ t('detail.actions.download') }}</button>
                   @if (doc._access === 'full') {
                     <label class="btn btn-g btn-sm" style="cursor:pointer">
-                      &#11014; Nowa wersja
+                      &#11014; {{ t('detail.attachments.newVersion') }}
                       <input type="file" hidden (change)="uploadAttachmentVersion($event, att.id)">
                     </label>
                     <button class="btn btn-d btn-sm" (click)="deleteAttachment(att.id)">&#10005;</button>
@@ -416,7 +468,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                 </div>
                 @if (att.versions?.length > 1) {
                   <div style="padding:8px 14px;border-top:1px solid var(--gray-100)">
-                    <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;margin-bottom:6px">Wersje</div>
+                    <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;margin-bottom:6px">{{ t('detail.tabs.versions') }}</div>
                     @for (ver of att.versions; track ver.id) {
                       <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-100);font-size:12px">
                         <span style="color:var(--gray-500);min-width:24px">v{{ ver.version_number }}</span>
@@ -433,10 +485,10 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             @empty {
               <div class="empty-state">
                 <div class="empty-icon">&#128206;</div>
-                <div class="empty-title">Brak załączników</div>
+                <div class="empty-title">{{ t('detail.attachments.empty') }}</div>
                 @if (doc._access === 'full') {
                   <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
-                    Dodaj pierwszy załącznik
+                    {{ t('detail.attachments.addFirst') }}
                     <input type="file" hidden (change)="uploadAttachment($event)">
                   </label>
                 }
@@ -447,7 +499,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
           <!-- HISTORY TIMELINE -->
           @if (activeTab === 'history') {
             @if (history().length === 0) {
-              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Brak historii</div></div>
+              <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">{{ t('detail.history.empty') }}</div></div>
             } @else {
               <ul class="tl">
                 @for (entry of history(); track entry.id) {
@@ -469,13 +521,13 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
           <!-- WORKFLOW -->
           @if (activeTab === 'workflow') {
             @if (doc._access === 'full') {
-              <div class="sec-title">Przypisz zadanie</div>
+              <div class="sec-title">{{ t('detail.workflow.assignTitle') }}</div>
               <div class="fgrid">
                 <div class="fg">
-                  <label class="fl">Przypisz do użytkownika <span class="req">*</span></label>
+                  <label class="fl">{{ t('detail.workflow.assignTo') }} <span class="req">*</span></label>
                   <div style="position:relative">
                     <input class="fi" style="width:100%;box-sizing:border-box"
-                           placeholder="Szukaj po nazwisku lub e-mailu…"
+                           [placeholder]="t('detail.workflow.userSearchPlaceholder')"
                            [(ngModel)]="wf.assignSearch"
                            (ngModelChange)="onUserSearch($event)"
                            (blur)="hideDropdown()">
@@ -491,42 +543,42 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                     }
                     @if (wf.assignTo) {
                       <div style="margin-top:4px;font-size:12px;color:var(--orange);font-weight:500">
-                        Wybrano: {{ wf.assignToName }}
+                        {{ t('detail.workflow.selected', { name: wf.assignToName }) }}
                       </div>
                     }
                   </div>
                 </div>
                 <div class="fg">
-                  <label class="fl">Typ zadania <span class="req">*</span></label>
+                  <label class="fl">{{ t('detail.workflow.taskType') }} <span class="req">*</span></label>
                   <select class="fsel" [(ngModel)]="wf.taskType">
-                    <option value="read">Odczyt</option>
-                    <option value="edit">Edycja</option>
-                    <option value="approve">Akceptacja</option>
-                    <option value="sign">Podpis</option>
+                    <option value="read">{{ t('labels.taskTypes.read') }}</option>
+                    <option value="edit">{{ t('labels.taskTypes.edit') }}</option>
+                    <option value="approve">{{ t('labels.taskTypes.approve') }}</option>
+                    <option value="sign">{{ t('labels.taskTypes.sign') }}</option>
                   </select>
                 </div>
                 <div class="fg">
-                  <label class="fl">Termin</label>
+                  <label class="fl">{{ t('detail.workflow.dueDate') }}</label>
                   <input class="fi" type="date" [(ngModel)]="wf.dueDate">
                 </div>
                 <div class="fg full">
-                  <label class="fl">Wiadomość</label>
-                  <textarea class="fta" placeholder="Opcjonalna wiadomość dla osoby przypisanej…" [(ngModel)]="wf.message"></textarea>
+                  <label class="fl">{{ t('detail.workflow.message') }}</label>
+                  <textarea class="fta" [placeholder]="t('detail.workflow.messagePlaceholder')" [(ngModel)]="wf.message"></textarea>
                 </div>
               </div>
               <button class="btn btn-p" style="margin-top:16px" [disabled]="!wf.assignTo" (click)="assignTask()">
-                📨 Przypisz i wyślij e-mail
+                📨 {{ t('detail.workflow.assign') }}
               </button>
             }
 
-            @if (doc._access === 'full' && doc.blob_name) {
-              <div class="sec-title" style="margin-top:24px">Podpis elektroniczny (Signus)</div>
+            @if (doc._access === 'full' && doc.blob_name && !isStoredInvoice) {
+              <div class="sec-title" style="margin-top:24px">{{ t('detail.signus.sectionTitle') }}</div>
               <button class="btn btn-p" (click)="openSignus()">
-                ✍ Rozpocznij podpisywanie przez Signus
+                ✍ {{ t('detail.signus.start') }}
               </button>
             }
 
-            <div class="sec-title" style="margin-top:24px">Aktywne zadania</div>
+            <div class="sec-title" style="margin-top:24px">{{ t('labels.activeTasks') }}</div>
             @for (task of doc.workflow_tasks ?? []; track task.id) {
               @if (task.task_status === 'pending' || task.task_status === 'in_progress') {
                 <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)">
@@ -535,7 +587,7 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
                   <span style="font-size:13px;flex:1">{{ task.assignee_name }}</span>
                   <span style="font-size:11px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM.yy' }}</span>
                   @if (doc._access === 'full') {
-                    <button class="btn btn-d btn-sm" (click)="cancelTask(task.id)">Anuluj</button>
+                    <button class="btn btn-d btn-sm" (click)="cancelTask(task.id)">{{ 'actions.cancel' | transloco }}</button>
                   }
                 </div>
               }
@@ -546,15 +598,15 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
         <!-- Panel Footer -->
         <div class="pf">
           @if (doc._access === 'full' && doc.blob_name) {
-            <button class="btn btn-g" (click)="downloadDoc()">⬇ Pobierz</button>
+            <button class="btn btn-g" (click)="downloadDoc()">⬇ {{ t('detail.actions.download') }}</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-d" (click)="deleteDoc()">🗑 Usuń</button>
+            <button class="btn btn-d" (click)="deleteDoc()">🗑 {{ t('detail.actions.delete') }}</button>
           }
           @if (doc._access === 'full' && activeTab === 'overview') {
-            <button class="btn btn-p" (click)="saveDoc()">💾 Zapisz zmiany</button>
+            <button class="btn btn-p" (click)="saveDoc()">💾 {{ t('detail.actions.saveChanges') }}</button>
           }
-          <button class="btn btn-g" (click)="close.emit()">Zamknij</button>
+          <button class="btn btn-g" (click)="close.emit()">{{ 'actions.close' | transloco }}</button>
         </div>
       </div>
     </div>
@@ -566,26 +618,27 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
           <div class="moh">
             <div class="moico" style="background:#F5F3FF">✍</div>
             <div>
-              <div class="mot">Rozpocznij podpisywanie elektroniczne</div>
+              <div class="mot">{{ t('detail.signus.modalTitle') }}</div>
               <div class="mos">{{ doc.doc_number }} · {{ doc.name }}</div>
             </div>
           </div>
           <div style="padding:20px 24px">
             <div class="fg" style="margin-bottom:14px">
-              <label class="fl">Osoby podpisujące (adresy e-mail po przecinku) <span class="req">*</span></label>
-              <textarea class="fta" style="min-height:60px" placeholder="anna@firma.com, partner@example.com" [(ngModel)]="signusEmails"></textarea>
+              <label class="fl">{{ t('detail.signus.signatories') }} <span class="req">*</span></label>
+              <textarea class="fta" style="min-height:60px" [placeholder]="t('detail.signus.emailsPlaceholder')" [(ngModel)]="signusEmails"></textarea>
             </div>
             <div style="background:var(--gray-50);border-radius:8px;padding:12px;font-size:12px;color:var(--gray-500)">
-              ℹ Dokument zostanie wysłany do API Signus. Każda osoba podpisująca dostanie e-mail. Podpisane wersje są automatycznie archiwizowane.
+              ℹ {{ t('detail.signus.info') }}
             </div>
           </div>
           <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
-            <button class="btn btn-g" (click)="signusOpen = false">Zamknij</button>
-            <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">Wyślij do Signus →</button>
+            <button class="btn btn-g" (click)="signusOpen = false">{{ 'actions.close' | transloco }}</button>
+            <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">{{ t('detail.signus.send') }} →</button>
           </div>
         </div>
       </div>
     }
+    </ng-container>
   `,
   styles: [`
     .udrop { position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--gray-200);border-radius:8px;box-shadow:var(--shadow-lg);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px; }
@@ -624,6 +677,8 @@ export class DetailPanelComponent implements OnChanges {
   private cdr         = inject(ChangeDetectorRef);
   private settingsSvc = inject(AppSettingsService);
   private crmApi      = inject(CrmApiService);
+  private transloco   = inject(TranslocoService);
+  private locale      = inject(LocaleService);
   auth                = inject(AuthService);
 
   get entity1Options(): string[] {
@@ -637,87 +692,97 @@ export class DetailPanelComponent implements OnChanges {
     return [];
   }
 
-  get docTypeOptions(): { value: string; label: string }[] {
-    const DOC_LABELS: Record<string, string> = {
-      partner_agreement:    'Umowa partnerska',
-      it_supplier_agreement:'Umowa z dostawcą IT',
-      employee_agreement:   'Umowa pracownicza',
-      nda:                  'NDA',
-      operator_agreement:   'Umowa operatorska',
-    };
+  get docTypeOptions(): SelectOption[] {
+    const byLabel = (a: SelectOption, b: SelectOption) => a.label.localeCompare(b.label, this.locale.activeLocale());
     try {
       const raw = this.settingsSvc.settings()?.['doc_types'];
       if (raw) {
         const types: string[] = JSON.parse(String(raw));
-        return types
-          .map(v => ({ value: v, label: DOC_LABELS[v] ?? v }))
-          .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+        return types.map(v => this.builtInOption('docTypes', BUILT_IN_DOC_TYPES, v)).sort(byLabel);
       }
     } catch { }
-    return Object.entries(DOC_LABELS)
-      .map(([value, label]) => ({ value, label }))
-      .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+    return BUILT_IN_DOC_TYPES.map(v => this.builtInOption('docTypes', BUILT_IN_DOC_TYPES, v)).sort(byLabel);
   }
 
-  get gdprTypeOptions(): { value: string; label: string }[] {
-    const GDPR_LABELS: Record<string, string> = {
-      data_processing_entrustment: 'Powierzenie przetwarzania danych',
-      data_administration: 'Współadministrowanie danych',
-      no_gdpr: 'Brak GDPR',
-    };
+  get gdprTypeOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_gdpr_types'];
       if (raw) {
         const types: string[] = JSON.parse(String(raw));
-        return types.map(v => ({ value: v, label: GDPR_LABELS[v] ?? v }));
+        return types.map(v => this.builtInOption('gdprTypes', BUILT_IN_GDPR_TYPES, v));
       }
     } catch { }
-    return Object.entries(GDPR_LABELS).map(([value, label]) => ({ value, label }));
+    return BUILT_IN_GDPR_TYPES.map(v => this.builtInOption('gdprTypes', BUILT_IN_GDPR_TYPES, v));
   }
 
-  get countryOptions(): string[] {
+  get countryOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['crm_partner_countries'];
-      if (raw) return JSON.parse(String(raw));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
     } catch { }
-    return ['Polska','Niemcy','Francja','Wielka Brytania','Czechy','Słowacja',
-            'Węgry','Rumunia','Ukraina','Rosja','Austria','Szwajcaria'];
+    return this.fallbackOptions('countries', FALLBACK_COUNTRY_KEYS);
   }
 
-  get contractSubjectOptions(): string[] {
+  get contractSubjectOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_contract_subjects'];
-      if (raw) return JSON.parse(String(raw));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
     } catch { }
-    return ['Podróże służbowe','Konferencje/Spotkania','Zakwaterowanie','System','Inne'];
+    return this.fallbackOptions('contractSubjects', FALLBACK_CONTRACT_SUBJECT_KEYS);
   }
 
-  get docStatusOptions(): { value: string; label: string }[] {
+  get docStatusOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_statuses'];
       if (raw) {
-        const STATUS_LABELS: Record<string, string> = {
-          new: 'Nowy', being_edited: 'W edycji', being_approved: 'W akceptacji',
-          being_signed: 'W podpisywaniu', signed: 'Podpisany', hold: 'Wstrzymany',
-          completed: 'Zakończony', rejected: 'Odrzucony',
-        };
         const types: string[] = JSON.parse(String(raw));
-        return types.map(v => ({ value: v, label: STATUS_LABELS[v] ?? v }));
+        return types.map(v => this.builtInOption('statuses', BUILT_IN_STATUSES, v));
       }
     } catch { }
-    return [
-      { value: 'new',            label: 'Nowy' },
-      { value: 'being_edited',   label: 'W edycji' },
-      { value: 'being_approved', label: 'W akceptacji' },
-      { value: 'being_signed',   label: 'W podpisywaniu' },
-      { value: 'signed',         label: 'Podpisany' },
-      { value: 'hold',           label: 'Wstrzymany' },
-      { value: 'completed',      label: 'Zakończony' },
-      { value: 'rejected',       label: 'Odrzucony' },
-    ];
+    return BUILT_IN_STATUSES.map(v => this.builtInOption('statuses', BUILT_IN_STATUSES, v));
+  }
+
+  private builtInOption(dictionary: string, builtInValues: string[], value: string): SelectOption {
+    return {
+      value,
+      label: builtInValues.includes(value) ? this.transloco.translate(`documents.labels.${dictionary}.${value}`) : value,
+    };
+  }
+
+  // The stored value of a fallback entry is its name in the source language —
+  // documents saved so far hold exactly that text, and one tenant's users may
+  // work in different languages. Only the label follows the user's language.
+  private fallbackOptions(dictionary: string, keys: string[]): SelectOption[] {
+    return keys.map(key => ({
+      value: this.transloco.translate(`documents.labels.${dictionary}.${key}`, {}, DEFAULT_LOCALE),
+      label: this.transloco.translate(`documents.labels.${dictionary}.${key}`),
+    }));
+  }
+
+  optionLabel(options: SelectOption[], value: string): string {
+    return options.find(option => option.value === value)?.label ?? value;
   }
 
   doc!: Document;
+
+  /** Follows the type chosen in the form, so the fields switch as soon as the type is changed. */
+  get isInvoice(): boolean { return this.draft.doc_type === INVOICE_DOC_TYPE; }
+  get isStoredInvoice(): boolean { return this.doc?.doc_type === INVOICE_DOC_TYPE; }
+
+  // The API refuses to change the type of an invoice that came from KSeF or is linked to project costs.
+  get isTypeLocked(): boolean {
+    return this.isStoredInvoice && (!!this.doc.ksef_invoice_id || (this.doc.project_links?.length ?? 0) > 0);
+  }
+
+  /**
+   * Links of an invoice to project costs; null hides the section. An invoice
+   * without links gets the "not linked" line only where the Projects module is on.
+   */
+  get shownProjectLinks(): DocumentProjectLink[] | null {
+    const links = this.doc?.project_links;
+    if (!this.isStoredInvoice || !links) return null;
+    return links.length > 0 || this.auth.hasFeature('projects') ? links : null;
+  }
 
   /**
    * Stable getter — avoids NG0100 caused by `doc.tags ?? []` creating
@@ -735,12 +800,12 @@ export class DetailPanelComponent implements OnChanges {
     if (v === 'history')     this.loadHistory();
   }
   tabs = [
-    { id: 'overview',    label: 'Szczegóły',       tooltip: 'docs.tab.overview' },
-    { id: 'preview',     label: 'Dokument główny', tooltip: 'docs.tab.preview' },
-    { id: 'versions',    label: 'Wersje',          tooltip: 'docs.tab.versions' },
-    { id: 'history',     label: 'Historia',        tooltip: 'docs.tab.history' },
-    { id: 'attachments', label: 'Załączniki',      tooltip: 'docs.tab.attachments' },
-    { id: 'workflow',    label: 'Workflow',         tooltip: 'docs.tab.workflow' },
+    { id: 'overview',    labelKey: 'detail.tabs.overview',    tooltip: 'docs.tab.overview' },
+    { id: 'preview',     labelKey: 'detail.tabs.preview',     tooltip: 'docs.tab.preview' },
+    { id: 'versions',    labelKey: 'detail.tabs.versions',    tooltip: 'docs.tab.versions' },
+    { id: 'history',     labelKey: 'detail.tabs.history',     tooltip: 'docs.tab.history' },
+    { id: 'attachments', labelKey: 'detail.tabs.attachments', tooltip: 'docs.tab.attachments' },
+    { id: 'workflow',    labelKey: 'detail.tabs.workflow',    tooltip: 'docs.tab.workflow' },
   ];
 
   get isPdf(): boolean {
@@ -773,8 +838,10 @@ export class DetailPanelComponent implements OnChanges {
     nip: string; country: string; contract_subject: string;
     contact_name: string; contact_email: string; contact_phone: string;
   } = {} as any;
+  invoiceDraft!: InvoiceFieldsDraft;
 
   initDraft(): void {
+    this.invoiceDraft = invoiceFieldsDraftOf(this.doc);
     const expDate = this.toDateInput(this.doc.expiration_date);
     this.draft = {
       name:                 this.doc.name ?? '',
@@ -800,6 +867,7 @@ export class DetailPanelComponent implements OnChanges {
   saveDoc(): void {
     if (this.doc._access !== 'full') return;
     const access = this.doc._access;
+    const isInvoice = this.isInvoice;
     const entities = [this.draft.entity1, this.draft.entity2]
       .map(s => s.trim()).filter(s => !!s);
     this.docSvc.update(this.doc.id, {
@@ -810,26 +878,34 @@ export class DetailPanelComponent implements OnChanges {
       group_id:         this.draft.group_id,
       owner_id:         this.draft.owner_id,
       entities,
-      expiration_date:  this.draft.expiration_date_mode === 'fixed'
-                          ? (this.draft.expiration_date || undefined)
-                          : null as any,
+      expiration_date:  isInvoice
+                          ? (this.draft.expiration_date || null) as any
+                          : this.draft.expiration_date_mode === 'fixed'
+                            ? (this.draft.expiration_date || undefined)
+                            : null as any,
       signing_date:     this.draft.signing_date || undefined,
       nip:              (this.draft.nip || null) as any,
       country:          (this.draft.country || null) as any,
-      contract_subject: (this.draft.contract_subject || null) as any,
+      contract_subject: isInvoice ? undefined : (this.draft.contract_subject || null) as any,
       contact_name:     (this.draft.contact_name || null) as any,
       contact_email:    (this.draft.contact_email || null) as any,
       contact_phone:    (this.draft.contact_phone || null) as any,
+      ...(isInvoice ? invoiceFieldsPayload(this.invoiceDraft, this.doc) : {}),
     }).subscribe(updated => {
-      this.doc = { ...updated, _access: access };
+      // The answer to a save carries no project links; they cannot have changed, so the loaded ones stay.
+      const projectLinks = updated.doc_type === INVOICE_DOC_TYPE ? (this.doc.project_links ?? []) : undefined;
+      this.doc = { ...updated, _access: access, project_links: projectLinks };
       this.initDraft();
       this.cdr.markForCheck();
       this.updated.emit(this.doc);
-      this.toast.success('Zapisano dokument');
+      this.toast.success(this.transloco.translate('documents.detail.toasts.saved'));
     });
   }
 
-  get docTypeLabel(): string { return DOC_TYPE_MAP[this.doc?.doc_type] ?? ''; }
+  get docTypeLabel(): string {
+    const docType = this.doc?.doc_type;
+    return BUILT_IN_DOC_TYPES.includes(docType) ? this.transloco.translate('documents.labels.docTypes.' + docType) : '';
+  }
   previewBlobUrl = signal<SafeResourceUrl | null>(null);
   previewLoading = signal(false);
   previewError   = signal<string | null>(null);
@@ -845,7 +921,7 @@ export class DetailPanelComponent implements OnChanges {
         this.previewLoading.set(false);
       },
       error: (err) => {
-        this.previewError.set(err?.error?.error ?? 'Nie udało się wczytać PDF');
+        this.previewError.set(err?.error?.error ?? this.transloco.translate('documents.detail.preview.loadFailed'));
         this.previewLoading.set(false);
       }
     });
@@ -910,7 +986,7 @@ export class DetailPanelComponent implements OnChanges {
       this.doc = { ...this.doc, tags: [...(this.doc.tags ?? []), tag] };
       this.newTagKey = '';
       this.cdr.markForCheck();
-      this.toast.success('Tag dodany');
+      this.toast.success(this.transloco.translate('documents.detail.tags.added'));
     });
   }
 
@@ -925,7 +1001,7 @@ export class DetailPanelComponent implements OnChanges {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     this.docSvc.uploadFile(this.doc.id, file).subscribe(() => {
-      this.toast.success('Wgrano plik');
+      this.toast.success(this.transloco.translate('documents.detail.preview.fileUploaded'));
       this.docSvc.get(this.doc.id).subscribe(d => { this.doc = d; this.cdr.markForCheck(); this.updated.emit(d); });
     });
   }
@@ -935,7 +1011,7 @@ export class DetailPanelComponent implements OnChanges {
     if (!file) return;
     const label = 'Version ' + ((this.doc.versions?.length ?? 0) + 1);
     this.docSvc.uploadFile(this.doc.id, file, label).subscribe(() => {
-      this.toast.success('Wgrano nową wersję');
+      this.toast.success(this.transloco.translate('documents.detail.versions.uploaded'));
       this.reloadHistory();
       this.docSvc.get(this.doc.id).subscribe(d => { this.doc = d; this.cdr.markForCheck(); this.updated.emit(d); });
     });
@@ -970,12 +1046,12 @@ export class DetailPanelComponent implements OnChanges {
     this.docSvc.uploadAttachment(this.doc.id, file, file.name).subscribe({
       next: att => {
         this.attachments.update(list => [...list, att]);
-        this.attachmentEvents.update(evts => [{icon:'📎', title:`Dodano załącznik: ${file.name}`, date: new Date().toISOString()}, ...evts]);
-        this.toast.success('Wgrano załącznik');
+        this.attachmentEvents.update(evts => [{icon:'📎', title: this.transloco.translate('documents.detail.history.actions.attachment_uploaded', { name: file.name }), date: new Date().toISOString()}, ...evts]);
+        this.toast.success(this.transloco.translate('documents.detail.attachments.uploaded'));
         this.reloadHistory();
       },
       error: err => {
-        const msg = err?.error?.error || err?.message || 'Błąd uploadu załącznika';
+        const msg = err?.error?.error || err?.message || this.transloco.translate('documents.detail.attachments.uploadFailed');
         this.toast.error(msg);
       },
     });
@@ -987,14 +1063,14 @@ export class DetailPanelComponent implements OnChanges {
     const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? file.name;
     this.docSvc.uploadAttachmentVersion(this.doc.id, attId, file).subscribe({
       next: () => {
-        this.toast.success('Wgrano nową wersję');
+        this.toast.success(this.transloco.translate('documents.detail.versions.uploaded'));
         this.reloadHistory();
-        this.attachmentEvents.update(evts => [{icon:'📎', title:`Nowa wersja załącznika: ${attName}`, date: new Date().toISOString()}, ...evts]);
+        this.attachmentEvents.update(evts => [{icon:'📎', title: this.transloco.translate('documents.detail.attachments.events.newVersion', { name: attName }), date: new Date().toISOString()}, ...evts]);
         this.attachmentsLoaded = false;
         this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
       },
       error: err => {
-        const msg = err?.error?.error || err?.message || 'Błąd uploadu nowej wersji';
+        const msg = err?.error?.error || err?.message || this.transloco.translate('documents.detail.attachments.versionUploadFailed');
         this.toast.error(msg);
       },
     });
@@ -1009,12 +1085,12 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   deleteAttachment(attId: string): void {
-    if (!confirm('Usunąć ten załącznik wraz ze wszystkimi wersjami?')) return;
+    if (!confirm(this.transloco.translate('documents.detail.attachments.deleteConfirm'))) return;
     const attName = this.attachments().find((a:any) => a.id === attId)?.name ?? attId;
     this.docSvc.deleteAttachment(this.doc.id, attId).subscribe(() => {
       this.attachments.update(list => list.filter((a: any) => a.id !== attId));
-      this.attachmentEvents.update(evts => [{icon:'🗑', title:'Usunięto załącznik: ' + attName, date: new Date().toISOString()}, ...evts]);
-      this.toast.success('Usunięto załącznik');
+      this.attachmentEvents.update(evts => [{icon:'🗑', title: this.transloco.translate('documents.detail.attachments.events.deleted', { name: attName }), date: new Date().toISOString()}, ...evts]);
+      this.toast.success(this.transloco.translate('documents.detail.attachments.deleted'));
       this.reloadHistory();
     });
   }
@@ -1046,28 +1122,13 @@ export class DetailPanelComponent implements OnChanges {
 
   historyLabel(entry: any): string {
     const after = entry.after_state ? (typeof entry.after_state === 'string' ? JSON.parse(entry.after_state) : entry.after_state) : null;
-    switch (entry.action) {
-      case 'document_created':            return 'Utworzono dokument';
-      case 'document_updated':            return 'Zaktualizowano dokument';
-      case 'document_deleted':            return 'Usunięto dokument';
-      case 'document_downloaded':         return 'Pobrano dokument';
-      case 'metadata_updated':            return 'Zaktualizowano metadane';
-      case 'tag_added':                   return `Dodano tag: ${after?.key ?? ''}`;
-      case 'tag_removed':                 return `Usunięto tag: ${after?.key ?? ''}`;
-      case 'tag_updated':                 return `Zmieniono tag: ${after?.key ?? ''}`;
-      case 'status_changed':              return `Zmieniono status na: ${after?.status ?? ''}`;
-      case 'version_uploaded':            return `Wgrano nową wersję dokumentu (v${after?.version ?? ''})`;
-      case 'workflow_task_created':       return `Przypisano zadanie workflow`;
-      case 'workflow_task_completed':     return `Ukończono zadanie workflow`;
-      case 'workflow_task_cancelled':     return `Anulowano zadanie workflow`;
-      case 'signing_initiated':           return 'Rozpoczęto podpisywanie elektroniczne';
-      case 'signing_completed':           return 'Zakończono podpisywanie elektroniczne';
-      case 'signing_failed':              return 'Podpisywanie elektroniczne nie powiodło się';
-      case 'attachment_uploaded':         return `Dodano załącznik: ${after?.name ?? after?.fileName ?? ''}`;
-      case 'attachment_version_uploaded': return `Nowa wersja załącznika (v${after?.version ?? ''})`;
-      case 'attachment_deleted':          return `Usunięto załącznik`;
-      default:                            return entry.action.replace(/_/g, ' ');
-    }
+    if (!DESCRIBED_HISTORY_ACTIONS.has(entry.action)) return entry.action.replace(/_/g, ' ');
+    return this.transloco.translate('documents.detail.history.actions.' + entry.action, {
+      key:     after?.key ?? '',
+      status:  after?.status ?? '',
+      version: after?.version ?? '',
+      name:    after?.name ?? after?.fileName ?? '',
+    });
   }
 
   loadLinkedPartners(): void {
@@ -1099,17 +1160,17 @@ export class DetailPanelComponent implements OnChanges {
         this.partnerSearch = '';
         this.partnerDropdown.set([]);
         this.loadLinkedPartners();
-        this.toast.success(`Powiązano z ${p.company}`);
+        this.toast.success(this.transloco.translate('documents.detail.partners.linked', { company: p.company }));
       },
-      error: () => this.toast.error('Błąd powiązania z partnerem'),
+      error: () => this.toast.error(this.transloco.translate('documents.detail.partners.linkFailed')),
     });
   }
 
   unlinkPartner(p: any): void {
-    if (!confirm(`Odpiąć partnera "${p.company}"?`)) return;
+    if (!confirm(this.transloco.translate('documents.detail.partners.unlinkConfirm', { company: p.company }))) return;
     this.crmApi.unlinkDocumentPartner(this.doc.id, p.id).subscribe({
-      next: () => { this.loadLinkedPartners(); this.toast.success('Odpięto partnera'); },
-      error: () => this.toast.error('Błąd odpinania partnera'),
+      next: () => { this.loadLinkedPartners(); this.toast.success(this.transloco.translate('documents.detail.partners.unlinked')); },
+      error: () => this.toast.error(this.transloco.translate('documents.detail.partners.unlinkFailed')),
     });
   }
 
@@ -1128,7 +1189,7 @@ export class DetailPanelComponent implements OnChanges {
   }
 
   deleteDoc(): void {
-    if (!confirm(`Usunąć „${this.doc.name}"?`)) return;
+    if (!confirm(this.transloco.translate('documents.detail.deleteConfirm', { name: this.doc.name }))) return;
     this.docSvc.delete(this.doc.id).subscribe(() => this.deleted.emit(this.doc.id));
   }
 
@@ -1163,7 +1224,7 @@ export class DetailPanelComponent implements OnChanges {
       this.doc = { ...this.doc, workflow_tasks: [...(this.doc.workflow_tasks ?? []), task] };
       this.wf = { assignTo: '', assignToName: '', assignSearch: '', taskType: 'read', message: '', dueDate: '' };
       this.cdr.markForCheck();
-      this.toast.success('Przypisano zadanie — wysłano powiadomienie e-mail');
+      this.toast.success(this.transloco.translate('documents.detail.workflow.assigned'));
     });
   }
 
@@ -1174,7 +1235,7 @@ export class DetailPanelComponent implements OnChanges {
         workflow_tasks: (this.doc.workflow_tasks ?? []).map(t => t.id === taskId ? { ...t, task_status: 'cancelled' } : t),
       };
       this.cdr.markForCheck();
-      this.toast.success('Anulowano zadanie');
+      this.toast.success(this.transloco.translate('documents.detail.workflow.cancelled'));
     });
   }
 
@@ -1186,7 +1247,7 @@ export class DetailPanelComponent implements OnChanges {
       next: (res: any) => {
         this.signusOpen = false;
         if (res.training) {
-          this.toast.success('Dokument wysłany do podpisu (symulacja). Podpisana wersja pojawi się za ~10 sekund.');
+          this.toast.success(this.transloco.translate('documents.detail.signus.sentTraining'));
           const docId = this.doc.id;
           setTimeout(() => {
             this.docSvc.get(docId).subscribe(d => {
@@ -1197,12 +1258,12 @@ export class DetailPanelComponent implements OnChanges {
             });
           }, 12_000);
         } else {
-          this.toast.success('Wysłano dokument do Signus — przekierowanie…');
+          this.toast.success(this.transloco.translate('documents.detail.signus.sentRedirect'));
           setTimeout(() => window.open(res.redirectUrl, '_blank'), 800);
         }
       },
       error: (err: any) => {
-        this.toast.error(err?.error?.error || 'Błąd wysyłania do Signusa');
+        this.toast.error(err?.error?.error || this.transloco.translate('documents.detail.signus.sendFailed'));
       },
     });
   }

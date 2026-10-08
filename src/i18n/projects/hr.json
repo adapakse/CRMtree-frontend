@@ -1,0 +1,863 @@
+{
+  "assigneeSummary": {
+    "atRisk": "U riziku",
+    "key": "otvoreni · izvan roka · u riziku",
+    "open": "Otvoreni zadaci",
+    "overdue": "Izvan roka"
+  },
+  "card": {
+    "closeConfirm": "Zatvoriti projekt? Zatvoreni projekt dostupan je samo za čitanje i nestaje sa zadanog popisa.",
+    "closeProject": "Zatvori projekt",
+    "closedBadge": "Zatvoren",
+    "datesHint": "Projekt dobiva oznaku „Kasni” kada nezavršeni zadatak završava nakon roka projekta ili kada je rok projekta istekao, a ostali su nezavršeni zadaci.",
+    "description": "Opis",
+    "edit": "Uredi",
+    "endDate": "Rok projekta",
+    "errors": {
+      "addMemberFailed": "Dodavanje osobe nije uspjelo",
+      "changeAccessLevelFailed": "Promjena ovlasti nije uspjela",
+      "changeRoleFailed": "Promjena uloge nije uspjela",
+      "closeProjectFailed": "Zatvaranje projekta nije uspjelo",
+      "endBeforeStart": "Rok projekta ne može biti prije njegova početka.",
+      "removeMemberFailed": "Uklanjanje osobe nije uspjelo",
+      "reopenProjectFailed": "Ponovno otvaranje projekta nije uspjelo",
+      "saveFieldsFailed": "Spremanje polja nije uspjelo",
+      "saveProjectFailed": "Spremanje projekta nije uspjelo"
+    },
+    "fields": {
+      "add": "Dodaj polje",
+      "empty": "Projekt nema dodatnih polja.",
+      "field": "Polje",
+      "noneAvailable": "Nema polja za dodavanje. Polja definira administrator u Postavke → Projekti → Dodatna polja zadataka.",
+      "remove": "Ukloni",
+      "removeConfirm": "Ukloniti polje „{name}” iz projekta? Vrijednosti unesene u zadacima ostat će sačuvane.",
+      "required": "Obavezno",
+      "requiredToggle": "obavezno",
+      "selectPlaceholder": "— odaberite polje —",
+      "title": "Dodatna polja zadataka",
+      "type": "Vrsta"
+    },
+    "members": {
+      "accessLevel": "Ovlasti",
+      "add": "Dodaj",
+      "companyAndDepartment": "Tvrtka / odjel",
+      "email": "E-pošta",
+      "externalAccount": "vanjski račun",
+      "inactive": "(neaktivan)",
+      "person": "Osoba",
+      "phone": "Telefon",
+      "remove": "Ukloni",
+      "removeConfirm": "Ukloniti osobu {name} iz projekta? Osoba će biti uklonjena i sa svojih zadataka.",
+      "role": "Uloga",
+      "searchPlaceholder": "Upišite ime, prezime, e-poštu ili tvrtku (najmanje 3 znaka)…",
+      "title": "Osobe u projektu"
+    },
+    "name": "Naziv",
+    "noDescription": "Nema opisa.",
+    "reopenProject": "Ponovno otvori",
+    "startDate": "Početak projekta",
+    "title": "Kartica projekta"
+  },
+  "chat": {
+    "deletedUser": "Izbrisani korisnik",
+    "empty": "Nema poruka.",
+    "hint": "Enter šalje poruku, Shift+Enter dodaje novi redak.",
+    "placeholder": "Napišite poruku…",
+    "send": "Pošalji",
+    "sendFailed": "Slanje poruke nije uspjelo"
+  },
+  "crmLink": {
+    "change": "Promijeni",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partner"
+    },
+    "link": "Poveži",
+    "linkFailed": "Povezivanje projekta nije uspjelo",
+    "none": "nema",
+    "remove": "Ukloni vezu",
+    "removeConfirm": "Ukloniti vezu projekta s CRM-om? Zadaci projekta nestat će s kartice leada ili partnera.",
+    "removeFailed": "Uklanjanje veze nije uspjelo",
+    "searchHint": "Prijedlozi obuhvaćaju samo leadove i partnere kojima imate pristup u CRM-u. Odabir odmah sprema vezu.",
+    "searchPlaceholder": "Upišite naziv leada ili partnera (najmanje 3 znaka)…",
+    "title": "Veza s CRM-om"
+  },
+  "deadlines": {
+    "atRisk": "U riziku",
+    "atRiskHint": "Rok je blizu, a rad još nije započeo.",
+    "completedLate": "Završeno izvan roka",
+    "completedLateHint": "Zadatak je završen nakon svojeg roka.",
+    "daysShort": "{days} d",
+    "legend": {
+      "atRisk": "u riziku (za obaviti, rok unutar {days, plural, one {# dana} few {# dana} other {# dana}})",
+      "beyondProjectEnd": "nakon roka projekta",
+      "completedLate": "završeno izvan roka",
+      "originalEndDate": "izvorni rok",
+      "overdue": "izvan roka",
+      "overdueSubtasks": "podzadaci izvan roka",
+      "projectEndDate": "rok projekta"
+    },
+    "originalEndDateHint": "Izvorni rok i pomak u danima",
+    "overdue": "Izvan roka",
+    "overdueDays": "Izvan roka {days} d",
+    "overdueHint": "Rok je istekao, a zadatak nije završen.",
+    "overdueSubtasks": "Podzadaci izvan roka",
+    "overdueSubtasksHint": "Barem je jedan podzadatak izvan roka.",
+    "slipEarlier": "−{days} d",
+    "slipLater": "+{days} d"
+  },
+  "delay": {
+    "badge": "Kasni",
+    "reasons": {
+      "endPassed": "Rok projekta istekao je prije {days, plural, one {# dan} few {# dana} other {# dana}}, otvoreni zadaci: {count}",
+      "taskAfterEnd": "Zadaci koji završavaju nakon roka projekta: {count} (najkasniji za {days, plural, one {# dan} few {# dana} other {# dana}})"
+    }
+  },
+  "detail": {
+    "backToProjects": "Projekti",
+    "closedBadge": "Zatvoren",
+    "empty": {
+      "noAssignedTasks": "Nemate dodijeljenih zadataka u ovom projektu.",
+      "noTasks": "U ovom projektu još nema zadataka."
+    },
+    "newTask": "Novi zadatak",
+    "openFailed": "Otvaranje projekta nije uspjelo",
+    "refreshFailed": "Osvježavanje projekta nije uspjelo",
+    "showOnlyMyTasks": "Prikaži moje zadatke",
+    "tabs": {
+      "card": "Kartica projekta",
+      "chat": "Chat",
+      "finance": "Financije",
+      "tasks": "Zadaci ({count})",
+      "timeline": "Vremenska crta"
+    },
+    "tasksLoadFailed": "Dohvaćanje zadataka nije uspjelo"
+  },
+  "filters": {
+    "assignee": "Osoba",
+    "atRiskCount": "Zadaci u riziku",
+    "cost": "Trošak",
+    "delayReason": "Razlog kašnjenja",
+    "delayReasonValues": {
+      "end_passed": "Rok projekta je istekao",
+      "task_after_end": "Zadatak završava nakon roka projekta"
+    },
+    "delayed": "Kašnjenje",
+    "delayedValues": {
+      "no": "Bez kašnjenja",
+      "yes": "Kasni"
+    },
+    "endDate": "Završetak",
+    "manager": "PM",
+    "myRole": "Moja uloga",
+    "myRoleValues": {
+      "controller": "Kontrolor",
+      "participant": "Sudionik",
+      "pm": "PM"
+    },
+    "name": "Naziv zadatka",
+    "number": "Broj",
+    "originalEndDate": "Izvorni rok",
+    "overdueCount": "Zadaci izvan roka",
+    "priority": "Prioritet",
+    "progress": "Napredak (%)",
+    "project": "Projekt",
+    "projectCost": "Nastali trošak",
+    "projectEndDate": "Rok projekta",
+    "projectName": "Naziv ili ključ projekta",
+    "projectRevenue": "Prihod",
+    "projectSort": {
+      "at_risk": "Zadaci u riziku",
+      "cost": "Nastali trošak",
+      "delay": "Kašnjenje",
+      "end_date": "Rok",
+      "key": "Ključ",
+      "name": "Naziv",
+      "overdue": "Zadaci izvan roka",
+      "pm": "PM",
+      "progress": "Napredak",
+      "revenue": "Prihod",
+      "start_date": "Početak",
+      "status": "Status"
+    },
+    "projectStartDate": "Početak projekta",
+    "slip": "Pomak (dani)",
+    "startDate": "Početak",
+    "status": "Status",
+    "statusCategory": "Faza",
+    "taskSort": {
+      "original_end_date": "Izvorni rok",
+      "parent": "Nadređeni zadatak",
+      "slip_days": "Pomak"
+    },
+    "timeliness": "Pravodobnost",
+    "timelinessValues": {
+      "at_risk": "U riziku",
+      "on_time": "U roku",
+      "overdue": "Izvan roka"
+    },
+    "type": "Vrsta",
+    "unassigned": "Nedodijeljeno"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Proračun kategorije {name}",
+      "columns": {
+        "budget": "Proračun",
+        "category": "Kategorija",
+        "incurred": "Nastali",
+        "planned": "Planirani",
+        "variance": "Odstupanje"
+      },
+      "empty": "Nema kategorija troškova. Administrator ih dodaje u Postavke → Projekti → Kategorije troškova.",
+      "hint": "Odstupanje je proračun umanjen za nastale troškove. Retci s prekoračenim proračunom su istaknuti.",
+      "inactive": "(neaktivna)",
+      "saveFailed": "Spremanje proračuna nije uspjelo",
+      "title": "Proračun po kategorijama",
+      "total": "Ukupno"
+    },
+    "costForm": {
+      "addTitle": "Novi trošak",
+      "amount": "Iznos",
+      "category": "Kategorija",
+      "clearInvoiceDocument": "Odvoji dokument",
+      "conversionHint": "Iznos će biti preračunat u {currency} po srednjem tečaju NBP-a (Narodne banke Poljske) na radni dan koji prethodi datumu troška.",
+      "currency": "Valuta iznosa",
+      "date": "Datum",
+      "description": "Opis",
+      "documentNumber": "Broj dokumenta",
+      "editTitle": "Uređivanje troška",
+      "invoiceDocument": "Dokument računa (neobavezno)",
+      "invoiceDocumentHint": "Dokumenti vrste Račun kojima imate pristup u modulu Dokumenti. Računi preuzeti iz KSeF-a povezuju se zasebno.",
+      "invoiceDocumentPlaceholder": "Tražite račun po broju ili nazivu…",
+      "noTask": "— bez zadatka —",
+      "saveFailed": "Spremanje troška nije uspjelo",
+      "saved": "Trošak je spremljen",
+      "savedWithRate": "Trošak je spremljen: {amount} po tečaju {rate} na dan {date}",
+      "selectCategory": "— odaberite kategoriju —",
+      "status": "Status",
+      "storedConversion": "Spremljeno kao {amount} (tečaj {rate} na dan {date}).",
+      "supplier": "Dobavljač",
+      "task": "Zadatak"
+    },
+    "costStatuses": {
+      "incurred": "Nastao",
+      "planned": "Planiran"
+    },
+    "costs": {
+      "add": "Dodaj trošak",
+      "columns": {
+        "amount": "Iznos",
+        "category": "Kategorija",
+        "date": "Datum",
+        "description": "Opis",
+        "documentNumber": "Br. dokumenta",
+        "status": "Status",
+        "supplier": "Dobavljač",
+        "task": "Zadatak"
+      },
+      "deleteConfirm": "Izbrisati trošak ({item})?",
+      "deleteFailed": "Brisanje troška nije uspjelo",
+      "empty": "Projekt još nema troškova.",
+      "emptyForFilters": "Nema troškova za odabrane filtre.",
+      "filters": {
+        "allCategories": "Sve kategorije",
+        "allStatuses": "Svi statusi",
+        "allTasks": "Svi zadaci",
+        "withoutTask": "Bez zadatka"
+      },
+      "rateNote": "tečaj {rate} na dan {date}",
+      "title": "Troškovi",
+      "totalIncurred": "Ukupno nastali"
+    },
+    "delete": "Izbriši",
+    "document": {
+      "lockedTitle": "Dokument računa — nemate mu pristup u modulu Dokumenti",
+      "openTitle": "Dokument računa — otvori u modulu Dokumenti"
+    },
+    "edit": "Uredi",
+    "loadFailed": "Dohvaćanje financija projekta nije uspjelo",
+    "plan": {
+      "currency": "Valuta projekta",
+      "currencyLockedHint": "Valutu nije moguće promijeniti jer projekt već ima stavke troškova ili prihoda.",
+      "participantsCanAddCosts": "Sudionici mogu dodavati troškove svojim zadacima",
+      "participantsCanAddCostsHint": "Interni sudionik dodaje troškove samo u zadacima koji su mu dodijeljeni i vidi isključivo stavke koje je sam dodao.",
+      "plannedRevenue": "Planirani prihod ({currency})",
+      "saveFailed": "Spremanje plana nije uspjelo",
+      "suggestedHint": "Prijedlog je vrijednost povezanog leada preračunata u valutu projekta.",
+      "title": "Financijski plan",
+      "useSuggested": "Upotrijebi predloženu: {amount}"
+    },
+    "readOnlyNote": "Samo pregled — financije ovog projekta možete pregledavati, ali ih ne možete mijenjati.",
+    "revenueStatuses": {
+      "invoiced": "Fakturiran",
+      "paid": "Plaćen",
+      "planned": "Planiran"
+    },
+    "revenues": {
+      "add": "Dodaj prihod",
+      "addTitle": "Novi prihod",
+      "amountIn": "Iznos ({currency})",
+      "columns": {
+        "amount": "Iznos",
+        "date": "Datum",
+        "description": "Opis",
+        "status": "Status"
+      },
+      "deleteConfirm": "Izbrisati prihod ({item})?",
+      "deleteFailed": "Brisanje prihoda nije uspjelo",
+      "editTitle": "Uređivanje prihoda",
+      "empty": "Projekt još nema prihoda.",
+      "saveFailed": "Spremanje prihoda nije uspjelo",
+      "saved": "Prihod je spremljen",
+      "statusHint": "U ostvarenje prihoda ubrajaju se fakturirane i plaćene stavke.",
+      "title": "Prihodi"
+    },
+    "saving": "Spremanje…",
+    "summary": {
+      "budget": "Proračun",
+      "cost": "Trošak (nastali)",
+      "margin": "Marža (ostvarenje)",
+      "plan": "Plan",
+      "plannedItems": "Planirane stavke",
+      "remainingBudget": "Preostali proračun",
+      "remainingBudgetHint": "Proračun umanjen za nastale troškove",
+      "revenue": "Prihod (ostvarenje)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Nastali (vlastiti)",
+        "plannedCost": "Planirani trošak",
+        "task": "Zadatak",
+        "totalIncurred": "Nastali s podzadacima",
+        "totalPlanned": "Planirani s podzadacima"
+      },
+      "empty": "Nijedan zadatak još nema troškova ni planirani trošak.",
+      "hint": "Planirani trošak zadatka informativan je i ne ulazi u proračun projekta. Iznosi „s podzadacima” obuhvaćaju stavke zadatka i svih njegovih podzadataka.",
+      "plannedCostOf": "Planirani trošak zadatka {task}",
+      "saveFailed": "Spremanje planiranog troška nije uspjelo",
+      "title": "Troškovi zadataka",
+      "total": "Ukupno"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Ostvarenje / plan",
+      "cost": "Trošak",
+      "margin": "Marža",
+      "marginHint": "Marža iz ostvarenja: fakturirani i plaćeni prihod umanjen za nastale troškove",
+      "revenue": "Prihod"
+    }
+  },
+  "gantt": {
+    "beyondProjectEnd": "Završava nakon roka projekta",
+    "emptyTitle": "Nema zadataka",
+    "loadFailed": "Dohvaćanje vremenske crte nije uspjelo",
+    "originalEndDate": "Izvorni rok: {date} ({slip})",
+    "projectEndDate": "Rok projekta: {date}",
+    "taskColumn": "Zadatak",
+    "today": "Danas",
+    "truncated": "Vremenska crta prikazuje prvih {limit} zadataka. Suzite filtre da biste vidjeli ostale.",
+    "undatedNote": "{count, plural, one {# zadatak bez datuma nema traku na vremenskoj crti.} few {# zadatka bez datuma nemaju traku na vremenskoj crti.} other {# zadataka bez datuma nema traku na vremenskoj crti.}}",
+    "zoom": {
+      "day": "Dani",
+      "month": "Mjeseci",
+      "week": "Tjedni"
+    }
+  },
+  "ksef": {
+    "badge": {
+      "openTitle": "Račun iz KSeF-a — prikaži pojedinosti",
+      "title": "Račun iz KSeF-a"
+    },
+    "costs": {
+      "addFromKsef": "Dodaj račun iz KSeF-a",
+      "link": "Poveži račun iz KSeF-a",
+      "unlink": "Odvoji račun",
+      "unlinkConfirm": "Odvojiti račun {invoice} od ovog troška? Trošak će ostati na popisu, a račun će ostati u KSeF-u.",
+      "unlinkFailed": "Odvajanje računa nije uspjelo"
+    },
+    "detail": {
+      "address": "Adresa",
+      "buyer": "Kupac",
+      "invoiceType": "Vrsta računa",
+      "issueDate": "Datum izdavanja",
+      "ksefNumber": "KSeF broj",
+      "lines": {
+        "empty": "Račun ne sadrži stavke.",
+        "name": "Naziv",
+        "netAmount": "Neto vrijednost",
+        "number": "R. br.",
+        "quantity": "Količina",
+        "title": "Stavke računa",
+        "unitNetPrice": "Neto cijena",
+        "vatRate": "PDV"
+      },
+      "links": {
+        "empty": "Račun nije povezan ni s jednim troškom.",
+        "linkedTotal": "Ukupno povezano {linked} od {net} neto.",
+        "title": "Veze računa"
+      },
+      "loadFailed": "Dohvaćanje računa nije uspjelo",
+      "payment": {
+        "amountDue": "Za platiti",
+        "bankAccounts": "Bankovni račun",
+        "dueDates": "Rok plaćanja",
+        "factor": "faktor",
+        "form": "Način plaćanja",
+        "paymentDate": "Datum plaćanja",
+        "state": "Stanje plaćanja",
+        "states": {
+          "paid": "Plaćen",
+          "partiallyPaid": "Djelomično plaćen",
+          "unknown": "Nema podataka",
+          "unpaid": "Neplaćen"
+        },
+        "title": "Plaćanje"
+      },
+      "saleDate": "Datum prodaje",
+      "seller": "Prodavatelj",
+      "title": "Račun {number}",
+      "titleLoading": "Račun iz KSeF-a",
+      "totals": {
+        "gross": "Bruto",
+        "net": "Neto",
+        "vat": "PDV"
+      }
+    },
+    "document": {
+      "groupMissing": "Nije odabrana grupa pristupa za dokumente računa pa se računi ne mogu evidentirati u Dokumentima. Administrator je odabire u Postavke → Projekti → KSeF.",
+      "noAccessTitle": "Niste član grupe pristupa ovog dokumenta pa ga ne možete otvoriti.",
+      "notRegisteredOnLink": "Račun će biti povezan, ali se neće pojaviti u modulu Dokumenti: nije odabrana grupa pristupa za dokumente računa (Postavke → Projekti → KSeF).",
+      "open": "Otvori dokument",
+      "register": "Evidentiraj u Dokumentima",
+      "registerFailed": "Evidentiranje računa u Dokumentima nije uspjelo",
+      "registerHint": "Račun još nema dokument u modulu Dokumenti. Povezivanjem s troškom automatski će se evidentirati.",
+      "registered": "Evidentiran: {number}",
+      "registeredToast": "Račun je evidentiran u Dokumentima kao {number}",
+      "registering": "Evidentiranje…",
+      "title": "Dokument u modulu Dokumenti"
+    },
+    "errors": {
+      "forbidden": "Nemate pristup računima iz KSeF-a. Ovlast dodjeljuje administrator u panelu korisnika."
+    },
+    "invoiceTypes": {
+      "KOR": "Korektivni račun",
+      "KOR_ROZ": "Ispravak konačnog računa",
+      "KOR_ZAL": "Ispravak računa za predujam",
+      "ROZ": "Konačni račun",
+      "UPR": "Pojednostavljeni račun",
+      "VAT": "PDV račun",
+      "ZAL": "Račun za predujam"
+    },
+    "link": {
+      "alreadyLinkedHint": "Ipak ga možete ponovno povezati — samo provjerite da isti trošak neće biti obračunat dvaput.",
+      "alreadyLinkedTitle": "Pozor: ovaj je račun već povezan",
+      "amountHint": "Zadano je cijeli neto iznos računa. Promijenite ga ako ovom trošku pripisujete samo dio računa.",
+      "amountHintForeign": "Račun je u valuti {invoiceCurrency}, a projekt u valuti {projectCurrency}. Ostavite polje prazno i cijeli neto iznos ({net}) bit će preračunat po srednjem tečaju NBP-a na radni dan koji prethodi datumu izdavanja računa. Iznos možete unijeti i odmah u valuti {projectCurrency}.",
+      "amountIn": "Pripisani iznos ({currency})",
+      "attachNote": "Račun će biti povezan s troškom: {item}. Iznos i ostali podaci troška neće se promijeniti.",
+      "back": "Natrag na popis",
+      "confirm": "Poveži račun",
+      "errors": {
+        "failed": "Povezivanje računa nije uspjelo",
+        "forbidden": "Nemate ovlasti za povezivanje računa iz KSeF-a u ovom projektu.",
+        "noExchangeRate": "Nema tečaja NBP-a za valutu računa. Unesite iznos u valuti {currency}.",
+        "projectClosed": "Projekt je zatvoren — računi se više ne mogu povezivati."
+      },
+      "saved": "Račun je povezan",
+      "savedWithRate": "Račun je povezan: {amount} po tečaju {rate} na dan {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Iznos",
+        "linkedBy": "Povezao/la",
+        "project": "Projekt",
+        "status": "Status",
+        "task": "Zadatak"
+      },
+      "wholeProject": "Cijeli projekt"
+    },
+    "list": {
+      "columns": {
+        "currency": "Valuta",
+        "document": "Dokument",
+        "gross": "Bruto",
+        "issueDate": "Datum izdavanja",
+        "net": "Neto",
+        "number": "Broj",
+        "paymentDueDate": "Rok plaćanja",
+        "seller": "Prodavatelj"
+      }
+    },
+    "nip": "Porezni broj",
+    "otherLinks": {
+      "intro": "Ovaj je račun povezan i s:",
+      "overAllocated": "Zbroj veza premašuje neto iznos računa.",
+      "wholeProject": "{project} (cijeli projekt)"
+    },
+    "paymentForms": {
+      "card": "Kartica",
+      "cash": "Gotovina",
+      "cheque": "Ček",
+      "credit": "Kredit",
+      "mobile": "Mobilno plaćanje",
+      "transfer": "Bankovni prijenos",
+      "voucher": "Vaučer"
+    },
+    "picker": {
+      "attachTitle": "Poveži račun iz KSeF-a s troškom",
+      "empty": "Nema računa u odabranom razdoblju i za odabrane filtre.",
+      "filters": {
+        "dateFrom": "Datum izdavanja od",
+        "dateTo": "Datum izdavanja do",
+        "invoiceNumber": "Broj računa",
+        "netMax": "Neto do",
+        "netMin": "Neto od",
+        "seller": "Prodavatelj (naziv ili porezni broj)"
+      },
+      "lastSync": "Posljednja uspješna sinkronizacija: {time}.",
+      "linkedCount": "{count, plural, one {Već povezan: # put} few {Već povezan: # puta} other {Već povezan: # puta}}",
+      "loadFailed": "Dohvaćanje popisa računa nije uspjelo",
+      "nextPage": "Sljedeća",
+      "noCompanies": "U KSeF još nije dodana nijedna tvrtka. Administrator to radi u Postavke → Projekti → KSeF.",
+      "notConfigured": "Integracija s KSeF-om nije konfigurirana na poslužitelju. Popis prikazuje samo ranije preuzete račune.",
+      "pageInfo": "Stranica {page} od {pages} · računa: {total}",
+      "previousPage": "Prethodna",
+      "search": "Traži",
+      "select": "Odaberi",
+      "syncHint": "Tek izdani račun može se u KSeF-u pojaviti tek nakon nekoliko minuta.",
+      "title": "Dodaj račun iz KSeF-a"
+    },
+    "settings": {
+      "addCompany": "Dodaj tvrtku",
+      "columns": {
+        "lastAttempt": "Posljednji pokušaj",
+        "lastSynced": "Posljednja uspješna sinkronizacija",
+        "name": "Naziv",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Nova tvrtka u KSeF-u",
+        "added": "Tvrtka je dodana. Računi će biti preuzeti pri sljedećoj sinkronizaciji.",
+        "editTitle": "Tvrtka u KSeF-u",
+        "name": "Naziv (neobavezno)",
+        "saveFailed": "Spremanje tvrtke nije uspjelo",
+        "saved": "Tvrtka je spremljena",
+        "token": "KSeF token",
+        "tokenHintAdd": "Token generiran u KSeF-u za ovaj porezni broj. Prije spremanja provjeravamo ga u KSeF-u; nakon spremanja više ga nije moguće pročitati.",
+        "tokenHintEdit": "Trenutačni token: {hint}. Ostavite polje prazno ako ga ne želite mijenjati.",
+        "verifying": "Provjera u KSeF-u…"
+      },
+      "edit": "Promijeni",
+      "environments": {
+        "production": "Produkcijsko okruženje",
+        "test": "Testno okruženje"
+      },
+      "errors": {
+        "companyNotFound": "Ove tvrtke više nema u konfiguraciji. Osvježite stranicu.",
+        "duplicateNip": "Tvrtka s ovim poreznim brojem već je dodana.",
+        "invalidNip": "Neispravan porezni broj.",
+        "notConfigured": "Integracija s KSeF-om nije konfigurirana na poslužitelju.",
+        "tokenRejected": "KSeF je odbio token za ovaj porezni broj. Provjerite je li token važeći i izdan za ovu tvrtku.",
+        "unknownGroup": "Ova grupa ne postoji ili nije aktivna. Osvježite stranicu i odaberite drugu.",
+        "unreachable": "Povezivanje s KSeF-om radi provjere tokena nije uspjelo. Pokušajte ponovno kasnije."
+      },
+      "hint": "Ulazni računi tvrtki dodanih u nastavku preuzimaju se iz sustava KSeF (poljski nacionalni sustav e-računa) svakih 30 minuta. Osobe s ovlašću „Pristup računima iz KSeF-a” povezuju ih s troškovima projekata.",
+      "initialSyncDays": "Prva sinkronizacija seže unatrag (dana)",
+      "initialSyncDaysHint": "Od {min} do {max} dana. Odnosi se na tvrtke dodane nakon promjene ove postavke.",
+      "invoiceDocumentsGroup": "Grupa pristupa za dokumente računa",
+      "invoiceDocumentsGroupHint": "U ovu grupu dolaze dokumenti računa evidentirani iz KSeF-a. Bez odabrane grupe računi povezani s projektima ne evidentiraju se u modulu Dokumenti.",
+      "loadFailed": "Dohvaćanje konfiguracije KSeF-a nije uspjelo",
+      "noCompanies": "Još nije dodana nijedna tvrtka.",
+      "noInvoiceDocumentsGroup": "— nema —",
+      "notConfigured": "Integracija s KSeF-om nije konfigurirana na poslužitelju, stoga nije moguće dodavati tvrtke ni preuzimati račune.",
+      "remove": "Ukloni",
+      "removeConfirm": "Ukloniti tvrtku {company} iz konfiguracije KSeF-a? Novi računi više se neće preuzimati. Već preuzeti računi i njihove veze s troškovima ostat će sačuvani.",
+      "removeFailed": "Uklanjanje tvrtke nije uspjelo",
+      "saveFailed": "Spremanje postavke nije uspjelo",
+      "saved": "Postavka je spremljena",
+      "statuses": {
+        "active": "Aktivna",
+        "error": "Pogreška sinkronizacije",
+        "invalid": "Token odbijen"
+      },
+      "syncFailed": "Sinkronizacija nije uspjela — razlog je vidljiv uz tvrtku.",
+      "testEnvironmentNote": "Poslužitelj se povezuje s testnim okruženjem KSeF-a — računi nisu stvarni dokumenti.",
+      "title": "KSeF — ulazni računi"
+    },
+    "sync": {
+      "failedForCompany": "Sinkronizacija nije uspjela za najmanje jednu tvrtku. Pojedinosti će administrator vidjeti u Postavke → Projekti → KSeF.",
+      "finished": "Sinkronizacija je završena",
+      "now": "Sinkroniziraj sada",
+      "running": "Sinkronizacija…",
+      "startFailed": "Pokretanje sinkronizacije nije uspjelo",
+      "stillRunning": "Sinkronizacija još traje — osvježite popis za koji trenutak."
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Pune",
+      "read": "Čitanje"
+    },
+    "fieldTypes": {
+      "date": "Datum",
+      "list": "Popis vrijednosti",
+      "money": "Iznos s valutom",
+      "number": "Broj",
+      "text": "Tekst"
+    },
+    "reminders": {
+      "1d_before": "1 dan prije roka",
+      "2d_before": "2 dana prije roka",
+      "3d_before": "3 dana prije roka",
+      "at_due": "Na dan roka",
+      "custom": "Vlastiti datum"
+    },
+    "roles": {
+      "controller": "Kontrolor",
+      "external_participant": "Vanjski sudionik",
+      "internal_participant": "Interni sudionik",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Završeno",
+      "in_progress": "U tijeku",
+      "todo": "Za obaviti"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partner {name}"
+    },
+    "closedBadge": "zatvoren",
+    "lockedHint": "Pregled — niste sudionik ovog projekta",
+    "noDueDate": "bez roka",
+    "noTasks": "Projekt još nema zadataka.",
+    "openOfTotal": "{open} od {total} otvoreno",
+    "showClosedProjectTasks": "Prikaži zadatke zatvorenog projekta",
+    "title": "Projektni zadaci"
+  },
+  "list": {
+    "closedBadge": "Zatvoren",
+    "createFailed": "Izrada projekta nije uspjela",
+    "createForm": {
+      "description": "Opis",
+      "keyHint": "Prefiks brojeva zadataka automatski će nastati iz naziva projekta.",
+      "name": "Naziv",
+      "namePlaceholder": "npr. Uvođenje CRM sustava",
+      "saving": "Spremanje…",
+      "submit": "Izradi projekt"
+    },
+    "empty": {
+      "noOpenProjects": "Ne sudjelujete ni u jednom otvorenom projektu.",
+      "noneForFilter": "Nema projekata za odabrani filtar.",
+      "title": "Nema projekata"
+    },
+    "filters": {
+      "all": "Svi",
+      "closed": "Zatvoreni",
+      "open": "Otvoreni"
+    },
+    "loadFailed": "Dohvaćanje projekata nije uspjelo",
+    "newProject": "Novi projekt",
+    "stats": {
+      "atRisk": "u riziku",
+      "doneOfTotalHint": "Završeni zadaci / svi",
+      "members": "{count, plural, one {osoba} few {osobe} other {osoba}}",
+      "myOpenTasks": "{count, plural, one {moj otvoreni} few {moja otvorena} other {mojih otvorenih}}",
+      "overdue": "izvan roka",
+      "tasks": "{count, plural, one {zadatak} few {zadatka} other {zadataka}}"
+    },
+    "title": "Projekti",
+    "views": {
+      "myTasks": "Moji zadaci",
+      "portfolio": "Pregled projekata",
+      "projects": "Projekti"
+    }
+  },
+  "myTasks": {
+    "empty": {
+      "description": "Nemate otvorenih zadataka ni u jednom projektu.",
+      "title": "Nema zadataka"
+    },
+    "includeDone": "Prikaži završene",
+    "loadFailed": "Dohvaćanje zadataka nije uspjelo"
+  },
+  "panel": {
+    "chatTitle": "Razgovor o zadatku",
+    "costs": {
+      "add": "Dodaj trošak",
+      "empty": "Zadatak još nema troškova.",
+      "loadFailed": "Dohvaćanje troškova zadatka nije uspjelo",
+      "ownOnlyHint": "Vidite samo troškove koje ste sami dodali.",
+      "title": "Troškovi",
+      "totalIncurred": "Ukupno nastali"
+    },
+    "createTask": "Izradi zadatak",
+    "created": "Zadatak je izrađen",
+    "customFields": {
+      "addButton": "+ Dodaj polje",
+      "addFailed": "Dodavanje polja nije uspjelo",
+      "addHint": "Polje će biti dodano svim zadacima ovog projekta.",
+      "noneAvailable": "Nema polja za dodavanje. Polja definira administrator u Postavke → Projekti → Dodatna polja zadataka.",
+      "selectField": "— odaberite polje —",
+      "title": "Dodatna polja"
+    },
+    "endDateChange": {
+      "hint": "Neobavezno. PM će razlog vidjeti u e-poruci o promjeni roka; bit će spremljen i u povijesti zadatka.",
+      "placeholder": "npr. kasna isporuka od klijenta",
+      "reason": "Razlog promjene roka"
+    },
+    "fields": {
+      "assignees": "Dodijeljene osobe",
+      "description": "Dodatni opis",
+      "endDate": "Datum završetka",
+      "name": "Naziv",
+      "noParent": "— nema (nadređeni zadatak) —",
+      "parentTask": "Nadređeni zadatak",
+      "priority": "Prioritet",
+      "startDate": "Datum početka",
+      "status": "Status",
+      "type": "Vrsta"
+    },
+    "history": {
+      "changed": "je izmijenio/la: {fields}",
+      "changedWithStatus": "je izmijenio/la: {fields} ({from} → {to})",
+      "created": "je izradio/la zadatak",
+      "empty": "Nema zapisa.",
+      "endDateChangeReason": "Razlog promjene roka: {reason}",
+      "fields": {
+        "assignees": "dodijeljene osobe",
+        "customFields": "dodatna polja",
+        "description": "opis",
+        "endDate": "datum završetka",
+        "name": "naziv",
+        "parentTask": "nadređeni zadatak",
+        "priority": "prioritet",
+        "reminder": "podsjetnik",
+        "startDate": "datum početka",
+        "status": "status",
+        "type": "vrsta"
+      },
+      "loadFailed": "Dohvaćanje povijesti nije uspjelo",
+      "systemUser": "Sustav",
+      "title": "Povijest promjena"
+    },
+    "loadFailed": "Dohvaćanje zadatka nije uspjelo",
+    "newTask": "Novi zadatak",
+    "reminder": {
+      "customDate": "Datum podsjetnika",
+      "hint": "Podsjetnik će u 9:00 stići svim dodijeljenim osobama i zahtijeva datum završetka.",
+      "label": "Podsjetnik e-poštom",
+      "none": "Nema"
+    },
+    "saveFailed": "Spremanje zadatka nije uspjelo",
+    "saved": "Zadatak je spremljen",
+    "saving": "Spremanje…"
+  },
+  "portfolio": {
+    "columns": {
+      "atRisk": "U riziku",
+      "cost": "Nastali trošak",
+      "delay": "Kašnjenje",
+      "endDate": "Rok",
+      "overdue": "Izvan roka",
+      "progress": "Napredak",
+      "project": "Projekt",
+      "projectManagers": "PM",
+      "revenue": "Prihod",
+      "startDate": "Početak"
+    },
+    "loadFailed": "Otvaranje pregleda projekata nije uspjelo",
+    "noProjects": "Ne vodite niti kontrolirate nijedan otvoreni projekt.",
+    "noTasks": "U vašim projektima nema zadataka.",
+    "tabs": {
+      "projects": "Projekti",
+      "tasks": "Zadaci",
+      "timeline": "Vremenska crta"
+    }
+  },
+  "settings": {
+    "costCategories": {
+      "hint": "Kategoriju nije moguće izbrisati — onu koju ne koristite isključite. Isključenu kategoriju nije moguće odabrati u novom trošku, a postojeće stavke je zadržavaju.",
+      "title": "Kategorije troškova"
+    },
+    "deadlines": {
+      "hint": "Zadatak na kojem rad još nije započeo označava se kao zadatak u riziku kada do njegova roka nije ostalo više dana od ovog praga (0–30; 0 znači sam dan roka).",
+      "invalid": "Unesite cijeli broj od 0 do 30.",
+      "saveFailed": "Spremanje praga nije uspjelo",
+      "saved": "Prag rizika roka je spremljen",
+      "threshold": "Prag rizika roka (dani)",
+      "title": "Kontrola rokova"
+    },
+    "dictionary": {
+      "active": "aktivno",
+      "addButton": "Dodaj",
+      "moveDown": "Dolje",
+      "moveUp": "Gore",
+      "newItemPlaceholder": "Nova stavka…",
+      "saveFailed": "Spremanje šifrarnika nije uspjelo"
+    },
+    "fields": {
+      "active": "aktivno",
+      "addButton": "Dodaj polje",
+      "empty": "Nema definiranih polja.",
+      "hint": "Ovdje definirana polja PM može dodati u svoj projekt (Kartica projekta → Dodatna polja zadataka) i odlučiti jesu li obavezna. Vrstu polja nije moguće promijeniti nakon izrade.",
+      "newNamePlaceholder": "Naziv novog polja…",
+      "optionsPlaceholder": "Vrijednosti odvojene zarezom",
+      "optionsRequired": "Popis mora imati barem jednu vrijednost",
+      "saveFailed": "Spremanje polja nije uspjelo",
+      "title": "Dodatna polja zadataka"
+    },
+    "finance": {
+      "disableConfirm": "Isključiti financije projekata? Podaci će ostati sačuvani, ali će nestati iz prikaza svih korisnika.",
+      "hint": "Nakon uključivanja PM i administrator u projektu vode proračun, troškove i prihode, a kontrolor ih može pregledavati. Sažetak financija projekta vidi i svatko tko ima pristup kartici povezanog leada ili partnera.",
+      "saveFailed": "Promjena postavke financija nije uspjela",
+      "title": "Financije projekata",
+      "toggle": "Uključi financije projekata"
+    },
+    "loadFailed": "Dohvaćanje konfiguracije projekata nije uspjelo",
+    "priorities": {
+      "title": "Prioriteti"
+    },
+    "statuses": {
+      "hint": "Kategorija govori sustavu što status znači — neovisno o nazivu. Zadaci u statusu kategorije „Završeno” ne računaju se kao otvoreni ni kao zakašnjeli.",
+      "title": "Statusi zadataka"
+    },
+    "transitions": {
+      "discardConfirm": "Imate nespremljene izmjene prijelaza. Odbaciti ih?",
+      "hint": "PM uvijek može promijeniti status u bilo koji. Sudionici mijenjaju status samo u zadacima koji su im dodijeljeni i ako imaju pune ovlasti. Kontrolor mijenja status u svakom zadatku projekta.",
+      "matrixCorner": "Iz statusa ↓ / u status →",
+      "saveButton": "Spremi prijelaze",
+      "saveFailed": "Spremanje prijelaza nije uspjelo",
+      "saved": "Prijelazi statusa su spremljeni",
+      "saving": "Spremanje…",
+      "title": "Prijelazi između statusa"
+    },
+    "types": {
+      "title": "Vrste zadataka"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Osobe",
+      "cost": "Trošak",
+      "endDate": "Završetak",
+      "number": "Br.",
+      "priority": "Prioritet",
+      "project": "Projekt",
+      "startDate": "Početak",
+      "status": "Status",
+      "task": "Zadatak",
+      "timeliness": "Pravodobnost",
+      "type": "Vrsta"
+    },
+    "emptyForFilters": "Nijedan zadatak ne odgovara filtrima.",
+    "emptyMessage": "U ovom projektu još nema zadataka.",
+    "emptyTitle": "Nema zadataka",
+    "flatList": "Plošni popis",
+    "parentTask": "Nadređeni zadatak",
+    "subtask": "Podzadatak"
+  }
+}

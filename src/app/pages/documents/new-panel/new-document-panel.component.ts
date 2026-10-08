@@ -1,24 +1,45 @@
 import { Component, inject, Input, Output, EventEmitter, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { DocumentService } from '@core/services/document.service';
-import { GroupProfile, Document, DocType, GdprType } from '@core/models/models';
+import { GroupProfile, Document, DocType, GdprType, CreateDocumentPayload } from '@core/models/models';
 import { ToastService } from '@core/services/toast.service';
 import { AppSettingsService } from '@core/services/app-settings.service';
 import { CrmApiService } from '../../../core/services/crm-api.service';
+import { LocaleService } from '@core/i18n/locale.service';
+import { DEFAULT_LOCALE } from '@core/i18n/locales';
+import { INVOICE_DOC_TYPE } from '@core/services/helpers';
+import {
+  InvoiceFieldsComponent, invoiceFieldsPayload, newInvoiceFieldsDraft, paymentStatusCodes,
+} from '../invoice-fields/invoice-fields.component';
+
+// Built-in values have translated names; any other value comes from App
+// Settings and is its own display name.
+const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'employee_agreement', 'nda', 'operator_agreement', 'invoice'];
+const BUILT_IN_GDPR_TYPES = ['data_processing_entrustment', 'data_administration', 'no_gdpr'];
+
+// Dictionaries offered when the tenant has not configured its own
+// (keys under documents.labels.countries / documents.labels.contractSubjects).
+const FALLBACK_COUNTRY_KEYS = ['pl', 'de', 'fr', 'gb', 'cz', 'sk', 'hu', 'ro', 'ua', 'ru', 'at', 'ch'];
+const FALLBACK_CONTRACT_SUBJECT_KEYS = ['businessTravel', 'conferences', 'accommodation', 'system', 'other'];
+
+interface SelectOption { value: string; label: string; }
 
 @Component({
   selector: 'wt-new-document-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective, TranslocoPipe, InvoiceFieldsComponent],
+  providers: [provideTranslocoScope('documents')],
   template: `
+    <ng-container *transloco="let t; prefix: 'documents'">
     <div class="overlay open" (click)="onOverlay($event)">
       <div class="panel" (click)="$event.stopPropagation()">
 
         <div class="ph">
           <div>
-            <div class="pt">Nowy dokument</div>
-            <div class="ps">Uzupełnij metadane i opcjonalnie dodaj plik</div>
+            <div class="pt">{{ t('newDocument.title') }}</div>
+            <div class="ps">{{ t('newDocument.subtitle') }}</div>
           </div>
           <div class="pc" (click)="close.emit()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -28,38 +49,38 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
         </div>
 
         <div class="pb">
-          <div class="sec-title">Podstawowe informacje</div>
+          <div class="sec-title">{{ t('newDocument.basicInfo') }}</div>
           <div class="fgrid">
 
             <div class="fg full">
-              <label class="fl">Nazwa dokumentu <span class="req">*</span></label>
-              <input class="fi" placeholder="np. Umowa partnerska — ABC Sp. z o.o." [(ngModel)]="form.name">
+              <label class="fl">{{ t('labels.fields.documentName') }} <span class="req">*</span></label>
+              <input class="fi" [placeholder]="t('newDocument.namePlaceholder')" [(ngModel)]="form.name">
             </div>
 
             <div class="fg">
-              <label class="fl">Typ dokumentu <span class="req">*</span></label>
+              <label class="fl">{{ t('labels.fields.documentType') }} <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.doc_type">
-                <option value="">— Wybierz typ —</option>
-                @for (t of docTypeOptions; track t.value) {
-                  <option [value]="t.value">{{ t.label }}</option>
+                <option value="">{{ t('newDocument.chooseType') }}</option>
+                @for (option of docTypeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
                 }
               </select>
             </div>
 
             <div class="fg">
-              <label class="fl">Klasyfikacja GDPR <span class="req">*</span></label>
+              <label class="fl">{{ t('labels.fields.gdprClassification') }} <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.gdpr_type">
-                <option value="">— Wybierz klasyfikację —</option>
-                @for (t of gdprTypeOptions; track t.value) {
-                  <option [value]="t.value">{{ t.label }}</option>
+                <option value="">{{ t('newDocument.chooseGdpr') }}</option>
+                @for (option of gdprTypeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
                 }
               </select>
             </div>
 
             <div class="fg">
-              <label class="fl">Grupa <span class="req">*</span></label>
+              <label class="fl">{{ t('labels.fields.group') }} <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.group_id">
-                <option value="">— Wybierz grupę —</option>
+                <option value="">{{ t('newDocument.chooseGroup') }}</option>
                 @for (g of groups; track g.id) {
                   <option [value]="g.id">{{ g.display_name }}</option>
                 }
@@ -68,9 +89,9 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
 
             <!-- Owner -->
             <div class="fg">
-              <label class="fl">Właściciel</label>
+              <label class="fl">{{ t('labels.fields.owner') }}</label>
               <select class="fsel" [(ngModel)]="ownerId">
-                <option value="">— nieprzypisany —</option>
+                <option value="">{{ t('labels.options.unassigned') }}</option>
                 @for (u of users(); track u.id) {
                   <option [value]="u.id">{{ u.display_name }}</option>
                 }
@@ -78,90 +99,99 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             </div>
 
             <div class="fg">
-              <label class="fl">Data podpisania</label>
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.issueDate' : 'labels.fields.signingDate') }}</label>
               <input class="fi" type="date" [(ngModel)]="form.signing_date">
             </div>
             <div class="fg">
-              <label class="fl">Data wygaśnięcia</label>
-              <select class="fsel" [(ngModel)]="form.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
-                <option value="indefinite">Czas nieokreślony</option>
-                <option value="fixed">Data określona</option>
-              </select>
-              <input *ngIf="form.expiration_date_mode==='fixed'" class="fi" type="date" [(ngModel)]="form.expiration_date" style="margin-top:6px">
+              @if (isInvoice) {
+                <label class="fl">{{ t('labels.fields.paymentDueDate') }}</label>
+                <input class="fi" type="date" [(ngModel)]="form.expiration_date">
+              } @else {
+                <label class="fl">{{ t('labels.fields.expirationDate') }}</label>
+                <select class="fsel" [(ngModel)]="form.expiration_date_mode" (ngModelChange)="onExpDateModeChange()">
+                  <option value="indefinite">{{ t('labels.options.indefinite') }}</option>
+                  <option value="fixed">{{ t('labels.options.fixedDate') }}</option>
+                </select>
+                <input *ngIf="form.expiration_date_mode==='fixed'" class="fi" type="date" [(ngModel)]="form.expiration_date" style="margin-top:6px">
+              }
             </div>
 
-            <div class="fg">
-              <label class="fl">Przedmiot umowy <span class="req">*</span></label>
-              <select class="fsel" [(ngModel)]="form.contract_subject">
-                <option value="">— Wybierz —</option>
-                @for (s of contractSubjectOptions; track s) {
-                  <option [value]="s">{{ s }}</option>
-                }
-              </select>
-            </div>
+            @if (!isInvoice) {
+              <div class="fg">
+                <label class="fl">{{ t('labels.fields.contractSubject') }} <span class="req">*</span></label>
+                <select class="fsel" [(ngModel)]="form.contract_subject">
+                  <option value="">{{ t('labels.options.choose') }}</option>
+                  @for (subject of contractSubjectOptions; track subject.value) {
+                    <option [value]="subject.value">{{ subject.label }}</option>
+                  }
+                </select>
+              </div>
+            }
 
             <div class="fg">
-              <label class="fl">Podmiot 1 <span class="req">*</span></label>
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.buyer' : 'labels.fields.entity1') }} <span class="req">*</span></label>
               @if (entity1Options.length > 0) {
                 <select class="fsel" [(ngModel)]="entity1">
-                  <option value="">— Wybierz podmiot —</option>
+                  <option value="">{{ t('newDocument.chooseEntity') }}</option>
                   @for (opt of entity1Options; track opt) {
                     <option [value]="opt">{{ opt }}</option>
                   }
                 </select>
               } @else {
-                <input class="fi" placeholder="np. CRMtree Sp. z o.o." [(ngModel)]="entity1">
+                <input class="fi" [placeholder]="t('labels.placeholders.entity1')" [(ngModel)]="entity1">
               }
             </div>
             <div class="fg">
-              <label class="fl">Podmiot 2</label>
-              <input class="fi" placeholder="np. Partner Ltd." [(ngModel)]="entity2">
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.seller' : 'labels.fields.entity2') }}</label>
+              <input class="fi" [placeholder]="t('labels.placeholders.entity2')" [(ngModel)]="entity2">
             </div>
             <div class="fg">
-              <label class="fl">NIP kontrahenta <span class="req">*</span></label>
-              <input class="fi" placeholder="np. 1234567890" maxlength="15" [(ngModel)]="form.nip">
+              <label class="fl">{{ t(isInvoice ? 'labels.fields.sellerTaxId' : 'labels.fields.counterpartyTaxId') }} <span class="req">*</span></label>
+              <input class="fi" [placeholder]="t('labels.placeholders.taxId')" maxlength="15" [(ngModel)]="form.nip">
             </div>
             <div class="fg">
-              <label class="fl">Kraj kontrahenta <span class="req">*</span></label>
+              <label class="fl">{{ t('labels.fields.counterpartyCountry') }} <span class="req">*</span></label>
               <select class="fsel" [(ngModel)]="form.country">
-                <option value="">— Wybierz kraj —</option>
-                @for (k of countryOptions; track k) {
-                  <option [value]="k">{{ k }}</option>
+                <option value="">{{ t('labels.options.chooseCountry') }}</option>
+                @for (country of countryOptions; track country.value) {
+                  <option [value]="country.value">{{ country.label }}</option>
                 }
               </select>
             </div>
 
           </div>
 
+          @if (isInvoice) { <wt-invoice-fields [(value)]="invoice" /> }
+
           <!-- Dane kontaktowe ds. umowy -->
-          <div class="sec-title" style="margin-top:20px">Dane kontaktowe ds. umowy</div>
+          <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.contactSection') }}</div>
           <div class="fgrid">
             <div class="fg full">
-              <label class="fl">Imię i Nazwisko</label>
-              <input class="fi" placeholder="np. Jan Kowalski" [(ngModel)]="form.contact_name">
+              <label class="fl">{{ t('labels.fields.contactName') }}</label>
+              <input class="fi" [placeholder]="t('labels.placeholders.contactName')" [(ngModel)]="form.contact_name">
             </div>
             <div class="fg">
-              <label class="fl">Email</label>
-              <input class="fi" type="email" placeholder="np. jan.kowalski@firma.pl" [(ngModel)]="form.contact_email">
+              <label class="fl">{{ t('labels.fields.email') }}</label>
+              <input class="fi" type="email" [placeholder]="t('labels.placeholders.contactEmail')" [(ngModel)]="form.contact_email">
             </div>
             <div class="fg">
-              <label class="fl">Telefon</label>
-              <input class="fi" placeholder="np. +48 600 000 000" [(ngModel)]="form.contact_phone">
+              <label class="fl">{{ t('labels.fields.phone') }}</label>
+              <input class="fi" [placeholder]="t('labels.placeholders.contactPhone')" [(ngModel)]="form.contact_phone">
             </div>
           </div>
 
           <!-- Tags -->
-          <div class="sec-title" style="margin-top:20px">Tagi (opcjonalne)</div>
+          <div class="sec-title" style="margin-top:20px">{{ t('newDocument.tags.title') }}</div>
           @for (tag of form.tags; track $index) {
             <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-              <input class="fi" style="flex:1" placeholder="klucz" [(ngModel)]="tag.key">
+              <input class="fi" style="flex:1" [placeholder]="t('newDocument.tags.keyPlaceholder')" [(ngModel)]="tag.key">
               <button class="btn btn-d btn-sm" (click)="removeTag($index)">✕</button>
             </div>
           }
-          <button class="btn btn-g btn-sm" (click)="addTag()" style="margin-bottom:20px">+ Dodaj tag</button>
+          <button class="btn btn-g btn-sm" (click)="addTag()" style="margin-bottom:20px">+ {{ t('labels.addTag') }}</button>
 
           <!-- File Upload -->
-          <div class="sec-title">Załącznik (opcjonalnie)</div>
+          <div class="sec-title">{{ t('newDocument.file.title') }}</div>
           <div class="upz" [class.drag-over]="isDragging"
                (dragover)="$event.preventDefault(); isDragging=true"
                (dragleave)="isDragging=false"
@@ -170,25 +200,26 @@ import { CrmApiService } from '../../../core/services/crm-api.service';
             @if (selectedFile) {
               <div style="font-size:14px;font-weight:600;color:var(--gray-800)">📄 {{ selectedFile.name }}</div>
               <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ formatSize(selectedFile.size) }}</div>
-              <button class="btn btn-g btn-sm" style="margin-top:8px" (click)="$event.stopPropagation();selectedFile=null">Usuń</button>
+              <button class="btn btn-g btn-sm" style="margin-top:8px" (click)="$event.stopPropagation();selectedFile=null">{{ t('newDocument.file.remove') }}</button>
             } @else {
               <div style="font-size:24px;margin-bottom:8px">📂</div>
-              <div style="font-size:13px;font-weight:600;color:var(--gray-700)">Upuść plik tutaj lub kliknij, aby wybrać</div>
-              <div style="font-size:12px;color:var(--gray-400);margin-top:4px">PDF, DOCX — maks. 50 MB</div>
+              <div style="font-size:13px;font-weight:600;color:var(--gray-700)">{{ t('newDocument.file.dropHint') }}</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-top:4px">{{ t('newDocument.file.formats') }}</div>
             }
           </div>
           <input #fileInput type="file" hidden accept=".pdf,.docx,.doc" (change)="onFileChange($event)">
         </div>
 
         <div class="pf">
-          <button class="btn btn-g" (click)="close.emit()">Anuluj</button>
+          <button class="btn btn-g" (click)="close.emit()">{{ 'actions.cancel' | transloco }}</button>
           <button class="btn btn-p" [disabled]="!isValid() || saving()" (click)="save()">
             @if (saving()) { <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;display:inline-block"></span> }
-            Utwórz dokument
+            {{ t('newDocument.create') }}
           </button>
         </div>
       </div>
     </div>
+    </ng-container>
   `,
   styles: [`
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; backdrop-filter: blur(2px); display: flex; align-items: flex-start; justify-content: flex-end; }
@@ -211,44 +242,49 @@ export class NewDocumentPanelComponent implements OnInit {
   private toast       = inject(ToastService);
   private settingsSvc = inject(AppSettingsService);
   private crmApi      = inject(CrmApiService);
+  private transloco   = inject(TranslocoService);
+  private locale      = inject(LocaleService);
 
-  get docTypeOptions(): { value: string; label: string }[] {
-    const DOC_LABELS: Record<string, string> = {
-      partner_agreement:    'Umowa partnerska',
-      it_supplier_agreement:'Umowa z dostawcą IT',
-      employee_agreement:   'Umowa pracownicza',
-      nda:                  'NDA',
-      operator_agreement:   'Umowa operatorska',
-    };
+  get docTypeOptions(): SelectOption[] {
+    const toOption = (value: string): SelectOption => ({
+      value,
+      label: BUILT_IN_DOC_TYPES.includes(value) ? this.transloco.translate('documents.labels.docTypes.' + value) : value,
+    });
+    const byLabel = (a: SelectOption, b: SelectOption) => a.label.localeCompare(b.label, this.locale.activeLocale());
     try {
       const raw = this.settingsSvc.settings()?.['doc_types'];
       if (raw) {
         const types: string[] = JSON.parse(String(raw));
-        return types
-          .map(v => ({ value: v, label: DOC_LABELS[v] ?? v }))
-          .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+        return types.map(toOption).sort(byLabel);
       }
     } catch { }
-    return Object.entries(DOC_LABELS)
-      .map(([value, label]) => ({ value, label }))
-      .sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+    return BUILT_IN_DOC_TYPES.map(toOption).sort(byLabel);
   }
 
-  get countryOptions(): string[] {
+  get countryOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['crm_partner_countries'];
-      if (raw) return JSON.parse(String(raw));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
     } catch { }
-    return ['Polska','Niemcy','Francja','Wielka Brytania','Czechy','Słowacja',
-            'Węgry','Rumunia','Ukraina','Rosja','Austria','Szwajcaria'];
+    return this.fallbackOptions('countries', FALLBACK_COUNTRY_KEYS);
   }
 
-  get contractSubjectOptions(): string[] {
+  get contractSubjectOptions(): SelectOption[] {
     try {
       const raw = this.settingsSvc.settings()?.['doc_contract_subjects'];
-      if (raw) return JSON.parse(String(raw));
+      if (raw) return (JSON.parse(String(raw)) as string[]).map(value => ({ value, label: value }));
     } catch { }
-    return ['Podróże służbowe','Konferencje/Spotkania','Zakwaterowanie','System','Inne'];
+    return this.fallbackOptions('contractSubjects', FALLBACK_CONTRACT_SUBJECT_KEYS);
+  }
+
+  // The stored value of a fallback entry is its name in the source language —
+  // documents saved so far hold exactly that text, and one tenant's users may
+  // work in different languages. Only the label follows the user's language.
+  private fallbackOptions(dictionary: string, keys: string[]): SelectOption[] {
+    return keys.map(key => ({
+      value: this.transloco.translate(`documents.labels.${dictionary}.${key}`, {}, DEFAULT_LOCALE),
+      label: this.transloco.translate(`documents.labels.${dictionary}.${key}`),
+    }));
   }
 
   get entity1Options(): string[] {
@@ -262,20 +298,19 @@ export class NewDocumentPanelComponent implements OnInit {
     return [];
   }
 
-  get gdprTypeOptions(): { value: string; label: string }[] {
-    const GDPR_LABELS: Record<string, string> = {
-      data_processing_entrustment: 'Powierzenie przetwarzania danych',
-      data_administration: 'Współadministrowanie danych',
-      no_gdpr: 'Brak GDPR',
-    };
+  get gdprTypeOptions(): SelectOption[] {
+    const toOption = (value: string): SelectOption => ({
+      value,
+      label: BUILT_IN_GDPR_TYPES.includes(value) ? this.transloco.translate('documents.labels.gdprTypes.' + value) : value,
+    });
     try {
       const raw = this.settingsSvc.settings()?.['doc_gdpr_types'];
       if (raw) {
         const types: string[] = JSON.parse(String(raw));
-        return types.map(v => ({ value: v, label: GDPR_LABELS[v] ?? v }));
+        return types.map(toOption);
       }
     } catch { }
-    return Object.entries(GDPR_LABELS).map(([value, label]) => ({ value, label }));
+    return BUILT_IN_GDPR_TYPES.map(toOption);
   }
 
   saving       = signal(false);
@@ -285,6 +320,9 @@ export class NewDocumentPanelComponent implements OnInit {
   entity2 = '';
   ownerId      = '';
   users = signal<any[]>([]);
+  invoice = newInvoiceFieldsDraft(paymentStatusCodes(this.settingsSvc.settings()));
+
+  get isInvoice(): boolean { return this.form.doc_type === INVOICE_DOC_TYPE; }
 
   ngOnInit(): void {
     this.crmApi.getCrmUsers().subscribe(users => this.users.set(users));
@@ -311,7 +349,7 @@ export class NewDocumentPanelComponent implements OnInit {
     return !!(
       this.form.name.trim() && this.form.doc_type && this.form.gdpr_type &&
       this.form.group_id && this.entity1.trim() &&
-      this.form.nip.trim() && this.form.country && this.form.contract_subject
+      this.form.nip.trim() && this.form.country && (this.isInvoice || this.form.contract_subject)
     );
   }
 
@@ -349,10 +387,11 @@ export class NewDocumentPanelComponent implements OnInit {
       group_id:         this.form.group_id,
       entities:         [this.entity1, this.entity2].filter(s => !!s.trim()).map(s => s.trim()),
       signing_date:     this.form.signing_date || undefined,
-      expiration_date:  this.form.expiration_date_mode === 'fixed' ? (this.form.expiration_date || undefined) : undefined,
+      expiration_date:  this.isInvoice || this.form.expiration_date_mode === 'fixed' ? (this.form.expiration_date || undefined) : undefined,
       nip:              this.form.nip.trim() || undefined,
       country:          this.form.country || undefined,
-      contract_subject: this.form.contract_subject,
+      contract_subject: this.isInvoice ? undefined : this.form.contract_subject,
+      ...(this.isInvoice ? this.newInvoicePayload() : {}),
       contact_name:     this.form.contact_name.trim() || undefined,
       contact_email:    this.form.contact_email.trim() || undefined,
       contact_phone:    this.form.contact_phone.trim() || undefined,
@@ -361,7 +400,21 @@ export class NewDocumentPanelComponent implements OnInit {
       file:             this.selectedFile ?? undefined,
     }).subscribe({
       next: doc => { this.saving.set(false); this.created.emit(doc); },
-      error: () => { this.saving.set(false); this.toast.error('Nie udało się utworzyć dokumentu'); },
+      error: () => { this.saving.set(false); this.toast.error(this.transloco.translate('documents.newDocument.createFailed')); },
     });
+  }
+
+  // Empty fields are left out, so the API applies its defaults (currency, payment status).
+  private newInvoicePayload(): Partial<CreateDocumentPayload> {
+    const fields = invoiceFieldsPayload(this.invoice);
+    return {
+      invoice_number: fields.invoice_number ?? undefined,
+      bank_account:   fields.bank_account ?? undefined,
+      payment_status: fields.payment_status ?? undefined,
+      currency:       fields.currency ?? undefined,
+      net_amount:     fields.net_amount,
+      vat_amount:     fields.vat_amount,
+      gross_amount:   fields.gross_amount,
+    };
   }
 }

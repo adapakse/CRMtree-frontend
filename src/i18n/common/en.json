@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save"
+  },
+  "addToCalendar": {
+    "google": "Google Calendar",
+    "icsFile": ".ics file (Apple and others)",
+    "outlook": "Outlook",
+    "title": "Add to calendar"
+  },
+  "language": {
+    "changeFailed": "Couldn't change the language",
+    "followTenant": "Organization default ({language})",
+    "hint": "Changing the language reloads the page. Emails and reminders will also be sent in this language.",
+    "tenantHint": "Language for people who haven't chosen their own. Changing it reloads the page.",
+    "tenantTitle": "Organization default language",
+    "title": "Interface language"
+  },
+  "list": {
+    "activeFilters": "{count, plural, one {# active filter} other {# active filters}}",
+    "anyValue": "Any",
+    "ascending": "Ascending",
+    "clearFilter": "Clear",
+    "clearFilters": "Clear filters",
+    "defaultSort": "Default",
+    "descending": "Descending",
+    "filterBy": "Filter: {name}",
+    "from": "from",
+    "noOptions": "Nothing to choose from.",
+    "pager": {
+      "next": "Next page",
+      "previous": "Previous page",
+      "range": "{from}–{to} of {total}"
+    },
+    "sort": "Sort by",
+    "sortBy": "Sort: {name}",
+    "to": "to"
+  },
+  "states": {
+    "loading": "Loading…"
+  },
+  "testEnvironmentBanner": {
+    "title": "Test version — this is not the production environment"
+  },
+  "typeahead": {
+    "minChars": "Type at least {count} characters…",
+    "noResults": "No results.",
+    "searching": "Searching…"
+  }
+}

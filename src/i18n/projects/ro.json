@@ -1,0 +1,863 @@
+{
+  "assigneeSummary": {
+    "atRisk": "La risc",
+    "key": "deschise · termen depășit · la risc",
+    "open": "Sarcini deschise",
+    "overdue": "Termen depășit"
+  },
+  "card": {
+    "closeConfirm": "Închideți proiectul? Un proiect închis poate fi doar citit și dispare din lista implicită.",
+    "closeProject": "Închidere proiect",
+    "closedBadge": "Închis",
+    "datesHint": "Proiectul este marcat ca întârziat atunci când o sarcină nefinalizată se încheie după termenul proiectului sau când termenul proiectului a trecut și au rămas sarcini nefinalizate.",
+    "description": "Descriere",
+    "edit": "Editare",
+    "endDate": "Termenul proiectului",
+    "errors": {
+      "addMemberFailed": "Persoana nu a putut fi adăugată",
+      "changeAccessLevelFailed": "Permisiunile nu au putut fi modificate",
+      "changeRoleFailed": "Rolul nu a putut fi modificat",
+      "closeProjectFailed": "Proiectul nu a putut fi închis",
+      "endBeforeStart": "Termenul proiectului nu poate fi anterior începutului său.",
+      "removeMemberFailed": "Persoana nu a putut fi eliminată",
+      "reopenProjectFailed": "Proiectul nu a putut fi redeschis",
+      "saveFieldsFailed": "Câmpurile nu au putut fi salvate",
+      "saveProjectFailed": "Proiectul nu a putut fi salvat"
+    },
+    "fields": {
+      "add": "Adăugare câmp",
+      "empty": "Proiectul nu are câmpuri suplimentare.",
+      "field": "Câmp",
+      "noneAvailable": "Nu există câmpuri de adăugat. Câmpurile sunt definite de administrator în Setări → Proiecte → Câmpuri suplimentare ale sarcinilor.",
+      "remove": "Eliminare",
+      "removeConfirm": "Eliminați câmpul „{name}” din proiect? Valorile introduse în sarcini vor fi păstrate.",
+      "required": "Obligatoriu",
+      "requiredToggle": "obligatoriu",
+      "selectPlaceholder": "— selectați câmpul —",
+      "title": "Câmpuri suplimentare ale sarcinilor",
+      "type": "Tip"
+    },
+    "members": {
+      "accessLevel": "Permisiuni",
+      "add": "Adăugare",
+      "companyAndDepartment": "Companie / departament",
+      "email": "E-mail",
+      "externalAccount": "cont extern",
+      "inactive": "(inactiv)",
+      "person": "Persoană",
+      "phone": "Telefon",
+      "remove": "Eliminare",
+      "removeConfirm": "Eliminați {name} din proiect? Persoana va fi scoasă și din sarcinile care îi sunt atribuite.",
+      "role": "Rol",
+      "searchPlaceholder": "Introduceți prenumele, numele, e-mailul sau compania (min. 3 caractere)…",
+      "title": "Persoane în proiect"
+    },
+    "name": "Denumire",
+    "noDescription": "Fără descriere.",
+    "reopenProject": "Redeschidere",
+    "startDate": "Începutul proiectului",
+    "title": "Fișa proiectului"
+  },
+  "chat": {
+    "deletedUser": "Utilizator șters",
+    "empty": "Niciun mesaj.",
+    "hint": "Enter trimite mesajul, Shift+Enter adaugă o linie nouă.",
+    "placeholder": "Scrieți un mesaj…",
+    "send": "Trimitere",
+    "sendFailed": "Mesajul nu a putut fi trimis"
+  },
+  "crmLink": {
+    "change": "Modificare",
+    "kinds": {
+      "lead": "Lead",
+      "partner": "Partener"
+    },
+    "link": "Asociere",
+    "linkFailed": "Proiectul nu a putut fi asociat",
+    "none": "niciuna",
+    "remove": "Eliminare asociere",
+    "removeConfirm": "Eliminați asocierea proiectului cu CRM? Sarcinile proiectului vor dispărea din fișa leadului sau a partenerului.",
+    "removeFailed": "Asocierea nu a putut fi eliminată",
+    "searchHint": "Sugestiile includ doar leadurile și partenerii la care aveți acces în CRM. Selectarea salvează imediat asocierea.",
+    "searchPlaceholder": "Introduceți numele leadului sau al partenerului (min. 3 caractere)…",
+    "title": "Asociere cu CRM"
+  },
+  "deadlines": {
+    "atRisk": "La risc",
+    "atRiskHint": "Termenul este aproape, iar lucrul nu a început încă.",
+    "completedLate": "Finalizată după termen",
+    "completedLateHint": "Sarcina a fost finalizată după termenul ei.",
+    "daysShort": "{days} z",
+    "legend": {
+      "atRisk": "la risc (de făcut, termen în cel mult {days, plural, one {# zi} few {# zile} other {# de zile}})",
+      "beyondProjectEnd": "după termenul proiectului",
+      "completedLate": "finalizate după termen",
+      "originalEndDate": "termen inițial",
+      "overdue": "termen depășit",
+      "overdueSubtasks": "subsarcini cu termen depășit",
+      "projectEndDate": "termenul proiectului"
+    },
+    "originalEndDateHint": "Termenul inițial și decalarea în zile",
+    "overdue": "Termen depășit",
+    "overdueDays": "Depășit cu {days} z",
+    "overdueHint": "Termenul a trecut, iar sarcina nu este finalizată.",
+    "overdueSubtasks": "Subsarcini cu termen depășit",
+    "overdueSubtasksHint": "Cel puțin o subsarcină are termenul depășit.",
+    "slipEarlier": "−{days} z",
+    "slipLater": "+{days} z"
+  },
+  "delay": {
+    "badge": "Întârziat",
+    "reasons": {
+      "endPassed": "Termenul proiectului a trecut acum {days, plural, one {# zi} few {# zile} other {# de zile}}, sarcini deschise: {count}",
+      "taskAfterEnd": "Sarcini care se încheie după termenul proiectului: {count} (cea mai târzie cu {days, plural, one {# zi} few {# zile} other {# de zile}})"
+    }
+  },
+  "detail": {
+    "backToProjects": "Proiecte",
+    "closedBadge": "Închis",
+    "empty": {
+      "noAssignedTasks": "Nu aveți sarcini atribuite în acest proiect.",
+      "noTasks": "Acest proiect nu are încă sarcini."
+    },
+    "newTask": "Sarcină nouă",
+    "openFailed": "Proiectul nu a putut fi deschis",
+    "refreshFailed": "Proiectul nu a putut fi reîmprospătat",
+    "showOnlyMyTasks": "Afișează sarcinile mele",
+    "tabs": {
+      "card": "Fișa proiectului",
+      "chat": "Chat",
+      "finance": "Finanțe",
+      "tasks": "Sarcini ({count})",
+      "timeline": "Cronologie"
+    },
+    "tasksLoadFailed": "Sarcinile nu au putut fi încărcate"
+  },
+  "filters": {
+    "assignee": "Persoană",
+    "atRiskCount": "Sarcini la risc",
+    "cost": "Cost",
+    "delayReason": "Motivul întârzierii",
+    "delayReasonValues": {
+      "end_passed": "Termenul proiectului a trecut",
+      "task_after_end": "O sarcină se încheie după termenul proiectului"
+    },
+    "delayed": "Întârziere",
+    "delayedValues": {
+      "no": "Fără întârziere",
+      "yes": "Întârziate"
+    },
+    "endDate": "Sfârșit",
+    "manager": "PM",
+    "myRole": "Rolul meu",
+    "myRoleValues": {
+      "controller": "Verificator",
+      "participant": "Participant",
+      "pm": "PM"
+    },
+    "name": "Denumirea sarcinii",
+    "number": "Număr",
+    "originalEndDate": "Termen inițial",
+    "overdueCount": "Sarcini cu termen depășit",
+    "priority": "Prioritate",
+    "progress": "Progres (%)",
+    "project": "Proiect",
+    "projectCost": "Cost suportat",
+    "projectEndDate": "Termenul proiectului",
+    "projectName": "Denumirea sau cheia proiectului",
+    "projectRevenue": "Venit",
+    "projectSort": {
+      "at_risk": "Sarcini la risc",
+      "cost": "Cost suportat",
+      "delay": "Întârziere",
+      "end_date": "Termen",
+      "key": "Cheie",
+      "name": "Denumire",
+      "overdue": "Sarcini cu termen depășit",
+      "pm": "PM",
+      "progress": "Progres",
+      "revenue": "Venit",
+      "start_date": "Început",
+      "status": "Status"
+    },
+    "projectStartDate": "Începutul proiectului",
+    "slip": "Decalare (zile)",
+    "startDate": "Început",
+    "status": "Status",
+    "statusCategory": "Etapă",
+    "taskSort": {
+      "original_end_date": "Termen inițial",
+      "parent": "Sarcină principală",
+      "slip_days": "Decalare"
+    },
+    "timeliness": "Punctualitate",
+    "timelinessValues": {
+      "at_risk": "La risc",
+      "on_time": "În termen",
+      "overdue": "Termen depășit"
+    },
+    "type": "Tip",
+    "unassigned": "Neatribuite"
+  },
+  "finance": {
+    "categories": {
+      "budgetOf": "Bugetul categoriei {name}",
+      "columns": {
+        "budget": "Buget",
+        "category": "Categorie",
+        "incurred": "Suportate",
+        "planned": "Planificate",
+        "variance": "Abatere"
+      },
+      "empty": "Nu există categorii de costuri. Administratorul le adaugă în Setări → Proiecte → Categorii de costuri.",
+      "hint": "Abaterea este bugetul minus costurile suportate. Rândurile cu bugetul depășit sunt evidențiate.",
+      "inactive": "(inactivă)",
+      "saveFailed": "Bugetul nu a putut fi salvat",
+      "title": "Buget pe categorii",
+      "total": "Total"
+    },
+    "costForm": {
+      "addTitle": "Cost nou",
+      "amount": "Sumă",
+      "category": "Categorie",
+      "clearInvoiceDocument": "Disociere document",
+      "conversionHint": "Suma va fi convertită în {currency} la cursul mediu NBP (Banca Națională a Poloniei) din ziua lucrătoare anterioară datei costului.",
+      "currency": "Moneda sumei",
+      "date": "Dată",
+      "description": "Descriere",
+      "documentNumber": "Numărul documentului",
+      "editTitle": "Editare cost",
+      "invoiceDocument": "Documentul facturii (opțional)",
+      "invoiceDocumentHint": "Documente de tip Factură la care aveți acces în modulul Documente. Facturile descărcate din KSeF se asociază separat.",
+      "invoiceDocumentPlaceholder": "Căutați factura după număr sau denumire…",
+      "noTask": "— fără sarcină —",
+      "saveFailed": "Costul nu a putut fi salvat",
+      "saved": "Cost salvat",
+      "savedWithRate": "Cost salvat: {amount} la cursul {rate} din {date}",
+      "selectCategory": "— selectați categoria —",
+      "status": "Status",
+      "storedConversion": "Salvat ca {amount} (curs {rate} din {date}).",
+      "supplier": "Furnizor",
+      "task": "Sarcină"
+    },
+    "costStatuses": {
+      "incurred": "Suportat",
+      "planned": "Planificat"
+    },
+    "costs": {
+      "add": "Adăugare cost",
+      "columns": {
+        "amount": "Sumă",
+        "category": "Categorie",
+        "date": "Dată",
+        "description": "Descriere",
+        "documentNumber": "Nr. document",
+        "status": "Status",
+        "supplier": "Furnizor",
+        "task": "Sarcină"
+      },
+      "deleteConfirm": "Ștergeți costul ({item})?",
+      "deleteFailed": "Costul nu a putut fi șters",
+      "empty": "Proiectul nu are încă costuri.",
+      "emptyForFilters": "Niciun cost pentru filtrele selectate.",
+      "filters": {
+        "allCategories": "Toate categoriile",
+        "allStatuses": "Toate statusurile",
+        "allTasks": "Toate sarcinile",
+        "withoutTask": "Fără sarcină"
+      },
+      "rateNote": "curs {rate} din {date}",
+      "title": "Costuri",
+      "totalIncurred": "Total suportate"
+    },
+    "delete": "Ștergere",
+    "document": {
+      "lockedTitle": "Documentul facturii — nu aveți acces la el în modulul Documente",
+      "openTitle": "Documentul facturii — deschidere în modulul Documente"
+    },
+    "edit": "Editare",
+    "loadFailed": "Finanțele proiectului nu au putut fi încărcate",
+    "plan": {
+      "currency": "Moneda proiectului",
+      "currencyLockedHint": "Moneda nu poate fi modificată, deoarece proiectul are deja poziții de costuri sau de venituri.",
+      "participantsCanAddCosts": "Participanții pot adăuga costuri la sarcinile lor",
+      "participantsCanAddCostsHint": "Participantul intern adaugă costuri doar în sarcinile care îi sunt atribuite și vede exclusiv pozițiile adăugate de el.",
+      "plannedRevenue": "Venit planificat ({currency})",
+      "saveFailed": "Planul nu a putut fi salvat",
+      "suggestedHint": "Sugestia este valoarea leadului asociat, convertită în moneda proiectului.",
+      "title": "Plan financiar",
+      "useSuggested": "Utilizare valoare sugerată: {amount}"
+    },
+    "readOnlyNote": "Doar vizualizare — puteți consulta finanțele acestui proiect, dar nu le puteți modifica.",
+    "revenueStatuses": {
+      "invoiced": "Facturat",
+      "paid": "Încasat",
+      "planned": "Planificat"
+    },
+    "revenues": {
+      "add": "Adăugare venit",
+      "addTitle": "Venit nou",
+      "amountIn": "Sumă ({currency})",
+      "columns": {
+        "amount": "Sumă",
+        "date": "Dată",
+        "description": "Descriere",
+        "status": "Status"
+      },
+      "deleteConfirm": "Ștergeți venitul ({item})?",
+      "deleteFailed": "Venitul nu a putut fi șters",
+      "editTitle": "Editare venit",
+      "empty": "Proiectul nu are încă venituri.",
+      "saveFailed": "Venitul nu a putut fi salvat",
+      "saved": "Venit salvat",
+      "statusHint": "În venitul realizat intră pozițiile facturate și încasate.",
+      "title": "Venituri"
+    },
+    "saving": "Se salvează…",
+    "summary": {
+      "budget": "Buget",
+      "cost": "Cost (suportat)",
+      "margin": "Marjă (realizat)",
+      "plan": "Plan",
+      "plannedItems": "Poziții planificate",
+      "remainingBudget": "Buget rămas",
+      "remainingBudgetHint": "Bugetul minus costurile suportate",
+      "revenue": "Venit (realizat)"
+    },
+    "taskCosts": {
+      "columns": {
+        "ownIncurred": "Suportate (proprii)",
+        "plannedCost": "Cost planificat",
+        "task": "Sarcină",
+        "totalIncurred": "Suportate cu subsarcini",
+        "totalPlanned": "Planificate cu subsarcini"
+      },
+      "empty": "Nicio sarcină nu are încă costuri sau un cost planificat.",
+      "hint": "Costul planificat al sarcinii este informativ și nu se include în bugetul proiectului. Sumele „cu subsarcini” cuprind pozițiile sarcinii și ale tuturor subsarcinilor sale.",
+      "plannedCostOf": "Costul planificat al sarcinii {task}",
+      "saveFailed": "Costul planificat nu a putut fi salvat",
+      "title": "Costurile sarcinilor",
+      "total": "Total"
+    },
+    "totals": {
+      "actualOfPlannedHint": "Realizat / plan",
+      "cost": "Cost",
+      "margin": "Marjă",
+      "marginHint": "Marja din realizat: venitul facturat și încasat minus costurile suportate",
+      "revenue": "Venit"
+    }
+  },
+  "gantt": {
+    "beyondProjectEnd": "Se încheie după termenul proiectului",
+    "emptyTitle": "Nicio sarcină",
+    "loadFailed": "Cronologia nu a putut fi încărcată",
+    "originalEndDate": "Termen inițial: {date} ({slip})",
+    "projectEndDate": "Termenul proiectului: {date}",
+    "taskColumn": "Sarcină",
+    "today": "Azi",
+    "truncated": "Cronologia afișează doar primele sarcini (maximum {limit}). Restrângeți filtrele pentru a le vedea pe celelalte.",
+    "undatedNote": "{count, plural, one {# sarcină fără date nu are bară pe cronologie.} few {# sarcini fără date nu au bară pe cronologie.} other {# de sarcini fără date nu au bară pe cronologie.}}",
+    "zoom": {
+      "day": "Zile",
+      "month": "Luni",
+      "week": "Săptămâni"
+    }
+  },
+  "ksef": {
+    "badge": {
+      "openTitle": "Factură din KSeF — afișare detalii",
+      "title": "Factură din KSeF"
+    },
+    "costs": {
+      "addFromKsef": "Adăugare factură din KSeF",
+      "link": "Asociere factură KSeF",
+      "unlink": "Disociere factură",
+      "unlinkConfirm": "Disociați factura {invoice} de acest cost? Costul rămâne în listă, iar factura rămâne în KSeF.",
+      "unlinkFailed": "Factura nu a putut fi disociată"
+    },
+    "detail": {
+      "address": "Adresă",
+      "buyer": "Cumpărător",
+      "invoiceType": "Tipul facturii",
+      "issueDate": "Data emiterii",
+      "ksefNumber": "Număr KSeF",
+      "lines": {
+        "empty": "Factura nu conține poziții.",
+        "name": "Denumire",
+        "netAmount": "Valoare netă",
+        "number": "Nr.",
+        "quantity": "Cantitate",
+        "title": "Pozițiile facturii",
+        "unitNetPrice": "Preț net",
+        "vatRate": "TVA"
+      },
+      "links": {
+        "empty": "Factura nu este asociată niciunui cost.",
+        "linkedTotal": "Total asociat: {linked} din {net} net.",
+        "title": "Asocierile facturii"
+      },
+      "loadFailed": "Factura nu a putut fi încărcată",
+      "payment": {
+        "amountDue": "De plată",
+        "bankAccounts": "Cont bancar",
+        "dueDates": "Termen de plată",
+        "factor": "factor",
+        "form": "Modalitate de plată",
+        "paymentDate": "Data plății",
+        "state": "Starea plății",
+        "states": {
+          "paid": "Plătită",
+          "partiallyPaid": "Plătită parțial",
+          "unknown": "Fără informații",
+          "unpaid": "Neplătită"
+        },
+        "title": "Plată"
+      },
+      "saleDate": "Data vânzării",
+      "seller": "Vânzător",
+      "title": "Factura {number}",
+      "titleLoading": "Factură din KSeF",
+      "totals": {
+        "gross": "Brut",
+        "net": "Net",
+        "vat": "TVA"
+      }
+    },
+    "document": {
+      "groupMissing": "Nu a fost ales niciun grup de acces pentru documentele de factură, așa că facturile nu pot fi înregistrate în Documente. Administratorul îl alege în Setări → Proiecte → KSeF.",
+      "noAccessTitle": "Nu faceți parte din grupul de acces al acestui document, așa că nu îl puteți deschide.",
+      "notRegisteredOnLink": "Factura va fi asociată, dar nu va apărea în modulul Documente: nu a fost ales niciun grup de acces pentru documentele de factură (Setări → Proiecte → KSeF).",
+      "open": "Deschidere document",
+      "register": "Înregistrare în Documente",
+      "registerFailed": "Factura nu a putut fi înregistrată în Documente",
+      "registerHint": "Factura nu are încă un document în modulul Documente. Asocierea ei cu un cost o va înregistra automat.",
+      "registered": "Înregistrată: {number}",
+      "registeredToast": "Factură înregistrată în Documente ca {number}",
+      "registering": "Se înregistrează…",
+      "title": "Document în modulul Documente"
+    },
+    "errors": {
+      "forbidden": "Nu aveți acces la facturile KSeF. Permisiunea este acordată de administrator în panoul de utilizatori."
+    },
+    "invoiceTypes": {
+      "KOR": "Factură de corecție",
+      "KOR_ROZ": "Corecție a facturii de regularizare",
+      "KOR_ZAL": "Corecție a facturii de avans",
+      "ROZ": "Factură de regularizare",
+      "UPR": "Factură simplificată",
+      "VAT": "Factură cu TVA",
+      "ZAL": "Factură de avans"
+    },
+    "link": {
+      "alreadyLinkedHint": "O puteți totuși asocia din nou — verificați doar ca același cost să nu fie socotit de două ori.",
+      "alreadyLinkedTitle": "Atenție: această factură este deja asociată",
+      "amountHint": "Implicit, întreaga sumă netă a facturii. Modificați-o dacă acestui cost îi atribuiți doar o parte din factură.",
+      "amountHintForeign": "Factura este în {invoiceCurrency}, iar proiectul în {projectCurrency}. Lăsați câmpul gol, iar întreaga sumă netă ({net}) va fi convertită la cursul mediu NBP din ziua lucrătoare anterioară datei de emitere a facturii. Puteți introduce suma și direct în {projectCurrency}.",
+      "amountIn": "Sumă atribuită ({currency})",
+      "attachNote": "Factura va fi asociată costului: {item}. Suma și celelalte date ale costului nu se vor modifica.",
+      "back": "Înapoi la listă",
+      "confirm": "Asociere factură",
+      "errors": {
+        "failed": "Factura nu a putut fi asociată",
+        "forbidden": "Nu aveți permisiunea de a asocia facturi KSeF în acest proiect.",
+        "noExchangeRate": "Nu există curs NBP pentru moneda facturii. Introduceți suma în {currency}.",
+        "projectClosed": "Proiectul este închis — facturile nu mai pot fi asociate."
+      },
+      "saved": "Factură asociată",
+      "savedWithRate": "Factură asociată: {amount} la cursul {rate} din {date}"
+    },
+    "links": {
+      "columns": {
+        "amount": "Sumă",
+        "linkedBy": "Asociată de",
+        "project": "Proiect",
+        "status": "Status",
+        "task": "Sarcină"
+      },
+      "wholeProject": "Întregul proiect"
+    },
+    "list": {
+      "columns": {
+        "currency": "Monedă",
+        "document": "Document",
+        "gross": "Brut",
+        "issueDate": "Data emiterii",
+        "net": "Net",
+        "number": "Număr",
+        "paymentDueDate": "Termen de plată",
+        "seller": "Vânzător"
+      }
+    },
+    "nip": "Cod fiscal",
+    "otherLinks": {
+      "intro": "Această factură este asociată și cu:",
+      "overAllocated": "Suma asocierilor depășește suma netă a facturii.",
+      "wholeProject": "{project} (întregul proiect)"
+    },
+    "paymentForms": {
+      "card": "Card",
+      "cash": "Numerar",
+      "cheque": "Cec",
+      "credit": "Credit",
+      "mobile": "Plată mobilă",
+      "transfer": "Transfer bancar",
+      "voucher": "Voucher"
+    },
+    "picker": {
+      "attachTitle": "Asociere factură KSeF la cost",
+      "empty": "Nicio factură în perioada selectată și pentru filtrele selectate.",
+      "filters": {
+        "dateFrom": "Data emiterii de la",
+        "dateTo": "Data emiterii până la",
+        "invoiceNumber": "Numărul facturii",
+        "netMax": "Net până la",
+        "netMin": "Net de la",
+        "seller": "Vânzător (denumire sau cod fiscal)"
+      },
+      "lastSync": "Ultima sincronizare reușită: {time}.",
+      "linkedCount": "{count, plural, one {Deja asociată: # dată} few {Deja asociată: # ori} other {Deja asociată: # de ori}}",
+      "loadFailed": "Lista de facturi nu a putut fi încărcată",
+      "nextPage": "Următoarea",
+      "noCompanies": "Nicio companie nu a fost încă adăugată în KSeF. Administratorul face acest lucru în Setări → Proiecte → KSeF.",
+      "notConfigured": "Integrarea cu KSeF nu este configurată pe server. Lista afișează doar facturile descărcate anterior.",
+      "pageInfo": "Pagina {page} din {pages} · facturi: {total}",
+      "previousPage": "Anterioara",
+      "search": "Căutare",
+      "select": "Selectare",
+      "syncHint": "O factură emisă recent poate apărea în KSeF abia după câteva minute.",
+      "title": "Adăugare factură din KSeF"
+    },
+    "settings": {
+      "addCompany": "Adăugare companie",
+      "columns": {
+        "lastAttempt": "Ultima încercare",
+        "lastSynced": "Ultima sincronizare reușită",
+        "name": "Denumire",
+        "status": "Status",
+        "token": "Token"
+      },
+      "companyForm": {
+        "addTitle": "Companie nouă în KSeF",
+        "added": "Companie adăugată. Facturile vor fi descărcate la următoarea sincronizare.",
+        "editTitle": "Companie în KSeF",
+        "name": "Denumire (opțional)",
+        "saveFailed": "Compania nu a putut fi salvată",
+        "saved": "Companie salvată",
+        "token": "Token KSeF",
+        "tokenHintAdd": "Tokenul generat în KSeF pentru acest cod fiscal. Înainte de salvare este verificat în KSeF; după salvare nu mai poate fi citit.",
+        "tokenHintEdit": "Token actual: {hint}. Lăsați câmpul gol pentru a nu-l modifica.",
+        "verifying": "Se verifică în KSeF…"
+      },
+      "edit": "Modificare",
+      "environments": {
+        "production": "Mediu de producție",
+        "test": "Mediu de testare"
+      },
+      "errors": {
+        "companyNotFound": "Această companie nu mai există în configurație. Reîmprospătați pagina.",
+        "duplicateNip": "O companie cu acest cod fiscal este deja adăugată.",
+        "invalidNip": "Cod fiscal incorect.",
+        "notConfigured": "Integrarea cu KSeF nu este configurată pe server.",
+        "tokenRejected": "KSeF a respins tokenul pentru acest cod fiscal. Verificați dacă tokenul este valabil și emis pentru această companie.",
+        "unknownGroup": "Acest grup nu există sau este inactiv. Reîmprospătați pagina și alegeți altul.",
+        "unreachable": "Conectarea la KSeF pentru verificarea tokenului nu a reușit. Încercați din nou mai târziu."
+      },
+      "hint": "Facturile de achiziție ale companiilor adăugate mai jos sunt descărcate din KSeF, sistemul național polonez de facturare electronică, la fiecare 30 de minute. Persoanele cu permisiunea „Acces la facturile KSeF” le asociază costurilor proiectelor.",
+      "initialSyncDays": "Prima sincronizare merge înapoi (zile)",
+      "initialSyncDaysHint": "De la {min} la {max} zile. Se aplică companiilor adăugate după modificarea acestei setări.",
+      "invoiceDocumentsGroup": "Grup de acces pentru documentele de factură",
+      "invoiceDocumentsGroupHint": "În acest grup ajung documentele de factură înregistrate din KSeF. Fără un grup ales, facturile asociate proiectelor nu sunt înregistrate în modulul Documente.",
+      "loadFailed": "Configurația KSeF nu a putut fi încărcată",
+      "noCompanies": "Nicio companie nu a fost încă adăugată.",
+      "noInvoiceDocumentsGroup": "— niciunul —",
+      "notConfigured": "Integrarea cu KSeF nu este configurată pe server, de aceea nu se pot adăuga companii și nici descărca facturi.",
+      "remove": "Eliminare",
+      "removeConfirm": "Eliminați compania {company} din configurația KSeF? Facturile noi nu vor mai fi descărcate. Facturile deja descărcate și asocierile lor cu costurile vor fi păstrate.",
+      "removeFailed": "Compania nu a putut fi eliminată",
+      "saveFailed": "Setarea nu a putut fi salvată",
+      "saved": "Setare salvată",
+      "statuses": {
+        "active": "Activă",
+        "error": "Eroare de sincronizare",
+        "invalid": "Token respins"
+      },
+      "syncFailed": "Sincronizarea nu a reușit — motivul este afișat în dreptul companiei.",
+      "testEnvironmentNote": "Serverul este conectat la mediul de testare KSeF — facturile nu sunt documente reale.",
+      "title": "KSeF — facturi de costuri"
+    },
+    "sync": {
+      "failedForCompany": "Sincronizarea nu a reușit pentru cel puțin o companie. Administratorul poate vedea detaliile în Setări → Proiecte → KSeF.",
+      "finished": "Sincronizare finalizată",
+      "now": "Sincronizare acum",
+      "running": "Se sincronizează…",
+      "startFailed": "Sincronizarea nu a putut fi pornită",
+      "stillRunning": "Sincronizarea este încă în curs — reîmprospătați lista peste câteva momente."
+    }
+  },
+  "labels": {
+    "accessLevels": {
+      "full": "Complete",
+      "read": "Citire"
+    },
+    "fieldTypes": {
+      "date": "Dată",
+      "list": "Listă de valori",
+      "money": "Sumă cu monedă",
+      "number": "Număr",
+      "text": "Text"
+    },
+    "reminders": {
+      "1d_before": "Cu 1 zi înainte de termen",
+      "2d_before": "Cu 2 zile înainte de termen",
+      "3d_before": "Cu 3 zile înainte de termen",
+      "at_due": "În ziua termenului",
+      "custom": "Dată personalizată"
+    },
+    "roles": {
+      "controller": "Verificator",
+      "external_participant": "Participant extern",
+      "internal_participant": "Participant intern",
+      "pm": "PM"
+    },
+    "statusCategories": {
+      "done": "Finalizate",
+      "in_progress": "În curs",
+      "todo": "De făcut"
+    }
+  },
+  "linked": {
+    "backLabel": {
+      "lead": "Lead {name}",
+      "partner": "Partener {name}"
+    },
+    "closedBadge": "închis",
+    "lockedHint": "Previzualizare — nu sunteți participant la acest proiect",
+    "noDueDate": "fără termen",
+    "noTasks": "Proiectul nu are încă sarcini.",
+    "openOfTotal": "{open} deschise din {total}",
+    "showClosedProjectTasks": "Afișează sarcinile proiectului închis",
+    "title": "Sarcini de proiect"
+  },
+  "list": {
+    "closedBadge": "Închis",
+    "createFailed": "Proiectul nu a putut fi creat",
+    "createForm": {
+      "description": "Descriere",
+      "keyHint": "Prefixul numerelor de sarcini va fi generat automat din denumirea proiectului.",
+      "name": "Denumire",
+      "namePlaceholder": "de ex. Implementarea sistemului CRM",
+      "saving": "Se salvează…",
+      "submit": "Creare proiect"
+    },
+    "empty": {
+      "noOpenProjects": "Nu participați la niciun proiect deschis.",
+      "noneForFilter": "Niciun proiect pentru filtrul selectat.",
+      "title": "Niciun proiect"
+    },
+    "filters": {
+      "all": "Toate",
+      "closed": "Închise",
+      "open": "Deschise"
+    },
+    "loadFailed": "Proiectele nu au putut fi încărcate",
+    "newProject": "Proiect nou",
+    "stats": {
+      "atRisk": "la risc",
+      "doneOfTotalHint": "Sarcini finalizate / toate",
+      "members": "{count, plural, one {persoană} few {persoane} other {de persoane}}",
+      "myOpenTasks": "{count, plural, one {a mea deschisă} few {ale mele deschise} other {ale mele deschise}}",
+      "overdue": "cu termen depășit",
+      "tasks": "{count, plural, one {sarcină} few {sarcini} other {de sarcini}}"
+    },
+    "title": "Proiecte",
+    "views": {
+      "myTasks": "Sarcinile mele",
+      "portfolio": "Prezentare proiecte",
+      "projects": "Proiecte"
+    }
+  },
+  "myTasks": {
+    "empty": {
+      "description": "Nu aveți sarcini deschise în niciun proiect.",
+      "title": "Nicio sarcină"
+    },
+    "includeDone": "Afișează finalizatele",
+    "loadFailed": "Sarcinile nu au putut fi încărcate"
+  },
+  "panel": {
+    "chatTitle": "Discuție despre sarcină",
+    "costs": {
+      "add": "Adăugare cost",
+      "empty": "Sarcina nu are încă costuri.",
+      "loadFailed": "Costurile sarcinii nu au putut fi încărcate",
+      "ownOnlyHint": "Vedeți doar costurile adăugate de dumneavoastră.",
+      "title": "Costuri",
+      "totalIncurred": "Total suportate"
+    },
+    "createTask": "Creare sarcină",
+    "created": "Sarcină creată",
+    "customFields": {
+      "addButton": "+ Adăugare câmp",
+      "addFailed": "Câmpul nu a putut fi adăugat",
+      "addHint": "Câmpul va fi adăugat la toate sarcinile acestui proiect.",
+      "noneAvailable": "Nu există câmpuri de adăugat. Câmpurile sunt definite de administrator în Setări → Proiecte → Câmpuri suplimentare ale sarcinilor.",
+      "selectField": "— selectați câmpul —",
+      "title": "Câmpuri suplimentare"
+    },
+    "endDateChange": {
+      "hint": "Opțional. PM va vedea motivul în e-mailul despre modificarea termenului; acesta va fi salvat și în istoricul sarcinii.",
+      "placeholder": "de ex. livrare întârziată din partea clientului",
+      "reason": "Motivul modificării termenului"
+    },
+    "fields": {
+      "assignees": "Persoane atribuite",
+      "description": "Descriere suplimentară",
+      "endDate": "Data de finalizare",
+      "name": "Denumire",
+      "noParent": "— niciuna (sarcină principală) —",
+      "parentTask": "Sarcină principală",
+      "priority": "Prioritate",
+      "startDate": "Data de început",
+      "status": "Status",
+      "type": "Tip"
+    },
+    "history": {
+      "changed": "a modificat: {fields}",
+      "changedWithStatus": "a modificat: {fields} ({from} → {to})",
+      "created": "a creat sarcina",
+      "empty": "Nicio înregistrare.",
+      "endDateChangeReason": "Motivul modificării termenului: {reason}",
+      "fields": {
+        "assignees": "persoane atribuite",
+        "customFields": "câmpuri suplimentare",
+        "description": "descriere",
+        "endDate": "data de finalizare",
+        "name": "denumire",
+        "parentTask": "sarcină principală",
+        "priority": "prioritate",
+        "reminder": "memento",
+        "startDate": "data de început",
+        "status": "status",
+        "type": "tip"
+      },
+      "loadFailed": "Istoricul nu a putut fi încărcat",
+      "systemUser": "Sistem",
+      "title": "Istoricul modificărilor"
+    },
+    "loadFailed": "Sarcina nu a putut fi încărcată",
+    "newTask": "Sarcină nouă",
+    "reminder": {
+      "customDate": "Data mementoului",
+      "hint": "Mementoul va fi trimis tuturor persoanelor atribuite la 9:00 și necesită o dată de finalizare.",
+      "label": "Memento prin e-mail",
+      "none": "Niciunul"
+    },
+    "saveFailed": "Sarcina nu a putut fi salvată",
+    "saved": "Sarcină salvată",
+    "saving": "Se salvează…"
+  },
+  "portfolio": {
+    "columns": {
+      "atRisk": "La risc",
+      "cost": "Cost suportat",
+      "delay": "Întârziere",
+      "endDate": "Termen",
+      "overdue": "Termen depășit",
+      "progress": "Progres",
+      "project": "Proiect",
+      "projectManagers": "PM",
+      "revenue": "Venit",
+      "startDate": "Început"
+    },
+    "loadFailed": "Prezentarea proiectelor nu a putut fi deschisă",
+    "noProjects": "Nu sunteți PM sau verificator în niciun proiect deschis.",
+    "noTasks": "Nu există sarcini în proiectele dvs.",
+    "tabs": {
+      "projects": "Proiecte",
+      "tasks": "Sarcini",
+      "timeline": "Cronologie"
+    }
+  },
+  "settings": {
+    "costCategories": {
+      "hint": "O categorie nu poate fi ștearsă — dezactivați-o pe cea nefolosită. O categorie dezactivată nu poate fi selectată într-un cost nou, iar pozițiile existente o păstrează.",
+      "title": "Categorii de costuri"
+    },
+    "deadlines": {
+      "hint": "O sarcină la care lucrul nu a început încă este marcată ca fiind la risc atunci când până la termenul ei au rămas cel mult atâtea zile cât indică acest prag (0–30; 0 înseamnă chiar ziua termenului).",
+      "invalid": "Introduceți un număr întreg de la 0 la 30.",
+      "saveFailed": "Pragul nu a putut fi salvat",
+      "saved": "Pragul de risc al termenului a fost salvat",
+      "threshold": "Prag de risc al termenului (zile)",
+      "title": "Controlul termenelor"
+    },
+    "dictionary": {
+      "active": "activ",
+      "addButton": "Adăugare",
+      "moveDown": "În jos",
+      "moveUp": "În sus",
+      "newItemPlaceholder": "Element nou…",
+      "saveFailed": "Dicționarul nu a putut fi salvat"
+    },
+    "fields": {
+      "active": "activ",
+      "addButton": "Adăugare câmp",
+      "empty": "Niciun câmp definit.",
+      "hint": "Câmpurile definite aici pot fi adăugate de PM în proiectul său (Fișa proiectului → Câmpuri suplimentare ale sarcinilor), iar PM decide dacă sunt obligatorii. Tipul câmpului nu poate fi modificat după creare.",
+      "newNamePlaceholder": "Denumirea noului câmp…",
+      "optionsPlaceholder": "Valori separate prin virgulă",
+      "optionsRequired": "Lista trebuie să conțină cel puțin o valoare",
+      "saveFailed": "Câmpul nu a putut fi salvat",
+      "title": "Câmpuri suplimentare ale sarcinilor"
+    },
+    "finance": {
+      "disableConfirm": "Dezactivați finanțele proiectelor? Datele vor fi păstrate, dar vor dispărea din vizualizarea tuturor utilizatorilor.",
+      "hint": "După activare, PM și administratorul gestionează în proiect bugetul, costurile și veniturile, iar verificatorul le poate vizualiza. Rezumatul finanțelor proiectului este vizibil și pentru oricine are acces la fișa leadului sau a partenerului asociat.",
+      "saveFailed": "Setarea finanțelor nu a putut fi modificată",
+      "title": "Finanțele proiectelor",
+      "toggle": "Activare finanțe proiecte"
+    },
+    "loadFailed": "Configurația proiectelor nu a putut fi încărcată",
+    "priorities": {
+      "title": "Priorități"
+    },
+    "statuses": {
+      "hint": "Categoria îi spune sistemului ce înseamnă statusul — indiferent de denumire. Sarcinile cu un status din categoria „Finalizate” nu sunt considerate deschise sau întârziate.",
+      "title": "Statusurile sarcinilor"
+    },
+    "transitions": {
+      "discardConfirm": "Există modificări nesalvate ale tranzițiilor. Renunțați la ele?",
+      "hint": "PM poate schimba oricând statusul în oricare altul. Participanții schimbă statusul doar în sarcinile care le sunt atribuite și pentru care au permisiuni complete. Verificatorul schimbă statusul în orice sarcină a proiectului.",
+      "matrixCorner": "Din statusul ↓ / în statusul →",
+      "saveButton": "Salvare tranziții",
+      "saveFailed": "Tranzițiile nu au putut fi salvate",
+      "saved": "Tranzițiile dintre statusuri au fost salvate",
+      "saving": "Se salvează…",
+      "title": "Tranziții între statusuri"
+    },
+    "types": {
+      "title": "Tipuri de sarcini"
+    }
+  },
+  "taskList": {
+    "columns": {
+      "assignees": "Persoane",
+      "cost": "Cost",
+      "endDate": "Sfârșit",
+      "number": "Nr.",
+      "priority": "Prioritate",
+      "project": "Proiect",
+      "startDate": "Început",
+      "status": "Status",
+      "task": "Sarcină",
+      "timeliness": "Punctualitate",
+      "type": "Tip"
+    },
+    "emptyForFilters": "Nicio sarcină nu corespunde filtrelor.",
+    "emptyMessage": "Acest proiect nu are încă sarcini.",
+    "emptyTitle": "Nicio sarcină",
+    "flatList": "Listă plată",
+    "parentTask": "Sarcină principală",
+    "subtask": "Subsarcină"
+  }
+}
