@@ -6,30 +6,18 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
-  CrmApiService, Lead, LeadStage, LEAD_SOURCES, LeadSource, CrmUser, CrmGroup, CalendarMeeting,
+  CrmApiService, Lead, LEAD_SOURCES, LeadSource, CrmUser, CrmGroup, CalendarMeeting,
 } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
 
-const KANBAN_STAGES: { key: LeadStage; dot: string }[] = [
-  { key: 'new',           dot: '#94A3B8' },
-  { key: 'qualification', dot: '#F59E0B' },
-  { key: 'presentation',  dot: '#3B82F6' },
-  { key: 'offer',         dot: '#A855F7' },
-  { key: 'negotiation',   dot: '#F97316' },
-];
-
 const ACTIVITY_TYPES_WITH_LABEL = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
 const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketing' };
-
-const PROB_MAP: Record<LeadStage, number> = {
-  new: 10, qualification: 25, presentation: 50,
-  offer: 70, negotiation: 85, closed_won: 100, closed_lost: 0, onboarding: 100, onboarded: 100, archived: 0,
-};
 
 @Component({
   selector: 'wt-crm-leads-list',
@@ -105,14 +93,10 @@ const PROB_MAP: Record<LeadStage, number> = {
     <span style="flex:1"></span>
     <select class="sel" [(ngModel)]="filterStageUI" (ngModelChange)="onStageFilterChange()">
       <option value="">{{ t('leadsList.filters.allStages') }}</option>
-      <option value="new">{{ t('labels.stages.new') }}</option>
-      <option value="qualification">{{ t('labels.stages.qualification') }}</option>
-      <option value="presentation">{{ t('labels.stages.presentation') }}</option>
-      <option value="offer">{{ t('labels.stages.offer') }}</option>
-      <option value="negotiation">{{ t('labels.stages.negotiation') }}</option>
-      <option value="closed_won">✓ {{ t('labels.stages.closed_won') }}</option>
-      <option value="closed_lost">✗ {{ t('labels.stages.closed_lost') }}</option>
-      <option value="archived">🗄️ {{ t('labels.stages.archived') }}</option>
+      @for (s of stages.selectable(); track s.key) {
+        <option [value]="s.key">{{ stageOptionPrefix(s.kind) }}{{ stages.label(s.key) }}</option>
+      }
+      <option value="archived">🗄️ {{ stages.label('archived') }}</option>
     </select>
     <select class="sel" [(ngModel)]="filterSource" (ngModelChange)="onSourceFilterChange()">
       <option value="">{{ t('leadsList.filters.allSources') }}</option>
@@ -160,10 +144,10 @@ const PROB_MAP: Record<LeadStage, number> = {
 
     <div class="kanban">
       <!-- Kolumny aktywne -->
-      <div *ngFor="let col of kanbanCols" class="kol">
+      <div *ngFor="let col of stages.funnel()" class="kol">
         <div class="kol-head">
-          <div class="kol-dot" [style.background]="col.dot"></div>
-          <span class="kol-title">{{ t('labels.stages.' + col.key) }}</span>
+          <div class="kol-dot" [style.background]="stages.color(col.key)"></div>
+          <span class="kol-title">{{ stages.label(col.key) }}</span>
           <span class="kol-cnt">{{ leadsFor(col.key).length }}</span>
           <span class="kol-val" *ngIf="valueFor(col.key)>0">{{ valueFor(col.key) }}k</span>
         </div>
@@ -196,18 +180,18 @@ const PROB_MAP: Record<LeadStage, number> = {
               <span *ngIf="hasWhatsappFeature && (lead.unread_whatsapp_count ?? 0) > 0" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{lead.unread_whatsapp_count}}</span>
               <span *ngIf="hasUnreadReply(lead)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
             </div>
-            <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="prob(lead.stage)"></div></div>
+            <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="stages.probability(lead.stage)"></div></div>
           </div>
           <div *ngIf="leadsFor(col.key).length===0" class="kol-empty">{{ t('leadsList.kanban.empty') }}</div>
         </div>
       </div>
 
-      <!-- Zamknięte -->
-      <div class="kol">
+      <!-- Zamknięte — tylko gdy tenant w ogóle rozlicza wygrane/przegrane -->
+      <div class="kol" *ngIf="stages.tracksOutcome()">
         <div class="kol-head">
           <div class="kol-dot" style="background:#22C55E"></div>
           <span class="kol-title">{{ t('leadsList.kanban.closed') }}</span>
-          <span class="kol-cnt">{{ t('leadsList.kanban.closedCount', { won: leadsFor('closed_won').length, lost: leadsFor('closed_lost').length }) }}</span>
+          <span class="kol-cnt">{{ t('leadsList.kanban.closedCount', { won: leadsFor(stages.wonKey()).length, lost: leadsFor(stages.lostKey()).length }) }}</span>
         </div>
         <div class="kol-cards">
           <div *ngFor="let lead of closedLeads(); trackBy:trackById"
@@ -217,13 +201,12 @@ const PROB_MAP: Record<LeadStage, number> = {
             <div class="lead-contact" *ngIf="lead.contact_name">{{ lead.contact_name }}</div>
             <div class="lead-value" *ngIf="lead.value_pln">{{ lead.value_pln | number:'1.0-0' }} {{ lead.annual_turnover_currency || 'PLN' }}</div>
             <div class="lead-meta">
-              <span class="tag" [class]="lead.stage==='closed_won' ? 'tag-green' : 'tag-red'">
-                {{ lead.stage==='closed_won' ? '✓ ' + t('labels.stages.closed_won') : '✗ ' + t('labels.stages.closed_lost') }}
+              <span class="tag" [class]="stages.isWon(lead.stage) ? 'tag-green' : 'tag-red'">
+                {{ (stages.isWon(lead.stage) ? '✓ ' : '✗ ') + stages.label(lead.stage) }}
               </span>
             </div>
             <div class="pipe-bar">
-              <div class="pipe-fill" style="width:100%"
-                   [style.background]="lead.stage==='closed_won' ? '#22C55E' : '#EF4444'"></div>
+              <div class="pipe-fill" style="width:100%" [style.background]="stages.color(lead.stage)"></div>
             </div>
           </div>
           <div *ngIf="closedLeads().length===0" class="kol-empty">{{ t('leadsList.kanban.closedEmpty') }}</div>
@@ -289,12 +272,12 @@ const PROB_MAP: Record<LeadStage, number> = {
           </div>
           <div class="info-row">
             <span class="info-label">{{ t('leadsList.detail.probability') }}</span>
-            <span class="info-val">{{ selected.probability ?? prob(selected.stage) }}%</span>
+            <span class="info-val">{{ selected.probability ?? stages.probability(selected.stage) }}%</span>
           </div>
           <div class="info-row">
             <span class="info-label">{{ t('leadsList.detail.weightedValue') }}</span>
             <span class="info-val">
-              {{ ((selected.value_pln||0) * (selected.probability ?? prob(selected.stage)) / 100) | number:'1.0-0' }} PLN
+              {{ ((selected.value_pln||0) * (selected.probability ?? stages.probability(selected.stage)) / 100) | number:'1.0-0' }} PLN
             </span>
           </div>
           <div class="info-row" *ngIf="selected.close_date">
@@ -302,11 +285,11 @@ const PROB_MAP: Record<LeadStage, number> = {
             <span class="info-val">{{ selected.close_date | date:'dd.MM.yyyy' }}</span>
           </div>
           <div class="pipe-bar" style="margin-top:6px">
-            <div class="pipe-fill" [style.width.%]="prob(selected.stage)"
-                 [style.background]="selected.stage==='closed_won'?'#22C55E':selected.stage==='closed_lost'?'#EF4444':null">
+            <div class="pipe-fill" [style.width.%]="stages.probability(selected.stage)"
+                 [style.background]="stages.isClosed(selected.stage) ? stages.color(selected.stage) : null">
             </div>
           </div>
-          <div style="font-size:10px;color:var(--gray-400);margin-top:3px">{{ t('leadsList.detail.stageValue', { stage: stageLabel(selected.stage) }) }}</div>
+          <div style="font-size:10px;color:var(--gray-400);margin-top:3px">{{ t('leadsList.detail.stageValue', { stage: stages.label(selected.stage) }) }}</div>
 
           <div class="sec-title" *ngIf="selected.assigned_to_name">{{ t('leadsList.fields.salesRep') }}</div>
           <div *ngIf="selected.assigned_to_name" class="dp-user">
@@ -389,7 +372,11 @@ const PROB_MAP: Record<LeadStage, number> = {
         </div>
       </div>
       <div class="td" style="font-size:12px;text-align:center;color:var(--gray-400)">{{ lead.first_contact_date ? (lead.first_contact_date | date:'dd.MM.yy') : '—' }}</div>
-      <div class="td"><span class="stage-pill stage-{{ lead.stage }}">{{ stageLabel(lead.stage) }}</span></div>
+      <div class="td">
+        <span class="stage-pill"
+              [style.background]="stages.pillBackground(lead.stage)"
+              [style.color]="stages.color(lead.stage)">{{ stages.label(lead.stage) }}</span>
+      </div>
       <div class="td" style="font-size:12px;text-align:center;font-weight:600;color:var(--gray-600)">{{ lead.probability != null ? lead.probability+'%' : '—' }}</div>
       <div class="td" style="font-family:'Sora',sans-serif;font-weight:700;color:var(--orange)">
         {{ lead.value_pln ? (lead.value_pln | number:'1.0-0')+' '+(lead.annual_turnover_currency||'PLN') : '—' }}
@@ -550,11 +537,9 @@ const PROB_MAP: Record<LeadStage, number> = {
         <div class="fg">
           <label class="fl">{{ t('leadsList.fields.stage') }}</label>
           <select class="fsel" [(ngModel)]="newForm.stage">
-            <option value="new">{{ t('labels.stages.new') }}</option>
-            <option value="qualification">{{ t('labels.stages.qualification') }}</option>
-            <option value="presentation">{{ t('labels.stages.presentation') }}</option>
-            <option value="offer">{{ t('labels.stages.offer') }}</option>
-            <option value="negotiation">{{ t('labels.stages.negotiation') }}</option>
+            @for (s of stages.creatable(); track s.key) {
+              <option [value]="s.key">{{ stages.label(s.key) }}</option>
+            }
           </select>
         </div>
         <div class="fg" *ngIf="isManager">
@@ -902,16 +887,10 @@ const PROB_MAP: Record<LeadStage, number> = {
     .pipe-fill { height:100%; background:var(--orange); border-radius:2px; }
     .avatar-sm { width:20px; height:20px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:white; flex-shrink:0; }
 
-    /* Stage pill */
+    /* Stage pill — kolory nie są klasami per etap, bo etapy są konfigurowalne
+       (etap dodany przez tenanta nie miałby swojej klasy). Tło i kolor tekstu
+       idą inline z LeadStagesService. */
     .stage-pill { padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
-    .stage-new { background:#F3F4F6; color:#374151; }
-    .stage-qualification { background:#DBEAFE; color:#1E40AF; }
-    .stage-presentation { background:#FEF3C7; color:#92400E; }
-    .stage-offer { background:#F3E8FF; color:#6B21A8; }
-    .stage-negotiation { background:#FFEDD5; color:#9A3412; }
-    .stage-closed_won { background:#DCFCE7; color:#166534; }
-    .stage-closed_lost { background:#FEE2E2; color:#991B1B; }
-    .stage-archived { background:#E5E7EB; color:#4B5563; }
 
     /* Detail Panel */
     .dp-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:200; display:flex; align-items:center; justify-content:center; }
@@ -1195,7 +1174,9 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   private projectTaskNavigation = inject(ProjectTaskNavigationService);
   private route  = inject(ActivatedRoute);
 
-  readonly kanbanCols  = KANBAN_STAGES;
+  // Etapy są konfigurowalne per tenant — kolumny kanbanu, nazwy, kolory i
+  // prawdopodobieństwa czytamy z serwisu, nigdy z listy w tym pliku.
+  readonly stages = inject(LeadStagesService);
   leadSources: LeadSource[] = LEAD_SOURCES;
 
   allLeads: Lead[]     = [];
@@ -1263,10 +1244,15 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   newFormErrors: string[] = [];
   newExtraContacts: {contact_name:string, contact_title:string, email:string, phone:string}[] = [];
 
-  private NEW_FULL_REQUIRED_STAGES = ['qualification','presentation','offer','negotiation','closed_won'];
-
+  /**
+   * Pełne dane są wymagane od momentu, gdy lead wchodzi do lejka na serio —
+   * czyli na każdym etapie poza wejściowym (dotąd: lista od Kwalifikacji
+   * w górę, wypisana na sztywno).
+   */
   get newFormRequiresFull(): boolean {
-    return this.NEW_FULL_REQUIRED_STAGES.includes(this.newForm.stage);
+    const funnel = this.stages.funnel();
+    if (!this.newForm.stage || !funnel.length) return false;
+    return this.newForm.stage !== funnel[0].key;
   }
 
   validateNewForm(): string[] {
@@ -1501,7 +1487,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
       next: res => this.zone.run(() => {
         this.allLeads        = res.data;
         this.total           = res.total;
-        this.totalQualified  = res.total_qualified ?? (res.total - (res.data as any[]).filter((l: any) => l.stage === 'new').length);
+        const entryStage = this.stages.funnel()[0]?.key;
+        this.totalQualified  = res.total_qualified ?? (res.total - (res.data as any[]).filter((l: any) => l.stage === entryStage).length);
         this.totalPages      = res.pages;
         this.calcStats();
         this.loading = false;
@@ -1516,26 +1503,36 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   }
 
   calcStats() {
-    const active = this.allLeads.filter(l => !l.converted_at && l.stage !== 'new' && l.stage !== 'archived' && !l.hold_active);
+    const entryStage = this.stages.funnel()[0]?.key;
+    const active = this.allLeads.filter(l =>
+      !l.converted_at && l.stage !== entryStage && l.stage !== 'archived' && !l.hold_active);
     this.stats = {
       total:    this.totalQualified,
       hot:      active.filter(l => l.hot).length,
-      pipeline: active.filter(l => !['closed_won','closed_lost'].includes(l.stage))
+      pipeline: active.filter(l => !this.stages.isClosed(l.stage))
                       .reduce((s, l) => s + +(l.value_pln || 0), 0),
-      won:      active.filter(l => l.stage === 'closed_won').length,
-      lost:     active.filter(l => l.stage === 'closed_lost').length,
+      won:      active.filter(l => this.stages.isWon(l.stage)).length,
+      lost:     active.filter(l => this.stages.isLost(l.stage)).length,
     };
   }
 
-  leadsFor(stage: string): Lead[] {
+  leadsFor(stage: string | null): Lead[] {
+    if (!stage) return [];
     return this.allLeads.filter(l => l.stage === stage);
   }
 
   closedLeads(): Lead[] {
-    return this.allLeads.filter(l => ['closed_won','closed_lost'].includes(l.stage));
+    return this.allLeads.filter(l => this.stages.isClosed(l.stage));
   }
 
-  valueFor(stage: LeadStage): number {
+  /** ✓ / ✗ przed nazwą etapu zamknięcia na liście filtrów. */
+  stageOptionPrefix(kind: string): string {
+    if (kind === 'won')  return '✓ ';
+    if (kind === 'lost') return '✗ ';
+    return '';
+  }
+
+  valueFor(stage: string): number {
     return Math.round(this.leadsFor(stage).reduce((s, l) => s + +(l.value_pln || 0), 0) / 1000);
   }
 
@@ -1561,7 +1558,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   openNew() {
     this.nipError = '';
     this.newForm       = { company:'', contact_name:'', contact_title:'', email:'', phone:'', nip:'PL',
-                           value_pln: null, source:'', stage:'new', hot:false, notes:'', assigned_to:'', first_contact_date:'' };
+                           value_pln: null, source:'', stage: this.stages.funnel()[0]?.key ?? 'new',
+                           hot:false, notes:'', assigned_to:'', first_contact_date:'' };
     this.newFormWebsite   = '';
     this.enrichPrompt     = false;
     this.enrichResult     = null;
@@ -1866,8 +1864,6 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   }
 
   // ── Helpers ──
-  prob(stage: LeadStage)       { return PROB_MAP[stage] ?? 10; }
-  stageLabel(s: LeadStage)     { return this.transloco.translate('crm.labels.stages.' + s); }
   srcLabel(val: string | null): string {
     if (!val) return '';
     const key = leadSourceLabelKey(val);

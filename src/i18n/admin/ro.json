@@ -949,6 +949,29 @@
         "visa": "Viză"
       }
     },
+    "leadStages": {
+      "addStage": "Adaugă etapă",
+      "cardTitle": "Etapele lead-ului",
+      "codeWrittenHint": "Nu este un pas al pâlniei, ci o stare pe care aplicația o setează singură (arhivarea lead-ului, conversia în partener), deci nu poate fi ștearsă. Numele poate fi schimbat.",
+      "confirmDelete": "Ștergeți etapa „{name}”?",
+      "confirmDeleteWithLeads": "Ștergeți etapa „{name}”?\n\nCele {count} lead-uri de pe ea vor trece la „{target}”.",
+      "intro": "Nume proprii pentru etapele pâlniei — redenumiți-le pe cele existente, adăugați un pas sau ștergeți unul de care nu aveți nevoie. Codul etapei rămâne același, așa că noul nume apare în toată aplicația, iar rapoartele și datele lead-urilor rămân neatinse. Un nume gol revine la cel implicit.",
+      "kinds": {
+        "archived": "arhivă",
+        "converted": "convertit în partener",
+        "lost": "pierdut",
+        "open": "pâlnie",
+        "won": "câștigat"
+      },
+      "lastStageHint": "Acesta este ultimul pas al pâlniei — lead-urile noi trebuie să înceapă de undeva.",
+      "limitReached": "S-a atins limita de {max} etape ale pâlniei.",
+      "loadFailedTitle": "Etapele lead-ului nu au putut fi încărcate.",
+      "loading": "Se încarcă etapele…",
+      "movedLeads": "S-au mutat {count} lead-uri în {stage}.",
+      "newStagePlaceholder": "Numele noii etape",
+      "otherSectionHint": "Arhivarea și conversia în partener le setează aplicația, deci nu pot fi șterse — numele, da.",
+      "saveFailed": "Modificarea etapei nu a putut fi salvată."
+    },
     "onboarding": {
       "intro": "— definiți sarcinile standard pentru fiecare pas al procesului de implementare. Șabloanele sunt sugerate automat la crearea sarcinilor în panoul Onboarding.",
       "introTitle": "Șabloane de sarcini de onboarding",

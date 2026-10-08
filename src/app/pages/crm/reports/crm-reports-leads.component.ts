@@ -16,8 +16,7 @@ import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
-
-const LEAD_STAGES = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won', 'closed_lost', 'onboarding', 'onboarded', 'archived'];
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 
 function getPeriodDates(preset: string): { from: string; to: string; periodEnd: string } {
   const now = new Date();
@@ -117,9 +116,10 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
         </div>
       </div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #22C55E">
+    <!-- Kafelek wygranych tylko u tenanta, który ma etap wygranej -->
+    <div class="stat-card" style="border-top:3px solid #22C55E" *ngIf="stages.wonKey() as wonKey">
       <div class="stat-val" style="color:#22C55E;cursor:pointer"
-           (click)="goToLeads({stage: 'closed_won'}, t('reports.leads.drilldown.won'))"
+           (click)="goToLeads({stage: wonKey}, t('reports.leads.drilldown.won'))"
            [title]="t('reports.leads.tooltips.viewWonLeads')">{{ kpi.won_value | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.common.kpi.wonPln') }}<wt-tooltip key="crm.leads.kpi.won"></wt-tooltip></div>
       <div class="stat-trend" style="color:#16a34a">↑ {{ t('reports.leads.kpi.contractsCount', { count: kpi.won }) }}</div>
@@ -350,6 +350,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   private zone   = inject(NgZone);
   private router = inject(Router);
   private transloco = inject(TranslocoService);
+  readonly stages = inject(LeadStagesService);
 
   loading      = false;
   periodPreset = 'cq';        // pkt 3: domyślnie bieżący kwartał
@@ -504,7 +505,9 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
 
   private buildVelocityData(): any[] {
     if (!this.stageVelocity?.length) return [];
-    const stageOrder = ['new','qualification','presentation','offer','negotiation','closed_won','closed_lost'];
+    // Kolejność etapów jest konfigurowalna per tenant, więc sortujemy po jego
+    // konfiguracji, nie po liście w tym pliku.
+    const stageOrder = this.stages.all().map(s => s.key);
     const sorted = [...this.stageVelocity].sort(
       (a, b) => stageOrder.indexOf(a.stage) - stageOrder.indexOf(b.stage)
     );
@@ -653,18 +656,17 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     // Onboarding wydzielone poza główny lejek — liczymy tylko aktywny onboarding, nie zakończony
     const onbRows  = this.funnel.filter(f => f.stage === 'onboarding');
     const mainRows = this.funnel.filter(f => !['onboarding','onboarded'].includes(f.stage));
-    const active   = mainRows.filter(f => !['closed_won','closed_lost'].includes(f.stage));
-    const all      = [...active, ...mainRows.filter(f => ['closed_won','closed_lost'].includes(f.stage))];
+    const active   = mainRows.filter(f => !this.stages.isClosed(f.stage));
+    const all      = [...active, ...mainRows.filter(f => this.stages.isClosed(f.stage))];
     const onbCount = onbRows.reduce((s, d) => s + d.count, 0);
     const onbValue = onbRows.reduce((s, d) => s + parseFloat(d.value), 0);
 
     if (!all.length && !onbCount) { el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">' + this.transloco.translate('crm.reports.common.noData') + '</div>'; return; }
     const maxVal = Math.max(...all.map(d => d.value), onbValue, 1);
-    const colors: Record<string,string> = { new:'#94A3B8',qualification:'#F59E0B',presentation:'#3B82F6',offer:'#A855F7',negotiation:'#F97316',closed_won:'#22C55E',closed_lost:'#EF4444' };
     all.forEach((d, i) => {
       const pct = Math.round(d.value / maxVal * 100);
       const label = this.stageLabel(d.stage);
-      const color = colors[d.stage] || '#94A3B8';
+      const color = this.stages.color(d.stage);
       const conv = (i < active.length - 1 && all[i+1])
         ? `<div style="width:34px;text-align:center;font-size:10px;color:#a1a1aa;flex-shrink:0">${d.count>0?Math.round(all[i+1].count/d.count*100):0}%↓</div>`
         : '<div style="width:34px"></div>';
@@ -698,7 +700,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       row.title = this.transloco.translate('crm.reports.leads.tooltips.goToOnboarding');
       row.addEventListener('click', () => this.router.navigate(['/crm/onboarding']));
       row.innerHTML = `<div style="display:flex;align-items:center;gap:8px">
-        <div style="width:88px;font-size:11.5px;color:#0891b2;text-align:right;flex-shrink:0;font-weight:600">${this.transloco.translate('crm.labels.stages.onboarding')}</div>
+        <div style="width:88px;font-size:11.5px;color:#0891b2;text-align:right;flex-shrink:0;font-weight:600">${this.stageLabel('onboarding')}</div>
         <div style="flex:1;position:relative;height:26px">
           <div style="position:absolute;inset:0;background:#f4f4f5;border-radius:4px"></div>
           <div style="position:absolute;top:0;left:0;width:${pct}%;height:100%;background:#06B6D4;border-radius:4px;opacity:.85"></div>
@@ -851,9 +853,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     if (key) return this.transloco.translate('crm.' + key);
     return this._dynamicSources.find(s => s.value === v)?.label ?? v;
   }
-  private stageLabel(stage: string): string {
-    return LEAD_STAGES.includes(stage) ? this.transloco.translate('crm.labels.stages.' + stage) : stage;
-  }
+  private stageLabel(stage: string): string { return this.stages.label(stage); }
   barColor(wr: number): string { return wr >= 50 ? '#22C55E' : wr >= 30 ? '#f26522' : '#3B82F6'; }
   initials(name: string): string { return (name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase(); }
   avatarColor(name: string): string { let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h},55%,48%)`; }

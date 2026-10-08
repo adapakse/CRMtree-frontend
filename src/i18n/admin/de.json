@@ -949,6 +949,29 @@
         "visa": "Visum"
       }
     },
+    "leadStages": {
+      "addStage": "Phase hinzufügen",
+      "cardTitle": "Lead-Phasen",
+      "codeWrittenHint": "Das ist kein Funnel-Schritt, sondern ein Zustand, den die Anwendung selbst setzt (Lead archivieren, in Partner umwandeln), daher nicht löschbar. Umbenennen ist möglich.",
+      "confirmDelete": "Phase „{name}“ entfernen?",
+      "confirmDeleteWithLeads": "Phase „{name}“ entfernen?\n\nDie {count} Lead(s) darauf wechseln zu „{target}“.",
+      "intro": "Eigene Namen für die Funnel-Phasen — bestehende umbenennen, einen Schritt hinzufügen oder einen überflüssigen entfernen. Der Phasencode bleibt gleich, daher erscheint der neue Name in der gesamten Anwendung, während Berichte und Lead-Daten unberührt bleiben. Ein leerer Name führt zum eingebauten zurück.",
+      "kinds": {
+        "archived": "Archiv",
+        "converted": "zu Partner konvertiert",
+        "lost": "verloren",
+        "open": "Funnel",
+        "won": "gewonnen"
+      },
+      "lastStageHint": "Das ist der letzte Funnel-Schritt — neue Leads müssen irgendwo beginnen.",
+      "limitReached": "Grenze von {max} Funnel-Phasen erreicht.",
+      "loadFailedTitle": "Die Lead-Phasen konnten nicht geladen werden.",
+      "loading": "Phasen werden geladen…",
+      "movedLeads": "{count} Lead(s) nach {stage} verschoben.",
+      "newStagePlaceholder": "Name der neuen Phase",
+      "otherSectionHint": "Archivierung und Umwandlung in einen Partner setzt die Anwendung selbst, daher nicht löschbar — der Name schon.",
+      "saveFailed": "Die Änderung der Phase konnte nicht gespeichert werden."
+    },
     "onboarding": {
       "intro": "— definieren Sie die Standardaufgaben für jeden Schritt des Onboarding-Prozesses. Die Vorlagen werden beim Erstellen von Aufgaben im Bereich Onboarding automatisch vorgeschlagen.",
       "introTitle": "Vorlagen für Onboarding-Aufgaben",

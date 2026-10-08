@@ -949,6 +949,29 @@
         "visa": "Vizum"
       }
     },
+    "leadStages": {
+      "addStage": "Dodaj fazo",
+      "cardTitle": "Faze potencialne stranke",
+      "codeWrittenHint": "To ni korak lijaka, ampak stanje, ki ga aplikacija nastavi sama (arhiviranje, pretvorba v partnerja), zato ga ni mogoče izbrisati. Preimenovati ga je mogoče.",
+      "confirmDelete": "Ali želite odstraniti fazo »{name}«?",
+      "confirmDeleteWithLeads": "Ali želite odstraniti fazo »{name}«?\n\n{count} potencialnih strank na njej se bo premaknilo v »{target}«.",
+      "intro": "Lastna imena faz lijaka — preimenujte obstoječe, dodajte korak ali odstranite nepotrebnega. Koda faze ostane enaka, zato se novo ime pokaže po vsej aplikaciji, poročila in podatki o potencialnih strankah pa ostanejo nedotaknjeni. Prazno ime se vrne na vgrajeno.",
+      "kinds": {
+        "archived": "arhiv",
+        "converted": "pretvorjeno v partnerja",
+        "lost": "izguba",
+        "open": "lijak",
+        "won": "uspeh"
+      },
+      "lastStageHint": "To je zadnji korak lijaka — nove potencialne stranke morajo kje nastati.",
+      "limitReached": "Dosežena je omejitev {max} faz lijaka.",
+      "loadFailedTitle": "Faz potencialne stranke ni bilo mogoče naložiti.",
+      "loading": "Nalaganje faz…",
+      "movedLeads": "Premaknjenih potencialnih strank: {count} v {stage}.",
+      "newStagePlaceholder": "Ime nove faze",
+      "otherSectionHint": "Arhiviranje in pretvorbo v partnerja nastavi aplikacija sama, zato jih ni mogoče izbrisati — ime pa.",
+      "saveFailed": "Spremembe faze ni bilo mogoče shraniti."
+    },
     "onboarding": {
       "intro": "— določite standardne naloge za vsak korak postopka uvajanja. Predloge se samodejno predlagajo pri ustvarjanju nalog na plošči Uvajanje.",
       "introTitle": "Predloge nalog uvajanja",

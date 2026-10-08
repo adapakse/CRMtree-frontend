@@ -12,11 +12,11 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 
 const CHURN_RISK_LEVELS = ['critical', 'high', 'medium', 'low'];
 // This dashboard words some stages differently than the shared CRM labels (e.g. "Lead", "Wygrane").
 const DASHBOARD_STAGE_LABELS = ['new', 'closed_won', 'closed_lost', 'onboarding', 'onboarded'];
-const SHARED_STAGE_LABELS = ['qualification', 'presentation', 'offer', 'negotiation'];
 const SHARED_ACTIVITY_TYPE_LABELS = ['call', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'task'];
 
 interface PipelineRow {
@@ -242,7 +242,9 @@ interface PipelineRow {
       </div>
     </div>
 
-    <div class="kpi-card clickable" (click)="goToLeads({ stage: 'closed_won', label: t('salesDashboard.kpi.wonOpportunities') })">
+    <!-- Kafelek wygranych ma sens tylko u tenanta, który ma etap wygranej -->
+    <div class="kpi-card clickable" *ngIf="stages.wonKey() as wonKey"
+         (click)="goToLeads({ stage: wonKey, label: t('salesDashboard.kpi.wonOpportunities') })">
       <div class="kpi-icon" style="background:#E6F4EA">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
           <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/>
@@ -416,7 +418,9 @@ interface PipelineRow {
               {{ lead.value_pln ? t('salesDashboard.currency.pln', { value: (lead.value_pln | number:'1.0-0') }) : '—' }}
             </td>
             <td>
-              <span class="stage-badge" [class]="stageClass(lead.stage)">
+              <span class="stage-badge"
+                    [style.background]="stages.pillBackground(lead.stage)"
+                    [style.color]="stages.color(lead.stage)">
                 {{ stageLabel(lead.stage) }}
               </span>
             </td>
@@ -598,13 +602,8 @@ interface PipelineRow {
     .text-muted { color: #9CA3AF; }
 
     /* Stage badges */
+    /* Kolor etapu idzie inline z LeadStagesService — etapy są konfigurowalne. */
     .stage-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
-    .stage-lead   { background: #F3F4F6; color: #374151; }
-    .stage-qual   { background: #DBEAFE; color: #1D4ED8; }
-    .stage-offer  { background: white; color: #2563EB; border: 1.5px solid #BFDBFE; }
-    .stage-neg    { background: #FEF3C7; color: #D97706; }
-    .stage-won    { background: #D1FAE5; color: #065F46; }
-    .stage-lost   { background: #FEE2E2; color: #991B1B; }
 
     /* Probability */
     .prob-wrap { display: flex; align-items: center; gap: 8px; }
@@ -709,6 +708,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   private route    = inject(ActivatedRoute);
   private settings = inject(AppSettingsService);
   private transloco = inject(TranslocoService);
+  readonly stages = inject(LeadStagesService);
   private locale   = inject(LocaleService);
 
   private trainingRefreshInterval: ReturnType<typeof setInterval> | null = null;
@@ -961,29 +961,32 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   private processPipeline(raw: any[]) {
-    const STAGES = [
-      { stage: 'new',           color: '#3B82F6' },
-      { stage: 'qualification', color: '#2563EB' },
-      { stage: 'offer',         color: '#7C3AED' },
-      { stage: 'negotiation',   color: '#F97316' },
-      { stage: 'closed_won',    color: '#3BAA5D' },
+    // Etapy lejka tenanta + wygrana na końcu. Wcześniej ta lista była wpisana na
+    // sztywno i nie zawierała Prezentacji, więc wykres lejka cicho ją pomijał,
+    // choć KPI obok ją liczyło.
+    // Wygrana może nie istnieć — tenant mógł ją usunąć. Wtedy lejek po prostu
+    // kończy się na ostatnim etapie, bez kolumny „wygrane".
+    const wonKey = this.stages.wonKey();
+    const stages = [
+      ...this.stages.funnel().map(s => ({ stage: s.key, color: this.stages.color(s.key) })),
+      ...(wonKey ? [{ stage: wonKey, color: this.stages.color(wonKey) }] : []),
     ];
-    const ACTIVE = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'onboarding', 'onboarded'];
+    const activeKeys = [...this.stages.funnel().map(s => s.key), 'onboarding', 'onboarded'];
 
     const map = new Map(raw.map(r => [r.stage, r]));
 
-    this.pipeline = STAGES.map(s => ({
+    this.pipeline = stages.map(s => ({
       ...s,
       count:  Number(map.get(s.stage)?.count)          || 0,
       value:  Number(map.get(s.stage)?.weighted_value) || 0,
       barPct: 0,
     }));
 
-    this.kpiPipelineValue = raw.filter(r => ACTIVE.includes(r.stage))
+    this.kpiPipelineValue = raw.filter(r => activeKeys.includes(r.stage))
       .reduce((s, r) => s + (Number(r.weighted_value) || 0), 0);
-    this.kpiActiveLeads = raw.filter(r => ACTIVE.includes(r.stage))
+    this.kpiActiveLeads = raw.filter(r => activeKeys.includes(r.stage))
       .reduce((s, r) => s + (Number(r.count) || 0), 0);
-    this.kpiWonCount = Number(map.get('closed_won')?.count) || 0;
+    this.kpiWonCount = wonKey ? (Number(map.get(wonKey)?.count) || 0) : 0;
     this.pipelineTotal = this.pipeline.reduce((s, r) => s + r.value, 0);
 
     this.refreshBars();
@@ -1214,15 +1217,12 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   }
 
   stageLabel(stage: string): string {
+    // Nazwa wpisana przez tenanta wygrywa nad dashboardowym brzmieniem etapu;
+    // dopóki tenant nie zmienił nazwy, zostaje dotychczasowe tłumaczenie.
+    const own = this.stages.customLabel(stage);
+    if (own) return own;
     if (DASHBOARD_STAGE_LABELS.includes(stage)) return this.transloco.translate('crm.salesDashboard.stages.' + stage);
-    if (SHARED_STAGE_LABELS.includes(stage)) return this.transloco.translate('crm.labels.stages.' + stage);
-    return stage;
-  }
-
-  stageClass(stage: string): string {
-    return ({ new:'stage-lead', qualification:'stage-qual', presentation:'stage-qual',
-              offer:'stage-offer', negotiation:'stage-neg', closed_won:'stage-won',
-              closed_lost:'stage-lost', onboarding:'stage-qual', onboarded:'stage-won' } as Record<string,string>)[stage] || 'stage-lead';
+    return this.stages.label(stage);
   }
 
   goToLeads(queryParams: Record<string, string> = {}) {

@@ -949,6 +949,29 @@
         "visa": "Visa"
       }
     },
+    "leadStages": {
+      "addStage": "Ajouter une étape",
+      "cardTitle": "Étapes du lead",
+      "codeWrittenHint": "Ce n'est pas une étape de l'entonnoir mais un état que l'application définit elle-même (archivage du lead, conversion en partenaire), il ne peut donc pas être supprimé. Le renommer est possible.",
+      "confirmDelete": "Supprimer l'étape « {name} » ?",
+      "confirmDeleteWithLeads": "Supprimer l'étape « {name} » ?\n\nLes {count} lead(s) présents passeront à « {target} ».",
+      "intro": "Vos propres noms pour les étapes de l'entonnoir : renommez les existantes, ajoutez une étape ou supprimez celle dont vous n'avez pas besoin. Le code de l'étape ne change pas : le nouveau nom apparaît dans toute l'application, tandis que les rapports et les données des leads restent intacts. Un nom vide revient au nom intégré.",
+      "kinds": {
+        "archived": "archives",
+        "converted": "converti en partenaire",
+        "lost": "perdu",
+        "open": "entonnoir",
+        "won": "gagné"
+      },
+      "lastStageHint": "C'est la dernière étape de l'entonnoir : les nouveaux leads doivent bien commencer quelque part.",
+      "limitReached": "Limite de {max} étapes d'entonnoir atteinte.",
+      "loadFailedTitle": "Impossible de charger les étapes du lead.",
+      "loading": "Chargement des étapes…",
+      "movedLeads": "{count} lead(s) déplacé(s) vers {stage}.",
+      "newStagePlaceholder": "Nom de la nouvelle étape",
+      "otherSectionHint": "L'archivage et la conversion en partenaire sont définis par l'application : non supprimables — le nom, oui.",
+      "saveFailed": "Impossible d'enregistrer la modification de l'étape."
+    },
     "onboarding": {
       "intro": "— définissez les tâches standard de chaque étape du processus d’intégration. Les modèles sont proposés automatiquement lors de la création de tâches dans le panneau Onboarding.",
       "introTitle": "Modèles de tâches d’onboarding",

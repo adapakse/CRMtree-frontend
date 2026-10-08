@@ -5,7 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
-import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-settings.service';
+import { AppSettingsService, AppSettingsMeta, LeadStageConfig } from '../../../core/services/app-settings.service';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
@@ -28,6 +29,23 @@ interface SettingField {
 
 // Zakładki
 type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding' | 'tooltips' | 'icp' | 'projects';
+
+// Klucz, pod którym etapy leada były słownikiem w app_settings. Został tu już
+// tylko po to, żeby karta etapów stała w zakładce CRM w tej samej kolejności co
+// dawniej (i co w worktrips-doc) — same dane siedzą w tenant_lead_stages.
+const LEAD_STAGES_CARD_SORT_KEY = 'crm_lead_stages';
+
+/**
+ * Edytowalny wiersz etapu leada. `stage` to stan zapisany, `label` to wersja
+ * robocza w polu — dirty wynika z ich porównania (ten sam wzorzec co IcpRow
+ * niżej). `label` pusty = wróć do wbudowanego tłumaczenia tego etapu.
+ * Prawdopodobieństwo wygranej celowo NIE jest tu edytowalne — patrz
+ * leadStageService.js, backend wylicza je z pozycji etapu w lejku.
+ */
+interface LeadStageRow {
+  stage: LeadStageConfig;
+  label: string;
+}
 
 // Dynamic ICP config per tenant. `key` is immutable once created — editable
 // only through `label`; the backend rejects any attempt to change `key`, so
@@ -175,10 +193,9 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
     codes: ['strona_www', 'polecenie', 'cold_call', 'linkedin', 'targi', 'partner',
             'agent', 'kampania', 'inbound', 'inne'],
   },
-  crm_lead_stages: {
-    group: 'leadStages',
-    codes: ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won', 'closed_lost'],
-  },
+  // crm_lead_stages NIE jest już słownikiem app_settings — etapy leada mają
+  // własną konfigurację per tenant (zakładka „Etapy leada"). Stary wiersz
+  // renderował się tu jako działający edytor, którego nic nie czytało.
   crm_partner_statuses: { group: 'partnerStatuses', codes: ['onboarding', 'active', 'inactive', 'churned'] },
   crm_contact_titles: { group: 'contactTitles', codes: ['Director', 'Manager', 'Specialist', 'Owner', 'Other'] },
   crm_industries: {
@@ -209,7 +226,10 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
   selector: 'wt-settings',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
-  providers: [provideTranslocoScope('admin')],
+  // Zakres `crm` obok `admin`: zakładka „Etapy leada" pokazuje wbudowane nazwy
+  // etapów (crm.labels.stages.*) jako podpowiedź w polu nazwy — bez tego
+  // placeholder pokazywałby surowy kod etapu.
+  providers: [provideTranslocoScope('admin', 'crm')],
   template: `
     <ng-container *transloco="let t; prefix: 'admin'">
     <div id="topbar">
@@ -248,7 +268,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           <button class="tab-btn" [class.active]="activeTab() === 'global'" (click)="activeTab.set('global')">
             ⚙️ {{ t('settings.tabs.global') }}
           </button>
-          <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm')">
+          <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm'); loadLeadStages()">
             💼 {{ t('settings.tabs.crm') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
@@ -371,7 +391,10 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
             </div>
           </div>
 
-          @for (field of crmFields(); track field.key) {
+          @for (field of crmFields(); track field.key; let i = $index) {
+            @if (i === leadStagesCardIndex()) {
+              <ng-container [ngTemplateOutlet]="leadStagesCard"></ng-container>
+            }
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
                 <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
@@ -426,6 +449,81 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
               </div>
             </div>
           }
+
+          <!-- Gdyby etapy wypadały alfabetycznie na końcu listy słowników -->
+          @if (leadStagesCardIndex() >= crmFields().length) {
+            <ng-container [ngTemplateOutlet]="leadStagesCard"></ng-container>
+          }
+
+          <ng-template #leadStagesCard>
+            <!-- Etapy leada — karta w tej samej zakładce co pozostałe słowniki CRM.
+                 Celowo NIE osobna zakładka: to słownik CRM jak źródła leadów czy
+                 branże. W tym miejscu stał dawniej martwy edytor „Etapy Leada"
+                 (app_settings.crm_lead_stages), którego nic nie czytało — teraz
+                 stoi tu działający. Etapy mają własną tabelę, a nie app_settings,
+                 bo niosą kolejność, kolor, prawdopodobieństwo i zachowanie. -->
+            <div class="card" style="margin-bottom:16px;overflow:hidden">
+              <div class="cat-header" style="padding:12px 20px">
+                <span class="cat-title" style="font-size:13px">{{ t('settings.leadStages.cardTitle') }}</span>
+              </div>
+              <div style="padding:14px 20px">
+                <div class="field-desc" style="margin-bottom:12px">{{ t('settings.leadStages.intro') }}</div>
+
+                @if (stagesLoading()) {
+                  <div class="state-msg">{{ t('settings.leadStages.loading') }}</div>
+                } @else if (stagesError(); as err) {
+                  <div class="icp-error">
+                    <div><strong>{{ t('settings.leadStages.loadFailedTitle') }}</strong></div>
+                    <div style="margin-top:4px">{{ err }}</div>
+                    <button class="btn-secondary" style="margin-top:12px" (click)="loadLeadStages()">{{ t('settings.icp.retry') }}</button>
+                  </div>
+                } @else {
+                  <div class="stage-list">
+                    @for (row of stageRows(); track row.stage.id) {
+                      <div class="stage-row">
+                        <span class="stage-ordinal">{{ stageOrdinal(row) }}</span>
+                        <span class="stage-kind-dot" [style.background]="row.stage.color || '#94A3B8'"></span>
+                        <input class="stage-name-input" [(ngModel)]="row.label" [disabled]="stagesSaving()">
+                        @if (row.stage.kind !== 'open') {
+                          <span class="stage-kind">{{ t('settings.leadStages.kinds.' + row.stage.kind) }}</span>
+                        }
+                        <span class="stage-row-spacer"></span>
+                        @if (isStageRowDirty(row)) {
+                          <button class="stage-save" [disabled]="stagesSaving()"
+                                  [title]="t('settings.actions.saveChanges')" (click)="saveStageRow(row)">✓</button>
+                        }
+                        @if (canDeleteStage(row)) {
+                          <button class="stage-del" [disabled]="stagesSaving()"
+                                  (click)="deleteStageRow(row)">{{ t('settings.actions.delete') }}</button>
+                        } @else {
+                          <span class="stage-no-del" [title]="deleteBlockedReason(row)">?</span>
+                        }
+                      </div>
+
+                      <!-- Po ostatnim kroku lejka: wiersz dodawania -->
+                      @if (isLastFunnelRow(row)) {
+                        <div class="stage-row stage-row-add">
+                          <span class="stage-ordinal">{{ funnelRows().length + 1 }}</span>
+                          <span class="stage-kind-dot" style="background:transparent"></span>
+                          <input class="stage-name-input" [(ngModel)]="newStageLabel"
+                                 [placeholder]="t('settings.leadStages.newStagePlaceholder')"
+                                 [disabled]="stagesSaving() || !canAddStage()"
+                                 (keyup.enter)="addStage()">
+                          <span class="stage-row-spacer"></span>
+                          <button class="stage-add" [disabled]="stagesSaving() || !newStageLabel.trim() || !canAddStage()"
+                                  (click)="addStage()">+ {{ t('settings.leadStages.addStage') }}</button>
+                        </div>
+                      }
+                    }
+                  </div>
+                  @if (!canAddStage()) {
+                    <div class="hint-inline">{{ t('settings.leadStages.limitReached', { max: maxOpenStages() }) }}</div>
+                  }
+                  <div class="hint-inline">{{ t('settings.leadStages.otherSectionHint') }}</div>
+                }
+              </div>
+            </div>
+          </ng-template>
 
           <!-- Algorytm Churn -->
           @if (churnFields().length > 0) {
@@ -1022,6 +1120,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           }
         }
 
+
         <!-- TAB: Enrichment / ICP — sygnały ICP tenanta. Admin tenanta edytuje
              WYŁĄCZNIE swojego (endpoint bierze tenant z sesji); superadmin
              dostaje dodatkowo dropdown i edytuje dowolnego, tą samą logiką
@@ -1187,8 +1286,11 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
     .page-title { font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--gray-900); }
     .tsp { flex:1; }
     #content { flex:1;overflow-y:auto;padding:24px; }
-    .tabs { display:flex;gap:4px;margin-bottom:24px;border-bottom:2px solid var(--gray-200);padding-bottom:0; }
-    .tab-btn { background:none;border:none;padding:10px 20px;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s; }
+    /* flex-wrap: zakładek jest już 9 (Etapy leada + Projekty za flagą) i przy
+       kontenerze 820px nie mieszczą się w jednym rzędzie — bez zawijania
+       wychodziły poza szary obszar. Zawijają się teraz pod spód. */
+    .tabs { display:flex;flex-wrap:wrap;column-gap:4px;row-gap:2px;margin-bottom:24px;border-bottom:2px solid var(--gray-200);padding-bottom:0; }
+    .tab-btn { background:none;border:none;padding:10px 15px;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s; }
     .tab-btn.active { color:var(--orange);border-bottom-color:var(--orange); }
     .tab-btn:hover:not(.active) { color:var(--gray-700); }
     .cat-header { padding:14px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px; }
@@ -1214,6 +1316,54 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
     .loading-overlay { display:flex;align-items:center;justify-content:center;padding:60px; }
     .spinner { width:32px;height:32px;border:3px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Etapy leada */
+    .stage-list { border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; }
+    .stage-row {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+      border-bottom: 1px solid var(--gray-100); background: white;
+    }
+    .stage-row:last-child { border-bottom: none; }
+    .stage-row-add { background: var(--gray-50); }
+    .stage-row-spacer { flex: 1; }
+    .stage-ordinal {
+      width: 20px; flex-shrink: 0; text-align: center; font-size: 12px; font-weight: 700;
+      color: var(--gray-400); font-variant-numeric: tabular-nums;
+    }
+    .stage-kind-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin: 0 6px; }
+    .stage-kind { font-size: 11.5px; color: var(--gray-400); white-space: nowrap; }
+    .stage-name-input {
+      flex: 0 1 240px; min-width: 120px; padding: 6px 9px; font-size: 13.5px; font-weight: 600;
+      color: var(--gray-800); background: white;
+      border: 1px solid var(--gray-200); border-radius: 6px;
+    }
+    .stage-name-input:focus { outline: none; border-color: var(--orange); }
+    .stage-name-input:disabled { background: var(--gray-50); color: var(--gray-400); }
+    .stage-save {
+      border: none; background: #16a34a; color: white; border-radius: 6px;
+      padding: 4px 9px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+    }
+    .stage-del {
+      border: 1px solid #fecaca; background: #fef2f2; color: #dc2626;
+      border-radius: 6px; padding: 4px 11px; font-size: 12px; font-weight: 600;
+      cursor: pointer; flex-shrink: 0; min-width: 62px;
+    }
+    .stage-del:hover:not(:disabled) { background: #dc2626; border-color: #dc2626; color: white; }
+    .stage-del:disabled { opacity: .4; cursor: not-allowed; }
+    /* Etap, którego nie da się usunąć — zamiast martwego przycisku sam myślnik
+       z wyjaśnieniem w tooltipie. */
+    /* Zamiast martwego przycisku „Usuń" — znak zapytania z wyjaśnieniem w
+       tooltipie, dlaczego tego etapu usunąć nie można. */
+    .stage-no-del {
+      min-width: 62px; text-align: center; flex-shrink: 0; cursor: help;
+      font-size: 12px; font-weight: 700; color: var(--gray-400);
+    }
+    .stage-no-del:hover { color: var(--gray-700); }
+    .stage-add {
+      border: none; background: var(--orange); color: white; border-radius: 6px;
+      padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+    }
+    .stage-add:disabled { opacity: .45; cursor: not-allowed; }
 
     /* Enrichment / ICP tab */
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
@@ -1347,6 +1497,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
 })
 export class SettingsComponent implements OnInit {
   private settingsSvc = inject(AppSettingsService);
+  private leadStages  = inject(LeadStagesService);
   private toast       = inject(ToastService);
   auth                = inject(AuthService);
   private transloco     = inject(TranslocoService);
@@ -1719,6 +1870,204 @@ export class SettingsComponent implements OnInit {
         this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.settingsSaveFailed'));
       },
     });
+  }
+
+  // ── Lead stages tab ────────────────────────────────────────────────────────
+  // What a tenant admin may change, and what it costs, is decided by the backend
+  // (leadStageService.js): renaming is always allowed, because the stage code
+  // that reports and lead records use never changes. Removing or disabling a
+  // stage is refused for system stages and for stages that still hold leads —
+  // the panel shows both so the refusal is never a surprise.
+  stagesLoading = signal(false);
+  stagesSaving  = signal(false);
+  // Osobny stan błędu, żeby 403/5xx nie wyglądało jak poprawnie wczytana,
+  // pusta lista etapów (ta sama lekcja co w zakładce ICP).
+  stagesError   = signal<string | null>(null);
+  stageRows     = signal<LeadStageRow[]>([]);
+  maxOpenStages = signal(10);
+  newStageLabel = '';
+
+
+  loadLeadStages(): void {
+    this.stagesLoading.set(true);
+    this.stagesError.set(null);
+    this.leadStages.list().subscribe({
+      next: res => {
+        this.maxOpenStages.set(res.max_open_stages);
+        this.stageRows.set(res.stages.map(stage => this.toStageRow(stage)));
+        this.leadStages.applyToApp(res.stages);
+        this.stagesLoading.set(false);
+      },
+      error: err => {
+        this.stagesError.set(err?.error?.error || this.transloco.translate('admin.settings.leadStages.loadFailedTitle'));
+        this.stagesLoading.set(false);
+      },
+    });
+  }
+
+  /**
+   * Pole nazwy jest WYPEŁNIONE aktualną nazwą etapu, a nie puste z nazwą w
+   * placeholderze. Inaczej nie da się jej zaznaczyć, poprawić jednej litery ani
+   * skrócić — trzeba przepisać od zera. Dla etapu, którego tenant nie zmieniał,
+   * wpisujemy wbudowane tłumaczenie; zapis i tak odłoży `null`, jeśli tekst nie
+   * różni się od tłumaczenia (patrz saveStageRow), więc pozostałe 9 języków się
+   * nie psuje przez samo wejście w pole.
+   */
+  private toStageRow(stage: LeadStageConfig): LeadStageRow {
+    return { stage, label: this.effectiveStageLabel(stage) };
+  }
+
+  /** Nazwa aktualnie widoczna w aplikacji: własna tenanta albo wbudowane tłumaczenie. */
+  private effectiveStageLabel(stage: LeadStageConfig): string {
+    return stage.label ?? this.builtinStageLabel(stage.key);
+  }
+
+  funnelRows = computed(() => this.stageRows().filter(r => r.stage.kind === 'open'));
+
+  /**
+   * Gdzie w zakładce „Parametry biznesowe CRM" stanie karta etapów. Karty
+   * słowników idą w kolejności klucza (API sortuje ORDER BY category, key), a
+   * etapy leada były tam dawniej zwykłym wpisem `crm_lead_stages` — stają więc
+   * dokładnie w tym miejscu, co w worktrips-doc, mimo że mają już własną tabelę.
+   */
+  leadStagesCardIndex = computed(() => {
+    const index = this.crmFields().findIndex(f => f.key > LEAD_STAGES_CARD_SORT_KEY);
+    return index === -1 ? this.crmFields().length : index;
+  });
+
+  canAddStage(): boolean {
+    return this.funnelRows().length < this.maxOpenStages();
+  }
+
+  /**
+   * Numer w jednej, ciągłej liście. Wiersz dodawania stoi po ostatnim kroku lejka
+   * i zajmuje jeden numer, więc etapy za nim są przesunięte o jeden — inaczej
+   * numeracja przeskakiwałaby w miejscu, gdzie użytkownik dodaje etap.
+   */
+  stageOrdinal(row: LeadStageRow): number {
+    const rows = this.stageRows();
+    const index = rows.indexOf(row);
+    const funnelCount = this.funnelRows().length;
+    return index < funnelCount ? index + 1 : index + 2;
+  }
+
+  isLastFunnelRow(row: LeadStageRow): boolean {
+    const funnel = this.funnelRows();
+    return funnel.length > 0 && funnel[funnel.length - 1] === row;
+  }
+
+  /**
+   * Usunąć można każdy krok lejka (poza ostatnim) oraz Wygraną i Przegraną.
+   * Nie da się usunąć stanów, które aplikacja zapisuje sama — patrz
+   * deleteBlockedReason.
+   */
+  canDeleteStage(row: LeadStageRow): boolean {
+    if (this.isCodeWrittenStage(row)) return false;
+    if (row.stage.kind === 'open' && this.funnelRows().length === 1) return false;
+    return true;
+  }
+
+  deleteBlockedReason(row: LeadStageRow): string {
+    return this.isCodeWrittenStage(row)
+      ? this.transloco.translate('admin.settings.leadStages.codeWrittenHint')
+      : this.transloco.translate('admin.settings.leadStages.lastStageHint');
+  }
+
+  /** Wbudowana nazwa etapu — podpowiedź w polu, gdy tenant nie nadał własnej. */
+  builtinStageLabel(key: string): string {
+    const translated = this.transloco.translate('crm.labels.stages.' + key);
+    return translated === 'crm.labels.stages.' + key ? key : translated;
+  }
+
+  /** Brudny = tekst w polu różni się od nazwy, która jest dziś widoczna w aplikacji. */
+  isStageRowDirty(row: LeadStageRow): boolean {
+    return row.label.trim() !== this.effectiveStageLabel(row.stage);
+  }
+
+  saveStageRow(row: LeadStageRow): void {
+    if (!row.stage.id) return;
+    const typed = row.label.trim();
+    // Tekst równy wbudowanemu tłumaczeniu (albo pusty) zapisujemy jako null —
+    // wtedy etap wraca do tłumaczeń we wszystkich 10 językach, zamiast zostać
+    // zabetonowany polską nazwą wpisaną w to pole.
+    const label = (!typed || typed === this.builtinStageLabel(row.stage.key)) ? null : typed;
+
+    this.stagesSaving.set(true);
+    this.leadStages.update(row.stage.id, { label }).subscribe({
+      next: () => { this.stagesSaving.set(false); this.loadLeadStages(); },
+      error: err => this.onStageError(err),
+    });
+  }
+
+  addStage(): void {
+    const label = this.newStageLabel.trim();
+    if (!label) return;
+    this.stagesSaving.set(true);
+    this.leadStages.create({ label }).subscribe({
+      next: () => {
+        this.newStageLabel = '';
+        this.stagesSaving.set(false);
+        this.loadLeadStages();
+      },
+      error: err => this.onStageError(err),
+    });
+  }
+
+  /** Archiwum i stany konwersji — ustawia je aplikacja, więc nie są do usunięcia. */
+  isCodeWrittenStage(row: LeadStageRow): boolean {
+    return row.stage.kind === 'archived' || row.stage.kind === 'converted';
+  }
+
+  stageName(row: LeadStageRow): string {
+    return row.label.trim() || this.builtinStageLabel(row.stage.key);
+  }
+
+  /**
+   * Usunięcie etapu to jedno potwierdzenie — admin nigdy nie wpisuje, gdzie
+   * przenieść leady. Jeśli na etapie ktoś siedzi, pytanie mówi wprost, na który
+   * etap przejdą; cel liczy serwer (delete_target_key), więc to, co widzi admin,
+   * jest tym, co faktycznie się stanie.
+   */
+  deleteStageRow(row: LeadStageRow): void {
+    if (!row.stage.id) return;
+    const name = this.stageName(row);
+    const count = row.stage.lead_count ?? 0;
+
+    const question = count
+      ? this.transloco.translate('admin.settings.leadStages.confirmDeleteWithLeads', {
+          name, count, target: this.stageNameByKey(row.stage.delete_target_key),
+        })
+      : this.transloco.translate('admin.settings.leadStages.confirmDelete', { name });
+    if (!confirm(question)) return;
+
+    this.stagesSaving.set(true);
+    this.leadStages.remove(row.stage.id).subscribe({
+      next: res => {
+        this.stagesSaving.set(false);
+        if (res.movedLeads) {
+          this.toast.success(this.transloco.translate('admin.settings.leadStages.movedLeads', {
+            count: res.movedLeads, stage: this.stageNameByKey(res.movedTo),
+          }));
+        }
+        this.loadLeadStages();
+      },
+      error: err => this.onStageError(err),
+    });
+  }
+
+  private stageNameByKey(key: string | null | undefined): string {
+    if (!key) return '';
+    const row = this.stageRows().find(r => r.stage.key === key);
+    return row ? this.stageName(row) : key;
+  }
+
+  /**
+   * Komunikat z backendu idzie wprost do usera — to on wie, ILE leadów blokuje
+   * usunięcie etapu i dlaczego etap systemowy jest nieusuwalny.
+   */
+  private onStageError(err: any): void {
+    this.stagesSaving.set(false);
+    this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.leadStages.saveFailed'));
   }
 
   // ── Enrichment / ICP tab (tenant admin — dynamic ICP signals of THIS tenant) ─

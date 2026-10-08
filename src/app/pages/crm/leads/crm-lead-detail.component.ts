@@ -7,11 +7,12 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import {
-  CrmApiService, Lead, LeadActivity, LEAD_STAGE_LABELS, LeadStage,
+  CrmApiService, Lead, LeadActivity, LeadStage,
   LEAD_SOURCES, LeadSource, LeadContact, LinkedDocument, LeadHistoryEntry, CrmUser,
   GmailSendResult, ConsentValue, EmailStatus, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation,
 } from '../../../core/services/crm-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
@@ -62,7 +63,9 @@ interface WhatsappConvUiState {
            [style.background-image]="logoSasUrl"></div>
       <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{lead.company}}</div>
     </div>
-    <span class="stage-badge stage-{{lead.stage}}">{{stageLabel(lead.stage)}}</span>
+    <span class="stage-badge"
+          [style.background]="stages.pillBackground(lead.stage)"
+          [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span>
     <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 {{ t('leadDetail.header.hot') }}</span>
     <span *ngIf="lead.hold_active" style="background:#e5e7eb;color:#374151;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700" title="{{lead.hold_reason}}">⏸️ {{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
     <div style="display:flex;gap:6px">
@@ -170,8 +173,10 @@ interface WhatsappConvUiState {
       <!-- Sprzedaż -->
       <div class="info-section">
         <div class="info-section-title">{{ t('leadDetail.sections.sales') }}</div>
-        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.stage') }}</span><span class="val"><span class="stage-badge stage-{{lead.stage}}" style="font-size:10px">{{stageLabel(lead.stage)}}</span></span></div>
-        <div class="info-kv" *ngIf="lead.stage==='closed_lost' && lead.lost_reason">
+        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.stage') }}</span><span class="val"><span class="stage-badge" style="font-size:10px"
+            [style.background]="stages.pillBackground(lead.stage)"
+            [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span></span></div>
+        <div class="info-kv" *ngIf="stages.isLost(lead.stage) && lead.lost_reason">
           <span class="lbl">{{ t('leadDetail.fields.lostReason') }}</span>
           <span class="val" style="color:#991b1b">{{lead.lost_reason}}</span>
         </div>
@@ -264,15 +269,15 @@ interface WhatsappConvUiState {
           <a routerLink="/crm/partners" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.partnerRegistryLink') }}</a>
         </ng-container>
         <!-- Closed lost: red banner mode -->
-        <ng-container *ngIf="lead.stage==='closed_lost'">
+        <ng-container *ngIf="stages.isLost(lead.stage)">
           <span style="font-size:15px">⛔</span>
-          <span style="color:#dc2626;font-weight:700;font-size:13px">{{ t('labels.stages.closed_lost') }}</span>
+          <span style="color:#dc2626;font-weight:700;font-size:13px">{{ stageLabel(lead.stage) }}</span>
           <span *ngIf="lead.lost_reason" style="font-size:12px;color:#991b1b">· {{lead.lost_reason}}</span>
           <span style="flex:1"></span>
-          <button *ngIf="canEdit" class="stage-arrow-btn" style="color:#15803d;border-color:#bbf7d0;font-size:12px;padding:4px 12px" (click)="quickChangeStage('new')">↩ {{ t('leadDetail.stage.backToNew') }}</button>
+          <button *ngIf="canEdit" class="stage-arrow-btn" style="color:#15803d;border-color:#bbf7d0;font-size:12px;padding:4px 12px" (click)="quickChangeStage(entryStageKey)">↩ {{ t('leadDetail.stage.backToNew') }}</button>
         </ng-container>
         <!-- Normal stepper mode -->
-        <ng-container *ngIf="lead.stage!=='closed_lost' && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
+        <ng-container *ngIf="!stages.isLost(lead.stage) && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
           <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" [title]="t('leadDetail.stage.previous')">‹</button>
           <div style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
             <ng-container *ngFor="let s of orderedStageOptions; let last=last">
@@ -288,7 +293,8 @@ interface WhatsappConvUiState {
             </ng-container>
           </div>
           <button class="stage-arrow-btn" [disabled]="!nextStage() || !canEdit" (click)="quickChangeStage(nextStage()!)" [title]="t('leadDetail.stage.next')">›</button>
-          <button *ngIf="canEdit && lead.stage!=='closed_won'" class="stage-arrow-btn" style="color:#dc2626;border-color:#fecaca;font-size:12px;padding:4px 8px" (click)="quickChangeStage('closed_lost')" [title]="t('labels.stages.closed_lost')">⛔</button>
+          <!-- Awaryjne wyjście w przegraną istnieje tylko, gdy tenant ma taki etap -->
+          <button *ngIf="canEdit && !stages.isWon(lead.stage) && stages.lostKey() as lostKey" class="stage-arrow-btn" style="color:#dc2626;border-color:#fecaca;font-size:12px;padding:4px 8px" (click)="quickChangeStage(lostKey)" [title]="stageLabel(lostKey)">⛔</button>
         </ng-container>
       </div>
 
@@ -1112,7 +1118,7 @@ interface WhatsappConvUiState {
           <label>{{ t('leadDetail.fields.companyName') }} *<input [(ngModel)]="editForm.company" [placeholder]="t('leadDetail.fields.companyName')" required></label>
           <label>{{ t('leadDetail.fields.stage') }}<select [(ngModel)]="editForm.stage"><option *ngFor="let s of allowedStageOptions" [value]="s.key">{{s.label}}</option></select></label>
         </div>
-        <div class="edit-row" *ngIf="editForm.stage==='closed_lost'">
+        <div class="edit-row" *ngIf="stages.isLost(editForm.stage)">
           <label class="full" style="color:#991b1b">{{ t('leadDetail.fields.lostReason') }} *
             <select [(ngModel)]="editForm.lost_reason"
                     [style.border-color]="!editForm.lost_reason ? '#ef4444' : ''">
@@ -1653,19 +1659,14 @@ interface WhatsappConvUiState {
     .tab-btn { background:none; border:none; border-bottom:2px solid transparent; padding:10px 14px; font-size:12.5px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; border-radius:6px 6px 0 0; transition:all .15s; }
     .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
     .tab-btn:hover:not(.active) { color:#374151; }
+    /* Kolory etapu idą inline z LeadStagesService — etapy są konfigurowalne,
+       więc etap dodany przez tenanta nie miałby tu swojej klasy. */
     .stage-badge { padding:2px 9px; border-radius:10px; font-size:11px; font-weight:700; }
-    .stage-new{background:#f3f4f6;color:#374151} .stage-qualification{background:#dbeafe;color:#1e40af}
-    .stage-presentation{background:#fef3c7;color:#92400e} .stage-offer{background:#f3e8ff;color:#6b21a8}
-    .stage-negotiation{background:#ffedd5;color:#9a3412} .stage-closed_won{background:#dcfce7;color:#166534}
-    .stage-closed_lost{background:#fee2e2;color:#991b1b}
-    .stage-archived{background:#e5e7eb;color:#4b5563}
     .stage-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:7px; background:white; font-size:12px; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
     .stage-btn:hover:not(:disabled) { background:var(--orange-pale); border-color:var(--orange); }
     .stage-btn.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:600; }
     .stage-btn:disabled { cursor:default; }
     .stage-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-    .stage-dot-new{background:#94a3b8} .stage-dot-qualification{background:#f59e0b} .stage-dot-presentation{background:#3b82f6}
-    .stage-dot-offer{background:#a855f7} .stage-dot-negotiation{background:#f97316} .stage-dot-closed_won{background:#22c55e} .stage-dot-closed_lost{background:#ef4444}
     .comm-btn { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid #bbf7d0; border-radius:8px; background:white; cursor:pointer; width:100%; transition:background .15s; }
     .comm-btn:hover:not(:disabled) { background:#f0fdf4; }
     .comm-btn:disabled { opacity:.5; cursor:not-allowed; }
@@ -1824,8 +1825,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   private locale = inject(LocaleService);
   logoSasUrl       = '';
 
+  // Etapy leada NIE są zwykłym słownikiem z app_settings — mają własną
+  // konfigurację per tenant (LeadStagesService), bo niosą kolejność, kolor,
+  // prawdopodobieństwo i zachowanie, nie samą listę kodów.
+  readonly stages = inject(LeadStagesService);
+
   // Słowniki z app_settings
-  get dictStages():    { value: string; label: string }[] { return this._dictArr('crm_lead_stages', Object.keys(LEAD_STAGE_LABELS)).map(v => ({ value: v, label: this.stageLabel(v) })); }
   get dictIndustries(): string[] { return this._dictArr('crm_industries', ['IT','Finance','Transport','Tourism','Healthcare','Retail','Manufacturing','Legal','Education','Other']); }
   get dictTitles():    string[] { return this._dictArr('crm_contact_titles', ['CEO','CFO','CTO','COO','VP','Director','Manager','Specialist','Owner','Other']); }
 
@@ -1867,17 +1872,20 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   // ── Wymagalność wg etapu ─────────────────────────────────────────────────
-  private FULL_REQUIRED_STAGES = ['qualification','presentation','offer','negotiation','closed_won'];
-
+  // Pełne dane są wymagane od chwili, gdy lead wchodzi do lejka na serio —
+  // czyli na każdym etapie poza wejściowym, aż do wygranej włącznie.
   get requiresFullFields(): boolean {
-    return this.FULL_REQUIRED_STAGES.includes(this.editForm?.stage);
+    const stage = this.editForm?.stage;
+    if (!stage) return false;
+    const seq = this.stageSeq;
+    return seq.indexOf(stage) > 0;
   }
 
   get editErrors(): string[] {
     const f = this.editForm;
     const errs: string[] = [];
     const fieldName = (key: string) => this.transloco.translate('crm.leadDetail.fields.' + key);
-    if (f.stage === 'closed_lost' && !f.lost_reason) errs.push(fieldName('lostReason'));
+    if (this.stages.isLost(f.stage) && !f.lost_reason) errs.push(fieldName('lostReason'));
     if (!this.requiresFullFields) return errs;
     if (!f.website)            errs.push(fieldName('website'));
     if (!f.contact_name)       errs.push(fieldName('fullName'));
@@ -1919,18 +1927,36 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   convertForm    = { contract_value: null as number | null, contract_signed: '' };
 
   crmUsers: CrmUser[] = [];
-  private readonly STAGE_SEQ = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won'];
+
+  /**
+   * Sekwencja lejka: etapy 'open' tenanta w jego kolejności + wygrana na końcu.
+   * Musi odpowiadać temu, co liczy backend (leadStageService.js) — inaczej UI
+   * zaproponuje przejście, które API odrzuci jako niedozwolone.
+   */
+  private get stageSeq(): string[] {
+    const won = this.stages.wonKey();
+    return [...this.stages.funnel().map(s => s.key), ...(won ? [won] : [])];
+  }
+
+  /** Etap wejściowy lejka — jedyne wyjście z Przegranej i z Archiwum. */
+  get entryStageKey(): string {
+    return this.stages.funnel()[0]?.key ?? 'new';
+  }
 
   private allowedNextStages(current: string): string[] {
-    if (current === 'archived')    return ['new']; // jedyne wyjście z Archiwum
-    if (current === 'closed_lost') return ['new'];
-    if (current === 'closed_won')  return ['negotiation'];
-    const idx = this.STAGE_SEQ.indexOf(current);
+    const seq = this.stageSeq;
+    const entry = seq[0];
+    const won = this.stages.wonKey();
+    const lost = this.stages.lostKey();
+    // Wyjście z archiwum i z przegranej prowadzi na początek lejka.
+    if (current === 'archived' || (lost && current === lost)) return entry ? [entry] : [];
+    if (won && current === won) return seq.length > 1 ? [seq[seq.length - 2]] : [];
+    const idx = seq.indexOf(current);
     if (idx === -1) return [];
     const result: string[] = [];
-    if (idx > 0) result.push(this.STAGE_SEQ[idx - 1]);
-    if (idx < this.STAGE_SEQ.length - 1) result.push(this.STAGE_SEQ[idx + 1]);
-    result.push('closed_lost');
+    if (idx > 0) result.push(seq[idx - 1]);
+    if (idx < seq.length - 1) result.push(seq[idx + 1]);
+    if (lost) result.push(lost);
     return result;
   }
 
@@ -1940,43 +1966,45 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     return this.allowedNextStages(current).includes(targetStage);
   }
 
-  // Wszystkie etapy — do wizualnego paska postępu
-  get stageOptions() { return this.dictStages.map(s => ({ key: s.value as LeadStage, label: s.label })); }
+  // Wszystkie etapy, które user może wybrać — do wizualnego paska postępu
+  get stageOptions() {
+    return this.stages.selectable().map(s => ({ key: s.key, label: this.stages.label(s.key) }));
+  }
 
-  // Etapy w kolejności głównego lejka (bez closed_lost)
+  // Etapy w kolejności głównego lejka (bez przegranej)
   get orderedStageOptions() {
-    return this.STAGE_SEQ
-      .map(k => this.stageOptions.find(s => s.key === k))
-      .filter(Boolean) as { key: LeadStage; label: string }[];
+    return this.stageSeq.map(key => ({ key, label: this.stages.label(key) }));
   }
 
   prevStage(): LeadStage | null {
     const cur = this.lead?.stage;
     if (!cur) return null;
-    if (cur === 'closed_lost') return 'new';
-    if (cur === 'closed_won')  return 'negotiation' as LeadStage;
-    const idx = this.STAGE_SEQ.indexOf(cur);
-    return idx > 0 ? this.STAGE_SEQ[idx - 1] as LeadStage : null;
+    const seq = this.stageSeq;
+    if (this.stages.isLost(cur)) return seq[0] ?? null;
+    if (this.stages.isWon(cur))  return seq.length > 1 ? seq[seq.length - 2] : null;
+    const idx = seq.indexOf(cur);
+    return idx > 0 ? seq[idx - 1] : null;
   }
 
   nextStage(): LeadStage | null {
     const cur = this.lead?.stage;
-    if (!cur || cur === 'closed_lost' || cur === 'closed_won') return null;
-    const idx = this.STAGE_SEQ.indexOf(cur);
-    return (idx >= 0 && idx < this.STAGE_SEQ.length - 1) ? this.STAGE_SEQ[idx + 1] as LeadStage : null;
+    if (!cur || this.stages.isClosed(cur)) return null;
+    const seq = this.stageSeq;
+    const idx = seq.indexOf(cur);
+    return (idx >= 0 && idx < seq.length - 1) ? seq[idx + 1] : null;
   }
 
   isStageCompleted(key: string): boolean {
     const cur = this.lead?.stage;
     if (!cur) return false;
-    const curIdx = this.STAGE_SEQ.indexOf(cur);
-    return this.STAGE_SEQ.indexOf(key) < curIdx;
+    const seq = this.stageSeq;
+    return seq.indexOf(key) < seq.indexOf(cur);
   }
 
   stepperDotStyle(key: string): Record<string, string> {
     const cur = this.lead?.stage;
     if (key === cur) {
-      const color = key === 'closed_won' ? '#22c55e' : '#f26522';
+      const color = this.stages.isWon(key) ? '#22c55e' : '#f26522';
       return { background: color, borderColor: color, transform: 'scale(1.3)' };
     }
     if (this.isStageCompleted(key)) return { background: '#22c55e', borderColor: '#22c55e' };
@@ -1985,7 +2013,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   stepperLabelStyle(key: string): Record<string, string> {
     const cur = this.lead?.stage;
-    if (key === cur) return { color: key === 'closed_won' ? '#15803d' : '#f26522', fontWeight: '700' };
+    if (key === cur) return { color: this.stages.isWon(key) ? '#15803d' : '#f26522', fontWeight: '700' };
     if (this.isStageCompleted(key)) return { color: '#15803d' };
     return {};
   }
@@ -1996,14 +2024,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (!current) return this.stageOptions;
     // Lead na Holdzie — etap zablokowany do zmiany, dopóki Hold nie zostanie zdjęty.
     if (this.lead?.hold_active) {
-      return this.dictStages
-        .filter(s => s.value === current)
-        .map(s => ({ key: s.value as LeadStage, label: s.label }));
+      return [{ key: current, label: this.stages.label(current) }];
     }
     const allowed = new Set([current, ...this.allowedNextStages(current)]);
-    return this.dictStages
-      .filter(s => allowed.has(s.value))
-      .map(s => ({ key: s.value as LeadStage, label: s.label }));
+    return [...allowed].map(key => ({ key, label: this.stages.label(key) }));
   }
   leadSources: LeadSource[] = LEAD_SOURCES;
 
@@ -2025,8 +2049,10 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     catch { return []; }
   }
 
-  private readonly HOLD_STAGES = ['qualification', 'presentation', 'offer', 'negotiation'];
-  isHoldEligibleStage(stage: string): boolean { return this.HOLD_STAGES.includes(stage); }
+  /** Hold ma sens na każdym etapie lejka poza wejściowym — jak w backendzie (holdKeys). */
+  isHoldEligibleStage(stage: string): boolean {
+    return this.stages.funnel().slice(1).some(s => s.key === stage);
+  }
 
   readonly todayStr = new Date().toISOString().slice(0, 10);
   showHoldModal = false;
@@ -3931,7 +3957,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       assigned_to:   this.editForm.assigned_to || null,
       tags:          this.editForm.tagsStr ? this.editForm.tagsStr.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       notes:         this.editForm.notes || null,
-      lost_reason:   this.editForm.stage === 'closed_lost' ? (this.editForm.lost_reason || null) : null,
+      lost_reason:   this.stages.isLost(this.editForm.stage) ? (this.editForm.lost_reason || null) : null,
       agent_name:    this.editForm.source === 'agent' ? (this.editForm.agent_name || null) : null,
       agent_email:   this.editForm.source === 'agent' ? (this.editForm.agent_email || null) : null,
       agent_phone:   this.editForm.source === 'agent' ? (this.editForm.agent_phone || null) : null,
@@ -4511,9 +4537,11 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   quickChangeStage(stage: LeadStage): void {
     if (!this.lead || this.lead.stage === stage) return;
-    if (stage === 'closed_lost') {
+    // Przegrana wymaga powodu, więc nie da się jej ustawić jednym kliknięciem —
+    // otwieramy edycję z już wybranym etapem.
+    if (this.stages.isLost(stage)) {
       this.openEdit();
-      this.editForm.stage = 'closed_lost';
+      this.editForm.stage = stage;
       return;
     }
     this.api.updateLead(this.lead.id, { stage } as any).subscribe({
@@ -4614,7 +4642,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     return this.leadSources.find(s => s.value === val)?.label ?? val;
   }
 
-  stageLabel(s: string): string { return s in LEAD_STAGE_LABELS ? this.transloco.translate('crm.labels.stages.' + s) : s; }
+  stageLabel(s: string): string { return this.stages.label(s); }
   actIcon(type: string) {
     return { task:'✅', call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄' }[type] || '💬';
   }

@@ -9,6 +9,7 @@ import {
   ProspectDashEnrichedRow, ProspectDashCallRow,
 } from '../../../core/services/crm-api.service';
 import { forkJoin } from 'rxjs';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 
 // ─── Typy pomocnicze ────────────────────────────────────────────────
 
@@ -68,29 +69,6 @@ const AI_TAG_COLORS: Record<string, string> = {
   'bez taga AI': '#c4b5fd',
 };
 
-const STAGE_COLORS: Record<string, string> = {
-  new:           '#94a3b8',
-  qualification: '#f59e0b',
-  presentation:  '#3b82f6',
-  offer:         '#a855f7',
-  negotiation:   '#f97316',
-  closed_won:    '#22c55e',
-  closed_lost:   '#ef4444',
-  onboarding:    '#06b6d4',
-  onboarded:     '#10b981',
-};
-
-const STAGE_LABELS: Record<string, string> = {
-  new:           'Nowy',
-  qualification: 'Kwalifikacja',
-  presentation:  'Prezentacja',
-  offer:         'Oferta',
-  negotiation:   'Negocjacje',
-  closed_won:    'Wygrany',
-  closed_lost:   'Przegrany',
-  onboarding:    'Onboarding',
-  onboarded:     'Klient',
-};
 
 function aiPct(tag: string): number { return parseInt(tag.match(/\d+/)?.[0] ?? '0', 10); }
 
@@ -146,13 +124,9 @@ function maxOf(rows: BarRow[]): number {
         </ng-container>
         <select class="pd-sel" [(ngModel)]="filter1Stage" (ngModelChange)="loadChart1()">
           <option value="">Wszystkie etapy</option>
-          <option value="new">Nowy</option>
-          <option value="qualification">Kwalifikacja</option>
-          <option value="presentation">Prezentacja</option>
-          <option value="offer">Oferta</option>
-          <option value="negotiation">Negocjacje</option>
-          <option value="closed_won">Wygrany</option>
-          <option value="closed_lost">Przegrany</option>
+          @for (s of stages.selectable(); track s.key) {
+            <option [value]="s.key">{{ stageLabel(s.key) }}</option>
+          }
         </select>
       </div>
     </div>
@@ -281,15 +255,11 @@ function maxOf(rows: BarRow[]): number {
       <div class="pd-filters">
         <select class="pd-sel" [(ngModel)]="filter3Stage" (ngModelChange)="loadChart3()">
           <option value="">Wszystkie etapy</option>
-          <option value="new">Nowy</option>
-          <option value="qualification">Kwalifikacja</option>
-          <option value="presentation">Prezentacja</option>
-          <option value="offer">Oferta</option>
-          <option value="negotiation">Negocjacje</option>
-          <option value="closed_won">Wygrany</option>
-          <option value="closed_lost">Przegrany</option>
-          <option value="onboarding">Onboarding</option>
-          <option value="onboarded">Klient</option>
+          @for (s of stages.selectable(); track s.key) {
+            <option [value]="s.key">{{ stageLabel(s.key) }}</option>
+          }
+          <option value="onboarding">{{ stageLabel('onboarding') }}</option>
+          <option value="onboarded">{{ stageLabel('onboarded') }}</option>
         </select>
       </div>
     </div>
@@ -628,6 +598,7 @@ function maxOf(rows: BarRow[]): number {
 })
 export class CrmProspectsDashboardComponent implements OnInit {
   private api = inject(CrmApiService);
+  readonly stages = inject(LeadStagesService);
   readonly cdr = inject(ChangeDetectorRef);
 
   // Dynamiczna mapa kolorów score: budowana na podstawie rzeczywistych zakresów z API
@@ -860,10 +831,10 @@ export class CrmProspectsDashboardComponent implements OnInit {
               segments: this.chart3StageList
                 .filter(s => stageMap.has(s))
                 .map(s => ({
-                  label: STAGE_LABELS[s] ?? s,
+                  label: this.stageLabel(s),
                   value: stageMap.get(s) ?? 0,
                   pct: 0,
-                  color: STAGE_COLORS[s] ?? '#9ca3af',
+                  color: this.stageColor(s),
                 })),
             };
           });
@@ -884,8 +855,8 @@ export class CrmProspectsDashboardComponent implements OnInit {
     if (pct >  0)  return '#fca5a5';
     return '#9ca3af';
   }
-  stageColor(s: string): string   { return STAGE_COLORS[s]   ?? '#9ca3af'; }
-  stageLabel(s: string): string   { return STAGE_LABELS[s]   ?? s; }
+  stageColor(s: string): string   { return this.stages.color(s); }
+  stageLabel(s: string): string   { return this.stages.label(s); }
 
   get belowThresholdLabel(): string {
     const s = this.raw2.find(r => r.score_range.startsWith('<'))?.score_range
