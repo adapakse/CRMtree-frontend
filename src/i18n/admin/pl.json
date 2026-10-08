@@ -949,6 +949,29 @@
         "visa": "Wiza"
       }
     },
+    "leadStages": {
+      "addStage": "Dodaj etap",
+      "cardTitle": "Etapy Leada",
+      "codeWrittenHint": "To nie krok lejka, a stan ustawiany przez aplikację (archiwizacja leada, konwersja na partnera), więc nie da się go usunąć. Nazwę możesz zmienić.",
+      "confirmDelete": "Usunąć etap „{name}”?",
+      "confirmDeleteWithLeads": "Usunąć etap „{name}”?\n\nLeady na tym etapie ({count}) przejdą na etap „{target}”.",
+      "intro": "Własne nazwy etapów lejka — zmień istniejące, dodaj nowy krok albo usuń niepotrzebny. Kod etapu zostaje bez zmian, więc nowa nazwa pojawia się w całej aplikacji, a raporty i dane leadów są nietknięte. Pusta nazwa wraca do nazwy wbudowanej.",
+      "kinds": {
+        "archived": "archiwum",
+        "converted": "konwersja na partnera",
+        "lost": "przegrana",
+        "open": "lejek",
+        "won": "wygrana"
+      },
+      "lastStageHint": "To ostatni krok lejka — nowe leady muszą gdzieś powstawać.",
+      "limitReached": "Osiągnięto limit {max} etapów lejka.",
+      "loadFailedTitle": "Nie udało się wczytać etapów leada.",
+      "loading": "Wczytywanie etapów…",
+      "movedLeads": "Przeniesiono leadów: {count} na etap {stage}.",
+      "newStagePlaceholder": "Nazwa nowego etapu",
+      "otherSectionHint": "Archiwum i konwersję na partnera aplikacja ustawia sama, więc nie da się ich usunąć — nazwę owszem.",
+      "saveFailed": "Nie udało się zapisać zmiany etapu."
+    },
     "onboarding": {
       "intro": "— zdefiniuj standardowe zadania dla każdego kroku procesu wdrożenia. Szablony są automatycznie podpowiadane podczas tworzenia zadań w panelu Onboarding.",
       "introTitle": "Szablony zadań onboardingowych",

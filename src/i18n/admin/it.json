@@ -949,6 +949,29 @@
         "visa": "Visto"
       }
     },
+    "leadStages": {
+      "addStage": "Aggiungi fase",
+      "cardTitle": "Fasi del lead",
+      "codeWrittenHint": "Non è un passo dell'imbuto ma uno stato impostato dall'applicazione (archiviazione del lead, conversione in partner), quindi non si può eliminare. Si può rinominare.",
+      "confirmDelete": "Rimuovere la fase \"{name}\"?",
+      "confirmDeleteWithLeads": "Eliminare la fase \"{name}\"?\n\nI {count} lead presenti passeranno a \"{target}\".",
+      "intro": "Nomi propri per le fasi dell'imbuto: rinomina quelle esistenti, aggiungi un passo o eliminane uno che non serve. Il codice della fase resta invariato, quindi il nuovo nome compare in tutta l'applicazione mentre report e dati dei lead non vengono toccati. Un nome vuoto torna a quello predefinito.",
+      "kinds": {
+        "archived": "archivio",
+        "converted": "convertito in partner",
+        "lost": "perso",
+        "open": "imbuto",
+        "won": "vinto"
+      },
+      "lastStageHint": "È l'ultimo passo dell'imbuto: i nuovi lead devono partire da qualche parte.",
+      "limitReached": "Raggiunto il limite di {max} fasi dell'imbuto.",
+      "loadFailedTitle": "Non è stato possibile caricare le fasi del lead.",
+      "loading": "Caricamento delle fasi…",
+      "movedLeads": "Lead spostati: {count} verso {stage}.",
+      "newStagePlaceholder": "Nome della nuova fase",
+      "otherSectionHint": "L'archiviazione e la conversione in partner le imposta l'applicazione, quindi non si eliminano — il nome sì.",
+      "saveFailed": "Non è stato possibile salvare la modifica della fase."
+    },
     "onboarding": {
       "intro": "— definisci le attività standard per ogni passo del processo di onboarding. I modelli vengono proposti automaticamente durante la creazione delle attività nel pannello Onboarding.",
       "introTitle": "Modelli di attività di onboarding",

@@ -12,9 +12,18 @@ import { environment } from '../../../environments/environment';
 // Models
 // ─────────────────────────────────────────────────────────────────
 
-export type LeadStage =
-  | 'new' | 'qualification' | 'presentation'
-  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost' | 'onboarding' | 'onboarded' | 'archived';
+/**
+ * Code of a lead stage. Not a closed union: stages are configurable per tenant
+ * (backend table tenant_lead_stages), so a tenant can add its own. The codes
+ * below are the ones built into CRMtree; ask LeadStagesService for the list that
+ * actually exists, its labels and colours.
+ */
+export type LeadStage = string;
+
+export const BUILTIN_LEAD_STAGES = [
+  'new', 'qualification', 'presentation', 'offer', 'negotiation',
+  'closed_won', 'closed_lost', 'onboarding', 'onboarded', 'archived',
+] as const;
 
 export type PartnerStatus = 'onboarding' | 'active' | 'inactive' | 'churned';
 
@@ -838,19 +847,6 @@ export interface PbxCallLogPayload {
 // ─────────────────────────────────────────────────────────────────
 // Stałe
 // ─────────────────────────────────────────────────────────────────
-
-export const LEAD_STAGE_LABELS: Record<LeadStage, string> = {
-  new:           'Nowy',
-  qualification: 'Kwalifikacja',
-  presentation:  'Prezentacja',
-  offer:         'Oferta',
-  negotiation:   'Negocjacje',
-  closed_won:    'Wygrany',
-  closed_lost:   'Przegrany',
-  onboarding:    'W onboardingu',
-  onboarded:     'Onboardowany',
-  archived:      'Archiwum',
-};
 
 export const PARTNER_STATUS_LABELS: Record<PartnerStatus, string> = {
   onboarding: 'Wdrożenie',
