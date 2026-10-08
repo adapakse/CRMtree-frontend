@@ -722,6 +722,33 @@
       "saveChanges": "Salvare modificări",
       "saving": "Se salvează…"
     },
+    "ai": {
+      "apiKey": "Cheie API",
+      "apiKeyKeptHint": "Lăsat gol, păstrează cheia deja salvată.",
+      "apiKeyPlaceholder": "Lipiți cheia API",
+      "apiKeySavedPlaceholder": "Cheie salvată (…{hint}) — lipiți una nouă pentru a o înlocui",
+      "confirmRemove": "Ștergeți configurația AI? Enrichment pentru prospecți și analiza apelurilor se vor opri pentru acest tenant.",
+      "intro": "Cheia API a companiei dumneavoastră, folosită de enrichment pentru prospecți și de analiza apelurilor. Fără cheie, aceste funcții sunt oprite. Cheia este criptată și nu mai este afișată niciodată — rămân vizibile doar ultimele patru caractere.",
+      "keyRejected": "Furnizorul a respins cheia:",
+      "loading": "Se încarcă configurația AI…",
+      "modelFast": "Model principal",
+      "modelFastHint": "Pentru volum mare: enrichment pentru prospecți și analiza apelurilor.",
+      "modelQuality": "Model pentru conținut lung",
+      "modelQualityHint": "Rezervă pentru conținut mai lung și sarcini mai dificile. Gol = la fel ca modelul principal.",
+      "provider": "Furnizor",
+      "recheck": "Testați conexiunea",
+      "recheckOk": "Conexiunea funcționează.",
+      "remove": "Ștergeți configurația",
+      "saveAndVerify": "Salvați și verificați",
+      "saveFailed": "Configurația AI nu a putut fi salvată.",
+      "savedAndVerified": "Salvat. Cheia și modelele au fost confirmate la furnizor.",
+      "statusActive": "activ",
+      "statusInvalid": "cheie respinsă",
+      "statusMissing": "neconfigurat",
+      "title": "Furnizor AI",
+      "verifying": "Se verifică la furnizor…",
+      "whereIsKey": "De unde iau o cheie"
+    },
     "crm": {
       "intro": "— dicționare și praguri utilizate de modulul CRM. Editați listele prin adăugarea / ștergerea elementelor. Modificările intră în vigoare după salvare.",
       "scoring": {

@@ -722,6 +722,33 @@
       "saveChanges": "Zapisz zmiany",
       "saving": "Zapisywanie…"
     },
+    "ai": {
+      "apiKey": "Klucz API",
+      "apiKeyKeptHint": "Puste pole oznacza „zostaw dotychczasowy klucz”.",
+      "apiKeyPlaceholder": "Wklej klucz API",
+      "apiKeySavedPlaceholder": "Klucz zapisany (…{hint}) — wklej nowy, aby podmienić",
+      "confirmRemove": "Usunąć konfigurację AI? Enrichment prospektów i analizator rozmów przestaną działać dla tego tenanta.",
+      "intro": "Klucz API Twojej firmy, z którego korzysta enrichment prospektów i analizator rozmów. Bez klucza te funkcje są wyłączone. Klucz jest szyfrowany i nigdy nie jest pokazywany ponownie — widoczne zostają tylko cztery ostatnie znaki.",
+      "keyRejected": "Dostawca odrzucił klucz:",
+      "loading": "Wczytywanie konfiguracji AI…",
+      "modelFast": "Model podstawowy",
+      "modelFastHint": "Używany do zadań masowych: enrichment prospektów i analizator rozmów.",
+      "modelQuality": "Model do długich treści",
+      "modelQualityHint": "Zapas na dłuższe treści i trudniejsze zadania. Puste = ten sam co podstawowy.",
+      "provider": "Dostawca",
+      "recheck": "Sprawdź połączenie",
+      "recheckOk": "Połączenie działa.",
+      "remove": "Usuń konfigurację",
+      "saveAndVerify": "Zapisz i sprawdź",
+      "saveFailed": "Nie udało się zapisać konfiguracji AI.",
+      "savedAndVerified": "Zapisano. Klucz i modele zostały potwierdzone u dostawcy.",
+      "statusActive": "aktywny",
+      "statusInvalid": "klucz odrzucony",
+      "statusMissing": "nieskonfigurowany",
+      "title": "Dostawca AI",
+      "verifying": "Sprawdzam u dostawcy…",
+      "whereIsKey": "Skąd wziąć klucz"
+    },
     "crm": {
       "intro": "— słowniki i progi używane przez moduł CRM. Listy edytuj przez dodawanie / usuwanie elementów. Zmiany wchodzą w życie po zapisie.",
       "scoring": {

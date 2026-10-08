@@ -722,6 +722,33 @@
       "saveChanges": "Spremi promjene",
       "saving": "Spremanje…"
     },
+    "ai": {
+      "apiKey": "API ključ",
+      "apiKeyKeptHint": "Prazno polje zadržava već spremljeni ključ.",
+      "apiKeyPlaceholder": "Zalijepite API ključ",
+      "apiKeySavedPlaceholder": "Ključ spremljen (…{hint}) — zalijepite novi za zamjenu",
+      "confirmRemove": "Ukloniti konfiguraciju UI? Obogaćivanje potencijalnih klijenata i analizator poziva prestat će raditi za ovog najmoprimca.",
+      "intro": "API ključ vaše firme koji koriste obogaćivanje potencijalnih klijenata i analizator poziva. Bez ključa te su funkcije isključene. Ključ je šifriran i više se nikad ne prikazuje — vidljiva ostaju samo posljednja četiri znaka.",
+      "keyRejected": "Pružatelj je odbio ključ:",
+      "loading": "Učitavanje konfiguracije UI…",
+      "modelFast": "Glavni model",
+      "modelFastHint": "Za masovne poslove: obogaćivanje potencijalnih klijenata i analizator poziva.",
+      "modelQuality": "Model za dugačke sadržaje",
+      "modelQualityHint": "Rezerva za dulje sadržaje i zahtjevnije zadatke. Prazno = isto kao glavni model.",
+      "provider": "Pružatelj",
+      "recheck": "Provjeri vezu",
+      "recheckOk": "Veza radi.",
+      "remove": "Ukloni konfiguraciju",
+      "saveAndVerify": "Spremi i provjeri",
+      "saveFailed": "Konfiguraciju UI nije bilo moguće spremiti.",
+      "savedAndVerified": "Spremljeno. Ključ i modeli potvrđeni su kod pružatelja.",
+      "statusActive": "aktivan",
+      "statusInvalid": "ključ odbijen",
+      "statusMissing": "nije konfiguriran",
+      "title": "Pružatelj UI",
+      "verifying": "Provjera kod pružatelja…",
+      "whereIsKey": "Gdje dobiti ključ"
+    },
     "crm": {
       "intro": "— šifrarnici i pragovi koje koristi modul CRM. Popise uređujte dodavanjem / brisanjem stavki. Promjene stupaju na snagu nakon spremanja.",
       "scoring": {

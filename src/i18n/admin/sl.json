@@ -722,6 +722,33 @@
       "saveChanges": "Shrani spremembe",
       "saving": "Shranjevanje…"
     },
+    "ai": {
+      "apiKey": "API-ključ",
+      "apiKeyKeptHint": "Prazno polje ohrani že shranjeni ključ.",
+      "apiKeyPlaceholder": "Prilepite API-ključ",
+      "apiKeySavedPlaceholder": "Ključ shranjen (…{hint}) — prilepite nov za zamenjavo",
+      "confirmRemove": "Ali želite odstraniti konfiguracijo UI? Obogatitev potencialnih strank in analizator klicev bosta za tega najemnika prenehala delovati.",
+      "intro": "API-ključ vašega podjetja, ki ga uporabljata obogatitev potencialnih strank in analizator klicev. Brez ključa sta ti funkciji izklopljeni. Ključ je šifriran in se nikoli več ne prikaže — vidni ostanejo le njegovi zadnji štirje znaki.",
+      "keyRejected": "Ponudnik je zavrnil ključ:",
+      "loading": "Nalaganje konfiguracije UI…",
+      "modelFast": "Glavni model",
+      "modelFastHint": "Za množična opravila: obogatitev potencialnih strank in analizator klicev.",
+      "modelQuality": "Model za dolge vsebine",
+      "modelQualityHint": "Rezerva za daljše vsebine in zahtevnejša opravila. Prazno = enako kot glavni model.",
+      "provider": "Ponudnik",
+      "recheck": "Preveri povezavo",
+      "recheckOk": "Povezava deluje.",
+      "remove": "Odstrani konfiguracijo",
+      "saveAndVerify": "Shrani in preveri",
+      "saveFailed": "Konfiguracije UI ni bilo mogoče shraniti.",
+      "savedAndVerified": "Shranjeno. Ključ in modeli so potrjeni pri ponudniku.",
+      "statusActive": "aktiven",
+      "statusInvalid": "ključ zavrnjen",
+      "statusMissing": "ni nastavljen",
+      "title": "Ponudnik UI",
+      "verifying": "Preverjanje pri ponudniku…",
+      "whereIsKey": "Kje dobim ključ"
+    },
     "crm": {
       "intro": "— šifranti in pragovi, ki jih uporablja modul CRM. Sezname urejajte z dodajanjem / odstranjevanjem elementov. Spremembe začnejo veljati po shranjevanju.",
       "scoring": {

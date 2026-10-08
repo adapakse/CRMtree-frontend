@@ -722,6 +722,33 @@
       "saveChanges": "Salva modifiche",
       "saving": "Salvataggio…"
     },
+    "ai": {
+      "apiKey": "Chiave API",
+      "apiKeyKeptHint": "Lasciando vuoto si mantiene la chiave già salvata.",
+      "apiKeyPlaceholder": "Incolla la chiave API",
+      "apiKeySavedPlaceholder": "Chiave salvata (…{hint}) — incollane una nuova per sostituirla",
+      "confirmRemove": "Rimuovere la configurazione AI? L'enrichment dei prospect e l'analisi delle chiamate smetteranno di funzionare per questo tenant.",
+      "intro": "La chiave API della tua azienda, usata dall'enrichment dei prospect e dall'analisi delle chiamate. Senza chiave queste funzioni sono disattivate. La chiave è cifrata e non viene mai più mostrata: restano visibili solo gli ultimi quattro caratteri.",
+      "keyRejected": "Il fornitore ha rifiutato la chiave:",
+      "loading": "Caricamento della configurazione AI…",
+      "modelFast": "Modello principale",
+      "modelFastHint": "Usato per il lavoro di massa: enrichment dei prospect e analisi delle chiamate.",
+      "modelQuality": "Modello per contenuti lunghi",
+      "modelQualityHint": "Riserva per contenuti più lunghi e compiti più difficili. Vuoto = come il principale.",
+      "provider": "Fornitore",
+      "recheck": "Prova la connessione",
+      "recheckOk": "La connessione funziona.",
+      "remove": "Rimuovi configurazione",
+      "saveAndVerify": "Salva e verifica",
+      "saveFailed": "Non è stato possibile salvare la configurazione AI.",
+      "savedAndVerified": "Salvato. Chiave e modelli confermati dal fornitore.",
+      "statusActive": "attivo",
+      "statusInvalid": "chiave rifiutata",
+      "statusMissing": "non configurato",
+      "title": "Fornitore AI",
+      "verifying": "Verifica presso il fornitore…",
+      "whereIsKey": "Dove ottenere una chiave"
+    },
     "crm": {
       "intro": "— dizionari e soglie utilizzati dal modulo CRM. Modifica gli elenchi aggiungendo / rimuovendo elementi. Le modifiche diventano effettive dopo il salvataggio.",
       "scoring": {

@@ -7,6 +7,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-settings.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AiConfigService, AiConfig, AiProviderOption } from '../../../core/services/ai-config.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
 import { LanguagePickerComponent } from '../../../shared/components/language-picker/language-picker.component';
@@ -296,6 +297,102 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
             <span style="font-size:18px;flex-shrink:0">ℹ️</span>
             <div>
               <strong>{{ t('settings.tabs.global') }}</strong> {{ t('settings.global.intro') }}
+            </div>
+          </div>
+
+          <!-- Dostawca AI — klucz tenanta zasila enrichment, analizator rozmów,
+               SEO i asystenta, dlatego karta stoi w parametrach globalnych, a nie
+               w CRM. Klucz NIE wraca z API: po zapisie widać tylko 4 ostatnie
+               znaki (api_key_hint). -->
+          <div class="card" style="margin-bottom:20px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🤖</span>
+              <span class="cat-title">{{ t('settings.ai.title') }}</span>
+              @if (aiConfig()?.status === 'active') {
+                <span class="ai-badge ai-badge-ok">✓ {{ t('settings.ai.statusActive') }}</span>
+              } @else if (aiConfig()?.status) {
+                <span class="ai-badge ai-badge-bad">✗ {{ t('settings.ai.statusInvalid') }}</span>
+              } @else {
+                <span class="ai-badge ai-badge-off">{{ t('settings.ai.statusMissing') }}</span>
+              }
+            </div>
+
+            <div style="padding:16px 20px">
+              <div class="field-desc" style="margin-bottom:14px">{{ t('settings.ai.intro') }}</div>
+
+              @if (aiLoading()) {
+                <div class="state-msg">{{ t('settings.ai.loading') }}</div>
+              } @else {
+                @if (aiConfig()?.status === 'invalid' && aiConfig()?.last_error; as err) {
+                  <div class="ai-error">{{ t('settings.ai.keyRejected') }} {{ err }}</div>
+                }
+
+                <div class="ai-row">
+                  <label class="ai-label">{{ t('settings.ai.provider') }}</label>
+                  <select class="fsel" [(ngModel)]="aiDraft.provider" (ngModelChange)="onAiProviderChange()"
+                          [disabled]="aiSaving()">
+                    @for (p of aiProviders(); track p.key) {
+                      <option [value]="p.key">{{ p.label }}</option>
+                    }
+                  </select>
+                  @if (selectedAiProvider(); as p) {
+                    <a class="ai-hint-link" [href]="p.keys_url" target="_blank" rel="noopener">
+                      {{ t('settings.ai.whereIsKey') }} ↗
+                    </a>
+                  }
+                </div>
+
+                <div class="ai-row">
+                  <label class="ai-label">{{ t('settings.ai.apiKey') }}</label>
+                  <input class="fin" type="password" autocomplete="off"
+                         [(ngModel)]="aiDraft.apiKey" [disabled]="aiSaving()"
+                         [placeholder]="aiConfig()
+                            ? t('settings.ai.apiKeySavedPlaceholder', { hint: aiConfig()!.api_key_hint })
+                            : t('settings.ai.apiKeyPlaceholder')">
+                </div>
+                @if (aiConfig()) {
+                  <div class="ai-sub">{{ t('settings.ai.apiKeyKeptHint') }}</div>
+                }
+
+                <div class="ai-row">
+                  <label class="ai-label">{{ t('settings.ai.modelFast') }}</label>
+                  <input class="fin" [(ngModel)]="aiDraft.modelFast" [disabled]="aiSaving()"
+                         [placeholder]="selectedAiProvider()?.suggested_fast || ''">
+                </div>
+                <div class="ai-sub">{{ t('settings.ai.modelFastHint') }}</div>
+
+                <div class="ai-row">
+                  <label class="ai-label">{{ t('settings.ai.modelQuality') }}</label>
+                  <input class="fin" [(ngModel)]="aiDraft.modelQuality" [disabled]="aiSaving()"
+                         [placeholder]="selectedAiProvider()?.suggested_quality || ''">
+                </div>
+                <div class="ai-sub">{{ t('settings.ai.modelQualityHint') }}</div>
+
+                @if (aiMessage(); as msg) {
+                  <div class="ai-ok">{{ msg }}</div>
+                }
+
+                <div style="display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap">
+                  <button class="btn-primary" [disabled]="aiSaving() || !aiDraft.modelFast.trim()"
+                          (click)="saveAiConfig()">
+                    {{ aiSaving() ? t('settings.ai.verifying') : t('settings.ai.saveAndVerify') }}
+                  </button>
+                  @if (aiConfig()) {
+                    <button class="btn-secondary" [disabled]="aiSaving()" (click)="recheckAiConfig()">
+                      {{ t('settings.ai.recheck') }}
+                    </button>
+                    <button class="btn-danger-sm" style="padding:6px 12px;font-size:12px"
+                            [disabled]="aiSaving()" (click)="deleteAiConfig()">
+                      {{ t('settings.ai.remove') }}
+                    </button>
+                  }
+                  @if (aiConfig()?.updated_by_name; as who) {
+                    <span class="field-meta" style="margin-left:auto">
+                      {{ t('settings.fields.changedBy') }} {{ who }}
+                    </span>
+                  }
+                </div>
+              }
             </div>
           </div>
 
@@ -1217,6 +1314,30 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
 
     /* Enrichment / ICP tab */
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
+
+    /* Dostawca AI */
+    .ai-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .ai-label { flex:0 0 190px; font-size:13px; font-weight:600; color:var(--gray-800); }
+    .ai-row .fsel, .ai-row .fin {
+      flex:1; max-width:340px; padding:7px 10px; font-size:13px;
+      border:1px solid var(--gray-200); border-radius:7px; background:white; color:var(--gray-800);
+    }
+    .ai-row .fin:focus, .ai-row .fsel:focus { outline:none; border-color:var(--orange); }
+    .ai-sub { font-size:11.5px; color:var(--gray-400); margin:0 0 14px 202px; line-height:1.5; }
+    .ai-hint-link { font-size:11.5px; color:#1D4ED8; text-decoration:none; white-space:nowrap; }
+    .ai-hint-link:hover { text-decoration:underline; }
+    .ai-badge { margin-left:auto; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; }
+    .ai-badge-ok  { background:#DCFCE7; color:#166534; }
+    .ai-badge-bad { background:#FEE2E2; color:#991B1B; }
+    .ai-badge-off { background:var(--gray-100); color:var(--gray-500); }
+    .ai-error {
+      background:#FEF2F2; border:1px solid #FECACA; color:#991B1B;
+      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-bottom:14px;
+    }
+    .ai-ok {
+      background:#F0FDF4; border:1px solid #BBF7D0; color:#166534;
+      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-top:14px;
+    }
     .td-muted { color: var(--gray-500); font-size: 13px; }
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
@@ -1347,7 +1468,114 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
 })
 export class SettingsComponent implements OnInit {
   private settingsSvc = inject(AppSettingsService);
+  private aiConfigSvc = inject(AiConfigService);
   private toast       = inject(ToastService);
+
+  // ── Dostawca AI (klucz tenanta) ────────────────────────────────────────────
+  // Klucz nie wraca z API, więc pole klucza jest ZAWSZE puste przy wejściu —
+  // puste przy zapisie znaczy „zostaw dotychczasowy", nie „wyczyść".
+  aiLoading  = signal(false);
+  aiSaving   = signal(false);
+  aiConfig   = signal<AiConfig | null>(null);
+  aiProviders = signal<AiProviderOption[]>([]);
+  aiMessage  = signal<string | null>(null);
+  aiDraft: { provider: string; apiKey: string; modelFast: string; modelQuality: string } =
+    { provider: 'anthropic', apiKey: '', modelFast: '', modelQuality: '' };
+
+  selectedAiProvider = computed(() =>
+    this.aiProviders().find(p => p.key === this.aiDraft.provider) ?? null);
+
+  loadAiConfig(): void {
+    this.aiLoading.set(true);
+    this.aiConfigSvc.get().subscribe({
+      next: res => {
+        this.aiProviders.set(res.providers);
+        this.aiConfig.set(res.config);
+        const provider = res.config?.provider ?? res.providers[0]?.key ?? 'anthropic';
+        this.aiDraft = {
+          provider,
+          apiKey: '',
+          modelFast: res.config?.model_fast ?? '',
+          modelQuality: res.config?.model_quality ?? '',
+        };
+        if (!res.config) this.applyAiProviderSuggestions();
+        this.aiLoading.set(false);
+      },
+      error: () => this.aiLoading.set(false),
+    });
+  }
+
+  /** Zmiana dostawcy podpowiada jego modele, ale nie nadpisuje tego, co admin już wpisał. */
+  onAiProviderChange(): void {
+    this.aiMessage.set(null);
+    this.applyAiProviderSuggestions();
+  }
+
+  private applyAiProviderSuggestions(): void {
+    const provider = this.selectedAiProvider();
+    if (!provider) return;
+    if (!this.aiDraft.modelFast.trim()) this.aiDraft.modelFast = provider.suggested_fast;
+  }
+
+  saveAiConfig(): void {
+    this.aiSaving.set(true);
+    this.aiMessage.set(null);
+    this.aiConfigSvc.save({
+      provider: this.aiDraft.provider,
+      // Puste pole = zostaw klucz, który już jest zapisany (API go nie wydaje,
+      // więc admin nie ma jak go przepisać przy zmianie samego modelu).
+      api_key: this.aiDraft.apiKey.trim() || null,
+      model_fast: this.aiDraft.modelFast.trim(),
+      model_quality: this.aiDraft.modelQuality.trim() || null,
+    }).subscribe({
+      next: res => {
+        this.aiConfig.set(res.config as AiConfig);
+        this.aiDraft.apiKey = '';
+        this.aiSaving.set(false);
+        this.aiMessage.set(this.transloco.translate('admin.settings.ai.savedAndVerified'));
+      },
+      error: err => {
+        this.aiSaving.set(false);
+        this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.ai.saveFailed'));
+      },
+    });
+  }
+
+  recheckAiConfig(): void {
+    this.aiSaving.set(true);
+    this.aiMessage.set(null);
+    this.aiConfigSvc.recheck().subscribe({
+      next: res => {
+        this.aiSaving.set(false);
+        if (res.status === 'active') {
+          this.aiMessage.set(this.transloco.translate('admin.settings.ai.recheckOk'));
+        } else {
+          this.toast.error(res.last_error || this.transloco.translate('admin.settings.ai.statusInvalid'));
+        }
+        this.loadAiConfig();
+      },
+      error: err => {
+        this.aiSaving.set(false);
+        this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.ai.saveFailed'));
+      },
+    });
+  }
+
+  deleteAiConfig(): void {
+    if (!confirm(this.transloco.translate('admin.settings.ai.confirmRemove'))) return;
+    this.aiSaving.set(true);
+    this.aiConfigSvc.remove().subscribe({
+      next: () => {
+        this.aiSaving.set(false);
+        this.aiMessage.set(null);
+        this.loadAiConfig();
+      },
+      error: err => {
+        this.aiSaving.set(false);
+        this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.ai.saveFailed'));
+      },
+    });
+  }
   auth                = inject(AuthService);
   private transloco     = inject(TranslocoService);
   private localeService = inject(LocaleService);
@@ -1548,6 +1776,8 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Karta dostawcy AI stoi w zakładce otwieranej domyślnie, więc wczytujemy ją od razu.
+    this.loadAiConfig();
     // Załaduj listę userów dla edytora szablonów onboarding
     this.http.get<any[]>(`${environment.apiUrl}/admin/users?limit=200`).subscribe({
       next: r => this.allUsers.set((r as any)?.data || r),

@@ -722,6 +722,33 @@
       "saveChanges": "Änderungen speichern",
       "saving": "Wird gespeichert…"
     },
+    "ai": {
+      "apiKey": "API-Schlüssel",
+      "apiKeyKeptHint": "Leer lassen behält den bereits gespeicherten Schlüssel.",
+      "apiKeyPlaceholder": "API-Schlüssel einfügen",
+      "apiKeySavedPlaceholder": "Schlüssel gespeichert (…{hint}) — neuen einfügen zum Ersetzen",
+      "confirmRemove": "KI-Konfiguration entfernen? Prospect-Enrichment und Gesprächsanalyse werden für diesen Tenant deaktiviert.",
+      "intro": "Der API-Schlüssel Ihres Unternehmens, den Prospect-Enrichment und Gesprächsanalyse nutzen. Ohne Schlüssel sind diese Funktionen aus. Der Schlüssel wird verschlüsselt und nie wieder angezeigt — sichtbar bleiben nur die letzten vier Zeichen.",
+      "keyRejected": "Der Anbieter hat den Schlüssel abgelehnt:",
+      "loading": "KI-Konfiguration wird geladen…",
+      "modelFast": "Hauptmodell",
+      "modelFastHint": "Für Massenaufgaben: Prospect-Enrichment und Gesprächsanalyse.",
+      "modelQuality": "Modell für lange Inhalte",
+      "modelQualityHint": "Reserve für längere Inhalte und schwierigere Aufgaben. Leer = wie das Hauptmodell.",
+      "provider": "Anbieter",
+      "recheck": "Verbindung testen",
+      "recheckOk": "Die Verbindung funktioniert.",
+      "remove": "Konfiguration entfernen",
+      "saveAndVerify": "Speichern und prüfen",
+      "saveFailed": "Die KI-Konfiguration konnte nicht gespeichert werden.",
+      "savedAndVerified": "Gespeichert. Schlüssel und Modelle wurden beim Anbieter bestätigt.",
+      "statusActive": "aktiv",
+      "statusInvalid": "Schlüssel abgelehnt",
+      "statusMissing": "nicht konfiguriert",
+      "title": "KI-Anbieter",
+      "verifying": "Prüfung beim Anbieter…",
+      "whereIsKey": "Woher einen Schlüssel"
+    },
     "crm": {
       "intro": "— Wörterbücher und Schwellenwerte, die das CRM-Modul verwendet. Listen bearbeiten Sie durch Hinzufügen / Entfernen von Einträgen. Änderungen werden nach dem Speichern wirksam.",
       "scoring": {

@@ -722,6 +722,33 @@
       "saveChanges": "Save changes",
       "saving": "Saving…"
     },
+    "ai": {
+      "apiKey": "API key",
+      "apiKeyKeptHint": "Leaving this empty keeps the key already saved.",
+      "apiKeyPlaceholder": "Paste the API key",
+      "apiKeySavedPlaceholder": "Key saved (...{hint}) - paste a new one to replace it",
+      "confirmRemove": "Remove the AI configuration? Prospect enrichment and call analysis will stop working for this tenant.",
+      "intro": "Your own API key, used by prospect enrichment and call analysis. Without a key those features are off. The key is encrypted and never shown again — only its last four characters stay visible.",
+      "keyRejected": "The provider rejected the key:",
+      "loading": "Loading AI configuration...",
+      "modelFast": "Main model",
+      "modelFastHint": "Used for bulk work: prospect enrichment and call analysis.",
+      "modelQuality": "Model for long content",
+      "modelQualityHint": "Reserved for longer content and harder tasks. Empty = same as the main model.",
+      "provider": "Provider",
+      "recheck": "Test connection",
+      "recheckOk": "The connection works.",
+      "remove": "Remove configuration",
+      "saveAndVerify": "Save and verify",
+      "saveFailed": "Could not save the AI configuration.",
+      "savedAndVerified": "Saved. The key and models were confirmed with the provider.",
+      "statusActive": "active",
+      "statusInvalid": "key rejected",
+      "statusMissing": "not configured",
+      "title": "AI provider",
+      "verifying": "Verifying with the provider...",
+      "whereIsKey": "Where to get a key"
+    },
     "crm": {
       "intro": "— dictionaries and thresholds used by the CRM module. Edit the lists by adding / removing items. Changes take effect after saving.",
       "scoring": {

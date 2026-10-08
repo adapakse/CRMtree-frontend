@@ -722,6 +722,33 @@
       "saveChanges": "Guardar cambios",
       "saving": "Guardando…"
     },
+    "ai": {
+      "apiKey": "Clave API",
+      "apiKeyKeptHint": "Dejarlo vacío mantiene la clave ya guardada.",
+      "apiKeyPlaceholder": "Pega la clave API",
+      "apiKeySavedPlaceholder": "Clave guardada (…{hint}) — pega una nueva para sustituirla",
+      "confirmRemove": "¿Eliminar la configuración de IA? El enriquecimiento de prospectos y el análisis de llamadas dejarán de funcionar para este tenant.",
+      "intro": "La clave API de tu empresa, usada por el enriquecimiento de prospectos y el análisis de llamadas. Sin clave esas funciones están desactivadas. La clave se cifra y no se vuelve a mostrar: solo quedan visibles sus últimos cuatro caracteres.",
+      "keyRejected": "El proveedor ha rechazado la clave:",
+      "loading": "Cargando la configuración de IA…",
+      "modelFast": "Modelo principal",
+      "modelFastHint": "Para trabajo masivo: enriquecimiento de prospectos y análisis de llamadas.",
+      "modelQuality": "Modelo para contenidos largos",
+      "modelQualityHint": "Reserva para contenidos más largos y tareas más difíciles. Vacío = igual que el principal.",
+      "provider": "Proveedor",
+      "recheck": "Probar conexión",
+      "recheckOk": "La conexión funciona.",
+      "remove": "Eliminar configuración",
+      "saveAndVerify": "Guardar y verificar",
+      "saveFailed": "No se ha podido guardar la configuración de IA.",
+      "savedAndVerified": "Guardado. La clave y los modelos se confirmaron con el proveedor.",
+      "statusActive": "activo",
+      "statusInvalid": "clave rechazada",
+      "statusMissing": "sin configurar",
+      "title": "Proveedor de IA",
+      "verifying": "Verificando con el proveedor…",
+      "whereIsKey": "Dónde conseguir una clave"
+    },
     "crm": {
       "intro": "— catálogos y umbrales que utiliza el módulo CRM. Edita las listas añadiendo o eliminando elementos. Los cambios se aplican al guardar.",
       "scoring": {

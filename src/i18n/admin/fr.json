@@ -722,6 +722,33 @@
       "saveChanges": "Enregistrer les modifications",
       "saving": "Enregistrement…"
     },
+    "ai": {
+      "apiKey": "Clé API",
+      "apiKeyKeptHint": "Laisser vide conserve la clé déjà enregistrée.",
+      "apiKeyPlaceholder": "Collez la clé API",
+      "apiKeySavedPlaceholder": "Clé enregistrée (…{hint}) — collez-en une nouvelle pour la remplacer",
+      "confirmRemove": "Supprimer la configuration IA ? L'enrichissement des prospects et l'analyse des appels cesseront de fonctionner pour ce locataire.",
+      "intro": "La clé API de votre entreprise, utilisée par l'enrichissement des prospects et l'analyse des appels. Sans clé, ces fonctions sont désactivées. La clé est chiffrée et n'est jamais réaffichée : seuls ses quatre derniers caractères restent visibles.",
+      "keyRejected": "Le fournisseur a refusé la clé :",
+      "loading": "Chargement de la configuration IA…",
+      "modelFast": "Modèle principal",
+      "modelFastHint": "Pour le travail de masse : enrichissement des prospects et analyse des appels.",
+      "modelQuality": "Modèle pour contenus longs",
+      "modelQualityHint": "Réserve pour les contenus plus longs et les tâches plus difficiles. Vide = identique au principal.",
+      "provider": "Fournisseur",
+      "recheck": "Tester la connexion",
+      "recheckOk": "La connexion fonctionne.",
+      "remove": "Supprimer la configuration",
+      "saveAndVerify": "Enregistrer et vérifier",
+      "saveFailed": "Impossible d'enregistrer la configuration IA.",
+      "savedAndVerified": "Enregistré. La clé et les modèles ont été confirmés par le fournisseur.",
+      "statusActive": "actif",
+      "statusInvalid": "clé refusée",
+      "statusMissing": "non configuré",
+      "title": "Fournisseur IA",
+      "verifying": "Vérification auprès du fournisseur…",
+      "whereIsKey": "Où obtenir une clé"
+    },
     "crm": {
       "intro": "— dictionnaires et seuils utilisés par le module CRM. Modifiez les listes en ajoutant / supprimant des éléments. Les modifications prennent effet après l’enregistrement.",
       "scoring": {
