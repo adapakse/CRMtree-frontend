@@ -722,6 +722,384 @@
       "saveChanges": "Save changes",
       "saving": "Saving…"
     },
+    "catalog": {
+      "churn_daily_run_time": {
+        "description": "Format HH:MM — at this time the server recalculates the scoring and sends email alerts",
+        "label": "Churn: daily recalculation time"
+      },
+      "churn_days_t1_max": {
+        "description": "Max. days without an order for threshold 1",
+        "label": "Churn: days threshold 1 — max"
+      },
+      "churn_days_t1_min": {
+        "description": "Min. days without an order for threshold 1",
+        "label": "Churn: days threshold 1 — min"
+      },
+      "churn_days_t1_pts": {
+        "description": "Points for 10–20 days without an order",
+        "label": "Churn: points for days threshold 1"
+      },
+      "churn_days_t2_max": {
+        "description": "Max. days without an order for threshold 2",
+        "label": "Churn: days threshold 2 — max"
+      },
+      "churn_days_t2_min": {
+        "description": "Min. days without an order for threshold 2",
+        "label": "Churn: days threshold 2 — min"
+      },
+      "churn_days_t2_pts": {
+        "description": "Points for 21–30 days without an order",
+        "label": "Churn: points for days threshold 2"
+      },
+      "churn_days_t3_pts": {
+        "description": "Points for >30 days without an order",
+        "label": "Churn: points for days threshold 3"
+      },
+      "churn_risk_critical": {
+        "description": "Min. points for risk level: Critical",
+        "label": "Churn: critical risk threshold"
+      },
+      "churn_risk_high": {
+        "description": "Min. points for risk level: High",
+        "label": "Churn: high risk threshold"
+      },
+      "churn_risk_low": {
+        "description": "Min. points for risk level: Low",
+        "label": "Churn: low risk threshold"
+      },
+      "churn_risk_medium": {
+        "description": "Min. points for risk level: Medium",
+        "label": "Churn: medium risk threshold"
+      },
+      "churn_sales_t1_pct": {
+        "description": "Min. % drop M-2→M-1 for threshold 1",
+        "label": "Churn: sales drop threshold 1 %"
+      },
+      "churn_sales_t1_pts": {
+        "description": "Points for a ≥30% sales drop M-2→M-1",
+        "label": "Churn: points for sales threshold 1"
+      },
+      "churn_sales_t2_pct": {
+        "description": "Min. % drop M-2→M-1 for threshold 2",
+        "label": "Churn: sales drop threshold 2 %"
+      },
+      "churn_sales_t2_pts": {
+        "description": "Points for a ≥51% sales drop M-2→M-1",
+        "label": "Churn: points for sales threshold 2"
+      },
+      "crm_adoption_target_pct": {
+        "description": "Target % of active users at a partner",
+        "label": "User adoption target (%)"
+      },
+      "crm_commission_basis": {
+        "description": "Available commission calculation bases for Partners. nie_dotyczy=Not applicable, segmenty=Number of segments, rezerwacje=Number of bookings, progi_obrotowe=Turnover thresholds.",
+        "label": "Commission bases"
+      },
+      "crm_commission_basis_options": {
+        "description": "Available WT/TM commission calculation bases in the partner record. Format: JSON array.",
+        "label": "Commission bases WT/TM"
+      },
+      "crm_consent_types": {
+        "description": "JSON array defining the types of marketing consents shown on the Lead and Partner cards. Format: [key, label, description].",
+        "label": "CRM – Marketing consent types"
+      },
+      "crm_contact_titles": {
+        "description": "Job titles available in contact forms for Leads and Partners.",
+        "label": "Contact job titles"
+      },
+      "crm_csv_max_rows": {
+        "description": "Row limit for a single CSV import",
+        "label": "CSV import row limit"
+      },
+      "crm_currencies": {
+        "description": "List of currencies available in the fields: credit limit, deposit amount, sales data. Format: JSON array.",
+        "label": "Supported currencies"
+      },
+      "crm_dashboard_hot_value_threshold": {
+        "description": "Leads above this value are highlighted on the dashboard as high-value.",
+        "label": "\"Hot\" lead value threshold (PLN)"
+      },
+      "crm_dashboard_long_cycle_days": {
+        "description": "Leads open longer than this number of days are marked on the dashboard as \"long cycle\".",
+        "label": "Long sales cycle (days)"
+      },
+      "crm_dashboard_win_stages": {
+        "description": "Lead stages treated as a win (they affect the Win Rate and the \"Won\" counter on the dashboard). Format: JSON array.",
+        "label": "Lead stages counted as \"won\""
+      },
+      "crm_global_read": {
+        "description": "When enabled, all CRM users can view Leads, Partners, Sales Reports and Performance without visibility restrictions. Edit permissions remain unchanged.",
+        "label": "Global CRM read access"
+      },
+      "crm_hold_reasons": {
+        "description": "List of Hold reasons. Shown as a drop-down list in the \"Reason\" field when setting the Hold status on a lead.",
+        "label": "Lead Hold reasons"
+      },
+      "crm_hot_lead_days": {
+        "description": "Days without contact → mark the lead as cold",
+        "label": "Days without contact (cold lead)"
+      },
+      "crm_industries": {
+        "description": "Industry values available for Leads and Partners.",
+        "label": "Industries"
+      },
+      "crm_lead_sources": {
+        "description": "List of keys available in the Source field on a Lead",
+        "label": "Lead sources dictionary"
+      },
+      "crm_lost_reasons": {
+        "description": "List of loss reasons. Shown as a drop-down list in the \"Loss reason\" field when changing a lead's stage to Lost.",
+        "label": "Lead loss reasons"
+      },
+      "crm_partner_countries": {
+        "description": "List of countries available in the partner profile (Additional data and Billing Address).",
+        "label": "Partner countries"
+      },
+      "crm_partner_languages": {
+        "description": "List of languages available in the partner profile.",
+        "label": "Partner languages"
+      },
+      "crm_partner_statuses": {
+        "description": "Statuses available for partners. onboarding=Onboarding, active=Active, inactive=Inactive, churned=Lost.",
+        "label": "Partner statuses"
+      },
+      "crm_platform_api_key": {
+        "description": "Transaction platform API key (plain, change it after deployment)",
+        "label": "Transaction platform API key"
+      },
+      "crm_product_types": {
+        "description": "List of product types shown in the sales data import and in reports. Format: JSON array.",
+        "label": "Sales product types"
+      },
+      "crm_renewal_warning_days": {
+        "description": "Alert X days before the contract expires",
+        "label": "Contract expiry alert (days)"
+      },
+      "crm_training_mode": {
+        "description": "Simulates sending emails, signing documents and phone calls without any real external actions. Intended for CRM training sessions.",
+        "label": "Training mode"
+      },
+      "default_page_size": {
+        "description": "Number of items per page in all list views (users, documents, audit log).",
+        "label": "Default page size"
+      },
+      "doc_contract_subjects": {
+        "description": "List of values for the Contract subject field in documents.",
+        "label": "Contract subjects"
+      },
+      "doc_entity1_options": {
+        "description": "List of entities available in the document's Entity 1 field. Edit by adding / removing values.",
+        "label": "Entity 1 – dictionary options"
+      },
+      "doc_gdpr_types": {
+        "description": "Available GDPR types. no_gdpr=No GDPR, data_processing_entrustment=Data processing entrustment, data_administration=Joint controllership.",
+        "label": "Document GDPR types"
+      },
+      "doc_payment_statuses": {
+        "description": "Payment statuses available for documents of type Invoice. unpaid=Unpaid, partially_paid=Partially paid, paid=Paid, overdue=Overdue.",
+        "label": "Invoice payment statuses"
+      },
+      "doc_statuses": {
+        "description": "Available document statuses. new=New, being_edited=Being edited, being_approved=For approval, being_signed=For signature, signed=Signed, completed=Completed, rejected=Rejected.",
+        "label": "Document statuses"
+      },
+      "doc_types": {
+        "description": "Available document types. The value must match the doc_type enum in the database.",
+        "label": "Document types"
+      },
+      "email_signature_banner_url": {
+        "description": "URL of the banner image shown below the personal section in the email signature (width 600px)",
+        "label": "Email signature – banner URL"
+      },
+      "email_signature_disclaimer": {
+        "description": "Text of the confidentiality notice shown at the bottom of the email signature (grey, 8px). Supports HTML tags.",
+        "label": "Email signature – confidentiality notice"
+      },
+      "expiration_red_days": {
+        "description": "Documents expiring within this many days are shown in red on the Kanban board and document list.",
+        "label": "Expiration warning threshold (days)"
+      },
+      "expiration_soon_days": {
+        "description": "Documents expiring within this many days are marked as \"expiring soon\" in badges and filters.",
+        "label": "Expiring soon threshold (days)"
+      },
+      "health_act_t1_max_days": {
+        "description": "Last order within N days → T1 points",
+        "label": "Health: max days for activity T1"
+      },
+      "health_act_t1_pts": {
+        "description": "Points for 1 order up to X days ago",
+        "label": "Health: activity T1 points"
+      },
+      "health_act_t2_max_days": {
+        "description": "Max. days ago for the T2 window",
+        "label": "Health: max days for activity T2"
+      },
+      "health_act_t2_min_days": {
+        "description": "Min. days ago for the T2 window (5-10 days)",
+        "label": "Health: min days for activity T2"
+      },
+      "health_act_t2_pts": {
+        "description": "Points for 1 order in the 5-10 day window",
+        "label": "Health: activity T2 points"
+      },
+      "health_act_t3_min_orders": {
+        "description": "Min. orders in 20d for the T3 threshold",
+        "label": "Health: min orders for activity T3"
+      },
+      "health_act_t3_pts": {
+        "description": "Points for 2–5 orders in 20 days",
+        "label": "Health: activity T3 points"
+      },
+      "health_act_t4_min_orders": {
+        "description": ">N orders in 20d → T4 (max tier)",
+        "label": "Health: min orders for activity T4"
+      },
+      "health_act_t4_pts": {
+        "description": "Points for >5 orders in 20 days",
+        "label": "Health: activity T4 points"
+      },
+      "health_good_min": {
+        "description": "Min. points for the Healthy status",
+        "label": "Health: Healthy threshold"
+      },
+      "health_rev_t1_pct": {
+        "description": "Min. % growth M-2→M-1 for T1",
+        "label": "Health: growth T1 %"
+      },
+      "health_rev_t1_pts": {
+        "description": "Points for growth ≥20%",
+        "label": "Health: growth T1 points"
+      },
+      "health_rev_t2_pct": {
+        "description": "Min. % growth M-2→M-1 for T2",
+        "label": "Health: growth T2 %"
+      },
+      "health_rev_t2_pts": {
+        "description": "Points for growth ≥30%",
+        "label": "Health: growth T2 points"
+      },
+      "health_rev_t3_pct": {
+        "description": "Min. % growth M-2→M-1 for T3",
+        "label": "Health: growth T3 %"
+      },
+      "health_rev_t3_pts": {
+        "description": "Points for growth ≥41%",
+        "label": "Health: growth T3 points"
+      },
+      "health_rev_t4_pct": {
+        "description": "Min. % growth M-2→M-1 for T4",
+        "label": "Health: growth T4 %"
+      },
+      "health_rev_t4_pts": {
+        "description": "Points for growth >50%",
+        "label": "Health: growth T4 points"
+      },
+      "health_warn_min": {
+        "description": "Min. points for the Warning status (below = Risk)",
+        "label": "Health: Warning threshold"
+      },
+      "kanban_refresh_interval_sec": {
+        "description": "Interval in seconds for automatic Kanban board refresh. Set to 0 to disable auto-refresh.",
+        "label": "Kanban auto-refresh interval (seconds)"
+      },
+      "lead_attachments_folder_url": {
+        "description": "URL of the folder with templates to send at the Lead stage (e.g. a Google Drive link). Shown as a shortcut next to the attachments field in the email compose window.",
+        "label": "Templates folder (Lead)"
+      },
+      "onboarding_task_templates": {
+        "description": "Task definitions for each onboarding step. Attributes: id, title, type, step, standard (auto-add on migration), assignee (user UUID or null), days (days from migration or null).",
+        "label": "Onboarding task templates"
+      },
+      "prospect_ai_provider": {
+        "description": "Which AI provider analyses the scraped company data (KRS, website, LinkedIn, Facebook) and generates the Travel Potential Score. \"deepseek\" or \"anthropic\".",
+        "label": "Prospects — AI provider for enrichment"
+      },
+      "prospect_icp_blacklist_keywords": {
+        "description": "If any of these words appears in the company name, industry or PKD description, a penalty is subtracted from icp_score (see \"Prospects — ICP blacklist point penalty\"). By default it catches wholesalers that do not fit the CRMtree ICP.",
+        "label": "Prospects — ICP blacklist keywords"
+      },
+      "prospect_icp_blacklist_penalty": {
+        "description": "How many points to subtract from icp_score when a company matches the ICP blacklist keywords. The result never drops below 0.",
+        "label": "Prospects — ICP blacklist point penalty"
+      },
+      "prospect_lead_min_score": {
+        "description": "The \"→ Lead\" button in the prospect list becomes active only when the company's Travel Potential Score is greater than or equal to this value (scale 0–100).",
+        "label": "Prospects — minimum score for conversion to Lead"
+      },
+      "roles_preview_count": {
+        "description": "Maximum number of group roles displayed inline in the user list before \"+N more\" truncation.",
+        "label": "Roles preview count"
+      },
+      "ta_billing_issuer": {
+        "description": "Invoice issuer code in the billing address (e.g. WT).",
+        "label": "Test account — invoice issuer (issuer)"
+      },
+      "ta_form_configs": {
+        "description": "Array of form steps in JSON format. Must contain at least one element with step=\"START\".",
+        "label": "Test account — form configuration (formConfigs)"
+      },
+      "ta_partner_type": {
+        "description": "Partner type in HTCD (e.g. PARTNER_BASIC).",
+        "label": "Test account — Partner type (selectedPartnerType)"
+      },
+      "ta_services_process_type": {
+        "description": "Default service processing type (e.g. ONLINE, MIDOFFICE).",
+        "label": "Test account — service processing type (defaultServicesProcessType)"
+      },
+      "ta_traveler_country_nationality": {
+        "description": "Whether the Partner country is the traveler's default nationality (true/false).",
+        "label": "Test account — nationality from the Partner country (partnerCountryAsDefaultNationality)"
+      },
+      "ta_traveler_max_limit": {
+        "description": "Maximum number of travelers in an order.",
+        "label": "Test account — traveler limit (travelersMaxLimit)"
+      },
+      "ta_traveler_meal_types": {
+        "description": "Comma-separated list of meal types (e.g. BF,HB,FB,AI).",
+        "label": "Test account — allowed meal types (allowedMealTypes)"
+      },
+      "ta_traveler_meals_only": {
+        "description": "Whether to show only hotel offers with meals (true/false).",
+        "label": "Test account — offers with meals only (hotelOffersWithMealsOnly)"
+      },
+      "ta_traveler_parking_only": {
+        "description": "Whether to show only hotels with parking (true/false).",
+        "label": "Test account — with parking only (accommodationsWithParkingOnly)"
+      },
+      "ta_traveler_refundable_only": {
+        "description": "Whether to show only refundable hotel offers (true/false).",
+        "label": "Test account — refundable offers only (refundableHotelOffersOnly)"
+      },
+      "ta_traveler_search_by": {
+        "description": "The way travelers are searched in HTCD.",
+        "label": "Test account — traveler search (searchTravelerBy)"
+      },
+      "ta_wh_accent_color": {
+        "description": "Hex color of the whitelabel accent in HTCD.",
+        "label": "Test account — accent color (whitelabelColor)"
+      },
+      "ta_wh_communicator_notifications": {
+        "description": "Whether to enable internal messenger notifications (true/false).",
+        "label": "Test account — messenger notifications (internalCommunicatorNotifications)"
+      },
+      "ta_wh_enable_meal_selection": {
+        "description": "Whether to enable meal selection (true/false).",
+        "label": "Test account — meal selection (enableMealSelection)"
+      },
+      "ta_wh_gds_locator": {
+        "description": "GDS profile identifier (gdsProfileLocator).",
+        "label": "Test account — GDS Profile Locator"
+      },
+      "ta_wh_gds_locator_manual": {
+        "description": "GDS profile identifier (manual) (gdsProfileLocatorManual).",
+        "label": "Test account — GDS Profile Locator Manual"
+      },
+      "ta_wh_header_color": {
+        "description": "Hex color of the whitelabel header in HTCD.",
+        "label": "Test account — header color (whitelabelHeader)"
+      }
+    },
     "crm": {
       "intro": "— dictionaries and thresholds used by the CRM module. Edit the lists by adding / removing items. Changes take effect after saving.",
       "scoring": {
@@ -891,6 +1269,11 @@
         "data_administration": "Joint controllership",
         "data_processing_entrustment": "Data processing entrustment",
         "no_gdpr": "No GDPR"
+      },
+      "holdReasons": {
+        "businessPause": "Business pause",
+        "internalSituation": "Internal company situation",
+        "noDecisionMakers": "No decision makers"
       },
       "industries": {
         "Education": "Education",

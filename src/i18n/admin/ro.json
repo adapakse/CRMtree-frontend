@@ -722,6 +722,384 @@
       "saveChanges": "Salvare modificări",
       "saving": "Se salvează…"
     },
+    "catalog": {
+      "churn_daily_run_time": {
+        "description": "Format HH:MM — la această oră serverul recalculează scoringul și trimite alertele pe e-mail",
+        "label": "Churn: ora recalculării zilnice"
+      },
+      "churn_days_t1_max": {
+        "description": "Max. zile fără comandă pentru pragul 1",
+        "label": "Churn: pragul 1 de zile — max"
+      },
+      "churn_days_t1_min": {
+        "description": "Min. zile fără comandă pentru pragul 1",
+        "label": "Churn: pragul 1 de zile — min"
+      },
+      "churn_days_t1_pts": {
+        "description": "Puncte pentru 10–20 zile fără comandă",
+        "label": "Churn: puncte pentru pragul 1 de zile"
+      },
+      "churn_days_t2_max": {
+        "description": "Max. zile fără comandă pentru pragul 2",
+        "label": "Churn: pragul 2 de zile — max"
+      },
+      "churn_days_t2_min": {
+        "description": "Min. zile fără comandă pentru pragul 2",
+        "label": "Churn: pragul 2 de zile — min"
+      },
+      "churn_days_t2_pts": {
+        "description": "Puncte pentru 21–30 zile fără comandă",
+        "label": "Churn: puncte pentru pragul 2 de zile"
+      },
+      "churn_days_t3_pts": {
+        "description": "Puncte pentru >30 zile fără comandă",
+        "label": "Churn: puncte pentru pragul 3 de zile"
+      },
+      "churn_risk_critical": {
+        "description": "Min. puncte pentru nivelul de risc: Critic",
+        "label": "Churn: pragul de risc critic"
+      },
+      "churn_risk_high": {
+        "description": "Min. puncte pentru nivelul de risc: Ridicat",
+        "label": "Churn: pragul de risc ridicat"
+      },
+      "churn_risk_low": {
+        "description": "Min. puncte pentru nivelul de risc: Scăzut",
+        "label": "Churn: pragul de risc scăzut"
+      },
+      "churn_risk_medium": {
+        "description": "Min. puncte pentru nivelul de risc: Mediu",
+        "label": "Churn: pragul de risc mediu"
+      },
+      "churn_sales_t1_pct": {
+        "description": "Min. % de scădere M-2→M-1 pentru pragul 1",
+        "label": "Churn: scădere vânzări pragul 1 %"
+      },
+      "churn_sales_t1_pts": {
+        "description": "Puncte pentru o scădere a vânzărilor ≥30% M-2→M-1",
+        "label": "Churn: puncte pentru pragul 1 de vânzări"
+      },
+      "churn_sales_t2_pct": {
+        "description": "Min. % de scădere M-2→M-1 pentru pragul 2",
+        "label": "Churn: scădere vânzări pragul 2 %"
+      },
+      "churn_sales_t2_pts": {
+        "description": "Puncte pentru o scădere a vânzărilor ≥51% M-2→M-1",
+        "label": "Churn: puncte pentru pragul 2 de vânzări"
+      },
+      "crm_adoption_target_pct": {
+        "description": "Procentul țintă de utilizatori activi la partener",
+        "label": "Țintă de adopție a utilizatorilor (%)"
+      },
+      "crm_commission_basis": {
+        "description": "Baze disponibile de calcul al comisionului pentru Parteneri. nie_dotyczy=Nu se aplică, segmenty=Număr de segmente, rezerwacje=Număr de rezervări, progi_obrotowe=Praguri de rulaj.",
+        "label": "Baze de calcul al comisionului"
+      },
+      "crm_commission_basis_options": {
+        "description": "Baze de calcul al comisionului WT/TM disponibile în fișa partenerului. Format: array JSON.",
+        "label": "Baze de comision WT/TM"
+      },
+      "crm_consent_types": {
+        "description": "Array JSON care definește tipurile de consimțământ de marketing afișate pe fișele Lead și Partener. Format: [key, label, description].",
+        "label": "CRM – Tipuri de consimțământ de marketing"
+      },
+      "crm_contact_titles": {
+        "description": "Funcții disponibile în formularele de contact pentru Lead-uri și Parteneri.",
+        "label": "Funcții ale contactelor"
+      },
+      "crm_csv_max_rows": {
+        "description": "Limita de rânduri într-un singur import CSV",
+        "label": "Limita de rânduri la importul CSV"
+      },
+      "crm_currencies": {
+        "description": "Lista valutelor disponibile în câmpurile: limită de credit, sumă depozit, date de vânzări. Format: array JSON.",
+        "label": "Valute acceptate"
+      },
+      "crm_dashboard_hot_value_threshold": {
+        "description": "Lead-urile peste această valoare sunt evidențiate în dashboard ca fiind de valoare ridicată.",
+        "label": "Pragul de valoare al unui lead „fierbinte” (PLN)"
+      },
+      "crm_dashboard_long_cycle_days": {
+        "description": "Lead-urile deschise mai mult decât acest număr de zile sunt marcate în dashboard ca „ciclu lung”.",
+        "label": "Ciclu de vânzare lung (zile)"
+      },
+      "crm_dashboard_win_stages": {
+        "description": "Etape ale lead-ului tratate ca fiind câștigate (influențează Win Rate și contorul „Câștigate” din dashboard). Format: array JSON.",
+        "label": "Etape ale lead-ului considerate „câștigate”"
+      },
+      "crm_global_read": {
+        "description": "Când este activată, toți utilizatorii CRM pot vizualiza Lead-uri, Parteneri, Rapoarte de vânzări și Performanță fără restricții de vizibilitate. Drepturile de editare rămân neschimbate.",
+        "label": "Citire globală în CRM"
+      },
+      "crm_hold_reasons": {
+        "description": "Lista motivelor de Hold. Se afișează ca listă derulantă în câmpul „Motiv” la setarea statusului Hold pe un lead.",
+        "label": "Motive de Hold pentru lead"
+      },
+      "crm_hot_lead_days": {
+        "description": "Zile fără contact → lead-ul se marchează ca rece",
+        "label": "Zile fără contact (lead rece)"
+      },
+      "crm_industries": {
+        "description": "Valori de industrie disponibile pentru Lead-uri și Parteneri.",
+        "label": "Industrii"
+      },
+      "crm_lead_sources": {
+        "description": "Lista cheilor disponibile în câmpul Sursă de pe un Lead",
+        "label": "Dicționar al surselor de Lead-uri"
+      },
+      "crm_lost_reasons": {
+        "description": "Lista motivelor de pierdere. Se afișează ca listă derulantă în câmpul „Motiv de pierdere” la schimbarea etapei lead-ului în Pierdut.",
+        "label": "Motive de pierdere a lead-ului"
+      },
+      "crm_partner_countries": {
+        "description": "Lista țărilor disponibile în profilul partenerului (Date suplimentare și Billing Address).",
+        "label": "Țări ale partenerilor"
+      },
+      "crm_partner_languages": {
+        "description": "Lista limbilor disponibile în profilul partenerului.",
+        "label": "Limbi ale partenerilor"
+      },
+      "crm_partner_statuses": {
+        "description": "Statusuri disponibile pentru parteneri. onboarding=Implementare, active=Activ, inactive=Inactiv, churned=Pierdut.",
+        "label": "Statusuri ale Partenerului"
+      },
+      "crm_platform_api_key": {
+        "description": "Cheie API a platformei tranzacționale (plain, se recomandă schimbarea după implementare)",
+        "label": "Cheie API a platformei tranzacționale"
+      },
+      "crm_product_types": {
+        "description": "Lista tipurilor de produse vizibile în importul datelor de vânzări și în rapoarte. Format: array JSON.",
+        "label": "Tipuri de produse de vânzare"
+      },
+      "crm_renewal_warning_days": {
+        "description": "Alertă X zile înainte de expirarea contractului",
+        "label": "Alertă de expirare a contractului (zile)"
+      },
+      "crm_training_mode": {
+        "description": "Simulează trimiterea de e-mailuri, semnarea documentelor și apelurile telefonice fără acțiuni externe reale. Este destinat instruirii în utilizarea CRM.",
+        "label": "Mod instruire"
+      },
+      "default_page_size": {
+        "description": "Numărul de elemente pe pagină în toate vizualizările de tip listă (utilizatori, documente, jurnal de audit).",
+        "label": "Dimensiune implicită a paginii"
+      },
+      "doc_contract_subjects": {
+        "description": "Lista valorilor câmpului Obiect al contractului în documente.",
+        "label": "Obiecte ale contractului"
+      },
+      "doc_entity1_options": {
+        "description": "Lista entităților disponibile în câmpul Entity 1 al documentului. Se editează prin adăugarea / eliminarea valorilor.",
+        "label": "Entitate 1 – opțiuni de dicționar"
+      },
+      "doc_gdpr_types": {
+        "description": "Tipuri GDPR disponibile. no_gdpr=Fără GDPR, data_processing_entrustment=Împuternicire pentru prelucrare, data_administration=Operator asociat.",
+        "label": "Tipuri GDPR ale documentelor"
+      },
+      "doc_payment_statuses": {
+        "description": "Statusuri de plată disponibile pentru documentele de tip Factură. unpaid=Neplătită, partially_paid=Plătită parțial, paid=Plătită, overdue=Restantă.",
+        "label": "Statusuri de plată ale facturilor"
+      },
+      "doc_statuses": {
+        "description": "Statusuri de document disponibile. new=Nou, being_edited=În editare, being_approved=Pentru aprobare, being_signed=Pentru semnare, signed=Semnat, completed=Finalizat, rejected=Respins.",
+        "label": "Statusuri ale documentelor"
+      },
+      "doc_types": {
+        "description": "Tipuri de documente disponibile. Valoarea trebuie să corespundă enum-ului doc_type din baza de date.",
+        "label": "Tipuri de documente"
+      },
+      "email_signature_banner_url": {
+        "description": "URL-ul imaginii de banner afișate sub secțiunea personală în semnătura e-mailului (lățime 600px)",
+        "label": "Semnătură e-mail – URL-ul bannerului"
+      },
+      "email_signature_disclaimer": {
+        "description": "Textul clauzei de confidențialitate afișat la finalul semnăturii e-mailului (gri, 8px). Acceptă etichete HTML.",
+        "label": "Semnătură e-mail – clauză de confidențialitate"
+      },
+      "expiration_red_days": {
+        "description": "Documentele care expiră în acest număr de zile sunt afișate cu roșu pe tabla Kanban și în lista de documente.",
+        "label": "Prag de avertizare privind expirarea (zile)"
+      },
+      "expiration_soon_days": {
+        "description": "Documentele care expiră în acest număr de zile sunt marcate ca „expiră în curând” în etichete și filtre.",
+        "label": "Prag „expiră în curând” (zile)"
+      },
+      "health_act_t1_max_days": {
+        "description": "Ultima comandă în ultimele N zile → puncte T1",
+        "label": "Health: max zile pentru activitatea T1"
+      },
+      "health_act_t1_pts": {
+        "description": "Puncte pentru 1 comandă de până la X zile în urmă",
+        "label": "Health: puncte activitate T1"
+      },
+      "health_act_t2_max_days": {
+        "description": "Max. zile în urmă pentru fereastra T2",
+        "label": "Health: max zile activitate T2"
+      },
+      "health_act_t2_min_days": {
+        "description": "Min. zile în urmă pentru fereastra T2 (5-10 zile)",
+        "label": "Health: min zile activitate T2"
+      },
+      "health_act_t2_pts": {
+        "description": "Puncte pentru 1 comandă în fereastra 5-10 zile",
+        "label": "Health: puncte activitate T2"
+      },
+      "health_act_t3_min_orders": {
+        "description": "Min. comenzi în 20d pentru pragul T3",
+        "label": "Health: min comenzi activitate T3"
+      },
+      "health_act_t3_pts": {
+        "description": "Puncte pentru 2–5 comenzi în 20 de zile",
+        "label": "Health: puncte activitate T3"
+      },
+      "health_act_t4_min_orders": {
+        "description": ">N comenzi în 20d → T4 (nivelul max)",
+        "label": "Health: min comenzi activitate T4"
+      },
+      "health_act_t4_pts": {
+        "description": "Puncte pentru >5 comenzi în 20 de zile",
+        "label": "Health: puncte activitate T4"
+      },
+      "health_good_min": {
+        "description": "Min. puncte pentru statusul Sănătos",
+        "label": "Health: pragul Sănătos"
+      },
+      "health_rev_t1_pct": {
+        "description": "Min. % de creștere M-2→M-1 pentru T1",
+        "label": "Health: creștere T1 %"
+      },
+      "health_rev_t1_pts": {
+        "description": "Puncte pentru creștere ≥20%",
+        "label": "Health: puncte creștere T1"
+      },
+      "health_rev_t2_pct": {
+        "description": "Min. % de creștere M-2→M-1 pentru T2",
+        "label": "Health: creștere T2 %"
+      },
+      "health_rev_t2_pts": {
+        "description": "Puncte pentru creștere ≥30%",
+        "label": "Health: puncte creștere T2"
+      },
+      "health_rev_t3_pct": {
+        "description": "Min. % de creștere M-2→M-1 pentru T3",
+        "label": "Health: creștere T3 %"
+      },
+      "health_rev_t3_pts": {
+        "description": "Puncte pentru creștere ≥41%",
+        "label": "Health: puncte creștere T3"
+      },
+      "health_rev_t4_pct": {
+        "description": "Min. % de creștere M-2→M-1 pentru T4",
+        "label": "Health: creștere T4 %"
+      },
+      "health_rev_t4_pts": {
+        "description": "Puncte pentru creștere >50%",
+        "label": "Health: puncte creștere T4"
+      },
+      "health_warn_min": {
+        "description": "Min. puncte pentru statusul Atenție (sub = Risc)",
+        "label": "Health: pragul Atenție"
+      },
+      "kanban_refresh_interval_sec": {
+        "description": "Interval în secunde pentru reîmprospătarea automată a tablei Kanban. Se setează 0 pentru a dezactiva reîmprospătarea automată.",
+        "label": "Interval de reîmprospătare automată a Kanban (secunde)"
+      },
+      "lead_attachments_folder_url": {
+        "description": "URL-ul folderului cu șabloane pentru trimitere în etapa de Lead (de ex. un link Google Drive). Se afișează ca scurtătură lângă câmpul de atașamente în fereastra de compunere a e-mailului.",
+        "label": "Folder de șabloane (Lead)"
+      },
+      "onboarding_task_templates": {
+        "description": "Definiții ale sarcinilor pentru fiecare pas al implementării. Atribute: id, title, type, step, standard (adăugare automată la migrare), assignee (UUID-ul utilizatorului sau null), days (zile de la migrare sau null).",
+        "label": "Șabloane de sarcini de onboarding"
+      },
+      "prospect_ai_provider": {
+        "description": "Care furnizor AI analizează datele companiei colectate prin scraping (KRS, site web, LinkedIn, Facebook) și generează Travel Potential Score. „deepseek” sau „anthropic”.",
+        "label": "Prospecți — furnizor AI pentru enrichment"
+      },
+      "prospect_icp_blacklist_keywords": {
+        "description": "Dacă oricare dintre aceste cuvinte apare în numele companiei, în industrie sau în descrierea PKD, din icp_score se scade o penalizare (vezi „Prospecți — penalizare de puncte pentru blacklista ICP”). Implicit, detectează distribuitorii en gros care nu se potrivesc cu ICP-ul CRMtree.",
+        "label": "Prospecți — cuvinte cheie ale blacklistei ICP"
+      },
+      "prospect_icp_blacklist_penalty": {
+        "description": "Câte puncte se scad din icp_score atunci când o companie corespunde cuvintelor cheie ale blacklistei ICP. Rezultatul nu scade sub 0.",
+        "label": "Prospecți — penalizare de puncte pentru blacklista ICP"
+      },
+      "prospect_lead_min_score": {
+        "description": "Butonul „→ Lead” din lista de prospecți se activează doar atunci când Travel Potential Score al companiei este mai mare sau egal cu această valoare (scala 0–100).",
+        "label": "Prospecți — scor minim pentru conversia în Lead"
+      },
+      "roles_preview_count": {
+        "description": "Numărul maxim de roluri de grup afișate inline în lista de utilizatori înainte de trunchierea „+N more”.",
+        "label": "Număr de roluri în previzualizare"
+      },
+      "ta_billing_issuer": {
+        "description": "Codul emitentului facturii în adresa de facturare (de ex. WT).",
+        "label": "Cont de test — emitentul facturii (issuer)"
+      },
+      "ta_form_configs": {
+        "description": "Tablou cu pașii formularului în format JSON. Trebuie să conțină cel puțin un element cu step=\"START\".",
+        "label": "Cont de test — configurarea formularelor (formConfigs)"
+      },
+      "ta_partner_type": {
+        "description": "Tipul de Partner în HTCD (de ex. PARTNER_BASIC).",
+        "label": "Cont de test — tipul de Partner (selectedPartnerType)"
+      },
+      "ta_services_process_type": {
+        "description": "Tipul implicit de procesare a serviciilor (de ex. ONLINE, MIDOFFICE).",
+        "label": "Cont de test — tipul de procesare a serviciilor (defaultServicesProcessType)"
+      },
+      "ta_traveler_country_nationality": {
+        "description": "Indică dacă țara Partnerului este naționalitatea implicită a călătorului (true/false).",
+        "label": "Cont de test — naționalitatea din țara Partnerului (partnerCountryAsDefaultNationality)"
+      },
+      "ta_traveler_max_limit": {
+        "description": "Numărul maxim de călători într-o comandă.",
+        "label": "Cont de test — limita de călători (travelersMaxLimit)"
+      },
+      "ta_traveler_meal_types": {
+        "description": "Lista tipurilor de masă separate prin virgulă (de ex. BF,HB,FB,AI).",
+        "label": "Cont de test — tipurile de masă permise (allowedMealTypes)"
+      },
+      "ta_traveler_meals_only": {
+        "description": "Indică dacă se afișează numai ofertele de hoteluri cu masă (true/false).",
+        "label": "Cont de test — numai oferte cu masă (hotelOffersWithMealsOnly)"
+      },
+      "ta_traveler_parking_only": {
+        "description": "Indică dacă se afișează numai hotelurile cu parcare (true/false).",
+        "label": "Cont de test — numai cu parcare (accommodationsWithParkingOnly)"
+      },
+      "ta_traveler_refundable_only": {
+        "description": "Indică dacă se afișează numai ofertele de hoteluri rambursabile (true/false).",
+        "label": "Cont de test — numai oferte rambursabile (refundableHotelOffersOnly)"
+      },
+      "ta_traveler_search_by": {
+        "description": "Modul de căutare a călătorilor în HTCD.",
+        "label": "Cont de test — căutarea călătorilor (searchTravelerBy)"
+      },
+      "ta_wh_accent_color": {
+        "description": "Culoarea hex a accentului whitelabel în HTCD.",
+        "label": "Cont de test — culoarea de accent (whitelabelColor)"
+      },
+      "ta_wh_communicator_notifications": {
+        "description": "Indică dacă se activează notificările mesageriei interne (true/false).",
+        "label": "Cont de test — notificările mesageriei (internalCommunicatorNotifications)"
+      },
+      "ta_wh_enable_meal_selection": {
+        "description": "Indică dacă se activează selectarea mesei (true/false).",
+        "label": "Cont de test — selectarea mesei (enableMealSelection)"
+      },
+      "ta_wh_gds_locator": {
+        "description": "Identificatorul profilului GDS (gdsProfileLocator).",
+        "label": "Cont de test — GDS Profile Locator"
+      },
+      "ta_wh_gds_locator_manual": {
+        "description": "Identificatorul profilului GDS (manual) (gdsProfileLocatorManual).",
+        "label": "Cont de test — GDS Profile Locator Manual"
+      },
+      "ta_wh_header_color": {
+        "description": "Culoarea hex a antetului whitelabel în HTCD.",
+        "label": "Cont de test — culoarea antetului (whitelabelHeader)"
+      }
+    },
     "crm": {
       "intro": "— dicționare și praguri utilizate de modulul CRM. Editați listele prin adăugarea / ștergerea elementelor. Modificările intră în vigoare după salvare.",
       "scoring": {
@@ -891,6 +1269,11 @@
         "data_administration": "Operare asociată",
         "data_processing_entrustment": "Împuternicire pentru prelucrare",
         "no_gdpr": "Fără GDPR"
+      },
+      "holdReasons": {
+        "businessPause": "Pauză în activitate",
+        "internalSituation": "Situație internă a companiei",
+        "noDecisionMakers": "Lipsa persoanelor decidente"
       },
       "industries": {
         "Education": "Educație",

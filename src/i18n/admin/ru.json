@@ -722,6 +722,384 @@
       "saveChanges": "Сохранить изменения",
       "saving": "Сохранение…"
     },
+    "catalog": {
+      "churn_daily_run_time": {
+        "description": "Формат HH:MM — в это время сервер пересчитывает скоринг и отправляет email-оповещения",
+        "label": "Churn: время ежедневного пересчёта"
+      },
+      "churn_days_t1_max": {
+        "description": "Макс. дней без заказа для порога 1",
+        "label": "Churn: порог 1 дней — макс"
+      },
+      "churn_days_t1_min": {
+        "description": "Мин. дней без заказа для порога 1",
+        "label": "Churn: порог 1 дней — мин"
+      },
+      "churn_days_t1_pts": {
+        "description": "Баллы за 10–20 дней без заказа",
+        "label": "Churn: баллы за порог 1 дней"
+      },
+      "churn_days_t2_max": {
+        "description": "Макс. дней без заказа для порога 2",
+        "label": "Churn: порог 2 дней — макс"
+      },
+      "churn_days_t2_min": {
+        "description": "Мин. дней без заказа для порога 2",
+        "label": "Churn: порог 2 дней — мин"
+      },
+      "churn_days_t2_pts": {
+        "description": "Баллы за 21–30 дней без заказа",
+        "label": "Churn: баллы за порог 2 дней"
+      },
+      "churn_days_t3_pts": {
+        "description": "Баллы за >30 дней без заказа",
+        "label": "Churn: баллы за порог 3 дней"
+      },
+      "churn_risk_critical": {
+        "description": "Мин. баллов для уровня риска: Критический",
+        "label": "Churn: порог критического риска"
+      },
+      "churn_risk_high": {
+        "description": "Мин. баллов для уровня риска: Высокий",
+        "label": "Churn: порог высокого риска"
+      },
+      "churn_risk_low": {
+        "description": "Мин. баллов для уровня риска: Низкий",
+        "label": "Churn: порог низкого риска"
+      },
+      "churn_risk_medium": {
+        "description": "Мин. баллов для уровня риска: Средний",
+        "label": "Churn: порог среднего риска"
+      },
+      "churn_sales_t1_pct": {
+        "description": "Мин. % падения M-2→M-1 для порога 1",
+        "label": "Churn: падение продаж порог 1 %"
+      },
+      "churn_sales_t1_pts": {
+        "description": "Баллы за падение продаж ≥30% M-2→M-1",
+        "label": "Churn: баллы за порог 1 продаж"
+      },
+      "churn_sales_t2_pct": {
+        "description": "Мин. % падения M-2→M-1 для порога 2",
+        "label": "Churn: падение продаж порог 2 %"
+      },
+      "churn_sales_t2_pts": {
+        "description": "Баллы за падение продаж ≥51% M-2→M-1",
+        "label": "Churn: баллы за порог 2 продаж"
+      },
+      "crm_adoption_target_pct": {
+        "description": "Целевой % активных пользователей у партнёра",
+        "label": "Целевой уровень использования пользователями (%)"
+      },
+      "crm_commission_basis": {
+        "description": "Доступные базы начисления комиссии для Партнёров. nie_dotyczy=Не применяется, segmenty=Количество сегментов, rezerwacje=Количество бронирований, progi_obrotowe=Пороги оборота.",
+        "label": "Базы начисления комиссии"
+      },
+      "crm_commission_basis_options": {
+        "description": "Доступные базы начисления комиссии WT/TM в карточке партнёра. Формат: JSON-массив.",
+        "label": "Базы начисления комиссии WT/TM"
+      },
+      "crm_consent_types": {
+        "description": "JSON-массив, определяющий типы маркетинговых согласий, отображаемых в карточках Лид и Партнёр. Формат: [key, label, description].",
+        "label": "CRM – Типы маркетинговых согласий"
+      },
+      "crm_contact_titles": {
+        "description": "Должности, доступные в формах контактов для Лидов и Партнёров.",
+        "label": "Должности контактов"
+      },
+      "crm_csv_max_rows": {
+        "description": "Лимит строк в одном импорте CSV",
+        "label": "Лимит строк при импорте CSV"
+      },
+      "crm_currencies": {
+        "description": "Список валют, доступных в полях: кредитный лимит, сумма депозита, данные о продажах. Формат: JSON-массив.",
+        "label": "Поддерживаемые валюты"
+      },
+      "crm_dashboard_hot_value_threshold": {
+        "description": "Лиды выше этого значения выделяются на дашборде как высокоценные.",
+        "label": "Порог стоимости «горячего» лида (PLN)"
+      },
+      "crm_dashboard_long_cycle_days": {
+        "description": "Лиды, открытые дольше указанного числа дней, отмечаются на дашборде как «длинный цикл».",
+        "label": "Длинный цикл продаж (дни)"
+      },
+      "crm_dashboard_win_stages": {
+        "description": "Этапы лида, считающиеся выигрышем (влияют на Win Rate и счётчик «Выигранные» на дашборде). Формат: JSON-массив.",
+        "label": "Этапы лида, считающиеся «выигранными»"
+      },
+      "crm_global_read": {
+        "description": "Если включено, все пользователи CRM могут просматривать Лиды, Партнёров, отчёты по продажам и Performance без ограничений видимости. Права на редактирование не меняются.",
+        "label": "Глобальный доступ на чтение в CRM"
+      },
+      "crm_hold_reasons": {
+        "description": "Список причин Hold. Отображается как выпадающий список в поле «Причина», когда вы устанавливаете статус Hold для лида.",
+        "label": "Причины Hold для лида"
+      },
+      "crm_hot_lead_days": {
+        "description": "Дни без контакта → лид помечается как холодный",
+        "label": "Дни без контакта (холодный лид)"
+      },
+      "crm_industries": {
+        "description": "Значения отрасли, доступные для Лидов и Партнёров.",
+        "label": "Отрасли"
+      },
+      "crm_lead_sources": {
+        "description": "Список ключей, доступных в поле Источник на Лиде",
+        "label": "Справочник источников Лидов"
+      },
+      "crm_lost_reasons": {
+        "description": "Список причин проигрыша. Отображается как выпадающий список в поле «Причина проигрыша», когда вы меняете этап лида на Проигран.",
+        "label": "Причины проигрыша лида"
+      },
+      "crm_partner_countries": {
+        "description": "Список стран, доступных в профиле партнёра (Дополнительные данные и Billing Address).",
+        "label": "Страны партнёров"
+      },
+      "crm_partner_languages": {
+        "description": "Список языков, доступных в профиле партнёра.",
+        "label": "Языки партнёров"
+      },
+      "crm_partner_statuses": {
+        "description": "Статусы, доступные для партнёров. onboarding=Внедрение, active=Активный, inactive=Неактивный, churned=Утрачен.",
+        "label": "Статусы Партнёра"
+      },
+      "crm_platform_api_key": {
+        "description": "API-ключ транзакционной платформы (plain, смените его после внедрения)",
+        "label": "API-ключ транзакционной платформы"
+      },
+      "crm_product_types": {
+        "description": "Список типов продуктов, отображаемых при импорте данных о продажах и в отчётах. Формат: JSON-массив.",
+        "label": "Типы продаваемых продуктов"
+      },
+      "crm_renewal_warning_days": {
+        "description": "Оповещение за X дней до истечения договора",
+        "label": "Оповещение об истечении договора (дни)"
+      },
+      "crm_training_mode": {
+        "description": "Имитирует отправку писем, подписание документов и телефонные звонки без реальных внешних действий. Предназначен для обучения работе с CRM.",
+        "label": "Режим обучения"
+      },
+      "default_page_size": {
+        "description": "Количество элементов на странице во всех списках (пользователи, документы, журнал аудита).",
+        "label": "Размер страницы по умолчанию"
+      },
+      "doc_contract_subjects": {
+        "description": "Список значений поля «Предмет договора» в документах.",
+        "label": "Предметы договора"
+      },
+      "doc_entity1_options": {
+        "description": "Список субъектов, доступных в поле Entity 1 документа. Редактируйте его, добавляя / удаляя значения.",
+        "label": "Субъект 1 – варианты справочника"
+      },
+      "doc_gdpr_types": {
+        "description": "Доступные типы GDPR. no_gdpr=Без GDPR, data_processing_entrustment=Поручение обработки, data_administration=Совместное администрирование.",
+        "label": "Типы GDPR документов"
+      },
+      "doc_payment_statuses": {
+        "description": "Доступные статусы оплаты для документов типа Счёт. unpaid=Не оплачен, partially_paid=Частично оплачен, paid=Оплачен, overdue=Просрочен.",
+        "label": "Статусы оплаты счетов"
+      },
+      "doc_statuses": {
+        "description": "Доступные статусы документов. new=Новый, being_edited=В редактировании, being_approved=На согласование, being_signed=На подпись, signed=Подписан, completed=Завершён, rejected=Отклонён.",
+        "label": "Статусы документов"
+      },
+      "doc_types": {
+        "description": "Доступные типы документов. Значение должно соответствовать enum doc_type в базе данных.",
+        "label": "Типы документов"
+      },
+      "email_signature_banner_url": {
+        "description": "URL изображения баннера, отображаемого под персональным блоком в подписи письма (ширина 600px)",
+        "label": "Подпись в письме – URL баннера"
+      },
+      "email_signature_disclaimer": {
+        "description": "Текст оговорки о конфиденциальности, отображаемый внизу подписи письма (серый, 8px). Поддерживает HTML-теги.",
+        "label": "Подпись в письме – оговорка о конфиденциальности"
+      },
+      "expiration_red_days": {
+        "description": "Документы, срок которых истекает в течение указанного числа дней, отображаются красным на доске Kanban и в списке документов.",
+        "label": "Порог предупреждения об истечении срока (дни)"
+      },
+      "expiration_soon_days": {
+        "description": "Документы, срок которых истекает в течение указанного числа дней, помечаются как «скоро истекает» в бейджах и фильтрах.",
+        "label": "Порог «скоро истекает» (дни)"
+      },
+      "health_act_t1_max_days": {
+        "description": "Последний заказ в течение N дней → баллы T1",
+        "label": "Health: макс дней для активности T1"
+      },
+      "health_act_t1_pts": {
+        "description": "Баллы за 1 заказ не позднее X дней назад",
+        "label": "Health: баллы активности T1"
+      },
+      "health_act_t2_max_days": {
+        "description": "Макс. дней назад для окна T2",
+        "label": "Health: макс дней активности T2"
+      },
+      "health_act_t2_min_days": {
+        "description": "Мин. дней назад для окна T2 (5-10 дней)",
+        "label": "Health: мин дней активности T2"
+      },
+      "health_act_t2_pts": {
+        "description": "Баллы за 1 заказ в окне 5-10 дней",
+        "label": "Health: баллы активности T2"
+      },
+      "health_act_t3_min_orders": {
+        "description": "Мин. заказов за 20d для порога T3",
+        "label": "Health: мин заказов активности T3"
+      },
+      "health_act_t3_pts": {
+        "description": "Баллы за 2–5 заказов за 20 дней",
+        "label": "Health: баллы активности T3"
+      },
+      "health_act_t4_min_orders": {
+        "description": ">N заказов за 20d → T4 (макс. уровень)",
+        "label": "Health: мин заказов активности T4"
+      },
+      "health_act_t4_pts": {
+        "description": "Баллы за >5 заказов за 20 дней",
+        "label": "Health: баллы активности T4"
+      },
+      "health_good_min": {
+        "description": "Мин. баллов для статуса Здоровый",
+        "label": "Health: порог Здоровый"
+      },
+      "health_rev_t1_pct": {
+        "description": "Мин. % роста M-2→M-1 для T1",
+        "label": "Health: рост T1 %"
+      },
+      "health_rev_t1_pts": {
+        "description": "Баллы за рост ≥20%",
+        "label": "Health: баллы роста T1"
+      },
+      "health_rev_t2_pct": {
+        "description": "Мин. % роста M-2→M-1 для T2",
+        "label": "Health: рост T2 %"
+      },
+      "health_rev_t2_pts": {
+        "description": "Баллы за рост ≥30%",
+        "label": "Health: баллы роста T2"
+      },
+      "health_rev_t3_pct": {
+        "description": "Мин. % роста M-2→M-1 для T3",
+        "label": "Health: рост T3 %"
+      },
+      "health_rev_t3_pts": {
+        "description": "Баллы за рост ≥41%",
+        "label": "Health: баллы роста T3"
+      },
+      "health_rev_t4_pct": {
+        "description": "Мин. % роста M-2→M-1 для T4",
+        "label": "Health: рост T4 %"
+      },
+      "health_rev_t4_pts": {
+        "description": "Баллы за рост >50%",
+        "label": "Health: баллы роста T4"
+      },
+      "health_warn_min": {
+        "description": "Мин. баллов для статуса Внимание (ниже = Риск)",
+        "label": "Health: порог Внимание"
+      },
+      "kanban_refresh_interval_sec": {
+        "description": "Интервал в секундах для автоматического обновления доски Kanban. Укажите 0, чтобы отключить автообновление.",
+        "label": "Интервал автообновления Kanban (секунды)"
+      },
+      "lead_attachments_folder_url": {
+        "description": "URL папки с шаблонами для отправки на этапе Лида (например, ссылка на Google Drive). Отображается как ярлык рядом с полем вложений в окне создания письма.",
+        "label": "Папка шаблонов (Лид)"
+      },
+      "onboarding_task_templates": {
+        "description": "Определения задач для каждого шага внедрения. Атрибуты: id, title, type, step, standard (автодобавление при миграции), assignee (UUID пользователя или null), days (дни от миграции или null).",
+        "label": "Шаблоны задач онбординга"
+      },
+      "prospect_ai_provider": {
+        "description": "Какой поставщик AI анализирует собранные данные компании (KRS, сайт, LinkedIn, Facebook) и формирует Travel Potential Score. «deepseek» или «anthropic».",
+        "label": "Проспекты — поставщик AI для обогащения данных"
+      },
+      "prospect_icp_blacklist_keywords": {
+        "description": "Если любое из этих слов встречается в названии компании, отрасли или описании PKD, из icp_score вычитается штраф (см. «Проспекты — штрафные баллы за блэклист ICP»). По умолчанию отбирает оптовые компании, которые не соответствуют ICP CRMtree.",
+        "label": "Проспекты — ключевые слова блэклиста ICP"
+      },
+      "prospect_icp_blacklist_penalty": {
+        "description": "Сколько баллов вычитается из icp_score, когда компания совпадает с ключевыми словами блэклиста ICP. Результат не опускается ниже 0.",
+        "label": "Проспекты — штрафные баллы за блэклист ICP"
+      },
+      "prospect_lead_min_score": {
+        "description": "Кнопка «→ Lead» в списке проспектов становится активной только тогда, когда Travel Potential Score компании больше или равен этому значению (шкала 0–100).",
+        "label": "Проспекты — минимальный score для конверсии в Лид"
+      },
+      "roles_preview_count": {
+        "description": "Максимальное количество групповых ролей, отображаемых в списке пользователей до сокращения «+N more».",
+        "label": "Количество ролей в предпросмотре"
+      },
+      "ta_billing_issuer": {
+        "description": "Код выставителя счёта в платёжном адресе (например, WT).",
+        "label": "Тестовый аккаунт — выставитель счёта (issuer)"
+      },
+      "ta_form_configs": {
+        "description": "Массив шагов формы в формате JSON. Должен содержать хотя бы один элемент со step=\"START\".",
+        "label": "Тестовый аккаунт — конфигурация форм (formConfigs)"
+      },
+      "ta_partner_type": {
+        "description": "Тип Partner в HTCD (например, PARTNER_BASIC).",
+        "label": "Тестовый аккаунт — тип Partner (selectedPartnerType)"
+      },
+      "ta_services_process_type": {
+        "description": "Тип обработки услуг по умолчанию (например, ONLINE, MIDOFFICE).",
+        "label": "Тестовый аккаунт — тип обработки услуг (defaultServicesProcessType)"
+      },
+      "ta_traveler_country_nationality": {
+        "description": "Является ли страна Partner национальностью путешественника по умолчанию (true/false).",
+        "label": "Тестовый аккаунт — национальность из страны Partner (partnerCountryAsDefaultNationality)"
+      },
+      "ta_traveler_max_limit": {
+        "description": "Максимальное количество путешественников в заказе.",
+        "label": "Тестовый аккаунт — лимит путешественников (travelersMaxLimit)"
+      },
+      "ta_traveler_meal_types": {
+        "description": "Список типов питания, разделённых запятыми (например, BF,HB,FB,AI).",
+        "label": "Тестовый аккаунт — разрешённые типы питания (allowedMealTypes)"
+      },
+      "ta_traveler_meals_only": {
+        "description": "Показывать ли только предложения отелей с питанием (true/false).",
+        "label": "Тестовый аккаунт — только предложения с питанием (hotelOffersWithMealsOnly)"
+      },
+      "ta_traveler_parking_only": {
+        "description": "Показывать ли только отели с парковкой (true/false).",
+        "label": "Тестовый аккаунт — только с парковкой (accommodationsWithParkingOnly)"
+      },
+      "ta_traveler_refundable_only": {
+        "description": "Показывать ли только возвратные предложения отелей (true/false).",
+        "label": "Тестовый аккаунт — только возвратные предложения (refundableHotelOffersOnly)"
+      },
+      "ta_traveler_search_by": {
+        "description": "Способ поиска путешественников в HTCD.",
+        "label": "Тестовый аккаунт — поиск путешественников (searchTravelerBy)"
+      },
+      "ta_wh_accent_color": {
+        "description": "Hex-цвет акцента whitelabel в HTCD.",
+        "label": "Тестовый аккаунт — акцентный цвет (whitelabelColor)"
+      },
+      "ta_wh_communicator_notifications": {
+        "description": "Включать ли уведомления внутреннего мессенджера (true/false).",
+        "label": "Тестовый аккаунт — уведомления мессенджера (internalCommunicatorNotifications)"
+      },
+      "ta_wh_enable_meal_selection": {
+        "description": "Включать ли выбор питания (true/false).",
+        "label": "Тестовый аккаунт — выбор питания (enableMealSelection)"
+      },
+      "ta_wh_gds_locator": {
+        "description": "Идентификатор профиля GDS (gdsProfileLocator).",
+        "label": "Тестовый аккаунт — GDS Profile Locator"
+      },
+      "ta_wh_gds_locator_manual": {
+        "description": "Идентификатор профиля GDS (вручную) (gdsProfileLocatorManual).",
+        "label": "Тестовый аккаунт — GDS Profile Locator Manual"
+      },
+      "ta_wh_header_color": {
+        "description": "Hex-цвет заголовка whitelabel в HTCD.",
+        "label": "Тестовый аккаунт — цвет заголовка (whitelabelHeader)"
+      }
+    },
     "crm": {
       "intro": "— справочники и пороги, используемые модулем CRM. Списки редактируются добавлением / удалением элементов. Изменения вступают в силу после сохранения.",
       "scoring": {
@@ -891,6 +1269,11 @@
         "data_administration": "Совместное управление",
         "data_processing_entrustment": "Поручение обработки",
         "no_gdpr": "Без GDPR"
+      },
+      "holdReasons": {
+        "businessPause": "Приостановка деятельности",
+        "internalSituation": "Внутренняя ситуация в компании",
+        "noDecisionMakers": "Нет лиц, принимающих решения"
       },
       "industries": {
         "Education": "Образование",

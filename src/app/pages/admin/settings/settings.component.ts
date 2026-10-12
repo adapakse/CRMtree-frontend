@@ -222,6 +222,13 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
   },
 };
 
+// Słowniki, których elementy są zapisane jako gotowy tekst, a nie kod — patrz
+// freeTextItemLabel(). Kody tych słowników nie mogą stać w tym pliku, bo są po
+// polsku, a i18n:check tego nie dopuszcza; żyją więc w plikach tłumaczeń.
+const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
+  crm_hold_reasons: 'holdReasons',
+};
+
 @Component({
   selector: 'wt-settings',
   standalone: true,
@@ -329,8 +336,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                 <div [style.border-bottom]="last ? 'none' : '1px solid var(--gray-100)'"
                      style="padding:16px 20px;display:grid;grid-template-columns:1fr 220px;gap:20px;align-items:start">
                   <div>
-                    <div class="field-label">{{ field.label }}</div>
-                    <div class="field-desc">{{ field.description }}</div>
+                    <div class="field-label">{{ fieldLabel(field) }}</div>
+                    <div class="field-desc">{{ fieldDescription(field) }}</div>
                     @if (field.updated_by_name) {
                       <div class="field-meta">{{ t('settings.fields.changedBy') }} <strong>{{ field.updated_by_name }}</strong> · {{ field.updated_at | date:'dd.MM.yyyy HH:mm' }}</div>
                     }
@@ -397,11 +404,11 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
             }
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span> }
               </div>
               <div style="padding:14px 20px">
-                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+                <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 @if (field.value_type === 'json') {
                   <!-- Edytor listy JSON -->
@@ -679,11 +686,11 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           @for (field of docFields(); track field.key) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span> }
               </div>
               <div style="padding:14px 20px">
-                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+                <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 @if (field.value_type === 'json') {
                   <div class="json-list">
@@ -834,7 +841,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           @for (field of crmDictFields(); track field.key) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center">
-                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:8px">● {{ t('settings.fields.changed') }}</span> }
                 @if (field.updated_by_name) {
                   <span class="field-meta" style="margin-left:auto;font-size:11px;color:var(--gray-400)">
@@ -843,7 +850,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                 }
               </div>
               <div style="padding:14px 20px">
-                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+                <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 <!-- Edytor tabeli szablonów -->
                 @if (field.key === 'crm_lead_sources') {
@@ -1699,6 +1706,11 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Polskie teksty zakresu `admin` są tu potrzebne obok języka aktywnego:
+    // wartości itemLabels w polskim służą za odcisk palca elementów słownika
+    // zapisanych jako gotowy tekst (patrz freeTextItemLabel). Dla polskiego
+    // interfejsu to ten sam, już wczytany plik, więc nic nie dociąga.
+    this.transloco.load('admin/pl').subscribe({ error: () => undefined });
     // Załaduj listę userów dla edytora szablonów onboarding
     this.http.get<any[]>(`${environment.apiUrl}/admin/users?limit=200`).subscribe({
       next: r => this.allUsers.set((r as any)?.data || r),
@@ -1814,9 +1826,50 @@ export class SettingsComponent implements OnInit {
 
   jsonItemLabel(key: string, item: string): string {
     const labels = JSON_ITEM_LABELS[key];
-    return labels?.codes.includes(item)
-      ? this.transloco.translate(`admin.settings.itemLabels.${labels.group}.${item}`)
-      : item;
+    if (labels?.codes.includes(item)) {
+      return this.transloco.translate(`admin.settings.itemLabels.${labels.group}.${item}`);
+    }
+    const freeText = FREE_TEXT_ITEM_GROUPS[key];
+    return freeText ? this.freeTextItemLabel(freeText, item) : item;
+  }
+
+  /**
+   * Nazwa i opis ustawienia siedzą w `app_settings` (kolumny label/description),
+   * zaseedowane po polsku per tenant — bez tego tłumaczenia cały ekran Ustawień
+   * pokazywałby polskie teksty niezależnie od języka. Tłumaczenie po kluczu
+   * ustawienia, a gdy go nie ma, zostaje wartość z bazy: nowe ustawienie dodane
+   * migracją pokaże się od razu, tylko jeszcze nieprzetłumaczone.
+   * Kropki w kluczach (`prospect.ai_provider`) zamieniamy na `_`, bo inaczej
+   * rozbiłyby się na kolejne poziomy drzewa tłumaczeń.
+   */
+  fieldLabel(field: SettingField): string {
+    return this.settingText(field.key, 'label') ?? field.label;
+  }
+
+  fieldDescription(field: SettingField): string {
+    return this.settingText(field.key, 'description') ?? field.description;
+  }
+
+  private settingText(key: string, field: 'label' | 'description'): string | null {
+    const path = `admin.settings.catalog.${key.replace(/\./g, '_')}.${field}`;
+    const value = this.transloco.translate(path);
+    return value && value !== path ? value : null;
+  }
+
+  /**
+   * Słowniki, których elementy są zapisane jako GOTOWY TEKST, nie jako kod
+   * techniczny (powody Holda zaseedowane migracją 0294). Tłumaczenia trzymamy
+   * pod własnymi slugami, a polska wartość służy za odcisk palca: podmieniamy
+   * tylko wtedy, gdy element jest dokładnie taki jak zaseedowany domyślny.
+   * Wartość dopisana przez admina tenanta zostaje nietknięta — to jego słownik.
+   */
+  private freeTextItemLabel(group: string, item: string): string {
+    const polish = this.transloco.translateObject(`admin.settings.itemLabels.${group}`, {}, 'pl');
+    if (!polish || typeof polish !== 'object') return item;
+    const slug = Object.keys(polish).find(k => (polish as Record<string, string>)[k] === item);
+    if (!slug) return item;
+    const translated = this.transloco.translate(`admin.settings.itemLabels.${group}.${slug}`);
+    return translated.startsWith('admin.settings.') ? item : translated;
   }
 
   addJsonItem(field: SettingField): void {

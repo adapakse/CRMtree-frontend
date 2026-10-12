@@ -722,6 +722,384 @@
       "saveChanges": "Zapisz zmiany",
       "saving": "Zapisywanie…"
     },
+    "catalog": {
+      "churn_daily_run_time": {
+        "description": "Format HH:MM — o tej godzinie serwer przelicza scoring i wysyła alerty email",
+        "label": "Churn: godzina dziennego przeliczenia"
+      },
+      "churn_days_t1_max": {
+        "description": "Max. dni bez zamówienia dla progu 1",
+        "label": "Churn: próg 1 dni — max"
+      },
+      "churn_days_t1_min": {
+        "description": "Min. dni bez zamówienia dla progu 1",
+        "label": "Churn: próg 1 dni — min"
+      },
+      "churn_days_t1_pts": {
+        "description": "Punkty za 10–20 dni bez zamówienia",
+        "label": "Churn: punkty za próg 1 dni"
+      },
+      "churn_days_t2_max": {
+        "description": "Max. dni bez zamówienia dla progu 2",
+        "label": "Churn: próg 2 dni — max"
+      },
+      "churn_days_t2_min": {
+        "description": "Min. dni bez zamówienia dla progu 2",
+        "label": "Churn: próg 2 dni — min"
+      },
+      "churn_days_t2_pts": {
+        "description": "Punkty za 21–30 dni bez zamówienia",
+        "label": "Churn: punkty za próg 2 dni"
+      },
+      "churn_days_t3_pts": {
+        "description": "Punkty za >30 dni bez zamówienia",
+        "label": "Churn: punkty za próg 3 dni"
+      },
+      "churn_risk_critical": {
+        "description": "Min. punktów dla poziomu ryzyka: Krytyczne",
+        "label": "Churn: próg ryzyka krytycznego"
+      },
+      "churn_risk_high": {
+        "description": "Min. punktów dla poziomu ryzyka: Wysokie",
+        "label": "Churn: próg ryzyka wysokiego"
+      },
+      "churn_risk_low": {
+        "description": "Min. punktów dla poziomu ryzyka: Niskie",
+        "label": "Churn: próg ryzyka niskiego"
+      },
+      "churn_risk_medium": {
+        "description": "Min. punktów dla poziomu ryzyka: Średnie",
+        "label": "Churn: próg ryzyka średniego"
+      },
+      "churn_sales_t1_pct": {
+        "description": "Min. % spadku M-2→M-1 dla progu 1",
+        "label": "Churn: spadek sprzedaży próg 1 %"
+      },
+      "churn_sales_t1_pts": {
+        "description": "Punkty za ≥30% spadku sprzedaży M-2→M-1",
+        "label": "Churn: punkty za próg 1 sprzedaży"
+      },
+      "churn_sales_t2_pct": {
+        "description": "Min. % spadku M-2→M-1 dla progu 2",
+        "label": "Churn: spadek sprzedaży próg 2 %"
+      },
+      "churn_sales_t2_pts": {
+        "description": "Punkty za ≥51% spadku sprzedaży M-2→M-1",
+        "label": "Churn: punkty za próg 2 sprzedaży"
+      },
+      "crm_adoption_target_pct": {
+        "description": "Docelowy % aktywnych użytkowników u partnera",
+        "label": "Cel adopcji użytkowników (%)"
+      },
+      "crm_commission_basis": {
+        "description": "Dostepne podstawy naliczania prowizji dla Partnerow. nie_dotyczy=Nie dotyczy, segmenty=Ilosc segmentow, rezerwacje=Ilosc rezerwacji, progi_obrotowe=Progi obrotowe.",
+        "label": "Podstawy Prowizji"
+      },
+      "crm_commission_basis_options": {
+        "description": "Dostępne podstawy naliczania prowizji WT/TM w kartotece partnera. Format: tablica JSON.",
+        "label": "Podstawy prowizji WT/TM"
+      },
+      "crm_consent_types": {
+        "description": "JSON array definiujący rodzaje zgód marketingowych prezentowanych na kartach Lead i Partner. Format: [key, label, description].",
+        "label": "CRM – Typy zgód marketingowych"
+      },
+      "crm_contact_titles": {
+        "description": "Dostepne stanowiska w formularzach kontaktu dla Leadow i Partnerow.",
+        "label": "Stanowiska Kontaktow"
+      },
+      "crm_csv_max_rows": {
+        "description": "Limit wierszy w pojedynczym imporcie CSV",
+        "label": "Limit wierszy importu CSV"
+      },
+      "crm_currencies": {
+        "description": "Lista walut dostępnych w polach: limit kredytowy, kwota depozytu, dane sprzedażowe. Format: tablica JSON.",
+        "label": "Obsługiwane waluty"
+      },
+      "crm_dashboard_hot_value_threshold": {
+        "description": "Leady powyżej tej wartości są wyróżniane w dashboardzie jako wysokowartościowe.",
+        "label": "Próg wartości \"gorącego\" leada (PLN)"
+      },
+      "crm_dashboard_long_cycle_days": {
+        "description": "Leady otwarte dłużej niż ta liczba dni są oznaczane w dashboardzie jako \"długi cykl\".",
+        "label": "Długi cykl sprzedażowy (dni)"
+      },
+      "crm_dashboard_win_stages": {
+        "description": "Etapy leada traktowane jako wygrana (wpływają na Win Rate i licznik \"Wygranych\" w dashboardzie). Format: tablica JSON.",
+        "label": "Etapy leada uznawane za \"wygrany\""
+      },
+      "crm_global_read": {
+        "description": "Gdy włączone, wszyscy użytkownicy CRM mogą przeglądać Leady, Partnerów, Raporty Sprzedaży i Performance bez ograniczeń widoczności. Uprawnienia do edycji pozostają bez zmian.",
+        "label": "Globalny odczyt CRM"
+      },
+      "crm_hold_reasons": {
+        "description": "Lista powodów Holda. Wyświetlana jako lista wyboru w polu \"Powód\" przy ustawianiu statusu Hold na leadzie.",
+        "label": "Powody Holda leada"
+      },
+      "crm_hot_lead_days": {
+        "description": "Dni bez kontaktu → lead oznaczyć jako zimny",
+        "label": "Dni bez kontaktu (zimny lead)"
+      },
+      "crm_industries": {
+        "description": "Dostepne wartosci branzy dla Leadow i Partnerow.",
+        "label": "Branze"
+      },
+      "crm_lead_sources": {
+        "description": "Lista kluczy dostepnych w polu Zrodlo na Leadzie",
+        "label": "Slownik Zrodel Leadow"
+      },
+      "crm_lost_reasons": {
+        "description": "Lista powodów przegranej. Wyświetlana jako lista wyboru w polu \"Powód przegranej\" przy zmianie etapu leada na Przegrany.",
+        "label": "Powody przegranej leada"
+      },
+      "crm_partner_countries": {
+        "description": "Lista krajów dostępnych w profilu partnera (Dane dodatkowe i Billing Address).",
+        "label": "Kraje partnerów"
+      },
+      "crm_partner_languages": {
+        "description": "Lista języków dostępnych w profilu partnera.",
+        "label": "Języki partnerów"
+      },
+      "crm_partner_statuses": {
+        "description": "Dostepne statusy dla partnerow. onboarding=Wdrozenie, active=Aktywny, inactive=Nieaktywny, churned=Utracony.",
+        "label": "Statusy Partnera"
+      },
+      "crm_platform_api_key": {
+        "description": "Klucz API platformy transakcyjnej (plain, zmień po wdrożeniu)",
+        "label": "Klucz API platformy transakcyjnej"
+      },
+      "crm_product_types": {
+        "description": "Lista typów produktów widocznych w imporcie danych sprzedażowych i raportach. Format: tablica JSON.",
+        "label": "Typy produktów sprzedażowych"
+      },
+      "crm_renewal_warning_days": {
+        "description": "Alert X dni przed wygaśnięciem umowy",
+        "label": "Alert wygaśnięcia umowy (dni)"
+      },
+      "crm_training_mode": {
+        "description": "Symuluje wysyłkę maili, podpisy dokumentów i połączenia telefoniczne bez rzeczywistych akcji zewnętrznych. Przeznaczony do szkoleń z obsługi CRM.",
+        "label": "Tryb szkoleniowy"
+      },
+      "default_page_size": {
+        "description": "Liczba pozycji na stronie we wszystkich widokach list (użytkownicy, dokumenty, log audytu).",
+        "label": "Domyślna liczba pozycji na stronie"
+      },
+      "doc_contract_subjects": {
+        "description": "Lista wartości pola Przedmiot umowy w dokumentach.",
+        "label": "Przedmioty umowy"
+      },
+      "doc_entity1_options": {
+        "description": "Lista podmiotów dostępnych w polu Entity 1 dokumentu. Edytuj przez dodawanie / usuwanie wartości.",
+        "label": "Podmiot 1 – opcje słownika"
+      },
+      "doc_gdpr_types": {
+        "description": "Dostepne typy GDPR. no_gdpr=Brak GDPR, data_processing_entrustment=Powierzenie przetwarzania, data_administration=Wspoladministrowanie.",
+        "label": "Typy GDPR Dokumentow"
+      },
+      "doc_payment_statuses": {
+        "description": "Dostępne statusy płatności dokumentów typu Faktura. unpaid=Nieopłacona, partially_paid=Opłacona częściowo, paid=Opłacona, overdue=Po terminie.",
+        "label": "Statusy płatności faktur"
+      },
+      "doc_statuses": {
+        "description": "Dostepne statusy dokumentow. new=Nowy, being_edited=W edycji, being_approved=Do akceptacji, being_signed=Do podpisu, signed=Podpisany, completed=Zakonczony, rejected=Odrzucony.",
+        "label": "Statusy Dokumentow"
+      },
+      "doc_types": {
+        "description": "Dostepne typy dokumentow. Wartosc musi byc zgodna z enum doc_type w bazie.",
+        "label": "Typy Dokumentow"
+      },
+      "email_signature_banner_url": {
+        "description": "URL obrazka bannera wyświetlanego poniżej sekcji personalnej w stopce maila (szerokość 600px)",
+        "label": "Stopka email – URL bannera"
+      },
+      "email_signature_disclaimer": {
+        "description": "Tekst klauzuli poufności wyświetlany na dole stopki maila (szary, 8px). Obsługuje tagi HTML.",
+        "label": "Stopka email – klauzula poufności"
+      },
+      "expiration_red_days": {
+        "description": "Dokumenty wygasające w ciągu tylu dni są pokazywane na czerwono na tablicy Kanban i na liście dokumentów.",
+        "label": "Próg ostrzeżenia o wygaśnięciu (dni)"
+      },
+      "expiration_soon_days": {
+        "description": "Dokumenty wygasające w ciągu tylu dni są oznaczane jako „wygasa wkrótce” na znacznikach i w filtrach.",
+        "label": "Próg „wygasa wkrótce” (dni)"
+      },
+      "health_act_t1_max_days": {
+        "description": "Ostatnie zamówienie w ciągu N dni → T1 punkty",
+        "label": "Health: max dni dla T1 aktywności"
+      },
+      "health_act_t1_pts": {
+        "description": "Punkty za 1 zamówienie do X dni temu",
+        "label": "Health: punkty T1 aktywności"
+      },
+      "health_act_t2_max_days": {
+        "description": "Max. dni temu dla okna T2",
+        "label": "Health: max dni T2 aktywności"
+      },
+      "health_act_t2_min_days": {
+        "description": "Min. dni temu dla okna T2 (5-10 dni)",
+        "label": "Health: min dni T2 aktywności"
+      },
+      "health_act_t2_pts": {
+        "description": "Punkty za 1 zamówienie w oknie 5-10 dni",
+        "label": "Health: punkty T2 aktywności"
+      },
+      "health_act_t3_min_orders": {
+        "description": "Min. zamówień w 20d dla progu T3",
+        "label": "Health: min zamówień T3 aktywności"
+      },
+      "health_act_t3_pts": {
+        "description": "Punkty za 2–5 zamówień w 20 dniach",
+        "label": "Health: punkty T3 aktywności"
+      },
+      "health_act_t4_min_orders": {
+        "description": ">N zamówień w 20d → T4 (max tier)",
+        "label": "Health: min zamówień T4 aktywności"
+      },
+      "health_act_t4_pts": {
+        "description": "Punkty za >5 zamówień w 20 dniach",
+        "label": "Health: punkty T4 aktywności"
+      },
+      "health_good_min": {
+        "description": "Min. punktów dla statusu Zdrowy",
+        "label": "Health: próg Zdrowy"
+      },
+      "health_rev_t1_pct": {
+        "description": "Min. % wzrostu M-2→M-1 dla T1",
+        "label": "Health: wzrost T1 %"
+      },
+      "health_rev_t1_pts": {
+        "description": "Punkty za wzrost ≥20%",
+        "label": "Health: punkty T1 wzrostu"
+      },
+      "health_rev_t2_pct": {
+        "description": "Min. % wzrostu M-2→M-1 dla T2",
+        "label": "Health: wzrost T2 %"
+      },
+      "health_rev_t2_pts": {
+        "description": "Punkty za wzrost ≥30%",
+        "label": "Health: punkty T2 wzrostu"
+      },
+      "health_rev_t3_pct": {
+        "description": "Min. % wzrostu M-2→M-1 dla T3",
+        "label": "Health: wzrost T3 %"
+      },
+      "health_rev_t3_pts": {
+        "description": "Punkty za wzrost ≥41%",
+        "label": "Health: punkty T3 wzrostu"
+      },
+      "health_rev_t4_pct": {
+        "description": "Min. % wzrostu M-2→M-1 dla T4",
+        "label": "Health: wzrost T4 %"
+      },
+      "health_rev_t4_pts": {
+        "description": "Punkty za wzrost >50%",
+        "label": "Health: punkty T4 wzrostu"
+      },
+      "health_warn_min": {
+        "description": "Min. punktów dla statusu Uwaga (poniżej = Ryzyko)",
+        "label": "Health: próg Uwaga"
+      },
+      "kanban_refresh_interval_sec": {
+        "description": "Odstęp w sekundach między automatycznymi odświeżeniami tablicy Kanban. Ustaw 0, aby wyłączyć automatyczne odświeżanie.",
+        "label": "Odstęp automatycznego odświeżania Kanbana (sekundy)"
+      },
+      "lead_attachments_folder_url": {
+        "description": "URL do folderu z szablonami do wysyłki na etapie Leada (np. link do Google Drive). Wyświetlany jako skrót obok pola załączników w oknie compose e-mail.",
+        "label": "Folder szablonów (Lead)"
+      },
+      "onboarding_task_templates": {
+        "description": "Definicje zadan dla kazdego kroku wdrozenia. Atrybuty: id, title, type, step, standard (auto-dodaj przy migracji), assignee (UUID usera lub null), days (dni od migracji lub null).",
+        "label": "Szablony zadań onboardingowych"
+      },
+      "prospect_ai_provider": {
+        "description": "Który dostawca AI analizuje zescrapowane dane firmy (KRS, WWW, LinkedIn, Facebook) i generuje Travel Potential Score. \"deepseek\" lub \"anthropic\".",
+        "label": "Prospekty — dostawca AI dla enrichmentu"
+      },
+      "prospect_icp_blacklist_keywords": {
+        "description": "Jeśli którekolwiek słowo pojawi się w nazwie firmy, branży lub opisie PKD, od icp_score odejmowana jest kara (patrz \"Prospekty — kara punktowa za blacklistę ICP\"). Domyślnie wychwytuje hurtownie, które nie pasują do ICP CRMtree.",
+        "label": "Prospekty — słowa kluczowe blacklisty ICP"
+      },
+      "prospect_icp_blacklist_penalty": {
+        "description": "Ile punktów odjąć od icp_score, gdy firma pasuje do słów kluczowych blacklisty ICP. Wynik nie spada poniżej 0.",
+        "label": "Prospekty — kara punktowa za blacklistę ICP"
+      },
+      "prospect_lead_min_score": {
+        "description": "Przycisk \"→ Lead\" na liście prospektów aktywuje się tylko gdy Travel Potential Score firmy jest większy lub równy tej wartości (skala 0–100).",
+        "label": "Prospekty — minimalny score do konwersji na Lead"
+      },
+      "roles_preview_count": {
+        "description": "Maksymalna liczba ról grupowych pokazywanych wprost na liście użytkowników, zanim nastąpi skrócenie do „+N more”.",
+        "label": "Liczba ról pokazywanych wprost"
+      },
+      "ta_billing_issuer": {
+        "description": "Kod wystawcy faktury w adresie rozliczeniowym (np. WT).",
+        "label": "Konto testowe — wystawca faktury (issuer)"
+      },
+      "ta_form_configs": {
+        "description": "Tablica kroków formularza w formacie JSON. Musi zawierać co najmniej jeden element ze step=\"START\".",
+        "label": "Konto testowe — konfiguracja formularzy (formConfigs)"
+      },
+      "ta_partner_type": {
+        "description": "Typ partnera w HTCD (np. PARTNER_BASIC).",
+        "label": "Konto testowe — typ partnera (selectedPartnerType)"
+      },
+      "ta_services_process_type": {
+        "description": "Domyślny typ procesowania usług (np. ONLINE, MIDOFFICE).",
+        "label": "Konto testowe — typ procesowania usług (defaultServicesProcessType)"
+      },
+      "ta_traveler_country_nationality": {
+        "description": "Czy kraj partnera jest domyślną narodowością podróżnego (true/false).",
+        "label": "Konto testowe — narodowość z kraju partnera (partnerCountryAsDefaultNationality)"
+      },
+      "ta_traveler_max_limit": {
+        "description": "Maksymalna liczba podróżnych w zamówieniu.",
+        "label": "Konto testowe — limit podróżnych (travelersMaxLimit)"
+      },
+      "ta_traveler_meal_types": {
+        "description": "Lista typów posiłków oddzielona przecinkami (np. BF,HB,FB,AI).",
+        "label": "Konto testowe — dozwolone typy posiłków (allowedMealTypes)"
+      },
+      "ta_traveler_meals_only": {
+        "description": "Czy pokazywać tylko oferty hoteli z posiłkami (true/false).",
+        "label": "Konto testowe — tylko oferty z posiłkami (hotelOffersWithMealsOnly)"
+      },
+      "ta_traveler_parking_only": {
+        "description": "Czy pokazywać tylko hotele z parkingiem (true/false).",
+        "label": "Konto testowe — tylko z parkingiem (accommodationsWithParkingOnly)"
+      },
+      "ta_traveler_refundable_only": {
+        "description": "Czy pokazywać tylko zwrotne oferty hoteli (true/false).",
+        "label": "Konto testowe — tylko oferty zwrotne (refundableHotelOffersOnly)"
+      },
+      "ta_traveler_search_by": {
+        "description": "Sposób wyszukiwania podróżnych w HTCD.",
+        "label": "Konto testowe — wyszukiwanie podróżnych (searchTravelerBy)"
+      },
+      "ta_wh_accent_color": {
+        "description": "Kolor hex akcentu whitelabel w HTCD.",
+        "label": "Konto testowe — kolor akcentu (whitelabelColor)"
+      },
+      "ta_wh_communicator_notifications": {
+        "description": "Czy włączyć powiadomienia komunikatora wewnętrznego (true/false).",
+        "label": "Konto testowe — powiadomienia komunikatora (internalCommunicatorNotifications)"
+      },
+      "ta_wh_enable_meal_selection": {
+        "description": "Czy włączyć wybór posiłków (true/false).",
+        "label": "Konto testowe — wybór posiłków (enableMealSelection)"
+      },
+      "ta_wh_gds_locator": {
+        "description": "Identyfikator profilu GDS (gdsProfileLocator).",
+        "label": "Konto testowe — GDS Profile Locator"
+      },
+      "ta_wh_gds_locator_manual": {
+        "description": "Identyfikator profilu GDS (ręczny) (gdsProfileLocatorManual).",
+        "label": "Konto testowe — GDS Profile Locator Manual"
+      },
+      "ta_wh_header_color": {
+        "description": "Kolor hex nagłówka whitelabel w HTCD.",
+        "label": "Konto testowe — kolor nagłówka (whitelabelHeader)"
+      }
+    },
     "crm": {
       "intro": "— słowniki i progi używane przez moduł CRM. Listy edytuj przez dodawanie / usuwanie elementów. Zmiany wchodzą w życie po zapisie.",
       "scoring": {
@@ -891,6 +1269,11 @@
         "data_administration": "Współadministrowanie",
         "data_processing_entrustment": "Powierzenie przetwarzania",
         "no_gdpr": "Brak GDPR"
+      },
+      "holdReasons": {
+        "businessPause": "Przerwa w działalności",
+        "internalSituation": "Sytuacja wewnątrz firmy",
+        "noDecisionMakers": "Brak osób decyzyjnych"
       },
       "industries": {
         "Education": "Edukacja",

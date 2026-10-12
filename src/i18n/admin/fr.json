@@ -722,6 +722,384 @@
       "saveChanges": "Enregistrer les modifications",
       "saving": "Enregistrement…"
     },
+    "catalog": {
+      "churn_daily_run_time": {
+        "description": "Format HH:MM — à cette heure, le serveur recalcule le scoring et envoie les alertes par e-mail",
+        "label": "Churn : heure du recalcul quotidien"
+      },
+      "churn_days_t1_max": {
+        "description": "Max. de jours sans commande pour le seuil 1",
+        "label": "Churn : seuil 1 de jours — max"
+      },
+      "churn_days_t1_min": {
+        "description": "Min. de jours sans commande pour le seuil 1",
+        "label": "Churn : seuil 1 de jours — min"
+      },
+      "churn_days_t1_pts": {
+        "description": "Points pour 10–20 jours sans commande",
+        "label": "Churn : points pour le seuil 1 de jours"
+      },
+      "churn_days_t2_max": {
+        "description": "Max. de jours sans commande pour le seuil 2",
+        "label": "Churn : seuil 2 de jours — max"
+      },
+      "churn_days_t2_min": {
+        "description": "Min. de jours sans commande pour le seuil 2",
+        "label": "Churn : seuil 2 de jours — min"
+      },
+      "churn_days_t2_pts": {
+        "description": "Points pour 21–30 jours sans commande",
+        "label": "Churn : points pour le seuil 2 de jours"
+      },
+      "churn_days_t3_pts": {
+        "description": "Points pour >30 jours sans commande",
+        "label": "Churn : points pour le seuil 3 de jours"
+      },
+      "churn_risk_critical": {
+        "description": "Points min. pour le niveau de risque : Critique",
+        "label": "Churn : seuil de risque critique"
+      },
+      "churn_risk_high": {
+        "description": "Points min. pour le niveau de risque : Élevé",
+        "label": "Churn : seuil de risque élevé"
+      },
+      "churn_risk_low": {
+        "description": "Points min. pour le niveau de risque : Faible",
+        "label": "Churn : seuil de risque faible"
+      },
+      "churn_risk_medium": {
+        "description": "Points min. pour le niveau de risque : Moyen",
+        "label": "Churn : seuil de risque moyen"
+      },
+      "churn_sales_t1_pct": {
+        "description": "% min. de baisse M-2→M-1 pour le seuil 1",
+        "label": "Churn : baisse des ventes seuil 1 %"
+      },
+      "churn_sales_t1_pts": {
+        "description": "Points pour une baisse des ventes ≥30% M-2→M-1",
+        "label": "Churn : points pour le seuil 1 des ventes"
+      },
+      "churn_sales_t2_pct": {
+        "description": "% min. de baisse M-2→M-1 pour le seuil 2",
+        "label": "Churn : baisse des ventes seuil 2 %"
+      },
+      "churn_sales_t2_pts": {
+        "description": "Points pour une baisse des ventes ≥51% M-2→M-1",
+        "label": "Churn : points pour le seuil 2 des ventes"
+      },
+      "crm_adoption_target_pct": {
+        "description": "% cible d'utilisateurs actifs chez le partenaire",
+        "label": "Objectif d'adoption des utilisateurs (%)"
+      },
+      "crm_commission_basis": {
+        "description": "Bases de calcul des commissions disponibles pour les Partenaires. nie_dotyczy=Non applicable, segmenty=Nombre de segments, rezerwacje=Nombre de réservations, progi_obrotowe=Seuils de chiffre d'affaires.",
+        "label": "Bases de commission"
+      },
+      "crm_commission_basis_options": {
+        "description": "Bases de calcul des commissions WT/TM disponibles dans la fiche du partenaire. Format : tableau JSON.",
+        "label": "Bases de commission WT/TM"
+      },
+      "crm_consent_types": {
+        "description": "Tableau JSON définissant les types de consentements marketing affichés sur les fiches Lead et Partenaire. Format : [key, label, description].",
+        "label": "CRM – Types de consentements marketing"
+      },
+      "crm_contact_titles": {
+        "description": "Fonctions disponibles dans les formulaires de contact des Leads et des Partenaires.",
+        "label": "Fonctions des contacts"
+      },
+      "crm_csv_max_rows": {
+        "description": "Limite de lignes dans un seul import CSV",
+        "label": "Limite de lignes pour l'import CSV"
+      },
+      "crm_currencies": {
+        "description": "Liste des devises disponibles dans les champs : limite de crédit, montant du dépôt, données de vente. Format : tableau JSON.",
+        "label": "Devises prises en charge"
+      },
+      "crm_dashboard_hot_value_threshold": {
+        "description": "Les leads dépassant cette valeur sont mis en évidence dans le tableau de bord comme à forte valeur.",
+        "label": "Seuil de valeur d'un lead « chaud » (PLN)"
+      },
+      "crm_dashboard_long_cycle_days": {
+        "description": "Les leads ouverts depuis plus de jours que ce nombre sont marqués dans le tableau de bord comme « cycle long ».",
+        "label": "Cycle de vente long (jours)"
+      },
+      "crm_dashboard_win_stages": {
+        "description": "Étapes du lead considérées comme gagnées (elles influencent le Win Rate et le compteur « Gagnés » du tableau de bord). Format : tableau JSON.",
+        "label": "Étapes du lead considérées comme « gagnées »"
+      },
+      "crm_global_read": {
+        "description": "Lorsque cette option est activée, tous les utilisateurs du CRM peuvent consulter les Leads, les Partenaires, les Rapports de vente et la Performance sans restriction de visibilité. Les droits de modification restent inchangés.",
+        "label": "Lecture globale du CRM"
+      },
+      "crm_hold_reasons": {
+        "description": "Liste des motifs de Hold. Affichée comme liste déroulante dans le champ « Motif » lorsque vous définissez le statut Hold sur un lead.",
+        "label": "Motifs de Hold d'un lead"
+      },
+      "crm_hot_lead_days": {
+        "description": "Jours sans contact → marquer le lead comme froid",
+        "label": "Jours sans contact (lead froid)"
+      },
+      "crm_industries": {
+        "description": "Valeurs de secteur disponibles pour les Leads et les Partenaires.",
+        "label": "Secteurs d'activité"
+      },
+      "crm_lead_sources": {
+        "description": "Liste des clés disponibles dans le champ Source d'un Lead",
+        "label": "Dictionnaire des sources de Leads"
+      },
+      "crm_lost_reasons": {
+        "description": "Liste des motifs de perte. Affichée comme liste déroulante dans le champ « Motif de perte » lorsque vous passez l'étape du lead à Perdu.",
+        "label": "Motifs de perte d'un lead"
+      },
+      "crm_partner_countries": {
+        "description": "Liste des pays disponibles dans le profil du partenaire (Données complémentaires et Billing Address).",
+        "label": "Pays des partenaires"
+      },
+      "crm_partner_languages": {
+        "description": "Liste des langues disponibles dans le profil du partenaire.",
+        "label": "Langues des partenaires"
+      },
+      "crm_partner_statuses": {
+        "description": "Statuts disponibles pour les partenaires. onboarding=Déploiement, active=Actif, inactive=Inactif, churned=Perdu.",
+        "label": "Statuts du Partenaire"
+      },
+      "crm_platform_api_key": {
+        "description": "Clé API de la plateforme transactionnelle (plain, changez-la après la mise en production)",
+        "label": "Clé API de la plateforme transactionnelle"
+      },
+      "crm_product_types": {
+        "description": "Liste des types de produits visibles dans l'import des données de vente et dans les rapports. Format : tableau JSON.",
+        "label": "Types de produits de vente"
+      },
+      "crm_renewal_warning_days": {
+        "description": "Alerte X jours avant l'expiration du contrat",
+        "label": "Alerte d'expiration du contrat (jours)"
+      },
+      "crm_training_mode": {
+        "description": "Simule l'envoi d'e-mails, la signature de documents et les appels téléphoniques sans aucune action externe réelle. Destiné aux formations à l'utilisation du CRM.",
+        "label": "Mode formation"
+      },
+      "default_page_size": {
+        "description": "Nombre d'éléments par page dans toutes les vues en liste (utilisateurs, documents, journal d'audit).",
+        "label": "Taille de page par défaut"
+      },
+      "doc_contract_subjects": {
+        "description": "Liste des valeurs du champ Objet du contrat dans les documents.",
+        "label": "Objets du contrat"
+      },
+      "doc_entity1_options": {
+        "description": "Liste des entités disponibles dans le champ Entity 1 du document. Modifiez-la en ajoutant / supprimant des valeurs.",
+        "label": "Entité 1 – options du dictionnaire"
+      },
+      "doc_gdpr_types": {
+        "description": "Types GDPR disponibles. no_gdpr=Pas de GDPR, data_processing_entrustment=Sous-traitance du traitement, data_administration=Responsabilité conjointe.",
+        "label": "Types GDPR des documents"
+      },
+      "doc_payment_statuses": {
+        "description": "Statuts de paiement disponibles pour les documents de type Facture. unpaid=Impayée, partially_paid=Partiellement payée, paid=Payée, overdue=En retard.",
+        "label": "Statuts de paiement des factures"
+      },
+      "doc_statuses": {
+        "description": "Statuts de document disponibles. new=Nouveau, being_edited=En cours de modification, being_approved=À approuver, being_signed=À signer, signed=Signé, completed=Terminé, rejected=Rejeté.",
+        "label": "Statuts des documents"
+      },
+      "doc_types": {
+        "description": "Types de documents disponibles. La valeur doit correspondre à l'énumération doc_type dans la base de données.",
+        "label": "Types de documents"
+      },
+      "email_signature_banner_url": {
+        "description": "URL de l'image de bannière affichée sous la section personnelle dans la signature e-mail (largeur 600px)",
+        "label": "Signature e-mail – URL de la bannière"
+      },
+      "email_signature_disclaimer": {
+        "description": "Texte de la clause de confidentialité affiché au bas de la signature e-mail (gris, 8px). Prend en charge les balises HTML.",
+        "label": "Signature e-mail – clause de confidentialité"
+      },
+      "expiration_red_days": {
+        "description": "Les documents qui expirent dans ce nombre de jours sont affichés en rouge sur le tableau Kanban et dans la liste des documents.",
+        "label": "Seuil d'alerte d'expiration (jours)"
+      },
+      "expiration_soon_days": {
+        "description": "Les documents qui expirent dans ce nombre de jours sont marqués comme « expire bientôt » dans les badges et les filtres.",
+        "label": "Seuil « expire bientôt » (jours)"
+      },
+      "health_act_t1_max_days": {
+        "description": "Dernière commande dans les N jours → points T1",
+        "label": "Health : max de jours pour l'activité T1"
+      },
+      "health_act_t1_pts": {
+        "description": "Points pour 1 commande jusqu'à X jours auparavant",
+        "label": "Health : points d'activité T1"
+      },
+      "health_act_t2_max_days": {
+        "description": "Max. de jours auparavant pour la fenêtre T2",
+        "label": "Health : max de jours activité T2"
+      },
+      "health_act_t2_min_days": {
+        "description": "Min. de jours auparavant pour la fenêtre T2 (5-10 jours)",
+        "label": "Health : min de jours activité T2"
+      },
+      "health_act_t2_pts": {
+        "description": "Points pour 1 commande dans la fenêtre 5-10 jours",
+        "label": "Health : points d'activité T2"
+      },
+      "health_act_t3_min_orders": {
+        "description": "Min. de commandes en 20d pour le seuil T3",
+        "label": "Health : min de commandes activité T3"
+      },
+      "health_act_t3_pts": {
+        "description": "Points pour 2–5 commandes en 20 jours",
+        "label": "Health : points d'activité T3"
+      },
+      "health_act_t4_min_orders": {
+        "description": ">N commandes en 20d → T4 (palier max)",
+        "label": "Health : min de commandes activité T4"
+      },
+      "health_act_t4_pts": {
+        "description": "Points pour >5 commandes en 20 jours",
+        "label": "Health : points d'activité T4"
+      },
+      "health_good_min": {
+        "description": "Points min. pour le statut Sain",
+        "label": "Health : seuil Sain"
+      },
+      "health_rev_t1_pct": {
+        "description": "% min. de croissance M-2→M-1 pour T1",
+        "label": "Health : croissance T1 %"
+      },
+      "health_rev_t1_pts": {
+        "description": "Points pour une croissance ≥20%",
+        "label": "Health : points de croissance T1"
+      },
+      "health_rev_t2_pct": {
+        "description": "% min. de croissance M-2→M-1 pour T2",
+        "label": "Health : croissance T2 %"
+      },
+      "health_rev_t2_pts": {
+        "description": "Points pour une croissance ≥30%",
+        "label": "Health : points de croissance T2"
+      },
+      "health_rev_t3_pct": {
+        "description": "% min. de croissance M-2→M-1 pour T3",
+        "label": "Health : croissance T3 %"
+      },
+      "health_rev_t3_pts": {
+        "description": "Points pour une croissance ≥41%",
+        "label": "Health : points de croissance T3"
+      },
+      "health_rev_t4_pct": {
+        "description": "% min. de croissance M-2→M-1 pour T4",
+        "label": "Health : croissance T4 %"
+      },
+      "health_rev_t4_pts": {
+        "description": "Points pour une croissance >50%",
+        "label": "Health : points de croissance T4"
+      },
+      "health_warn_min": {
+        "description": "Points min. pour le statut Attention (en dessous = Risque)",
+        "label": "Health : seuil Attention"
+      },
+      "kanban_refresh_interval_sec": {
+        "description": "Intervalle en secondes pour l'actualisation automatique du tableau Kanban. Mettez 0 pour désactiver l'actualisation automatique.",
+        "label": "Intervalle d'actualisation automatique du Kanban (secondes)"
+      },
+      "lead_attachments_folder_url": {
+        "description": "URL du dossier contenant les modèles à envoyer à l'étape Lead (par ex. un lien Google Drive). Affiché comme raccourci à côté du champ des pièces jointes dans la fenêtre de rédaction de l'e-mail.",
+        "label": "Dossier de modèles (Lead)"
+      },
+      "onboarding_task_templates": {
+        "description": "Définitions des tâches pour chaque étape du déploiement. Attributs : id, title, type, step, standard (ajout automatique lors de la migration), assignee (UUID de l'utilisateur ou null), days (jours depuis la migration ou null).",
+        "label": "Modèles de tâches d'onboarding"
+      },
+      "prospect_ai_provider": {
+        "description": "Quel fournisseur d'IA analyse les données de l'entreprise collectées par scraping (KRS, site web, LinkedIn, Facebook) et génère le Travel Potential Score. « deepseek » ou « anthropic ».",
+        "label": "Prospects — fournisseur d'IA pour l'enrichissement"
+      },
+      "prospect_icp_blacklist_keywords": {
+        "description": "Si l'un de ces mots apparaît dans le nom de l'entreprise, le secteur ou la description PKD, une pénalité est soustraite de l'icp_score (voir « Prospects — pénalité de points pour la blacklist ICP »). Par défaut, cela détecte les grossistes qui ne correspondent pas à l'ICP de CRMtree.",
+        "label": "Prospects — mots-clés de la blacklist ICP"
+      },
+      "prospect_icp_blacklist_penalty": {
+        "description": "Nombre de points à soustraire de l'icp_score lorsqu'une entreprise correspond aux mots-clés de la blacklist ICP. Le résultat ne descend pas en dessous de 0.",
+        "label": "Prospects — pénalité de points pour la blacklist ICP"
+      },
+      "prospect_lead_min_score": {
+        "description": "Le bouton « → Lead » dans la liste des prospects ne s'active que lorsque le Travel Potential Score de l'entreprise est supérieur ou égal à cette valeur (échelle 0–100).",
+        "label": "Prospects — score minimum pour la conversion en Lead"
+      },
+      "roles_preview_count": {
+        "description": "Nombre maximal de rôles de groupe affichés en ligne dans la liste des utilisateurs avant la troncature « +N more ».",
+        "label": "Nombre de rôles affichés en aperçu"
+      },
+      "ta_billing_issuer": {
+        "description": "Code de l'émetteur de la facture dans l'adresse de facturation (par ex. WT).",
+        "label": "Compte de test — émetteur de la facture (issuer)"
+      },
+      "ta_form_configs": {
+        "description": "Tableau des étapes du formulaire au format JSON. Doit contenir au moins un élément avec step=\"START\".",
+        "label": "Compte de test — configuration des formulaires (formConfigs)"
+      },
+      "ta_partner_type": {
+        "description": "Type de Partner dans HTCD (par ex. PARTNER_BASIC).",
+        "label": "Compte de test — type de Partner (selectedPartnerType)"
+      },
+      "ta_services_process_type": {
+        "description": "Type de traitement des services par défaut (par ex. ONLINE, MIDOFFICE).",
+        "label": "Compte de test — type de traitement des services (defaultServicesProcessType)"
+      },
+      "ta_traveler_country_nationality": {
+        "description": "Indique si le pays du Partner est la nationalité par défaut du voyageur (true/false).",
+        "label": "Compte de test — nationalité issue du pays du Partner (partnerCountryAsDefaultNationality)"
+      },
+      "ta_traveler_max_limit": {
+        "description": "Nombre maximal de voyageurs dans une commande.",
+        "label": "Compte de test — limite de voyageurs (travelersMaxLimit)"
+      },
+      "ta_traveler_meal_types": {
+        "description": "Liste des types de repas séparés par des virgules (par ex. BF,HB,FB,AI).",
+        "label": "Compte de test — types de repas autorisés (allowedMealTypes)"
+      },
+      "ta_traveler_meals_only": {
+        "description": "Indique s'il faut afficher uniquement les offres d'hôtels avec repas (true/false).",
+        "label": "Compte de test — uniquement les offres avec repas (hotelOffersWithMealsOnly)"
+      },
+      "ta_traveler_parking_only": {
+        "description": "Indique s'il faut afficher uniquement les hôtels avec parking (true/false).",
+        "label": "Compte de test — uniquement avec parking (accommodationsWithParkingOnly)"
+      },
+      "ta_traveler_refundable_only": {
+        "description": "Indique s'il faut afficher uniquement les offres d'hôtels remboursables (true/false).",
+        "label": "Compte de test — uniquement les offres remboursables (refundableHotelOffersOnly)"
+      },
+      "ta_traveler_search_by": {
+        "description": "Mode de recherche des voyageurs dans HTCD.",
+        "label": "Compte de test — recherche de voyageurs (searchTravelerBy)"
+      },
+      "ta_wh_accent_color": {
+        "description": "Couleur hex de l'accent whitelabel dans HTCD.",
+        "label": "Compte de test — couleur d'accent (whitelabelColor)"
+      },
+      "ta_wh_communicator_notifications": {
+        "description": "Indique s'il faut activer les notifications de la messagerie interne (true/false).",
+        "label": "Compte de test — notifications de la messagerie (internalCommunicatorNotifications)"
+      },
+      "ta_wh_enable_meal_selection": {
+        "description": "Indique s'il faut activer la sélection des repas (true/false).",
+        "label": "Compte de test — sélection des repas (enableMealSelection)"
+      },
+      "ta_wh_gds_locator": {
+        "description": "Identifiant du profil GDS (gdsProfileLocator).",
+        "label": "Compte de test — GDS Profile Locator"
+      },
+      "ta_wh_gds_locator_manual": {
+        "description": "Identifiant du profil GDS (manuel) (gdsProfileLocatorManual).",
+        "label": "Compte de test — GDS Profile Locator Manual"
+      },
+      "ta_wh_header_color": {
+        "description": "Couleur hex de l'en-tête whitelabel dans HTCD.",
+        "label": "Compte de test — couleur de l'en-tête (whitelabelHeader)"
+      }
+    },
     "crm": {
       "intro": "— dictionnaires et seuils utilisés par le module CRM. Modifiez les listes en ajoutant / supprimant des éléments. Les modifications prennent effet après l’enregistrement.",
       "scoring": {
@@ -891,6 +1269,11 @@
         "data_administration": "Coresponsabilité du traitement",
         "data_processing_entrustment": "Sous-traitance du traitement",
         "no_gdpr": "Hors RGPD"
+      },
+      "holdReasons": {
+        "businessPause": "Pause d'activité",
+        "internalSituation": "Situation interne de l'entreprise",
+        "noDecisionMakers": "Pas de décideurs"
       },
       "industries": {
         "Education": "Éducation",
