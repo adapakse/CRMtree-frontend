@@ -8,8 +8,10 @@ import { LocaleService } from '../../../core/i18n/locale.service';
 import { AppSettingsService, AppSettingsMeta, LeadStageConfig } from '../../../core/services/app-settings.service';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AiConfigService, AiConfig, AiProviderOption, AiPurpose } from '../../../core/services/ai-config.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
+import { AiPurposeRowComponent } from './ai-purpose-row.component';
 import { LanguagePickerComponent } from '../../../shared/components/language-picker/language-picker.component';
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
@@ -232,7 +234,7 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
   // Zakres `crm` obok `admin`: zakładka „Etapy leada" pokazuje wbudowane nazwy
   // etapów (crm.labels.stages.*) jako podpowiedź w polu nazwy — bez tego
   // placeholder pokazywałby surowy kod etapu.
@@ -325,6 +327,46 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
               <strong>{{ t('settings.tabs.global') }}</strong> {{ t('settings.global.intro') }}
             </div>
           </div>
+
+          <!-- Dostawca AI — pokazywana TYLKO gdy tenant ma włączony jakikolwiek
+               moduł korzystający z tego klucza (Prospekty, Analizator rozmów,
+               SEO). Bez nich pole na klucz API nie miałoby czego obsługiwać,
+               więc byłoby samym szumem. Gate'owanie flagą to ten sam wzorzec co
+               zakładka ICP. Klucz NIE wraca z API — po zapisie widać tylko 4
+               ostatnie znaki (api_key_hint).
+
+               Model jest ustawiany OSOBNO DLA KAŻDEJ FUNKCJI, bo ich potrzeby są
+               skrajnie różne: enrichment to tysiące firm na najtańszym modelu,
+               SEO to długie artykuły. Puste pole = model domyślny dostawcy, więc
+               admin, który nie chce o tym decydować, nie musi nic wpisywać.
+               Funkcje wymagające zdolności, których wybrany dostawca nie ma
+               (wyszukiwanie w internecie, wymuszony format odpowiedzi), są
+               wyszarzone z podanym powodem — nigdy po cichu nieaktywne. -->
+          @if (aiFeatureEnabled()) {
+          <div class="card" style="margin-bottom:20px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🤖</span>
+              <span class="cat-title">{{ t('settings.ai.title') }}</span>
+            </div>
+
+            <div style="padding:16px 20px">
+              <div class="field-desc" style="margin-bottom:6px">{{ t('settings.ai.intro') }}</div>
+
+              @if (aiLoading()) {
+                <div class="state-msg">{{ t('settings.ai.loading') }}</div>
+              } @else {
+                @for (p of aiPurposes(); track p.key) {
+                  <app-ai-purpose-row
+                    [purpose]="p"
+                    [providers]="aiProviders()"
+                    [config]="aiConfig()[p.key] ?? null"
+                    [savedProviders]="aiSavedProviders()"
+                    (changed)="loadAiConfig()" />
+                }
+              }
+            </div>
+          </div>
+          }
 
           @for (cat of globalCategories(); track cat.key) {
             <div class="card" style="margin-bottom:20px;overflow:hidden">
@@ -1374,6 +1416,48 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
 
     /* Enrichment / ICP tab */
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
+
+    /* Dostawca AI */
+    .ai-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .ai-label { flex:0 0 190px; font-size:13px; font-weight:600; color:var(--gray-800); }
+    .ai-row .fsel, .ai-row .fi {
+      flex:1; max-width:340px; padding:7px 10px; font-size:13px;
+      border:1px solid var(--gray-200); border-radius:7px; background:white; color:var(--gray-800);
+    }
+    .ai-row .fi:focus, .ai-row .fsel:focus { outline:none; border-color:var(--orange); }
+    .ai-sub { font-size:11.5px; color:var(--gray-400); margin:0 0 14px 202px; line-height:1.5; }
+    .ai-models-state { display:block; margin-top:3px; color:var(--gray-400); font-style:italic; }
+    .ai-link-btn {
+      display:inline-block; margin-top:3px; padding:0; border:0; background:none;
+      font-size:11.5px; color:var(--orange-dark); text-decoration:underline; cursor:pointer;
+    }
+    .ai-link-btn:disabled { color:var(--gray-400); cursor:default; }
+    .ai-models-title {
+      margin:18px 0 2px; font-size:12px; font-weight:700; letter-spacing:.04em;
+      text-transform:uppercase; color:var(--gray-400);
+    }
+    /* Funkcja niedostępna u wybranego dostawcy: wiersz zostaje widoczny z podanym
+       powodem, zamiast znikać — inaczej admin nie wiedziałby, że ją traci. */
+    .ai-row-off .ai-label { color:var(--gray-400); font-weight:500; }
+    .ai-unavailable {
+      flex:1; min-width:0; font-size:12px; color:var(--gray-400);
+      background:var(--gray-50); border:1px dashed var(--gray-200);
+      border-radius:8px; padding:7px 10px;
+    }
+    .ai-hint-link { font-size:11.5px; color:#1D4ED8; text-decoration:none; white-space:nowrap; }
+    .ai-hint-link:hover { text-decoration:underline; }
+    .ai-badge { margin-left:auto; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; }
+    .ai-badge-ok  { background:#DCFCE7; color:#166534; }
+    .ai-badge-bad { background:#FEE2E2; color:#991B1B; }
+    .ai-badge-off { background:var(--gray-100); color:var(--gray-500); }
+    .ai-error {
+      background:#FEF2F2; border:1px solid #FECACA; color:#991B1B;
+      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-bottom:14px;
+    }
+    .ai-ok {
+      background:#F0FDF4; border:1px solid #BBF7D0; color:#166534;
+      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-top:14px;
+    }
     .td-muted { color: var(--gray-500); font-size: 13px; }
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
@@ -1504,8 +1588,92 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
 })
 export class SettingsComponent implements OnInit {
   private settingsSvc = inject(AppSettingsService);
+  private aiConfigSvc = inject(AiConfigService);
   private leadStages  = inject(LeadStagesService);
   private toast       = inject(ToastService);
+
+
+  // ── Dostawcy AI (klucz tenanta, osobno dla każdej funkcji) ────────────────
+  // Każda funkcja AI ma własnego dostawcę, klucz i model — klient może mieć
+  // enrichment na tanim dostawcy, a „Znajdź konkurencję" na innym. Szczegóły
+  // jednego wiersza obsługuje AiPurposeRowComponent; tutaj zostaje tylko
+  // wczytanie całości i rozdanie jej wierszom.
+  //
+  // Klucz nie wraca z API — po zapisie widać wyłącznie 4 ostatnie znaki.
+  aiLoading   = signal(false);
+  aiConfig    = signal<Record<string, AiConfig>>({});
+  aiProviders = signal<AiProviderOption[]>([]);
+  aiPurposes  = signal<AiPurpose[]>([]);
+
+  /**
+   * Dostawcy skonfigurowani już przy którejkolwiek funkcji, z hintem klucza.
+   * Wiersz nieskonfigurowanej funkcji oferuje ich jednym kliknięciem — klucz
+   * jest już zapisany, więc nie trzeba go wklejać po raz drugi.
+   */
+  aiSavedProviders = computed(() => {
+    const seen = new Map<string, string>();
+    for (const config of Object.values(this.aiConfig())) {
+      if (!seen.has(config.provider)) seen.set(config.provider, config.api_key_hint);
+    }
+    return [...seen].map(([provider, hint]) => ({ provider, hint }));
+  });
+
+  /**
+   * Konfiguracja AI jest pokazywana tylko tenantowi, który ma włączony
+   * jakikolwiek moduł z niej korzystający. Bez nich byłaby samym szumem.
+   */
+  aiFeatureEnabled = computed(() =>
+    this.auth.hasFeature('prospects')
+    || this.auth.hasFeature('call_analysis')
+    || this.auth.hasFeature('seo_bot'));
+
+  loadAiConfig(): void {
+    if (!this.aiFeatureEnabled()) return;
+    this.aiLoading.set(true);
+    this.aiConfigSvc.get().subscribe({
+      next: res => {
+        this.aiProviders.set(res.providers);
+        this.aiPurposes.set(res.purposes);
+        this.aiConfig.set(res.config);
+        this.aiLoading.set(false);
+        this.recheckFailedAiConfigs(res.config);
+      },
+      error: () => this.aiLoading.set(false),
+    });
+  }
+
+  /**
+   * Status funkcji AI jest zapamiętany z ostatniego sprawdzenia, więc sam z
+   * siebie nigdy się nie zmienia — admin, który doładował konto u dostawcy,
+   * widziałby „brak środków" bez końca, a panel nie ma przycisku do ponownego
+   * sprawdzenia. Dlatego odpytujemy dostawcę przy wejściu na ekran, ale tylko
+   * dla statusu `error` (przejściowy: brak środków, limit, sieć). Statusu
+   * `invalid` nie ponawiamy — dostawca odrzucił klucz albo model, więc do
+   * zmiany w ustawieniach ponowienie nic nie wniesie, a każde kosztuje realne
+   * (drobne) wywołanie modelu. Odstęp chroni przed serią wywołań, gdy ktoś
+   * przeklikuje zakładki tam i z powrotem.
+   */
+  private recheckFailedAiConfigs(config: Record<string, AiConfig>): void {
+    const RECHECK_AFTER_MS = 60_000;
+    const now = Date.now();
+    const stale = Object.values(config).filter(c => {
+      if (c.status !== 'error') return false;
+      const checkedAt = c.last_checked_at ? Date.parse(c.last_checked_at) : 0;
+      return !Number.isFinite(checkedAt) || now - checkedAt > RECHECK_AFTER_MS;
+    });
+    for (const cfg of stale) {
+      this.aiConfigSvc.recheck(cfg.purpose).subscribe({
+        next: res => this.aiConfig.update(current => ({
+          ...current,
+          [res.purpose]: { ...current[res.purpose], status: res.status, last_error: res.last_error },
+        })),
+        // Nieudane ponowienie zostawia status taki, jaki był — nie ma sensu
+        // zamieniać jednego błędu na drugi, gorszy.
+        error: () => undefined,
+      });
+    }
+  }
+
   auth                = inject(AuthService);
   private transloco     = inject(TranslocoService);
   private localeService = inject(LocaleService);
@@ -1711,6 +1879,8 @@ export class SettingsComponent implements OnInit {
     // zapisanych jako gotowy tekst (patrz freeTextItemLabel). Dla polskiego
     // interfejsu to ten sam, już wczytany plik, więc nic nie dociąga.
     this.transloco.load('admin/pl').subscribe({ error: () => undefined });
+    // Karta dostawcy AI stoi w zakładce otwieranej domyślnie, więc wczytujemy ją od razu.
+    this.loadAiConfig();
     // Załaduj listę userów dla edytora szablonów onboarding
     this.http.get<any[]>(`${environment.apiUrl}/admin/users?limit=200`).subscribe({
       next: r => this.allUsers.set((r as any)?.data || r),
@@ -2364,3 +2534,4 @@ export class SettingsComponent implements OnInit {
     this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.saveFailed'));
   }
 }
+
