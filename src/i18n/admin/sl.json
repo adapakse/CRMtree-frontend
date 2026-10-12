@@ -1157,6 +1157,28 @@
         "value": "Vrednost"
       }
     },
+    "customFields": {
+      "active": "Aktivno",
+      "addButton": "Dodaj polje",
+      "deleteConfirm": "Ali izbrišem polje „{name}“?",
+      "deleteTooltip": "Izbriši polje — mogoče le, dokler noben zapis nima vrednosti",
+      "empty": "Ta obrazec nima dodatnih polj.",
+      "hint": "Polja, ki jih za ta obrazec določite sami. Vrste polja pozneje ni mogoče spremeniti — če jo želite spremeniti, polje izklopite in dodajte novo. Izklopljeno polje izgine z obrazca, že vnesene vrednosti pa ostanejo.",
+      "newNamePlaceholder": "Ime novega polja",
+      "optionsPlaceholder": "Vrednosti, ločene z vejico",
+      "optionsRequired": "Polje s seznamom potrebuje vsaj eno vrednost.",
+      "saveFailed": "Polja ni bilo mogoče shraniti.",
+      "titleDocument": "Dodatna polja dokumenta",
+      "titleLead": "Dodatna polja potencialne stranke",
+      "titlePartner": "Dodatna polja partnerja",
+      "types": {
+        "date": "Datum",
+        "list": "Spustni seznam",
+        "money": "Znesek",
+        "number": "Število",
+        "text": "Besedilo"
+      }
+    },
     "documents": {
       "empty": "Ni šifrantov dokumentov. Zaženite migracijo 0116.",
       "intro": "— upravljajte razpoložljive vrednosti za vrste dokumentov, statuse in klasifikacijo GDPR. Opozorilo: odstranitev vrednosti, ki je že uporabljena v dokumentih, lahko povzroči težave pri prikazu."

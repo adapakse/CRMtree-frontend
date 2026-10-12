@@ -1157,6 +1157,28 @@
         "value": "Wert"
       }
     },
+    "customFields": {
+      "active": "Aktiv",
+      "addButton": "Feld hinzufügen",
+      "deleteConfirm": "Feld „{name}“ löschen?",
+      "deleteTooltip": "Feld löschen — nur möglich, solange kein Datensatz einen Wert darin hat",
+      "empty": "Keine Zusatzfelder in diesem Formular.",
+      "hint": "Felder, die Sie selbst für dieses Formular definieren. Der Feldtyp lässt sich später nicht ändern — schalten Sie das Feld dafür ab und legen Sie ein neues an. Ein abgeschaltetes Feld verschwindet aus dem Formular, bereits erfasste Werte bleiben erhalten.",
+      "newNamePlaceholder": "Name des neuen Feldes",
+      "optionsPlaceholder": "Werte durch Komma getrennt",
+      "optionsRequired": "Ein Listenfeld braucht mindestens einen Wert.",
+      "saveFailed": "Das Feld konnte nicht gespeichert werden.",
+      "titleDocument": "Zusatzfelder des Dokuments",
+      "titleLead": "Zusatzfelder des Leads",
+      "titlePartner": "Zusatzfelder des Partners",
+      "types": {
+        "date": "Datum",
+        "list": "Auswahlliste",
+        "money": "Betrag",
+        "number": "Zahl",
+        "text": "Text"
+      }
+    },
     "documents": {
       "empty": "Keine Dokument-Wörterbücher vorhanden. Führen Sie die Migration 0116 aus.",
       "intro": "— verwalten Sie die verfügbaren Werte für Dokumenttypen, Status und DSGVO-Klassifizierung. Achtung: Das Löschen eines Werts, der bereits in Dokumenten verwendet wird, kann zu Anzeigeproblemen führen."

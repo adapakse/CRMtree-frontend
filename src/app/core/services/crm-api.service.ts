@@ -1,5 +1,6 @@
 // src/app/core/services/crm-api.service.ts
 import { Injectable, inject } from '@angular/core';
+import { TenantFieldValue } from './tenant-fields.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, combineLatest, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -82,6 +83,8 @@ export interface Lead {
   linked_documents?: LinkedDocument[];
   extra_contacts?: LeadContact[];
   can_edit?: boolean;
+  /** Pola dodatkowe tenanta razem z wartościami tego rekordu (migracja 0328). */
+  custom_fields?: TenantFieldValue[];
   created_at: string;
   updated_at: string;
 }
@@ -311,6 +314,8 @@ export interface Partner {
   churn_sales_drop_pct?: number | null;
   health_score?: number | null;
   health_level?: string | null;
+  /** Pola dodatkowe tenanta razem z wartościami tego rekordu (migracja 0328). */
+  custom_fields?: TenantFieldValue[];
   created_at: string;
   updated_at: string;
 }

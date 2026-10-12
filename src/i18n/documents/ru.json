@@ -220,6 +220,7 @@
       "contractSubject": "Предмет договора",
       "counterpartyCountry": "Страна контрагента",
       "counterpartyTaxId": "ИНН контрагента",
+      "customFields": "Дополнительные поля",
       "documentName": "Название документа",
       "documentType": "Тип документа",
       "email": "E-mail",

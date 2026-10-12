@@ -220,6 +220,7 @@
       "contractSubject": "Oggetto del contratto",
       "counterpartyCountry": "Paese della controparte",
       "counterpartyTaxId": "Partita IVA della controparte",
+      "customFields": "Campi aggiuntivi",
       "documentName": "Nome del documento",
       "documentType": "Tipo di documento",
       "email": "E-mail",

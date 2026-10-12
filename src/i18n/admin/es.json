@@ -1157,6 +1157,28 @@
         "value": "Valor"
       }
     },
+    "customFields": {
+      "active": "Activo",
+      "addButton": "Añadir campo",
+      "deleteConfirm": "¿Eliminar el campo «{name}»?",
+      "deleteTooltip": "Eliminar el campo — solo es posible si ningún registro tiene valor",
+      "empty": "No hay campos adicionales en este formulario.",
+      "hint": "Campos que defines tú para este formulario. El tipo de campo no se puede cambiar después: para cambiarlo, desactiva el campo y crea uno nuevo. Un campo desactivado desaparece del formulario, pero los valores ya introducidos se conservan.",
+      "newNamePlaceholder": "Nombre del nuevo campo",
+      "optionsPlaceholder": "Valores separados por comas",
+      "optionsRequired": "Un campo de lista necesita al menos un valor.",
+      "saveFailed": "No se pudo guardar el campo.",
+      "titleDocument": "Campos adicionales del documento",
+      "titleLead": "Campos adicionales del lead",
+      "titlePartner": "Campos adicionales del partner",
+      "types": {
+        "date": "Fecha",
+        "list": "Lista desplegable",
+        "money": "Importe",
+        "number": "Número",
+        "text": "Texto"
+      }
+    },
     "documents": {
       "empty": "No hay catálogos de documentos. Ejecuta la migración 0116.",
       "intro": "— gestiona los valores disponibles para los tipos de documento, los estados y la clasificación RGPD. Atención: eliminar un valor que ya se usa en documentos puede causar problemas de visualización."

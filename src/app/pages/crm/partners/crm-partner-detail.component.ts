@@ -12,6 +12,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
 import { LinkedProjectTasksComponent } from '../../../shared/components/linked-project-tasks/linked-project-tasks.component';
+import { CustomFieldsComponent } from '../../../shared/components/custom-fields/custom-fields.component';
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
@@ -55,7 +56,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   selector: 'wt-crm-partner-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, CustomFieldsComponent, TranslocoDirective, TranslocoPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -341,6 +342,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <span class="notes dwh-note" [innerHTML]="partner.customer_service_note"></span>
         </ng-container>
       </div>
+      <!-- Pola dodatkowe tenanta (migracja 0328) — podgląd; edycja w oknie „Edytuj". -->
+      @if (partner.custom_fields?.length) {
+        <div class="info-grid" style="margin-top:10px;display:block">
+          <app-custom-fields [fields]="partner.custom_fields!" [readonly]="true" />
+        </div>
+      }
 
       <!-- Dane dodatkowe — CRM + DWH -->
       <div class="info-subsection">
@@ -1659,6 +1666,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </label>
           <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" [placeholder]="t('partnerDetail.edit.placeholders.notes')" style="margin-top:8px"></textarea>
         </div>
+        <!-- Pola dodatkowe tenanta (migracja 0328). Jadą w tym samym żądaniu co
+             reszta formularza, więc „Zapisz" zapisuje wszystko naraz. -->
+        @if (partner?.custom_fields?.length) {
+          <div class="edit-section">
+            <div class="edit-section-title">{{ t('partnerDetail.sections.customFields') }}</div>
+            <app-custom-fields [fields]="partner!.custom_fields!" (valuesChange)="customValues = $event" />
+          </div>
+        }
       </div>
       <div class="modal-footer">
         <button class="btn-outline" (click)="showEdit = false; submitAttempted = false">{{ 'actions.cancel' | transloco }}</button>
@@ -2072,6 +2087,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   partner: Partner | null = null;
+  /** Zmienione pola dodatkowe tenanta; puste, dopóki formularz ich nie dotknął. */
+  customValues: Record<string, unknown> = {};
 
   /** Id that both the partner API and the /crm/partners/:id route accept: CRM uuid, else the DWH id. */
   get partnerRouteId(): string {
@@ -3256,6 +3273,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
         error: () => {},
       });
     }
+    this.customValues = {};
     this.showEdit = true;
   }
 
@@ -3323,6 +3341,8 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
       ...(this.isDwhFieldReadOnly('admin_first_name')      ? {} : { admin_first_name:      this.editForm.admin_first_name      || null }),
       ...(this.isDwhFieldReadOnly('admin_last_name')       ? {} : { admin_last_name:       this.editForm.admin_last_name       || null }),
       ...(this.isDwhFieldReadOnly('admin_email')           ? {} : { admin_email:           this.editForm.admin_email           || null }),
+      // Puste = formularz nie dotknął pól dodatkowych; backend pomija wtedy kolumnę.
+      ...(Object.keys(this.customValues).length ? { custom_values: this.customValues } : {}),
     };
     const partnerId = this.pid;
     const extraContacts = this.extraContacts.filter(contact => !this.isContactEmpty(contact));
@@ -3343,6 +3363,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
             this.zone.run(() => {
               this.partner = { ...full, activities: this.partner?.activities ?? full.activities };
               this.saving = false;
+              this.customValues = {};
               this.showEdit = false;
               this.historyLoaded = false;
               this.loadHistory();

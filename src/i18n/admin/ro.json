@@ -1157,6 +1157,28 @@
         "value": "Valoare"
       }
     },
+    "customFields": {
+      "active": "Activ",
+      "addButton": "Adaugă câmp",
+      "deleteConfirm": "Se șterge câmpul „{name}”?",
+      "deleteTooltip": "Șterge câmpul — posibil doar dacă nicio înregistrare nu are valoare",
+      "empty": "Niciun câmp suplimentar în acest formular.",
+      "hint": "Câmpuri pe care le definești singur pentru acest formular. Tipul câmpului nu mai poate fi schimbat ulterior — pentru a-l schimba, dezactivează câmpul și adaugă unul nou. Un câmp dezactivat dispare din formular, dar valorile deja introduse rămân.",
+      "newNamePlaceholder": "Numele câmpului nou",
+      "optionsPlaceholder": "Valori separate prin virgulă",
+      "optionsRequired": "Un câmp de tip listă necesită cel puțin o valoare.",
+      "saveFailed": "Câmpul nu a putut fi salvat.",
+      "titleDocument": "Câmpuri suplimentare ale documentului",
+      "titleLead": "Câmpuri suplimentare ale lead-ului",
+      "titlePartner": "Câmpuri suplimentare ale partenerului",
+      "types": {
+        "date": "Dată",
+        "list": "Listă",
+        "money": "Sumă",
+        "number": "Număr",
+        "text": "Text"
+      }
+    },
     "documents": {
       "empty": "Nu există dicționare de documente. Rulați migrarea 0116.",
       "intro": "— gestionați valorile disponibile pentru tipurile de documente, statusuri și clasificarea GDPR. Atenție: ștergerea unei valori deja utilizate în documente poate cauza probleme de afișare."

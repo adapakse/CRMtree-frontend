@@ -1157,6 +1157,28 @@
         "value": "Wartość"
       }
     },
+    "customFields": {
+      "active": "Aktywne",
+      "addButton": "Dodaj pole",
+      "deleteConfirm": "Usunąć pole „{name}”?",
+      "deleteTooltip": "Usuń pole — możliwe tylko, gdy nikt nic w nim nie zapisał",
+      "empty": "Brak pól dodatkowych na tej formatce.",
+      "hint": "Pola, które sam definiujesz dla tej formatki. Typu pola nie da się później zmienić — żeby go zmienić, wyłącz pole i dodaj nowe. Wyłączone pole znika z formatki, ale wpisane wcześniej wartości zostają.",
+      "newNamePlaceholder": "Nazwa nowego pola",
+      "optionsPlaceholder": "Wartości po przecinku",
+      "optionsRequired": "Pole typu lista wymaga co najmniej jednej wartości.",
+      "saveFailed": "Nie udało się zapisać pola.",
+      "titleDocument": "Pola dodatkowe dokumentu",
+      "titleLead": "Pola dodatkowe leada",
+      "titlePartner": "Pola dodatkowe partnera",
+      "types": {
+        "date": "Data",
+        "list": "Lista wyboru",
+        "money": "Kwota",
+        "number": "Liczba",
+        "text": "Tekst"
+      }
+    },
     "documents": {
       "empty": "Brak słowników dokumentów. Uruchom migrację 0116.",
       "intro": "— zarządzaj dostępnymi wartościami dla typów dokumentów, statusów i klasyfikacji GDPR. Uwaga: usunięcie wartości która jest już użyta w dokumentach może powodować problemy wyświetlania."
