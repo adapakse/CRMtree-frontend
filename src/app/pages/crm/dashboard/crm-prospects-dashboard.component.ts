@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import {
   CrmApiService,
   ProspectDashLeadRow, ProspectDashScoreRow, ProspectDashAiTagRow,
@@ -23,8 +24,13 @@ const SCORE_PALETTE = [
   '#facc15', '#fb923c', '#ef4444',
 ];
 
+// Wartości przychodzące z API, nie etykiety — porównania muszą zostać na nich,
+// a tłumaczymy dopiero przy wyświetlaniu (scoreRangeLabel / aiTagLabel).
+const SCORE_RANGE_NONE = 'brak';
+const AI_TAG_NONE = 'bez taga AI';
+
 function scoreSortKey(range: string): number {
-  if (range === 'brak') return -Infinity;
+  if (range === SCORE_RANGE_NONE) return -Infinity;
   const m = range.match(/\d+/);
   const num = m ? parseInt(m[0], 10) : 0;
   if (range.startsWith('<'))  return num - 0.5;
@@ -33,8 +39,8 @@ function scoreSortKey(range: string): number {
 }
 
 function buildScoreColorMap(ranges: string[]): Map<string, string> {
-  const map = new Map<string, string>([['brak', '#9ca3af']]);
-  const sorted = [...ranges].filter(r => r !== 'brak')
+  const map = new Map<string, string>([[SCORE_RANGE_NONE, '#9ca3af']]);
+  const sorted = [...ranges].filter(r => r !== SCORE_RANGE_NONE)
     .sort((a, b) => scoreSortKey(a) - scoreSortKey(b));
   sorted.forEach((r, i) => {
     const n = sorted.length;
@@ -53,37 +59,22 @@ const CALL_STATUS_COLORS: Record<string, string> = {
   error:        '#9ca3af',
 };
 
-const CALL_STATUS_LABELS: Record<string, string> = {
-  answered:     'Odebrane',
-  missed:       'Przychodzące nieodebrane',
-  not_answered: 'Wychodzące nieodebrane',
-  rejected:     'Odrzucone',
-  error:        'Błąd połączenia',
-};
-
 const AI_TAG_COLORS: Record<string, string> = {
   'AI70%': '#4ade80',
   'AI50%': '#60a5fa',
   'AI30%': '#fdba74',
   'AI0%':  '#9ca3af',
-  'bez taga AI': '#c4b5fd',
+  [AI_TAG_NONE]: '#c4b5fd',
 };
 
 
 function aiPct(tag: string): number { return parseInt(tag.match(/\d+/)?.[0] ?? '0', 10); }
 
 type Period = 'this_week' | 'this_month' | 'this_quarter' | 'ytd' | 'prev_week' | 'prev_month' | 'prev_quarter' | 'prev_year' | 'custom';
-const PERIOD_LABELS: Record<Period, string> = {
-  this_week:    'Ten tydzień',
-  this_month:   'Ten miesiąc',
-  this_quarter: 'Ten kwartał',
-  ytd:          'Ten rok (YTD)',
-  prev_week:    'Poprzedni tydzień',
-  prev_month:   'Poprzedni miesiąc',
-  prev_quarter: 'Poprzedni kwartał',
-  prev_year:    'Poprzedni rok',
-  custom:       'Własny…',
-};
+const PERIODS: Period[] = [
+  'this_week', 'this_month', 'this_quarter', 'ytd',
+  'prev_week', 'prev_month', 'prev_quarter', 'prev_year', 'custom',
+];
 
 function maxOf(rows: BarRow[]): number {
   return Math.max(1, ...rows.map(r => r.total));
@@ -92,15 +83,17 @@ function maxOf(rows: BarRow[]): number {
 @Component({
   selector: 'wt-crm-prospects-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('prospects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+<ng-container *transloco="let t; prefix: 'prospects'">
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
 <div style="height:60px;background:white;border-bottom:1px solid var(--gray-200,#e5e7eb);display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">Dashboard Prospekty</span>
-  <span style="font-size:12px;color:#a1a1aa">Statystyki leadów, prospektów i połączeń PBX</span>
+  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">{{ t('dashboard.title') }}</span>
+  <span style="font-size:12px;color:#a1a1aa">{{ t('dashboard.subtitle') }}</span>
 </div>
 
 <!-- CONTENT -->
@@ -112,10 +105,10 @@ function maxOf(rows: BarRow[]): number {
   ══════════════════════════════════════════════════════ -->
   <div class="pd-panel">
     <div class="pd-panel-head">
-      <h2>Leady per handlowiec (wg score prospektu)</h2>
+      <h2>{{ t('dashboard.leadsBySalesperson') }}</h2>
       <div class="pd-filters">
         <select class="pd-sel" [(ngModel)]="period1" (ngModelChange)="onPeriod1Change()">
-          <option *ngFor="let p of periods" [value]="p.value">{{ p.label }}</option>
+          <option *ngFor="let p of periods" [value]="p">{{ t('periods.' + p) }}</option>
         </select>
         <ng-container *ngIf="period1 === 'custom'">
           <input type="date" class="pd-sel" [(ngModel)]="customFrom1" (ngModelChange)="loadChart1()">
@@ -123,7 +116,7 @@ function maxOf(rows: BarRow[]): number {
           <input type="date" class="pd-sel" [(ngModel)]="customTo1" (ngModelChange)="loadChart1()">
         </ng-container>
         <select class="pd-sel" [(ngModel)]="filter1Stage" (ngModelChange)="loadChart1()">
-          <option value="">Wszystkie etapy</option>
+          <option value="">{{ t('dashboard.allStages') }}</option>
           @for (s of stages.selectable(); track s.key) {
             <option [value]="s.key">{{ stageLabel(s.key) }}</option>
           }
@@ -131,8 +124,8 @@ function maxOf(rows: BarRow[]): number {
       </div>
     </div>
 
-    <div *ngIf="loading1" class="pd-loading">Ładowanie…</div>
-    <div *ngIf="!loading1 && chart1Rows.length === 0" class="pd-empty">Brak danych dla wybranego okresu</div>
+    <div *ngIf="loading1" class="pd-loading">{{ t('dashboard.loading') }}</div>
+    <div *ngIf="!loading1 && chart1Rows.length === 0" class="pd-empty">{{ t('dashboard.noDataForPeriod') }}</div>
 
     <div *ngIf="!loading1 && chart1Rows.length > 0" class="pd-chart-wrap">
       <!-- Słupki per handlowiec -->
@@ -158,7 +151,7 @@ function maxOf(rows: BarRow[]): number {
       <div class="pd-legend">
         <div *ngFor="let s of chart1ScoreRanges" class="pd-leg-item">
           <span class="pd-leg-dot" [style.background]="scoreColor(s)"></span>
-          <span>{{ s }}</span>
+          <span>{{ scoreRangeLabel(s) }}</span>
         </div>
       </div>
     </div>
@@ -169,18 +162,18 @@ function maxOf(rows: BarRow[]): number {
   ══════════════════════════════════════════════════════ -->
   <div class="pd-panel">
     <div class="pd-panel-head">
-      <h2>Prospekty w bazie (wg punktów i statusu)</h2>
+      <h2>{{ t('dashboard.prospectsInDatabase') }}</h2>
       <div class="pd-filters">
         <select class="pd-sel" [(ngModel)]="filter2Status" (ngModelChange)="loadChart2()">
-          <option value="">Wszystkie statusy</option>
-          <option value="prospect">Prospekt</option>
-          <option value="lead">Lead</option>
-          <option value="hold">Hold</option>
-          <option value="archive">Archiwum</option>
+          <option value="">{{ t('dashboard.allStatuses') }}</option>
+          <option value="prospect">{{ t('prospectStatus.prospect') }}</option>
+          <option value="lead">{{ t('prospectStatus.lead') }}</option>
+          <option value="hold">{{ t('prospectStatus.hold') }}</option>
+          <option value="archive">{{ t('prospectStatus.archive') }}</option>
         </select>
         <label class="pd-chk">
           <input type="checkbox" [(ngModel)]="show2NullScore" (ngModelChange)="buildChart2(); cdr.markForCheck()">
-          <span>Pokaż score=NULL</span>
+          <span>{{ t('dashboard.showNullScore') }}</span>
         </label>
         <label class="pd-chk">
           <input type="checkbox" [(ngModel)]="show2BelowThreshold" (ngModelChange)="buildChart2(); cdr.markForCheck()">
@@ -198,11 +191,11 @@ function maxOf(rows: BarRow[]): number {
               type="text"
               class="pd-ms-search"
               [(ngModel)]="filter2DbSearch"
-              placeholder="Szukaj bazy…"
+              [placeholder]="t('dashboard.searchDatabase')"
               (click)="$event.stopPropagation()">
             <div class="pd-ms-actions">
-              <button type="button" (click)="selectAllDbs()">Wszystkie</button>
-              <button type="button" (click)="clearDbs()">Wyczyść</button>
+              <button type="button" (click)="selectAllDbs()">{{ t('dashboard.selectAll') }}</button>
+              <button type="button" (click)="clearDbs()">{{ t('dashboard.clear') }}</button>
             </div>
             <div class="pd-ms-list">
               <label *ngFor="let db of filteredDbOptions" class="pd-ms-item">
@@ -211,15 +204,15 @@ function maxOf(rows: BarRow[]): number {
                   (change)="toggleDb(db)">
                 <span>{{ db }}</span>
               </label>
-              <div *ngIf="filteredDbOptions.length === 0" class="pd-ms-empty">Brak wyników</div>
+              <div *ngIf="filteredDbOptions.length === 0" class="pd-ms-empty">{{ t('dashboard.noResults') }}</div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div *ngIf="loading2" class="pd-loading">Ładowanie…</div>
-    <div *ngIf="!loading2 && chart2Bars.length === 0" class="pd-empty">Brak danych</div>
+    <div *ngIf="loading2" class="pd-loading">{{ t('dashboard.loading') }}</div>
+    <div *ngIf="!loading2 && chart2Bars.length === 0" class="pd-empty">{{ t('dashboard.noData') }}</div>
 
     <div *ngIf="!loading2 && chart2Bars.length > 0" class="pd-bars">
       <div class="pd-bar-row" *ngFor="let row of chart2Bars">
@@ -240,7 +233,7 @@ function maxOf(rows: BarRow[]): number {
       <div class="pd-legend">
         <div *ngFor="let s of chart2ScoreRanges" class="pd-leg-item">
           <span class="pd-leg-dot" [style.background]="scoreColor(s)"></span>
-          <span>{{ s }}</span>
+          <span>{{ scoreRangeLabel(s) }}</span>
         </div>
       </div>
     </div>
@@ -251,10 +244,10 @@ function maxOf(rows: BarRow[]): number {
   ══════════════════════════════════════════════════════ -->
   <div class="pd-panel pd-panel-sm">
     <div class="pd-panel-head">
-      <h2>Leady wg tagu AI</h2>
+      <h2>{{ t('dashboard.leadsByAiTag') }}</h2>
       <div class="pd-filters">
         <select class="pd-sel" [(ngModel)]="filter3Stage" (ngModelChange)="loadChart3()">
-          <option value="">Wszystkie etapy</option>
+          <option value="">{{ t('dashboard.allStages') }}</option>
           @for (s of stages.selectable(); track s.key) {
             <option [value]="s.key">{{ stageLabel(s.key) }}</option>
           }
@@ -264,13 +257,13 @@ function maxOf(rows: BarRow[]): number {
       </div>
     </div>
 
-    <div *ngIf="loading3" class="pd-loading">Ładowanie…</div>
-    <div *ngIf="!loading3 && chart3Rows.length === 0" class="pd-empty">Brak danych</div>
+    <div *ngIf="loading3" class="pd-loading">{{ t('dashboard.loading') }}</div>
+    <div *ngIf="!loading3 && chart3Rows.length === 0" class="pd-empty">{{ t('dashboard.noData') }}</div>
 
     <div *ngIf="!loading3 && chart3Rows.length > 0">
       <div class="pd-bars">
         <div class="pd-bar-row" *ngFor="let row of chart3Rows">
-          <span class="pd-bar-label pd-bar-label-tag" [style.color]="aiTagColor(row.label)">{{ row.label }}</span>
+          <span class="pd-bar-label pd-bar-label-tag" [style.color]="aiTagColor(row.label)">{{ aiTagLabel(row.label) }}</span>
           <div class="pd-bar-track">
             <div class="pd-bar-stacked" [style.width.%]="(row.total / chart3Max) * 100">
               <div
@@ -299,7 +292,7 @@ function maxOf(rows: BarRow[]): number {
   ══════════════════════════════════════════════════════ -->
   <div class="pd-panel">
     <div class="pd-panel-head">
-      <h2>Wzbogacone prospekty per baza (score po grupach)</h2>
+      <h2>{{ t('dashboard.enrichedByDatabase') }}</h2>
       <div class="pd-filters">
         <label class="pd-chk">
           <input type="checkbox" [(ngModel)]="show4BelowThreshold" (ngModelChange)="cdr.markForCheck()">
@@ -311,16 +304,16 @@ function maxOf(rows: BarRow[]): number {
             type="text"
             class="pd-search-input"
             [(ngModel)]="filter4DbSearch"
-            placeholder="Szukaj bazy…"
+            [placeholder]="t('dashboard.searchDatabase')"
             (ngModelChange)="cdr.markForCheck()">
           <button *ngIf="filter4DbSearch" type="button" class="pd-search-clear" (click)="filter4DbSearch=''">✕</button>
         </div>
       </div>
     </div>
 
-    <div *ngIf="loading4" class="pd-loading">Ładowanie…</div>
-    <div *ngIf="!loading4 && chart4Bars.length === 0" class="pd-empty">Brak danych</div>
-    <div *ngIf="!loading4 && chart4Bars.length > 0 && displayedChart4Bars.length === 0" class="pd-empty">Brak baz pasujących do frazy „{{ filter4DbSearch }}"</div>
+    <div *ngIf="loading4" class="pd-loading">{{ t('dashboard.loading') }}</div>
+    <div *ngIf="!loading4 && chart4Bars.length === 0" class="pd-empty">{{ t('dashboard.noData') }}</div>
+    <div *ngIf="!loading4 && chart4Bars.length > 0 && displayedChart4Bars.length === 0" class="pd-empty">{{ t('dashboard.noDatabasesMatching', { query: filter4DbSearch }) }}</div>
 
     <div *ngIf="!loading4 && displayedChart4Bars.length > 0" class="pd-bars">
       <div class="pd-bar-row" *ngFor="let row of displayedChart4Bars">
@@ -341,7 +334,7 @@ function maxOf(rows: BarRow[]): number {
       <div class="pd-legend">
         <div *ngFor="let s of displayedChart4ScoreRanges" class="pd-leg-item">
           <span class="pd-leg-dot" [style.background]="scoreColor(s)"></span>
-          <span>{{ s }}</span>
+          <span>{{ scoreRangeLabel(s) }}</span>
         </div>
       </div>
     </div>
@@ -352,10 +345,10 @@ function maxOf(rows: BarRow[]): number {
   ══════════════════════════════════════════════════════ -->
   <div class="pd-panel">
     <div class="pd-panel-head">
-      <h2>Połączenia PBX per handlowiec</h2>
+      <h2>{{ t('dashboard.callsBySalesperson') }}</h2>
       <div class="pd-filters">
         <select class="pd-sel" [(ngModel)]="period5" (ngModelChange)="onPeriod5Change()">
-          <option *ngFor="let p of periods" [value]="p.value">{{ p.label }}</option>
+          <option *ngFor="let p of periods" [value]="p">{{ t('periods.' + p) }}</option>
         </select>
         <ng-container *ngIf="period5 === 'custom'">
           <input type="date" class="pd-sel" [(ngModel)]="customFrom5" (ngModelChange)="loadChart5()">
@@ -363,23 +356,23 @@ function maxOf(rows: BarRow[]): number {
           <input type="date" class="pd-sel" [(ngModel)]="customTo5" (ngModelChange)="loadChart5()">
         </ng-container>
         <select class="pd-sel" [(ngModel)]="filter5Direction" (ngModelChange)="loadChart5()">
-          <option value="">Oba kierunki</option>
-          <option value="inbound">Przychodzące</option>
-          <option value="outbound">Wychodzące</option>
+          <option value="">{{ t('dashboard.bothDirections') }}</option>
+          <option value="inbound">{{ t('callDirection.inbound') }}</option>
+          <option value="outbound">{{ t('callDirection.outbound') }}</option>
         </select>
         <select class="pd-sel" [(ngModel)]="filter5Status" (ngModelChange)="loadChart5()">
-          <option value="">Wszystkie statusy</option>
-          <option value="answered">Odebrane</option>
-          <option value="missed">Przych. nieodebrane</option>
-          <option value="not_answered">Wych. nieodebrane</option>
-          <option value="rejected">Odrzucone</option>
-          <option value="error">Błąd</option>
+          <option value="">{{ t('dashboard.allStatuses') }}</option>
+          <option value="answered">{{ t('callStatus.answered') }}</option>
+          <option value="missed">{{ t('callStatusShort.missed') }}</option>
+          <option value="not_answered">{{ t('callStatusShort.not_answered') }}</option>
+          <option value="rejected">{{ t('callStatus.rejected') }}</option>
+          <option value="error">{{ t('callStatusShort.error') }}</option>
         </select>
       </div>
     </div>
 
-    <div *ngIf="loading5" class="pd-loading">Ładowanie…</div>
-    <div *ngIf="!loading5 && chart5Rows.length === 0" class="pd-empty">Brak danych dla wybranego okresu i filtrów</div>
+    <div *ngIf="loading5" class="pd-loading">{{ t('dashboard.loading') }}</div>
+    <div *ngIf="!loading5 && chart5Rows.length === 0" class="pd-empty">{{ t('dashboard.noDataForPeriodAndFilters') }}</div>
 
     <div *ngIf="!loading5 && chart5Rows.length > 0" class="pd-bars">
       <div class="pd-bar-row" *ngFor="let row of chart5Rows">
@@ -410,6 +403,7 @@ function maxOf(rows: BarRow[]): number {
 </div>
 </div>
 </div>
+</ng-container>
   `,
   styles: [`
     :host { display: flex; flex-direction: column; flex: 1; min-height: 0; }
@@ -598,6 +592,7 @@ function maxOf(rows: BarRow[]): number {
 })
 export class CrmProspectsDashboardComponent implements OnInit {
   private api = inject(CrmApiService);
+  private transloco = inject(TranslocoService);
   readonly stages = inject(LeadStagesService);
   readonly cdr = inject(ChangeDetectorRef);
 
@@ -663,7 +658,7 @@ export class CrmProspectsDashboardComponent implements OnInit {
   chart5StatusList: string[] = [];
   chart5Max = 1;
 
-  readonly periods = Object.entries(PERIOD_LABELS).map(([value, label]) => ({ value, label })) as { value: Period; label: string }[];
+  readonly periods = PERIODS;
 
   ngOnInit(): void {
     this.loadChart1();
@@ -743,7 +738,7 @@ export class CrmProspectsDashboardComponent implements OnInit {
       ? this.raw2.filter(r => this.filter2Dbs.includes(r.source_database))
       : this.raw2)
       .filter(r => this.show2BelowThreshold || !r.score_range.startsWith('<'))
-      .filter(r => this.show2NullScore || r.score_range !== 'brak');
+      .filter(r => this.show2NullScore || r.score_range !== SCORE_RANGE_NONE);
     const scoreRanges = [...new Set(data.map(r => r.score_range))]
       .sort((a, b) => scoreSortKey(a) - scoreSortKey(b));
     this.addScoreRanges(scoreRanges);
@@ -766,9 +761,9 @@ export class CrmProspectsDashboardComponent implements OnInit {
   }
 
   get dbFilterLabel(): string {
-    if (this.filter2Dbs.length === 0) return 'Wszystkie bazy';
+    if (this.filter2Dbs.length === 0) return this.transloco.translate('prospects.dashboard.allDatabases');
     if (this.filter2Dbs.length === 1) return this.filter2Dbs[0];
-    return `${this.filter2Dbs.length} baz`;
+    return this.transloco.translate('prospects.dashboard.databasesSelected', { count: this.filter2Dbs.length });
   }
 
   get filteredDbOptions(): string[] {
@@ -800,10 +795,9 @@ export class CrmProspectsDashboardComponent implements OnInit {
   }
 
   statusLabel(s: string): string {
-    const map: Record<string, string> = {
-      prospect: 'Prospekt', lead: 'Lead', hold: 'Hold', archive: 'Archiwum',
-    };
-    return map[s] ?? s;
+    const key = `prospects.prospectStatus.${s}`;
+    const label = this.transloco.translate(key);
+    return label === key ? s : label;
   }
 
   // ── #3 ──────────────────────────────────────────────────────────
@@ -819,9 +813,9 @@ export class CrmProspectsDashboardComponent implements OnInit {
           byTag.get(r.tag)!.set(r.stage, (byTag.get(r.tag)!.get(r.stage) ?? 0) + r.count);
         }
         const aiTags = [...byTag.keys()]
-          .filter(t => t !== 'bez taga AI')
+          .filter(t => t !== AI_TAG_NONE)
           .sort((a, b) => aiPct(b) - aiPct(a));
-        const tagOrder = byTag.has('bez taga AI') ? [...aiTags, 'bez taga AI'] : aiTags;
+        const tagOrder = byTag.has(AI_TAG_NONE) ? [...aiTags, AI_TAG_NONE] : aiTags;
 
         this.chart3Rows = tagOrder.map(tag => {
             const stageMap = byTag.get(tag)!;
@@ -846,8 +840,18 @@ export class CrmProspectsDashboardComponent implements OnInit {
     });
   }
 
+  aiTagLabel(tag: string): string {
+    return tag === AI_TAG_NONE ? this.transloco.translate('prospects.dashboard.noAiTag') : tag;
+  }
+
+  scoreRangeLabel(range: string): string {
+    return range === SCORE_RANGE_NONE
+      ? this.transloco.translate('prospects.dashboard.scoreNone')
+      : range;
+  }
+
   aiTagColor(tag: string): string {
-    if (tag === 'bez taga AI') return AI_TAG_COLORS['bez taga AI'];
+    if (tag === AI_TAG_NONE) return AI_TAG_COLORS[AI_TAG_NONE];
     const pct = aiPct(tag);
     if (pct >= 70) return '#4ade80';
     if (pct >= 50) return '#60a5fa';
@@ -861,7 +865,9 @@ export class CrmProspectsDashboardComponent implements OnInit {
   get belowThresholdLabel(): string {
     const s = this.raw2.find(r => r.score_range.startsWith('<'))?.score_range
       ?? this.chart4Bars.flatMap(b => b.segments.map(seg => seg.label)).find(l => l.startsWith('<'));
-    return s ? `Pokaż ${s}` : 'Pokaż < próg';
+    return s
+      ? this.transloco.translate('prospects.dashboard.showBelowThreshold', { range: s })
+      : this.transloco.translate('prospects.dashboard.showBelowThresholdFallback');
   }
 
   // ── #4 ──────────────────────────────────────────────────────────
@@ -958,7 +964,7 @@ export class CrmProspectsDashboardComponent implements OnInit {
         label: u.display_name, total,
         segments: [...u.byStatus.entries()].map(([key, val]) => {
           const status = key.split('/')[1];
-          return { label: CALL_STATUS_LABELS[status] ?? status, value: val, pct: 0, color: CALL_STATUS_COLORS[status] ?? '#9ca3af' };
+          return { label: this.callStatusLabel(status), value: val, pct: 0, color: CALL_STATUS_COLORS[status] ?? '#9ca3af' };
         }),
       });
     }
@@ -967,7 +973,12 @@ export class CrmProspectsDashboardComponent implements OnInit {
   }
 
   callStatusColor(s: string): string { return CALL_STATUS_COLORS[s] ?? '#9ca3af'; }
-  callStatusLabel(s: string): string { return CALL_STATUS_LABELS[s] ?? s; }
+
+  callStatusLabel(s: string): string {
+    const key = `prospects.callStatus.${s}`;
+    const label = this.transloco.translate(key);
+    return label === key ? s : label;
+  }
 
   scoreColor(s: string): string { return this.scoreColorMap.get(s) ?? '#e5e7eb'; }
 }

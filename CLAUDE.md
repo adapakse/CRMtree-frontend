@@ -245,15 +245,26 @@ przed dodaniem jakiegokolwiek tekstu widocznego dla użytkownika.
 - `npm run i18n:check` pilnuje kompletu kluczy, parametrów i formatu; uruchamia się też przed
   `npm run build`. Pliki z listy `src/i18n/translated-files.json` nie mogą już zawierać polskiego
   tekstu wpisanego na sztywno.
-- **Stan na 2026-10-08:** cała część aplikacji dla tenantów jest przetłumaczona. Zakresy:
+- **Stan na 2026-10-12:** cała część aplikacji dla tenantów jest przetłumaczona. Zakresy:
   `common` (wspólne, w tym kontrolki list), `shell` (menu), `auth`, `crm` (leady, partnerzy,
   kalendarz, raporty, softphone, analiza rozmów, SEObot), `projects` (projekty, finanse, KSeF,
   terminy), `documents`, `admin` (ustawienia, użytkownicy, grupy, logi, dane, ankieta),
-  `account` (moje ustawienia). Nowy ekran dopisz do `SCOPES_BY_PATH_PREFIX` w
-  `src/app/core/i18n/i18n-scope.guard.ts`.
-- **Po polsku zostają celowo:** panel superadmina (Tenants, rozliczenia), moduł Prospekty
-  (przerabiany osobno) i publiczne strony (blog, strona główna, regulamin, polityka prywatności).
-  Danych wpisanych przez tenanta nie tłumaczymy.
+  `account` (moje ustawienia), `prospects` (panel Enrichment i Dashboard Prospekty).
+  Nowy ekran dopisz do `SCOPES_BY_PATH_PREFIX` w
+  `src/app/core/i18n/i18n-scope.guard.ts` — klucz może być pełną ścieżką
+  (`admin/prospects`), nie tylko pierwszym segmentem, i wtedy wygrywa z segmentem.
+- **Po polsku zostają celowo:** panel superadmina (Tenants, rozliczenia) i publiczne strony
+  (blog, strona główna, regulamin, polityka prywatności). Danych wpisanych przez tenanta nie
+  tłumaczymy — w Prospektach dotyczy to etykiet sygnałów ICP (config tenanta) i nazw baz
+  źródłowych z pliku importu.
+- **Nagłówki kolumn pliku CSV w imporcie Prospektów** (`branża`, `województwo`,
+  `Osoba Decyzyjna`…) siedzą w `prospects/*.json` pod `admin.import.optionalColumns` i mają
+  tę samą polską wartość we wszystkich 10 językach — to nazwy, które użytkownik musi mieć
+  dosłownie w pliku, nie tekst do tłumaczenia.
+- **Analizator rozmów:** interfejs jest przetłumaczony, ale streszczenia i zastrzeżenia
+  generuje model po polsku (tak każe prompt), a `follow_up_date_hint` jest parsowany polskimi
+  regułami dat. Zmiana języka wyjścia modelu wymaga przepisania tego parsera — nie rób tego
+  bez ustalenia z Adamem.
 - Maile i wizualizację faktury KSeF tłumaczy backend (język odbiorcy / tenanta).
 
 ---
@@ -265,7 +276,7 @@ przed dodaniem jakiegokolwiek tekstu widocznego dla użytkownika.
   interface names, type aliases, enum values, and inline comments.
 - No hardcoded user-facing text: every label, message and tooltip goes through Transloco keys
   in all 10 languages (see "Wielojęzyczność (i18n)"). Polish literals remain only in the parts
-  deliberately left untranslated (super-admin panel, Prospects, public pages).
+  deliberately left untranslated (super-admin panel, public pages).
 
 ### Naming conventions
 - Use descriptive, self-explanatory names — a reader should understand intent without
