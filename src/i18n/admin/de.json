@@ -722,6 +722,46 @@
       "saveChanges": "Änderungen speichern",
       "saving": "Wird gespeichert…"
     },
+    "ai": {
+      "apiKey": "API-Schlüssel",
+      "apiKeyPlaceholder": "API-Schlüssel einfügen",
+      "cancel": "Abbrechen",
+      "changeKey": "Schlüssel ändern",
+      "confirmRemove": "KI für diese Funktion abschalten? Die übrigen Funktionen laufen weiter.",
+      "detectFailed": "Der Anbieter ließ sich aus diesem Schlüssel nicht erkennen — bitte wählen Sie ihn selbst.",
+      "detectHint": "Den Anbieter erkennen wir am Schlüssel — Sie müssen keinen auswählen.",
+      "detected": "Erkannt: {provider}",
+      "detectedShort": "am Schlüssel erkannt",
+      "detecting": "Anbieter wird erkannt…",
+      "intro": "Jede Funktion hat einen eigenen Anbieter, Schlüssel und Modell — Enrichment kann bei einem Anbieter laufen, die Gesprächsanalyse bei einem anderen. Fügen Sie einen Schlüssel ein, den Anbieter erkennen wir selbst. Das Speichern prüft die Einrichtung beim Anbieter; der Schlüssel wird verschlüsselt und nie wieder angezeigt.",
+      "loading": "KI-Konfiguration wird geladen…",
+      "model": "Modell",
+      "modelCustom": "Andere (Name eingeben)",
+      "modelDefaultOption": "Standard ({model})",
+      "modelsLoading": "Modellliste wird beim Anbieter abgerufen…",
+      "needsStructuredOutput": "Benötigt erzwungenes Antwortformat — nur {providers}",
+      "needsWebSearch": "Benötigt Websuche — nur {providers}",
+      "provider": "Anbieter",
+      "purpose": {
+        "assistant": "Formularassistent",
+        "call_analysis": "Gesprächsanalyse",
+        "competitor_discovery": "Wettbewerber finden",
+        "enrichment": "Prospect-Enrichment",
+        "seo_content": "SEO — Texterstellung",
+        "seo_facts": "SEO — Faktenrecherche",
+        "seo_research": "SEO — Keywords und Gliederung"
+      },
+      "remove": "Konfiguration entfernen",
+      "saveAndVerify": "Speichern und prüfen",
+      "saveFailed": "Die KI-Konfiguration konnte nicht gespeichert werden.",
+      "statusActive": "aktiv",
+      "statusError": "Verbindungsfehler",
+      "statusInvalid": "Schlüssel abgelehnt",
+      "statusMissing": "nicht konfiguriert",
+      "title": "KI-Anbieter",
+      "useSaved": "Gespeicherten verwenden:",
+      "verifying": "Prüfe…"
+    },
     "catalog": {
       "churn_daily_run_time": {
         "description": "Format HH:MM — zu dieser Uhrzeit berechnet der Server das Scoring neu und versendet E-Mail-Benachrichtigungen",
@@ -1115,6 +1155,28 @@
         "salesDrop": "Umsatzrückgang (M-2→M-1)",
         "schedule": "Zeitplan",
         "value": "Wert"
+      }
+    },
+    "customFields": {
+      "active": "Aktiv",
+      "addButton": "Feld hinzufügen",
+      "deleteConfirm": "Feld „{name}“ löschen?",
+      "deleteTooltip": "Feld löschen — nur möglich, solange kein Datensatz einen Wert darin hat",
+      "empty": "Keine Zusatzfelder in diesem Formular.",
+      "hint": "Felder, die Sie selbst für dieses Formular definieren. Der Feldtyp lässt sich später nicht ändern — schalten Sie das Feld dafür ab und legen Sie ein neues an. Ein abgeschaltetes Feld verschwindet aus dem Formular, bereits erfasste Werte bleiben erhalten.",
+      "newNamePlaceholder": "Name des neuen Feldes",
+      "optionsPlaceholder": "Werte durch Komma getrennt",
+      "optionsRequired": "Ein Listenfeld braucht mindestens einen Wert.",
+      "saveFailed": "Das Feld konnte nicht gespeichert werden.",
+      "titleDocument": "Zusatzfelder des Dokuments",
+      "titleLead": "Zusatzfelder des Leads",
+      "titlePartner": "Zusatzfelder des Partners",
+      "types": {
+        "date": "Datum",
+        "list": "Auswahlliste",
+        "money": "Betrag",
+        "number": "Zahl",
+        "text": "Text"
       }
     },
     "documents": {

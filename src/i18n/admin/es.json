@@ -722,6 +722,46 @@
       "saveChanges": "Guardar cambios",
       "saving": "Guardando…"
     },
+    "ai": {
+      "apiKey": "Clave API",
+      "apiKeyPlaceholder": "Pega la clave API",
+      "cancel": "Cancelar",
+      "changeKey": "Cambiar clave",
+      "confirmRemove": "¿Desactivar la IA para esta función? Las demás funciones seguirán funcionando.",
+      "detectFailed": "No hemos podido reconocer el proveedor con esta clave: indícalo tú.",
+      "detectHint": "Reconocemos el proveedor por la clave: no tienes que elegirlo.",
+      "detected": "Reconocido: {provider}",
+      "detectedShort": "reconocido por la clave",
+      "detecting": "Reconociendo el proveedor…",
+      "intro": "Cada función tiene su propio proveedor, clave y modelo: el enriquecimiento puede ir en un proveedor y el análisis de llamadas en otro. Pega una clave y reconoceremos el proveedor por ti. Guardar verifica la configuración con el proveedor; la clave se cifra y no se vuelve a mostrar.",
+      "loading": "Cargando la configuración de IA…",
+      "model": "Modelo",
+      "modelCustom": "Otro (escribe el nombre)",
+      "modelDefaultOption": "Predeterminado ({model})",
+      "modelsLoading": "Obteniendo la lista de modelos del proveedor…",
+      "needsStructuredOutput": "Requiere respuestas con formato impuesto — solo {providers}",
+      "needsWebSearch": "Requiere búsqueda en internet — solo {providers}",
+      "provider": "Proveedor",
+      "purpose": {
+        "assistant": "Asistente de formularios",
+        "call_analysis": "Análisis de llamadas",
+        "competitor_discovery": "Buscar competidores",
+        "enrichment": "Enriquecimiento de prospectos",
+        "seo_content": "SEO — redacción de contenido",
+        "seo_facts": "SEO — investigación de datos",
+        "seo_research": "SEO — palabras clave y esquema"
+      },
+      "remove": "Eliminar configuración",
+      "saveAndVerify": "Guardar y comprobar",
+      "saveFailed": "No se ha podido guardar la configuración de IA.",
+      "statusActive": "activo",
+      "statusError": "error de conexión",
+      "statusInvalid": "clave rechazada",
+      "statusMissing": "sin configurar",
+      "title": "Proveedores de IA",
+      "useSaved": "Usar uno guardado:",
+      "verifying": "Comprobando…"
+    },
     "catalog": {
       "churn_daily_run_time": {
         "description": "Formato HH:MM — a esta hora el servidor recalcula el scoring y envía las alertas por correo electrónico",
@@ -1115,6 +1155,28 @@
         "salesDrop": "Caída de ventas (M-2→M-1)",
         "schedule": "Programación",
         "value": "Valor"
+      }
+    },
+    "customFields": {
+      "active": "Activo",
+      "addButton": "Añadir campo",
+      "deleteConfirm": "¿Eliminar el campo «{name}»?",
+      "deleteTooltip": "Eliminar el campo — solo es posible si ningún registro tiene valor",
+      "empty": "No hay campos adicionales en este formulario.",
+      "hint": "Campos que defines tú para este formulario. El tipo de campo no se puede cambiar después: para cambiarlo, desactiva el campo y crea uno nuevo. Un campo desactivado desaparece del formulario, pero los valores ya introducidos se conservan.",
+      "newNamePlaceholder": "Nombre del nuevo campo",
+      "optionsPlaceholder": "Valores separados por comas",
+      "optionsRequired": "Un campo de lista necesita al menos un valor.",
+      "saveFailed": "No se pudo guardar el campo.",
+      "titleDocument": "Campos adicionales del documento",
+      "titleLead": "Campos adicionales del lead",
+      "titlePartner": "Campos adicionales del partner",
+      "types": {
+        "date": "Fecha",
+        "list": "Lista desplegable",
+        "money": "Importe",
+        "number": "Número",
+        "text": "Texto"
       }
     },
     "documents": {

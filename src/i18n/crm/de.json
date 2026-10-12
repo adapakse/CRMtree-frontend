@@ -427,6 +427,10 @@
     "subtitle": "Importieren Sie Leads, Partner und Vertriebsdaten gesammelt aus einer CSV-Datei. Laden Sie die Vorlage herunter, füllen Sie sie aus und laden Sie sie hoch.",
     "title": "CSV-Import"
   },
+  "customFields": {
+    "choose": "— auswählen —",
+    "notSet": "nicht gesetzt"
+  },
   "documents": {
     "add": "Hinzufügen",
     "linkFailed": "Dokument konnte nicht verknüpft werden. Prüfen Sie, ob Sie die erforderlichen Berechtigungen haben.",
@@ -797,6 +801,7 @@
       "agent": "Agent",
       "company": "Firma",
       "contact": "Kontakt",
+      "customFields": "Zusatzfelder",
       "extraContacts": "Weitere Kontakte",
       "notes": "Notizen",
       "sales": "Vertrieb"
@@ -1378,6 +1383,7 @@
       "billingAddress": "Rechnungsadresse",
       "billingContact": "Kontakt für Abrechnung",
       "contractContact": "Kontakt für Vertragsfragen",
+      "customFields": "Zusatzfelder",
       "extraContacts": "Weitere Kontakte",
       "financialTerms": "Finanzielle Konditionen",
       "partnerAdmin": "Partner-Admin"

@@ -722,6 +722,46 @@
       "saveChanges": "Enregistrer les modifications",
       "saving": "Enregistrement…"
     },
+    "ai": {
+      "apiKey": "Clé API",
+      "apiKeyPlaceholder": "Collez la clé API",
+      "cancel": "Annuler",
+      "changeKey": "Changer la clé",
+      "confirmRemove": "Désactiver l'IA pour cette fonction ? Les autres fonctions continuent de fonctionner.",
+      "detectFailed": "Nous n'avons pas pu reconnaître le fournisseur à partir de cette clé — indiquez-le vous-même.",
+      "detectHint": "Nous reconnaissons le fournisseur à partir de la clé : inutile de le choisir.",
+      "detected": "Reconnu : {provider}",
+      "detectedShort": "reconnu à la clé",
+      "detecting": "Reconnaissance du fournisseur…",
+      "intro": "Chaque fonction a son propre fournisseur, sa clé et son modèle : l'enrichissement peut tourner chez un fournisseur et l'analyse des appels chez un autre. Collez une clé, nous reconnaissons le fournisseur nous-mêmes. L'enregistrement vérifie la configuration auprès du fournisseur ; la clé est chiffrée et n'est plus jamais affichée.",
+      "loading": "Chargement de la configuration IA…",
+      "model": "Modèle",
+      "modelCustom": "Autre (saisir un nom)",
+      "modelDefaultOption": "Par défaut ({model})",
+      "modelsLoading": "Récupération de la liste des modèles auprès du fournisseur…",
+      "needsStructuredOutput": "Nécessite un format de réponse imposé — {providers} uniquement",
+      "needsWebSearch": "Nécessite la recherche web — {providers} uniquement",
+      "provider": "Fournisseur",
+      "purpose": {
+        "assistant": "Assistant de formulaires",
+        "call_analysis": "Analyse des appels",
+        "competitor_discovery": "Trouver des concurrents",
+        "enrichment": "Enrichissement des prospects",
+        "seo_content": "SEO — rédaction de contenu",
+        "seo_facts": "SEO — recherche de données",
+        "seo_research": "SEO — mots-clés et plan"
+      },
+      "remove": "Supprimer la configuration",
+      "saveAndVerify": "Enregistrer et vérifier",
+      "saveFailed": "Impossible d'enregistrer la configuration IA.",
+      "statusActive": "actif",
+      "statusError": "erreur de connexion",
+      "statusInvalid": "clé refusée",
+      "statusMissing": "non configuré",
+      "title": "Fournisseurs IA",
+      "useSaved": "Utiliser un enregistré :",
+      "verifying": "Vérification…"
+    },
     "catalog": {
       "churn_daily_run_time": {
         "description": "Format HH:MM — à cette heure, le serveur recalcule le scoring et envoie les alertes par e-mail",
@@ -1115,6 +1155,28 @@
         "salesDrop": "Baisse des ventes (M-2→M-1)",
         "schedule": "Planification",
         "value": "Valeur"
+      }
+    },
+    "customFields": {
+      "active": "Actif",
+      "addButton": "Ajouter un champ",
+      "deleteConfirm": "Supprimer le champ « {name} » ?",
+      "deleteTooltip": "Supprimer le champ — possible uniquement si aucun enregistrement n’a de valeur",
+      "empty": "Aucun champ supplémentaire dans ce formulaire.",
+      "hint": "Champs que vous définissez vous-même pour ce formulaire. Le type d'un champ ne peut plus être modifié ensuite : pour le changer, désactivez le champ et créez-en un nouveau. Un champ désactivé disparaît du formulaire, mais les valeurs déjà saisies sont conservées.",
+      "newNamePlaceholder": "Nom du nouveau champ",
+      "optionsPlaceholder": "Valeurs séparées par des virgules",
+      "optionsRequired": "Un champ liste nécessite au moins une valeur.",
+      "saveFailed": "Impossible d'enregistrer le champ.",
+      "titleDocument": "Champs supplémentaires du document",
+      "titleLead": "Champs supplémentaires du lead",
+      "titlePartner": "Champs supplémentaires du partenaire",
+      "types": {
+        "date": "Date",
+        "list": "Liste déroulante",
+        "money": "Montant",
+        "number": "Nombre",
+        "text": "Texte"
       }
     },
     "documents": {
