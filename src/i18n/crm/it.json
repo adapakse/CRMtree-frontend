@@ -427,6 +427,10 @@
     "subtitle": "Importa lead, partner e dati di vendita in blocco da un file CSV. Scarica il modello, compilalo e caricalo.",
     "title": "Importazione CSV"
   },
+  "customFields": {
+    "choose": "— scegli —",
+    "notSet": "non impostato"
+  },
   "documents": {
     "add": "Aggiungi",
     "linkFailed": "Impossibile collegare il documento. Verifica di avere i permessi necessari.",
@@ -796,6 +800,7 @@
       "agent": "Agente",
       "company": "Azienda",
       "contact": "Contatto",
+      "customFields": "Campi aggiuntivi",
       "extraContacts": "Contatti aggiuntivi",
       "notes": "Note",
       "sales": "Vendita"
@@ -1374,6 +1379,7 @@
       "billingAddress": "Billing Address",
       "billingContact": "Contatto per la fatturazione",
       "contractContact": "Contatto per il contratto",
+      "customFields": "Campi aggiuntivi",
       "extraContacts": "Contatti aggiuntivi",
       "financialTerms": "Condizioni finanziarie",
       "partnerAdmin": "Partner Admin"

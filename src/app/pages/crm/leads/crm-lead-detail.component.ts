@@ -16,6 +16,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
 import { LinkedProjectTasksComponent } from '../../../shared/components/linked-project-tasks/linked-project-tasks.component';
+import { CustomFieldsComponent } from '../../../shared/components/custom-fields/custom-fields.component';
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { PhoneCallSimulatorComponent } from '../../../shared/components/phone-call-simulator/phone-call-simulator.component';
 import { PbxService } from '../../../core/services/pbx.service';
@@ -48,7 +49,7 @@ interface WhatsappConvUiState {
   selector: 'wt-crm-lead-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, CustomFieldsComponent, TranslocoDirective, TranslocoPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -195,6 +196,14 @@ interface WhatsappConvUiState {
         </div>
         <div *ngIf="lead.notes" style="font-size:12px;color:#6b7280;white-space:pre-line;line-height:1.5">{{lead.notes}}</div>
       </div>
+
+      <!-- Pola dodatkowe tenanta (migracja 0328) — podgląd; edycja w oknie „Edytuj". -->
+      @if (lead.custom_fields?.length) {
+        <div class="info-section">
+          <div class="info-section-title">{{ t('leadDetail.sections.customFields') }}</div>
+          <app-custom-fields [fields]="lead.custom_fields!" [readonly]="true" />
+        </div>
+      }
 
       <!-- Zgody marketingowe -->
       <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
@@ -1233,6 +1242,14 @@ interface WhatsappConvUiState {
         <div class="edit-section-title">{{ t('leadDetail.sections.notes') }}</div>
         <textarea [(ngModel)]="editForm.notes" rows="3" class="edit-textarea" [placeholder]="t('leadDetail.edit.placeholders.notes')"></textarea>
       </div>
+      <!-- Pola dodatkowe tenanta (migracja 0328). Jadą w tym samym żądaniu co
+           reszta formularza, więc „Zapisz" zapisuje wszystko naraz. -->
+      @if (lead?.custom_fields?.length) {
+        <div class="edit-section">
+          <div class="edit-section-title">{{ t('leadDetail.sections.customFields') }}</div>
+          <app-custom-fields [fields]="lead!.custom_fields!" (valuesChange)="customValues = $event" />
+        </div>
+      }
     </div>
 
       <!-- Błędy walidacji -->
@@ -1839,6 +1856,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   lead: Lead | null = null;
+  /** Zmienione pola dodatkowe tenanta; puste, dopóki formularz ich nie dotknął. */
+  customValues: Record<string, unknown> = {};
   loading      = false;
   loadError    = false;
   saving       = false;
@@ -3898,6 +3917,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         error: () => {},
       });
     }
+    this.customValues = {};
     this.showEdit = true;
   }
 
@@ -3937,11 +3957,14 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       agent_phone:   this.editForm.source === 'agent' ? (this.editForm.agent_phone || null) : null,
       website:       (this.editForm.website || null) as any,
       logo_url:      ((this.editForm as any).logo_url || null) as any,
-    };
+      // Puste = formularz nie dotknął pól dodatkowych; backend pomija wtedy kolumnę.
+      ...(Object.keys(this.customValues).length ? { custom_values: this.customValues } : {}),
+    } as any;
     this.api.updateLead(this.lead.id, payload).subscribe({
       next: updated => {
         this.zone.run(() => {
           this.lead = { ...this.lead!, ...updated, activities: this.lead!.activities };
+          this.customValues = {};
           if (this.editForm.assigned_to) {
             const u = this.crmUsers.find(x => x.id === this.editForm.assigned_to);
             if (u) this.lead!.assigned_to_name = u.display_name;

@@ -427,6 +427,10 @@
     "subtitle": "Importuj leady, partnerów i dane sprzedażowe zbiorczo z pliku CSV. Pobierz szablon, wypełnij i prześlij.",
     "title": "Import CSV"
   },
+  "customFields": {
+    "choose": "— wybierz —",
+    "notSet": "nie ustawiono"
+  },
   "documents": {
     "add": "Dodaj",
     "linkFailed": "Nie udało się powiązać dokumentu. Sprawdź czy masz wymagane uprawnienia.",
@@ -796,6 +800,7 @@
       "agent": "Agent",
       "company": "Firma",
       "contact": "Kontakt",
+      "customFields": "Pola dodatkowe",
       "extraContacts": "Dodatkowe kontakty",
       "notes": "Notatki",
       "sales": "Sprzedaż"
@@ -1374,6 +1379,7 @@
       "billingAddress": "Billing Address",
       "billingContact": "Kontakt do spraw rozliczeń",
       "contractContact": "Kontakt do spraw umowy",
+      "customFields": "Pola dodatkowe",
       "extraContacts": "Dodatkowe kontakty",
       "financialTerms": "Warunki finansowe",
       "partnerAdmin": "Partner Admin"

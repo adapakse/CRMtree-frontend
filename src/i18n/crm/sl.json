@@ -427,6 +427,10 @@
     "subtitle": "Množično uvozite leade, partnerje in prodajne podatke iz datoteke CSV. Prenesite predlogo, jo izpolnite in naložite.",
     "title": "Uvoz CSV"
   },
+  "customFields": {
+    "choose": "— izberite —",
+    "notSet": "ni nastavljeno"
+  },
   "documents": {
     "add": "Dodaj",
     "linkFailed": "Dokumenta ni bilo mogoče povezati. Preverite, ali imate zahtevane pravice.",
@@ -796,6 +800,7 @@
       "agent": "Agent",
       "company": "Podjetje",
       "contact": "Kontakt",
+      "customFields": "Dodatna polja",
       "extraContacts": "Dodatni kontakti",
       "notes": "Zapiski",
       "sales": "Prodaja"
@@ -1374,6 +1379,7 @@
       "billingAddress": "Naslov za obračun",
       "billingContact": "Kontakt za obračun",
       "contractContact": "Kontakt za pogodbo",
+      "customFields": "Dodatna polja",
       "extraContacts": "Dodatni kontakti",
       "financialTerms": "Finančni pogoji",
       "partnerAdmin": "Partner Admin"

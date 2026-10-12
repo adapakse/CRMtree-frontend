@@ -427,6 +427,10 @@
     "subtitle": "Importați în bloc leaduri, parteneri și date de vânzări dintr-un fișier CSV. Descărcați șablonul, completați-l și încărcați-l.",
     "title": "Import CSV"
   },
+  "customFields": {
+    "choose": "— alege —",
+    "notSet": "nesetat"
+  },
   "documents": {
     "add": "Adăugare",
     "linkFailed": "Documentul nu a putut fi asociat. Verificați dacă aveți permisiunile necesare.",
@@ -796,6 +800,7 @@
       "agent": "Agent",
       "company": "Companie",
       "contact": "Contact",
+      "customFields": "Câmpuri suplimentare",
       "extraContacts": "Contacte suplimentare",
       "notes": "Notițe",
       "sales": "Vânzări"
@@ -1374,6 +1379,7 @@
       "billingAddress": "Adresă de facturare",
       "billingContact": "Persoană de contact pentru facturare",
       "contractContact": "Persoană de contact pentru contract",
+      "customFields": "Câmpuri suplimentare",
       "extraContacts": "Contacte suplimentare",
       "financialTerms": "Condiții financiare",
       "partnerAdmin": "Partner Admin"

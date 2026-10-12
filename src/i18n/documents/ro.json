@@ -220,6 +220,7 @@
       "contractSubject": "Obiectul contractului",
       "counterpartyCountry": "Țara contractantului",
       "counterpartyTaxId": "Codul fiscal al contractantului",
+      "customFields": "Câmpuri suplimentare",
       "documentName": "Denumirea documentului",
       "documentType": "Tip document",
       "email": "E-mail",

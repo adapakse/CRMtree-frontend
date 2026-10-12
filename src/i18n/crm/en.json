@@ -427,6 +427,10 @@
     "subtitle": "Import leads, partners and sales data in bulk from a CSV file. Download the template, fill it in and upload it.",
     "title": "CSV import"
   },
+  "customFields": {
+    "choose": "— choose —",
+    "notSet": "not set"
+  },
   "documents": {
     "add": "Add",
     "linkFailed": "Couldn't link the document. Check that you have the required permissions.",
@@ -796,6 +800,7 @@
       "agent": "Agent",
       "company": "Company",
       "contact": "Contact",
+      "customFields": "Custom fields",
       "extraContacts": "Additional contacts",
       "notes": "Notes",
       "sales": "Sales"
@@ -1374,6 +1379,7 @@
       "billingAddress": "Billing address",
       "billingContact": "Billing contact",
       "contractContact": "Contract contact",
+      "customFields": "Custom fields",
       "extraContacts": "Additional contacts",
       "financialTerms": "Financial terms",
       "partnerAdmin": "Partner Admin"

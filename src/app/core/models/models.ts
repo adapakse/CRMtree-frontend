@@ -1,3 +1,4 @@
+import { TenantFieldValue } from '../services/tenant-fields.service';
 // ── User ──────────────────────────────────────────────────
 export interface UserRole {
   role_id: string;
@@ -281,6 +282,8 @@ export interface Document {
   is_payment_overdue?: boolean;
   /** Present only in the detail of an invoice. */
   project_links?: DocumentProjectLink[];
+  /** Pola dodatkowe tenanta razem z wartościami tego dokumentu (migracja 0328). */
+  custom_fields?: TenantFieldValue[];
   blob_name?: string;
   blob_size_bytes?: number;
   signus_envelope_id?: string;

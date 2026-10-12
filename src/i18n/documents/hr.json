@@ -220,6 +220,7 @@
       "contractSubject": "Predmet ugovora",
       "counterpartyCountry": "Država ugovorne strane",
       "counterpartyTaxId": "Porezni broj ugovorne strane",
+      "customFields": "Dodatna polja",
       "documentName": "Naziv dokumenta",
       "documentType": "Vrsta dokumenta",
       "email": "E-pošta",
