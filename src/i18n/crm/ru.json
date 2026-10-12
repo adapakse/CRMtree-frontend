@@ -427,6 +427,10 @@
     "subtitle": "Импортируйте лиды, партнёров и данные о продажах массово из файла CSV. Скачайте шаблон, заполните и загрузите.",
     "title": "Импорт CSV"
   },
+  "customFields": {
+    "choose": "— выберите —",
+    "notSet": "не задано"
+  },
   "documents": {
     "add": "Добавить",
     "linkFailed": "Не удалось связать документ. Проверьте, есть ли у вас необходимые права.",
@@ -638,12 +642,12 @@
     "sources": {
       "agent": "Агент",
       "aliasHello": "Alias Hello",
-      "coldCall": "Cold Call",
+      "coldCall": "Холодный звонок",
       "emailCampaign": "E-mail-рассылка",
       "googleAdsAiSearch": "Google Ads AI Search",
       "googleAdsPmax": "Google Ads PMax",
       "googleAdsSeaBrand": "Google Ads SEA Brand",
-      "inbound": "Inbound",
+      "inbound": "Входящий запрос",
       "linkedin": "LinkedIn",
       "linkedinInMail": "LinkedIn InMail",
       "linkedinLeadForm": "LinkedIn Lead Form",
@@ -797,6 +801,7 @@
       "agent": "Агент",
       "company": "Компания",
       "contact": "Контакт",
+      "customFields": "Дополнительные поля",
       "extraContacts": "Дополнительные контакты",
       "notes": "Заметки",
       "sales": "Продажи"
@@ -1378,6 +1383,7 @@
       "billingAddress": "Адрес для расчётов",
       "billingContact": "Контакт по вопросам расчётов",
       "contractContact": "Контакт по вопросам договора",
+      "customFields": "Дополнительные поля",
       "extraContacts": "Дополнительные контакты",
       "financialTerms": "Финансовые условия",
       "partnerAdmin": "Администратор партнёра"
@@ -1529,7 +1535,7 @@
         "leads": "Лиды",
         "pipeline": "Воронка",
         "progress": "Прогресс",
-        "winRatePct": "Win%",
+        "winRatePct": "Победы %",
         "won": "Выиграно"
       },
       "days": "{count, plural, one {# день} few {# дня} many {# дней} other {# дня}}",
@@ -1542,7 +1548,7 @@
         "activeLeads": "Активные лиды",
         "avgSalesCycle": "Ср. цикл продажи",
         "avgWonValue": "Ср. сумма выигранного",
-        "winRate": "Win Rate",
+        "winRate": "Доля побед",
         "wonPln": "Закрыто / Выиграно (PLN)"
       },
       "leadSources": {
@@ -1649,7 +1655,7 @@
       },
       "external": {
         "feeRate": "Fee rate: {value}%",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Комиссии (PLN)",
         "grossTurnoverPln": "Оборот брутто (PLN)",
         "margin": "Маржа: {value}%",
         "netTurnoverPln": "Оборот нетто (PLN)",
@@ -1701,7 +1707,7 @@
         "tradeFairs": "Выставки"
       },
       "table": {
-        "fees": "Fees",
+        "fees": "Комиссии",
         "grossTurnover": "Оборот брутто",
         "net": "Нетто",
         "partners": "Партнёры",
@@ -1798,9 +1804,9 @@
         "title": "Риск оттока партнёров"
       },
       "columns": {
-        "fees": "Fees",
+        "fees": "Комиссии",
         "grossTurnover": "Оборот брутто",
-        "health": "Health",
+        "health": "Состояние",
         "margin": "Маржа",
         "netTurnover": "Оборот нетто",
         "partner": "Партнёр",
@@ -1827,7 +1833,7 @@
       "kpi": {
         "activePartners": "Активных партнёров",
         "feeRateShare": "{percent}% fee rate",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Комиссии (PLN)",
         "productsCount": "Продукты: {count}",
         "revenueMarginPln": "Выручка / Маржа (PLN)",
         "revenueTrend": "тренд выручки",
@@ -1862,7 +1868,7 @@
         "revenueMargin": "Выручка (маржа)",
         "title": "Финансовая сводка"
       },
-      "title": "Partner Performance",
+      "title": "Результаты партнёров",
       "trend": {
         "title": "Тренд выручки",
         "totalTurnover": "Общий оборот"

@@ -16,6 +16,7 @@ import { PaymentStatusBadgeComponent } from '../../../shared/components/payment-
 import {
   InvoiceFieldsComponent, InvoiceFieldsDraft, invoiceFieldsDraftOf, invoiceFieldsPayload,
 } from '../invoice-fields/invoice-fields.component';
+import { CustomFieldsComponent } from '../../../shared/components/custom-fields/custom-fields.component';
 import { DocumentProjectLinksComponent } from '../project-links/document-project-links.component';
 import { environment } from '../../../../environments/environment';
 import { CrmApiService } from '../../../core/services/crm-api.service';
@@ -47,7 +48,7 @@ interface SelectOption { value: string; label: string; }
 @Component({
   selector: 'wt-detail-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, TypeBadgeComponent, GdprBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent, TooltipComponent, TranslocoDirective, TranslocoPipe, PaymentStatusBadgeComponent, InvoiceFieldsComponent, DocumentProjectLinksComponent, CustomFieldsComponent],
   providers: [provideTranslocoScope('documents')],
   template: `
     <ng-container *transloco="let t; prefix: 'documents'">
@@ -240,6 +241,15 @@ interface SelectOption { value: string; label: string; }
 
             @if (isInvoice) {
               <wt-invoice-fields [(value)]="invoiceDraft" [isReadOnly]="doc._access !== 'full'" [isOverdue]="doc.is_payment_overdue" />
+            }
+
+            <!-- Pola dodatkowe tenanta (migracja 0328). Zapisują się razem z resztą
+                 metadanych, tym samym przyciskiem co one. -->
+            @if (doc.custom_fields?.length) {
+              <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.customFields') }}</div>
+              <app-custom-fields [fields]="doc.custom_fields!"
+                                 [readonly]="doc._access !== 'full'"
+                                 (valuesChange)="customValues = $event" />
             }
 
             <!-- Dane kontaktowe ds. umowy -->
@@ -864,6 +874,9 @@ export class DetailPanelComponent implements OnChanges {
     };
   }
 
+  /** Zmienione pola dodatkowe tenanta; puste, dopóki formularz ich nie dotknął. */
+  customValues: Record<string, unknown> = {};
+
   saveDoc(): void {
     if (this.doc._access !== 'full') return;
     const access = this.doc._access;
@@ -891,11 +904,14 @@ export class DetailPanelComponent implements OnChanges {
       contact_email:    (this.draft.contact_email || null) as any,
       contact_phone:    (this.draft.contact_phone || null) as any,
       ...(isInvoice ? invoiceFieldsPayload(this.invoiceDraft, this.doc) : {}),
+      // Puste = formularz nie dotknął pól dodatkowych; backend pomija wtedy kolumnę.
+      ...(Object.keys(this.customValues).length ? { custom_values: this.customValues } as any : {}),
     }).subscribe(updated => {
       // The answer to a save carries no project links; they cannot have changed, so the loaded ones stay.
       const projectLinks = updated.doc_type === INVOICE_DOC_TYPE ? (this.doc.project_links ?? []) : undefined;
       this.doc = { ...updated, _access: access, project_links: projectLinks };
       this.initDraft();
+      this.customValues = {};
       this.cdr.markForCheck();
       this.updated.emit(this.doc);
       this.toast.success(this.transloco.translate('documents.detail.toasts.saved'));

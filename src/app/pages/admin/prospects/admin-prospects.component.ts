@@ -2,8 +2,10 @@ import { Component, inject, signal, computed, OnInit, OnDestroy, HostListener, C
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { NavBackService } from '../../../core/services/nav-back.service';
@@ -218,20 +220,22 @@ interface DiscoveredCompany {
   selector: 'wt-admin-prospects',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoDirective],
+  providers: [provideTranslocoScope('prospects')],
   template: `
+    <ng-container *transloco="let t; prefix: 'prospects'">
     <div id="topbar">
-      <span class="page-title">Prospekty — Enrichment firm</span>
+      <span class="page-title">{{ t('admin.title') }}</span>
       <span class="tsp"></span>
-      <button class="btn btn-g" (click)="openDiscovery()" title="Generuj prospekty z konkurencji">🔍 Znajdź konkurencję</button>
-      <button class="btn btn-g" (click)="exportCsv()">⬇ Eksport CSV</button>
+      <button class="btn btn-g" (click)="openDiscovery()" [title]="t('admin.discoveryTooltip')">🔍 {{ t('admin.discovery') }}</button>
+      <button class="btn btn-g" (click)="exportCsv()">⬇ {{ t('admin.exportCsv') }}</button>
       <button class="btn btn-p"
         [disabled]="batch().running || enriching()"
         (click)="startBatch()">
         @if (batch().running) {
-          ⏳ {{ batch().done }}/{{ batch().total }} firm…
+          ⏳ {{ t('admin.enrichmentProgress', { done: batch().done, total: batch().total }) }}
         } @else {
-          ▶ Uruchom enrichment
+          ▶ {{ t('admin.runEnrichment') }}
         }
       </button>
     </div>
@@ -248,27 +252,23 @@ interface DiscoveredCompany {
 
       <!-- Import CSV -->
       <div class="card" style="margin-bottom:16px;padding:16px">
-        <div style="font-weight:600;margin-bottom:10px">Import firm z CSV</div>
+        <div style="font-weight:600;margin-bottom:10px">{{ t('admin.import.heading') }}</div>
         <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
-          Wymagane kolumny: <code>nip</code>, <code>BAZA</code> (nazwa bazy źródłowej — musi mieć wartość w każdym wierszu). Wykrywane automatycznie:
-          <code>www</code>, <code>krs</code>, <code>company_name</code>/<code>nazwa</code>,
-          <code>branża</code>, <code>profil</code>, <code>zatrudnienie</code>, <code>obrot</code>,
-          <code>rok</code>, <code>miasto</code>, <code>województwo</code>, <code>PKD-ID</code>,
-          <code>PKD-opis</code>, <code>Osoba Decyzyjna</code>, <code>Stanowisko</code>,
-          <code>Komórka</code>, <code>Telefon</code>, <code>Email</code>.
-          Podanie kolumny <code>www</code> pozwala pominąć autodiscovery (tańsze, szybsze).
-          Duplikaty (ten sam NIP) aktualizują istniejący rekord.
+          {{ t('admin.import.requiredLabel') }} <code>nip</code>, <code>BAZA</code> — {{ t('admin.import.baseColumnHint') }}
+          {{ t('admin.import.optionalLabel') }} <code>{{ t('admin.import.optionalColumns') }}</code>.
+          {{ t('admin.import.wwwHint') }}
+          {{ t('admin.import.duplicatesHint') }}
         </div>
         <div style="display:flex;gap:10px;align-items:center">
           <label class="btn btn-g" style="cursor:pointer;margin:0">
-            📁 Wybierz plik CSV
+            📁 {{ t('admin.import.chooseFile') }}
             <input type="file" accept=".csv" style="display:none"
               (change)="onFileSelected($event)">
           </label>
           @if (importFile()) {
             <span style="font-size:13px;color:#374151">{{ importFile()!.name }}</span>
             <button class="btn btn-p" [disabled]="importing()" (click)="doImport()">
-              @if (importing()) { Importuję… } @else { Importuj }
+              @if (importing()) { {{ t('admin.import.importing') }} } @else { {{ t('admin.import.submit') }} }
             </button>
           }
         </div>
@@ -276,32 +276,32 @@ interface DiscoveredCompany {
           @if (importResult()!.fatal_error) {
             <div style="margin-top:10px;font-size:13px;padding:8px 12px;border-radius:6px;
                         border:1px solid #fca5a5;background:#fee2e2;color:#991b1b">
-              ✗ Błąd importu: <b>{{ importResult()!.fatal_error }}</b>
+              ✗ {{ t('admin.import.fatalError') }} <b>{{ importResult()!.fatal_error }}</b>
             </div>
           } @else {
             <div style="margin-top:10px;font-size:13px;padding:8px 12px;border-radius:6px;border:1px solid"
               [style.background]="importResult()!.errors! > 0 ? '#fef3c7' : '#f0fdf4'"
               [style.borderColor]="importResult()!.errors! > 0 ? '#fcd34d' : '#86efac'"
               [style.color]="importResult()!.errors! > 0 ? '#92400e' : '#166534'">
-              ✓ Dodano: <b>{{ importResult()!.added }}</b> &nbsp;|&nbsp;
-              Pominięto (duplikaty): <b>{{ importResult()!.skipped }}</b> &nbsp;|&nbsp;
-              Błędy: <b>{{ importResult()!.errors }}</b> &nbsp;|&nbsp;
-              Razem wierszy: <b>{{ importResult()!.total }}</b>
+              ✓ {{ t('admin.import.added') }} <b>{{ importResult()!.added }}</b> &nbsp;|&nbsp;
+              {{ t('admin.import.skipped') }} <b>{{ importResult()!.skipped }}</b> &nbsp;|&nbsp;
+              {{ t('admin.import.errors') }} <b>{{ importResult()!.errors }}</b> &nbsp;|&nbsp;
+              {{ t('admin.import.totalRows') }} <b>{{ importResult()!.total }}</b>
               @if (importResult()!.detected_encoding) {
                 <div style="margin-top:6px;font-size:11px;opacity:0.8">
-                  Kodowanie: <b>{{ importResult()!.detected_encoding }}</b>
+                  {{ t('admin.import.encoding') }} <b>{{ importResult()!.detected_encoding }}</b>
                   @if (importResult()!.detected_columns?.length) {
-                    &nbsp;|&nbsp; Kolumny: {{ importResult()!.detected_columns!.join(', ') }}
+                    &nbsp;|&nbsp; {{ t('admin.import.columns') }} {{ importResult()!.detected_columns!.join(', ') }}
                   }
                 </div>
               } @else if (importResult()!.detected_columns?.length) {
                 <div style="margin-top:6px;font-size:11px;opacity:0.8">
-                  Wykryte kolumny: {{ importResult()!.detected_columns!.join(', ') }}
+                  {{ t('admin.import.detectedColumns') }} {{ importResult()!.detected_columns!.join(', ') }}
                 </div>
               }
               @if (importResult()!.error_details?.length) {
                 <div style="margin-top:8px;border-top:1px solid #fcd34d;padding-top:8px">
-                  <div style="font-weight:600;margin-bottom:4px">Szczegóły błędów:</div>
+                  <div style="font-weight:600;margin-bottom:4px">{{ t('admin.import.errorDetails') }}</div>
                   @for (e of importResult()!.error_details!; track e) {
                     <div style="font-size:12px;margin-bottom:2px">• {{ e }}</div>
                   }
@@ -317,71 +317,71 @@ interface DiscoveredCompany {
         <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
 
           <div class="fld">
-            <label>Szukaj</label>
-            <input class="inp" [(ngModel)]="filters.search" placeholder="nazwa, NIP lub baza"
+            <label>{{ t('admin.filters.search') }}</label>
+            <input class="inp" [(ngModel)]="filters.search" [placeholder]="t('admin.filters.searchPlaceholder')"
               (ngModelChange)="onFilterChange()" style="width:180px">
           </div>
 
           <div class="fld">
-            <label>Status</label>
+            <label>{{ t('admin.filters.status') }}</label>
             <select class="inp" [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()">
-              <option value="">Wszystkie</option>
-              <option value="pending">Oczekujące</option>
-              <option value="done">Wzbogacone</option>
-              <option value="error">Błąd</option>
-              <option value="no_krs">Brak w KRS</option>
-              <option value="no_website">Brak strony WWW</option>
-              <option value="hold">Hold</option>
-              <option value="archived">Archiwum</option>
-              <option value="lead">Lead w CRM</option>
+              <option value="">{{ t('admin.filters.all') }}</option>
+              <option value="pending">{{ t('admin.status.pending') }}</option>
+              <option value="done">{{ t('admin.status.done') }}</option>
+              <option value="error">{{ t('admin.status.error') }}</option>
+              <option value="no_krs">{{ t('admin.status.no_krs') }}</option>
+              <option value="no_website">{{ t('admin.status.no_website') }}</option>
+              <option value="hold">{{ t('admin.status.hold') }}</option>
+              <option value="archived">{{ t('admin.status.archived') }}</option>
+              <option value="lead">{{ t('admin.status.lead') }}</option>
             </select>
           </div>
 
           <div class="fld">
-            <label>Score min</label>
+            <label>{{ t('admin.filters.scoreMin') }}</label>
             <input class="inp" type="number" min="0" max="100" [(ngModel)]="filters.score_min"
               (ngModelChange)="onFilterChange()" style="width:80px">
           </div>
 
           <div class="fld">
-            <label>Score max</label>
+            <label>{{ t('admin.filters.scoreMax') }}</label>
             <input class="inp" type="number" min="0" max="100" [(ngModel)]="filters.score_max"
               (ngModelChange)="onFilterChange()" style="width:80px">
           </div>
 
           <div class="fld">
-            <label>Importowano od</label>
+            <label>{{ t('admin.filters.importedFrom') }}</label>
             <input class="inp" type="date" [(ngModel)]="filters.imported_from"
               (ngModelChange)="onFilterChange()">
           </div>
 
           <div class="fld">
-            <label>Importowano do</label>
+            <label>{{ t('admin.filters.importedTo') }}</label>
             <input class="inp" type="date" [(ngModel)]="filters.imported_to"
               (ngModelChange)="onFilterChange()">
           </div>
 
           <div class="fld">
-            <label>Enrichment od</label>
+            <label>{{ t('admin.filters.enrichedFrom') }}</label>
             <input class="inp" type="date" [(ngModel)]="filters.enriched_from"
               (ngModelChange)="onFilterChange()">
           </div>
 
           <div class="fld">
-            <label>Enrichment do</label>
+            <label>{{ t('admin.filters.enrichedTo') }}</label>
             <input class="inp" type="date" [(ngModel)]="filters.enriched_to"
               (ngModelChange)="onFilterChange()">
           </div>
 
           <button class="btn btn-g" style="margin-bottom:1px" (click)="resetFilters()">
-            Resetuj filtry
+            {{ t('admin.filters.reset') }}
           </button>
 
           <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;cursor:pointer;margin-bottom:1px;user-select:none">
             <input type="checkbox"
               [checked]="showArchived()"
               (change)="showArchived.set(!showArchived()); page.set(1); load()">
-            Pokaż Archiwum
+            {{ t('admin.filters.showArchived') }}
           </label>
 
         </div>
@@ -390,34 +390,34 @@ interface DiscoveredCompany {
       <!-- Pasek akcji masowych -->
       @if (someSelected()) {
         <div class="bulk-bar">
-          <span class="bulk-count">{{ selectedIds().size }} zaznaczonych</span>
+          <span class="bulk-count">{{ t('admin.bulk.selected', { count: selectedIds().size }) }}</span>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('hold')">
-            ⏸ Hold
+            ⏸ {{ t('admin.status.hold') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('archived')">
-            📦 Archiwizuj
+            📦 {{ t('admin.bulk.archive') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('pending')">
-            ▶ Przywróć
+            ▶ {{ t('admin.bulk.restore') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkReProcess()">
             🔄 Re-process
           </button>
           <span style="flex:1"></span>
           <button class="btn bulk-delete-btn" [disabled]="bulkActioning()" (click)="bulkDelete()">
-            🗑 Usuń zaznaczone
+            🗑 {{ t('admin.bulk.deleteSelected') }}
           </button>
-          <button class="btn btn-g" (click)="clearSelection()">✕ Anuluj</button>
+          <button class="btn btn-g" (click)="clearSelection()">✕ {{ t('admin.bulk.cancel') }}</button>
         </div>
       }
 
       <!-- Podsumowanie -->
       <div style="font-size:13px;color:#6b7280;margin-bottom:10px">
-        Wyświetlono: <b style="color:#374151">{{ total() }}</b> z <b style="color:#374151">{{ grandTotal() }}</b>
+        {{ t('admin.summary.shown') }} <b style="color:#374151">{{ total() }}</b> / <b style="color:#374151">{{ grandTotal() }}</b>
         @if (batch().running) {
           &nbsp;|&nbsp; <span style="color:var(--orange)">
-            ⏳ Enrichment w toku: {{ batch().done }}/{{ batch().total }}
-            (błędy: {{ batch().errors }})
+            ⏳ {{ t('admin.summary.inProgress', { done: batch().done, total: batch().total }) }}
+            {{ t('admin.summary.errorCount', { count: batch().errors }) }}
           </span>
         }
       </div>
@@ -437,13 +437,13 @@ interface DiscoveredCompany {
                 (change)="toggleSelectAll()">
             </th>
             <th style="cursor:pointer" (click)="setSort('company_name')">
-              Firma {{ sortIcon('company_name') }}
+              {{ t('admin.table.company') }} {{ sortIcon('company_name') }}
             </th>
-            <th>NIP</th>
+            <th>{{ t('admin.table.taxId') }}</th>
             <th style="cursor:pointer" (click)="setSort('icp_score')">
-              Score {{ sortIcon('icp_score') }}
+              {{ t('admin.table.score') }} {{ sortIcon('icp_score') }}
             </th>
-            <th>Oddziały</th>
+            <th>{{ t('admin.table.branches') }}</th>
             @for (s of signalDefs(); track s.key) {
               <th class="sig-th">
                 <span>{{ s.label }}</span>
@@ -457,13 +457,13 @@ interface DiscoveredCompany {
               </th>
             }
             <th style="cursor:pointer" (click)="setSort('imported_at')">
-              Importowano {{ sortIcon('imported_at') }}
+              {{ t('admin.table.imported') }} {{ sortIcon('imported_at') }}
             </th>
             <th style="cursor:pointer" (click)="setSort('enriched_at')">
-              Enrichment {{ sortIcon('enriched_at') }}
+              {{ t('admin.table.enrichment') }} {{ sortIcon('enriched_at') }}
             </th>
-            <th>Status</th>
-            <th>Akcje</th>
+            <th>{{ t('admin.table.status') }}</th>
+            <th>{{ t('admin.table.actions') }}</th>
             <th style="width:36px"></th>
           </tr>
         </thead>
@@ -486,19 +486,19 @@ interface DiscoveredCompany {
                   }
                   @if (p.has_partner) {
                     <button (click)="$event.stopPropagation(); goToPartner(p.partner_nav_id!, p.nip)"
-                      title="Partner w CRM z tym NIP — kliknij aby przejść"
+                      [title]="t('admin.table.partnerBadgeTooltip')"
                       style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🤝 Partner
                     </button>
                   } @else if (p.crm_lead_id) {
                     <button (click)="$event.stopPropagation(); goToLead(p.crm_lead_id!, p.nip)"
-                      title="Lead w CRM (skonwertowany prospekt) — kliknij aby przejść"
+                      [title]="t('admin.table.convertedLeadTooltip')"
                       style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
                   } @else if (p.has_lead) {
                     <button (click)="$event.stopPropagation(); goToLead(p.lead_id!, p.nip)"
-                      title="Lead w CRM z tym NIP — kliknij aby przejść"
+                      [title]="t('admin.table.leadBadgeTooltip')"
                       style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
@@ -515,15 +515,15 @@ interface DiscoveredCompany {
                         🌐 {{ shortUrl(p.website_url) }}
                       </a>
                       @if (p.website_status === 'ok') {
-                        <span style="font-size:10px;color:#16a34a;font-weight:700;line-height:1" title="Dane ze strony pobrane">✓</span>
+                        <span style="font-size:10px;color:#16a34a;font-weight:700;line-height:1" [title]="t('admin.website.okShort')">✓</span>
                       } @else if (p.website_status === 'blocked') {
-                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" title="Strona zablokowana przez Cloudflare/WAF — treść niedostępna dla botów">!</span>
+                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" [title]="t('admin.website.blockedShort')">!</span>
                       } @else if (p.website_status === 'failed') {
-                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" title="Strona niedostępna lub błąd scrapingu">!</span>
+                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" [title]="t('admin.website.failedShort')">!</span>
                       } @else if (p.website_status === 'not_found') {
-                        <span style="font-size:10px;color:#9ca3af;font-weight:700;line-height:1" title="Nie znaleziono strony WWW">–</span>
+                        <span style="font-size:10px;color:#9ca3af;font-weight:700;line-height:1" [title]="t('admin.website.notFoundShort')">–</span>
                       } @else if (p.website_status === 'unconfirmed') {
-                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" title="Nie udało się potwierdzić strony firmy">?</span>
+                        <span style="font-size:10px;color:#d97706;font-weight:700;line-height:1" [title]="t('admin.website.unconfirmedShort')">?</span>
                       }
                     </span>
                   }
@@ -534,7 +534,7 @@ interface DiscoveredCompany {
                   }
                   @if (p.linkedin_url) {
                     <a [href]="p.linkedin_url" target="_blank"
-                      [title]="'LinkedIn' + (p.linkedin_status === 'ok' ? ' — dane pobrane' : p.linkedin_status === 'blocked' ? ' — zablokowany (bot)' : p.linkedin_status === 'not_found' ? ' — nie znaleziono' : '')"
+                      [title]="linkedinTooltip(p.linkedin_status)"
                       [style.outline]="p.linkedin_status === 'ok' ? '2px solid #16a34a' : p.linkedin_status === 'blocked' ? '2px solid #d97706' : p.linkedin_status === 'not_found' ? '2px solid #9ca3af' : 'none'"
                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#0a66c2;color:#fff;font-size:10px;font-weight:700;text-decoration:none"
                       (click)="$event.stopPropagation()">in</a>
@@ -582,7 +582,7 @@ interface DiscoveredCompany {
               </td>
               <td>
                 @if (processingIds().has(p.id)) {
-                  <span class="row-spin" title="Przetwarzanie…"></span>
+                  <span class="row-spin" [title]="t('admin.table.processing')"></span>
                 } @else {
                   <span class="badge" [class]="statusClass(p.enrichment_status)">
                     {{ statusLabel(p.enrichment_status) }}
@@ -593,20 +593,20 @@ interface DiscoveredCompany {
                 @if (p.has_partner) {
                   <button class="btn btn-g" style="font-size:11px;padding:3px 8px;background:#d1fae5;color:#065f46;border-color:#6ee7b7"
                     (click)="goToPartner(p.partner_nav_id!, p.nip)"
-                    title="Partner z tym NIP już istnieje w CRM — kliknij aby przejść">
-                    ↗ Partner
+                    [title]="t('admin.table.goToPartnerTooltip')">
+                    ↗ {{ t('admin.table.partner') }}
                   </button>
                 } @else if (p.crm_lead_id) {
                   <button class="btn btn-g" style="font-size:11px;padding:3px 8px"
                     (click)="goToLead(p.crm_lead_id!, p.nip)"
-                    title="Przejdź do leadu CRM">
+                    [title]="t('admin.table.goToCrmTooltip')">
                     ↗ CRM
                   </button>
                 } @else if (p.has_lead) {
                   <button class="btn btn-g" style="font-size:11px;padding:3px 8px;background:#dbeafe;color:#1d4ed8;border-color:#93c5fd"
                     (click)="goToLead(p.lead_id!, p.nip)"
-                    title="Lead z tym NIP już istnieje w CRM — kliknij aby przejść">
-                    ↗ Lead
+                    [title]="t('admin.table.goToLeadTooltip')">
+                    ↗ {{ t('admin.table.lead') }}
                   </button>
                 } @else {
                   <button class="btn btn-p" style="font-size:11px;padding:3px 8px"
@@ -614,7 +614,7 @@ interface DiscoveredCompany {
                     [style.opacity]="qualifiesForLead(p) ? '1' : '0.4'"
                     (click)="toLead(p)"
                     [title]="leadButtonTooltip(p)">
-                    @if (toLeadLoading() === p.id) { … } @else { → Lead }
+                    @if (toLeadLoading() === p.id) { … } @else { → {{ t('admin.table.lead') }} }
                   </button>
                 }
               </td>
@@ -624,7 +624,7 @@ interface DiscoveredCompany {
                   [class.btn-menu-active]="openMenu() === p.id"
                   [disabled]="statusActioning() === p.id"
                   (click)="openMenuFor($event, p.id)"
-                  title="Akcje">
+                  [title]="t('admin.table.actions')">
                   @if (statusActioning() === p.id) { ⏳ } @else { ⋮ }
                 </button>
               </td>
@@ -639,7 +639,7 @@ interface DiscoveredCompany {
                   <div style="margin-bottom:14px;padding:10px 14px;background:white;border:1px solid #e5e7eb;border-radius:8px"
                        (click)="$event.stopPropagation()">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                      <span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em">Notatka walidacyjna</span>
+                      <span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em">{{ t('admin.note.heading') }}</span>
                       @if (p.note_author) {
                         <span style="font-size:11px;color:#9ca3af">
                           {{ p.note_author }} · {{ p.note_updated_at | date:'dd.MM.yyyy HH:mm' }}
@@ -652,7 +652,7 @@ interface DiscoveredCompany {
                       (blur)="saveNote(p)"
                       maxlength="500"
                       rows="3"
-                      placeholder="Dodaj notatkę…"
+                      [placeholder]="t('admin.note.placeholder')"
                       style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;line-height:1.5;resize:vertical;color:#374151;font-family:inherit;outline:none"
                       onfocus="this.style.borderColor='#3BAA5D'"
                       onblur="this.style.borderColor='#d1d5db'"
@@ -668,13 +668,13 @@ interface DiscoveredCompany {
                     <div>
                       @if (p.ai_summary) {
                         <div style="margin-bottom:12px">
-                          <div class="detail-label">Podsumowanie AI</div>
+                          <div class="detail-label">{{ t('admin.detail.aiSummary') }}</div>
                           <div style="font-size:13px;line-height:1.5">{{ p.ai_summary }}</div>
                         </div>
                       }
                       @if (p.icp_signals?.length) {
                         <div style="margin-bottom:12px">
-                          <div class="detail-label">Sygnały ICP</div>
+                          <div class="detail-label">{{ t('admin.detail.icpSignals') }}</div>
                           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
                             @for (s of signalDefs(); track s.key) {
                               <span [title]="s.desc" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:12px;border:1px solid"
@@ -690,41 +690,41 @@ interface DiscoveredCompany {
                       }
                       <div style="font-size:12px;display:flex;flex-direction:column;gap:5px">
                         @if (p.industry) {
-                          <div><b>Branża:</b> {{ p.industry }}</div>
+                          <div><b>{{ t('admin.detail.industry') }}</b> {{ p.industry }}</div>
                         }
                         @if (p.city || p.voivodeship) {
-                          <div><b>Lokalizacja:</b> {{ p.city }}{{ p.city && p.voivodeship ? ', woj. ' : '' }}{{ p.voivodeship }}</div>
+                          <div><b>{{ t('admin.detail.location') }}</b> {{ p.city }}{{ p.city && p.voivodeship ? ', ' : '' }}{{ p.voivodeship }}</div>
                         }
                         @if (p.employment_count) {
-                          <div><b>Zatrudnienie:</b> {{ p.employment_count | number }} os.</div>
+                          <div><b>{{ t('admin.detail.employment') }}</b> {{ t('admin.detail.employeesCount', { count: p.employment_count }) }}</div>
                         } @else if (p.employment_range) {
-                          <div><b>Zatrudnienie:</b> {{ p.employment_range }}</div>
+                          <div><b>{{ t('admin.detail.employment') }}</b> {{ p.employment_range }}</div>
                         }
                         @if (p.company_size) {
-                          <div><b>Wielkość:</b> {{ p.company_size }}</div>
+                          <div><b>{{ t('admin.detail.companySize') }}</b> {{ p.company_size }}</div>
                         }
                         @if (p.krs_number) {
                           <div><b>KRS:</b> {{ p.krs_number }}</div>
                         }
                         @if (p.pkd_id) {
-                          <div><b>PKD (import):</b> {{ p.pkd_id }}{{ p.pkd_description ? ' — ' + p.pkd_description : '' }}</div>
+                          <div><b>{{ t('admin.detail.pkdImport') }}</b> {{ p.pkd_id }}{{ p.pkd_description ? ' — ' + p.pkd_description : '' }}</div>
                         }
                         @if (p.enrichment_log?.gus?.found && p.enrichment_log?.gus?.pkd_codes?.length) {
                           <div>
-                            <b>PKD (GUS):</b>
+                            <b>{{ t('admin.detail.pkdGus') }}</b>
                             @for (code of (p.enrichment_log?.gus?.pkd_codes ?? []); track code) {
                               <span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:11px;font-family:monospace">{{ code }}</span>
                             }
                           </div>
                         }
                         @if (p.icp_downgrade_flags?.length) {
-                          <div><b>Obniżony priorytet:</b>
+                          <div><b>{{ t('admin.detail.downgraded') }}</b>
                             {{ p.icp_downgrade_flags!.map(f => f.label).join(', ') }}
                           </div>
                         }
                         @if (p.icp_bonus_signals?.length) {
-                          <div><b>Bonus:</b>
-                            {{ p.icp_bonus_signals!.filter(b => b.hit).map(b => b.label).join(', ') || 'brak' }}
+                          <div><b>{{ t('admin.detail.bonus') }}</b>
+                            {{ p.icp_bonus_signals!.filter(b => b.hit).map(b => b.label).join(', ') || t('admin.detail.none') }}
                           </div>
                         }
                         @if (p.website_url) {
@@ -735,19 +735,19 @@ interface DiscoveredCompany {
                             </a>
                             @if (p.website_status === 'ok') {
                               <span style="font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap"
-                                title="Dane ze strony pobrane pomyślnie">✓ pobrano</span>
+                                [title]="t('admin.website.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.website_status === 'blocked') {
                               <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
-                                title="Strona zablokowana przez Cloudflare/WAF — treść niedostępna dla botów, enrichment kontynuowany z danych KRS">⚠ Cloudflare</span>
+                                [title]="t('admin.website.blocked')">⚠ Cloudflare</span>
                             } @else if (p.website_status === 'failed') {
                               <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
-                                title="Strona niedostępna lub pusty wynik scrapingu">⚠ brak treści</span>
+                                [title]="t('admin.website.failed')">⚠ {{ t('admin.website.noContent') }}</span>
                             } @else if (p.website_status === 'not_found') {
                               <span style="font-size:10px;font-weight:600;color:#9ca3af;white-space:nowrap"
-                                title="Nie znaleziono adresu strony WWW">✗ nie znaleziono</span>
+                                [title]="t('admin.website.notFound')">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
                             } @else if (p.website_status === 'unconfirmed') {
                               <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
-                                title="Strona istnieje, ale nie znaleziono na niej NIP/KRS/REGON ani adresu firmy — użyj Re-process, aby podać właściwy adres">⚠ Nie udało się potwierdzić strony firmy</span>
+                                [title]="t('admin.website.unconfirmed')">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
                             }
                           </div>
                         }
@@ -767,25 +767,24 @@ interface DiscoveredCompany {
                             </a>
                             @if (p.linkedin_status === 'ok') {
                               <span style="font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap"
-                                title="Dane LinkedIn pobrane pomyślnie">✓ pobrano</span>
+                                [title]="t('admin.linkedin.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.linkedin_status === 'blocked') {
                               <span style="font-size:10px;font-weight:600;color:#d97706;white-space:nowrap"
-                                title="LinkedIn zwrócił HTTP 999 bez treści — robot zablokowany">⚠ zablokowany</span>
+                                [title]="t('admin.linkedin.blocked')">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
                             } @else if (p.linkedin_status === 'not_found') {
                               <span style="font-size:10px;font-weight:600;color:#9ca3af;white-space:nowrap"
-                                title="Nie znaleziono strony LinkedIn">✗ nie znaleziono</span>
+                                [title]="t('admin.linkedin.notFound')">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
                             }
                           </div>
                         }
                         @if (p.enrichment_status === 'no_website') {
                           <div style="color:#92400e;background:#fef3c7;padding:5px 8px;border-radius:5px;margin-top:4px;font-size:11px">
-                            ⚠ Nie znaleziono strony WWW — enrichment wstrzymany.
-                            Użyj opcji Re-process i podaj adres strony ręcznie.
+                            ⚠ {{ t('admin.detail.noWebsiteHalted') }}
                           </div>
                         }
                         @if (p.enrichment_error) {
                           <div style="color:#dc2626;margin-top:4px">
-                            <b>Błąd enrichmentu:</b> {{ p.enrichment_error }}
+                            <b>{{ t('admin.detail.enrichmentError') }}</b> {{ p.enrichment_error }}
                           </div>
                         }
                       </div>
@@ -795,7 +794,7 @@ interface DiscoveredCompany {
                     <div>
                       @if (p.decision_maker_name) {
                         <div style="margin-bottom:10px">
-                          <div class="detail-label">Osoba decyzyjna (z pliku importu)</div>
+                          <div class="detail-label">{{ t('admin.detail.decisionMaker') }}</div>
                           <div style="border:1px solid #fbd0b6;border-radius:6px;padding:8px 10px;background:#fff7ed;font-size:12px">
                             <div style="font-weight:600">{{ p.decision_maker_name }}</div>
                             @if (p.decision_maker_title) {
@@ -831,7 +830,7 @@ interface DiscoveredCompany {
                         </div>
                       }
                       @if (p.key_contacts?.length) {
-                        <div class="detail-label">Kluczowe kontakty — znalezione przez AI ({{ p.key_contacts!.length }})</div>
+                        <div class="detail-label">{{ t('admin.detail.keyContacts', { count: p.key_contacts!.length }) }}</div>
                         <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
                           @for (c of p.key_contacts!; track $index) {
                             <div style="border:1px solid #e5e7eb;border-radius:6px;
@@ -863,7 +862,7 @@ interface DiscoveredCompany {
                         </div>
                       } @else if (p.enrichment_status === 'done') {
                         <div style="font-size:12px;color:#9ca3af;padding-top:4px">
-                          Nie znaleziono kluczowych kontaktów na stronie WWW.
+                          {{ t('admin.detail.noKeyContacts') }}
                         </div>
                       }
                     </div>
@@ -874,7 +873,7 @@ interface DiscoveredCompany {
                   @if (p.enrichment_log) {
                     <div class="enrich-log">
                       <div class="detail-label" style="margin-bottom:10px">
-                        Log enrichmentu
+                        {{ t('admin.log.heading') }}
                         <span style="font-weight:400;color:#9ca3af;margin-left:8px;text-transform:none;letter-spacing:0">
                           {{ p.enrichment_log.timestamp | date:'dd.MM.yyyy HH:mm' }}
                         </span>
@@ -900,13 +899,13 @@ interface DiscoveredCompany {
                                         <span style="padding:0 4px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:10px;font-family:monospace">{{ code }}</span>
                                       }
                                     </span>
-                                    <button class="log-expand-btn" (click)="toggleGusExpand(p.id, $event)">zwiń</button>
+                                    <button class="log-expand-btn" (click)="toggleGusExpand(p.id, $event)">{{ t('admin.log.collapse') }}</button>
                                   } @else {
-                                    <button class="log-expand-btn" (click)="toggleGusExpand(p.id, $event)">(+{{ (p.enrichment_log?.gus?.pkd_codes?.length ?? 1) - 1 }} więcej)</button>
+                                    <button class="log-expand-btn" (click)="toggleGusExpand(p.id, $event)">{{ t('admin.log.more', { count: (p.enrichment_log?.gus?.pkd_codes?.length ?? 1) - 1 }) }}</button>
                                   }
                                 }
                               } @else {
-                                <span class="log-err">✗ Nie znaleziono w GUS REGON</span>
+                                <span class="log-err">✗ {{ t('admin.log.gusNotFound') }}</span>
                                 @if (p.enrichment_log?.gus?.error) {
                                   <span class="log-muted"> — {{ p.enrichment_log?.gus?.error }}</span>
                                 }
@@ -921,18 +920,18 @@ interface DiscoveredCompany {
                                [class.log-badge-err]="!p.enrichment_log.krs?.found">KRS</div>
                           <div class="log-step-body">
                             @if (p.enrichment_log.krs?.found) {
-                              <span class="log-ok">✓ Znaleziono</span>
+                              <span class="log-ok">✓ {{ t('admin.log.found') }}</span>
                               @if (p.enrichment_log.krs!.legal_form) {
                                 <span class="log-detail"> — {{ p.enrichment_log.krs!.legal_form }}</span>
                               }
                               @if (p.enrichment_log.krs!.branches_count) {
-                                <span class="log-detail"> · {{ p.enrichment_log.krs!.branches_count }} oddziałów ({{ p.enrichment_log.krs!.branches_scope }})</span>
+                                <span class="log-detail"> · {{ t('admin.log.branchesCount', { count: p.enrichment_log.krs!.branches_count }) }} ({{ p.enrichment_log.krs!.branches_scope }})</span>
                               }
                               @if (!p.enrichment_log.krs!.had_website) {
-                                <span class="log-muted"> · brak URL strony w rejestrze</span>
+                                <span class="log-muted"> · {{ t('admin.log.noUrlInRegistry') }}</span>
                               }
                             } @else {
-                              <span class="log-err">✗ Nie znaleziono w KRS</span>
+                              <span class="log-err">✗ {{ t('admin.log.krsNotFound') }}</span>
                             }
                           </div>
                         </div>
@@ -948,16 +947,16 @@ interface DiscoveredCompany {
                                  (click)="$event.stopPropagation()">
                                 ✓ {{ p.enrichment_log.website!.url }}
                               </a>
-                              <span class="log-detail"> · metoda: {{ websiteMethodLabel(p.enrichment_log.website!.method) }}</span>
+                              <span class="log-detail"> · {{ t('admin.log.method') }} {{ websiteMethodLabel(p.enrichment_log.website!.method) }}</span>
                               @if (p.enrichment_log.website!.pages_count) {
-                                <span class="log-detail"> · {{ p.enrichment_log.website!.pages_count }} stron</span>
+                                <span class="log-detail"> · {{ t('admin.log.pagesCount', { count: p.enrichment_log.website!.pages_count }) }}</span>
                               }
                               @if (p.enrichment_log.website!.chars_extracted) {
-                                <span class="log-detail"> · {{ p.enrichment_log.website!.chars_extracted | number }} znaków</span>
+                                <span class="log-detail"> · {{ t('admin.log.charsCount', { count: p.enrichment_log.website!.chars_extracted }) }}</span>
                               }
                             } @else {
-                              <span class="log-err">✗ Nie znaleziono strony WWW</span>
-                              <span class="log-muted"> (metoda: {{ websiteMethodLabel(p.enrichment_log.website?.method || 'none') }})</span>
+                              <span class="log-err">✗ {{ t('admin.log.websiteNotFound') }}</span>
+                              <span class="log-muted"> ({{ t('admin.log.method') }} {{ websiteMethodLabel(p.enrichment_log.website?.method || 'none') }})</span>
                             }
                           </div>
                         </div>
@@ -1001,7 +1000,7 @@ interface DiscoveredCompany {
           } @empty {
             <tr>
               <td colspan="16" style="text-align:center;color:#9ca3af;padding:40px">
-                Brak firm. Zaimportuj plik CSV aby rozpocząć.
+                {{ t('admin.table.empty') }}
               </td>
             </tr>
           }
@@ -1012,13 +1011,13 @@ interface DiscoveredCompany {
       @if (pages() > 1) {
         <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
           <button class="btn btn-g" [disabled]="page() <= 1" (click)="setPage(page() - 1)">
-            ‹ Poprzednia
+            ‹ {{ t('admin.pager.previous') }}
           </button>
           <span style="line-height:32px;font-size:13px">
             {{ page() }} / {{ pages() }}
           </span>
           <button class="btn btn-g" [disabled]="page() >= pages()" (click)="setPage(page() + 1)">
-            Następna ›
+            {{ t('admin.pager.next') }} ›
           </button>
         </div>
       }
@@ -1034,21 +1033,21 @@ interface DiscoveredCompany {
 
         @if (activeMenuProspect()!.enrichment_status !== 'hold') {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'hold'); closeMenu()">
-            ⏸ Hold
+            ⏸ {{ t('admin.status.hold') }}
           </button>
         } @else {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'pending'); closeMenu()">
-            ▶ Przywróć do kolejki
+            ▶ {{ t('admin.menu.restoreToQueue') }}
           </button>
         }
 
         @if (activeMenuProspect()!.enrichment_status !== 'archived') {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'archived'); closeMenu()">
-            📦 Archiwizuj
+            📦 {{ t('admin.bulk.archive') }}
           </button>
         } @else {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'pending'); closeMenu()">
-            ▶ Przywróć z archiwum
+            ▶ {{ t('admin.menu.restoreFromArchive') }}
           </button>
         }
 
@@ -1058,14 +1057,14 @@ interface DiscoveredCompany {
 
         @if (activeMenuProspect()!.enrichment_log) {
           <button class="mi" (click)="openInspect(activeMenuProspect()!)">
-            🔍 Inspekcja
+            🔍 {{ t('admin.menu.inspect') }}
           </button>
         }
 
         <div class="mi-sep"></div>
 
         <button class="mi mi-danger" (click)="deleteProspect(activeMenuProspect()!)">
-          🗑 Usuń
+          🗑 {{ t('admin.menu.delete') }}
         </button>
       </div>
     }
@@ -1074,13 +1073,13 @@ interface DiscoveredCompany {
     @if (toLeadDialog() != null) {
       <div class="inspect-overlay" (click)="toLeadDialog.set(null)"></div>
       <div class="inspect-modal" style="max-width:420px;padding:24px" (click)="$event.stopPropagation()">
-        <div style="font-weight:600;font-size:15px;margin-bottom:4px">Utwórz lead w CRM</div>
+        <div style="font-weight:600;font-size:15px;margin-bottom:4px">{{ t('admin.toLead.heading') }}</div>
         <div style="font-size:13px;color:#6b7280;margin-bottom:16px">
           {{ toLeadDialog()!.company_name || toLeadDialog()!.nip }}
         </div>
 
         <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">
-          NIP firmy — potwierdź lub popraw
+          {{ t('admin.toLead.taxIdLabel') }}
         </label>
         <div style="position:relative;margin-bottom:4px">
           <input class="inp" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;letter-spacing:0.05em"
@@ -1089,52 +1088,52 @@ interface DiscoveredCompany {
             placeholder="0000000000">
           @if (toLeadNipDigits !== toLeadDialog()!.nip) {
             <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#d97706;font-weight:600">
-              zmieniony
+              {{ t('admin.toLead.changed') }}
             </span>
           }
         </div>
         <div style="font-size:11px;color:#6b7280;margin-bottom:16px">
-          Ten NIP zostanie użyty do wyszukania duplikatów i utworzenia leada.
+          {{ t('admin.toLead.taxIdHint') }}
           @if (toLeadNipDigits !== toLeadDialog()!.nip && toLeadNipDigits.length === 10) {
-            <span style="color:#d97706"> Prospekt zostanie zaktualizowany.</span>
+            <span style="color:#d97706"> {{ t('admin.toLead.prospectWillUpdate') }}</span>
           }
         </div>
 
         <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px">
-          Przypisz do handlowca
+          {{ t('admin.toLead.assignTo') }}
         </label>
         <select style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;margin-bottom:20px"
           [ngModel]="toLeadAssignedTo()"
           (ngModelChange)="toLeadAssignedTo.set($event)">
-          <option value="">— Przypisz do siebie (domyślnie) —</option>
+          <option value="">{{ t('admin.toLead.assignToSelf') }}</option>
           @for (u of salesUsers(); track u.id) {
             <option [value]="u.id">{{ u.display_name }}</option>
           }
         </select>
 
         <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">
-          Tag (opcjonalny)
+          {{ t('admin.toLead.tagLabel') }}
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:20px"
           [(ngModel)]="toLeadTagValue"
           maxlength="50"
-          placeholder="np. hot-lead, q4-2026, priorytet">
+          [placeholder]="t('admin.toLead.tagPlaceholder')">
 
         @if (toLeadDuplicateError()) {
           <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#991b1b">
-            Firma o podobnej nazwie już istnieje w CRM jako
-            <strong>{{ toLeadDuplicateError()!.src === 'lead' ? 'lead' : 'partner' }}</strong>:
+            {{ t('admin.toLead.duplicateWarning') }}
+            <strong>{{ toLeadDuplicateError()!.src === 'lead' ? t('admin.table.lead') : t('admin.table.partner') }}</strong>:
             „{{ toLeadDuplicateError()!.company }}"
           </div>
         }
 
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button style="padding:7px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px"
-            (click)="toLeadDialog.set(null)">Anuluj</button>
+            (click)="toLeadDialog.set(null)">{{ t('admin.bulk.cancel') }}</button>
           <button style="padding:7px 16px;border:none;border-radius:6px;background:var(--orange);color:#fff;cursor:pointer;font-size:13px;font-weight:600"
             [disabled]="toLeadNipDigits.length !== 10 || !!toLeadLoading()"
             (click)="confirmToLead()">
-            {{ toLeadLoading() ? 'Tworzenie…' : toLeadDuplicateError() ? '→ Utwórz mimo to' : '→ Utwórz lead' }}
+            {{ toLeadLoading() ? t('admin.toLead.creating') : toLeadDuplicateError() ? t('admin.toLead.createAnyway') : t('admin.toLead.create') }}
           </button>
         </div>
       </div>
@@ -1147,17 +1146,17 @@ interface DiscoveredCompany {
 
         <div class="inspect-header">
           <div class="inspect-title">
-            <span style="font-size:12px;color:#6b7280;font-weight:500">🔍 Inspekcja enrichmentu</span>
+            <span style="font-size:12px;color:#6b7280;font-weight:500">🔍 {{ t('admin.inspect.heading') }}</span>
             <span class="inspect-company">{{ inspectTarget()!.company_name || inspectTarget()!.nip }}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             <div class="inspect-tabs">
               <button class="inspect-tab" [class.inspect-tab-active]="inspectView() === 'analysis'"
-                (click)="inspectView.set('analysis')">Analiza</button>
+                (click)="inspectView.set('analysis')">{{ t('admin.inspect.tabAnalysis') }}</button>
               <button class="inspect-tab" [class.inspect-tab-active]="inspectView() === 'prompt'"
-                (click)="switchToPrompt()">Prompt Claude</button>
+                (click)="switchToPrompt()">{{ t('admin.inspect.tabPrompt') }}</button>
               <button class="inspect-tab" [class.inspect-tab-active]="inspectView() === 'scoring'"
-                (click)="switchToScoringRules()">Zasady naliczania punktów</button>
+                (click)="switchToScoringRules()">{{ t('admin.inspect.tabScoring') }}</button>
             </div>
             <button class="inspect-close" (click)="inspectTarget.set(null)">✕</button>
           </div>
@@ -1168,7 +1167,7 @@ interface DiscoveredCompany {
           <div class="inspect-prompt-view">
             @if (inspectPromptLoading()) {
               <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:13px">
-                <span class="row-spin"></span> Wczytuję prompt…
+                <span class="row-spin"></span> {{ t('admin.inspect.loadingPrompt') }}
               </div>
             } @else if (inspectPrompt()) {
               <pre class="inspect-prompt-pre">{{ inspectPrompt() }}</pre>
@@ -1183,7 +1182,7 @@ interface DiscoveredCompany {
           <div class="inspect-prompt-view">
             @if (inspectScoringRulesLoading()) {
               <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:13px">
-                <span class="row-spin"></span> Wczytuję zasady naliczania punktów…
+                <span class="row-spin"></span> {{ t('admin.inspect.loadingScoring') }}
               </div>
             } @else if (inspectScoringRules()) {
               <pre class="inspect-prompt-pre">{{ inspectScoringRules() | json }}</pre>
@@ -1197,7 +1196,7 @@ interface DiscoveredCompany {
 
           <!-- Kolumna lewa: dane wejściowe -->
           <div class="inspect-col-left">
-            <div class="inspect-section-title">Dane wejściowe Claude</div>
+            <div class="inspect-section-title">{{ t('admin.inspect.inputData') }}</div>
 
             <!-- GUS -->
             @if (inspectTarget()!.enrichment_log!.gus !== undefined) {
@@ -1207,7 +1206,7 @@ interface DiscoveredCompany {
                     [class.inspect-badge-ok]="inspectTarget()!.enrichment_log!.gus?.found"
                     [class.inspect-badge-err]="!inspectTarget()!.enrichment_log!.gus?.found">GUS</span>
                   <span style="font-size:12px">
-                    {{ inspectTarget()!.enrichment_log!.gus?.found ? '✓ Znaleziono w REGON' : '✗ Nie znaleziono' }}
+                    {{ inspectTarget()!.enrichment_log!.gus?.found ? t('admin.inspect.foundInRegon') : t('admin.inspect.notFound') }}
                   </span>
                 </div>
                 @if (inspectTarget()!.enrichment_log!.gus?.found) {
@@ -1218,13 +1217,13 @@ interface DiscoveredCompany {
                     </div>
                     @if (inspectTarget()!.enrichment_log?.gus?.official_name) {
                       <div class="inspect-row">
-                        <span class="ik">Nazwa oficjalna</span>
+                        <span class="ik">{{ t('admin.inspect.officialName') }}</span>
                         <span class="iv">{{ inspectTarget()!.enrichment_log?.gus?.official_name }}</span>
                       </div>
                     }
                     @if (inspectTarget()!.enrichment_log?.gus?.pkd_codes?.length) {
                       <div class="inspect-row" style="align-items:flex-start">
-                        <span class="ik">Kody PKD</span>
+                        <span class="ik">{{ t('admin.inspect.pkdCodes') }}</span>
                         <span class="iv" style="display:flex;flex-wrap:wrap;gap:3px">
                           @for (code of (inspectTarget()!.enrichment_log?.gus?.pkd_codes ?? []); track code) {
                             <span style="padding:1px 6px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:10px;font-family:monospace"
@@ -1245,27 +1244,27 @@ interface DiscoveredCompany {
                   [class.inspect-badge-ok]="inspectTarget()!.enrichment_log!.krs?.found"
                   [class.inspect-badge-err]="!inspectTarget()!.enrichment_log!.krs?.found">KRS</span>
                 <span style="font-size:12px">
-                  {{ inspectTarget()!.enrichment_log!.krs?.found ? '✓ Znaleziono' : '✗ Nie znaleziono' }}
+                  {{ inspectTarget()!.enrichment_log!.krs?.found ? t('admin.inspect.found') : t('admin.inspect.notFound') }}
                 </span>
               </div>
               @if (inspectTarget()!.enrichment_log!.krs?.found) {
                 <div class="inspect-kv">
                   @if (inspectTarget()!.krs_number) {
-                    <div class="inspect-row"><span class="ik">Nr KRS</span><span class="iv" style="font-family:monospace">{{ inspectTarget()!.krs_number }}</span></div>
+                    <div class="inspect-row"><span class="ik">{{ t('admin.inspect.krsNumber') }}</span><span class="iv" style="font-family:monospace">{{ inspectTarget()!.krs_number }}</span></div>
                   }
                   @if (inspectTarget()!.legal_form) {
-                    <div class="inspect-row"><span class="ik">Forma prawna</span><span class="iv">{{ inspectTarget()!.legal_form }}</span></div>
+                    <div class="inspect-row"><span class="ik">{{ t('admin.inspect.legalForm') }}</span><span class="iv">{{ inspectTarget()!.legal_form }}</span></div>
                   }
                   @if (inspectTarget()!.enrichment_log!.krs!.branches_count != null) {
                     <div class="inspect-row">
-                      <span class="ik">Oddziały KRS</span>
+                      <span class="ik">{{ t('admin.inspect.krsBranches') }}</span>
                       <span class="iv inspect-highlight">{{ inspectTarget()!.enrichment_log!.krs!.branches_count }} ({{ inspectTarget()!.enrichment_log!.krs!.branches_scope }})</span>
                     </div>
                   }
                   <div class="inspect-row">
-                    <span class="ik">URL w KRS</span>
+                    <span class="ik">{{ t('admin.inspect.krsUrl') }}</span>
                     <span class="iv" [class.inspect-muted]="!inspectTarget()!.enrichment_log!.krs!.had_website">
-                      {{ inspectTarget()!.enrichment_log!.krs!.had_website ? '✓ był' : 'brak' }}
+                      {{ inspectTarget()!.enrichment_log!.krs!.had_website ? t('admin.inspect.present') : t('admin.detail.none') }}
                     </span>
                   </div>
                 </div>
@@ -1280,20 +1279,20 @@ interface DiscoveredCompany {
                   [class.inspect-badge-err]="!inspectTarget()!.enrichment_log!.website?.url || inspectTarget()!.enrichment_log!.website?.identity_check_failed">WWW</span>
                 <span style="font-size:12px">
                   @if (inspectTarget()!.enrichment_log!.website?.identity_check_failed) {
-                    ⚠ Nie udało się potwierdzić strony firmy
+                    ⚠ {{ t('admin.website.unconfirmedLabel') }}
                   } @else {
-                    {{ inspectTarget()!.enrichment_log!.website?.url ? '✓ Znaleziono' : '✗ Brak strony' }}
+                    {{ inspectTarget()!.enrichment_log!.website?.url ? t('admin.inspect.found') : t('admin.inspect.noWebsite') }}
                   }
                 </span>
               </div>
               <div class="inspect-kv">
                 @if (inspectTarget()!.enrichment_log!.website?.identity_check; as idc) {
                   <div class="inspect-row">
-                    <span class="ik">Tożsamość</span>
+                    <span class="ik">{{ t('admin.inspect.identity') }}</span>
                     <span class="iv">
-                      {{ idc.verified ? 'potwierdzona' : 'niepotwierdzona' }} ({{ idc.reason }}{{ idc.decided_by ? ', ' + idc.decided_by : '' }})
+                      {{ idc.verified ? t('admin.inspect.identityVerified') : t('admin.inspect.identityUnverified') }} ({{ idc.reason }}{{ idc.decided_by ? ', ' + idc.decided_by : '' }})
                       @if (idc.fallback?.attempted) {
-                        — sprawdzono podstrony: {{ idc.fallback!.pages_checked?.length ?? 0 }}
+                        — {{ t('admin.inspect.subpagesChecked', { count: idc.fallback!.pages_checked?.length ?? 0 }) }}
                       }
                     </span>
                   </div>
@@ -1308,18 +1307,18 @@ interface DiscoveredCompany {
                   </div>
                 }
                 <div class="inspect-row">
-                  <span class="ik">Metoda</span>
+                  <span class="ik">{{ t('admin.inspect.method') }}</span>
                   <span class="iv">{{ websiteMethodLabel(inspectTarget()!.enrichment_log!.website?.method || 'none') }}</span>
                 </div>
                 @if (inspectTarget()!.enrichment_log!.website?.pages_count) {
                   <div class="inspect-row">
-                    <span class="ik">Stron</span>
+                    <span class="ik">{{ t('admin.inspect.pages') }}</span>
                     <span class="iv inspect-highlight">{{ inspectTarget()!.enrichment_log!.website!.pages_count }}</span>
                   </div>
                 }
                 @if (inspectTarget()!.enrichment_log!.website?.chars_extracted) {
                   <div class="inspect-row">
-                    <span class="ik">Znaków</span>
+                    <span class="ik">{{ t('admin.inspect.chars') }}</span>
                     <span class="iv">{{ inspectTarget()!.enrichment_log!.website!.chars_extracted! | number }}</span>
                   </div>
                 }
@@ -1346,7 +1345,7 @@ interface DiscoveredCompany {
           <!-- Kolumna prawa: sygnały + scoring -->
           <div class="inspect-col-right">
 
-            <div class="inspect-section-title">Sygnały i uzasadnienie Claude</div>
+            <div class="inspect-section-title">{{ t('admin.inspect.signalsHeading') }}</div>
             <div class="inspect-signals">
               @for (s of signalDefs(); track s.key) {
                 <div class="inspect-signal-row"
@@ -1361,7 +1360,7 @@ interface DiscoveredCompany {
                     @if (getSignalReasoning(inspectTarget()!, s.key)) {
                       <div class="inspect-signal-reason">{{ getSignalReasoning(inspectTarget()!, s.key) }}</div>
                     } @else {
-                      <div class="inspect-signal-reason inspect-muted">brak uzasadnienia</div>
+                      <div class="inspect-signal-reason inspect-muted">{{ t('admin.inspect.noReasoning') }}</div>
                     }
                   </div>
                   <code class="inspect-signal-val">{{ getSignal(inspectTarget()!, s.key) === true ? 'true' : getSignal(inspectTarget()!, s.key) === false ? 'false' : 'null' }}</code>
@@ -1370,21 +1369,21 @@ interface DiscoveredCompany {
             </div>
 
             <!-- Kalkulacja score -->
-            <div class="inspect-section-title" style="margin-top:18px">Kalkulacja score</div>
+            <div class="inspect-section-title" style="margin-top:18px">{{ t('admin.inspect.scoreCalculation') }}</div>
             @if (inspectScoreBreakdown(); as sb) {
               <div class="inspect-score-breakdown">
                 <div class="sb-row">
-                  <span class="sb-label">Aktywne sygnały (true)</span>
+                  <span class="sb-label">{{ t('admin.inspect.activeSignals') }}</span>
                   <span class="sb-value">{{ sb.trueCount }} / {{ signalDefs().length }}</span>
                 </div>
                 <div class="sb-row">
-                  <span class="sb-label">Suma sygnałów ({{ sb.trueCount }}/{{ signalDefs().length }} true)</span>
+                  <span class="sb-label">{{ t('admin.inspect.signalsSum', { trueCount: sb.trueCount, total: signalDefs().length }) }}</span>
                   <span class="sb-value sb-plus">{{ sb.raw }}</span>
                 </div>
                 @for (b of sb.bonusBreakdown; track b.id) {
                   @if (b.hit) {
                     <div class="sb-row">
-                      <span class="sb-label">Bonus: {{ b.label }}</span>
+                      <span class="sb-label">{{ t('admin.detail.bonus') }} {{ b.label }}</span>
                       <span class="sb-value sb-plus">+{{ b.points }}</span>
                     </div>
                   }
@@ -1398,7 +1397,7 @@ interface DiscoveredCompany {
                   }
                 }
                 <div class="sb-row sb-total">
-                  <span class="sb-label">Wynik obliczony</span>
+                  <span class="sb-label">{{ t('admin.inspect.computedScore') }}</span>
                   <span class="sb-value">= {{ sb.total }}</span>
                 </div>
               </div>
@@ -1413,7 +1412,7 @@ interface DiscoveredCompany {
 
             @if (inspectTarget()!.ai_summary) {
               <div>
-                <div class="inspect-section-title" style="margin-bottom:5px">Podsumowanie AI</div>
+                <div class="inspect-section-title" style="margin-bottom:5px">{{ t('admin.detail.aiSummary') }}</div>
                 <div style="font-size:12px;line-height:1.6;color:#374151">{{ inspectTarget()!.ai_summary }}</div>
               </div>
             }
@@ -1423,7 +1422,7 @@ interface DiscoveredCompany {
           @if (inspectTarget()!.key_contacts?.length) {
             <div style="margin-top:12px">
               <div class="inspect-section-title" style="margin-bottom:6px">
-                Kluczowe kontakty ({{ inspectTarget()!.key_contacts!.length }})
+                {{ t('admin.inspect.keyContacts', { count: inspectTarget()!.key_contacts!.length }) }}
               </div>
               <div style="display:flex;flex-wrap:wrap;gap:8px">
                 @for (c of inspectTarget()!.key_contacts!; track $index) {
@@ -1458,11 +1457,11 @@ interface DiscoveredCompany {
           Re-process: {{ reprocessTarget()!.company_name || reprocessTarget()!.nip }}
         </div>
         <div style="font-size:12px;color:#6b7280;margin-bottom:14px">
-          Pola są opcjonalne — wypełnij tylko te, które chcesz poprawić lub uzupełnić.
+          {{ t('admin.reprocess.hint') }}
         </div>
 
         <label style="font-size:12px;font-weight:500;color:#374151;display:block;margin-bottom:4px">
-          NIP <span style="font-weight:400;color:#6b7280">(zostaw puste jeśli poprawny)</span>
+          {{ t('admin.table.taxId') }} <span style="font-weight:400;color:#6b7280">{{ t('admin.reprocess.taxIdHint') }}</span>
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:12px"
           [(ngModel)]="reprocessNipValue"
@@ -1470,17 +1469,17 @@ interface DiscoveredCompany {
           maxlength="12">
 
         <label style="font-size:12px;font-weight:500;color:#374151;display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          Strona WWW
+          {{ t('admin.reprocess.website') }}
           @if (reprocessTarget()?.website_status === 'ok') {
-            <span style="font-size:10px;font-weight:600;color:#16a34a">✓ pobrano</span>
+            <span style="font-size:10px;font-weight:600;color:#16a34a">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.website_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:#d97706" title="Strona zablokowana przez Cloudflare/WAF">⚠ Cloudflare</span>
+            <span style="font-size:10px;font-weight:600;color:#d97706" [title]="t('admin.website.blockedShort')">⚠ Cloudflare</span>
           } @else if (reprocessTarget()?.website_status === 'failed') {
-            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ brak treści</span>
+            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ {{ t('admin.website.noContent') }}</span>
           } @else if (reprocessTarget()?.website_status === 'not_found') {
-            <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ nie znaleziono</span>
+            <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           } @else if (reprocessTarget()?.website_status === 'unconfirmed') {
-            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ Nie udało się potwierdzić strony firmy</span>
+            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
           }
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:12px"
@@ -1490,11 +1489,11 @@ interface DiscoveredCompany {
         <label style="font-size:12px;font-weight:500;color:#374151;display:flex;align-items:center;gap:8px;margin-bottom:4px">
           LinkedIn
           @if (reprocessTarget()?.linkedin_status === 'ok') {
-            <span style="font-size:10px;font-weight:600;color:#16a34a">✓ pobrano</span>
+            <span style="font-size:10px;font-weight:600;color:#16a34a">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ zablokowany</span>
+            <span style="font-size:10px;font-weight:600;color:#d97706">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'not_found') {
-            <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ nie znaleziono</span>
+            <span style="font-size:10px;font-weight:600;color:#9ca3af">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           }
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:10px"
@@ -1505,14 +1504,14 @@ interface DiscoveredCompany {
           <input type="checkbox" [(ngModel)]="reprocessDoLinkedin"
             style="width:14px;height:14px;accent-color:#3BAA5D;cursor:pointer">
           <span style="font-size:12px;color:#374151">
-            Analizuj LinkedIn podczas przetwarzania
-            <span style="color:#6b7280">(próba scrapingu strony firmy)</span>
+            {{ t('admin.reprocess.analyzeLinkedin') }}
+            <span style="color:#6b7280">{{ t('admin.reprocess.analyzeLinkedinHint') }}</span>
           </span>
         </label>
 
         <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn btn-g" (click)="reprocessTarget.set(null)">Anuluj</button>
-          <button class="btn btn-p" (click)="confirmReprocess()">🔄 Przetwórz</button>
+          <button class="btn btn-g" (click)="reprocessTarget.set(null)">{{ t('admin.bulk.cancel') }}</button>
+          <button class="btn btn-p" (click)="confirmReprocess()">🔄 {{ t('admin.reprocess.submit') }}</button>
         </div>
       </div>
     }
@@ -1524,9 +1523,9 @@ interface DiscoveredCompany {
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
-            <div style="font-weight:700;font-size:15px;color:#111827">🔍 Znajdź konkurencję</div>
+            <div style="font-weight:700;font-size:15px;color:#111827">🔍 {{ t('admin.discovery') }}</div>
             <div style="font-size:12px;color:#6b7280;margin-top:2px">
-              Podaj firmę wejściową — AI zaproponuje konkurentów z weryfikacją GUS
+              {{ t('admin.discoveryModal.subtitle') }}
             </div>
           </div>
           <button (click)="cancelDiscovery()"
@@ -1535,15 +1534,15 @@ interface DiscoveredCompany {
 
         <div style="display:grid;grid-template-columns:1fr 160px;gap:8px;margin-bottom:10px">
           <div>
-            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">Nazwa firmy</label>
+            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">{{ t('admin.discoveryModal.companyName') }}</label>
             <input class="inp" style="width:100%;box-sizing:border-box"
               [(ngModel)]="discoverySeedName"
-              placeholder="np. Comarch S.A."
+              [placeholder]="t('admin.discoveryModal.companyNamePlaceholder')"
               [disabled]="discoveryLoading()"
               (keydown.enter)="startDiscovery()">
           </div>
           <div>
-            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">NIP firmy *</label>
+            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">{{ t('admin.discoveryModal.taxId') }}</label>
             <input class="inp" style="width:100%;box-sizing:border-box"
               [(ngModel)]="discoverySeedNip"
               placeholder="1234567890"
@@ -1559,11 +1558,11 @@ interface DiscoveredCompany {
             </div>
             @if (discoveryResults().length > 0) {
               <div style="font-size:11px;color:#6b7280;margin-top:5px">
-                ⏳ Wyszukiwanie w toku…
-                <b style="color:var(--orange)"> {{ discoveryResults().length }} znalezionych</b>
+                ⏳ {{ t('admin.discoveryModal.searching') }}
+                <b style="color:var(--orange)"> {{ t('admin.discoveryModal.foundCount', { count: discoveryResults().length }) }}</b>
               </div>
             } @else {
-              <div style="font-size:11px;color:#6b7280;margin-top:5px">⏳ Wyszukiwanie w toku…</div>
+              <div style="font-size:11px;color:#6b7280;margin-top:5px">⏳ {{ t('admin.discoveryModal.searching') }}</div>
             }
           </div>
         }
@@ -1573,12 +1572,12 @@ interface DiscoveredCompany {
           <button class="btn btn-p"
             [disabled]="discoveryLoading() || !discoverySeedName.trim() || discoverySeedNip.replace(/\D/g,'').length !== 10"
             (click)="startDiscovery()">
-            ▶ Szukaj
+            ▶ {{ t('admin.discoveryModal.search') }}
           </button>
-          <button class="btn btn-g" (click)="cancelDiscovery()">Anuluj</button>
+          <button class="btn btn-g" (click)="cancelDiscovery()">{{ t('admin.bulk.cancel') }}</button>
           @if (discoveryResults().length > 0 && !discoveryLoading()) {
             <span style="align-self:center;font-size:12px;color:#6b7280">
-              Branża: <b style="color:#374151">{{ discoveryIndustry() || '—' }}</b>
+              {{ t('admin.detail.industry') }} <b style="color:#374151">{{ discoveryIndustry() || '—' }}</b>
             </span>
           }
         </div>
@@ -1592,11 +1591,11 @@ interface DiscoveredCompany {
                   (change)="toggleDiscoveryAll($any($event.target).checked)"
                   style="accent-color:var(--orange)">
               </label>
-              <span>Firma</span>
-              <span>NIP</span>
-              <span>Strona WWW</span>
+              <span>{{ t('admin.table.company') }}</span>
+              <span>{{ t('admin.table.taxId') }}</span>
+              <span>{{ t('admin.reprocess.website') }}</span>
               <span>PKD</span>
-              <span>Zasoby</span>
+              <span>{{ t('admin.discoveryModal.presence') }}</span>
             </div>
 
             @for (c of discoveryResults(); track $index) {
@@ -1621,14 +1620,14 @@ interface DiscoveredCompany {
                 <div>
                   @if (c.nip_verified) {
                     <span style="font-family:monospace;font-size:11px;color:#374151">{{ c.nip }}</span>
-                    <span style="margin-left:4px;font-size:10px;color:#16a34a" title="Zweryfikowany w GUS">✓</span>
+                    <span style="margin-left:4px;font-size:10px;color:#16a34a" [title]="t('admin.discoveryModal.verifiedInGus')">✓</span>
                   } @else {
                     <input class="inp" style="width:100px;font-size:11px;padding:2px 5px;height:24px;font-family:monospace"
                       [(ngModel)]="c.nip_edit"
-                      placeholder="NIP"
-                      title="Wpisz NIP ręcznie">
+                      [placeholder]="t('admin.table.taxId')"
+                      [title]="t('admin.discoveryModal.enterTaxIdManually')">
                     @if (c.nip) {
-                      <div style="font-size:9px;color:#f59e0b;margin-top:1px">⚠ nieweryfik.</div>
+                      <div style="font-size:9px;color:#f59e0b;margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
                     }
                     <!-- Wyszukiwanie NIP-u w internecie jest płatne, więc odpala
                          się tylko z tego przycisku — nigdy automatycznie dla
@@ -1637,8 +1636,8 @@ interface DiscoveredCompany {
                       style="font-size:9px;padding:1px 5px;height:20px;margin-top:2px"
                       [disabled]="c.resolvingNip"
                       (click)="resolveNip($index)"
-                      title="Szukaj NIP-u w internecie (płatne wywołanie AI)">
-                      @if (c.resolvingNip) { ⏳ } @else { 🔍 Szukaj NIP }
+                      [title]="t('admin.discoveryModal.resolveTaxIdTooltip')">
+                      @if (c.resolvingNip) { ⏳ } @else { 🔍 {{ t('admin.discoveryModal.resolveTaxId') }} }
                     </button>
                   }
                 </div>
@@ -1654,7 +1653,7 @@ interface DiscoveredCompany {
                     <input class="inp" style="width:130px;font-size:11px;padding:2px 5px;height:24px"
                       [(ngModel)]="c.website_edit"
                       [placeholder]="c.website_url || 'https://…'"
-                      title="Edytuj adres WWW">
+                      [title]="t('admin.discoveryModal.editWebsite')">
                   }
                 </div>
 
@@ -1673,7 +1672,7 @@ interface DiscoveredCompany {
                   @if (c.in_leads)     { <span class="badge-cl">L</span> }
                   @if (c.in_partners)  { <span class="badge-cpa">PA</span> }
                   @if (!c.in_prospects && !c.in_leads && !c.in_partners) {
-                    <span style="font-size:10px;color:#9ca3af">nowa</span>
+                    <span style="font-size:10px;color:#9ca3af">{{ t('admin.discoveryModal.newCompany') }}</span>
                   }
                 </div>
               </div>
@@ -1682,20 +1681,20 @@ interface DiscoveredCompany {
 
           <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid #e5e7eb">
             <span style="font-size:12px;color:#6b7280">
-              Zaznaczono: <b style="color:#111827">{{ discoverySelectedCount() }}</b> firm
+              {{ t('admin.discoveryModal.selectedLabel') }} <b style="color:#111827">{{ discoverySelectedCount() }}</b>
             </span>
             <span class="tsp"></span>
             @if (discoveryDone()) {
               <div style="font-size:12px;padding:6px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;color:#166534">
-                ✓ Dodano <b>{{ discoveryDone()!.added }}</b> firm do bazy
+                ✓ {{ t('admin.discoveryModal.addedPrefix') }} <b>{{ discoveryDone()!.added }}</b> {{ t('admin.discoveryModal.addedSuffix') }}
                 <b>„{{ discoveryDone()!.source_database }}"</b>
-                @if (discoveryDone()!.batchStarted) { i uruchomiono Enrichment }
+                @if (discoveryDone()!.batchStarted) { {{ t('admin.discoveryModal.andEnrichmentStarted') }} }
               </div>
             } @else {
               <button class="btn btn-p"
                 [disabled]="discoveryAdding() || discoverySelectedCount() === 0"
                 (click)="bulkAddAndEnrich()">
-                @if (discoveryAdding()) { ⏳ Dodaję… } @else { ▶ Dodaj zaznaczone i uruchom Enrichment }
+                @if (discoveryAdding()) { ⏳ {{ t('admin.discoveryModal.adding') }} } @else { ▶ {{ t('admin.discoveryModal.addAndEnrich') }} }
               </button>
             }
           </div>
@@ -1703,11 +1702,12 @@ interface DiscoveredCompany {
 
         @if (!discoveryLoading() && discoveryResults().length === 0 && discoverySeedName.trim()) {
           <div style="padding:20px;text-align:center;color:#6b7280;font-size:12px">
-            Wpisz dane firmy i kliknij „Szukaj"
+            {{ t('admin.discoveryModal.emptyHint') }}
           </div>
         }
       </div>
     }
+    </ng-container>
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
@@ -2195,6 +2195,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   private appSettings = inject(AppSettingsService);
   navBack             = inject(NavBackService);
   private toast       = inject(ToastService);
+  private transloco   = inject(TranslocoService);
   // Strumień SSE idzie przez fetch(), a nie HttpClient, więc interceptor JWT go
   // nie obsłuży — token dokładamy ręcznie z AuthService (sessionStorage, SSR-safe).
   private auth        = inject(AuthService);
@@ -2426,23 +2427,47 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // (GET /scoring-rules), ale wołany raz przy starcie ekranu, nie leniwie per
   // prospekt. Kolejność = kolejność zwrócona przez backend (sort_order configu).
   loadSignalDefs(): void {
-    this.http.get<{ signals: { definitions: { id: string; label: string; short_description?: string | null }[] } }>(
-      `${API}/scoring-rules`,
-    ).subscribe({
-      next: rules => {
+    // Zakres `prospects` w polskim jest tu potrzebny obok języka aktywnego:
+    // polskie wartości signals.*.label służą za odcisk palca nazwy domyślnej
+    // (patrz localizeSignal). Dla polskiego interfejsu to ten sam, już wczytany
+    // plik, więc nic nie dociąga.
+    forkJoin({
+      rules: this.http.get<{ signals: { definitions: { id: string; label: string; short_description?: string | null }[] } }>(
+        `${API}/scoring-rules`,
+      ),
+      pl: this.transloco.load('prospects/pl').pipe(catchError(() => of(null))),
+    }).subscribe({
+      next: ({ rules }) => {
         // Tooltip = short_description (krótki, biznesowy opis "co oznacza TRUE"),
         // NIGDY ai_definition (pełna, wieloparagrafowa instrukcja dla AI — za
         // długa i nieczytelna jako tooltip). Brak short_description = brak opisu,
         // tooltip pokazuje wtedy samą nazwę sygnału.
         const defs = (rules.signals?.definitions ?? []).map(d => ({
           key: d.id,
-          label: d.label,
-          desc: d.short_description ?? '',
+          label: this.localizeSignal(d.id, 'label', d.label),
+          desc: this.localizeSignal(d.id, 'desc', d.short_description ?? ''),
         }));
         this.signalDefs.set(defs);
       },
       error: () => { /* kolumny sygnałów zostają puste — reszta ekranu i tak działa */ },
     });
+  }
+
+  /**
+   * Nazwy i opisy sygnałów ICP są wierszami w `tenant_icp_signals`, czyli danymi
+   * tenanta — admin tenanta może je zmienić, a także dodać własny sygnał. Dlatego
+   * tłumaczymy WYŁĄCZNIE wtedy, gdy wartość z backendu jest dokładnie taka, jak
+   * polska wartość domyślna: to znaczy, że nikt jej nie ruszył. Nazwa zmieniona
+   * przez tenanta zostaje nietknięta — inaczej tłumaczenie nadpisywałoby jego
+   * świadomą decyzję.
+   */
+  private localizeSignal(key: string, field: 'label' | 'desc', value: string): string {
+    if (!value) return value;
+    const path = `prospects.signals.${key}.${field}`;
+    const polishDefault = this.transloco.translate(path, {}, 'pl');
+    if (polishDefault === path || polishDefault !== value) return value;
+    const translated = this.transloco.translate(path);
+    return translated === path ? value : translated;
   }
   ngOnDestroy() {
     clearTimeout(this.pollTimer);
@@ -2492,7 +2517,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     })
       .then(async response => {
         if (!response.ok || !response.body) {
-          this.toast.error('Błąd wyszukiwania konkurencji');
+          this.toast.error(this.tr('discoveryModal.searchFailed'));
           this.discoveryLoading.set(false);
           return;
         }
@@ -2524,8 +2549,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
                 this.discoveryAbort = null;
               } else if (data.type === 'error') {
                 this.toast.error(data.billing
-                  ? 'Brak środków na koncie AI'
-                  : 'Błąd wyszukiwania: ' + (data.message || ''));
+                  ? this.tr('errors.aiNoCredit')
+                  : this.tr('errors.searchFailedWithReason', { reason: data.message || '' }));
                 this.discoveryLoading.set(false);
               }
             } catch { /* ignoruj niepoprawne linie */ }
@@ -2534,7 +2559,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.discoveryLoading.set(false);
       })
       .catch((err: Error) => {
-        if (err.name !== 'AbortError') this.toast.error('Błąd wyszukiwania konkurencji');
+        if (err.name !== 'AbortError') this.toast.error(this.tr('discoveryModal.searchFailed'));
         this.discoveryLoading.set(false);
       });
   }
@@ -2560,14 +2585,14 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
           resolvingNip: false,
         } : c));
 
-        if (!found.nip)              this.toast.error('Nie udało się znaleźć NIP-u tej firmy');
-        else if (!found.nip_verified) this.toast.error('Znaleziony NIP nie zgadza się z nazwą firmy w GUS — sprawdź ręcznie');
+        if (!found.nip)              this.toast.error(this.tr('discoveryModal.taxIdNotFound'));
+        else if (!found.nip_verified) this.toast.error(this.tr('discoveryModal.taxIdMismatch'));
       },
       error: err => {
         this.discoveryResults.update(r => r.map((c, i) => i === index ? { ...c, resolvingNip: false } : c));
         this.toast.error(err?.error?.billing
-          ? 'Brak środków na koncie AI'
-          : 'Błąd wyszukiwania NIP-u');
+          ? this.tr('errors.aiNoCredit')
+          : this.tr('discoveryModal.taxIdSearchFailed'));
       },
     });
   }
@@ -2603,7 +2628,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.pollBatch();
       },
       error: () => {
-        this.toast.error('Błąd dodawania firm do bazy');
+        this.toast.error(this.tr('discoveryModal.addFailed'));
         this.discoveryAdding.set(false);
       },
     });
@@ -2851,7 +2876,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         p.note_updated_at = r.note_updated_at;
         this.noteEdits.delete(p.id);
       },
-      error: e => this.toast.error(e.error?.error || 'Błąd zapisu notatki'),
+      error: e => this.toast.error(e.error?.error || this.tr('note.saveFailed')),
     });
   }
 
@@ -2947,7 +2972,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.statusActioning.set(null);
         this.processingIds.update(set => { const n = new Set(set); n.delete(p.id); return n; });
         if (err.status === 409) {
-          this.toast.error(err.error?.error || 'Konflikt NIP — inny rekord ma już ten numer.');
+          this.toast.error(err.error?.error || this.tr('errors.taxIdConflict'));
         }
       },
     });
@@ -2955,10 +2980,8 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
 
   deleteProspect(p: Prospect) {
     const label = p.company_name || p.nip;
-    const warn  = p.crm_lead_id
-      ? '\n\nUwaga: ten prospekt ma powiązany lead CRM. Lead pozostanie, usunięty zostanie tylko prospekt.'
-      : '';
-    if (!confirm(`Usunąć prospekt "${label}"?${warn}`)) return;
+    const warn  = p.crm_lead_id ? '\n\n' + this.tr('confirm.deleteKeepsLead') : '';
+    if (!confirm(this.tr('confirm.deleteProspect', { name: label }) + warn)) return;
     this.closeMenu();
 
     this.statusActioning.set(p.id);
@@ -3050,7 +3073,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   bulkDelete() {
     const ids = [...this.selectedIds()];
     if (!ids.length) return;
-    if (!confirm(`Usunąć ${ids.length} zaznaczonych prospektów? Tej operacji nie można cofnąć.`)) return;
+    if (!confirm(this.tr('confirm.deleteSelected', { count: ids.length }))) return;
     this.bulkActioning.set(true);
     forkJoin(ids.map(id => this.http.delete<any>(`${API}/${id}`))).subscribe({
       next: () => {
@@ -3075,6 +3098,19 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     return found ? found.hit : null;
   }
 
+  /** Skrót na tłumaczenia tego ekranu — zakres jest zawsze ten sam. */
+  private tr(key: string, params?: Record<string, unknown>): string {
+    return this.transloco.translate(`prospects.admin.${key}`, params);
+  }
+
+  linkedinTooltip(status: string | null | undefined): string {
+    const suffix = status === 'ok' ? this.tr('linkedin.okSuffix')
+      : status === 'blocked' ? this.tr('linkedin.blockedSuffix')
+      : status === 'not_found' ? this.tr('linkedin.notFoundSuffix')
+      : '';
+    return 'LinkedIn' + suffix;
+  }
+
   signalTooltip(p: Prospect, key: string, desc: string): string {
     const val = this.getSignal(p, key);
     if (val === true)  return `✓ ${desc}`;
@@ -3087,11 +3123,11 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   }
 
   leadButtonTooltip(p: Prospect): string {
-    if (p.icp_score == null) return 'Firma nie została jeszcze wzbogacona — brak score';
+    if (p.icp_score == null) return this.tr('leadButton.notEnriched');
     if (!this.qualifiesForLead(p)) {
-      return `Score zbyt niski (${p.icp_score}/100). Wymagane ≥ ${this.minLeadScore()}. Próg konfigurowalny w App Settings → CRM.`;
+      return this.tr('leadButton.scoreTooLow', { score: p.icp_score, required: this.minLeadScore() });
     }
-    return 'Utwórz lead w CRM';
+    return this.tr('toLead.heading');
   }
 
   // Progi 57/31 pochodzą z formuły max=95 sprzed 2026-09-22 (65 za sygnały +
@@ -3105,28 +3141,26 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   }
 
   statusLabel(s: string): string {
-    const map: Record<string, string> = {
-      pending: 'Oczekuje', done: 'Wzbogacone', error: 'Błąd',
-      no_website: 'Brak WWW', no_krs: 'Brak KRS',
-      hold: 'Hold', archived: 'Archiwum', lead: 'Lead w CRM',
-    };
-    return map[s] || s;
+    const key = `prospects.admin.status.${s}`;
+    const label = this.transloco.translate(key);
+    return label === key ? s : label;
   }
 
   statusClass(s: string): string { return `badge badge-${s}`; }
 
+  // Nazwy wyszukiwarek zostają bez tłumaczenia (nazwy własne); tłumaczymy
+  // tylko metody opisowe.
   websiteMethodLabel(method: string): string {
-    const map: Record<string, string> = {
-      krs:        'rejestr KRS',
-      heuristic:  'zgadnięta z nazwy',
+    const verbatim: Record<string, string> = {
       google_cse: 'Google CSE',
       bing:       'Bing',
       duckduckgo: 'DuckDuckGo',
       serper:     'Google (Serper)',
-      manual:     'ustawiona ręcznie',
-      none:       'nie znaleziono',
     };
-    return map[method] || method;
+    if (verbatim[method]) return verbatim[method];
+    const key = `prospects.admin.websiteMethod.${method}`;
+    const label = this.transloco.translate(key);
+    return label === key ? method : label;
   }
 
   // ── Inspect helpers ─────────────────────────────────────────────
@@ -3146,7 +3180,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     this.inspectPromptLoading.set(true);
     this.http.get<{ prompt: string }>(`${API}/${p.id}/prompt`).subscribe({
       next: r => { this.inspectPrompt.set(r.prompt); this.inspectPromptLoading.set(false); },
-      error: ()  => { this.inspectPrompt.set('Błąd wczytywania promptu.'); this.inspectPromptLoading.set(false); },
+      error: ()  => { this.inspectPrompt.set(this.tr('inspect.promptLoadFailed')); this.inspectPromptLoading.set(false); },
     });
   }
 
@@ -3156,7 +3190,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
     this.inspectScoringRulesLoading.set(true);
     this.http.get<Record<string, unknown>>(`${API}/scoring-rules`).subscribe({
       next: r  => { this.inspectScoringRules.set(r); this.inspectScoringRulesLoading.set(false); },
-      error: () => { this.inspectScoringRules.set({ error: 'Błąd wczytywania zasad naliczania punktów.' }); this.inspectScoringRulesLoading.set(false); },
+      error: () => { this.inspectScoringRules.set({ error: this.tr('inspect.scoringLoadFailed') }); this.inspectScoringRulesLoading.set(false); },
     });
   }
 

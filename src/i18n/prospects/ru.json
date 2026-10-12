@@ -1,0 +1,367 @@
+{
+  "admin": {
+    "bulk": {
+      "archive": "В архив",
+      "cancel": "Отмена",
+      "deleteSelected": "Удалить выбранное",
+      "restore": "Восстановить",
+      "selected": "Выбрано: {count}"
+    },
+    "confirm": {
+      "deleteKeepsLead": "Внимание: у этого проспекта есть связанный лид в CRM. Лид останется, удалён будет только проспект.",
+      "deleteProspect": "Удалить проспект «{name}»?",
+      "deleteSelected": "Удалить выбранные проспекты ({count})? Действие нельзя отменить."
+    },
+    "detail": {
+      "aiSummary": "Сводка ИИ",
+      "bonus": "Бонус:",
+      "companySize": "Размер:",
+      "decisionMaker": "Принимающий решения (из файла импорта)",
+      "downgraded": "Пониженный приоритет:",
+      "employeesCount": "{count} чел.",
+      "employment": "Сотрудники:",
+      "enrichmentError": "Ошибка обогащения:",
+      "icpSignals": "Сигналы ICP",
+      "industry": "Отрасль:",
+      "keyContacts": "Ключевые контакты — найдены ИИ ({count})",
+      "location": "Расположение:",
+      "noKeyContacts": "Ключевые контакты на сайте не найдены.",
+      "noWebsiteHalted": "Сайт не найден — обогащение приостановлено. Воспользуйтесь Re-process и укажите адрес вручную.",
+      "none": "нет",
+      "pkdGus": "PKD (GUS):",
+      "pkdImport": "PKD (импорт):"
+    },
+    "discovery": "Найти конкурентов",
+    "discoveryModal": {
+      "addAndEnrich": "Добавить выбранное и запустить обогащение",
+      "addFailed": "Не удалось добавить компании в базу",
+      "addedPrefix": "Добавлено:",
+      "addedSuffix": "компаний в базу",
+      "adding": "Добавление…",
+      "andEnrichmentStarted": "и обогащение запущено",
+      "companyName": "Название компании",
+      "companyNamePlaceholder": "напр. Comarch S.A.",
+      "editWebsite": "Изменить адрес сайта",
+      "emptyHint": "Введите данные компании и нажмите «Искать»",
+      "enterTaxIdManually": "Введите ИНН вручную",
+      "foundCount": "найдено: {count}",
+      "newCompany": "новая",
+      "presence": "Записи",
+      "resolveTaxId": "Найти ИНН",
+      "resolveTaxIdTooltip": "Искать ИНН в интернете (платный вызов ИИ)",
+      "search": "Искать",
+      "searchFailed": "Не удалось выполнить поиск конкурентов",
+      "searching": "Идёт поиск…",
+      "selectedLabel": "Выбрано компаний:",
+      "subtitle": "Укажите исходную компанию — ИИ предложит конкурентов с проверкой в GUS",
+      "taxId": "ИНН компании *",
+      "taxIdMismatch": "Найденный ИНН не совпадает с названием компании в GUS — проверьте вручную",
+      "taxIdNotFound": "Не удалось найти ИНН этой компании",
+      "taxIdSearchFailed": "Не удалось выполнить поиск ИНН",
+      "unverified": "не провер.",
+      "verifiedInGus": "Проверено в GUS"
+    },
+    "discoveryTooltip": "Создать проспекты по конкурентам",
+    "enrichmentProgress": "{done}/{total} компаний…",
+    "errors": {
+      "aiNoCredit": "На счету ИИ нет средств",
+      "searchFailedWithReason": "Ошибка поиска: {reason}",
+      "taxIdConflict": "Конфликт ИНН — этот номер уже использует другая запись."
+    },
+    "exportCsv": "Экспорт CSV",
+    "filters": {
+      "all": "Все",
+      "enrichedFrom": "Обогащение с",
+      "enrichedTo": "Обогащение по",
+      "importedFrom": "Импорт с",
+      "importedTo": "Импорт по",
+      "reset": "Сбросить фильтры",
+      "scoreMax": "Score до",
+      "scoreMin": "Score от",
+      "search": "Поиск",
+      "searchPlaceholder": "название, ИНН или база",
+      "showArchived": "Показать архив",
+      "status": "Статус"
+    },
+    "import": {
+      "added": "Добавлено:",
+      "baseColumnHint": "название исходной базы; должно быть заполнено в каждой строке.",
+      "chooseFile": "Выбрать файл CSV",
+      "columns": "Столбцы:",
+      "detectedColumns": "Определённые столбцы:",
+      "duplicatesHint": "Дубликаты (тот же ИНН) обновляют существующую запись.",
+      "encoding": "Кодировка:",
+      "errorDetails": "Подробности ошибок:",
+      "errors": "Ошибок:",
+      "fatalError": "Ошибка импорта:",
+      "heading": "Импорт компаний из CSV",
+      "importing": "Идёт импорт…",
+      "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
+      "optionalLabel": "Определяются автоматически:",
+      "requiredLabel": "Обязательные столбцы:",
+      "skipped": "Пропущено (дубликаты):",
+      "submit": "Импортировать",
+      "totalRows": "Всего строк:",
+      "wwwHint": "Столбец www позволяет пропустить автопоиск (дешевле и быстрее)."
+    },
+    "inspect": {
+      "activeSignals": "Активные сигналы (true)",
+      "chars": "Символов",
+      "computedScore": "Вычисленный результат",
+      "found": "✓ Найдено",
+      "foundInRegon": "✓ Найдено в REGON",
+      "heading": "Инспекция обогащения",
+      "identity": "Идентификация",
+      "identityUnverified": "не подтверждена",
+      "identityVerified": "подтверждена",
+      "inputData": "Входные данные для Claude",
+      "keyContacts": "Ключевые контакты ({count})",
+      "krsBranches": "Филиалы в KRS",
+      "krsNumber": "Номер KRS",
+      "krsUrl": "URL в KRS",
+      "legalForm": "Правовая форма",
+      "loadingPrompt": "Загрузка промпта…",
+      "loadingScoring": "Загрузка правил начисления баллов…",
+      "method": "Метод",
+      "noReasoning": "без обоснования",
+      "noWebsite": "✗ Сайта нет",
+      "notFound": "✗ Не найдено",
+      "officialName": "Официальное название",
+      "pages": "Страниц",
+      "pkdCodes": "Коды PKD",
+      "present": "✓ был",
+      "promptLoadFailed": "Не удалось загрузить промпт.",
+      "scoreCalculation": "Расчёт score",
+      "scoringLoadFailed": "Не удалось загрузить правила начисления баллов.",
+      "signalsHeading": "Сигналы и обоснование Claude",
+      "signalsSum": "Сумма сигналов ({trueCount}/{total} true)",
+      "subpagesChecked": "проверено подстраниц: {count}",
+      "tabAnalysis": "Анализ",
+      "tabPrompt": "Промпт Claude",
+      "tabScoring": "Правила начисления баллов"
+    },
+    "leadButton": {
+      "notEnriched": "Эта компания ещё не обогащена — score отсутствует",
+      "scoreTooLow": "Score слишком низкий ({score}/100). Требуется не менее {required}. Порог настраивается в App Settings → CRM."
+    },
+    "linkedin": {
+      "blocked": "LinkedIn вернул HTTP 999 без содержимого — робот заблокирован",
+      "blockedLabel": "заблокирован",
+      "blockedSuffix": " — заблокирован (бот)",
+      "notFound": "Страница LinkedIn не найдена",
+      "notFoundSuffix": " — не найдено",
+      "ok": "Данные LinkedIn успешно получены",
+      "okSuffix": " — данные получены"
+    },
+    "log": {
+      "branchesCount": "филиалы: {count}",
+      "charsCount": "символов: {count}",
+      "collapse": "свернуть",
+      "found": "Найдено",
+      "gusNotFound": "Не найдено в реестре GUS REGON",
+      "heading": "Журнал обогащения",
+      "krsNotFound": "Не найдено в KRS",
+      "method": "метод:",
+      "more": "(+{count} ещё)",
+      "noUrlInRegistry": "в реестре нет адреса сайта",
+      "pagesCount": "страниц: {count}",
+      "websiteNotFound": "Сайт не найден"
+    },
+    "menu": {
+      "delete": "Удалить",
+      "inspect": "Инспекция",
+      "restoreFromArchive": "Восстановить из архива",
+      "restoreToQueue": "Вернуть в очередь"
+    },
+    "note": {
+      "heading": "Проверочная заметка",
+      "placeholder": "Добавить заметку…",
+      "saveFailed": "Не удалось сохранить заметку"
+    },
+    "pager": {
+      "next": "Вперёд",
+      "previous": "Назад"
+    },
+    "reprocess": {
+      "analyzeLinkedin": "Анализировать LinkedIn при обработке",
+      "analyzeLinkedinHint": "(попытка скрапинга страницы компании)",
+      "hint": "Поля необязательные — заполните только то, что хотите исправить или дополнить.",
+      "submit": "Обработать",
+      "taxIdHint": "(оставьте пустым, если верный)",
+      "website": "Сайт"
+    },
+    "runEnrichment": "Запустить обогащение",
+    "status": {
+      "archived": "Архив",
+      "done": "Обогащён",
+      "error": "Ошибка",
+      "hold": "На паузе",
+      "lead": "Лид в CRM",
+      "no_krs": "Нет в KRS",
+      "no_website": "Нет сайта",
+      "pending": "Ожидает"
+    },
+    "summary": {
+      "errorCount": "(ошибок: {count})",
+      "inProgress": "Обогащение выполняется: {done}/{total}",
+      "shown": "Показано:"
+    },
+    "table": {
+      "actions": "Действия",
+      "branches": "Филиалы",
+      "company": "Компания",
+      "convertedLeadTooltip": "Лид в CRM (преобразованный проспект) — нажмите, чтобы открыть",
+      "empty": "Компаний нет. Импортируйте файл CSV, чтобы начать.",
+      "enrichment": "Обогащение",
+      "goToCrmTooltip": "Перейти к лиду в CRM",
+      "goToLeadTooltip": "Лид с таким ИНН уже есть в CRM — нажмите, чтобы открыть",
+      "goToPartnerTooltip": "Партнёр с таким ИНН уже есть в CRM — нажмите, чтобы открыть",
+      "imported": "Импорт",
+      "lead": "Лид",
+      "leadBadgeTooltip": "Лид с таким ИНН есть в CRM — нажмите, чтобы открыть",
+      "partner": "Партнёр",
+      "partnerBadgeTooltip": "Партнёр с таким ИНН есть в CRM — нажмите, чтобы открыть",
+      "processing": "Обработка…",
+      "score": "Score",
+      "status": "Статус",
+      "taxId": "ИНН"
+    },
+    "title": "Проспекты — обогащение данных о компаниях",
+    "toLead": {
+      "assignTo": "Назначить менеджеру по продажам",
+      "assignToSelf": "— Назначить мне (по умолчанию) —",
+      "changed": "изменён",
+      "create": "→ Создать лид",
+      "createAnyway": "→ Всё равно создать",
+      "creating": "Создание…",
+      "duplicateWarning": "Компания с похожим названием уже есть в CRM как",
+      "heading": "Создать лид в CRM",
+      "prospectWillUpdate": "Проспект будет обновлён.",
+      "tagLabel": "Тег (необязательно)",
+      "tagPlaceholder": "напр. hot-lead, q4-2026, приоритет",
+      "taxIdHint": "Этот ИНН будет использован для поиска дубликатов и создания лида.",
+      "taxIdLabel": "ИНН компании — подтвердите или исправьте"
+    },
+    "website": {
+      "blocked": "Сайт заблокирован Cloudflare/WAF — содержимое недоступно ботам; обогащение продолжено по данным KRS",
+      "blockedShort": "Сайт заблокирован Cloudflare/WAF — содержимое недоступно ботам",
+      "failed": "Сайт недоступен или скрапинг не дал результата",
+      "failedShort": "Сайт недоступен или ошибка скрапинга",
+      "fetched": "получены",
+      "noContent": "нет содержимого",
+      "notFound": "Адрес сайта не найден",
+      "notFoundShort": "Сайт не найден",
+      "notFoundShortLabel": "не найдено",
+      "ok": "Данные с сайта успешно получены",
+      "okShort": "Данные с сайта получены",
+      "unconfirmed": "Сайт существует, но на нём не найдены ни ИНН, ни KRS, ни REGON, ни адрес компании — укажите верный адрес через Re-process",
+      "unconfirmedLabel": "Не удалось подтвердить сайт компании",
+      "unconfirmedShort": "Не удалось подтвердить сайт компании"
+    },
+    "websiteMethod": {
+      "heuristic": "подобран по названию",
+      "krs": "реестр KRS",
+      "manual": "задан вручную",
+      "none": "не найдено"
+    }
+  },
+  "callDirection": {
+    "inbound": "Входящие",
+    "outbound": "Исходящие"
+  },
+  "callStatus": {
+    "answered": "Принятые",
+    "error": "Ошибка соединения",
+    "missed": "Входящие пропущенные",
+    "not_answered": "Исходящие без ответа",
+    "rejected": "Отклонённые"
+  },
+  "callStatusShort": {
+    "error": "Ошибка",
+    "missed": "Вход. пропущ.",
+    "not_answered": "Исход. без отв."
+  },
+  "dashboard": {
+    "allDatabases": "Все базы",
+    "allStages": "Все этапы",
+    "allStatuses": "Все статусы",
+    "bothDirections": "Оба направления",
+    "callsBySalesperson": "Звонки PBX по менеджерам",
+    "clear": "Очистить",
+    "databasesSelected": "Баз: {count}",
+    "enrichedByDatabase": "Обогащённые проспекты по базам (score по группам)",
+    "leadsByAiTag": "Лиды по тегу ИИ",
+    "leadsBySalesperson": "Лиды по менеджерам (по score проспекта)",
+    "loading": "Загрузка…",
+    "noAiTag": "без тега ИИ",
+    "noData": "Нет данных",
+    "noDataForPeriod": "Нет данных за выбранный период",
+    "noDataForPeriodAndFilters": "Нет данных за выбранный период с учётом фильтров",
+    "noDatabasesMatching": "Нет баз, подходящих под «{query}»",
+    "noResults": "Нет результатов",
+    "prospectsInDatabase": "Проспекты в базе (по score и статусу)",
+    "scoreNone": "нет",
+    "searchDatabase": "Поиск базы…",
+    "selectAll": "Все",
+    "showBelowThreshold": "Показать {range}",
+    "showBelowThresholdFallback": "Показать ниже порога",
+    "showNullScore": "Показать score=NULL",
+    "subtitle": "Статистика лидов, проспектов и звонков PBX",
+    "title": "Дашборд проспектов"
+  },
+  "periods": {
+    "custom": "Свой…",
+    "prev_month": "Предыдущий месяц",
+    "prev_quarter": "Предыдущий квартал",
+    "prev_week": "Предыдущая неделя",
+    "prev_year": "Предыдущий год",
+    "this_month": "Этот месяц",
+    "this_quarter": "Этот квартал",
+    "this_week": "Эта неделя",
+    "ytd": "Этот год (YTD)"
+  },
+  "prospectStatus": {
+    "archive": "Архив",
+    "hold": "На паузе",
+    "lead": "Лид",
+    "prospect": "Проспект"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "После продажи возникают повторяющиеся события: проверки, сервис, продления, повторные визиты и подобное.",
+      "label": "Регулярное обслуживание"
+    },
+    "dzial_handlowy": {
+      "desc": "Явно названный отдел или команда продаж либо несколько конкретных сотрудников в ролях продавцов.",
+      "label": "Отдел продаж"
+    },
+    "ecommerce_b2b": {
+      "desc": "У компании есть B2B-магазин или платформа заказов с реальной обработкой онлайн-заказов.",
+      "label": "B2B-электронная коммерция"
+    },
+    "konsultacja_demo": {
+      "desc": "Перед покупкой есть реальный этап консультирования, анализа потребностей, подбора решения или демо.",
+      "label": "Консультация / демо"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Конкретный куратор, KAM, сотрудник или команда постоянно отвечает за клиента, аккаунт или сегмент.",
+      "label": "Персональное ведение"
+    },
+    "przetargi": {
+      "desc": "Компания участвует в тендерах как исполнитель или поставщик, а не как заказчик.",
+      "label": "Тендеры"
+    },
+    "rozproszona_struktura": {
+      "desc": "У компании есть свои физически разнесённые подразделения или территориальные представители.",
+      "label": "Распределённая структура"
+    },
+    "siec_partnerow": {
+      "desc": "Независимые дилеры, реселлеры или партнёры продают предложение компании.",
+      "label": "Партнёрская сеть"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Компания готовит предложение, расчёт или условия индивидуально под конкретного клиента.",
+      "label": "Индивидуальный расчёт"
+    }
+  }
+}

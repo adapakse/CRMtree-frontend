@@ -1,5 +1,6 @@
 // src/app/core/services/crm-api.service.ts
 import { Injectable, inject } from '@angular/core';
+import { TenantFieldValue } from './tenant-fields.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, combineLatest, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -12,9 +13,18 @@ import { environment } from '../../../environments/environment';
 // Models
 // ─────────────────────────────────────────────────────────────────
 
-export type LeadStage =
-  | 'new' | 'qualification' | 'presentation'
-  | 'offer' | 'negotiation' | 'closed_won' | 'closed_lost' | 'onboarding' | 'onboarded' | 'archived';
+/**
+ * Code of a lead stage. Not a closed union: stages are configurable per tenant
+ * (backend table tenant_lead_stages), so a tenant can add its own. The codes
+ * below are the ones built into CRMtree; ask LeadStagesService for the list that
+ * actually exists, its labels and colours.
+ */
+export type LeadStage = string;
+
+export const BUILTIN_LEAD_STAGES = [
+  'new', 'qualification', 'presentation', 'offer', 'negotiation',
+  'closed_won', 'closed_lost', 'onboarding', 'onboarded', 'archived',
+] as const;
 
 export type PartnerStatus = 'onboarding' | 'active' | 'inactive' | 'churned';
 
@@ -73,6 +83,8 @@ export interface Lead {
   linked_documents?: LinkedDocument[];
   extra_contacts?: LeadContact[];
   can_edit?: boolean;
+  /** Pola dodatkowe tenanta razem z wartościami tego rekordu (migracja 0328). */
+  custom_fields?: TenantFieldValue[];
   created_at: string;
   updated_at: string;
 }
@@ -302,6 +314,8 @@ export interface Partner {
   churn_sales_drop_pct?: number | null;
   health_score?: number | null;
   health_level?: string | null;
+  /** Pola dodatkowe tenanta razem z wartościami tego rekordu (migracja 0328). */
+  custom_fields?: TenantFieldValue[];
   created_at: string;
   updated_at: string;
 }
@@ -838,19 +852,6 @@ export interface PbxCallLogPayload {
 // ─────────────────────────────────────────────────────────────────
 // Stałe
 // ─────────────────────────────────────────────────────────────────
-
-export const LEAD_STAGE_LABELS: Record<LeadStage, string> = {
-  new:           'Nowy',
-  qualification: 'Kwalifikacja',
-  presentation:  'Prezentacja',
-  offer:         'Oferta',
-  negotiation:   'Negocjacje',
-  closed_won:    'Wygrany',
-  closed_lost:   'Przegrany',
-  onboarding:    'W onboardingu',
-  onboarded:     'Onboardowany',
-  archived:      'Archiwum',
-};
 
 export const PARTNER_STATUS_LABELS: Record<PartnerStatus, string> = {
   onboarding: 'Wdrożenie',

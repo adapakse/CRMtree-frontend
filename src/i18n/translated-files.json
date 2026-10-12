@@ -119,5 +119,7 @@
   "src/app/shared/list/list-filter-control.component.ts",
   "src/app/shared/list/list-filter-menu.component.ts",
   "src/app/shared/list/list-pager.component.ts",
-  "src/app/shared/list/list-query.ts"
+  "src/app/shared/list/list-query.ts",
+  "src/app/pages/admin/prospects/admin-prospects.component.ts",
+  "src/app/pages/crm/dashboard/crm-prospects-dashboard.component.ts"
 ]

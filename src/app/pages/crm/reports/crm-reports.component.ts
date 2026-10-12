@@ -10,6 +10,7 @@ import { CrmApiService, SalesSummaryRow, SalesByPerson, SalesByPartner, SalesPar
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 
 // ─── Typy lokalne ────────────────────────────────────────────────────────────
 interface FunnelRow   { label: string; n: number; val: number; color: string; }
@@ -28,10 +29,6 @@ interface KpiData {
   hot:       number;
 }
 
-const STAGE_COLORS: Record<string, string> = {
-  new: '#94A3B8', qualification: '#F59E0B', presentation: '#3B82F6',
-  offer: '#A855F7', negotiation: '#F97316', closed_won: '#22C55E', closed_lost: '#EF4444',
-};
 
 @Component({
   selector: 'wt-crm-reports',
@@ -492,6 +489,7 @@ export class CrmReportsComponent implements OnInit {
   private zone = inject(NgZone);
   private cdr  = inject(ChangeDetectorRef);
   private transloco = inject(TranslocoService);
+  private stages = inject(LeadStagesService);
   private locale = inject(LocaleService);
 
   loading     = true;
@@ -627,15 +625,11 @@ export class CrmReportsComponent implements OnInit {
 
   private compute(leads: any[]) {
     const active = leads.filter(l => !l.converted_at);
-    const probMap: Record<string, number> = {
-      new: 10, qualification: 25, presentation: 50, offer: 70, negotiation: 85,
-      closed_won: 100, closed_lost: 0,
-    };
 
     // KPI
-    const won   = active.filter(l => l.stage === 'closed_won');
-    const lost  = active.filter(l => l.stage === 'closed_lost');
-    const open  = active.filter(l => !['closed_won','closed_lost'].includes(l.stage));
+    const won   = active.filter(l => this.stages.isWon(l.stage));
+    const lost  = active.filter(l => this.stages.isLost(l.stage));
+    const open  = active.filter(l => !this.stages.isClosed(l.stage));
     const total = won.length + lost.length;
 
     this.kpi = {
@@ -650,17 +644,16 @@ export class CrmReportsComponent implements OnInit {
     this.totalLeads = active.length;
 
     this.projected = active.reduce((s, l) => {
-      const p = probMap[l.stage] ?? 0;
+      const p = this.stages.probability(l.stage);
       return s + (l.value_pln || 0) * p / 100;
     }, 0);
 
-    // Funnel
-    const stageOrder = ['new','qualification','presentation','offer','negotiation'];
-    this.funnel = stageOrder.map(s => ({
-      label: this.transloco.translate('crm.labels.stages.' + s),
-      n:     active.filter(l => l.stage === s).length,
-      val:   active.filter(l => l.stage === s).reduce((x, l) => x + (l.value_pln || 0), 0),
-      color: STAGE_COLORS[s],
+    // Funnel — etapy lejka tenanta w jego kolejności, z jego nazwami i kolorami
+    this.funnel = this.stages.funnel().map(stage => ({
+      label: this.stages.label(stage.key),
+      n:     active.filter(l => l.stage === stage.key).length,
+      val:   active.filter(l => l.stage === stage.key).reduce((x, l) => x + (l.value_pln || 0), 0),
+      color: this.stages.color(stage.key),
     }));
     // Dodaj zamknięte
     this.funnel.push({
@@ -688,9 +681,9 @@ export class CrmReportsComponent implements OnInit {
       });
       return {
         m: m.label,
-        pipe: inMonth.filter(l => !['closed_won','closed_lost'].includes(l.stage))
+        pipe: inMonth.filter(l => !this.stages.isClosed(l.stage))
                      .reduce((s, l) => s + (l.value_pln || 0), 0),
-        won:  inMonth.filter(l => l.stage === 'closed_won')
+        won:  inMonth.filter(l => this.stages.isWon(l.stage))
                      .reduce((s, l) => s + (l.value_pln || 0), 0),
       };
     });
@@ -761,8 +754,8 @@ export class CrmReportsComponent implements OnInit {
       if (!id || !name) return;
       if (!repMap[id]) repMap[id] = { leads:0, pipeline:0, won:0, wonCount:0, lostCount:0, name };
       repMap[id].leads++;
-      if (l.stage === 'closed_won')   { repMap[id].won += (l.value_pln||0); repMap[id].wonCount++; }
-      else if (l.stage === 'closed_lost') repMap[id].lostCount++;
+      if (this.stages.isWon(l.stage))       { repMap[id].won += (l.value_pln||0); repMap[id].wonCount++; }
+      else if (this.stages.isLost(l.stage)) repMap[id].lostCount++;
       else repMap[id].pipeline += (l.value_pln||0);
     });
     const colors = ['var(--orange)','#22C55E','#3B82F6','#A855F7','#F59E0B'];

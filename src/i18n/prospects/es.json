@@ -1,0 +1,367 @@
+{
+  "admin": {
+    "bulk": {
+      "archive": "Archivar",
+      "cancel": "Cancelar",
+      "deleteSelected": "Eliminar los seleccionados",
+      "restore": "Restaurar",
+      "selected": "Seleccionados: {count}"
+    },
+    "confirm": {
+      "deleteKeepsLead": "Aviso: este prospecto tiene un lead del CRM vinculado. El lead se mantiene; solo se elimina el prospecto.",
+      "deleteProspect": "¿Eliminar el prospecto «{name}»?",
+      "deleteSelected": "¿Eliminar los prospectos seleccionados ({count})? Esta acción no se puede deshacer."
+    },
+    "detail": {
+      "aiSummary": "Resumen de IA",
+      "bonus": "Bonus:",
+      "companySize": "Tamaño:",
+      "decisionMaker": "Persona decisora (del archivo de importación)",
+      "downgraded": "Prioridad reducida:",
+      "employeesCount": "{count} personas",
+      "employment": "Empleados:",
+      "enrichmentError": "Error de enriquecimiento:",
+      "icpSignals": "Señales ICP",
+      "industry": "Sector:",
+      "keyContacts": "Contactos clave — encontrados por la IA ({count})",
+      "location": "Ubicación:",
+      "noKeyContacts": "No se encontraron contactos clave en el sitio web.",
+      "noWebsiteHalted": "No se encontró sitio web — enriquecimiento detenido. Usa Re-process e indica la dirección manualmente.",
+      "none": "ninguno",
+      "pkdGus": "PKD (GUS):",
+      "pkdImport": "PKD (importación):"
+    },
+    "discovery": "Buscar competidores",
+    "discoveryModal": {
+      "addAndEnrich": "Añadir los seleccionados e iniciar el enriquecimiento",
+      "addFailed": "No se pudieron añadir las empresas a la base",
+      "addedPrefix": "Añadidas:",
+      "addedSuffix": "empresas a la base",
+      "adding": "Añadiendo…",
+      "andEnrichmentStarted": "y se inició el enriquecimiento",
+      "companyName": "Nombre de la empresa",
+      "companyNamePlaceholder": "p. ej. Comarch S.A.",
+      "editWebsite": "Editar la dirección del sitio",
+      "emptyHint": "Introduce los datos de la empresa y pulsa «Buscar»",
+      "enterTaxIdManually": "Introduce el NIF manualmente",
+      "foundCount": "encontrados: {count}",
+      "newCompany": "nueva",
+      "presence": "Registros",
+      "resolveTaxId": "Buscar NIF",
+      "resolveTaxIdTooltip": "Buscar el NIF en internet (llamada de IA de pago)",
+      "search": "Buscar",
+      "searchFailed": "Falló la búsqueda de competidores",
+      "searching": "Búsqueda en curso…",
+      "selectedLabel": "Empresas seleccionadas:",
+      "subtitle": "Indica una empresa de partida — la IA propondrá competidores, verificados en GUS",
+      "taxId": "NIF de la empresa *",
+      "taxIdMismatch": "El NIF encontrado no coincide con el nombre de la empresa en GUS — compruébalo manualmente",
+      "taxIdNotFound": "No se pudo encontrar el NIF de esta empresa",
+      "taxIdSearchFailed": "Falló la búsqueda del NIF",
+      "unverified": "sin verificar",
+      "verifiedInGus": "Verificado en GUS"
+    },
+    "discoveryTooltip": "Generar prospectos a partir de los competidores",
+    "enrichmentProgress": "{done}/{total} empresas…",
+    "errors": {
+      "aiNoCredit": "Sin saldo en la cuenta de IA",
+      "searchFailedWithReason": "Falló la búsqueda: {reason}",
+      "taxIdConflict": "Conflicto de NIF — otro registro ya usa este número."
+    },
+    "exportCsv": "Exportar CSV",
+    "filters": {
+      "all": "Todos",
+      "enrichedFrom": "Enriquecimiento desde",
+      "enrichedTo": "Enriquecimiento hasta",
+      "importedFrom": "Importado desde",
+      "importedTo": "Importado hasta",
+      "reset": "Restablecer filtros",
+      "scoreMax": "Score máx.",
+      "scoreMin": "Score mín.",
+      "search": "Buscar",
+      "searchPlaceholder": "nombre, NIF o base",
+      "showArchived": "Mostrar el archivo",
+      "status": "Estado"
+    },
+    "import": {
+      "added": "Añadidos:",
+      "baseColumnHint": "nombre de la base de origen; debe tener valor en cada fila.",
+      "chooseFile": "Elegir un archivo CSV",
+      "columns": "Columnas:",
+      "detectedColumns": "Columnas detectadas:",
+      "duplicatesHint": "Los duplicados (mismo NIF) actualizan el registro existente.",
+      "encoding": "Codificación:",
+      "errorDetails": "Detalle de los errores:",
+      "errors": "Errores:",
+      "fatalError": "Error de importación:",
+      "heading": "Importar empresas desde CSV",
+      "importing": "Importando…",
+      "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
+      "optionalLabel": "Detectadas automáticamente:",
+      "requiredLabel": "Columnas obligatorias:",
+      "skipped": "Omitidos (duplicados):",
+      "submit": "Importar",
+      "totalRows": "Filas en total:",
+      "wwwHint": "Si indicas la columna www, se omite la búsqueda automática (más barato y rápido)."
+    },
+    "inspect": {
+      "activeSignals": "Señales activas (true)",
+      "chars": "Caracteres",
+      "computedScore": "Resultado calculado",
+      "found": "✓ Encontrado",
+      "foundInRegon": "✓ Encontrado en REGON",
+      "heading": "Inspección del enriquecimiento",
+      "identity": "Identidad",
+      "identityUnverified": "no confirmada",
+      "identityVerified": "confirmada",
+      "inputData": "Datos de entrada para Claude",
+      "keyContacts": "Contactos clave ({count})",
+      "krsBranches": "Sucursales en KRS",
+      "krsNumber": "Número KRS",
+      "krsUrl": "URL en KRS",
+      "legalForm": "Forma jurídica",
+      "loadingPrompt": "Cargando el prompt…",
+      "loadingScoring": "Cargando las reglas de puntuación…",
+      "method": "Método",
+      "noReasoning": "sin justificación",
+      "noWebsite": "✗ Sin sitio web",
+      "notFound": "✗ No encontrado",
+      "officialName": "Nombre oficial",
+      "pages": "Páginas",
+      "pkdCodes": "Códigos PKD",
+      "present": "✓ presente",
+      "promptLoadFailed": "No se pudo cargar el prompt.",
+      "scoreCalculation": "Cálculo del score",
+      "scoringLoadFailed": "No se pudieron cargar las reglas de puntuación.",
+      "signalsHeading": "Señales y justificación de Claude",
+      "signalsSum": "Total de señales ({trueCount}/{total} true)",
+      "subpagesChecked": "subpáginas comprobadas: {count}",
+      "tabAnalysis": "Análisis",
+      "tabPrompt": "Prompt de Claude",
+      "tabScoring": "Reglas de puntuación"
+    },
+    "leadButton": {
+      "notEnriched": "Esta empresa aún no se ha enriquecido — sin score",
+      "scoreTooLow": "Score demasiado bajo ({score}/100). Se requiere al menos {required}. El umbral se configura en App Settings → CRM."
+    },
+    "linkedin": {
+      "blocked": "LinkedIn devolvió HTTP 999 sin contenido — el rastreador fue bloqueado",
+      "blockedLabel": "bloqueado",
+      "blockedSuffix": " — bloqueado (bot)",
+      "notFound": "No se encontró la página de LinkedIn",
+      "notFoundSuffix": " — no encontrado",
+      "ok": "Datos de LinkedIn obtenidos correctamente",
+      "okSuffix": " — datos obtenidos"
+    },
+    "log": {
+      "branchesCount": "sucursales: {count}",
+      "charsCount": "caracteres: {count}",
+      "collapse": "contraer",
+      "found": "Encontrado",
+      "gusNotFound": "No encontrado en el registro GUS REGON",
+      "heading": "Registro del enriquecimiento",
+      "krsNotFound": "No encontrado en KRS",
+      "method": "método:",
+      "more": "(+{count} más)",
+      "noUrlInRegistry": "sin URL del sitio en el registro",
+      "pagesCount": "páginas: {count}",
+      "websiteNotFound": "No se encontró sitio web"
+    },
+    "menu": {
+      "delete": "Eliminar",
+      "inspect": "Inspección",
+      "restoreFromArchive": "Restaurar del archivo",
+      "restoreToQueue": "Devolver a la cola"
+    },
+    "note": {
+      "heading": "Nota de validación",
+      "placeholder": "Añadir una nota…",
+      "saveFailed": "No se pudo guardar la nota"
+    },
+    "pager": {
+      "next": "Siguiente",
+      "previous": "Anterior"
+    },
+    "reprocess": {
+      "analyzeLinkedin": "Analizar LinkedIn durante el procesamiento",
+      "analyzeLinkedinHint": "(intento de scraping de la página de la empresa)",
+      "hint": "Los campos son opcionales — rellena solo los que quieras corregir o completar.",
+      "submit": "Procesar",
+      "taxIdHint": "(déjalo vacío si es correcto)",
+      "website": "Sitio web"
+    },
+    "runEnrichment": "Iniciar enriquecimiento",
+    "status": {
+      "archived": "Archivo",
+      "done": "Enriquecido",
+      "error": "Error",
+      "hold": "En espera",
+      "lead": "Lead en el CRM",
+      "no_krs": "Sin KRS",
+      "no_website": "Sin sitio web",
+      "pending": "Pendiente"
+    },
+    "summary": {
+      "errorCount": "(errores: {count})",
+      "inProgress": "Enriquecimiento en curso: {done}/{total}",
+      "shown": "Mostrados:"
+    },
+    "table": {
+      "actions": "Acciones",
+      "branches": "Sucursales",
+      "company": "Empresa",
+      "convertedLeadTooltip": "Lead en el CRM (prospecto convertido) — haz clic para abrirlo",
+      "empty": "No hay empresas. Importa un archivo CSV para empezar.",
+      "enrichment": "Enriquecimiento",
+      "goToCrmTooltip": "Ir al lead del CRM",
+      "goToLeadTooltip": "Ya existe un lead con este NIF en el CRM — haz clic para abrirlo",
+      "goToPartnerTooltip": "Ya existe un partner con este NIF en el CRM — haz clic para abrirlo",
+      "imported": "Importado",
+      "lead": "Lead",
+      "leadBadgeTooltip": "Hay un lead con este NIF en el CRM — haz clic para abrirlo",
+      "partner": "Partner",
+      "partnerBadgeTooltip": "Hay un partner con este NIF en el CRM — haz clic para abrirlo",
+      "processing": "Procesando…",
+      "score": "Score",
+      "status": "Estado",
+      "taxId": "NIF"
+    },
+    "title": "Prospectos — enriquecimiento de empresas",
+    "toLead": {
+      "assignTo": "Asignar a un comercial",
+      "assignToSelf": "— Asignarme a mí (por defecto) —",
+      "changed": "modificado",
+      "create": "→ Crear lead",
+      "createAnyway": "→ Crear de todos modos",
+      "creating": "Creando…",
+      "duplicateWarning": "Ya existe en el CRM una empresa con un nombre parecido como",
+      "heading": "Crear un lead en el CRM",
+      "prospectWillUpdate": "El prospecto se actualizará.",
+      "tagLabel": "Etiqueta (opcional)",
+      "tagPlaceholder": "p. ej. hot-lead, q4-2026, prioridad",
+      "taxIdHint": "Este NIF se usará para buscar duplicados y crear el lead.",
+      "taxIdLabel": "NIF de la empresa — confirma o corrige"
+    },
+    "website": {
+      "blocked": "Sitio bloqueado por Cloudflare/WAF — contenido no disponible para bots; el enriquecimiento continuó con los datos de KRS",
+      "blockedShort": "Sitio bloqueado por Cloudflare/WAF — contenido no disponible para bots",
+      "failed": "Sitio no disponible o scraping sin resultado",
+      "failedShort": "Sitio no disponible o error de scraping",
+      "fetched": "obtenidos",
+      "noContent": "sin contenido",
+      "notFound": "No se encontró la dirección del sitio web",
+      "notFoundShort": "No se encontró sitio web",
+      "notFoundShortLabel": "no encontrado",
+      "ok": "Datos del sitio obtenidos correctamente",
+      "okShort": "Datos del sitio obtenidos",
+      "unconfirmed": "El sitio existe, pero no se encontró en él el NIF, KRS, REGON ni la dirección de la empresa — usa Re-process para indicar la dirección correcta",
+      "unconfirmedLabel": "No se pudo confirmar el sitio de la empresa",
+      "unconfirmedShort": "No se pudo confirmar el sitio de la empresa"
+    },
+    "websiteMethod": {
+      "heuristic": "deducido del nombre",
+      "krs": "registro KRS",
+      "manual": "establecido manualmente",
+      "none": "no encontrado"
+    }
+  },
+  "callDirection": {
+    "inbound": "Entrantes",
+    "outbound": "Salientes"
+  },
+  "callStatus": {
+    "answered": "Contestadas",
+    "error": "Error de conexión",
+    "missed": "Entrantes perdidas",
+    "not_answered": "Salientes sin respuesta",
+    "rejected": "Rechazadas"
+  },
+  "callStatusShort": {
+    "error": "Error",
+    "missed": "Entr. perdidas",
+    "not_answered": "Sal. sin resp."
+  },
+  "dashboard": {
+    "allDatabases": "Todas las bases",
+    "allStages": "Todas las etapas",
+    "allStatuses": "Todos los estados",
+    "bothDirections": "Ambos sentidos",
+    "callsBySalesperson": "Llamadas PBX por comercial",
+    "clear": "Vaciar",
+    "databasesSelected": "Bases: {count}",
+    "enrichedByDatabase": "Prospectos enriquecidos por base (score por grupo)",
+    "leadsByAiTag": "Leads por etiqueta de IA",
+    "leadsBySalesperson": "Leads por comercial (según el score del prospecto)",
+    "loading": "Cargando…",
+    "noAiTag": "sin etiqueta de IA",
+    "noData": "Sin datos",
+    "noDataForPeriod": "Sin datos para el periodo seleccionado",
+    "noDataForPeriodAndFilters": "Sin datos para el periodo y los filtros seleccionados",
+    "noDatabasesMatching": "Ninguna base coincide con «{query}»",
+    "noResults": "Sin resultados",
+    "prospectsInDatabase": "Prospectos en la base (según el score y el estado)",
+    "scoreNone": "ninguno",
+    "searchDatabase": "Buscar una base…",
+    "selectAll": "Todas",
+    "showBelowThreshold": "Mostrar {range}",
+    "showBelowThresholdFallback": "Mostrar por debajo del umbral",
+    "showNullScore": "Mostrar score=NULL",
+    "subtitle": "Estadísticas de leads, prospectos y llamadas PBX",
+    "title": "Panel de prospectos"
+  },
+  "periods": {
+    "custom": "Personalizado…",
+    "prev_month": "Mes anterior",
+    "prev_quarter": "Trimestre anterior",
+    "prev_week": "Semana anterior",
+    "prev_year": "Año anterior",
+    "this_month": "Este mes",
+    "this_quarter": "Este trimestre",
+    "this_week": "Esta semana",
+    "ytd": "Este año (YTD)"
+  },
+  "prospectStatus": {
+    "archive": "Archivo",
+    "hold": "En espera",
+    "lead": "Lead",
+    "prospect": "Prospecto"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Tras la venta se repiten eventos recurrentes: revisiones, servicio técnico, renovaciones, visitas posteriores y similares.",
+      "label": "Servicio recurrente"
+    },
+    "dzial_handlowy": {
+      "desc": "Un departamento o equipo comercial nombrado explícitamente, o varias personas concretas con funciones de venta.",
+      "label": "Departamento comercial"
+    },
+    "ecommerce_b2b": {
+      "desc": "La empresa tiene una tienda o plataforma de pedidos B2B con gestión real de pedidos en línea.",
+      "label": "Comercio electrónico B2B"
+    },
+    "konsultacja_demo": {
+      "desc": "Antes de la compra existe una etapa real de asesoramiento, análisis de necesidades, elección de solución o demo.",
+      "label": "Consultoría / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Un gestor, KAM, persona o equipo concreto es responsable de forma permanente de un cliente, cuenta o segmento.",
+      "label": "Atención dedicada"
+    },
+    "przetargi": {
+      "desc": "La empresa participa en licitaciones como contratista o proveedor, no como entidad compradora.",
+      "label": "Licitaciones"
+    },
+    "rozproszona_struktura": {
+      "desc": "La empresa tiene sus propias sedes físicamente distribuidas o representantes territoriales.",
+      "label": "Estructura distribuida"
+    },
+    "siec_partnerow": {
+      "desc": "Distribuidores, revendedores o partners independientes venden la oferta de la empresa.",
+      "label": "Red de partners"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "La empresa prepara la oferta, el presupuesto o las condiciones de forma individual para cada cliente.",
+      "label": "Presupuesto personalizado"
+    }
+  }
+}

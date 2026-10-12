@@ -1,0 +1,367 @@
+{
+  "admin": {
+    "bulk": {
+      "archive": "Arhiviraj",
+      "cancel": "Odustani",
+      "deleteSelected": "Izbriši odabrano",
+      "restore": "Vrati",
+      "selected": "Odabrano: {count}"
+    },
+    "confirm": {
+      "deleteKeepsLead": "Pozor: ovaj prospekt ima povezani lead u CRM-u. Lead ostaje, bit će izbrisan samo prospekt.",
+      "deleteProspect": "Izbrisati prospekt „{name}“?",
+      "deleteSelected": "Izbrisati odabrane prospekte ({count})? Ovu radnju nije moguće poništiti."
+    },
+    "detail": {
+      "aiSummary": "Sažetak UI",
+      "bonus": "Bonus:",
+      "companySize": "Veličina:",
+      "decisionMaker": "Donositelj odluke (iz datoteke uvoza)",
+      "downgraded": "Snižen prioritet:",
+      "employeesCount": "{count} osoba",
+      "employment": "Zaposleni:",
+      "enrichmentError": "Pogreška obogaćivanja:",
+      "icpSignals": "Signali ICP",
+      "industry": "Djelatnost:",
+      "keyContacts": "Ključni kontakti — pronašla UI ({count})",
+      "location": "Lokacija:",
+      "noKeyContacts": "Na web stranici nisu nađeni ključni kontakti.",
+      "noWebsiteHalted": "Web stranica nije nađena — obogaćivanje je zaustavljeno. Upotrijebite Re-process i ručno unesite adresu.",
+      "none": "nema",
+      "pkdGus": "PKD (GUS):",
+      "pkdImport": "PKD (uvoz):"
+    },
+    "discovery": "Nađi konkurente",
+    "discoveryModal": {
+      "addAndEnrich": "Dodaj odabrano i pokreni obogaćivanje",
+      "addFailed": "Firme nije bilo moguće dodati u bazu",
+      "addedPrefix": "Dodano:",
+      "addedSuffix": "firmi u bazu",
+      "adding": "Dodavanje…",
+      "andEnrichmentStarted": "i obogaćivanje je pokrenuto",
+      "companyName": "Ime firme",
+      "companyNamePlaceholder": "npr. Comarch S.A.",
+      "editWebsite": "Uredi adresu stranice",
+      "emptyHint": "Unesite podatke firme i kliknite „Traži“",
+      "enterTaxIdManually": "Ručno unesite OIB",
+      "foundCount": "nađeno: {count}",
+      "newCompany": "nova",
+      "presence": "Zapisi",
+      "resolveTaxId": "Nađi OIB",
+      "resolveTaxIdTooltip": "Traži OIB na internetu (plaćeni poziv UI)",
+      "search": "Traži",
+      "searchFailed": "Traženje konkurenata nije uspjelo",
+      "searching": "Traženje u tijeku…",
+      "selectedLabel": "Odabranih firmi:",
+      "subtitle": "Unesite početnu firmu — UI će predložiti konkurente, provjerene u GUS-u",
+      "taxId": "OIB firme *",
+      "taxIdMismatch": "Nađeni OIB ne odgovara imenu firme u GUS-u — provjerite ručno",
+      "taxIdNotFound": "OIB ove firme nije bilo moguće naći",
+      "taxIdSearchFailed": "Traženje OIB-a nije uspjelo",
+      "unverified": "neprovjereno",
+      "verifiedInGus": "Provjereno u GUS-u"
+    },
+    "discoveryTooltip": "Generiraj prospekte iz konkurenata",
+    "enrichmentProgress": "{done}/{total} firmi…",
+    "errors": {
+      "aiNoCredit": "Na UI računu nema sredstava",
+      "searchFailedWithReason": "Traženje nije uspjelo: {reason}",
+      "taxIdConflict": "Konflikt OIB-a — drugi zapis već koristi ovaj broj."
+    },
+    "exportCsv": "Izvoz CSV",
+    "filters": {
+      "all": "Sve",
+      "enrichedFrom": "Obogaćivanje od",
+      "enrichedTo": "Obogaćivanje do",
+      "importedFrom": "Uvezeno od",
+      "importedTo": "Uvezeno do",
+      "reset": "Poništi filtre",
+      "scoreMax": "Score maks",
+      "scoreMin": "Score min",
+      "search": "Traži",
+      "searchPlaceholder": "ime, OIB ili baza",
+      "showArchived": "Prikaži arhivu",
+      "status": "Status"
+    },
+    "import": {
+      "added": "Dodano:",
+      "baseColumnHint": "ime izvorne baze; mora imati vrijednost u svakom redu.",
+      "chooseFile": "Odaberite CSV datoteku",
+      "columns": "Stupci:",
+      "detectedColumns": "Prepoznati stupci:",
+      "duplicatesHint": "Duplikati (isti OIB) ažuriraju postojeći zapis.",
+      "encoding": "Kodiranje:",
+      "errorDetails": "Detalji pogrešaka:",
+      "errors": "Pogreške:",
+      "fatalError": "Pogreška uvoza:",
+      "heading": "Uvoz firmi iz CSV",
+      "importing": "Uvoz u tijeku…",
+      "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
+      "optionalLabel": "Prepoznaju se automatski:",
+      "requiredLabel": "Obavezni stupci:",
+      "skipped": "Preskočeno (duplikati):",
+      "submit": "Uvezi",
+      "totalRows": "Redova ukupno:",
+      "wwwHint": "Stupac www omogućuje preskočiti automatsko traženje (jeftinije i brže)."
+    },
+    "inspect": {
+      "activeSignals": "Aktivni signali (true)",
+      "chars": "Znakova",
+      "computedScore": "Izračunani rezultat",
+      "found": "✓ Nađeno",
+      "foundInRegon": "✓ Nađeno u REGON",
+      "heading": "Pregled obogaćivanja",
+      "identity": "Identitet",
+      "identityUnverified": "nije potvrđen",
+      "identityVerified": "potvrđen",
+      "inputData": "Ulazni podaci za Claude",
+      "keyContacts": "Ključni kontakti ({count})",
+      "krsBranches": "Podružnice u KRS",
+      "krsNumber": "KRS broj",
+      "krsUrl": "URL u KRS",
+      "legalForm": "Pravni oblik",
+      "loadingPrompt": "Učitavanje prompta…",
+      "loadingScoring": "Učitavanje pravila bodovanja…",
+      "method": "Metoda",
+      "noReasoning": "bez obrazloženja",
+      "noWebsite": "✗ Nema stranice",
+      "notFound": "✗ Nije nađeno",
+      "officialName": "Službeno ime",
+      "pages": "Stranica",
+      "pkdCodes": "PKD kodovi",
+      "present": "✓ postojao",
+      "promptLoadFailed": "Prompt nije bilo moguće učitati.",
+      "scoreCalculation": "Izračun score",
+      "scoringLoadFailed": "Pravila bodovanja nije bilo moguće učitati.",
+      "signalsHeading": "Signali i obrazloženje Claude",
+      "signalsSum": "Zbroj signala ({trueCount}/{total} true)",
+      "subpagesChecked": "provjerene podstranice: {count}",
+      "tabAnalysis": "Analiza",
+      "tabPrompt": "Prompt Claude",
+      "tabScoring": "Pravila bodovanja"
+    },
+    "leadButton": {
+      "notEnriched": "Ova firma još nije obogaćena — nema score",
+      "scoreTooLow": "Score je prenizak ({score}/100). Potrebno je najmanje {required}. Granicu postavljate u App Settings → CRM."
+    },
+    "linkedin": {
+      "blocked": "LinkedIn je vratio HTTP 999 bez sadržaja — robot je blokiran",
+      "blockedLabel": "blokiran",
+      "blockedSuffix": " — blokiran (bot)",
+      "notFound": "LinkedIn stranica nije nađena",
+      "notFoundSuffix": " — nije nađeno",
+      "ok": "Podaci s LinkedIna uspješno preuzeti",
+      "okSuffix": " — podaci preuzeti"
+    },
+    "log": {
+      "branchesCount": "podružnice: {count}",
+      "charsCount": "znakova: {count}",
+      "collapse": "sažmi",
+      "found": "Nađeno",
+      "gusNotFound": "Nije nađeno u registru GUS REGON",
+      "heading": "Zapis obogaćivanja",
+      "krsNotFound": "Nije nađeno u KRS",
+      "method": "metoda:",
+      "more": "(+{count} više)",
+      "noUrlInRegistry": "u registru nema adrese stranice",
+      "pagesCount": "stranica: {count}",
+      "websiteNotFound": "Web stranica nije nađena"
+    },
+    "menu": {
+      "delete": "Izbriši",
+      "inspect": "Pregled",
+      "restoreFromArchive": "Vrati iz arhive",
+      "restoreToQueue": "Vrati u čekanje"
+    },
+    "note": {
+      "heading": "Napomena o provjeri",
+      "placeholder": "Dodajte napomenu…",
+      "saveFailed": "Napomenu nije bilo moguće spremiti"
+    },
+    "pager": {
+      "next": "Sljedeća",
+      "previous": "Prethodna"
+    },
+    "reprocess": {
+      "analyzeLinkedin": "Analiziraj LinkedIn tijekom obrade",
+      "analyzeLinkedinHint": "(pokušaj scrapinga stranice firme)",
+      "hint": "Polja su neobavezna — ispunite samo ono što želite ispraviti ili dopuniti.",
+      "submit": "Obradi",
+      "taxIdHint": "(ostavite prazno ako je točan)",
+      "website": "Web stranica"
+    },
+    "runEnrichment": "Pokreni obogaćivanje",
+    "status": {
+      "archived": "Arhiva",
+      "done": "Obogaćeno",
+      "error": "Pogreška",
+      "hold": "Na čekanju",
+      "lead": "Lead u CRM-u",
+      "no_krs": "Nema u KRS",
+      "no_website": "Nema web stranice",
+      "pending": "Na čekanju"
+    },
+    "summary": {
+      "errorCount": "(pogreške: {count})",
+      "inProgress": "Obogaćivanje u tijeku: {done}/{total}",
+      "shown": "Prikazano:"
+    },
+    "table": {
+      "actions": "Radnje",
+      "branches": "Podružnice",
+      "company": "Firma",
+      "convertedLeadTooltip": "Lead u CRM-u (pretvoreni prospekt) — kliknite za otvaranje",
+      "empty": "Nema firmi. Uvezite CSV datoteku da započnete.",
+      "enrichment": "Obogaćivanje",
+      "goToCrmTooltip": "Idi na lead u CRM-u",
+      "goToLeadTooltip": "Lead s ovim OIB-om već postoji u CRM-u — kliknite za otvaranje",
+      "goToPartnerTooltip": "Partner s ovim OIB-om već postoji u CRM-u — kliknite za otvaranje",
+      "imported": "Uvezeno",
+      "lead": "Lead",
+      "leadBadgeTooltip": "Lead s ovim OIB-om postoji u CRM-u — kliknite za otvaranje",
+      "partner": "Partner",
+      "partnerBadgeTooltip": "Partner s ovim OIB-om postoji u CRM-u — kliknite za otvaranje",
+      "processing": "Obrada…",
+      "score": "Score",
+      "status": "Status",
+      "taxId": "OIB"
+    },
+    "title": "Prospekti — obogaćivanje podataka o firmama",
+    "toLead": {
+      "assignTo": "Dodijeli prodavaču",
+      "assignToSelf": "— Dodijeli meni (zadano) —",
+      "changed": "promijenjen",
+      "create": "→ Kreiraj lead",
+      "createAnyway": "→ Ipak kreiraj",
+      "creating": "Kreiranje…",
+      "duplicateWarning": "Firma sličnog imena već postoji u CRM-u kao",
+      "heading": "Kreiraj lead u CRM-u",
+      "prospectWillUpdate": "Prospekt će biti ažuriran.",
+      "tagLabel": "Oznaka (neobavezno)",
+      "tagPlaceholder": "npr. hot-lead, q4-2026, prioritet",
+      "taxIdHint": "Ovaj OIB koristit će se za traženje duplikata i kreiranje leada.",
+      "taxIdLabel": "OIB firme — potvrdite ili ispravite"
+    },
+    "website": {
+      "blocked": "Stranicu blokira Cloudflare/WAF — sadržaj nije dostupan botovima; obogaćivanje je nastavljeno s podacima iz KRS-a",
+      "blockedShort": "Stranicu blokira Cloudflare/WAF — sadržaj nije dostupan botovima",
+      "failed": "Stranica nedostupna ili scraping bez rezultata",
+      "failedShort": "Stranica nedostupna ili pogreška scrapinga",
+      "fetched": "preuzeto",
+      "noContent": "bez sadržaja",
+      "notFound": "Adresa web stranice nije nađena",
+      "notFoundShort": "Web stranica nije nađena",
+      "notFoundShortLabel": "nije nađeno",
+      "ok": "Podaci sa stranice uspješno preuzeti",
+      "okShort": "Podaci sa stranice preuzeti",
+      "unconfirmed": "Stranica postoji, ali na njoj nisu nađeni OIB, KRS, REGON ni adresa firme — pomoću Re-process unesite ispravnu adresu",
+      "unconfirmedLabel": "Web stranicu firme nije bilo moguće potvrditi",
+      "unconfirmedShort": "Web stranicu firme nije bilo moguće potvrditi"
+    },
+    "websiteMethod": {
+      "heuristic": "pogođena iz imena",
+      "krs": "registar KRS",
+      "manual": "postavljena ručno",
+      "none": "nije nađeno"
+    }
+  },
+  "callDirection": {
+    "inbound": "Dolazni",
+    "outbound": "Odlazni"
+  },
+  "callStatus": {
+    "answered": "Odgovoreni",
+    "error": "Pogreška veze",
+    "missed": "Dolazni propušteni",
+    "not_answered": "Odlazni bez odgovora",
+    "rejected": "Odbijeni"
+  },
+  "callStatusShort": {
+    "error": "Pogreška",
+    "missed": "Dol. propušteni",
+    "not_answered": "Odl. bez odg."
+  },
+  "dashboard": {
+    "allDatabases": "Sve baze",
+    "allStages": "Sve faze",
+    "allStatuses": "Svi statusi",
+    "bothDirections": "Oba smjera",
+    "callsBySalesperson": "PBX pozivi po prodavaču",
+    "clear": "Očisti",
+    "databasesSelected": "Baza: {count}",
+    "enrichedByDatabase": "Obogaćeni prospekti po bazi (score po grupama)",
+    "leadsByAiTag": "Leadovi po UI oznaci",
+    "leadsBySalesperson": "Leadovi po prodavaču (po score prospekta)",
+    "loading": "Učitavanje…",
+    "noAiTag": "bez UI oznake",
+    "noData": "Nema podataka",
+    "noDataForPeriod": "Nema podataka za odabrano razdoblje",
+    "noDataForPeriodAndFilters": "Nema podataka za odabrano razdoblje i filtre",
+    "noDatabasesMatching": "Nijedna baza ne odgovara „{query}“",
+    "noResults": "Nema rezultata",
+    "prospectsInDatabase": "Prospekti u bazi (po score i statusu)",
+    "scoreNone": "nema",
+    "searchDatabase": "Traži bazu…",
+    "selectAll": "Sve",
+    "showBelowThreshold": "Prikaži {range}",
+    "showBelowThresholdFallback": "Prikaži ispod granice",
+    "showNullScore": "Prikaži score=NULL",
+    "subtitle": "Statistika leadova, prospekata i PBX poziva",
+    "title": "Nadzorna ploča prospekata"
+  },
+  "periods": {
+    "custom": "Prilagođeno…",
+    "prev_month": "Prethodni mjesec",
+    "prev_quarter": "Prethodno tromjesečje",
+    "prev_week": "Prethodni tjedan",
+    "prev_year": "Prethodna godina",
+    "this_month": "Ovaj mjesec",
+    "this_quarter": "Ovo tromjesečje",
+    "this_week": "Ovaj tjedan",
+    "ytd": "Ova godina (YTD)"
+  },
+  "prospectStatus": {
+    "archive": "Arhiva",
+    "hold": "Na čekanju",
+    "lead": "Lead",
+    "prospect": "Prospekt"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Nakon prodaje javljaju se ponavljajući događaji: pregledi, servis, obnove, daljnji posjeti i slično.",
+      "label": "Ponavljajuća usluga"
+    },
+    "dzial_handlowy": {
+      "desc": "Izričito imenovan prodajni odjel ili tim, odnosno više konkretnih osoba u prodajnim ulogama.",
+      "label": "Prodajni odjel"
+    },
+    "ecommerce_b2b": {
+      "desc": "Firma ima B2B trgovinu ili platformu za narudžbe sa stvarnom obradom online narudžbi.",
+      "label": "B2B e-trgovina"
+    },
+    "konsultacja_demo": {
+      "desc": "Prije kupnje postoji stvarna faza savjetovanja, analize potreba, odabira rješenja ili demo.",
+      "label": "Konzultacija / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Određeni skrbnik, KAM, osoba ili tim trajno je odgovoran za klijenta, račun ili segment.",
+      "label": "Namjenska briga o klijentu"
+    },
+    "przetargi": {
+      "desc": "Firma na natječajima nastupa kao izvođač ili dobavljač, a ne kao naručitelj.",
+      "label": "Javni natječaji"
+    },
+    "rozproszona_struktura": {
+      "desc": "Firma ima vlastite, fizički raspršene podružnice ili teritorijalne predstavnike.",
+      "label": "Raspršena struktura"
+    },
+    "siec_partnerow": {
+      "desc": "Neovisni trgovci, preprodavači ili partneri prodaju ponudu firme.",
+      "label": "Mreža partnera"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Firma priprema ponudu, izračun ili uvjete pojedinačno za određenog klijenta.",
+      "label": "Individualna ponuda"
+    }
+  }
+}

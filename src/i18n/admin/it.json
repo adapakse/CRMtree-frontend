@@ -722,6 +722,424 @@
       "saveChanges": "Salva modifiche",
       "saving": "Salvataggio…"
     },
+    "ai": {
+      "apiKey": "Chiave API",
+      "apiKeyPlaceholder": "Incolla la chiave API",
+      "cancel": "Annulla",
+      "changeKey": "Cambia chiave",
+      "confirmRemove": "Disattivare l'IA per questa funzione? Le altre funzioni continuano a funzionare.",
+      "detectFailed": "Non siamo riusciti a riconoscere il fornitore da questa chiave: indicalo tu.",
+      "detectHint": "Riconosciamo il fornitore dalla chiave: non devi sceglierlo.",
+      "detected": "Riconosciuto: {provider}",
+      "detectedShort": "riconosciuto dalla chiave",
+      "detecting": "Riconoscimento del fornitore…",
+      "intro": "Ogni funzione ha il proprio fornitore, chiave e modello: l'enrichment può girare presso un fornitore e l'analisi delle chiamate presso un altro. Incolla una chiave e riconosceremo il fornitore da soli. Il salvataggio verifica la configurazione presso il fornitore; la chiave è cifrata e non viene mai più mostrata.",
+      "loading": "Caricamento della configurazione AI…",
+      "model": "Modello",
+      "modelCustom": "Altro (digita il nome)",
+      "modelDefaultOption": "Predefinito ({model})",
+      "modelsLoading": "Recupero l'elenco dei modelli dal fornitore…",
+      "needsStructuredOutput": "Richiede risposte in formato imposto — solo {providers}",
+      "needsWebSearch": "Richiede la ricerca sul web — solo {providers}",
+      "provider": "Fornitore",
+      "purpose": {
+        "assistant": "Assistente dei moduli",
+        "call_analysis": "Analisi delle chiamate",
+        "competitor_discovery": "Trova concorrenti",
+        "enrichment": "Enrichment dei prospect",
+        "seo_content": "SEO — scrittura dei contenuti",
+        "seo_facts": "SEO — ricerca dei dati",
+        "seo_research": "SEO — parole chiave e scaletta"
+      },
+      "remove": "Rimuovi configurazione",
+      "saveAndVerify": "Salva e verifica",
+      "saveFailed": "Non è stato possibile salvare la configurazione AI.",
+      "statusActive": "attivo",
+      "statusError": "errore di connessione",
+      "statusInvalid": "chiave rifiutata",
+      "statusMissing": "non configurato",
+      "title": "Fornitori IA",
+      "useSaved": "Usa uno salvato:",
+      "verifying": "Controllo…"
+    },
+    "catalog": {
+      "churn_daily_run_time": {
+        "description": "Formato HH:MM — a quest'ora il server ricalcola lo scoring e invia gli avvisi email",
+        "label": "Churn: ora del ricalcolo giornaliero"
+      },
+      "churn_days_t1_max": {
+        "description": "Max. giorni senza ordine per la soglia 1",
+        "label": "Churn: soglia 1 giorni — max"
+      },
+      "churn_days_t1_min": {
+        "description": "Min. giorni senza ordine per la soglia 1",
+        "label": "Churn: soglia 1 giorni — min"
+      },
+      "churn_days_t1_pts": {
+        "description": "Punti per 10–20 giorni senza ordine",
+        "label": "Churn: punti per la soglia 1 giorni"
+      },
+      "churn_days_t2_max": {
+        "description": "Max. giorni senza ordine per la soglia 2",
+        "label": "Churn: soglia 2 giorni — max"
+      },
+      "churn_days_t2_min": {
+        "description": "Min. giorni senza ordine per la soglia 2",
+        "label": "Churn: soglia 2 giorni — min"
+      },
+      "churn_days_t2_pts": {
+        "description": "Punti per 21–30 giorni senza ordine",
+        "label": "Churn: punti per la soglia 2 giorni"
+      },
+      "churn_days_t3_pts": {
+        "description": "Punti per >30 giorni senza ordine",
+        "label": "Churn: punti per la soglia 3 giorni"
+      },
+      "churn_risk_critical": {
+        "description": "Punti min. per il livello di rischio: Critico",
+        "label": "Churn: soglia di rischio critico"
+      },
+      "churn_risk_high": {
+        "description": "Punti min. per il livello di rischio: Alto",
+        "label": "Churn: soglia di rischio alto"
+      },
+      "churn_risk_low": {
+        "description": "Punti min. per il livello di rischio: Basso",
+        "label": "Churn: soglia di rischio basso"
+      },
+      "churn_risk_medium": {
+        "description": "Punti min. per il livello di rischio: Medio",
+        "label": "Churn: soglia di rischio medio"
+      },
+      "churn_sales_t1_pct": {
+        "description": "% min. di calo M-2→M-1 per la soglia 1",
+        "label": "Churn: calo vendite soglia 1 %"
+      },
+      "churn_sales_t1_pts": {
+        "description": "Punti per un calo delle vendite ≥30% M-2→M-1",
+        "label": "Churn: punti per la soglia 1 vendite"
+      },
+      "churn_sales_t2_pct": {
+        "description": "% min. di calo M-2→M-1 per la soglia 2",
+        "label": "Churn: calo vendite soglia 2 %"
+      },
+      "churn_sales_t2_pts": {
+        "description": "Punti per un calo delle vendite ≥51% M-2→M-1",
+        "label": "Churn: punti per la soglia 2 vendite"
+      },
+      "crm_adoption_target_pct": {
+        "description": "% target di utenti attivi presso il partner",
+        "label": "Obiettivo di adozione utenti (%)"
+      },
+      "crm_commission_basis": {
+        "description": "Basi di calcolo della commissione disponibili per i Partner. nie_dotyczy=Non applicabile, segmenty=Numero di segmenti, rezerwacje=Numero di prenotazioni, progi_obrotowe=Soglie di fatturato.",
+        "label": "Basi di calcolo della commissione"
+      },
+      "crm_commission_basis_options": {
+        "description": "Basi di calcolo della commissione WT/TM disponibili nella scheda del partner. Formato: array JSON.",
+        "label": "Basi di commissione WT/TM"
+      },
+      "crm_consent_types": {
+        "description": "Array JSON che definisce i tipi di consenso al marketing mostrati nelle schede Lead e Partner. Formato: [key, label, description].",
+        "label": "CRM – Tipi di consenso al marketing"
+      },
+      "crm_contact_titles": {
+        "description": "Ruoli disponibili nei moduli di contatto per Lead e Partner.",
+        "label": "Ruoli dei contatti"
+      },
+      "crm_csv_max_rows": {
+        "description": "Limite di righe in una singola importazione CSV",
+        "label": "Limite di righe per l'importazione CSV"
+      },
+      "crm_currencies": {
+        "description": "Elenco delle valute disponibili nei campi: limite di credito, importo del deposito, dati di vendita. Formato: array JSON.",
+        "label": "Valute supportate"
+      },
+      "crm_dashboard_hot_value_threshold": {
+        "description": "I lead superiori a questo valore vengono evidenziati nella dashboard come di alto valore.",
+        "label": "Soglia di valore del lead \"caldo\" (PLN)"
+      },
+      "crm_dashboard_long_cycle_days": {
+        "description": "I lead aperti da più giorni di questo numero vengono contrassegnati nella dashboard come \"ciclo lungo\".",
+        "label": "Ciclo di vendita lungo (giorni)"
+      },
+      "crm_dashboard_win_stages": {
+        "description": "Fasi del lead considerate come vinte (influenzano il Win Rate e il contatore \"Vinti\" nella dashboard). Formato: array JSON.",
+        "label": "Fasi del lead considerate \"vinte\""
+      },
+      "crm_global_read": {
+        "description": "Se attivata, tutti gli utenti del CRM possono visualizzare Lead, Partner, Report di vendita e Performance senza limitazioni di visibilità. I permessi di modifica restano invariati.",
+        "label": "Lettura globale del CRM"
+      },
+      "crm_hold_reasons": {
+        "description": "Elenco dei motivi di Hold. Visualizzato come elenco a discesa nel campo \"Motivo\" quando imposti lo stato Hold su un lead.",
+        "label": "Motivi di Hold del lead"
+      },
+      "crm_hot_lead_days": {
+        "description": "Giorni senza contatto → contrassegnare il lead come freddo",
+        "label": "Giorni senza contatto (lead freddo)"
+      },
+      "crm_industries": {
+        "description": "Valori di settore disponibili per Lead e Partner.",
+        "label": "Settori"
+      },
+      "crm_lead_sources": {
+        "description": "Elenco delle chiavi disponibili nel campo Fonte di un Lead",
+        "label": "Dizionario delle fonti dei Lead"
+      },
+      "crm_lost_reasons": {
+        "description": "Elenco dei motivi di perdita. Visualizzato come elenco a discesa nel campo \"Motivo della perdita\" quando cambi la fase del lead in Perso.",
+        "label": "Motivi di perdita del lead"
+      },
+      "crm_partner_countries": {
+        "description": "Elenco dei paesi disponibili nel profilo del partner (Dati aggiuntivi e Billing Address).",
+        "label": "Paesi dei partner"
+      },
+      "crm_partner_languages": {
+        "description": "Elenco delle lingue disponibili nel profilo del partner.",
+        "label": "Lingue dei partner"
+      },
+      "crm_partner_statuses": {
+        "description": "Stati disponibili per i partner. onboarding=Attivazione, active=Attivo, inactive=Inattivo, churned=Perso.",
+        "label": "Stati del Partner"
+      },
+      "crm_platform_api_key": {
+        "description": "Chiave API della piattaforma transazionale (plain, cambiala dopo il rilascio)",
+        "label": "Chiave API della piattaforma transazionale"
+      },
+      "crm_product_types": {
+        "description": "Elenco dei tipi di prodotto visibili nell'importazione dei dati di vendita e nei report. Formato: array JSON.",
+        "label": "Tipi di prodotti di vendita"
+      },
+      "crm_renewal_warning_days": {
+        "description": "Avviso X giorni prima della scadenza del contratto",
+        "label": "Avviso di scadenza del contratto (giorni)"
+      },
+      "crm_training_mode": {
+        "description": "Simula l'invio di email, la firma dei documenti e le telefonate senza alcuna azione esterna reale. Destinata alla formazione sull'uso del CRM.",
+        "label": "Modalità formazione"
+      },
+      "default_page_size": {
+        "description": "Numero di elementi per pagina in tutte le viste a elenco (utenti, documenti, log di audit).",
+        "label": "Dimensione predefinita della pagina"
+      },
+      "doc_contract_subjects": {
+        "description": "Elenco dei valori del campo Oggetto del contratto nei documenti.",
+        "label": "Oggetti del contratto"
+      },
+      "doc_entity1_options": {
+        "description": "Elenco dei soggetti disponibili nel campo Entity 1 del documento. Modifica aggiungendo / rimuovendo valori.",
+        "label": "Soggetto 1 – opzioni del dizionario"
+      },
+      "doc_gdpr_types": {
+        "description": "Tipi GDPR disponibili. no_gdpr=Nessun GDPR, data_processing_entrustment=Affidamento del trattamento, data_administration=Contitolarità.",
+        "label": "Tipi GDPR dei documenti"
+      },
+      "doc_payment_statuses": {
+        "description": "Stati di pagamento disponibili per i documenti di tipo Fattura. unpaid=Non pagata, partially_paid=Parzialmente pagata, paid=Pagata, overdue=Scaduta.",
+        "label": "Stati di pagamento delle fatture"
+      },
+      "doc_statuses": {
+        "description": "Stati dei documenti disponibili. new=Nuovo, being_edited=In modifica, being_approved=Da approvare, being_signed=Da firmare, signed=Firmato, completed=Completato, rejected=Rifiutato.",
+        "label": "Stati dei documenti"
+      },
+      "doc_types": {
+        "description": "Tipi di documenti disponibili. Il valore deve corrispondere all'enum doc_type nel database.",
+        "label": "Tipi di documenti"
+      },
+      "email_signature_banner_url": {
+        "description": "URL dell'immagine del banner mostrata sotto la sezione personale nella firma email (larghezza 600px)",
+        "label": "Firma email – URL del banner"
+      },
+      "email_signature_disclaimer": {
+        "description": "Testo della clausola di riservatezza mostrato in fondo alla firma email (grigio, 8px). Supporta i tag HTML.",
+        "label": "Firma email – clausola di riservatezza"
+      },
+      "expiration_red_days": {
+        "description": "I documenti che scadono entro questo numero di giorni vengono mostrati in rosso sulla bacheca Kanban e nell'elenco dei documenti.",
+        "label": "Soglia di avviso di scadenza (giorni)"
+      },
+      "expiration_soon_days": {
+        "description": "I documenti che scadono entro questo numero di giorni vengono contrassegnati come \"in scadenza\" nei badge e nei filtri.",
+        "label": "Soglia \"in scadenza\" (giorni)"
+      },
+      "health_act_t1_max_days": {
+        "description": "Ultimo ordine entro N giorni → punti T1",
+        "label": "Health: max giorni per attività T1"
+      },
+      "health_act_t1_pts": {
+        "description": "Punti per 1 ordine fino a X giorni fa",
+        "label": "Health: punti attività T1"
+      },
+      "health_act_t2_max_days": {
+        "description": "Max. giorni fa per la finestra T2",
+        "label": "Health: max giorni attività T2"
+      },
+      "health_act_t2_min_days": {
+        "description": "Min. giorni fa per la finestra T2 (5-10 giorni)",
+        "label": "Health: min giorni attività T2"
+      },
+      "health_act_t2_pts": {
+        "description": "Punti per 1 ordine nella finestra 5-10 giorni",
+        "label": "Health: punti attività T2"
+      },
+      "health_act_t3_min_orders": {
+        "description": "Min. ordini in 20d per la soglia T3",
+        "label": "Health: min ordini attività T3"
+      },
+      "health_act_t3_pts": {
+        "description": "Punti per 2–5 ordini in 20 giorni",
+        "label": "Health: punti attività T3"
+      },
+      "health_act_t4_min_orders": {
+        "description": ">N ordini in 20d → T4 (livello max)",
+        "label": "Health: min ordini attività T4"
+      },
+      "health_act_t4_pts": {
+        "description": "Punti per >5 ordini in 20 giorni",
+        "label": "Health: punti attività T4"
+      },
+      "health_good_min": {
+        "description": "Punti min. per lo stato Sano",
+        "label": "Health: soglia Sano"
+      },
+      "health_rev_t1_pct": {
+        "description": "% min. di crescita M-2→M-1 per T1",
+        "label": "Health: crescita T1 %"
+      },
+      "health_rev_t1_pts": {
+        "description": "Punti per crescita ≥20%",
+        "label": "Health: punti crescita T1"
+      },
+      "health_rev_t2_pct": {
+        "description": "% min. di crescita M-2→M-1 per T2",
+        "label": "Health: crescita T2 %"
+      },
+      "health_rev_t2_pts": {
+        "description": "Punti per crescita ≥30%",
+        "label": "Health: punti crescita T2"
+      },
+      "health_rev_t3_pct": {
+        "description": "% min. di crescita M-2→M-1 per T3",
+        "label": "Health: crescita T3 %"
+      },
+      "health_rev_t3_pts": {
+        "description": "Punti per crescita ≥41%",
+        "label": "Health: punti crescita T3"
+      },
+      "health_rev_t4_pct": {
+        "description": "% min. di crescita M-2→M-1 per T4",
+        "label": "Health: crescita T4 %"
+      },
+      "health_rev_t4_pts": {
+        "description": "Punti per crescita >50%",
+        "label": "Health: punti crescita T4"
+      },
+      "health_warn_min": {
+        "description": "Punti min. per lo stato Attenzione (sotto = Rischio)",
+        "label": "Health: soglia Attenzione"
+      },
+      "kanban_refresh_interval_sec": {
+        "description": "Intervallo in secondi per l'aggiornamento automatico della bacheca Kanban. Imposta 0 per disattivare l'aggiornamento automatico.",
+        "label": "Intervallo di aggiornamento automatico del Kanban (secondi)"
+      },
+      "lead_attachments_folder_url": {
+        "description": "URL della cartella con i modelli da inviare nella fase di Lead (ad es. un link a Google Drive). Visualizzato come scorciatoia accanto al campo degli allegati nella finestra di composizione dell'email.",
+        "label": "Cartella dei modelli (Lead)"
+      },
+      "onboarding_task_templates": {
+        "description": "Definizioni delle attività per ogni fase di attivazione. Attributi: id, title, type, step, standard (aggiungi automaticamente alla migrazione), assignee (UUID dell'utente o null), days (giorni dalla migrazione o null).",
+        "label": "Modelli di attività di onboarding"
+      },
+      "prospect_ai_provider": {
+        "description": "Quale provider AI analizza i dati aziendali raccolti tramite scraping (KRS, sito web, LinkedIn, Facebook) e genera il Travel Potential Score. \"deepseek\" o \"anthropic\".",
+        "label": "Prospect — provider AI per l'enrichment"
+      },
+      "prospect_icp_blacklist_keywords": {
+        "description": "Se una di queste parole compare nel nome dell'azienda, nel settore o nella descrizione PKD, dall'icp_score viene sottratta una penalità (vedi \"Prospect — penalità in punti per la blacklist ICP\"). Per impostazione predefinita individua i grossisti che non rientrano nell'ICP di CRMtree.",
+        "label": "Prospect — parole chiave della blacklist ICP"
+      },
+      "prospect_icp_blacklist_penalty": {
+        "description": "Quanti punti sottrarre dall'icp_score quando un'azienda corrisponde alle parole chiave della blacklist ICP. Il risultato non scende sotto 0.",
+        "label": "Prospect — penalità in punti per la blacklist ICP"
+      },
+      "prospect_lead_min_score": {
+        "description": "Il pulsante \"→ Lead\" nell'elenco dei prospect si attiva solo quando il Travel Potential Score dell'azienda è maggiore o uguale a questo valore (scala 0–100).",
+        "label": "Prospect — punteggio minimo per la conversione in Lead"
+      },
+      "roles_preview_count": {
+        "description": "Numero massimo di ruoli di gruppo visualizzati in linea nell'elenco degli utenti prima del troncamento \"+N more\".",
+        "label": "Numero di ruoli nell'anteprima"
+      },
+      "ta_billing_issuer": {
+        "description": "Codice dell'emittente della fattura nell'indirizzo di fatturazione (es. WT).",
+        "label": "Account di test — emittente della fattura (issuer)"
+      },
+      "ta_form_configs": {
+        "description": "Array dei passaggi del modulo in formato JSON. Deve contenere almeno un elemento con step=\"START\".",
+        "label": "Account di test — configurazione dei moduli (formConfigs)"
+      },
+      "ta_partner_type": {
+        "description": "Tipo di Partner in HTCD (es. PARTNER_BASIC).",
+        "label": "Account di test — tipo di Partner (selectedPartnerType)"
+      },
+      "ta_services_process_type": {
+        "description": "Tipo di elaborazione dei servizi predefinito (es. ONLINE, MIDOFFICE).",
+        "label": "Account di test — tipo di elaborazione dei servizi (defaultServicesProcessType)"
+      },
+      "ta_traveler_country_nationality": {
+        "description": "Indica se il paese del Partner è la nazionalità predefinita del viaggiatore (true/false).",
+        "label": "Account di test — nazionalità dal paese del Partner (partnerCountryAsDefaultNationality)"
+      },
+      "ta_traveler_max_limit": {
+        "description": "Numero massimo di viaggiatori in un ordine.",
+        "label": "Account di test — limite di viaggiatori (travelersMaxLimit)"
+      },
+      "ta_traveler_meal_types": {
+        "description": "Elenco dei tipi di pasto separati da virgole (es. BF,HB,FB,AI).",
+        "label": "Account di test — tipi di pasto consentiti (allowedMealTypes)"
+      },
+      "ta_traveler_meals_only": {
+        "description": "Indica se mostrare solo le offerte di hotel con pasti (true/false).",
+        "label": "Account di test — solo offerte con pasti (hotelOffersWithMealsOnly)"
+      },
+      "ta_traveler_parking_only": {
+        "description": "Indica se mostrare solo gli hotel con parcheggio (true/false).",
+        "label": "Account di test — solo con parcheggio (accommodationsWithParkingOnly)"
+      },
+      "ta_traveler_refundable_only": {
+        "description": "Indica se mostrare solo le offerte di hotel rimborsabili (true/false).",
+        "label": "Account di test — solo offerte rimborsabili (refundableHotelOffersOnly)"
+      },
+      "ta_traveler_search_by": {
+        "description": "Modalità di ricerca dei viaggiatori in HTCD.",
+        "label": "Account di test — ricerca dei viaggiatori (searchTravelerBy)"
+      },
+      "ta_wh_accent_color": {
+        "description": "Colore hex dell'accento whitelabel in HTCD.",
+        "label": "Account di test — colore dell'accento (whitelabelColor)"
+      },
+      "ta_wh_communicator_notifications": {
+        "description": "Indica se abilitare le notifiche della chat interna (true/false).",
+        "label": "Account di test — notifiche della chat (internalCommunicatorNotifications)"
+      },
+      "ta_wh_enable_meal_selection": {
+        "description": "Indica se abilitare la selezione dei pasti (true/false).",
+        "label": "Account di test — selezione dei pasti (enableMealSelection)"
+      },
+      "ta_wh_gds_locator": {
+        "description": "Identificatore del profilo GDS (gdsProfileLocator).",
+        "label": "Account di test — GDS Profile Locator"
+      },
+      "ta_wh_gds_locator_manual": {
+        "description": "Identificatore del profilo GDS (manuale) (gdsProfileLocatorManual).",
+        "label": "Account di test — GDS Profile Locator Manual"
+      },
+      "ta_wh_header_color": {
+        "description": "Colore hex dell'intestazione whitelabel in HTCD.",
+        "label": "Account di test — colore dell'intestazione (whitelabelHeader)"
+      }
+    },
     "crm": {
       "intro": "— dizionari e soglie utilizzati dal modulo CRM. Modifica gli elenchi aggiungendo / rimuovendo elementi. Le modifiche diventano effettive dopo il salvataggio.",
       "scoring": {
@@ -737,6 +1155,28 @@
         "salesDrop": "Calo delle vendite (M-2→M-1)",
         "schedule": "Pianificazione",
         "value": "Valore"
+      }
+    },
+    "customFields": {
+      "active": "Attivo",
+      "addButton": "Aggiungi campo",
+      "deleteConfirm": "Eliminare il campo “{name}”?",
+      "deleteTooltip": "Elimina il campo — possibile solo se nessun record ha un valore",
+      "empty": "Nessun campo aggiuntivo in questo modulo.",
+      "hint": "Campi che definisci tu per questo modulo. Il tipo di campo non è modificabile in seguito: per cambiarlo, disattiva il campo e creane uno nuovo. Un campo disattivato scompare dal modulo, ma i valori già inseriti restano.",
+      "newNamePlaceholder": "Nome del nuovo campo",
+      "optionsPlaceholder": "Valori separati da virgola",
+      "optionsRequired": "Un campo elenco richiede almeno un valore.",
+      "saveFailed": "Non è stato possibile salvare il campo.",
+      "titleDocument": "Campi aggiuntivi del documento",
+      "titleLead": "Campi aggiuntivi del lead",
+      "titlePartner": "Campi aggiuntivi del partner",
+      "types": {
+        "date": "Data",
+        "list": "Elenco",
+        "money": "Importo",
+        "number": "Numero",
+        "text": "Testo"
       }
     },
     "documents": {
@@ -775,6 +1215,32 @@
         "noWarning": "giorni → nessun avviso",
         "title": "Anteprima dei colori delle scadenze",
         "urgent": "giorni → rosso (urgente)"
+      }
+    },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Reparto finanza e contabilità",
+        "customerService": "Reparto assistenza clienti",
+        "hr": "Reparto risorse umane",
+        "management": "Consiglio direttivo dell’azienda",
+        "marketing": "Reparto marketing",
+        "operations": "Reparto operazioni",
+        "prospects": "Accesso al modulo Prospect (import CSV, arricchimento, conversione in lead).",
+        "sales": "Reparto vendite",
+        "seo": "Revisione e approvazione dei contenuti di SEObot prima della pubblicazione.",
+        "seoEditorial": "Redattori di SEObot: modifica, completamento e approvazione degli articoli prima della pubblicazione."
+      },
+      "displayName": {
+        "accounting": "Contabilità",
+        "customerService": "Assistenza clienti",
+        "hr": "Risorse umane",
+        "management": "Consiglio direttivo",
+        "marketing": "Marketing",
+        "operations": "Operazioni",
+        "prospects": "Prospect",
+        "sales": "Vendite",
+        "seo": "SEO",
+        "seoEditorial": "Redazione SEO"
       }
     },
     "groups": {
@@ -892,6 +1358,11 @@
         "data_processing_entrustment": "Affidamento del trattamento",
         "no_gdpr": "Nessun GDPR"
       },
+      "holdReasons": {
+        "businessPause": "Pausa dell'attività",
+        "internalSituation": "Situazione interna all'azienda",
+        "noDecisionMakers": "Nessun decisore"
+      },
       "industries": {
         "Education": "Istruzione",
         "Finance": "Finanza",
@@ -906,7 +1377,7 @@
       "leadSources": {
         "agent": "Agent",
         "cold_call": "Cold call",
-        "inbound": "Inbound",
+        "inbound": "Richiesta in entrata",
         "inne": "Altro",
         "kampania": "Campagna e-mail",
         "linkedin": "LinkedIn",
@@ -948,6 +1419,29 @@
         "travel_insurance": "Assicurazione",
         "visa": "Visto"
       }
+    },
+    "leadStages": {
+      "addStage": "Aggiungi fase",
+      "cardTitle": "Fasi del lead",
+      "codeWrittenHint": "Non è un passo dell'imbuto ma uno stato impostato dall'applicazione (archiviazione del lead, conversione in partner), quindi non si può eliminare. Si può rinominare.",
+      "confirmDelete": "Rimuovere la fase \"{name}\"?",
+      "confirmDeleteWithLeads": "Eliminare la fase \"{name}\"?\n\nI {count} lead presenti passeranno a \"{target}\".",
+      "intro": "Nomi propri per le fasi dell'imbuto: rinomina quelle esistenti, aggiungi un passo o eliminane uno che non serve. Il codice della fase resta invariato, quindi il nuovo nome compare in tutta l'applicazione mentre report e dati dei lead non vengono toccati. Un nome vuoto torna a quello predefinito.",
+      "kinds": {
+        "archived": "archivio",
+        "converted": "convertito in partner",
+        "lost": "perso",
+        "open": "imbuto",
+        "won": "vinto"
+      },
+      "lastStageHint": "È l'ultimo passo dell'imbuto: i nuovi lead devono partire da qualche parte.",
+      "limitReached": "Raggiunto il limite di {max} fasi dell'imbuto.",
+      "loadFailedTitle": "Non è stato possibile caricare le fasi del lead.",
+      "loading": "Caricamento delle fasi…",
+      "movedLeads": "Lead spostati: {count} verso {stage}.",
+      "newStagePlaceholder": "Nome della nuova fase",
+      "otherSectionHint": "L'archiviazione e la conversione in partner le imposta l'applicazione, quindi non si eliminano — il nome sì.",
+      "saveFailed": "Non è stato possibile salvare la modifica della fase."
     },
     "onboarding": {
       "intro": "— definisci le attività standard per ogni passo del processo di onboarding. I modelli vengono proposti automaticamente durante la creazione delle attività nel pannello Onboarding.",
@@ -1039,7 +1533,7 @@
         "leadsTrendTitle": "Trend mensile (titolo)",
         "leadsVelocityTitle": "Tempo nella fase – media giorni (titolo)",
         "partnersKpiActivePartners": "Partner attivi",
-        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiFees": "Commissioni (PLN)",
         "partnersKpiGrossTurnover": "Fatturato lordo (PLN)",
         "partnersKpiRevenue": "Ricavi / Margine (PLN)",
         "partnersKpiTransactions": "Transazioni",
@@ -1075,7 +1569,7 @@
       "saved": "Tooltip «{key}» salvato",
       "screen": "Schermata",
       "screens": {
-        "partnerPerformance": "Partner Performance",
+        "partnerPerformance": "Performance dei partner",
         "salesDashboard": "Sales Dashboard",
         "salesReports": "Report vendite"
       }

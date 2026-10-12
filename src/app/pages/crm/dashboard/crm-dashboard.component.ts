@@ -6,9 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmApiService, PRODUCT_TYPE_ICONS, ProductType, CrmUser } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 
 const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
-const PIPELINE_STAGES = ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won', 'closed_lost'];
 
 @Component({
   selector: 'wt-crm-dashboard',
@@ -197,6 +197,7 @@ export class CrmDashboardComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private auth = inject(AuthService);
   private transloco = inject(TranslocoService);
+  private stages = inject(LeadStagesService);
 
   pipelineData: any[] = [];
   recentActivities: any[] = [];
@@ -271,9 +272,7 @@ export class CrmDashboardComponent implements OnInit {
   statusLabel(s: string) {
     return PARTNER_STATUSES.includes(s) ? this.transloco.translate('crm.labels.partnerStatuses.' + s) : s;
   }
-  stageName(s: string) {
-    return PIPELINE_STAGES.includes(s) ? this.transloco.translate('crm.labels.stages.' + s) : s;
-  }
+  stageName(s: string) { return this.stages.label(s); }
   actIcon(type: string) {
     return { call:'📞', email:'📧', meeting:'🤝', note:'📝', doc_sent:'📄', training:'🎓', qbr:'📊' }[type] || '💬';
   }

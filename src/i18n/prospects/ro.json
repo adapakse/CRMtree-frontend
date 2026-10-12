@@ -1,0 +1,367 @@
+{
+  "admin": {
+    "bulk": {
+      "archive": "Arhivează",
+      "cancel": "Anulează",
+      "deleteSelected": "Șterge selecția",
+      "restore": "Restaurează",
+      "selected": "Selectate: {count}"
+    },
+    "confirm": {
+      "deleteKeepsLead": "Atenție: acest prospect are un lead CRM asociat. Leadul rămâne, se șterge doar prospectul.",
+      "deleteProspect": "Se șterge prospectul „{name}”?",
+      "deleteSelected": "Se șterg prospecții selectați ({count})? Operațiunea nu poate fi anulată."
+    },
+    "detail": {
+      "aiSummary": "Rezumat AI",
+      "bonus": "Bonus:",
+      "companySize": "Mărime:",
+      "decisionMaker": "Decident (din fișierul de import)",
+      "downgraded": "Prioritate redusă:",
+      "employeesCount": "{count} persoane",
+      "employment": "Angajați:",
+      "enrichmentError": "Eroare de îmbogățire:",
+      "icpSignals": "Semnale ICP",
+      "industry": "Domeniu:",
+      "keyContacts": "Contacte-cheie — găsite de AI ({count})",
+      "location": "Localizare:",
+      "noKeyContacts": "Nu s-au găsit contacte-cheie pe site.",
+      "noWebsiteHalted": "Nu s-a găsit niciun site — îmbogățirea a fost oprită. Folosește Re-process și indică adresa manual.",
+      "none": "niciunul",
+      "pkdGus": "PKD (GUS):",
+      "pkdImport": "PKD (import):"
+    },
+    "discovery": "Caută concurenți",
+    "discoveryModal": {
+      "addAndEnrich": "Adaugă selecția și pornește îmbogățirea",
+      "addFailed": "Firmele nu au putut fi adăugate în bază",
+      "addedPrefix": "Adăugate:",
+      "addedSuffix": "firme în bază",
+      "adding": "Se adaugă…",
+      "andEnrichmentStarted": "și îmbogățirea a pornit",
+      "companyName": "Numele firmei",
+      "companyNamePlaceholder": "ex. Comarch S.A.",
+      "editWebsite": "Modifică adresa site-ului",
+      "emptyHint": "Introdu datele firmei și apasă „Caută”",
+      "enterTaxIdManually": "Introdu CUI-ul manual",
+      "foundCount": "găsite: {count}",
+      "newCompany": "nouă",
+      "presence": "Înregistrări",
+      "resolveTaxId": "Caută CUI",
+      "resolveTaxIdTooltip": "Caută CUI-ul pe internet (apel AI cu plată)",
+      "search": "Caută",
+      "searchFailed": "Căutarea concurenților a eșuat",
+      "searching": "Căutare în curs…",
+      "selectedLabel": "Firme selectate:",
+      "subtitle": "Indică o firmă de plecare — AI va propune concurenți, verificați în GUS",
+      "taxId": "CUI-ul firmei *",
+      "taxIdMismatch": "CUI-ul găsit nu corespunde numelui firmei din GUS — verifică manual",
+      "taxIdNotFound": "CUI-ul acestei firme nu a putut fi găsit",
+      "taxIdSearchFailed": "Căutarea CUI-ului a eșuat",
+      "unverified": "neverificat",
+      "verifiedInGus": "Verificat în GUS"
+    },
+    "discoveryTooltip": "Generează prospecți din concurență",
+    "enrichmentProgress": "{done}/{total} firme…",
+    "errors": {
+      "aiNoCredit": "Nu mai există credit în contul AI",
+      "searchFailedWithReason": "Căutarea a eșuat: {reason}",
+      "taxIdConflict": "Conflict de CUI — o altă înregistrare folosește deja acest număr."
+    },
+    "exportCsv": "Export CSV",
+    "filters": {
+      "all": "Toate",
+      "enrichedFrom": "Îmbogățire de la",
+      "enrichedTo": "Îmbogățire până la",
+      "importedFrom": "Importat de la",
+      "importedTo": "Importat până la",
+      "reset": "Resetează filtrele",
+      "scoreMax": "Score max",
+      "scoreMin": "Score min",
+      "search": "Caută",
+      "searchPlaceholder": "nume, CUI sau bază",
+      "showArchived": "Arată arhiva",
+      "status": "Status"
+    },
+    "import": {
+      "added": "Adăugate:",
+      "baseColumnHint": "numele bazei sursă; trebuie să aibă valoare pe fiecare rând.",
+      "chooseFile": "Alege un fișier CSV",
+      "columns": "Coloane:",
+      "detectedColumns": "Coloane detectate:",
+      "duplicatesHint": "Duplicatele (același CUI) actualizează înregistrarea existentă.",
+      "encoding": "Codificare:",
+      "errorDetails": "Detalii despre erori:",
+      "errors": "Erori:",
+      "fatalError": "Eroare de import:",
+      "heading": "Import firme din CSV",
+      "importing": "Se importă…",
+      "optionalColumns": "www, krs, company_name/nazwa, branża, profil, zatrudnienie, obrot, rok, miasto, województwo, PKD-ID, PKD-opis, Osoba Decyzyjna, Stanowisko, Komórka, Telefon, Email",
+      "optionalLabel": "Detectate automat:",
+      "requiredLabel": "Coloane obligatorii:",
+      "skipped": "Omise (duplicate):",
+      "submit": "Importă",
+      "totalRows": "Rânduri în total:",
+      "wwwHint": "Indicarea coloanei www permite sărirea căutării automate (mai ieftin și mai rapid)."
+    },
+    "inspect": {
+      "activeSignals": "Semnale active (true)",
+      "chars": "Caractere",
+      "computedScore": "Rezultat calculat",
+      "found": "✓ Găsit",
+      "foundInRegon": "✓ Găsit în REGON",
+      "heading": "Inspecția îmbogățirii",
+      "identity": "Identitate",
+      "identityUnverified": "neconfirmată",
+      "identityVerified": "confirmată",
+      "inputData": "Date de intrare pentru Claude",
+      "keyContacts": "Contacte-cheie ({count})",
+      "krsBranches": "Filiale în KRS",
+      "krsNumber": "Număr KRS",
+      "krsUrl": "URL în KRS",
+      "legalForm": "Formă juridică",
+      "loadingPrompt": "Se încarcă promptul…",
+      "loadingScoring": "Se încarcă regulile de punctare…",
+      "method": "Metodă",
+      "noReasoning": "fără justificare",
+      "noWebsite": "✗ Fără site",
+      "notFound": "✗ Negăsit",
+      "officialName": "Denumire oficială",
+      "pages": "Pagini",
+      "pkdCodes": "Coduri PKD",
+      "present": "✓ prezent",
+      "promptLoadFailed": "Promptul nu a putut fi încărcat.",
+      "scoreCalculation": "Calculul scorului",
+      "scoringLoadFailed": "Regulile de punctare nu au putut fi încărcate.",
+      "signalsHeading": "Semnale și justificarea Claude",
+      "signalsSum": "Total semnale ({trueCount}/{total} true)",
+      "subpagesChecked": "subpagini verificate: {count}",
+      "tabAnalysis": "Analiză",
+      "tabPrompt": "Prompt Claude",
+      "tabScoring": "Reguli de punctare"
+    },
+    "leadButton": {
+      "notEnriched": "Această firmă nu a fost îmbogățită încă — fără score",
+      "scoreTooLow": "Score prea mic ({score}/100). Este necesar cel puțin {required}. Pragul se configurează în App Settings → CRM."
+    },
+    "linkedin": {
+      "blocked": "LinkedIn a returnat HTTP 999 fără conținut — robotul a fost blocat",
+      "blockedLabel": "blocat",
+      "blockedSuffix": " — blocat (bot)",
+      "notFound": "Nu s-a găsit pagina de LinkedIn",
+      "notFoundSuffix": " — negăsit",
+      "ok": "Datele LinkedIn au fost preluate cu succes",
+      "okSuffix": " — date preluate"
+    },
+    "log": {
+      "branchesCount": "filiale: {count}",
+      "charsCount": "caractere: {count}",
+      "collapse": "restrânge",
+      "found": "Găsit",
+      "gusNotFound": "Negăsit în registrul GUS REGON",
+      "heading": "Jurnalul îmbogățirii",
+      "krsNotFound": "Negăsit în KRS",
+      "method": "metodă:",
+      "more": "(+{count} în plus)",
+      "noUrlInRegistry": "nicio adresă de site în registru",
+      "pagesCount": "pagini: {count}",
+      "websiteNotFound": "Nu s-a găsit niciun site"
+    },
+    "menu": {
+      "delete": "Șterge",
+      "inspect": "Inspecție",
+      "restoreFromArchive": "Restaurează din arhivă",
+      "restoreToQueue": "Trimite înapoi în coadă"
+    },
+    "note": {
+      "heading": "Notă de validare",
+      "placeholder": "Adaugă o notă…",
+      "saveFailed": "Nota nu a putut fi salvată"
+    },
+    "pager": {
+      "next": "Următoarea",
+      "previous": "Anterioara"
+    },
+    "reprocess": {
+      "analyzeLinkedin": "Analizează LinkedIn în timpul procesării",
+      "analyzeLinkedinHint": "(încercare de scraping a paginii firmei)",
+      "hint": "Câmpurile sunt opționale — completează doar ce vrei să corectezi sau să adăugi.",
+      "submit": "Procesează",
+      "taxIdHint": "(lasă gol dacă este corect)",
+      "website": "Site web"
+    },
+    "runEnrichment": "Pornește îmbogățirea",
+    "status": {
+      "archived": "Arhivă",
+      "done": "Îmbogățit",
+      "error": "Eroare",
+      "hold": "În așteptare",
+      "lead": "Lead în CRM",
+      "no_krs": "Fără KRS",
+      "no_website": "Fără site",
+      "pending": "În așteptare"
+    },
+    "summary": {
+      "errorCount": "(erori: {count})",
+      "inProgress": "Îmbogățire în curs: {done}/{total}",
+      "shown": "Afișate:"
+    },
+    "table": {
+      "actions": "Acțiuni",
+      "branches": "Filiale",
+      "company": "Firmă",
+      "convertedLeadTooltip": "Lead în CRM (prospect convertit) — clic pentru a-l deschide",
+      "empty": "Nicio firmă. Importă un fișier CSV pentru a începe.",
+      "enrichment": "Îmbogățire",
+      "goToCrmTooltip": "Mergi la leadul din CRM",
+      "goToLeadTooltip": "Un lead cu acest CUI există deja în CRM — clic pentru a-l deschide",
+      "goToPartnerTooltip": "Un partener cu acest CUI există deja în CRM — clic pentru a-l deschide",
+      "imported": "Importat",
+      "lead": "Lead",
+      "leadBadgeTooltip": "Un lead cu acest CUI există în CRM — clic pentru a-l deschide",
+      "partner": "Partener",
+      "partnerBadgeTooltip": "Un partener cu acest CUI există în CRM — clic pentru a-l deschide",
+      "processing": "Se procesează…",
+      "score": "Score",
+      "status": "Status",
+      "taxId": "CUI"
+    },
+    "title": "Prospecți — îmbogățirea datelor firmelor",
+    "toLead": {
+      "assignTo": "Atribuie unui agent de vânzări",
+      "assignToSelf": "— Atribuie-mi mie (implicit) —",
+      "changed": "modificat",
+      "create": "→ Creează leadul",
+      "createAnyway": "→ Creează oricum",
+      "creating": "Se creează…",
+      "duplicateWarning": "O firmă cu nume asemănător există deja în CRM ca",
+      "heading": "Creează un lead în CRM",
+      "prospectWillUpdate": "Prospectul va fi actualizat.",
+      "tagLabel": "Etichetă (opțional)",
+      "tagPlaceholder": "ex. hot-lead, q4-2026, prioritate",
+      "taxIdHint": "Acest CUI va fi folosit pentru căutarea duplicatelor și crearea leadului.",
+      "taxIdLabel": "CUI-ul firmei — confirmă sau corectează"
+    },
+    "website": {
+      "blocked": "Site blocat de Cloudflare/WAF — conținutul nu este disponibil pentru boți; îmbogățirea a continuat cu datele din KRS",
+      "blockedShort": "Site blocat de Cloudflare/WAF — conținutul nu este disponibil pentru boți",
+      "failed": "Site indisponibil sau scraping fără rezultat",
+      "failedShort": "Site indisponibil sau eroare de scraping",
+      "fetched": "preluate",
+      "noContent": "fără conținut",
+      "notFound": "Nu s-a găsit adresa site-ului",
+      "notFoundShort": "Nu s-a găsit niciun site",
+      "notFoundShortLabel": "negăsit",
+      "ok": "Datele de pe site au fost preluate cu succes",
+      "okShort": "Datele de pe site au fost preluate",
+      "unconfirmed": "Site-ul există, dar nu s-au găsit pe el CUI, KRS, REGON sau adresa firmei — folosește Re-process pentru a indica adresa corectă",
+      "unconfirmedLabel": "Site-ul firmei nu a putut fi confirmat",
+      "unconfirmedShort": "Site-ul firmei nu a putut fi confirmat"
+    },
+    "websiteMethod": {
+      "heuristic": "dedus din nume",
+      "krs": "registrul KRS",
+      "manual": "setat manual",
+      "none": "negăsit"
+    }
+  },
+  "callDirection": {
+    "inbound": "Intrate",
+    "outbound": "Ieșite"
+  },
+  "callStatus": {
+    "answered": "Preluate",
+    "error": "Eroare de conectare",
+    "missed": "Intrate pierdute",
+    "not_answered": "Ieșite fără răspuns",
+    "rejected": "Respinse"
+  },
+  "callStatusShort": {
+    "error": "Eroare",
+    "missed": "Intr. pierdute",
+    "not_answered": "Ieș. fără răsp."
+  },
+  "dashboard": {
+    "allDatabases": "Toate bazele",
+    "allStages": "Toate etapele",
+    "allStatuses": "Toate statusurile",
+    "bothDirections": "Ambele sensuri",
+    "callsBySalesperson": "Apeluri PBX pe agent de vânzări",
+    "clear": "Golește",
+    "databasesSelected": "Baze: {count}",
+    "enrichedByDatabase": "Prospecți îmbogățiți pe bază (score pe grupe)",
+    "leadsByAiTag": "Leaduri după eticheta AI",
+    "leadsBySalesperson": "Leaduri pe agent de vânzări (după scorul prospectului)",
+    "loading": "Se încarcă…",
+    "noAiTag": "fără etichetă AI",
+    "noData": "Nicio dată",
+    "noDataForPeriod": "Nicio dată pentru perioada selectată",
+    "noDataForPeriodAndFilters": "Nicio dată pentru perioada și filtrele selectate",
+    "noDatabasesMatching": "Nicio bază nu corespunde cu „{query}”",
+    "noResults": "Niciun rezultat",
+    "prospectsInDatabase": "Prospecți în bază (după score și status)",
+    "scoreNone": "niciunul",
+    "searchDatabase": "Caută o bază…",
+    "selectAll": "Toate",
+    "showBelowThreshold": "Arată {range}",
+    "showBelowThresholdFallback": "Arată sub prag",
+    "showNullScore": "Arată score=NULL",
+    "subtitle": "Statistici pentru leaduri, prospecți și apeluri PBX",
+    "title": "Panou prospecți"
+  },
+  "periods": {
+    "custom": "Personalizat…",
+    "prev_month": "Luna precedentă",
+    "prev_quarter": "Trimestrul precedent",
+    "prev_week": "Săptămâna precedentă",
+    "prev_year": "Anul precedent",
+    "this_month": "Luna aceasta",
+    "this_quarter": "Trimestrul acesta",
+    "this_week": "Săptămâna aceasta",
+    "ytd": "Anul acesta (YTD)"
+  },
+  "prospectStatus": {
+    "archive": "Arhivă",
+    "hold": "În așteptare",
+    "lead": "Lead",
+    "prospect": "Prospect"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "După vânzare apar evenimente repetate: revizii, service, reînnoiri, vizite ulterioare și altele asemănătoare.",
+      "label": "Servicii recurente"
+    },
+    "dzial_handlowy": {
+      "desc": "Un departament sau o echipă de vânzări numită explicit, ori mai multe persoane concrete cu roluri comerciale.",
+      "label": "Departament de vânzări"
+    },
+    "ecommerce_b2b": {
+      "desc": "Firma are un magazin sau o platformă de comandă B2B cu procesare reală a comenzilor online.",
+      "label": "Comerț electronic B2B"
+    },
+    "konsultacja_demo": {
+      "desc": "Înaintea achiziției există o etapă reală de consiliere, analiză a nevoilor, alegere a soluției sau demo.",
+      "label": "Consultanță / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Un responsabil, KAM, o persoană sau o echipă anume răspunde permanent de un client, cont sau segment.",
+      "label": "Îngrijire dedicată"
+    },
+    "przetargi": {
+      "desc": "Firma participă la licitații ca executant sau furnizor, nu ca autoritate contractantă.",
+      "label": "Licitații"
+    },
+    "rozproszona_struktura": {
+      "desc": "Firma are sedii proprii distribuite fizic sau reprezentanți teritoriali.",
+      "label": "Structură distribuită"
+    },
+    "siec_partnerow": {
+      "desc": "Dealeri, reselleri sau parteneri independenți vând oferta firmei.",
+      "label": "Rețea de parteneri"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Firma pregătește oferta, prețul sau condițiile individual pentru fiecare client.",
+      "label": "Ofertă personalizată"
+    }
+  }
+}

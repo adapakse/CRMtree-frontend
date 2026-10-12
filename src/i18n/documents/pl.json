@@ -220,6 +220,7 @@
       "contractSubject": "Przedmiot umowy",
       "counterpartyCountry": "Kraj kontrahenta",
       "counterpartyTaxId": "NIP kontrahenta",
+      "customFields": "Pola dodatkowe",
       "documentName": "Nazwa dokumentu",
       "documentType": "Typ dokumentu",
       "email": "Email",

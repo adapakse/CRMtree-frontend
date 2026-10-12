@@ -220,6 +220,7 @@
       "contractSubject": "Objet du contrat",
       "counterpartyCountry": "Pays du cocontractant",
       "counterpartyTaxId": "Numéro fiscal du cocontractant",
+      "customFields": "Champs supplémentaires",
       "documentName": "Nom du document",
       "documentType": "Type de document",
       "email": "E-mail",

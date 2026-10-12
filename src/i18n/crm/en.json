@@ -427,6 +427,10 @@
     "subtitle": "Import leads, partners and sales data in bulk from a CSV file. Download the template, fill it in and upload it.",
     "title": "CSV import"
   },
+  "customFields": {
+    "choose": "— choose —",
+    "notSet": "not set"
+  },
   "documents": {
     "add": "Add",
     "linkFailed": "Couldn't link the document. Check that you have the required permissions.",
@@ -638,12 +642,12 @@
     "sources": {
       "agent": "Agent",
       "aliasHello": "Alias Hello",
-      "coldCall": "Cold Call",
+      "coldCall": "Cold call",
       "emailCampaign": "Email campaign",
       "googleAdsAiSearch": "Google Ads AI Search",
       "googleAdsPmax": "Google Ads PMax",
       "googleAdsSeaBrand": "Google Ads SEA Brand",
-      "inbound": "Inbound",
+      "inbound": "Inbound enquiry",
       "linkedin": "LinkedIn",
       "linkedinInMail": "LinkedIn InMail",
       "linkedinLeadForm": "LinkedIn Lead Form",
@@ -797,6 +801,7 @@
       "agent": "Agent",
       "company": "Company",
       "contact": "Contact",
+      "customFields": "Custom fields",
       "extraContacts": "Additional contacts",
       "notes": "Notes",
       "sales": "Sales"
@@ -1378,6 +1383,7 @@
       "billingAddress": "Billing address",
       "billingContact": "Billing contact",
       "contractContact": "Contract contact",
+      "customFields": "Custom fields",
       "extraContacts": "Additional contacts",
       "financialTerms": "Financial terms",
       "partnerAdmin": "Partner Admin"
@@ -1529,7 +1535,7 @@
         "leads": "Leads",
         "pipeline": "Pipeline",
         "progress": "Progress",
-        "winRatePct": "Win%",
+        "winRatePct": "Win %",
         "won": "Won"
       },
       "days": "{count, plural, one {# day} other {# days}}",
@@ -1542,7 +1548,7 @@
         "activeLeads": "Active leads",
         "avgSalesCycle": "Avg. sales cycle",
         "avgWonValue": "Avg. won value",
-        "winRate": "Win Rate",
+        "winRate": "Win rate",
         "wonPln": "Closed / Won (PLN)"
       },
       "leadSources": {
@@ -1862,7 +1868,7 @@
         "revenueMargin": "Revenue (margin)",
         "title": "Financial summary"
       },
-      "title": "Partner Performance",
+      "title": "Partner performance",
       "trend": {
         "title": "Revenue trend",
         "totalTurnover": "Total turnover"

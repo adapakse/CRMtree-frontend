@@ -722,6 +722,424 @@
       "saveChanges": "Änderungen speichern",
       "saving": "Wird gespeichert…"
     },
+    "ai": {
+      "apiKey": "API-Schlüssel",
+      "apiKeyPlaceholder": "API-Schlüssel einfügen",
+      "cancel": "Abbrechen",
+      "changeKey": "Schlüssel ändern",
+      "confirmRemove": "KI für diese Funktion abschalten? Die übrigen Funktionen laufen weiter.",
+      "detectFailed": "Der Anbieter ließ sich aus diesem Schlüssel nicht erkennen — bitte wählen Sie ihn selbst.",
+      "detectHint": "Den Anbieter erkennen wir am Schlüssel — Sie müssen keinen auswählen.",
+      "detected": "Erkannt: {provider}",
+      "detectedShort": "am Schlüssel erkannt",
+      "detecting": "Anbieter wird erkannt…",
+      "intro": "Jede Funktion hat einen eigenen Anbieter, Schlüssel und Modell — Enrichment kann bei einem Anbieter laufen, die Gesprächsanalyse bei einem anderen. Fügen Sie einen Schlüssel ein, den Anbieter erkennen wir selbst. Das Speichern prüft die Einrichtung beim Anbieter; der Schlüssel wird verschlüsselt und nie wieder angezeigt.",
+      "loading": "KI-Konfiguration wird geladen…",
+      "model": "Modell",
+      "modelCustom": "Andere (Name eingeben)",
+      "modelDefaultOption": "Standard ({model})",
+      "modelsLoading": "Modellliste wird beim Anbieter abgerufen…",
+      "needsStructuredOutput": "Benötigt erzwungenes Antwortformat — nur {providers}",
+      "needsWebSearch": "Benötigt Websuche — nur {providers}",
+      "provider": "Anbieter",
+      "purpose": {
+        "assistant": "Formularassistent",
+        "call_analysis": "Gesprächsanalyse",
+        "competitor_discovery": "Wettbewerber finden",
+        "enrichment": "Prospect-Enrichment",
+        "seo_content": "SEO — Texterstellung",
+        "seo_facts": "SEO — Faktenrecherche",
+        "seo_research": "SEO — Keywords und Gliederung"
+      },
+      "remove": "Konfiguration entfernen",
+      "saveAndVerify": "Speichern und prüfen",
+      "saveFailed": "Die KI-Konfiguration konnte nicht gespeichert werden.",
+      "statusActive": "aktiv",
+      "statusError": "Verbindungsfehler",
+      "statusInvalid": "Schlüssel abgelehnt",
+      "statusMissing": "nicht konfiguriert",
+      "title": "KI-Anbieter",
+      "useSaved": "Gespeicherten verwenden:",
+      "verifying": "Prüfe…"
+    },
+    "catalog": {
+      "churn_daily_run_time": {
+        "description": "Format HH:MM — zu dieser Uhrzeit berechnet der Server das Scoring neu und versendet E-Mail-Benachrichtigungen",
+        "label": "Churn: Uhrzeit der täglichen Neuberechnung"
+      },
+      "churn_days_t1_max": {
+        "description": "Max. Tage ohne Bestellung für Schwelle 1",
+        "label": "Churn: Tagesschwelle 1 — max"
+      },
+      "churn_days_t1_min": {
+        "description": "Min. Tage ohne Bestellung für Schwelle 1",
+        "label": "Churn: Tagesschwelle 1 — min"
+      },
+      "churn_days_t1_pts": {
+        "description": "Punkte für 10–20 Tage ohne Bestellung",
+        "label": "Churn: Punkte für Tagesschwelle 1"
+      },
+      "churn_days_t2_max": {
+        "description": "Max. Tage ohne Bestellung für Schwelle 2",
+        "label": "Churn: Tagesschwelle 2 — max"
+      },
+      "churn_days_t2_min": {
+        "description": "Min. Tage ohne Bestellung für Schwelle 2",
+        "label": "Churn: Tagesschwelle 2 — min"
+      },
+      "churn_days_t2_pts": {
+        "description": "Punkte für 21–30 Tage ohne Bestellung",
+        "label": "Churn: Punkte für Tagesschwelle 2"
+      },
+      "churn_days_t3_pts": {
+        "description": "Punkte für >30 Tage ohne Bestellung",
+        "label": "Churn: Punkte für Tagesschwelle 3"
+      },
+      "churn_risk_critical": {
+        "description": "Min. Punkte für die Risikostufe: Kritisch",
+        "label": "Churn: Schwelle für kritisches Risiko"
+      },
+      "churn_risk_high": {
+        "description": "Min. Punkte für die Risikostufe: Hoch",
+        "label": "Churn: Schwelle für hohes Risiko"
+      },
+      "churn_risk_low": {
+        "description": "Min. Punkte für die Risikostufe: Niedrig",
+        "label": "Churn: Schwelle für niedriges Risiko"
+      },
+      "churn_risk_medium": {
+        "description": "Min. Punkte für die Risikostufe: Mittel",
+        "label": "Churn: Schwelle für mittleres Risiko"
+      },
+      "churn_sales_t1_pct": {
+        "description": "Min. % Rückgang M-2→M-1 für Schwelle 1",
+        "label": "Churn: Umsatzrückgang Schwelle 1 %"
+      },
+      "churn_sales_t1_pts": {
+        "description": "Punkte für einen Umsatzrückgang von ≥30% M-2→M-1",
+        "label": "Churn: Punkte für Umsatzschwelle 1"
+      },
+      "churn_sales_t2_pct": {
+        "description": "Min. % Rückgang M-2→M-1 für Schwelle 2",
+        "label": "Churn: Umsatzrückgang Schwelle 2 %"
+      },
+      "churn_sales_t2_pts": {
+        "description": "Punkte für einen Umsatzrückgang von ≥51% M-2→M-1",
+        "label": "Churn: Punkte für Umsatzschwelle 2"
+      },
+      "crm_adoption_target_pct": {
+        "description": "Angestrebter Prozentsatz aktiver Nutzer beim Partner",
+        "label": "Ziel für die Nutzerakzeptanz (%)"
+      },
+      "crm_commission_basis": {
+        "description": "Verfügbare Grundlagen für die Provisionsberechnung für Partner. nie_dotyczy=Nicht zutreffend, segmenty=Anzahl der Segmente, rezerwacje=Anzahl der Buchungen, progi_obrotowe=Umsatzschwellen.",
+        "label": "Provisionsgrundlagen"
+      },
+      "crm_commission_basis_options": {
+        "description": "Verfügbare WT/TM-Provisionsgrundlagen in der Partnerkartei. Format: JSON-Array.",
+        "label": "Provisionsgrundlagen WT/TM"
+      },
+      "crm_consent_types": {
+        "description": "JSON-Array, das die Arten von Marketingeinwilligungen definiert, die auf den Lead- und Partner-Karten angezeigt werden. Format: [key, label, description].",
+        "label": "CRM – Arten von Marketingeinwilligungen"
+      },
+      "crm_contact_titles": {
+        "description": "Positionen, die in den Kontaktformularen für Leads und Partner verfügbar sind.",
+        "label": "Positionen der Kontakte"
+      },
+      "crm_csv_max_rows": {
+        "description": "Zeilenlimit für einen einzelnen CSV-Import",
+        "label": "Zeilenlimit für CSV-Import"
+      },
+      "crm_currencies": {
+        "description": "Liste der Währungen, die in den Feldern Kreditlimit, Kautionsbetrag und Verkaufsdaten verfügbar sind. Format: JSON-Array.",
+        "label": "Unterstützte Währungen"
+      },
+      "crm_dashboard_hot_value_threshold": {
+        "description": "Leads über diesem Wert werden im Dashboard als hochwertig hervorgehoben.",
+        "label": "Wertschwelle für \"heiße\" Leads (PLN)"
+      },
+      "crm_dashboard_long_cycle_days": {
+        "description": "Leads, die länger als diese Anzahl von Tagen offen sind, werden im Dashboard als \"langer Zyklus\" markiert.",
+        "label": "Langer Vertriebszyklus (Tage)"
+      },
+      "crm_dashboard_win_stages": {
+        "description": "Lead-Phasen, die als Gewinn gewertet werden (sie beeinflussen die Win Rate und den Zähler \"Gewonnen\" im Dashboard). Format: JSON-Array.",
+        "label": "Lead-Phasen, die als \"gewonnen\" gelten"
+      },
+      "crm_global_read": {
+        "description": "Wenn aktiviert, können alle CRM-Nutzer Leads, Partner, Verkaufsberichte und Performance ohne Sichtbarkeitseinschränkungen einsehen. Die Bearbeitungsrechte bleiben unverändert.",
+        "label": "Globaler CRM-Lesezugriff"
+      },
+      "crm_hold_reasons": {
+        "description": "Liste der Hold-Gründe. Wird als Auswahlliste im Feld \"Grund\" angezeigt, wenn Sie den Status Hold für einen Lead setzen.",
+        "label": "Gründe für den Hold eines Leads"
+      },
+      "crm_hot_lead_days": {
+        "description": "Tage ohne Kontakt → Lead als kalt markieren",
+        "label": "Tage ohne Kontakt (kalter Lead)"
+      },
+      "crm_industries": {
+        "description": "Für Leads und Partner verfügbare Branchenwerte.",
+        "label": "Branchen"
+      },
+      "crm_lead_sources": {
+        "description": "Liste der Schlüssel, die im Feld Quelle eines Leads verfügbar sind",
+        "label": "Wörterbuch der Lead-Quellen"
+      },
+      "crm_lost_reasons": {
+        "description": "Liste der Verlustgründe. Wird als Auswahlliste im Feld \"Verlustgrund\" angezeigt, wenn Sie die Phase eines Leads auf Verloren ändern.",
+        "label": "Verlustgründe eines Leads"
+      },
+      "crm_partner_countries": {
+        "description": "Liste der Länder, die im Partnerprofil verfügbar sind (Zusatzdaten und Billing Address).",
+        "label": "Länder der Partner"
+      },
+      "crm_partner_languages": {
+        "description": "Liste der Sprachen, die im Partnerprofil verfügbar sind.",
+        "label": "Sprachen der Partner"
+      },
+      "crm_partner_statuses": {
+        "description": "Für Partner verfügbare Status. onboarding=Einführung, active=Aktiv, inactive=Inaktiv, churned=Verloren.",
+        "label": "Partner-Status"
+      },
+      "crm_platform_api_key": {
+        "description": "API-Schlüssel der Transaktionsplattform (plain, ändern Sie ihn nach dem Rollout)",
+        "label": "API-Schlüssel der Transaktionsplattform"
+      },
+      "crm_product_types": {
+        "description": "Liste der Produkttypen, die im Import der Verkaufsdaten und in den Berichten angezeigt werden. Format: JSON-Array.",
+        "label": "Arten von Verkaufsprodukten"
+      },
+      "crm_renewal_warning_days": {
+        "description": "Warnung X Tage vor Vertragsablauf",
+        "label": "Warnung vor Vertragsablauf (Tage)"
+      },
+      "crm_training_mode": {
+        "description": "Simuliert den Versand von E-Mails, das Signieren von Dokumenten und Telefonanrufe ohne tatsächliche externe Aktionen. Für Schulungen zur CRM-Nutzung vorgesehen.",
+        "label": "Schulungsmodus"
+      },
+      "default_page_size": {
+        "description": "Anzahl der Elemente pro Seite in allen Listenansichten (Nutzer, Dokumente, Audit-Log).",
+        "label": "Standardseitengröße"
+      },
+      "doc_contract_subjects": {
+        "description": "Liste der Werte für das Feld Vertragsgegenstand in Dokumenten.",
+        "label": "Vertragsgegenstände"
+      },
+      "doc_entity1_options": {
+        "description": "Liste der Entitäten, die im Feld Entity 1 des Dokuments verfügbar sind. Bearbeiten Sie sie durch Hinzufügen / Entfernen von Werten.",
+        "label": "Entität 1 – Wörterbuchoptionen"
+      },
+      "doc_gdpr_types": {
+        "description": "Verfügbare GDPR-Typen. no_gdpr=Kein GDPR, data_processing_entrustment=Auftragsverarbeitung, data_administration=Gemeinsame Verantwortlichkeit.",
+        "label": "GDPR-Typen von Dokumenten"
+      },
+      "doc_payment_statuses": {
+        "description": "Verfügbare Zahlungsstatus für Dokumente des Typs Rechnung. unpaid=Unbezahlt, partially_paid=Teilweise bezahlt, paid=Bezahlt, overdue=Überfällig.",
+        "label": "Zahlungsstatus von Rechnungen"
+      },
+      "doc_statuses": {
+        "description": "Verfügbare Dokumentstatus. new=Neu, being_edited=In Bearbeitung, being_approved=Zur Genehmigung, being_signed=Zur Signatur, signed=Signiert, completed=Abgeschlossen, rejected=Abgelehnt.",
+        "label": "Dokumentstatus"
+      },
+      "doc_types": {
+        "description": "Verfügbare Dokumenttypen. Der Wert muss mit dem Enum doc_type in der Datenbank übereinstimmen.",
+        "label": "Dokumenttypen"
+      },
+      "email_signature_banner_url": {
+        "description": "URL des Bannerbilds, das unter dem persönlichen Abschnitt in der E-Mail-Signatur angezeigt wird (Breite 600px)",
+        "label": "E-Mail-Signatur – Banner-URL"
+      },
+      "email_signature_disclaimer": {
+        "description": "Text des Vertraulichkeitshinweises, der am Ende der E-Mail-Signatur angezeigt wird (grau, 8px). Unterstützt HTML-Tags.",
+        "label": "E-Mail-Signatur – Vertraulichkeitshinweis"
+      },
+      "expiration_red_days": {
+        "description": "Dokumente, die innerhalb dieser Anzahl von Tagen ablaufen, werden auf dem Kanban-Board und in der Dokumentenliste rot angezeigt.",
+        "label": "Warnschwelle für Ablauf (Tage)"
+      },
+      "expiration_soon_days": {
+        "description": "Dokumente, die innerhalb dieser Anzahl von Tagen ablaufen, werden in Badges und Filtern als \"läuft bald ab\" markiert.",
+        "label": "Schwelle für \"läuft bald ab\" (Tage)"
+      },
+      "health_act_t1_max_days": {
+        "description": "Letzte Bestellung innerhalb von N Tagen → T1-Punkte",
+        "label": "Health: max Tage für Aktivität T1"
+      },
+      "health_act_t1_pts": {
+        "description": "Punkte für 1 Bestellung bis vor X Tagen",
+        "label": "Health: Punkte für Aktivität T1"
+      },
+      "health_act_t2_max_days": {
+        "description": "Max. Tage zurück für das T2-Fenster",
+        "label": "Health: max Tage Aktivität T2"
+      },
+      "health_act_t2_min_days": {
+        "description": "Min. Tage zurück für das T2-Fenster (5-10 Tage)",
+        "label": "Health: min Tage Aktivität T2"
+      },
+      "health_act_t2_pts": {
+        "description": "Punkte für 1 Bestellung im Fenster 5-10 Tage",
+        "label": "Health: Punkte für Aktivität T2"
+      },
+      "health_act_t3_min_orders": {
+        "description": "Min. Bestellungen in 20d für die T3-Schwelle",
+        "label": "Health: min Bestellungen Aktivität T3"
+      },
+      "health_act_t3_pts": {
+        "description": "Punkte für 2–5 Bestellungen in 20 Tagen",
+        "label": "Health: Punkte für Aktivität T3"
+      },
+      "health_act_t4_min_orders": {
+        "description": ">N Bestellungen in 20d → T4 (höchste Stufe)",
+        "label": "Health: min Bestellungen Aktivität T4"
+      },
+      "health_act_t4_pts": {
+        "description": "Punkte für >5 Bestellungen in 20 Tagen",
+        "label": "Health: Punkte für Aktivität T4"
+      },
+      "health_good_min": {
+        "description": "Min. Punkte für den Status Gesund",
+        "label": "Health: Schwelle Gesund"
+      },
+      "health_rev_t1_pct": {
+        "description": "Min. % Wachstum M-2→M-1 für T1",
+        "label": "Health: Wachstum T1 %"
+      },
+      "health_rev_t1_pts": {
+        "description": "Punkte für Wachstum ≥20%",
+        "label": "Health: Punkte für Wachstum T1"
+      },
+      "health_rev_t2_pct": {
+        "description": "Min. % Wachstum M-2→M-1 für T2",
+        "label": "Health: Wachstum T2 %"
+      },
+      "health_rev_t2_pts": {
+        "description": "Punkte für Wachstum ≥30%",
+        "label": "Health: Punkte für Wachstum T2"
+      },
+      "health_rev_t3_pct": {
+        "description": "Min. % Wachstum M-2→M-1 für T3",
+        "label": "Health: Wachstum T3 %"
+      },
+      "health_rev_t3_pts": {
+        "description": "Punkte für Wachstum ≥41%",
+        "label": "Health: Punkte für Wachstum T3"
+      },
+      "health_rev_t4_pct": {
+        "description": "Min. % Wachstum M-2→M-1 für T4",
+        "label": "Health: Wachstum T4 %"
+      },
+      "health_rev_t4_pts": {
+        "description": "Punkte für Wachstum >50%",
+        "label": "Health: Punkte für Wachstum T4"
+      },
+      "health_warn_min": {
+        "description": "Min. Punkte für den Status Achtung (darunter = Risiko)",
+        "label": "Health: Schwelle Achtung"
+      },
+      "kanban_refresh_interval_sec": {
+        "description": "Intervall in Sekunden für die automatische Aktualisierung des Kanban-Boards. Setzen Sie 0, um die automatische Aktualisierung zu deaktivieren.",
+        "label": "Intervall für die automatische Kanban-Aktualisierung (Sekunden)"
+      },
+      "lead_attachments_folder_url": {
+        "description": "URL des Ordners mit Vorlagen für den Versand in der Lead-Phase (z. B. ein Google Drive-Link). Wird als Verknüpfung neben dem Anhangsfeld im Fenster zum Verfassen von E-Mails angezeigt.",
+        "label": "Vorlagenordner (Lead)"
+      },
+      "onboarding_task_templates": {
+        "description": "Aufgabendefinitionen für jeden Einführungsschritt. Attribute: id, title, type, step, standard (bei der Migration automatisch hinzufügen), assignee (UUID des Nutzers oder null), days (Tage ab der Migration oder null).",
+        "label": "Vorlagen für Onboarding-Aufgaben"
+      },
+      "prospect_ai_provider": {
+        "description": "Welcher KI-Anbieter die gescrapten Firmendaten (KRS, Website, LinkedIn, Facebook) analysiert und den Travel Potential Score erzeugt. \"deepseek\" oder \"anthropic\".",
+        "label": "Prospekte — KI-Anbieter für die Datenanreicherung"
+      },
+      "prospect_icp_blacklist_keywords": {
+        "description": "Wenn eines dieser Wörter im Firmennamen, in der Branche oder in der PKD-Beschreibung vorkommt, wird vom icp_score ein Abzug vorgenommen (siehe \"Prospekte — Punktabzug für die ICP-Blacklist\"). Standardmäßig erfasst es Großhändler, die nicht zum ICP von CRMtree passen.",
+        "label": "Prospekte — Schlüsselwörter der ICP-Blacklist"
+      },
+      "prospect_icp_blacklist_penalty": {
+        "description": "Wie viele Punkte vom icp_score abgezogen werden, wenn ein Unternehmen den Schlüsselwörtern der ICP-Blacklist entspricht. Das Ergebnis fällt nicht unter 0.",
+        "label": "Prospekte — Punktabzug für die ICP-Blacklist"
+      },
+      "prospect_lead_min_score": {
+        "description": "Die Schaltfläche \"→ Lead\" in der Prospekt-Liste wird nur aktiv, wenn der Travel Potential Score des Unternehmens größer oder gleich diesem Wert ist (Skala 0–100).",
+        "label": "Prospekte — Mindestscore für die Umwandlung in einen Lead"
+      },
+      "roles_preview_count": {
+        "description": "Maximale Anzahl von Gruppenrollen, die in der Nutzerliste inline angezeigt werden, bevor auf \"+N more\" gekürzt wird.",
+        "label": "Anzahl der in der Vorschau angezeigten Rollen"
+      },
+      "ta_billing_issuer": {
+        "description": "Code des Rechnungsausstellers in der Rechnungsadresse (z. B. WT).",
+        "label": "Testkonto — Rechnungsaussteller (issuer)"
+      },
+      "ta_form_configs": {
+        "description": "Array der Formularschritte im JSON-Format. Muss mindestens ein Element mit step=\"START\" enthalten.",
+        "label": "Testkonto — Formularkonfiguration (formConfigs)"
+      },
+      "ta_partner_type": {
+        "description": "Partner-Typ in HTCD (z. B. PARTNER_BASIC).",
+        "label": "Testkonto — Partner-Typ (selectedPartnerType)"
+      },
+      "ta_services_process_type": {
+        "description": "Standardverarbeitungsart der Leistungen (z. B. ONLINE, MIDOFFICE).",
+        "label": "Testkonto — Verarbeitungsart der Leistungen (defaultServicesProcessType)"
+      },
+      "ta_traveler_country_nationality": {
+        "description": "Ob das Partner-Land die Standardnationalität des Reisenden ist (true/false).",
+        "label": "Testkonto — Nationalität aus dem Partner-Land (partnerCountryAsDefaultNationality)"
+      },
+      "ta_traveler_max_limit": {
+        "description": "Maximale Anzahl der Reisenden in einer Bestellung.",
+        "label": "Testkonto — Reisendenlimit (travelersMaxLimit)"
+      },
+      "ta_traveler_meal_types": {
+        "description": "Durch Kommas getrennte Liste der Verpflegungsarten (z. B. BF,HB,FB,AI).",
+        "label": "Testkonto — zulässige Verpflegungsarten (allowedMealTypes)"
+      },
+      "ta_traveler_meals_only": {
+        "description": "Ob nur Hotelangebote mit Verpflegung angezeigt werden (true/false).",
+        "label": "Testkonto — nur Angebote mit Verpflegung (hotelOffersWithMealsOnly)"
+      },
+      "ta_traveler_parking_only": {
+        "description": "Ob nur Hotels mit Parkplatz angezeigt werden (true/false).",
+        "label": "Testkonto — nur mit Parkplatz (accommodationsWithParkingOnly)"
+      },
+      "ta_traveler_refundable_only": {
+        "description": "Ob nur stornierbare Hotelangebote angezeigt werden (true/false).",
+        "label": "Testkonto — nur stornierbare Angebote (refundableHotelOffersOnly)"
+      },
+      "ta_traveler_search_by": {
+        "description": "Art der Reisendensuche in HTCD.",
+        "label": "Testkonto — Reisendensuche (searchTravelerBy)"
+      },
+      "ta_wh_accent_color": {
+        "description": "Hex-Farbe des Whitelabel-Akzents in HTCD.",
+        "label": "Testkonto — Akzentfarbe (whitelabelColor)"
+      },
+      "ta_wh_communicator_notifications": {
+        "description": "Ob Benachrichtigungen des internen Messengers aktiviert werden (true/false).",
+        "label": "Testkonto — Messenger-Benachrichtigungen (internalCommunicatorNotifications)"
+      },
+      "ta_wh_enable_meal_selection": {
+        "description": "Ob die Verpflegungsauswahl aktiviert wird (true/false).",
+        "label": "Testkonto — Verpflegungsauswahl (enableMealSelection)"
+      },
+      "ta_wh_gds_locator": {
+        "description": "Kennung des GDS-Profils (gdsProfileLocator).",
+        "label": "Testkonto — GDS Profile Locator"
+      },
+      "ta_wh_gds_locator_manual": {
+        "description": "Kennung des GDS-Profils (manuell) (gdsProfileLocatorManual).",
+        "label": "Testkonto — GDS Profile Locator Manual"
+      },
+      "ta_wh_header_color": {
+        "description": "Hex-Farbe der Whitelabel-Kopfzeile in HTCD.",
+        "label": "Testkonto — Kopfzeilenfarbe (whitelabelHeader)"
+      }
+    },
     "crm": {
       "intro": "— Wörterbücher und Schwellenwerte, die das CRM-Modul verwendet. Listen bearbeiten Sie durch Hinzufügen / Entfernen von Einträgen. Änderungen werden nach dem Speichern wirksam.",
       "scoring": {
@@ -737,6 +1155,28 @@
         "salesDrop": "Umsatzrückgang (M-2→M-1)",
         "schedule": "Zeitplan",
         "value": "Wert"
+      }
+    },
+    "customFields": {
+      "active": "Aktiv",
+      "addButton": "Feld hinzufügen",
+      "deleteConfirm": "Feld „{name}“ löschen?",
+      "deleteTooltip": "Feld löschen — nur möglich, solange kein Datensatz einen Wert darin hat",
+      "empty": "Keine Zusatzfelder in diesem Formular.",
+      "hint": "Felder, die Sie selbst für dieses Formular definieren. Der Feldtyp lässt sich später nicht ändern — schalten Sie das Feld dafür ab und legen Sie ein neues an. Ein abgeschaltetes Feld verschwindet aus dem Formular, bereits erfasste Werte bleiben erhalten.",
+      "newNamePlaceholder": "Name des neuen Feldes",
+      "optionsPlaceholder": "Werte durch Komma getrennt",
+      "optionsRequired": "Ein Listenfeld braucht mindestens einen Wert.",
+      "saveFailed": "Das Feld konnte nicht gespeichert werden.",
+      "titleDocument": "Zusatzfelder des Dokuments",
+      "titleLead": "Zusatzfelder des Leads",
+      "titlePartner": "Zusatzfelder des Partners",
+      "types": {
+        "date": "Datum",
+        "list": "Auswahlliste",
+        "money": "Betrag",
+        "number": "Zahl",
+        "text": "Text"
       }
     },
     "documents": {
@@ -775,6 +1215,32 @@
         "noWarning": "Tage → keine Warnung",
         "title": "Vorschau der Fristfarben",
         "urgent": "Tage → rot (dringend)"
+      }
+    },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Abteilung Finanzen und Buchhaltung",
+        "customerService": "Kundenserviceabteilung",
+        "hr": "Personalabteilung",
+        "management": "Vorstand des Unternehmens",
+        "marketing": "Marketingabteilung",
+        "operations": "Betriebsabteilung",
+        "prospects": "Zugang zum Modul Prospekte (CSV-Import, Enrichment, Umwandlung in einen Lead).",
+        "sales": "Vertriebsabteilung",
+        "seo": "Prüfung und Freigabe der SEObot-Inhalte vor der Veröffentlichung.",
+        "seoEditorial": "SEObot-Redaktion: Bearbeiten, Ergänzen und Freigeben von Artikeln vor der Veröffentlichung."
+      },
+      "displayName": {
+        "accounting": "Buchhaltung",
+        "customerService": "Kundenservice",
+        "hr": "Personalwesen",
+        "management": "Vorstand",
+        "marketing": "Marketing",
+        "operations": "Betrieb",
+        "prospects": "Prospekte",
+        "sales": "Vertrieb",
+        "seo": "SEO",
+        "seoEditorial": "SEO-Redaktion"
       }
     },
     "groups": {
@@ -892,6 +1358,11 @@
         "data_processing_entrustment": "Auftragsverarbeitung",
         "no_gdpr": "Kein DSGVO-Bezug"
       },
+      "holdReasons": {
+        "businessPause": "Betriebspause",
+        "internalSituation": "Interne Unternehmenssituation",
+        "noDecisionMakers": "Keine Entscheidungsträger"
+      },
       "industries": {
         "Education": "Bildung",
         "Finance": "Finanzen",
@@ -906,7 +1377,7 @@
       "leadSources": {
         "agent": "Agent",
         "cold_call": "Cold Call",
-        "inbound": "Inbound",
+        "inbound": "Eingehende Anfrage",
         "inne": "Sonstige",
         "kampania": "E-Mail-Kampagne",
         "linkedin": "LinkedIn",
@@ -948,6 +1419,29 @@
         "travel_insurance": "Versicherung",
         "visa": "Visum"
       }
+    },
+    "leadStages": {
+      "addStage": "Phase hinzufügen",
+      "cardTitle": "Lead-Phasen",
+      "codeWrittenHint": "Das ist kein Funnel-Schritt, sondern ein Zustand, den die Anwendung selbst setzt (Lead archivieren, in Partner umwandeln), daher nicht löschbar. Umbenennen ist möglich.",
+      "confirmDelete": "Phase „{name}“ entfernen?",
+      "confirmDeleteWithLeads": "Phase „{name}“ entfernen?\n\nDie {count} Lead(s) darauf wechseln zu „{target}“.",
+      "intro": "Eigene Namen für die Funnel-Phasen — bestehende umbenennen, einen Schritt hinzufügen oder einen überflüssigen entfernen. Der Phasencode bleibt gleich, daher erscheint der neue Name in der gesamten Anwendung, während Berichte und Lead-Daten unberührt bleiben. Ein leerer Name führt zum eingebauten zurück.",
+      "kinds": {
+        "archived": "Archiv",
+        "converted": "zu Partner konvertiert",
+        "lost": "verloren",
+        "open": "Funnel",
+        "won": "gewonnen"
+      },
+      "lastStageHint": "Das ist der letzte Funnel-Schritt — neue Leads müssen irgendwo beginnen.",
+      "limitReached": "Grenze von {max} Funnel-Phasen erreicht.",
+      "loadFailedTitle": "Die Lead-Phasen konnten nicht geladen werden.",
+      "loading": "Phasen werden geladen…",
+      "movedLeads": "{count} Lead(s) nach {stage} verschoben.",
+      "newStagePlaceholder": "Name der neuen Phase",
+      "otherSectionHint": "Archivierung und Umwandlung in einen Partner setzt die Anwendung selbst, daher nicht löschbar — der Name schon.",
+      "saveFailed": "Die Änderung der Phase konnte nicht gespeichert werden."
     },
     "onboarding": {
       "intro": "— definieren Sie die Standardaufgaben für jeden Schritt des Onboarding-Prozesses. Die Vorlagen werden beim Erstellen von Aufgaben im Bereich Onboarding automatisch vorgeschlagen.",
@@ -1039,7 +1533,7 @@
         "leadsTrendTitle": "Monatstrend (Titel)",
         "leadsVelocityTitle": "Zeit in Phase – Ø Tage (Titel)",
         "partnersKpiActivePartners": "Aktive Partner",
-        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiFees": "Gebühren (PLN)",
         "partnersKpiGrossTurnover": "Bruttoumsatz (PLN)",
         "partnersKpiRevenue": "Erlös / Marge (PLN)",
         "partnersKpiTransactions": "Transaktionen",
@@ -1075,7 +1569,7 @@
       "saved": "Tooltip „{key}“ gespeichert",
       "screen": "Bildschirm",
       "screens": {
-        "partnerPerformance": "Partner Performance",
+        "partnerPerformance": "Partnerleistung",
         "salesDashboard": "Sales Dashboard",
         "salesReports": "Vertriebsberichte"
       }

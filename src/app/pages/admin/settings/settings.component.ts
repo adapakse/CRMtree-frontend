@@ -5,10 +5,17 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
-import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-settings.service';
+import { AppSettingsService, AppSettingsMeta, LeadStageConfig } from '../../../core/services/app-settings.service';
+import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AiConfigService, AiConfig, AiProviderOption, AiPurpose } from '../../../core/services/ai-config.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
+import { TenantFieldsEditorComponent } from './tenant-fields-editor.component';
+import { AiPurposeRowComponent } from './ai-purpose-row.component';
+import {
+  TenantFieldDefinitions, TenantFieldsService,
+} from '../../../core/services/tenant-fields.service';
 import { LanguagePickerComponent } from '../../../shared/components/language-picker/language-picker.component';
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
@@ -28,6 +35,23 @@ interface SettingField {
 
 // Zakładki
 type Tab = 'global' | 'crm' | 'documents' | 'users' | 'onboarding' | 'tooltips' | 'icp' | 'projects';
+
+// Klucz, pod którym etapy leada były słownikiem w app_settings. Został tu już
+// tylko po to, żeby karta etapów stała w zakładce CRM w tej samej kolejności co
+// dawniej (i co w worktrips-doc) — same dane siedzą w tenant_lead_stages.
+const LEAD_STAGES_CARD_SORT_KEY = 'crm_lead_stages';
+
+/**
+ * Edytowalny wiersz etapu leada. `stage` to stan zapisany, `label` to wersja
+ * robocza w polu — dirty wynika z ich porównania (ten sam wzorzec co IcpRow
+ * niżej). `label` pusty = wróć do wbudowanego tłumaczenia tego etapu.
+ * Prawdopodobieństwo wygranej celowo NIE jest tu edytowalne — patrz
+ * leadStageService.js, backend wylicza je z pozycji etapu w lejku.
+ */
+interface LeadStageRow {
+  stage: LeadStageConfig;
+  label: string;
+}
 
 // Dynamic ICP config per tenant. `key` is immutable once created — editable
 // only through `label`; the backend rejects any attempt to change `key`, so
@@ -175,10 +199,9 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
     codes: ['strona_www', 'polecenie', 'cold_call', 'linkedin', 'targi', 'partner',
             'agent', 'kampania', 'inbound', 'inne'],
   },
-  crm_lead_stages: {
-    group: 'leadStages',
-    codes: ['new', 'qualification', 'presentation', 'offer', 'negotiation', 'closed_won', 'closed_lost'],
-  },
+  // crm_lead_stages NIE jest już słownikiem app_settings — etapy leada mają
+  // własną konfigurację per tenant (zakładka „Etapy leada"). Stary wiersz
+  // renderował się tu jako działający edytor, którego nic nie czytało.
   crm_partner_statuses: { group: 'partnerStatuses', codes: ['onboarding', 'active', 'inactive', 'churned'] },
   crm_contact_titles: { group: 'contactTitles', codes: ['Director', 'Manager', 'Specialist', 'Owner', 'Other'] },
   crm_industries: {
@@ -205,11 +228,21 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
   },
 };
 
+// Słowniki, których elementy są zapisane jako gotowy tekst, a nie kod — patrz
+// freeTextItemLabel(). Kody tych słowników nie mogą stać w tym pliku, bo są po
+// polsku, a i18n:check tego nie dopuszcza; żyją więc w plikach tłumaczeń.
+const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
+  crm_hold_reasons: 'holdReasons',
+};
+
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
-  providers: [provideTranslocoScope('admin')],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, TenantFieldsEditorComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  // Zakres `crm` obok `admin`: zakładka „Etapy leada" pokazuje wbudowane nazwy
+  // etapów (crm.labels.stages.*) jako podpowiedź w polu nazwy — bez tego
+  // placeholder pokazywałby surowy kod etapu.
+  providers: [provideTranslocoScope('admin', 'crm')],
   template: `
     <ng-container *transloco="let t; prefix: 'admin'">
     <div id="topbar">
@@ -248,7 +281,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           <button class="tab-btn" [class.active]="activeTab() === 'global'" (click)="activeTab.set('global')">
             ⚙️ {{ t('settings.tabs.global') }}
           </button>
-          <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm')">
+          <button class="tab-btn" [class.active]="activeTab() === 'crm'" (click)="activeTab.set('crm'); loadLeadStages()">
             💼 {{ t('settings.tabs.crm') }}
           </button>
           <button class="tab-btn" [class.active]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
@@ -299,6 +332,46 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
             </div>
           </div>
 
+          <!-- Dostawca AI — pokazywana TYLKO gdy tenant ma włączony jakikolwiek
+               moduł korzystający z tego klucza (Prospekty, Analizator rozmów,
+               SEO). Bez nich pole na klucz API nie miałoby czego obsługiwać,
+               więc byłoby samym szumem. Gate'owanie flagą to ten sam wzorzec co
+               zakładka ICP. Klucz NIE wraca z API — po zapisie widać tylko 4
+               ostatnie znaki (api_key_hint).
+
+               Model jest ustawiany OSOBNO DLA KAŻDEJ FUNKCJI, bo ich potrzeby są
+               skrajnie różne: enrichment to tysiące firm na najtańszym modelu,
+               SEO to długie artykuły. Puste pole = model domyślny dostawcy, więc
+               admin, który nie chce o tym decydować, nie musi nic wpisywać.
+               Funkcje wymagające zdolności, których wybrany dostawca nie ma
+               (wyszukiwanie w internecie, wymuszony format odpowiedzi), są
+               wyszarzone z podanym powodem — nigdy po cichu nieaktywne. -->
+          @if (aiFeatureEnabled()) {
+          <div class="card" style="margin-bottom:20px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🤖</span>
+              <span class="cat-title">{{ t('settings.ai.title') }}</span>
+            </div>
+
+            <div style="padding:16px 20px">
+              <div class="field-desc" style="margin-bottom:6px">{{ t('settings.ai.intro') }}</div>
+
+              @if (aiLoading()) {
+                <div class="state-msg">{{ t('settings.ai.loading') }}</div>
+              } @else {
+                @for (p of aiPurposes(); track p.key) {
+                  <app-ai-purpose-row
+                    [purpose]="p"
+                    [providers]="aiProviders()"
+                    [config]="aiConfig()[p.key] ?? null"
+                    [savedProviders]="aiSavedProviders()"
+                    (changed)="loadAiConfig()" />
+                }
+              }
+            </div>
+          </div>
+          }
+
           @for (cat of globalCategories(); track cat.key) {
             <div class="card" style="margin-bottom:20px;overflow:hidden">
               <div class="cat-header">
@@ -309,8 +382,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                 <div [style.border-bottom]="last ? 'none' : '1px solid var(--gray-100)'"
                      style="padding:16px 20px;display:grid;grid-template-columns:1fr 220px;gap:20px;align-items:start">
                   <div>
-                    <div class="field-label">{{ field.label }}</div>
-                    <div class="field-desc">{{ field.description }}</div>
+                    <div class="field-label">{{ fieldLabel(field) }}</div>
+                    <div class="field-desc">{{ fieldDescription(field) }}</div>
                     @if (field.updated_by_name) {
                       <div class="field-meta">{{ t('settings.fields.changedBy') }} <strong>{{ field.updated_by_name }}</strong> · {{ field.updated_at | date:'dd.MM.yyyy HH:mm' }}</div>
                     }
@@ -371,14 +444,17 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
             </div>
           </div>
 
-          @for (field of crmFields(); track field.key) {
+          @for (field of crmFields(); track field.key; let i = $index) {
+            @if (i === leadStagesCardIndex()) {
+              <ng-container [ngTemplateOutlet]="leadStagesCard"></ng-container>
+            }
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span> }
               </div>
               <div style="padding:14px 20px">
-                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+                <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 @if (field.value_type === 'json') {
                   <!-- Edytor listy JSON -->
@@ -427,6 +503,81 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
             </div>
           }
 
+          <!-- Gdyby etapy wypadały alfabetycznie na końcu listy słowników -->
+          @if (leadStagesCardIndex() >= crmFields().length) {
+            <ng-container [ngTemplateOutlet]="leadStagesCard"></ng-container>
+          }
+
+          <ng-template #leadStagesCard>
+            <!-- Etapy leada — karta w tej samej zakładce co pozostałe słowniki CRM.
+                 Celowo NIE osobna zakładka: to słownik CRM jak źródła leadów czy
+                 branże. W tym miejscu stał dawniej martwy edytor „Etapy Leada"
+                 (app_settings.crm_lead_stages), którego nic nie czytało — teraz
+                 stoi tu działający. Etapy mają własną tabelę, a nie app_settings,
+                 bo niosą kolejność, kolor, prawdopodobieństwo i zachowanie. -->
+            <div class="card" style="margin-bottom:16px;overflow:hidden">
+              <div class="cat-header" style="padding:12px 20px">
+                <span class="cat-title" style="font-size:13px">{{ t('settings.leadStages.cardTitle') }}</span>
+              </div>
+              <div style="padding:14px 20px">
+                <div class="field-desc" style="margin-bottom:12px">{{ t('settings.leadStages.intro') }}</div>
+
+                @if (stagesLoading()) {
+                  <div class="state-msg">{{ t('settings.leadStages.loading') }}</div>
+                } @else if (stagesError(); as err) {
+                  <div class="icp-error">
+                    <div><strong>{{ t('settings.leadStages.loadFailedTitle') }}</strong></div>
+                    <div style="margin-top:4px">{{ err }}</div>
+                    <button class="btn-secondary" style="margin-top:12px" (click)="loadLeadStages()">{{ t('settings.icp.retry') }}</button>
+                  </div>
+                } @else {
+                  <div class="stage-list">
+                    @for (row of stageRows(); track row.stage.id) {
+                      <div class="stage-row">
+                        <span class="stage-ordinal">{{ stageOrdinal(row) }}</span>
+                        <span class="stage-kind-dot" [style.background]="row.stage.color || '#94A3B8'"></span>
+                        <input class="stage-name-input" [(ngModel)]="row.label" [disabled]="stagesSaving()">
+                        @if (row.stage.kind !== 'open') {
+                          <span class="stage-kind">{{ t('settings.leadStages.kinds.' + row.stage.kind) }}</span>
+                        }
+                        <span class="stage-row-spacer"></span>
+                        @if (isStageRowDirty(row)) {
+                          <button class="stage-save" [disabled]="stagesSaving()"
+                                  [title]="t('settings.actions.saveChanges')" (click)="saveStageRow(row)">✓</button>
+                        }
+                        @if (canDeleteStage(row)) {
+                          <button class="stage-del" [disabled]="stagesSaving()"
+                                  (click)="deleteStageRow(row)">{{ t('settings.actions.delete') }}</button>
+                        } @else {
+                          <span class="stage-no-del" [title]="deleteBlockedReason(row)">?</span>
+                        }
+                      </div>
+
+                      <!-- Po ostatnim kroku lejka: wiersz dodawania -->
+                      @if (isLastFunnelRow(row)) {
+                        <div class="stage-row stage-row-add">
+                          <span class="stage-ordinal">{{ funnelRows().length + 1 }}</span>
+                          <span class="stage-kind-dot" style="background:transparent"></span>
+                          <input class="stage-name-input" [(ngModel)]="newStageLabel"
+                                 [placeholder]="t('settings.leadStages.newStagePlaceholder')"
+                                 [disabled]="stagesSaving() || !canAddStage()"
+                                 (keyup.enter)="addStage()">
+                          <span class="stage-row-spacer"></span>
+                          <button class="stage-add" [disabled]="stagesSaving() || !newStageLabel.trim() || !canAddStage()"
+                                  (click)="addStage()">+ {{ t('settings.leadStages.addStage') }}</button>
+                        </div>
+                      }
+                    }
+                  </div>
+                  @if (!canAddStage()) {
+                    <div class="hint-inline">{{ t('settings.leadStages.limitReached', { max: maxOpenStages() }) }}</div>
+                  }
+                  <div class="hint-inline">{{ t('settings.leadStages.otherSectionHint') }}</div>
+                }
+              </div>
+            </div>
+          </ng-template>
+
           <!-- Algorytm Churn -->
           @if (churnFields().length > 0) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
@@ -450,8 +601,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                   </tr>
                   @for (f of churnDayFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -463,8 +614,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                   </tr>
                   @for (f of churnSalesFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -476,8 +627,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                   </tr>
                   @for (f of churnRiskFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -528,8 +679,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                   </tr>
                   @for (f of healthActFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -541,8 +692,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                   </tr>
                   @for (f of healthRevFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -554,8 +705,8 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                   </tr>
                   @for (f of healthLevelFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -566,6 +717,34 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
               </table>
             </div>
           }
+
+          <!-- Pola dodatkowe formatek leada i partnera. Dwie osobne listy, bo
+               pola są rozłączne — pole partnera nie pojawia się na leadzie. -->
+          <div class="card" style="margin-top:20px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titleLead') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="lead"
+                [definitions]="fieldDefinitions().lead"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:16px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titlePartner') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="partner"
+                [definitions]="fieldDefinitions().partner"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
         }
 
         <!-- TAB: Słowniki dokumentów -->
@@ -581,11 +760,11 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           @for (field of docFields(); track field.key) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span> }
               </div>
               <div style="padding:14px 20px">
-                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+                <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 @if (field.value_type === 'json') {
                   <div class="json-list">
@@ -623,6 +802,22 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
               {{ t('settings.documents.empty') }}
             </div>
           }
+
+          <!-- Pola dodatkowe formatki dokumentu, definiowane przez admina
+               tenanta. Stoją tutaj, a nie w osobnej zakładce, bo to słownik
+               dokumentów tak samo jak typy i statusy wyżej. -->
+          <div class="card" style="margin-top:24px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titleDocument') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="document"
+                [definitions]="fieldDefinitions().document"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
         }
 
         <!-- TAB: Grupy użytkowników -->
@@ -691,7 +886,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                 <div style="padding:14px 20px;display:flex;align-items:center;gap:12px">
                   <div style="width:36px;height:36px;background:#EFF6FF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👥</div>
                   <div style="flex:1;min-width:0">
-                    <div style="font-size:13.5px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
+                    <div style="font-size:13.5px;font-weight:700;color:var(--gray-900)">{{ groupDisplayName(g) }}</div>
                     <div style="font-size:11.5px;color:var(--gray-400);margin-top:1px">
                       <span style="font-family:monospace;background:var(--gray-100);padding:1px 6px;border-radius:4px">{{ g.name }}</span>
                       <span style="margin:0 6px">·</span>
@@ -706,7 +901,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                       }
                     </div>
                     @if (g.description) {
-                      <div style="font-size:12px;color:var(--gray-500);margin-top:3px">{{ g.description }}</div>
+                      <div style="font-size:12px;color:var(--gray-500);margin-top:3px">{{ groupDescription(g) }}</div>
                     }
                   </div>
                   <button class="btn btn-d btn-sm"
@@ -736,7 +931,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           @for (field of crmDictFields(); track field.key) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center">
-                <span class="cat-title" style="font-size:13px">{{ field.label }}</span>
+                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:8px">● {{ t('settings.fields.changed') }}</span> }
                 @if (field.updated_by_name) {
                   <span class="field-meta" style="margin-left:auto;font-size:11px;color:var(--gray-400)">
@@ -745,7 +940,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
                 }
               </div>
               <div style="padding:14px 20px">
-                <div class="field-desc" style="margin-bottom:12px">{{ field.description }}</div>
+                <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 <!-- Edytor tabeli szablonów -->
                 @if (field.key === 'crm_lead_sources') {
@@ -1022,6 +1217,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
           }
         }
 
+
         <!-- TAB: Enrichment / ICP — sygnały ICP tenanta. Admin tenanta edytuje
              WYŁĄCZNIE swojego (endpoint bierze tenant z sesji); superadmin
              dostaje dodatkowo dropdown i edytuje dowolnego, tą samą logiką
@@ -1187,8 +1383,11 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
     .page-title { font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--gray-900); }
     .tsp { flex:1; }
     #content { flex:1;overflow-y:auto;padding:24px; }
-    .tabs { display:flex;gap:4px;margin-bottom:24px;border-bottom:2px solid var(--gray-200);padding-bottom:0; }
-    .tab-btn { background:none;border:none;padding:10px 20px;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s; }
+    /* flex-wrap: zakładek jest już 9 (Etapy leada + Projekty za flagą) i przy
+       kontenerze 820px nie mieszczą się w jednym rzędzie — bez zawijania
+       wychodziły poza szary obszar. Zawijają się teraz pod spód. */
+    .tabs { display:flex;flex-wrap:wrap;column-gap:4px;row-gap:2px;margin-bottom:24px;border-bottom:2px solid var(--gray-200);padding-bottom:0; }
+    .tab-btn { background:none;border:none;padding:10px 15px;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s; }
     .tab-btn.active { color:var(--orange);border-bottom-color:var(--orange); }
     .tab-btn:hover:not(.active) { color:var(--gray-700); }
     .cat-header { padding:14px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px; }
@@ -1215,8 +1414,98 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
     .spinner { width:32px;height:32px;border:3px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
+    /* Etapy leada */
+    .stage-list { border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; }
+    .stage-row {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+      border-bottom: 1px solid var(--gray-100); background: white;
+    }
+    .stage-row:last-child { border-bottom: none; }
+    .stage-row-add { background: var(--gray-50); }
+    .stage-row-spacer { flex: 1; }
+    .stage-ordinal {
+      width: 20px; flex-shrink: 0; text-align: center; font-size: 12px; font-weight: 700;
+      color: var(--gray-400); font-variant-numeric: tabular-nums;
+    }
+    .stage-kind-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin: 0 6px; }
+    .stage-kind { font-size: 11.5px; color: var(--gray-400); white-space: nowrap; }
+    .stage-name-input {
+      flex: 0 1 240px; min-width: 120px; padding: 6px 9px; font-size: 13.5px; font-weight: 600;
+      color: var(--gray-800); background: white;
+      border: 1px solid var(--gray-200); border-radius: 6px;
+    }
+    .stage-name-input:focus { outline: none; border-color: var(--orange); }
+    .stage-name-input:disabled { background: var(--gray-50); color: var(--gray-400); }
+    .stage-save {
+      border: none; background: #16a34a; color: white; border-radius: 6px;
+      padding: 4px 9px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+    }
+    .stage-del {
+      border: 1px solid #fecaca; background: #fef2f2; color: #dc2626;
+      border-radius: 6px; padding: 4px 11px; font-size: 12px; font-weight: 600;
+      cursor: pointer; flex-shrink: 0; min-width: 62px;
+    }
+    .stage-del:hover:not(:disabled) { background: #dc2626; border-color: #dc2626; color: white; }
+    .stage-del:disabled { opacity: .4; cursor: not-allowed; }
+    /* Etap, którego nie da się usunąć — zamiast martwego przycisku sam myślnik
+       z wyjaśnieniem w tooltipie. */
+    /* Zamiast martwego przycisku „Usuń" — znak zapytania z wyjaśnieniem w
+       tooltipie, dlaczego tego etapu usunąć nie można. */
+    .stage-no-del {
+      min-width: 62px; text-align: center; flex-shrink: 0; cursor: help;
+      font-size: 12px; font-weight: 700; color: var(--gray-400);
+    }
+    .stage-no-del:hover { color: var(--gray-700); }
+    .stage-add {
+      border: none; background: var(--orange); color: white; border-radius: 6px;
+      padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+    }
+    .stage-add:disabled { opacity: .45; cursor: not-allowed; }
+
     /* Enrichment / ICP tab */
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
+
+    /* Dostawca AI */
+    .ai-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .ai-label { flex:0 0 190px; font-size:13px; font-weight:600; color:var(--gray-800); }
+    .ai-row .fsel, .ai-row .fi {
+      flex:1; max-width:340px; padding:7px 10px; font-size:13px;
+      border:1px solid var(--gray-200); border-radius:7px; background:white; color:var(--gray-800);
+    }
+    .ai-row .fi:focus, .ai-row .fsel:focus { outline:none; border-color:var(--orange); }
+    .ai-sub { font-size:11.5px; color:var(--gray-400); margin:0 0 14px 202px; line-height:1.5; }
+    .ai-models-state { display:block; margin-top:3px; color:var(--gray-400); font-style:italic; }
+    .ai-link-btn {
+      display:inline-block; margin-top:3px; padding:0; border:0; background:none;
+      font-size:11.5px; color:var(--orange-dark); text-decoration:underline; cursor:pointer;
+    }
+    .ai-link-btn:disabled { color:var(--gray-400); cursor:default; }
+    .ai-models-title {
+      margin:18px 0 2px; font-size:12px; font-weight:700; letter-spacing:.04em;
+      text-transform:uppercase; color:var(--gray-400);
+    }
+    /* Funkcja niedostępna u wybranego dostawcy: wiersz zostaje widoczny z podanym
+       powodem, zamiast znikać — inaczej admin nie wiedziałby, że ją traci. */
+    .ai-row-off .ai-label { color:var(--gray-400); font-weight:500; }
+    .ai-unavailable {
+      flex:1; min-width:0; font-size:12px; color:var(--gray-400);
+      background:var(--gray-50); border:1px dashed var(--gray-200);
+      border-radius:8px; padding:7px 10px;
+    }
+    .ai-hint-link { font-size:11.5px; color:#1D4ED8; text-decoration:none; white-space:nowrap; }
+    .ai-hint-link:hover { text-decoration:underline; }
+    .ai-badge { margin-left:auto; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; }
+    .ai-badge-ok  { background:#DCFCE7; color:#166534; }
+    .ai-badge-bad { background:#FEE2E2; color:#991B1B; }
+    .ai-badge-off { background:var(--gray-100); color:var(--gray-500); }
+    .ai-error {
+      background:#FEF2F2; border:1px solid #FECACA; color:#991B1B;
+      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-bottom:14px;
+    }
+    .ai-ok {
+      background:#F0FDF4; border:1px solid #BBF7D0; color:#166534;
+      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-top:14px;
+    }
     .td-muted { color: var(--gray-500); font-size: 13px; }
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
@@ -1347,7 +1636,105 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
 })
 export class SettingsComponent implements OnInit {
   private settingsSvc = inject(AppSettingsService);
+  private aiConfigSvc = inject(AiConfigService);
+  private tenantFieldsSvc = inject(TenantFieldsService);
+  private leadStages  = inject(LeadStagesService);
   private toast       = inject(ToastService);
+
+  // ── Pola dodatkowe formatek (lead / partner / dokument) ───────────────────
+  // Definiowane przez admina tenanta, odpowiednik pól dodatkowych w Projektach.
+  // Trzymane razem dla wszystkich trzech formatek, bo API zwraca je jednym
+  // żądaniem i każda mutacja oddaje pełny, świeży komplet.
+  fieldDefinitions = signal<TenantFieldDefinitions>({ lead: [], partner: [], document: [] });
+
+  loadFieldDefinitions(): void {
+    this.tenantFieldsSvc.get().subscribe({
+      next: res => this.fieldDefinitions.set(res.definitions),
+      error: () => { /* brak pól to nie powód, żeby psuć cały ekran ustawień */ },
+    });
+  }
+
+  // ── Dostawcy AI (klucz tenanta, osobno dla każdej funkcji) ────────────────
+  // Każda funkcja AI ma własnego dostawcę, klucz i model — klient może mieć
+  // enrichment na tanim dostawcy, a „Znajdź konkurencję" na innym. Szczegóły
+  // jednego wiersza obsługuje AiPurposeRowComponent; tutaj zostaje tylko
+  // wczytanie całości i rozdanie jej wierszom.
+  //
+  // Klucz nie wraca z API — po zapisie widać wyłącznie 4 ostatnie znaki.
+  aiLoading   = signal(false);
+  aiConfig    = signal<Record<string, AiConfig>>({});
+  aiProviders = signal<AiProviderOption[]>([]);
+  aiPurposes  = signal<AiPurpose[]>([]);
+
+  /**
+   * Dostawcy skonfigurowani już przy którejkolwiek funkcji, z hintem klucza.
+   * Wiersz nieskonfigurowanej funkcji oferuje ich jednym kliknięciem — klucz
+   * jest już zapisany, więc nie trzeba go wklejać po raz drugi.
+   */
+  aiSavedProviders = computed(() => {
+    const seen = new Map<string, string>();
+    for (const config of Object.values(this.aiConfig())) {
+      if (!seen.has(config.provider)) seen.set(config.provider, config.api_key_hint);
+    }
+    return [...seen].map(([provider, hint]) => ({ provider, hint }));
+  });
+
+  /**
+   * Konfiguracja AI jest pokazywana tylko tenantowi, który ma włączony
+   * jakikolwiek moduł z niej korzystający. Bez nich byłaby samym szumem.
+   */
+  aiFeatureEnabled = computed(() =>
+    this.auth.hasFeature('prospects')
+    || this.auth.hasFeature('call_analysis')
+    || this.auth.hasFeature('seo_bot'));
+
+  loadAiConfig(): void {
+    if (!this.aiFeatureEnabled()) return;
+    this.aiLoading.set(true);
+    this.aiConfigSvc.get().subscribe({
+      next: res => {
+        this.aiProviders.set(res.providers);
+        this.aiPurposes.set(res.purposes);
+        this.aiConfig.set(res.config);
+        this.aiLoading.set(false);
+        this.recheckFailedAiConfigs(res.config);
+      },
+      error: () => this.aiLoading.set(false),
+    });
+  }
+
+  /**
+   * Status funkcji AI jest zapamiętany z ostatniego sprawdzenia, więc sam z
+   * siebie nigdy się nie zmienia — admin, który doładował konto u dostawcy,
+   * widziałby „brak środków" bez końca, a panel nie ma przycisku do ponownego
+   * sprawdzenia. Dlatego odpytujemy dostawcę przy wejściu na ekran, ale tylko
+   * dla statusu `error` (przejściowy: brak środków, limit, sieć). Statusu
+   * `invalid` nie ponawiamy — dostawca odrzucił klucz albo model, więc do
+   * zmiany w ustawieniach ponowienie nic nie wniesie, a każde kosztuje realne
+   * (drobne) wywołanie modelu. Odstęp chroni przed serią wywołań, gdy ktoś
+   * przeklikuje zakładki tam i z powrotem.
+   */
+  private recheckFailedAiConfigs(config: Record<string, AiConfig>): void {
+    const RECHECK_AFTER_MS = 60_000;
+    const now = Date.now();
+    const stale = Object.values(config).filter(c => {
+      if (c.status !== 'error') return false;
+      const checkedAt = c.last_checked_at ? Date.parse(c.last_checked_at) : 0;
+      return !Number.isFinite(checkedAt) || now - checkedAt > RECHECK_AFTER_MS;
+    });
+    for (const cfg of stale) {
+      this.aiConfigSvc.recheck(cfg.purpose).subscribe({
+        next: res => this.aiConfig.update(current => ({
+          ...current,
+          [res.purpose]: { ...current[res.purpose], status: res.status, last_error: res.last_error },
+        })),
+        // Nieudane ponowienie zostawia status taki, jaki był — nie ma sensu
+        // zamieniać jednego błędu na drugi, gorszy.
+        error: () => undefined,
+      });
+    }
+  }
+
   auth                = inject(AuthService);
   private transloco     = inject(TranslocoService);
   private localeService = inject(LocaleService);
@@ -1548,6 +1935,14 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Polskie teksty zakresu `admin` są tu potrzebne obok języka aktywnego:
+    // wartości itemLabels w polskim służą za odcisk palca elementów słownika
+    // zapisanych jako gotowy tekst (patrz freeTextItemLabel). Dla polskiego
+    // interfejsu to ten sam, już wczytany plik, więc nic nie dociąga.
+    this.transloco.load('admin/pl').subscribe({ error: () => undefined });
+    // Karta dostawcy AI stoi w zakładce otwieranej domyślnie, więc wczytujemy ją od razu.
+    this.loadAiConfig();
+    this.loadFieldDefinitions();
     // Załaduj listę userów dla edytora szablonów onboarding
     this.http.get<any[]>(`${environment.apiUrl}/admin/users?limit=200`).subscribe({
       next: r => this.allUsers.set((r as any)?.data || r),
@@ -1663,9 +2058,66 @@ export class SettingsComponent implements OnInit {
 
   jsonItemLabel(key: string, item: string): string {
     const labels = JSON_ITEM_LABELS[key];
-    return labels?.codes.includes(item)
-      ? this.transloco.translate(`admin.settings.itemLabels.${labels.group}.${item}`)
-      : item;
+    if (labels?.codes.includes(item)) {
+      return this.transloco.translate(`admin.settings.itemLabels.${labels.group}.${item}`);
+    }
+    const freeText = FREE_TEXT_ITEM_GROUPS[key];
+    return freeText ? this.freeTextItemLabel(freeText, item) : item;
+  }
+
+  /**
+   * Nazwa i opis ustawienia siedzą w `app_settings` (kolumny label/description),
+   * zaseedowane po polsku per tenant — bez tego tłumaczenia cały ekran Ustawień
+   * pokazywałby polskie teksty niezależnie od języka. Tłumaczenie po kluczu
+   * ustawienia, a gdy go nie ma, zostaje wartość z bazy: nowe ustawienie dodane
+   * migracją pokaże się od razu, tylko jeszcze nieprzetłumaczone.
+   * Kropki w kluczach (`prospect.ai_provider`) zamieniamy na `_`, bo inaczej
+   * rozbiłyby się na kolejne poziomy drzewa tłumaczeń.
+   */
+  fieldLabel(field: SettingField): string {
+    return this.settingText(field.key, 'label') ?? field.label;
+  }
+
+  fieldDescription(field: SettingField): string {
+    return this.settingText(field.key, 'description') ?? field.description;
+  }
+
+  private settingText(key: string, field: 'label' | 'description'): string | null {
+    const path = `admin.settings.catalog.${key.replace(/\./g, '_')}.${field}`;
+    const value = this.transloco.translate(path);
+    return value && value !== path ? value : null;
+  }
+
+  /**
+   * Słowniki, których elementy są zapisane jako GOTOWY TEKST, nie jako kod
+   * techniczny (powody Holda zaseedowane migracją 0294). Tłumaczenia trzymamy
+   * pod własnymi slugami, a polska wartość służy za odcisk palca: podmieniamy
+   * tylko wtedy, gdy element jest dokładnie taki jak zaseedowany domyślny.
+   * Wartość dopisana przez admina tenanta zostaje nietknięta — to jego słownik.
+   */
+  /**
+   * Nazwa wyświetlana i opis grupy uprawnień (`group_profiles`) są zaseedowane
+   * po polsku, a admin tenanta może je zmienić — więc podmieniamy je na
+   * tłumaczenie tylko wtedy, gdy są dokładnie takie jak polskie domyślne.
+   * Dopasowanie idzie po WARTOŚCI, nie po kodzie grupy (`g.name`), bo dwie
+   * grupy mają ten sam kod `SEO` przy różnych nazwach i opisach. Sam kod
+   * zostaje nietknięty — używa go słownik importu CSV.
+   */
+  groupDisplayName(g: { display_name?: string | null }): string {
+    return this.freeTextItemLabel('groupProfiles.displayName', g.display_name ?? '');
+  }
+
+  groupDescription(g: { description?: string | null }): string {
+    return this.freeTextItemLabel('groupProfiles.description', g.description ?? '');
+  }
+
+  private freeTextItemLabel(group: string, item: string): string {
+    const polish = this.transloco.translateObject(`admin.settings.itemLabels.${group}`, {}, 'pl');
+    if (!polish || typeof polish !== 'object') return item;
+    const slug = Object.keys(polish).find(k => (polish as Record<string, string>)[k] === item);
+    if (!slug) return item;
+    const translated = this.transloco.translate(`admin.settings.itemLabels.${group}.${slug}`);
+    return translated.startsWith('admin.settings.') ? item : translated;
   }
 
   addJsonItem(field: SettingField): void {
@@ -1719,6 +2171,204 @@ export class SettingsComponent implements OnInit {
         this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.settingsSaveFailed'));
       },
     });
+  }
+
+  // ── Lead stages tab ────────────────────────────────────────────────────────
+  // What a tenant admin may change, and what it costs, is decided by the backend
+  // (leadStageService.js): renaming is always allowed, because the stage code
+  // that reports and lead records use never changes. Removing or disabling a
+  // stage is refused for system stages and for stages that still hold leads —
+  // the panel shows both so the refusal is never a surprise.
+  stagesLoading = signal(false);
+  stagesSaving  = signal(false);
+  // Osobny stan błędu, żeby 403/5xx nie wyglądało jak poprawnie wczytana,
+  // pusta lista etapów (ta sama lekcja co w zakładce ICP).
+  stagesError   = signal<string | null>(null);
+  stageRows     = signal<LeadStageRow[]>([]);
+  maxOpenStages = signal(10);
+  newStageLabel = '';
+
+
+  loadLeadStages(): void {
+    this.stagesLoading.set(true);
+    this.stagesError.set(null);
+    this.leadStages.list().subscribe({
+      next: res => {
+        this.maxOpenStages.set(res.max_open_stages);
+        this.stageRows.set(res.stages.map(stage => this.toStageRow(stage)));
+        this.leadStages.applyToApp(res.stages);
+        this.stagesLoading.set(false);
+      },
+      error: err => {
+        this.stagesError.set(err?.error?.error || this.transloco.translate('admin.settings.leadStages.loadFailedTitle'));
+        this.stagesLoading.set(false);
+      },
+    });
+  }
+
+  /**
+   * Pole nazwy jest WYPEŁNIONE aktualną nazwą etapu, a nie puste z nazwą w
+   * placeholderze. Inaczej nie da się jej zaznaczyć, poprawić jednej litery ani
+   * skrócić — trzeba przepisać od zera. Dla etapu, którego tenant nie zmieniał,
+   * wpisujemy wbudowane tłumaczenie; zapis i tak odłoży `null`, jeśli tekst nie
+   * różni się od tłumaczenia (patrz saveStageRow), więc pozostałe 9 języków się
+   * nie psuje przez samo wejście w pole.
+   */
+  private toStageRow(stage: LeadStageConfig): LeadStageRow {
+    return { stage, label: this.effectiveStageLabel(stage) };
+  }
+
+  /** Nazwa aktualnie widoczna w aplikacji: własna tenanta albo wbudowane tłumaczenie. */
+  private effectiveStageLabel(stage: LeadStageConfig): string {
+    return stage.label ?? this.builtinStageLabel(stage.key);
+  }
+
+  funnelRows = computed(() => this.stageRows().filter(r => r.stage.kind === 'open'));
+
+  /**
+   * Gdzie w zakładce „Parametry biznesowe CRM" stanie karta etapów. Karty
+   * słowników idą w kolejności klucza (API sortuje ORDER BY category, key), a
+   * etapy leada były tam dawniej zwykłym wpisem `crm_lead_stages` — stają więc
+   * dokładnie w tym miejscu, co w worktrips-doc, mimo że mają już własną tabelę.
+   */
+  leadStagesCardIndex = computed(() => {
+    const index = this.crmFields().findIndex(f => f.key > LEAD_STAGES_CARD_SORT_KEY);
+    return index === -1 ? this.crmFields().length : index;
+  });
+
+  canAddStage(): boolean {
+    return this.funnelRows().length < this.maxOpenStages();
+  }
+
+  /**
+   * Numer w jednej, ciągłej liście. Wiersz dodawania stoi po ostatnim kroku lejka
+   * i zajmuje jeden numer, więc etapy za nim są przesunięte o jeden — inaczej
+   * numeracja przeskakiwałaby w miejscu, gdzie użytkownik dodaje etap.
+   */
+  stageOrdinal(row: LeadStageRow): number {
+    const rows = this.stageRows();
+    const index = rows.indexOf(row);
+    const funnelCount = this.funnelRows().length;
+    return index < funnelCount ? index + 1 : index + 2;
+  }
+
+  isLastFunnelRow(row: LeadStageRow): boolean {
+    const funnel = this.funnelRows();
+    return funnel.length > 0 && funnel[funnel.length - 1] === row;
+  }
+
+  /**
+   * Usunąć można każdy krok lejka (poza ostatnim) oraz Wygraną i Przegraną.
+   * Nie da się usunąć stanów, które aplikacja zapisuje sama — patrz
+   * deleteBlockedReason.
+   */
+  canDeleteStage(row: LeadStageRow): boolean {
+    if (this.isCodeWrittenStage(row)) return false;
+    if (row.stage.kind === 'open' && this.funnelRows().length === 1) return false;
+    return true;
+  }
+
+  deleteBlockedReason(row: LeadStageRow): string {
+    return this.isCodeWrittenStage(row)
+      ? this.transloco.translate('admin.settings.leadStages.codeWrittenHint')
+      : this.transloco.translate('admin.settings.leadStages.lastStageHint');
+  }
+
+  /** Wbudowana nazwa etapu — podpowiedź w polu, gdy tenant nie nadał własnej. */
+  builtinStageLabel(key: string): string {
+    const translated = this.transloco.translate('crm.labels.stages.' + key);
+    return translated === 'crm.labels.stages.' + key ? key : translated;
+  }
+
+  /** Brudny = tekst w polu różni się od nazwy, która jest dziś widoczna w aplikacji. */
+  isStageRowDirty(row: LeadStageRow): boolean {
+    return row.label.trim() !== this.effectiveStageLabel(row.stage);
+  }
+
+  saveStageRow(row: LeadStageRow): void {
+    if (!row.stage.id) return;
+    const typed = row.label.trim();
+    // Tekst równy wbudowanemu tłumaczeniu (albo pusty) zapisujemy jako null —
+    // wtedy etap wraca do tłumaczeń we wszystkich 10 językach, zamiast zostać
+    // zabetonowany polską nazwą wpisaną w to pole.
+    const label = (!typed || typed === this.builtinStageLabel(row.stage.key)) ? null : typed;
+
+    this.stagesSaving.set(true);
+    this.leadStages.update(row.stage.id, { label }).subscribe({
+      next: () => { this.stagesSaving.set(false); this.loadLeadStages(); },
+      error: err => this.onStageError(err),
+    });
+  }
+
+  addStage(): void {
+    const label = this.newStageLabel.trim();
+    if (!label) return;
+    this.stagesSaving.set(true);
+    this.leadStages.create({ label }).subscribe({
+      next: () => {
+        this.newStageLabel = '';
+        this.stagesSaving.set(false);
+        this.loadLeadStages();
+      },
+      error: err => this.onStageError(err),
+    });
+  }
+
+  /** Archiwum i stany konwersji — ustawia je aplikacja, więc nie są do usunięcia. */
+  isCodeWrittenStage(row: LeadStageRow): boolean {
+    return row.stage.kind === 'archived' || row.stage.kind === 'converted';
+  }
+
+  stageName(row: LeadStageRow): string {
+    return row.label.trim() || this.builtinStageLabel(row.stage.key);
+  }
+
+  /**
+   * Usunięcie etapu to jedno potwierdzenie — admin nigdy nie wpisuje, gdzie
+   * przenieść leady. Jeśli na etapie ktoś siedzi, pytanie mówi wprost, na który
+   * etap przejdą; cel liczy serwer (delete_target_key), więc to, co widzi admin,
+   * jest tym, co faktycznie się stanie.
+   */
+  deleteStageRow(row: LeadStageRow): void {
+    if (!row.stage.id) return;
+    const name = this.stageName(row);
+    const count = row.stage.lead_count ?? 0;
+
+    const question = count
+      ? this.transloco.translate('admin.settings.leadStages.confirmDeleteWithLeads', {
+          name, count, target: this.stageNameByKey(row.stage.delete_target_key),
+        })
+      : this.transloco.translate('admin.settings.leadStages.confirmDelete', { name });
+    if (!confirm(question)) return;
+
+    this.stagesSaving.set(true);
+    this.leadStages.remove(row.stage.id).subscribe({
+      next: res => {
+        this.stagesSaving.set(false);
+        if (res.movedLeads) {
+          this.toast.success(this.transloco.translate('admin.settings.leadStages.movedLeads', {
+            count: res.movedLeads, stage: this.stageNameByKey(res.movedTo),
+          }));
+        }
+        this.loadLeadStages();
+      },
+      error: err => this.onStageError(err),
+    });
+  }
+
+  private stageNameByKey(key: string | null | undefined): string {
+    if (!key) return '';
+    const row = this.stageRows().find(r => r.stage.key === key);
+    return row ? this.stageName(row) : key;
+  }
+
+  /**
+   * Komunikat z backendu idzie wprost do usera — to on wie, ILE leadów blokuje
+   * usunięcie etapu i dlaczego etap systemowy jest nieusuwalny.
+   */
+  private onStageError(err: any): void {
+    this.stagesSaving.set(false);
+    this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.leadStages.saveFailed'));
   }
 
   // ── Enrichment / ICP tab (tenant admin — dynamic ICP signals of THIS tenant) ─
@@ -1946,3 +2596,4 @@ export class SettingsComponent implements OnInit {
     this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.saveFailed'));
   }
 }
+

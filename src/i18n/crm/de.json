@@ -427,6 +427,10 @@
     "subtitle": "Importieren Sie Leads, Partner und Vertriebsdaten gesammelt aus einer CSV-Datei. Laden Sie die Vorlage herunter, füllen Sie sie aus und laden Sie sie hoch.",
     "title": "CSV-Import"
   },
+  "customFields": {
+    "choose": "— auswählen —",
+    "notSet": "nicht gesetzt"
+  },
   "documents": {
     "add": "Hinzufügen",
     "linkFailed": "Dokument konnte nicht verknüpft werden. Prüfen Sie, ob Sie die erforderlichen Berechtigungen haben.",
@@ -638,12 +642,12 @@
     "sources": {
       "agent": "Agent",
       "aliasHello": "Alias Hello",
-      "coldCall": "Cold Call",
+      "coldCall": "Kaltakquise",
       "emailCampaign": "E-Mail-Kampagne",
       "googleAdsAiSearch": "Google Ads AI Search",
       "googleAdsPmax": "Google Ads PMax",
       "googleAdsSeaBrand": "Google Ads SEA Brand",
-      "inbound": "Inbound",
+      "inbound": "Eingehende Anfrage",
       "linkedin": "LinkedIn",
       "linkedinInMail": "LinkedIn InMail",
       "linkedinLeadForm": "LinkedIn Lead Form",
@@ -797,6 +801,7 @@
       "agent": "Agent",
       "company": "Firma",
       "contact": "Kontakt",
+      "customFields": "Zusatzfelder",
       "extraContacts": "Weitere Kontakte",
       "notes": "Notizen",
       "sales": "Vertrieb"
@@ -1378,6 +1383,7 @@
       "billingAddress": "Rechnungsadresse",
       "billingContact": "Kontakt für Abrechnung",
       "contractContact": "Kontakt für Vertragsfragen",
+      "customFields": "Zusatzfelder",
       "extraContacts": "Weitere Kontakte",
       "financialTerms": "Finanzielle Konditionen",
       "partnerAdmin": "Partner-Admin"
@@ -1529,7 +1535,7 @@
         "leads": "Leads",
         "pipeline": "Pipeline",
         "progress": "Fortschritt",
-        "winRatePct": "Win%",
+        "winRatePct": "Quote %",
         "won": "Won"
       },
       "days": "{count, plural, one {# Tag} other {# Tage}}",
@@ -1542,7 +1548,7 @@
         "activeLeads": "Aktive Leads",
         "avgSalesCycle": "Ø Vertriebszyklus",
         "avgWonValue": "Ø Wert pro Abschluss",
-        "winRate": "Win Rate",
+        "winRate": "Abschlussquote",
         "wonPln": "Abgeschlossen / Won (PLN)"
       },
       "leadSources": {
@@ -1649,7 +1655,7 @@
       },
       "external": {
         "feeRate": "Fee Rate: {value}%",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Gebühren (PLN)",
         "grossTurnoverPln": "Bruttoumsatz (PLN)",
         "margin": "Marge: {value}%",
         "netTurnoverPln": "Nettoumsatz (PLN)",
@@ -1701,7 +1707,7 @@
         "tradeFairs": "Messen"
       },
       "table": {
-        "fees": "Fees",
+        "fees": "Gebühren",
         "grossTurnover": "Bruttoumsatz",
         "net": "Netto",
         "partners": "Partner",
@@ -1798,9 +1804,9 @@
         "title": "Abwanderungsrisiko der Partner"
       },
       "columns": {
-        "fees": "Fees",
+        "fees": "Gebühren",
         "grossTurnover": "Bruttoumsatz",
-        "health": "Health",
+        "health": "Zustand",
         "margin": "Marge",
         "netTurnover": "Nettoumsatz",
         "partner": "Partner",
@@ -1827,7 +1833,7 @@
       "kpi": {
         "activePartners": "Aktive Partner",
         "feeRateShare": "{percent}% Fee Rate",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Gebühren (PLN)",
         "productsCount": "{count} Produkte",
         "revenueMarginPln": "Erlös / Marge (PLN)",
         "revenueTrend": "Erlöstrend",
@@ -1862,7 +1868,7 @@
         "revenueMargin": "Erlös (Marge)",
         "title": "Finanzübersicht"
       },
-      "title": "Partner Performance",
+      "title": "Partnerleistung",
       "trend": {
         "title": "Erlöstrend",
         "totalTurnover": "Umsatz gesamt"
