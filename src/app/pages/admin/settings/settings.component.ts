@@ -555,8 +555,8 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                   </tr>
                   @for (f of churnDayFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -568,8 +568,8 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                   </tr>
                   @for (f of churnSalesFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -581,8 +581,8 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                   </tr>
                   @for (f of churnRiskFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -633,8 +633,8 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                   </tr>
                   @for (f of healthActFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -646,8 +646,8 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                   </tr>
                   @for (f of healthRevFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
@@ -659,8 +659,8 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                   </tr>
                   @for (f of healthLevelFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ f.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ f.description }}</td>
+                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
                       <td style="padding:9px 16px;text-align:right">
                         <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
