@@ -7,9 +7,14 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { AppSettingsService, AppSettingsMeta } from '../../../core/services/app-settings.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { AiConfigService, AiConfig, AiProviderOption } from '../../../core/services/ai-config.service';
+import { AiConfigService, AiConfig, AiProviderOption, AiPurpose } from '../../../core/services/ai-config.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
+import { TenantFieldsEditorComponent } from './tenant-fields-editor.component';
+import { AiPurposeRowComponent } from './ai-purpose-row.component';
+import {
+  TenantFieldDefinitions, TenantFieldsService,
+} from '../../../core/services/tenant-fields.service';
 import { LanguagePickerComponent } from '../../../shared/components/language-picker/language-picker.component';
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
@@ -209,7 +214,7 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, TenantFieldsEditorComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('admin')],
   template: `
     <ng-container *transloco="let t; prefix: 'admin'">
@@ -300,101 +305,45 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
             </div>
           </div>
 
-          <!-- Dostawca AI — klucz tenanta zasila enrichment, analizator rozmów,
-               SEO i asystenta, dlatego karta stoi w parametrach globalnych, a nie
-               w CRM. Klucz NIE wraca z API: po zapisie widać tylko 4 ostatnie
-               znaki (api_key_hint). -->
+          <!-- Dostawca AI — pokazywana TYLKO gdy tenant ma włączony jakikolwiek
+               moduł korzystający z tego klucza (Prospekty, Analizator rozmów,
+               SEO). Bez nich pole na klucz API nie miałoby czego obsługiwać,
+               więc byłoby samym szumem. Gate'owanie flagą to ten sam wzorzec co
+               zakładka ICP. Klucz NIE wraca z API — po zapisie widać tylko 4
+               ostatnie znaki (api_key_hint).
+
+               Model jest ustawiany OSOBNO DLA KAŻDEJ FUNKCJI, bo ich potrzeby są
+               skrajnie różne: enrichment to tysiące firm na najtańszym modelu,
+               SEO to długie artykuły. Puste pole = model domyślny dostawcy, więc
+               admin, który nie chce o tym decydować, nie musi nic wpisywać.
+               Funkcje wymagające zdolności, których wybrany dostawca nie ma
+               (wyszukiwanie w internecie, wymuszony format odpowiedzi), są
+               wyszarzone z podanym powodem — nigdy po cichu nieaktywne. -->
+          @if (aiFeatureEnabled()) {
           <div class="card" style="margin-bottom:20px;overflow:hidden">
             <div class="cat-header">
               <span style="font-size:18px">🤖</span>
               <span class="cat-title">{{ t('settings.ai.title') }}</span>
-              @if (aiConfig()?.status === 'active') {
-                <span class="ai-badge ai-badge-ok">✓ {{ t('settings.ai.statusActive') }}</span>
-              } @else if (aiConfig()?.status) {
-                <span class="ai-badge ai-badge-bad">✗ {{ t('settings.ai.statusInvalid') }}</span>
-              } @else {
-                <span class="ai-badge ai-badge-off">{{ t('settings.ai.statusMissing') }}</span>
-              }
             </div>
 
             <div style="padding:16px 20px">
-              <div class="field-desc" style="margin-bottom:14px">{{ t('settings.ai.intro') }}</div>
+              <div class="field-desc" style="margin-bottom:6px">{{ t('settings.ai.intro') }}</div>
 
               @if (aiLoading()) {
                 <div class="state-msg">{{ t('settings.ai.loading') }}</div>
               } @else {
-                @if (aiConfig()?.status === 'invalid' && aiConfig()?.last_error; as err) {
-                  <div class="ai-error">{{ t('settings.ai.keyRejected') }} {{ err }}</div>
+                @for (p of aiPurposes(); track p.key) {
+                  <app-ai-purpose-row
+                    [purpose]="p"
+                    [providers]="aiProviders()"
+                    [config]="aiConfig()[p.key] ?? null"
+                    [savedProviders]="aiSavedProviders()"
+                    (changed)="loadAiConfig()" />
                 }
-
-                <div class="ai-row">
-                  <label class="ai-label">{{ t('settings.ai.provider') }}</label>
-                  <select class="fsel" [(ngModel)]="aiDraft.provider" (ngModelChange)="onAiProviderChange()"
-                          [disabled]="aiSaving()">
-                    @for (p of aiProviders(); track p.key) {
-                      <option [value]="p.key">{{ p.label }}</option>
-                    }
-                  </select>
-                  @if (selectedAiProvider(); as p) {
-                    <a class="ai-hint-link" [href]="p.keys_url" target="_blank" rel="noopener">
-                      {{ t('settings.ai.whereIsKey') }} ↗
-                    </a>
-                  }
-                </div>
-
-                <div class="ai-row">
-                  <label class="ai-label">{{ t('settings.ai.apiKey') }}</label>
-                  <input class="fin" type="password" autocomplete="off"
-                         [(ngModel)]="aiDraft.apiKey" [disabled]="aiSaving()"
-                         [placeholder]="aiConfig()
-                            ? t('settings.ai.apiKeySavedPlaceholder', { hint: aiConfig()!.api_key_hint })
-                            : t('settings.ai.apiKeyPlaceholder')">
-                </div>
-                @if (aiConfig()) {
-                  <div class="ai-sub">{{ t('settings.ai.apiKeyKeptHint') }}</div>
-                }
-
-                <div class="ai-row">
-                  <label class="ai-label">{{ t('settings.ai.modelFast') }}</label>
-                  <input class="fin" [(ngModel)]="aiDraft.modelFast" [disabled]="aiSaving()"
-                         [placeholder]="selectedAiProvider()?.suggested_fast || ''">
-                </div>
-                <div class="ai-sub">{{ t('settings.ai.modelFastHint') }}</div>
-
-                <div class="ai-row">
-                  <label class="ai-label">{{ t('settings.ai.modelQuality') }}</label>
-                  <input class="fin" [(ngModel)]="aiDraft.modelQuality" [disabled]="aiSaving()"
-                         [placeholder]="selectedAiProvider()?.suggested_quality || ''">
-                </div>
-                <div class="ai-sub">{{ t('settings.ai.modelQualityHint') }}</div>
-
-                @if (aiMessage(); as msg) {
-                  <div class="ai-ok">{{ msg }}</div>
-                }
-
-                <div style="display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap">
-                  <button class="btn-primary" [disabled]="aiSaving() || !aiDraft.modelFast.trim()"
-                          (click)="saveAiConfig()">
-                    {{ aiSaving() ? t('settings.ai.verifying') : t('settings.ai.saveAndVerify') }}
-                  </button>
-                  @if (aiConfig()) {
-                    <button class="btn-secondary" [disabled]="aiSaving()" (click)="recheckAiConfig()">
-                      {{ t('settings.ai.recheck') }}
-                    </button>
-                    <button class="btn-danger-sm" style="padding:6px 12px;font-size:12px"
-                            [disabled]="aiSaving()" (click)="deleteAiConfig()">
-                      {{ t('settings.ai.remove') }}
-                    </button>
-                  }
-                  @if (aiConfig()?.updated_by_name; as who) {
-                    <span class="field-meta" style="margin-left:auto">
-                      {{ t('settings.fields.changedBy') }} {{ who }}
-                    </span>
-                  }
-                </div>
               }
             </div>
           </div>
+          }
 
           @for (cat of globalCategories(); track cat.key) {
             <div class="card" style="margin-bottom:20px;overflow:hidden">
@@ -663,6 +612,34 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
               </table>
             </div>
           }
+
+          <!-- Pola dodatkowe formatek leada i partnera. Dwie osobne listy, bo
+               pola są rozłączne — pole partnera nie pojawia się na leadzie. -->
+          <div class="card" style="margin-top:20px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titleLead') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="lead"
+                [definitions]="fieldDefinitions().lead"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:16px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titlePartner') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="partner"
+                [definitions]="fieldDefinitions().partner"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
         }
 
         <!-- TAB: Słowniki dokumentów -->
@@ -720,6 +697,22 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
               {{ t('settings.documents.empty') }}
             </div>
           }
+
+          <!-- Pola dodatkowe formatki dokumentu, definiowane przez admina
+               tenanta. Stoją tutaj, a nie w osobnej zakładce, bo to słownik
+               dokumentów tak samo jak typy i statusy wyżej. -->
+          <div class="card" style="margin-top:24px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titleDocument') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="document"
+                [definitions]="fieldDefinitions().document"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
         }
 
         <!-- TAB: Grupy użytkowników -->
@@ -1324,6 +1317,24 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
     }
     .ai-row .fin:focus, .ai-row .fsel:focus { outline:none; border-color:var(--orange); }
     .ai-sub { font-size:11.5px; color:var(--gray-400); margin:0 0 14px 202px; line-height:1.5; }
+    .ai-models-state { display:block; margin-top:3px; color:var(--gray-400); font-style:italic; }
+    .ai-link-btn {
+      display:inline-block; margin-top:3px; padding:0; border:0; background:none;
+      font-size:11.5px; color:var(--orange-dark); text-decoration:underline; cursor:pointer;
+    }
+    .ai-link-btn:disabled { color:var(--gray-400); cursor:default; }
+    .ai-models-title {
+      margin:18px 0 2px; font-size:12px; font-weight:700; letter-spacing:.04em;
+      text-transform:uppercase; color:var(--gray-400);
+    }
+    /* Funkcja niedostępna u wybranego dostawcy: wiersz zostaje widoczny z podanym
+       powodem, zamiast znikać — inaczej admin nie wiedziałby, że ją traci. */
+    .ai-row-off .ai-label { color:var(--gray-400); font-weight:500; }
+    .ai-unavailable {
+      flex:1; min-width:0; font-size:12px; color:var(--gray-400);
+      background:var(--gray-50); border:1px dashed var(--gray-200);
+      border-radius:8px; padding:7px 10px;
+    }
     .ai-hint-link { font-size:11.5px; color:#1D4ED8; text-decoration:none; white-space:nowrap; }
     .ai-hint-link:hover { text-decoration:underline; }
     .ai-badge { margin-left:auto; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; }
@@ -1469,113 +1480,70 @@ const JSON_ITEM_LABELS: Record<string, { group: string; codes: string[] }> = {
 export class SettingsComponent implements OnInit {
   private settingsSvc = inject(AppSettingsService);
   private aiConfigSvc = inject(AiConfigService);
+  private tenantFieldsSvc = inject(TenantFieldsService);
   private toast       = inject(ToastService);
 
-  // ── Dostawca AI (klucz tenanta) ────────────────────────────────────────────
-  // Klucz nie wraca z API, więc pole klucza jest ZAWSZE puste przy wejściu —
-  // puste przy zapisie znaczy „zostaw dotychczasowy", nie „wyczyść".
-  aiLoading  = signal(false);
-  aiSaving   = signal(false);
-  aiConfig   = signal<AiConfig | null>(null);
-  aiProviders = signal<AiProviderOption[]>([]);
-  aiMessage  = signal<string | null>(null);
-  aiDraft: { provider: string; apiKey: string; modelFast: string; modelQuality: string } =
-    { provider: 'anthropic', apiKey: '', modelFast: '', modelQuality: '' };
+  // ── Pola dodatkowe formatek (lead / partner / dokument) ───────────────────
+  // Definiowane przez admina tenanta, odpowiednik pól dodatkowych w Projektach.
+  // Trzymane razem dla wszystkich trzech formatek, bo API zwraca je jednym
+  // żądaniem i każda mutacja oddaje pełny, świeży komplet.
+  fieldDefinitions = signal<TenantFieldDefinitions>({ lead: [], partner: [], document: [] });
 
-  selectedAiProvider = computed(() =>
-    this.aiProviders().find(p => p.key === this.aiDraft.provider) ?? null);
+  loadFieldDefinitions(): void {
+    this.tenantFieldsSvc.get().subscribe({
+      next: res => this.fieldDefinitions.set(res.definitions),
+      error: () => { /* brak pól to nie powód, żeby psuć cały ekran ustawień */ },
+    });
+  }
+
+  // ── Dostawcy AI (klucz tenanta, osobno dla każdej funkcji) ────────────────
+  // Każda funkcja AI ma własnego dostawcę, klucz i model — klient może mieć
+  // enrichment na tanim dostawcy, a „Znajdź konkurencję" na innym. Szczegóły
+  // jednego wiersza obsługuje AiPurposeRowComponent; tutaj zostaje tylko
+  // wczytanie całości i rozdanie jej wierszom.
+  //
+  // Klucz nie wraca z API — po zapisie widać wyłącznie 4 ostatnie znaki.
+  aiLoading   = signal(false);
+  aiConfig    = signal<Record<string, AiConfig>>({});
+  aiProviders = signal<AiProviderOption[]>([]);
+  aiPurposes  = signal<AiPurpose[]>([]);
+
+  /**
+   * Dostawcy skonfigurowani już przy którejkolwiek funkcji, z hintem klucza.
+   * Wiersz nieskonfigurowanej funkcji oferuje ich jednym kliknięciem — klucz
+   * jest już zapisany, więc nie trzeba go wklejać po raz drugi.
+   */
+  aiSavedProviders = computed(() => {
+    const seen = new Map<string, string>();
+    for (const config of Object.values(this.aiConfig())) {
+      if (!seen.has(config.provider)) seen.set(config.provider, config.api_key_hint);
+    }
+    return [...seen].map(([provider, hint]) => ({ provider, hint }));
+  });
+
+  /**
+   * Konfiguracja AI jest pokazywana tylko tenantowi, który ma włączony
+   * jakikolwiek moduł z niej korzystający. Bez nich byłaby samym szumem.
+   */
+  aiFeatureEnabled = computed(() =>
+    this.auth.hasFeature('prospects')
+    || this.auth.hasFeature('call_analysis')
+    || this.auth.hasFeature('seo_bot'));
 
   loadAiConfig(): void {
+    if (!this.aiFeatureEnabled()) return;
     this.aiLoading.set(true);
     this.aiConfigSvc.get().subscribe({
       next: res => {
         this.aiProviders.set(res.providers);
+        this.aiPurposes.set(res.purposes);
         this.aiConfig.set(res.config);
-        const provider = res.config?.provider ?? res.providers[0]?.key ?? 'anthropic';
-        this.aiDraft = {
-          provider,
-          apiKey: '',
-          modelFast: res.config?.model_fast ?? '',
-          modelQuality: res.config?.model_quality ?? '',
-        };
-        if (!res.config) this.applyAiProviderSuggestions();
         this.aiLoading.set(false);
       },
       error: () => this.aiLoading.set(false),
     });
   }
 
-  /** Zmiana dostawcy podpowiada jego modele, ale nie nadpisuje tego, co admin już wpisał. */
-  onAiProviderChange(): void {
-    this.aiMessage.set(null);
-    this.applyAiProviderSuggestions();
-  }
-
-  private applyAiProviderSuggestions(): void {
-    const provider = this.selectedAiProvider();
-    if (!provider) return;
-    if (!this.aiDraft.modelFast.trim()) this.aiDraft.modelFast = provider.suggested_fast;
-  }
-
-  saveAiConfig(): void {
-    this.aiSaving.set(true);
-    this.aiMessage.set(null);
-    this.aiConfigSvc.save({
-      provider: this.aiDraft.provider,
-      // Puste pole = zostaw klucz, który już jest zapisany (API go nie wydaje,
-      // więc admin nie ma jak go przepisać przy zmianie samego modelu).
-      api_key: this.aiDraft.apiKey.trim() || null,
-      model_fast: this.aiDraft.modelFast.trim(),
-      model_quality: this.aiDraft.modelQuality.trim() || null,
-    }).subscribe({
-      next: res => {
-        this.aiConfig.set(res.config as AiConfig);
-        this.aiDraft.apiKey = '';
-        this.aiSaving.set(false);
-        this.aiMessage.set(this.transloco.translate('admin.settings.ai.savedAndVerified'));
-      },
-      error: err => {
-        this.aiSaving.set(false);
-        this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.ai.saveFailed'));
-      },
-    });
-  }
-
-  recheckAiConfig(): void {
-    this.aiSaving.set(true);
-    this.aiMessage.set(null);
-    this.aiConfigSvc.recheck().subscribe({
-      next: res => {
-        this.aiSaving.set(false);
-        if (res.status === 'active') {
-          this.aiMessage.set(this.transloco.translate('admin.settings.ai.recheckOk'));
-        } else {
-          this.toast.error(res.last_error || this.transloco.translate('admin.settings.ai.statusInvalid'));
-        }
-        this.loadAiConfig();
-      },
-      error: err => {
-        this.aiSaving.set(false);
-        this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.ai.saveFailed'));
-      },
-    });
-  }
-
-  deleteAiConfig(): void {
-    if (!confirm(this.transloco.translate('admin.settings.ai.confirmRemove'))) return;
-    this.aiSaving.set(true);
-    this.aiConfigSvc.remove().subscribe({
-      next: () => {
-        this.aiSaving.set(false);
-        this.aiMessage.set(null);
-        this.loadAiConfig();
-      },
-      error: err => {
-        this.aiSaving.set(false);
-        this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.ai.saveFailed'));
-      },
-    });
-  }
   auth                = inject(AuthService);
   private transloco     = inject(TranslocoService);
   private localeService = inject(LocaleService);
@@ -1778,6 +1746,7 @@ export class SettingsComponent implements OnInit {
   ngOnInit(): void {
     // Karta dostawcy AI stoi w zakładce otwieranej domyślnie, więc wczytujemy ją od razu.
     this.loadAiConfig();
+    this.loadFieldDefinitions();
     // Załaduj listę userów dla edytora szablonów onboarding
     this.http.get<any[]>(`${environment.apiUrl}/admin/users?limit=200`).subscribe({
       next: r => this.allUsers.set((r as any)?.data || r),
@@ -2176,3 +2145,4 @@ export class SettingsComponent implements OnInit {
     this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.saveFailed'));
   }
 }
+

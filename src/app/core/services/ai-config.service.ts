@@ -2,25 +2,41 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
-/** One AI provider the tenant can pick, as the backend registry describes it. */
+/**
+ * One AI provider the tenant can pick, as the backend registry describes it.
+ * `unsupported_purposes` lets the panel grey a provider out for a function it
+ * cannot serve, without asking the backend again.
+ */
 export interface AiProviderOption {
   key: string;
   label: string;
-  suggested_fast: string;
-  suggested_quality: string;
   keys_url: string;
+  /** Default model per function — the placeholder shown when none is chosen. */
+  default_models: Record<string, string>;
+  unsupported_purposes: string[];
 }
 
 /**
- * The tenant's saved AI configuration. The API key itself is never returned —
- * only `api_key_hint` (its last 4 characters), so the admin can tell a saved key
- * from none and recognise which key it is.
+ * One AI feature. `requires` names the provider capability it needs
+ * (`webSearch` or `structuredOutput`), or null when any provider will do.
+ */
+export interface AiPurpose {
+  key: string;
+  requires: 'webSearch' | 'structuredOutput' | null;
+  supported_by: string[];
+}
+
+/**
+ * The saved configuration of ONE function. The API key itself is never
+ * returned — only `api_key_hint` (its last 4 characters), so the admin can tell
+ * a saved key from none and recognise which key it is.
  */
 export interface AiConfig {
+  purpose: string;
   provider: string;
   api_key_hint: string;
-  model_fast: string;
-  model_quality: string | null;
+  /** null = the provider's default model for this function is used. */
+  model: string | null;
   base_url: string | null;
   status: 'active' | 'invalid' | 'error';
   last_error: string | null;
@@ -29,45 +45,61 @@ export interface AiConfig {
   updated_by_name: string | null;
 }
 
-export interface AiConfigResponse {
-  /** null = tenant has no AI configured, so every AI feature is off for them. */
-  config: AiConfig | null;
-  providers: AiProviderOption[];
+/** One model available on the tenant's account at a given provider. */
+export interface AiModelOption {
+  id: string;
+  label: string;
 }
 
+export interface AiConfigResponse {
+  /** Function → its configuration. A missing entry means that function is off. */
+  config: Record<string, AiConfig>;
+  providers: AiProviderOption[];
+  purposes: AiPurpose[];
+}
+
+const BASE = `${environment.apiUrl}/admin/settings/ai`;
+
+/**
+ * Per-function AI configuration: every feature has its own provider, key and
+ * model, so a tenant can run enrichment on a cheap provider and competitor
+ * discovery on another.
+ */
 @Injectable({ providedIn: 'root' })
 export class AiConfigService {
   private http = inject(HttpClient);
 
   get() {
-    return this.http.get<AiConfigResponse>(`${environment.apiUrl}/admin/settings/ai`);
+    return this.http.get<AiConfigResponse>(BASE);
   }
 
   /**
-   * Saves provider, key and models. `api_key` may be omitted when only the model
-   * changes — the backend keeps the stored key (and never hands it back, so the
-   * admin could not resend it anyway). The key and both models are verified
-   * against the provider before anything is written.
+   * Saves one function. `api_key` may be omitted when that provider already has
+   * a key saved under any function — the backend reuses it. The key and the
+   * model are verified against the provider before anything is written.
    */
-  save(payload: {
-    provider: string;
+  save(purpose: string, payload: {
+    provider?: string | null;
     api_key?: string | null;
-    model_fast: string;
-    model_quality?: string | null;
+    model?: string | null;
     base_url?: string | null;
   }) {
-    return this.http.put<{ config: AiConfig }>(`${environment.apiUrl}/admin/settings/ai`, payload);
+    return this.http.put<{ config: AiConfig }>(`${BASE}/${purpose}`, payload);
   }
 
-  /** Re-verifies the stored key against the provider and refreshes `status`. */
-  recheck() {
-    return this.http.post<{ status: string; last_error: string | null }>(
-      `${environment.apiUrl}/admin/settings/ai/recheck`, {},
-    );
+  /**
+   * The models available on the tenant's account. With no `provider` the
+   * backend recognises it from the key — confirmed against the provider, not
+   * guessed from a prefix — and returns both, so pasting a key costs one call.
+   * POST, not GET: the body may carry a freshly pasted key that must not end up
+   * in a URL, access log or browser history.
+   */
+  models(payload: { provider?: string | null; api_key?: string | null; base_url?: string | null }) {
+    return this.http.post<{ provider: string; models: AiModelOption[] }>(`${BASE}/models`, payload);
   }
 
-  /** Removes the configuration — turns every AI feature off for the tenant. */
-  remove() {
-    return this.http.delete<{ deleted: boolean }>(`${environment.apiUrl}/admin/settings/ai`);
+  /** Turns one function off; the others keep working. */
+  remove(purpose: string) {
+    return this.http.delete<{ deleted: boolean; purpose: string }>(`${BASE}/${purpose}`);
   }
 }
