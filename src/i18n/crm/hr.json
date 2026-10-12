@@ -638,12 +638,12 @@
     "sources": {
       "agent": "Agent",
       "aliasHello": "Alias Hello",
-      "coldCall": "Cold Call",
+      "coldCall": "Hladni poziv",
       "emailCampaign": "Kampanja e-poštom",
       "googleAdsAiSearch": "Google Ads AI Search",
       "googleAdsPmax": "Google Ads PMax",
       "googleAdsSeaBrand": "Google Ads SEA Brand",
-      "inbound": "Inbound",
+      "inbound": "Dolazni upit",
       "linkedin": "LinkedIn",
       "linkedinInMail": "LinkedIn InMail",
       "linkedinLeadForm": "LinkedIn Lead Form",
@@ -1529,7 +1529,7 @@
         "leads": "Leadovi",
         "pipeline": "Pipeline",
         "progress": "Napredak",
-        "winRatePct": "Win%",
+        "winRatePct": "Uspjeh %",
         "won": "Won"
       },
       "days": "{count, plural, one {# dan} few {# dana} other {# dana}}",
@@ -1542,7 +1542,7 @@
         "activeLeads": "Aktivni leadovi",
         "avgSalesCycle": "Prosj. prodajni ciklus",
         "avgWonValue": "Prosj. vrijednost dobivenog",
-        "winRate": "Win Rate",
+        "winRate": "Stopa uspjeha",
         "wonPln": "Zatvoreno / Won (PLN)"
       },
       "leadSources": {
@@ -1649,7 +1649,7 @@
       },
       "external": {
         "feeRate": "Fee rate: {value}%",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Provizije (PLN)",
         "grossTurnoverPln": "Bruto promet (PLN)",
         "margin": "Marža: {value}%",
         "netTurnoverPln": "Neto promet (PLN)",
@@ -1701,7 +1701,7 @@
         "tradeFairs": "Sajmovi"
       },
       "table": {
-        "fees": "Fees",
+        "fees": "Provizije",
         "grossTurnover": "Bruto promet",
         "net": "Neto",
         "partners": "Partneri",
@@ -1798,9 +1798,9 @@
         "title": "Rizik churna partnera"
       },
       "columns": {
-        "fees": "Fees",
+        "fees": "Provizije",
         "grossTurnover": "Bruto promet",
-        "health": "Health",
+        "health": "Stanje",
         "margin": "Marža",
         "netTurnover": "Neto promet",
         "partner": "Partner",
@@ -1827,7 +1827,7 @@
       "kpi": {
         "activePartners": "Aktivnih partnera",
         "feeRateShare": "{percent}% fee rate",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Provizije (PLN)",
         "productsCount": "Proizvodi: {count}",
         "revenueMarginPln": "Prihod / Marža (PLN)",
         "revenueTrend": "trend prihoda",
@@ -1862,7 +1862,7 @@
         "revenueMargin": "Prihod (marža)",
         "title": "Financijski sažetak"
       },
-      "title": "Partner Performance",
+      "title": "Uspješnost partnera",
       "trend": {
         "title": "Trend prihoda",
         "totalTurnover": "Ukupni promet"

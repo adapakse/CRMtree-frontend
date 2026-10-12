@@ -906,7 +906,7 @@
       "leadSources": {
         "agent": "Agent",
         "cold_call": "Cold call",
-        "inbound": "Inbound",
+        "inbound": "Inbound enquiry",
         "inne": "Other",
         "kampania": "Email campaign",
         "linkedin": "LinkedIn",
@@ -1098,7 +1098,7 @@
       "saved": "Tooltip “{key}” saved",
       "screen": "Screen",
       "screens": {
-        "partnerPerformance": "Partner Performance",
+        "partnerPerformance": "Partner performance",
         "salesDashboard": "Sales Dashboard",
         "salesReports": "Sales reports"
       }

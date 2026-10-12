@@ -638,12 +638,12 @@
     "sources": {
       "agent": "Agent",
       "aliasHello": "Alias Hello",
-      "coldCall": "Cold Call",
+      "coldCall": "Cold call",
       "emailCampaign": "Email campaign",
       "googleAdsAiSearch": "Google Ads AI Search",
       "googleAdsPmax": "Google Ads PMax",
       "googleAdsSeaBrand": "Google Ads SEA Brand",
-      "inbound": "Inbound",
+      "inbound": "Inbound enquiry",
       "linkedin": "LinkedIn",
       "linkedinInMail": "LinkedIn InMail",
       "linkedinLeadForm": "LinkedIn Lead Form",
@@ -1529,7 +1529,7 @@
         "leads": "Leads",
         "pipeline": "Pipeline",
         "progress": "Progress",
-        "winRatePct": "Win%",
+        "winRatePct": "Win %",
         "won": "Won"
       },
       "days": "{count, plural, one {# day} other {# days}}",
@@ -1542,7 +1542,7 @@
         "activeLeads": "Active leads",
         "avgSalesCycle": "Avg. sales cycle",
         "avgWonValue": "Avg. won value",
-        "winRate": "Win Rate",
+        "winRate": "Win rate",
         "wonPln": "Closed / Won (PLN)"
       },
       "leadSources": {
@@ -1862,7 +1862,7 @@
         "revenueMargin": "Revenue (margin)",
         "title": "Financial summary"
       },
-      "title": "Partner Performance",
+      "title": "Partner performance",
       "trend": {
         "title": "Revenue trend",
         "totalTurnover": "Total turnover"

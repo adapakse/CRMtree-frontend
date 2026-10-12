@@ -906,7 +906,7 @@
       "leadSources": {
         "agent": "Agent",
         "cold_call": "Cold call",
-        "inbound": "Inbound",
+        "inbound": "Solicitare primită",
         "inne": "Altele",
         "kampania": "Campanie de e-mail",
         "linkedin": "LinkedIn",
@@ -1062,7 +1062,7 @@
         "leadsTrendTitle": "Trend lunar (titlu)",
         "leadsVelocityTitle": "Timp în etapă – medie zile (titlu)",
         "partnersKpiActivePartners": "Parteneri activi",
-        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiFees": "Comisioane (PLN)",
         "partnersKpiGrossTurnover": "Cifră de afaceri brută (PLN)",
         "partnersKpiRevenue": "Venit / Marjă (PLN)",
         "partnersKpiTransactions": "Tranzacții",
@@ -1098,7 +1098,7 @@
       "saved": "Tooltipul „{key}” a fost salvat",
       "screen": "Ecran",
       "screens": {
-        "partnerPerformance": "Partner Performance",
+        "partnerPerformance": "Performanța partenerilor",
         "salesDashboard": "Sales Dashboard",
         "salesReports": "Rapoarte de vânzări"
       }

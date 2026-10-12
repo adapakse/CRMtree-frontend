@@ -906,7 +906,7 @@
       "leadSources": {
         "agent": "Агент",
         "cold_call": "Cold call",
-        "inbound": "Inbound",
+        "inbound": "Входящий запрос",
         "inne": "Другое",
         "kampania": "E-mail-рассылка",
         "linkedin": "LinkedIn",
@@ -1062,7 +1062,7 @@
         "leadsTrendTitle": "Помесячный тренд (заголовок)",
         "leadsVelocityTitle": "Время на этапе – ср. дней (заголовок)",
         "partnersKpiActivePartners": "Активных партнёров",
-        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiFees": "Комиссии (PLN)",
         "partnersKpiGrossTurnover": "Оборот брутто (PLN)",
         "partnersKpiRevenue": "Выручка / Маржа (PLN)",
         "partnersKpiTransactions": "Транзакции",
@@ -1098,7 +1098,7 @@
       "saved": "Подсказка «{key}» сохранена",
       "screen": "Экран",
       "screens": {
-        "partnerPerformance": "Partner Performance",
+        "partnerPerformance": "Результаты партнёров",
         "salesDashboard": "Sales Dashboard",
         "salesReports": "Отчёты по продажам"
       }

@@ -906,7 +906,7 @@
       "leadSources": {
         "agent": "Agent",
         "cold_call": "Cold call",
-        "inbound": "Inbound",
+        "inbound": "Zapytanie przychodzące",
         "inne": "Inne",
         "kampania": "Kampania email",
         "linkedin": "LinkedIn",
@@ -1062,7 +1062,7 @@
         "leadsTrendTitle": "Trend miesięczny (tytuł)",
         "leadsVelocityTitle": "Czas w etapie – avg dni (tytuł)",
         "partnersKpiActivePartners": "Aktywnych partnerów",
-        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiFees": "Prowizje (PLN)",
         "partnersKpiGrossTurnover": "Obrót brutto (PLN)",
         "partnersKpiRevenue": "Przychód / Marża (PLN)",
         "partnersKpiTransactions": "Transakcje",
@@ -1098,7 +1098,7 @@
       "saved": "Tooltip \"{key}\" zapisany",
       "screen": "Ekran",
       "screens": {
-        "partnerPerformance": "Partner Performance",
+        "partnerPerformance": "Wyniki partnerów",
         "salesDashboard": "Sales Dashboard",
         "salesReports": "Raporty sprzedaży"
       }

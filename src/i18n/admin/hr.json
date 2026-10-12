@@ -906,7 +906,7 @@
       "leadSources": {
         "agent": "Agent",
         "cold_call": "Cold call",
-        "inbound": "Inbound",
+        "inbound": "Dolazni upit",
         "inne": "Ostalo",
         "kampania": "Kampanja e-poštom",
         "linkedin": "LinkedIn",
@@ -1062,7 +1062,7 @@
         "leadsTrendTitle": "Mjesečni trend (naslov)",
         "leadsVelocityTitle": "Vrijeme u fazi – prosj. dana (naslov)",
         "partnersKpiActivePartners": "Aktivnih partnera",
-        "partnersKpiFees": "Fees (PLN)",
+        "partnersKpiFees": "Provizije (PLN)",
         "partnersKpiGrossTurnover": "Bruto promet (PLN)",
         "partnersKpiRevenue": "Prihod / Marža (PLN)",
         "partnersKpiTransactions": "Transakcije",
@@ -1098,7 +1098,7 @@
       "saved": "Tooltip „{key}” je spremljen",
       "screen": "Zaslon",
       "screens": {
-        "partnerPerformance": "Partner Performance",
+        "partnerPerformance": "Uspješnost partnera",
         "salesDashboard": "Sales Dashboard",
         "salesReports": "Izvješća o prodaji"
       }

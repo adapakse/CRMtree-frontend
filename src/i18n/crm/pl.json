@@ -638,12 +638,12 @@
     "sources": {
       "agent": "Agent",
       "aliasHello": "Alias Hello",
-      "coldCall": "Cold Call",
+      "coldCall": "Zimny telefon",
       "emailCampaign": "Kampania email",
       "googleAdsAiSearch": "Google Ads AI Search",
       "googleAdsPmax": "Google Ads PMax",
       "googleAdsSeaBrand": "Google Ads SEA Brand",
-      "inbound": "Inbound",
+      "inbound": "Zapytanie przychodzące",
       "linkedin": "LinkedIn",
       "linkedinInMail": "LinkedIn InMail",
       "linkedinLeadForm": "LinkedIn Lead Form",
@@ -1529,7 +1529,7 @@
         "leads": "Leady",
         "pipeline": "Pipeline",
         "progress": "Postęp",
-        "winRatePct": "Win%",
+        "winRatePct": "Skut. %",
         "won": "Won"
       },
       "days": "{count, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
@@ -1542,7 +1542,7 @@
         "activeLeads": "Aktywne leady",
         "avgSalesCycle": "Avg. cykl sprzedaży",
         "avgWonValue": "Avg. wartość wygranego",
-        "winRate": "Win Rate",
+        "winRate": "Skuteczność",
         "wonPln": "Zamknięte / Won (PLN)"
       },
       "leadSources": {
@@ -1649,7 +1649,7 @@
       },
       "external": {
         "feeRate": "Fee rate: {value}%",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Prowizje (PLN)",
         "grossTurnoverPln": "Obrót brutto (PLN)",
         "margin": "Marża: {value}%",
         "netTurnoverPln": "Obrót netto (PLN)",
@@ -1701,7 +1701,7 @@
         "tradeFairs": "Targi"
       },
       "table": {
-        "fees": "Fees",
+        "fees": "Prowizje",
         "grossTurnover": "Obrót brutto",
         "net": "Netto",
         "partners": "Partnerzy",
@@ -1798,9 +1798,9 @@
         "title": "Ryzyko Churn partnerów"
       },
       "columns": {
-        "fees": "Fees",
+        "fees": "Prowizje",
         "grossTurnover": "Obrót brutto",
-        "health": "Health",
+        "health": "Kondycja",
         "margin": "Marża",
         "netTurnover": "Obrót netto",
         "partner": "Partner",
@@ -1827,7 +1827,7 @@
       "kpi": {
         "activePartners": "Aktywnych partnerów",
         "feeRateShare": "{percent}% fee rate",
-        "feesPln": "Fees (PLN)",
+        "feesPln": "Prowizje (PLN)",
         "productsCount": "{count} Produkty",
         "revenueMarginPln": "Przychód / Marża (PLN)",
         "revenueTrend": "trend przychodów",
@@ -1862,7 +1862,7 @@
         "revenueMargin": "Przychód (marża)",
         "title": "Podsumowanie finansowe"
       },
-      "title": "Partner Performance",
+      "title": "Wyniki partnerów",
       "trend": {
         "title": "Trend przychodów",
         "totalTurnover": "Łącznie obrót"
