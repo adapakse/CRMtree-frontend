@@ -1155,6 +1155,32 @@
         "urgent": "days → red (urgent)"
       }
     },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Finance and accounting department",
+        "customerService": "Customer service department",
+        "hr": "Human resources department",
+        "management": "Company management board",
+        "marketing": "Marketing department",
+        "operations": "Operations department",
+        "prospects": "Access to the Prospects module (CSV import, enrichment, conversion to a lead).",
+        "sales": "Sales department",
+        "seo": "Review and approval of SEObot content before publication.",
+        "seoEditorial": "SEObot editors: editing, completing and approving articles before publication."
+      },
+      "displayName": {
+        "accounting": "Accounting",
+        "customerService": "Customer service",
+        "hr": "HR",
+        "management": "Management board",
+        "marketing": "Marketing",
+        "operations": "Operations",
+        "prospects": "Prospects",
+        "sales": "Sales",
+        "seo": "SEO",
+        "seoEditorial": "SEO editorial"
+      }
+    },
     "groups": {
       "addFailed": "Couldn’t add the group",
       "addGroup": "Add group",

@@ -796,7 +796,7 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                 <div style="padding:14px 20px;display:flex;align-items:center;gap:12px">
                   <div style="width:36px;height:36px;background:#EFF6FF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👥</div>
                   <div style="flex:1;min-width:0">
-                    <div style="font-size:13.5px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
+                    <div style="font-size:13.5px;font-weight:700;color:var(--gray-900)">{{ groupDisplayName(g) }}</div>
                     <div style="font-size:11.5px;color:var(--gray-400);margin-top:1px">
                       <span style="font-family:monospace;background:var(--gray-100);padding:1px 6px;border-radius:4px">{{ g.name }}</span>
                       <span style="margin:0 6px">·</span>
@@ -811,7 +811,7 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
                       }
                     </div>
                     @if (g.description) {
-                      <div style="font-size:12px;color:var(--gray-500);margin-top:3px">{{ g.description }}</div>
+                      <div style="font-size:12px;color:var(--gray-500);margin-top:3px">{{ groupDescription(g) }}</div>
                     }
                   </div>
                   <button class="btn btn-d btn-sm"
@@ -1863,6 +1863,22 @@ export class SettingsComponent implements OnInit {
    * tylko wtedy, gdy element jest dokładnie taki jak zaseedowany domyślny.
    * Wartość dopisana przez admina tenanta zostaje nietknięta — to jego słownik.
    */
+  /**
+   * Nazwa wyświetlana i opis grupy uprawnień (`group_profiles`) są zaseedowane
+   * po polsku, a admin tenanta może je zmienić — więc podmieniamy je na
+   * tłumaczenie tylko wtedy, gdy są dokładnie takie jak polskie domyślne.
+   * Dopasowanie idzie po WARTOŚCI, nie po kodzie grupy (`g.name`), bo dwie
+   * grupy mają ten sam kod `SEO` przy różnych nazwach i opisach. Sam kod
+   * zostaje nietknięty — używa go słownik importu CSV.
+   */
+  groupDisplayName(g: { display_name?: string | null }): string {
+    return this.freeTextItemLabel('groupProfiles.displayName', g.display_name ?? '');
+  }
+
+  groupDescription(g: { description?: string | null }): string {
+    return this.freeTextItemLabel('groupProfiles.description', g.description ?? '');
+  }
+
   private freeTextItemLabel(group: string, item: string): string {
     const polish = this.transloco.translateObject(`admin.settings.itemLabels.${group}`, {}, 'pl');
     if (!polish || typeof polish !== 'object') return item;

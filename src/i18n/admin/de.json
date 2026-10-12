@@ -1155,6 +1155,32 @@
         "urgent": "Tage → rot (dringend)"
       }
     },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Abteilung Finanzen und Buchhaltung",
+        "customerService": "Kundenserviceabteilung",
+        "hr": "Personalabteilung",
+        "management": "Vorstand des Unternehmens",
+        "marketing": "Marketingabteilung",
+        "operations": "Betriebsabteilung",
+        "prospects": "Zugang zum Modul Prospekte (CSV-Import, Enrichment, Umwandlung in einen Lead).",
+        "sales": "Vertriebsabteilung",
+        "seo": "Prüfung und Freigabe der SEObot-Inhalte vor der Veröffentlichung.",
+        "seoEditorial": "SEObot-Redaktion: Bearbeiten, Ergänzen und Freigeben von Artikeln vor der Veröffentlichung."
+      },
+      "displayName": {
+        "accounting": "Buchhaltung",
+        "customerService": "Kundenservice",
+        "hr": "Personalwesen",
+        "management": "Vorstand",
+        "marketing": "Marketing",
+        "operations": "Betrieb",
+        "prospects": "Prospekte",
+        "sales": "Vertrieb",
+        "seo": "SEO",
+        "seoEditorial": "SEO-Redaktion"
+      }
+    },
     "groups": {
       "addFailed": "Fehler beim Hinzufügen der Gruppe",
       "addGroup": "Gruppe hinzufügen",

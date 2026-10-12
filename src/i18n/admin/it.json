@@ -1155,6 +1155,32 @@
         "urgent": "giorni → rosso (urgente)"
       }
     },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Reparto finanza e contabilità",
+        "customerService": "Reparto assistenza clienti",
+        "hr": "Reparto risorse umane",
+        "management": "Consiglio direttivo dell’azienda",
+        "marketing": "Reparto marketing",
+        "operations": "Reparto operazioni",
+        "prospects": "Accesso al modulo Prospect (import CSV, arricchimento, conversione in lead).",
+        "sales": "Reparto vendite",
+        "seo": "Revisione e approvazione dei contenuti di SEObot prima della pubblicazione.",
+        "seoEditorial": "Redattori di SEObot: modifica, completamento e approvazione degli articoli prima della pubblicazione."
+      },
+      "displayName": {
+        "accounting": "Contabilità",
+        "customerService": "Assistenza clienti",
+        "hr": "Risorse umane",
+        "management": "Consiglio direttivo",
+        "marketing": "Marketing",
+        "operations": "Operazioni",
+        "prospects": "Prospect",
+        "sales": "Vendite",
+        "seo": "SEO",
+        "seoEditorial": "Redazione SEO"
+      }
+    },
     "groups": {
       "addFailed": "Errore durante l’aggiunta del gruppo",
       "addGroup": "Aggiungi gruppo",

@@ -1155,6 +1155,32 @@
         "urgent": "jours → rouge (urgent)"
       }
     },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Service des finances et de la comptabilité",
+        "customerService": "Service client",
+        "hr": "Service des ressources humaines",
+        "management": "Direction de l’entreprise",
+        "marketing": "Service marketing",
+        "operations": "Service des opérations",
+        "prospects": "Accès au module Prospects (import CSV, enrichissement, conversion en lead).",
+        "sales": "Service commercial",
+        "seo": "Relecture et validation des contenus SEObot avant publication.",
+        "seoEditorial": "Rédacteurs SEObot : rédaction, complétion et validation des articles avant publication."
+      },
+      "displayName": {
+        "accounting": "Comptabilité",
+        "customerService": "Service client",
+        "hr": "Ressources humaines",
+        "management": "Direction",
+        "marketing": "Marketing",
+        "operations": "Opérations",
+        "prospects": "Prospects",
+        "sales": "Ventes",
+        "seo": "SEO",
+        "seoEditorial": "Rédaction SEO"
+      }
+    },
     "groups": {
       "addFailed": "Erreur lors de l’ajout du groupe",
       "addGroup": "Ajouter le groupe",

@@ -1155,6 +1155,32 @@
         "urgent": "dana → crveno (hitno)"
       }
     },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Odjel za financije i računovodstvo",
+        "customerService": "Odjel korisničke podrške",
+        "hr": "Kadrovski odjel",
+        "management": "Uprava društva",
+        "marketing": "Marketinški odjel",
+        "operations": "Operativni odjel",
+        "prospects": "Pristup modulu Prospekti (uvoz CSV, obogaćivanje, pretvorba u lead).",
+        "sales": "Prodajni odjel",
+        "seo": "Pregled i odobrenje sadržaja SEObota prije objave.",
+        "seoEditorial": "Urednici SEObota: uređivanje, dopunjavanje i odobravanje članaka prije objave."
+      },
+      "displayName": {
+        "accounting": "Računovodstvo",
+        "customerService": "Korisnička podrška",
+        "hr": "Kadrovi",
+        "management": "Uprava",
+        "marketing": "Marketing",
+        "operations": "Operacije",
+        "prospects": "Prospekti",
+        "sales": "Prodaja",
+        "seo": "SEO",
+        "seoEditorial": "Uredništvo SEO"
+      }
+    },
     "groups": {
       "addFailed": "Pogreška pri dodavanju grupe",
       "addGroup": "Dodaj grupu",

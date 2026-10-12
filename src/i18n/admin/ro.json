@@ -1155,6 +1155,32 @@
         "urgent": "zile → roșu (urgent)"
       }
     },
+    "groupProfiles": {
+      "description": {
+        "accounting": "Departamentul de finanțe și contabilitate",
+        "customerService": "Departamentul de relații cu clienții",
+        "hr": "Departamentul de resurse umane",
+        "management": "Conducerea companiei",
+        "marketing": "Departamentul de marketing",
+        "operations": "Departamentul de operațiuni",
+        "prospects": "Acces la modulul Prospecți (import CSV, îmbogățire, conversie în lead).",
+        "sales": "Departamentul de vânzări",
+        "seo": "Verificarea și aprobarea conținutului SEObot înainte de publicare.",
+        "seoEditorial": "Redactorii SEObot: editarea, completarea și aprobarea articolelor înainte de publicare."
+      },
+      "displayName": {
+        "accounting": "Contabilitate",
+        "customerService": "Relații cu clienții",
+        "hr": "Resurse umane",
+        "management": "Conducere",
+        "marketing": "Marketing",
+        "operations": "Operațiuni",
+        "prospects": "Prospecți",
+        "sales": "Vânzări",
+        "seo": "SEO",
+        "seoEditorial": "Redacția SEO"
+      }
+    },
     "groups": {
       "addFailed": "Eroare la adăugarea grupului",
       "addGroup": "Adăugare grup",
