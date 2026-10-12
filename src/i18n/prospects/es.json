@@ -325,5 +325,43 @@
     "hold": "En espera",
     "lead": "Lead",
     "prospect": "Prospecto"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Tras la venta se repiten eventos recurrentes: revisiones, servicio técnico, renovaciones, visitas posteriores y similares.",
+      "label": "Servicio recurrente"
+    },
+    "dzial_handlowy": {
+      "desc": "Un departamento o equipo comercial nombrado explícitamente, o varias personas concretas con funciones de venta.",
+      "label": "Departamento comercial"
+    },
+    "ecommerce_b2b": {
+      "desc": "La empresa tiene una tienda o plataforma de pedidos B2B con gestión real de pedidos en línea.",
+      "label": "Comercio electrónico B2B"
+    },
+    "konsultacja_demo": {
+      "desc": "Antes de la compra existe una etapa real de asesoramiento, análisis de necesidades, elección de solución o demo.",
+      "label": "Consultoría / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Un gestor, KAM, persona o equipo concreto es responsable de forma permanente de un cliente, cuenta o segmento.",
+      "label": "Atención dedicada"
+    },
+    "przetargi": {
+      "desc": "La empresa participa en licitaciones como contratista o proveedor, no como entidad compradora.",
+      "label": "Licitaciones"
+    },
+    "rozproszona_struktura": {
+      "desc": "La empresa tiene sus propias sedes físicamente distribuidas o representantes territoriales.",
+      "label": "Estructura distribuida"
+    },
+    "siec_partnerow": {
+      "desc": "Distribuidores, revendedores o partners independientes venden la oferta de la empresa.",
+      "label": "Red de partners"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "La empresa prepara la oferta, el presupuesto o las condiciones de forma individual para cada cliente.",
+      "label": "Presupuesto personalizado"
+    }
   }
 }

@@ -325,5 +325,43 @@
     "hold": "On hold",
     "lead": "Lead",
     "prospect": "Prospect"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "After the sale there are recurring events: inspections, servicing, renewals, repeat visits and similar.",
+      "label": "Recurring service"
+    },
+    "dzial_handlowy": {
+      "desc": "An explicitly named sales department or team, or several specific people in sales roles.",
+      "label": "Sales department"
+    },
+    "ecommerce_b2b": {
+      "desc": "The company runs a B2B shop or ordering platform with real online order handling.",
+      "label": "B2B e-commerce"
+    },
+    "konsultacja_demo": {
+      "desc": "Before the purchase there is a real stage of advice, needs analysis, solution fit or a demo.",
+      "label": "Consultation / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "A named account manager, KAM, person or team is permanently responsible for a customer, account or segment.",
+      "label": "Dedicated account care"
+    },
+    "przetargi": {
+      "desc": "The company takes part in tenders as a contractor or supplier, not as the buyer.",
+      "label": "Public tenders"
+    },
+    "rozproszona_struktura": {
+      "desc": "The company has its own physically distributed branches or territorial representatives.",
+      "label": "Distributed structure"
+    },
+    "siec_partnerow": {
+      "desc": "Independent dealers, resellers or partners sell the company’s offering.",
+      "label": "Partner network"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "The company prepares an offer, quote or terms individually for a given customer.",
+      "label": "Custom quote"
+    }
   }
 }

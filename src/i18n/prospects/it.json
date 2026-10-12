@@ -325,5 +325,43 @@
     "hold": "In sospeso",
     "lead": "Lead",
     "prospect": "Prospect"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Dopo la vendita si ripetono eventi ricorrenti: controlli, assistenza, rinnovi, visite successive e simili.",
+      "label": "Servizio ricorrente"
+    },
+    "dzial_handlowy": {
+      "desc": "Un reparto o team vendite esplicitamente indicato, oppure più persone precise con ruoli commerciali.",
+      "label": "Reparto vendite"
+    },
+    "ecommerce_b2b": {
+      "desc": "L’azienda ha un negozio o una piattaforma di ordini B2B con reale gestione degli ordini online.",
+      "label": "E-commerce B2B"
+    },
+    "konsultacja_demo": {
+      "desc": "Prima dell’acquisto c’è una fase reale di consulenza, analisi dei bisogni, scelta della soluzione o demo.",
+      "label": "Consulenza / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Un referente, KAM, persona o team dedicato è responsabile in modo continuativo di un cliente, account o segmento.",
+      "label": "Gestione dedicata"
+    },
+    "przetargi": {
+      "desc": "L’azienda partecipa alle gare come appaltatore o fornitore, non come committente.",
+      "label": "Gare d’appalto"
+    },
+    "rozproszona_struktura": {
+      "desc": "L’azienda ha sedi proprie fisicamente distribuite o rappresentanti territoriali.",
+      "label": "Struttura distribuita"
+    },
+    "siec_partnerow": {
+      "desc": "Dealer, rivenditori o partner indipendenti vendono l’offerta dell’azienda.",
+      "label": "Rete di partner"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "L’azienda prepara offerta, preventivo o condizioni su misura per il singolo cliente.",
+      "label": "Preventivo personalizzato"
+    }
   }
 }

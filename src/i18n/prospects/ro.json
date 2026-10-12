@@ -325,5 +325,43 @@
     "hold": "În așteptare",
     "lead": "Lead",
     "prospect": "Prospect"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "După vânzare apar evenimente repetate: revizii, service, reînnoiri, vizite ulterioare și altele asemănătoare.",
+      "label": "Servicii recurente"
+    },
+    "dzial_handlowy": {
+      "desc": "Un departament sau o echipă de vânzări numită explicit, ori mai multe persoane concrete cu roluri comerciale.",
+      "label": "Departament de vânzări"
+    },
+    "ecommerce_b2b": {
+      "desc": "Firma are un magazin sau o platformă de comandă B2B cu procesare reală a comenzilor online.",
+      "label": "Comerț electronic B2B"
+    },
+    "konsultacja_demo": {
+      "desc": "Înaintea achiziției există o etapă reală de consiliere, analiză a nevoilor, alegere a soluției sau demo.",
+      "label": "Consultanță / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Un responsabil, KAM, o persoană sau o echipă anume răspunde permanent de un client, cont sau segment.",
+      "label": "Îngrijire dedicată"
+    },
+    "przetargi": {
+      "desc": "Firma participă la licitații ca executant sau furnizor, nu ca autoritate contractantă.",
+      "label": "Licitații"
+    },
+    "rozproszona_struktura": {
+      "desc": "Firma are sedii proprii distribuite fizic sau reprezentanți teritoriali.",
+      "label": "Structură distribuită"
+    },
+    "siec_partnerow": {
+      "desc": "Dealeri, reselleri sau parteneri independenți vând oferta firmei.",
+      "label": "Rețea de parteneri"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Firma pregătește oferta, prețul sau condițiile individual pentru fiecare client.",
+      "label": "Ofertă personalizată"
+    }
   }
 }

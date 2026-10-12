@@ -325,5 +325,43 @@
     "hold": "Hold",
     "lead": "Lead",
     "prospect": "Prospekt"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Po sprzedaży występują powtarzalne zdarzenia: przeglądy, serwis, odnowienia, kolejne wizyty itp.",
+      "label": "Cykliczna obsługa"
+    },
+    "dzial_handlowy": {
+      "desc": "Jawnie nazwany dział/zespół sprzedaży albo kilka konkretnych osób pełniących role handlowe.",
+      "label": "Dział handlowy"
+    },
+    "ecommerce_b2b": {
+      "desc": "Firma ma sklep/platformę zamówieniową B2B z realną obsługą zamówień online.",
+      "label": "E-commerce B2B"
+    },
+    "konsultacja_demo": {
+      "desc": "Przed zakupem występuje realny etap doradztwa, analizy potrzeb, doboru rozwiązania lub demo.",
+      "label": "Konsultacja / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Konkretny opiekun/KAM/osoba lub zespół jest stale odpowiedzialny za klienta, konto albo segment.",
+      "label": "Dedykowana opieka"
+    },
+    "przetargi": {
+      "desc": "Firma występuje jako wykonawca/dostawca w przetargach, nie jako zamawiający.",
+      "label": "Przetargi"
+    },
+    "rozproszona_struktura": {
+      "desc": "Firma ma własne, fizycznie rozproszone oddziały lub przedstawicieli terytorialnych.",
+      "label": "Rozproszona struktura"
+    },
+    "siec_partnerow": {
+      "desc": "Niezależni dealerzy/resellerzy/partnerzy sprzedają ofertę badanej firmy.",
+      "label": "Sieć partnerów"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Firma przygotowuje ofertę, wycenę lub warunki indywidualnie dla konkretnego klienta.",
+      "label": "Indywidualna wycena"
+    }
   }
 }

@@ -325,5 +325,43 @@
     "hold": "Zurückgestellt",
     "lead": "Lead",
     "prospect": "Prospect"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Nach dem Verkauf treten wiederkehrende Ereignisse auf: Prüfungen, Service, Verlängerungen, Folgebesuche und Ähnliches.",
+      "label": "Wiederkehrende Betreuung"
+    },
+    "dzial_handlowy": {
+      "desc": "Eine ausdrücklich benannte Vertriebsabteilung oder ein Vertriebsteam bzw. mehrere konkrete Personen in Vertriebsrollen.",
+      "label": "Vertriebsabteilung"
+    },
+    "ecommerce_b2b": {
+      "desc": "Das Unternehmen betreibt einen B2B-Shop oder eine Bestellplattform mit echter Online-Auftragsabwicklung.",
+      "label": "B2B-E-Commerce"
+    },
+    "konsultacja_demo": {
+      "desc": "Vor dem Kauf gibt es eine echte Phase der Beratung, Bedarfsanalyse, Lösungsauswahl oder eine Demo.",
+      "label": "Beratung / Demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Ein benannter Betreuer, KAM, eine Person oder ein Team ist dauerhaft für Kunde, Konto oder Segment verantwortlich.",
+      "label": "Dedizierte Kundenbetreuung"
+    },
+    "przetargi": {
+      "desc": "Das Unternehmen tritt in Ausschreibungen als Auftragnehmer oder Lieferant auf, nicht als Auftraggeber.",
+      "label": "Ausschreibungen"
+    },
+    "rozproszona_struktura": {
+      "desc": "Das Unternehmen hat eigene, räumlich verteilte Niederlassungen oder Gebietsvertreter.",
+      "label": "Verteilte Struktur"
+    },
+    "siec_partnerow": {
+      "desc": "Unabhängige Händler, Reseller oder Partner verkaufen das Angebot des Unternehmens.",
+      "label": "Partnernetzwerk"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Das Unternehmen erstellt Angebot, Preis oder Bedingungen individuell für den jeweiligen Kunden.",
+      "label": "Individuelles Angebot"
+    }
   }
 }

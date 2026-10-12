@@ -325,5 +325,43 @@
     "hold": "En attente",
     "lead": "Lead",
     "prospect": "Prospect"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Après la vente, des événements récurrents se produisent : contrôles, maintenance, renouvellements, visites suivantes, etc.",
+      "label": "Service récurrent"
+    },
+    "dzial_handlowy": {
+      "desc": "Un service ou une équipe commerciale explicitement nommé, ou plusieurs personnes précises occupant des fonctions commerciales.",
+      "label": "Service commercial"
+    },
+    "ecommerce_b2b": {
+      "desc": "L’entreprise dispose d’une boutique ou d’une plateforme de commande B2B avec un véritable traitement des commandes en ligne.",
+      "label": "E-commerce B2B"
+    },
+    "konsultacja_demo": {
+      "desc": "Avant l’achat, il existe une véritable étape de conseil, d’analyse des besoins, de choix de solution ou de démonstration.",
+      "label": "Conseil / démo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Un interlocuteur, KAM, personne ou équipe dédié est responsable en permanence d’un client, d’un compte ou d’un segment.",
+      "label": "Suivi dédié"
+    },
+    "przetargi": {
+      "desc": "L’entreprise participe aux appels d’offres comme prestataire ou fournisseur, et non comme donneur d’ordre.",
+      "label": "Appels d’offres"
+    },
+    "rozproszona_struktura": {
+      "desc": "L’entreprise possède ses propres sites physiquement répartis ou des représentants territoriaux.",
+      "label": "Structure distribuée"
+    },
+    "siec_partnerow": {
+      "desc": "Des revendeurs, distributeurs ou partenaires indépendants vendent l’offre de l’entreprise.",
+      "label": "Réseau de partenaires"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "L’entreprise établit l’offre, le devis ou les conditions individuellement pour chaque client.",
+      "label": "Devis personnalisé"
+    }
   }
 }

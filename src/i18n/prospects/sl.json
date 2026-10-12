@@ -325,5 +325,43 @@
     "hold": "Zadržano",
     "lead": "Lead",
     "prospect": "Prospekt"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Po prodaji se pojavljajo ponavljajoči dogodki: pregledi, servis, podaljšanja, nadaljnji obiski in podobno.",
+      "label": "Ponavljajoča se storitev"
+    },
+    "dzial_handlowy": {
+      "desc": "Izrecno poimenovan prodajni oddelek ali ekipa oziroma več konkretnih oseb v prodajnih vlogah.",
+      "label": "Prodajni oddelek"
+    },
+    "ecommerce_b2b": {
+      "desc": "Podjetje ima B2B trgovino ali naročilno platformo z resnično obdelavo spletnih naročil.",
+      "label": "B2B e-trgovina"
+    },
+    "konsultacja_demo": {
+      "desc": "Pred nakupom obstaja resnična faza svetovanja, analize potreb, izbire rešitve ali demo.",
+      "label": "Svetovanje / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Določen skrbnik, KAM, oseba ali ekipa je trajno odgovorna za stranko, račun ali segment.",
+      "label": "Namenska skrb za stranke"
+    },
+    "przetargi": {
+      "desc": "Podjetje na razpisih nastopa kot izvajalec ali dobavitelj, ne kot naročnik.",
+      "label": "Javni razpisi"
+    },
+    "rozproszona_struktura": {
+      "desc": "Podjetje ima lastne, fizično razpršene podružnice ali območne zastopnike.",
+      "label": "Razpršena struktura"
+    },
+    "siec_partnerow": {
+      "desc": "Neodvisni trgovci, preprodajalci ali partnerji prodajajo ponudbo podjetja.",
+      "label": "Mreža partnerjev"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Podjetje pripravi ponudbo, izračun ali pogoje posebej za posameznega naročnika.",
+      "label": "Individualna ponudba"
+    }
   }
 }

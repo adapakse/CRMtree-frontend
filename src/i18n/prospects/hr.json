@@ -325,5 +325,43 @@
     "hold": "Na čekanju",
     "lead": "Lead",
     "prospect": "Prospekt"
+  },
+  "signals": {
+    "cykliczna_obsluga_klienta_odnowienia": {
+      "desc": "Nakon prodaje javljaju se ponavljajući događaji: pregledi, servis, obnove, daljnji posjeti i slično.",
+      "label": "Ponavljajuća usluga"
+    },
+    "dzial_handlowy": {
+      "desc": "Izričito imenovan prodajni odjel ili tim, odnosno više konkretnih osoba u prodajnim ulogama.",
+      "label": "Prodajni odjel"
+    },
+    "ecommerce_b2b": {
+      "desc": "Firma ima B2B trgovinu ili platformu za narudžbe sa stvarnom obradom online narudžbi.",
+      "label": "B2B e-trgovina"
+    },
+    "konsultacja_demo": {
+      "desc": "Prije kupnje postoji stvarna faza savjetovanja, analize potreba, odabira rješenja ili demo.",
+      "label": "Konzultacija / demo"
+    },
+    "opieka_nad_klientem": {
+      "desc": "Određeni skrbnik, KAM, osoba ili tim trajno je odgovoran za klijenta, račun ili segment.",
+      "label": "Namjenska briga o klijentu"
+    },
+    "przetargi": {
+      "desc": "Firma na natječajima nastupa kao izvođač ili dobavljač, a ne kao naručitelj.",
+      "label": "Javni natječaji"
+    },
+    "rozproszona_struktura": {
+      "desc": "Firma ima vlastite, fizički raspršene podružnice ili teritorijalne predstavnike.",
+      "label": "Raspršena struktura"
+    },
+    "siec_partnerow": {
+      "desc": "Neovisni trgovci, preprodavači ili partneri prodaju ponudu firme.",
+      "label": "Mreža partnera"
+    },
+    "zlozony_proces_sprzedazy": {
+      "desc": "Firma priprema ponudu, izračun ili uvjete pojedinačno za određenog klijenta.",
+      "label": "Individualna ponuda"
+    }
   }
 }

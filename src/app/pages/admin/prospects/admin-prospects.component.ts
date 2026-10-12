@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { NavBackService } from '../../../core/services/nav-back.service';
@@ -2426,23 +2427,47 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // (GET /scoring-rules), ale wołany raz przy starcie ekranu, nie leniwie per
   // prospekt. Kolejność = kolejność zwrócona przez backend (sort_order configu).
   loadSignalDefs(): void {
-    this.http.get<{ signals: { definitions: { id: string; label: string; short_description?: string | null }[] } }>(
-      `${API}/scoring-rules`,
-    ).subscribe({
-      next: rules => {
+    // Zakres `prospects` w polskim jest tu potrzebny obok języka aktywnego:
+    // polskie wartości signals.*.label służą za odcisk palca nazwy domyślnej
+    // (patrz localizeSignal). Dla polskiego interfejsu to ten sam, już wczytany
+    // plik, więc nic nie dociąga.
+    forkJoin({
+      rules: this.http.get<{ signals: { definitions: { id: string; label: string; short_description?: string | null }[] } }>(
+        `${API}/scoring-rules`,
+      ),
+      pl: this.transloco.load('prospects/pl').pipe(catchError(() => of(null))),
+    }).subscribe({
+      next: ({ rules }) => {
         // Tooltip = short_description (krótki, biznesowy opis "co oznacza TRUE"),
         // NIGDY ai_definition (pełna, wieloparagrafowa instrukcja dla AI — za
         // długa i nieczytelna jako tooltip). Brak short_description = brak opisu,
         // tooltip pokazuje wtedy samą nazwę sygnału.
         const defs = (rules.signals?.definitions ?? []).map(d => ({
           key: d.id,
-          label: d.label,
-          desc: d.short_description ?? '',
+          label: this.localizeSignal(d.id, 'label', d.label),
+          desc: this.localizeSignal(d.id, 'desc', d.short_description ?? ''),
         }));
         this.signalDefs.set(defs);
       },
       error: () => { /* kolumny sygnałów zostają puste — reszta ekranu i tak działa */ },
     });
+  }
+
+  /**
+   * Nazwy i opisy sygnałów ICP są wierszami w `tenant_icp_signals`, czyli danymi
+   * tenanta — admin tenanta może je zmienić, a także dodać własny sygnał. Dlatego
+   * tłumaczymy WYŁĄCZNIE wtedy, gdy wartość z backendu jest dokładnie taka, jak
+   * polska wartość domyślna: to znaczy, że nikt jej nie ruszył. Nazwa zmieniona
+   * przez tenanta zostaje nietknięta — inaczej tłumaczenie nadpisywałoby jego
+   * świadomą decyzję.
+   */
+  private localizeSignal(key: string, field: 'label' | 'desc', value: string): string {
+    if (!value) return value;
+    const path = `prospects.signals.${key}.${field}`;
+    const polishDefault = this.transloco.translate(path, {}, 'pl');
+    if (polishDefault === path || polishDefault !== value) return value;
+    const translated = this.transloco.translate(path);
+    return translated === path ? value : translated;
   }
   ngOnDestroy() {
     clearTimeout(this.pollTimer);
