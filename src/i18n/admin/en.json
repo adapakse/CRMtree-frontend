@@ -1157,6 +1157,28 @@
         "value": "Value"
       }
     },
+    "customFields": {
+      "active": "Active",
+      "addButton": "Add field",
+      "deleteConfirm": "Delete the field “{name}”?",
+      "deleteTooltip": "Delete the field — only possible while no record has a value in it",
+      "empty": "No custom fields on this form.",
+      "hint": "Fields you define yourself for this form. A field's type cannot be changed later — to change it, switch the field off and add a new one. A disabled field disappears from the form, but values already entered are kept.",
+      "newNamePlaceholder": "New field name",
+      "optionsPlaceholder": "Comma-separated values",
+      "optionsRequired": "A list field needs at least one value.",
+      "saveFailed": "Could not save the field.",
+      "titleDocument": "Document custom fields",
+      "titleLead": "Lead custom fields",
+      "titlePartner": "Partner custom fields",
+      "types": {
+        "date": "Date",
+        "list": "Dropdown",
+        "money": "Amount",
+        "number": "Number",
+        "text": "Text"
+      }
+    },
     "documents": {
       "empty": "No document dictionaries. Run migration 0116.",
       "intro": "— manage the available values for document types, statuses and GDPR classification. Note: deleting a value that is already used in documents may cause display problems."

@@ -220,6 +220,7 @@
       "contractSubject": "Vertragsgegenstand",
       "counterpartyCountry": "Land des Vertragspartners",
       "counterpartyTaxId": "Steuernummer des Vertragspartners",
+      "customFields": "Zusatzfelder",
       "documentName": "Dokumentname",
       "documentType": "Dokumenttyp",
       "email": "E-Mail",

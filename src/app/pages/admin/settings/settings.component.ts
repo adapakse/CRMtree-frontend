@@ -11,7 +11,11 @@ import { ToastService } from '../../../core/services/toast.service';
 import { AiConfigService, AiConfig, AiProviderOption, AiPurpose } from '../../../core/services/ai-config.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
+import { TenantFieldsEditorComponent } from './tenant-fields-editor.component';
 import { AiPurposeRowComponent } from './ai-purpose-row.component';
+import {
+  TenantFieldDefinitions, TenantFieldsService,
+} from '../../../core/services/tenant-fields.service';
 import { LanguagePickerComponent } from '../../../shared/components/language-picker/language-picker.component';
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
@@ -234,7 +238,7 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
 @Component({
   selector: 'wt-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectSettingsComponent, TenantFieldsEditorComponent, AiPurposeRowComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
   // Zakres `crm` obok `admin`: zakładka „Etapy leada" pokazuje wbudowane nazwy
   // etapów (crm.labels.stages.*) jako podpowiedź w polu nazwy — bez tego
   // placeholder pokazywałby surowy kod etapu.
@@ -713,6 +717,34 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
               </table>
             </div>
           }
+
+          <!-- Pola dodatkowe formatek leada i partnera. Dwie osobne listy, bo
+               pola są rozłączne — pole partnera nie pojawia się na leadzie. -->
+          <div class="card" style="margin-top:20px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titleLead') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="lead"
+                [definitions]="fieldDefinitions().lead"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:16px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titlePartner') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="partner"
+                [definitions]="fieldDefinitions().partner"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
         }
 
         <!-- TAB: Słowniki dokumentów -->
@@ -770,6 +802,22 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
               {{ t('settings.documents.empty') }}
             </div>
           }
+
+          <!-- Pola dodatkowe formatki dokumentu, definiowane przez admina
+               tenanta. Stoją tutaj, a nie w osobnej zakładce, bo to słownik
+               dokumentów tak samo jak typy i statusy wyżej. -->
+          <div class="card" style="margin-top:24px;overflow:hidden">
+            <div class="cat-header">
+              <span style="font-size:18px">🧩</span>
+              <span class="cat-title">{{ t('settings.customFields.titleDocument') }}</span>
+            </div>
+            <div style="padding:16px 20px">
+              <app-tenant-fields-editor
+                entity="document"
+                [definitions]="fieldDefinitions().document"
+                (definitionsChanged)="fieldDefinitions.set($event)" />
+            </div>
+          </div>
         }
 
         <!-- TAB: Grupy użytkowników -->
@@ -1589,9 +1637,22 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
 export class SettingsComponent implements OnInit {
   private settingsSvc = inject(AppSettingsService);
   private aiConfigSvc = inject(AiConfigService);
+  private tenantFieldsSvc = inject(TenantFieldsService);
   private leadStages  = inject(LeadStagesService);
   private toast       = inject(ToastService);
 
+  // ── Pola dodatkowe formatek (lead / partner / dokument) ───────────────────
+  // Definiowane przez admina tenanta, odpowiednik pól dodatkowych w Projektach.
+  // Trzymane razem dla wszystkich trzech formatek, bo API zwraca je jednym
+  // żądaniem i każda mutacja oddaje pełny, świeży komplet.
+  fieldDefinitions = signal<TenantFieldDefinitions>({ lead: [], partner: [], document: [] });
+
+  loadFieldDefinitions(): void {
+    this.tenantFieldsSvc.get().subscribe({
+      next: res => this.fieldDefinitions.set(res.definitions),
+      error: () => { /* brak pól to nie powód, żeby psuć cały ekran ustawień */ },
+    });
+  }
 
   // ── Dostawcy AI (klucz tenanta, osobno dla każdej funkcji) ────────────────
   // Każda funkcja AI ma własnego dostawcę, klucz i model — klient może mieć
@@ -1881,6 +1942,7 @@ export class SettingsComponent implements OnInit {
     this.transloco.load('admin/pl').subscribe({ error: () => undefined });
     // Karta dostawcy AI stoi w zakładce otwieranej domyślnie, więc wczytujemy ją od razu.
     this.loadAiConfig();
+    this.loadFieldDefinitions();
     // Załaduj listę userów dla edytora szablonów onboarding
     this.http.get<any[]>(`${environment.apiUrl}/admin/users?limit=200`).subscribe({
       next: r => this.allUsers.set((r as any)?.data || r),

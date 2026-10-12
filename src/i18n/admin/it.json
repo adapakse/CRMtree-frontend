@@ -1157,6 +1157,28 @@
         "value": "Valore"
       }
     },
+    "customFields": {
+      "active": "Attivo",
+      "addButton": "Aggiungi campo",
+      "deleteConfirm": "Eliminare il campo “{name}”?",
+      "deleteTooltip": "Elimina il campo — possibile solo se nessun record ha un valore",
+      "empty": "Nessun campo aggiuntivo in questo modulo.",
+      "hint": "Campi che definisci tu per questo modulo. Il tipo di campo non è modificabile in seguito: per cambiarlo, disattiva il campo e creane uno nuovo. Un campo disattivato scompare dal modulo, ma i valori già inseriti restano.",
+      "newNamePlaceholder": "Nome del nuovo campo",
+      "optionsPlaceholder": "Valori separati da virgola",
+      "optionsRequired": "Un campo elenco richiede almeno un valore.",
+      "saveFailed": "Non è stato possibile salvare il campo.",
+      "titleDocument": "Campi aggiuntivi del documento",
+      "titleLead": "Campi aggiuntivi del lead",
+      "titlePartner": "Campi aggiuntivi del partner",
+      "types": {
+        "date": "Data",
+        "list": "Elenco",
+        "money": "Importo",
+        "number": "Numero",
+        "text": "Testo"
+      }
+    },
     "documents": {
       "empty": "Nessun dizionario dei documenti. Esegui la migrazione 0116.",
       "intro": "— gestisci i valori disponibili per tipi di documento, stati e classificazione GDPR. Attenzione: l’eliminazione di un valore già utilizzato nei documenti può causare problemi di visualizzazione."

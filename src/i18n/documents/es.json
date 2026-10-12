@@ -220,6 +220,7 @@
       "contractSubject": "Objeto del contrato",
       "counterpartyCountry": "País de la contraparte",
       "counterpartyTaxId": "NIF de la contraparte",
+      "customFields": "Campos adicionales",
       "documentName": "Nombre del documento",
       "documentType": "Tipo de documento",
       "email": "Correo",

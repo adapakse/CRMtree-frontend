@@ -220,6 +220,7 @@
       "contractSubject": "Contract subject",
       "counterpartyCountry": "Counterparty country",
       "counterpartyTaxId": "Counterparty tax ID",
+      "customFields": "Custom fields",
       "documentName": "Document name",
       "documentType": "Document type",
       "email": "Email",

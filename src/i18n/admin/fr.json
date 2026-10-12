@@ -1157,6 +1157,28 @@
         "value": "Valeur"
       }
     },
+    "customFields": {
+      "active": "Actif",
+      "addButton": "Ajouter un champ",
+      "deleteConfirm": "Supprimer le champ « {name} » ?",
+      "deleteTooltip": "Supprimer le champ — possible uniquement si aucun enregistrement n’a de valeur",
+      "empty": "Aucun champ supplémentaire dans ce formulaire.",
+      "hint": "Champs que vous définissez vous-même pour ce formulaire. Le type d'un champ ne peut plus être modifié ensuite : pour le changer, désactivez le champ et créez-en un nouveau. Un champ désactivé disparaît du formulaire, mais les valeurs déjà saisies sont conservées.",
+      "newNamePlaceholder": "Nom du nouveau champ",
+      "optionsPlaceholder": "Valeurs séparées par des virgules",
+      "optionsRequired": "Un champ liste nécessite au moins une valeur.",
+      "saveFailed": "Impossible d'enregistrer le champ.",
+      "titleDocument": "Champs supplémentaires du document",
+      "titleLead": "Champs supplémentaires du lead",
+      "titlePartner": "Champs supplémentaires du partenaire",
+      "types": {
+        "date": "Date",
+        "list": "Liste déroulante",
+        "money": "Montant",
+        "number": "Nombre",
+        "text": "Texte"
+      }
+    },
     "documents": {
       "empty": "Aucun dictionnaire de documents. Exécutez la migration 0116.",
       "intro": "— gérez les valeurs disponibles pour les types de documents, les statuts et la classification RGPD. Attention : la suppression d’une valeur déjà utilisée dans des documents peut entraîner des problèmes d’affichage."
