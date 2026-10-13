@@ -1695,11 +1695,16 @@
     },
     "empty": "Nie znaleziono użytkowników",
     "featureAccess": {
+      "callAnalysis": "Analizator rozmów",
+      "callAnalysisDisabled": "Dostęp do Analizatora rozmów wyłączony",
+      "callAnalysisEnabled": "Dostęp do Analizatora rozmów włączony",
+      "callAnalysisHint": "Analiza notatek z rozmów telefonicznych (AI), ocena i follow-up",
       "prospects": "Prospekty",
       "prospectsDisabled": "Dostęp do Prospektów wyłączony",
       "prospectsEnabled": "Dostęp do Prospektów włączony",
       "prospectsGroupDescription": "Dostęp do modułu Prospektów (import CSV, enrichment, konwersja na lead).",
       "prospectsHint": "Analiza i wzbogacanie prospektów firm (AI)",
+      "saveFailed": "Nie udało się zapisać dostępu do funkcji",
       "title": "Dostęp do funkcji"
     },
     "fields": {

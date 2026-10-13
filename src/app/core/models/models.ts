@@ -33,6 +33,8 @@ export interface User {
   tenant_id?: string | null;
   must_change_password?: boolean;
   tenant_features?: Partial<Record<CrmFeature, boolean>>;
+  /** Uprawnienia nadane imiennie przez admina tenanta (user_feature_access). */
+  user_features?: Partial<Record<CrmFeature, boolean>>;
   crm_role?: 'salesperson' | 'sales_manager' | null;
   phone?: string | null;
   company?: string | null;

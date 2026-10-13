@@ -1695,11 +1695,16 @@
     },
     "empty": "Keine Benutzer gefunden",
     "featureAccess": {
+      "callAnalysis": "Gesprächsanalyse",
+      "callAnalysisDisabled": "Zugriff auf Gesprächsanalyse deaktiviert",
+      "callAnalysisEnabled": "Zugriff auf Gesprächsanalyse aktiviert",
+      "callAnalysisHint": "KI-Analyse von Telefonnotizen, Bewertung und Follow-up",
       "prospects": "Interessenten",
       "prospectsDisabled": "Zugriff auf Interessenten deaktiviert",
       "prospectsEnabled": "Zugriff auf Interessenten aktiviert",
       "prospectsGroupDescription": "Zugriff auf das Modul Interessenten (CSV-Import, Enrichment, Umwandlung in einen Lead).",
       "prospectsHint": "Analyse und Anreicherung von Firmeninteressenten (KI)",
+      "saveFailed": "Funktionszugriff konnte nicht gespeichert werden",
       "title": "Funktionszugriff"
     },
     "fields": {

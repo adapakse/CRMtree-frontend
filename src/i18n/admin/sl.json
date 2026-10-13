@@ -1695,11 +1695,16 @@
     },
     "empty": "Ni najdenih uporabnikov",
     "featureAccess": {
+      "callAnalysis": "Analizator klicev",
+      "callAnalysisDisabled": "Dostop do Analizatorja klicev onemogočen",
+      "callAnalysisEnabled": "Dostop do Analizatorja klicev omogočen",
+      "callAnalysisHint": "Analiza zapiskov klicev z UI, ocena in follow-up",
       "prospects": "Potencialne stranke",
       "prospectsDisabled": "Dostop do Potencialnih strank izklopljen",
       "prospectsEnabled": "Dostop do Potencialnih strank vklopljen",
       "prospectsGroupDescription": "Dostop do modula Potencialne stranke (uvoz CSV, enrichment, pretvorba v lead).",
       "prospectsHint": "Analiza in obogatitev potencialnih strank – podjetij (AI)",
+      "saveFailed": "Dostopa do funkcije ni bilo mogoče shraniti",
       "title": "Dostop do funkcij"
     },
     "fields": {

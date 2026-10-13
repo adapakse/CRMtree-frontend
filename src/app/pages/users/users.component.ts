@@ -511,8 +511,10 @@ import { LocaleService } from '../../core/i18n/locale.service';
                 {{ t('users.grants.hint') }}
               </div>
 
-              @if (tenantHasProspects()) {
+              @if (tenantHasProspects() || tenantHasCallAnalysis()) {
                 <div class="sec-title" style="margin-top:24px">{{ t('users.featureAccess.title') }}</div>
+              }
+              @if (tenantHasProspects()) {
                 <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
                   <div style="flex:1">
                     <div style="font-weight:600">{{ t('users.featureAccess.prospects') }}</div>
@@ -521,6 +523,21 @@ import { LocaleService } from '../../core/i18n/locale.service';
                   <input type="checkbox"
                          [checked]="!!prospectsRole()"
                          (change)="toggleProspectsAccess($any($event.target).checked)">
+                </div>
+              }
+              <!-- Analizator rozmów — uprawnienie imienne (user_feature_access).
+                   Admin tenanta ma dostęp zawsze, więc przełącznik nic by u niego
+                   nie zmienił i celowo go nie pokazujemy. -->
+              @if (tenantHasCallAnalysis() && !selected()!.is_admin) {
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-100);border-radius:8px;margin-top:8px">
+                  <div style="flex:1">
+                    <div style="font-weight:600">{{ t('users.featureAccess.callAnalysis') }}</div>
+                    <div style="font-size:12px;color:var(--gray-500)">{{ t('users.featureAccess.callAnalysisHint') }}</div>
+                  </div>
+                  <input type="checkbox"
+                         [disabled]="featureSaving()"
+                         [checked]="callAnalysisAccess()"
+                         (change)="toggleCallAnalysisAccess($any($event.target).checked)">
                 </div>
               }
             }
@@ -605,6 +622,10 @@ export class UsersComponent implements OnInit {
   tenantHasProspects = computed(() => this.auth.hasFeature('prospects'));
 
   prospectsRole = computed(() => this.selected()?.roles?.find(r => r.group_name === 'Prospekty'));
+
+  tenantHasCallAnalysis = computed(() => this.auth.hasFeature('call_analysis'));
+  callAnalysisAccess = signal(false);
+  featureSaving      = signal(false);
 
   users      = signal<User[]>([]);
   groups     = signal<GroupProfile[]>([]);
@@ -892,6 +913,13 @@ export class UsersComponent implements OnInit {
   }
 
   openUser(user: User): void {
+    this.callAnalysisAccess.set(false);
+    if (this.tenantHasCallAnalysis() && !user.is_admin) {
+      this.userSvc.getFeatureAccess(user.id).subscribe({
+        next: map => this.callAnalysisAccess.set(map['call_analysis'] === true),
+        error: () => this.callAnalysisAccess.set(false),
+      });
+    }
     this.userSvc.get(user.id).subscribe({
       next: u => {
         this.selected.set(u);
@@ -1053,6 +1081,30 @@ export class UsersComponent implements OnInit {
         this.toast.success(this.transloco.translate('admin.users.grants.removed'));
       },
       error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.grants.removeFailed')),
+    });
+  }
+
+  // Analizator rozmów — uprawnienie imienne, osobny mechanizm niż Prospekty
+  // (tam dostęp daje członkostwo w grupie „Prospekty"). Przy błędzie wracamy do
+  // poprzedniego stanu, żeby przełącznik nie pokazywał czegoś, czego nie zapisano.
+  toggleCallAnalysisAccess(checked: boolean): void {
+    const u = this.selected();
+    if (!u) return;
+    const previous = this.callAnalysisAccess();
+    this.callAnalysisAccess.set(checked);
+    this.featureSaving.set(true);
+    this.userSvc.setFeatureAccess(u.id, 'call_analysis', checked).subscribe({
+      next: () => {
+        this.featureSaving.set(false);
+        this.toast.success(this.transloco.translate(
+          checked ? 'admin.users.featureAccess.callAnalysisEnabled'
+                  : 'admin.users.featureAccess.callAnalysisDisabled'));
+      },
+      error: err => {
+        this.featureSaving.set(false);
+        this.callAnalysisAccess.set(previous);
+        this.toast.error(this.transloco.translate('admin.users.featureAccess.saveFailed'));
+      },
     });
   }
 

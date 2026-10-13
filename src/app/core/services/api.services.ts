@@ -74,6 +74,15 @@ export class UserService {
     return this.http.delete<void>(`${this.base}/${userId}/roles/${roleId}`);
   }
 
+  /** Uprawnienia do modułów nadawane imiennie (user_feature_access, migracja 0330). */
+  getFeatureAccess(userId: string): Observable<Record<string, boolean>> {
+    return this.http.get<Record<string, boolean>>(`${this.base}/${userId}/features`);
+  }
+
+  setFeatureAccess(userId: string, feature: string, granted: boolean): Observable<{ granted: boolean }> {
+    return this.http.put<{ granted: boolean }>(`${this.base}/${userId}/features/${feature}`, { granted });
+  }
+
   getVisibilityGrants(userId: string): Observable<VisibilityGrant[]> {
     return this.http.get<VisibilityGrant[]>(`${this.base}/${userId}/visibility-grants`);
   }

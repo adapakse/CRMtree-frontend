@@ -9,6 +9,14 @@ import { User, AuthTokens, CrmFeature } from '../models/models';
 const ACCESS_KEY  = 'wt_access';
 const REFRESH_KEY = 'wt_refresh';
 
+/**
+ * Moduły, do których dostęp admin tenanta nadaje pojedynczym osobom
+ * (user_feature_access, migracja 0330). Lista musi zgadzać się z
+ * USER_MANAGED_FEATURES w backendowym `middleware/crm-rbac.js` — rozjazd
+ * oznacza menu pokazujące moduł, do którego backend i tak nie wpuści.
+ */
+export const USER_MANAGED_FEATURES: CrmFeature[] = ['call_analysis'];
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly api = environment.apiUrl;
@@ -34,7 +42,14 @@ export class AuthService {
   hasFeature(feature: CrmFeature): boolean {
     const features = this._user()?.tenant_features;
     if (!features) return true; // gold / brak danych → wszystko włączone
-    return features[feature] === true;
+    if (features[feature] !== true) return false;
+
+    // Druga bramka, dla modułów rozdawanych imiennie: superadmin włącza moduł
+    // tenantowi, admin tenanta daje go konkretnym osobom. Bez tego menu
+    // prowadziłoby takiego usera prosto w 403 z backendu.
+    if (!USER_MANAGED_FEATURES.includes(feature)) return true;
+    if (this._user()?.is_admin) return true;
+    return this._user()?.user_features?.[feature] === true;
   }
 
   loginWithPassword(email: string, password: string): Observable<{ access_token: string; refresh_token: string; must_change_password?: boolean }> {
