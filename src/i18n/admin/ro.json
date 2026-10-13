@@ -1695,11 +1695,16 @@
     },
     "empty": "Nu s-au găsit utilizatori",
     "featureAccess": {
+      "callAnalysis": "Analizor de apeluri",
+      "callAnalysisDisabled": "Acces la Analizorul de apeluri dezactivat",
+      "callAnalysisEnabled": "Acces la Analizorul de apeluri activat",
+      "callAnalysisHint": "Analiză AI a notelor de apel, scor și follow-up",
       "prospects": "Prospecți",
       "prospectsDisabled": "Accesul la Prospecți a fost dezactivat",
       "prospectsEnabled": "Accesul la Prospecți a fost activat",
       "prospectsGroupDescription": "Acces la modulul Prospecți (import CSV, enrichment, conversie în lead).",
       "prospectsHint": "Analiza și îmbogățirea prospecților — companii (AI)",
+      "saveFailed": "Nu s-a putut salva accesul la funcție",
       "title": "Acces la funcții"
     },
     "fields": {

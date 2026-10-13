@@ -1695,11 +1695,16 @@
     },
     "empty": "No users found",
     "featureAccess": {
+      "callAnalysis": "Call analyser",
+      "callAnalysisDisabled": "Access to Call analyser disabled",
+      "callAnalysisEnabled": "Access to Call analyser enabled",
+      "callAnalysisHint": "AI analysis of phone call notes, scoring and follow-up",
       "prospects": "Prospects",
       "prospectsDisabled": "Access to Prospects disabled",
       "prospectsEnabled": "Access to Prospects enabled",
       "prospectsGroupDescription": "Access to the Prospects module (CSV import, enrichment, conversion to lead).",
       "prospectsHint": "Analysis and enrichment of company prospects (AI)",
+      "saveFailed": "Could not save feature access",
       "title": "Feature access"
     },
     "fields": {

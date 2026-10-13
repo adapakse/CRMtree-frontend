@@ -1695,11 +1695,16 @@
     },
     "empty": "No se han encontrado usuarios",
     "featureAccess": {
+      "callAnalysis": "Analizador de llamadas",
+      "callAnalysisDisabled": "Acceso al Analizador de llamadas desactivado",
+      "callAnalysisEnabled": "Acceso al Analizador de llamadas activado",
+      "callAnalysisHint": "Análisis con IA de las notas de llamadas, puntuación y seguimiento",
       "prospects": "Prospectos",
       "prospectsDisabled": "Acceso a Prospectos desactivado",
       "prospectsEnabled": "Acceso a Prospectos activado",
       "prospectsGroupDescription": "Acceso al módulo Prospectos (importación CSV, enrichment, conversión a lead).",
       "prospectsHint": "Análisis y enriquecimiento de prospectos de empresas (IA)",
+      "saveFailed": "No se pudo guardar el acceso a la función",
       "title": "Acceso a funciones"
     },
     "fields": {

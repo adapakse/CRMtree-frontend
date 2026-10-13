@@ -1695,11 +1695,16 @@
     },
     "empty": "Nema pronađenih korisnika",
     "featureAccess": {
+      "callAnalysis": "Analizator poziva",
+      "callAnalysisDisabled": "Pristup Analizatoru poziva onemogućen",
+      "callAnalysisEnabled": "Pristup Analizatoru poziva omogućen",
+      "callAnalysisHint": "AI analiza bilješki poziva, ocjena i follow-up",
       "prospects": "Potencijalni klijenti",
       "prospectsDisabled": "Pristup Potencijalnim klijentima isključen",
       "prospectsEnabled": "Pristup Potencijalnim klijentima uključen",
       "prospectsGroupDescription": "Pristup modulu Potencijalni klijenti (uvoz CSV-a, enrichment, konverzija u lead).",
       "prospectsHint": "Analiza i obogaćivanje potencijalnih klijenata – tvrtki (AI)",
+      "saveFailed": "Nije moguće spremiti pristup funkciji",
       "title": "Pristup funkcijama"
     },
     "fields": {
