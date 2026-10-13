@@ -148,7 +148,8 @@ export interface SavedProvider {
             <label class="lbl">{{ t('settings.ai.model') }}</label>
             <div class="cell">
               @if (models().length && !customModel()) {
-                <select class="fsel" [(ngModel)]="draftModel" [disabled]="busy()">
+                <select class="fsel" [(ngModel)]="draftModel" [disabled]="busy()"
+                        (ngModelChange)="onModelChange($event)">
                   <option value="">{{ t('settings.ai.modelDefaultOption', { model: defaultModel() }) }}</option>
                   @for (m of models(); track m.id) {
                     <option [value]="m.id">{{ m.label }}</option>
@@ -449,10 +450,25 @@ export class AiPurposeRowComponent {
     });
   }
 
+  /**
+   * „Własny model" zamienia listę na pole tekstowe od razu przy wyborze.
+   * Wcześniej robił to dopiero przycisk zapisu, który w tym jednym przypadku
+   * kończył po cichu — bez żądania i bez komunikatu — więc wyglądało to jak
+   * zapis, który nie zapisuje.
+   */
+  onModelChange(value: string): void {
+    if (value !== CUSTOM_MODEL) return;
+    this.customModel.set(true);
+    this.draftModel = '';
+  }
+
   save(): void {
+    // Zapas na wypadek, gdyby wartość-wartownik trafiła tu inną drogą: lepiej
+    // powiedzieć wprost, czego brakuje, niż nie zrobić nic.
     if (this.draftModel === CUSTOM_MODEL) {
       this.customModel.set(true);
       this.draftModel = '';
+      this.toast.error(this.t('settings.ai.modelCustomRequired'));
       return;
     }
     this.busy.set(true);
