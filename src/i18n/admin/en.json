@@ -723,6 +723,9 @@
       "saving": "Saving…"
     },
     "ai": {
+      "apiAddress": "API address",
+      "apiAddressHint": "Empty = the provider’s default address. Fill it in for Azure OpenAI or your own endpoint compatible with the provider’s API, e.g. {example}",
+      "apiAddressUse": "Custom API address",
       "apiKey": "API key",
       "apiKeyPlaceholder": "Paste the API key",
       "cancel": "Cancel",

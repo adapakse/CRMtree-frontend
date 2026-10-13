@@ -723,6 +723,9 @@
       "saving": "Salvataggio…"
     },
     "ai": {
+      "apiAddress": "Indirizzo API",
+      "apiAddressHint": "Vuoto = indirizzo predefinito del fornitore. Compilalo per Azure OpenAI o per un tuo endpoint compatibile con l’API del fornitore, ad es. {example}",
+      "apiAddressUse": "Indirizzo API personalizzato",
       "apiKey": "Chiave API",
       "apiKeyPlaceholder": "Incolla la chiave API",
       "cancel": "Annulla",

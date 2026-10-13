@@ -723,6 +723,9 @@
       "saving": "Сохранение…"
     },
     "ai": {
+      "apiAddress": "Адрес API",
+      "apiAddressHint": "Пусто = адрес поставщика по умолчанию. Заполните для Azure OpenAI или собственного адреса, совместимого с API поставщика, например {example}",
+      "apiAddressUse": "Свой адрес API",
       "apiKey": "API-ключ",
       "apiKeyPlaceholder": "Вставьте API-ключ",
       "cancel": "Отмена",

@@ -7,11 +7,15 @@ import {
 } from '../../../core/services/ai-config.service';
 
 const CUSTOM_MODEL = '__custom__';
+const API_ADDRESS_EXAMPLE = 'https://<resource>.openai.azure.com/openai/v1';
+const DETECT_DELAY_MS = 400;
 
 /** A provider the tenant already set up somewhere, offered as a one-click reuse. */
 export interface SavedProvider {
   provider: string;
   hint: string;
+  /** The custom API address saved with that key, if any. */
+  apiAddress: string | null;
 }
 
 /**
@@ -116,12 +120,29 @@ export interface SavedProvider {
             <div class="cell">
               <span class="note">{{ t('settings.ai.useSaved') }}</span>
               @for (s of reusableProviders(); track s.provider) {
-                <button type="button" class="chip" [disabled]="busy()" (click)="useSaved(s.provider)">
+                <button type="button" class="chip" [disabled]="busy()" (click)="useSaved(s)">
                   {{ providerLabel(s.provider) }} ····{{ s.hint }}
                 </button>
               }
             </div>
           }
+
+          <!-- Zwinięte, bo potrzebuje go mało kto: Azure OpenAI i własne adresy
+               zgodne z API dostawcy. Rozwinięte samo, gdy adres jest zapisany —
+               inaczej zapis z panelu po cichu by go skasował. -->
+          <label class="lbl">{{ isApiAddressOpen() ? t('settings.ai.apiAddress') : '' }}</label>
+          <div class="cell">
+            @if (isApiAddressOpen()) {
+              <input class="fi" type="url" autocomplete="off" spellcheck="false"
+                     [(ngModel)]="draftApiAddress" (ngModelChange)="onApiAddressChange()"
+                     [disabled]="busy()" placeholder="https://">
+              <span class="note wide">{{ t('settings.ai.apiAddressHint', { example: API_ADDRESS_EXAMPLE }) }}</span>
+            } @else {
+              <button type="button" class="linkbtn" [disabled]="busy()" (click)="isApiAddressOpen.set(true)">
+                {{ t('settings.ai.apiAddressUse') }}
+              </button>
+            }
+          </div>
 
           @if (effectiveProvider()) {
             <label class="lbl">{{ t('settings.ai.model') }}</label>
@@ -203,6 +224,7 @@ export interface SavedProvider {
     .linkbtn:disabled { color:var(--gray-400); cursor:default; }
 
     .note { font-size:11.5px; color:var(--gray-400); }
+    .note.wide { flex-basis:100%; }
     .ok-text { color:#166534; }
     .warn-text { color:#92400E; }
     .pr-note {
@@ -229,6 +251,7 @@ export class AiPurposeRowComponent {
   private readonly transloco = inject(TranslocoService);
 
   readonly CUSTOM_MODEL = CUSTOM_MODEL;
+  readonly API_ADDRESS_EXAMPLE = API_ADDRESS_EXAMPLE;
 
   readonly purpose = input.required<AiPurpose>();
   readonly providers = input.required<AiProviderOption[]>();
@@ -245,9 +268,11 @@ export class AiPurposeRowComponent {
   detectFailed = signal(false);
   detectedProvider = signal<string | null>(null);
   keyEditing = signal(false);
+  isApiAddressOpen = signal(false);
 
   draftKey = '';
   draftModel = '';
+  draftApiAddress = '';
   /** Only used on the manual fallback, when recognition could not decide. */
   draftProvider = '';
 
@@ -294,6 +319,8 @@ export class AiPurposeRowComponent {
     if (this.initialisedFor === key) return;
     this.initialisedFor = key;
     this.draftModel = this.config()?.model ?? '';
+    this.draftApiAddress = this.config()?.base_url ?? '';
+    this.isApiAddressOpen.set(Boolean(this.draftApiAddress));
     const provider = this.settledProvider();
     if (provider) this.loadModelsFor(provider);
   }
@@ -343,7 +370,29 @@ export class AiPurposeRowComponent {
     this.detectFailed.set(false);
     if (this.detectTimer) clearTimeout(this.detectTimer);
     if (this.draftKey.trim().length <= 20) return;
-    this.detectTimer = setTimeout(() => this.detect(), 400);
+    this.detectTimer = setTimeout(() => this.detect(), DETECT_DELAY_MS);
+  }
+
+  /**
+   * The address decides which service answers for the key, so both the
+   * recognition and the model list have to be asked again.
+   */
+  onApiAddressChange(): void {
+    if (this.detectTimer) clearTimeout(this.detectTimer);
+    this.detectTimer = setTimeout(() => {
+      if (this.draftKey.trim().length > 20) {
+        this.detectedProvider.set(null);
+        this.detectFailed.set(false);
+        this.detect();
+        return;
+      }
+      const provider = this.effectiveProvider();
+      if (provider) this.loadModelsFor(provider);
+    }, DETECT_DELAY_MS);
+  }
+
+  private apiAddress(): string | null {
+    return this.draftApiAddress.trim() || null;
   }
 
   private detect(): void {
@@ -352,7 +401,7 @@ export class AiPurposeRowComponent {
     this.detecting.set(true);
     // Bez `provider` backend rozpoznaje go z klucza i od razu oddaje modele —
     // jedno żądanie zamiast dwóch.
-    this.api.models({ api_key: key }).subscribe({
+    this.api.models({ api_key: key, base_url: this.apiAddress() }).subscribe({
       next: res => {
         this.detecting.set(false);
         this.detectedProvider.set(res.provider);
@@ -373,15 +422,20 @@ export class AiPurposeRowComponent {
     if (this.draftProvider) this.loadModelsFor(this.draftProvider);
   }
 
-  useSaved(provider: string): void {
-    this.draftProvider = provider;
-    this.detectedProvider.set(provider);
-    this.loadModelsFor(provider);
+  useSaved(saved: SavedProvider): void {
+    this.draftProvider = saved.provider;
+    this.detectedProvider.set(saved.provider);
+    // A key issued for a custom address only works there.
+    this.draftApiAddress = saved.apiAddress ?? '';
+    this.isApiAddressOpen.set(Boolean(saved.apiAddress));
+    this.loadModelsFor(saved.provider);
   }
 
   private loadModelsFor(provider: string): void {
     this.modelsLoading.set(true);
-    this.api.models({ provider, api_key: this.draftKey.trim() || null }).subscribe({
+    this.api.models({
+      provider, api_key: this.draftKey.trim() || null, base_url: this.apiAddress(),
+    }).subscribe({
       next: res => {
         this.models.set(res.models);
         this.modelsLoading.set(false);
@@ -407,6 +461,8 @@ export class AiPurposeRowComponent {
       provider: this.detectedProvider() ?? this.draftProvider ?? null,
       api_key: this.draftKey.trim() || null,
       model: this.draftModel.trim() || null,
+      // Always sent: the backend overwrites the stored address with this value.
+      base_url: this.apiAddress(),
     }).subscribe({
       next: () => {
         this.busy.set(false);
@@ -430,6 +486,8 @@ export class AiPurposeRowComponent {
         this.busy.set(false);
         this.initialisedFor = null;
         this.keyEditing.set(false);
+        this.draftApiAddress = '';
+        this.isApiAddressOpen.set(false);
         this.changed.emit();
       },
       error: err => {

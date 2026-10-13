@@ -723,6 +723,9 @@
       "saving": "Shranjevanje…"
     },
     "ai": {
+      "apiAddress": "Naslov API",
+      "apiAddressHint": "Prazno = privzeti naslov ponudnika. Izpolnite ga za Azure OpenAI ali lastno končno točko, združljivo z API-jem ponudnika, npr. {example}",
+      "apiAddressUse": "Lasten naslov API",
       "apiKey": "API-ključ",
       "apiKeyPlaceholder": "Prilepite ključ API",
       "cancel": "Prekliči",

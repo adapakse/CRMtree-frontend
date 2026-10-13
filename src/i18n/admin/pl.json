@@ -723,6 +723,9 @@
       "saving": "Zapisywanie…"
     },
     "ai": {
+      "apiAddress": "Adres API",
+      "apiAddressHint": "Puste = domyślny adres dostawcy. Wypełnij dla Azure OpenAI lub własnego adresu zgodnego z API dostawcy, np. {example}",
+      "apiAddressUse": "Własny adres API",
       "apiKey": "Klucz API",
       "apiKeyPlaceholder": "Wklej klucz API",
       "cancel": "Anuluj",
