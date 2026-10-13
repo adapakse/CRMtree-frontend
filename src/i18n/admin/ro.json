@@ -731,10 +731,10 @@
       "cancel": "Anulează",
       "changeKey": "Schimbă cheia",
       "confirmRemove": "Dezactivezi AI pentru această funcție? Celelalte funcții continuă să funcționeze.",
-      "detected": "Recunoscut: {provider}",
-      "detectedShort": "recunoscut după cheie",
       "detectFailed": "Nu am putut recunoaște furnizorul după această cheie — indică-l tu.",
       "detectHint": "Recunoaștem furnizorul după cheie — nu trebuie să îl alegi.",
+      "detected": "Recunoscut: {provider}",
+      "detectedShort": "recunoscut după cheie",
       "detecting": "Se recunoaște furnizorul…",
       "intro": "Fiecare funcție are propriul furnizor, cheie și model — enrichment poate rula la un furnizor, iar analiza apelurilor la altul. Lipește o cheie și recunoaștem singuri furnizorul. Salvarea verifică configurația la furnizor; cheia este criptată și nu mai este afișată niciodată.",
       "loading": "Se încarcă configurația AI…",
@@ -1762,8 +1762,10 @@
       "previous": "Înapoi"
     },
     "password": {
+      "createHint": "Opțional. Fără parolă contul nu se poate autentifica până nu setezi una pe fișa utilizatorului.",
       "mismatch": "Parolele nu sunt identice",
       "new": "Parolă nouă",
+      "newPassword": "Parolă nouă",
       "placeholder": "Min. 8 caractere",
       "repeat": "Repetați parola",
       "saveFailed": "Eroare la salvarea parolei",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Se salvează…",
     "searchPlaceholder": "Căutare utilizatori…",
+    "sections": {
+      "projectFields": "Date pentru modulul Proiecte"
+    },
     "statuses": {
       "active": "Activ",
       "inactive": "Inactiv"

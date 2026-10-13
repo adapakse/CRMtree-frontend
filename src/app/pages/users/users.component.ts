@@ -184,6 +184,9 @@ import { LocaleService } from '../../core/i18n/locale.service';
                   <option value="sales_manager">{{ t('users.crmRoles.salesManager') }}</option>
                 </select>
               </div>
+              <div class="fg" style="grid-column:1/-1">
+                <div class="sec-title" style="margin-top:8px">{{ t('users.sections.projectFields') }}</div>
+              </div>
               <div class="fg">
                 <label class="fl">{{ t('users.fields.phone') }}</label>
                 <input class="fi" [(ngModel)]="newPhone" maxlength="40" placeholder="+48 600 100 200"
@@ -198,6 +201,25 @@ import { LocaleService } from '../../core/i18n/locale.service';
                 <label class="fl">{{ t('users.fields.department') }}</label>
                 <input class="fi" [(ngModel)]="newDepartment" maxlength="200"
                        name="user-department" autocomplete="off">
+              </div>
+              <div class="fg" style="grid-column:1/-1">
+                <div class="sec-title" style="margin-top:8px">{{ t('users.password.title') }}</div>
+              </div>
+              <div class="fg">
+                <label class="fl">{{ t('users.password.newPassword') }}</label>
+                <input class="fi" type="password" [(ngModel)]="newUserPassword"
+                       [placeholder]="t('users.password.placeholder')" autocomplete="new-password">
+              </div>
+              <div class="fg">
+                <label class="fl">{{ t('users.password.repeat') }}</label>
+                <input class="fi" type="password" [(ngModel)]="newUserPasswordConfirm"
+                       [placeholder]="t('users.password.placeholder')" autocomplete="new-password">
+              </div>
+              <div class="fg" style="grid-column:1/-1">
+                <span style="font-size:11px;color:var(--gray-500)">{{ t('users.password.createHint') }}</span>
+                @if (newUserPasswordError) {
+                  <span class="ferr">{{ newUserPasswordError }}</span>
+                }
               </div>
               @if (hasProjectsFeature()) {
                 <div class="fg">
@@ -313,6 +335,9 @@ import { LocaleService } from '../../core/i18n/locale.service';
                     <option value="salesperson">{{ t('users.crmRoles.salesperson') }}</option>
                     <option value="sales_manager">{{ t('users.crmRoles.salesManager') }}</option>
                   </select>
+                </div>
+                <div class="fg" style="grid-column:1/-1">
+                  <div class="sec-title" style="margin-top:16px">{{ t('users.sections.projectFields') }}</div>
                 </div>
                 <div class="fg">
                   <label class="fl">{{ t('users.fields.phone') }}</label>
@@ -707,6 +732,9 @@ export class UsersComponent implements OnInit {
   newPhone       = '';
   newCompany     = '';
   newDepartment  = '';
+  newUserPassword        = '';
+  newUserPasswordConfirm = '';
+  newUserPasswordError   = '';
   newExternal    = false;
   newCanCreateProjects = false;
   newCanViewKsefInvoices = false;
@@ -856,6 +884,7 @@ export class UsersComponent implements OnInit {
     this.newFirst = ''; this.newLast = ''; this.newEmail = '';
     this.newActive = true; this.newAdmin = false; this.newCrmRole = '';
     this.newPhone = ''; this.newCompany = ''; this.newDepartment = '';
+    this.newUserPassword = ''; this.newUserPasswordConfirm = ''; this.newUserPasswordError = '';
     this.newExternal = false; this.newCanCreateProjects = false; this.newCanViewKsefInvoices = false;
     this.newGroup = ''; this.newGroupAccess = 'read';
     this.submitted = false;
@@ -865,6 +894,22 @@ export class UsersComponent implements OnInit {
   createUser(): void {
     this.submitted = true;
     if (!this.newFirst || !this.newLast || !this.newEmail) return;
+
+    // Hasło jest opcjonalne — konto bez hasła działa, ale nie zaloguje się,
+    // dopóki admin nie ustawi hasła na karcie użytkownika. Jeśli jednak admin
+    // je podał, musi być poprawne, bo inaczej założyłby konto z hasłem, którego
+    // nie zna.
+    this.newUserPasswordError = '';
+    if (this.newUserPassword || this.newUserPasswordConfirm) {
+      if (this.newUserPassword.length < 8) {
+        this.newUserPasswordError = this.transloco.translate('admin.users.password.tooShort');
+        return;
+      }
+      if (this.newUserPassword !== this.newUserPasswordConfirm) {
+        this.newUserPasswordError = this.transloco.translate('admin.users.password.mismatch');
+        return;
+      }
+    }
     this.saving.set(true);
     this.userSvc.create({
       first_name: this.newFirst,
@@ -879,6 +924,7 @@ export class UsersComponent implements OnInit {
       is_external: this.newExternal,
       can_create_projects: this.newCanCreateProjects && !this.newExternal,
       can_view_ksef_invoices: this.newCanViewKsefInvoices && !this.newExternal,
+      password: this.newUserPassword || null,
     } as any).subscribe({
       next: (user) => {
         if (this.newGroup) {

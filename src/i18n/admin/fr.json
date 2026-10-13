@@ -731,10 +731,10 @@
       "cancel": "Annuler",
       "changeKey": "Changer la clé",
       "confirmRemove": "Désactiver l'IA pour cette fonction ? Les autres fonctions continuent de fonctionner.",
-      "detected": "Reconnu : {provider}",
-      "detectedShort": "reconnu à la clé",
       "detectFailed": "Nous n'avons pas pu reconnaître le fournisseur à partir de cette clé — indiquez-le vous-même.",
       "detectHint": "Nous reconnaissons le fournisseur à partir de la clé : inutile de le choisir.",
+      "detected": "Reconnu : {provider}",
+      "detectedShort": "reconnu à la clé",
       "detecting": "Reconnaissance du fournisseur…",
       "intro": "Chaque fonction a son propre fournisseur, sa clé et son modèle : l'enrichissement peut tourner chez un fournisseur et l'analyse des appels chez un autre. Collez une clé, nous reconnaissons le fournisseur nous-mêmes. L'enregistrement vérifie la configuration auprès du fournisseur ; la clé est chiffrée et n'est plus jamais affichée.",
       "loading": "Chargement de la configuration IA…",
@@ -1762,8 +1762,10 @@
       "previous": "Préc."
     },
     "password": {
+      "createHint": "Facultatif. Sans mot de passe, le compte ne pourra pas se connecter tant que vous n en définirez pas un sur la fiche utilisateur.",
       "mismatch": "Les mots de passe ne sont pas identiques",
       "new": "Nouveau mot de passe",
+      "newPassword": "Nouveau mot de passe",
       "placeholder": "Min. 8 caractères",
       "repeat": "Répétez le mot de passe",
       "saveFailed": "Erreur lors de l’enregistrement du mot de passe",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Enregistrement…",
     "searchPlaceholder": "Rechercher des utilisateurs…",
+    "sections": {
+      "projectFields": "Données pour le module Projets"
+    },
     "statuses": {
       "active": "Actif",
       "inactive": "Inactif"

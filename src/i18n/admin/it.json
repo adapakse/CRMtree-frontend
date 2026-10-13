@@ -731,10 +731,10 @@
       "cancel": "Annulla",
       "changeKey": "Cambia chiave",
       "confirmRemove": "Disattivare l'IA per questa funzione? Le altre funzioni continuano a funzionare.",
-      "detected": "Riconosciuto: {provider}",
-      "detectedShort": "riconosciuto dalla chiave",
       "detectFailed": "Non siamo riusciti a riconoscere il fornitore da questa chiave: indicalo tu.",
       "detectHint": "Riconosciamo il fornitore dalla chiave: non devi sceglierlo.",
+      "detected": "Riconosciuto: {provider}",
+      "detectedShort": "riconosciuto dalla chiave",
       "detecting": "Riconoscimento del fornitore…",
       "intro": "Ogni funzione ha il proprio fornitore, chiave e modello: l'enrichment può girare presso un fornitore e l'analisi delle chiamate presso un altro. Incolla una chiave e riconosceremo il fornitore da soli. Il salvataggio verifica la configurazione presso il fornitore; la chiave è cifrata e non viene mai più mostrata.",
       "loading": "Caricamento della configurazione AI…",
@@ -1762,8 +1762,10 @@
       "previous": "Prec."
     },
     "password": {
+      "createHint": "Facoltativo. Senza password l account non può accedere finché non ne imposti una sulla scheda utente.",
       "mismatch": "Le password non coincidono",
       "new": "Nuova password",
+      "newPassword": "Nuova password",
       "placeholder": "Min. 8 caratteri",
       "repeat": "Ripeti la password",
       "saveFailed": "Errore di salvataggio della password",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Salvataggio…",
     "searchPlaceholder": "Cerca utenti…",
+    "sections": {
+      "projectFields": "Dati per il modulo Progetti"
+    },
     "statuses": {
       "active": "Attivo",
       "inactive": "Inattivo"

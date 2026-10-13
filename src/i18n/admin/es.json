@@ -731,10 +731,10 @@
       "cancel": "Cancelar",
       "changeKey": "Cambiar clave",
       "confirmRemove": "¿Desactivar la IA para esta función? Las demás funciones seguirán funcionando.",
-      "detected": "Reconocido: {provider}",
-      "detectedShort": "reconocido por la clave",
       "detectFailed": "No hemos podido reconocer el proveedor con esta clave: indícalo tú.",
       "detectHint": "Reconocemos el proveedor por la clave: no tienes que elegirlo.",
+      "detected": "Reconocido: {provider}",
+      "detectedShort": "reconocido por la clave",
       "detecting": "Reconociendo el proveedor…",
       "intro": "Cada función tiene su propio proveedor, clave y modelo: el enriquecimiento puede ir en un proveedor y el análisis de llamadas en otro. Pega una clave y reconoceremos el proveedor por ti. Guardar verifica la configuración con el proveedor; la clave se cifra y no se vuelve a mostrar.",
       "loading": "Cargando la configuración de IA…",
@@ -1762,8 +1762,10 @@
       "previous": "Ant."
     },
     "password": {
+      "createHint": "Opcional. Sin contraseña la cuenta no podrá iniciar sesión hasta que establezcas una en la ficha del usuario.",
       "mismatch": "Las contraseñas no coinciden",
       "new": "Nueva contraseña",
+      "newPassword": "Nueva contraseña",
       "placeholder": "Mín. 8 caracteres",
       "repeat": "Repite la contraseña",
       "saveFailed": "Error al guardar la contraseña",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Guardando…",
     "searchPlaceholder": "Buscar usuarios…",
+    "sections": {
+      "projectFields": "Datos para el módulo Proyectos"
+    },
     "statuses": {
       "active": "Activo",
       "inactive": "Inactivo"

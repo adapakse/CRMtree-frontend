@@ -731,10 +731,10 @@
       "cancel": "Prekliči",
       "changeKey": "Zamenjaj ključ",
       "confirmRemove": "Želite izklopiti UI za to funkcijo? Druge funkcije bodo delovale naprej.",
-      "detected": "Prepoznan: {provider}",
-      "detectedShort": "prepoznan po ključu",
       "detectFailed": "Ponudnika iz tega ključa nismo prepoznali — izberite ga sami.",
       "detectHint": "Ponudnika prepoznamo po ključu — izbirati vam ga ni treba.",
+      "detected": "Prepoznan: {provider}",
+      "detectedShort": "prepoznan po ključu",
       "detecting": "Prepoznavam ponudnika…",
       "intro": "Vsaka funkcija ima svojega ponudnika, ključ in model — obogatitev lahko teče pri enem, analiza klicev pa pri drugem. Prilepite ključ, ponudnika prepoznamo sami. Shranjevanje preveri nastavitev pri ponudniku; ključ je šifriran in ni nikoli več prikazan.",
       "loading": "Nalaganje konfiguracije UI…",
@@ -1762,8 +1762,10 @@
       "previous": "Prejš."
     },
     "password": {
+      "createHint": "Neobvezno. Brez gesla se račun ne more prijaviti, dokler ga ne nastavite na kartici uporabnika.",
       "mismatch": "Gesli se ne ujemata",
       "new": "Novo geslo",
+      "newPassword": "Novo geslo",
       "placeholder": "Najm. 8 znakov",
       "repeat": "Ponovite geslo",
       "saveFailed": "Napaka pri shranjevanju gesla",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Shranjevanje…",
     "searchPlaceholder": "Iščite uporabnike…",
+    "sections": {
+      "projectFields": "Podatki za modul Projekti"
+    },
     "statuses": {
       "active": "Aktiven",
       "inactive": "Neaktiven"

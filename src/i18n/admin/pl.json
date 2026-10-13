@@ -731,10 +731,10 @@
       "cancel": "Anuluj",
       "changeKey": "Zmień klucz",
       "confirmRemove": "Wyłączyć AI dla tej funkcji? Pozostałe funkcje będą działać dalej.",
-      "detected": "Rozpoznano: {provider}",
-      "detectedShort": "rozpoznano z klucza",
       "detectFailed": "Nie rozpoznaliśmy dostawcy po tym kluczu — wskaż go sam.",
       "detectHint": "Dostawcę rozpoznamy po kluczu — nie musisz go wybierać.",
+      "detected": "Rozpoznano: {provider}",
+      "detectedShort": "rozpoznano z klucza",
       "detecting": "Rozpoznaję dostawcę…",
       "intro": "Każda funkcja ma własnego dostawcę, klucz i model — enrichment może iść u jednego, a analizator rozmów u innego. Wklej klucz, a dostawcę rozpoznamy sami. Zapis sprawdza konfigurację u dostawcy; klucz jest szyfrowany i nigdy nie jest pokazywany ponownie.",
       "loading": "Wczytywanie konfiguracji AI…",
@@ -1762,8 +1762,10 @@
       "previous": "Poprz."
     },
     "password": {
+      "createHint": "Opcjonalne. Bez hasła konto nie zaloguje się, dopóki nie ustawisz go później na karcie użytkownika.",
       "mismatch": "Hasła nie są identyczne",
       "new": "Nowe hasło",
+      "newPassword": "Nowe hasło",
       "placeholder": "Min. 8 znaków",
       "repeat": "Powtórz hasło",
       "saveFailed": "Błąd zapisu hasła",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Zapisywanie…",
     "searchPlaceholder": "Szukaj użytkowników…",
+    "sections": {
+      "projectFields": "Dane do modułu Projekty"
+    },
     "statuses": {
       "active": "Aktywny",
       "inactive": "Nieaktywny"

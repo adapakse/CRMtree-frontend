@@ -731,10 +731,10 @@
       "cancel": "Abbrechen",
       "changeKey": "Schlüssel ändern",
       "confirmRemove": "KI für diese Funktion abschalten? Die übrigen Funktionen laufen weiter.",
-      "detected": "Erkannt: {provider}",
-      "detectedShort": "am Schlüssel erkannt",
       "detectFailed": "Der Anbieter ließ sich aus diesem Schlüssel nicht erkennen — bitte wählen Sie ihn selbst.",
       "detectHint": "Den Anbieter erkennen wir am Schlüssel — Sie müssen keinen auswählen.",
+      "detected": "Erkannt: {provider}",
+      "detectedShort": "am Schlüssel erkannt",
       "detecting": "Anbieter wird erkannt…",
       "intro": "Jede Funktion hat einen eigenen Anbieter, Schlüssel und Modell — Enrichment kann bei einem Anbieter laufen, die Gesprächsanalyse bei einem anderen. Fügen Sie einen Schlüssel ein, den Anbieter erkennen wir selbst. Das Speichern prüft die Einrichtung beim Anbieter; der Schlüssel wird verschlüsselt und nie wieder angezeigt.",
       "loading": "KI-Konfiguration wird geladen…",
@@ -1762,8 +1762,10 @@
       "previous": "Zurück"
     },
     "password": {
+      "createHint": "Optional. Ohne Passwort kann sich das Konto erst anmelden, wenn Sie später eines auf der Benutzerkarte setzen.",
       "mismatch": "Die Passwörter stimmen nicht überein",
       "new": "Neues Passwort",
+      "newPassword": "Neues Passwort",
       "placeholder": "Mind. 8 Zeichen",
       "repeat": "Passwort wiederholen",
       "saveFailed": "Fehler beim Speichern des Passworts",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Wird gespeichert…",
     "searchPlaceholder": "Benutzer suchen…",
+    "sections": {
+      "projectFields": "Angaben für das Modul Projekte"
+    },
     "statuses": {
       "active": "Aktiv",
       "inactive": "Inaktiv"

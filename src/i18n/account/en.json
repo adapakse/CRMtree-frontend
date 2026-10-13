@@ -15,6 +15,19 @@
   },
   "mySettings": {
     "delete": "Delete",
+    "password": {
+      "current": "Current password",
+      "hint": "Enter your current password and a new one, at least 8 characters. Changing it signs your account out of the mobile app.",
+      "mismatch": "Passwords do not match",
+      "new": "New password",
+      "repeat": "Repeat new password",
+      "saveFailed": "Could not change the password",
+      "saved": "Password changed",
+      "saving": "Saving…",
+      "submit": "Change password",
+      "title": "Change password",
+      "tooShort": "Password must be at least 8 characters"
+    },
     "pbx": {
       "configured": "Token configured",
       "directPhone": "Your direct number:",

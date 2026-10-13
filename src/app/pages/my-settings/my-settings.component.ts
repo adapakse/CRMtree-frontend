@@ -1,5 +1,5 @@
 // src/app/pages/my-settings/my-settings.component.ts
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { LanguagePickerComponent } from '../../shared/components/language-picker/language-picker.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -31,6 +31,46 @@ const BASE = environment.apiUrl;
 
   <div class="card" style="padding:24px">
     <wt-language-picker mode="user" />
+  </div>
+
+  <!-- ── Zmiana hasła ───────────────────────────────────────────────────── -->
+  <div class="card" style="padding:24px">
+    <h2 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#18181b;margin:0 0 6px">
+      🔑 {{ t('mySettings.password.title') }}
+    </h2>
+    <p style="font-size:12.5px;color:#6b7280;margin:0 0 20px;line-height:1.5">
+      {{ t('mySettings.password.hint') }}
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:end">
+      <div>
+        <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">
+          {{ t('mySettings.password.current') }}
+        </label>
+        <input class="fi" type="password" [(ngModel)]="pwdCurrent" autocomplete="current-password">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">
+          {{ t('mySettings.password.new') }}
+        </label>
+        <input class="fi" type="password" [(ngModel)]="pwdNew" autocomplete="new-password">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">
+          {{ t('mySettings.password.repeat') }}
+        </label>
+        <input class="fi" type="password" [(ngModel)]="pwdRepeat" autocomplete="new-password">
+      </div>
+    </div>
+
+    @if (pwdError) {
+      <div style="font-size:12px;color:#991B1B;margin-top:10px">{{ pwdError }}</div>
+    }
+    <div style="margin-top:16px">
+      <button class="btn btn-p" [disabled]="pwdSaving()" (click)="changePassword()">
+        {{ pwdSaving() ? t('mySettings.password.saving') : t('mySettings.password.submit') }}
+      </button>
+    </div>
   </div>
 
   <!-- ── Stopka email ───────────────────────────────────────────────────── -->
@@ -278,6 +318,44 @@ export class MySettingsComponent implements OnInit {
   get canSeeSubstitutions(): boolean {
     const role = this.auth.currentUser?.crm_role;
     return this.auth.isAdmin() || role === 'salesperson' || role === 'sales_manager';
+  }
+
+  // ── Zmiana hasła ────────────────────────────────────────────────────────────
+  // Ekran /change-password jest wymuszany po pierwszym logowaniu; stąd user nie
+  // miał gdzie zmienić hasła z własnej woli. Endpoint istniał od dawna i sam
+  // wymaga starego hasła, więc wystarczyło dać do niego wejście.
+  pwdCurrent = '';
+  pwdNew     = '';
+  pwdRepeat  = '';
+  pwdError   = '';
+  pwdSaving  = signal(false);
+
+  changePassword(): void {
+    this.pwdError = '';
+    if (this.pwdNew.length < 8) {
+      this.pwdError = this.transloco.translate('account.mySettings.password.tooShort');
+      return;
+    }
+    if (this.pwdNew !== this.pwdRepeat) {
+      this.pwdError = this.transloco.translate('account.mySettings.password.mismatch');
+      return;
+    }
+    this.pwdSaving.set(true);
+    this.auth.changePassword(this.pwdCurrent || null, this.pwdNew).subscribe({
+      next: () => {
+        this.pwdSaving.set(false);
+        this.pwdCurrent = ''; this.pwdNew = ''; this.pwdRepeat = '';
+        this.pwdError = '';
+        alert(this.transloco.translate('account.mySettings.password.saved'));
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.pwdSaving.set(false);
+        // Backend zwraca tu czytelny powód (złe aktualne hasło, za krótkie).
+        this.pwdError = err?.error?.error ?? this.transloco.translate('account.mySettings.password.saveFailed');
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   // ── Stopka ──────────────────────────────────────────────────────────────────

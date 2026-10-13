@@ -731,10 +731,10 @@
       "cancel": "Odustani",
       "changeKey": "Promijeni ključ",
       "confirmRemove": "Želite isključiti AI za ovu funkciju? Ostale funkcije nastavljaju raditi.",
-      "detected": "Prepoznat: {provider}",
-      "detectedShort": "prepoznat po ključu",
       "detectFailed": "Dobavljača iz ovog ključa nismo prepoznali — odaberite ga sami.",
       "detectHint": "Dobavljača prepoznajemo po ključu — ne morate ga birati.",
+      "detected": "Prepoznat: {provider}",
+      "detectedShort": "prepoznat po ključu",
       "detecting": "Prepoznajem dobavljača…",
       "intro": "Svaka funkcija ima vlastitog dobavljača, ključ i model — obogaćivanje može raditi kod jednog, a analiza poziva kod drugog. Zalijepite ključ, dobavljača prepoznajemo sami. Spremanje provjerava postavku kod dobavljača; ključ je šifriran i više se nikada ne prikazuje.",
       "loading": "Učitavanje konfiguracije UI…",
@@ -1762,8 +1762,10 @@
       "previous": "Preth."
     },
     "password": {
+      "createHint": "Neobavezno. Bez lozinke račun se ne može prijaviti dok je ne postavite na kartici korisnika.",
       "mismatch": "Lozinke se ne podudaraju",
       "new": "Nova lozinka",
+      "newPassword": "Nova lozinka",
       "placeholder": "Najmanje 8 znakova",
       "repeat": "Ponovite lozinku",
       "saveFailed": "Pogreška pri spremanju lozinke",
@@ -1784,6 +1786,9 @@
     },
     "saving": "Spremanje…",
     "searchPlaceholder": "Traži korisnike…",
+    "sections": {
+      "projectFields": "Podaci za modul Projekti"
+    },
     "statuses": {
       "active": "Aktivan",
       "inactive": "Neaktivan"
