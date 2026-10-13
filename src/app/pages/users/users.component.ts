@@ -186,15 +186,18 @@ import { LocaleService } from '../../core/i18n/locale.service';
               </div>
               <div class="fg">
                 <label class="fl">{{ t('users.fields.phone') }}</label>
-                <input class="fi" [(ngModel)]="newPhone" maxlength="40" placeholder="+48 600 100 200">
+                <input class="fi" [(ngModel)]="newPhone" maxlength="40" placeholder="+48 600 100 200"
+                       name="user-phone" autocomplete="off">
               </div>
               <div class="fg">
                 <label class="fl">{{ t('users.fields.company') }}</label>
-                <input class="fi" [(ngModel)]="newCompany" maxlength="200">
+                <input class="fi" [(ngModel)]="newCompany" maxlength="200"
+                       name="user-company" autocomplete="off">
               </div>
               <div class="fg" style="grid-column:1/-1">
                 <label class="fl">{{ t('users.fields.department') }}</label>
-                <input class="fi" [(ngModel)]="newDepartment" maxlength="200">
+                <input class="fi" [(ngModel)]="newDepartment" maxlength="200"
+                       name="user-department" autocomplete="off">
               </div>
               @if (hasProjectsFeature()) {
                 <div class="fg">
@@ -313,15 +316,18 @@ import { LocaleService } from '../../core/i18n/locale.service';
                 </div>
                 <div class="fg">
                   <label class="fl">{{ t('users.fields.phone') }}</label>
-                  <input class="fi" [(ngModel)]="editPhone" maxlength="40" placeholder="+48 600 100 200">
+                  <input class="fi" [(ngModel)]="editPhone" maxlength="40" placeholder="+48 600 100 200"
+                         name="user-phone-edit" autocomplete="off">
                 </div>
                 <div class="fg">
                   <label class="fl">{{ t('users.fields.company') }}</label>
-                  <input class="fi" [(ngModel)]="editCompany" maxlength="200">
+                  <input class="fi" [(ngModel)]="editCompany" maxlength="200"
+                         name="user-company-edit" autocomplete="off">
                 </div>
                 <div class="fg" style="grid-column:1/-1">
                   <label class="fl">{{ t('users.fields.department') }}</label>
-                  <input class="fi" [(ngModel)]="editDepartment" maxlength="200">
+                  <input class="fi" [(ngModel)]="editDepartment" maxlength="200"
+                         name="user-department-edit" autocomplete="off">
                 </div>
                 @if (hasProjectsFeature()) {
                   <div class="fg">
