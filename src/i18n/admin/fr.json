@@ -723,6 +723,9 @@
       "saving": "Enregistrement…"
     },
     "ai": {
+      "apiAddress": "Adresse de l’API",
+      "apiAddressHint": "Vide = adresse par défaut du fournisseur. Renseignez-la pour Azure OpenAI ou pour votre propre point d’accès compatible avec l’API du fournisseur, p. ex. {example}",
+      "apiAddressUse": "Adresse d’API personnalisée",
       "apiKey": "Clé API",
       "apiKeyPlaceholder": "Collez la clé API",
       "cancel": "Annuler",

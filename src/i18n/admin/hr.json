@@ -723,6 +723,9 @@
       "saving": "Spremanje…"
     },
     "ai": {
+      "apiAddress": "API adresa",
+      "apiAddressHint": "Prazno = zadana adresa pružatelja. Ispunite je za Azure OpenAI ili vlastitu krajnju točku kompatibilnu s API-jem pružatelja, npr. {example}",
+      "apiAddressUse": "Vlastita API adresa",
       "apiKey": "API ključ",
       "apiKeyPlaceholder": "Zalijepite API ključ",
       "cancel": "Odustani",

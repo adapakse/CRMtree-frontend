@@ -723,6 +723,9 @@
       "saving": "Guardando…"
     },
     "ai": {
+      "apiAddress": "Dirección de la API",
+      "apiAddressHint": "Vacío = dirección predeterminada del proveedor. Rellénalo para Azure OpenAI o para un endpoint propio compatible con la API del proveedor, p. ej. {example}",
+      "apiAddressUse": "Dirección de API propia",
       "apiKey": "Clave API",
       "apiKeyPlaceholder": "Pega la clave API",
       "cancel": "Cancelar",

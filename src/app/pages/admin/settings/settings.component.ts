@@ -12,7 +12,7 @@ import { AiConfigService, AiConfig, AiProviderOption, AiPurpose } from '../../..
 import { AuthService } from '../../../core/auth/auth.service';
 import { ProjectSettingsComponent } from '../project-settings/project-settings.component';
 import { TenantFieldsEditorComponent } from './tenant-fields-editor.component';
-import { AiPurposeRowComponent } from './ai-purpose-row.component';
+import { AiPurposeRowComponent, SavedProvider } from './ai-purpose-row.component';
 import {
   TenantFieldDefinitions, TenantFieldsService,
 } from '../../../core/services/tenant-fields.service';
@@ -235,6 +235,8 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
   crm_hold_reasons: 'holdReasons',
 };
 
+const AI_ASSISTANT_PURPOSE = 'assistant';
+
 @Component({
   selector: 'wt-settings',
   standalone: true,
@@ -359,7 +361,7 @@ const FREE_TEXT_ITEM_GROUPS: Record<string, string> = {
               @if (aiLoading()) {
                 <div class="state-msg">{{ t('settings.ai.loading') }}</div>
               } @else {
-                @for (p of aiPurposes(); track p.key) {
+                @for (p of visibleAiPurposes(); track p.key) {
                   <app-ai-purpose-row
                     [purpose]="p"
                     [providers]="aiProviders()"
@@ -1672,21 +1674,40 @@ export class SettingsComponent implements OnInit {
    * jest już zapisany, więc nie trzeba go wklejać po raz drugi.
    */
   aiSavedProviders = computed(() => {
-    const seen = new Map<string, string>();
+    const seen = new Map<string, SavedProvider>();
     for (const config of Object.values(this.aiConfig())) {
-      if (!seen.has(config.provider)) seen.set(config.provider, config.api_key_hint);
+      if (seen.has(config.provider)) continue;
+      seen.set(config.provider, {
+        provider: config.provider, hint: config.api_key_hint, apiAddress: config.base_url,
+      });
     }
-    return [...seen].map(([provider, hint]) => ({ provider, hint }));
+    return [...seen.values()];
   });
+
+  private hasAiModule = computed(() =>
+    this.auth.hasFeature('prospects')
+    || this.auth.hasFeature('call_analysis')
+    || this.auth.hasFeature('seo_bot'));
+
+  /** The mobile app's form assistant works on leads, partners and project tasks. */
+  private hasFormAssistant = computed(() =>
+    this.auth.hasFeature('leads')
+    || this.auth.hasFeature('partner_registry')
+    || this.auth.hasFeature('projects'));
 
   /**
    * Konfiguracja AI jest pokazywana tylko tenantowi, który ma włączony
    * jakikolwiek moduł z niej korzystający. Bez nich byłaby samym szumem.
    */
-  aiFeatureEnabled = computed(() =>
-    this.auth.hasFeature('prospects')
-    || this.auth.hasFeature('call_analysis')
-    || this.auth.hasFeature('seo_bot'));
+  aiFeatureEnabled = computed(() => this.hasAiModule() || this.hasFormAssistant());
+
+  /**
+   * A tenant with CRM or Projects alone gets just the assistant row: the other
+   * features belong to modules it does not have.
+   */
+  visibleAiPurposes = computed(() => this.hasAiModule()
+    ? this.aiPurposes()
+    : this.aiPurposes().filter(purpose => purpose.key === AI_ASSISTANT_PURPOSE));
 
   loadAiConfig(): void {
     if (!this.aiFeatureEnabled()) return;

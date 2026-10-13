@@ -723,6 +723,9 @@
       "saving": "Wird gespeichert…"
     },
     "ai": {
+      "apiAddress": "API-Adresse",
+      "apiAddressHint": "Leer = Standardadresse des Anbieters. Für Azure OpenAI oder einen eigenen, mit der API des Anbieters kompatiblen Endpunkt ausfüllen, z. B. {example}",
+      "apiAddressUse": "Eigene API-Adresse",
       "apiKey": "API-Schlüssel",
       "apiKeyPlaceholder": "API-Schlüssel einfügen",
       "cancel": "Abbrechen",

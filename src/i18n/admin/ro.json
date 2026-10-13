@@ -723,6 +723,9 @@
       "saving": "Se salvează…"
     },
     "ai": {
+      "apiAddress": "Adresa API",
+      "apiAddressHint": "Gol = adresa implicită a furnizorului. Completeaz-o pentru Azure OpenAI sau pentru un endpoint propriu compatibil cu API-ul furnizorului, de ex. {example}",
+      "apiAddressUse": "Adresă API proprie",
       "apiKey": "Cheie API",
       "apiKeyPlaceholder": "Lipește cheia API",
       "cancel": "Anulează",
