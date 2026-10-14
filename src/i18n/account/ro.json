@@ -15,6 +15,19 @@
   },
   "mySettings": {
     "delete": "Ștergere",
+    "password": {
+      "current": "Parola actuală",
+      "hint": "Introdu parola actuală și una nouă, de cel puțin 8 caractere. Schimbarea deconectează contul din aplicația mobilă.",
+      "mismatch": "Parolele nu coincid",
+      "new": "Parolă nouă",
+      "repeat": "Repetă parola nouă",
+      "saveFailed": "Parola nu a putut fi schimbată",
+      "saved": "Parola a fost schimbată",
+      "saving": "Se salvează…",
+      "submit": "Schimbă parola",
+      "title": "Schimbă parola",
+      "tooShort": "Parola trebuie să aibă cel puțin 8 caractere"
+    },
     "pbx": {
       "configured": "Token configurat",
       "directPhone": "Numărul dvs. direct:",

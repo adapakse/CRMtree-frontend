@@ -148,7 +148,8 @@ export interface SavedProvider {
             <label class="lbl">{{ t('settings.ai.model') }}</label>
             <div class="cell">
               @if (models().length && !customModel()) {
-                <select class="fsel" [(ngModel)]="draftModel" [disabled]="busy()">
+                <select class="fsel" [(ngModel)]="draftModel" [disabled]="busy()"
+                        (ngModelChange)="onModelChange($event)">
                   <option value="">{{ t('settings.ai.modelDefaultOption', { model: defaultModel() }) }}</option>
                   @for (m of models(); track m.id) {
                     <option [value]="m.id">{{ m.label }}</option>
@@ -173,6 +174,13 @@ export interface SavedProvider {
              konfigurację u dostawcy i działa bez ponownego wklejania klucza, więc
              po doładowaniu konta wystarczy kliknąć Zapisz. Dwa przyciski robiące
              to samo tylko zaśmiecały kartę przy siedmiu funkcjach. -->
+        <!-- Powod nieudanego zapisu zostaje na ekranie. Toast znika po chwili,
+             a przy siedmiu funkcjach latwo go przegapic i wtedy widac tylko, ze
+             klucz sie nie zapisal, bez zadnej wskazowki dlaczego. -->
+        @if (saveError(); as err) {
+          <div class="pr-error" [title]="err">{{ err }}</div>
+        }
+
         <div class="pr-actions">
           <button class="btn btn-p" [disabled]="busy() || !canSave()" (click)="save()">
             {{ busy() ? t('settings.ai.verifying') : t('settings.ai.saveAndVerify') }}
@@ -261,6 +269,7 @@ export class AiPurposeRowComponent {
   readonly changed = output<void>();
 
   busy = signal(false);
+  saveError = signal<string | null>(null);
   models = signal<AiModelOption[]>([]);
   modelsLoading = signal(false);
   customModel = signal(false);
@@ -449,13 +458,29 @@ export class AiPurposeRowComponent {
     });
   }
 
+  /**
+   * „Własny model" zamienia listę na pole tekstowe od razu przy wyborze.
+   * Wcześniej robił to dopiero przycisk zapisu, który w tym jednym przypadku
+   * kończył po cichu — bez żądania i bez komunikatu — więc wyglądało to jak
+   * zapis, który nie zapisuje.
+   */
+  onModelChange(value: string): void {
+    if (value !== CUSTOM_MODEL) return;
+    this.customModel.set(true);
+    this.draftModel = '';
+  }
+
   save(): void {
+    // Zapas na wypadek, gdyby wartość-wartownik trafiła tu inną drogą: lepiej
+    // powiedzieć wprost, czego brakuje, niż nie zrobić nic.
     if (this.draftModel === CUSTOM_MODEL) {
       this.customModel.set(true);
       this.draftModel = '';
+      this.toast.error(this.t('settings.ai.modelCustomRequired'));
       return;
     }
     this.busy.set(true);
+    this.saveError.set(null);
     this.api.save(this.purpose().key, {
       // Pusty dostawca = backend rozpozna go z klucza.
       provider: this.detectedProvider() ?? this.draftProvider ?? null,
@@ -466,6 +491,7 @@ export class AiPurposeRowComponent {
     }).subscribe({
       next: () => {
         this.busy.set(false);
+        this.saveError.set(null);
         this.draftKey = '';
         this.keyEditing.set(false);
         this.detectedProvider.set(null);
@@ -473,7 +499,9 @@ export class AiPurposeRowComponent {
       },
       error: err => {
         this.busy.set(false);
-        this.toast.error(err?.error?.error ?? this.t('settings.ai.saveFailed'));
+        const reason = err?.error?.error ?? this.t('settings.ai.saveFailed');
+        this.saveError.set(reason);
+        this.toast.error(reason);
       },
     });
   }

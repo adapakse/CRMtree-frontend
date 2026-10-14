@@ -15,6 +15,19 @@
   },
   "mySettings": {
     "delete": "Izbriši",
+    "password": {
+      "current": "Trenutno geslo",
+      "hint": "Vnesite trenutno in novo geslo, vsaj 8 znakov. Sprememba odjavi vaš račun iz mobilne aplikacije.",
+      "mismatch": "Gesli se ne ujemata",
+      "new": "Novo geslo",
+      "repeat": "Ponovite novo geslo",
+      "saveFailed": "Gesla ni bilo mogoče spremeniti",
+      "saved": "Geslo je spremenjeno",
+      "saving": "Shranjevanje…",
+      "submit": "Spremeni geslo",
+      "title": "Sprememba gesla",
+      "tooShort": "Geslo mora imeti vsaj 8 znakov"
+    },
     "pbx": {
       "configured": "Žeton je nastavljen",
       "directPhone": "Vaša direktna številka:",

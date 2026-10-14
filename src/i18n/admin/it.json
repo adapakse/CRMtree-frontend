@@ -740,6 +740,7 @@
       "loading": "Caricamento della configurazione AI…",
       "model": "Modello",
       "modelCustom": "Altro (digita il nome)",
+      "modelCustomRequired": "Inserisci il nome del modello personalizzato",
       "modelDefaultOption": "Predefinito ({model})",
       "modelsLoading": "Recupero l'elenco dei modelli dal fornitore…",
       "needsStructuredOutput": "Richiede risposte in formato imposto — solo {providers}",
@@ -1761,8 +1762,10 @@
       "previous": "Prec."
     },
     "password": {
+      "createHint": "Facoltativo. Senza password l account non può accedere finché non ne imposti una sulla scheda utente.",
       "mismatch": "Le password non coincidono",
       "new": "Nuova password",
+      "newPassword": "Nuova password",
       "placeholder": "Min. 8 caratteri",
       "repeat": "Ripeti la password",
       "saveFailed": "Errore di salvataggio della password",
@@ -1783,6 +1786,9 @@
     },
     "saving": "Salvataggio…",
     "searchPlaceholder": "Cerca utenti…",
+    "sections": {
+      "projectFields": "Dati per il modulo Progetti"
+    },
     "statuses": {
       "active": "Attivo",
       "inactive": "Inattivo"

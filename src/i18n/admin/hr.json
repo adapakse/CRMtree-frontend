@@ -740,6 +740,7 @@
       "loading": "Učitavanje konfiguracije UI…",
       "model": "Model",
       "modelCustom": "Drugo (upišite ime)",
+      "modelCustomRequired": "Unesite naziv vlastitog modela",
       "modelDefaultOption": "Zadano ({model})",
       "modelsLoading": "Dohvaćam popis modela od dobavljača…",
       "needsStructuredOutput": "Zahtijeva odgovore u zadanom formatu — samo {providers}",
@@ -1761,8 +1762,10 @@
       "previous": "Preth."
     },
     "password": {
+      "createHint": "Neobavezno. Bez lozinke račun se ne može prijaviti dok je ne postavite na kartici korisnika.",
       "mismatch": "Lozinke se ne podudaraju",
       "new": "Nova lozinka",
+      "newPassword": "Nova lozinka",
       "placeholder": "Najmanje 8 znakova",
       "repeat": "Ponovite lozinku",
       "saveFailed": "Pogreška pri spremanju lozinke",
@@ -1783,6 +1786,9 @@
     },
     "saving": "Spremanje…",
     "searchPlaceholder": "Traži korisnike…",
+    "sections": {
+      "projectFields": "Podaci za modul Projekti"
+    },
     "statuses": {
       "active": "Aktivan",
       "inactive": "Neaktivan"
