@@ -723,6 +723,9 @@
       "saving": "Guardando…"
     },
     "ai": {
+      "apiAddress": "Dirección de la API",
+      "apiAddressHint": "Vacío = dirección predeterminada del proveedor. Rellénalo para Azure OpenAI o para un endpoint propio compatible con la API del proveedor, p. ej. {example}",
+      "apiAddressUse": "Dirección de API propia",
       "apiKey": "Clave API",
       "apiKeyPlaceholder": "Pega la clave API",
       "cancel": "Cancelar",
@@ -737,6 +740,7 @@
       "loading": "Cargando la configuración de IA…",
       "model": "Modelo",
       "modelCustom": "Otro (escribe el nombre)",
+      "modelCustomRequired": "Introduce el nombre del modelo personalizado",
       "modelDefaultOption": "Predeterminado ({model})",
       "modelsLoading": "Obteniendo la lista de modelos del proveedor…",
       "needsStructuredOutput": "Requiere respuestas con formato impuesto — solo {providers}",
@@ -1758,8 +1762,10 @@
       "previous": "Ant."
     },
     "password": {
+      "createHint": "Opcional. Sin contraseña la cuenta no podrá iniciar sesión hasta que establezcas una en la ficha del usuario.",
       "mismatch": "Las contraseñas no coinciden",
       "new": "Nueva contraseña",
+      "newPassword": "Nueva contraseña",
       "placeholder": "Mín. 8 caracteres",
       "repeat": "Repite la contraseña",
       "saveFailed": "Error al guardar la contraseña",
@@ -1780,6 +1786,9 @@
     },
     "saving": "Guardando…",
     "searchPlaceholder": "Buscar usuarios…",
+    "sections": {
+      "projectFields": "Datos para el módulo Proyectos"
+    },
     "statuses": {
       "active": "Activo",
       "inactive": "Inactivo"

@@ -723,6 +723,9 @@
       "saving": "Shranjevanje…"
     },
     "ai": {
+      "apiAddress": "Naslov API",
+      "apiAddressHint": "Prazno = privzeti naslov ponudnika. Izpolnite ga za Azure OpenAI ali lastno končno točko, združljivo z API-jem ponudnika, npr. {example}",
+      "apiAddressUse": "Lasten naslov API",
       "apiKey": "API-ključ",
       "apiKeyPlaceholder": "Prilepite ključ API",
       "cancel": "Prekliči",
@@ -737,6 +740,7 @@
       "loading": "Nalaganje konfiguracije UI…",
       "model": "Model",
       "modelCustom": "Drugo (vnesite ime)",
+      "modelCustomRequired": "Vnesite ime lastnega modela",
       "modelDefaultOption": "Privzeto ({model})",
       "modelsLoading": "Pridobivam seznam modelov od ponudnika…",
       "needsStructuredOutput": "Zahteva odgovore v vsiljeni obliki — samo {providers}",
@@ -1758,8 +1762,10 @@
       "previous": "Prejš."
     },
     "password": {
+      "createHint": "Neobvezno. Brez gesla se račun ne more prijaviti, dokler ga ne nastavite na kartici uporabnika.",
       "mismatch": "Gesli se ne ujemata",
       "new": "Novo geslo",
+      "newPassword": "Novo geslo",
       "placeholder": "Najm. 8 znakov",
       "repeat": "Ponovite geslo",
       "saveFailed": "Napaka pri shranjevanju gesla",
@@ -1780,6 +1786,9 @@
     },
     "saving": "Shranjevanje…",
     "searchPlaceholder": "Iščite uporabnike…",
+    "sections": {
+      "projectFields": "Podatki za modul Projekti"
+    },
     "statuses": {
       "active": "Aktiven",
       "inactive": "Neaktiven"

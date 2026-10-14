@@ -723,6 +723,9 @@
       "saving": "Zapisywanie…"
     },
     "ai": {
+      "apiAddress": "Adres API",
+      "apiAddressHint": "Puste = domyślny adres dostawcy. Wypełnij dla Azure OpenAI lub własnego adresu zgodnego z API dostawcy, np. {example}",
+      "apiAddressUse": "Własny adres API",
       "apiKey": "Klucz API",
       "apiKeyPlaceholder": "Wklej klucz API",
       "cancel": "Anuluj",
@@ -737,6 +740,7 @@
       "loading": "Wczytywanie konfiguracji AI…",
       "model": "Model",
       "modelCustom": "Inny (wpisz nazwę)",
+      "modelCustomRequired": "Wpisz nazwę własnego modelu",
       "modelDefaultOption": "Domyślny ({model})",
       "modelsLoading": "Pobieram listę modeli od dostawcy…",
       "needsStructuredOutput": "Wymaga wymuszonego formatu odpowiedzi — tylko {providers}",
@@ -1758,8 +1762,10 @@
       "previous": "Poprz."
     },
     "password": {
+      "createHint": "Opcjonalne. Bez hasła konto nie zaloguje się, dopóki nie ustawisz go później na karcie użytkownika.",
       "mismatch": "Hasła nie są identyczne",
       "new": "Nowe hasło",
+      "newPassword": "Nowe hasło",
       "placeholder": "Min. 8 znaków",
       "repeat": "Powtórz hasło",
       "saveFailed": "Błąd zapisu hasła",
@@ -1780,6 +1786,9 @@
     },
     "saving": "Zapisywanie…",
     "searchPlaceholder": "Szukaj użytkowników…",
+    "sections": {
+      "projectFields": "Dane do modułu Projekty"
+    },
     "statuses": {
       "active": "Aktywny",
       "inactive": "Nieaktywny"

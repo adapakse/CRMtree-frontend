@@ -15,6 +15,19 @@
   },
   "mySettings": {
     "delete": "Eliminar",
+    "password": {
+      "current": "Contraseña actual",
+      "hint": "Introduce tu contraseña actual y una nueva, de al menos 8 caracteres. El cambio cierra la sesión de tu cuenta en la app móvil.",
+      "mismatch": "Las contraseñas no coinciden",
+      "new": "Nueva contraseña",
+      "repeat": "Repite la nueva contraseña",
+      "saveFailed": "No se pudo cambiar la contraseña",
+      "saved": "Contraseña cambiada",
+      "saving": "Guardando…",
+      "submit": "Cambiar contraseña",
+      "title": "Cambiar contraseña",
+      "tooShort": "La contraseña debe tener al menos 8 caracteres"
+    },
     "pbx": {
       "configured": "Token configurado",
       "directPhone": "Tu número directo:",

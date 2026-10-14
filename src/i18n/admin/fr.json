@@ -723,6 +723,9 @@
       "saving": "Enregistrement…"
     },
     "ai": {
+      "apiAddress": "Adresse de l’API",
+      "apiAddressHint": "Vide = adresse par défaut du fournisseur. Renseignez-la pour Azure OpenAI ou pour votre propre point d’accès compatible avec l’API du fournisseur, p. ex. {example}",
+      "apiAddressUse": "Adresse d’API personnalisée",
       "apiKey": "Clé API",
       "apiKeyPlaceholder": "Collez la clé API",
       "cancel": "Annuler",
@@ -737,6 +740,7 @@
       "loading": "Chargement de la configuration IA…",
       "model": "Modèle",
       "modelCustom": "Autre (saisir un nom)",
+      "modelCustomRequired": "Saisissez le nom du modèle personnalisé",
       "modelDefaultOption": "Par défaut ({model})",
       "modelsLoading": "Récupération de la liste des modèles auprès du fournisseur…",
       "needsStructuredOutput": "Nécessite un format de réponse imposé — {providers} uniquement",
@@ -1758,8 +1762,10 @@
       "previous": "Préc."
     },
     "password": {
+      "createHint": "Facultatif. Sans mot de passe, le compte ne pourra pas se connecter tant que vous n en définirez pas un sur la fiche utilisateur.",
       "mismatch": "Les mots de passe ne sont pas identiques",
       "new": "Nouveau mot de passe",
+      "newPassword": "Nouveau mot de passe",
       "placeholder": "Min. 8 caractères",
       "repeat": "Répétez le mot de passe",
       "saveFailed": "Erreur lors de l’enregistrement du mot de passe",
@@ -1780,6 +1786,9 @@
     },
     "saving": "Enregistrement…",
     "searchPlaceholder": "Rechercher des utilisateurs…",
+    "sections": {
+      "projectFields": "Données pour le module Projets"
+    },
     "statuses": {
       "active": "Actif",
       "inactive": "Inactif"

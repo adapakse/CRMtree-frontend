@@ -723,6 +723,9 @@
       "saving": "Saving…"
     },
     "ai": {
+      "apiAddress": "API address",
+      "apiAddressHint": "Empty = the provider’s default address. Fill it in for Azure OpenAI or your own endpoint compatible with the provider’s API, e.g. {example}",
+      "apiAddressUse": "Custom API address",
       "apiKey": "API key",
       "apiKeyPlaceholder": "Paste the API key",
       "cancel": "Cancel",
@@ -737,6 +740,7 @@
       "loading": "Loading AI configuration...",
       "model": "Model",
       "modelCustom": "Other (type a name)",
+      "modelCustomRequired": "Enter the custom model name",
       "modelDefaultOption": "Default ({model})",
       "modelsLoading": "Fetching the model list from the provider…",
       "needsStructuredOutput": "Needs schema-enforced replies — {providers} only",
@@ -1758,8 +1762,10 @@
       "previous": "Prev"
     },
     "password": {
+      "createHint": "Optional. Without a password the account cannot sign in until you set one later on the user card.",
       "mismatch": "The passwords don’t match",
       "new": "New password",
+      "newPassword": "New password",
       "placeholder": "Min. 8 characters",
       "repeat": "Repeat password",
       "saveFailed": "Couldn’t save the password",
@@ -1780,6 +1786,9 @@
     },
     "saving": "Saving…",
     "searchPlaceholder": "Search users…",
+    "sections": {
+      "projectFields": "Details for the Projects module"
+    },
     "statuses": {
       "active": "Active",
       "inactive": "Inactive"

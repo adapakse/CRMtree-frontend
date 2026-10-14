@@ -723,6 +723,9 @@
       "saving": "Wird gespeichert…"
     },
     "ai": {
+      "apiAddress": "API-Adresse",
+      "apiAddressHint": "Leer = Standardadresse des Anbieters. Für Azure OpenAI oder einen eigenen, mit der API des Anbieters kompatiblen Endpunkt ausfüllen, z. B. {example}",
+      "apiAddressUse": "Eigene API-Adresse",
       "apiKey": "API-Schlüssel",
       "apiKeyPlaceholder": "API-Schlüssel einfügen",
       "cancel": "Abbrechen",
@@ -737,6 +740,7 @@
       "loading": "KI-Konfiguration wird geladen…",
       "model": "Modell",
       "modelCustom": "Andere (Name eingeben)",
+      "modelCustomRequired": "Namen des eigenen Modells eingeben",
       "modelDefaultOption": "Standard ({model})",
       "modelsLoading": "Modellliste wird beim Anbieter abgerufen…",
       "needsStructuredOutput": "Benötigt erzwungenes Antwortformat — nur {providers}",
@@ -1758,8 +1762,10 @@
       "previous": "Zurück"
     },
     "password": {
+      "createHint": "Optional. Ohne Passwort kann sich das Konto erst anmelden, wenn Sie später eines auf der Benutzerkarte setzen.",
       "mismatch": "Die Passwörter stimmen nicht überein",
       "new": "Neues Passwort",
+      "newPassword": "Neues Passwort",
       "placeholder": "Mind. 8 Zeichen",
       "repeat": "Passwort wiederholen",
       "saveFailed": "Fehler beim Speichern des Passworts",
@@ -1780,6 +1786,9 @@
     },
     "saving": "Wird gespeichert…",
     "searchPlaceholder": "Benutzer suchen…",
+    "sections": {
+      "projectFields": "Angaben für das Modul Projekte"
+    },
     "statuses": {
       "active": "Aktiv",
       "inactive": "Inaktiv"

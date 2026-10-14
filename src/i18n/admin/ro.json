@@ -723,6 +723,9 @@
       "saving": "Se salvează…"
     },
     "ai": {
+      "apiAddress": "Adresa API",
+      "apiAddressHint": "Gol = adresa implicită a furnizorului. Completeaz-o pentru Azure OpenAI sau pentru un endpoint propriu compatibil cu API-ul furnizorului, de ex. {example}",
+      "apiAddressUse": "Adresă API proprie",
       "apiKey": "Cheie API",
       "apiKeyPlaceholder": "Lipește cheia API",
       "cancel": "Anulează",
@@ -737,6 +740,7 @@
       "loading": "Se încarcă configurația AI…",
       "model": "Model",
       "modelCustom": "Altul (scrie numele)",
+      "modelCustomRequired": "Introdu numele modelului personalizat",
       "modelDefaultOption": "Implicit ({model})",
       "modelsLoading": "Se preia lista de modele de la furnizor…",
       "needsStructuredOutput": "Necesită răspunsuri într-un format impus — doar {providers}",
@@ -1758,8 +1762,10 @@
       "previous": "Înapoi"
     },
     "password": {
+      "createHint": "Opțional. Fără parolă contul nu se poate autentifica până nu setezi una pe fișa utilizatorului.",
       "mismatch": "Parolele nu sunt identice",
       "new": "Parolă nouă",
+      "newPassword": "Parolă nouă",
       "placeholder": "Min. 8 caractere",
       "repeat": "Repetați parola",
       "saveFailed": "Eroare la salvarea parolei",
@@ -1780,6 +1786,9 @@
     },
     "saving": "Se salvează…",
     "searchPlaceholder": "Căutare utilizatori…",
+    "sections": {
+      "projectFields": "Date pentru modulul Proiecte"
+    },
     "statuses": {
       "active": "Activ",
       "inactive": "Inactiv"
