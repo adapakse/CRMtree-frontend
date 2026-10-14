@@ -174,6 +174,13 @@ export interface SavedProvider {
              konfigurację u dostawcy i działa bez ponownego wklejania klucza, więc
              po doładowaniu konta wystarczy kliknąć Zapisz. Dwa przyciski robiące
              to samo tylko zaśmiecały kartę przy siedmiu funkcjach. -->
+        <!-- Powod nieudanego zapisu zostaje na ekranie. Toast znika po chwili,
+             a przy siedmiu funkcjach latwo go przegapic i wtedy widac tylko, ze
+             klucz sie nie zapisal, bez zadnej wskazowki dlaczego. -->
+        @if (saveError(); as err) {
+          <div class="pr-error" [title]="err">{{ err }}</div>
+        }
+
         <div class="pr-actions">
           <button class="btn btn-p" [disabled]="busy() || !canSave()" (click)="save()">
             {{ busy() ? t('settings.ai.verifying') : t('settings.ai.saveAndVerify') }}
@@ -262,6 +269,7 @@ export class AiPurposeRowComponent {
   readonly changed = output<void>();
 
   busy = signal(false);
+  saveError = signal<string | null>(null);
   models = signal<AiModelOption[]>([]);
   modelsLoading = signal(false);
   customModel = signal(false);
@@ -472,6 +480,7 @@ export class AiPurposeRowComponent {
       return;
     }
     this.busy.set(true);
+    this.saveError.set(null);
     this.api.save(this.purpose().key, {
       // Pusty dostawca = backend rozpozna go z klucza.
       provider: this.detectedProvider() ?? this.draftProvider ?? null,
@@ -482,6 +491,7 @@ export class AiPurposeRowComponent {
     }).subscribe({
       next: () => {
         this.busy.set(false);
+        this.saveError.set(null);
         this.draftKey = '';
         this.keyEditing.set(false);
         this.detectedProvider.set(null);
@@ -489,7 +499,9 @@ export class AiPurposeRowComponent {
       },
       error: err => {
         this.busy.set(false);
-        this.toast.error(err?.error?.error ?? this.t('settings.ai.saveFailed'));
+        const reason = err?.error?.error ?? this.t('settings.ai.saveFailed');
+        this.saveError.set(reason);
+        this.toast.error(reason);
       },
     });
   }
