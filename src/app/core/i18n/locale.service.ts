@@ -98,6 +98,30 @@ export class LocaleService {
     } catch {
       // Private mode / blocked storage: the language is simply resolved again next time.
     }
+    this.shareWithLanding(locale);
+  }
+
+  /**
+   * Strona marketingowa stoi na crmtree.pl, a aplikacja na {slug}.crmtree.pl i
+   * app.crmtree.pl. localStorage jest per origin, więc się nim nie podzielą —
+   * ciasteczko na `.crmtree.pl` już tak. Dzięki temu klient, któremu CRM działa
+   * po rosyjsku, widzi po rosyjsku także crmtree.pl, zamiast lądować na polskiej
+   * wersji. Landing czyta ten sam klucz (public/i18n.js w repo CRMtree-landing).
+   *
+   * Poza domeną crmtree.pl (localhost, własna domena klienta) ciasteczko jest
+   * zapisywane bez `domain`, więc po prostu nie jest współdzielone — nic się nie
+   * psuje, landing po prostu wraca do wykrywania z przeglądarki.
+   */
+  private shareWithLanding(locale: AppLocale): void {
+    try {
+      const host = window.location.hostname;
+      const shared = /(^|\.)crmtree\.pl$/.test(host) ? '; domain=.crmtree.pl' : '';
+      const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie =
+        `crmtree_lang=${locale}; path=/; max-age=31536000${shared}${secure}; SameSite=Lax`;
+    } catch {
+      // Ciasteczka zablokowane — landing wykryje język po swojemu.
+    }
   }
 
   private forget(): void {
