@@ -348,9 +348,8 @@
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Nemojte to pitati klijenta — to je naša zajednička infrastruktura, ista vrijednost za svakog klijenta (tenant). Zalijepite je ovdje prilikom postavljanja integracije.",
-        "label": "Google — Pub/Sub Topic (popunjava CRMtree)",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Ostavite prazno — to ispunjavamo mi tijekom postavljanja, ista vrijednost za svakog klijenta. Ovdje ne morate ništa unijeti.",
+        "label": "Google — Pub/Sub Topic"
       },
       "go_live_date": {
         "label": "Planirani datum pokretanja"

@@ -194,7 +194,7 @@ export const ONBOARDING_SURVEY_SECTIONS: SurveySection[] = [
       // project for every tenant, so this value is always the same. Kept as
       // a field (not deleted) so whoever fills in the tenant's email config
       // sees the exact value to copy, instead of having to look it up.
-      { key: 'gmail_pubsub_topic', labelKey: 'onboardingSurvey.questions.gmail_pubsub_topic.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_pubsub_topic.placeholder', hintKey: 'onboardingSurvey.questions.gmail_pubsub_topic.hint', isVisible: isAnswer('email_provider', 'gmail') },
+      { key: 'gmail_pubsub_topic', labelKey: 'onboardingSurvey.questions.gmail_pubsub_topic.label', type: 'text', hintKey: 'onboardingSurvey.questions.gmail_pubsub_topic.hint', isVisible: isAnswer('email_provider', 'gmail') },
 
       { key: 'outlook_client_id', labelKey: 'onboardingSurvey.questions.outlook_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.outlook_client_id.placeholder', isVisible: isAnswer('email_provider', 'outlook') },
       { key: 'outlook_client_secret', labelKey: 'onboardingSurvey.questions.outlook_client_secret.label', type: 'secret', isVisible: isAnswer('email_provider', 'outlook') },

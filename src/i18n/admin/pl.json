@@ -348,9 +348,8 @@
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Nie pytaj o to klienta — to nasza wspólna infrastruktura, ta sama wartość dla każdego tenanta. Wklej ją tu, konfigurując integrację.",
-        "label": "Google — Pub/Sub Topic (uzupełnia CRMtree)",
-        "placeholder": "projects/crmtree-integrations/topics/gmail-notifications"
+        "hint": "Zostaw puste — to uzupełniamy po naszej stronie podczas wdrożenia, ta sama wartość dla każdego klienta. Nic nie musisz tu wpisywać.",
+        "label": "Google — Pub/Sub Topic"
       },
       "go_live_date": {
         "label": "Planowana data uruchomienia"

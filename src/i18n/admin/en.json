@@ -348,9 +348,8 @@
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Don't ask the client for this — it's our shared infrastructure, the same value for every tenant. Paste it here when configuring the integration.",
-        "label": "Google — Pub/Sub Topic (filled in by CRMtree)",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Leave this empty — we fill it in on our side during setup, the same value for every client. You don't need to enter anything here.",
+        "label": "Google — Pub/Sub Topic"
       },
       "go_live_date": {
         "label": "Planned go-live date"
