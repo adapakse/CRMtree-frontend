@@ -338,16 +338,17 @@
         "label": "Enrichment — câte companii pe lună intenționați să analizați?"
       },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → APIs & Services → Credentials → Create Credentials → OAuth client ID.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Afișat o singură dată, la creare — copiază-l imediat.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Necesar pentru primirea imediată a mesajelor noi.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Lasă necompletat — îl completăm noi în timpul configurării, aceeași valoare pentru fiecare client. Nu trebuie să introduci nimic aici.",
+        "label": "Google — Pub/Sub Topic"
       },
       "go_live_date": {
         "label": "Data planificată a lansării"
@@ -434,14 +435,16 @@
         "label": "Poate administratorul Microsoft 365 să acorde consimțământul (admin consent) pentru întreaga organizație?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Opțional.",
+        "hint": "Nu completa — integrarea funcționează cu un cont Microsoft din orice organizație. Introducerea unui ID specific ar bloca autentificarea conturilor din afara unei singure companii.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → aplicația ta → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → aplicația ta → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +600,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Același ecran ca Client ID, chiar lângă el.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {

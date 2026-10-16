@@ -338,16 +338,17 @@
         "label": "Enrichment — koliko tvrtki mjesečno planirate analizirati?"
       },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → API-ji i usluge → Vjerodajnice → Izradi vjerodajnice → OAuth Client ID.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Prikazuje se samo jednom, pri izradi — odmah kopirajte.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Potreban za trenutačno primanje novih poruka.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Ostavite prazno — to ispunjavamo mi tijekom postavljanja, ista vrijednost za svakog klijenta. Ovdje ne morate ništa unijeti.",
+        "label": "Google — Pub/Sub Topic"
       },
       "go_live_date": {
         "label": "Planirani datum pokretanja"
@@ -434,14 +435,16 @@
         "label": "Može li administrator Microsoft 365 dati suglasnost (admin consent) za cijelu organizaciju?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Neobavezno.",
+        "hint": "Ne popunjavajte — integracija radi s Microsoft računom iz bilo koje organizacije. Unos određenog ID-a blokirao bi prijavu računima izvan jedne tvrtke.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → vaša aplikacija → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → vaša aplikacija → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +600,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Isti zaslon kao Client ID, odmah pored njega.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {

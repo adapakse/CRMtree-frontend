@@ -338,16 +338,17 @@
         "label": "Enrichment — wie viele Unternehmen möchten Sie pro Monat analysieren?"
       },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → APIs & Dienste → Anmeldedaten → Anmeldedaten erstellen → OAuth-Client-ID.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Wird nur einmal angezeigt, bei der Erstellung — sofort kopieren.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Erforderlich für den sofortigen Empfang neuer Nachrichten.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Lassen Sie dieses Feld leer — wir tragen es bei der Einrichtung auf unserer Seite ein, für jeden Kunden derselbe Wert. Sie müssen hier nichts eintragen.",
+        "label": "Google — Pub/Sub Topic"
       },
       "go_live_date": {
         "label": "Geplanter Starttermin"
@@ -434,14 +435,16 @@
         "label": "Kann der Microsoft-365-Administrator die Zustimmung (admin consent) für die gesamte Organisation erteilen?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Optional.",
+        "hint": "Nicht ausfüllen — die Integration funktioniert mit einem Microsoft-Konto aus jeder Organisation. Eine konkrete ID würde die Anmeldung für Konten außerhalb einer Firma blockieren.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App-Registrierungen → Ihre App → Übersicht.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App-Registrierungen → Ihre App → Zertifikate & Geheimnisse → Neuer geheimer Clientschlüssel.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +600,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Derselbe Bildschirm wie die Client-ID, direkt daneben.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {

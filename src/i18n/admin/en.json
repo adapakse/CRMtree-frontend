@@ -338,16 +338,17 @@
         "label": "Enrichment — how many companies per month do you plan to analyse?"
       },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → APIs & Services → Credentials → Create Credentials → OAuth client ID.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Shown only once, at creation — copy it right away.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Needed to receive new messages instantly.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Leave this empty — we fill it in on our side during setup, the same value for every client. You don't need to enter anything here.",
+        "label": "Google — Pub/Sub Topic"
       },
       "go_live_date": {
         "label": "Planned go-live date"
@@ -434,14 +435,16 @@
         "label": "Can your Microsoft 365 administrator grant admin consent for the whole organization?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Optional.",
+        "hint": "Leave this blank — the integration works with a Microsoft account from any organization. Entering a specific ID will block sign-in for accounts outside one company.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → your app → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → your app → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +600,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Same screen as Client ID, right next to it.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {
