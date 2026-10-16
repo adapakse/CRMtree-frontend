@@ -179,16 +179,21 @@ export const ONBOARDING_SURVEY_SECTIONS: SurveySection[] = [
           { value: 'gmail', labelKey: 'onboardingSurvey.questions.email_provider.options.gmail.label' },
           { value: 'outlook', labelKey: 'onboardingSurvey.questions.email_provider.options.outlook.label' },
           { value: 'zoho', labelKey: 'onboardingSurvey.questions.email_provider.options.zoho.label' },
+          { value: 'yandex', labelKey: 'onboardingSurvey.questions.email_provider.options.yandex.label' },
           { value: 'other', labelKey: 'onboardingSurvey.questions.email_provider.options.other.label' },
           { value: 'none', labelKey: 'onboardingSurvey.questions.email_provider.options.none.label' },
         ],
       },
       { key: 'email_other_provider', labelKey: 'onboardingSurvey.questions.email_other_provider.label', type: 'text', isVisible: isAnswer('email_provider', 'other'), hintKey: 'onboardingSurvey.questions.email_other_provider.hint' },
-      { key: 'email_mailbox_count', labelKey: 'onboardingSurvey.questions.email_mailbox_count.label', type: 'number', isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
-      { key: 'email_oauth_app_owner', labelKey: 'onboardingSurvey.questions.email_oauth_app_owner.label', type: 'select', options: OAUTH_APP_OWNER, isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
+      { key: 'email_mailbox_count', labelKey: 'onboardingSurvey.questions.email_mailbox_count.label', type: 'number', isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho', 'yandex']) },
+      { key: 'email_oauth_app_owner', labelKey: 'onboardingSurvey.questions.email_oauth_app_owner.label', type: 'select', options: OAUTH_APP_OWNER, isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho', 'yandex']) },
 
       { key: 'gmail_client_id', labelKey: 'onboardingSurvey.questions.gmail_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_client_id.placeholder', isVisible: isAnswer('email_provider', 'gmail') },
       { key: 'gmail_client_secret', labelKey: 'onboardingSurvey.questions.gmail_client_secret.label', type: 'secret', isVisible: isAnswer('email_provider', 'gmail') },
+      // Not a question for the client — CRMtree runs a single shared Pub/Sub
+      // project for every tenant, so this value is always the same. Kept as
+      // a field (not deleted) so whoever fills in the tenant's email config
+      // sees the exact value to copy, instead of having to look it up.
       { key: 'gmail_pubsub_topic', labelKey: 'onboardingSurvey.questions.gmail_pubsub_topic.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_pubsub_topic.placeholder', hintKey: 'onboardingSurvey.questions.gmail_pubsub_topic.hint', isVisible: isAnswer('email_provider', 'gmail') },
 
       { key: 'outlook_client_id', labelKey: 'onboardingSurvey.questions.outlook_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.outlook_client_id.placeholder', isVisible: isAnswer('email_provider', 'outlook') },
@@ -206,6 +211,9 @@ export const ONBOARDING_SURVEY_SECTIONS: SurveySection[] = [
           { value: 'other', labelKey: 'onboardingSurvey.questions.zoho_data_center.options.other.label' },
         ],
       },
+
+      { key: 'yandex_client_id', labelKey: 'onboardingSurvey.questions.yandex_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.yandex_client_id.placeholder', isVisible: isAnswer('email_provider', 'yandex') },
+      { key: 'yandex_client_secret', labelKey: 'onboardingSurvey.questions.yandex_client_secret.label', type: 'secret', isVisible: isAnswer('email_provider', 'yandex') },
     ],
   },
   {

@@ -305,6 +305,9 @@
           "outlook": {
             "label": "Outlook / Microsoft 365"
           },
+          "yandex": {
+            "label": "Yandex Mail"
+          },
           "zoho": {
             "label": "Zoho Mail"
           }
@@ -345,8 +348,8 @@
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Necesar pentru primirea imediată a mesajelor noi.",
-        "label": "Google — Pub/Sub Topic",
+        "hint": "Nu întreba clientul despre asta — este infrastructura noastră comună, aceeași valoare pentru fiecare tenant. Lipește-o aici la configurarea integrării.",
+        "label": "Google — Pub/Sub Topic (completat de CRMtree)",
         "placeholder": "projects/moj-projekt/topics/gmail-push"
       },
       "go_live_date": {
@@ -434,7 +437,7 @@
         "label": "Poate administratorul Microsoft 365 să acorde consimțământul (admin consent) pentru întreaga organizație?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Opțional.",
+        "hint": "Nu completa — integrarea funcționează cu un cont Microsoft din orice organizație. Introducerea unui ID specific ar bloca autentificarea conturilor din afara unei singure companii.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
@@ -595,6 +598,13 @@
       "whatsapp_waba_id": {
         "hint": "Meta App Dashboard → WhatsApp → API Setup.",
         "label": "WABA ID (WhatsApp Business Account ID)"
+      },
+      "yandex_client_id": {
+        "label": "Yandex — Client ID",
+        "placeholder": "a1b2c3d4e5f6..."
+      },
+      "yandex_client_secret": {
+        "label": "Yandex — Client Secret"
       },
       "zoho_client_id": {
         "label": "Zoho — Client ID",

@@ -305,6 +305,9 @@
           "outlook": {
             "label": "Outlook / Microsoft 365"
           },
+          "yandex": {
+            "label": "Yandex Mail"
+          },
           "zoho": {
             "label": "Zoho Mail"
           }
@@ -345,9 +348,9 @@
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Potrzebny do natychmiastowego odbioru nowych wiadomości.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Nie pytaj o to klienta — to nasza wspólna infrastruktura, ta sama wartość dla każdego tenanta. Wklej ją tu, konfigurując integrację.",
+        "label": "Google — Pub/Sub Topic (uzupełnia CRMtree)",
+        "placeholder": "projects/crmtree-integrations/topics/gmail-notifications"
       },
       "go_live_date": {
         "label": "Planowana data uruchomienia"
@@ -434,7 +437,7 @@
         "label": "Czy administrator Microsoft 365 może udzielić zgody (admin consent) dla całej organizacji?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Opcjonalne.",
+        "hint": "Nie wypełniaj — integracja działa z kontem Microsoft z dowolnej organizacji. Podanie konkretnego ID zablokuje logowanie kontom spoza jednej firmy.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
@@ -595,6 +598,13 @@
       "whatsapp_waba_id": {
         "hint": "Meta App Dashboard → WhatsApp → API Setup.",
         "label": "WABA ID (WhatsApp Business Account ID)"
+      },
+      "yandex_client_id": {
+        "label": "Yandex — Client ID",
+        "placeholder": "a1b2c3d4e5f6..."
+      },
+      "yandex_client_secret": {
+        "label": "Yandex — Client Secret"
       },
       "zoho_client_id": {
         "label": "Zoho — Client ID",
