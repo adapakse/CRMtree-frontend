@@ -179,14 +179,13 @@ export const ONBOARDING_SURVEY_SECTIONS: SurveySection[] = [
           { value: 'gmail', labelKey: 'onboardingSurvey.questions.email_provider.options.gmail.label' },
           { value: 'outlook', labelKey: 'onboardingSurvey.questions.email_provider.options.outlook.label' },
           { value: 'zoho', labelKey: 'onboardingSurvey.questions.email_provider.options.zoho.label' },
-          { value: 'yandex', labelKey: 'onboardingSurvey.questions.email_provider.options.yandex.label' },
           { value: 'other', labelKey: 'onboardingSurvey.questions.email_provider.options.other.label' },
           { value: 'none', labelKey: 'onboardingSurvey.questions.email_provider.options.none.label' },
         ],
       },
       { key: 'email_other_provider', labelKey: 'onboardingSurvey.questions.email_other_provider.label', type: 'text', isVisible: isAnswer('email_provider', 'other'), hintKey: 'onboardingSurvey.questions.email_other_provider.hint' },
-      { key: 'email_mailbox_count', labelKey: 'onboardingSurvey.questions.email_mailbox_count.label', type: 'number', isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho', 'yandex']) },
-      { key: 'email_oauth_app_owner', labelKey: 'onboardingSurvey.questions.email_oauth_app_owner.label', type: 'select', options: OAUTH_APP_OWNER, isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho', 'yandex']) },
+      { key: 'email_mailbox_count', labelKey: 'onboardingSurvey.questions.email_mailbox_count.label', type: 'number', isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
+      { key: 'email_oauth_app_owner', labelKey: 'onboardingSurvey.questions.email_oauth_app_owner.label', type: 'select', options: OAUTH_APP_OWNER, isVisible: isAnyOf('email_provider', ['gmail', 'outlook', 'zoho']) },
 
       { key: 'gmail_client_id', labelKey: 'onboardingSurvey.questions.gmail_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_client_id.placeholder', hintKey: 'onboardingSurvey.questions.gmail_client_id.hint', isVisible: isAnswer('email_provider', 'gmail') },
       { key: 'gmail_client_secret', labelKey: 'onboardingSurvey.questions.gmail_client_secret.label', type: 'secret', hintKey: 'onboardingSurvey.questions.gmail_client_secret.hint', isVisible: isAnswer('email_provider', 'gmail') },
@@ -211,9 +210,6 @@ export const ONBOARDING_SURVEY_SECTIONS: SurveySection[] = [
           { value: 'other', labelKey: 'onboardingSurvey.questions.zoho_data_center.options.other.label' },
         ],
       },
-
-      { key: 'yandex_client_id', labelKey: 'onboardingSurvey.questions.yandex_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.yandex_client_id.placeholder', hintKey: 'onboardingSurvey.questions.yandex_client_id.hint', isVisible: isAnswer('email_provider', 'yandex') },
-      { key: 'yandex_client_secret', labelKey: 'onboardingSurvey.questions.yandex_client_secret.label', type: 'secret', hintKey: 'onboardingSurvey.questions.yandex_client_secret.hint', isVisible: isAnswer('email_provider', 'yandex') },
     ],
   },
   {
