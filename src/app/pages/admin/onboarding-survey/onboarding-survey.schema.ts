@@ -69,6 +69,11 @@ const OAUTH_APP_OWNER: SurveyOption[] = [
   { value: 'needs_help', labelKey: 'onboardingSurvey.options.oauthAppOwner.needs_help' },
 ];
 
+const GMAIL_APP_AUDIENCE: SurveyOption[] = [
+  { value: 'internal', labelKey: 'onboardingSurvey.options.gmailAppAudience.internal' },
+  { value: 'external', labelKey: 'onboardingSurvey.options.gmailAppAudience.external' },
+];
+
 const AI_LICENCE: SurveyOption[] = [
   { value: 'shared', labelKey: 'onboardingSurvey.options.aiLicence.shared' },
   { value: 'own', labelKey: 'onboardingSurvey.options.aiLicence.own' },
@@ -189,6 +194,12 @@ export const ONBOARDING_SURVEY_SECTIONS: SurveySection[] = [
 
       { key: 'gmail_client_id', labelKey: 'onboardingSurvey.questions.gmail_client_id.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_client_id.placeholder', hintKey: 'onboardingSurvey.questions.gmail_client_id.hint', isVisible: isAnswer('email_provider', 'gmail') },
       { key: 'gmail_client_secret', labelKey: 'onboardingSurvey.questions.gmail_client_secret.label', type: 'secret', hintKey: 'onboardingSurvey.questions.gmail_client_secret.hint', isVisible: isAnswer('email_provider', 'gmail') },
+      // The callback path is fixed by the backend route (/api/crm/gmail/oauth/callback) —
+      // registering any other path fails the OAuth exchange with redirect_uri_mismatch.
+      // Asked here so the client has the exact value in writing instead of over email.
+      { key: 'gmail_redirect_uri', labelKey: 'onboardingSurvey.questions.gmail_redirect_uri.label', type: 'text', placeholderKey: 'onboardingSurvey.questions.gmail_redirect_uri.placeholder', hintKey: 'onboardingSurvey.questions.gmail_redirect_uri.hint', isVisible: isAnswer('email_provider', 'gmail') },
+      { key: 'gmail_app_audience', labelKey: 'onboardingSurvey.questions.gmail_app_audience.label', type: 'select', options: GMAIL_APP_AUDIENCE, hintKey: 'onboardingSurvey.questions.gmail_app_audience.hint', isVisible: isAnswer('email_provider', 'gmail') },
+      { key: 'gmail_apis_enabled', labelKey: 'onboardingSurvey.questions.gmail_apis_enabled.label', type: 'select', options: YES_NO, hintKey: 'onboardingSurvey.questions.gmail_apis_enabled.hint', isVisible: isAnswer('email_provider', 'gmail') },
       // Not a question for the client — CRMtree runs a single shared Pub/Sub
       // project for every tenant, so this value is always the same. Kept as
       // a field (not deleted) so whoever fills in the tenant's email config

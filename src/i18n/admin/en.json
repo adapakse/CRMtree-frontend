@@ -128,6 +128,10 @@
         "shared": "CRMtree licence (shared, billed under the contract)",
         "undecided": "We don’t know yet — please recommend"
       },
+      "gmailAppAudience": {
+        "external": "External",
+        "internal": "Internal — only accounts in our Google Workspace domain"
+      },
       "oauthAppOwner": {
         "client": "Our IT department will register the app and provide the details below",
         "needs_help": "We need CRMtree’s help with registering the app"
@@ -337,6 +341,14 @@
       "enrichment_monthly_volume": {
         "label": "Enrichment — how many companies per month do you plan to analyse?"
       },
+      "gmail_apis_enabled": {
+        "hint": "APIs & Services → Enabled APIs & services → \"+ ENABLE APIS AND SERVICES\" → search → Enable, for both. Gmail API is required; Drive API opens attachments sent as Drive links.",
+        "label": "Are the Gmail API and Google Drive API enabled in the Google project?"
+      },
+      "gmail_app_audience": {
+        "hint": "OAuth consent screen → Audience. Internal works right away; External needs Google's paid verification — please contact us in that case.",
+        "label": "Google — OAuth app type"
+      },
       "gmail_client_id": {
         "hint": "Google Cloud Console → APIs & Services → Credentials → Create Credentials → OAuth client ID.",
         "label": "Google — Client ID",
@@ -349,6 +361,11 @@
       "gmail_pubsub_topic": {
         "hint": "Leave this empty — we fill it in on our side during setup, the same value for every client. You don't need to enter anything here.",
         "label": "Google — Pub/Sub Topic"
+      },
+      "gmail_redirect_uri": {
+        "hint": "Your CRMtree address plus the /api/crm/gmail/oauth/callback path — exactly that. Add it in: Credentials → OAuth client → Authorized redirect URIs.",
+        "label": "Google — Redirect URI",
+        "placeholder": "https://firma.crmtree.pl/api/crm/gmail/oauth/callback"
       },
       "go_live_date": {
         "label": "Planned go-live date"

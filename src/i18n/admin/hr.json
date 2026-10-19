@@ -128,6 +128,10 @@
         "shared": "Licenca CRMtree (dijeljena, obračunava se u okviru ugovora)",
         "undecided": "Još ne znamo — molimo preporuku"
       },
+      "gmailAppAudience": {
+        "external": "External",
+        "internal": "Internal — samo računi iz naše Google Workspace domene"
+      },
       "oauthAppOwner": {
         "client": "Naš IT odjel registrirat će aplikaciju i navesti podatke u nastavku",
         "needs_help": "Trebamo pomoć CRMtreeja pri registraciji aplikacije"
@@ -337,6 +341,14 @@
       "enrichment_monthly_volume": {
         "label": "Enrichment — koliko tvrtki mjesečno planirate analizirati?"
       },
+      "gmail_apis_enabled": {
+        "hint": "API-ji i usluge → Uključeni API-ji → „+ UKLJUČI API-JE I USLUGE\" → potražite → Uključi, za oba. Gmail API je obavezan; Drive API otvara privitke poslane kao poveznice na Disk.",
+        "label": "Jesu li u Google projektu uključeni Gmail API i Google Drive API?"
+      },
+      "gmail_app_audience": {
+        "hint": "Zaslon privole OAuth → Audience. Internal radi odmah; External zahtijeva Googleovu naplatnu provjeru — u tom nas slučaju kontaktirajte.",
+        "label": "Google — vrsta OAuth aplikacije"
+      },
       "gmail_client_id": {
         "hint": "Google Cloud Console → API-ji i usluge → Vjerodajnice → Izradi vjerodajnice → OAuth Client ID.",
         "label": "Google — Client ID",
@@ -349,6 +361,11 @@
       "gmail_pubsub_topic": {
         "hint": "Ostavite prazno — to ispunjavamo mi tijekom postavljanja, ista vrijednost za svakog klijenta. Ovdje ne morate ništa unijeti.",
         "label": "Google — Pub/Sub Topic"
+      },
+      "gmail_redirect_uri": {
+        "hint": "Vaša CRMtree adresa i putanja /api/crm/gmail/oauth/callback — točno ta. Dodaje se u: Vjerodajnice → OAuth klijent → Ovlašteni URI-ji za preusmjeravanje.",
+        "label": "Google — Redirect URI",
+        "placeholder": "https://firma.crmtree.pl/api/crm/gmail/oauth/callback"
       },
       "go_live_date": {
         "label": "Planirani datum pokretanja"
