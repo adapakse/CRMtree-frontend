@@ -355,7 +355,7 @@
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
-        "hint": "Prikazuje se samo jednom, pri izradi — odmah kopirajte.",
+        "hint": "Isti zaslon kao Client ID — prikazuje se u prozoru odmah nakon stvaranja OAuth klijenta, samo jednom. Odmah ga kopirajte.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
