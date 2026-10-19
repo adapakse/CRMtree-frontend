@@ -136,7 +136,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       </svg>
       {{ t('leadsList.view.timeline') }}
     </button>
-    <button class="btn btn-g btn-sm" (click)="viewMode = viewMode==='kanban' ? 'table' : 'kanban'">
+    <button class="btn btn-g btn-sm" (click)="toggleViewMode()">
       {{ isKanbanView ? '☰ ' + t('leadsList.view.table') : '⊞ ' + t('leadsList.view.kanban') }}
     </button>
   </div>
@@ -1426,6 +1426,30 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
   onStageFilterChange(): void {
     this.filterStage = ''; // wyczyść filtr z raportu gdy user wybiera z toolbara
+    this.load();
+  }
+
+  /**
+   * Kanban always renders the whole funnel, so a single-stage filter and the
+   * kanban cannot both hold. Switching to it therefore drops that filter —
+   * before, the view silently stayed a table and the button looked broken.
+   */
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'kanban' ? 'table' : 'kanban';
+
+    if (this.viewMode === 'kanban' && (this.filterStage || this.filterStageUI)) {
+      this.filterStage = '';
+      this.filterStageUI = '';
+      // The chip describes filters that came from the sales report; it would name a
+      // stage that is no longer applied, unless some other report filter survives.
+      if (!this.filterCloseDateFrom && !this.filterCloseDateTo
+        && !this.filterCreatedFrom && !this.filterCreatedTo && !this.filterLostReason) {
+        this.reportFilterLabel = '';
+      }
+    }
+
+    // Both views read different page sizes (the board needs every lead, the table
+    // one page), so the data has to be refetched for the view being switched to.
     this.load();
   }
 
