@@ -100,8 +100,12 @@ export class AppSettingsService {
       this.meta.set(res.meta);
       if (res.lead_stages) this.leadStages.set(res.lead_stages);
       this.loaded = true;
-    } catch {
-      // Non-fatal — fall back to defaults (e.g. before login)
+    } catch (err) {
+      // Non-fatal — fall back to defaults (e.g. before login). Logged anyway: when
+      // this fails for a signed-in user, every screen silently loses the tenant's
+      // settings and lead stages (empty kanban, empty stage filter, won/lost at
+      // zero) with nothing in the UI pointing here.
+      console.error('[AppSettings] Failed to load tenant settings', err);
     }
   }
 
