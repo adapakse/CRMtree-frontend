@@ -7,6 +7,7 @@ import {
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { join } from 'node:path';
+import { matchTenantSlug } from './app/core/tenant-host';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 const API_UPSTREAM = process.env['API_UPSTREAM'] || 'http://127.0.0.1:3001';
@@ -85,6 +86,18 @@ app.use((req, res, next) => {
   if (host !== 'crmtree.pl') {
     res.setHeader('X-Robots-Tag', 'noindex, follow');
   }
+  next();
+});
+
+/**
+ * {slug}.crmtree.pl is a client's own entrance to its CRM: its root goes
+ * straight to the login page (in the tenant's language) instead of rendering
+ * CRMtree's marketing start page there. crmtree.pl and app.crmtree.pl keep it.
+ * publicRootGuard does the same for navigation inside the running app.
+ */
+app.get('/', (req, res, next) => {
+  const host = ((req.headers['x-forwarded-host'] as string) || req.headers.host || '').replace(/:\d+$/, '');
+  if (matchTenantSlug(host)) return res.redirect(302, '/login');
   next();
 });
 
