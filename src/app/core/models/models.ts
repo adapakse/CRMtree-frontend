@@ -38,7 +38,6 @@ export interface User {
   crm_role?: 'salesperson' | 'sales_manager' | null;
   phone?: string | null;
   company?: string | null;
-  department?: string | null;
   is_external?: boolean;
   can_create_projects?: boolean;
   /** Raw flag; a tenant admin has the right regardless of it. */

@@ -40,7 +40,7 @@
     "members": {
       "accessLevel": "Access level",
       "add": "Add",
-      "companyAndDepartment": "Company / department",
+      "company": "Company",
       "email": "Email",
       "externalAccount": "external account",
       "inactive": "(inactive)",

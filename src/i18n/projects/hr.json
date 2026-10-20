@@ -40,7 +40,7 @@
     "members": {
       "accessLevel": "Ovlasti",
       "add": "Dodaj",
-      "companyAndDepartment": "Tvrtka / odjel",
+      "company": "Tvrtka",
       "email": "E-pošta",
       "externalAccount": "vanjski račun",
       "inactive": "(neaktivan)",

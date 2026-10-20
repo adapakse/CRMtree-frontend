@@ -40,7 +40,7 @@
     "members": {
       "accessLevel": "Permessi",
       "add": "Aggiungi",
-      "companyAndDepartment": "Azienda / reparto",
+      "company": "Azienda",
       "email": "E-mail",
       "externalAccount": "account esterno",
       "inactive": "(inattivo)",

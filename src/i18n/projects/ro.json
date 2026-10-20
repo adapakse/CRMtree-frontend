@@ -40,7 +40,7 @@
     "members": {
       "accessLevel": "Permisiuni",
       "add": "Adăugare",
-      "companyAndDepartment": "Companie / departament",
+      "company": "Companie",
       "email": "E-mail",
       "externalAccount": "cont extern",
       "inactive": "(inactiv)",

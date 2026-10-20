@@ -40,7 +40,7 @@
     "members": {
       "accessLevel": "Droits d’accès",
       "add": "Ajouter",
-      "companyAndDepartment": "Société / service",
+      "company": "Société",
       "email": "E-mail",
       "externalAccount": "compte externe",
       "inactive": "(inactif)",
