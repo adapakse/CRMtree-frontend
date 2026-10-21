@@ -50,6 +50,7 @@ export interface AppSettings {
   roles_preview_count:            number;
   lead_attachments_folder_url:    string;
   crm_training_mode:              boolean;
+  min_call_duration_sec:          number;
   'prospect.icp_blacklist_keywords': string;   // JSON array of strings (value_type 'json' — GET zwraca surowy string)
   'prospect.icp_blacklist_penalty':  number;
   [key: string]: number | boolean | string;
@@ -63,6 +64,7 @@ const DEFAULTS: AppSettings = {
   roles_preview_count:            3,
   lead_attachments_folder_url:    '',
   crm_training_mode:              false,
+  min_call_duration_sec:          35,
   'prospect.icp_blacklist_keywords': '["hurtow","sprzedaż hurtowa","handel hurtowy","dystrybucja hurtowa"]',
   'prospect.icp_blacklist_penalty':  15,
 };

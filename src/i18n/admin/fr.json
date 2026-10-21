@@ -1073,6 +1073,10 @@
         "description": "URL du dossier contenant les modèles à envoyer à l'étape Lead (par ex. un lien Google Drive). Affiché comme raccourci à côté du champ des pièces jointes dans la fenêtre de rédaction de l'e-mail.",
         "label": "Dossier de modèles (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Les appels plus courts sont exclus lorsque le filtre « ≥ X s » est coché dans le panneau « Mes appels téléphoniques » et sur le graphique des appels par commercial du tableau de bord Prospects.",
+        "label": "PBX : durée minimale d’un appel (s)"
+      },
       "onboarding_task_templates": {
         "description": "Définitions des tâches pour chaque étape du déploiement. Attributs : id, title, type, step, standard (ajout automatique lors de la migration), assignee (UUID de l'utilisateur ou null), days (jours depuis la migration ou null).",
         "label": "Modèles de tâches d'onboarding"

@@ -1073,6 +1073,10 @@
         "description": "URL mape s predlošcima za slanje u fazi Lead (npr. Google Drive poveznica). Prikazuje se kao prečac uz polje priloga u prozoru za sastavljanje e-pošte.",
         "label": "Mapa predložaka (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Kraći pozivi izostavljaju se kada je označen filtar „≥ X s” na ploči „Moji telefonski pozivi” i na grafikonu poziva po prodavaču na nadzornoj ploči Potencijalni klijenti.",
+        "label": "PBX: minimalno trajanje poziva (s)"
+      },
       "onboarding_task_templates": {
         "description": "Definicije zadataka za svaki korak uvođenja. Atributi: id, title, type, step, standard (automatsko dodavanje pri migraciji), assignee (UUID korisnika ili null), days (dani od migracije ili null).",
         "label": "Predlošci zadataka za uvođenje"

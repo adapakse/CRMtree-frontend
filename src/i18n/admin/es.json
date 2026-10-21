@@ -1073,6 +1073,10 @@
         "description": "URL de la carpeta con las plantillas para enviar en la etapa de Lead (p. ej. un enlace de Google Drive). Se muestra como atajo junto al campo de adjuntos en la ventana de redacción del correo.",
         "label": "Carpeta de plantillas (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Las llamadas más cortas se omiten cuando está marcado el filtro «≥ X s» en el panel «Mis llamadas» y en el gráfico de llamadas por comercial del panel de prospectos.",
+        "label": "PBX: duración mínima de la llamada (s)"
+      },
       "onboarding_task_templates": {
         "description": "Definiciones de tareas para cada paso de la implantación. Atributos: id, title, type, step, standard (añadir automáticamente en la migración), assignee (UUID del usuario o null), days (días desde la migración o null).",
         "label": "Plantillas de tareas de onboarding"

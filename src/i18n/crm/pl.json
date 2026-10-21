@@ -1522,10 +1522,12 @@
     "presets": {
       "currentMonth": "Bieżący miesiąc",
       "currentQuarter": "Bieżący kwartał",
+      "currentWeek": "Bieżący tydzień",
       "currentYear": "Bieżący rok (YTD {year})",
       "customRange": "Własny przedział…",
       "previousMonth": "Poprzedni miesiąc",
       "previousQuarter": "Poprzedni kwartał",
+      "previousWeek": "Poprzedni tydzień",
       "previousYear": "Poprzedni rok ({year})"
     }
   },
@@ -1884,6 +1886,11 @@
       "title": "Ostatnia aktywność",
       "yesterday": "Wczoraj"
     },
+    "callsGoal": {
+      "label": "Rozmowy dziś: {count} / {goal}",
+      "reached": "Cel na dziś osiągnięty",
+      "tooltip": "Rozmowy dziś powyżej {seconds} s"
+    },
     "chart": {
       "periods": {
         "month": "Miesiąc",
@@ -1930,6 +1937,14 @@
       "vsPreviousMonth": "vs poprzedni miesiąc",
       "vsPreviousWeek": "vs poprzedni tydzień",
       "wonOpportunities": "Wygrane szanse"
+    },
+    "myCalls": {
+      "empty": "Brak połączeń w wybranym przedziale",
+      "inboundAnswered": "Przychodzące odebrane",
+      "inboundMissed": "Przychodzące nieodebrane",
+      "outboundAnswered": "Wychodzące odebrane",
+      "outboundMissed": "Wychodzące nieodebrane",
+      "title": "Moje połączenia telefoniczne"
     },
     "opportunities": {
       "empty": "Brak szans",

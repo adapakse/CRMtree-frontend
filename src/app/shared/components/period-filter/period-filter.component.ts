@@ -22,11 +22,13 @@ export interface PeriodChangeEvent extends PeriodDates {
 
   <select [ngStyle]="selStyle" [(ngModel)]="preset" (ngModelChange)="onPresetChange($event)">
     <optgroup [label]="t('periodFilter.groups.current')">
+      <option value="cw"   style="color:#374151">{{ t('periodFilter.presets.currentWeek') }}</option>
       <option value="cm"   style="color:#374151">{{ t('periodFilter.presets.currentMonth') }}</option>
       <option value="cq"   style="color:#374151">{{ t('periodFilter.presets.currentQuarter') }}</option>
       <option value="ytd"  style="color:#374151">{{ t('periodFilter.presets.currentYear', { year: year }) }}</option>
     </optgroup>
     <optgroup [label]="t('periodFilter.groups.previous')">
+      <option value="prev_w"    style="color:#374151">{{ t('periodFilter.presets.previousWeek') }}</option>
       <option value="prev_1m"   style="color:#374151">{{ t('periodFilter.presets.previousMonth') }}</option>
       <option value="prev_q"    style="color:#374151">{{ t('periodFilter.presets.previousQuarter') }}</option>
       <option value="prev_year" style="color:#374151">{{ t('periodFilter.presets.previousYear', { year: year - 1 }) }}</option>

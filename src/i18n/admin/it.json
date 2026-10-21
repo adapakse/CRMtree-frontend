@@ -1073,6 +1073,10 @@
         "description": "URL della cartella con i modelli da inviare nella fase di Lead (ad es. un link a Google Drive). Visualizzato come scorciatoia accanto al campo degli allegati nella finestra di composizione dell'email.",
         "label": "Cartella dei modelli (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Le chiamate più brevi vengono escluse quando il filtro «≥ X s» è selezionato nel pannello «Le mie chiamate» e nel grafico delle chiamate per commerciale della dashboard Prospect.",
+        "label": "PBX: durata minima della chiamata (sec.)"
+      },
       "onboarding_task_templates": {
         "description": "Definizioni delle attività per ogni fase di attivazione. Attributi: id, title, type, step, standard (aggiungi automaticamente alla migrazione), assignee (UUID dell'utente o null), days (giorni dalla migrazione o null).",
         "label": "Modelli di attività di onboarding"

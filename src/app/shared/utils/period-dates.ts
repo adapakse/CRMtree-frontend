@@ -17,6 +17,18 @@ export function getPresetDates(preset: string, customFrom = '', customTo = ''): 
   const m     = now.getMonth();
 
   switch (preset) {
+    case 'cw': {
+      const daysSinceMonday = (now.getDay() + 6) % 7;
+      const monday = new Date(y, m, now.getDate() - daysSinceMonday);
+      return { from: fmt(monday), to: today, periodEnd: today };
+    }
+    case 'prev_w': {
+      const daysSinceMonday = (now.getDay() + 6) % 7;
+      const thisMonday = new Date(y, m, now.getDate() - daysSinceMonday);
+      const lastMonday = new Date(thisMonday.getFullYear(), thisMonday.getMonth(), thisMonday.getDate() - 7);
+      const lastSunday = new Date(thisMonday.getFullYear(), thisMonday.getMonth(), thisMonday.getDate() - 1);
+      return { from: fmt(lastMonday), to: fmt(lastSunday), periodEnd: fmt(lastSunday) };
+    }
     case 'cm': {
       const start = fmt(new Date(y, m, 1));
       const end   = fmt(new Date(y, m + 1, 0));

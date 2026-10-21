@@ -988,6 +988,12 @@ export interface ProspectDashCallRow {
   count:        number;
 }
 
+export interface MyCallTypeRow {
+  direction: string;
+  status:    string;
+  count:     number;
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Service
 // ─────────────────────────────────────────────────────────────────
@@ -1724,16 +1730,27 @@ export class CrmApiService {
   }
 
   getProspectDashCallsBySalesperson(
-    opts: { period: string; direction?: string; status?: string; fromDate?: string; toDate?: string }
+    opts: { period: string; direction?: string; status?: string; fromDate?: string; toDate?: string; minDurationSec?: number }
   ): Observable<ProspectDashCallRow[]> {
     let p = new HttpParams().set('period', opts.period);
     if (opts.direction) p = p.set('direction', opts.direction);
     if (opts.status)    p = p.set('status',    opts.status);
     if (opts.period === 'custom' && opts.fromDate) p = p.set('from_date', opts.fromDate);
     if (opts.period === 'custom' && opts.toDate)   p = p.set('to_date',   opts.toDate);
+    if (opts.minDurationSec != null && opts.minDurationSec > 0)
+      p = p.set('min_duration_sec', String(opts.minDurationSec));
     return this.http.get<ProspectDashCallRow[]>(
       `${environment.apiUrl}/crm/prospects-dashboard/calls-by-salesperson`, { params: p }
     );
+  }
+
+  getMyCalls(opts: { period: string; fromDate?: string; toDate?: string; minDurationSec?: number }): Observable<MyCallTypeRow[]> {
+    let p = new HttpParams().set('period', opts.period);
+    if (opts.period === 'custom' && opts.fromDate) p = p.set('from_date', opts.fromDate);
+    if (opts.period === 'custom' && opts.toDate)   p = p.set('to_date',   opts.toDate);
+    if (opts.minDurationSec != null && opts.minDurationSec > 0)
+      p = p.set('min_duration_sec', String(opts.minDurationSec));
+    return this.http.get<MyCallTypeRow[]>(`${environment.apiUrl}/crm/dashboard/my-calls`, { params: p });
   }
 
 }

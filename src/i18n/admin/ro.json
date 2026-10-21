@@ -1073,6 +1073,10 @@
         "description": "URL-ul folderului cu șabloane pentru trimitere în etapa de Lead (de ex. un link Google Drive). Se afișează ca scurtătură lângă câmpul de atașamente în fereastra de compunere a e-mailului.",
         "label": "Folder de șabloane (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Apelurile mai scurte sunt omise când filtrul „≥ X s” este bifat în panoul „Apelurile mele telefonice” și pe graficul apelurilor per agent de vânzări din panoul Prospecți.",
+        "label": "PBX: durata minimă a apelului (sec.)"
+      },
       "onboarding_task_templates": {
         "description": "Definiții ale sarcinilor pentru fiecare pas al implementării. Atribute: id, title, type, step, standard (adăugare automată la migrare), assignee (UUID-ul utilizatorului sau null), days (zile de la migrare sau null).",
         "label": "Șabloane de sarcini de onboarding"

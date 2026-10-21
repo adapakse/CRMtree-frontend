@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
-import { CrmApiService, ActivityTask, Lead, ChurnPartner, ChurnSettings } from '../../../core/services/crm-api.service';
+import { CrmApiService, ActivityTask, Lead, ChurnPartner, ChurnSettings, MyCallTypeRow } from '../../../core/services/crm-api.service';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { TooltipComponent } from '../../../shared/components/tooltip/tooltip.component';
+import { PeriodFilterComponent, PeriodChangeEvent } from '../../../shared/components/period-filter/period-filter.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
@@ -27,10 +28,29 @@ interface PipelineRow {
   barPct: number;
 }
 
+interface CallBarRow {
+  labelKey: string;
+  count:    number;
+  pct:      number;
+  color:    string;
+}
+
+const MISSED_CALL_STATUSES = ['missed', 'not_answered', 'rejected', 'error'];
+const MY_CALL_TYPES: { direction: string; statuses: string[]; labelKey: string; color: string }[] = [
+  { direction: 'outbound', statuses: ['answered'],         labelKey: 'outboundAnswered', color: '#22C55E' },
+  { direction: 'outbound', statuses: MISSED_CALL_STATUSES, labelKey: 'outboundMissed',   color: '#F97316' },
+  { direction: 'inbound',  statuses: ['answered'],         labelKey: 'inboundAnswered',  color: '#3B82F6' },
+  { direction: 'inbound',  statuses: MISSED_CALL_STATUSES, labelKey: 'inboundMissed',    color: '#EF4444' },
+];
+
+// Daily calls goal. Once it is reached (Adam's feedback) only the gold medal is
+// shown, with no intermediate bronze/silver thresholds. Ported 1:1 from WorkTrips.
+const TODAY_CALLS_GOAL = 37;
+
 @Component({
   selector: 'wt-crm-sales-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, RouterModule, FormsModule, TooltipComponent, AddToCalendarComponent, PeriodFilterComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('crm')],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -156,7 +176,29 @@ interface PipelineRow {
   <!-- ── HEADER ── -->
   <div class="dash-top">
     <div class="dash-greeting">
-      <h1>{{ t('salesDashboard.header.greeting', { name: firstName }) }}</h1>
+      <h1>
+        {{ t('salesDashboard.header.greeting', { name: firstName }) }}
+
+        <!-- Independent of the period filter and the >=Xs checkbox of the "My phone calls"
+             panel below. Always gold: faded before the goal, full colour once reached;
+             the counter keeps growing past the goal. -->
+        <span *ngIf="!todayCallsLoading && !todayCallsError"
+              class="calls-goal"
+              [title]="t('salesDashboard.callsGoal.tooltip', { seconds: todayMinDurationSec })">
+          <span class="calls-goal-medal" [class.calls-goal-medal-reached]="todayGoalReached">
+            <svg class="calls-goal-medal-svg" viewBox="0 0 44 52" aria-hidden="true">
+              <path class="calls-goal-medal-ribbon" d="M16.5,38 L9,54.5 L13.5,52 L17.5,55.5 L22.5,40 Z"/>
+              <path class="calls-goal-medal-ribbon" d="M27.5,38 L35,54.5 L30.5,52 L26.5,55.5 L21.5,40 Z"/>
+              <circle class="calls-goal-medal-disc"   cx="22" cy="26" r="17.6"/>
+              <circle class="calls-goal-medal-inline" cx="22" cy="26" r="14" fill="none"/>
+            </svg>
+            <span class="calls-goal-medal-count">{{ todayCallCount }}</span>
+          </span>
+          <span class="calls-goal-text">
+            {{ t('salesDashboard.callsGoal.label', { count: todayCallCount, goal: todayCallsGoal }) }}<ng-container *ngIf="todayGoalReached"> — {{ t('salesDashboard.callsGoal.reached') }}</ng-container>
+          </span>
+        </span>
+      </h1>
       <p>{{ t('salesDashboard.header.subtitle') }}</p>
     </div>
     <div class="date-chip">
@@ -503,6 +545,31 @@ interface PipelineRow {
 
   </div>
 
+  <!-- ── MY PHONE CALLS ── -->
+  <div class="panel my-calls-panel">
+    <div class="panel-head">
+      <span class="panel-title">{{ t('salesDashboard.myCalls.title') }}</span>
+      <label class="mc-check-label">
+        <input type="checkbox" [(ngModel)]="myCallsMinDuration" (ngModelChange)="loadMyCalls()" />
+        &nbsp;≥&nbsp;{{ myCallsMinDurationSec }}s
+      </label>
+      <period-filter preset="cw" (periodChange)="onMyCallsPeriodChange($event)"></period-filter>
+    </div>
+
+    <div *ngIf="myCallsLoading" class="mc-loading"><span class="act-spinner"></span></div>
+
+    <div *ngIf="!myCallsLoading" class="mc-bars">
+      <div class="mc-bar-row" *ngFor="let bar of myCallsBars">
+        <div class="mc-bar-label">{{ t('salesDashboard.myCalls.' + bar.labelKey) }}</div>
+        <div class="mc-bar-track">
+          <div class="mc-bar-fill" [style.width.%]="bar.pct" [style.background]="bar.color"></div>
+        </div>
+        <div class="mc-bar-count">{{ bar.count }}</div>
+      </div>
+      <div *ngIf="myCallsBars.length === 0" class="empty-msg">{{ t('salesDashboard.myCalls.empty') }}</div>
+    </div>
+  </div>
+
   </ng-container><!-- end dashboard tab -->
 </div>
 
@@ -516,9 +583,45 @@ interface PipelineRow {
 
     /* Header */
     .dash-top { display: flex; align-items: flex-start; justify-content: space-between; }
-    .dash-greeting h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; color: #111827; }
+    .dash-greeting h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; color: #111827; display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
     .dash-greeting p { margin: 0; font-size: 13.5px; color: #6B7280; }
     .date-chip { display: flex; align-items: center; gap: 6px; border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 14px; font-size: 13px; color: #374151; background: white; white-space: nowrap; }
+
+    /* "Calls today" medal: ribbons + disc + count, always gold. */
+    .calls-goal { display: inline-flex; align-items: center; align-self: center; margin-left: -2px; padding-left: 0; }
+    .calls-goal-medal {
+      position: relative; width: 35px; height: 27px; flex-shrink: 0;
+      display: grid; place-items: center;
+      opacity: .35; transition: opacity .2s;
+      /* The ribbons (overflow: visible) reach further down than the disc, so centring
+         the disc alone looks shifted down; compensate by moving it up. */
+      transform: translateY(-10px);
+    }
+    .calls-goal-medal-reached { opacity: 1; }
+    .calls-goal-medal-svg {
+      grid-area: 1 / 1; width: 35px; height: 41px; overflow: visible;
+      filter: drop-shadow(0 1px 2px rgba(17, 24, 39, .12));
+    }
+    .calls-goal-medal-count {
+      grid-area: 1 / 1; z-index: 1; position: relative; top: 1px;
+      font-size: 10px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums;
+      color: #fff; pointer-events: none; text-align: center;
+    }
+    .calls-goal-medal-disc   { stroke-width: 1.25; fill: #CB962A; stroke: #9C6E18; }
+    .calls-goal-medal-inline { stroke-width: 1; stroke-opacity: .5; stroke: #F6E3AC; }
+    .calls-goal-medal-ribbon { fill: #8A5E0E; fill-opacity: .62; }
+    .calls-goal-text { margin-left: 4px; font-size: 13px; font-weight: 800; color: #6B7280; white-space: nowrap; }
+
+    /* My phone calls */
+    .mc-check-label { display: flex; align-items: center; font-size: 12px; color: #374151; white-space: nowrap; cursor: pointer; gap: 2px; }
+    .mc-check-label input { cursor: pointer; accent-color: var(--orange); }
+    .mc-loading { display: flex; justify-content: center; padding: 24px 0; }
+    .mc-bars { display: flex; flex-direction: column; gap: 14px; }
+    .mc-bar-row { display: grid; grid-template-columns: 200px 1fr 36px; align-items: center; gap: 10px; }
+    .mc-bar-label { font-size: 12.5px; color: #374151; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mc-bar-track { height: 18px; background: #F3F4F6; border-radius: 4px; overflow: hidden; min-width: 0; }
+    .mc-bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+    .mc-bar-count { font-size: 13px; font-weight: 700; color: #1F2937; text-align: right; font-variant-numeric: tabular-nums; }
 
     /* KPI */
     .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
@@ -778,6 +881,28 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
 
   private allLeads: Lead[] = [];
 
+  myCallsPeriod         = 'cw';
+  myCallsMinDuration    = true;
+  myCallsMinDurationSec = 35;
+  myCallsBars: CallBarRow[] = [];
+  myCallsLoading = false;
+  private myCallsCustomFrom = '';
+  private myCallsCustomTo   = '';
+
+  // Independent of the panel's period filter and >=Xs checkbox.
+  // "Longer than 35 s" => backend filter duration_sec >= 36.
+  readonly todayMinDurationSec = 35;
+  readonly todayCallsGoal      = TODAY_CALLS_GOAL;
+  todayCallCount    = 0;
+  todayCallsLoading = false;
+  todayCallsError   = false;
+  private todayCallsInterval: ReturnType<typeof setInterval> | null = null;
+
+  // Reached from the goal inclusive; the counter keeps growing (e.g. 38/37) and the medal stays.
+  get todayGoalReached(): boolean {
+    return this.todayCallCount >= this.todayCallsGoal;
+  }
+
   get firstName(): string {
     const name = this.auth.user()?.display_name || this.auth.user()?.email || '';
     return name.split(' ')[0] || this.transloco.translate('crm.salesDashboard.header.fallbackName');
@@ -825,6 +950,10 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     });
     this.refreshActivities();
     this.loadChurn();
+    this.myCallsMinDurationSec = (this.settings.get('min_call_duration_sec') as number) || 35;
+    this.loadMyCalls();
+    this.loadTodayCalls();
+    this.todayCallsInterval = setInterval(() => this.loadTodayCalls(), 60_000);
     this.trainingRefreshInterval = setInterval(() => {
       if (this.settings.settings().crm_training_mode) {
         this.api.getCrmTasks().subscribe({ next: tasks => { this.processTasks(tasks); this.cdr.markForCheck(); } });
@@ -835,6 +964,65 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.trainingRefreshInterval) clearInterval(this.trainingRefreshInterval);
+    if (this.todayCallsInterval) clearInterval(this.todayCallsInterval);
+  }
+
+  loadTodayCalls() {
+    this.todayCallsLoading = true;
+    this.todayCallsError   = false;
+    this.cdr.markForCheck();
+    this.api.getMyCalls({ period: 'today', minDurationSec: this.todayMinDurationSec + 1 }).subscribe({
+      next: rows => {
+        this.todayCallCount = rows
+          .filter(r => r.status === 'answered')
+          .reduce((sum, r) => sum + Number(r.count), 0);
+        this.todayCallsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.todayCallsError   = true;
+        this.todayCallsLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  onMyCallsPeriodChange(event: PeriodChangeEvent) {
+    this.myCallsPeriod     = event.preset;
+    this.myCallsCustomFrom = event.from;
+    this.myCallsCustomTo   = event.to;
+    this.loadMyCalls();
+  }
+
+  loadMyCalls() {
+    this.myCallsLoading = true;
+    this.cdr.markForCheck();
+    this.api.getMyCalls({
+      period:         this.myCallsPeriod,
+      fromDate:       this.myCallsCustomFrom || undefined,
+      toDate:         this.myCallsCustomTo   || undefined,
+      minDurationSec: this.myCallsMinDuration ? this.myCallsMinDurationSec : 0,
+    }).subscribe({
+      next: rows => {
+        this.myCallsBars    = this.buildMyCallsBars(rows);
+        this.myCallsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.myCallsLoading = false; this.cdr.markForCheck(); },
+    });
+  }
+
+  private buildMyCallsBars(rows: MyCallTypeRow[]): CallBarRow[] {
+    const bars = MY_CALL_TYPES.map(type => ({
+      labelKey: type.labelKey,
+      count: rows.filter(r => r.direction === type.direction && type.statuses.includes(r.status))
+                 .reduce((sum, r) => sum + Number(r.count), 0),
+      pct:   0,
+      color: type.color,
+    }));
+    const max = Math.max(...bars.map(b => b.count), 1);
+    bars.forEach(b => b.pct = Math.round((b.count / max) * 100));
+    return bars;
   }
 
   refreshActivities() {

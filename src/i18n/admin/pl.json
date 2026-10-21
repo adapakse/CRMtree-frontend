@@ -1073,6 +1073,10 @@
         "description": "URL do folderu z szablonami do wysyłki na etapie Leada (np. link do Google Drive). Wyświetlany jako skrót obok pola załączników w oknie compose e-mail.",
         "label": "Folder szablonów (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Rozmowy krótsze niż ta wartość są pomijane, gdy zaznaczony jest filtr „≥ X s” w panelu „Moje połączenia telefoniczne” i na wykresie połączeń per handlowiec w Dashboardzie Prospektów.",
+        "label": "PBX: min. czas trwania rozmowy (sek.)"
+      },
       "onboarding_task_templates": {
         "description": "Definicje zadan dla kazdego kroku wdrozenia. Atrybuty: id, title, type, step, standard (auto-dodaj przy migracji), assignee (UUID usera lub null), days (dni od migracji lub null).",
         "label": "Szablony zadań onboardingowych"

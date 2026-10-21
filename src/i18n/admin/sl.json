@@ -1073,6 +1073,10 @@
         "description": "URL mape s predlogami za pošiljanje v fazi Lead (npr. povezava do Google Drive). Prikaže se kot bližnjica ob polju za priloge v oknu za sestavljanje e-pošte.",
         "label": "Mapa predlog (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Krajši klici so izpuščeni, ko je označen filter »≥ X s« na plošči »Moji telefonski klici« in na grafu klicev po prodajniku na nadzorni plošči Potencialne stranke.",
+        "label": "PBX: najkrajše trajanje klica (s)"
+      },
       "onboarding_task_templates": {
         "description": "Definicije nalog za vsak korak uvajanja. Atributi: id, title, type, step, standard (samodejno dodaj pri migraciji), assignee (UUID uporabnika ali null), days (dni od migracije ali null).",
         "label": "Predloge nalog za uvajanje"

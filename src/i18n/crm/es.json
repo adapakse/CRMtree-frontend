@@ -1522,10 +1522,12 @@
     "presets": {
       "currentMonth": "Mes actual",
       "currentQuarter": "Trimestre actual",
+      "currentWeek": "Semana actual",
       "currentYear": "Año actual (YTD {year})",
       "customRange": "Intervalo personalizado…",
       "previousMonth": "Mes anterior",
       "previousQuarter": "Trimestre anterior",
+      "previousWeek": "Semana anterior",
       "previousYear": "Año anterior ({year})"
     }
   },
@@ -1884,6 +1886,11 @@
       "title": "Actividad reciente",
       "yesterday": "Ayer"
     },
+    "callsGoal": {
+      "label": "Llamadas hoy: {count} / {goal}",
+      "reached": "Objetivo de hoy alcanzado",
+      "tooltip": "Llamadas de hoy de más de {seconds} s"
+    },
     "chart": {
       "periods": {
         "month": "Mes",
@@ -1930,6 +1937,14 @@
       "vsPreviousMonth": "vs. mes anterior",
       "vsPreviousWeek": "vs. semana anterior",
       "wonOpportunities": "Oportunidades ganadas"
+    },
+    "myCalls": {
+      "empty": "No hay llamadas en el periodo seleccionado",
+      "inboundAnswered": "Entrantes contestadas",
+      "inboundMissed": "Entrantes perdidas",
+      "outboundAnswered": "Salientes contestadas",
+      "outboundMissed": "Salientes no contestadas",
+      "title": "Mis llamadas"
     },
     "opportunities": {
       "empty": "Sin oportunidades",

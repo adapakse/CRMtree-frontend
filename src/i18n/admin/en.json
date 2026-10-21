@@ -1073,6 +1073,10 @@
         "description": "URL of the folder with templates to send at the Lead stage (e.g. a Google Drive link). Shown as a shortcut next to the attachments field in the email compose window.",
         "label": "Templates folder (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Calls shorter than this are left out when the “≥ X s” filter is ticked in the “My phone calls” panel and on the calls-per-salesperson chart of the Prospects dashboard.",
+        "label": "PBX: minimum call duration (sec.)"
+      },
       "onboarding_task_templates": {
         "description": "Task definitions for each onboarding step. Attributes: id, title, type, step, standard (auto-add on migration), assignee (user UUID or null), days (days from migration or null).",
         "label": "Onboarding task templates"

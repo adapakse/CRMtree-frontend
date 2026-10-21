@@ -1522,10 +1522,12 @@
     "presets": {
       "currentMonth": "Текущий месяц",
       "currentQuarter": "Текущий квартал",
+      "currentWeek": "Текущая неделя",
       "currentYear": "Текущий год (YTD {year})",
       "customRange": "Свой период…",
       "previousMonth": "Предыдущий месяц",
       "previousQuarter": "Предыдущий квартал",
+      "previousWeek": "Предыдущая неделя",
       "previousYear": "Предыдущий год ({year})"
     }
   },
@@ -1884,6 +1886,11 @@
       "title": "Последняя активность",
       "yesterday": "Вчера"
     },
+    "callsGoal": {
+      "label": "Разговоры сегодня: {count} / {goal}",
+      "reached": "Цель на сегодня достигнута",
+      "tooltip": "Разговоры сегодня дольше {seconds} с"
+    },
     "chart": {
       "periods": {
         "month": "Месяц",
@@ -1930,6 +1937,14 @@
       "vsPreviousMonth": "к предыдущему месяцу",
       "vsPreviousWeek": "к предыдущей неделе",
       "wonOpportunities": "Выигранные сделки"
+    },
+    "myCalls": {
+      "empty": "Нет звонков за выбранный период",
+      "inboundAnswered": "Входящие отвеченные",
+      "inboundMissed": "Входящие пропущенные",
+      "outboundAnswered": "Исходящие отвеченные",
+      "outboundMissed": "Исходящие неотвеченные",
+      "title": "Мои телефонные звонки"
     },
     "opportunities": {
       "empty": "Нет сделок",

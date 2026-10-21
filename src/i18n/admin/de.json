@@ -1073,6 +1073,10 @@
         "description": "URL des Ordners mit Vorlagen für den Versand in der Lead-Phase (z. B. ein Google Drive-Link). Wird als Verknüpfung neben dem Anhangsfeld im Fenster zum Verfassen von E-Mails angezeigt.",
         "label": "Vorlagenordner (Lead)"
       },
+      "min_call_duration_sec": {
+        "description": "Kürzere Gespräche werden ausgelassen, wenn der Filter „≥ X s“ im Bereich „Meine Telefonate“ und im Diagramm „Anrufe pro Vertriebsmitarbeiter“ im Prospekt-Dashboard aktiviert ist.",
+        "label": "PBX: Mindestdauer eines Gesprächs (Sek.)"
+      },
       "onboarding_task_templates": {
         "description": "Aufgabendefinitionen für jeden Einführungsschritt. Attribute: id, title, type, step, standard (bei der Migration automatisch hinzufügen), assignee (UUID des Nutzers oder null), days (Tage ab der Migration oder null).",
         "label": "Vorlagen für Onboarding-Aufgaben"

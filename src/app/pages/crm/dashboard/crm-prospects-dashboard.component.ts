@@ -11,6 +11,7 @@ import {
 } from '../../../core/services/crm-api.service';
 import { forkJoin } from 'rxjs';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 // ─── Typy pomocnicze ────────────────────────────────────────────────
 
@@ -368,6 +369,10 @@ function maxOf(rows: BarRow[]): number {
           <option value="rejected">{{ t('callStatus.rejected') }}</option>
           <option value="error">{{ t('callStatusShort.error') }}</option>
         </select>
+        <label class="pd-chk" style="display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap">
+          <input type="checkbox" [(ngModel)]="filterMinDuration" (ngModelChange)="loadChart5()" style="accent-color:var(--orange,#3BAA5D)">
+          <span>≥ {{ minCallDurationSec }} s</span>
+        </label>
       </div>
     </div>
 
@@ -595,6 +600,7 @@ export class CrmProspectsDashboardComponent implements OnInit {
   private transloco = inject(TranslocoService);
   readonly stages = inject(LeadStagesService);
   readonly cdr = inject(ChangeDetectorRef);
+  private settingsSvc = inject(AppSettingsService);
 
   // Dynamiczna mapa kolorów score: budowana na podstawie rzeczywistych zakresów z API
   private knownScoreRanges = new Set<string>();
@@ -627,6 +633,8 @@ export class CrmProspectsDashboardComponent implements OnInit {
   show4BelowThreshold  = false;
   filter5Direction     = '';
   filter5Status        = '';
+  filterMinDuration    = true;
+  minCallDurationSec   = 35;
 
   // Stany ładowania
   loading1 = true; loading2 = true; loading3 = true; loading4 = true; loading5 = true;
@@ -665,6 +673,7 @@ export class CrmProspectsDashboardComponent implements OnInit {
     this.loadChart2();
     this.loadChart3();
     this.loadChart4();
+    this.minCallDurationSec = (this.settingsSvc.get('min_call_duration_sec') as number) || 35;
     this.loadChart5();
   }
 
@@ -933,11 +942,12 @@ export class CrmProspectsDashboardComponent implements OnInit {
     if (this.period5 === 'custom' && (!this.customFrom5 || !this.customTo5)) return;
     this.loading5 = true;
     this.api.getProspectDashCallsBySalesperson({
-      period:    this.period5,
-      direction: this.filter5Direction || undefined,
-      status:    this.filter5Status    || undefined,
-      fromDate:  this.customFrom5 || undefined,
-      toDate:    this.customTo5   || undefined,
+      period:         this.period5,
+      direction:      this.filter5Direction || undefined,
+      status:         this.filter5Status    || undefined,
+      fromDate:       this.customFrom5 || undefined,
+      toDate:         this.customTo5   || undefined,
+      minDurationSec: this.filterMinDuration ? this.minCallDurationSec : undefined,
     }).subscribe({
       next: rows => {
         this.raw5 = rows.map(r => ({ ...r, count: Number(r.count) }));
