@@ -40,7 +40,7 @@
     "members": {
       "accessLevel": "Права доступа",
       "add": "Добавить",
-      "companyAndDepartment": "Компания / отдел",
+      "company": "Компания",
       "email": "E-mail",
       "externalAccount": "внешняя учётная запись",
       "inactive": "(неактивен)",

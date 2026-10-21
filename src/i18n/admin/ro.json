@@ -128,6 +128,10 @@
         "shared": "Licența CRMtree (partajată, decontată în cadrul contractului)",
         "undecided": "Nu știm încă — vă rugăm să ne recomandați"
       },
+      "gmailAppAudience": {
+        "external": "External",
+        "internal": "Internal — doar conturi din domeniul nostru Google Workspace"
+      },
       "oauthAppOwner": {
         "client": "Departamentul nostru IT va înregistra aplicația și va completa datele de mai jos",
         "needs_help": "Avem nevoie de ajutorul CRMtree la înregistrarea aplicației"
@@ -337,17 +341,31 @@
       "enrichment_monthly_volume": {
         "label": "Enrichment — câte companii pe lună intenționați să analizați?"
       },
+      "gmail_apis_enabled": {
+        "hint": "API-uri și servicii → API-uri activate → „+ ACTIVAȚI API-URI ȘI SERVICII\" → căutați → Activare, pentru ambele. API-ul Gmail este obligatoriu; cel Drive deschide atașamentele trimise ca linkuri Drive.",
+        "label": "Sunt activate API-urile Gmail și Google Drive în proiectul Google?"
+      },
+      "gmail_app_audience": {
+        "hint": "Ecranul de consimțământ OAuth → Audience. Internal funcționează imediat; External necesită verificarea contra cost a Google — în acest caz contactați-ne.",
+        "label": "Google — tipul aplicației OAuth"
+      },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → APIs & Services → Credentials → Create Credentials → OAuth client ID.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Același ecran ca Client ID — apare în fereastra afișată imediat după crearea clientului OAuth, o singură dată. Copiați-l imediat.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Necesar pentru primirea imediată a mesajelor noi.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Lasă necompletat — îl completăm noi în timpul configurării, aceeași valoare pentru fiecare client. Nu trebuie să introduci nimic aici.",
+        "label": "Google — Pub/Sub Topic"
+      },
+      "gmail_redirect_uri": {
+        "hint": "Adresa dumneavoastră CRMtree plus calea /api/crm/gmail/oauth/callback — exact aceasta. Se adaugă în: Credențiale → client OAuth → URI-uri de redirecționare autorizate.",
+        "label": "Google — Redirect URI",
+        "placeholder": "https://firma.crmtree.pl/api/crm/gmail/oauth/callback"
       },
       "go_live_date": {
         "label": "Data planificată a lansării"
@@ -434,14 +452,16 @@
         "label": "Poate administratorul Microsoft 365 să acorde consimțământul (admin consent) pentru întreaga organizație?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Opțional.",
+        "hint": "Nu completa — integrarea funcționează cu un cont Microsoft din orice organizație. Introducerea unui ID specific ar bloca autentificarea conturilor din afara unei singure companii.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → aplicația ta → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → aplicația ta → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +617,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Același ecran ca Client ID, chiar lângă el.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {
@@ -1050,6 +1072,10 @@
       "lead_attachments_folder_url": {
         "description": "URL-ul folderului cu șabloane pentru trimitere în etapa de Lead (de ex. un link Google Drive). Se afișează ca scurtătură lângă câmpul de atașamente în fereastra de compunere a e-mailului.",
         "label": "Folder de șabloane (Lead)"
+      },
+      "min_call_duration_sec": {
+        "description": "Apelurile mai scurte sunt omise când filtrul „≥ X s” este bifat în panoul „Apelurile mele telefonice” și pe graficul apelurilor per agent de vânzări din panoul Prospecți.",
+        "label": "PBX: durata minimă a apelului (sec.)"
       },
       "onboarding_task_templates": {
         "description": "Definiții ale sarcinilor pentru fiecare pas al implementării. Atribute: id, title, type, step, standard (adăugare automată la migrare), assignee (UUID-ul utilizatorului sau null), days (zile de la migrare sau null).",
@@ -1718,7 +1744,6 @@
       "canViewKsefInvoices": "Acces la facturile KSeF",
       "company": "Companie",
       "crmRole": "Rol CRM",
-      "department": "Departament",
       "email": "Adresă de e-mail",
       "firstName": "Prenume",
       "lastName": "Nume",

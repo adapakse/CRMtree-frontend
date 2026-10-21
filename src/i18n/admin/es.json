@@ -128,6 +128,10 @@
         "shared": "Licencia de CRMtree (compartida, facturada dentro del contrato)",
         "undecided": "Aún no lo sabemos — solicitamos una recomendación"
       },
+      "gmailAppAudience": {
+        "external": "External",
+        "internal": "Internal — solo cuentas de nuestro dominio de Google Workspace"
+      },
       "oauthAppOwner": {
         "client": "Nuestro departamento de TI registrará la aplicación e indicará los datos a continuación",
         "needs_help": "Necesitamos la ayuda de CRMtree para registrar la aplicación"
@@ -337,17 +341,31 @@
       "enrichment_monthly_volume": {
         "label": "Enrichment — ¿cuántas empresas al mes tienen previsto analizar?"
       },
+      "gmail_apis_enabled": {
+        "hint": "APIs y servicios → APIs habilitadas → \"+ HABILITAR APIS Y SERVICIOS\" → buscar → Habilitar, para ambas. La API de Gmail es obligatoria; la de Drive abre los adjuntos enviados como enlaces de Drive.",
+        "label": "¿Están habilitadas las API de Gmail y de Google Drive en el proyecto de Google?"
+      },
+      "gmail_app_audience": {
+        "hint": "Pantalla de consentimiento de OAuth → Audience. Internal funciona de inmediato; External requiere la verificación de pago de Google — en ese caso, contáctennos.",
+        "label": "Google — tipo de aplicación OAuth"
+      },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → APIs y servicios → Credenciales → Crear credenciales → ID de cliente de OAuth.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "La misma pantalla que el Client ID — aparece en la ventana justo después de crear el cliente OAuth, una sola vez. Cópienlo de inmediato.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Necesario para recibir al instante los mensajes nuevos.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Déjalo en blanco — lo completamos nosotros durante la configuración, el mismo valor para cada cliente. No necesitas escribir nada aquí.",
+        "label": "Google — Pub/Sub Topic"
+      },
+      "gmail_redirect_uri": {
+        "hint": "Su dirección de CRMtree más la ruta /api/crm/gmail/oauth/callback — exactamente así. Se añade en: Credenciales → cliente OAuth → URI de redirección autorizados.",
+        "label": "Google — Redirect URI",
+        "placeholder": "https://firma.crmtree.pl/api/crm/gmail/oauth/callback"
       },
       "go_live_date": {
         "label": "Fecha prevista de puesta en marcha"
@@ -434,14 +452,16 @@
         "label": "¿Puede el administrador de Microsoft 365 conceder el consentimiento (admin consent) para toda la organización?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Opcional.",
+        "hint": "No lo rellenes — la integración funciona con una cuenta de Microsoft de cualquier organización. Indicar un ID concreto bloquearía el inicio de sesión de cuentas fuera de una sola empresa.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → tu aplicación → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → tu aplicación → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +617,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "La misma pantalla que el Client ID, justo al lado.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {
@@ -1050,6 +1072,10 @@
       "lead_attachments_folder_url": {
         "description": "URL de la carpeta con las plantillas para enviar en la etapa de Lead (p. ej. un enlace de Google Drive). Se muestra como atajo junto al campo de adjuntos en la ventana de redacción del correo.",
         "label": "Carpeta de plantillas (Lead)"
+      },
+      "min_call_duration_sec": {
+        "description": "Las llamadas más cortas se omiten cuando está marcado el filtro «≥ X s» en el panel «Mis llamadas» y en el gráfico de llamadas por comercial del panel de prospectos.",
+        "label": "PBX: duración mínima de la llamada (s)"
       },
       "onboarding_task_templates": {
         "description": "Definiciones de tareas para cada paso de la implantación. Atributos: id, title, type, step, standard (añadir automáticamente en la migración), assignee (UUID del usuario o null), days (días desde la migración o null).",
@@ -1718,7 +1744,6 @@
       "canViewKsefInvoices": "Acceso a las facturas de KSeF",
       "company": "Empresa",
       "crmRole": "Rol CRM",
-      "department": "Departamento",
       "email": "Correo electrónico",
       "firstName": "Nombre",
       "lastName": "Apellidos",

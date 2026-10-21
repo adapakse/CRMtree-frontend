@@ -1522,10 +1522,12 @@
     "presets": {
       "currentMonth": "Current month",
       "currentQuarter": "Current quarter",
+      "currentWeek": "Current week",
       "currentYear": "Current year (YTD {year})",
       "customRange": "Custom range…",
       "previousMonth": "Previous month",
       "previousQuarter": "Previous quarter",
+      "previousWeek": "Previous week",
       "previousYear": "Previous year ({year})"
     }
   },
@@ -1884,6 +1886,11 @@
       "title": "Recent activity",
       "yesterday": "Yesterday"
     },
+    "callsGoal": {
+      "label": "Calls today: {count} / {goal}",
+      "reached": "Today's goal reached",
+      "tooltip": "Calls today longer than {seconds} s"
+    },
     "chart": {
       "periods": {
         "month": "Month",
@@ -1930,6 +1937,14 @@
       "vsPreviousMonth": "vs previous month",
       "vsPreviousWeek": "vs previous week",
       "wonOpportunities": "Won opportunities"
+    },
+    "myCalls": {
+      "empty": "No calls in the selected period",
+      "inboundAnswered": "Incoming answered",
+      "inboundMissed": "Incoming missed",
+      "outboundAnswered": "Outgoing answered",
+      "outboundMissed": "Outgoing unanswered",
+      "title": "My phone calls"
     },
     "opportunities": {
       "empty": "No opportunities",

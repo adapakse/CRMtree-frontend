@@ -50,6 +50,7 @@ export interface AppSettings {
   roles_preview_count:            number;
   lead_attachments_folder_url:    string;
   crm_training_mode:              boolean;
+  min_call_duration_sec:          number;
   'prospect.icp_blacklist_keywords': string;   // JSON array of strings (value_type 'json' — GET zwraca surowy string)
   'prospect.icp_blacklist_penalty':  number;
   [key: string]: number | boolean | string;
@@ -63,6 +64,7 @@ const DEFAULTS: AppSettings = {
   roles_preview_count:            3,
   lead_attachments_folder_url:    '',
   crm_training_mode:              false,
+  min_call_duration_sec:          35,
   'prospect.icp_blacklist_keywords': '["hurtow","sprzedaż hurtowa","handel hurtowy","dystrybucja hurtowa"]',
   'prospect.icp_blacklist_penalty':  15,
 };
@@ -100,8 +102,12 @@ export class AppSettingsService {
       this.meta.set(res.meta);
       if (res.lead_stages) this.leadStages.set(res.lead_stages);
       this.loaded = true;
-    } catch {
-      // Non-fatal — fall back to defaults (e.g. before login)
+    } catch (err) {
+      // Non-fatal — fall back to defaults (e.g. before login). Logged anyway: when
+      // this fails for a signed-in user, every screen silently loses the tenant's
+      // settings and lead stages (empty kanban, empty stage filter, won/lost at
+      // zero) with nothing in the UI pointing here.
+      console.error('[AppSettings] Failed to load tenant settings', err);
     }
   }
 

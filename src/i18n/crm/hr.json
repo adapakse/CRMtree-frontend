@@ -1522,10 +1522,12 @@
     "presets": {
       "currentMonth": "Tekući mjesec",
       "currentQuarter": "Tekući kvartal",
+      "currentWeek": "Tekući tjedan",
       "currentYear": "Tekuća godina (YTD {year})",
       "customRange": "Vlastito razdoblje…",
       "previousMonth": "Prethodni mjesec",
       "previousQuarter": "Prethodni kvartal",
+      "previousWeek": "Prethodni tjedan",
       "previousYear": "Prethodna godina ({year})"
     }
   },
@@ -1884,6 +1886,11 @@
       "title": "Zadnja aktivnost",
       "yesterday": "Jučer"
     },
+    "callsGoal": {
+      "label": "Pozivi danas: {count} / {goal}",
+      "reached": "Današnji cilj ostvaren",
+      "tooltip": "Današnji pozivi dulji od {seconds} s"
+    },
     "chart": {
       "periods": {
         "month": "Mjesec",
@@ -1930,6 +1937,14 @@
       "vsPreviousMonth": "vs prethodni mjesec",
       "vsPreviousWeek": "vs prethodni tjedan",
       "wonOpportunities": "Dobivene prilike"
+    },
+    "myCalls": {
+      "empty": "Nema poziva u odabranom razdoblju",
+      "inboundAnswered": "Dolazni odgovoreni",
+      "inboundMissed": "Dolazni propušteni",
+      "outboundAnswered": "Odlazni odgovoreni",
+      "outboundMissed": "Odlazni neodgovoreni",
+      "title": "Moji telefonski pozivi"
     },
     "opportunities": {
       "empty": "Nema prilika",

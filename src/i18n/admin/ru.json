@@ -128,6 +128,10 @@
         "shared": "Лицензия CRMtree (общая, оплачивается в рамках договора)",
         "undecided": "Пока не знаем — просим дать рекомендацию"
       },
+      "gmailAppAudience": {
+        "external": "External",
+        "internal": "Internal — только аккаунты нашего домена Google Workspace"
+      },
       "oauthAppOwner": {
         "client": "Наш ИТ-отдел зарегистрирует приложение и укажет данные ниже",
         "needs_help": "Нам нужна помощь CRMtree в регистрации приложения"
@@ -337,17 +341,31 @@
       "enrichment_monthly_volume": {
         "label": "Enrichment — сколько компаний в месяц вы планируете анализировать?"
       },
+      "gmail_apis_enabled": {
+        "hint": "API и сервисы → Включённые API → «+ ВКЛЮЧИТЬ API И СЕРВИСЫ» → найти → Включить, для обоих. Gmail API обязателен; Drive API открывает вложения-ссылки на Диск.",
+        "label": "Включены ли в проекте Google API Gmail и Google Drive?"
+      },
+      "gmail_app_audience": {
+        "hint": "Экран согласия OAuth → Audience. Internal работает сразу; External требует платной проверки Google — в этом случае свяжитесь с нами.",
+        "label": "Google — тип приложения OAuth"
+      },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → API и сервисы → Учётные данные → Создать учётные данные → Идентификатор клиента OAuth.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Тот же экран, что и Client ID — показывается в окне сразу после создания клиента OAuth, только один раз. Скопируйте его сразу.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Нужен для мгновенного получения новых писем.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Оставьте пустым — мы заполняем это сами при настройке, одно и то же значение для каждого клиента. Здесь ничего вводить не нужно.",
+        "label": "Google — Pub/Sub Topic"
+      },
+      "gmail_redirect_uri": {
+        "hint": "Ваш адрес CRMtree плюс путь /api/crm/gmail/oauth/callback — именно такой. Добавляется в: Учётные данные → клиент OAuth → Разрешённые URI перенаправления.",
+        "label": "Google — Redirect URI",
+        "placeholder": "https://firma.crmtree.pl/api/crm/gmail/oauth/callback"
       },
       "go_live_date": {
         "label": "Планируемая дата запуска"
@@ -434,14 +452,16 @@
         "label": "Может ли администратор Microsoft 365 дать согласие (admin consent) для всей организации?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Необязательно.",
+        "hint": "Не заполняйте — интеграция работает с учётной записью Microsoft из любой организации. Указание конкретного ID заблокирует вход для аккаунтов за пределами одной компании.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → ваше приложение → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → ваше приложение → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +617,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Тот же экран, что и Client ID, рядом с ним.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {
@@ -1050,6 +1072,10 @@
       "lead_attachments_folder_url": {
         "description": "URL папки с шаблонами для отправки на этапе Лида (например, ссылка на Google Drive). Отображается как ярлык рядом с полем вложений в окне создания письма.",
         "label": "Папка шаблонов (Лид)"
+      },
+      "min_call_duration_sec": {
+        "description": "Более короткие разговоры не учитываются, когда отмечен фильтр «≥ X с» в панели «Мои телефонные звонки» и на графике звонков по менеджерам в панели «Проспекты».",
+        "label": "АТС: мин. длительность разговора (сек.)"
       },
       "onboarding_task_templates": {
         "description": "Определения задач для каждого шага внедрения. Атрибуты: id, title, type, step, standard (автодобавление при миграции), assignee (UUID пользователя или null), days (дни от миграции или null).",
@@ -1718,7 +1744,6 @@
       "canViewKsefInvoices": "Доступ к счетам KSeF",
       "company": "Компания",
       "crmRole": "Роль CRM",
-      "department": "Отдел",
       "email": "Адрес e-mail",
       "firstName": "Имя",
       "lastName": "Фамилия",

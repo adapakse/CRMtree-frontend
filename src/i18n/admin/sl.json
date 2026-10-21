@@ -128,6 +128,10 @@
         "shared": "Licenca CRMtree (deljena, obračunana v okviru pogodbe)",
         "undecided": "Še ne vemo — prosimo za priporočilo"
       },
+      "gmailAppAudience": {
+        "external": "External",
+        "internal": "Internal — samo računi iz naše domene Google Workspace"
+      },
       "oauthAppOwner": {
         "client": "Naš oddelek IT bo registriral aplikacijo in spodaj navedel podatke",
         "needs_help": "Pri registraciji aplikacije potrebujemo pomoč CRMtree"
@@ -337,17 +341,31 @@
       "enrichment_monthly_volume": {
         "label": "Enrichment — koliko podjetij na mesec nameravate analizirati?"
       },
+      "gmail_apis_enabled": {
+        "hint": "API-ji in storitve → Omogočeni API-ji → »+ OMOGOČI API-JE IN STORITVE« → poiščite → Omogoči, za oba. Gmail API je obvezen; Drive API odpira priloge, poslane kot povezave do Diska.",
+        "label": "Ali sta v projektu Google omogočena Gmail API in Google Drive API?"
+      },
+      "gmail_app_audience": {
+        "hint": "Zaslon za soglasje OAuth → Audience. Internal deluje takoj; External zahteva plačljivo Googlovo preverjanje — v tem primeru nas kontaktirajte.",
+        "label": "Google — vrsta aplikacije OAuth"
+      },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → API-ji in storitve → Poverilnice → Ustvari poverilnice → ID odjemalca OAuth.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Isti zaslon kot Client ID — prikaže se v oknu takoj po ustvaritvi odjemalca OAuth, samo enkrat. Takoj ga kopirajte.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Potreben za takojšnje prejemanje novih sporočil.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Pusti prazno — to izpolnimo mi med nastavitvijo, ista vrednost za vsakega naročnika. Tu ti ni treba ničesar vnesti.",
+        "label": "Google — Pub/Sub Topic"
+      },
+      "gmail_redirect_uri": {
+        "hint": "Vaš naslov CRMtree in pot /api/crm/gmail/oauth/callback — točno ta. Dodate v: Poverilnice → odjemalec OAuth → Pooblaščeni URI-ji za preusmeritev.",
+        "label": "Google — Redirect URI",
+        "placeholder": "https://firma.crmtree.pl/api/crm/gmail/oauth/callback"
       },
       "go_live_date": {
         "label": "Načrtovani datum zagona"
@@ -434,14 +452,16 @@
         "label": "Ali lahko skrbnik Microsoft 365 da soglasje (admin consent) za celotno organizacijo?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Neobvezno.",
+        "hint": "Ne izpolnjuj — integracija deluje z računom Microsoft iz katere koli organizacije. Vnos določenega ID-ja bi blokiral prijavo računom zunaj enega podjetja.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → vaša aplikacija → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → vaša aplikacija → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +617,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Isti zaslon kot ID odjemalca, tik zraven.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {
@@ -1050,6 +1072,10 @@
       "lead_attachments_folder_url": {
         "description": "URL mape s predlogami za pošiljanje v fazi Lead (npr. povezava do Google Drive). Prikaže se kot bližnjica ob polju za priloge v oknu za sestavljanje e-pošte.",
         "label": "Mapa predlog (Lead)"
+      },
+      "min_call_duration_sec": {
+        "description": "Krajši klici so izpuščeni, ko je označen filter »≥ X s« na plošči »Moji telefonski klici« in na grafu klicev po prodajniku na nadzorni plošči Potencialne stranke.",
+        "label": "PBX: najkrajše trajanje klica (s)"
       },
       "onboarding_task_templates": {
         "description": "Definicije nalog za vsak korak uvajanja. Atributi: id, title, type, step, standard (samodejno dodaj pri migraciji), assignee (UUID uporabnika ali null), days (dni od migracije ali null).",
@@ -1718,7 +1744,6 @@
       "canViewKsefInvoices": "Dostop do računov KSeF",
       "company": "Podjetje",
       "crmRole": "Vloga CRM",
-      "department": "Oddelek",
       "email": "E-poštni naslov",
       "firstName": "Ime",
       "lastName": "Priimek",

@@ -86,7 +86,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
           <thead>
             <tr>
               <th>{{ t('card.members.person') }}</th><th>{{ t('card.members.email') }}</th><th>{{ t('card.members.phone') }}</th>
-              <th>{{ t('card.members.companyAndDepartment') }}</th><th>{{ t('card.members.role') }}</th>
+              <th>{{ t('card.members.company') }}</th><th>{{ t('card.members.role') }}</th>
               <th>{{ t('card.members.accessLevel') }}</th><th></th>
             </tr>
           </thead>
@@ -101,7 +101,7 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
                 <td>
                   @if (member.phone) { <a [href]="'tel:' + member.phone">{{ member.phone }}</a> } @else { <span class="muted">—</span> }
                 </td>
-                <td>{{ companyAndDepartment(member) }}</td>
+                <td>{{ member.company || '—' }}</td>
                 <td>
                   @if (canEditMembers()) {
                     <select class="fsel compact" [ngModel]="member.role" (ngModelChange)="changeRole(member, $event)">
@@ -251,10 +251,6 @@ export class ProjectCardComponent {
 
   private get projectId(): string {
     return this.detail().project.id;
-  }
-
-  companyAndDepartment(member: ProjectMember): string {
-    return [member.company, member.department].filter(Boolean).join(' / ') || '—';
   }
 
   hasFixedAccess(role: ProjectRole): boolean {

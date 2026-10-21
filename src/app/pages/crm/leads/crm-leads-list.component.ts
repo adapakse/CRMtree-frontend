@@ -136,7 +136,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       </svg>
       {{ t('leadsList.view.timeline') }}
     </button>
-    <button class="btn btn-g btn-sm" (click)="viewMode = viewMode==='kanban' ? 'table' : 'kanban'">
+    <button class="btn btn-g btn-sm" (click)="toggleViewMode()">
       {{ isKanbanView ? '☰ ' + t('leadsList.view.table') : '⊞ ' + t('leadsList.view.kanban') }}
     </button>
   </div>
@@ -151,7 +151,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 
     <div class="kanban">
       <!-- Kolumny aktywne -->
-      <div *ngFor="let col of stages.funnel()" class="kol">
+      <div *ngFor="let col of kanbanColumns()" class="kol">
         <div class="kol-head">
           <div class="kol-dot" [style.background]="stages.color(col.key)"></div>
           <span class="kol-title">{{ stages.label(col.key) }}</span>
@@ -195,7 +195,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       </div>
 
       <!-- Zamknięte — tylko gdy tenant w ogóle rozlicza wygrane/przegrane -->
-      <div class="kol" *ngIf="stages.tracksOutcome()">
+      <div class="kol" *ngIf="showsClosedColumn()">
         <div class="kol-head">
           <div class="kol-dot" style="background:#22C55E"></div>
           <span class="kol-title">{{ t('leadsList.kanban.closed') }}</span>
@@ -1429,6 +1429,32 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     this.load();
   }
 
+  /**
+   * A stage filter narrows the board to that stage's column. Only a stage the
+   * board has no column for (Archive) cannot be shown there, so switching to
+   * the board drops that one filter — otherwise the view silently stays a
+   * table and the button looks broken.
+   */
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'kanban' ? 'table' : 'kanban';
+
+    const activeStageFilter = this.filterStage || this.filterStageUI;
+    if (this.viewMode === 'kanban' && activeStageFilter && !this.fitsKanban(activeStageFilter)) {
+      this.filterStage = '';
+      this.filterStageUI = '';
+      // The chip describes filters that came from the sales report; it would name a
+      // stage that is no longer applied, unless some other report filter survives.
+      if (!this.filterCloseDateFrom && !this.filterCloseDateTo
+        && !this.filterCreatedFrom && !this.filterCreatedTo && !this.filterLostReason) {
+        this.reportFilterLabel = '';
+      }
+    }
+
+    // Both views read different page sizes (the board needs every lead, the table
+    // one page), so the data has to be refetched for the view being switched to.
+    this.load();
+  }
+
   // ── Persistent rep filter (sessionStorage) ───────────────────────
   private loadPersistRepFilter(): void {
     try {
@@ -1466,11 +1492,28 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     this.load();
   }
 
-  /** Kanban ma stałe kolumny etapów lejka — nie ma w nim miejsca na pojedynczy
-   *  etap spoza lejka (np. Archiwum), więc przy aktywnym filtrze Etap zawsze
-   *  pokazujemy tabelę, niezależnie od wybranego viewMode. */
+  /** Kanban nie ma kolumny dla etapu spoza lejka i zamknięcia (np. Archiwum),
+   *  więc przy takim filtrze Etap pokazujemy tabelę, niezależnie od viewMode. */
   get isKanbanView(): boolean {
-    return this.viewMode === 'kanban' && !(this.filterStage || this.filterStageUI);
+    const activeStageFilter = this.filterStage || this.filterStageUI;
+    return this.viewMode === 'kanban' && (!activeStageFilter || this.fitsKanban(activeStageFilter));
+  }
+
+  private fitsKanban(stage: string): boolean {
+    return this.stages.funnel().some(s => s.key === stage)
+      || (this.stages.tracksOutcome() && this.stages.isClosed(stage));
+  }
+
+  /** Przy filtrze Etap plansza pokazuje tylko kolumnę wybranego etapu. */
+  kanbanColumns() {
+    const activeStageFilter = this.filterStage || this.filterStageUI;
+    const funnel = this.stages.funnel();
+    return activeStageFilter ? funnel.filter(s => s.key === activeStageFilter) : funnel;
+  }
+
+  showsClosedColumn(): boolean {
+    const activeStageFilter = this.filterStage || this.filterStageUI;
+    return this.stages.tracksOutcome() && (!activeStageFilter || this.stages.isClosed(activeStageFilter));
   }
 
   load() {

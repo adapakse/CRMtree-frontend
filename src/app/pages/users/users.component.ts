@@ -198,11 +198,6 @@ import { LocaleService } from '../../core/i18n/locale.service';
                        name="user-company" autocomplete="off">
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">{{ t('users.fields.department') }}</label>
-                <input class="fi" [(ngModel)]="newDepartment" maxlength="200"
-                       name="user-department" autocomplete="off">
-              </div>
-              <div class="fg" style="grid-column:1/-1">
                 <div class="sec-title" style="margin-top:8px">{{ t('users.password.title') }}</div>
               </div>
               <div class="fg">
@@ -348,11 +343,6 @@ import { LocaleService } from '../../core/i18n/locale.service';
                   <label class="fl">{{ t('users.fields.company') }}</label>
                   <input class="fi" [(ngModel)]="editCompany" maxlength="200"
                          name="user-company-edit" autocomplete="off">
-                </div>
-                <div class="fg" style="grid-column:1/-1">
-                  <label class="fl">{{ t('users.fields.department') }}</label>
-                  <input class="fi" [(ngModel)]="editDepartment" maxlength="200"
-                         name="user-department-edit" autocomplete="off">
                 </div>
                 @if (hasProjectsFeature()) {
                   <div class="fg">
@@ -731,7 +721,6 @@ export class UsersComponent implements OnInit {
   newCrmRole     = '';           // ★ rola CRM dla nowego usera
   newPhone       = '';
   newCompany     = '';
-  newDepartment  = '';
   newUserPassword        = '';
   newUserPasswordConfirm = '';
   newUserPasswordError   = '';
@@ -740,7 +729,6 @@ export class UsersComponent implements OnInit {
   newCanViewKsefInvoices = false;
   editPhone      = '';
   editCompany    = '';
-  editDepartment = '';
   editExternal   = false;
   editCanCreateProjects = false;
   editCanViewKsefInvoices = false;
@@ -883,7 +871,7 @@ export class UsersComponent implements OnInit {
   openNew(): void {
     this.newFirst = ''; this.newLast = ''; this.newEmail = '';
     this.newActive = true; this.newAdmin = false; this.newCrmRole = '';
-    this.newPhone = ''; this.newCompany = ''; this.newDepartment = '';
+    this.newPhone = ''; this.newCompany = '';
     this.newUserPassword = ''; this.newUserPasswordConfirm = ''; this.newUserPasswordError = '';
     this.newExternal = false; this.newCanCreateProjects = false; this.newCanViewKsefInvoices = false;
     this.newGroup = ''; this.newGroupAccess = 'read';
@@ -920,7 +908,6 @@ export class UsersComponent implements OnInit {
       crm_role:   this.newCrmRole || null,
       phone:      this.newPhone.trim() || null,
       company:    this.newCompany.trim() || null,
-      department: this.newDepartment.trim() || null,
       is_external: this.newExternal,
       can_create_projects: this.newCanCreateProjects && !this.newExternal,
       can_view_ksef_invoices: this.newCanViewKsefInvoices && !this.newExternal,
@@ -983,7 +970,6 @@ export class UsersComponent implements OnInit {
         this.editCrmRole = (u as any).crm_role ?? '';
         this.editPhone      = u.phone ?? '';
         this.editCompany    = u.company ?? '';
-        this.editDepartment = u.department ?? '';
         this.editExternal   = u.is_external ?? false;
         this.editCanCreateProjects = u.can_create_projects ?? false;
         this.editCanViewKsefInvoices = u.can_view_ksef_invoices ?? false;
@@ -1040,7 +1026,6 @@ export class UsersComponent implements OnInit {
       crm_role:   this.editCrmRole || null,
       phone:      this.editPhone.trim() || null,
       company:    this.editCompany.trim() || null,
-      department: this.editDepartment.trim() || null,
       is_external: this.editExternal,
       can_create_projects: this.editCanCreateProjects && !this.editExternal,
       can_view_ksef_invoices: this.editCanViewKsefInvoices && !this.editExternal,

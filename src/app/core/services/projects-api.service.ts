@@ -234,7 +234,6 @@ export interface ProjectMember {
   email: string;
   phone: string | null;
   company: string | null;
-  department: string | null;
   is_external: boolean;
   is_active: boolean;
 }
@@ -265,7 +264,6 @@ export interface ProjectMemberCandidate {
   display_name: string;
   email: string;
   company: string | null;
-  department: string | null;
   is_external: boolean;
 }
 

@@ -1522,10 +1522,12 @@
     "presets": {
       "currentMonth": "Aktueller Monat",
       "currentQuarter": "Aktuelles Quartal",
+      "currentWeek": "Aktuelle Woche",
       "currentYear": "Aktuelles Jahr (YTD {year})",
       "customRange": "Eigener Zeitraum…",
       "previousMonth": "Vorheriger Monat",
       "previousQuarter": "Vorheriges Quartal",
+      "previousWeek": "Vorherige Woche",
       "previousYear": "Vorheriges Jahr ({year})"
     }
   },
@@ -1884,6 +1886,11 @@
       "title": "Letzte Aktivität",
       "yesterday": "Gestern"
     },
+    "callsGoal": {
+      "label": "Gespräche heute: {count} / {goal}",
+      "reached": "Tagesziel erreicht",
+      "tooltip": "Gespräche heute über {seconds} s"
+    },
     "chart": {
       "periods": {
         "month": "Monat",
@@ -1930,6 +1937,14 @@
       "vsPreviousMonth": "vs. Vormonat",
       "vsPreviousWeek": "vs. Vorwoche",
       "wonOpportunities": "Gewonnene Verkaufschancen"
+    },
+    "myCalls": {
+      "empty": "Keine Anrufe im gewählten Zeitraum",
+      "inboundAnswered": "Eingehend angenommen",
+      "inboundMissed": "Eingehend verpasst",
+      "outboundAnswered": "Ausgehend angenommen",
+      "outboundMissed": "Ausgehend nicht angenommen",
+      "title": "Meine Telefonate"
     },
     "opportunities": {
       "empty": "Keine Verkaufschancen",

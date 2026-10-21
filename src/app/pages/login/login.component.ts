@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal, effect } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
+import { AppSettingsService } from '../../core/services/app-settings.service';
 import { EnvironmentBannerService } from '../../core/services/environment-banner.service';
 import { TenantContextService } from '../../core/services/tenant-context.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
@@ -126,6 +127,7 @@ type Tab = 'sso' | 'password';
 })
 export class LoginComponent implements OnInit {
   private auth      = inject(AuthService);
+  private settings  = inject(AppSettingsService);
   private router    = inject(Router);
   private route     = inject(ActivatedRoute);
   private envBanner = inject(EnvironmentBannerService);
@@ -176,6 +178,11 @@ export class LoginComponent implements OnInit {
         this.auth.loadCurrentUser().subscribe({
           next: user => {
             this.loading.set(false);
+            // APP_INITIALIZER skips the settings call for anonymous visitors, and a
+            // password login never reloads the page — without this, the whole session
+            // runs on defaults, with no tenant lead stages (empty kanban, empty stage
+            // filter, won/lost counts stuck at zero). The SSO callback does the same.
+            this.settings.reload();
             if (tokens.must_change_password) {
               this.router.navigate(['/change-password']);
             } else {

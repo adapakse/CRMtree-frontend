@@ -128,6 +128,10 @@
         "shared": "CRMtree licence (shared, billed under the contract)",
         "undecided": "We don’t know yet — please recommend"
       },
+      "gmailAppAudience": {
+        "external": "External",
+        "internal": "Internal — only accounts in our Google Workspace domain"
+      },
       "oauthAppOwner": {
         "client": "Our IT department will register the app and provide the details below",
         "needs_help": "We need CRMtree’s help with registering the app"
@@ -337,17 +341,31 @@
       "enrichment_monthly_volume": {
         "label": "Enrichment — how many companies per month do you plan to analyse?"
       },
+      "gmail_apis_enabled": {
+        "hint": "APIs & Services → Enabled APIs & services → \"+ ENABLE APIS AND SERVICES\" → search → Enable, for both. Gmail API is required; Drive API opens attachments sent as Drive links.",
+        "label": "Are the Gmail API and Google Drive API enabled in the Google project?"
+      },
+      "gmail_app_audience": {
+        "hint": "OAuth consent screen → Audience. Internal works right away; External needs Google's paid verification — please contact us in that case.",
+        "label": "Google — OAuth app type"
+      },
       "gmail_client_id": {
+        "hint": "Google Cloud Console → APIs & Services → Credentials → Create Credentials → OAuth client ID.",
         "label": "Google — Client ID",
         "placeholder": "123456789.apps.googleusercontent.com"
       },
       "gmail_client_secret": {
+        "hint": "Same screen as the Client ID — shown in the dialog right after the OAuth client is created, once only. Copy it immediately.",
         "label": "Google — Client Secret"
       },
       "gmail_pubsub_topic": {
-        "hint": "Needed to receive new messages instantly.",
-        "label": "Google — Pub/Sub Topic",
-        "placeholder": "projects/moj-projekt/topics/gmail-push"
+        "hint": "Leave this empty — we fill it in on our side during setup, the same value for every client. You don't need to enter anything here.",
+        "label": "Google — Pub/Sub Topic"
+      },
+      "gmail_redirect_uri": {
+        "hint": "Your CRMtree address plus the /api/crm/gmail/oauth/callback path — exactly that. Add it in: Credentials → OAuth client → Authorized redirect URIs.",
+        "label": "Google — Redirect URI",
+        "placeholder": "https://firma.crmtree.pl/api/crm/gmail/oauth/callback"
       },
       "go_live_date": {
         "label": "Planned go-live date"
@@ -434,14 +452,16 @@
         "label": "Can your Microsoft 365 administrator grant admin consent for the whole organization?"
       },
       "outlook_azure_tenant_id": {
-        "hint": "Optional.",
+        "hint": "Leave this blank — the integration works with a Microsoft account from any organization. Entering a specific ID will block sign-in for accounts outside one company.",
         "label": "Microsoft — Directory (tenant) ID"
       },
       "outlook_client_id": {
+        "hint": "Azure Portal → App registrations → your app → Overview.",
         "label": "Microsoft — Application (client) ID",
         "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       },
       "outlook_client_secret": {
+        "hint": "Azure Portal → App registrations → your app → Certificates & secrets → New client secret.",
         "label": "Microsoft — Client Secret"
       },
       "pbx_account_name": {
@@ -597,10 +617,12 @@
         "label": "WABA ID (WhatsApp Business Account ID)"
       },
       "zoho_client_id": {
+        "hint": "Zoho API Console (api-console.zoho.com) → Server-based Applications.",
         "label": "Zoho — Client ID",
         "placeholder": "1000.XXXXXXXX"
       },
       "zoho_client_secret": {
+        "hint": "Same screen as Client ID, right next to it.",
         "label": "Zoho — Client Secret"
       },
       "zoho_data_center": {
@@ -1050,6 +1072,10 @@
       "lead_attachments_folder_url": {
         "description": "URL of the folder with templates to send at the Lead stage (e.g. a Google Drive link). Shown as a shortcut next to the attachments field in the email compose window.",
         "label": "Templates folder (Lead)"
+      },
+      "min_call_duration_sec": {
+        "description": "Calls shorter than this are left out when the “≥ X s” filter is ticked in the “My phone calls” panel and on the calls-per-salesperson chart of the Prospects dashboard.",
+        "label": "PBX: minimum call duration (sec.)"
       },
       "onboarding_task_templates": {
         "description": "Task definitions for each onboarding step. Attributes: id, title, type, step, standard (auto-add on migration), assignee (user UUID or null), days (days from migration or null).",
@@ -1718,7 +1744,6 @@
       "canViewKsefInvoices": "Access to KSeF invoices",
       "company": "Company",
       "crmRole": "CRM role",
-      "department": "Department",
       "email": "Email address",
       "firstName": "First name",
       "lastName": "Last name",

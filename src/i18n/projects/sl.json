@@ -40,7 +40,7 @@
     "members": {
       "accessLevel": "Pravice",
       "add": "Dodaj",
-      "companyAndDepartment": "Podjetje / oddelek",
+      "company": "Podjetje",
       "email": "E-pošta",
       "externalAccount": "zunanji račun",
       "inactive": "(neaktiven)",
