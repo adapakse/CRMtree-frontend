@@ -582,8 +582,11 @@ const TODAY_CALLS_GOAL = 37;
     .crm-dash { padding: 24px; overflow: auto; display: flex; flex-direction: column; gap: 20px; min-height: 100%; box-sizing: border-box; }
 
     /* Header */
-    .dash-top { display: flex; align-items: flex-start; justify-content: space-between; }
-    .dash-greeting h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; color: #111827; display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
+    .dash-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .dash-greeting { min-width: 0; }
+    /* Wraps so a long first name on a narrow screen pushes the medal below the
+       greeting instead of overflowing into the date chip. */
+    .dash-greeting h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; color: #111827; display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; }
     .dash-greeting p { margin: 0; font-size: 13.5px; color: #6B7280; }
     .date-chip { display: flex; align-items: center; gap: 6px; border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 14px; font-size: 13px; color: #374151; background: white; white-space: nowrap; }
 
