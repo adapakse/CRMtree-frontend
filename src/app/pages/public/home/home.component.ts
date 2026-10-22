@@ -1,41 +1,41 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { SeoService } from '../../../core/services/seo.service';
 
 @Component({
   selector: 'wt-public-home',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslocoDirective],
   template: `
+    <ng-container *transloco="let t; prefix: 'public.home'">
     <section class="hero">
-      <h1>CRM dla firm, które nie chcą tracić leadów</h1>
-      <p class="hero-sub">
-        CRMtree porządkuje pracę handlowców, lejek sprzedażowy oraz upsell i cross-sell
-        w jednym miejscu — niezależnie od branży, w której działasz.
-      </p>
-      <a routerLink="/login" class="hero-cta">Zaloguj się do CRMtree</a>
+      <h1>{{ t('title') }}</h1>
+      <p class="hero-sub">{{ t('subtitle') }}</p>
+      <a routerLink="/login" class="hero-cta">{{ t('cta') }}</a>
     </section>
 
     <section class="features">
       <div class="feature">
-        <h2>Dynamiczna praca handlowców</h2>
-        <p>Leady, zadania i kalendarz w jednym miejscu — zespół sprzedaży widzi, co wymaga uwagi teraz.</p>
+        <h2>{{ t('features.sales.title') }}</h2>
+        <p>{{ t('features.sales.text') }}</p>
       </div>
       <div class="feature">
-        <h2>Przejrzysty lejek sprzedażowy</h2>
-        <p>Każdy etap — od pierwszego kontaktu po zamknięcie — widoczny i mierzalny.</p>
+        <h2>{{ t('features.funnel.title') }}</h2>
+        <p>{{ t('features.funnel.text') }}</p>
       </div>
       <div class="feature">
-        <h2>Upsell i cross-sell</h2>
-        <p>Historia klienta w jednym miejscu ułatwia rozpoznanie momentu na dosprzedaż.</p>
+        <h2>{{ t('features.upsell.title') }}</h2>
+        <p>{{ t('features.upsell.text') }}</p>
       </div>
     </section>
 
     <section class="blog-teaser">
-      <h2>Ostatnio na blogu</h2>
-      <a routerLink="/blog" class="blog-teaser-link">Zobacz wszystkie wpisy →</a>
+      <h2>{{ t('blogTitle') }}</h2>
+      <a routerLink="/blog" class="blog-teaser-link">{{ t('blogLink') }}</a>
     </section>
+    </ng-container>
   `,
   styles: [`
     .hero { text-align:center; padding:5rem 1.5rem 4rem; max-width:760px; margin:0 auto; }
@@ -60,11 +60,12 @@ import { SeoService } from '../../../core/services/seo.service';
 })
 export class HomeComponent implements OnInit {
   private seo = inject(SeoService);
+  private transloco = inject(TranslocoService);
 
   ngOnInit(): void {
     this.seo.setPage({
-      title: 'CRM dla dynamicznej sprzedaży',
-      description: 'CRMtree porządkuje pracę handlowców, lejek sprzedażowy oraz upsell i cross-sell — dla firm z dowolnej branży.',
+      title: this.transloco.translate('public.home.seoTitle'),
+      description: this.transloco.translate('public.home.seoDescription'),
       path: '/',
     });
     this.seo.setJsonLd('ld-organization', {

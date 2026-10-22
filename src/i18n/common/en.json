@@ -38,6 +38,46 @@
     "sortBy": "Sort: {name}",
     "to": "to"
   },
+  "public": {
+    "cookies": {
+      "accept": "Accept",
+      "ariaLabel": "Cookie consent",
+      "decline": "Decline",
+      "policyLink": "privacy policy",
+      "text": "We use cookies to analyse traffic on this site. Details in our"
+    },
+    "footer": {
+      "privacy": "Privacy policy",
+      "terms": "Terms of service"
+    },
+    "home": {
+      "blogLink": "See all posts →",
+      "blogTitle": "Latest on the blog",
+      "cta": "Sign in to CRMtree",
+      "features": {
+        "funnel": {
+          "text": "Every stage — from first contact to closing — visible and measurable.",
+          "title": "A clear sales pipeline"
+        },
+        "sales": {
+          "text": "Leads, tasks and calendar in one place — your sales team sees what needs attention right now.",
+          "title": "Dynamic sales work"
+        },
+        "upsell": {
+          "text": "The customer's full history in one place makes it easier to spot the right moment for an additional sale.",
+          "title": "Upselling and cross-selling"
+        }
+      },
+      "seoDescription": "CRMtree brings your sales team's work, sales pipeline, upselling and cross-selling together — for companies in any industry.",
+      "seoTitle": "CRM for dynamic sales",
+      "subtitle": "CRMtree brings your sales team's work, sales pipeline, upselling and cross-selling together in one place — whatever industry you're in.",
+      "title": "A CRM for companies that don't want to lose leads"
+    },
+    "nav": {
+      "blog": "Blog",
+      "login": "Sign in"
+    }
+  },
   "states": {
     "loading": "Loading…"
   },

@@ -1,30 +1,33 @@
-import { PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { inject } from '@angular/core';
 import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { matchTenantSlug } from '../tenant-host';
 import { map, of, catchError } from 'rxjs';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (_route, state) => {
   const auth   = inject(AuthService);
   const router = inject(Router);
 
   if (auth.isLoggedIn()) return true;
 
+  const sendToLogin = () => {
+    auth.rememberReturnUrl(state.url);
+    router.navigate(['/login']);
+  };
+
   const token = auth.getAccessToken();
   if (!token) {
-    router.navigate(['/login']);
+    sendToLogin();
     return false;
   }
 
   return auth.loadCurrentUser().pipe(
     map(() => {
       if (auth.isLoggedIn()) return true;
-      router.navigate(['/login']);
+      sendToLogin();
       return false;
     }),
     catchError(() => {
-      router.navigate(['/login']);
+      sendToLogin();
       return of(false);
     })
   );
@@ -74,15 +77,9 @@ export const superAdminGuard: CanActivateFn = () => {
 
 // Root ('') is the public marketing home for anonymous visitors (SSR-rendered for SEO),
 // but a logged-in user landing on '/' should still go straight to their dashboard.
-// {slug}.crmtree.pl is the client's own door into its CRM, not a place to
-// advertise CRMtree — its root goes straight to the (translated) login page.
-// server.ts redirects the first page load; this covers in-app navigation.
 export const publicRootGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);
-  if (isPlatformBrowser(inject(PLATFORM_ID)) && !auth.getAccessToken() && matchTenantSlug(window.location.hostname)) {
-    return router.createUrlTree(['/login']);
-  }
   if (auth.getAccessToken()) {
     router.navigate(['/dashboard']);
     return false;

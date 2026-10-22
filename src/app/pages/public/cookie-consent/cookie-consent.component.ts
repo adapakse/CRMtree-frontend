@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 const CONSENT_KEY = 'crmtree_cookie_consent';
 
@@ -8,17 +9,17 @@ const CONSENT_KEY = 'crmtree_cookie_consent';
   selector: 'wt-cookie-consent',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslocoDirective],
   template: `
     @if (visible()) {
-      <div class="cookie-banner" role="dialog" aria-label="Zgoda na cookies">
+      <div class="cookie-banner" role="dialog" *transloco="let t; prefix: 'public.cookies'" [attr.aria-label]="t('ariaLabel')">
         <p>
-          Używamy plików cookie do analizy ruchu na stronie. Szczegóły w
-          <a routerLink="/polityka-prywatnosci">polityce prywatności</a>.
+          {{ t('text') }}
+          <a routerLink="/polityka-prywatnosci">{{ t('policyLink') }}</a>.
         </p>
         <div class="cookie-actions">
-          <button type="button" class="btn-ghost" (click)="decline()">Odrzuć</button>
-          <button type="button" class="btn-accent" (click)="accept()">Akceptuję</button>
+          <button type="button" class="btn-ghost" (click)="decline()">{{ t('decline') }}</button>
+          <button type="button" class="btn-accent" (click)="accept()">{{ t('accept') }}</button>
         </div>
       </div>
     }

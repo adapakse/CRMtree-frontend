@@ -38,6 +38,46 @@
     "sortBy": "Sortuj: {name}",
     "to": "do"
   },
+  "public": {
+    "cookies": {
+      "accept": "Akceptuję",
+      "ariaLabel": "Zgoda na cookies",
+      "decline": "Odrzuć",
+      "policyLink": "polityce prywatności",
+      "text": "Używamy plików cookie do analizy ruchu na stronie. Szczegóły w"
+    },
+    "footer": {
+      "privacy": "Polityka prywatności",
+      "terms": "Regulamin"
+    },
+    "home": {
+      "blogLink": "Zobacz wszystkie wpisy →",
+      "blogTitle": "Ostatnio na blogu",
+      "cta": "Zaloguj się do CRMtree",
+      "features": {
+        "funnel": {
+          "text": "Każdy etap — od pierwszego kontaktu po zamknięcie — widoczny i mierzalny.",
+          "title": "Przejrzysty lejek sprzedażowy"
+        },
+        "sales": {
+          "text": "Leady, zadania i kalendarz w jednym miejscu — zespół sprzedaży widzi, co wymaga uwagi teraz.",
+          "title": "Dynamiczna praca handlowców"
+        },
+        "upsell": {
+          "text": "Historia klienta w jednym miejscu ułatwia rozpoznanie momentu na dosprzedaż.",
+          "title": "Upsell i cross-sell"
+        }
+      },
+      "seoDescription": "CRMtree porządkuje pracę handlowców, lejek sprzedażowy oraz upsell i cross-sell — dla firm z dowolnej branży.",
+      "seoTitle": "CRM dla dynamicznej sprzedaży",
+      "subtitle": "CRMtree porządkuje pracę handlowców, lejek sprzedażowy oraz upsell i cross-sell w jednym miejscu — niezależnie od branży, w której działasz.",
+      "title": "CRM dla firm, które nie chcą tracić leadów"
+    },
+    "nav": {
+      "blog": "Blog",
+      "login": "Zaloguj się"
+    }
+  },
   "states": {
     "loading": "Ładowanie…"
   },
