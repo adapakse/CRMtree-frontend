@@ -8,6 +8,13 @@ import { User, AuthTokens, CrmFeature } from '../models/models';
 
 const ACCESS_KEY  = 'wt_access';
 const REFRESH_KEY = 'wt_refresh';
+const RETURN_URL_KEY = 'wt_return_url';
+
+// Only a page of this app may be a return target: no other origin
+// ('//host') and no page of the sign-in flow itself.
+const SIGN_IN_PATHS = ['/login', '/auth/', '/change-password'];
+const isSafeReturnUrl = (url: string): boolean =>
+  url.startsWith('/') && !url.startsWith('//') && !SIGN_IN_PATHS.some(path => url.startsWith(path));
 
 /**
  * Moduły, do których dostęp admin tenanta nadaje pojedynczym osobom
@@ -79,11 +86,7 @@ export class AuthService {
     sessionStorage.setItem(ACCESS_KEY,  accessToken);
     sessionStorage.setItem(REFRESH_KEY, refreshToken);
     this.loadCurrentUser().subscribe({
-      next: (user) => {
-        const dest = (user.crm_role === 'salesperson' || user.crm_role === 'sales_manager')
-          ? '/crm/dashboard' : '/dashboard';
-        this.router.navigate([dest]);
-      },
+      next: (user) => this.router.navigateByUrl(this.landingUrl(user)),
       error: () => this.logout(),
     });
   }
@@ -106,12 +109,31 @@ export class AuthService {
     );
   }
 
+  // ── Return to the requested page after signing in ─────
+  // Links in e-mails open a new tab, which has no session (tokens live in
+  // sessionStorage), so the guard sends the user to sign in first. The page
+  // they asked for is kept here — in sessionStorage, so it survives the SSO
+  // round trip through the backend — and used once after signing in.
+  rememberReturnUrl(url: string): void {
+    if (!isPlatformBrowser(this.platformId) || !isSafeReturnUrl(url)) return;
+    sessionStorage.setItem(RETURN_URL_KEY, url);
+  }
+
+  /** The remembered page if there is one, else the user's start page. */
+  landingUrl(user: User): string {
+    const remembered = isPlatformBrowser(this.platformId) ? sessionStorage.getItem(RETURN_URL_KEY) : null;
+    if (remembered) sessionStorage.removeItem(RETURN_URL_KEY);
+    if (remembered && isSafeReturnUrl(remembered)) return remembered;
+    return (user.crm_role === 'salesperson' || user.crm_role === 'sales_manager') ? '/crm/dashboard' : '/dashboard';
+  }
+
   // ── Logout ─────────────────────────────────────────────
   logout(): void {
     const refresh_token = this.getRefreshToken();
     this.http.post(`${this.api}/auth/logout`, { refresh_token }).subscribe();
     sessionStorage.removeItem(ACCESS_KEY);
     sessionStorage.removeItem(REFRESH_KEY);
+    sessionStorage.removeItem(RETURN_URL_KEY);
     this._user.set(null);
     this.router.navigate(['/login']);
   }
