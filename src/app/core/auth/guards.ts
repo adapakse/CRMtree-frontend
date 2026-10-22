@@ -3,26 +3,31 @@ import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { map, of, catchError } from 'rxjs';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (_route, state) => {
   const auth   = inject(AuthService);
   const router = inject(Router);
 
   if (auth.isLoggedIn()) return true;
 
+  const sendToLogin = () => {
+    auth.rememberReturnUrl(state.url);
+    router.navigate(['/login']);
+  };
+
   const token = auth.getAccessToken();
   if (!token) {
-    router.navigate(['/login']);
+    sendToLogin();
     return false;
   }
 
   return auth.loadCurrentUser().pipe(
     map(() => {
       if (auth.isLoggedIn()) return true;
-      router.navigate(['/login']);
+      sendToLogin();
       return false;
     }),
     catchError(() => {
-      router.navigate(['/login']);
+      sendToLogin();
       return of(false);
     })
   );

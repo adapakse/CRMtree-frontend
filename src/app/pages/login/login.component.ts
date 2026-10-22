@@ -186,9 +186,7 @@ export class LoginComponent implements OnInit {
             if (tokens.must_change_password) {
               this.router.navigate(['/change-password']);
             } else {
-              const dest = (user.crm_role === 'salesperson' || user.crm_role === 'sales_manager')
-                ? '/crm/dashboard' : '/dashboard';
-              this.router.navigate([dest]);
+              this.router.navigateByUrl(this.auth.landingUrl(user));
             }
           },
           error: () => { this.loading.set(false); this.errorMsg.set(this.transloco.translate('auth.login.profileLoadFailed')); },
