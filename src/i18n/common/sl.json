@@ -38,6 +38,46 @@
     "sortBy": "Razvrsti: {name}",
     "to": "do"
   },
+  "public": {
+    "cookies": {
+      "accept": "Sprejmem",
+      "ariaLabel": "Soglasje za piškotke",
+      "decline": "Zavrni",
+      "policyLink": "politiki zasebnosti",
+      "text": "Piškotke uporabljamo za analizo prometa na spletnem mestu. Podrobnosti v"
+    },
+    "footer": {
+      "privacy": "Politika zasebnosti",
+      "terms": "Pogoji uporabe"
+    },
+    "home": {
+      "blogLink": "Vsi prispevki →",
+      "blogTitle": "Novo na blogu",
+      "cta": "Prijava v CRMtree",
+      "features": {
+        "funnel": {
+          "text": "Vsaka faza — od prvega stika do zaključka — vidna in merljiva.",
+          "title": "Pregleden prodajni lijak"
+        },
+        "sales": {
+          "text": "Leadi, naloge in koledar na enem mestu — prodajna ekipa vidi, kaj zahteva pozornost zdaj.",
+          "title": "Dinamično delo prodajalcev"
+        },
+        "upsell": {
+          "text": "Celotna zgodovina stranke na enem mestu olajša prepoznavanje pravega trenutka za dodatno prodajo.",
+          "title": "Dodatna in navzkrižna prodaja"
+        }
+      },
+      "seoDescription": "CRMtree uredi delo prodajalcev, prodajni lijak ter dodatno in navzkrižno prodajo — za podjetja iz katere koli panoge.",
+      "seoTitle": "CRM za dinamično prodajo",
+      "subtitle": "CRMtree na enem mestu uredi delo prodajalcev, prodajni lijak ter dodatno in navzkrižno prodajo — ne glede na panogo, v kateri delujete.",
+      "title": "CRM za podjetja, ki nočejo izgubljati leadov"
+    },
+    "nav": {
+      "blog": "Blog",
+      "login": "Prijava"
+    }
+  },
   "states": {
     "loading": "Nalaganje…"
   },

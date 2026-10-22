@@ -1,21 +1,22 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { TranslocoDirective } from '@jsverse/transloco';
 import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie-consent.component';
 
 @Component({
   selector: 'wt-public-layout',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterOutlet, CookieConsentComponent],
+  imports: [RouterLink, RouterOutlet, CookieConsentComponent, TranslocoDirective],
   template: `
-    <div class="public-shell">
+    <div class="public-shell" *transloco="let t; prefix: 'public'">
       <header class="public-header">
         <a href="https://crmtree.pl/" class="public-logo">
           <img src="assets/crmtree-logo-reverse.png" alt="CRMtree">
         </a>
         <nav class="public-nav">
-          <a routerLink="/blog">Blog</a>
-          <a routerLink="/login" class="public-cta">Zaloguj się</a>
+          <a routerLink="/blog">{{ t('nav.blog') }}</a>
+          <a routerLink="/login" class="public-cta">{{ t('nav.login') }}</a>
         </nav>
       </header>
 
@@ -26,8 +27,8 @@ import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie
       <footer class="public-footer">
         <span>&copy; {{ year }} CRMtree</span>
         <nav>
-          <a routerLink="/polityka-prywatnosci">Polityka prywatności</a>
-          <a routerLink="/regulamin">Regulamin</a>
+          <a routerLink="/polityka-prywatnosci">{{ t('footer.privacy') }}</a>
+          <a routerLink="/regulamin">{{ t('footer.terms') }}</a>
         </nav>
       </footer>
 

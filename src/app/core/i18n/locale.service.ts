@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, effect, inject, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, REQUEST_CONTEXT, effect, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { TranslocoService } from '@jsverse/transloco';
@@ -18,7 +18,9 @@ const STORAGE_KEY = 'crmtree_locale';
  * Order of precedence: the signed-in user's own choice, their tenant's
  * default, the choice remembered in this browser (used before login), the
  * default of the organisation whose host this is ({slug}.crmtree.pl), the
- * browser's language, Polish.
+ * browser's language, Polish. Server-side rendering knows only the host's
+ * organisation (looked up by server.ts), so a client's start page arrives
+ * already in its language.
  *
  * Only a real choice is remembered — the signed-in user's language or one
  * picked on the login page, never a guess.
@@ -33,6 +35,7 @@ export class LocaleService {
   private readonly auth = inject(AuthService);
   private readonly http = inject(HttpClient);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly requestContext = inject(REQUEST_CONTEXT, { optional: true }) as { hostLocale?: string } | null;
 
   private readonly _activeLocale = signal<AppLocale>(DEFAULT_LOCALE);
   readonly activeLocale = this._activeLocale.asReadonly();
@@ -84,7 +87,10 @@ export class LocaleService {
       if (isSupportedLocale(user.locale)) return user.locale;
       if (isSupportedLocale(user.tenant_default_locale)) return user.tenant_default_locale;
     }
-    if (!this.isBrowser) return DEFAULT_LOCALE;
+    if (!this.isBrowser) {
+      const hostLocale = this.requestContext?.hostLocale;
+      return isSupportedLocale(hostLocale) ? hostLocale : DEFAULT_LOCALE;
+    }
     const remembered = this.readRemembered();
     if (remembered) return remembered;
     if (this.hostLocale) return this.hostLocale;

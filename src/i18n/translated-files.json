@@ -121,5 +121,8 @@
   "src/app/shared/list/list-pager.component.ts",
   "src/app/shared/list/list-query.ts",
   "src/app/pages/admin/prospects/admin-prospects.component.ts",
-  "src/app/pages/crm/dashboard/crm-prospects-dashboard.component.ts"
+  "src/app/pages/crm/dashboard/crm-prospects-dashboard.component.ts",
+  "src/app/layout/public-layout/public-layout.component.ts",
+  "src/app/pages/public/cookie-consent/cookie-consent.component.ts",
+  "src/app/pages/public/home/home.component.ts"
 ]

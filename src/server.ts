@@ -90,18 +90,6 @@ app.use((req, res, next) => {
 });
 
 /**
- * {slug}.crmtree.pl is a client's own entrance to its CRM: its root goes
- * straight to the login page (in the tenant's language) instead of rendering
- * CRMtree's marketing start page there. crmtree.pl and app.crmtree.pl keep it.
- * publicRootGuard does the same for navigation inside the running app.
- */
-app.get('/', (req, res, next) => {
-  const host = ((req.headers['x-forwarded-host'] as string) || req.headers.host || '').replace(/:\d+$/, '');
-  if (matchTenantSlug(host)) return res.redirect(302, '/login');
-  next();
-});
-
-/**
  * sitemap.xml / robots.txt — built from the backend's published blog posts.
  */
 app.get('/sitemap.xml', async (req, res) => {
@@ -152,11 +140,32 @@ app.use(
 );
 
 /**
+ * {slug}.crmtree.pl speaks its organisation's language from the very first
+ * server-rendered byte (start page included), not Polish swapped for it once
+ * the browser takes over. Handed to LocaleService through REQUEST_CONTEXT.
+ * Unknown tenant or unreachable backend: undefined, the usual fallbacks apply.
+ */
+async function tenantDefaultLocale(req: express.Request): Promise<string | undefined> {
+  const host = ((req.headers['x-forwarded-host'] as string) || req.headers.host || '').replace(/:\d+$/, '');
+  const slug = matchTenantSlug(host);
+  if (!slug) return undefined;
+  try {
+    const r = await fetch(`${API_UPSTREAM}/api/public/tenants/by-slug/${encodeURIComponent(slug)}`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    if (!r.ok) return undefined;
+    return ((await r.json()) as { default_locale?: string }).default_locale;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Handle all other requests by rendering the Angular application.
  */
 app.use((req, res, next) => {
-  angularApp
-    .handle(req)
+  tenantDefaultLocale(req)
+    .then((hostLocale) => angularApp.handle(req, { hostLocale }))
     .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
     )

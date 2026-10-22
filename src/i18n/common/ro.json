@@ -38,6 +38,46 @@
     "sortBy": "Sortare: {name}",
     "to": "până la"
   },
+  "public": {
+    "cookies": {
+      "accept": "Accept",
+      "ariaLabel": "Consimțământ cookie",
+      "decline": "Refuz",
+      "policyLink": "politica de confidențialitate",
+      "text": "Folosim cookie-uri pentru a analiza traficul pe site. Detalii în"
+    },
+    "footer": {
+      "privacy": "Politica de confidențialitate",
+      "terms": "Termeni și condiții"
+    },
+    "home": {
+      "blogLink": "Vezi toate articolele →",
+      "blogTitle": "Noutăți pe blog",
+      "cta": "Conectează-te la CRMtree",
+      "features": {
+        "funnel": {
+          "text": "Fiecare etapă — de la primul contact până la încheiere — vizibilă și măsurabilă.",
+          "title": "O pâlnie de vânzări clară"
+        },
+        "sales": {
+          "text": "Leaduri, sarcini și calendar într-un singur loc — echipa de vânzări vede ce necesită atenție acum.",
+          "title": "Muncă dinamică în vânzări"
+        },
+        "upsell": {
+          "text": "Istoricul complet al clientului într-un singur loc te ajută să recunoști momentul potrivit pentru o vânzare suplimentară.",
+          "title": "Upselling și cross-selling"
+        }
+      },
+      "seoDescription": "CRMtree organizează munca agenților de vânzări, pâlnia de vânzări, upsellingul și cross-sellingul — pentru firme din orice domeniu.",
+      "seoTitle": "CRM pentru vânzări dinamice",
+      "subtitle": "CRMtree organizează într-un singur loc munca agenților de vânzări, pâlnia de vânzări, upsellingul și cross-sellingul, indiferent de domeniul în care activezi.",
+      "title": "Un CRM pentru firmele care nu vor să piardă leaduri"
+    },
+    "nav": {
+      "blog": "Blog",
+      "login": "Conectare"
+    }
+  },
   "states": {
     "loading": "Se încarcă…"
   },

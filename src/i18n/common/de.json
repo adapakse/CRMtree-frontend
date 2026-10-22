@@ -38,6 +38,46 @@
     "sortBy": "Sortieren: {name}",
     "to": "bis"
   },
+  "public": {
+    "cookies": {
+      "accept": "Akzeptieren",
+      "ariaLabel": "Cookie-Einwilligung",
+      "decline": "Ablehnen",
+      "policyLink": "Datenschutzerklärung",
+      "text": "Wir verwenden Cookies, um den Datenverkehr auf dieser Website zu analysieren. Details in unserer"
+    },
+    "footer": {
+      "privacy": "Datenschutzerklärung",
+      "terms": "AGB"
+    },
+    "home": {
+      "blogLink": "Alle Beiträge ansehen →",
+      "blogTitle": "Neu im Blog",
+      "cta": "Bei CRMtree anmelden",
+      "features": {
+        "funnel": {
+          "text": "Jede Phase – vom ersten Kontakt bis zum Abschluss – sichtbar und messbar.",
+          "title": "Eine übersichtliche Sales-Pipeline"
+        },
+        "sales": {
+          "text": "Leads, Aufgaben und Kalender an einem Ort – Ihr Vertriebsteam sieht sofort, was jetzt Aufmerksamkeit braucht.",
+          "title": "Dynamische Vertriebsarbeit"
+        },
+        "upsell": {
+          "text": "Die gesamte Kundenhistorie an einem Ort hilft, den richtigen Moment für einen Zusatzverkauf zu erkennen.",
+          "title": "Upselling und Cross-Selling"
+        }
+      },
+      "seoDescription": "CRMtree bündelt die Arbeit Ihres Vertriebsteams, die Sales-Pipeline sowie Upselling und Cross-Selling – für Unternehmen jeder Branche.",
+      "seoTitle": "CRM für dynamischen Vertrieb",
+      "subtitle": "CRMtree bündelt die Arbeit Ihres Vertriebsteams, die Sales-Pipeline sowie Upselling und Cross-Selling an einem Ort – unabhängig von Ihrer Branche.",
+      "title": "Ein CRM für Unternehmen, die keine Leads verlieren wollen"
+    },
+    "nav": {
+      "blog": "Blog",
+      "login": "Anmelden"
+    }
+  },
   "states": {
     "loading": "Wird geladen…"
   },

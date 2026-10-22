@@ -38,6 +38,46 @@
     "sortBy": "Ordenar: {name}",
     "to": "hasta"
   },
+  "public": {
+    "cookies": {
+      "accept": "Aceptar",
+      "ariaLabel": "Consentimiento de cookies",
+      "decline": "Rechazar",
+      "policyLink": "política de privacidad",
+      "text": "Usamos cookies para analizar el tráfico del sitio. Más detalles en la"
+    },
+    "footer": {
+      "privacy": "Política de privacidad",
+      "terms": "Términos y condiciones"
+    },
+    "home": {
+      "blogLink": "Ver todas las entradas →",
+      "blogTitle": "Lo último en el blog",
+      "cta": "Inicia sesión en CRMtree",
+      "features": {
+        "funnel": {
+          "text": "Cada etapa, desde el primer contacto hasta el cierre, visible y medible.",
+          "title": "Un embudo de ventas claro"
+        },
+        "sales": {
+          "text": "Leads, tareas y calendario en un solo lugar: el equipo de ventas ve qué requiere atención ahora mismo.",
+          "title": "Trabajo comercial dinámico"
+        },
+        "upsell": {
+          "text": "Todo el historial del cliente en un solo lugar facilita detectar el momento adecuado para una venta adicional.",
+          "title": "Upselling y cross-selling"
+        }
+      },
+      "seoDescription": "CRMtree organiza el trabajo de los comerciales, el embudo de ventas, el upselling y el cross-selling, para empresas de cualquier sector.",
+      "seoTitle": "CRM para ventas dinámicas",
+      "subtitle": "CRMtree organiza en un solo lugar el trabajo de los comerciales, el embudo de ventas, el upselling y el cross-selling, sea cual sea tu sector.",
+      "title": "Un CRM para empresas que no quieren perder leads"
+    },
+    "nav": {
+      "blog": "Blog",
+      "login": "Iniciar sesión"
+    }
+  },
   "states": {
     "loading": "Cargando…"
   },

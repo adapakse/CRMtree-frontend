@@ -38,6 +38,46 @@
     "sortBy": "Trier : {name}",
     "to": "au"
   },
+  "public": {
+    "cookies": {
+      "accept": "J'accepte",
+      "ariaLabel": "Consentement aux cookies",
+      "decline": "Refuser",
+      "policyLink": "politique de confidentialité",
+      "text": "Nous utilisons des cookies pour analyser le trafic du site. Détails dans notre"
+    },
+    "footer": {
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions générales"
+    },
+    "home": {
+      "blogLink": "Voir tous les articles →",
+      "blogTitle": "Derniers articles du blog",
+      "cta": "Se connecter à CRMtree",
+      "features": {
+        "funnel": {
+          "text": "Chaque étape, du premier contact à la conclusion, visible et mesurable.",
+          "title": "Un pipeline de ventes clair"
+        },
+        "sales": {
+          "text": "Leads, tâches et agenda au même endroit : l'équipe commerciale voit ce qui demande son attention maintenant.",
+          "title": "Un travail commercial dynamique"
+        },
+        "upsell": {
+          "text": "Tout l'historique du client au même endroit aide à repérer le bon moment pour une vente additionnelle.",
+          "title": "Upsell et cross-sell"
+        }
+      },
+      "seoDescription": "CRMtree réunit le travail des commerciaux, le pipeline de ventes, l'upsell et le cross-sell, pour les entreprises de tous secteurs.",
+      "seoTitle": "CRM pour une vente dynamique",
+      "subtitle": "CRMtree réunit en un seul endroit le travail des commerciaux, le pipeline de ventes, l'upsell et le cross-sell, quel que soit votre secteur.",
+      "title": "Un CRM pour les entreprises qui ne veulent plus perdre de leads"
+    },
+    "nav": {
+      "blog": "Blog",
+      "login": "Se connecter"
+    }
+  },
   "states": {
     "loading": "Chargement…"
   },
