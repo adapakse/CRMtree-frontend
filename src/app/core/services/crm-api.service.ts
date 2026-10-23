@@ -795,6 +795,31 @@ export interface WhatsappSendResult {
   id: string;
 }
 
+// An approved message template of the tenant's WhatsApp Business Account,
+// as created in Meta's WhatsApp Manager. Only templates with `supported: true`
+// can be sent from the CRM (variables in the body only — no media headers or
+// button variables yet).
+export interface WhatsappTemplate {
+  name: string;
+  language: string;
+  category: string;
+  header_text: string | null;
+  body_text: string;
+  footer_text: string | null;
+  buttons: string[];
+  variables: { key: string; example: string | null }[];
+  parameter_format: 'NAMED' | 'POSITIONAL';
+  supported: boolean;
+  unsupported_reason: 'HEADER_MEDIA' | 'HEADER_VARIABLE' | 'BUTTON_VARIABLE' | null;
+}
+
+export interface WhatsappTemplateSelection {
+  name: string;
+  language: string;
+  params: Record<string, string>;
+  isComplete: boolean;
+}
+
 // One message in a lead's/partner's WhatsApp conversation — read from the
 // whatsapp_messages table (real per-message model, not a generic activity
 // log). direction is always 'outgoing' until the webhook/incoming step lands.
@@ -1563,6 +1588,19 @@ export class CrmApiService {
   // toPhone: optional per-send override of the recipient number — used only
   // for this one message, never written back to the lead's/partner's own
   // phone field.
+  getWhatsappTemplates(): Observable<WhatsappTemplate[]> {
+    return this.http.get<WhatsappTemplate[]>(`${BASE}/whatsapp/templates`);
+  }
+  sendLeadWhatsappTemplate(leadId: number, template: WhatsappTemplateSelection, toPhone: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/lead/${leadId}`, {
+      template: { name: template.name, language: template.language, params: template.params }, to_phone: toPhone,
+    });
+  }
+  sendPartnerWhatsappTemplate(partnerId: number | string, template: WhatsappTemplateSelection, toPhone: string): Observable<WhatsappSendResult> {
+    return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/partner/${partnerId}`, {
+      template: { name: template.name, language: template.language, params: template.params }, to_phone: toPhone,
+    });
+  }
   sendLeadWhatsapp(leadId: number, message: string, toPhone?: string): Observable<WhatsappSendResult> {
     return this.http.post<WhatsappSendResult>(`${BASE}/whatsapp/send/lead/${leadId}`, { message, to_phone: toPhone || undefined });
   }

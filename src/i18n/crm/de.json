@@ -2627,6 +2627,10 @@
     "messageBody": "Inhalt der Nachricht",
     "messagePlaceholder": "Inhalt der Nachricht...",
     "missingCountryCode": "Geben Sie die Nummer mit Ländervorwahl an, z. B. +49 151 23456789.",
+    "mode": {
+      "template": "Vorlage",
+      "text": "Freitext"
+    },
     "newMessage": "Neue WhatsApp-Nachricht",
     "notConfigured": "WhatsApp ist für diese Organisation nicht konfiguriert. Wenden Sie sich an den Administrator.",
     "reply": {
@@ -2640,7 +2644,28 @@
     "sendFailed": "Fehler beim Senden der WhatsApp-Nachricht",
     "sending": "Wird gesendet...",
     "sent": "Nachricht gesendet.",
+    "status": {
+      "failed": "Nicht zugestellt",
+      "failedHint": "WhatsApp hat diese Nachricht nicht zugestellt. Häufigster Grund: Freitext an einen Kunden, der seit über 24 Stunden nicht geschrieben hat — senden Sie eine Vorlage."
+    },
+    "template": {
+      "choose": "— Vorlage wählen —",
+      "invalidVariable": "Das Feld darf keine Zeilenumbrüche, Tabulatoren oder mehrere Leerzeichen hintereinander enthalten.",
+      "label": "Nachrichtenvorlage",
+      "loadFailed": "Vorlagen konnten nicht von WhatsApp geladen werden.",
+      "loading": "Vorlagen werden geladen…",
+      "none": "Keine genehmigten Vorlagen. Vorlagen erstellt ein Administrator im WhatsApp Manager (Meta); nach der Genehmigung erscheinen sie hier.",
+      "preview": "Vorschau",
+      "retry": "Erneut versuchen",
+      "unsupported": "{count, plural, one {# Vorlage benötigt ein Bild/eine Datei oder eine Button-Variable — sie kann noch nicht aus dem CRM gesendet werden.} other {# Vorlagen benötigen ein Bild/eine Datei oder eine Button-Variable — sie können noch nicht aus dem CRM gesendet werden.}}",
+      "variable": "Feld {key}"
+    },
     "to": "An:",
-    "toField": "An"
+    "toField": "An",
+    "window": {
+      "closedHint": "Dieser Kunde hat Ihnen in den letzten 24 Stunden nicht geschrieben — WhatsApp stellt dann nur eine genehmigte Vorlage zu. Freitext können Sie senden, sobald der Kunde antwortet.",
+      "closedShort": "Seit der letzten Nachricht des Kunden sind 24 Stunden vergangen — verwenden Sie eine Vorlage.",
+      "sendTemplate": "Vorlage senden"
+    }
   }
 }

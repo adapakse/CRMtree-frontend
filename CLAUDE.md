@@ -110,6 +110,17 @@ próba cofnięcia tej decyzji — dopytaj, zanim to zrobisz.
   plikach, osobne komponenty — sprawdzaj oba przy zmianach). Widoczność jest tenant-wide —
   każdy CRM user w tenancie widzi te same konwersacje, bo numer jest wspólny.
 
+### Okno 24 h i szablony
+
+Pierwsza wiadomość do klienta (i każda po 24 h ciszy klienta) musi być zatwierdzonym
+szablonem Meta — reguła i backend w `CRMtree-backend/CLAUDE.md` → „Okno 24 h i szablony”.
+- Formularz „Nowa wiadomość” ma przełącznik Szablon / Zwykły tekst; domyślnie szablon.
+  Wybór i zmienne: `shared/components/whatsapp-template-picker`.
+- `shared/utils/whatsapp-window.util.ts` liczy okno z historii widocznej na karcie — to
+  tylko podpowiedź; backend sprawdza tenant-wide i odrzuca tekst z `WHATSAPP_WINDOW_CLOSED`.
+- W zamkniętej rozmowie zamiast „Odpowiedz” jest „Wyślij szablon” (wypełnia formularz
+  na górze). Wychodzące ze statusem `failed` mają znacznik „Nie dostarczono”.
+
 ### Jeden numer rozmówcy = jedna karta konwersacji
 
 `groupWhatsappConversations()` w obu komponentach leada/partnera grupuje wiadomości po

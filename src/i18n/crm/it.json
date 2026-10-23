@@ -2627,6 +2627,10 @@
     "messageBody": "Testo del messaggio",
     "messagePlaceholder": "Testo del messaggio...",
     "missingCountryCode": "Indica il numero con il prefisso internazionale, es. +39 312 345 6789.",
+    "mode": {
+      "template": "Modello",
+      "text": "Testo libero"
+    },
     "newMessage": "Nuovo messaggio WhatsApp",
     "notConfigured": "WhatsApp non è configurato per questa organizzazione. Contatta l’amministratore.",
     "reply": {
@@ -2640,7 +2644,28 @@
     "sendFailed": "Errore durante l’invio del messaggio WhatsApp",
     "sending": "Invio in corso...",
     "sent": "Messaggio inviato.",
+    "status": {
+      "failed": "Non consegnato",
+      "failedHint": "WhatsApp non ha consegnato questo messaggio. Motivo più comune: testo libero a un cliente che non scrive da oltre 24 ore — invia un modello."
+    },
+    "template": {
+      "choose": "— scegli un modello —",
+      "invalidVariable": "Il campo non può contenere a capo, tabulazioni o più spazi consecutivi.",
+      "label": "Modello di messaggio",
+      "loadFailed": "Impossibile caricare i modelli da WhatsApp.",
+      "loading": "Caricamento modelli…",
+      "none": "Nessun modello approvato. I modelli vengono creati dall'amministratore in WhatsApp Manager (Meta); dopo l'approvazione compaiono qui.",
+      "preview": "Anteprima",
+      "retry": "Riprova",
+      "unsupported": "{count, plural, one {# modello richiede un'immagine/un file o una variabile nel pulsante — non può ancora essere inviato dal CRM.} other {# modelli richiedono un'immagine/un file o una variabile nel pulsante — non possono ancora essere inviati dal CRM.}}",
+      "variable": "Campo {key}"
+    },
     "to": "A:",
-    "toField": "A"
+    "toField": "A",
+    "window": {
+      "closedHint": "Questo cliente non vi ha scritto nelle ultime 24 ore — WhatsApp consegnerà solo un modello approvato. Potrai inviare testo libero quando il cliente risponde.",
+      "closedShort": "Sono passate 24 ore dall'ultimo messaggio del cliente — usa un modello.",
+      "sendTemplate": "Invia modello"
+    }
   }
 }

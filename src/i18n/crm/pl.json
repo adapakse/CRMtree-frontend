@@ -2627,6 +2627,10 @@
     "messageBody": "Treść wiadomości",
     "messagePlaceholder": "Treść wiadomości...",
     "missingCountryCode": "Podaj numer z kierunkowym kraju, np. +48 123 123 123.",
+    "mode": {
+      "template": "Szablon",
+      "text": "Zwykły tekst"
+    },
     "newMessage": "Nowa wiadomość WhatsApp",
     "notConfigured": "WhatsApp nie jest skonfigurowany dla tego tenanta. Skontaktuj się z administratorem.",
     "reply": {
@@ -2640,7 +2644,28 @@
     "sendFailed": "Błąd wysyłki WhatsApp",
     "sending": "Wysyłanie...",
     "sent": "Wiadomość wysłana.",
+    "status": {
+      "failed": "Nie dostarczono",
+      "failedHint": "WhatsApp nie dostarczył tej wiadomości. Najczęstszy powód: zwykły tekst do klienta, który nie pisał od ponad 24 godzin — wyślij szablon."
+    },
+    "template": {
+      "choose": "— wybierz szablon —",
+      "invalidVariable": "Pole nie może zawierać nowych linii, tabulatorów ani wielu spacji z rzędu.",
+      "label": "Szablon wiadomości",
+      "loadFailed": "Nie udało się pobrać szablonów z WhatsApp.",
+      "loading": "Ładowanie szablonów…",
+      "none": "Brak zatwierdzonych szablonów. Szablony tworzy administrator w WhatsApp Manager (Meta); po zatwierdzeniu pojawią się tutaj.",
+      "preview": "Podgląd",
+      "retry": "Spróbuj ponownie",
+      "unsupported": "{count, plural, one {# szablon wymaga zdjęcia/pliku lub zmiennej w przycisku — nie da się go jeszcze wysłać z CRM.} few {# szablony wymagają zdjęcia/pliku lub zmiennej w przycisku — nie da się ich jeszcze wysłać z CRM.} many {# szablonów wymaga zdjęcia/pliku lub zmiennej w przycisku — nie da się ich jeszcze wysłać z CRM.} other {# szablonu wymaga zdjęcia/pliku lub zmiennej w przycisku — nie da się ich jeszcze wysłać z CRM.}}",
+      "variable": "Pole {key}"
+    },
     "to": "Do:",
-    "toField": "Do"
+    "toField": "Do",
+    "window": {
+      "closedHint": "Ten klient nie pisał do Was w ciągu ostatnich 24 godzin — WhatsApp dostarczy wtedy tylko zatwierdzony szablon. Zwykły tekst wyślesz, gdy klient odpisze.",
+      "closedShort": "Minęły 24 godziny od ostatniej wiadomości klienta — napisz szablonem.",
+      "sendTemplate": "Wyślij szablon"
+    }
   }
 }
