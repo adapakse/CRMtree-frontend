@@ -2627,6 +2627,10 @@
     "messageBody": "Vsebina sporočila",
     "messagePlaceholder": "Vsebina sporočila...",
     "missingCountryCode": "Vnesite številko s klicno kodo države, npr. +386 40 123 456.",
+    "mode": {
+      "template": "Predloga",
+      "text": "Prosto besedilo"
+    },
     "newMessage": "Novo sporočilo WhatsApp",
     "notConfigured": "WhatsApp za to organizacijo ni nastavljen. Obrnite se na skrbnika.",
     "reply": {
@@ -2640,7 +2644,28 @@
     "sendFailed": "Napaka pri pošiljanju WhatsApp",
     "sending": "Pošiljanje...",
     "sent": "Sporočilo poslano.",
+    "status": {
+      "failed": "Ni dostavljeno",
+      "failedHint": "WhatsApp tega sporočila ni dostavil. Najpogostejši razlog: prosto besedilo stranki, ki ni pisala več kot 24 ur — pošljite predlogo."
+    },
+    "template": {
+      "choose": "— izberite predlogo —",
+      "invalidVariable": "Polje ne sme vsebovati novih vrstic, tabulatorjev ali več zaporednih presledkov.",
+      "label": "Predloga sporočila",
+      "loadFailed": "Predlog iz WhatsAppa ni bilo mogoče naložiti.",
+      "loading": "Nalaganje predlog…",
+      "none": "Ni odobrenih predlog. Predloge ustvari skrbnik v WhatsApp Managerju (Meta); po odobritvi se prikažejo tukaj.",
+      "preview": "Predogled",
+      "retry": "Poskusi znova",
+      "unsupported": "{count, plural, one {# predloga zahteva sliko/datoteko ali spremenljivko v gumbu — iz CRM je še ni mogoče poslati.} two {# predlogi zahtevata sliko/datoteko ali spremenljivko v gumbu — iz CRM ju še ni mogoče poslati.} few {# predloge zahtevajo sliko/datoteko ali spremenljivko v gumbu — iz CRM jih še ni mogoče poslati.} other {# predlog zahteva sliko/datoteko ali spremenljivko v gumbu — iz CRM jih še ni mogoče poslati.}}",
+      "variable": "Polje {key}"
+    },
     "to": "Za:",
-    "toField": "Za"
+    "toField": "Za",
+    "window": {
+      "closedHint": "Ta stranka vam v zadnjih 24 urah ni pisala — WhatsApp bo dostavil le odobreno predlogo. Prosto besedilo lahko pošljete, ko stranka odgovori.",
+      "closedShort": "Od zadnjega sporočila stranke je minilo 24 ur — uporabite predlogo.",
+      "sendTemplate": "Pošlji predlogo"
+    }
   }
 }

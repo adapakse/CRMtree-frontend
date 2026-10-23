@@ -2627,6 +2627,10 @@
     "messageBody": "Message body",
     "messagePlaceholder": "Message body...",
     "missingCountryCode": "Enter the number with the country code, e.g. +44 20 1234 5678.",
+    "mode": {
+      "template": "Template",
+      "text": "Plain text"
+    },
     "newMessage": "New WhatsApp message",
     "notConfigured": "WhatsApp is not configured for this organization. Contact your administrator.",
     "reply": {
@@ -2640,7 +2644,28 @@
     "sendFailed": "Couldn't send the WhatsApp message",
     "sending": "Sending...",
     "sent": "Message sent.",
+    "status": {
+      "failed": "Not delivered",
+      "failedHint": "WhatsApp did not deliver this message. Most common reason: plain text to a customer who hasn't written for over 24 hours — send a template."
+    },
+    "template": {
+      "choose": "— choose a template —",
+      "invalidVariable": "The field cannot contain line breaks, tabs or several spaces in a row.",
+      "label": "Message template",
+      "loadFailed": "Could not load templates from WhatsApp.",
+      "loading": "Loading templates…",
+      "none": "No approved templates. An administrator creates templates in WhatsApp Manager (Meta); once approved they appear here.",
+      "preview": "Preview",
+      "retry": "Try again",
+      "unsupported": "{count, plural, one {# template needs an image/file or a button variable — it can't be sent from the CRM yet.} other {# templates need an image/file or a button variable — they can't be sent from the CRM yet.}}",
+      "variable": "Field {key}"
+    },
     "to": "To:",
-    "toField": "To"
+    "toField": "To",
+    "window": {
+      "closedHint": "This customer hasn't written to you in the last 24 hours — WhatsApp will only deliver an approved template. You can send plain text once the customer replies.",
+      "closedShort": "24 hours have passed since the customer's last message — use a template.",
+      "sendTemplate": "Send template"
+    }
   }
 }

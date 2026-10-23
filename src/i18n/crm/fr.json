@@ -2627,6 +2627,10 @@
     "messageBody": "Contenu du message",
     "messagePlaceholder": "Contenu du message...",
     "missingCountryCode": "Indiquez le numéro avec l’indicatif du pays, p. ex. +33 6 12 34 56 78.",
+    "mode": {
+      "template": "Modèle",
+      "text": "Texte libre"
+    },
     "newMessage": "Nouveau message WhatsApp",
     "notConfigured": "WhatsApp n’est pas configuré pour cette organisation. Contactez votre administrateur.",
     "reply": {
@@ -2640,7 +2644,28 @@
     "sendFailed": "Erreur d’envoi WhatsApp",
     "sending": "Envoi...",
     "sent": "Message envoyé.",
+    "status": {
+      "failed": "Non distribué",
+      "failedHint": "WhatsApp n'a pas distribué ce message. Raison la plus fréquente : texte libre envoyé à un client qui n'a pas écrit depuis plus de 24 heures — envoyez un modèle."
+    },
+    "template": {
+      "choose": "— choisir un modèle —",
+      "invalidVariable": "Le champ ne peut pas contenir de retours à la ligne, de tabulations ni plusieurs espaces d'affilée.",
+      "label": "Modèle de message",
+      "loadFailed": "Impossible de charger les modèles depuis WhatsApp.",
+      "loading": "Chargement des modèles…",
+      "none": "Aucun modèle approuvé. Un administrateur crée les modèles dans WhatsApp Manager (Meta) ; une fois approuvés, ils apparaissent ici.",
+      "preview": "Aperçu",
+      "retry": "Réessayer",
+      "unsupported": "{count, plural, one {# modèle nécessite une image/un fichier ou une variable de bouton — il ne peut pas encore être envoyé depuis le CRM.} other {# modèles nécessitent une image/un fichier ou une variable de bouton — ils ne peuvent pas encore être envoyés depuis le CRM.}}",
+      "variable": "Champ {key}"
+    },
     "to": "À :",
-    "toField": "À"
+    "toField": "À",
+    "window": {
+      "closedHint": "Ce client ne vous a pas écrit au cours des dernières 24 heures — WhatsApp ne livrera qu'un modèle approuvé. Vous pourrez envoyer du texte libre dès que le client répondra.",
+      "closedShort": "Plus de 24 heures depuis le dernier message du client — utilisez un modèle.",
+      "sendTemplate": "Envoyer un modèle"
+    }
   }
 }
