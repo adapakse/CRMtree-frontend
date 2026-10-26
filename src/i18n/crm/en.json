@@ -2662,6 +2662,7 @@
     },
     "to": "To:",
     "toField": "To",
+    "tokenInvalid": "WhatsApp is not working: the Meta access token has expired. Ask your CRMtree administrator to connect a new token.",
     "window": {
       "closedHint": "This customer hasn't written to you in the last 24 hours — WhatsApp will only deliver an approved template. You can send plain text once the customer replies.",
       "closedShort": "24 hours have passed since the customer's last message — use a template.",

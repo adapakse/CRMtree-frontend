@@ -2662,6 +2662,7 @@
     },
     "to": "À :",
     "toField": "À",
+    "tokenInvalid": "WhatsApp ne fonctionne pas : le jeton d'accès Meta a expiré. Demandez à votre administrateur CRMtree de connecter un nouveau jeton.",
     "window": {
       "closedHint": "Ce client ne vous a pas écrit au cours des dernières 24 heures — WhatsApp ne livrera qu'un modèle approuvé. Vous pourrez envoyer du texte libre dès que le client répondra.",
       "closedShort": "Plus de 24 heures depuis le dernier message du client — utilisez un modèle.",

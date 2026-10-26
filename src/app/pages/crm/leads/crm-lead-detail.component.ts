@@ -3041,7 +3041,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.whatsappSending = false;
-        this.whatsappError   = err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
+        this.whatsappError   = err?.error?.code === 'WHATSAPP_TOKEN_INVALID'
+          ? this.transloco.translate('crm.whatsapp.tokenInvalid')
+          : err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });

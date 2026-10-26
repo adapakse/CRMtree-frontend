@@ -2662,6 +2662,7 @@
     },
     "to": "Za:",
     "toField": "Za",
+    "tokenInvalid": "WhatsApp ne deluje: dostopni žeton Meta je potekel. Skrbnika CRMtree prosite, naj poveže nov žeton.",
     "window": {
       "closedHint": "Ta stranka vam v zadnjih 24 urah ni pisala — WhatsApp bo dostavil le odobreno predlogo. Prosto besedilo lahko pošljete, ko stranka odgovori.",
       "closedShort": "Od zadnjega sporočila stranke je minilo 24 ur — uporabite predlogo.",

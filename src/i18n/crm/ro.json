@@ -2662,6 +2662,7 @@
     },
     "to": "Către:",
     "toField": "Către",
+    "tokenInvalid": "WhatsApp nu funcționează: tokenul de acces Meta a expirat. Roagă administratorul CRMtree să conecteze un token nou.",
     "window": {
       "closedHint": "Acest client nu v-a scris în ultimele 24 de ore — WhatsApp va livra doar un șablon aprobat. Poți trimite text liber după ce clientul răspunde.",
       "closedShort": "Au trecut 24 de ore de la ultimul mesaj al clientului — folosește un șablon.",

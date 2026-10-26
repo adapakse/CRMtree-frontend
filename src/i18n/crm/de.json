@@ -2662,6 +2662,7 @@
     },
     "to": "An:",
     "toField": "An",
+    "tokenInvalid": "WhatsApp funktioniert nicht: Das Meta-Zugriffstoken ist abgelaufen. Bitten Sie Ihren CRMtree-Administrator, ein neues Token zu hinterlegen.",
     "window": {
       "closedHint": "Dieser Kunde hat Ihnen in den letzten 24 Stunden nicht geschrieben — WhatsApp stellt dann nur eine genehmigte Vorlage zu. Freitext können Sie senden, sobald der Kunde antwortet.",
       "closedShort": "Seit der letzten Nachricht des Kunden sind 24 Stunden vergangen — verwenden Sie eine Vorlage.",

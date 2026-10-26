@@ -98,6 +98,8 @@ interface WhatsappConfig {
   app_secret_configured?: boolean;
   webhook_verify_token?: string;
   updated_at?: string;
+  // Live check against Meta when the tab opens; valid: null = Meta unreachable.
+  token_check?: { valid: boolean | null; error: string | null } | null;
 }
 
 interface WhatsappConfigForm {
@@ -729,6 +731,13 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                     <div class="hint-inline" style="margin-top:4px">
                                       Numer, nazwa i status weryfikacji pochodzą bezpośrednio z Meta (pobierane przy każdym zapisie) — nie da się ich wpisać ręcznie.
                                     </div>
+                                    @if (whatsappConfig()!.token_check?.valid === false) {
+                                      <div class="token-warning">
+                                        ⚠️ <strong>Token dostępu nie działa — wysyłka WhatsApp z CRM nie przechodzi.</strong>
+                                        Meta: {{ whatsappConfig()!.token_check!.error }}<br>
+                                        Wygeneruj stały token użytkownika systemowego (Meta Business Suite → Użytkownicy systemowi, ważność „Nigdy”) i wklej go poniżej w „Access Token”.
+                                      </div>
+                                    }
                                   </div>
                                 }
                                 <div class="provider-form">
@@ -1323,6 +1332,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
 
     .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
     .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
+    .token-warning { margin-top: 8px; font-size: 12px; color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 10px; line-height: 1.5; }
     .req  { color: #dc2626; }
     .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #1e40af; }
     .temp-pass-box {

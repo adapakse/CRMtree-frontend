@@ -2662,6 +2662,7 @@
     },
     "to": "Para:",
     "toField": "Para",
+    "tokenInvalid": "WhatsApp no funciona: el token de acceso de Meta ha caducado. Pide al administrador de CRMtree que conecte un token nuevo.",
     "window": {
       "closedHint": "Este cliente no os ha escrito en las últimas 24 horas — WhatsApp solo entregará una plantilla aprobada. Podrás enviar texto libre cuando el cliente responda.",
       "closedShort": "Han pasado 24 horas desde el último mensaje del cliente — usa una plantilla.",

@@ -25,7 +25,7 @@ const INVALID_VARIABLE_RE = /[\n\t]| {5,}/;
       @if (isLoading()) {
         <div class="hint">{{ t('whatsapp.template.loading') }}</div>
       } @else if (hasLoadError()) {
-        <div class="error">⚠️ {{ t('whatsapp.template.loadFailed') }}
+        <div class="error">⚠️ {{ isTokenInvalid() ? t('whatsapp.tokenInvalid') : t('whatsapp.template.loadFailed') }}
           <button type="button" class="link" (click)="load()">{{ t('whatsapp.template.retry') }}</button>
         </div>
       } @else if (supportedTemplates().length === 0) {
@@ -93,6 +93,7 @@ export class WhatsappTemplatePickerComponent implements OnInit {
   readonly templates = signal<WhatsappTemplate[]>([]);
   readonly isLoading = signal(false);
   readonly hasLoadError = signal(false);
+  readonly isTokenInvalid = signal(false);
   readonly selectedKey = signal('');
   readonly params = signal<Record<string, string>>({});
 
@@ -114,13 +115,15 @@ export class WhatsappTemplatePickerComponent implements OnInit {
   load(): void {
     this.isLoading.set(true);
     this.hasLoadError.set(false);
+    this.isTokenInvalid.set(false);
     this.api.getWhatsappTemplates().subscribe({
       next: templates => {
         this.templates.set(templates);
         this.isLoading.set(false);
       },
-      error: () => {
+      error: (err: any) => {
         this.hasLoadError.set(true);
+        this.isTokenInvalid.set(err?.error?.code === 'WHATSAPP_TOKEN_INVALID');
         this.isLoading.set(false);
       },
     });

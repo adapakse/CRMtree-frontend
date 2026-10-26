@@ -2662,6 +2662,7 @@
     },
     "to": "Prima:",
     "toField": "Prima",
+    "tokenInvalid": "WhatsApp ne radi: pristupni token za Metu je istekao. Zamolite administratora CRMtreeja da poveže novi token.",
     "window": {
       "closedHint": "Ovaj klijent vam nije pisao u posljednja 24 sata — WhatsApp će dostaviti samo odobreni predložak. Slobodan tekst možete poslati kad klijent odgovori.",
       "closedShort": "Prošlo je 24 sata od posljednje poruke klijenta — upotrijebite predložak.",
