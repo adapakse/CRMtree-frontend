@@ -2627,6 +2627,10 @@
     "messageBody": "Conținutul mesajului",
     "messagePlaceholder": "Conținutul mesajului...",
     "missingCountryCode": "Introduceți numărul cu prefixul de țară, de ex. +40 712 345 678.",
+    "mode": {
+      "template": "Șablon",
+      "text": "Text liber"
+    },
     "newMessage": "Mesaj WhatsApp nou",
     "notConfigured": "WhatsApp nu este configurat pentru această organizație. Contactați administratorul.",
     "reply": {
@@ -2640,7 +2644,29 @@
     "sendFailed": "Eroare la trimiterea mesajului WhatsApp",
     "sending": "Se trimite...",
     "sent": "Mesaj trimis.",
+    "status": {
+      "failed": "Nelivrat",
+      "failedHint": "WhatsApp nu a livrat acest mesaj. Cel mai frecvent motiv: text liber către un client care nu a scris de peste 24 de ore — trimite un șablon."
+    },
+    "template": {
+      "choose": "— alege un șablon —",
+      "invalidVariable": "Câmpul nu poate conține rânduri noi, taburi sau mai multe spații consecutive.",
+      "label": "Șablon de mesaj",
+      "loadFailed": "Nu s-au putut încărca șabloanele din WhatsApp.",
+      "loading": "Se încarcă șabloanele…",
+      "none": "Nu există șabloane aprobate. Șabloanele le creează un administrator în WhatsApp Manager (Meta); după aprobare apar aici.",
+      "preview": "Previzualizare",
+      "retry": "Încearcă din nou",
+      "unsupported": "{count, plural, one {# șablon necesită o imagine/un fișier sau o variabilă în buton — încă nu poate fi trimis din CRM.} few {# șabloane necesită o imagine/un fișier sau o variabilă în buton — încă nu pot fi trimise din CRM.} other {# de șabloane necesită o imagine/un fișier sau o variabilă în buton — încă nu pot fi trimise din CRM.}}",
+      "variable": "Câmpul {key}"
+    },
     "to": "Către:",
-    "toField": "Către"
+    "toField": "Către",
+    "tokenInvalid": "WhatsApp nu funcționează: tokenul de acces Meta a expirat. Roagă administratorul CRMtree să conecteze un token nou.",
+    "window": {
+      "closedHint": "Acest client nu v-a scris în ultimele 24 de ore — WhatsApp va livra doar un șablon aprobat. Poți trimite text liber după ce clientul răspunde.",
+      "closedShort": "Au trecut 24 de ore de la ultimul mesaj al clientului — folosește un șablon.",
+      "sendTemplate": "Trimite șablon"
+    }
   }
 }

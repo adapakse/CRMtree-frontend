@@ -2627,6 +2627,10 @@
     "messageBody": "Texto del mensaje",
     "messagePlaceholder": "Texto del mensaje...",
     "missingCountryCode": "Indica el número con el prefijo del país, p. ej., +34 612 345 678.",
+    "mode": {
+      "template": "Plantilla",
+      "text": "Texto libre"
+    },
     "newMessage": "Nuevo mensaje de WhatsApp",
     "notConfigured": "WhatsApp no está configurado para esta organización. Ponte en contacto con el administrador.",
     "reply": {
@@ -2640,7 +2644,29 @@
     "sendFailed": "Error al enviar el WhatsApp",
     "sending": "Enviando...",
     "sent": "Mensaje enviado.",
+    "status": {
+      "failed": "No entregado",
+      "failedHint": "WhatsApp no entregó este mensaje. Motivo más común: texto libre a un cliente que no escribe desde hace más de 24 horas — envía una plantilla."
+    },
+    "template": {
+      "choose": "— elige una plantilla —",
+      "invalidVariable": "El campo no puede contener saltos de línea, tabulaciones ni varios espacios seguidos.",
+      "label": "Plantilla de mensaje",
+      "loadFailed": "No se pudieron cargar las plantillas de WhatsApp.",
+      "loading": "Cargando plantillas…",
+      "none": "No hay plantillas aprobadas. Las plantillas las crea un administrador en WhatsApp Manager (Meta); una vez aprobadas aparecen aquí.",
+      "preview": "Vista previa",
+      "retry": "Reintentar",
+      "unsupported": "{count, plural, one {# plantilla requiere una imagen/archivo o una variable en un botón — aún no se puede enviar desde el CRM.} other {# plantillas requieren una imagen/archivo o una variable en un botón — aún no se pueden enviar desde el CRM.}}",
+      "variable": "Campo {key}"
+    },
     "to": "Para:",
-    "toField": "Para"
+    "toField": "Para",
+    "tokenInvalid": "WhatsApp no funciona: el token de acceso de Meta ha caducado. Pide al administrador de CRMtree que conecte un token nuevo.",
+    "window": {
+      "closedHint": "Este cliente no os ha escrito en las últimas 24 horas — WhatsApp solo entregará una plantilla aprobada. Podrás enviar texto libre cuando el cliente responda.",
+      "closedShort": "Han pasado 24 horas desde el último mensaje del cliente — usa una plantilla.",
+      "sendTemplate": "Enviar plantilla"
+    }
   }
 }

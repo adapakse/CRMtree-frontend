@@ -1,12 +1,12 @@
 // src/app/pages/crm/partners/crm-partner-detail.component.ts
-import { Component, OnInit, OnDestroy, inject, Input, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, Input, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize, catchError, switchMap } from 'rxjs/operators';
 import { forkJoin, of, Subscription } from 'rxjs';
-import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LeadContact, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry, SmsConversation } from '../../../core/services/crm-api.service';
+import { CrmApiService, Partner, PartnerActivity, OnboardingTask, PARTNER_STATUS_LABELS, PartnerStatus, CrmUser, PartnerGroup, LeadContact, LinkedDocument, GmailSendResult, EmailStatus, ChurnPartner, ConsentValue, ConsentType, GmailThreadResponse, WhatsappHistoryEntry, WhatsappTemplateSelection, SmsConversation } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
@@ -17,6 +17,8 @@ import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/cale
 import { formatAddressDisplay, formatAddressListDisplay, countExtraAddresses, isSameMailboxAddress, decodeAddressEntities } from '../../../shared/utils/email-address.util';
 import { trimEdgeEmptyHtml } from '../../../shared/utils/email-body.util';
 import { formatPhoneDisplay, requiresCountryCode, normalizePhoneDigits } from '../../../shared/utils/phone-format.util';
+import { isWhatsappWindowOpen } from '../../../shared/utils/whatsapp-window.util';
+import { WhatsappTemplatePickerComponent } from '../../../shared/components/whatsapp-template-picker/whatsapp-template-picker.component';
 import { EMAIL_PROVIDERS, EmailProviderKey } from '../../../core/config/email-providers.config';
 import { EmailOauthListenerService } from '../../../core/services/email-oauth-listener.service';
 import { PbxService } from '../../../core/services/pbx.service';
@@ -56,7 +58,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   selector: 'wt-crm-partner-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, CustomFieldsComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -857,7 +859,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div style="font-size:13px;color:#9ca3af;text-align:center">{{ t('whatsapp.notConfigured') }}</div>
         </div>
 
-        <div *ngIf="whatsappConfigured===true" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+        <div *ngIf="whatsappConfigured===true" id="wa-new-message" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -872,16 +874,26 @@ function getMonthRange(preset: string): { from: string; to: string } {
           </label>
           <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">{{ t('whatsapp.missingCountryCode') }}</div>
 
-          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.messageBody') }}
+          <div class="wa-mode-switch">
+            <button type="button" [class.active]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
+            <button type="button" [class.active]="whatsappMode==='text'" [disabled]="whatsappSending" (click)="whatsappMode='text'">✏️ {{ t('whatsapp.mode.text') }}</button>
+          </div>
+          <div *ngIf="whatsappMode==='text' && whatsappToPhone.trim() && !whatsappToPhoneMissingCountryCode && !isWhatsappWindowOpen(whatsappToPhone)" class="wa-window-hint">
+            🕒 {{ t('whatsapp.window.closedHint') }}
+          </div>
+
+          <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.messageBody') }}
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
                       [placeholder]="t('whatsapp.messagePlaceholder')"></textarea>
           </label>
+          <wt-whatsapp-template-picker *ngIf="whatsappMode==='template'" [disabled]="!canEdit || whatsappSending"
+                                       (selectionChange)="whatsappTemplateSelection=$event" />
 
           <div *ngIf="whatsappError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
           <div *ngIf="whatsappSuccess" style="color:#16a34a;font-size:12px;background:#f0fdf4;border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
 
           <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !whatsappMessage.trim() || whatsappToPhoneMissingCountryCode || whatsappSending"
+            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
                     (click)="sendWhatsapp()">
               {{ whatsappSending ? t('whatsapp.sending') : t('whatsapp.send') }}
             </button>
@@ -921,7 +933,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
                     <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? t('whatsapp.to') : t('whatsapp.from')}}</span>
                     <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
                   </span>
-                  <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+                  <span style="display:flex;align-items:center;gap:6px">
+                    <span *ngIf="h.direction==='outgoing' && h.status==='failed'" class="wa-failed" [title]="t('whatsapp.status.failedHint')">⚠️ {{ t('whatsapp.status.failed') }}</span>
+                    <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
+                  </span>
                 </div>
                 <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap">
                   <div [class.wa-body-clamp]="!isWhatsappExpanded(h.id)">{{h.message}}</div>
@@ -931,8 +946,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 </button>
               </div>
 
-              <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:6px">
-                <button class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ {{ t('whatsapp.reply.action') }}</button>
+              <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                <button *ngIf="isWhatsappWindowOpen(conv.phone)" class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ {{ t('whatsapp.reply.action') }}</button>
+                <ng-container *ngIf="!isWhatsappWindowOpen(conv.phone)">
+                  <button class="btn-sm" (click)="startWhatsappTemplateTo(conv.phone)">📋 {{ t('whatsapp.window.sendTemplate') }}</button>
+                  <span class="wa-window-note">🕒 {{ t('whatsapp.window.closedShort') }}</span>
+                </ng-container>
               </div>
 
               <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa;display:flex;flex-direction:column;gap:8px">
@@ -1969,6 +1988,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:16px; }
     .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
     .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10.5px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
+    .wa-mode-switch { display:inline-flex; align-self:flex-start; border:1px solid #d1d5db; border-radius:6px; overflow:hidden; }
+    .wa-mode-switch button { background:white; border:none; padding:5px 12px; font-size:11.5px; font-weight:600; color:#6b7280; cursor:pointer; font-family:inherit; }
+    .wa-mode-switch button + button { border-left:1px solid #d1d5db; }
+    .wa-mode-switch button.active { background:#E6F4EA; color:#2F8F4D; }
+    .wa-window-hint { font-size:11.5px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:6px 10px; }
+    .wa-window-note { font-size:11px; color:#92400e; }
+    .wa-failed { font-size:10.5px; font-weight:700; color:#b91c1c; background:#fef2f2; border-radius:4px; padding:1px 6px; }
     .loading, .not-found { padding:40px; text-align:center; color:#9ca3af; }
     /* Modal */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
@@ -2219,23 +2245,30 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   sendWhatsapp(): void {
-    if (!this.partner || !this.whatsappToPhone.trim() || !this.whatsappMessage.trim()) return;
+    if (!this.partner || !this.whatsappToPhone.trim() || !this.canSendWhatsappContent) return;
     if (this.whatsappToPhoneMissingCountryCode) return;
     this.whatsappSending = true;
     this.whatsappError   = null;
     this.whatsappSuccess = false;
     this.cdr.markForCheck();
-    this.api.sendPartnerWhatsapp(this.pid, this.whatsappMessage.trim(), this.whatsappToPhone.trim()).subscribe({
+    const toPhone = this.whatsappToPhone.trim();
+    const request = this.whatsappMode === 'template'
+      ? this.api.sendPartnerWhatsappTemplate(this.pid, this.whatsappTemplateSelection!, toPhone)
+      : this.api.sendPartnerWhatsapp(this.pid, this.whatsappMessage.trim(), toPhone);
+    request.subscribe({
       next: () => this.zone.run(() => {
         this.whatsappSending = false;
         this.whatsappSuccess = true;
         this.whatsappMessage = '';
+        this.whatsappTemplatePicker?.reset();
         this.cdr.markForCheck();
         this.loadWhatsappHistory();
       }),
       error: (err: any) => this.zone.run(() => {
         this.whatsappSending = false;
-        this.whatsappError   = err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
+        this.whatsappError   = err?.error?.code === 'WHATSAPP_TOKEN_INVALID'
+          ? this.transloco.translate('crm.whatsapp.tokenInvalid')
+          : err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2366,6 +2399,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   whatsappSending = false;
   whatsappError: string | null = null;
   whatsappSuccess = false;
+  // Template is the default: a new conversation is usually a first contact,
+  // and Meta delivers only an approved template to a customer who hasn't
+  // written in the last 24h. Free text stays available for an open window.
+  whatsappMode: 'template' | 'text' = 'template';
+  whatsappTemplateSelection: WhatsappTemplateSelection | null = null;
+  @ViewChild(WhatsappTemplatePickerComponent) private whatsappTemplatePicker?: WhatsappTemplatePickerComponent;
   // Real conversation history (whatsapp_messages table), not an activity log —
   // grouped by counterpart phone number: each number is its own conversation,
   // never merged. A new conversation is only ever started via "Nowa wiadomość
@@ -2382,6 +2421,24 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   // type a full international number. Doesn't block typing, only sending.
   get whatsappToPhoneMissingCountryCode(): boolean {
     return requiresCountryCode(this.whatsappToPhone);
+  }
+
+  get canSendWhatsappContent(): boolean {
+    return this.whatsappMode === 'text' ? !!this.whatsappMessage.trim() : !!this.whatsappTemplateSelection?.isComplete;
+  }
+
+  isWhatsappWindowOpen(phone: string): boolean {
+    return isWhatsappWindowOpen(this.whatsappConversations.flatMap(conv => conv.messages), phone);
+  }
+
+  // A closed conversation can only be reopened with a template — reuses the
+  // "new message" form above instead of a second template picker per thread.
+  startWhatsappTemplateTo(phone: string): void {
+    this.whatsappToPhone = formatPhoneDisplay(phone);
+    this.whatsappMode    = 'template';
+    this.whatsappError   = null;
+    this.whatsappSuccess = false;
+    document.getElementById('wa-new-message')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   formatWhatsappHistoryPhone(raw: string | null): string {

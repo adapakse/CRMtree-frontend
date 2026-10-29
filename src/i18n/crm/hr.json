@@ -2627,6 +2627,10 @@
     "messageBody": "Sadržaj poruke",
     "messagePlaceholder": "Sadržaj poruke...",
     "missingCountryCode": "Unesite broj s pozivnim brojem države, npr. +385 91 123 4567.",
+    "mode": {
+      "template": "Predložak",
+      "text": "Slobodan tekst"
+    },
     "newMessage": "Nova WhatsApp poruka",
     "notConfigured": "WhatsApp nije konfiguriran za ovu organizaciju. Obratite se administratoru.",
     "reply": {
@@ -2640,7 +2644,29 @@
     "sendFailed": "Pogreška pri slanju WhatsApp poruke",
     "sending": "Slanje...",
     "sent": "Poruka je poslana.",
+    "status": {
+      "failed": "Nije dostavljeno",
+      "failedHint": "WhatsApp nije dostavio ovu poruku. Najčešći razlog: slobodan tekst klijentu koji nije pisao više od 24 sata — pošaljite predložak."
+    },
+    "template": {
+      "choose": "— odaberite predložak —",
+      "invalidVariable": "Polje ne smije sadržavati nove retke, tabulatore ni više uzastopnih razmaka.",
+      "label": "Predložak poruke",
+      "loadFailed": "Predloške iz WhatsAppa nije moguće učitati.",
+      "loading": "Učitavanje predložaka…",
+      "none": "Nema odobrenih predložaka. Predloške izrađuje administrator u WhatsApp Manageru (Meta); nakon odobrenja pojavit će se ovdje.",
+      "preview": "Pregled",
+      "retry": "Pokušaj ponovno",
+      "unsupported": "{count, plural, one {# predložak zahtijeva sliku/datoteku ili varijablu u gumbu — još se ne može poslati iz CRM-a.} few {# predloška zahtijevaju sliku/datoteku ili varijablu u gumbu — još se ne mogu poslati iz CRM-a.} other {# predložaka zahtijeva sliku/datoteku ili varijablu u gumbu — još se ne mogu poslati iz CRM-a.}}",
+      "variable": "Polje {key}"
+    },
     "to": "Prima:",
-    "toField": "Prima"
+    "toField": "Prima",
+    "tokenInvalid": "WhatsApp ne radi: pristupni token za Metu je istekao. Zamolite administratora CRMtreeja da poveže novi token.",
+    "window": {
+      "closedHint": "Ovaj klijent vam nije pisao u posljednja 24 sata — WhatsApp će dostaviti samo odobreni predložak. Slobodan tekst možete poslati kad klijent odgovori.",
+      "closedShort": "Prošlo je 24 sata od posljednje poruke klijenta — upotrijebite predložak.",
+      "sendTemplate": "Pošalji predložak"
+    }
   }
 }
