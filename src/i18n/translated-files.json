@@ -1,4 +1,5 @@
 [
+  "src/app/shared/components/entity-attachments/entity-attachments.component.ts",
   "src/app/core/services/projects-api.service.ts",
   "src/app/layout/shell/shell.component.ts",
   "src/app/pages/admin/pbx/admin-pbx.component.ts",

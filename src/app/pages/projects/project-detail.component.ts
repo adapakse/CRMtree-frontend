@@ -17,8 +17,9 @@ import { FilterSet, ProjectListFiltersService, TaskFilterId } from './project-li
 import { ProjectTaskPanelComponent } from './project-task-panel.component';
 import { ProjectTasksTabComponent } from './project-tasks-tab.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
+import { EntityAttachmentsComponent } from '../../shared/components/entity-attachments/entity-attachments.component';
 
-type ProjectTab = 'tasks' | 'gantt' | 'chat' | 'finance' | 'card';
+type ProjectTab = 'tasks' | 'gantt' | 'chat' | 'finance' | 'card' | 'attachments';
 
 // Marks the task panel as open for a task that does not exist yet.
 const NEW_TASK = 'new';
@@ -32,7 +33,7 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
   imports: [
     RouterLink, TranslocoDirective, TranslocoPipe,
     ProjectCardComponent, ProjectChatComponent, ProjectDelayBadgeComponent, ProjectFinanceComponent, ProjectGanttViewComponent,
-    ProjectTaskPanelComponent, ProjectTasksTabComponent,
+    ProjectTaskPanelComponent, ProjectTasksTabComponent, EntityAttachmentsComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,6 +67,7 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
                 </button>
                 <button class="tab-btn" [class.active]="activeTab() === 'gantt'" (click)="selectTab('gantt')">{{ t('detail.tabs.timeline') }}</button>
                 <button class="tab-btn" [class.active]="activeTab() === 'chat'" (click)="selectTab('chat')">{{ t('detail.tabs.chat') }}</button>
+                <button class="tab-btn" [class.active]="activeTab() === 'attachments'" (click)="selectTab('attachments')">{{ 'attachments.title' | transloco }}</button>
                 @if (canReadFinance()) {
                   <button class="tab-btn" [class.active]="activeTab() === 'finance'" (click)="selectTab('finance')">{{ t('detail.tabs.finance') }}</button>
                 }
@@ -91,6 +93,10 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
                 [extraParams]="ganttExtraParams()" [atRiskThresholdDays]="loadedConfig.at_risk_threshold_days"
                 [emptyMessage]="t(showsOnlyMyTasks() ? 'detail.empty.noAssignedTasks' : 'detail.empty.noTasks')"
                 (taskOpened)="openTask($event.id)" />
+            } @else if (activeTab() === 'attachments') {
+              <section class="card">
+                <wt-entity-attachments sourceType="project" [sourceId]="loaded.project.id" />
+              </section>
             } @else if (activeTab() === 'chat') {
               <section class="card chat-card">
                 <wt-project-chat [projectId]="loaded.project.id" [canPost]="loaded.project.status === 'open'" />
@@ -216,7 +222,7 @@ export class ProjectDetailComponent implements OnInit {
   constructor() {
     const query = this.route.snapshot.queryParamMap;
     const requestedTab = query.get('tab');
-    if (requestedTab === 'card' || requestedTab === 'gantt' || requestedTab === 'chat' || requestedTab === 'finance') {
+    if (requestedTab === 'card' || requestedTab === 'gantt' || requestedTab === 'chat' || requestedTab === 'finance' || requestedTab === 'attachments') {
       this.activeTab.set(requestedTab);
     }
     this.openTaskId.set(query.get('task'));

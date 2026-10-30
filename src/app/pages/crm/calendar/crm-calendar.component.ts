@@ -9,6 +9,7 @@ import { CrmApiService, CalendarMeeting, ActivityTask, CrmUser, CrmGroup } from 
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { ProjectTaskNavigationService } from '../../../core/services/project-task-navigation.service';
 import { LocaleService } from '../../../core/i18n/locale.service';
@@ -28,7 +29,7 @@ interface CalendarDay {
 @Component({
   selector: 'wt-crm-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, RouterModule, AddToCalendarComponent, EntityAttachmentsComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -272,6 +273,7 @@ interface CalendarDay {
                style="font-size:12px;color:#6b7280;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:600px">
             {{stripHtml(task.body)}}
           </div>
+          <wt-entity-attachments *ngIf="task.type==='task' || task.type==='note'" [sourceType]="task.source_type==='project' ? 'project-task' : task.source_type==='lead' ? 'lead-activity' : 'partner-activity'" [sourceId]="task.source_type==='project' ? (task.project_task_id || task.id) : task.id" [compact]="true"></wt-entity-attachments>
           <span *ngIf="isExpanded(task)" style="font-size:11px;color:#3BAA5D;margin-top:2px;display:block">✎ {{ t('calendar.tasks.editMode') }}</span>
         </div>
 

@@ -11,6 +11,11 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { EntityAttachment } from '../../../core/services/entity-attachments-api.service';
+import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
+import { PendingAttachmentsComponent } from '../../../shared/components/entity-attachments/pending-attachments.component';
+import { EntityAttachmentsApiService } from '../../../core/services/entity-attachments-api.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { LinkedProjectTasksComponent } from '../../../shared/components/linked-project-tasks/linked-project-tasks.component';
 import { CustomFieldsComponent } from '../../../shared/components/custom-fields/custom-fields.component';
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
@@ -58,7 +63,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   selector: 'wt-crm-partner-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -438,6 +443,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           {{ t('activity.tabs.all') }}
           <wt-activity-count-badge [activities]="partner.activities||[]"></wt-activity-count-badge>
         </button>
+        <button class="tab-btn" [class.active]="midTab==='attachments'" (click)="midTab='attachments'">{{ 'attachments.title' | transloco }}</button>
         <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">{{ t('activity.tabs.tasks') }}</button>
         <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">{{ t('activity.tabs.notes') }}</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
@@ -451,7 +457,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
 
       <!-- ── Tab: Aktywności ─────────────────────────────────────────────── -->
-      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div *ngIf="midTab==='attachments'" style="flex:1;overflow-y:auto;min-height:0">
+        <wt-entity-attachments sourceType="partner" [sourceId]="pid" [aggregate]="true" (sourceOpened)="openAttachmentSource($event)"></wt-entity-attachments>
+      </div>
+      <div *ngIf="midTab!=='attachments' && midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:flex-end">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ {{ t('activity.add') }}</button>
         </div>
@@ -559,15 +568,16 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <!-- Treść Quill -->
           <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules"
                         style="background:white" [placeholder]="t('partnerDetail.activity.bodyPlaceholder')"></quill-editor>
+          <wt-pending-attachments *ngIf="actForm.type==='task' || actForm.type==='note'" [(files)]="pendingActivityFiles"></wt-pending-attachments>
           <div class="act-actions">
-            <button class="btn-sm" (click)="showNewActivity = false">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn-sm" (click)="showNewActivity = false; pendingActivityFiles = []">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn-sm primary" (click)="addActivity()" [disabled]="!actForm.title || savingActivity">
               {{savingActivity ? '…' : ('actions.save' | transloco)}}
             </button>
           </div>
         </div>
         <!-- Karty aktywności -->
-        <div *ngFor="let a of filteredActivities" class="act-card"
+        <div *ngFor="let a of filteredActivities" class="act-card" [attr.id]="'crm-activity-' + a.id"
              [class.act-closed]="a.status==='closed'"
              [class.act-card-expanded]="isActExpanded(a.id)"
              [class.act-card-editable]="canEdit && inlineEditActId!==a.id"
@@ -595,6 +605,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 {{isActExpanded(a.id) ? '▲ ' + t('activity.card.collapse') : '▼ ' + t('activity.card.expand')}}
               </button>
             </div>
+            <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="partner-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
             <div *ngIf="canEdit && a.type==='task'" class="task-actions-row" (click)="$event.stopPropagation()">
               <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ {{ t('activity.card.closeTask') }}</button>
               <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ {{ t('activity.card.reopen') }}</button>
@@ -656,6 +667,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
             </ng-container>
             <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" style="background:white" [placeholder]="t('activity.form.bodyShortPlaceholder')"></quill-editor>
+            <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="partner-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
             <div style="display:flex;gap:6px;justify-content:flex-end">
               <button class="btn-sm" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
               <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="!inlineEditForm.title||savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
@@ -2073,6 +2085,9 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   protected settings = inject(AppSettingsService);
   private pbx = inject(PbxService);
   private transloco = inject(TranslocoService);
+  private attachmentsApi = inject(EntityAttachmentsApiService);
+  private toast = inject(ToastService);
+  pendingActivityFiles: File[] = [];
   private locale = inject(LocaleService);
 
   // Słowniki z app_settings
@@ -2295,7 +2310,12 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
   }
 
   // ── Taby środkowej kolumny ───────────────────────────────────────────────────
-  midTab: 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' | 'sms' = 'all';
+  openAttachmentSource(file: EntityAttachment): void {
+    this.midTab = file.source_category === 'note' ? 'notes' : 'tasks';
+    setTimeout(() => document.getElementById('crm-activity-' + file.source_id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  }
+
+  midTab: 'attachments' | 'all' | 'tasks' | 'notes' | 'calls' | 'meetings' | 'emails' | 'whatsapp' | 'sms' = this.route.snapshot.queryParamMap.keys.some(key => key.startsWith('attachments_')) ? 'attachments' : 'all';
 
   // ── SMS — same PBX account/PAT as telephony. Local log, synced on demand
   // (no webhook from ip-pbx.eu for incoming SMS) — grouped into one
@@ -3646,6 +3666,23 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Files picked in the new-activity form are uploaded once the activity exists. */
+  private uploadPendingActivityFiles(activity: PartnerActivity): void {
+    const files = this.pendingActivityFiles;
+    this.pendingActivityFiles = [];
+    if (activity.type !== 'note' && (activity.type as string) !== 'task') return;
+    activity.attachment_count = 0;
+    if (!files.length) return;
+    this.attachmentsApi.uploadAll('partner-activity', activity.id, files).subscribe(failedNames => {
+      this.zone.run(() => {
+        failedNames.forEach(name => this.toast.error(this.transloco.translate('attachments.uploadFailed', { name })));
+        activity.attachment_count = files.length - failedNames.length;
+        if (this.partner) this.partner = { ...this.partner, activities: [...(this.partner.activities || [])] };
+        this.cdr.markForCheck();
+      });
+    });
+  }
+
   addActivity() {
     if (!this.actForm.title || !this.partner) return;
     this.savingActivity = true;
@@ -3675,6 +3712,7 @@ export class CrmPartnerDetailComponent implements OnInit, OnDestroy {
     const meetingSnap = this.actForm.type === 'meeting' ? { ...payload } : null;
     this.api.createPartnerActivity(this.pid, payload).subscribe({
       next: newAct => {
+        this.uploadPendingActivityFiles(newAct);
         this.zone.run(() => {
           if (this.partner) {
             this.partner = { ...this.partner, activities: [newAct, ...(this.partner.activities || [])] };
