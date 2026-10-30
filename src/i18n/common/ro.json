@@ -35,6 +35,7 @@
     "dropHint": "Faceți clic sau trageți fișierele aici",
     "empty": "Nu există atașamente.",
     "filename": "Nume fișier",
+    "from": "De la",
     "loadFailed": "Atașamentele nu au putut fi încărcate.",
     "loading": "Se încarcă…",
     "noMatches": "Niciun fișier nu corespunde filtrelor.",
@@ -43,12 +44,11 @@
     "source": "Sursă",
     "summaryHint": "Fișierele acestei înregistrări, ale sarcinilor și notelor sale și ale proiectelor accesibile cu sarcinile lor, organizate după locație.",
     "title": "Atașamente",
+    "to": "Până la",
     "tooLarge": "Fișierul „{name}” este prea mare (max. {max} MB).",
     "typeNotAllowed": "Tip de fișier nepermis: {name}.",
     "uploadFailed": "Fișierul nu a putut fi încărcat: {name}.",
-    "uploading": "Se încarcă…",
-    "from": "De la",
-    "to": "Până la"
+    "uploading": "Se încarcă…"
   },
   "language": {
     "changeFailed": "Limba nu a putut fi schimbată",

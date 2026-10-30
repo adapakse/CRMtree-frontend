@@ -35,6 +35,7 @@
     "dropHint": "Click or drag files here",
     "empty": "No attachments.",
     "filename": "Filename",
+    "from": "From",
     "loadFailed": "Failed to load attachments.",
     "loading": "Loading…",
     "noMatches": "No files match the filters.",
@@ -43,12 +44,11 @@
     "source": "Source",
     "summaryHint": "Files from this record, its tasks and notes, and accessible projects and their tasks, organized by where they were added.",
     "title": "Attachments",
+    "to": "To",
     "tooLarge": "The file “{name}” is too large (max {max} MB).",
     "typeNotAllowed": "File type not allowed: {name}.",
     "uploadFailed": "Failed to upload file: {name}.",
-    "uploading": "Uploading…",
-    "from": "From",
-    "to": "To"
+    "uploading": "Uploading…"
   },
   "language": {
     "changeFailed": "Couldn't change the language",

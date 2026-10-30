@@ -35,6 +35,7 @@
     "dropHint": "Klicken oder Dateien hierher ziehen",
     "empty": "Keine Anhänge.",
     "filename": "Dateiname",
+    "from": "Von",
     "loadFailed": "Anhänge konnten nicht geladen werden.",
     "loading": "Wird geladen…",
     "noMatches": "Keine Dateien entsprechen den Filtern.",
@@ -43,12 +44,11 @@
     "source": "Quelle",
     "summaryHint": "Dateien dieses Datensatzes, seiner Aufgaben und Notizen sowie zugänglicher Projekte und ihrer Aufgaben, nach Ablageort geordnet.",
     "title": "Anhänge",
+    "to": "Bis",
     "tooLarge": "Die Datei „{name}“ ist zu groß (max. {max} MB).",
     "typeNotAllowed": "Dateityp nicht erlaubt: {name}.",
     "uploadFailed": "Datei konnte nicht hochgeladen werden: {name}.",
-    "uploading": "Wird hochgeladen…",
-    "from": "Von",
-    "to": "Bis"
+    "uploading": "Wird hochgeladen…"
   },
   "language": {
     "changeFailed": "Sprache konnte nicht geändert werden",

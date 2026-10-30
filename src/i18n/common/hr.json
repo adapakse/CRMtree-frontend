@@ -35,6 +35,7 @@
     "dropHint": "Kliknite ili povucite datoteke ovamo",
     "empty": "Nema privitaka.",
     "filename": "Naziv datoteke",
+    "from": "Od",
     "loadFailed": "Nije moguće učitati privitke.",
     "loading": "Učitavanje…",
     "noMatches": "Nijedna datoteka ne odgovara filtrima.",
@@ -43,12 +44,11 @@
     "source": "Izvor",
     "summaryHint": "Datoteke ovog zapisa, njegovih zadataka i bilješki te dostupnih projekata s njihovim zadacima, raspoređene prema mjestu dodavanja.",
     "title": "Privici",
+    "to": "Do",
     "tooLarge": "Datoteka „{name}” je prevelika (najviše {max} MB).",
     "typeNotAllowed": "Vrsta datoteke nije dopuštena: {name}.",
     "uploadFailed": "Nije moguće prenijeti datoteku: {name}.",
-    "uploading": "Učitavanje…",
-    "from": "Od",
-    "to": "Do"
+    "uploading": "Učitavanje…"
   },
   "language": {
     "changeFailed": "Promjena jezika nije uspjela",

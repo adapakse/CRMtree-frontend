@@ -35,6 +35,7 @@
     "dropHint": "Fai clic o trascina qui i file",
     "empty": "Nessun allegato.",
     "filename": "Nome file",
+    "from": "Da",
     "loadFailed": "Impossibile caricare gli allegati.",
     "loading": "Caricamento…",
     "noMatches": "Nessun file corrisponde ai filtri.",
@@ -43,12 +44,11 @@
     "source": "Origine",
     "summaryHint": "File di questo record, delle sue attività e note e dei progetti accessibili con le relative attività, ordinati per posizione.",
     "title": "Allegati",
+    "to": "A",
     "tooLarge": "Il file “{name}” è troppo grande (max {max} MB).",
     "typeNotAllowed": "Tipo di file non consentito: {name}.",
     "uploadFailed": "Impossibile caricare il file: {name}.",
-    "uploading": "Caricamento…",
-    "from": "Da",
-    "to": "A"
+    "uploading": "Caricamento…"
   },
   "language": {
     "changeFailed": "Impossibile cambiare la lingua",

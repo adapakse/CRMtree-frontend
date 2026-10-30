@@ -35,6 +35,7 @@
     "dropHint": "Kliknite ali povlecite datoteke sem",
     "empty": "Ni prilog.",
     "filename": "Ime datoteke",
+    "from": "Od",
     "loadFailed": "Prilog ni bilo mogoče naložiti.",
     "loading": "Nalaganje…",
     "noMatches": "Nobena datoteka ne ustreza filtrom.",
@@ -43,12 +44,11 @@
     "source": "Vir",
     "summaryHint": "Datoteke tega zapisa, njegovih nalog in opomb ter dostopnih projektov z njihovimi nalogami, urejene po mestu dodajanja.",
     "title": "Priloge",
+    "to": "Do",
     "tooLarge": "Datoteka »{name}« je prevelika (največ {max} MB).",
     "typeNotAllowed": "Vrsta datoteke ni dovoljena: {name}.",
     "uploadFailed": "Datoteke ni bilo mogoče naložiti: {name}.",
-    "uploading": "Nalaganje…",
-    "from": "Od",
-    "to": "Do"
+    "uploading": "Nalaganje…"
   },
   "language": {
     "changeFailed": "Jezika ni bilo mogoče spremeniti",

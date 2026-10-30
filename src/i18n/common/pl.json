@@ -35,6 +35,7 @@
     "dropHint": "Kliknij albo przeciągnij pliki tutaj",
     "empty": "Brak załączników.",
     "filename": "Nazwa pliku",
+    "from": "Od",
     "loadFailed": "Nie udało się wczytać załączników.",
     "loading": "Wczytywanie…",
     "noMatches": "Brak plików pasujących do filtrów.",
@@ -43,12 +44,11 @@
     "source": "Źródło",
     "summaryHint": "Pliki z tego rekordu, jego zadań i notatek oraz dostępnych projektów i ich zadań, uporządkowane według miejsca dodania.",
     "title": "Załączniki",
+    "to": "Do",
     "tooLarge": "Plik „{name}” jest za duży (maks. {max} MB).",
     "typeNotAllowed": "Niedozwolony typ pliku: {name}.",
     "uploadFailed": "Nie udało się przesłać pliku: {name}.",
-    "uploading": "Przesyłanie…",
-    "from": "Od",
-    "to": "Do"
+    "uploading": "Przesyłanie…"
   },
   "language": {
     "changeFailed": "Nie udało się zmienić języka",

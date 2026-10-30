@@ -35,6 +35,7 @@
     "dropHint": "Cliquez ou faites glisser des fichiers ici",
     "empty": "Aucune pièce jointe.",
     "filename": "Nom du fichier",
+    "from": "Du",
     "loadFailed": "Impossible de charger les pièces jointes.",
     "loading": "Chargement…",
     "noMatches": "Aucun fichier ne correspond aux filtres.",
@@ -43,12 +44,11 @@
     "source": "Source",
     "summaryHint": "Fichiers de cette fiche, de ses tâches et notes et des projets accessibles avec leurs tâches, classés par emplacement.",
     "title": "Pièces jointes",
+    "to": "Au",
     "tooLarge": "Le fichier « {name} » est trop volumineux (max. {max} Mo).",
     "typeNotAllowed": "Type de fichier non autorisé : {name}.",
     "uploadFailed": "Impossible d’envoyer le fichier : {name}.",
-    "uploading": "Envoi en cours…",
-    "from": "Du",
-    "to": "Au"
+    "uploading": "Envoi en cours…"
   },
   "language": {
     "changeFailed": "Impossible de changer la langue",
