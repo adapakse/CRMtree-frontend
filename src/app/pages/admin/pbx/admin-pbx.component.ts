@@ -42,7 +42,8 @@ interface PbxUserRow {
         <div class="ap-error">{{ t('pbx.loadError') }}</div>
       } @else {
         <div class="ap-toolbar">
-          <input class="ap-search" type="text" [placeholder]="t('pbx.searchPlaceholder')"
+          <input class="ap-search" type="search" name="pbx-user-filter" autocomplete="off"
+                 data-1p-ignore data-lpignore="true" [placeholder]="t('pbx.searchPlaceholder')"
                  [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
         </div>
 
@@ -110,10 +111,10 @@ interface PbxUserRow {
 
       @if (editUser()) {
         <div class="ap-overlay" (click)="closeEdit()">
-          <div class="ap-modal" (click)="$event.stopPropagation()">
+          <div class="ap-modal" role="dialog" aria-modal="true" aria-labelledby="pbx-modal-title" (click)="$event.stopPropagation()">
             <div class="ap-modal-header">
               <div>
-                <div class="ap-modal-title">{{ t('pbx.modal.title', { name: editUser()!.display_name }) }}</div>
+                <div class="ap-modal-title" id="pbx-modal-title">{{ t('pbx.modal.title', { name: editUser()!.display_name }) }}</div>
                 <div class="ap-modal-sub">{{ editUser()!.email }}</div>
               </div>
               <button class="ap-close" (click)="closeEdit()">✕</button>
@@ -126,10 +127,15 @@ interface PbxUserRow {
               </div>
 
               <div class="ap-field">
-                <label>{{ t('pbx.modal.patLabel') }}</label>
+                <label for="pbx-pat-token">{{ t('pbx.modal.patLabel') }}</label>
                 <div class="ap-input-row">
-                  <input [type]="isTokenVisible ? 'text' : 'password'" [(ngModel)]="patToken"
-                         [placeholder]="t('pbx.modal.patPlaceholder')" autocomplete="off" />
+                  <!-- A password field makes browsers autofill the user filter as a
+                       login and the PAT as a saved password. Mask a text field instead. -->
+                  <input id="pbx-pat-token" name="pbx-pat-token" type="text" [(ngModel)]="patToken"
+                         [class.ap-token-masked]="!isTokenVisible"
+                         [placeholder]="t('pbx.modal.patPlaceholder')" autocomplete="new-password"
+                         autocapitalize="off" autocorrect="off" spellcheck="false"
+                         data-1p-ignore data-lpignore="true" />
                   <button class="ap-eye" type="button" (click)="isTokenVisible = !isTokenVisible">
                     {{ isTokenVisible ? t('pbx.actions.hide') : t('pbx.actions.show') }}
                   </button>
@@ -253,6 +259,7 @@ interface PbxUserRow {
                           border-radius: 6px; font-size: 13px; background: var(--bg-input, #fff);
                           color: var(--text, #18181B); outline: none; font-family: monospace; }
     .ap-input-row input:focus { border-color: var(--orange, #3BAA5D); }
+    .ap-token-masked { -webkit-text-security: disc; }
     .ap-field-hint  { font-size: 11px; color: var(--text-muted, #71717A); line-height: 1.5; }
     .ap-eye         { background: none; border: 1px solid var(--border, #E4E4E7); border-radius: 6px;
                       font-size: 11px; font-weight: 600; color: var(--text-muted, #71717A);
@@ -313,8 +320,8 @@ export class AdminPbxComponent implements OnInit {
 
   ngOnInit(): void { this.load(); }
 
-  private load(): void {
-    this.isLoading.set(true);
+  private load(silent = false): void {
+    if (!silent) this.isLoading.set(true);
     this.loadError.set(false);
     this.http.get<PbxUserRow[]>(`${API}/credentials`).subscribe({
       next:  rows => { this.users.set(rows); this.isLoading.set(false); },
@@ -328,7 +335,11 @@ export class AdminPbxComponent implements OnInit {
     this.editUser.set(user);
   }
 
-  closeEdit(): void { this.editUser.set(null); }
+  closeEdit(): void {
+    this.editUser.set(null);
+    this.patToken = '';
+    this.isTokenVisible = false;
+  }
 
   saveToken(): void {
     const user = this.editUser();
@@ -345,7 +356,7 @@ export class AdminPbxComponent implements OnInit {
         this.toast.success(res.direct_phone
           ? this.transloco.translate('admin.pbx.toast.savedWithPhone', { phone: res.direct_phone })
           : this.transloco.translate('admin.pbx.toast.saved'));
-        this.load();
+        this.load(true);
       },
       error: err => {
         this.isSaving.set(false);
@@ -366,7 +377,7 @@ export class AdminPbxComponent implements OnInit {
         this.isSaving.set(false);
         this.deleteUser.set(null);
         this.toast.success(this.transloco.translate('admin.pbx.toast.deleted'));
-        this.load();
+        this.load(true);
       },
       error: () => {
         this.isSaving.set(false);
