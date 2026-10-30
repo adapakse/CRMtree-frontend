@@ -15,6 +15,7 @@ import { projectTaskCalendarEntry } from '../../shared/utils/calendar-export.uti
 import { ProjectChatComponent } from './project-chat.component';
 import { ProjectTaskCostsComponent } from './project-task-costs.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
+import { EntityAttachmentsComponent } from '../../shared/components/entity-attachments/entity-attachments.component';
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK'];
 const DEFAULT_CURRENCY = 'PLN';
@@ -72,7 +73,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
   standalone: true,
   imports: [
     FormsModule, DatePipe, ProjectChatComponent, ProjectTaskCostsComponent, AddToCalendarComponent, TranslocoDirective, TranslocoPipe,
-    ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent,
+    ProjectTaskDueDateComponent, ProjectTaskTimelinessComponent, EntityAttachmentsComponent,
   ],
   providers: [provideTranslocoScope('projects')],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -264,6 +265,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
               }
 
               @if (taskId(); as existingTaskId) {
+                <wt-entity-attachments sourceType="project-task" [sourceId]="existingTaskId" />
                 <div class="sec-title">{{ t('panel.chatTitle') }}</div>
                 <wt-project-chat [projectId]="projectId()" [taskId]="existingTaskId" [canPost]="isProjectOpen()" />
               }

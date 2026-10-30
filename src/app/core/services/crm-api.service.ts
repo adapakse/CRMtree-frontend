@@ -92,6 +92,7 @@ export interface Lead {
 export interface LeadActivity {
   id: number;
   lead_id: number;
+  attachment_count?: number;
   type: 'call' | 'email' | 'meeting' | 'note' | 'doc_sent';
   title: string;
   body: string | null;
@@ -323,6 +324,7 @@ export interface Partner {
 export interface PartnerActivity {
   id: number;
   partner_id: number;
+  attachment_count?: number;
   type: 'call' | 'email' | 'meeting' | 'note' | 'doc_sent' | 'training' | 'qbr' | 'opportunity';
   title: string;
   body: string | null;
