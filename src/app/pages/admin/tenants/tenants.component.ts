@@ -242,6 +242,11 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
                                 <label>DWH prefix</label>
                                 <input [(ngModel)]="editDraft.dwh_schema_prefix" placeholder="acme">
                               </div>
+                              <div class="field">
+                                <label>Strefa czasowa</label>
+                                <input [(ngModel)]="editDraft.time_zone" placeholder="Europe/Warsaw">
+                                <div class="td-muted">Godzina zadania w mailach, np. Asia/Bishkek.</div>
+                              </div>
                               <div class="field field-check">
                                 <label class="check-label">
                                   <input type="checkbox" [(ngModel)]="editDraft.is_active">
@@ -1403,7 +1408,7 @@ export class TenantsComponent implements OnInit {
 
   editDraft: {
     name: string; email_domain: string; dwh_schema_prefix: string; is_active: boolean;
-    features: Record<CrmFeature, boolean>; seo_daily_article_limit: number;
+    features: Record<CrmFeature, boolean>; seo_daily_article_limit: number; time_zone: string;
   } = this.emptyDraft();
 
   ngOnInit(): void {
@@ -1432,6 +1437,7 @@ export class TenantsComponent implements OnInit {
       name: t.name, email_domain: t.email_domain ?? '', dwh_schema_prefix: t.dwh_schema_prefix ?? '',
       is_active: t.is_active, features: featMap,
       seo_daily_article_limit: t.seo_daily_article_limit ?? 0,
+      time_zone: t.time_zone ?? 'Europe/Warsaw',
     };
     this.trainingMode.set(t.crm_training_mode ?? false);
     this.editTab.set('settings');
@@ -1460,6 +1466,7 @@ export class TenantsComponent implements OnInit {
       email_domain:      this.editDraft.email_domain || null,
       dwh_schema_prefix: this.editDraft.dwh_schema_prefix || null,
       is_active:         this.editDraft.is_active,
+      time_zone:         this.editDraft.time_zone.trim() || 'Europe/Warsaw',
     };
     this.http.patch<Tenant>(`${API}/admin/tenants/${id}`, body).subscribe({
       next: updated => {
@@ -2130,7 +2137,7 @@ export class TenantsComponent implements OnInit {
     return {
       name: '', email_domain: '', dwh_schema_prefix: '', is_active: true,
       features: Object.fromEntries(ALL_FEATURES.map(f => [f, false])) as Record<CrmFeature, boolean>,
-      seo_daily_article_limit: 0,
+      seo_daily_article_limit: 0, time_zone: 'Europe/Warsaw',
     };
   }
 }
