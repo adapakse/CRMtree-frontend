@@ -8,6 +8,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Document, WorkflowTask, ActiveTaskInfo } from '../../core/models/models';
 import { StatusBadgeComponent, TypeBadgeComponent, GroupPillComponent, TaskBadgeComponent, AvatarComponent } from '../../shared/components/badges.components';
 import { isExpiringSoon } from '../../core/services/helpers';
+import { LocaleService } from '../../core/i18n/locale.service';
 
 @Component({
   selector: 'wt-dashboard',
@@ -213,12 +214,13 @@ import { isExpiringSoon } from '../../core/services/helpers';
 export class DashboardComponent implements OnInit {
   private docSvc = inject(DocumentService);
   private wfSvc  = inject(WorkflowService);
+  private locale = inject(LocaleService);
 
   loading    = signal(true);
   recentDocs = signal<Document[]>([]);
   myTasks    = signal<WorkflowTask[]>([]);
   stats      = signal({ total: 0, inWorkflow: 0, signed: 0, expiring: 0 });
-  today      = new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  today      = new Date().toLocaleDateString(this.locale.activeLocale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   isExpiring = (d?: string) => isExpiringSoon(d, 30);
 
