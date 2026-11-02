@@ -13,6 +13,7 @@ import {
 import { ProjectDelayBadgeComponent } from '../../shared/components/project-deadlines/project-delay-badge.component';
 import { ProjectCrmLinkComponent } from './project-crm-link.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 // PM always has full access and the controller is always read-only, so the
 // access level is a choice only for the two participant roles.
@@ -386,6 +387,6 @@ export class ProjectCardComponent {
   }
 
   private showError(err: { error?: { error?: string } }, fallbackKey: string): void {
-    this.toast.error(err?.error?.error ?? this.transloco.translate(fallbackKey));
+    this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate(fallbackKey));
   }
 }

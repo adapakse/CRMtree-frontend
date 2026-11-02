@@ -37,6 +37,7 @@ import { QuillModule } from 'ngx-quill';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -2149,7 +2150,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.holdSaving = false;
-        this.holdError  = err?.error?.error || this.transloco.translate('crm.leadDetail.hold.saveFailed');
+        this.holdError  = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.hold.saveFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2168,7 +2169,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.holdSaving = false;
-        this.holdError  = err?.error?.error || this.transloco.translate('crm.leadDetail.hold.removeFailed');
+        this.holdError  = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.hold.removeFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2183,7 +2184,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }),
       error: (err: any) => this.zone.run(() => {
-        alert(err?.error?.error || this.transloco.translate('crm.leadDetail.archive.failed'));
+        alert(localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.archive.failed'));
       }),
     });
   }
@@ -2520,7 +2521,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.smsLoading = false;
-        this.smsThreadError = err?.error?.error || this.transloco.translate('crm.sms.loadFailed');
+        this.smsThreadError = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.sms.loadFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2573,7 +2574,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         state.sending = false;
-        state.error = err?.error?.error || this.transloco.translate('crm.sms.sendFailed');
+        state.error = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.sms.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2699,7 +2700,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         s.replySending = false;
-        s.replyError   = err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
+        s.replyError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -3064,7 +3065,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.whatsappSending = false;
         this.whatsappError   = err?.error?.code === 'WHATSAPP_TOKEN_INVALID'
           ? this.transloco.translate('crm.whatsapp.tokenInvalid')
-          : err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
+          : localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -3365,7 +3366,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        const msg = err?.error?.error || err?.message || this.transloco.translate('crm.email.driveDownloadFailed');
+        const msg = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate<string>('crm.email.driveDownloadFailed');
         if (target === 'reply') {
           this.msgModalError = msg;
         } else {
@@ -3446,7 +3447,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
     const onError = (err: any) => {
       this.zone.run(() => {
-        this.emailError   = err?.error?.error || this.transloco.translate('crm.email.sendFailed');
+        this.emailError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.email.sendFailed');
         this.sendingEmail = false;
         this.cdr.markForCheck();
       });
@@ -3740,7 +3741,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
     const onError = (err: any) => this.zone.run(() => {
-      this.inlineReplyError   = err?.error?.error || this.transloco.translate('crm.email.reply.sendFailed');
+      this.inlineReplyError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.email.reply.sendFailed');
       this.inlineReplySending = false;
       this.cdr.markForCheck();
     });
@@ -3880,7 +3881,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
     const onError = (err: any) => this.zone.run(() => {
-      this.msgModalError   = err?.error?.error || this.transloco.translate('crm.email.reply.sendFailed');
+      this.msgModalError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.email.reply.sendFailed');
       this.msgModalSending = false;
       this.cdr.markForCheck();
     });
@@ -4095,7 +4096,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => { this.zone.run(() => {
         this.saving = false;
-        if (err?.status === 409) this.editNipError = err?.error?.error || this.transloco.translate('crm.leadDetail.nip.duplicate');
+        if (err?.status === 409) this.editNipError = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.nip.duplicate');
         this.cdr.markForCheck();
       }); },
     });
@@ -4704,7 +4705,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }),
         error: (err: any) => this.zone.run(() => {
-          this.linkDocError = err?.error?.message || err?.error?.detail || this.transloco.translate('crm.documents.unlinkFailed');
+          this.linkDocError = localizedApiErrorMessage(err?.error?.message, this.transloco) || err?.error?.detail || this.transloco.translate('crm.documents.unlinkFailed');
           this.cdr.markForCheck();
         }),
       });
@@ -4715,7 +4716,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }),
         error: (err: any) => this.zone.run(() => {
-          this.linkDocError = err?.error?.message || err?.error?.detail || this.transloco.translate('crm.documents.linkFailed');
+          this.linkDocError = localizedApiErrorMessage(err?.error?.message, this.transloco) || err?.error?.detail || this.transloco.translate('crm.documents.linkFailed');
           this.cdr.markForCheck();
         }),
       });
@@ -4839,7 +4840,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         if (err?.status === 422 && err?.error?.record) {
           this.testAccount = err.error.record;
         }
-        this.testAccountError      = err?.error?.error || this.transloco.translate('crm.leadDetail.testAccount.apiError');
+        this.testAccountError      = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.testAccount.apiError');
         this.submittingTestAccount = false;
         this.cdr.markForCheck();
       }),

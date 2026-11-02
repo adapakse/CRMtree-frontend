@@ -19,6 +19,7 @@ import {
 import { LanguagePickerComponent } from '../../../shared/components/language-picker/language-picker.component';
 import { environment } from '../../../../environments/environment';
 import { Tenant } from '../../../core/models/models';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 interface SettingField {
   key: string;
@@ -1806,7 +1807,7 @@ export class SettingsComponent implements OnInit {
         this.toast.success(this.transloco.translate('admin.settings.groups.added', { name: created.display_name }));
       },
       error: err => {
-        this.groupError.set(err?.error?.error ?? this.transloco.translate('admin.settings.groups.addFailed'));
+        this.groupError.set(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.groups.addFailed'));
         this.groupSaving.set(false);
       },
     });
@@ -1878,7 +1879,7 @@ export class SettingsComponent implements OnInit {
         this.groups.update(list => list.filter(x => x.id !== g.id));
         this.toast.success(this.transloco.translate('admin.settings.groups.deleted', { name: g.display_name }));
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.groups.deleteFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.groups.deleteFailed')),
     });
   }
 
@@ -2019,7 +2020,7 @@ export class SettingsComponent implements OnInit {
         this.toast.success(this.transloco.translate('admin.settings.tooltips.added'));
         this.settingsSvc.reload().then(() => this.buildFields(this.settingsSvc.meta()));
       },
-      error: err => { this.tipError.set(err?.error?.error ?? this.transloco.translate('admin.settings.errors.saveFailed')); this.tipSaving.set(false); },
+      error: err => { this.tipError.set(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.errors.saveFailed')); this.tipSaving.set(false); },
     });
   }
 
@@ -2034,7 +2035,7 @@ export class SettingsComponent implements OnInit {
         this.toast.success(this.transloco.translate('admin.settings.tooltips.saved', { key }));
         this.settingsSvc.reload().then(() => this.buildFields(this.settingsSvc.meta()));
       },
-      error: err => { this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.saveFailed')); this.tipSaving.set(false); },
+      error: err => { this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.errors.saveFailed')); this.tipSaving.set(false); },
     });
   }
 
@@ -2045,7 +2046,7 @@ export class SettingsComponent implements OnInit {
         this.toast.success(this.transloco.translate('admin.settings.tooltips.deleted', { key }));
         this.settingsSvc.reload().then(() => this.buildFields(this.settingsSvc.meta()));
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.tooltips.deleteFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.tooltips.deleteFailed')),
     });
   }
 
@@ -2189,7 +2190,7 @@ export class SettingsComponent implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.settingsSaveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.errors.settingsSaveFailed'));
       },
     });
   }
@@ -2221,7 +2222,7 @@ export class SettingsComponent implements OnInit {
         this.stagesLoading.set(false);
       },
       error: err => {
-        this.stagesError.set(err?.error?.error || this.transloco.translate('admin.settings.leadStages.loadFailedTitle'));
+        this.stagesError.set(localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('admin.settings.leadStages.loadFailedTitle'));
         this.stagesLoading.set(false);
       },
     });
@@ -2389,7 +2390,7 @@ export class SettingsComponent implements OnInit {
    */
   private onStageError(err: any): void {
     this.stagesSaving.set(false);
-    this.toast.error(err?.error?.error || this.transloco.translate('admin.settings.leadStages.saveFailed'));
+    this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('admin.settings.leadStages.saveFailed'));
   }
 
   // ── Enrichment / ICP tab (tenant admin — dynamic ICP signals of THIS tenant) ─
@@ -2614,7 +2615,7 @@ export class SettingsComponent implements OnInit {
       this.loadIcpConfig();
       return;
     }
-    this.toast.error(err?.error?.error ?? this.transloco.translate('admin.settings.errors.saveFailed'));
+    this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.settings.errors.saveFailed'));
   }
 }
 

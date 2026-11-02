@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { environment } from '../../../../environments/environment';
 import { ToastService } from '../../../core/services/toast.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const API = `${environment.apiUrl}/admin/pbx`;
 
@@ -360,7 +361,7 @@ export class AdminPbxComponent implements OnInit {
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err.error?.error ?? this.transloco.translate('admin.pbx.toast.saveError'));
+        this.toast.error(localizedApiErrorMessage(err.error?.error, this.transloco) ?? this.transloco.translate('admin.pbx.toast.saveError'));
       },
     });
   }

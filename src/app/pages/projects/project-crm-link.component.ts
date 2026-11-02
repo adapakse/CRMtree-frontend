@@ -8,6 +8,7 @@ import { CrmApiService } from '../../core/services/crm-api.service';
 import { ProjectDetail, ProjectsApiService } from '../../core/services/projects-api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { TypeaheadComponent, TypeaheadOption } from '../../shared/components/typeahead/typeahead.component';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 /** What the link API takes: a lead id, or a partner reference (CRM uuid, else DWH id). */
 type CrmLink = { lead_id: number } | { partner_ref: string };
@@ -127,7 +128,7 @@ export class ProjectCrmLinkComponent {
   private send(link: { lead_id?: number; partner_ref?: string }, fallbackError: string): void {
     this.projectsApi.setCrmLink(this.detail().project.id, link).subscribe({
       next: () => { this.isEditing.set(false); this.changed.emit(); },
-      error: err => this.toast.error(err?.error?.error ?? fallbackError),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? fallbackError),
     });
   }
 }

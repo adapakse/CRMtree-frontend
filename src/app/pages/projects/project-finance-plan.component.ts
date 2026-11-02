@@ -6,6 +6,7 @@ import {
 } from '../../core/services/project-finance-api.service';
 import { PROJECT_CURRENCIES, ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { PROJECT_FINANCE_STYLES, parseMoneyInput } from './project-finance.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 /**
  * Plan of the project finance: currency, planned revenue and whether
@@ -103,7 +104,7 @@ export class ProjectFinancePlanComponent {
       next: summary => this.saved.emit(summary),
       error: err => {
         restore?.();
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.plan.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.plan.saveFailed'));
       },
     });
   }

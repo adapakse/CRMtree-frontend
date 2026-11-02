@@ -7,6 +7,7 @@ import { EnvironmentBannerService } from '../../core/services/environment-banner
 import { TenantContextService } from '../../core/services/tenant-context.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LanguagePickerComponent } from '../../shared/components/language-picker/language-picker.component';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 type Tab = 'sso' | 'password';
 
@@ -194,7 +195,7 @@ export class LoginComponent implements OnInit {
       },
       error: err => {
         this.loading.set(false);
-        this.errorMsg.set(err?.error?.error ?? this.transloco.translate('auth.login.failed'));
+        this.errorMsg.set(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('auth.login.failed'));
       },
     });
   }

@@ -12,6 +12,7 @@ import { ProjectFinancePlanComponent } from './project-finance-plan.component';
 import { ProjectFinanceRevenuesComponent } from './project-finance-revenues.component';
 import { ProjectFinanceSummaryComponent } from './project-finance-summary.component';
 import { ProjectFinanceTaskCostsComponent } from './project-finance-task-costs.component';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 /**
  * "Finance" tab of a project: summary tiles, plan, budget per category, cost
@@ -96,7 +97,7 @@ export class ProjectFinanceComponent implements OnInit {
       },
       error: err => {
         this.hasLoadFailed.set(true);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.loadFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.loadFailed'));
       },
     });
   }

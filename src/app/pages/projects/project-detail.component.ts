@@ -18,6 +18,7 @@ import { ProjectTaskPanelComponent } from './project-task-panel.component';
 import { ProjectTasksTabComponent } from './project-tasks-tab.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { EntityAttachmentsComponent } from '../../shared/components/entity-attachments/entity-attachments.component';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 type ProjectTab = 'tasks' | 'gantt' | 'chat' | 'finance' | 'card' | 'attachments';
 
@@ -248,7 +249,7 @@ export class ProjectDetailComponent implements OnInit {
         if (this.activeTab() === 'finance' && !this.canReadFinance()) this.activeTab.set('tasks');
       },
       error: err => {
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.detail.openFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.detail.openFailed'));
         this.router.navigate(['/projects']);
       },
     });
@@ -283,7 +284,7 @@ export class ProjectDetailComponent implements OnInit {
         this.detail.set(detail);
         if (this.activeTab() === 'finance' && !this.canReadFinance()) this.activeTab.set('tasks');
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.detail.refreshFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.detail.refreshFailed')),
     });
     // Removing a member unassigns them from tasks, so the task list may have changed too.
     this.loadTasks();
@@ -294,7 +295,7 @@ export class ProjectDetailComponent implements OnInit {
     this.ganttTab()?.reload();
     this.api.listTasks(this.projectId, false).subscribe({
       next: tasks => this.tasks.set(tasks),
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.detail.tasksLoadFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.detail.tasksLoadFailed')),
     });
   }
 }

@@ -8,6 +8,7 @@ import {
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const REVENUE_STATUSES: ProjectRevenueStatus[] = ['planned', 'invoiced', 'paid'];
 
@@ -169,7 +170,7 @@ export class ProjectFinanceRevenuesComponent {
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.revenues.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.revenues.saveFailed'));
       },
     });
   }
@@ -179,7 +180,7 @@ export class ProjectFinanceRevenuesComponent {
     if (!confirm(this.transloco.translate('projects.finance.revenues.deleteConfirm', { item: label }))) return;
     this.api.deleteRevenue(this.projectId(), item.id).subscribe({
       next: () => this.changed.emit(),
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.revenues.deleteFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.revenues.deleteFailed')),
     });
   }
 

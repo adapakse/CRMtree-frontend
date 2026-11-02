@@ -22,6 +22,7 @@ import { environment } from '../../../../environments/environment';
 import { CrmApiService } from '../../../core/services/crm-api.service';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { DEFAULT_LOCALE } from '../../../core/i18n/locales';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 // Built-in values have translated names; any other value comes from App
 // Settings and is its own display name.
@@ -937,7 +938,7 @@ export class DetailPanelComponent implements OnChanges {
         this.previewLoading.set(false);
       },
       error: (err) => {
-        this.previewError.set(err?.error?.error ?? this.transloco.translate('documents.detail.preview.loadFailed'));
+        this.previewError.set(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('documents.detail.preview.loadFailed'));
         this.previewLoading.set(false);
       }
     });
@@ -1067,7 +1068,7 @@ export class DetailPanelComponent implements OnChanges {
         this.reloadHistory();
       },
       error: err => {
-        const msg = err?.error?.error || err?.message || this.transloco.translate('documents.detail.attachments.uploadFailed');
+        const msg = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate<string>('documents.detail.attachments.uploadFailed');
         this.toast.error(msg);
       },
     });
@@ -1086,7 +1087,7 @@ export class DetailPanelComponent implements OnChanges {
         this.docSvc.getAttachments(this.doc.id).subscribe(list => { this.attachments.set(list); this.attachmentsLoaded = true; });
       },
       error: err => {
-        const msg = err?.error?.error || err?.message || this.transloco.translate('documents.detail.attachments.versionUploadFailed');
+        const msg = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate<string>('documents.detail.attachments.versionUploadFailed');
         this.toast.error(msg);
       },
     });
@@ -1279,7 +1280,7 @@ export class DetailPanelComponent implements OnChanges {
         }
       },
       error: (err: any) => {
-        this.toast.error(err?.error?.error || this.transloco.translate('documents.detail.signus.sendFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('documents.detail.signus.sendFailed'));
       },
     });
   }

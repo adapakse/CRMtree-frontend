@@ -8,6 +8,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LeadStagesService } from '../../../core/services/lead-stages.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 @Component({
   selector: 'wt-crm-import',
@@ -464,7 +465,7 @@ export class CrmImportComponent implements OnInit {
         next: (r: any) => this.zone.run(() => { this.uploadingDocs = false; this.docsResult = r; this.loadLogs(); this.cdr.markForCheck(); }),
         error: (err: any) => this.zone.run(() => {
           this.uploadingDocs = false;
-          this.docsResult = { import_id: 0, filename: file.name, rows_total: 0, imported: 0, skipped: 0, errors_count: 1, errors: [{ row: 0, error: err?.error?.error || this.transloco.translate('crm.csvImport.messages.serverError') }] } as any;
+          this.docsResult = { import_id: 0, filename: file.name, rows_total: 0, imported: 0, skipped: 0, errors_count: 1, errors: [{ row: 0, error: localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.csvImport.messages.serverError') }] } as any;
           this.cdr.markForCheck();
         }),
       });
@@ -488,7 +489,7 @@ export class CrmImportComponent implements OnInit {
       }),
       error: err => this.zone.run(() => {
         this.uploadingSales = false;
-        this.salesResult    = { rows_total: 0, rows_imported: 0, rows_skipped: 0, rows_error: 1, errors: [{ line: 0, reason: err?.error?.error || this.transloco.translate('crm.csvImport.messages.serverError') }] };
+        this.salesResult    = { rows_total: 0, rows_imported: 0, rows_skipped: 0, rows_error: 1, errors: [{ line: 0, reason: localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.csvImport.messages.serverError') }] };
         this.cdr.markForCheck();
       }),
     });
