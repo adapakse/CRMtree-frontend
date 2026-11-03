@@ -575,10 +575,11 @@ export class CrmSeoComponent implements OnInit {
     return status === 'in_review' || status === 'needs_update' || status === 'draft';
   }
 
-  // Approval locks the text, not the byline: an approved or scheduled article
-  // (often given an author by the calendar rotation) can still be re-assigned.
+  // Approval locks the text, not the byline: the author (often given by the
+  // calendar rotation) can be re-assigned even after publishing — the blog
+  // reads it live, so the article keeps its date and address.
   canChangeAuthor(status: SeoContentStatus): boolean {
-    return this.isEditable(status) || status === 'approved' || status === 'scheduled';
+    return this.isEditable(status) || status === 'approved' || status === 'scheduled' || status === 'published';
   }
 
   setStatusFilter(value: ContentFilter): void {
