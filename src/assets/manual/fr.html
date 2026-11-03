@@ -1288,7 +1288,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><span class="badge b-blue">En validation</span></td><td>Défini manuellement lorsque le document attend une décision.</td></tr>
 <tr><td><span class="badge b-blue">En signature</span></td><td>Défini automatiquement lorsqu’une tâche de signature est assignée ou que le document est envoyé pour signature électronique.</td></tr>
 <tr><td><span class="badge b-green">Signé</span>, <span class="badge b-green">Terminé</span></td><td>Le document est signé ou clos. Une facture enregistrée depuis KSeF est Terminée d’emblée.</td></tr>
-<tr><td><span class="badge b-red">Rejeté</span>, <span class="badge b-orange">En attente</span></td><td>Défini manuellement.</td></tr>
+<tr><td><span class="badge b-red">Rejeté</span>, <span class="badge b-orange">Suspendu</span></td><td>Défini manuellement.</td></tr>
 </table></div>
 <p>Tous les autres changements de statut se font manuellement dans les détails du document. Terminer une tâche ne change pas le statut du document.</p>
 
@@ -1331,7 +1331,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p>L’élément de menu <b>« Workflow »</b> propose deux vues :</p>
 <ul>
 <li><b>« Mes tâches »</b> : une carte par tâche avec le type, le document, la personne qui l’a attribuée, le groupe, l’échéance et le message. <b>« Commencer »</b> indique que vous y travaillez, <b>« Terminer »</b> la clôt et <b>« Ouvrir le document »</b> ouvre les détails. L’icône de calendrier ajoute l’échéance à Google Calendar, Outlook ou un fichier .ics.</li>
-<li><b>« Tableau Kanban »</b> : les documents dans les colonnes <b>« En attente »</b> (nouveau), <b>« En cours »</b> (rédaction, validation, signature), <b>« Terminés »</b> (signé, terminé) et <b>« Annulées »</b> (rejeté, en attente). Chaque carte affiche le nombre de tâches, le propriétaire, le groupe et la date d’expiration ou de paiement ; « BIENTÔT » et la couleur signalent une expiration proche.</li>
+<li><b>« Tableau Kanban »</b> : les documents dans les colonnes <b>« En attente »</b> (nouveau), <b>« En cours »</b> (rédaction, validation, signature), <b>« Terminés »</b> (signé, terminé) et <b>« Annulées »</b> (rejeté, suspendu). Chaque carte affiche le nombre de tâches, le propriétaire, le groupe et la date d’expiration ou de paiement ; « BIENTÔT » et la couleur signalent une expiration proche.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_d04_workflow.jpg" width="1440" height="900" alt="Workflow – Mes tâches"><figcaption>« Workflow » → « Mes tâches » pour Anna : lecture, validation et rédaction, avec les échéances.</figcaption></figure>
 <p>Les tâches de documents ouvertes qui sont en retard, à échéance aujourd’hui ou sans date figurent aussi dans l’e-mail quotidien « Vos tâches », si vous l’avez activé dans « Mes paramètres ».</p>
@@ -1508,7 +1508,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="tbl"><table>
 <tr><th>Panneau</th><th>Ce qu’il affiche</th><th>Filtres</th></tr>
 <tr><td>« Leads par commercial (selon le score du prospect) »</td><td>Leads créés à partir de prospects pour chaque commercial sur la période, répartis par score de prospect.</td><td>période, étape du lead</td></tr>
-<tr><td>« Prospects dans la base (selon le score et le statut) »</td><td>Photo du jour : combien d’entreprises sont des prospects, des leads, en attente ou archivées, réparties par score.</td><td>statut, « Afficher score=NULL », « Afficher &lt; 45 », bases</td></tr>
+<tr><td>« Prospects dans la base (selon le score et le statut) »</td><td>Instantané du jour : combien d’entreprises sont des prospects, des leads, en attente ou archivées, réparties par score.</td><td>statut, « Afficher score=NULL », « Afficher &lt; 45 », bases</td></tr>
 <tr><td>« Prospects enrichis par base (score par groupe) »</td><td>Répartition des scores dans chaque base source (par ex. Lista-KAM, Targi2026). « aucun » signifie pas encore de score.</td><td>« Afficher &lt; 45 », « Rechercher une base… »</td></tr>
 <tr><td>« Appels PBX par commercial »</td><td>Appels téléphoniques des commerciaux sur la période, par statut d’appel.</td><td>période, direction, statut, « ≥ 35 s »</td></tr>
 </table></div>
@@ -1639,7 +1639,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="tbl"><table>
 <tr><th>Élément</th><th>Où le définir</th><th>Ce qu’il contrôle</th></tr>
 <tr><td><b>Rôle d’administrateur</b></td><td>Fiche utilisateur</td><td>Accès complet à toutes les données et à tous les paramètres de l’entreprise.</td></tr>
-<tr><td><b>Rôle CRM</b> : Commercial ou Responsable commercial</td><td>Fiche utilisateur</td><td>Accès au module CRM et leads et partenaires que l’utilisateur voit. Seules les personnes ayant un rôle CRM peuvent se connecter à l’application mobile CRMtree.</td></tr>
+<tr><td><b>Rôle CRM</b> : Commercial ou Responsable commercial</td><td>Fiche utilisateur</td><td>Accès au module CRM et aux leads et partenaires que l’utilisateur voit. Seules les personnes ayant un rôle CRM peuvent se connecter à l’application mobile CRMtree.</td></tr>
 <tr><td><b>Groupes</b> (accès « Lecture » ou « Complet »)</td><td>« Groupes et rôles » + fiche utilisateur</td><td>L’équipe d’un responsable commercial, l’accès aux documents du groupe, l’accès aux Prospects.</td></tr>
 <tr><td><b>Droits de visibilité CRM</b></td><td>Fiche utilisateur</td><td>Visibilité supplémentaire sur les leads ou partenaires dont les membres d’un groupe choisi sont responsables.</td></tr>
 </table></div>
@@ -1784,7 +1784,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td>Taille de page par défaut / Nombre de rôles affichés en aperçu</td><td>Pagination et nombre de pastilles de groupes affichées dans la liste des utilisateurs.</td></tr>
 <tr><td>Limite de lignes pour l’import CSV, 5 000 par défaut</td><td>Un fichier de leads comportant davantage de lignes est rejeté en bloc.</td></tr>
 <tr><td><b>Mode formation</b></td><td>Simule l’envoi d’e-mails, de signatures et d’appels. Pratique pour les sessions de formation. Désactivez-le avant la mise en production.</td></tr>
-<tr><td>Signature e-mail – URL de la bannière / mention de confidentialité</td><td>Une image (jusqu’à 600 px de large) et des mentions en petits caractères grises ajoutées sous la signature personnelle de chaque commercial dans les e-mails envoyés depuis le CRM.</td></tr>
+<tr><td>Signature e-mail – URL de la bannière / mention de confidentialité</td><td>Une image (jusqu’à 600 px de large) et des mentions en petits caractères gris ajoutées sous la signature personnelle de chaque commercial dans les e-mails envoyés depuis le CRM.</td></tr>
 </table></div>
 
 <h4 id="p2-ai">Fournisseurs IA</h4>
@@ -1893,7 +1893,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td>Types de documents</td><td>Contrat de partenariat, NDA, contrat de fournisseur informatique, contrat de travail, facture</td></tr>
 <tr><td>Statuts des documents</td><td>Nouveau … Signé, Terminé, Rejeté</td></tr>
 <tr><td>Types RGPD des documents</td><td>Sans RGPD, sous-traitance du traitement de données, administration de données</td></tr>
-<tr><td>Statuts de paiement des factures</td><td>Non payée, Partiellement payée, Payée, en retard. Une facture « Payée » n’est jamais signalée en retard.</td></tr>
+<tr><td>Statuts de paiement des factures</td><td>Non payée, Partiellement payée, Payée, En retard. Une facture « Payée » n’est jamais signalée en retard.</td></tr>
 <tr><td>Entité 1 – options du dictionnaire</td><td>Vos propres entités juridiques, par ex. « CRMtree Demo Sp. z o.o. »</td></tr>
 <tr><td>Objets du contrat</td><td>Votre propre liste ; l’entreprise de démonstration utilise licences, services de mise en œuvre, fourniture de matériel, formation et autres</td></tr>
 </table></div>
@@ -1916,7 +1916,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p>L’onglet <b>« Enrichment / ICP »</b> (avec le module Prospects) définit votre profil de client idéal. Pour chaque entreprise, l’IA répond par oui ou non à chaque <b>signal ICP</b> actif, et CRMtree additionne les points des signaux auxquels elle répond oui. Le résultat est un score de 0 à 100 affiché dans la liste des prospects.</p>
 <figure class="webfig"><img loading="lazy" src="img/en_a06_settings_icp.jpg" width="1440" height="900" alt="Signaux ICP"><figcaption>Les signaux ICP de l’entreprise de démonstration : « Total des points : 100 / 100 », version 7 publiée par Jan Kowalski.</figcaption></figure>
 <ul>
-<li>Chaque signal a un interrupteur on/off, un nom, une courte description et des points. <b>« Modifier »</b> ouvre une boîte de dialogue : « Nom du signal », <b>« Comment reconnaître ce signal ? »</b> (l’instruction donnée à l’IA, transmise mot pour mot), « Infobulle / courte description pour l’utilisateur », « Points », « Actif ».</li>
+<li>Chaque signal a un interrupteur d’activation, un nom, une courte description et des points. <b>« Modifier »</b> ouvre une boîte de dialogue : « Nom du signal », <b>« Comment reconnaître ce signal ? »</b> (l’instruction donnée à l’IA, transmise mot pour mot), « Infobulle / courte description pour l’utilisateur », « Points », « Actif ».</li>
 <li><b>« + Ajouter un signal »</b> ajoute un nouveau signal.</li>
 <li>Les points des signaux actifs doivent totaliser exactement <b>100</b>. Ce n’est qu’alors que CRMtree publie une nouvelle version de la configuration. D’ici là, l’enrichissement continue d’utiliser la dernière version valide.</li>
 <li>La ligne « Dernière mise à jour » indique le numéro de version, la date et l’auteur. Un signal déjà utilisé n’est que désactivé lorsque vous le supprimez, afin que les anciens résultats puissent toujours être expliqués.</li>

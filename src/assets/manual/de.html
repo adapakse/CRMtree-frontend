@@ -1488,7 +1488,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <ol class="steps">
 <li>Klicken Sie auf <b>„→ Lead“</b>. Der Dialog „Lead im CRM anlegen“ öffnet sich.</li>
 <li>Bestätigen oder korrigieren Sie die <b>„Steuernummer des Unternehmens“</b>. CRMtree prüft damit auf Duplikate.</li>
-<li>Wählen Sie unter <b>„Vertriebsmitarbeiter zuweisen“</b> den Betreuer. Standardmäßig ist der Lead Ihrer.</li>
+<li>Wählen Sie unter <b>„Vertriebsmitarbeiter zuweisen“</b> den Betreuer. Standardmäßig wird der Lead Ihnen zugewiesen.</li>
 <li>Fügen Sie optional einen <b>„Tag“</b> hinzu, z. B. „q4-2026“.</li>
 <li>Klicken Sie auf <b>„→ Lead anlegen“</b>.</li>
 </ol>
@@ -1516,7 +1516,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <figure class="webfig"><img loading="lazy" src="img/en_r03_prospects_dashboard.jpg" width="1440" height="900" alt="Prospects-Dashboard"><figcaption>Das „Prospects-Dashboard“ von Anna Nowicka: Leads aus Interessenten in dieser Woche und der Zustand der Interessenten-Datenbank.</figcaption></figure>
 
 <div class="example"><span class="lbl">BEISPIEL · VON DER MESSE ZUM LEAD</span>
-<p>Piotr Zieliński importiert eine Messeliste als Datenbank „Targi2026“. Nach „Enrichment starten“ erreicht Borowik Maszyny Demo einen Score von 90. Die KI-Zusammenfassung weist auf eine Vertriebsabteilung und Beratungen vor dem Verkauf hin, und zu den Kontakten gehört der Geschäftsführer mit einer Telefonnummer. Piotr klickt auf „→ Lead“ und behält den Lead sich selbst zugewiesen.</p>
+<p>Piotr Zieliński importiert eine Messeliste als Datenbank „Targi2026“. Nach „Enrichment starten“ erreicht Borowik Maszyny Demo einen Score von 90. Die KI-Zusammenfassung weist auf eine Vertriebsabteilung und Beratungen vor dem Verkauf hin, und zu den Kontakten gehört der Geschäftsführer mit einer Telefonnummer. Piotr klickt auf „→ Lead“ und belässt den Lead bei sich selbst.</p>
 <p class="res">Im CRM erscheint ein Lead „Borowik Maszyny Demo“ in der Phase „Neu“, mit zwei Kontakten und der KI-Zusammenfassung in den Notizen. Der Interessent zeigt „Lead im CRM“ und ein Etikett „Lead“, und im „Prospects-Dashboard“ sieht Anna Nowicka Piotrs neuen Lead im Bereich 85–94.</p></div>
 </section>
 
@@ -1833,7 +1833,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <ul>
 <li><b>„Phase hinzufügen“</b> fügt am Ende des Trichters, vor Gewonnen, einen Schritt hinzu. Seine Wahrscheinlichkeit liegt in der Mitte zwischen dem vorherigen Schritt und 100 %. Der Trichter kann bis zu 10 Schritte haben.</li>
 <li><b>„Löschen“</b> funktioniert für Trichterschritte sowie für Gewonnen und Verloren. Leads in der gelöschten Phase wandern zum vorherigen Schritt (vom ersten Schritt zum nächsten; von Gewonnen und Verloren zum letzten Schritt). Die Bestätigung sagt Ihnen, wie viele Leads wohin wandern.</li>
-<li>Die Phasen „umgewandelt“ und „Archiv“ können nicht gelöscht werden, weil die App sie selbst setzt, ebenso wenig der letzte Trichterschritt. Umbenennen können Sie sie immer.</li>
+<li>Die Phasen „umgewandelt“ und „Archiv“ können nicht gelöscht werden, weil die App sie selbst setzt, ebenso wenig kann der letzte Trichterschritt gelöscht werden. Umbenennen können Sie sie immer.</li>
 </ul>
 <p><b>Was Vertriebsmitarbeiter tun können:</b> Ein neuer Lead beginnt im ersten Schritt. Aus jeder Phase wechselt ein Lead einen Schritt vor oder zurück oder direkt zu Verloren. Aus Gewonnen kann er nur zurück zum letzten Schritt; aus Verloren und Archiv nur zum ersten Schritt. Der Wechsel zu Verloren erfordert einen Verlustgrund. „Zurückstellen“ (einen Lead mit Grund und Datum pausieren) ist in jedem Schritt außer dem ersten möglich.</p>
 
@@ -1903,7 +1903,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <section class="ch" id="p2-onboarding">
 <h3>Onboarding-Vorlagen, Lead-Quellen und Tooltips</h3>
 <p>Die Registerkarte <b>„Onboarding-Vorlagen“</b> hat zwei Editoren.</p>
-<p><b>Vorlagen für Onboarding-Aufgaben</b> sind die Standardaufgaben für jeden Schritt der Einführung eines neuen Partners: „Vertragsunterzeichnung“, „Konfiguration“, „Schulung“, „Freischaltung“. Für jede Vorlage legen Sie Titel, Typ (Anruf, E-Mail, Meeting, Aufgabe, Schulung, Dokument), Zugewiesenen und die Anzahl der Tage nach der Migration des Leads (das Fälligkeitsdatum) fest. Ein grüner Hintergrund kennzeichnet eine Standardaufgabe, die automatisch angelegt wird, wenn ein Lead ins Onboarding wechselt. Andere Vorlagen werden vorgeschlagen, wenn im Onboarding-Panel Aufgaben angelegt werden. Der Schritt „Vertragsunterzeichnung“ geht immer an den Vertriebsmitarbeiter des Leads.</p>
+<p><b>Vorlagen für Onboarding-Aufgaben</b> sind die Standardaufgaben für jeden Schritt der Einführung eines neuen Partners: „Vertragsunterzeichnung“, „Konfiguration“, „Schulung“, „Freischaltung“. Für jede Vorlage legen Sie Titel, Typ (Anruf, E-Mail, Meeting, Aufgabe, Schulung, Dokument), Zugewiesenen und die Anzahl der Tage nach der Überführung des Leads (das Fälligkeitsdatum) fest. Ein grüner Hintergrund kennzeichnet eine Standardaufgabe, die automatisch angelegt wird, wenn ein Lead ins Onboarding wechselt. Andere Vorlagen werden vorgeschlagen, wenn im Onboarding-Panel Aufgaben angelegt werden. Der Schritt „Vertragsunterzeichnung“ geht immer an den Vertriebsmitarbeiter des Leads.</p>
 <p>Das <b>Wörterbuch der Lead-Quellen</b> ist die Liste der Werte für das Feld Quelle des Leads: „Wert (Code)“, „Bezeichnung (angezeigt)“ und „Gruppe“. Werte mit einer Gruppe (blauer Hintergrund, z. B. „Marketing“) werden im Abschnitt Marketing der Listen angezeigt. <b>„Quelle hinzufügen“</b> fügt eine Zeile hinzu.</p>
 <figure class="webfig"><img loading="lazy" src="img/en_a05_settings_onboarding.jpg" width="1440" height="900" alt="Onboarding-Vorlagen und Lead-Quellen"><figcaption>Lead-Quellen: „Własne“ (eigene), „Cold Call“, „Partner“ und „Agent“ ohne Gruppe, dazu Kanäle in der Gruppe „Marketing“.</figcaption></figure>
 

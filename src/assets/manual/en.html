@@ -642,7 +642,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <h4 id="p1-partners-list"><span class="tag web">WEB</span>Partner registry</h4>
 <p>Go to <b>“Partners” → “Partner registry”</b>. Partners are shown as cards by default; switch between <b>“Cards”</b> and <b>“Table”</b> at the top.</p>
 <ul>
-<li>The <b>search box</b> (“Search company, contact…”) looks through company names, e-mail addresses, tax IDs, contact names and phone numbers.</li>
+<li>The <b>search box</b> (“Search company, contact…”) looks through company names, email addresses, tax IDs, contact names and phone numbers.</li>
 <li>Filters: <b>“All statuses”</b>, <b>“All groups”</b>, <b>“All industries”</b>. Managers also get <b>“All salespeople”</b>. “Clear” resets them.</li>
 <li><b>“Only mine”</b> limits the list to partners you own.</li>
 </ul>
@@ -679,10 +679,10 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td>Level</td><td><span class="badge b-gray">Low</span> from 21 · <span class="badge b-orange">Medium</span> from 51 · <span class="badge b-red">High</span> from 71 · <span class="badge b-red">Critical</span> from 91 pts</td></tr>
 </table></div>
 <p>The registry refreshes the score once a day, in the morning. The “Churn risk” widget on the card calculates it when you open the card and shows the days without an order and the drop. With no risk you will see “No churn risk”.</p>
-<div class="callout"><b>“Churn” tasks are created automatically</b>Every morning CRMtree creates a task “Churn: &lt;company&gt; [level]” for the account owner of each partner at medium, high or critical risk. Due date: critical today, high in 3 days, medium in 7 days. For high and critical risk the owner also gets an e-mail. No new task is created while the previous one is still open.</div>
+<div class="callout"><b>“Churn” tasks are created automatically</b>Every morning CRMtree creates a task “Churn: &lt;company&gt; [level]” for the account owner of each partner at medium, high or critical risk. Due date: critical today, high in 3 days, medium in 7 days. For high and critical risk the owner also gets an email. No new task is created while the previous one is still open.</div>
 <div class="example"><span class="lbl">EXAMPLE · GRYF BUDOWA DEMO</span>
 <p>Gryf Budowa Demo hasn’t ordered for more than 30 days (50 pts), and its sales last month fell by more than half (50 pts).</p>
-<p class="res">Total 100 pts, level “Critical”. Piotr Zieliński, the account owner, gets a “Churn: Gryf Budowa Demo… [Krytyczne]” task due today, plus an e-mail.</p></div>
+<p class="res">Total 100 pts, level “Critical”. Piotr Zieliński, the account owner, gets a “Churn: Gryf Budowa Demo… [Krytyczne]” task due today, plus an email.</p></div>
 
 <h4 id="p1-partner-edit">Editing a partner</h4>
 <p><span class="tag web">WEB</span> <b>“Edit”</b> opens the “Edit partner” window with sections for basic data, Partner Admin, contract contact, additional contacts, billing contact, billing address, financial terms, account owner and group, sales and source, contract and finance, additional data, and tags and notes. You can edit partners you own. Fields tagged <b>DWH</b> are synchronised from the transaction system and are read-only. Every change is logged in the card’s “Change history”.</p>
@@ -695,7 +695,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 </div>
 <p>The partner card has four tabs:</p>
 <ul>
-<li><b>“Details”</b>: status, active since, industry, account owner, contact (call, text or e-mail with one tap), additional contacts, notes, billing and additional data. The pencil at the top lets you correct company and contact details.</li>
+<li><b>“Details”</b>: status, active since, industry, account owner, contact (call, text or email with one tap), additional contacts, notes, billing and additional data. The pencil at the top lets you correct company and contact details.</li>
 <li><b>“Finance”</b>: warehouse sales with a period picker (“Year to date”, current month, last 3, 6 or 12 months), gross and net turnover, margin, transactions, a “By product” split and “Financial terms” with the contract value and dates. This tab is read-only.</li>
 <li><b>“Activities”</b>: the partner’s activities, working the same way as on a lead card. The <b>“+”</b> button adds an activity from any tab.</li>
 <li><b>“Projects”</b>: projects linked to the partner (if your company has the Projects module).</li>
@@ -750,19 +750,19 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><span class="tag web">WEB</span> Click the gear icon, <b>“My settings”</b>, at the bottom of the menu. The page is made of cards:</p>
 <div class="tbl"><table>
 <tr><th>Card</th><th>What it’s for</th></tr>
-<tr><td><b>“Interface language”</b></td><td>The app language, or the organization default. E-mails and reminders are sent in this language too. Changing it reloads the page.</td></tr>
+<tr><td><b>“Interface language”</b></td><td>The app language, or the organisation default. Emails and reminders are sent in this language too. Changing it reloads the page.</td></tr>
 <tr><td><b>“Change password”</b></td><td>Current password, new password (at least 8 characters) and confirmation. Changing it signs your account out of the mobile app.</td></tr>
-<tr><td><b>“My email signature”</b></td><td>Paste your signature as HTML and check the “Preview”. It is appended to every e-mail you send from lead and partner cards.</td></tr>
+<tr><td><b>“My email signature”</b></td><td>Paste your signature as HTML and check the “Preview”. It is appended to every email you send from lead and partner cards.</td></tr>
 <tr><td><b>“Email templates”</b></td><td>Your own ready-made messages (“+ New template”) to insert when writing to a lead or partner.</td></tr>
 <tr><td><b>“Signed-in phones”</b></td><td>Phones signed in to the CRMtree app with your account. “Sign out” disconnects one, for example a lost phone.</td></tr>
 <tr><td><b>“Softphone – PBX token”</b></td><td>If your company uses the phone system: paste your Personal Access Token from the ip-pbx.eu panel and enable call notifications. You can then call from lead and partner cards in the browser.</td></tr>
-<tr><td><b>“Project deadline notifications”</b></td><td>With the Projects module: e-mails about overdue tasks, changed due dates and delayed projects.</td></tr>
+<tr><td><b>“Project deadline notifications”</b></td><td>With the Projects module: emails about overdue tasks, changed due dates and delayed projects.</td></tr>
 <tr><td><b>“Substitution during absence”</b></td><td>Your holiday or other absence and who covers for you. See below.</td></tr>
 </table></div>
-<figure class="webfig"><img loading="lazy" src="img/en_w11_my_settings.jpg" width="1440" height="900" alt="My settings"><figcaption>“My settings”: language, password and e-mail signature.</figcaption></figure>
+<figure class="webfig"><img loading="lazy" src="img/en_w11_my_settings.jpg" width="1440" height="900" alt="My settings"><figcaption>“My settings”: language, password and email signature.</figcaption></figure>
 
 <h4 id="p1-settings-mailbox">Connecting your mailbox</h4>
-<p><span class="tag web">WEB</span> You connect your mailbox from a lead or partner card, not from the settings. Open the <b>“Emails”</b> tab and click <b>“+ New email”</b>. The first time, a sign-in window for your company mail opens (your company decides which provider is used). Once you agree, you’ll see a confirmation and the message form with your address as the sender. From then on, customer replies show up on lead and partner cards whenever the sender matches the company’s or a contact’s e-mail address. The <b>“Disconnect”</b> link in the form disconnects the mailbox.</p>
+<p><span class="tag web">WEB</span> You connect your mailbox from a lead or partner card, not from the settings. Open the <b>“Emails”</b> tab and click <b>“+ New email”</b>. The first time, a sign-in window for your company mail opens (your company decides which provider is used). Once you agree, you’ll see a confirmation and the message form with your address as the sender. From then on, customer replies show up on lead and partner cards whenever the sender matches the company’s or a contact’s email address. The <b>“Disconnect”</b> link in the form disconnects the mailbox.</p>
 
 <h4 id="p1-settings-substitution">Substitution during absence</h4>
 <p>Before you go on leave, name someone to cover for you. For the duration of your absence the substitute has full access to your leads and partners, with the same permissions you have.</p>
@@ -770,7 +770,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>In “My settings”, scroll to <b>“Substitution during absence”</b>.</li>
 <li>Pick a <b>“Reason”</b>: “Vacation”, “Sick leave” or “Other absence”.</li>
 <li>Set <b>“Date from”</b> and <b>“Date to”</b> (whole days) and choose the <b>“Substitute”</b>. You can add a note, e.g. “urgent matters should go to…”.</li>
-<li>Click <b>“Save substitution”</b>. The substitute gets an e-mail about it.</li>
+<li>Click <b>“Save substitution”</b>. The substitute gets an email about it.</li>
 </ol>
 <p>The absences table shows the status: “Upcoming”, “Ongoing”, “Ended” or “Cancelled”. “Cancel” ends a substitution early. <b>“People I am substituting for”</b> lists the colleagues you are covering. Sales managers can also register absences for members of their team.</p>
 <div class="example"><span class="lbl">EXAMPLE · COVERING FOR PIOTR</span>
@@ -780,13 +780,13 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <h4 id="p1-settings-notifications">Reminders and the daily digest</h4>
 <ul>
-<li><b>Reminders</b> are set on an activity (e.g. “1 hr before”). They go to the activity owner by e-mail and as a notification in the mobile app.</li>
-<li><b>Tasks from colleagues</b>: when someone assigns you an activity, you get an e-mail and a phone notification.</li>
-<li><b>Daily digest</b>: on working days at 9:00 you receive “Your tasks”, an e-mail with “Overdue”, “Due today”, “Unread emails” and “No due date” sections. If there’s nothing on your plate, no e-mail is sent.</li>
+<li><b>Reminders</b> are set on an activity (e.g. “1 hr before”). They go to the activity owner by email and as a notification in the mobile app.</li>
+<li><b>Tasks from colleagues</b>: when someone assigns you an activity, you get an email and a phone notification.</li>
+<li><b>Daily digest</b>: on working days at 9:00 you receive “Your tasks”, an email with “Overdue”, “Due today”, “Unread emails” and “No due date” sections. If there’s nothing on your plate, no email is sent.</li>
 </ul>
 
 <h4 id="p1-settings-mobile"><span class="tag mob">MOBILE</span>Your profile in the app</h4>
-<p>The round person icon at the top left of every tab opens <b>“Profile”</b>. At the top you’ll see your name, e-mail and company. Below:</p>
+<p>The round person icon at the top left of every tab opens <b>“Profile”</b>. At the top you’ll see your name, email and company. Below:</p>
 <ul>
 <li><b>“Biometric sign-in”</b>: unlock the app with your fingerprint or face instead of a password. The app offers this after your first sign-in. With biometrics on, the app opens on an “Unlock CRMtree” screen; “Sign in with password” lets you use your password instead.</li>
 <li><b>“E-mails about project deadlines”</b>: the same setting as on the web (only with the Projects module).</li>
@@ -795,7 +795,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“Sign out”</b>: signs you out of the app.</li>
 </ul>
 <div class="phones">
-<figure class="phone"><img loading="lazy" src="img/en_t50_profile.jpg" width="540" height="1083" alt="Profile in the app"><figcaption>“Profile”: biometrics, e-mails, dark mode, language.</figcaption></figure>
+<figure class="phone"><img loading="lazy" src="img/en_t50_profile.jpg" width="540" height="1083" alt="Profile in the app"><figcaption>“Profile”: biometrics, emails, dark mode, language.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t51_language_sheet.jpg" width="540" height="1083" alt="Choosing the language"><figcaption>Choosing the app language.</figcaption></figure>
 <figure class="phone"><img loading="lazy" src="img/en_t52_dark_mode_start.jpg" width="540" height="1083" alt="Dark mode"><figcaption>The Home screen in dark mode.</figcaption></figure>
 </div>
@@ -811,7 +811,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>The registry shows a risk but the card says “No churn risk”.</b> The registry refreshes the score once a day in the morning, while the card calculates it live. They will match after the next refresh.</p>
 <p><b>Will my substitute see my tasks in their calendar?</b> No. The substitute can open your leads and partners (and the activities on their cards), but reminders and the daily digest still come to you.</p>
 <p><b>I’ve lost my phone.</b> In “My settings” → “Signed-in phones”, click “Sign out” next to that device. The app loses access within about fifteen minutes at most.</p>
-<p><b>Can I change the language only on my phone?</b> Yes: Profile → “Language” in the app. The language of e-mails and notifications is set in “My settings” in the web app.</p>
+<p><b>Can I change the language only on my phone?</b> Yes: Profile → “Language” in the app. The language of emails and notifications is set in “My settings” in the web app.</p>
 </section>
 
 <!-- ===================== SALES MANAGER: REPORTING ===================== -->
@@ -1123,9 +1123,9 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>Status</b></td><td>The list offers only the statuses your role may move the task to.</td></tr>
 <tr><td><b>Type</b>, <b>Priority</b></td><td>Values from your company’s dictionaries (by default a task, a meeting or a milestone, and four priority levels).</td></tr>
 <tr><td><b>Parent task</b></td><td>Builds the task tree. Only the PM changes it.</td></tr>
-<tr><td><b>Start date</b>, <b>End date</b></td><td>The task’s schedule. When you change an existing end date, the field <b>“Reason for the change of the end date”</b> appears. The reason goes into the task history and into the e-mail to the PM.</td></tr>
-<tr><td><b>Email reminder</b></td><td>On the due date, 1–3 days before, or a custom date. All assignees get it at 9:00 by e-mail and as a phone notification. It needs an end date.</td></tr>
-<tr><td><b>Assignees</b></td><td>Project members. Assigned by the PM. A newly assigned person gets an e-mail and a phone notification.</td></tr>
+<tr><td><b>Start date</b>, <b>End date</b></td><td>The task’s schedule. When you change an existing end date, the field <b>“Reason for the change of the end date”</b> appears. The reason goes into the task history and into the email to the PM.</td></tr>
+<tr><td><b>Email reminder</b></td><td>On the due date, 1–3 days before, or a custom date. All assignees get it at 9:00 by email and as a phone notification. It needs an end date.</td></tr>
+<tr><td><b>Assignees</b></td><td>Project members. Assigned by the PM. A newly assigned person gets an email and a phone notification.</td></tr>
 <tr><td><b>Custom fields</b></td><td>Company fields attached to the project, e.g. a required contract number.</td></tr>
 </table></div>
 <p>Further down the panel you find the task’s costs (when the project uses finance), task files, the <b>“Task discussion”</b> and the <b>“Change history”</b>. <b>“Add to calendar”</b> puts the due date into Google Calendar, Outlook or an .ics file.</p>
@@ -1162,7 +1162,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>WCA-6 “Testy akceptacyjne”, due 27 Oct, finished later: <b>Completed late</b>.</li>
 </ul>
 <p class="res">WCA-5 “Raport końcowy” ends on 21 Nov while the project ends on 16 Nov, so the project is “Delayed”: “Tasks ending after the project’s end date: 1 (the latest by 5 days)”.</p></div>
-<p>Deadline e-mails: a daily summary of overdue tasks (for the assignee and for the PM), plus e-mails to PMs when a task’s due date changes and when a project becomes delayed. You can turn them off in <b>“My settings”</b> → <b>“Project deadline notifications”</b>.</p>
+<p>Deadline emails: a daily summary of overdue tasks (for the assignee and for the PM), plus emails to PMs when a task’s due date changes and when a project becomes delayed. You can turn them off in <b>“My settings”</b> → <b>“Project deadline notifications”</b>.</p>
 
 <h4 id="p1-proj-gantt"><span class="tag web">WEB</span>Timeline</h4>
 <p>The <b>“Timeline”</b> tab shows tasks as bars (a Gantt chart) and uses the same filters as the list. Switch the scale with <b>“Days”</b>, <b>“Weeks”</b> and <b>“Months”</b>. A red outline means overdue, an amber one at risk, and a grey trail shows the original end date. The red vertical line is today, the dashed purple line is the project end date, and the hatched end of a bar runs past it. The timeline is for viewing; click a bar to open the task panel.</p>
@@ -1181,7 +1181,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <ul>
 <li><b>Project data</b>: name, description, dates, delay reason. The PM has <b>“Edit”</b> and <b>“Close project”</b>. A closed project is read-only and disappears from the default list; <b>“Reopen”</b> brings it back.</li>
 <li><b>“CRM link”</b>: a lead or a partner. <b>“Link”</b> opens a search (at least 3 characters) that suggests only leads and partners you can access in the CRM. Picking one saves the link straight away.</li>
-<li><b>“People in the project”</b>: person, e-mail, phone, company, role and access level. The PM adds people, changes roles and removes them (a removed person is also unassigned from their tasks). Below, the PM attaches <b>“Task custom fields”</b>.</li>
+<li><b>“People in the project”</b>: person, email, phone, company, role and access level. The PM adds people, changes roles and removes them (a removed person is also unassigned from their tasks). Below, the PM attaches <b>“Task custom fields”</b>.</li>
 </ul>
 <div class="callout"><b>Projects on lead and partner cards</b>The linked lead or partner card has a <b>“Project tasks”</b> block listing its projects with tasks, delay and a finance summary. People who are not project members get a preview and cannot open the tasks. When a lead converts to a partner, its projects move with it. Project tasks assigned to you also appear in the CRM calendar and dashboard at 9:00 on their due date.</div>
 
@@ -1323,9 +1323,9 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <h3>Workflow: tasks on documents</h3>
 <p>You assign a task from the document details, on the <b>“Workflow”</b> tab:</p>
 <ol class="steps">
-<li>In <b>“Assign to user”</b>, type a name or e-mail and pick the person.</li>
+<li>In <b>“Assign to user”</b>, type a name or email and pick the person.</li>
 <li>Choose the <b>“Task type”</b>: <b>Reading</b>, <b>Editing</b>, <b>Approval</b> or <b>Signature</b>. Optionally add a <b>“Due date”</b> and a <b>“Message”</b>.</li>
-<li>Click <b>“Assign and send email”</b>. The person gets an e-mail, and the task shows up under “Active tasks” and in their Workflow.</li>
+<li>Click <b>“Assign and send email”</b>. The person gets an email, and the task shows up under “Active tasks” and in their Workflow.</li>
 </ol>
 <p>Anyone with an open task sees the document in the list and can open it, even outside the document’s group. You cancel an open task with “Cancel” in the list of active tasks.</p>
 <p>The <b>“Workflow”</b> menu item has two views:</p>
@@ -1334,7 +1334,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“Kanban board”</b>: documents in the columns <b>“Pending”</b> (new), <b>“In progress”</b> (editing, approval, signing), <b>“Completed”</b> (signed, completed) and <b>“Cancelled”</b> (rejected, on hold). Each card shows the task count, owner, group and the expiry or payment date; “SOON” and colour warn about upcoming expiry.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_d04_workflow.jpg" width="1440" height="900" alt="Workflow – My tasks"><figcaption>“Workflow” → “My tasks” for Anna: reading, approval and editing, with due dates.</figcaption></figure>
-<p>Open document tasks that are overdue, due today or undated are also listed in the daily “Your tasks” e-mail, if you have it switched on in “My settings”.</p>
+<p>Open document tasks that are overdue, due today or undated are also listed in the daily “Your tasks” email, if you have it switched on in “My settings”.</p>
 <div class="example"><span class="lbl">EXAMPLE · A CONTRACT FROM EDITING TO COMPLETION</span>
 <ul>
 <li>Anna Nowicka creates “Umowa ramowa — Delta Druk Demo” in the sales group. Status: <b>New</b>, Kanban column “Pending”.</li>
@@ -1343,7 +1343,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li>Anna sets the status to <b>In approval</b>, saves, and assigns an <b>Approval</b> task to her manager.</li>
 </ul>
 <p class="res">Once approved and signed, Anna sets the status to Signed and finally Completed, and the document moves to the “Completed” column. If the customer declines, Anna sets “Rejected” and cancels the open task (Kanban “Cancelled”).</p></div>
-<p>If your company uses Signus electronic signatures, the Workflow tab has an <b>“Electronic signature (Signus)”</b> section. “Start signing with Signus” sends the document to the signatories (e-mail addresses separated by commas) and sets the status to “In signing”. Invoices are not sent for signing.</p>
+<p>If your company uses Signus electronic signatures, the Workflow tab has an <b>“Electronic signature (Signus)”</b> section. “Start signing with Signus” sends the document to the signatories (email addresses separated by commas) and sets the status to “In signing”. Invoices are not sent for signing.</p>
 </section>
 
 <section class="ch" id="p1-doc-invoices">
@@ -1411,7 +1411,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p>You add companies from a CSV file or with “Find competitors” (see <a href="#p1-pros-discovery">below</a>). Each company is identified by its Polish tax ID (NIP).</p>
 <ol class="steps">
 <li>Prepare a file with the <code>nip</code> and <code>BAZA</code> columns. BAZA is the name of the source list (e.g. “Targi2026”, “Lista-KAM”) and must be filled in on every row.</li>
-<li>Add any optional columns you have: <code>www</code>, <code>krs</code>, name, industry, headcount, city, region, PKD code and decision-maker details (name, position, department, phone, e-mail). A <code>www</code> column makes finding the website faster and cheaper.</li>
+<li>Add any optional columns you have: <code>www</code>, <code>krs</code>, name, industry, headcount, city, region, PKD code and decision-maker details (name, position, department, phone, email). A <code>www</code> column makes finding the website faster and cheaper.</li>
 <li>Click <b>“Choose a CSV file”</b>, then <b>“Import”</b>.</li>
 <li>Check the summary: “Added”, “Skipped (duplicates)”, “Errors”, “Rows in total”. Rows with an invalid tax ID (it must have 10 digits) are skipped and listed under “Error details”.</li>
 </ol>
@@ -1465,7 +1465,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“AI summary”</b>: two or three sentences about the company with a suggested next step.</li>
 <li><b>“ICP signals”</b>: green chips with ✓ are signals found, red chips with ✗ are signals not found.</li>
 <li>Company data: “Industry”, “Location”, “Employees”, PKD codes from GUS, and the website with its fetch status.</li>
-<li><b>“Decision maker (from the import file)”</b> and <b>“Key contacts — found by AI”</b>: name, position, e-mail and phone.</li>
+<li><b>“Decision maker (from the import file)”</b> and <b>“Key contacts — found by AI”</b>: name, position, email and phone.</li>
 <li><b>“Enrichment log”</b>: what was found in GUS, KRS and on the website, and the AI’s reasoning for each signal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Expanded prospect row"><figcaption>Borowik Maszyny Demo: score 90, status “Lead in CRM”, AI summary, signals and two key contacts.</figcaption></figure>
@@ -1913,7 +1913,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 
 <section class="ch" id="p2-icp">
 <h3>Enrichment / ICP</h3>
-<p>The <b>“Enrichment / ICP”</b> tab (with the Prospects module) defines your ideal customer profile. For each company, AI answers yes or no to every active <b>ICP signal</b>, and CRMtree adds up the points of the signals answered yes. The result is a score from 0 to 100 shown in the prospect list.</p>
+<p>The <b>“Enrichment / ICP”</b> tab (with the Prospects module) defines your ideal customer profile. For each company, the AI answers yes or no to every active <b>ICP signal</b>, and CRMtree adds up the points of the signals answered yes. The result is a score from 0 to 100 shown in the prospect list.</p>
 <figure class="webfig"><img loading="lazy" src="img/en_a06_settings_icp.jpg" width="1440" height="900" alt="ICP signals"><figcaption>The demo company’s ICP signals: “Total points: 100 / 100”, version 7 published by Jan Kowalski.</figcaption></figure>
 <ul>
 <li>Each signal has an on/off switch, a name, a short description and points. <b>“Edit”</b> opens a dialog: “Signal name”, <b>“How to recognise this signal?”</b> (the instruction for the AI, passed on word for word), “Tooltip / short description for the user”, “Points”, “Active”.</li>

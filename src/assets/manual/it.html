@@ -810,7 +810,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p><b>Mi è stata assegnata un'attività «Churn: …». E adesso?</b> Contatta il cliente, registra la conversazione nella scheda del partner e chiudi l'attività. Il punteggio di abbandono scende quando il partner riprende a ordinare.</p>
 <p><b>Il registro mostra un rischio ma la scheda dice «Nessun rischio di abbandono».</b> Il registro aggiorna il punteggio una volta al giorno al mattino, mentre la scheda lo calcola in tempo reale. Coincideranno dopo il prossimo aggiornamento.</p>
 <p><b>Il mio sostituto vedrà le mie attività nel suo calendario?</b> No. Il sostituto può aprire i tuoi lead e partner (e le azioni nelle loro schede), ma i promemoria e il riepilogo giornaliero arrivano comunque a te.</p>
-<p><b>Ho perso il telefono.</b> In «Le mie impostazioni» → «Telefoni connessi» fai clic su «Disconnetti» accanto a quel dispositivo. L'app perde l'accesso entro al massimo circa quindici minuti.</p>
+<p><b>Ho perso il telefono.</b> In «Le mie impostazioni» → «Telefoni connessi» fai clic su «Disconnetti» accanto a quel dispositivo. L'app perde l'accesso entro circa quindici minuti al massimo.</p>
 <p><b>Posso cambiare la lingua solo sul telefono?</b> Sì: Profilo → «Lingua» nell'app. La lingua di e-mail e notifiche si imposta in «Le mie impostazioni» nell'app web.</p>
 </section>
 
@@ -1056,7 +1056,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <p>Ibis Elektro Demo (responsabile Tomasz Wójcik): ultimo ordine 13 giorni fa, vendite di ottobre inferiori del 66,7% rispetto a settembre.</p>
 <p class="res">13 giorni = +10 punti, un calo superiore al 51% = +50 punti. Totale 60, livello «Medio». Dopo «Genera attività», Tomasz riceve un'attività Churn per Ibis Elektro in scadenza tra 7 giorni, senza e-mail. Gryf Budowa (48 giorni, calo del 100%) totalizza 100: «Critico», un'attività in scadenza oggi e un'e-mail a Piotr.</p></div>
 
-<div class="example"><span class="lbl">ESEMPIO D · PERCHÉ DELTA DRUK È MENO IN SALUTE DI ORION?</span>
+<div class="example"><span class="lbl">ESEMPIO D · PERCHÉ DELTA DRUK HA UNO STATO DI SALUTE INFERIORE A ORION?</span>
 <p>Nella «Scorecard dei partner» Orion Systemy Demo ha 70 punti e Delta Druk Demo 30.</p>
 <p class="res">Orion: più di cinque registrazioni di vendita negli ultimi 20 giorni (+50) e crescita mese su mese superiore al 20% (+20) = 70, verde. Delta Druk: 2–5 registrazioni (+30) e nessuna crescita (0) = 30, arancione. Delta non rischia di andarsene, ma non cresce nemmeno: un buon argomento per la prossima telefonata del responsabile di account.</p></div>
 
@@ -1207,7 +1207,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <tr><td><b>«Budget per categoria»</b></td><td>Budget, sostenuto, pianificato e <b>«Scostamento»</b> (budget meno sostenuto) per ogni categoria di costo. Le righe oltre il budget sono evidenziate.</td></tr>
 <tr><td><b>«Costi»</b></td><td>Voci di costo con filtri per categoria, stato e attività. <b>«+ Aggiungi costo»</b>: data, stato (Sostenuto o Pianificato), categoria, importo e valuta, attività, fornitore, numero di documento, descrizione. Un costo in un'altra valuta viene convertito al cambio medio NBP (Banca Nazionale di Polonia) del giorno lavorativo precedente la data del costo.</td></tr>
 <tr><td><b>«Ricavi»</b></td><td>Voci Pianificate, Fatturate o Pagate. Le voci fatturate e pagate contano come ricavo a consuntivo.</td></tr>
-<tr><td><b>«Costi delle attività»</b></td><td>L'albero delle attività con il costo pianificato e i costi sostenuti di ciascuna, comprese anche le sottoattività. Il costo pianificato di un'attività è solo informativo e non fa parte del budget del progetto.</td></tr>
+<tr><td><b>«Costi delle attività»</b></td><td>L'albero delle attività con il costo pianificato e i costi sostenuti di ciascuna, comprese le sottoattività. Il costo pianificato di un'attività è solo informativo e non fa parte del budget del progetto.</td></tr>
 </table></div>
 <div class="example"><span class="lbl">ESEMPIO · WDROŻENIE CRM ATLAS</span>
 <p>Ricavo pianificato 120.000 PLN. Budget: lavoro interno 50.000, subappaltatori 30.000, licenze 10.000, 92.000 PLN in totale. Costi sostenuti 82.932,10 PLN. Ricavo fatturato e pagato 80.000 PLN.</p>
@@ -1987,7 +1987,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <div class="tbl"><table>
 <tr><th>Regola</th><th>Dettagli</th></tr>
 <tr><td>File</td><td>.csv o .txt, fino a 10 MB, UTF-8. Il separatore («;» o «,») viene rilevato automaticamente. La prima riga è l'intestazione.</td></tr>
-<tr><td>Numeri</td><td>Gli spazi vengono ignorati; sono compresi sia «1.000,50» sia «1,000.50». Una probabilità di 0,4 significa 40%.</td></tr>
+<tr><td>Numeri</td><td>Gli spazi vengono ignorati; sono accettati sia «1.000,50» sia «1,000.50». Una probabilità di 0,4 significa 40%.</td></tr>
 <tr><td>Lead</td><td>La colonna <code>company</code> è obbligatoria. <code>stage</code> accetta il <b>codice</b> della fase (ad es. <code>qualification</code>), non il suo nome. Una fase vuota significa il primo passaggio del funnel. <code>assigned_to_email</code> imposta il responsabile (altrimenti è chi importa). Limite di righe: il parametro «Limite di righe per l'importazione CSV».</td></tr>
 <tr><td>Partner</td><td>La colonna <code>company</code> è obbligatoria. <code>partner_number</code> collega il partner ai dati di vendita, <code>group_name</code> è il gruppo di partner, <code>manager_email</code> l'account owner.</td></tr>
 <tr><td>Documenti</td><td>La colonna <code>name</code> è obbligatoria. Tipo, tipo GDPR e stato devono essere codici del dizionario. Carica i file veri e propri dopo l'importazione.</td></tr>
