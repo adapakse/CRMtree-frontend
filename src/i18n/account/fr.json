@@ -15,6 +15,11 @@
   },
   "mySettings": {
     "delete": "Supprimer",
+    "manual": {
+      "hint": "Guide interactif de CRMtree avec captures d’écran. S’ouvre dans un nouvel onglet.",
+      "open": "Ouvrir le guide",
+      "title": "Guide d’utilisation"
+    },
     "password": {
       "current": "Mot de passe actuel",
       "hint": "Saisissez votre mot de passe actuel et un nouveau, d au moins 8 caractères. Le changement déconnecte votre compte de l application mobile.",

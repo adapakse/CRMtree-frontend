@@ -15,6 +15,11 @@
   },
   "mySettings": {
     "delete": "Elimina",
+    "manual": {
+      "hint": "Manuale interattivo di CRMtree con schermate. Si apre in una nuova scheda.",
+      "open": "Apri il manuale",
+      "title": "Manuale utente"
+    },
     "password": {
       "current": "Password attuale",
       "hint": "Inserisci la password attuale e una nuova, almeno 8 caratteri. La modifica disconnette il tuo account dall app mobile.",

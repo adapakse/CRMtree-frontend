@@ -15,6 +15,11 @@
   },
   "mySettings": {
     "delete": "Usuń",
+    "manual": {
+      "hint": "Interaktywna instrukcja CRMtree ze zrzutami ekranu. Otworzy się w nowej karcie.",
+      "open": "Otwórz instrukcję",
+      "title": "Instrukcja obsługi"
+    },
     "password": {
       "current": "Aktualne hasło",
       "hint": "Podaj aktualne hasło i nowe, co najmniej 8 znaków. Zmiana wylogowuje Twoje konto z aplikacji mobilnej.",
