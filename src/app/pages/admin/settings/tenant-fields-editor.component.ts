@@ -7,6 +7,7 @@ import {
   TenantFieldDefinition, TenantFieldDefinitions, TenantFieldEntity, TenantFieldType,
   TenantFieldsService,
 } from '../../../core/services/tenant-fields.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const FIELD_TYPE_OPTIONS: { value: TenantFieldType; labelKey: string }[] = [
   { value: 'text', labelKey: 'text' },
@@ -206,7 +207,7 @@ export class TenantFieldsEditorComponent {
       },
       error: err => {
         this.saving = false;
-        this.toast.error(err?.error?.error ?? this.t('settings.customFields.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.t('settings.customFields.saveFailed'));
       },
     });
   }

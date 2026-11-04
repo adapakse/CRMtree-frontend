@@ -7,6 +7,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { AuthService } from '../../../core/auth/auth.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const BASE      = '/api/admin/data';
 const API_DOCS  = '/api/documents';
@@ -427,7 +428,7 @@ export class DataManagementComponent {
     this.deleting.set('doc'); this.deleteDocResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/documents/${this.docSelected.id}`, { headers: this.hdrs() }).subscribe({
       next: r => { this.deleting.set(''); this.deleteDocResult = r.name || String(r.id); this.clearDocSel(); },
-      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || this.transloco.translate('admin.dataManagement.delete.document.failed'); },
+      error: e => { this.deleting.set(''); this.deleteError = localizedApiErrorMessage(e?.error?.error, this.transloco) || this.transloco.translate('admin.dataManagement.delete.document.failed'); },
     });
   }
 
@@ -436,7 +437,7 @@ export class DataManagementComponent {
     this.deleting.set('lead'); this.deleteLeadResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/leads/${this.leadSelected.id}`, { headers: this.hdrs() }).subscribe({
       next: r => { this.deleting.set(''); this.deleteLeadResult = r.company || String(r.id); this.clearLeadSel(); },
-      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || this.transloco.translate('admin.dataManagement.delete.lead.failed'); },
+      error: e => { this.deleting.set(''); this.deleteError = localizedApiErrorMessage(e?.error?.error, this.transloco) || this.transloco.translate('admin.dataManagement.delete.lead.failed'); },
     });
   }
 
@@ -445,7 +446,7 @@ export class DataManagementComponent {
     this.deleting.set('partner'); this.deletePartnerResult = ''; this.deleteError = '';
     this.http.delete<any>(`${BASE}/partners/${this.partnerSelected.id}`, { headers: this.hdrs() }).subscribe({
       next: r => { this.deleting.set(''); this.deletePartnerResult = r.company || String(r.id); this.clearPartnerSel(); },
-      error: e => { this.deleting.set(''); this.deleteError = e?.error?.error || this.transloco.translate('admin.dataManagement.delete.partner.failed'); },
+      error: e => { this.deleting.set(''); this.deleteError = localizedApiErrorMessage(e?.error?.error, this.transloco) || this.transloco.translate('admin.dataManagement.delete.partner.failed'); },
     });
   }
 
@@ -462,7 +463,7 @@ export class DataManagementComponent {
         this.purgeConfirming = '';
         (this.purgeTexts as any)[cat] = '';
       },
-      error: e => { this.purging.set(''); this.purgeError = e?.error?.error || this.transloco.translate('admin.dataManagement.purge.failed'); },
+      error: e => { this.purging.set(''); this.purgeError = localizedApiErrorMessage(e?.error?.error, this.transloco) || this.transloco.translate('admin.dataManagement.purge.failed'); },
     });
   }
 
@@ -501,7 +502,7 @@ export class DataManagementComponent {
         const payload = JSON.parse(reader.result as string);
         this.http.post<any>(`${BASE}/import-settings`, payload, { headers: this.hdrs() }).subscribe({
           next: r => { this.importing.set(false); this.importResult = r; this.selectedFile = null; },
-          error: e => { this.importing.set(false); this.importError = e?.error?.error || this.transloco.translate('admin.dataManagement.settings.import.failed'); },
+          error: e => { this.importing.set(false); this.importError = localizedApiErrorMessage(e?.error?.error, this.transloco) || this.transloco.translate('admin.dataManagement.settings.import.failed'); },
         });
       } catch { this.importing.set(false); this.importError = this.transloco.translate('admin.dataManagement.settings.import.invalidFile'); }
     };

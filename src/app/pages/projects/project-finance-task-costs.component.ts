@@ -9,6 +9,7 @@ import { ProjectTask } from '../../core/services/projects-api.service';
 import { INDENT_PX_PER_LEVEL, buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES, parseMoneyInput } from './project-finance.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 interface TaskCostRow {
   task: ProjectTask;
@@ -131,7 +132,7 @@ export class ProjectFinanceTaskCostsComponent {
       next: () => this.changed.emit(),
       error: err => {
         restore();
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.taskCosts.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.taskCosts.saveFailed'));
       },
     });
   }

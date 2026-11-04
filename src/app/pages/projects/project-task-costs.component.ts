@@ -11,6 +11,7 @@ import { ProjectKsefInvoiceBadgeComponent } from './project-ksef-invoice-badge.c
 import { ProjectKsefInvoicePickerComponent } from './project-ksef-invoice-picker.component';
 import { ProjectKsefOtherLinksComponent } from './project-ksef-other-links.component';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 /**
  * "Costs" section of the task panel. Someone with finance read rights sees
@@ -179,7 +180,7 @@ export class ProjectTaskCostsComponent implements OnInit {
     if (!confirm(this.transloco.translate('projects.ksef.costs.unlinkConfirm', { invoice }))) return;
     this.api.updateCost(this.projectId(), item.id, { ksef_invoice_id: null }).subscribe({
       next: () => { this.loadCosts(); this.costsChanged.emit(); },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.ksef.costs.unlinkFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.ksef.costs.unlinkFailed')),
     });
   }
 
@@ -188,14 +189,14 @@ export class ProjectTaskCostsComponent implements OnInit {
     if (!confirm(this.transloco.translate('projects.finance.costs.deleteConfirm', { item: label }))) return;
     this.api.deleteCost(this.projectId(), item.id).subscribe({
       next: () => { this.loadCosts(); this.costsChanged.emit(); },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.costs.deleteFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.costs.deleteFailed')),
     });
   }
 
   private loadCosts(): void {
     this.api.listCosts(this.projectId(), this.taskId()).subscribe({
       next: costs => this.costs.set(costs),
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.costs.loadFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.panel.costs.loadFailed')),
     });
   }
 }

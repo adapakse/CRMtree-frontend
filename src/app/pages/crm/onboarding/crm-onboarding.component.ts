@@ -16,6 +16,7 @@ import { AddToCalendarComponent } from '../../../shared/components/add-to-calend
 import { CalendarEntry, dueDateCalendarEntry } from '../../../shared/utils/calendar-export.util';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 // Translation keys relative to the `crm` scope.
 const STEP_LABELS = [
@@ -948,7 +949,7 @@ export class CrmOnboardingComponent implements OnInit {
       }),
       error: (err: any) => this.zone.run(() => {
         this.launching.set(null);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('crm.onboardingBoard.launch.failed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('crm.onboardingBoard.launch.failed'));
         this.cdr.markForCheck();
       }),
     });

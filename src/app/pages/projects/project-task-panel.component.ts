@@ -16,6 +16,7 @@ import { ProjectChatComponent } from './project-chat.component';
 import { ProjectTaskCostsComponent } from './project-task-costs.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { EntityAttachmentsComponent } from '../../shared/components/entity-attachments/entity-attachments.component';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK'];
 const DEFAULT_CURRENCY = 'PLN';
@@ -442,7 +443,7 @@ export class ProjectTaskPanelComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: err => {
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.loadFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.panel.loadFailed'));
         this.closed.emit();
       },
     });
@@ -472,7 +473,7 @@ export class ProjectTaskPanelComponent implements OnInit {
         this.form.currencies[fieldId] = DEFAULT_CURRENCY;
         this.fieldsChanged.emit();
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.customFields.addFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.panel.customFields.addFailed')),
     });
   }
 
@@ -512,7 +513,7 @@ export class ProjectTaskPanelComponent implements OnInit {
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.panel.saveFailed'));
       },
     });
   }
@@ -632,7 +633,7 @@ export class ProjectTaskPanelComponent implements OnInit {
     if (taskId === null) return;
     this.api.listTaskHistory(this.projectId(), taskId).subscribe({
       next: history => this.history.set(history),
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.panel.history.loadFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.panel.history.loadFailed')),
     });
   }
 }

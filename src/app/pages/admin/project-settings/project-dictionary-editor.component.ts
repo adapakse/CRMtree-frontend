@@ -7,6 +7,7 @@ import {
   ProjectConfig, ProjectDictionary, ProjectDictionaryEntry, ProjectDictionaryItem, ProjectTaskStatus, ProjectsApiService,
   TaskStatusCategory,
 } from '../../../core/services/projects-api.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const DEFAULT_COLOR = '#6B7280';
 
@@ -147,7 +148,7 @@ export class ProjectDictionaryEditorComponent {
         onSuccess?.();
         this.configChanged.emit(config);
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.dictionary.saveFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.settings.dictionary.saveFailed')),
     });
   }
 }

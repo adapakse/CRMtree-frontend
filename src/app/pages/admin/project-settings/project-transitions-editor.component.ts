@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, ou
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../../core/services/toast.service';
 import { ProjectConfig, ProjectRole, ProjectsApiService } from '../../../core/services/projects-api.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 type TransitionRole = Exclude<ProjectRole, 'pm'>;
 
@@ -130,7 +131,7 @@ export class ProjectTransitionsEditorComponent {
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.transitions.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.settings.transitions.saveFailed'));
       },
     });
   }

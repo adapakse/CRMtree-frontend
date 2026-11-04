@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { ToastService } from '../../core/services/toast.service';
 import { KsefApiService, KsefInvoiceDocument } from '../../core/services/ksef-api.service';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const GROUP_NOT_CONFIGURED_STATUS = 409;
 
@@ -75,7 +76,7 @@ export class ProjectKsefInvoiceDocumentComponent {
         this.isRegistering.set(false);
         this.toast.error(err?.status === GROUP_NOT_CONFIGURED_STATUS
           ? this.transloco.translate('projects.ksef.document.groupMissing')
-          : err?.error?.error ?? this.transloco.translate('projects.ksef.document.registerFailed'));
+          : localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.ksef.document.registerFailed'));
       },
     });
   }

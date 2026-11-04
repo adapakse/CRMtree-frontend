@@ -7,6 +7,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ProjectMessage, ProjectsApiService } from '../../core/services/projects-api.service';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 // The backend has no push channel, so an open thread is refreshed by polling.
 const POLL_INTERVAL_MS = 20_000;
@@ -105,7 +106,7 @@ export class ProjectChatComponent implements OnInit {
       },
       error: err => {
         this.isSending.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.chat.sendFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.chat.sendFailed'));
       },
     });
   }

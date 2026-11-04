@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { CrmApiService, Partner, PartnerStatus, PARTNER_STATUS_LABELS, CrmUser, PartnersReportPartner } from '../../../core/services/crm-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 type SortDir = 'asc' | 'desc';
 
@@ -513,7 +514,7 @@ export class CrmPartnersListComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           this.saving = false;
           if (err?.status === 409) {
-            this.partnerNipError = err?.error?.error || this.transloco.translate('crm.partnersList.taxIdErrors.duplicate');
+            this.partnerNipError = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.partnersList.taxIdErrors.duplicate');
           } else {
             this.partnerNipError = this.transloco.translate('crm.partnersList.create.error');
           }

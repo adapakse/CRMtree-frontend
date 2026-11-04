@@ -7,6 +7,7 @@ import {
 import { ProjectFinanceFormatService } from '../../core/services/project-finance-format.service';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES, parseMoneyInput } from './project-finance.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 /** Budget per cost category against what was incurred and what is still planned. */
 @Component({
@@ -111,7 +112,7 @@ export class ProjectFinanceCategoriesComponent {
       next: summary => this.saved.emit(summary),
       error: err => {
         restore();
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.categories.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.categories.saveFailed'));
       },
     });
   }

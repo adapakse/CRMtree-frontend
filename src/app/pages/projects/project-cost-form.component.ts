@@ -16,6 +16,7 @@ import { ProjectDocumentLinkComponent } from './project-document-link.component'
 import { buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const COST_STATUSES: ProjectCostStatus[] = ['incurred', 'planned'];
 const DOCUMENT_SEARCH_LIMIT = 10;
@@ -271,7 +272,7 @@ export class ProjectCostFormComponent implements OnInit {
       },
       error: err => {
         this.isSaving.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.costForm.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.costForm.saveFailed'));
       },
     });
   }

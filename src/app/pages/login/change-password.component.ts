@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
 import { TranslocoDirective, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 @Component({
   selector: 'wt-change-password',
@@ -90,7 +91,7 @@ export class ChangePasswordComponent {
           error: () => { this.loading.set(false); this.router.navigate(['/dashboard']); },
         });
       },
-      error: err => { this.loading.set(false); this.errorMsg.set(err?.error?.error ?? this.transloco.translate('auth.changePassword.errors.failed')); },
+      error: err => { this.loading.set(false); this.errorMsg.set(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('auth.changePassword.errors.failed')); },
     });
   }
 }
