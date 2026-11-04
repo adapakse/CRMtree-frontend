@@ -828,7 +828,7 @@
     "transitions": {
       "discardConfirm": "Masz niezapisane zmiany przejść. Porzucić je?",
       "hint": "PM zawsze może zmienić status na dowolny. Uczestnicy zmieniają status tylko w zadaniach, do których są przypisani i mają pełne uprawnienia. Kontroler zmienia status w każdym zadaniu projektu.",
-      "matrixCorner": "Z statusu ↓ / na status →",
+      "matrixCorner": "Ze statusu ↓ / na status →",
       "saveButton": "Zapisz przejścia",
       "saveFailed": "Nie udało się zapisać przejść",
       "saved": "Zapisano przejścia statusów",

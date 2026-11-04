@@ -15,6 +15,11 @@
   },
   "mySettings": {
     "delete": "Izbriši",
+    "manual": {
+      "hint": "Interaktivni priročnik CRMtree s posnetki zaslona. Odpre se v novem zavihku.",
+      "open": "Odpri priročnik",
+      "title": "Uporabniški priročnik"
+    },
     "password": {
       "current": "Trenutno geslo",
       "hint": "Vnesite trenutno in novo geslo, vsaj 8 znakov. Sprememba odjavi vaš račun iz mobilne aplikacije.",

@@ -10,6 +10,7 @@
     "test": "ng test",
     "serve:ssr:worktrips-doc-frontend": "node dist/crmtree-frontend/server/server.mjs",
     "i18n:check": "node scripts/i18n-check.mjs",
+    "manual:check": "bash scripts/manual-reminder.sh origin/develop HEAD",
     "prebuild": "node scripts/i18n-check.mjs"
   },
   "private": true,
