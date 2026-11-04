@@ -8,6 +8,7 @@ import { environment } from '../../../../environments/environment';
 import { CrmApiService, CrmUser } from '../../../core/services/crm-api.service';
 import { NavBackService } from '../../../core/services/nav-back.service';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const API = `${environment.apiUrl}/admin/call-analysis`;
 const ROW_POLL_TIMEOUT_MS = 120000;
@@ -911,7 +912,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         this.loadBatchStatus();
       },
       error: e => {
-        this.importResult = { error: e.error?.error || this.transloco.translate('crm.callAnalysis.import.failed') };
+        this.importResult = { error: localizedApiErrorMessage(e.error?.error, this.transloco) || this.transloco.translate('crm.callAnalysis.import.failed') };
       },
     });
   }
@@ -1133,7 +1134,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         }
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.bulkFailed')),
+      error: e => alert(localizedApiErrorMessage(e.error?.error, this.transloco) || this.transloco.translate('crm.callAnalysis.errors.bulkFailed')),
     });
   }
 
@@ -1191,7 +1192,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         r.follow_up_done = newDone;
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.followUpUpdateFailed')),
+      error: e => alert(localizedApiErrorMessage(e.error?.error, this.transloco) || this.transloco.translate('crm.callAnalysis.errors.followUpUpdateFailed')),
     });
   }
 
@@ -1204,7 +1205,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         if (row) (row as any).analysis_status = status;
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.statusChangeFailed')),
+      error: e => alert(localizedApiErrorMessage(e.error?.error, this.transloco) || this.transloco.translate('crm.callAnalysis.errors.statusChangeFailed')),
     });
   }
 
@@ -1218,7 +1219,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         this.startRowPolling(nip);
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.reanalyzeFailed')),
+      error: e => alert(localizedApiErrorMessage(e.error?.error, this.transloco) || this.transloco.translate('crm.callAnalysis.errors.reanalyzeFailed')),
     });
   }
 
@@ -1252,7 +1253,7 @@ export class AdminCallAnalysisComponent implements OnInit, OnDestroy {
         this.total--;
         this.cdr.markForCheck();
       },
-      error: e => alert(e.error?.error || this.transloco.translate('crm.callAnalysis.errors.deleteFailed')),
+      error: e => alert(localizedApiErrorMessage(e.error?.error, this.transloco) || this.transloco.translate('crm.callAnalysis.errors.deleteFailed')),
     });
   }
 

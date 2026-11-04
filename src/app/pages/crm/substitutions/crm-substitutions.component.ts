@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import {
   SubstitutionsService, Absence, AbsenceReason, CrmUserOption, CrmGroupOption,
 } from '../../../core/services/substitutions.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 interface AbsenceForm {
   absent_user_id: string;
@@ -580,7 +581,7 @@ export class CrmSubstitutionsComponent implements OnInit {
       },
       error: err => {
         this.cancellingId.set(null);
-        this.cancelError.set(err.error?.error ?? this.transloco.translate('crm.substitutions.cancel.failed'));
+        this.cancelError.set(localizedApiErrorMessage(err.error?.error, this.transloco) ?? this.transloco.translate('crm.substitutions.cancel.failed'));
       },
     });
   }
@@ -612,7 +613,7 @@ export class CrmSubstitutionsComponent implements OnInit {
       },
       error: err => {
         this.saving.set(false);
-        this.formError.set(err.error?.error ?? this.transloco.translate('crm.substitutions.form.saveFailed'));
+        this.formError.set(localizedApiErrorMessage(err.error?.error, this.transloco) ?? this.transloco.translate('crm.substitutions.form.saveFailed'));
       },
     });
   }

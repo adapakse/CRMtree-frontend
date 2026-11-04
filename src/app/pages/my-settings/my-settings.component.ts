@@ -13,6 +13,7 @@ import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitution
 import { MyProjectNotificationsComponent } from './my-project-notifications.component';
 import { MyDevicesComponent } from './my-devices.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const BASE = environment.apiUrl;
 
@@ -352,7 +353,7 @@ export class MySettingsComponent implements OnInit {
       error: (err) => {
         this.pwdSaving.set(false);
         // Backend zwraca tu czytelny powód (złe aktualne hasło, za krótkie).
-        this.pwdError = err?.error?.error ?? this.transloco.translate('account.mySettings.password.saveFailed');
+        this.pwdError = localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('account.mySettings.password.saveFailed');
         this.cdr.markForCheck();
       },
     });
@@ -439,7 +440,7 @@ export class MySettingsComponent implements OnInit {
       },
       error: err => {
         this.pbxSaving  = false;
-        this.pbxSaveErr = err.error?.error ?? this.transloco.translate('account.mySettings.saveFailed');
+        this.pbxSaveErr = localizedApiErrorMessage(err.error?.error, this.transloco) ?? this.transloco.translate('account.mySettings.saveFailed');
         this.cdr.markForCheck();
       },
     });

@@ -13,6 +13,7 @@ import { ProjectKsefLinkFormComponent } from './project-ksef-link-form.component
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { PROJECT_KSEF_STYLES } from './project-ksef.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const DEFAULT_PERIOD_DAYS = 30;
 const PAGE_SIZE = 50;
@@ -257,7 +258,7 @@ export class ProjectKsefInvoicePickerComponent implements OnInit {
       },
       error: err => {
         this.openingInvoiceId.set(null);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.ksef.detail.loadFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.ksef.detail.loadFailed'));
       },
     });
   }
@@ -276,7 +277,7 @@ export class ProjectKsefInvoicePickerComponent implements OnInit {
       },
       error: err => {
         this.isSyncing.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.ksef.sync.startFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.ksef.sync.startFailed'));
       },
     });
   }

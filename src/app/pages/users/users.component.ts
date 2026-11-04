@@ -10,6 +10,7 @@ import { CrmApiService, SalesBudget } from '../../core/services/crm-api.service'
 import { AuthService } from '../../core/auth/auth.service';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../core/i18n/locale.service';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 @Component({
   selector: 'wt-users',
@@ -817,7 +818,7 @@ export class UsersComponent implements OnInit {
         amount: e.amt, currency: this.budgetCurrency,
       }).subscribe({
         next: () => { if (--pending === 0) { this.budgetSaving = false; this.budgetDirty = false; this.loadBudgets(); this.toast.success(this.transloco.translate('admin.users.budgets.saved')); } },
-        error: (err) => { this.budgetSaving = false; this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.budgets.saveFailed')); },
+        error: (err) => { this.budgetSaving = false; this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.budgets.saveFailed')); },
       });
     }
   }
@@ -925,7 +926,7 @@ export class UsersComponent implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.create.failed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.create.failed'));
       },
     });
   }
@@ -946,7 +947,7 @@ export class UsersComponent implements OnInit {
       },
       error: err => {
         this.passwordSaving.set(false);
-        this.passwordError = err?.error?.error ?? this.transloco.translate('admin.users.password.saveFailed');
+        this.passwordError = localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.password.saveFailed');
       },
     });
   }
@@ -987,7 +988,7 @@ export class UsersComponent implements OnInit {
           this.loadBudgets();
         }
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.edit.loadFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.edit.loadFailed')),
     });
   }
 
@@ -1002,7 +1003,7 @@ export class UsersComponent implements OnInit {
         this.selected.set(null);
         this.toast.success(this.transloco.translate('admin.users.edit.deleted'));
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.edit.deleteFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.edit.deleteFailed')),
     });
   }
 
@@ -1041,7 +1042,7 @@ export class UsersComponent implements OnInit {
         if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique')) {
           this.emailError = this.transloco.translate('admin.users.edit.emailTaken');
         } else {
-          this.toast.error(msg || this.transloco.translate('admin.users.edit.updateFailed'));
+          this.toast.error(localizedApiErrorMessage(msg || undefined, this.transloco) || this.transloco.translate('admin.users.edit.updateFailed'));
         }
       },
     });
@@ -1067,7 +1068,7 @@ export class UsersComponent implements OnInit {
         this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== roleId) } : s);
         this.toast.success(this.transloco.translate('admin.users.roles.removed'));
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.roles.removeFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.roles.removeFailed')),
     });
   }
 
@@ -1105,7 +1106,7 @@ export class UsersComponent implements OnInit {
           this.newGrantGroup = '';
           this.toast.success(this.transloco.translate('admin.users.grants.added'));
         },
-        error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.grants.addFailed')),
+        error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.grants.addFailed')),
       });
   }
 
@@ -1117,7 +1118,7 @@ export class UsersComponent implements OnInit {
         this.applyGrants(u.id, prev => prev.filter(g => g.id !== grantId));
         this.toast.success(this.transloco.translate('admin.users.grants.removed'));
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.grants.removeFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.grants.removeFailed')),
     });
   }
 
@@ -1192,7 +1193,7 @@ export class UsersComponent implements OnInit {
           this.selected.update(s => s ? { ...s, roles: (s.roles ?? []).filter(r => r.role_id !== existing.role_id) } : s);
           this.toast.success(this.transloco.translate('admin.users.featureAccess.prospectsDisabled'));
         },
-        error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('admin.users.roles.removeFailed')),
+        error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.users.roles.removeFailed')),
       });
     }
   }

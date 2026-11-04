@@ -16,6 +16,11 @@ import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivityCountBadgeComponent } from '../../../shared/components/activity-count-badge/activity-count-badge.component';
 import { AddToCalendarComponent } from '../../../shared/components/add-to-calendar/add-to-calendar.component';
+import { EntityAttachment } from '../../../core/services/entity-attachments-api.service';
+import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
+import { PendingAttachmentsComponent } from '../../../shared/components/entity-attachments/pending-attachments.component';
+import { EntityAttachmentsApiService } from '../../../core/services/entity-attachments-api.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { LinkedProjectTasksComponent } from '../../../shared/components/linked-project-tasks/linked-project-tasks.component';
 import { CustomFieldsComponent } from '../../../shared/components/custom-fields/custom-fields.component';
 import { CalendarEntry, activityCalendarEntry } from '../../../shared/utils/calendar-export.util';
@@ -32,6 +37,7 @@ import { QuillModule } from 'ngx-quill';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -52,7 +58,7 @@ interface WhatsappConvUiState {
   selector: 'wt-crm-lead-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
-            AddToCalendarComponent, LinkedProjectTasksComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
+            AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -315,6 +321,7 @@ interface WhatsappConvUiState {
           {{ t('activity.tabs.all') }}
           <wt-activity-count-badge [activities]="lead.activities||[]"></wt-activity-count-badge>
         </button>
+        <button class="tab-btn" [class.active]="midTab==='attachments'" (click)="midTab='attachments'">{{ 'attachments.title' | transloco }}</button>
         <button class="tab-btn" [class.active]="midTab==='tasks'" (click)="midTab='tasks'">{{ t('activity.tabs.tasks') }}</button>
         <button class="tab-btn" [class.active]="midTab==='notes'" (click)="midTab='notes'">{{ t('activity.tabs.notes') }}</button>
         <button class="tab-btn" [class.active]="midTab==='emails'" (click)="midTab='emails'; refreshEmailActivities()">
@@ -328,7 +335,10 @@ interface WhatsappConvUiState {
       </div>
 
       <!-- Aktywności tabs (all/tasks/notes/calls/meetings) -->
-      <div *ngIf="midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
+      <div *ngIf="midTab==='attachments'" style="flex:1;overflow-y:auto;min-height:0">
+        <wt-entity-attachments sourceType="lead" [sourceId]="lead.id" [aggregate]="true" (sourceOpened)="openAttachmentSource($event)"></wt-entity-attachments>
+      </div>
+      <div *ngIf="midTab!=='attachments' && midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
           <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ {{ t('activity.add') }}</button>
         </div>
@@ -417,14 +427,15 @@ interface WhatsappConvUiState {
             </label>
           </ng-container>
           <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules" [placeholder]="t('activity.form.bodyPlaceholder')" style="display:block" theme="snow"></quill-editor>
+          <wt-pending-attachments *ngIf="actForm.type==='task' || actForm.type==='note'" [(files)]="pendingActivityFiles"></wt-pending-attachments>
           <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn-sm" (click)="showNewActivity=false">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn-sm" (click)="showNewActivity=false; pendingActivityFiles=[]">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn-sm primary" (click)="addActivity()" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
           </div>
         </div>
 
         <!-- Activity cards -->
-        <div *ngFor="let a of filteredActivities; trackBy: trackActivity" class="act-card"
+        <div *ngFor="let a of filteredActivities; trackBy: trackActivity" class="act-card" [attr.id]="'crm-activity-' + a.id"
              [class.act-card-closed]="a.status==='closed'"
              [class.act-card-overdue]="a.status!=='closed' && a.activity_at && isActOverdue(a.activity_at)"
              [class.act-card-today]="a.status!=='closed' && a.activity_at && isActToday(a.activity_at)"
@@ -453,6 +464,7 @@ interface WhatsappConvUiState {
                 {{isActExpanded(a.id) ? '▲ ' + t('activity.card.collapse') : '▼ ' + t('activity.card.expand')}}
               </button>
             </div>
+            <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="lead-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
             <div *ngIf="canEdit && a.type==='task'" class="task-actions-row" (click)="$event.stopPropagation()">
               <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ {{ t('activity.card.closeTask') }}</button>
               <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ {{ t('activity.card.reopen') }}</button>
@@ -485,6 +497,7 @@ interface WhatsappConvUiState {
                 </label>
               </div>
               <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" [placeholder]="t('activity.form.bodyShortPlaceholder')" style="display:block" theme="snow"></quill-editor>
+              <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="lead-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
               <div style="display:flex;gap:6px;justify-content:flex-end">
                 <button class="btn-sm" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
                 <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
@@ -1589,6 +1602,7 @@ interface WhatsappConvUiState {
         <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📝 {{ t('activity.modal.description') }}</span>
         <span style="white-space:pre-line">{{selectedAct.body}}</span>
       </div>
+      <wt-entity-attachments *ngIf="selectedAct.type==='task' || selectedAct.type==='note'" sourceType="lead-activity" [sourceId]="selectedAct.id"></wt-entity-attachments>
       <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:13px">
         <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 {{ t('activity.modal.comment') }}</span>
         <span style="font-style:italic">{{selectedAct.close_comment}}</span>
@@ -1866,6 +1880,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   protected settings = inject(AppSettingsService);
   private pbx = inject(PbxService);
   private transloco = inject(TranslocoService);
+  private attachmentsApi = inject(EntityAttachmentsApiService);
+  private toast = inject(ToastService);
+  pendingActivityFiles: File[] = [];
   private locale = inject(LocaleService);
   logoSasUrl       = '';
 
@@ -2133,7 +2150,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.holdSaving = false;
-        this.holdError  = err?.error?.error || this.transloco.translate('crm.leadDetail.hold.saveFailed');
+        this.holdError  = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.hold.saveFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2152,7 +2169,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.holdSaving = false;
-        this.holdError  = err?.error?.error || this.transloco.translate('crm.leadDetail.hold.removeFailed');
+        this.holdError  = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.hold.removeFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2167,7 +2184,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }),
       error: (err: any) => this.zone.run(() => {
-        alert(err?.error?.error || this.transloco.translate('crm.leadDetail.archive.failed'));
+        alert(localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.archive.failed'));
       }),
     });
   }
@@ -2467,7 +2484,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   toggleLeftPanel(): void { this.leftCollapsed = !this.leftCollapsed; this.cdr.markForCheck(); }
 
   // Historia
-  midTab: 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'sms' | 'calls' | 'meetings' = 'all';
+  openAttachmentSource(file: EntityAttachment): void {
+    this.midTab = file.source_category === 'note' ? 'notes' : 'tasks';
+    setTimeout(() => document.getElementById('crm-activity-' + file.source_id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  }
+
+  midTab: 'attachments' | 'all' | 'tasks' | 'notes' | 'emails' | 'whatsapp' | 'sms' | 'calls' | 'meetings' = this.route.snapshot.queryParamMap.keys.some(key => key.startsWith('attachments_')) ? 'attachments' : 'all';
 
   // ── SMS — same PBX account/PAT as telephony. Local log, synced on demand
   // (no webhook from ip-pbx.eu for incoming SMS) — grouped into one
@@ -2499,7 +2521,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         this.smsLoading = false;
-        this.smsThreadError = err?.error?.error || this.transloco.translate('crm.sms.loadFailed');
+        this.smsThreadError = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.sms.loadFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2552,7 +2574,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         state.sending = false;
-        state.error = err?.error?.error || this.transloco.translate('crm.sms.sendFailed');
+        state.error = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.sms.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -2678,7 +2700,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       }),
       error: (err: any) => this.zone.run(() => {
         s.replySending = false;
-        s.replyError   = err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
+        s.replyError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -3043,7 +3065,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.whatsappSending = false;
         this.whatsappError   = err?.error?.code === 'WHATSAPP_TOKEN_INVALID'
           ? this.transloco.translate('crm.whatsapp.tokenInvalid')
-          : err?.error?.error || this.transloco.translate('crm.whatsapp.sendFailed');
+          : localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.whatsapp.sendFailed');
         this.cdr.markForCheck();
       }),
     });
@@ -3344,7 +3366,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        const msg = err?.error?.error || err?.message || this.transloco.translate('crm.email.driveDownloadFailed');
+        const msg = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate<string>('crm.email.driveDownloadFailed');
         if (target === 'reply') {
           this.msgModalError = msg;
         } else {
@@ -3425,7 +3447,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
     const onError = (err: any) => {
       this.zone.run(() => {
-        this.emailError   = err?.error?.error || this.transloco.translate('crm.email.sendFailed');
+        this.emailError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.email.sendFailed');
         this.sendingEmail = false;
         this.cdr.markForCheck();
       });
@@ -3719,7 +3741,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
     const onError = (err: any) => this.zone.run(() => {
-      this.inlineReplyError   = err?.error?.error || this.transloco.translate('crm.email.reply.sendFailed');
+      this.inlineReplyError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.email.reply.sendFailed');
       this.inlineReplySending = false;
       this.cdr.markForCheck();
     });
@@ -3859,7 +3881,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
     const onError = (err: any) => this.zone.run(() => {
-      this.msgModalError   = err?.error?.error || this.transloco.translate('crm.email.reply.sendFailed');
+      this.msgModalError   = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.email.reply.sendFailed');
       this.msgModalSending = false;
       this.cdr.markForCheck();
     });
@@ -4074,7 +4096,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => { this.zone.run(() => {
         this.saving = false;
-        if (err?.status === 409) this.editNipError = err?.error?.error || this.transloco.translate('crm.leadDetail.nip.duplicate');
+        if (err?.status === 409) this.editNipError = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.nip.duplicate');
         this.cdr.markForCheck();
       }); },
     });
@@ -4417,6 +4439,23 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     this.showNewActivity = true;
   }
 
+  /** Files picked in the new-activity form are uploaded once the activity exists. */
+  private uploadPendingActivityFiles(activity: LeadActivity): void {
+    const files = this.pendingActivityFiles;
+    this.pendingActivityFiles = [];
+    if (activity.type !== 'note' && (activity.type as string) !== 'task') return;
+    activity.attachment_count = 0;
+    if (!files.length) return;
+    this.attachmentsApi.uploadAll('lead-activity', activity.id, files).subscribe(failedNames => {
+      this.zone.run(() => {
+        failedNames.forEach(name => this.toast.error(this.transloco.translate('attachments.uploadFailed', { name })));
+        activity.attachment_count = files.length - failedNames.length;
+        if (this.lead) this.lead = { ...this.lead, activities: [...(this.lead.activities || [])] };
+        this.cdr.markForCheck();
+      });
+    });
+  }
+
   addActivity() {
     if (!this.actForm.title?.trim() || !this.lead) return;
     this.savingActivity = true;
@@ -4443,6 +4482,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     const meetingSnap = this.actForm.type === 'meeting' ? { ...payload } : null;
     this.api.createLeadActivity(this.lead.id, payload).subscribe({
       next: newAct => {
+        this.uploadPendingActivityFiles(newAct);
         this.zone.run(() => {
           if (this.lead) {
             this.lead = { ...this.lead, activities: [newAct, ...(this.lead.activities || [])] };
@@ -4665,7 +4705,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }),
         error: (err: any) => this.zone.run(() => {
-          this.linkDocError = err?.error?.message || err?.error?.detail || this.transloco.translate('crm.documents.unlinkFailed');
+          this.linkDocError = localizedApiErrorMessage(err?.error?.message, this.transloco) || err?.error?.detail || this.transloco.translate('crm.documents.unlinkFailed');
           this.cdr.markForCheck();
         }),
       });
@@ -4676,7 +4716,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }),
         error: (err: any) => this.zone.run(() => {
-          this.linkDocError = err?.error?.message || err?.error?.detail || this.transloco.translate('crm.documents.linkFailed');
+          this.linkDocError = localizedApiErrorMessage(err?.error?.message, this.transloco) || err?.error?.detail || this.transloco.translate('crm.documents.linkFailed');
           this.cdr.markForCheck();
         }),
       });
@@ -4800,7 +4840,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
         if (err?.status === 422 && err?.error?.record) {
           this.testAccount = err.error.record;
         }
-        this.testAccountError      = err?.error?.error || this.transloco.translate('crm.leadDetail.testAccount.apiError');
+        this.testAccountError      = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.testAccount.apiError');
         this.submittingTestAccount = false;
         this.cdr.markForCheck();
       }),

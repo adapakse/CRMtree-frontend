@@ -11,6 +11,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { NavBackService } from '../../../core/services/nav-back.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const API = `${environment.apiUrl}/admin/prospects`;
 
@@ -2876,7 +2877,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         p.note_updated_at = r.note_updated_at;
         this.noteEdits.delete(p.id);
       },
-      error: e => this.toast.error(e.error?.error || this.tr('note.saveFailed')),
+      error: e => this.toast.error(localizedApiErrorMessage(e.error?.error, this.transloco) || this.tr('note.saveFailed')),
     });
   }
 
@@ -2972,7 +2973,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
         this.statusActioning.set(null);
         this.processingIds.update(set => { const n = new Set(set); n.delete(p.id); return n; });
         if (err.status === 409) {
-          this.toast.error(err.error?.error || this.tr('errors.taxIdConflict'));
+          this.toast.error(localizedApiErrorMessage(err.error?.error, this.transloco) || this.tr('errors.taxIdConflict'));
         }
       },
     });

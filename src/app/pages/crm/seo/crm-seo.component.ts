@@ -194,7 +194,7 @@ const SOCIAL_STATUS_LABEL_KEYS: Record<SocialPost['status'], string> = {
             </h2>
             <div class="author-row">
               <label for="authorSelect">{{ t('seo.main.detail.author.label') }}</label>
-              <select id="authorSelect" [(ngModel)]="editAuthorId" [disabled]="!isEditable(d.status)" (change)="saveAuthor(d.id)">
+              <select id="authorSelect" [(ngModel)]="editAuthorId" [disabled]="!canChangeAuthor(d.status)" (change)="saveAuthor(d.id)">
                 <option [ngValue]="null">{{ t('seo.main.detail.author.choose') }}</option>
                 @for (a of selectableAuthors(); track a.id) {
                   <option [ngValue]="a.id">{{ a.full_name }}{{ a.job_title ? ' · ' + a.job_title : '' }}{{ !a.is_active ? ' (' + t('seo.main.detail.author.inactive') + ')' : '' }}</option>
@@ -573,6 +573,13 @@ export class CrmSeoComponent implements OnInit {
 
   isEditable(status: SeoContentStatus): boolean {
     return status === 'in_review' || status === 'needs_update' || status === 'draft';
+  }
+
+  // Approval locks the text, not the byline: the author (often given by the
+  // calendar rotation) can be re-assigned even after publishing — the blog
+  // reads it live, so the article keeps its date and address.
+  canChangeAuthor(status: SeoContentStatus): boolean {
+    return this.isEditable(status) || status === 'approved' || status === 'scheduled' || status === 'published';
   }
 
   setStatusFilter(value: ContentFilter): void {

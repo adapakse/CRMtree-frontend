@@ -13,6 +13,7 @@ import { buildTaskRows } from './project-task-tree.util';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
 import { PROJECT_KSEF_STYLES, taskLabel } from './project-ksef.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const COST_STATUSES: ProjectCostStatus[] = ['incurred', 'planned'];
 // A <select> option cannot be indented with CSS, so the tree depth is drawn with non-breaking spaces.
@@ -235,6 +236,6 @@ export class ProjectKsefLinkFormComponent implements OnInit {
       return this.transloco.translate('projects.ksef.link.errors.noExchangeRate', { currency: this.projectCurrency() });
     }
     if (err?.status === 409) return this.transloco.translate('projects.ksef.link.errors.projectClosed');
-    return err?.error?.error ?? this.transloco.translate('projects.ksef.link.errors.failed');
+    return localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.ksef.link.errors.failed');
   }
 }

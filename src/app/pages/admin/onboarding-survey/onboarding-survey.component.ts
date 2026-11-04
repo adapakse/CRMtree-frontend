@@ -10,6 +10,7 @@ import {
   OnboardingSurveyResponse, SurveyAnswers, SurveyField, SurveySection,
   visibleSurveyFields, visibleSurveySections,
 } from './onboarding-survey.schema';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
 
@@ -203,7 +204,7 @@ export class OnboardingSurveyComponent implements OnInit {
         this.isSaving.set(false);
         this.toast.success(isSubmit ? this.transloco.translate('admin.onboardingSurvey.page.submitted') : this.transloco.translate('admin.onboardingSurvey.page.draftSaved'));
       },
-      error: err => { this.isSaving.set(false); this.toast.error(err?.error?.error ?? this.transloco.translate('admin.onboardingSurvey.page.saveFailed')); },
+      error: err => { this.isSaving.set(false); this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('admin.onboardingSurvey.page.saveFailed')); },
     });
   }
 

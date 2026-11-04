@@ -13,6 +13,7 @@ import { ProjectKsefInvoicePickerComponent } from './project-ksef-invoice-picker
 import { ProjectKsefOtherLinksComponent } from './project-ksef-other-links.component';
 import { PROJECTS_SHARED_STYLES } from './projects-shared.styles';
 import { PROJECT_FINANCE_STYLES } from './project-finance.styles';
+import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 // Filter value for cost items that belong to no task.
 const WITHOUT_TASK = 'none';
@@ -255,7 +256,7 @@ export class ProjectFinanceCostsComponent {
     if (!confirm(this.transloco.translate('projects.ksef.costs.unlinkConfirm', { invoice }))) return;
     this.api.updateCost(this.projectId(), item.id, { ksef_invoice_id: null }).subscribe({
       next: () => this.changed.emit(),
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.ksef.costs.unlinkFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.ksef.costs.unlinkFailed')),
     });
   }
 
@@ -264,7 +265,7 @@ export class ProjectFinanceCostsComponent {
     if (!confirm(this.transloco.translate('projects.finance.costs.deleteConfirm', { item: label }))) return;
     this.api.deleteCost(this.projectId(), item.id).subscribe({
       next: () => this.changed.emit(),
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.finance.costs.deleteFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.finance.costs.deleteFailed')),
     });
   }
 }

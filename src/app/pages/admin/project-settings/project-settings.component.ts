@@ -6,6 +6,7 @@ import { ProjectDictionaryEditorComponent } from './project-dictionary-editor.co
 import { ProjectFieldsEditorComponent } from './project-fields-editor.component';
 import { ProjectKsefSettingsComponent } from './project-ksef-settings.component';
 import { ProjectTransitionsEditorComponent } from './project-transitions-editor.component';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const MIN_AT_RISK_DAYS = 0;
 const MAX_AT_RISK_DAYS = 30;
@@ -106,7 +107,7 @@ export class ProjectSettingsComponent implements OnInit {
   ngOnInit(): void {
     this.api.getConfig().subscribe({
       next: config => this.config.set(config),
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.loadFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.settings.loadFailed')),
     });
   }
 
@@ -125,7 +126,7 @@ export class ProjectSettingsComponent implements OnInit {
       },
       error: err => {
         input.value = String(storedDays);
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.deadlines.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.settings.deadlines.saveFailed'));
       },
     });
   }
@@ -141,7 +142,7 @@ export class ProjectSettingsComponent implements OnInit {
       next: config => this.config.set(config),
       error: err => {
         checkbox.checked = !isEnabled;
-        this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.finance.saveFailed'));
+        this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.settings.finance.saveFailed'));
       },
     });
   }

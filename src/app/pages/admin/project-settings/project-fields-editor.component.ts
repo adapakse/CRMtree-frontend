@@ -6,6 +6,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import {
   ProjectConfig, ProjectFieldDefinition, ProjectFieldType, ProjectsApiService,
 } from '../../../core/services/projects-api.service';
+import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
 
 const FIELD_TYPE_OPTIONS: { value: ProjectFieldType; labelKey: string }[] = [
   { value: 'text', labelKey: 'labels.fieldTypes.text' },
@@ -137,7 +138,7 @@ export class ProjectFieldsEditorComponent {
         onSuccess?.();
         this.configChanged.emit(config);
       },
-      error: err => this.toast.error(err?.error?.error ?? this.transloco.translate('projects.settings.fields.saveFailed')),
+      error: err => this.toast.error(localizedApiErrorMessage(err?.error?.error, this.transloco) ?? this.transloco.translate('projects.settings.fields.saveFailed')),
     });
   }
 }

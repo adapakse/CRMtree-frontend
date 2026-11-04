@@ -103,16 +103,13 @@ export class ListQueryState {
     this.page.set(1);
   }
 
-  /** Unsorted → ascending → descending → unsorted. */
+  /** A new column starts ascending; clicking the sorted column again flips the direction. */
   toggleSort(key: string): void {
     if (this.sort() !== key) {
       this.sort.set(key);
       this.order.set('asc');
-    } else if (this.order() === 'asc') {
-      this.order.set('desc');
     } else {
-      this.sort.set(null);
-      this.order.set('asc');
+      this.order.set(this.order() === 'asc' ? 'desc' : 'asc');
     }
     this.page.set(1);
   }

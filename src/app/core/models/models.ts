@@ -69,6 +69,7 @@ export interface Tenant {
   dwh_schema_prefix?: string | null;
   is_active: boolean;
   seo_daily_article_limit?: number;
+  time_zone?: string;
   user_count?: number;
   total_users?: number;
   features?: TenantFeature[];
