@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/manual-guard.js\"",
+            "timeout": 20,
+            "statusMessage": "Sprawdzam, czy instrukcja jest aktualna…"
+          }
+        ]
+      }
+    ]
+  }
+}

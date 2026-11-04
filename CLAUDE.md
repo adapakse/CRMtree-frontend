@@ -108,6 +108,10 @@ Każdy zalogowany użytkownik otwiera ją w swoim języku: Moje ustawienia → �
   zmieniony. Nie blokuje wdrożenia. Commit, który naprawdę nie wymaga zmiany instrukcji
   (np. panel superadmina — instrukcja go nie opisuje), ma w treści `[manual: n/a]`.
 - **Przed pushem zmiany z `feat(...)`** uruchom `npm run manual:check`.
+- **Hook Claude Code** (`.claude/settings.json` → `.claude/hooks/manual-guard.js`) zatrzymuje
+  w sesji Claude commit `feat(...)`, który zmienia `src/app` albo `src/i18n` bez zmian w
+  `src/assets/manual` (wyjątek: `[manual: n/a]`). Gdy zablokuje — zaktualizuj instrukcję, nie
+  obchodź go.
 - Treść instrukcji to dane demo z INT (tenant `crmtree`) — nie wpisuj do niej prawdziwych danych
   klientów. Pliki są statyczne i dostępne pod znanym adresem także bez logowania.
 
