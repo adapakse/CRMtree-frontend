@@ -197,6 +197,7 @@
       "error": "Erreur",
       "hold": "En attente",
       "lead": "Lead dans le CRM",
+      "needs_review": "À vérifier",
       "no_krs": "Pas de KRS",
       "no_website": "Pas de site web",
       "pending": "En attente"

@@ -197,6 +197,7 @@
       "error": "Błąd",
       "hold": "Hold",
       "lead": "Lead w CRM",
+      "needs_review": "Do weryfikacji",
       "no_krs": "Brak KRS",
       "no_website": "Brak WWW",
       "pending": "Oczekuje"

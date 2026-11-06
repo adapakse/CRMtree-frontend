@@ -197,6 +197,7 @@
       "error": "Napaka",
       "hold": "Zadržano",
       "lead": "Lead v CRM",
+      "needs_review": "Za preverjanje",
       "no_krs": "Ni v KRS",
       "no_website": "Ni spletne strani",
       "pending": "V čakanju"

@@ -197,6 +197,7 @@
       "error": "Fehler",
       "hold": "Zurückgestellt",
       "lead": "Lead im CRM",
+      "needs_review": "Zu prüfen",
       "no_krs": "Kein KRS",
       "no_website": "Keine Website",
       "pending": "Offen"

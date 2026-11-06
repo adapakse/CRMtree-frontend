@@ -197,6 +197,7 @@
       "error": "Ошибка",
       "hold": "На паузе",
       "lead": "Лид в CRM",
+      "needs_review": "Требует проверки",
       "no_krs": "Нет в KRS",
       "no_website": "Нет сайта",
       "pending": "Ожидает"
