@@ -156,6 +156,7 @@ export interface AssignedProjectTask extends ProjectTaskSummary {
   reminder_type: ProjectReminderType | null;
   reminder_at: string | null;
   updated_at: string;
+  attachment_count: number;
 }
 
 export interface LinkedProject extends ProjectSchedule {
