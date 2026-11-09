@@ -1453,6 +1453,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Penalità della blacklist.</b> Se il nome dell'azienda, il settore o il PKD contiene una parola chiave della blacklist (per impostazione predefinita termini legati al commercio all'ingrosso), lo score cala di un numero stabilito di punti (15 per impostazione predefinita).</li>
 <li><b>Colore della barra</b>: verde da 57, arancione da 31, rosso sotto.</li>
 <li><b>La soglia per i lead</b> è impostata dall'amministratore (45 per impostazione predefinita). Sotto di essa il pulsante «→ Lead» è disattivato e il suo suggerimento mostra lo score e il minimo richiesto.</li>
+<li><b>Modificare lo score a mano.</b> La matita ✏️ accanto allo score nella tabella apre un campo per un numero da 0 a 100. Invio salva, Esc annulla. Il numero inserito sostituisce lo score calcolato, anche per la soglia del lead. I segnali restano invariati e «Rielabora» ricalcola lo score. Nella finestra «Ispezione», «Risultato calcolato» mostra allora la somma dei punti dei segnali e il numero inserito compare sotto come «Risultato salvato».</li>
 </ul>
 <div class="example"><span class="lbl">ESEMPIO · SCORE 65</span>
 <p>L'azienda CRMtree del database «Lista-KAM». L'AI ha trovato Reparto vendite (25), Consulenza / demo (15), Gestione dedicata (15) e Servizio ricorrente (10). Preventivo personalizzato, Gare d'appalto e Rete di partner hanno il pallino rosso.</p>
@@ -1465,7 +1466,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>«Riepilogo AI»</b>: due o tre frasi sull'azienda con un prossimo passo suggerito.</li>
 <li><b>«Segnali ICP»</b>: i chip verdi con ✓ sono segnali trovati, i chip rossi con ✗ sono segnali non trovati.</li>
 <li>Dati dell'azienda: «Settore», «Località», «Dipendenti», codici PKD dal GUS e il sito web con il suo stato di recupero.</li>
-<li><b>«Decisore (dal file di importazione)»</b> e <b>«Contatti chiave — trovati dall'IA»</b>: nome, ruolo, e-mail e telefono.</li>
+<li><b>«Decisore»</b>: nome, ruolo, e-mail e telefono. La matita ✏️ accanto a nome, e-mail o telefono corregge solo quel campo (Invio salva, Esc annulla).</li>
+<li><b>«Contatti chiave»</b>: persone trovate dall'IA e aggiunte a mano. La matita ✏️ accanto al titolo apre la modifica dell'elenco: <b>«+ Aggiungi contatto»</b> aggiunge una persona, il cestino la rimuove e la casella <b>«Decisore»</b> indica l'unico decisore dell'azienda (spuntarla per un'altra persona la toglie alla precedente). <b>«Salva»</b> salva l'intero elenco, al massimo 20 contatti. Il decisore è il primo tra i contatti del lead creato dal prospect. «Rielabora» svuota l'elenco dei contatti e l'IA li cerca di nuovo; il decisore resta.</li>
 <li><b>«Log dell'arricchimento»</b>: cosa è stato trovato in GUS, KRS e sul sito web, e il ragionamento dell'AI per ogni segnale.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Riga di prospect espansa"><figcaption>Borowik Maszyny Demo: score 90, stato «Lead nel CRM», riepilogo AI, segnali e due contatti chiave.</figcaption></figure>

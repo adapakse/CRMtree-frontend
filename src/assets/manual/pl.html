@@ -1455,6 +1455,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Kara za czarną listę.</b> Jeśli nazwa, branża lub PKD firmy zawiera słowo z czarnej listy (domyślnie słowa związane z hurtownią), score spada o ustaloną liczbę punktów (domyślnie 15).</li>
 <li><b>Kolor paska</b>: zielony od 57 pkt, pomarańczowy od 31 pkt, czerwony poniżej.</li>
 <li><b>Próg konwersji na lead</b> ustawia administrator (domyślnie 45 pkt). Poniżej progu przycisk „→ Lead” jest nieaktywny, a podpowiedź pokazuje wynik i wymagane minimum.</li>
+<li><b>Ręczna zmiana score.</b> Ołówek ✏️ obok score w tabeli otwiera pole z liczbą od 0 do 100. Enter zapisuje, Esc anuluje. Wpisana liczba zastępuje policzony wynik, także przy progu konwersji na lead. Sygnały się nie zmieniają, a „Re-process” policzy score od nowa. W oknie „Inspekcja” „Wynik obliczony” pokazuje wtedy sumę punktów z sygnałów, a wpisana liczba jest niżej jako „Wynik zapisany”.</li>
 </ul>
 <div class="example"><span class="lbl">PRZYKŁAD · SCORE 65</span>
 <p>Firma CRMtree z bazy „Lista-KAM”. AI uznała za obecne sygnały: Dział handlowy (25), Konsultacja / demo (15), Dedykowana opieka (15) i Cykliczna obsługa (10). Indywidualna wycena, Przetargi i Sieć partnerów mają czerwone kropki.</p>
@@ -1467,7 +1468,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Podsumowanie AI”</b>: 2–3 zdania o firmie z rekomendacją, co dalej.</li>
 <li><b>„Sygnały ICP”</b>: zielone chipy ze znakiem ✓ to sygnały obecne, czerwone ze znakiem ✗ nieobecne.</li>
 <li>Dane firmy: „Branża”, „Lokalizacja”, „Zatrudnienie”, kody PKD z GUS, strona WWW ze statusem pobrania.</li>
-<li><b>„Osoba decyzyjna (z pliku importu)”</b> i <b>„Kluczowe kontakty — znalezione przez AI”</b>: imię, stanowisko, e-mail i telefon.</li>
+<li><b>„Osoba decyzyjna”</b>: imię, stanowisko, e-mail i telefon. Ołówek ✏️ przy imieniu, e-mailu albo telefonie poprawia jedno pole (Enter zapisuje, Esc anuluje).</li>
+<li><b>„Kluczowe kontakty”</b>: osoby znalezione przez AI i dopisane ręcznie. Ołówek ✏️ przy nagłówku otwiera edycję listy: <b>„+ Dodaj kontakt”</b> dodaje osobę, kosz ją usuwa, a pole <b>„Osoba decyzyjna”</b> wskazuje jedną osobę decyzyjną firmy (zaznaczenie przy innej osobie zdejmuje je z poprzedniej). <b>„Zapisz”</b> zapisuje całą listę, maksymalnie 20 kontaktów. Osoba decyzyjna jest pierwsza na liście kontaktów leada utworzonego z prospektu. „Re-process” usuwa listę kontaktów i AI szuka ich od nowa; osoba decyzyjna zostaje.</li>
 <li><b>„Log enrichmentu”</b>: co znaleziono w GUS, KRS i na stronie WWW oraz uzasadnienie AI dla każdego sygnału.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/pl_r02_prospect_card.jpg" width="1440" height="900" alt="Rozwinięty wiersz prospektu"><figcaption>Borowik Maszyny Demo: score 90, status „Lead w CRM”, podsumowanie AI, sygnały i dwa kluczowe kontakty.</figcaption></figure>

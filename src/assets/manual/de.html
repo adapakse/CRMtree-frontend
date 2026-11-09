@@ -1453,6 +1453,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Blacklist-Abzug.</b> Enthalten Firmenname, Branche oder PKD ein Stichwort der Blacklist (standardmäßig Wörter rund um den Großhandel), sinkt der Score um eine festgelegte Anzahl von Punkten (standardmäßig 15).</li>
 <li><b>Balkenfarbe</b>: grün ab 57, orange ab 31, darunter rot.</li>
 <li><b>Die Lead-Schwelle</b> legt der Administrator fest (standardmäßig 45). Darunter ist die Schaltfläche „→ Lead“ deaktiviert, und ihr Tooltip zeigt den Score und das erforderliche Minimum.</li>
+<li><b>Score von Hand ändern.</b> Der Stift ✏️ neben dem Score in der Tabelle öffnet ein Feld für eine Zahl von 0 bis 100. Enter speichert, Esc bricht ab. Die eingegebene Zahl ersetzt den berechneten Score, auch für die Lead-Schwelle. Die Signale bleiben unverändert, und „Re-process“ berechnet den Score neu. Im Fenster „Inspektion“ zeigt „Berechneter Wert“ dann die Summe der Signalpunkte, die eingegebene Zahl steht darunter als „Gespeicherter Wert“.</li>
 </ul>
 <div class="example"><span class="lbl">BEISPIEL · SCORE 65</span>
 <p>Das Unternehmen CRMtree aus der Datenbank „Lista-KAM“. Die KI fand Vertriebsabteilung (25), Beratung / Demo (15), Dedizierte Kundenbetreuung (15) und Wiederkehrende Betreuung (10). Individuelles Angebot, Ausschreibungen und Partnernetzwerk haben rote Punkte.</p>
@@ -1465,7 +1466,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„KI-Zusammenfassung“</b>: zwei oder drei Sätze über das Unternehmen mit einem vorgeschlagenen nächsten Schritt.</li>
 <li><b>„ICP-Signale“</b>: grüne Chips mit ✓ sind gefundene Signale, rote Chips mit ✗ sind nicht gefundene Signale.</li>
 <li>Firmendaten: „Branche“, „Ort“, „Mitarbeitende“, PKD-Codes aus GUS und die Website mit ihrem Abrufstatus.</li>
-<li><b>„Entscheider (aus der Importdatei)“</b> und <b>„Wichtige Kontakte — von der KI gefunden“</b>: Name, Position, E-Mail und Telefon.</li>
+<li><b>„Entscheider“</b>: Name, Position, E-Mail und Telefon. Der Stift ✏️ neben Name, E-Mail oder Telefon korrigiert genau dieses Feld (Enter speichert, Esc bricht ab).</li>
+<li><b>„Wichtige Kontakte“</b>: von der KI gefundene und von Hand ergänzte Personen. Der Stift ✏️ neben der Überschrift öffnet die Bearbeitung der Liste: <b>„+ Kontakt hinzufügen“</b> fügt eine Person hinzu, der Papierkorb entfernt sie, und das Feld <b>„Entscheider“</b> markiert den einen Entscheider des Unternehmens (ein Häkchen bei einer anderen Person entfernt es bei der vorherigen). <b>„Speichern“</b> speichert die ganze Liste, höchstens 20 Kontakte. Der Entscheider steht an erster Stelle der Kontakte eines aus dem Prospekt erstellten Leads. „Re-process“ leert die Kontaktliste und die KI sucht Kontakte neu; der Entscheider bleibt erhalten.</li>
 <li><b>„Enrichment-Protokoll“</b>: was in GUS, KRS und auf der Website gefunden wurde, und die Begründung der KI für jedes Signal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Erweiterte Zeile eines Interessenten"><figcaption>Borowik Maszyny Demo: Score 90, Status „Lead im CRM“, KI-Zusammenfassung, Signale und zwei wichtige Kontakte.</figcaption></figure>

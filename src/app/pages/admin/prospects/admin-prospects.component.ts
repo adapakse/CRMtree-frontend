@@ -51,7 +51,21 @@ interface KeyContact {
   title: string | null;
   email: string | null;
   phone: string | null;
+  role?: 'decision_maker' | null;
 }
+
+type DecisionMakerField = 'name' | 'phone' | 'email';
+
+const DECISION_MAKER_COLUMNS: Record<DecisionMakerField, 'decision_maker_name' | 'decision_maker_phone' | 'decision_maker_email'> = {
+  name: 'decision_maker_name',
+  phone: 'decision_maker_phone',
+  email: 'decision_maker_email',
+};
+
+// Same limits as PATCH /admin/prospects/:id/key-contacts (decision_maker_* column sizes).
+const CONTACT_TEXT_MAX_LENGTH = 200;
+const CONTACT_PHONE_MAX_LENGTH = 50;
+const MAX_KEY_CONTACTS = 20;
 
 interface EnrichmentLog {
   timestamp: string;
@@ -544,19 +558,29 @@ interface DiscoveredCompany {
               </td>
               <td style="font-family:monospace;font-size:12px">{{ p.nip }}</td>
               <td>
-                @if (p.icp_score != null) {
-                  <div style="display:flex;align-items:center;gap:6px">
-                    <div style="width:44px;height:6px;border-radius:3px;background:#e5e7eb;overflow:hidden">
-                      <div [style.width.%]="p.icp_score"
-                        [style.background]="scoreColor(p.icp_score)"
-                        style="height:100%"></div>
-                    </div>
-                    <b [style.color]="scoreColor(p.icp_score)">
-                      {{ p.icp_score }}
-                    </b>
+                @if (editingScoreId() === p.id) {
+                  <div style="display:flex;align-items:center;gap:4px" (click)="$event.stopPropagation()">
+                    <input class="inp inp-sm" type="number" min="0" max="100" step="1" style="width:60px"
+                      [(ngModel)]="scoreDraft" (keydown.enter)="saveScore(p)" (keydown.escape)="cancelEditScore()">
+                    <button class="icon-btn" [title]="t('admin.edit.save')" (click)="saveScore(p, $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                    <button class="icon-btn" [title]="t('admin.edit.cancel')" (click)="cancelEditScore($event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
                   </div>
                 } @else {
-                  <span style="color:#d1d5db">—</span>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    @if (p.icp_score != null) {
+                      <div style="width:44px;height:6px;border-radius:3px;background:#e5e7eb;overflow:hidden">
+                        <div [style.width.%]="p.icp_score"
+                          [style.background]="scoreColor(p.icp_score)"
+                          style="height:100%"></div>
+                      </div>
+                      <b [style.color]="scoreColor(p.icp_score)">
+                        {{ p.icp_score }}
+                      </b>
+                    } @else {
+                      <span style="color:#d1d5db">—</span>
+                    }
+                    <button class="icon-btn" [title]="t('admin.edit.editScore')" (click)="startEditScore(p, $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                  </div>
                 }
               </td>
               <td style="font-size:12px">
@@ -791,53 +815,136 @@ interface DiscoveredCompany {
                       </div>
                     </div>
 
-                    <!-- Prawa kolumna: kluczowe kontakty + osoba decyzyjna z pliku -->
+                    <!-- Prawa kolumna: osoba decyzyjna + kluczowe kontakty -->
                     <div>
-                      @if (p.decision_maker_name) {
-                        <div style="margin-bottom:10px">
-                          <div class="detail-label">{{ t('admin.detail.decisionMaker') }}</div>
-                          <div style="border:1px solid #fbd0b6;border-radius:6px;padding:8px 10px;background:#fff7ed;font-size:12px">
-                            <div style="font-weight:600">{{ p.decision_maker_name }}</div>
-                            @if (p.decision_maker_title) {
-                              <div style="color:#6b7280">{{ p.decision_maker_title }}{{ p.decision_maker_dept ? ' · ' + p.decision_maker_dept : '' }}</div>
-                            }
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
-                              @if (p.decision_maker_email) {
-                                <a [href]="'mailto:' + p.decision_maker_email"
-                                  style="color:var(--orange);text-decoration:none"
-                                  (click)="$event.stopPropagation()">
-                                  ✉ {{ p.decision_maker_email }}
-                                </a>
-                              }
-                              @if (p.decision_maker_phone) {
-                                <span style="color:#374151;font-size:12px">📞 {{ p.decision_maker_phone }}</span>
-                              }
-                              @if (p.decision_maker_linkedin) {
-                                <a [href]="p.decision_maker_linkedin" target="_blank"
-                                  style="color:#0a66c2;text-decoration:none;font-weight:600"
-                                  (click)="$event.stopPropagation()">
-                                  in LI
-                                </a>
-                              }
-                              @if (p.decision_maker_facebook) {
-                                <a [href]="p.decision_maker_facebook" target="_blank"
-                                  style="color:#1877f2;text-decoration:none;font-weight:600"
-                                  (click)="$event.stopPropagation()">
-                                  f FB
-                                </a>
-                              }
+                      <div style="margin-bottom:10px">
+                        <div class="detail-label">{{ t('admin.detail.decisionMaker') }}</div>
+                        <div style="border:1px solid #fbd0b6;border-radius:6px;padding:8px 10px;background:#fff7ed;font-size:12px">
+                          @if (isEditingContactField(p, 'name')) {
+                            <div style="display:flex;gap:4px;align-items:center" (click)="$event.stopPropagation()">
+                              <input class="inp inp-sm" style="flex:1" [maxlength]="contactTextMaxLength"
+                                [placeholder]="t('admin.edit.contactName')"
+                                [(ngModel)]="contactFieldDraft" (keydown.enter)="saveContactField(p)" (keydown.escape)="cancelEditContactField()">
+                              <button class="icon-btn" [title]="t('admin.edit.save')" (click)="saveContactField(p, $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                              <button class="icon-btn" [title]="t('admin.edit.cancel')" (click)="cancelEditContactField($event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
                             </div>
+                          } @else {
+                            <div style="font-weight:600;display:flex;align-items:center;gap:6px">
+                              {{ p.decision_maker_name || '—' }}
+                              <button class="icon-btn" [title]="t('admin.edit.editName')" (click)="startEditContactField(p, 'name', $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                            </div>
+                          }
+                          @if (p.decision_maker_title) {
+                            <div style="color:#6b7280">{{ p.decision_maker_title }}{{ p.decision_maker_dept ? ' · ' + p.decision_maker_dept : '' }}</div>
+                          }
+                          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;align-items:center">
+                            @if (isEditingContactField(p, 'email')) {
+                              <div style="display:flex;gap:4px;align-items:center" (click)="$event.stopPropagation()">
+                                <input class="inp inp-sm" type="email" style="width:180px" [maxlength]="contactTextMaxLength"
+                                  [placeholder]="t('admin.edit.contactEmail')"
+                                  [(ngModel)]="contactFieldDraft" (keydown.enter)="saveContactField(p)" (keydown.escape)="cancelEditContactField()">
+                                <button class="icon-btn" [title]="t('admin.edit.save')" (click)="saveContactField(p, $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                                <button class="icon-btn" [title]="t('admin.edit.cancel')" (click)="cancelEditContactField($event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+                              </div>
+                            } @else {
+                              <span style="display:inline-flex;align-items:center;gap:4px">
+                                @if (p.decision_maker_email) {
+                                  <a [href]="'mailto:' + p.decision_maker_email"
+                                    style="color:var(--orange);text-decoration:none"
+                                    (click)="$event.stopPropagation()">
+                                    ✉ {{ p.decision_maker_email }}
+                                  </a>
+                                } @else {
+                                  <span style="color:#9ca3af">✉ —</span>
+                                }
+                                <button class="icon-btn" [title]="t('admin.edit.editEmail')" (click)="startEditContactField(p, 'email', $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                              </span>
+                            }
+                            @if (isEditingContactField(p, 'phone')) {
+                              <div style="display:flex;gap:4px;align-items:center" (click)="$event.stopPropagation()">
+                                <input class="inp inp-sm" type="tel" style="width:140px" [maxlength]="contactPhoneMaxLength"
+                                  [placeholder]="t('admin.edit.contactPhone')"
+                                  [(ngModel)]="contactFieldDraft" (keydown.enter)="saveContactField(p)" (keydown.escape)="cancelEditContactField()">
+                                <button class="icon-btn" [title]="t('admin.edit.save')" (click)="saveContactField(p, $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                                <button class="icon-btn" [title]="t('admin.edit.cancel')" (click)="cancelEditContactField($event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+                              </div>
+                            } @else {
+                              <span style="display:inline-flex;align-items:center;gap:4px">
+                                <span style="color:#374151;font-size:12px">📞 {{ p.decision_maker_phone || '—' }}</span>
+                                <button class="icon-btn" [title]="t('admin.edit.editPhone')" (click)="startEditContactField(p, 'phone', $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                              </span>
+                            }
+                            @if (p.decision_maker_linkedin) {
+                              <a [href]="p.decision_maker_linkedin" target="_blank"
+                                style="color:#0a66c2;text-decoration:none;font-weight:600"
+                                (click)="$event.stopPropagation()">
+                                in LI
+                              </a>
+                            }
+                            @if (p.decision_maker_facebook) {
+                              <a [href]="p.decision_maker_facebook" target="_blank"
+                                style="color:#1877f2;text-decoration:none;font-weight:600"
+                                (click)="$event.stopPropagation()">
+                                f FB
+                              </a>
+                            }
                           </div>
                         </div>
-                      }
-                      @if (p.key_contacts?.length) {
-                        <div class="detail-label">{{ t('admin.detail.keyContacts', { count: p.key_contacts!.length }) }}</div>
+                      </div>
+
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <div class="detail-label" style="margin-bottom:0">{{ t('admin.detail.keyContacts', { count: p.key_contacts?.length ?? 0 }) }}</div>
+                        @if (editingKeyContactsId() !== p.id) {
+                          <button class="icon-btn" [title]="t('admin.edit.editKeyContacts')" (click)="startEditKeyContacts(p, $event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                        }
+                      </div>
+                      @if (editingKeyContactsId() === p.id) {
+                        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px" (click)="$event.stopPropagation()">
+                          @for (c of keyContactsDraft(); track $index) {
+                            <div style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;background:#fafafa;font-size:12px;display:flex;flex-direction:column;gap:5px">
+                              <div style="display:flex;gap:6px">
+                                <input class="inp inp-sm" style="flex:1" [maxlength]="contactTextMaxLength"
+                                  [placeholder]="t('admin.edit.contactName')" [(ngModel)]="c.name">
+                                <button class="icon-btn icon-btn-danger" [title]="t('admin.edit.removeContact')" (click)="removeKeyContactDraft($index, $event)">🗑</button>
+                              </div>
+                              <input class="inp inp-sm" [maxlength]="contactTextMaxLength"
+                                [placeholder]="t('admin.edit.contactTitle')" [(ngModel)]="c.title">
+                              <div style="display:flex;gap:6px">
+                                <input class="inp inp-sm" type="email" style="flex:1" [maxlength]="contactTextMaxLength"
+                                  [placeholder]="t('admin.edit.contactEmail')" [(ngModel)]="c.email">
+                                <input class="inp inp-sm" type="tel" style="flex:1" [maxlength]="contactPhoneMaxLength"
+                                  [placeholder]="t('admin.edit.contactPhone')" [(ngModel)]="c.phone">
+                              </div>
+                              <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;cursor:pointer">
+                                <input type="checkbox" [checked]="c.role === 'decision_maker'" (change)="setKeyContactDecisionMaker($index, $event)">
+                                {{ t('admin.edit.decisionMaker') }}
+                              </label>
+                            </div>
+                          }
+                          @if (keyContactsDraft().length < maxKeyContacts) {
+                            <button class="btn btn-g btn-sm" style="align-self:flex-start" (click)="addKeyContactDraft($event)">{{ t('admin.edit.addContact') }}</button>
+                          } @else {
+                            <div style="font-size:11px;color:#6b7280">{{ t('admin.edit.maxContacts', { max: maxKeyContacts }) }}</div>
+                          }
+                          <div style="display:flex;gap:6px;margin-top:2px">
+                            <button class="btn btn-p btn-sm" [disabled]="isSavingKeyContacts()" (click)="saveKeyContacts(p, $event)">{{ t('admin.edit.save') }}</button>
+                            <button class="btn btn-g btn-sm" (click)="cancelEditKeyContacts($event)">{{ t('admin.edit.cancel') }}</button>
+                          </div>
+                        </div>
+                      } @else if (p.key_contacts?.length) {
                         <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
                           @for (c of p.key_contacts!; track $index) {
                             <div style="border:1px solid #e5e7eb;border-radius:6px;
                                         padding:8px 10px;background:#fff;font-size:12px">
-                              @if (c.name) {
-                                <div style="font-weight:600;margin-bottom:2px">{{ c.name }}</div>
+                              @if (c.name || c.role === 'decision_maker') {
+                                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                                  @if (c.name) {
+                                    <div style="font-weight:600">{{ c.name }}</div>
+                                  }
+                                  @if (c.role === 'decision_maker') {
+                                    <span class="dm-badge">{{ t('admin.edit.decisionMaker') }}</span>
+                                  }
+                                </div>
                               }
                               @if (c.title) {
                                 <div style="color:#6b7280;margin-bottom:4px">{{ c.title }}</div>
@@ -1401,6 +1508,12 @@ interface DiscoveredCompany {
                   <span class="sb-label">{{ t('admin.inspect.computedScore') }}</span>
                   <span class="sb-value">= {{ sb.total }}</span>
                 </div>
+                @if (sb.actualScore != null && sb.actualScore !== sb.total) {
+                  <div class="sb-row" style="font-size:11px;color:#9ca3af;background:#fafafa">
+                    <span class="sb-label">{{ t('admin.inspect.savedScore') }}</span>
+                    <span class="sb-value">{{ sb.actualScore }}</span>
+                  </div>
+                }
               </div>
             }
 
@@ -1770,6 +1883,18 @@ interface DiscoveredCompany {
     .inp { height:32px; border:1px solid #d1d5db; border-radius:6px;
            padding:0 8px; font-size:13px; background:#fff; }
     .inp:focus { outline:none; border-color:var(--orange); }
+    .inp-sm { height:26px; font-size:12px; padding:0 6px; }
+
+    .icon-btn {
+      border:none; background:transparent; cursor:pointer; padding:0 2px;
+      font-size:12px; line-height:1; color:#6b7280; opacity:.7;
+    }
+    .icon-btn:hover { opacity:1; }
+    .icon-btn-danger { color:#dc2626; }
+    .dm-badge {
+      background:var(--orange-pale); color:var(--orange); font-size:10px; font-weight:700;
+      padding:1px 6px; border-radius:4px;
+    }
 
     /* Pasek akcji masowych */
     .bulk-bar {
@@ -2870,14 +2995,194 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   saveNote(p: Prospect) {
     const note = this.noteEdits.get(p.id) ?? p.note ?? '';
     if (note === (p.note ?? '')) { this.noteEdits.delete(p.id); return; }
-    this.http.patch<any>(`${API}/${p.id}/note`, { note }).subscribe({
+    this.http.patch<Pick<Prospect, 'note' | 'note_author' | 'note_updated_at'>>(`${API}/${p.id}/note`, { note }).subscribe({
       next: r => {
-        p.note            = r.note;
-        p.note_author     = r.note_author;
-        p.note_updated_at = r.note_updated_at;
         this.noteEdits.delete(p.id);
+        this.patchRow(p.id, { note: r.note, note_author: r.note_author, note_updated_at: r.note_updated_at });
       },
       error: e => this.toast.error(localizedApiErrorMessage(e.error?.error, this.transloco) || this.tr('note.saveFailed')),
+    });
+  }
+
+  // Rows live in a signal under OnPush: assigning to the row object would not re-render
+  // the list, so every save replaces the row through rows.update().
+  private patchRow(id: number, changes: Partial<Prospect>) {
+    this.rows.update(rows => rows.map(row => row.id === id ? { ...row, ...changes } : row));
+  }
+
+  // ── Ręczna edycja score ──────────────────────────────────────────
+
+  editingScoreId = signal<number | null>(null);
+  scoreDraft: number | null = null;
+
+  startEditScore(p: Prospect, event: MouseEvent) {
+    event.stopPropagation();
+    this.scoreDraft = p.icp_score;
+    this.editingScoreId.set(p.id);
+  }
+
+  cancelEditScore(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.editingScoreId.set(null);
+  }
+
+  saveScore(p: Prospect, event?: MouseEvent) {
+    event?.stopPropagation();
+    const value = this.scoreDraft;
+    if (value == null || !Number.isInteger(value) || value < 0 || value > 100) {
+      this.toast.error(this.tr('edit.scoreInvalid'));
+      return;
+    }
+    this.editingScoreId.set(null);
+    this.http.patch<{ icp_score: number }>(`${API}/${p.id}/score`, { icp_score: value }).subscribe({
+      next: r => {
+        this.patchRow(p.id, { icp_score: r.icp_score });
+        this.toast.success(this.tr('edit.scoreSaved'));
+      },
+      error: () => this.toast.error(this.tr('edit.scoreSaveFailed')),
+    });
+  }
+
+  // ── Edycja osoby decyzyjnej (pojedyncze pole) ────────────────────
+
+  readonly contactTextMaxLength = CONTACT_TEXT_MAX_LENGTH;
+  readonly contactPhoneMaxLength = CONTACT_PHONE_MAX_LENGTH;
+  readonly maxKeyContacts = MAX_KEY_CONTACTS;
+
+  editingContactField = signal<{ id: number; field: DecisionMakerField } | null>(null);
+  contactFieldDraft = '';
+
+  isEditingContactField(p: Prospect, field: DecisionMakerField): boolean {
+    const editing = this.editingContactField();
+    return editing?.id === p.id && editing.field === field;
+  }
+
+  startEditContactField(p: Prospect, field: DecisionMakerField, event: MouseEvent) {
+    event.stopPropagation();
+    this.contactFieldDraft = p[DECISION_MAKER_COLUMNS[field]] ?? '';
+    this.editingContactField.set({ id: p.id, field });
+  }
+
+  cancelEditContactField(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.editingContactField.set(null);
+  }
+
+  saveContactField(p: Prospect, event?: MouseEvent) {
+    event?.stopPropagation();
+    const editing = this.editingContactField();
+    if (!editing || editing.id !== p.id) return;
+    const column = DECISION_MAKER_COLUMNS[editing.field];
+    const value = this.contactFieldDraft.trim() || null;
+    this.editingContactField.set(null);
+    if (value === (p[column] ?? null)) return;
+    this.http.patch<Pick<Prospect, 'decision_maker_name' | 'decision_maker_phone' | 'decision_maker_email' | 'key_contacts'>>(
+      `${API}/${p.id}/contact`, { [column]: value },
+    ).subscribe({
+      next: r => {
+        this.patchRow(p.id, {
+          decision_maker_name: r.decision_maker_name,
+          decision_maker_phone: r.decision_maker_phone,
+          decision_maker_email: r.decision_maker_email,
+          key_contacts: r.key_contacts,
+        });
+        this.toast.success(this.tr('edit.contactSaved'));
+      },
+      error: () => this.toast.error(this.tr('edit.contactSaveFailed')),
+    });
+  }
+
+  // ── Edycja listy kluczowych kontaktów ────────────────────────────
+  // Cała lista zapisywana jednym żądaniem; backend pilnuje jednej osoby
+  // decyzyjnej i przepisuje ją do decision_maker_*.
+
+  editingKeyContactsId = signal<number | null>(null);
+  keyContactsDraft     = signal<KeyContact[]>([]);
+  isSavingKeyContacts  = signal(false);
+
+  startEditKeyContacts(p: Prospect, event: MouseEvent) {
+    event.stopPropagation();
+    const draft: KeyContact[] = (p.key_contacts ?? []).map(c => ({ ...c, role: c.role ?? null }));
+    const hasDecisionMaker = draft.some(c => c.role === 'decision_maker');
+    // Older records keep the decision maker only in decision_maker_* (import file) —
+    // attach it to the matching contact or add it, so saving the list does not drop it.
+    if (!hasDecisionMaker && (p.decision_maker_name || p.decision_maker_phone || p.decision_maker_email)) {
+      const match = draft.find(c =>
+        (!!p.decision_maker_email && c.email === p.decision_maker_email) ||
+        (!!p.decision_maker_phone && c.phone === p.decision_maker_phone) ||
+        (!!p.decision_maker_name  && c.name  === p.decision_maker_name)
+      );
+      if (match) match.role = 'decision_maker';
+      else draft.unshift({
+        name: p.decision_maker_name, title: p.decision_maker_title,
+        email: p.decision_maker_email, phone: p.decision_maker_phone,
+        role: 'decision_maker',
+      });
+    }
+    this.keyContactsDraft.set(draft);
+    this.editingKeyContactsId.set(p.id);
+  }
+
+  cancelEditKeyContacts(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.editingKeyContactsId.set(null);
+    this.keyContactsDraft.set([]);
+  }
+
+  addKeyContactDraft(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.keyContactsDraft.update(contacts => contacts.length >= MAX_KEY_CONTACTS
+      ? contacts
+      : [...contacts, { name: null, title: null, email: null, phone: null, role: null }]);
+  }
+
+  removeKeyContactDraft(index: number, event?: MouseEvent) {
+    event?.stopPropagation();
+    this.keyContactsDraft.update(contacts => contacts.filter((_, i) => i !== index));
+  }
+
+  setKeyContactDecisionMaker(index: number, event: Event) {
+    event.stopPropagation();
+    const isChecked = (event.target as HTMLInputElement).checked;
+    this.keyContactsDraft.update(contacts => contacts.map((c, i) => ({
+      ...c,
+      role: i === index ? (isChecked ? 'decision_maker' : null) : (isChecked ? null : c.role),
+    })));
+  }
+
+  saveKeyContacts(p: Prospect, event?: MouseEvent) {
+    event?.stopPropagation();
+    const contacts = this.keyContactsDraft()
+      .map(c => ({
+        name:  (c.name  || '').trim() || null,
+        title: (c.title || '').trim() || null,
+        email: (c.email || '').trim() || null,
+        phone: (c.phone || '').trim() || null,
+        role:  c.role ?? null,
+      }))
+      .filter(c => c.name || c.title || c.email || c.phone);
+    this.isSavingKeyContacts.set(true);
+    this.http.patch<Pick<Prospect,
+      'key_contacts' | 'decision_maker_name' | 'decision_maker_title' | 'decision_maker_phone' | 'decision_maker_email'>>(
+      `${API}/${p.id}/key-contacts`, { contacts },
+    ).subscribe({
+      next: r => {
+        this.isSavingKeyContacts.set(false);
+        this.patchRow(p.id, {
+          key_contacts: r.key_contacts,
+          decision_maker_name: r.decision_maker_name,
+          decision_maker_title: r.decision_maker_title,
+          decision_maker_phone: r.decision_maker_phone,
+          decision_maker_email: r.decision_maker_email,
+        });
+        this.editingKeyContactsId.set(null);
+        this.keyContactsDraft.set([]);
+        this.toast.success(this.tr('edit.keyContactsSaved'));
+      },
+      error: () => {
+        this.isSavingKeyContacts.set(false);
+        this.toast.error(this.tr('edit.keyContactsSaveFailed'));
+      },
     });
   }
 
@@ -3213,6 +3518,7 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
   // bez powtarzania formuły scoringu po stronie frontendu.
   calcScoreBreakdown(p: Prospect): {
     trueCount: number; raw: number; bonus: number; downgradePenalty: number; total: number;
+    actualScore: number | null;
     bonusBreakdown: IcpBonusHit[];
     downgradeFlags: IcpDowngradeFlag[];
   } {
@@ -3227,10 +3533,12 @@ export class AdminProspectsComponent implements OnInit, OnDestroy {
       trueCount, raw, bonus, downgradePenalty,
       // Decyzja 2026-09-22: icp_score = wyłącznie suma trafionych sygnałów (minus
       // kara blacklisty w downgradePenalty) — bramki usunięte z UI, bonus zostaje
-      // tylko jako informacyjny breakdown, nie wchodzi do total. Fallback (gdy
-      // backend nie przysłał icp_score, np. rekord jeszcze nieprzetworzony) musi
-      // liczyć tak samo jak enrichOne(), inaczej inspektor pokazuje zawyżony wynik.
-      total: p.icp_score ?? Math.max(0, Math.min(100, raw + downgradePenalty)),
+      // tylko jako informacyjny breakdown, nie wchodzi do total. total musi liczyć
+      // tak samo jak enrichOne(), inaczej inspektor pokazuje zawyżony wynik.
+      total: Math.max(0, Math.min(100, raw + downgradePenalty)),
+      // Jak w worktrips.doc: zapisany icp_score pokazany osobno, gdy różni się od
+      // policzonego (np. po ręcznej zmianie score ołówkiem w tabeli).
+      actualScore: p.icp_score ?? null,
       bonusBreakdown,
       downgradeFlags,
     };

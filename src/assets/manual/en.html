@@ -1453,6 +1453,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Blacklist penalty.</b> If the company name, industry or PKD contains a blacklisted keyword (by default words related to wholesale), the score drops by a set number of points (15 by default).</li>
 <li><b>Bar colour</b>: green from 57, orange from 31, red below that.</li>
 <li><b>The lead threshold</b> is set by the administrator (45 by default). Below it the “→ Lead” button is disabled, and its tooltip shows the score and the minimum required.</li>
+<li><b>Changing the score by hand.</b> The pencil ✏️ next to the score in the table opens a field for a number from 0 to 100. Enter saves, Esc cancels. The number you type replaces the calculated score, also for the lead threshold. The signals stay as they are, and “Re-process” calculates the score again. In the “Inspect” window, “Computed score” then shows the sum of signal points, and the number you typed is shown below it as “Saved score”.</li>
 </ul>
 <div class="example"><span class="lbl">EXAMPLE · SCORE 65</span>
 <p>The company CRMtree from the “Lista-KAM” database. The AI found Sales department (25), Consultation / demo (15), Dedicated account care (15) and Recurring service (10). Custom quote, Public tenders and Partner network have red dots.</p>
@@ -1465,7 +1466,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“AI summary”</b>: two or three sentences about the company with a suggested next step.</li>
 <li><b>“ICP signals”</b>: green chips with ✓ are signals found, red chips with ✗ are signals not found.</li>
 <li>Company data: “Industry”, “Location”, “Employees”, PKD codes from GUS, and the website with its fetch status.</li>
-<li><b>“Decision maker (from the import file)”</b> and <b>“Key contacts — found by AI”</b>: name, position, email and phone.</li>
+<li><b>“Decision maker”</b>: name, position, email and phone. The pencil ✏️ next to the name, email or phone corrects that one field (Enter saves, Esc cancels).</li>
+<li><b>“Key contacts”</b>: people found by AI and added by hand. The pencil ✏️ next to the heading opens the list editor: <b>“+ Add contact”</b> adds a person, the bin removes one, and the <b>“Decision maker”</b> box marks the company’s one decision maker (ticking it for another person clears it from the previous one). <b>“Save”</b> saves the whole list, up to 20 contacts. The decision maker comes first among the contacts of a lead created from the prospect. “Re-process” clears the contact list and the AI looks for contacts again; the decision maker stays.</li>
 <li><b>“Enrichment log”</b>: what was found in GUS, KRS and on the website, and the AI’s reasoning for each signal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Expanded prospect row"><figcaption>Borowik Maszyny Demo: score 90, status “Lead in CRM”, AI summary, signals and two key contacts.</figcaption></figure>
