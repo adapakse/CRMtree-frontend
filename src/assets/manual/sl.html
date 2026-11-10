@@ -1453,6 +1453,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Kazen zaradi črnega seznama.</b> Če naziv podjetja, panoga ali PKD vsebuje ključno besedo s črnega seznama (privzeto besede, povezane z veleprodajo), se ocena zniža za določeno število točk (privzeto 15).</li>
 <li><b>Barva stolpca</b>: zelena od 57, oranžna od 31, rdeča pod tem.</li>
 <li><b>Prag za lead</b> nastavi administrator (privzeto 45). Pod njim je gumb »→ Lead« onemogočen, njegov opis orodja pa prikazuje oceno in zahtevani minimum.</li>
+<li><b>Ročna sprememba ocene.</b> Svinčnik ✏️ ob oceni v tabeli odpre polje za število od 0 do 100. Enter shrani, Esc prekliče. Vpisano število nadomesti izračunano oceno, tudi pri pragu za lead. Signali ostanejo nespremenjeni, »Re-process« pa oceno izračuna znova. V oknu »Pregled« »Izračunani rezultat« tedaj prikaže vsoto točk signalov, vpisano število pa je spodaj kot »Shranjeni rezultat«.</li>
 </ul>
 <div class="example"><span class="lbl">PRIMER · OCENA 65</span>
 <p>Podjetje CRMtree iz baze »Lista-KAM«. Umetna inteligenca je našla Prodajni oddelek (25), Svetovanje / demo (15), Namensko skrb za stranke (15) in Ponavljajočo se storitev (10). Individualna ponudba, Javni razpisi in Mreža partnerjev imajo rdeče pike.</p>
@@ -1465,7 +1466,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>»Povzetek UI«</b>: dva ali trije stavki o podjetju s predlaganim naslednjim korakom.</li>
 <li><b>»Signali ICP«</b>: zeleni čipi s ✓ so najdeni signali, rdeči čipi z ✗ pa signali, ki niso najdeni.</li>
 <li>Podatki podjetja: »Panoga«, »Lokacija«, »Zaposleni«, kode PKD iz GUS ter spletna stran s stanjem prenosa.</li>
-<li><b>»Odločovalec (iz uvozne datoteke)«</b> in <b>»Ključni kontakti — najdeni z UI«</b>: ime, položaj, e-pošta in telefon.</li>
+<li><b>»Odločovalec«</b>: ime, položaj, e-pošta in telefon. Svinčnik ✏️ ob imenu, e-pošti ali telefonu popravi samo to polje (Enter shrani, Esc prekliče).</li>
+<li><b>»Ključni kontakti«</b>: osebe, ki jih je našla UI, in ročno dodane osebe. Svinčnik ✏️ ob naslovu odpre urejanje seznama: <b>»+ Dodaj kontakt«</b> doda osebo, koš jo odstrani, polje <b>»Odločovalec«</b> pa označi edinega odločovalca podjetja (oznaka pri drugi osebi jo odstrani s prejšnje). <b>»Shrani«</b> shrani celoten seznam, največ 20 kontaktov. Odločovalec je prvi med kontakti leada, ustvarjenega iz prospekta. »Re-process« izprazni seznam kontaktov in UI jih poišče znova; odločovalec ostane.</li>
 <li><b>»Dnevnik bogatenja«</b>: kaj je bilo najdeno v GUS, KRS in na spletni strani ter utemeljitev umetne inteligence za vsak signal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Razširjena vrstica potencialne stranke"><figcaption>Borowik Maszyny Demo: ocena 90, status »Lead v CRM«, povzetek UI, signali in dva ključna kontakta.</figcaption></figure>

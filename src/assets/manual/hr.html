@@ -1453,6 +1453,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Kazna za crnu listu.</b> Ako naziv tvrtke, djelatnost ili PKD sadrži ključnu riječ s crne liste (prema zadanim postavkama riječi povezane s veleprodajom), ocjena pada za određeni broj bodova (prema zadanim postavkama 15).</li>
 <li><b>Boja trake</b>: zelena od 57, narančasta od 31, a ispod toga crvena.</li>
 <li><b>Prag za lead</b> postavlja administrator (prema zadanim postavkama 45). Ispod njega je gumb „→ Lead” onemogućen, a njegov opis prikazuje ocjenu i potrebni minimum.</li>
+<li><b>Ručna promjena ocjene.</b> Olovka ✏️ pokraj ocjene u tablici otvara polje za broj od 0 do 100. Enter sprema, Esc odustaje. Upisani broj zamjenjuje izračunatu ocjenu, i za prag za lead. Signali se ne mijenjaju, a „Re-process” ponovno izračunava ocjenu. U prozoru „Pregled” „Izračunani rezultat” tada prikazuje zbroj bodova signala, a upisani broj je ispod kao „Spremljeni rezultat”.</li>
 </ul>
 <div class="example"><span class="lbl">PRIMJER · OCJENA 65</span>
 <p>Tvrtka CRMtree iz baze „Lista-KAM”. AI je pronašao Prodajni odjel (25), Konzultacija / demo (15), Namjenska skrb o klijentu (15) i Ponavljajuća usluga (10). Individualna ponuda, Javni natječaji i Mreža partnera imaju crvene točke.</p>
@@ -1465,7 +1466,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„AI sažetak”</b>: dvije ili tri rečenice o tvrtki s predloženim sljedećim korakom.</li>
 <li><b>„ICP signali”</b>: zeleni čipovi s ✓ su pronađeni signali, crveni čipovi s ✗ signali koji nisu pronađeni.</li>
 <li>Podaci o tvrtki: „Djelatnost”, „Lokacija”, „Zaposleni”, PKD šifre iz GUS-a i web-stranica sa statusom dohvata.</li>
-<li><b>„Donositelj odluke (iz datoteke uvoza)”</b> i <b>„Ključni kontakti — pronašla UI”</b>: ime, položaj, e-pošta i telefon.</li>
+<li><b>„Donositelj odluke”</b>: ime, položaj, e-pošta i telefon. Olovka ✏️ pokraj imena, e-pošte ili telefona ispravlja samo to polje (Enter sprema, Esc odustaje).</li>
+<li><b>„Ključni kontakti”</b>: osobe koje je pronašla UI i ručno dodane osobe. Olovka ✏️ pokraj naslova otvara uređivanje popisa: <b>„+ Dodaj kontakt”</b> dodaje osobu, koš je uklanja, a polje <b>„Donositelj odluke”</b> označava jedinog donositelja odluke u tvrtki (oznaka kod druge osobe uklanja je s prethodne). <b>„Spremi”</b> sprema cijeli popis, najviše 20 kontakata. Donositelj odluke prvi je među kontaktima leada stvorenog iz prospekta. „Re-process” prazni popis kontakata i UI ih ponovno traži; donositelj odluke ostaje.</li>
 <li><b>„Zapis obogaćivanja”</b>: što je pronađeno u GUS-u, KRS-u i na web-stranici te obrazloženje AI-ja za svaki signal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Prošireni redak prospekta"><figcaption>Borowik Maszyny Demo: ocjena 90, status „Lead u CRM-u”, AI sažetak, signali i dva ključna kontakta.</figcaption></figure>

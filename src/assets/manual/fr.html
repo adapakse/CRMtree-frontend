@@ -1453,6 +1453,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Pénalité de liste noire.</b> Si le nom, le secteur ou le PKD de l’entreprise contient un mot-clé de la liste noire (par défaut des mots liés au commerce de gros), le score baisse d’un nombre de points défini (15 par défaut).</li>
 <li><b>Couleur de la barre</b> : verte à partir de 57, orange à partir de 31, rouge en dessous.</li>
 <li><b>Le seuil de lead</b> est défini par l’administrateur (45 par défaut). En dessous, le bouton « → Lead » est désactivé, et son infobulle affiche le score et le minimum requis.</li>
+<li><b>Modifier le score à la main.</b> Le crayon ✏️ à côté du score dans le tableau ouvre un champ pour un nombre de 0 à 100. Entrée enregistre, Échap annule. Le nombre saisi remplace le score calculé, y compris pour le seuil de lead. Les signaux ne changent pas, et « Retraiter » recalcule le score. Dans la fenêtre « Inspection », « Résultat calculé » affiche alors la somme des points des signaux, et le nombre saisi apparaît en dessous comme « Résultat enregistré ».</li>
 </ul>
 <div class="example"><span class="lbl">EXEMPLE · SCORE 65</span>
 <p>L’entreprise CRMtree issue de la base « Lista-KAM ». L’IA a trouvé Service commercial (25), Conseil / démo (15), Suivi dédié (15) et Service récurrent (10). Devis personnalisé, Appels d’offres et Réseau de partenaires ont des points rouges.</p>
@@ -1465,7 +1466,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>« Résumé IA »</b> : deux ou trois phrases sur l’entreprise avec une prochaine étape suggérée.</li>
 <li><b>« Signaux ICP »</b> : les puces vertes avec ✓ sont des signaux trouvés, les puces rouges avec ✗ des signaux non trouvés.</li>
 <li>Données de l’entreprise : « Secteur », « Lieu », « Employés », codes PKD issus du GUS, et le site web avec son état de récupération.</li>
-<li><b>« Décideur (issu du fichier d’import) »</b> et <b>« Contacts clés — trouvés par l’IA »</b> : nom, poste, e-mail et téléphone.</li>
+<li><b>« Décideur »</b> : nom, poste, e-mail et téléphone. Le crayon ✏️ à côté du nom, de l’e-mail ou du téléphone corrige ce seul champ (Entrée enregistre, Échap annule).</li>
+<li><b>« Contacts clés »</b> : personnes trouvées par l’IA et ajoutées à la main. Le crayon ✏️ à côté du titre ouvre la modification de la liste : <b>« + Ajouter un contact »</b> ajoute une personne, la corbeille la supprime, et la case <b>« Décideur »</b> désigne l’unique décideur de l’entreprise (la cocher pour une autre personne la retire de la précédente). <b>« Enregistrer »</b> enregistre toute la liste, 20 contacts au maximum. Le décideur apparaît en premier parmi les contacts du lead créé à partir du prospect. « Retraiter » vide la liste des contacts et l’IA les recherche à nouveau ; le décideur reste.</li>
 <li><b>« Journal d’enrichissement »</b> : ce qui a été trouvé dans le GUS, le KRS et sur le site web, et le raisonnement de l’IA pour chaque signal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Ligne de prospect dépliée"><figcaption>Borowik Maszyny Demo : score 90, statut « Lead dans le CRM », résumé IA, signaux et deux contacts clés.</figcaption></figure>

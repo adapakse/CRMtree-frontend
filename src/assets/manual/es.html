@@ -1452,6 +1452,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Penalización de la lista negra.</b> Si el nombre, el sector o el PKD de la empresa contiene una palabra clave de la lista negra (por defecto, palabras relacionadas con la venta al por mayor), la puntuación baja un número fijo de puntos (15 por defecto).</li>
 <li><b>Color de la barra</b>: verde desde 57, naranja desde 31, rojo por debajo.</li>
 <li><b>El umbral de lead</b> lo establece el administrador (45 por defecto). Por debajo, el botón “→ Lead” está desactivado, y su ayuda muestra la puntuación y el mínimo requerido.</li>
+<li><b>Cambiar el score a mano.</b> El lápiz ✏️ junto al score en la tabla abre un campo para un número de 0 a 100. Intro guarda, Esc cancela. El número que escribes sustituye al score calculado, también para el umbral de lead. Las señales no cambian y “Procesar de nuevo” vuelve a calcular el score. En la ventana “Inspección”, “Resultado calculado” muestra entonces la suma de puntos de las señales, y el número escrito aparece debajo como “Resultado guardado”.</li>
 </ul>
 <div class="example"><span class="lbl">EJEMPLO · SCORE 65</span>
 <p>La empresa CRMtree de la base “Lista-KAM”. La IA encontró Departamento comercial (25), Consultoría / demo (15), Atención dedicada (15) y Servicio recurrente (10). Presupuesto personalizado, Licitaciones y Red de partners tienen puntos rojos.</p>
@@ -1464,7 +1465,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>“Resumen de IA”</b>: dos o tres frases sobre la empresa con un siguiente paso sugerido.</li>
 <li><b>“Señales ICP”</b>: los chips verdes con ✓ son señales encontradas, los chips rojos con ✗ son señales no encontradas.</li>
 <li>Datos de la empresa: “Sector”, “Ubicación”, “Empleados”, códigos PKD de GUS y el sitio web con su estado de obtención.</li>
-<li><b>“Persona decisora (del archivo de importación)”</b> y <b>“Contactos clave — encontrados por la IA”</b>: nombre, cargo, correo y teléfono.</li>
+<li><b>“Persona decisora”</b>: nombre, cargo, correo y teléfono. El lápiz ✏️ junto al nombre, el correo o el teléfono corrige solo ese campo (Intro guarda, Esc cancela).</li>
+<li><b>“Contactos clave”</b>: personas encontradas por la IA y añadidas a mano. El lápiz ✏️ junto al título abre la edición de la lista: <b>“+ Añadir contacto”</b> añade una persona, la papelera la elimina y la casilla <b>“Persona decisora”</b> marca a la única persona decisora de la empresa (marcarla en otra persona la quita de la anterior). <b>“Guardar”</b> guarda toda la lista, hasta 20 contactos. La persona decisora va primero en los contactos del lead creado a partir del prospecto. “Procesar de nuevo” vacía la lista de contactos y la IA los busca otra vez; la persona decisora se mantiene.</li>
 <li><b>“Registro del enriquecimiento”</b>: lo que se encontró en GUS, KRS y en el sitio web, y el razonamiento de la IA para cada señal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Fila de prospecto desplegada"><figcaption>Borowik Maszyny Demo: score 90, estado “Lead en el CRM”, resumen de IA, señales y dos contactos clave.</figcaption></figure>

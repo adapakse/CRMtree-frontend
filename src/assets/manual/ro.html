@@ -1453,6 +1453,7 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>Penalizare din lista neagră.</b> Dacă denumirea companiei, industria sau PKD conține un cuvânt-cheie din lista neagră (implicit cuvinte legate de comerțul en-gros), scorul scade cu un număr stabilit de puncte (implicit 15).</li>
 <li><b>Culoarea barei</b>: verde de la 57, portocaliu de la 31, roșu sub acest prag.</li>
 <li><b>Pragul de lead</b> este stabilit de administrator (implicit 45). Sub el, butonul „→ Lead” este dezactivat, iar descrierea lui afișează scorul și minimul necesar.</li>
+<li><b>Modificarea manuală a scorului.</b> Creionul ✏️ de lângă scor din tabel deschide un câmp pentru un număr de la 0 la 100. Enter salvează, Esc anulează. Numărul introdus înlocuiește scorul calculat, inclusiv pentru pragul de lead. Semnalele rămân neschimbate, iar „Re-process” recalculează scorul. În fereastra „Inspecție”, „Rezultat calculat” arată atunci suma punctelor din semnale, iar numărul introdus apare dedesubt ca „Rezultat salvat”.</li>
 </ul>
 <div class="example"><span class="lbl">EXEMPLU · SCOR 65</span>
 <p>Compania CRMtree din baza „Lista-KAM”. AI a găsit Departamentul de vânzări (25), Consultanță / demo (15), Îngrijire dedicată (15) și Servicii recurente (10). Ofertă personalizată, Licitații și Rețea de parteneri au puncte roșii.</p>
@@ -1465,7 +1466,8 @@ nav.toc .grp{margin:12px 0 2px;padding:0 10px;font-size:12.5px;font-weight:700;c
 <li><b>„Rezumat AI”</b>: două sau trei propoziții despre companie, cu un pas următor sugerat.</li>
 <li><b>„Semnale ICP”</b>: chipurile verzi cu ✓ sunt semnale găsite, chipurile roșii cu ✗ sunt semnale negăsite.</li>
 <li>Datele companiei: „Domeniu”, „Locație”, „Angajați”, coduri PKD din GUS și site-ul cu starea preluării lui.</li>
-<li><b>„Decident (din fișierul de import)”</b> și <b>„Contacte-cheie — găsite de AI”</b>: nume, funcție, e-mail și telefon.</li>
+<li><b>„Decident”</b>: nume, funcție, e-mail și telefon. Creionul ✏️ de lângă nume, e-mail sau telefon corectează doar acel câmp (Enter salvează, Esc anulează).</li>
+<li><b>„Contacte-cheie”</b>: persoane găsite de AI și adăugate manual. Creionul ✏️ de lângă titlu deschide editarea listei: <b>„+ Adaugă contact”</b> adaugă o persoană, coșul o elimină, iar căsuța <b>„Decident”</b> marchează unicul decident al companiei (bifarea ei la altă persoană o scoate de la cea anterioară). <b>„Salvează”</b> salvează toată lista, cel mult 20 de contacte. Decidentul este primul dintre contactele lead-ului creat din prospect. „Re-process” golește lista de contacte, iar AI le caută din nou; decidentul rămâne.</li>
 <li><b>„Jurnalul îmbogățirii”</b>: ce s-a găsit în GUS, KRS și pe site și raționamentul AI pentru fiecare semnal.</li>
 </ul>
 <figure class="webfig"><img loading="lazy" src="img/en_r02_prospect_card.jpg" width="1440" height="900" alt="Rând de prospect extins"><figcaption>Borowik Maszyny Demo: scor 90, status „Lead în CRM”, rezumat AI, semnale și două contacte-cheie.</figcaption></figure>
