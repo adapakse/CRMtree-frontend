@@ -171,6 +171,7 @@ export interface ActivityTask {
   /** Tenant-defined status name of a project task; CRM activities use `status`. */
   status_label?: string;
   project_task_id?: string;
+  attachment_count?: number;
 }
 
 

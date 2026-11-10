@@ -1,10 +1,11 @@
 // src/app/pages/my-settings/my-settings.component.ts
-import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { LanguagePickerComponent } from '../../shared/components/language-picker/language-picker.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeEmailHtml } from '../../shared/utils/email-html.util';
 import { QuillModule } from 'ngx-quill';
 import { environment } from '../../../environments/environment';
 import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
@@ -13,6 +14,7 @@ import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitution
 import { MyProjectNotificationsComponent } from './my-project-notifications.component';
 import { MyDevicesComponent } from './my-devices.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
+import { LocaleService } from '../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 
 const BASE = environment.apiUrl;
@@ -30,8 +32,13 @@ const BASE = environment.apiUrl;
 
 <div id="content" style="padding:24px;max-width:860px;display:flex;flex-direction:column;gap:20px">
 
-  <div class="card" style="padding:24px">
+  <div class="card settings-head">
     <wt-language-picker mode="user" />
+    <div class="manual-entry">
+      <div class="manual-title">📘 {{ t('mySettings.manual.title') }}</div>
+      <p class="manual-hint">{{ t('mySettings.manual.hint') }}</p>
+      <a class="btn btn-p btn-sm" [href]="manualUrl()" target="_blank" rel="noopener">{{ t('mySettings.manual.open') }}</a>
+    </div>
   </div>
 
   <!-- ── Zmiana hasła ───────────────────────────────────────────────────── -->
@@ -305,6 +312,12 @@ const BASE = environment.apiUrl;
     .btn-p { background:#3BAA5D; color:white; }
     .btn-g { background:white; border:1px solid #d1d5db; color:#374151; }
     .btn-sm { padding:6px 12px; font-size:12px; }
+    .settings-head { padding:24px; display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; }
+    .settings-head > wt-language-picker { flex:1 1 320px; }
+    .manual-entry { flex:0 1 280px; border-left:1px solid #e5e7eb; padding-left:24px; }
+    .manual-title { font-size:14px; font-weight:600; color:#111827; }
+    .manual-hint { font-size:12px; color:#6b7280; margin:6px 0 12px; }
+    a.btn { text-decoration:none; }
   `],
 })
 export class MySettingsComponent implements OnInit {
@@ -314,6 +327,10 @@ export class MySettingsComponent implements OnInit {
   private api        = inject(CrmApiService);
   auth               = inject(AuthService);
   private transloco  = inject(TranslocoService);
+  private locale     = inject(LocaleService);
+
+  // src/assets/manual has a page for every interface language.
+  readonly manualUrl = computed(() => `/assets/manual/${this.locale.activeLocale()}.html`);
 
   /** Substitutions panel — same scope as crmGuard: admin | salesperson | sales_manager. */
   get canSeeSubstitutions(): boolean {
@@ -469,7 +486,7 @@ export class MySettingsComponent implements OnInit {
   }
 
   updatePreview() {
-    this.safePreview = this.sanitizer.bypassSecurityTrustHtml(this.signatureHtml);
+    this.safePreview = this.sanitizer.bypassSecurityTrustHtml(sanitizeEmailHtml(this.signatureHtml));
   }
 
   save() {
@@ -567,6 +584,6 @@ export class MySettingsComponent implements OnInit {
   }
 
   tplPreview(body: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(body);
+    return this.sanitizer.bypassSecurityTrustHtml(sanitizeEmailHtml(body));
   }
 }

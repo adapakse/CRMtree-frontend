@@ -273,7 +273,7 @@ interface CalendarDay {
                style="font-size:12px;color:#6b7280;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:600px">
             {{stripHtml(task.body)}}
           </div>
-          <wt-entity-attachments *ngIf="task.type==='task' || task.type==='note'" [sourceType]="task.source_type==='project' ? 'project-task' : task.source_type==='lead' ? 'lead-activity' : 'partner-activity'" [sourceId]="task.source_type==='project' ? (task.project_task_id || task.id) : task.id" [compact]="true"></wt-entity-attachments>
+          <wt-entity-attachments *ngIf="task.type==='task' || task.type==='note'" [sourceType]="task.source_type==='project' ? 'project-task' : task.source_type==='lead' ? 'lead-activity' : 'partner-activity'" [sourceId]="task.source_type==='project' ? (task.project_task_id || task.id) : task.id" [compact]="true" [attachmentCount]="task.attachment_count ?? null" (fileCountChange)="task.attachment_count = $event"></wt-entity-attachments>
           <span *ngIf="isExpanded(task)" style="font-size:11px;color:#3BAA5D;margin-top:2px;display:block">✎ {{ t('calendar.tasks.editMode') }}</span>
         </div>
 

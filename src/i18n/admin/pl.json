@@ -858,7 +858,7 @@
         "label": "Cel adopcji użytkowników (%)"
       },
       "crm_commission_basis": {
-        "description": "Dostepne podstawy naliczania prowizji dla Partnerow. nie_dotyczy=Nie dotyczy, segmenty=Ilosc segmentow, rezerwacje=Ilosc rezerwacji, progi_obrotowe=Progi obrotowe.",
+        "description": "Dostępne podstawy naliczania prowizji dla Partnerów. nie_dotyczy=Nie dotyczy, segmenty=Ilość segmentów, rezerwacje=Ilość rezerwacji, progi_obrotowe=Progi obrotowe.",
         "label": "Podstawy Prowizji"
       },
       "crm_commission_basis_options": {
@@ -870,8 +870,8 @@
         "label": "CRM – Typy zgód marketingowych"
       },
       "crm_contact_titles": {
-        "description": "Dostepne stanowiska w formularzach kontaktu dla Leadow i Partnerow.",
-        "label": "Stanowiska Kontaktow"
+        "description": "Dostępne stanowiska w formularzach kontaktu dla Leadów i Partnerów.",
+        "label": "Stanowiska Kontaktów"
       },
       "crm_csv_max_rows": {
         "description": "Limit wierszy w pojedynczym imporcie CSV",
@@ -906,12 +906,12 @@
         "label": "Dni bez kontaktu (zimny lead)"
       },
       "crm_industries": {
-        "description": "Dostepne wartosci branzy dla Leadow i Partnerow.",
-        "label": "Branze"
+        "description": "Dostępne wartości branży dla Leadów i Partnerów.",
+        "label": "Branże"
       },
       "crm_lead_sources": {
-        "description": "Lista kluczy dostepnych w polu Zrodlo na Leadzie",
-        "label": "Slownik Zrodel Leadow"
+        "description": "Lista kluczy dostępnych w polu Źródło na Leadzie",
+        "label": "Słownik Źródeł Leadów"
       },
       "crm_lost_reasons": {
         "description": "Lista powodów przegranej. Wyświetlana jako lista wyboru w polu \"Powód przegranej\" przy zmianie etapu leada na Przegrany.",
@@ -926,7 +926,7 @@
         "label": "Języki partnerów"
       },
       "crm_partner_statuses": {
-        "description": "Dostepne statusy dla partnerow. onboarding=Wdrozenie, active=Aktywny, inactive=Nieaktywny, churned=Utracony.",
+        "description": "Dostępne statusy dla partnerów. onboarding=Wdrożenie, active=Aktywny, inactive=Nieaktywny, churned=Utracony.",
         "label": "Statusy Partnera"
       },
       "crm_platform_api_key": {
@@ -958,20 +958,20 @@
         "label": "Podmiot 1 – opcje słownika"
       },
       "doc_gdpr_types": {
-        "description": "Dostepne typy GDPR. no_gdpr=Brak GDPR, data_processing_entrustment=Powierzenie przetwarzania, data_administration=Wspoladministrowanie.",
-        "label": "Typy GDPR Dokumentow"
+        "description": "Dostępne typy GDPR. no_gdpr=Brak GDPR, data_processing_entrustment=Powierzenie przetwarzania, data_administration=Współadministrowanie.",
+        "label": "Typy GDPR Dokumentów"
       },
       "doc_payment_statuses": {
         "description": "Dostępne statusy płatności dokumentów typu Faktura. unpaid=Nieopłacona, partially_paid=Opłacona częściowo, paid=Opłacona, overdue=Po terminie.",
         "label": "Statusy płatności faktur"
       },
       "doc_statuses": {
-        "description": "Dostepne statusy dokumentow. new=Nowy, being_edited=W edycji, being_approved=Do akceptacji, being_signed=Do podpisu, signed=Podpisany, completed=Zakonczony, rejected=Odrzucony.",
-        "label": "Statusy Dokumentow"
+        "description": "Dostępne statusy dokumentów. new=Nowy, being_edited=W edycji, being_approved=Do akceptacji, being_signed=Do podpisu, signed=Podpisany, completed=Zakończony, rejected=Odrzucony.",
+        "label": "Statusy Dokumentów"
       },
       "doc_types": {
-        "description": "Dostepne typy dokumentow. Wartosc musi byc zgodna z enum doc_type w bazie.",
-        "label": "Typy Dokumentow"
+        "description": "Dostępne typy dokumentów. Wartość musi być zgodna z enum doc_type w bazie.",
+        "label": "Typy Dokumentów"
       },
       "email_signature_banner_url": {
         "description": "URL obrazka bannera wyświetlanego poniżej sekcji personalnej w stopce maila (szerokość 600px)",

@@ -81,6 +81,21 @@ app.use('/api', createProxyMiddleware({
  * robots.txt: a noindex'd page still needs to be crawlable for Google to see
  * this header at all.
  */
+/**
+ * Baseline security headers for every page. The app is never meant to be
+ * framed by other sites (clickjacking); the softphone needs the microphone.
+ * A Content-Security-Policy is not set yet: inline styles and third-party
+ * scripts need an inventory first, or it would break pages.
+ */
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), geolocation=(), microphone=(self), payment=()');
+  res.setHeader('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
+  next();
+});
+
 app.use((req, res, next) => {
   const host = ((req.headers['x-forwarded-host'] as string) || req.headers.host || '').replace(/:\d+$/, '');
   if (host !== 'crmtree.pl') {

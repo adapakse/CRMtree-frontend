@@ -52,6 +52,7 @@ export function projectTaskToActivityTask(task: AssignedProjectTask): ActivityTa
     act_assigned_to_id: null,
     priority: null,
     project_task_id: task.id,
+    attachment_count: task.attachment_count,
   };
 }
 

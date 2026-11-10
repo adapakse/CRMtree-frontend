@@ -1,0 +1,25 @@
+name: User manual reminder
+
+# The in-app user manual (src/assets/manual) lives together with the app: every new feature or change of
+# a screen or logic must update it, fixes don't (Adam, 2026-11-03). This job never blocks anything — it
+# leaves a warning on the push / pull request when feature commits did not touch the manual.
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop, master]
+
+jobs:
+  manual-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check that feature commits updated the manual
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: bash scripts/manual-reminder.sh "$BASE" "$HEAD"

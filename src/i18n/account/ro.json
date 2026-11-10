@@ -15,6 +15,11 @@
   },
   "mySettings": {
     "delete": "Ștergere",
+    "manual": {
+      "hint": "Manual interactiv CRMtree cu capturi de ecran. Se deschide într-o filă nouă.",
+      "open": "Deschide manualul",
+      "title": "Manual de utilizare"
+    },
     "password": {
       "current": "Parola actuală",
       "hint": "Introdu parola actuală și una nouă, de cel puțin 8 caractere. Schimbarea deconectează contul din aplicația mobilă.",

@@ -15,6 +15,11 @@
   },
   "mySettings": {
     "delete": "Izbriši",
+    "manual": {
+      "hint": "Interaktivni priručnik za CRMtree sa snimkama zaslona. Otvara se u novoj kartici.",
+      "open": "Otvori priručnik",
+      "title": "Korisnički priručnik"
+    },
     "password": {
       "current": "Trenutna lozinka",
       "hint": "Unesite trenutnu i novu lozinku, najmanje 8 znakova. Promjena odjavljuje vaš račun iz mobilne aplikacije.",

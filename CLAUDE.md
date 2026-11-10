@@ -77,6 +77,43 @@ sam w osobnym terminalu — nie startuj ich w tle z sesji. Do weryfikacji używa
 - **Aplikacja mobilna** (`crmtree-mobile`) powtarza funkcje webu własnym kodem. Gdy zmieniasz
   kształt odpowiedzi API, sprawdź, czy korzysta z niej telefon. Opis kontroli terminów i
   finansów projektu dla sesji mobilnej: `docs/mobile-handoff-project-deadlines-finance.md`.
+- **Instrukcja użytkownika jest częścią aplikacji** — każda zmiana widoczna dla użytkownika
+  aktualizuje ją w tym samym zadaniu. Szczegóły: sekcja „Instrukcja użytkownika (manual)” niżej.
+
+---
+
+## Instrukcja użytkownika (manual) — żyje razem z aplikacją (decyzja Adama, 2026-11-03)
+
+Interaktywna instrukcja CRMtree (web + aplikacja mobilna, część dla użytkownika, kierownika
+sprzedaży i administratora) jest **wewnętrznym zasobem aplikacji**, nie osobnym dokumentem.
+Każdy zalogowany użytkownik otwiera ją w swoim języku: Moje ustawienia → „Instrukcja obsługi”.
+
+- **Pliki:** `src/assets/manual/<język>.html` dla wszystkich 10 języków aplikacji + `img/`
+  (zrzuty `pl_*.jpg` i `en_*.jpg`; wersje inne niż polska pokazują zrzuty angielskie).
+  Pierwsza wersja (PL, EN) powstała narzędziami Adama na INT, pozostałe 8 to tłumaczenia wersji EN.
+  Nazwy przycisków, menu i pól w tekście instrukcji są dokładnie takie jak w tłumaczeniach
+  aplikacji (`src/i18n/<zakres>/<język>.json`) — zmiana etykiety w aplikacji to też zmiana
+  w instrukcji.
+- **Wejście w aplikacji:** `pages/my-settings/my-settings.component.ts` — `manualUrl` otwiera
+  `/assets/manual/<aktywny język>.html`. Nowy język aplikacji = od razu nowy plik instrukcji
+  (inaczej przycisk prowadzi donikąd) i nowa pozycja w przełączniku języków w nagłówku
+  wszystkich plików instrukcji.
+- **Zasada: instrukcja nadąża za aplikacją web i mobile.** Nowa funkcja, zmiana ekranu, zmiana
+  logiki widocznej dla użytkownika (także po stronie backendu albo w `crmtree-mobile`) — w tym
+  samym zadaniu aktualizujesz odpowiedni rozdział **we wszystkich 10 plikach** (i zrzut, jeśli
+  ekran wygląda inaczej). Same poprawki błędów (`fix`) nie wymagają zmian w instrukcji.
+- **Pilnowanie w Git:** `scripts/manual-reminder.sh` (lokalnie `npm run manual:check`, w CI
+  workflow `.github/workflows/manual-reminder.yml` przy pushu na `develop` i PR-ach). Ostrzega,
+  gdy commit `feat(...)` zmienia `src/app` albo `src/i18n`, a `src/assets/manual` nie został
+  zmieniony. Nie blokuje wdrożenia. Commit, który naprawdę nie wymaga zmiany instrukcji
+  (np. panel superadmina — instrukcja go nie opisuje), ma w treści `[manual: n/a]`.
+- **Przed pushem zmiany z `feat(...)`** uruchom `npm run manual:check`.
+- **Hook Claude Code** (`.claude/settings.json` → `.claude/hooks/manual-guard.js`) zatrzymuje
+  w sesji Claude commit `feat(...)`, który zmienia `src/app` albo `src/i18n` bez zmian w
+  `src/assets/manual` (wyjątek: `[manual: n/a]`). Gdy zablokuje — zaktualizuj instrukcję, nie
+  obchodź go.
+- Treść instrukcji to dane demo z INT (tenant `crmtree`) — nie wpisuj do niej prawdziwych danych
+  klientów. Pliki są statyczne i dostępne pod znanym adresem także bez logowania.
 
 ---
 

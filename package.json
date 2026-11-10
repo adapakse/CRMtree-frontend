@@ -10,6 +10,7 @@
     "test": "ng test",
     "serve:ssr:worktrips-doc-frontend": "node dist/crmtree-frontend/server/server.mjs",
     "i18n:check": "node scripts/i18n-check.mjs",
+    "manual:check": "bash scripts/manual-reminder.sh origin/develop HEAD",
     "prebuild": "node scripts/i18n-check.mjs"
   },
   "private": true,
@@ -28,6 +29,7 @@
     "@jsverse/transloco": "^8.4.0",
     "@jsverse/transloco-messageformat": "^8.4.0",
     "@lucide/angular": "^1.25.0",
+    "dompurify": "^3.4.17",
     "express": "^5.1.0",
     "http-proxy-middleware": "^4.2.0",
     "ngx-quill": "^30.1.3",
