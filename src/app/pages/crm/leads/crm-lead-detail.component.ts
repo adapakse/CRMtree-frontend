@@ -1,6 +1,7 @@
 // src/app/pages/crm/leads/crm-lead-detail.component.ts
 import { Component, OnInit, OnDestroy, Input, inject, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeEmailHtml } from '../../../shared/utils/email-html.util';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -2884,7 +2885,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   safeHtml(html: string): SafeHtml {
     const key = html || '';
     if (!this._safeHtmlCache.has(key)) {
-      this._safeHtmlCache.set(key, this.sanitizer.bypassSecurityTrustHtml(key));
+      this._safeHtmlCache.set(key, this.sanitizer.bypassSecurityTrustHtml(sanitizeEmailHtml(key)));
     }
     return this._safeHtmlCache.get(key)!;
   }

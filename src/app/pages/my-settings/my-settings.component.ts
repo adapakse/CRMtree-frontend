@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeEmailHtml } from '../../shared/utils/email-html.util';
 import { QuillModule } from 'ngx-quill';
 import { environment } from '../../../environments/environment';
 import { CrmApiService, EmailTemplate } from '../../core/services/crm-api.service';
@@ -485,7 +486,7 @@ export class MySettingsComponent implements OnInit {
   }
 
   updatePreview() {
-    this.safePreview = this.sanitizer.bypassSecurityTrustHtml(this.signatureHtml);
+    this.safePreview = this.sanitizer.bypassSecurityTrustHtml(sanitizeEmailHtml(this.signatureHtml));
   }
 
   save() {
@@ -583,6 +584,6 @@ export class MySettingsComponent implements OnInit {
   }
 
   tplPreview(body: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(body);
+    return this.sanitizer.bypassSecurityTrustHtml(sanitizeEmailHtml(body));
   }
 }
