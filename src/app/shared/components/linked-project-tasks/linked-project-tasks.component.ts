@@ -77,24 +77,24 @@ import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-ex
   `,
   styles: [`
     .linked { margin:12px 0; border:1px solid #e5e7eb; border-radius:10px; background:white; overflow:hidden; }
-    .linked-title { padding:9px 14px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#5b21b6; background:#f5f3ff; }
+    .linked-title { padding:8px 14px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#5b21b6; background:#f5f3ff; }
     .project + .project { border-top:1px solid #e5e7eb; }
-    .project-head { width:100%; display:flex; align-items:center; gap:8px; padding:9px 14px; border:none; background:#fafafa; cursor:pointer; font-family:inherit; text-align:left; }
+    .project-head { width:100%; display:flex; align-items:center; gap:8px; padding:8px 14px; border:none; background:#fafafa; cursor:pointer; font-family:inherit; text-align:left; }
     .project-head:hover { background:#f3f4f6; }
-    .key { font-size:11px; font-weight:700; color:#2F8F4D; background:#E6F4EA; border-radius:5px; padding:1px 7px; }
-    .name { font-size:13px; font-weight:700; color:#111827; flex:1; }
-    .closed { font-size:11px; color:#6b7280; background:#f3f4f6; border-radius:10px; padding:1px 8px; }
-    .count { font-size:11.5px; color:#6b7280; }
-    .finance { padding:7px 14px; border-top:1px solid #f3f4f6; }
+    .key { font-size:12px; font-weight:700; color:#2F8F4D; background:#E6F4EA; border-radius:5px; padding:1px 8px; }
+    .name { font-size:14px; font-weight:700; color:#333333; flex:1; }
+    .closed { font-size:12px; color:#6b7280; background:#f3f4f6; border-radius:10px; padding:1px 8px; }
+    .count { font-size:12px; color:#6b7280; }
+    .finance { padding:8px 14px; border-top:1px solid #f3f4f6; }
     .delay-reason { padding:6px 14px; border-top:1px solid #f3f4f6; }
-    .task { display:grid; grid-template-columns:70px 1fr auto 150px 104px auto; align-items:center; gap:10px; padding:7px 14px; border-top:1px solid #f3f4f6; font-size:12.5px; cursor:pointer; }
+    .task { display:grid; grid-template-columns:70px 1fr auto 150px 104px auto; align-items:center; gap:10px; padding:8px 14px; border-top:1px solid #f3f4f6; font-size:12px; cursor:pointer; }
     .task:hover { background:#f9fafb; }
     .locked { cursor:default !important; }
     .task.done .task-title { color:#9ca3af; text-decoration:line-through; }
-    .task-number { font-size:11px; font-weight:600; color:#9ca3af; }
+    .task-number { font-size:12px; font-weight:600; color:#9ca3af; }
     .task-name { display:flex; align-items:center; gap:6px; min-width:0; }
-    .task-title { color:#111827; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .status { font-size:11px; font-weight:600; border-radius:10px; padding:1px 8px; white-space:nowrap; }
+    .task-title { color:#333333; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .status { font-size:12px; font-weight:600; border-radius:10px; padding:1px 8px; white-space:nowrap; }
     .assignees { color:#6b7280; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .empty, .show-closed { padding:8px 14px; font-size:12px; color:#9ca3af; border-top:1px solid #f3f4f6; }
     .show-closed { width:100%; text-align:left; border-left:none; border-right:none; border-bottom:none; background:white; cursor:pointer; font-family:inherit; }

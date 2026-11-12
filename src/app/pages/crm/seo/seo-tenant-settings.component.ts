@@ -25,7 +25,7 @@ import { ToastService } from '../../../core/services/toast.service';
       <label class="field-label">{{ t('seo.tenantSettings.fields.industry') }}</label>
       <input class="field-input" [(ngModel)]="industryVertical" [placeholder]="t('seo.tenantSettings.fields.industryPlaceholder')">
 
-      <button type="button" class="btn-ghost btn-sm" (click)="save()" [disabled]="saving()">
+      <button type="button" class="btn btn-p btn-sm" (click)="save()" [disabled]="saving()">
         @if (saving()) { {{ t('seo.tenantSettings.saving') }} } @else { {{ t('seo.tenantSettings.save') }} }
       </button>
 
@@ -51,7 +51,7 @@ import { ToastService } from '../../../core/services/toast.service';
             {{ t('seo.tenantSettings.gscProperty.hint') }}
           </p>
           <input class="field-input" [(ngModel)]="gscSiteUrl" [placeholder]="t('seo.tenantSettings.gscProperty.placeholder')">
-          <button type="button" class="btn-ghost btn-sm" (click)="saveGscSiteUrl()">{{ t('seo.tenantSettings.gscProperty.save') }}</button>
+          <button type="button" class="btn btn-g btn-sm" (click)="saveGscSiteUrl()">{{ t('seo.tenantSettings.gscProperty.save') }}</button>
         </div>
       }
     </div>
@@ -59,12 +59,11 @@ import { ToastService } from '../../../core/services/toast.service';
   `,
   styles: [`
     .settings-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .settings-box > .btn, .superadmin-box .btn { margin-top: 0.9rem; }
     .settings-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.75rem; }
     .field-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--gray-700); margin: 0.7rem 0 0.3rem; }
     .field-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.55rem 0.7rem; font-family: inherit; font-size: 0.85rem; }
-    .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
-    .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.82rem; margin-top: 0.9rem; }
     .superadmin-box { border-top: 1px solid var(--gray-200); margin-top: 0.75rem; padding-top: 1rem; }
     .superadmin-box h4 { font-size: 0.88rem; margin: 0 0 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
     .sa-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; background: var(--orange-pale); color: var(--orange-dark); border-radius: 999px; padding: 0.15em 0.55em; }

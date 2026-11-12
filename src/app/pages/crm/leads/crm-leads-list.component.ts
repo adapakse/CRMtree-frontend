@@ -3,6 +3,7 @@ import {
   Component, OnInit, OnDestroy, inject, ChangeDetectorRef, NgZone, ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActTypeIconComponent } from './act-type-icon.component';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
@@ -15,6 +16,9 @@ import { LeadStagesService } from '../../../core/services/lead-stages.service';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
+import { PhoneInputComponent } from '../../../shared/components/phone-input/phone-input.component';
+import { describeHttpError } from '../../../core/services/http-error-message';
+import { amountError, scrollToFirstFieldError } from '../../../shared/utils/field-error.util';
 
 const ACTIVITY_TYPES_WITH_LABEL = ['task', 'call', 'email', 'meeting', 'note', 'training', 'qbr', 'doc_sent', 'opportunity'];
 const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketing' };
@@ -23,7 +27,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
   selector: 'wt-crm-leads-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, FormsModule, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, RouterModule, FormsModule, ActTypeIconComponent, PhoneInputComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
@@ -35,7 +39,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     <input class="srch" type="search" [placeholder]="t('leadsList.searchPlaceholder')"
            [(ngModel)]="search" (ngModelChange)="onSearch()">
   </div>
-  <button class="btn btn-g btn-sm" routerLink="/crm/import">
+  <button class="btn btn-g" routerLink="/crm/import">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     {{ t('leadsList.importCsv') }}
   </button>
@@ -67,20 +71,20 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     </div>
     <div class="stat-card">
       <div class="stat-val" style="color:#DC2626">{{ stats.lost }}</div>
-      <div class="stat-lbl">✗ {{ t('leadsList.stats.lost') }}</div>
+      <div class="stat-lbl"><svg class="ic ic-red" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg> {{ t('leadsList.stats.lost') }}</div>
     </div>
   </div>
 
   <!-- ── Toolbar ── -->
   <div *ngIf="reportFilterLabel" style="display:flex;align-items:center;gap:8px;padding:6px 0 0 0;margin-bottom:-4px">
-    <span style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:20px;padding:3px 12px;font-size:11.5px;font-weight:600;color:#9A3412;display:flex;align-items:center;gap:6px">
+    <span style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:#9A3412;display:flex;align-items:center;gap:6px">
       📊 {{ t('leadsList.filters.reportFilter', { label: reportFilterLabel }) }}
       <span style="cursor:pointer;font-size:14px;color:#9A3412;line-height:1" (click)="clearReportFilter()">×</span>
     </span>
   </div>
   <!-- Persistent rep filter chip -->
   <div *ngIf="persistRepName" style="display:flex;align-items:center;gap:8px;padding:4px 0 0 0;margin-bottom:-4px">
-    <span style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:20px;padding:3px 12px;font-size:11.5px;font-weight:600;color:#1D4ED8;display:flex;align-items:center;gap:6px">
+    <span style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:#1D4ED8;display:flex;align-items:center;gap:6px">
       👤 {{ t('leadsList.filters.repChip', { name: persistRepName }) }}
       <span style="cursor:pointer;font-size:14px;line-height:1" (click)="clearPersistRepFilter()">×</span>
     </span>
@@ -104,7 +108,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
         <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
       }
       @for (g of sourceGroups(); track g) {
-        <optgroup [label]="'── ' + sourceGroupLabel(g)">
+        <optgroup [label]="sourceGroupLabel(g)">
           <option [value]="'__group__' + g">📂 {{ t('leadsList.filters.wholeGroup', { group: sourceGroupLabel(g) }) }}</option>
         </optgroup>
         @for (s of sourcesInGroup(g); track s.value) {
@@ -114,31 +118,33 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     </select>
     <select class="sel" [(ngModel)]="filterUser" (ngModelChange)="onRepFilterChange($event)" *ngIf="isManager">
       <option value="">{{ t('leadsList.filters.allReps') }}</option>
-      <optgroup [label]="'── ' + t('leadsList.filters.repsGroup') + ' ──'" *ngIf="crmUsers.length > 0">
+      <optgroup [label]="t('leadsList.filters.repsGroup')" *ngIf="crmUsers.length > 0">
         <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
       </optgroup>
-      <optgroup [label]="'── ' + t('leadsList.filters.groupsGroup') + ' ──'" *ngIf="crmGroups.length > 0">
-        <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">📂 {{ g.name }}</option>
+      <optgroup [label]="t('leadsList.filters.groupsGroup')" *ngIf="crmGroups.length > 0">
+        <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">👥 {{ g.name }}</option>
       </optgroup>
     </select>
-    <div class="date-range" [class.on]="filterCreatedFrom || filterCreatedTo" [title]="t('leadsList.filters.addedRangeTitle')">
-      <span class="date-range-lbl">{{ t('leadsList.fields.addedOn') }}</span>
-      <input type="date" class="sel" [(ngModel)]="filterCreatedFrom" (ngModelChange)="load()" [max]="filterCreatedTo || null">
-      <span class="date-range-sep">–</span>
-      <input type="date" class="sel" [(ngModel)]="filterCreatedTo" (ngModelChange)="load()" [min]="filterCreatedFrom || null">
-      <span *ngIf="filterCreatedFrom || filterCreatedTo" class="date-range-x" (click)="filterCreatedFrom=''; filterCreatedTo=''; load()" [title]="t('leadsList.filters.clearDates')">×</span>
+    <!-- Views sit on their own row, bottom-right of the filter card (same on every list). -->
+    <div class="view-row">
+      <div class="date-range view-row-start" [class.on]="filterCreatedFrom || filterCreatedTo" [title]="t('leadsList.filters.addedRangeTitle')">
+        <span class="date-range-lbl">{{ t('leadsList.fields.addedOn') }}</span>
+        <input type="date" class="sel" [(ngModel)]="filterCreatedFrom" (ngModelChange)="load()" [max]="filterCreatedTo || null">
+        <span class="date-range-sep">–</span>
+        <input type="date" class="sel" [(ngModel)]="filterCreatedTo" (ngModelChange)="load()" [min]="filterCreatedFrom || null">
+        <span *ngIf="filterCreatedFrom || filterCreatedTo" class="date-range-x" (click)="filterCreatedFrom=''; filterCreatedTo=''; load()" [title]="t('leadsList.filters.clearDates')">×</span>
+      </div>
+      <button class="btn btn-g btn-sm" (click)="openTimeline()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        {{ t('leadsList.view.timeline') }}
+      </button>
+      <span class="fchip" [class.on]="isKanbanView" (click)="setViewMode('kanban')">{{ t('leadsList.view.kanban') }}</span>
+      <span class="fchip" [class.on]="!isKanbanView" (click)="setViewMode('table')">{{ t('leadsList.view.table') }}</span>
     </div>
-    <button class="btn btn-g btn-sm" (click)="openTimeline()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      {{ t('leadsList.view.timeline') }}
-    </button>
-    <button class="btn btn-g btn-sm" (click)="toggleViewMode()">
-      {{ isKanbanView ? '☰ ' + t('leadsList.view.table') : '⊞ ' + t('leadsList.view.kanban') }}
-    </button>
   </div>
 
   <!-- Loading -->
@@ -164,15 +170,18 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 5px;margin-left:3px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:#dcfce7;color:#15803d;border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
             </div>
-            <div class="lead-value" *ngIf="lead.value_pln">{{ lead.value_pln | number:'1.0-0' }} {{ lead.annual_turnover_currency || 'PLN' }}</div>
-            <div class="lead-chips" *ngIf="lead.probability != null || lead.online_pct != null">
-              <span *ngIf="lead.probability != null" class="lchip lchip-prob">⚡ {{lead.probability}}%</span>
-              <span *ngIf="lead.online_pct != null" class="lchip lchip-online">🌐 {{lead.online_pct}}%</span>
+            <div class="lead-value" *ngIf="lead.value_pln || lead.probability != null">
+              <span *ngIf="lead.value_pln">{{ lead.value_pln | number:'1.0-0' }} {{ lead.annual_turnover_currency || 'PLN' }}</span>
+              <span *ngIf="lead.value_pln && lead.probability != null" class="lv-dot"></span>
+              <span *ngIf="lead.probability != null" class="lv-pct" [title]="t('leadsList.table.chance')">{{lead.probability}}%</span>
+            </div>
+            <div class="lead-chips" *ngIf="lead.online_pct != null">
+              <span class="lchip lchip-online">🌐 {{lead.online_pct}}%</span>
             </div>
             <div class="lead-meta">
               <span *ngIf="lead.source" class="tag" [class]="srcTagCls(lead.source)">{{ srcLabel(lead.source) }}</span>
@@ -188,7 +197,6 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
               <span *ngIf="hasUnreadReply(lead)" style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
               <span *ngIf="lead.created_at" class="lead-added">{{ t('leadsList.fields.addedOn') }} {{ lead.created_at | date:'dd.MM.yy' }}</span>
             </div>
-            <div class="pipe-bar"><div class="pipe-fill" [style.width.%]="stages.probability(lead.stage)"></div></div>
           </div>
           <div *ngIf="leadsFor(col.key).length===0" class="kol-empty">{{ t('leadsList.kanban.empty') }}</div>
         </div>
@@ -213,9 +221,6 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                 {{ (stages.isWon(lead.stage) ? '✓ ' : '✗ ') + stages.label(lead.stage) }}
               </span>
               <span *ngIf="lead.created_at" class="lead-added">{{ t('leadsList.fields.addedOn') }} {{ lead.created_at | date:'dd.MM.yy' }}</span>
-            </div>
-            <div class="pipe-bar">
-              <div class="pipe-fill" style="width:100%" [style.background]="stages.color(lead.stage)"></div>
             </div>
           </div>
           <div *ngIf="closedLeads().length===0" class="kol-empty">{{ t('leadsList.kanban.closedEmpty') }}</div>
@@ -278,7 +283,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <div class="sec-title">{{ t('leadsList.detail.pipeline') }}</div>
           <div class="info-row">
             <span class="info-label">{{ t('leadsList.detail.value') }}</span>
-            <span class="info-val" style="color:var(--orange);font-family:'Sora',sans-serif;font-size:15px;font-weight:700">
+            <span class="info-val" style="color:var(--orange);font-family:'Sora',sans-serif;font-size:16px;font-weight:700">
               {{ (selected.value_pln||0) | number:'1.0-0' }} {{ selected.annual_turnover_currency || 'PLN' }}
             </span>
           </div>
@@ -301,12 +306,12 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                  [style.background]="stages.isClosed(selected.stage) ? stages.color(selected.stage) : null">
             </div>
           </div>
-          <div style="font-size:10px;color:var(--gray-400);margin-top:3px">{{ t('leadsList.detail.stageValue', { stage: stages.label(selected.stage) }) }}</div>
+          <div style="font-size:10px;color:var(--gray-400);margin-top:4px">{{ t('leadsList.detail.stageValue', { stage: stages.label(selected.stage) }) }}</div>
 
           <div class="sec-title" *ngIf="selected.assigned_to_name">{{ t('leadsList.fields.salesRep') }}</div>
           <div *ngIf="selected.assigned_to_name" class="dp-user">
-            <div class="avatar-sm" style="width:28px;height:28px;font-size:11px">{{ initials(selected.assigned_to_name) }}</div>
-            <div style="font-size:13px;font-weight:600;color:var(--gray-900)">{{ selected.assigned_to_name }}</div>
+            <div class="avatar-sm" style="width:28px;height:28px;font-size:12px">{{ initials(selected.assigned_to_name) }}</div>
+            <div style="font-size:14px;font-weight:600;color:var(--gray-900)">{{ selected.assigned_to_name }}</div>
           </div>
 
           <div class="sec-title" *ngIf="selected.tags?.length">{{ t('leadsList.detail.tags') }}</div>
@@ -325,7 +330,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           </div>
           <div *ngIf="!loadingDetail">
             <div *ngFor="let a of selected.activities||[]" class="act-item">
-              <div class="act-dot" [class]="a.type">{{ actIcon(a.type) }}</div>
+              <div class="act-dot" [class]="a.type"><wt-act-type-icon [type]="a.type"></wt-act-type-icon></div>
               <div class="act-text">
                 <div class="act-title">{{ a.title }}</div>
                 <div class="act-date">{{ a.activity_at | date:'dd.MM.yyyy HH:mm' }} · {{ a.created_by_name }}</div>
@@ -366,7 +371,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="td" style="display:flex;align-items:center;gap:8px">
         <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
         <div>
-          <div style="font-weight:600;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
+          <div style="font-weight:650;color:var(--gray-900)">{{ lead.company }}<span *ngIf="lead.hot"> 🔥</span><span *ngIf="lead.hold_active" class="hold-badge" style="margin-left:4px" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span>
             <span *ngIf="hasPbxFeature && (lead.missed_call_count ?? 0) > 0"
                   style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{lead.missed_call_count}}</span>
             <span *ngIf="hasPbxFeature && (lead.unread_sms_count ?? 0) > 0"
@@ -376,7 +381,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             <span *ngIf="hasUnreadReply(lead)"
                   style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
           </div>
-          <div style="font-size:11px;color:var(--gray-400)">{{ lead.contact_name }}</div>
+          <div style="font-size:12px;color:var(--gray-400)">{{ lead.contact_name }}</div>
           <div *ngIf="lead.converted_at" style="font-size:10px;color:#7C3AED;font-weight:600;margin-top:2px">
             ✦ {{ t('leadsList.table.migrated') }} →
             <a [routerLink]="['/crm/partners', lead.converted_partner_id]" style="color:#7C3AED" (click)="$event.stopPropagation()">{{ t('labels.sourceTypes.partner') }}</a>
@@ -389,8 +394,8 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
               [style.background]="stages.pillBackground(lead.stage)"
               [style.color]="stages.color(lead.stage)">{{ stages.label(lead.stage) }}</span>
       </div>
-      <div class="td" style="font-size:12px;text-align:center;font-weight:600;color:var(--gray-600)">{{ lead.probability != null ? lead.probability+'%' : '—' }}</div>
-      <div class="td" style="font-family:'Sora',sans-serif;font-weight:700;color:var(--orange)">
+      <div class="td" style="font-size:12px;text-align:center;font-weight:500;color:var(--gray-600);font-variant-numeric:tabular-nums">{{ lead.probability != null ? lead.probability+'%' : '—' }}</div>
+      <div class="td" style="font-size:13px;font-weight:650;color:var(--gray-900);font-variant-numeric:tabular-nums">
         {{ lead.value_pln ? (lead.value_pln | number:'1.0-0')+' '+(lead.annual_turnover_currency||'PLN') : '—' }}
       </div>
       <div class="td" style="font-size:12px;text-align:center">{{ lead.online_pct != null ? lead.online_pct+'%' : '—' }}</div>
@@ -405,7 +410,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     </div>
     <div *ngIf="totalPages>1" class="pagination">
       <button class="btn btn-g btn-sm" [disabled]="page===1" (click)="setPage(page-1)">← {{ t('leadsList.table.previous') }}</button>
-      <span style="font-size:12.5px;color:var(--gray-500)">{{ t('leadsList.table.pageOf', { page: page, pages: totalPages }) }}</span>
+      <span style="font-size:12px;color:var(--gray-500)">{{ t('leadsList.table.pageOf', { page: page, pages: totalPages }) }}</span>
       <button class="btn btn-g btn-sm" [disabled]="page===totalPages" (click)="setPage(page+1)">{{ t('leadsList.table.next') }} →</button>
     </div>
   </div>
@@ -428,32 +433,32 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     <div class="modal-body">
       <div class="fgrid2">
         <!-- WWW field + hot checkbox -->
-        <div class="fg" style="grid-column:1/-1;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
-          <div>
-            <label class="fl">{{ t('leadsList.fields.website') }} <span style="font-size:10px;color:var(--gray-400)">{{ t('leadsList.newLead.optional') }}</span></label>
-            <div style="position:relative">
+        <div class="fg" style="grid-column:1/-1">
+          <label class="fl">{{ t('leadsList.fields.website') }} @if (newFormRequiresFull) { <span style="color:var(--orange)">*</span> } @else { <span style="font-size:10px;color:var(--gray-400)">{{ t('leadsList.newLead.optional') }}</span> }</label>
+          <div class="www-row">
+            <div style="position:relative;flex:1;min-width:0">
               <input class="fi" [(ngModel)]="newFormWebsite"
                      [placeholder]="t('leadsList.newLead.websitePlaceholder')"
                      (ngModelChange)="onWebsiteChange()"
+                     [class.fi-err]="newMissing('website')"
                      style="padding-right:36px">
               <span *ngIf="enriching" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400)">⏳</span>
             </div>
+            <button type="button" class="fchip hot-chip" [class.on]="newForm.hot" [attr.aria-pressed]="!!newForm.hot"
+                    [title]="t('leadsList.newLead.hotHint')" (click)="newForm.hot = !newForm.hot">🔥 {{ t('leadsList.newLead.hot') }}</button>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;padding-bottom:1px">
-            <input type="checkbox" [(ngModel)]="newForm.hot" id="hotchk" style="width:auto;margin:0">
-            <label for="hotchk" style="font-size:13px;cursor:pointer;font-weight:400;white-space:nowrap">🔥 {{ t('leadsList.newLead.hot') }}</label>
-          </div>
+          @if (newMissing('website')) { <span class="ferr">{{ t('fieldErrors.website') }}</span> }
         </div>
         <div class="fg" style="grid-column:1/-1">
           <div>
           <!-- Enrich prompt banner -->
           <div *ngIf="enrichPrompt&&!enriching" style="margin-top:6px;background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
             <span>🔍 {{ t('leadsList.newLead.enrichPrompt') }}</span>
-            <button style="background:var(--orange);color:white;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600" (click)="runEnrich()">{{ t('leadsList.newLead.enrichConfirm') }}</button>
-            <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:11px" (click)="enrichPrompt=false">{{ t('leadsList.newLead.enrichDecline') }}</button>
+            <button style="background:var(--orange);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-weight:600" (click)="runEnrich()">{{ t('leadsList.newLead.enrichConfirm') }}</button>
+            <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:12px" (click)="enrichPrompt=false">{{ t('leadsList.newLead.enrichDecline') }}</button>
           </div>
           <!-- Enrich result badge -->
-          <div *ngIf="enrichResult" style="margin-top:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 12px;font-size:11px;color:#15803d">
+          <div *ngIf="enrichResult" style="margin-top:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 12px;font-size:12px;color:#15803d">
             ✓ {{ t('leadsList.newLead.enrichDone') }}
           </div>
           </div>
@@ -463,28 +468,32 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <label class="fl">{{ t('leadsList.newLead.companyName') }} <span style="color:var(--orange)">*</span></label>
           <input class="fi" [(ngModel)]="newForm.company" [placeholder]="t('leadsList.newLead.companyPlaceholder')"
                  [class.fi-err]="submitted&&!newForm.company">
-          <span class="ferr" *ngIf="submitted&&!newForm.company">{{ t('leadsList.newLead.fieldRequired') }}</span>
+          @if (submitted&&!newForm.company) { <span class="ferr">{{ t('fieldErrors.company') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:3px">{{ t('leadsList.newLead.contactName') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.newLead.contactName') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
           <input class="fi" [(ngModel)]="newForm.contact_name" [placeholder]="t('leadsList.newLead.namePlaceholder')"
-                 [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_name">
+                 [class.fi-err]="newMissing('contactName')">
+          @if (newMissing('contactName')) { <span class="ferr">{{ t('fieldErrors.contactName') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl" style="display:flex;align-items:center;gap:3px">{{ t('leadsList.fields.companyRole') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <label class="fl" style="display:flex;align-items:center;gap:4px">{{ t('leadsList.fields.companyRole') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
           <select class="fi" [(ngModel)]="newForm.contact_title"
-                  [class.fi-err]="newFormRequiresFull && submitted && !newForm.contact_title">
+                  [class.fi-err]="newMissing('contactTitle')">
             <option value="">{{ t('leadsList.newLead.select') }}</option>
             <option *ngFor="let t of dictTitles" [value]="t">{{ t }}</option>
           </select>
+          @if (newMissing('contactTitle')) { <span class="ferr">{{ t('fieldErrors.contactTitle') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.email') }}</label>
-          <input class="fi" type="email" [(ngModel)]="newForm.email" [placeholder]="t('leadsList.newLead.emailPlaceholder')">
+          <label class="fl">{{ t('leadsList.fields.email') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <input class="fi" type="email" [(ngModel)]="newForm.email" [placeholder]="t('leadsList.newLead.emailPlaceholder')" [class.fi-err]="newMissing('email')">
+          @if (newMissing('email')) { <span class="ferr">{{ t('fieldErrors.email') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.phone') }}</label>
-          <input class="fi" [(ngModel)]="newForm.phone" placeholder="+48 600 000 000">
+          <label class="fl">{{ t('leadsList.fields.phone') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <wt-phone-input [(ngModel)]="newForm.phone" [invalid]="newMissing('phone')" />
+          @if (newMissing('phone')) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
         </div>
         <div class="fg" style="grid-column:1/-1">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -505,7 +514,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div class="fg"><label class="fl">{{ t('leadsList.fields.email') }}</label><input class="fi" type="email" [(ngModel)]="ec.email" [placeholder]="t('leadsList.newLead.emailPlaceholder')"></div>
-                <div class="fg"><label class="fl">{{ t('leadsList.fields.phone') }}</label><input class="fi" [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></div>
+                <div class="fg"><label class="fl">{{ t('leadsList.fields.phone') }}</label><wt-phone-input [(ngModel)]="ec.phone" /></div>
               </div>
             </div>
           }
@@ -520,15 +529,17 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                  maxlength="14"
                  (ngModelChange)="onNipChange('lead')"
                  [class.fi-err]="nipError">
-          <span class="ferr" *ngIf="nipError">{{ nipError }}</span>
+          @if (nipError) { <span class="ferr">{{ nipError }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.newLead.value') }}</label>
-          <input class="fi" type="number" [(ngModel)]="newForm.value_pln" placeholder="0" min="0">
+          <label class="fl">{{ t('leadsList.newLead.value') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <input class="fi" type="number" [(ngModel)]="newForm.value_pln" placeholder="0" min="0" [class.fi-err]="newMissing('value') || !!amountError(newForm.value_pln)">
+          @if (amountError(newForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }
+          @if (newMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.source') }}</label>
-          <select class="fsel" [(ngModel)]="newForm.source">
+          <label class="fl">{{ t('leadsList.fields.source') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <select class="fsel" [(ngModel)]="newForm.source" [class.fi-err]="newMissing('source')">
             <option value="">{{ t('leadsList.newLead.select') }}</option>
             @for (s of sourcesWithoutGroup(); track s.value) {
               <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
@@ -541,10 +552,12 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
               </optgroup>
             }
           </select>
+          @if (newMissing('source')) { <span class="ferr">{{ t('fieldErrors.source') }}</span> }
         </div>
         <div class="fg">
-          <label class="fl">{{ t('leadsList.fields.firstContact') }}</label>
-          <input class="fi" type="date" [(ngModel)]="newForm.first_contact_date">
+          <label class="fl">{{ t('leadsList.fields.firstContact') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <input class="fi" type="date" [(ngModel)]="newForm.first_contact_date" [class.fi-err]="newMissing('firstContact')">
+          @if (newMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }
         </div>
         <div class="fg">
           <label class="fl">{{ t('leadsList.fields.stage') }}</label>
@@ -555,11 +568,12 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           </select>
         </div>
         <div class="fg" *ngIf="isManager">
-          <label class="fl">{{ t('leadsList.fields.salesRep') }}</label>
-          <select class="fsel" [(ngModel)]="newForm.assigned_to">
+          <label class="fl">{{ t('leadsList.fields.salesRep') }} <span *ngIf="newFormRequiresFull" style="color:var(--orange)">*</span></label>
+          <select class="fsel" [(ngModel)]="newForm.assigned_to" [class.fi-err]="newMissing('salesperson')">
             <option value="">{{ t('leadsList.newLead.unassigned') }}</option>
             <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
           </select>
+          @if (newMissing('salesperson')) { <span class="ferr">{{ t('fieldErrors.salesperson') }}</span> }
         </div>
         <div class="fg" style="grid-column:1/-1">
           <label class="fl">{{ t('leadsList.newLead.notes') }}</label>
@@ -567,10 +581,11 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
         </div>
       </div>
     </div>
-    @if (newFormErrors.length > 0) {
-      <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin:8px 16px;font-size:12px;color:#991b1b">
-        <strong>{{ t('leadsList.newLead.fillRequired') }}</strong> {{ newFormErrors.join(', ') }}
-      </div>
+    @if (!isManager && newMissing('salesperson')) {
+      <div class="ferr" style="margin:0 24px 8px">{{ t('fieldErrors.salesperson') }}</div>
+    }
+    @if (saveError) {
+      <div class="ferr" role="alert" style="margin:0 24px 8px">{{ saveError }}</div>
     }
     <div class="modal-foot">
       <button class="btn btn-g" (click)="showNew=false">{{ 'actions.cancel' | transloco }}</button>
@@ -718,7 +733,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 <div class="overlay" *ngIf="selectedMeeting" (click)="closeMeetingOnOverlay($event)" style="z-index:310">
   <div class="modal" (click)="$event.stopPropagation()" style="width:520px">
     <div class="modal-head">
-      <div class="modal-icon" style="background:#F0FDF4;font-size:18px">{{tlTypeIcon(selectedMeeting.type)}}</div>
+      <div class="modal-icon" style="background:#F0FDF4;font-size:18px"><wt-act-type-icon [type]="selectedMeeting.type"></wt-act-type-icon></div>
       <div style="flex:1;min-width:0">
         <div class="modal-title">{{ meetingEditMode ? t('leadsList.meeting.editTitle') : t('leadsList.meeting.detailTitle') }}</div>
         <div style="font-size:12px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
@@ -835,11 +850,11 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
     #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
-    .page-title { font-family:'Sora',sans-serif; font-size:17px; font-weight:700; color:var(--gray-900); }
+    .page-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); }
     .tsp { flex:1; }
     .srch-wrap { position:relative; display:flex; align-items:center; }
     .srch-wrap svg { position:absolute; left:10px; width:15px; height:15px; color:var(--gray-400); pointer-events:none; }
-    .srch { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:8px; padding:7px 14px 7px 34px; font-size:13px; width:260px; outline:none; font-family:inherit; }
+    .srch { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:8px; padding:8px 14px 8px 34px; font-size:14px; width:260px; outline:none; font-family:inherit; }
     .srch:focus { border-color:var(--orange); background:white; }
     #content { flex:1; overflow:hidden; padding:20px 24px 24px; display:flex; flex-direction:column; gap:0; min-height:0; }
 
@@ -851,18 +866,10 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 
     /* Toolbar */
     .toolbar { background:white; border:1px solid var(--gray-200); border-radius:10px; padding:10px 16px; margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-shrink:0; flex-wrap:wrap; }
-    .fchip { display:inline-flex; align-items:center; gap:5px; background:var(--gray-100); border:1px solid var(--gray-200); border-radius:20px; padding:4px 12px; font-size:12px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:all .12s; user-select:none; }
-    .fchip:hover { border-color:var(--orange); color:var(--orange); }
-    .fchip.on { background:var(--orange); color:white; border-color:var(--orange); }
-    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    .sel { font-size:12px; font-family:inherit; }
     .sel:focus { border-color:var(--orange); }
 
     /* Buttons */
-    .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; border:none; font-family:inherit; white-space:nowrap; transition:all .15s; text-decoration:none; }
-    .btn-p { background:var(--orange); color:white; } .btn-p:hover { background:var(--orange-dark); }
-    .btn-g { background:white; color:var(--gray-600); border:1px solid var(--gray-200); } .btn-g:hover { background:var(--gray-50); }
-    .btn-sm { padding:5px 10px; font-size:12px; }
-    .btn:disabled { opacity:.55; cursor:not-allowed; }
 
     /* Kanban */
     .kanban-wrap { display:flex; flex:1; overflow-y:auto; min-height:0; gap:0; }
@@ -870,32 +877,35 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .kol { min-width:0; }
     .kol-head { display:flex; align-items:center; gap:6px; margin-bottom:10px; }
     .kol-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-    .kol-title { font-size:10.5px; font-weight:700; color:var(--gray-600); text-transform:uppercase; letter-spacing:.5px; }
-    .kol-cnt { margin-left:auto; background:var(--gray-100); border-radius:10px; padding:1px 6px; font-size:11px; font-weight:600; color:var(--gray-500); }
+    .kol-title { font-size:10px; font-weight:700; color:var(--gray-600); text-transform:uppercase; letter-spacing:.5px; }
+    .kol-cnt { margin-left:auto; background:var(--gray-100); border-radius:10px; padding:1px 6px; font-size:12px; font-weight:600; color:var(--gray-500); }
     .kol-val { font-size:10px; color:var(--orange); font-weight:600; font-family:'Sora',sans-serif; white-space:nowrap; }
     .kol-cards { display:flex; flex-direction:column; gap:8px; }
-    .kol-empty { font-size:11px; color:var(--gray-300); text-align:center; padding:16px 8px; border:1.5px dashed var(--gray-200); border-radius:8px; }
+    .kol-empty { font-size:12px; color:var(--gray-300); text-align:center; padding:16px 8px; border:1.5px dashed var(--gray-200); border-radius:8px; }
 
     .lead-card { background:white; border:1px solid var(--gray-200); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all .15s; }
     .lead-card:hover { border-color:#a8d9b6; box-shadow:0 4px 12px rgba(59,170,93,.1); transform:translateY(-1px); }
     .lead-card.selected { border-color:var(--orange); box-shadow:0 0 0 2px rgba(59,170,93,.15); }
     .logo-circle { display:inline-block;width:22px;height:22px;border-radius:50%;background-size:cover;background-position:center;background-repeat:no-repeat;flex-shrink:0;border:1px solid var(--gray-200);background-color:#f9fafb; }
-    .lead-company { font-size:12.5px; font-weight:700; color:var(--gray-900); margin-bottom:2px; display:flex; align-items:center; gap:3px; }
-    .lead-contact { font-size:11px; color:var(--gray-500); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .lead-value { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:var(--orange); margin-bottom:3px; }
+    .lead-company { font-size:12px; font-weight:700; color:var(--gray-900); margin-bottom:2px; display:flex; align-items:center; gap:4px; }
+    .lead-contact { font-size:12px; color:var(--gray-500); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lead-value { display:flex; align-items:center; gap:6px; font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:var(--orange); margin-bottom:4px; font-variant-numeric:tabular-nums; }
+    .lv-dot { width:3px; height:3px; border-radius:50%; background:var(--gray-300); flex-shrink:0; }
+    .lv-pct { font-family:inherit; font-weight:600; color:var(--gray-500); }
+    .lead-chips { font-size:11px; color:var(--gray-500); margin-bottom:4px; }
     .lead-meta { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
     .lead-added { margin-left:auto; font-size:10px; color:var(--gray-400); white-space:nowrap; }
     .date-range { display:inline-flex; align-items:center; gap:4px; }
-    .date-range .sel { padding:5px 6px; width:128px; }
+    .date-range input.sel[type=date] { height:30px; min-width:0; width:128px; padding:0 10px; font-size:12px; font-weight:500; }
     .date-range.on .sel { border-color:var(--orange); }
     .date-range-lbl { font-size:12px; font-weight:500; color:var(--gray-500); }
     .date-range-sep { color:var(--gray-400); font-size:12px; }
-    .date-range-x { cursor:pointer; font-size:15px; line-height:1; color:var(--gray-400); padding:0 2px; }
+    .date-range-x { cursor:pointer; font-size:16px; line-height:1; color:var(--gray-400); padding:0 2px; }
     .date-range-x:hover { color:var(--orange); }
-    .hot-dot { font-size:11px; }
+    .hot-dot { font-size:12px; }
     .lead-card-held { opacity:.55; filter:grayscale(.6); }
     .tr-row-held { opacity:.55; filter:grayscale(.6); }
-    .hold-badge { display:inline-flex; align-items:center; gap:2px; font-size:10px; font-weight:700; background:#e5e7eb; color:#374151; border-radius:6px; padding:1px 5px; line-height:16px; }
+    .hold-badge { display:inline-flex; align-items:center; gap:2px; font-size:10px; font-weight:700; background:#e5e7eb; color:#374151; border-radius:6px; padding:1px 4px; line-height:16px; }
     .tag { display:inline-flex; align-items:center; padding:1px 6px; border-radius:10px; font-size:10px; font-weight:600; }
     .tag-blue { background:#EFF6FF; color:#1D4ED8; }
     .tag-purple { background:#FDF4FF; color:#7E22CE; }
@@ -903,23 +913,23 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .tag-orange { background:var(--orange-pale); color:var(--orange-dark); }
     .tag-red { background:#FFF1F2; color:#BE123C; }
     .tag-gray { background:var(--gray-100); color:var(--gray-600); }
-    .pipe-bar { height:4px; background:var(--gray-100); border-radius:2px; overflow:hidden; margin-top:7px; }
+    .pipe-bar { height:4px; background:var(--gray-100); border-radius:2px; overflow:hidden; margin-top:8px; }
     .pipe-fill { height:100%; background:var(--orange); border-radius:2px; }
     .avatar-sm { width:20px; height:20px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:white; flex-shrink:0; }
 
     /* Stage pill — kolory nie są klasami per etap, bo etapy są konfigurowalne
        (etap dodany przez tenanta nie miałby swojej klasy). Tło i kolor tekstu
        idą inline z LeadStagesService. */
-    .stage-pill { padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+    .stage-pill { padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600; }
 
     /* Detail Panel */
     .dp-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:200; display:flex; align-items:center; justify-content:center; }
-    .detail-panel { width:420px; max-height:85vh; background:white; border-radius:14px; display:flex; flex-direction:column; overflow:hidden; animation:slideIn .2s ease; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+    .detail-panel { width:420px; max-height:85vh; background:white; border-radius:14px; display:flex; flex-direction:column; overflow:hidden; animation:slideIn .2s ease; box-shadow:0 12px 39px rgba(0,0,0,0.163); }
     @keyframes slideIn { from { transform:translateX(16px); opacity:0; } to { transform:none; opacity:1; } }
     .dp-head { padding:14px 16px 12px; border-bottom:1px solid var(--gray-200); background:linear-gradient(135deg,var(--orange-pale) 0%,white 70%); flex-shrink:0; }
     .dp-top-row { display:flex; align-items:flex-start; gap:6px; margin-bottom:10px; }
     .dp-company { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:var(--gray-900); }
-    .dp-sub { font-size:11.5px; color:var(--gray-400); margin-top:2px; }
+    .dp-sub { font-size:12px; color:var(--gray-400); margin-top:2px; }
     .dp-actions { display:flex; gap:6px; }
     .dp-close { background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:16px; padding:0; line-height:1; }
     .dp-close:hover { color:var(--gray-700); }
@@ -929,17 +939,14 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .dp-note { background:var(--gray-50); border:1px solid var(--gray-200); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--gray-600); line-height:1.6; white-space:pre-line; }
 
     /* Tabs */
-    .tabs { display:flex; gap:2px; background:var(--gray-100); border-radius:8px; padding:3px; margin-bottom:12px; }
-    .tab-btn { flex:1; padding:5px 6px; border-radius:6px; font-size:12px; font-weight:500; color:var(--gray-500); cursor:pointer; border:none; background:transparent; font-family:inherit; }
-    .tab-btn.active { background:white; color:var(--orange); font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,.08); }
-    .tab-cnt { display:inline-flex; align-items:center; justify-content:center; background:var(--orange); color:white; font-size:9px; font-weight:700; min-width:15px; height:15px; border-radius:10px; padding:0 4px; margin-left:4px; }
+    .tab-cnt { display:inline-flex; align-items:center; justify-content:center; background:var(--orange); color:white; font-size:10px; font-weight:700; min-width:15px; height:15px; border-radius:10px; padding:0 4px; margin-left:4px; }
 
     /* Info rows */
     .sec-title { font-size:10px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.7px; margin:14px 0 8px; display:flex; align-items:center; gap:8px; }
     .sec-title::after { content:''; flex:1; height:1px; background:var(--gray-200); }
     .sec-title:first-child { margin-top:0; }
-    .info-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:12.5px; }
-    .info-label { color:var(--gray-400); font-size:11.5px; }
+    .info-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:12px; }
+    .info-label { color:var(--gray-400); font-size:12px; }
     .info-val { color:var(--gray-800); font-weight:500; }
     .link { color:var(--orange); text-decoration:none; } .link:hover { text-decoration:underline; }
 
@@ -953,13 +960,13 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .act-dot.doc_sent { background:var(--orange-pale); border-color:var(--orange-muted); }
     .act-text { flex:1; }
     .act-title { font-size:12px; font-weight:600; color:var(--gray-800); }
-    .act-date { font-size:11px; color:var(--gray-400); margin-top:1px; }
-    .act-body { font-size:11.5px; color:var(--gray-600); margin-top:3px; line-height:1.5; }
+    .act-date { font-size:12px; color:var(--gray-400); margin-top:1px; }
+    .act-body { font-size:12px; color:var(--gray-600); margin-top:4px; line-height:1.5; }
 
     /* Table */
     .tw { background:white; border:1px solid var(--gray-200); border-radius:10px; overflow-y:auto; flex:1; min-height:0; display:flex; flex-direction:column; }
     .thead { display:grid; background:var(--gray-50); border-bottom:1px solid var(--gray-200); padding:0 16px; flex-shrink:0; }
-    .th { padding:9px 8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-500); display:flex; align-items:center; gap:4px; }
+    .th { padding:8px 8px; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-500); display:flex; align-items:center; gap:4px; }
     .th.sortable { cursor:pointer; user-select:none; }
     .th.sortable:hover { color:#374151; }
     .si { font-size:10px; color:#d1d5db; }
@@ -971,24 +978,24 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 
     /* Modal */
     .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
-    .modal { background:white; border-radius:14px; width:560px; max-width:95vw; box-shadow:0 12px 32px rgba(0,0,0,.18); overflow:hidden; animation:scaleIn .2s ease; }
+    .modal { background:white; border-radius:14px; width:560px; max-width:95vw; box-shadow:0 11px 29px rgba(0,0,0,0.162); overflow:hidden; animation:scaleIn .2s ease; }
     @keyframes scaleIn { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
     .modal-head { padding:18px 22px; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; }
     .modal-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .modal-title { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:var(--gray-900); }
+    .modal-title { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:var(--gray-900); }
     .modal-body { padding:20px 22px; max-height:65vh; overflow-y:auto; }
     .modal-foot { padding:14px 22px; border-top:1px solid var(--gray-200); display:flex; gap:8px; align-items:center; background:var(--gray-50); }
     .fgrid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .fg { display:flex; flex-direction:column; gap:4px; }
     .fl { font-size:12px; font-weight:600; color:var(--gray-600); }
-    .fi,.fsel,.fta { background:var(--gray-50); border:1.5px solid var(--gray-200); border-radius:8px; padding:8px 11px; font-size:13px; color:var(--gray-800); outline:none; font-family:inherit; width:100%; box-sizing:border-box; }
+    .fi,.fsel,.fta { background:var(--gray-50); border:1.5px solid var(--gray-200); border-radius:8px; padding:8px 12px; font-size:14px; color:var(--gray-800); outline:none; font-family:inherit; width:100%; box-sizing:border-box; }
     .fi:focus,.fsel:focus,.fta:focus { border-color:var(--orange); background:white; }
-    .fi-err { border-color:#ef4444 !important; }
-    .ferr { font-size:11px; color:#ef4444; }
+    .www-row { display:flex; align-items:stretch; gap:8px; }
+    .hot-chip { height:auto !important; flex-shrink:0; font-size:14px !important; padding:0 14px !important; }
     .fta { min-height:60px; resize:vertical; }
 
     /* Loading */
-    .loading-state { display:flex; align-items:center; justify-content:center; gap:10px; padding:48px; color:var(--gray-400); font-size:13px; }
+    .loading-state { display:flex; align-items:center; justify-content:center; gap:10px; padding:48px; color:var(--gray-400); font-size:14px; }
     .spinner { width:20px; height:20px; border:2px solid var(--gray-200); border-top-color:var(--orange); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
@@ -1032,8 +1039,8 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       background: #DCFCE7; color: #16A34A;
       display: flex; align-items:center; justify-content:center; flex-shrink:0;
     }
-    .tl-head-title { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:var(--gray-900); }
-    .tl-head-sub { font-size:11px; color:var(--gray-400); margin-top:1px; }
+    .tl-head-title { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:var(--gray-900); }
+    .tl-head-sub { font-size:12px; color:var(--gray-400); margin-top:1px; }
 
     /* Manager filter bar */
     .tl-filter {
@@ -1055,7 +1062,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 
     /* Scroll hints */
     .tl-past-hint, .tl-future-hint {
-      text-align: center; font-size: 10.5px; color: var(--gray-300);
+      text-align: center; font-size: 10px; color: var(--gray-300);
       padding: 10px 24px;
       font-style: italic;
     }
@@ -1069,20 +1076,20 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     }
     .tl-sep-line { flex:1; height:1px; background: var(--gray-200); }
     .tl-sep-badge {
-      display: flex; align-items: center; gap:5px;
-      font-size: 10.5px; font-weight: 600;
+      display: flex; align-items: center; gap:4px;
+      font-size: 10px; font-weight: 600;
       color: var(--gray-500);
       white-space: nowrap;
-      padding: 2px 10px; border-radius: 20px;
+      padding: 2px 10px; border-radius: 16px;
       border: 1px solid var(--gray-200);
       background: white;
     }
     /* Today separator — highlighted */
     .tl-sep-today { background: linear-gradient(180deg, #F0FDF4, white); padding-top:16px; }
     .tl-sep-today .tl-sep-line { background: #86EFAC; }
-    .tl-sep-today .tl-sep-badge { background: #DCFCE7; border-color: #86EFAC; color: #15803D; font-size:11.5px; }
+    .tl-sep-today .tl-sep-badge { background: #DCFCE7; border-color: #86EFAC; color: #15803D; font-size:12px; }
     .tl-today-dot { width:7px; height:7px; background:#22C55E; border-radius:50%; display:inline-block; flex-shrink:0; }
-    .tl-today-tag { background:#22C55E; color:white; font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; }
+    .tl-today-tag { background:#22C55E; color:white; font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; }
     /* Past separator — muted */
     .tl-sep-past .tl-sep-badge { color: var(--gray-300); border-color: var(--gray-100); }
     .tl-sep-past .tl-sep-line { background: var(--gray-100); }
@@ -1104,8 +1111,8 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       display: flex; flex-direction:column; align-items:flex-end;
       padding-top: 12px; padding-right: 4px;
     }
-    .tl-item-time { font-size:11.5px; font-weight:700; color:var(--gray-700); font-family:'Sora',sans-serif; white-space:nowrap; }
-    .tl-item-dur { font-size:9.5px; color:var(--gray-400); margin-top:2px; white-space:nowrap; }
+    .tl-item-time { font-size:12px; font-weight:700; color:var(--gray-700); font-family:'Sora',sans-serif; white-space:nowrap; }
+    .tl-item-dur { font-size:10px; color:var(--gray-400); margin-top:2px; white-space:nowrap; }
 
     /* Connector column */
     .tl-item-dot-col {
@@ -1140,21 +1147,21 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       background: linear-gradient(135deg, #F0FDF4 0%, white 50%);
     }
     .tl-item-header {
-      display: flex; align-items: center; gap:5px;
+      display: flex; align-items: center; gap:4px;
       margin-bottom: 4px;
     }
     .tl-src-badge {
-      font-size: 9px; font-weight: 700; text-transform:uppercase; letter-spacing:.4px;
-      padding: 1px 5px; border-radius: 4px; flex-shrink:0;
+      font-size: 10px; font-weight: 700; text-transform:uppercase; letter-spacing:.4px;
+      padding: 1px 4px; border-radius: 4px; flex-shrink:0;
     }
     .tl-src-lead    { background: #EFF6FF; color: #1D4ED8; }
     .tl-src-partner { background: #FDF4FF; color: #7E22CE; }
-    .tl-item-company { font-size:11px; color:var(--gray-500); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .tl-item-title { font-size:12.5px; font-weight:700; color:var(--gray-900); line-height:1.35; margin-bottom:5px; }
+    .tl-item-company { font-size:12px; color:var(--gray-500); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .tl-item-title { font-size:12px; font-weight:700; color:var(--gray-900); line-height:1.35; margin-bottom:4px; }
     .tl-item-meta { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
-    .tl-item-loc { font-size:10.5px; color:var(--gray-500); display:flex; align-items:center; gap:3px; }
-    .tl-item-rep { font-size:10.5px; color:var(--gray-500); display:flex; align-items:center; gap:4px; }
-    .tl-item-body { font-size:11.5px; color:var(--gray-500); margin-top:5px; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .tl-item-loc { font-size:10px; color:var(--gray-500); display:flex; align-items:center; gap:4px; }
+    .tl-item-rep { font-size:10px; color:var(--gray-500); display:flex; align-items:center; gap:4px; }
+    .tl-item-body { font-size:12px; color:var(--gray-500); margin-top:4px; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
     .tl-item-arrow {
       position:absolute; right:10px; top:50%; transform:translateY(-50%);
       font-size:12px; color:var(--gray-300); opacity:0; transition:opacity .15s;
@@ -1165,9 +1172,9 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     /* MEETING DETAIL                                  */
     /* ═══════════════════════════════════════════════ */
     .meet-detail-grid { display:flex; flex-direction:column; gap:10px; }
-    .meet-field { background:var(--gray-50); border:1px solid var(--gray-100); border-radius:8px; padding:10px 13px; }
-    .meet-field-label { font-size:10.5px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px; }
-    .meet-field-val { font-size:13px; color:var(--gray-800); font-weight:500; line-height:1.45; }
+    .meet-field { background:var(--gray-50); border:1px solid var(--gray-100); border-radius:8px; padding:10px 12px; }
+    .meet-field-label { font-size:10px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+    .meet-field-val { font-size:14px; color:var(--gray-800); font-weight:500; line-height:1.45; }
   `],
 })
 export class CrmLeadsListComponent implements OnInit, OnDestroy {
@@ -1261,6 +1268,8 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   submitted = false;
   newForm: any = {};
   nipError = '';
+  saveError = '';
+  readonly amountError = amountError;
   newFormErrors: string[] = [];
   newExtraContacts: {contact_name:string, contact_title:string, email:string, phone:string}[] = [];
 
@@ -1273,6 +1282,23 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     const funnel = this.stages.funnel();
     if (!this.newForm.stage || !funnel.length) return false;
     return this.newForm.stage !== funnel[0].key;
+  }
+
+  newMissing(field: string): boolean {
+    if (!this.submitted || !this.newFormRequiresFull) return false;
+    const f = this.newForm;
+    switch (field) {
+      case 'website':      return !this.newFormWebsite;
+      case 'contactName':  return !f.contact_name;
+      case 'contactTitle': return !f.contact_title;
+      case 'email':        return !f.email;
+      case 'phone':        return !f.phone;
+      case 'value':        return !f.value_pln && f.value_pln !== 0;
+      case 'firstContact': return !f.first_contact_date;
+      case 'source':       return !f.source;
+      case 'salesperson':  return !f.assigned_to;
+      default:             return false;
+    }
   }
 
   validateNewForm(): string[] {
@@ -1435,6 +1461,11 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
    * the board drops that one filter — otherwise the view silently stays a
    * table and the button looks broken.
    */
+  setViewMode(mode: 'kanban' | 'table'): void {
+    const isTarget = mode === 'kanban' ? this.isKanbanView : !this.isKanbanView;
+    if (!isTarget) this.toggleViewMode();
+  }
+
   toggleViewMode(): void {
     this.viewMode = this.viewMode === 'kanban' ? 'table' : 'kanban';
 
@@ -1620,6 +1651,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
   openNew() {
     this.nipError = '';
+    this.saveError = '';
     this.newForm       = { company:'', contact_name:'', contact_title:'', email:'', phone:'', nip:'PL',
                            value_pln: null, source:'', stage: this.stages.funnel()[0]?.key ?? 'new',
                            hot:false, notes:'', assigned_to:'', first_contact_date:'' };
@@ -1683,14 +1715,14 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
 
   createLead() {
     this.submitted = true;
-    if (!this.newForm.company) return;
-    // Wyzwól walidację NIP przed sprawdzeniem (user mógł nie dotknąć pola)
+    this.saveError = '';
     this.onNipChange();
     const nipVal = (this.newForm.nip || this.enrichResult?.nip || '').trim();
-    if (!nipVal || this.nipError) return;
-    // Walidacja wymagalności wg etapu
     this.newFormErrors = this.validateNewForm();
-    if (this.newFormErrors.length > 0) return;
+    if (!this.newForm.company || !nipVal || this.nipError || this.newFormErrors.length > 0 || amountError(this.newForm.value_pln)) {
+      scrollToFirstFieldError();
+      return;
+    }
     this.saving = true;
     const payload: any = {
       company:       this.newForm.company,
@@ -1710,7 +1742,7 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     };
     if (this.newForm.assigned_to) payload.assigned_to = this.newForm.assigned_to;
 
-    this.api.createLead(payload).subscribe({
+    this.api.createLead(payload, { showsOwnError: true }).subscribe({
       next: lead => this.zone.run(() => {
         this.allLeads  = [lead, ...this.allLeads];
         this.total    += 1;
@@ -1724,7 +1756,16 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
         if ((lead as any).logo_url) this.loadLogoSas(lead);
         this.cdr.markForCheck();
       }),
-      error: () => this.zone.run(() => { this.saving = false; this.cdr.markForCheck(); }),
+      error: (err: any) => this.zone.run(() => {
+        this.saving = false;
+        if (err?.status === 409) {
+          this.nipError = this.transloco.translate('crm.leadsList.newLead.taxIdErrors.duplicate');
+          scrollToFirstFieldError();
+        } else {
+          this.saveError = describeHttpError(err, this.transloco);
+        }
+        this.cdr.markForCheck();
+      }),
     });
   }
 
@@ -1943,7 +1984,10 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
   trackById(_: number, l: Lead){ return l.id; }
   callPhone(p: string)         { window.location.href = `tel:${p}`; }
   mailTo(e: string)            { window.location.href = `mailto:${e}`; }
-  formatPLN(v: number)         { return v >= 1_000_000 ? (v/1_000_000).toFixed(1)+'M' : v >= 1000 ? Math.round(v/1000)+'k' : String(Math.round(v)); }
+  /** Short amount in the viewer's language: 950 · 12 tys. · 4,5 mln · 11,1 mld (en: 12K, 4.5M, 11.1B). */
+  formatPLN(v: number): string {
+    return new Intl.NumberFormat(this.locale.activeLocale(), { notation: 'compact', maximumFractionDigits: 1 }).format(v || 0);
+  }
 
   hasUnreadReply(lead: any): boolean {
     return (lead.new_email_count ?? 0) > 0;

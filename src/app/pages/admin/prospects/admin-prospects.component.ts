@@ -256,8 +256,8 @@ interface DiscoveredCompany {
     </div>
 
     @if (navBack.ctx(); as ctx) {
-      <div style="padding:5px 16px;background:#f8fafc;border-bottom:1px solid #e5e7eb">
-        <button (click)="navigateBack()" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:white;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:12px;font-weight:500;cursor:pointer;line-height:1">
+      <div style="padding:8px 24px;background:#f8fafc;border-bottom:1px solid var(--gray-200)">
+        <button class="btn btn-g btn-sm" (click)="navigateBack()">
           ← {{ctx.label}}
         </button>
       </div>
@@ -281,7 +281,7 @@ interface DiscoveredCompany {
               (change)="onFileSelected($event)">
           </label>
           @if (importFile()) {
-            <span style="font-size:13px;color:#374151">{{ importFile()!.name }}</span>
+            <span style="font-size:14px;color:#374151">{{ importFile()!.name }}</span>
             <button class="btn btn-p" [disabled]="importing()" (click)="doImport()">
               @if (importing()) { {{ t('admin.import.importing') }} } @else { {{ t('admin.import.submit') }} }
             </button>
@@ -289,12 +289,12 @@ interface DiscoveredCompany {
         </div>
         @if (importResult()) {
           @if (importResult()!.fatal_error) {
-            <div style="margin-top:10px;font-size:13px;padding:8px 12px;border-radius:6px;
+            <div style="margin-top:12px;font-size:14px;padding:8px 12px;border-radius:12px;
                         border:1px solid #fca5a5;background:#fee2e2;color:#991b1b">
               ✗ {{ t('admin.import.fatalError') }} <b>{{ importResult()!.fatal_error }}</b>
             </div>
           } @else {
-            <div style="margin-top:10px;font-size:13px;padding:8px 12px;border-radius:6px;border:1px solid"
+            <div style="margin-top:12px;font-size:14px;padding:8px 12px;border-radius:12px;border:1px solid"
               [style.background]="importResult()!.errors! > 0 ? '#fef3c7' : '#f0fdf4'"
               [style.borderColor]="importResult()!.errors! > 0 ? '#fcd34d' : '#86efac'"
               [style.color]="importResult()!.errors! > 0 ? '#92400e' : '#166534'">
@@ -303,14 +303,14 @@ interface DiscoveredCompany {
               {{ t('admin.import.errors') }} <b>{{ importResult()!.errors }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.totalRows') }} <b>{{ importResult()!.total }}</b>
               @if (importResult()!.detected_encoding) {
-                <div style="margin-top:6px;font-size:11px;opacity:0.8">
+                <div style="margin-top:6px;font-size:12px;opacity:0.8">
                   {{ t('admin.import.encoding') }} <b>{{ importResult()!.detected_encoding }}</b>
                   @if (importResult()!.detected_columns?.length) {
                     &nbsp;|&nbsp; {{ t('admin.import.columns') }} {{ importResult()!.detected_columns!.join(', ') }}
                   }
                 </div>
               } @else if (importResult()!.detected_columns?.length) {
-                <div style="margin-top:6px;font-size:11px;opacity:0.8">
+                <div style="margin-top:6px;font-size:12px;opacity:0.8">
                   {{ t('admin.import.detectedColumns') }} {{ importResult()!.detected_columns!.join(', ') }}
                 </div>
               }
@@ -328,8 +328,8 @@ interface DiscoveredCompany {
       </div>
 
       <!-- Filtry -->
-      <div class="card" style="margin-bottom:16px;padding:16px">
-        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
+      <div class="card filter-card">
+        <div style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end">
 
           <div class="fld">
             <label>{{ t('admin.filters.search') }}</label>
@@ -388,11 +388,11 @@ interface DiscoveredCompany {
               (ngModelChange)="onFilterChange()">
           </div>
 
-          <button class="btn btn-g" style="margin-bottom:1px" (click)="resetFilters()">
+          <button class="btn btn-g" style="height:36px" (click)="resetFilters()">
             {{ t('admin.filters.reset') }}
           </button>
 
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;cursor:pointer;margin-bottom:1px;user-select:none">
+          <label style="display:flex;align-items:center;gap:8px;height:36px;font-size:14px;color:#374151;cursor:pointer;user-select:none">
             <input type="checkbox"
               [checked]="showArchived()"
               (change)="showArchived.set(!showArchived()); page.set(1); load()">
@@ -407,7 +407,7 @@ interface DiscoveredCompany {
         <div class="bulk-bar">
           <span class="bulk-count">{{ t('admin.bulk.selected', { count: selectedIds().size }) }}</span>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('hold')">
-            ⏸ {{ t('admin.status.hold') }}
+            ⏸️ {{ t('admin.status.hold') }}
           </button>
           <button class="btn btn-g" [disabled]="bulkActioning()" (click)="bulkSetStatus('archived')">
             📦 {{ t('admin.bulk.archive') }}
@@ -419,7 +419,7 @@ interface DiscoveredCompany {
             🔄 Re-process
           </button>
           <span style="flex:1"></span>
-          <button class="btn bulk-delete-btn" [disabled]="bulkActioning()" (click)="bulkDelete()">
+          <button class="btn btn-d" [disabled]="bulkActioning()" (click)="bulkDelete()">
             🗑 {{ t('admin.bulk.deleteSelected') }}
           </button>
           <button class="btn btn-g" (click)="clearSelection()">✕ {{ t('admin.bulk.cancel') }}</button>
@@ -427,7 +427,7 @@ interface DiscoveredCompany {
       }
 
       <!-- Podsumowanie -->
-      <div style="font-size:13px;color:#6b7280;margin-bottom:10px">
+      <div style="font-size:14px;color:#6b7280;margin-bottom:10px">
         {{ t('admin.summary.shown') }} <b style="color:#374151">{{ total() }}</b> / <b style="color:#374151">{{ grandTotal() }}</b>
         @if (batch().running) {
           &nbsp;|&nbsp; <span style="color:var(--orange)">
@@ -442,6 +442,7 @@ interface DiscoveredCompany {
         <div class="loading-overlay"><div class="spinner"></div></div>
       }
 
+      <div class="tbl-card">
       <table class="tbl">
         <thead>
           <tr>
@@ -502,31 +503,31 @@ interface DiscoveredCompany {
                   @if (p.has_partner) {
                     <button (click)="$event.stopPropagation(); goToPartner(p.partner_nav_id!, p.nip)"
                       [title]="t('admin.table.partnerBadgeTooltip')"
-                      style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🤝 Partner
                     </button>
                   } @else if (p.crm_lead_id) {
                     <button (click)="$event.stopPropagation(); goToLead(p.crm_lead_id!, p.nip)"
                       [title]="t('admin.table.convertedLeadTooltip')"
-                      style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
                   } @else if (p.has_lead) {
                     <button (click)="$event.stopPropagation(); goToLead(p.lead_id!, p.nip)"
                       [title]="t('admin.table.leadBadgeTooltip')"
-                      style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:#dbeafe;border:1px solid #93c5fd;color:#1d4ed8;cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
                   }
                 </div>
                 @if (p.legal_form) {
-                  <div style="font-size:11px;color:#9ca3af">{{ p.legal_form }}</div>
+                  <div style="font-size:12px;color:#9ca3af">{{ p.legal_form }}</div>
                 }
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px">
                   @if (p.website_url) {
                     <span style="display:inline-flex;align-items:center;gap:2px">
                       <a [href]="p.website_url" target="_blank"
-                        style="font-size:11px;color:var(--orange);text-decoration:none" (click)="$event.stopPropagation()">
+                        style="font-size:12px;color:var(--orange);text-decoration:none" (click)="$event.stopPropagation()">
                         🌐 {{ shortUrl(p.website_url) }}
                       </a>
                       @if (p.website_status === 'ok') {
@@ -544,7 +545,7 @@ interface DiscoveredCompany {
                   }
                   @if (p.facebook_url) {
                     <a [href]="p.facebook_url" target="_blank" title="Facebook"
-                      style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#1877f2;color:#fff;font-size:11px;font-weight:700;text-decoration:none"
+                      style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#1877f2;color:#fff;font-size:12px;font-weight:700;text-decoration:none"
                       (click)="$event.stopPropagation()">f</a>
                   }
                   @if (p.linkedin_url) {
@@ -616,25 +617,25 @@ interface DiscoveredCompany {
               </td>
               <td (click)="$event.stopPropagation()">
                 @if (p.has_partner) {
-                  <button class="btn btn-g" style="font-size:11px;padding:3px 8px;background:#d1fae5;color:#065f46;border-color:#6ee7b7"
+                  <button class="btn btn-g btn-sm" style="background:#d1fae5;color:#065f46;border-color:#6ee7b7"
                     (click)="goToPartner(p.partner_nav_id!, p.nip)"
                     [title]="t('admin.table.goToPartnerTooltip')">
                     ↗ {{ t('admin.table.partner') }}
                   </button>
                 } @else if (p.crm_lead_id) {
-                  <button class="btn btn-g" style="font-size:11px;padding:3px 8px"
+                  <button class="btn btn-g btn-sm"
                     (click)="goToLead(p.crm_lead_id!, p.nip)"
                     [title]="t('admin.table.goToCrmTooltip')">
                     ↗ CRM
                   </button>
                 } @else if (p.has_lead) {
-                  <button class="btn btn-g" style="font-size:11px;padding:3px 8px;background:#dbeafe;color:#1d4ed8;border-color:#93c5fd"
+                  <button class="btn btn-g btn-sm" style="background:#dbeafe;color:#1d4ed8;border-color:#93c5fd"
                     (click)="goToLead(p.lead_id!, p.nip)"
                     [title]="t('admin.table.goToLeadTooltip')">
                     ↗ {{ t('admin.table.lead') }}
                   </button>
                 } @else {
-                  <button class="btn btn-p" style="font-size:11px;padding:3px 8px"
+                  <button class="btn btn-p btn-sm"
                     [disabled]="toLeadLoading() === p.id || !qualifiesForLead(p)"
                     [style.opacity]="qualifiesForLead(p) ? '1' : '0.4'"
                     (click)="toLead(p)"
@@ -661,12 +662,12 @@ interface DiscoveredCompany {
                 <td colspan="17" style="background:#fafafa;padding:14px 20px">
 
                   <!-- NOTATKA WALIDACYJNA -->
-                  <div style="margin-bottom:14px;padding:10px 14px;background:white;border:1px solid #e5e7eb;border-radius:8px"
+                  <div style="margin-bottom:16px;padding:12px 16px;background:white;border-radius:14px;box-shadow:var(--shadow-sm)"
                        (click)="$event.stopPropagation()">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                      <span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em">{{ t('admin.note.heading') }}</span>
+                      <span style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em">{{ t('admin.note.heading') }}</span>
                       @if (p.note_author) {
-                        <span style="font-size:11px;color:#9ca3af">
+                        <span style="font-size:12px;color:#9ca3af">
                           {{ p.note_author }} · {{ p.note_updated_at | date:'dd.MM.yyyy HH:mm' }}
                         </span>
                       }
@@ -678,11 +679,11 @@ interface DiscoveredCompany {
                       maxlength="500"
                       rows="3"
                       [placeholder]="t('admin.note.placeholder')"
-                      style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;line-height:1.5;resize:vertical;color:#374151;font-family:inherit;outline:none"
+                      style="width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid #e4e4e7;border-radius:12px;font-size:14px;line-height:1.5;resize:vertical;color:#374151;font-family:inherit;outline:none"
                       onfocus="this.style.borderColor='#3BAA5D'"
-                      onblur="this.style.borderColor='#d1d5db'"
+                      onblur="this.style.borderColor='#e4e4e7'"
                     ></textarea>
-                    <div style="text-align:right;font-size:11px;color:#9ca3af;margin-top:2px">
+                    <div style="text-align:right;font-size:12px;color:#9ca3af;margin-top:2px">
                       {{ (noteEdits.get(p.id) ?? (p.note ?? '')).length }} / 500
                     </div>
                   </div>
@@ -694,7 +695,7 @@ interface DiscoveredCompany {
                       @if (p.ai_summary) {
                         <div style="margin-bottom:12px">
                           <div class="detail-label">{{ t('admin.detail.aiSummary') }}</div>
-                          <div style="font-size:13px;line-height:1.5">{{ p.ai_summary }}</div>
+                          <div style="font-size:14px;line-height:1.5">{{ p.ai_summary }}</div>
                         </div>
                       }
                       @if (p.icp_signals?.length) {
@@ -713,7 +714,7 @@ interface DiscoveredCompany {
                           </div>
                         </div>
                       }
-                      <div style="font-size:12px;display:flex;flex-direction:column;gap:5px">
+                      <div style="font-size:12px;display:flex;flex-direction:column;gap:4px">
                         @if (p.industry) {
                           <div><b>{{ t('admin.detail.industry') }}</b> {{ p.industry }}</div>
                         }
@@ -738,7 +739,7 @@ interface DiscoveredCompany {
                           <div>
                             <b>{{ t('admin.detail.pkdGus') }}</b>
                             @for (code of (p.enrichment_log?.gus?.pkd_codes ?? []); track code) {
-                              <span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:11px;font-family:monospace">{{ code }}</span>
+                              <span style="display:inline-block;margin:1px 4px 1px 0;padding:0 4px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:12px;font-family:monospace">{{ code }}</span>
                             }
                           </div>
                         }
@@ -803,7 +804,7 @@ interface DiscoveredCompany {
                           </div>
                         }
                         @if (p.enrichment_status === 'no_website') {
-                          <div style="color:#92400e;background:#fef3c7;padding:5px 8px;border-radius:5px;margin-top:4px;font-size:11px">
+                          <div style="color:#92400e;background:#fef3c7;padding:4px 8px;border-radius:8px;margin-top:4px;font-size:12px">
                             ⚠ {{ t('admin.detail.noWebsiteHalted') }}
                           </div>
                         }
@@ -1114,6 +1115,7 @@ interface DiscoveredCompany {
           }
         </tbody>
       </table>
+      </div>
 
       <!-- Paginacja -->
       @if (pages() > 1) {
@@ -1121,7 +1123,7 @@ interface DiscoveredCompany {
           <button class="btn btn-g" [disabled]="page() <= 1" (click)="setPage(page() - 1)">
             ‹ {{ t('admin.pager.previous') }}
           </button>
-          <span style="line-height:32px;font-size:13px">
+          <span style="line-height:32px;font-size:14px">
             {{ page() }} / {{ pages() }}
           </span>
           <button class="btn btn-g" [disabled]="page() >= pages()" (click)="setPage(page() + 1)">
@@ -1141,7 +1143,7 @@ interface DiscoveredCompany {
 
         @if (activeMenuProspect()!.enrichment_status !== 'hold') {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'hold'); closeMenu()">
-            ⏸ {{ t('admin.status.hold') }}
+            ⏸️ {{ t('admin.status.hold') }}
           </button>
         } @else {
           <button class="mi" (click)="setStatus(activeMenuProspect()!, 'pending'); closeMenu()">
@@ -1181,8 +1183,8 @@ interface DiscoveredCompany {
     @if (toLeadDialog() != null) {
       <div class="inspect-overlay" (click)="toLeadDialog.set(null)"></div>
       <div class="inspect-modal" style="max-width:420px;padding:24px" (click)="$event.stopPropagation()">
-        <div style="font-weight:600;font-size:15px;margin-bottom:4px">{{ t('admin.toLead.heading') }}</div>
-        <div style="font-size:13px;color:#6b7280;margin-bottom:16px">
+        <div style="font-weight:600;font-size:16px;margin-bottom:4px">{{ t('admin.toLead.heading') }}</div>
+        <div style="font-size:14px;color:#6b7280;margin-bottom:16px">
           {{ toLeadDialog()!.company_name || toLeadDialog()!.nip }}
         </div>
 
@@ -1190,17 +1192,17 @@ interface DiscoveredCompany {
           {{ t('admin.toLead.taxIdLabel') }}
         </label>
         <div style="position:relative;margin-bottom:4px">
-          <input class="inp" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;letter-spacing:0.05em"
+          <input class="inp" style="width:100%;box-sizing:border-box"
             [(ngModel)]="toLeadNipValue"
             maxlength="13"
             placeholder="0000000000">
           @if (toLeadNipDigits !== toLeadDialog()!.nip) {
-            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#d97706;font-weight:600">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:#d97706;font-weight:600">
               {{ t('admin.toLead.changed') }}
             </span>
           }
         </div>
-        <div style="font-size:11px;color:#6b7280;margin-bottom:16px">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:16px">
           {{ t('admin.toLead.taxIdHint') }}
           @if (toLeadNipDigits !== toLeadDialog()!.nip && toLeadNipDigits.length === 10) {
             <span style="color:#d97706"> {{ t('admin.toLead.prospectWillUpdate') }}</span>
@@ -1210,7 +1212,7 @@ interface DiscoveredCompany {
         <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px">
           {{ t('admin.toLead.assignTo') }}
         </label>
-        <select style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;margin-bottom:20px"
+        <select style="width:100%;height:36px;margin-bottom:20px"
           [ngModel]="toLeadAssignedTo()"
           (ngModelChange)="toLeadAssignedTo.set($event)">
           <option value="">{{ t('admin.toLead.assignToSelf') }}</option>
@@ -1228,17 +1230,17 @@ interface DiscoveredCompany {
           [placeholder]="t('admin.toLead.tagPlaceholder')">
 
         @if (toLeadDuplicateError()) {
-          <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#991b1b">
+          <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#991b1b">
             {{ t('admin.toLead.duplicateWarning') }}
             <strong>{{ toLeadDuplicateError()!.src === 'lead' ? t('admin.table.lead') : t('admin.table.partner') }}</strong>:
             „{{ toLeadDuplicateError()!.company }}"
           </div>
         }
 
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button style="padding:7px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px"
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-g"
             (click)="toLeadDialog.set(null)">{{ t('admin.bulk.cancel') }}</button>
-          <button style="padding:7px 16px;border:none;border-radius:6px;background:var(--orange);color:#fff;cursor:pointer;font-size:13px;font-weight:600"
+          <button class="btn btn-p"
             [disabled]="toLeadNipDigits.length !== 10 || !!toLeadLoading()"
             (click)="confirmToLead()">
             {{ toLeadLoading() ? t('admin.toLead.creating') : toLeadDuplicateError() ? t('admin.toLead.createAnyway') : t('admin.toLead.create') }}
@@ -1274,7 +1276,7 @@ interface DiscoveredCompany {
         @if (inspectView() === 'prompt') {
           <div class="inspect-prompt-view">
             @if (inspectPromptLoading()) {
-              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:13px">
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:14px">
                 <span class="row-spin"></span> {{ t('admin.inspect.loadingPrompt') }}
               </div>
             } @else if (inspectPrompt()) {
@@ -1289,7 +1291,7 @@ interface DiscoveredCompany {
         @if (inspectView() === 'scoring') {
           <div class="inspect-prompt-view">
             @if (inspectScoringRulesLoading()) {
-              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:13px">
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af;font-size:14px">
                 <span class="row-spin"></span> {{ t('admin.inspect.loadingScoring') }}
               </div>
             } @else if (inspectScoringRules()) {
@@ -1332,7 +1334,7 @@ interface DiscoveredCompany {
                     @if (inspectTarget()!.enrichment_log?.gus?.pkd_codes?.length) {
                       <div class="inspect-row" style="align-items:flex-start">
                         <span class="ik">{{ t('admin.inspect.pkdCodes') }}</span>
-                        <span class="iv" style="display:flex;flex-wrap:wrap;gap:3px">
+                        <span class="iv" style="display:flex;flex-wrap:wrap;gap:4px">
                           @for (code of (inspectTarget()!.enrichment_log?.gus?.pkd_codes ?? []); track code) {
                             <span style="padding:1px 6px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:3px;font-size:10px;font-family:monospace"
                               [class.inspect-highlight]="code === inspectTarget()!.enrichment_log?.gus?.pkd_main">{{ code }}</span>
@@ -1526,7 +1528,7 @@ interface DiscoveredCompany {
 
             @if (inspectTarget()!.ai_summary) {
               <div>
-                <div class="inspect-section-title" style="margin-bottom:5px">{{ t('admin.detail.aiSummary') }}</div>
+                <div class="inspect-section-title" style="margin-bottom:4px">{{ t('admin.detail.aiSummary') }}</div>
                 <div style="font-size:12px;line-height:1.6;color:#374151">{{ inspectTarget()!.ai_summary }}</div>
               </div>
             }
@@ -1541,14 +1543,14 @@ interface DiscoveredCompany {
               <div style="display:flex;flex-wrap:wrap;gap:8px">
                 @for (c of inspectTarget()!.key_contacts!; track $index) {
                   <div class="inspect-contact-card">
-                    @if (c.name) { <div style="font-weight:600;font-size:12px;color:#111827;margin-bottom:1px">{{ c.name }}</div> }
-                    @if (c.title) { <div style="font-size:11px;color:#6b7280;margin-bottom:5px">{{ c.title }}</div> }
+                    @if (c.name) { <div style="font-weight:600;font-size:12px;color:#333333;margin-bottom:1px">{{ c.name }}</div> }
+                    @if (c.title) { <div style="font-size:12px;color:#6b7280;margin-bottom:4px">{{ c.title }}</div> }
                     <div style="display:flex;flex-direction:column;gap:2px">
                       @if (c.email) {
-                        <a [href]="'mailto:' + c.email" style="color:var(--orange);text-decoration:none;font-size:11px" (click)="$event.stopPropagation()">✉ {{ c.email }}</a>
+                        <a [href]="'mailto:' + c.email" style="color:var(--orange);text-decoration:none;font-size:12px" (click)="$event.stopPropagation()">✉ {{ c.email }}</a>
                       }
                       @if (c.phone) {
-                        <span style="color:#374151;font-size:11px">📞 {{ c.phone }}</span>
+                        <span style="color:#374151;font-size:12px">📞 {{ c.phone }}</span>
                       }
                     </div>
                   </div>
@@ -1637,18 +1639,17 @@ interface DiscoveredCompany {
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
-            <div style="font-weight:700;font-size:15px;color:#111827">🔍 {{ t('admin.discovery') }}</div>
+            <div style="font-weight:700;font-size:16px;color:#333333">🔍 {{ t('admin.discovery') }}</div>
             <div style="font-size:12px;color:#6b7280;margin-top:2px">
               {{ t('admin.discoveryModal.subtitle') }}
             </div>
           </div>
-          <button (click)="cancelDiscovery()"
-            style="background:none;border:none;font-size:18px;cursor:pointer;color:#6b7280;padding:4px 8px">✕</button>
+          <button class="inspect-close" (click)="cancelDiscovery()">✕</button>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 160px;gap:8px;margin-bottom:10px">
           <div>
-            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">{{ t('admin.discoveryModal.companyName') }}</label>
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">{{ t('admin.discoveryModal.companyName') }}</label>
             <input class="inp" style="width:100%;box-sizing:border-box"
               [(ngModel)]="discoverySeedName"
               [placeholder]="t('admin.discoveryModal.companyNamePlaceholder')"
@@ -1656,7 +1657,7 @@ interface DiscoveredCompany {
               (keydown.enter)="startDiscovery()">
           </div>
           <div>
-            <label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">{{ t('admin.discoveryModal.taxId') }}</label>
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">{{ t('admin.discoveryModal.taxId') }}</label>
             <input class="inp" style="width:100%;box-sizing:border-box"
               [(ngModel)]="discoverySeedNip"
               placeholder="1234567890"
@@ -1671,12 +1672,12 @@ interface DiscoveredCompany {
               <div class="discovery-progress-bar"></div>
             </div>
             @if (discoveryResults().length > 0) {
-              <div style="font-size:11px;color:#6b7280;margin-top:5px">
+              <div style="font-size:12px;color:#6b7280;margin-top:4px">
                 ⏳ {{ t('admin.discoveryModal.searching') }}
                 <b style="color:var(--orange)"> {{ t('admin.discoveryModal.foundCount', { count: discoveryResults().length }) }}</b>
               </div>
             } @else {
-              <div style="font-size:11px;color:#6b7280;margin-top:5px">⏳ {{ t('admin.discoveryModal.searching') }}</div>
+              <div style="font-size:12px;color:#6b7280;margin-top:4px">⏳ {{ t('admin.discoveryModal.searching') }}</div>
             }
           </div>
         }
@@ -1697,7 +1698,7 @@ interface DiscoveredCompany {
         </div>
 
         @if (discoveryResults().length > 0) {
-          <div style="border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;margin-bottom:10px">
+          <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:12px">
             <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;background:#f9fafb;border-bottom:1px solid #e5e7eb;padding:6px 10px;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em">
               <label style="display:flex;align-items:center;cursor:pointer">
                 <input type="checkbox"
@@ -1713,7 +1714,7 @@ interface DiscoveredCompany {
             </div>
 
             @for (c of discoveryResults(); track $index) {
-              <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;padding:7px 10px;border-bottom:1px solid #f3f4f6;font-size:12px;align-items:center"
+              <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;padding:8px 10px;border-bottom:1px solid #f3f4f6;font-size:12px;align-items:center"
                 [style.background]="c.selected ? 'var(--orange-pale)' : 'white'">
 
                 <label style="display:flex;align-items:center;cursor:pointer">
@@ -1725,7 +1726,7 @@ interface DiscoveredCompany {
                 </label>
 
                 <div>
-                  <div style="font-weight:500;color:#111827;line-height:1.3">{{ c.company_name }}</div>
+                  <div style="font-weight:500;color:#333333;line-height:1.3">{{ c.company_name }}</div>
                   @if (c.regon) {
                     <div style="font-size:10px;color:#9ca3af">REGON {{ c.regon }}</div>
                   }
@@ -1733,21 +1734,21 @@ interface DiscoveredCompany {
 
                 <div>
                   @if (c.nip_verified) {
-                    <span style="font-family:monospace;font-size:11px;color:#374151">{{ c.nip }}</span>
+                    <span style="font-family:monospace;font-size:12px;color:#374151">{{ c.nip }}</span>
                     <span style="margin-left:4px;font-size:10px;color:#16a34a" [title]="t('admin.discoveryModal.verifiedInGus')">✓</span>
                   } @else {
-                    <input class="inp" style="width:100px;font-size:11px;padding:2px 5px;height:24px;font-family:monospace"
+                    <input class="inp" style="width:100px;font-size:12px;padding:2px 4px;height:24px"
                       [(ngModel)]="c.nip_edit"
                       [placeholder]="t('admin.table.taxId')"
                       [title]="t('admin.discoveryModal.enterTaxIdManually')">
                     @if (c.nip) {
-                      <div style="font-size:9px;color:#f59e0b;margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
+                      <div style="font-size:10px;color:#f59e0b;margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
                     }
                     <!-- Wyszukiwanie NIP-u w internecie jest płatne, więc odpala
                          się tylko z tego przycisku — nigdy automatycznie dla
                          całej listy wyników. -->
                     <button class="btn btn-g"
-                      style="font-size:9px;padding:1px 5px;height:20px;margin-top:2px"
+                      style="font-size:10px;padding:1px 4px;height:20px;margin-top:2px"
                       [disabled]="c.resolvingNip"
                       (click)="resolveNip($index)"
                       [title]="t('admin.discoveryModal.resolveTaxIdTooltip')">
@@ -1759,21 +1760,21 @@ interface DiscoveredCompany {
                 <div>
                   @if (c.website_url && !c.website_edit) {
                     <a [href]="c.website_url" target="_blank" rel="noopener"
-                      style="color:var(--orange);text-decoration:none;font-size:11px;word-break:break-all"
+                      style="color:var(--orange);text-decoration:none;font-size:12px;word-break:break-all"
                       (click)="$event.stopPropagation()">
                       {{ c.website_url | slice:0:22 }}…
                     </a>
                   } @else {
-                    <input class="inp" style="width:130px;font-size:11px;padding:2px 5px;height:24px"
+                    <input class="inp" style="width:130px;font-size:12px;padding:2px 4px;height:24px"
                       [(ngModel)]="c.website_edit"
                       [placeholder]="c.website_url || 'https://…'"
                       [title]="t('admin.discoveryModal.editWebsite')">
                   }
                 </div>
 
-                <div style="font-size:11px;color:#374151">
+                <div style="font-size:12px;color:#374151">
                   @if (c.pkd_main) {
-                    <span style="background:#eff6ff;color:#1d4ed8;border-radius:3px;padding:1px 5px;font-size:10px">{{ c.pkd_main }}</span>
+                    <span style="background:#eff6ff;color:#1d4ed8;border-radius:3px;padding:1px 4px;font-size:10px">{{ c.pkd_main }}</span>
                   } @else {
                     <span style="color:#9ca3af">—</span>
                   }
@@ -1781,7 +1782,7 @@ interface DiscoveredCompany {
 
                 <!-- Obecność WYŁĄCZNIE w zasobach tego tenanta — backend filtruje
                      po tenant_id, front nigdy nie widzi danych innego klienta. -->
-                <div style="display:flex;flex-wrap:wrap;gap:3px">
+                <div style="display:flex;flex-wrap:wrap;gap:4px">
                   @if (c.in_prospects) { <span class="badge-cp">P</span> }
                   @if (c.in_leads)     { <span class="badge-cl">L</span> }
                   @if (c.in_partners)  { <span class="badge-cpa">PA</span> }
@@ -1795,11 +1796,11 @@ interface DiscoveredCompany {
 
           <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid #e5e7eb">
             <span style="font-size:12px;color:#6b7280">
-              {{ t('admin.discoveryModal.selectedLabel') }} <b style="color:#111827">{{ discoverySelectedCount() }}</b>
+              {{ t('admin.discoveryModal.selectedLabel') }} <b style="color:#333333">{{ discoverySelectedCount() }}</b>
             </span>
             <span class="tsp"></span>
             @if (discoveryDone()) {
-              <div style="font-size:12px;padding:6px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;color:#166534">
+              <div style="font-size:12px;padding:8px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;color:#166534">
                 ✓ {{ t('admin.discoveryModal.addedPrefix') }} <b>{{ discoveryDone()!.added }}</b> {{ t('admin.discoveryModal.addedSuffix') }}
                 <b>„{{ discoveryDone()!.source_database }}"</b>
                 @if (discoveryDone()!.batchStarted) { {{ t('admin.discoveryModal.andEnrichmentStarted') }} }
@@ -1845,13 +1846,13 @@ interface DiscoveredCompany {
       position:fixed; z-index:2001;
       top:50%; left:50%; transform:translate(-50%,-50%);
       width:860px; max-width:95vw; max-height:90vh; overflow-y:auto;
-      background:white; border-radius:12px; padding:22px 24px;
-      box-shadow:0 8px 32px rgba(0,0,0,0.22);
+      background:white; border-radius:14px; padding:24px;
+      box-shadow:0 7px 29px rgba(0,0,0,0.198);
     }
     /* Obecność w zasobach TEGO tenanta: P = prospekt, L = lead, PA = partner */
-    .badge-cp  { background:var(--orange-pale);color:var(--orange);border:1px solid #a7d8b6;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
-    .badge-cl  { background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
-    .badge-cpa { background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700 }
+    .badge-cp  { background:var(--orange-pale);color:var(--orange);border:1px solid #a7d8b6;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .badge-cl  { background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .badge-cpa { background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
 
     .reprocess-overlay {
       position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.35);
@@ -1859,12 +1860,12 @@ interface DiscoveredCompany {
     .reprocess-dialog {
       position:fixed; z-index:2001;
       top:50%; left:50%; transform:translate(-50%,-50%);
-      background:#fff; border-radius:10px; padding:24px;
+      background:#fff; border-radius:14px; padding:24px;
       width:400px; max-width:calc(100vw - 32px);
-      box-shadow:0 8px 32px rgba(0,0,0,0.22);
+      box-shadow:0 7px 29px rgba(0,0,0,0.198);
     }
     .reprocess-dialog-title {
-      font-weight:600; font-size:14px; color:#111827;
+      font-weight:600; font-size:14px; color:#333333;
       margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
 
@@ -1878,12 +1879,13 @@ interface DiscoveredCompany {
       padding:20px 24px 32px; display:flex; flex-direction:column; gap:0;
     }
 
-    .fld { display:flex; flex-direction:column; gap:3px; }
-    .fld label { font-size:11px; font-weight:500; color:#6b7280; }
-    .inp { height:32px; border:1px solid #d1d5db; border-radius:6px;
-           padding:0 8px; font-size:13px; background:#fff; }
-    .inp:focus { outline:none; border-color:var(--orange); }
-    .inp-sm { height:26px; font-size:12px; padding:0 6px; }
+    .fld { display:flex; flex-direction:column; gap:4px; }
+    .fld label { font-size:12px; font-weight:500; color:#6b7280; }
+    .inp { box-sizing:border-box; height:36px; border:1px solid var(--gray-200); border-radius:12px;
+           padding:0 14px; font-size:14px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+    .inp:focus { outline:none; border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .filter-card { margin-bottom:16px; padding:12px 18px; border-radius:14px; }
+    .inp-sm { height:28px; font-size:12px; padding:0 8px; border-radius:8px; }
 
     .icon-btn {
       border:none; background:transparent; cursor:pointer; padding:0 2px;
@@ -1899,18 +1901,19 @@ interface DiscoveredCompany {
     /* Pasek akcji masowych */
     .bulk-bar {
       display: flex; align-items: center; gap: 8px;
-      padding: 8px 14px; margin-bottom: 10px;
-      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
-      font-size: 13px;
+      padding: 8px 16px; margin-bottom: 12px; flex-wrap: wrap;
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 14px;
+      font-size: 14px;
     }
     .bulk-count { font-weight: 600; color: #1d4ed8; margin-right: 4px; white-space: nowrap; }
-    .bulk-delete-btn { color: #991b1b !important; border-color: #fca5a5 !important; }
-    .bulk-delete-btn:hover:not(:disabled) { background: #fee2e2 !important; }
 
-    .tbl { width:100%; border-collapse:collapse; font-size:13px; }
+    /* overflow: clip rounds the corners without creating a scroll box, so the
+       sticky table header keeps sticking to the page scroll. */
+    .tbl-card { background:white; border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:clip; }
+    .tbl { width:100%; border-collapse:collapse; font-size:12px; }
     .tbl th {
       background:#f9fafb; text-align:left; padding:8px 10px 14px;
-      border-bottom:1px solid #e5e7eb; font-size:11px;
+      border-bottom:1px solid #e5e7eb; font-size:12px;
       font-weight:600; color:#6b7280; white-space:nowrap; position:sticky; top:0; z-index:1;
       vertical-align:bottom;
     }
@@ -1942,7 +1945,7 @@ interface DiscoveredCompany {
       writing-mode: vertical-rl;
       transform: rotate(180deg);
       display: inline-block;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       color: #6b7280;
       cursor: default;
@@ -1954,7 +1957,7 @@ interface DiscoveredCompany {
       position: relative;
       display: flex;
       justify-content: center;
-      margin-top: 5px;
+      margin-top: 4px;
     }
     .sig-info {
       width: 15px; height: 15px;
@@ -1962,7 +1965,7 @@ interface DiscoveredCompany {
       border: 1px solid #d1d5db;
       background: #f9fafb;
       color: #9ca3af;
-      font-size: 9px; font-weight: 700;
+      font-size: 10px; font-weight: 700;
       cursor: help;
       display: flex; align-items: center; justify-content: center;
       padding: 0; line-height: 1;
@@ -1992,9 +1995,9 @@ interface DiscoveredCompany {
     }
     .sig-info-tip-title {
       font-weight: 700;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       color: #fff;
-      font-size: 13px;
+      font-size: 14px;
     }
     .sig-info-wrap:hover .sig-info-tip { display: block; }
 
@@ -2022,12 +2025,12 @@ interface DiscoveredCompany {
     }
 
     .detail-label {
-      font-size:11px; font-weight:600; color:#6b7280;
+      font-size:12px; font-weight:600; color:#6b7280;
       text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;
     }
 
     .tag { display:inline-block; padding:2px 6px; border-radius:4px;
-           font-size:11px; background:#fff7ed; color:#c2410c; }
+           font-size:12px; background:#fff7ed; color:#c2410c; }
     .tag-sm { font-size:10px; }
 
     /* Zasięg geograficzny */
@@ -2054,7 +2057,7 @@ interface DiscoveredCompany {
       vertical-align: middle;
     }
 
-    .badge { display:inline-block; padding:2px 7px; border-radius:10px; font-size:11px; font-weight:500; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:500; }
     .badge-pending   { background:#fef3c7; color:#92400e; }
     .badge-done      { background:#d1fae5; color:#065f46; }
     .badge-error     { background:#fee2e2; color:#991b1b; }
@@ -2066,7 +2069,7 @@ interface DiscoveredCompany {
     .badge-db        { background:#fef0e9; color:#c2410c; font-size:10px; padding:1px 6px; border-radius:8px; }
 
     .btn-menu {
-      width:28px; height:28px; border:1px solid #e5e7eb; border-radius:6px;
+      width:28px; height:28px; border:1px solid #e5e7eb; border-radius:10px;
       background:none; cursor:pointer; font-size:16px; line-height:1;
       display:flex; align-items:center; justify-content:center;
       color:#6b7280; transition:background .12s, border-color .12s;
@@ -2078,19 +2081,19 @@ interface DiscoveredCompany {
     /* Dropdown — position:fixed, poza flow tabeli */
     .row-menu {
       position:fixed; z-index:9999;
-      background:white; border:1px solid #e5e7eb; border-radius:8px;
-      box-shadow:0 4px 16px rgba(0,0,0,.12); padding:4px;
+      background:white; border:1px solid #e5e7eb; border-radius:14px;
+      box-shadow:0 4px 16px rgba(0,0,0,.12); padding:8px;
       min-width:180px;
     }
     .mi {
-      display:block; width:100%; text-align:left; padding:7px 12px;
-      border:none; background:none; cursor:pointer; font-size:13px;
-      border-radius:5px; color:#374151; white-space:nowrap;
+      display:block; width:100%; text-align:left; padding:8px 12px;
+      border:none; background:none; cursor:pointer; font-size:14px; font-family:inherit;
+      border-radius:10px; color:#374151; white-space:nowrap;
     }
     .mi:hover { background:#f3f4f6; }
     .mi-danger { color:#991b1b; }
     .mi-danger:hover { background:#fee2e2; }
-    .mi-sep { height:1px; background:#f3f4f6; margin:3px 0; }
+    .mi-sep { height:1px; background:#f3f4f6; margin:4px 0; }
 
     code { font-family:monospace; background:#f3f4f6; padding:1px 4px;
            border-radius:3px; font-size:12px; }
@@ -2127,14 +2130,14 @@ interface DiscoveredCompany {
     .log-muted  { color: #9ca3af; font-style: italic; }
     .log-expand-btn {
       background: none; border: none; padding: 0 0 0 4px; margin: 0;
-      color: #6b7280; font-size: 11px; font-style: italic; cursor: pointer;
+      color: #6b7280; font-size: 12px; font-style: italic; cursor: pointer;
       &:hover { color: #3BAA5D; text-decoration: underline; }
     }
 
     /* Sekcja sygnałów w logu Claude */
     .log-signals {
       width: 100%; margin-top: 8px;
-      display: flex; flex-direction: column; gap: 5px;
+      display: flex; flex-direction: column; gap: 4px;
     }
     .log-signal-row {
       display: flex; align-items: baseline; gap: 8px;
@@ -2145,12 +2148,12 @@ interface DiscoveredCompany {
       width: 10px; height: 10px; flex-shrink: 0;
       border-radius: 3px;
       background: #e5e7eb; border: 1px solid #d1d5db;
-      margin-top: 3px;
+      margin-top: 4px;
     }
     .log-signal-key {
       flex-shrink: 0;
       width: 68px;
-      font-weight: 600; font-size: 11px; color: #374151;
+      font-weight: 600; font-size: 12px; color: #374151;
     }
     .log-signal-reason { font-size: 12px; color: #6b7280; line-height: 1.4; }
     .log-branches {
@@ -2172,8 +2175,8 @@ interface DiscoveredCompany {
       top: 4vh; left: 50%; transform: translateX(-50%);
       width: min(920px, calc(100vw - 32px));
       max-height: 92vh;
-      background: #fff; border-radius: 12px;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.28);
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 14px 43px rgba(0,0,0,0.252);
       display: flex; flex-direction: column;
       overflow: hidden;
     }
@@ -2192,8 +2195,9 @@ interface DiscoveredCompany {
     .inspect-close {
       flex-shrink: 0; margin-top: 2px;
       width: 28px; height: 28px;
-      border: 1px solid #e5e7eb; border-radius: 6px;
+      border: 1px solid #e5e7eb; border-radius: 10px;
       background: none; cursor: pointer; font-size: 14px;
+      display: inline-flex; align-items: center; justify-content: center;
       color: #6b7280; line-height: 1;
     }
     .inspect-close:hover { background: #f3f4f6; color: #111; }
@@ -2217,12 +2221,12 @@ interface DiscoveredCompany {
       margin-bottom: 8px;
     }
     .inspect-card {
-      border: 1px solid #e5e7eb; border-radius: 8px;
-      padding: 9px 11px; background: #fafafa;
+      border: 1px solid #e5e7eb; border-radius: 12px;
+      padding: 8px 12px; background: #fafafa;
     }
     .inspect-card-header {
       display: flex; align-items: center; gap: 8px;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
     }
     .inspect-badge {
       padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700;
@@ -2233,7 +2237,7 @@ interface DiscoveredCompany {
     .inspect-kv { display: flex; flex-direction: column; gap: 4px; }
     .inspect-row { display: flex; gap: 6px; font-size: 12px; line-height: 1.4; }
     .ik { color: #6b7280; flex-shrink: 0; min-width: 84px; }
-    .iv { color: #111827; flex: 1; word-break: break-all; }
+    .iv { color: #333333; flex: 1; word-break: break-all; }
     .inspect-highlight { color: var(--orange); font-weight: 600; }
     .inspect-muted { color: #9ca3af; font-style: italic; }
     .inspect-link { color: var(--orange); text-decoration: none; word-break: break-all; }
@@ -2242,24 +2246,24 @@ interface DiscoveredCompany {
     .inspect-signals { display: flex; flex-direction: column; gap: 4px; }
     .inspect-signal-row {
       display: flex; align-items: flex-start; gap: 10px;
-      padding: 7px 10px; border-radius: 6px;
+      padding: 8px 12px; border-radius: 10px;
       border: 1px solid #f3f4f6; background: #fafafa;
     }
     .inspect-signal-true  { background: #f0fdf4; border-color: #bbf7d0; }
     .inspect-signal-false { background: #fff5f5; border-color: #fecaca; }
-    .inspect-sig-dot { margin-top: 3px; flex-shrink: 0; }
+    .inspect-sig-dot { margin-top: 4px; flex-shrink: 0; }
     .inspect-signal-body { flex: 1; min-width: 0; }
     .inspect-signal-name  { font-size: 12px; font-weight: 600; color: #374151; }
-    .inspect-signal-reason { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+    .inspect-signal-reason { font-size: 12px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
     .inspect-signal-val {
       flex-shrink: 0; font-size: 10px; font-family: monospace;
-      padding: 1px 5px; border-radius: 4px;
+      padding: 1px 4px; border-radius: 4px;
       background: #f3f4f6; color: #374151; align-self: flex-start;
       border: none;
     }
 
     .inspect-score-breakdown {
-      border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
+      border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;
     }
     .sb-row {
       display: flex; justify-content: space-between; align-items: center;
@@ -2284,21 +2288,21 @@ interface DiscoveredCompany {
       background: #fafafa;
     }
     .inspect-contact-card {
-      border: 1px solid #e5e7eb; border-radius: 6px;
-      padding: 8px 10px; background: #fff;
+      border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 8px 12px; background: #fff;
       min-width: 160px; max-width: 240px;
     }
     .inspect-tabs {
       display: flex; gap: 2px;
-      background: #f3f4f6; padding: 3px; border-radius: 8px;
+      background: #f3f4f6; padding: 4px; border-radius: 12px;
     }
     .inspect-tab {
-      padding: 4px 14px; border-radius: 6px; border: none;
+      padding: 4px 14px; border-radius: 9px; border: none; font-family: inherit;
       background: none; cursor: pointer; font-size: 12px;
       font-weight: 500; color: #6b7280; transition: all .12s;
     }
     .inspect-tab:hover { background: #e5e7eb; color: #374151; }
-    .inspect-tab-active { background: #fff !important; color: #111827 !important; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+    .inspect-tab-active { background: #fff !important; color: #333333 !important; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
     .inspect-prompt-view {
       flex: 1 1 auto; min-height: 0; overflow: hidden;
       display: flex; flex-direction: column;
@@ -2307,7 +2311,7 @@ interface DiscoveredCompany {
       flex: 1 1 auto; overflow: auto;
       margin: 0; padding: 16px 20px;
       font-family: 'Consolas', 'Fira Mono', monospace; font-size: 12px;
-      line-height: 1.6; color: #1f2937;
+      line-height: 1.6; color: #333333;
       white-space: pre-wrap; word-break: break-word;
       background: #f9fafb;
       border-top: 1px solid #e5e7eb;

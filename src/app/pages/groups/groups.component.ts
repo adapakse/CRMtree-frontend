@@ -19,7 +19,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
       <span class="page-title">{{ t('userGroups.title') }}</span>
       <span class="tsp"></span>
       @if (auth.isAdmin()) {
-        <button class="btn btn-p" (click)="openNew = true">+ {{ t('userGroups.newGroup') }}</button>
+        <button class="btn btn-p" (click)="openNew = true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('userGroups.newGroup') }}</button>
       }
     </div>
 
@@ -31,7 +31,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
         @for (g of groups(); track g.id) {
           <div class="card" style="padding:20px;cursor:pointer" (click)="select(g)">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
               <div style="width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px"
                    [class]="groupBg(g.name)">
                 {{ groupIcon(g.name) }}
@@ -39,27 +39,27 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
               <div>
                 <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
                 @if (g.has_owner_restriction) {
-                  <span style="font-size:10.5px;font-weight:600;background:#EFF6FF;color:#1D4ED8;padding:1px 7px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
+                  <span style="font-size:10px;font-weight:600;background:#EFF6FF;color:#1D4ED8;padding:1px 8px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
                 }
               </div>
               <span style="margin-left:auto">
                 @if (!g.is_active) {
-                  <span style="font-size:10.5px;font-weight:600;background:var(--gray-100);color:var(--gray-400);padding:2px 8px;border-radius:10px">{{ t('userGroups.inactive') }}</span>
+                  <span style="font-size:10px;font-weight:600;background:var(--gray-100);color:var(--gray-400);padding:2px 8px;border-radius:10px">{{ t('userGroups.inactive') }}</span>
                 }
               </span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px">
+              <div style="background:var(--gray-50);border-radius:12px;padding:12px">
                 <div style="font-size:18px;font-weight:700;font-family:'Sora',sans-serif;color:var(--gray-900)">{{ g.member_count ?? 0 }}</div>
-                <div style="font-size:11px;color:var(--gray-400)">{{ t('userGroups.members') }}</div>
+                <div style="font-size:12px;color:var(--gray-400)">{{ t('userGroups.members') }}</div>
               </div>
-              <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px">
+              <div style="background:var(--gray-50);border-radius:12px;padding:12px">
                 <div style="font-size:18px;font-weight:700;font-family:'Sora',sans-serif;color:var(--gray-900)">{{ g.document_count ?? 0 }}</div>
-                <div style="font-size:11px;color:var(--gray-400)">{{ t('userGroups.documents') }}</div>
+                <div style="font-size:12px;color:var(--gray-400)">{{ t('userGroups.documents') }}</div>
               </div>
             </div>
             @if (g.description) {
-              <div style="font-size:12px;color:var(--gray-400);margin-top:10px">{{ g.description }}</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-top:12px">{{ g.description }}</div>
             }
           </div>
         }
@@ -99,18 +99,18 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
                   <textarea class="fta" [(ngModel)]="editDescription"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p btn-sm" style="margin-top:16px" (click)="saveGroup()">{{ t('userGroups.edit.saveChanges') }}</button>
+              <button class="btn btn-p" style="margin-top:20px" (click)="saveGroup()">{{ t('userGroups.edit.saveChanges') }}</button>
             }
 
             <div class="sec-title" style="margin-top:24px">{{ t('userGroups.members') }}</div>
             @for (m of selected()!.members ?? []; track m.user_id) {
-              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)">
                 <div class="av" style="width:32px;height:32px;font-size:12px">
                   {{ initials(m.display_name) }}
                 </div>
                 <div style="flex:1">
-                  <div style="font-size:13px;font-weight:500;color:var(--gray-900)">{{ m.display_name }}</div>
-                  <div style="font-size:11.5px;color:var(--gray-400)">{{ m.email }}</div>
+                  <div style="font-size:14px;font-weight:500;color:var(--gray-900)">{{ m.display_name }}</div>
+                  <div style="font-size:12px;color:var(--gray-400)">{{ m.email }}</div>
                 </div>
                 <span class="badge" [class]="m.access_level === 'full' ? 's-signed' : 's-new'">
                   {{ m.access_level === 'full' ? t('userGroups.accessLevels.full') : t('userGroups.accessLevels.read') }}
@@ -123,8 +123,8 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
           </div>
           @if (auth.isAdmin()) {
             <div class="pf">
-              <button class="btn btn-d" (click)="deactivateGroup()">{{ t('userGroups.deactivate.action') }}</button>
               <button class="btn btn-g" (click)="selected.set(null)">{{ 'actions.close' | transloco }}</button>
+              <button class="btn btn-d" style="margin-left:auto" (click)="deactivateGroup()">{{ t('userGroups.deactivate.action') }}</button>
             </div>
           }
         </div>
@@ -136,10 +136,10 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
       <div class="mol open" (click)="openNew=false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:var(--orange-pale);font-size:18px">👥</div>
+            <div class="moico" style="background:var(--orange-pale);color:var(--orange)">👥</div>
             <div><div class="mot">{{ t('userGroups.create.title') }}</div><div class="mos">{{ t('userGroups.create.subtitle') }}</div></div>
           </div>
-          <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
             <div class="fg">
               <label class="fl">{{ t('userGroups.fields.internalName') }} <span class="req">*</span></label>
               <input class="fi" [placeholder]="t('userGroups.create.internalNamePlaceholder')" [(ngModel)]="newGroup.name">
@@ -152,12 +152,12 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
               <label class="fl">{{ t('userGroups.fields.description') }}</label>
               <textarea class="fta" style="min-height:60px" [(ngModel)]="newGroup.description"></textarea>
             </div>
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+            <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">
               <input type="checkbox" [(ngModel)]="newGroup.has_owner_restriction">
               {{ t('userGroups.create.ownerRestrictionCheckbox') }}
             </label>
           </div>
-          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
+          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50)">
             <button class="btn btn-g" (click)="openNew=false">{{ 'actions.cancel' | transloco }}</button>
             <button class="btn btn-p" [disabled]="!newGroup.name.trim()" (click)="createGroup()">{{ t('userGroups.create.title') }}</button>
           </div>
@@ -168,23 +168,23 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
   `,
   styles: [`
     #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
-    .page-title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; color: var(--gray-900); }
+    .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); }
     .tsp { flex: 1; }
     #content { flex: 1; overflow-y: auto; padding: 24px; }
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; backdrop-filter: blur(2px); display: flex; align-items: flex-start; justify-content: flex-end; }
     .panel { width: 520px; height: 100vh; background: white; box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
     .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; position: sticky; top: 0; background: white; z-index: 1; }
     .pt { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
-    .ps { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+    .ps { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
     .pc { margin-left: auto; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 6px; }
     .pc:hover { background: var(--gray-100); }
     .pb { padding: 24px; flex: 1; }
-    .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 10px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+    .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
     .mol { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-    .mo { background: white; border-radius: 14px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
+    .mo { background: white; border-radius: 12px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
     .moh { padding: 20px 24px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
     .moico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .mot { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--gray-900); }
+    .mot { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
     .mos { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
     .av { border-radius: 50%; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; }
   `],

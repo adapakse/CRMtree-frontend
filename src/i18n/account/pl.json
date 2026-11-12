@@ -22,6 +22,7 @@
     },
     "password": {
       "current": "Aktualne hasło",
+      "hide": "Ukryj hasło",
       "hint": "Podaj aktualne hasło i nowe, co najmniej 8 znaków. Zmiana wylogowuje Twoje konto z aplikacji mobilnej.",
       "mismatch": "Hasła nie są takie same",
       "new": "Nowe hasło",
@@ -29,6 +30,7 @@
       "saveFailed": "Nie udało się zmienić hasła",
       "saved": "Hasło zostało zmienione",
       "saving": "Zapisywanie…",
+      "show": "Pokaż hasło",
       "submit": "Zmień hasło",
       "title": "Zmiana hasła",
       "tooShort": "Hasło musi mieć co najmniej 8 znaków"

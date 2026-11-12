@@ -45,12 +45,6 @@ const SCREEN_PARAMS = ['view', 'status'];
         <wt-projects-view-switch [active]="view()" [showsPortfolio]="config()?.has_cross_project_view === true" />
         <span class="tsp"></span>
         @if (view() === 'projects') {
-          <div class="filter">
-            @for (filter of statusFilters; track filter.value) {
-              <button class="filter-btn" [class.active]="statusFilter() === filter.value"
-                      (click)="setStatusFilter(filter.value)">{{ t(filter.labelKey) }}</button>
-            }
-          </div>
           @if (canCreate()) {
             <button class="btn btn-p" (click)="openCreateForm()">+ {{ t('list.newProject') }}</button>
           }
@@ -61,6 +55,13 @@ const SCREEN_PARAMS = ['view', 'status'];
         @if (view() === 'my-tasks') {
           <wt-project-my-tasks />
         } @else {
+          <!-- Status narrows the project list, so it sits with the list, below the views. -->
+          <div class="filter">
+            @for (filter of statusFilters; track filter.value) {
+              <button class="fchip" [class.on]="statusFilter() === filter.value"
+                      (click)="setStatusFilter(filter.value)">{{ t(filter.labelKey) }}</button>
+            }
+          </div>
           <wt-list-filter-bar class="list-bar" [filters]="filters().all" [query]="query" [sortOptions]="sortOptions()" />
           @if (projects().length > 0) {
             <div class="project-grid" [class.is-loading]="loader.isLoading()">
@@ -121,14 +122,12 @@ const SCREEN_PARAMS = ['view', 'status'];
     </ng-container>
   `,
   styles: [PROJECTS_SHARED_STYLES, `
-    .filter { display:flex; gap:2px; background:var(--gray-100); border-radius:9px; padding:3px; }
-    .filter-btn { border:none; background:transparent; padding:6px 12px; border-radius:7px; font-size:12.5px; color:var(--gray-500); cursor:pointer; font-family:inherit; }
-    .filter-btn.active { background:white; color:var(--orange); font-weight:600; box-shadow:var(--shadow-sm); }
+    .filter { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
     .list-bar { margin-bottom:14px; }
     .list-pager { margin-top:14px; }
     .project-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px; }
     .project-grid.is-loading { opacity:.55; }
-    .hint { font-size:11.5px; color:var(--gray-400); }
+    .hint { font-size:12px; color:var(--gray-400); }
     .hint.danger { color:#DC2626; }
   `],
 })

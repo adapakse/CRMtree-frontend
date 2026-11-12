@@ -529,6 +529,26 @@
     "trainingMode": "Tryb szkoleniowy",
     "writeNew": "Napisz nowego maila"
   },
+  "fieldErrors": {
+    "closeDate": "Wybierz przewidywaną datę zamknięcia",
+    "company": "Podaj nazwę firmy",
+    "contactName": "Podaj imię i nazwisko osoby kontaktowej",
+    "contactTitle": "Wybierz stanowisko osoby kontaktowej",
+    "email": "Podaj adres e-mail, np. jan@firma.pl",
+    "firstContact": "Wybierz datę pierwszego kontaktu",
+    "industry": "Wybierz branżę",
+    "lostReason": "Wybierz powód przegranej",
+    "onlinePct": "Wybierz udział sprzedaży online",
+    "phone": "Podaj numer telefonu, np. +48 600 000 000",
+    "probability": "Wybierz szansę na wygraną",
+    "salesperson": "Przypisz handlowca",
+    "saveFailed": "Nie udało się zapisać. Spróbuj jeszcze raz — jeśli błąd się powtórzy, zgłoś go administratorowi.",
+    "source": "Wybierz, skąd przyszedł lead",
+    "value": "Podaj kwotę — jeśli jej nie znasz, wpisz 0",
+    "valueNegative": "Kwota nie może być ujemna",
+    "valueTooLarge": "Za duża kwota — maksymalnie 999 999 999 999",
+    "website": "Podaj adres strony firmy, np. firma.pl"
+  },
   "history": {
     "activityAdded": "Aktywność dodana: {title}",
     "activityClosed": "Aktywność zamknięta: {title}",
@@ -741,9 +761,14 @@
       "hot": "Gorący"
     },
     "history": {
+      "archived": "Lead przeniesiony do archiwum",
       "converted": "Lead skonwertowany na Partnera",
       "created": "Lead utworzony",
       "deleted": "Lead usunięty",
+      "holdCancelled": "Hold zdjęty",
+      "holdSet": "Hold do {date}",
+      "migrated": "Lead przeniesiony",
+      "testAccount": "Konto testowe",
       "updated": "Zaktualizowano lead"
     },
     "hold": {
@@ -770,11 +795,11 @@
     },
     "loadError": "Błąd ładowania leada.",
     "nip": {
-      "countryCodeRequired": "Podaj kod kraju (2 litery), np. PL",
-      "duplicate": "Ten Numer NIP jest już przypisany dla innego rekordu.",
-      "numberRequired": "Podaj numer po kodzie kraju",
-      "plTenDigits": "Dla PL wymagane 10 cyfr po kodzie kraju",
-      "required": "NIP jest wymagany"
+      "countryCodeRequired": "Zacznij od kodu kraju (2 litery), np. PL",
+      "duplicate": "Ten NIP jest już przypisany do innej firmy w CRM",
+      "numberRequired": "Po kodzie kraju wpisz numer NIP",
+      "plTenDigits": "Polski NIP ma 10 cyfr po „PL”, np. PL1234567890",
+      "required": "Podaj NIP firmy, np. PL1234567890"
     },
     "notFound": "Lead nie znaleziony.",
     "onboarding": {
@@ -975,6 +1000,7 @@
       "fillRequired": "Uzupełnij wymagane pola:",
       "fullName": "Imię i nazwisko",
       "hot": "Gorący lead",
+      "hotHint": "Klient jest blisko zakupu — lead dostanie 🔥 na liście i w kanbanie",
       "namePlaceholder": "Jan Kowalski",
       "noExtraContacts": "Brak dodatkowych kontaktów",
       "notes": "Notatki",
@@ -985,10 +1011,11 @@
       "subtitle": "Dodaj nową szansę sprzedażową",
       "taxId": "NIP",
       "taxIdErrors": {
-        "countryCode": "Podaj kod kraju (2 litery), np. PL",
-        "numberMissing": "Podaj numer po kodzie kraju",
-        "polishDigits": "Dla PL wymagane 10 cyfr po kodzie kraju",
-        "required": "NIP jest wymagany"
+        "countryCode": "Zacznij od kodu kraju (2 litery), np. PL",
+        "duplicate": "Ten NIP jest już przypisany do innej firmy w CRM",
+        "numberMissing": "Po kodzie kraju wpisz numer NIP",
+        "polishDigits": "Polski NIP ma 10 cyfr po „PL”, np. PL1234567890",
+        "required": "Podaj NIP firmy, np. PL1234567890"
       },
       "title": "Nowy lead",
       "unassigned": "— nieprzypisany —",
@@ -1321,10 +1348,10 @@
     },
     "loadError": "Błąd ładowania.",
     "nip": {
-      "countryCodeRequired": "Podaj kod kraju (2 litery), np. PL",
-      "numberRequired": "Podaj numer po kodzie kraju",
-      "plTenDigits": "Dla PL wymagane 10 cyfr po kodzie kraju",
-      "required": "NIP jest wymagany"
+      "countryCodeRequired": "Zacznij od kodu kraju (2 litery), np. PL",
+      "numberRequired": "Po kodzie kraju wpisz numer NIP",
+      "plTenDigits": "Polski NIP ma 10 cyfr po „PL”, np. PL1234567890",
+      "required": "Podaj NIP firmy, np. PL1234567890"
     },
     "notFound": "Partner nie znaleziony.",
     "onboarding": {
@@ -1477,11 +1504,11 @@
       "dwhTurnoverHint": "Obrót brutto YTD z DWH"
     },
     "taxIdErrors": {
-      "countryCode": "Podaj kod kraju (2 litery), np. PL",
-      "duplicate": "Ten Numer NIP jest już przypisany dla innego rekordu.",
-      "numberMissing": "Podaj numer po kodzie kraju",
-      "polishDigits": "Dla PL wymagane 10 cyfr po kodzie kraju",
-      "required": "NIP jest wymagany"
+      "countryCode": "Zacznij od kodu kraju (2 litery), np. PL",
+      "duplicate": "Ten NIP jest już przypisany do innej firmy w CRM",
+      "numberMissing": "Po kodzie kraju wpisz numer NIP",
+      "polishDigits": "Polski NIP ma 10 cyfr po „PL”, np. PL1234567890",
+      "required": "Podaj NIP firmy, np. PL1234567890"
     },
     "title": "Rejestr Partnerów",
     "toolbar": {
@@ -1913,6 +1940,8 @@
       "showAll": "Pokaż wszystkich partnerów z ryzykiem churn →"
     },
     "currency": {
+      "billionsPln": "{value} mld zł",
+      "millionsPln": "{value} mln zł",
       "pln": "{value} zł",
       "thousandsPln": "{value} tys. zł"
     },

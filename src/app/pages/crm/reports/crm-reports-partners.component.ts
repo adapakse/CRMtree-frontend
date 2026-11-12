@@ -62,11 +62,18 @@ function healthColor(engagement: number): string {
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div id="topbar" style="min-height:60px;background:white;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b;flex-shrink:0">{{ t('reports.partners.title') }}</span>
-  <span style="flex:1;min-width:8px"></span>
-  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
-    <select class="sel" style="max-width:150px" [(ngModel)]="groupFilter" (ngModelChange)="load()">
+<div id="topbar" style="height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
+  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#333333;flex-shrink:0">{{ t('reports.partners.title') }}</span>
+  <span style="flex:1"></span>
+  <button class="btn btn-g btn-sm" (click)="load()"><svg class="ic" viewBox="0 0 24 24" *ngIf="!loading"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg>{{ loading ? '…' : t('reports.partners.refresh') }}</button>
+</div>
+
+<!-- CONTENT -->
+<div style="flex:1;overflow-y:auto;padding:20px 24px 24px;display:flex;flex-direction:column;gap:20px">
+
+  <!-- Filtry -->
+  <div class="toolbar">
+    <select class="sel" [(ngModel)]="groupFilter" (ngModelChange)="load()">
       <option value="">{{ t('partnersList.toolbar.allGroups') }}</option>
       <option *ngFor="let g of groupNames" [value]="g">{{ g }}</option>
     </select>
@@ -74,7 +81,7 @@ function healthColor(engagement: number): string {
       <option value="">{{ t('reports.partners.filters.allPartners') }}</option>
       <option *ngFor="let p of partnerNames" [value]="p">{{ p }}</option>
     </select>
-    <select class="sel" style="max-width:190px" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
+    <select class="sel" [(ngModel)]="periodPreset" (ngModelChange)="onPresetChange()">
       <optgroup [label]="t('reports.partners.filters.currentGroup')">
         <option value="1m">{{ t('reports.partners.filters.currentMonth') }}</option>
         <option value="3m">{{ t('partnerDetail.sales.periods.last3Months') }}</option>
@@ -88,55 +95,50 @@ function healthColor(engagement: number): string {
         <option value="prev_year">{{ t('reports.partners.filters.previousYear', { year: currentYear - 1 }) }}</option>
       </optgroup>
     </select>
-    <select class="sel" style="max-width:160px" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
+    <select class="sel" *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)">
       <option value="">{{ t('partnersList.toolbar.allSalesReps') }}</option>
       <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
     </select>
-    <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap" (click)="clearRepFilter()">
+    <button *ngIf="persistRepName" class="btn btn-g btn-sm" (click)="clearRepFilter()">
       × {{ persistRepName }}
     </button>
-    <button class="btn-g" style="font-size:12px;border:1px solid #e4e4e7;border-radius:8px;padding:6px 12px;background:white;cursor:pointer;white-space:nowrap;flex-shrink:0" (click)="load()">{{ loading ? '…' : '↻ ' + t('reports.partners.refresh') }}</button>
   </div>
-</div>
-
-<!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px">
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#4DC671);border-radius:2px"></div>
 
   <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
     <div style="font-size:48px;margin-bottom:12px">📈</div>
-    <div style="font-size:15px;font-weight:600">{{ t('partnerDetail.sales.noData') }}</div>
-    <div style="font-size:13px;margin-top:4px">{{ t('reports.partners.emptyHint') }}</div>
+    <div style="font-size:16px;font-weight:600">{{ t('partnerDetail.sales.noData') }}</div>
+    <div style="font-size:14px;margin-top:4px">{{ t('reports.partners.emptyHint') }}</div>
   </div>
 
   <ng-container *ngIf="kpi">
 
   <!-- KPI ROW -->
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
-    <div class="stat-card stat-clickable" style="border-top:3px solid #f26522" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:#f26522;font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px">
+    <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
+      <div class="stat-val" style="color:#3BAA5D;font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.grossTurnoverPln') }}<wt-tooltip key="crm.partners.kpi.gross_turnover"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? '#16a34a' : '#dc2626'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ t('reports.partners.kpi.vsPrevious', { delta: deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }) }}
       </div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #22C55E" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
+    <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#22C55E;font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.revenueMarginPln') }}<wt-tooltip key="crm.partners.kpi.revenue"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.marginShare', { percent: (kpi.margin_pct | number:'1.0-1') }) }}</div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #3B82F6" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
+    <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#3B82F6;font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.feesPln') }}<wt-tooltip key="crm.partners.kpi.fees"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.kpi.feeRateShare', { percent: (kpi.fee_rate_pct | number:'1.0-1') }) }}</div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #A855F7" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
+    <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#A855F7;font-size:20px">{{ kpi.transactions_count | number }}</div>
       <div class="stat-lbl">{{ t('partnerDetail.sales.kpi.transactions') }}<wt-tooltip key="crm.partners.kpi.transactions"></wt-tooltip></div>
       <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.kpi.productsCount', { count: (kpi.pax_count | number) }) }}</div>
     </div>
-    <div class="stat-card stat-clickable" style="border-top:3px solid #F59E0B" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
+    <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#F59E0B;font-size:20px">{{ kpi.partners_count }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.activePartners') }}<wt-tooltip key="crm.partners.kpi.active_partners"></wt-tooltip></div>
       <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '#16a34a' : '#dc2626'">
@@ -151,23 +153,23 @@ function healthColor(engagement: number): string {
     <!-- Partner scorecard table -->
     <div class="card" style="padding:0;overflow:hidden">
       <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">{{ t('reports.partners.scorecard.title') }}</div>
-        <div style="display:flex;gap:6px;font-size:11px">
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.good') }}</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.medium') }}</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.poor') }}</span>
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.partners.scorecard.title') }}</div>
+        <div style="display:flex;gap:6px;font-size:12px">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.good') }}</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.medium') }}</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.poor') }}</span>
         </div>
       </div>
       <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
           <thead>
             <tr style="background:#fafafa;border-bottom:1px solid #e4e4e7">
-              <th style="padding:8px 14px;text-align:left;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.partner') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px" *ngIf="isManager">{{ t('partnersList.fields.salesRep') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.grossTurnover') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.margin') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('partnerDetail.sales.kpi.transactions') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.health') }}<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
+              <th style="padding:8px 14px;text-align:left;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.partner') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px" *ngIf="isManager">{{ t('partnersList.fields.salesRep') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.grossTurnover') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.margin') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('partnerDetail.sales.kpi.transactions') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.health') }}<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
             </tr>
           </thead>
           <tbody>
@@ -181,13 +183,13 @@ function healthColor(engagement: number): string {
                 <div style="display:flex;align-items:center;gap:8px">
                   <div [style.background]="avatarColor(p.partner_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(p.partner_name) }}</div>
                   <div>
-                    <span style="font-weight:600;color:#18181b">{{ p.partner_name }}</span>
-                    <div *ngIf="p.partner_number" style="font-size:10.5px;color:#a1a1aa;font-family:monospace">{{ p.partner_number }}</div>
+                    <span style="font-weight:600;color:#333333">{{ p.partner_name }}</span>
+                    <div *ngIf="p.partner_number" style="font-size:10px;color:#a1a1aa;font-family:monospace">{{ p.partner_number }}</div>
                   </div>
                 </div>
               </td>
-              <td *ngIf="isManager" style="padding:10px;text-align:center;font-size:11px;color:#71717a">{{ p.salesperson_name || '—' }}</td>
-              <td style="padding:10px;text-align:center;font-family:'Sora',sans-serif;font-weight:700;color:#f26522">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
+              <td *ngIf="isManager" style="padding:10px;text-align:center;font-size:12px;color:#71717a">{{ p.salesperson_name || '—' }}</td>
+              <td style="padding:10px;text-align:center;font-family:'Sora',sans-serif;font-weight:700;color:#3BAA5D">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
               <td style="padding:10px;text-align:center">
                 <div style="height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden;width:60px;margin:0 auto">
                   <div [style.width.%]="marginPct(p.gross_turnover_pln, p.revenue_pln)" [style.background]="marginColor(p.gross_turnover_pln, p.revenue_pln)" style="height:100%;border-radius:3px"></div>
@@ -198,7 +200,7 @@ function healthColor(engagement: number): string {
               <td style="padding:8px 10px;text-align:center">
                 <span [style.background]="healthBg(p.health_level)"
                       [style.color]="healthColor(p.health_level)"
-                      style="font-size:11px;font-weight:700;border-radius:10px;padding:3px 10px;white-space:nowrap;display:inline-block">
+                      style="font-size:12px;font-weight:700;border-radius:10px;padding:4px 10px;white-space:nowrap;display:inline-block">
                   {{ t('reports.partners.healthPoints', { score: p.health_score }) }}
                 </span>
               </td>
@@ -214,13 +216,13 @@ function healthColor(engagement: number): string {
     <!-- Produkty -->
     <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
       <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7">
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">{{ t('reports.partners.products.title') }}</div>
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.partners.products.title') }}</div>
       </div>
       <div style="padding:14px;display:flex;flex-direction:column;gap:10px;flex:1">
         <div *ngFor="let p of byProduct; let i = index">
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
             <span style="color:#3f3f46">{{ productIcon(p.product_type) }} {{ productLabel(p.product_type) }}</span>
-            <span style="font-weight:700;color:#f26522">{{ (p.gross_turnover_pln/1000).toFixed(0) }}k PLN</span>
+            <span style="font-weight:700;color:#3BAA5D">{{ (p.gross_turnover_pln/1000).toFixed(0) }}k PLN</span>
           </div>
           <div style="height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden">
             <div [style.width.%]="barPct(p.gross_turnover_pln, byProduct[0]?.gross_turnover_pln)" [style.background]="PROD_COLORS[i % PROD_COLORS.length]" style="height:100%;border-radius:3px;opacity:.85"></div>
@@ -237,20 +239,20 @@ function healthColor(engagement: number): string {
 
     <!-- Revenue trend chart -->
     <div class="card" style="padding:18px">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:4px">{{ t('reports.partners.trend.title') }}</div>
-      <div style="font-size:11px;color:#a1a1aa;margin-bottom:16px">{{ t('reports.partners.grossTurnoverPln') }}</div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:4px">{{ t('reports.partners.trend.title') }}</div>
+      <div style="font-size:12px;color:#a1a1aa;margin-bottom:16px">{{ t('reports.partners.grossTurnoverPln') }}</div>
       <div #revenueEl style="display:flex;align-items:flex-end;gap:4px;height:100px"></div>
       <div #revLabels style="display:flex;gap:4px;margin-top:4px"></div>
       <div style="margin-top:14px;padding-top:10px;border-top:1px solid #f4f4f5;display:flex;justify-content:space-between;font-size:12px">
         <span style="color:#71717a">{{ t('reports.partners.trend.totalTurnover') }}</span>
-        <span style="font-weight:700;color:#f26522;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }} PLN</span>
+        <span style="font-weight:700;color:#3BAA5D;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }} PLN</span>
       </div>
     </div>
 
     <!-- Handlowcy (manager) -->
     <div class="card" style="padding:18px" *ngIf="isManager">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">{{ t('reports.partners.reps.title') }}</div>
-      <div *ngFor="let r of byRep" style="margin-bottom:12px;cursor:pointer;border-radius:8px;padding:6px 8px;transition:background .12s"
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:14px">{{ t('reports.partners.reps.title') }}</div>
+      <div *ngFor="let r of byRep" style="margin-bottom:12px;cursor:pointer;border-radius:12px;padding:8px;transition:background .12s"
            (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
            (mouseleave)="$any($event.currentTarget).style.background=''"
            (click)="goToPartnersByRep(r.salesperson_id, r.salesperson_name)"
@@ -262,12 +264,12 @@ function healthColor(engagement: number): string {
             <div style="font-size:10px;color:#a1a1aa">{{ t('reports.partners.partnersCount', { count: +r.partners_count }) }}</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:12px;font-weight:700;color:#f26522">{{ (r.gross_turnover_pln/1000).toFixed(0) }}k</div>
+            <div style="font-size:12px;font-weight:700;color:#3BAA5D">{{ (r.gross_turnover_pln/1000).toFixed(0) }}k</div>
             <div style="font-size:10px;color:#22C55E">{{ t('reports.partners.marginShare', { percent: calcMargin(r.gross_turnover_pln, r.revenue_pln) }) }}</div>
           </div>
         </div>
         <div style="height:5px;background:#f4f4f5;border-radius:3px;overflow:hidden">
-          <div [style.width.%]="barPct(r.gross_turnover_pln, byRep[0]?.gross_turnover_pln)" style="height:100%;background:#f26522;border-radius:3px"></div>
+          <div [style.width.%]="barPct(r.gross_turnover_pln, byRep[0]?.gross_turnover_pln)" style="height:100%;background:#3BAA5D;border-radius:3px"></div>
         </div>
       </div>
       <div *ngIf="!byRep.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">{{ t('reports.partners.noData') }}</div>
@@ -275,21 +277,21 @@ function healthColor(engagement: number): string {
 
     <!-- Podsumowanie finansowe -->
     <div class="card" style="padding:18px">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px">{{ t('reports.partners.summary.title') }}</div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:14px">{{ t('reports.partners.summary.title') }}</div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px">
-          <span style="font-size:12px;color:#9a3412">{{ t('reports.partners.columns.grossTurnover') }}</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:#f26522">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px">
+          <span style="font-size:12px;color:#166534">{{ t('reports.partners.columns.grossTurnover') }}</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;color:#3BAA5D">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px">
           <span style="font-size:12px;color:#166534">{{ t('reports.partners.summary.revenueMargin') }}</span>
           <span style="font-family:'Sora',sans-serif;font-weight:700;color:#22C55E">{{ kpi.revenue_pln | number:'1.0-0' }}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px">
           <span style="font-size:12px;color:#1d4ed8">{{ t('reports.partners.summary.feesCommissions') }}</span>
           <span style="font-family:'Sora',sans-serif;font-weight:700;color:#3B82F6">{{ kpi.fees_pln | number:'1.0-0' }}</span>
         </div>
-        <div style="margin-top:4px;padding:12px;background:#fafafa;border-radius:8px;display:flex;flex-direction:column;gap:5px;font-size:12px">
+        <div style="margin-top:4px;padding:12px;background:#fafafa;border-radius:12px;display:flex;flex-direction:column;gap:4px;font-size:12px">
           <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('reports.partners.summary.marginPct') }}</span><span style="font-weight:700">{{ kpi.margin_pct | number:'1.0-1' }}%</span></div>
           <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('reports.partners.summary.feeRate') }}</span><span style="font-weight:700">{{ kpi.fee_rate_pct | number:'1.0-1' }}%</span></div>
           <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('partnerDetail.sales.kpi.transactions') }}</span><span style="font-weight:700">{{ kpi.transactions_count | number }}</span></div>
@@ -302,9 +304,9 @@ function healthColor(engagement: number): string {
   <!-- ROW CHURN: Widget ryzyka churn -->
   <div class="card" style="padding:18px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;flex:1">{{ t('reports.partners.churn.title') }}</span>
+      <span style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;flex:1">{{ t('reports.partners.churn.title') }}</span>
       <span *ngIf="churnRows.filter(r => r.risk_level === 'critical').length > 0"
-            style="background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px">
+            style="background:#FEE2E2;color:#991B1B;font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px">
         {{ t('reports.partners.churn.criticalCount', { count: churnRows.filter(r => r.risk_level === 'critical').length }) }}
       </span>
     </div>
@@ -314,21 +316,21 @@ function healthColor(engagement: number): string {
     <div *ngIf="!churnLoading && churnRows.length > 0" style="display:flex;flex-direction:column;gap:6px">
       <div *ngFor="let p of churnRows.slice(0, 5)"
            (click)="goToPartner(p.partner_id)"
-           style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;transition:background .12s"
+           style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:8px 12px;border-radius:12px;transition:background .12s"
            (mouseenter)="$any($event.currentTarget).style.background='#fafafa'"
            (mouseleave)="$any($event.currentTarget).style.background=''">
-        <span [style.background]="p.risk_level === 'critical' ? '#FEE2E2' : p.risk_level === 'high' ? '#FED7AA' : p.risk_level === 'medium' ? '#FEF3C7' : '#DBEAFE'"
-              [style.color]="p.risk_level === 'critical' ? '#991B1B' : p.risk_level === 'high' ? '#9A3412' : p.risk_level === 'medium' ? '#92400E' : '#1E40AF'"
-              style="font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px;white-space:nowrap;flex-shrink:0">
+        <span [style.background]="p.risk_level === 'critical' ? '#FEE2E2' : p.risk_level === 'high' ? '#BBF7D0' : p.risk_level === 'medium' ? '#FEF3C7' : '#DBEAFE'"
+              [style.color]="p.risk_level === 'critical' ? '#991B1B' : p.risk_level === 'high' ? '#166534' : p.risk_level === 'medium' ? '#92400E' : '#1E40AF'"
+              style="font-size:12px;font-weight:700;border-radius:16px;padding:2px 8px;white-space:nowrap;flex-shrink:0">
           {{ churnRiskLabel(p.risk_level) }}
         </span>
-        <span style="flex:1;font-size:13px;font-weight:600;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
+        <span style="flex:1;font-size:14px;font-weight:600;color:#333333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
         <span style="font-size:12px;font-weight:700;color:#52525b;flex-shrink:0">{{ t('partnersList.churn.points', { score: p.total_score }) }}</span>
-        <span style="font-size:11px;color:#a1a1aa;flex-shrink:0">{{ t('reports.partners.churn.daysShort', { days: p.days_since_order }) }}</span>
+        <span style="font-size:12px;color:#a1a1aa;flex-shrink:0">{{ t('reports.partners.churn.daysShort', { days: p.days_since_order }) }}</span>
       </div>
     </div>
     <a routerLink="/crm/dashboard" [queryParams]="{tab: 'churn'}"
-       style="display:block;margin-top:14px;font-size:12.5px;color:#3BAA5D;font-weight:600;text-decoration:none"
+       style="display:block;margin-top:14px;font-size:12px;color:#3BAA5D;font-weight:600;text-decoration:none"
        (mouseenter)="$any($event.currentTarget).style.textDecoration='underline'"
        (mouseleave)="$any($event.currentTarget).style.textDecoration='none'">
       {{ t('reports.partners.churn.showAll') }} →
@@ -338,11 +340,11 @@ function healthColor(engagement: number): string {
   <!-- ROW 4: Pełna tabela partnerów -->
   <div class="card" style="padding:0;overflow:hidden">
     <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b">{{ t('reports.partners.allPartners.title') }}</div>
-      <span style="font-size:11px;color:#a1a1aa">{{ t('reports.partners.partnersCount', { count: filteredByPartner.length }) }}</span>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.partners.allPartners.title') }}</div>
+      <span style="font-size:12px;color:#a1a1aa">{{ t('reports.partners.partnersCount', { count: filteredByPartner.length }) }}</span>
     </div>
     <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead>
           <tr style="background:#fafafa;border-bottom:1px solid #e4e4e7">
             <th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.partner') }}</th>
@@ -363,23 +365,23 @@ function healthColor(engagement: number): string {
               (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
               (mouseleave)="$any($event.currentTarget).style.background=''"
               [title]="p.partner_id ? t('reports.partners.openPartnerTooltip') : ''">
-            <td style="padding:9px 14px">
-              <span *ngIf="p.partner_id" style="font-weight:600;color:#f26522">{{ p.partner_name }}</span>
+            <td style="padding:8px 14px">
+              <span *ngIf="p.partner_id" style="font-weight:600;color:#3BAA5D">{{ p.partner_name }}</span>
               <span *ngIf="!p.partner_id" style="color:#71717a">{{ p.partner_name }}</span>
             </td>
-            <td *ngIf="isManager" style="padding:9px 10px;color:#a1a1aa;font-size:12px">{{ p.salesperson_name || '—' }}</td>
-            <td style="padding:9px 10px;text-align:right;font-weight:700;color:#f26522;font-family:'Sora',sans-serif">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right;color:#3f3f46">{{ p.net_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right;color:#3b82f6">{{ p.fees_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right;color:#22C55E;font-weight:600">{{ p.revenue_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right">
-              <span [style.background]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#dcfce7' : '#f4f4f5'" [style.color]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#166534' : '#71717a'" style="border-radius:4px;padding:1px 6px;font-size:11px">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</span>
+            <td *ngIf="isManager" style="padding:8px 10px;color:#a1a1aa;font-size:12px">{{ p.salesperson_name || '—' }}</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#3BAA5D;font-family:'Sora',sans-serif">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:#3f3f46">{{ p.net_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:#3b82f6">{{ p.fees_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:#22C55E;font-weight:600">{{ p.revenue_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right">
+              <span [style.background]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#dcfce7' : '#f4f4f5'" [style.color]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#166534' : '#71717a'" style="border-radius:999px;padding:2px 8px;font-size:12px">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</span>
             </td>
-            <td style="padding:9px 10px;text-align:right;color:#71717a">{{ p.transactions_count }}</td>
-            <td style="padding:9px 10px;text-align:center">
+            <td style="padding:8px 10px;text-align:right;color:#71717a">{{ p.transactions_count }}</td>
+            <td style="padding:8px 10px;text-align:center">
               <span [style.background]="healthBg(p.health_level)"
                     [style.color]="healthColor(p.health_level)"
-                    style="font-size:11px;font-weight:700;border-radius:10px;padding:2px 9px;white-space:nowrap;display:inline-block">
+                    style="font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px;white-space:nowrap;display:inline-block">
                 {{ t('reports.partners.healthPoints', { score: p.health_score }) }}
               </span>
             </td>
@@ -390,14 +392,14 @@ function healthColor(engagement: number): string {
         </tbody>
         <tfoot *ngIf="kpi && filteredByPartner.length">
           <tr style="background:#fafafa;border-top:2px solid #e4e4e7;font-weight:700">
-            <td style="padding:9px 14px">{{ t('reports.partners.allPartners.total') }}</td>
+            <td style="padding:8px 14px">{{ t('reports.partners.allPartners.total') }}</td>
             <td *ngIf="isManager"></td>
-            <td style="padding:9px 10px;text-align:right;color:#f26522;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right">{{ kpi.net_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right;color:#3b82f6">{{ kpi.fees_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right;color:#22C55E">{{ kpi.revenue_pln | number:'1.0-0' }}</td>
-            <td style="padding:9px 10px;text-align:right">{{ kpi.margin_pct | number:'1.0-1' }}%</td>
-            <td style="padding:9px 10px;text-align:right">{{ kpi.transactions_count | number }}</td>
+            <td style="padding:8px 10px;text-align:right;color:#3BAA5D;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right">{{ kpi.net_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:#3b82f6">{{ kpi.fees_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:#22C55E">{{ kpi.revenue_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right">{{ kpi.margin_pct | number:'1.0-1' }}%</td>
+            <td style="padding:8px 10px;text-align:right">{{ kpi.transactions_count | number }}</td>
             <td></td>
           </tr>
         </tfoot>
@@ -411,24 +413,23 @@ function healthColor(engagement: number): string {
 </ng-container>
   `,
   styles: [`
-    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
-    .sel:focus { border-color:var(--orange); }
-    .btn-g { background:transparent;color:#52525b;border:1px solid #e4e4e7 }
-    .btn-g:hover { background:#fafafa }
-    .stat-card { background:white;border:1px solid #e4e4e7;border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.08) }
+    /* Filter card under the title bar — same as the leads list (shadow/radius/padding from global .toolbar). */
+    .toolbar { background:white; display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; flex-shrink:0; }
+    input[type=search] { height:36px; box-sizing:border-box; }
+    input[type=month] { height:36px; box-sizing:border-box; }
+    .btn-sm { height:36px; }
     .stat-clickable { cursor:pointer;transition:box-shadow .12s,border-color .12s,transform .1s }
-    .stat-clickable:hover { box-shadow:0 4px 12px rgba(0,0,0,.12);border-color:#3BAA5D;transform:translateY(-1px) }
-    .stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#18181b;margin-bottom:2px }
+    .stat-clickable:hover { box-shadow:var(--shadow);transform:translateY(-2px) }
+    .stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#333333;margin-bottom:2px }
     .stat-lbl { font-size:12px;color:#a1a1aa;font-weight:500 }
-    .stat-trend { font-size:11px;margin-top:6px;font-weight:600 }
-    .card { background:white;border:1px solid #e4e4e7;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08) }
+    .stat-trend { font-size:12px;margin-top:6px;font-weight:600 }
   `],
 })
 export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
   @ViewChild('revenueEl', { static: false }) revenueEl!: ElementRef;
   @ViewChild('revLabels', { static: false }) revLabels!: ElementRef;
 
-  readonly PROD_COLORS = ['#f26522','#3B82F6','#22C55E','#A855F7','#F59E0B','#06B6D4','#EC4899','#84CC16','#EF4444','#6B7280'];
+  readonly PROD_COLORS = ['#3BAA5D','#3B82F6','#22C55E','#A855F7','#F59E0B','#06B6D4','#EC4899','#84CC16','#EF4444','#6B7280'];
 
   private api    = inject(CrmApiService);
   private auth   = inject(AuthService);
@@ -587,8 +588,8 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
       const col = document.createElement('div');
       col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px';
       col.innerHTML = `
-        <div style="font-size:9px;font-weight:700;color:${isLast?'#f26522':'#a1a1aa'}">${d.gross_turnover_pln>0?(d.gross_turnover_pln/1000).toFixed(0)+'k':''}</div>
-        <div style="width:100%;height:${h}px;background:${isLast?'#f26522':'#FED7AA'};border-radius:3px 3px 0 0"></div>`;
+        <div style="font-size:10px;font-weight:700;color:${isLast?'#3BAA5D':'#a1a1aa'}">${d.gross_turnover_pln>0?(d.gross_turnover_pln/1000).toFixed(0)+'k':''}</div>
+        <div style="width:100%;height:${h}px;background:${isLast?'#3BAA5D':'#BBF7D0'};border-radius:3px 3px 0 0"></div>`;
       el.appendChild(col);
       const lbl = document.createElement('div');
       lbl.style.cssText = 'flex:1;text-align:center;font-size:10px;color:#a1a1aa';

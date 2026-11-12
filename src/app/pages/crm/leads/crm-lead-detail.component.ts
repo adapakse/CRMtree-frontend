@@ -1,5 +1,6 @@
 // src/app/pages/crm/leads/crm-lead-detail.component.ts
 import { Component, OnInit, OnDestroy, Input, inject, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
+import { ActTypeIconComponent } from './act-type-icon.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { sanitizeEmailHtml } from '../../../shared/utils/email-html.util';
 import { CommonModule } from '@angular/common';
@@ -39,6 +40,9 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { leadSourceLabelKey } from '../../../core/i18n/crm-label-keys';
 import { localizedApiErrorMessage } from '../../../core/services/api-error.util';
+import { PhoneInputComponent } from '../../../shared/components/phone-input/phone-input.component';
+import { describeHttpError } from '../../../core/services/http-error-message';
+import { amountError, scrollToFirstFieldError } from '../../../shared/utils/field-error.util';
 
 // One WhatsApp conversation = all messages with a single counterpart phone
 // number. Numbers are never merged into each other's history.
@@ -58,76 +62,76 @@ interface WhatsappConvUiState {
 @Component({
   selector: 'wt-crm-lead-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
+  imports: [CommonModule, RouterModule, FormsModule, PhoneInputComponent, ActTypeIconComponent, ActivityCountBadgeComponent, PhoneCallSimulatorComponent, QuillModule,
             AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
-<div style="display:flex;flex-direction:column;height:100%;overflow:hidden" *ngIf="lead">
+<div style="display:flex;flex-direction:column;height:100%;overflow:hidden;padding:24px;box-sizing:border-box;gap:24px" *ngIf="lead">
 
   <!-- HEADER -->
-  <div style="height:56px;background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0">
-    <button style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px" routerLink="/crm/leads">← {{ t('leadDetail.header.backToLeads') }}</button>
-    <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
-      <div *ngIf="lead.logo_url && logoSasUrl" style="width:34px;height:34px;border-radius:50%;background-size:cover;background-position:center;border:1px solid #e5e7eb;flex-shrink:0;background-color:#f9fafb"
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0">
+    <button type="button" class="back-link" routerLink="/crm/leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>{{ t('leadDetail.header.backToLeads') }}</button>
+    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+      <div *ngIf="lead.logo_url && logoSasUrl" style="width:36px;height:36px;border-radius:50%;background-size:cover;background-position:center;box-shadow:var(--shadow-sm);flex-shrink:0;background-color:#f9fafb"
            [style.background-image]="logoSasUrl"></div>
-      <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{lead.company}}</div>
+      <h1 style="font-size:22px;font-weight:800;margin:0;color:#333333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{lead.company}}</h1>
     </div>
     <span class="stage-badge"
           [style.background]="stages.pillBackground(lead.stage)"
           [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span>
-    <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700">🔥 {{ t('leadDetail.header.hot') }}</span>
-    <span *ngIf="lead.hold_active" style="background:#e5e7eb;color:#374151;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700" title="{{lead.hold_reason}}">⏸️ {{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
-    <div style="display:flex;gap:6px">
-      <button class="hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
+    <span *ngIf="lead.hot" style="background:#fef3c7;color:#92400e;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥{{ t('leadDetail.header.hot') }}</span>
+    <span *ngIf="lead.hold_active" style="background:#e5e7eb;color:#374151;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-g btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
               [style.background]="lead.hold_active ? '#e5e7eb' : ''"
               [style.color]="lead.hold_active ? '#374151' : ''"
               (click)="openHoldModal()"
               [title]="lead.hold_active ? t('leadDetail.hold.editTooltip', { date: (lead.hold_until | date:'dd.MM.yyyy') }) : t('leadDetail.hold.set')">
         ⏸️ {{ lead.hold_active ? t('leadDetail.hold.active') : t('leadDetail.hold.label') }}
       </button>
-      <button class="hdr-btn" *ngIf="canEdit && lead.stage !== 'archived'" (click)="archiveLead()" [title]="t('leadDetail.archive.tooltip')">
+      <button class="btn btn-g btn-sm hdr-btn" *ngIf="canEdit && lead.stage !== 'archived'" (click)="archiveLead()" [title]="t('leadDetail.archive.tooltip')">
         🗄️ {{ t('leadDetail.archive.action') }}
       </button>
-      <button class="hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        [title]="t('calls.callNumber', { phone: lead.phone })">📞</button>
-      <button class="hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  [title]="t('email.addressTooltip', { email: lead.email })">
+      <button class="btn btn-g btn-sm hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        [title]="t('calls.callNumber', { phone: lead.phone })">📞</button>
+      <button class="btn btn-g btn-sm hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  [title]="t('email.addressTooltip', { email: lead.email })">
         ✉️ {{ t('email.label') }}
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
-      <button class="hdr-btn hdr-btn-edit" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('leadDetail.edit.title') : t('leadDetail.edit.noPermission')">✏️ {{ t('leadDetail.header.edit') }}</button>
-      <button class="hdr-btn hdr-btn-test" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" [title]="t('leadDetail.testAccount.openTooltip')">
+      <button class="btn btn-g btn-sm hdr-btn" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('leadDetail.edit.title') : t('leadDetail.edit.noPermission')">✏️ {{ t('leadDetail.header.edit') }}</button>
+      <button class="btn btn-g btn-sm hdr-btn" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" [title]="t('leadDetail.testAccount.openTooltip')">
         🖥️ {{ t('leadDetail.testAccount.title') }}
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
         <span *ngIf="testAccount?.status==='error'"   class="ta-badge-err">!</span>
       </button>
-      <button class="hdr-btn hdr-btn-primary" *ngIf="!lead.converted_at && canEdit" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }}</button>
+      <button class="btn btn-p btn-sm hdr-btn" *ngIf="!lead.converted_at && canEdit" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }}</button>
     </div>
   </div>
 
   <!-- BODY: 3 kolumny -->
-  <div [style.grid-template-columns]="leftCollapsed ? '32px 1fr 252px' : '252px 1fr 252px'" style="flex:1;display:grid;gap:0;overflow:hidden;min-height:0">
+  <div [style.grid-template-columns]="leftCollapsed ? '32px 1fr 260px' : '260px 1fr 260px'" style="flex:1;display:grid;gap:16px;overflow:hidden;min-height:0">
 
     <!-- LEWA: Informacje -->
-    <div style="border-right:1px solid #e5e7eb;display:flex;flex-direction:column;min-height:0" [class.left-panel-collapsed]="leftCollapsed">
+    <div class="lead-card" style="display:flex;flex-direction:column;min-height:0" [class.left-panel-collapsed]="leftCollapsed">
       <div class="left-panel-hdr">
         <span *ngIf="!leftCollapsed" class="left-panel-title">{{ t('leadDetail.info.title') }}</span>
-        <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')">{{leftCollapsed?'›':'‹'}}</button>
+        <button type="button" class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')" [attr.aria-label]="leftCollapsed ? t('leadDetail.info.expandPanel') : t('leadDetail.info.collapsePanel')">@if (leftCollapsed) { <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg> } @else { <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></svg> }</button>
       </div>
-      <div *ngIf="!leftCollapsed" style="padding:0 16px 16px;overflow-y:auto;flex:1">
+      <div *ngIf="!leftCollapsed" style="padding:16px;overflow-y:auto;flex:1">
 
       <!-- Firma -->
       <div class="info-section">
         <div class="info-section-title">{{ t('leadDetail.sections.company') }}</div>
         <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.name') }}</span><span class="val fw">{{lead.company}}</span></div>
-        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">{{ t('leadDetail.fields.nip') }}</span><span class="val" style="font-family:monospace">{{lead.nip}}</span></div>
+        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">{{ t('leadDetail.fields.nip') }}</span><span class="val">{{lead.nip}}</span></div>
         <div class="info-kv" *ngIf="lead.website">
           <span class="lbl">{{ t('leadDetail.fields.www') }}</span>
-          <span class="val"><a class="link" [href]="'https://'+lead.website" target="_blank">{{lead.website}}</a></span>
+          <span class="val val-line"><a class="link" [href]="'https://'+lead.website" target="_blank" [title]="lead.website">{{lead.website}}</a></span>
         </div>
         <div class="info-kv" *ngIf="lead.industry"><span class="lbl">{{ t('leadDetail.fields.industry') }}</span><span class="val">{{lead.industry}}</span></div>
-        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;font-size:11px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥 {{ t('leadDetail.fields.hotLead') }}</div>
-        <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:2px;background:#f3f4f6;color:#374151;font-size:11px;padding:6px 10px;border-radius:8px;font-weight:600;margin-top:4px">
-          <span>⏸️ {{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
+        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥{{ t('leadDetail.fields.hotLead') }}</div>
+        <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:4px;background:#f3f4f6;color:#374151;font-size:12px;padding:8px 12px;border-radius:10px;font-weight:600;margin-top:4px">
+          <span style="display:inline-flex;align-items:center;gap:4px">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
           <span style="font-weight:400;color:#6b7280">{{lead.hold_reason}}</span>
         </div>
       </div>
@@ -141,16 +145,16 @@ interface WhatsappConvUiState {
         </div>
         <div class="info-kv" *ngIf="lead.email">
           <span class="lbl">{{ t('leadDetail.fields.email') }}</span>
-          <span class="val" style="display:flex;align-items:center;gap:4px">
-            <a class="link" href="mailto:{{lead.email}}">{{lead.email}}</a>
-            <button style="background:none;border:none;cursor:pointer;font-size:12px;opacity:.6" (click)="openEmailCompose()" [title]="t('email.send')">✉️</button>
+          <span class="val val-line">
+            <a class="link" href="mailto:{{lead.email}}" [title]="lead.email">{{lead.email}}</a>
+            <button class="info-icon-btn" (click)="openEmailCompose()" [title]="t('email.send')">✉️</button>
           </span>
         </div>
         <div class="info-kv" *ngIf="lead.phone">
           <span class="lbl">{{ t('leadDetail.fields.phone') }}</span>
-          <span class="val">
-            <a class="link" href="tel:{{lead.phone}}">{{lead.phone}}</a>
-            <button *ngIf="canEdit" style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;opacity:.6" (click)="mockCall()" [title]="t('calls.call')">📞</button>
+          <span class="val val-line">
+            <a class="link" href="tel:{{lead.phone}}" [title]="lead.phone">{{lead.phone}}</a>
+            <button *ngIf="canEdit" class="info-icon-btn" (click)="mockCall()" [title]="t('calls.call')">📞</button>
           </span>
         </div>
       </div>
@@ -163,8 +167,8 @@ interface WhatsappConvUiState {
             <div style="font-size:12px;font-weight:600;color:#374151">
               {{ec.contact_name || '—'}}<span style="color:#9ca3af;font-weight:400" *ngIf="ec.contact_title"> · {{ec.contact_title}}</span>
             </div>
-            <div *ngIf="ec.email" style="font-size:11px;color:#6b7280;margin-top:2px"><a class="link" href="mailto:{{ec.email}}">{{ec.email}}</a></div>
-            <div *ngIf="ec.phone" style="font-size:11px;color:#6b7280;margin-top:1px"><a class="link" href="tel:{{ec.phone}}">{{ec.phone}}</a></div>
+            <div *ngIf="ec.email" style="font-size:12px;color:#6b7280;margin-top:2px"><a class="link" href="mailto:{{ec.email}}">{{ec.email}}</a></div>
+            <div *ngIf="ec.phone" style="font-size:12px;color:#6b7280;margin-top:1px"><a class="link" href="tel:{{ec.phone}}">{{ec.phone}}</a></div>
           </div>
         }
       </div>
@@ -193,7 +197,7 @@ interface WhatsappConvUiState {
         <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.probability') }}</span><span class="val">{{lead.probability||0}}%</span></div>
         <div class="info-kv" *ngIf="lead.value_pln">
           <span class="lbl">{{ t('leadDetail.fields.annualTurnover') }}</span>
-          <span class="val" style="color:#f97316;font-family:'Sora',sans-serif;font-weight:700">{{lead.value_pln|number:'1.0-0'}} {{lead.annual_turnover_currency||'PLN'}}</span>
+          <span class="val" style="color:var(--orange-dark);font-weight:600">{{lead.value_pln|number:'1.0-0'}} {{lead.annual_turnover_currency||'PLN'}}</span>
         </div>
         <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">{{ t('leadDetail.fields.onlinePct') }}</span><span class="val">{{lead.online_pct}}%</span></div>
         <div class="info-kv" *ngIf="lead.source"><span class="lbl">{{ t('leadDetail.fields.source') }}</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
@@ -207,7 +211,7 @@ interface WhatsappConvUiState {
       <div class="info-section" *ngIf="lead.tags?.length || lead.notes">
         <div class="info-section-title">{{ t('leadDetail.sections.notes') }}</div>
         <div *ngIf="lead.tags?.length" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
-          <span *ngFor="let t of lead.tags" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px">{{t}}</span>
+          <span *ngFor="let t of lead.tags" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:12px">{{t}}</span>
         </div>
         <div *ngIf="lead.notes" style="font-size:12px;color:#6b7280;white-space:pre-line;line-height:1.5">{{lead.notes}}</div>
       </div>
@@ -221,21 +225,21 @@ interface WhatsappConvUiState {
       }
 
       <!-- Zgody marketingowe -->
-      <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:12px">✅ {{ t('consents.title') }}</div>
+      <div class="info-section">
+        <div class="info-section-title" style="margin-bottom:12px">✅ {{ t('consents.title') }}</div>
         <div *ngIf="consentLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:14px">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:5px">
-            <div style="font-size:11.5px;font-weight:600;color:#374151;line-height:1.4;flex:1">{{ct.label}}</div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
+            <div style="font-size:12px;font-weight:600;color:#374151;line-height:1.4;flex:1">{{ct.label}}</div>
             <button (click)="toggleConsentExpand(ct.consent_key)"
                     style="background:none;border:none;cursor:pointer;font-size:10px;color:#9ca3af;white-space:nowrap;padding:0;flex-shrink:0;line-height:1.8">
               {{expandedConsent===ct.consent_key ? '▲ ' + t('consents.collapse') : '▾ ' + t('consents.details')}}
             </button>
           </div>
           <div *ngIf="expandedConsent===ct.consent_key"
-               style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:6px;padding:8px 10px;margin-bottom:7px;line-height:1.55;border-left:3px solid #e5e7eb">
+               style="font-size:12px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:8px 12px;margin-bottom:8px;line-height:1.55">
             {{ct.description}}
-            <div *ngIf="ct.updated_at" style="margin-top:5px;font-size:10px;color:#9ca3af">
+            <div *ngIf="ct.updated_at" style="margin-top:4px;font-size:10px;color:#9ca3af">
               {{ t('consents.lastChange') }} {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
               <span *ngIf="ct.updated_by_name"> · {{ct.updated_by_name}}</span>
             </div>
@@ -247,17 +251,15 @@ interface WhatsappConvUiState {
                     [style.color]="consentDraft[ct.consent_key]===v.val ? 'white' : '#6b7280'"
                     [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : '#e5e7eb')"
                     [style.cursor]="canEditConsents ? 'pointer' : 'default'"
-                    style="flex:1;font-size:10.5px;font-weight:600;padding:5px 2px;border-radius:6px;transition:all .12s;text-align:center;line-height:1.3">
+                    style="flex:1;font-size:10px;font-weight:600;padding:6px 2px;border-radius:8px;transition:all .12s;text-align:center;line-height:1.3;font-family:inherit">
               {{ t(v.labelKey) }}
             </button>
           </div>
         </div>
-        <button *ngIf="canEditConsents && consents.length" (click)="saveConsents()"
+        <button *ngIf="canEditConsents && consents.length" class="btn btn-sm" (click)="saveConsents()"
+                [class.btn-p]="consentsDirty" [class.btn-g]="!consentsDirty"
                 [disabled]="savingConsents || !consentsDirty"
-                style="width:100%;margin-top:2px;font-size:12px;padding:7px;border-radius:8px;cursor:pointer;font-weight:600;border:none;transition:background .15s"
-                [style.background]="consentsDirty ? '#3BAA5D' : '#f4f4f5'"
-                [style.color]="consentsDirty ? 'white' : '#a1a1aa'"
-                [style.cursor]="consentsDirty ? 'pointer' : 'default'">
+                style="width:100%;margin-top:4px">
           {{savingConsents ? t('consents.saving') : consentsDirty ? '💾 ' + t('consents.save') : '✓ ' + t('consents.saved')}}
         </button>
       </div>
@@ -266,45 +268,45 @@ interface WhatsappConvUiState {
     </div>
 
     <!-- ŚRODEK: Aktywności (tabs: Aktywności | Historia) -->
-    <div style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+    <div class="lead-card" style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
 
       <!-- STAGE STEPPER BAR -->
-      <div style="background:white;border-bottom:1px solid #e5e7eb;padding:10px 12px;flex-shrink:0;display:flex;align-items:center;gap:8px">
+      <div style="background:white;border-bottom:1px solid #f3f4f6;padding:12px 16px;flex-shrink:0;display:flex;align-items:center;gap:8px">
         <!-- Onboarding in progress: blue banner -->
         <ng-container *ngIf="lead.stage==='onboarding'">
           <span style="font-size:15px">⏳</span>
-          <span style="color:#1d4ed8;font-weight:700;font-size:13px">{{ t('leadDetail.onboarding.inProgress') }}</span>
+          <span style="color:#1d4ed8;font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.inProgress') }}</span>
           <span style="font-size:12px;color:#6b7280;margin-left:4px">— {{ t('leadDetail.onboarding.partnerInProgress') }}</span>
           <span style="flex:1"></span>
-          <span style="font-size:11px;color:#9ca3af">{{ t('leadDetail.onboarding.leadLocked') }}</span>
+          <span style="font-size:12px;color:#9ca3af">{{ t('leadDetail.onboarding.leadLocked') }}</span>
           <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.panelLink') }}</a>
         </ng-container>
         <!-- Onboarded: locked banner -->
         <ng-container *ngIf="lead.stage==='onboarded'">
           <span style="font-size:15px">✅</span>
-          <span style="color:#15803d;font-weight:700;font-size:13px">{{ t('leadDetail.onboarding.completedPartnerActive') }}</span>
+          <span style="color:#15803d;font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.completedPartnerActive') }}</span>
           <span style="flex:1"></span>
-          <span style="font-size:11px;color:#9ca3af">{{ t('leadDetail.onboarding.leadLocked') }}</span>
+          <span style="font-size:12px;color:#9ca3af">{{ t('leadDetail.onboarding.leadLocked') }}</span>
           <a routerLink="/crm/partners" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.partnerRegistryLink') }}</a>
         </ng-container>
         <!-- Closed lost: red banner mode -->
         <ng-container *ngIf="stages.isLost(lead.stage)">
           <span style="font-size:15px">⛔</span>
-          <span style="color:#dc2626;font-weight:700;font-size:13px">{{ stageLabel(lead.stage) }}</span>
+          <span style="color:#dc2626;font-weight:700;font-size:14px">{{ stageLabel(lead.stage) }}</span>
           <span *ngIf="lead.lost_reason" style="font-size:12px;color:#991b1b">· {{lead.lost_reason}}</span>
           <span style="flex:1"></span>
-          <button *ngIf="canEdit" class="stage-arrow-btn" style="color:#15803d;border-color:#bbf7d0;font-size:12px;padding:4px 12px" (click)="quickChangeStage(entryStageKey)">↩ {{ t('leadDetail.stage.backToNew') }}</button>
+          <button *ngIf="canEdit" class="btn btn-g btn-sm" style="color:#15803d" (click)="quickChangeStage(entryStageKey)">↩ {{ t('leadDetail.stage.backToNew') }}</button>
         </ng-container>
         <!-- Normal stepper mode -->
         <ng-container *ngIf="!stages.isLost(lead.stage) && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
           <button class="stage-arrow-btn" [disabled]="!prevStage() || !canEdit" (click)="quickChangeStage(prevStage()!)" [title]="t('leadDetail.stage.previous')">‹</button>
           <div style="flex:1;display:flex;align-items:flex-start;padding-top:2px">
             <ng-container *ngFor="let s of orderedStageOptions; let last=last">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
-                <div class="stepper-dot" [ngStyle]="stepperDotStyle(s.key)"
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div class="stepper-slot"><div class="stepper-dot" [ngStyle]="stepperDotStyle(s.key)"
                      (click)="isStageAllowed(s.key) && canEdit && quickChangeStage(s.key)"
                      [style.cursor]="canEdit && isStageAllowed(s.key) ? 'pointer' : 'default'"
-                     [title]="s.label"></div>
+                     [title]="s.label"></div></div>
                 <div class="stepper-label" [ngStyle]="stepperLabelStyle(s.key)">{{s.label}}</div>
               </div>
               <div *ngIf="!last" style="flex:0 0 8px;height:2px;margin-top:8px;border-radius:1px"
@@ -313,11 +315,11 @@ interface WhatsappConvUiState {
           </div>
           <button class="stage-arrow-btn" [disabled]="!nextStage() || !canEdit" (click)="quickChangeStage(nextStage()!)" [title]="t('leadDetail.stage.next')">›</button>
           <!-- Awaryjne wyjście w przegraną istnieje tylko, gdy tenant ma taki etap -->
-          <button *ngIf="canEdit && !stages.isWon(lead.stage) && stages.lostKey() as lostKey" class="stage-arrow-btn" style="color:#dc2626;border-color:#fecaca;font-size:12px;padding:4px 8px" (click)="quickChangeStage(lostKey)" [title]="stageLabel(lostKey)">⛔</button>
+          <button *ngIf="canEdit && !stages.isWon(lead.stage) && stages.lostKey() as lostKey" class="stage-arrow-btn" style="color:#dc2626;border-color:#fecaca" (click)="quickChangeStage(lostKey)" [title]="stageLabel(lostKey)">⛔</button>
         </ng-container>
       </div>
 
-      <div style="display:flex;align-items:center;border-bottom:1px solid #e5e7eb;padding:0 16px;background:white;flex-shrink:0;gap:0;flex-wrap:wrap">
+      <div class="tabs one-line" style="padding:0 16px;margin-bottom:0;background:white;flex-shrink:0">
         <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
           {{ t('activity.tabs.all') }}
           <wt-activity-count-badge [activities]="lead.activities||[]"></wt-activity-count-badge>
@@ -340,34 +342,34 @@ interface WhatsappConvUiState {
         <wt-entity-attachments sourceType="lead" [sourceId]="lead.id" [aggregate]="true" (sourceOpened)="openAttachmentSource($event)"></wt-entity-attachments>
       </div>
       <div *ngIf="midTab!=='attachments' && midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ {{ t('activity.add') }}</button>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-p btn-sm" *ngIf="canEdit" (click)="openNewActivityForm()">+ {{ t('activity.add') }}</button>
         </div>
 
         <wt-linked-project-tasks *ngIf="midTab==='tasks' || midTab==='all'"
                                  sourceType="lead" [sourceId]="lead.id" [sourceName]="lead.company"></wt-linked-project-tasks>
 
         <!-- Nowa aktywność form -->
-        <div *ngIf="showNewActivity" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">
-            {{actIcon(actForm.type)}} {{actTypeName(actForm.type)}}
+        <div *ngIf="showNewActivity" class="lead-form-box" style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D;display:flex;align-items:center;gap:4px">
+            <wt-act-type-icon [type]="actForm.type"></wt-act-type-icon> {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
           <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('meetings.titleRequiredPlaceholder')" class="act-input">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px;align-items:start">
-            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.dueDate') }}
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;align-items:start">
+            <label style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.dueDate') }}
               <div style="position:relative">
                 <div *ngIf="actDueDateOpen" style="position:fixed;inset:0;z-index:99" (click)="actDueDateOpen=false"></div>
                 <button type="button" class="act-input"
-                        style="display:flex;align-items:center;gap:4px;width:100%;text-align:left;cursor:pointer;background:white;padding:5px 8px"
+                        style="display:flex;align-items:center;gap:4px;width:100%;text-align:left;cursor:pointer;background:white"
                         (click)="actDueDateOpen=!actDueDateOpen">
-                  <span style="flex:1;font-size:11px" [style.color]="actDueDatePreset ? '#111827' : '#9ca3af'">
+                  <span style="flex:1;font-size:12px" [style.color]="actDueDatePreset ? '#111827' : '#9ca3af'">
                     {{actDueDateSelectedLabel || t('activity.dueDate.none')}}
                   </span>
-                  <span style="font-size:9px;color:#9ca3af">{{actDueDateOpen ? '▲' : '▾'}}</span>
+                  <span style="font-size:10px;color:#9ca3af">{{actDueDateOpen ? '▲' : '▾'}}</span>
                 </button>
                 <div *ngIf="actDueDateOpen"
-                     style="position:absolute;top:calc(100% + 2px);left:0;min-width:200px;background:white;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.14);z-index:100;overflow:hidden">
+                     style="position:absolute;top:calc(100% + 4px);left:0;min-width:200px;background:white;border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 7px 22px rgba(0,0,0,0.108);z-index:100;overflow:hidden">
                   <div *ngFor="let p of computedDueDatePresets"
                        style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;white-space:nowrap"
                        [style.background]="actDueDatePreset===p.value ? '#E6F4EA' : 'white'"
@@ -382,25 +384,25 @@ interface WhatsappConvUiState {
                 </div>
               </div>
               <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom' && actForm.type!=='task'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
-                <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:90px;font-size:11px;padding:4px 6px">
-                <button type="button" (click)="clearDueDate()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:0">🗑</button>
+                <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:96px;font-size:12px">
+                <button type="button" class="act-ctrl-btn del" (click)="clearDueDate()">🗑</button>
               </div>
-              <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px;margin-top:2px">
+              <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:12px;margin-top:2px">
             </label>
-            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.reminder') }}
-              <select [(ngModel)]="actReminderType" class="act-input" style="font-size:11px">
+            <label style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.reminder') }}
+              <select [(ngModel)]="actReminderType" class="act-input" style="font-size:12px">
                 <option *ngFor="let r of reminderOptions" [value]="r.value">{{ t(r.labelKey) }}</option>
               </select>
-              <input *ngIf="actReminderType==='custom'" type="datetime-local" [(ngModel)]="actReminderAt" class="act-input" style="font-size:11px;margin-top:2px">
+              <input *ngIf="actReminderType==='custom'" type="datetime-local" [(ngModel)]="actReminderAt" class="act-input" style="font-size:12px;margin-top:2px">
             </label>
-            <label style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.owner') }}
-              <select [(ngModel)]="actForm.assigned_to" class="act-input" style="font-size:11px">
+            <label style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.owner') }}
+              <select [(ngModel)]="actForm.assigned_to" class="act-input" style="font-size:12px">
                 <option value="">{{ t('activity.form.noOwner') }}</option>
                 <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
               </select>
             </label>
-            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.priority') }}
-              <select [(ngModel)]="actForm.priority" class="act-input" style="font-size:11px">
+            <label *ngIf="actForm.type==='task'" style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.priority') }}
+              <select [(ngModel)]="actForm.priority" class="act-input" style="font-size:12px">
                 <option value="">{{ t('activity.form.none') }}</option>
                 <option value="asap">{{ t('labels.priorities.asap') }}</option>
                 <option value="important">{{ t('labels.priorities.important') }}</option>
@@ -410,11 +412,11 @@ interface WhatsappConvUiState {
             </label>
           </div>
           <ng-container *ngIf="actForm.type==='meeting'">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">{{ t('meetings.durationMin') }}<input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="60" class="act-input" style="font-size:11px"></label>
-              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">{{ t('meetings.location') }}<input [(ngModel)]="actForm.meeting_location" [placeholder]="t('meetings.locationPlaceholder')" class="act-input" style="font-size:11px"></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:4px;font-weight:600">{{ t('meetings.durationMin') }}<input type="number" min="0" [(ngModel)]="actForm.duration_min" placeholder="60" class="act-input" style="font-size:12px"></label>
+              <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:4px;font-weight:600">{{ t('meetings.location') }}<input [(ngModel)]="actForm.meeting_location" [placeholder]="t('meetings.locationPlaceholder')" class="act-input" style="font-size:12px"></label>
             </div>
-            <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+            <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:4px;font-weight:600">
               {{ t('meetings.participants') }}
               <div class="participant-input-wrap">
                 <div class="participant-chips">
@@ -422,16 +424,16 @@ interface WhatsappConvUiState {
                   <input class="participant-input" [(ngModel)]="participantQuery" (ngModelChange)="filterSuggestions()" (keydown.enter)="addParticipantFromInput(actForm)" (keydown.Tab)="addParticipantFromInput(actForm)" [placeholder]="t('meetings.participantPlaceholder')" autocomplete="off">
                 </div>
                 <div class="suggestions-dropdown" *ngIf="filteredSuggestions.length && participantQuery">
-                  <div *ngFor="let s of filteredSuggestions" class="suggestion-item" (mousedown)="pickSuggestion(actForm,s)"><span style="font-weight:600">{{s.name}}</span><span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span></div>
+                  <div *ngFor="let s of filteredSuggestions" class="suggestion-item" (mousedown)="pickSuggestion(actForm,s)"><span style="font-weight:600">{{s.name}}</span><span style="color:#9ca3af;margin-left:6px;font-size:12px">{{s.email}}</span></div>
                 </div>
               </div>
             </label>
           </ng-container>
           <quill-editor [(ngModel)]="actForm.body" [modules]="quillModules" [placeholder]="t('activity.form.bodyPlaceholder')" style="display:block" theme="snow"></quill-editor>
           <wt-pending-attachments *ngIf="actForm.type==='task' || actForm.type==='note'" [(files)]="pendingActivityFiles"></wt-pending-attachments>
-          <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn-sm" (click)="showNewActivity=false; pendingActivityFiles=[]">{{ 'actions.cancel' | transloco }}</button>
-            <button class="btn-sm primary" (click)="addActivity()" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-g btn-sm" (click)="showNewActivity=false; pendingActivityFiles=[]">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn btn-p btn-sm" (click)="addActivity()" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
           </div>
         </div>
 
@@ -445,7 +447,7 @@ interface WhatsappConvUiState {
           <!-- View mode -->
           <ng-container *ngIf="inlineEditActId !== a.id">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-              <span style="font-size:16px">{{actIcon(a.type)}}</span>
+              <span style="font-size:16px;display:inline-flex"><wt-act-type-icon [type]="a.type"></wt-act-type-icon></span>
               <span style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9ca3af;letter-spacing:.4px">{{actTypeName(a.type)}}</span>
               <span class="act-status-badge act-status-{{a.status||'new'}}">{{actStatusLabel(a.status||'new')}}</span>
               <span *ngIf="a.type==='task' && a.priority" class="priority-badge priority-{{a.priority}}">{{priorityLabel(a.priority)}}</span>
@@ -454,7 +456,7 @@ interface WhatsappConvUiState {
               <wt-add-to-calendar *ngIf="a.activity_at && a.type !== 'email' && a.type !== 'note'"
                                   [entry]="calendarEntryOf(a)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
             </div>
-            <div style="font-size:12.5px;font-weight:600;color:#111827;margin-bottom:2px">{{a.title}}</div>
+            <div style="font-size:12px;font-weight:600;color:#333333;margin-bottom:2px">{{a.title}}</div>
             <div class="act-meta" style="margin-bottom:4px">
               <span *ngIf="a.assigned_to_name">👤 {{a.assigned_to_name}}</span>
               <span *ngIf="!a.assigned_to_name && a.created_by_name">{{a.created_by_name}}</span>
@@ -467,8 +469,8 @@ interface WhatsappConvUiState {
             </div>
             <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="lead-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
             <div *ngIf="canEdit && a.type==='task'" class="task-actions-row" (click)="$event.stopPropagation()">
-              <button *ngIf="a.status!=='closed'" class="btn-task-close" (click)="closeActivity(a)" [disabled]="savingActivity">✓ {{ t('activity.card.closeTask') }}</button>
-              <button *ngIf="a.status==='closed'" class="btn-task-reopen" (click)="reopenActivity(a)" [disabled]="savingActivity">↩ {{ t('activity.card.reopen') }}</button>
+              <button *ngIf="a.status!=='closed'" class="btn btn-g btn-sm" (click)="closeActivity(a)" [disabled]="savingActivity">✓ {{ t('activity.card.closeTask') }}</button>
+              <button *ngIf="a.status==='closed'" class="btn btn-g btn-sm" (click)="reopenActivity(a)" [disabled]="savingActivity">↩{{ t('activity.card.reopen') }}</button>
             </div>
             <div class="act-card-controls">
               <button *ngIf="canEdit" class="act-ctrl-btn del" (click)="$event.stopPropagation(); deleteActivity(a)" [title]="t('activity.card.delete')">🗑️</button>
@@ -476,22 +478,22 @@ interface WhatsappConvUiState {
           </ng-container>
           <!-- Inline edit mode -->
           <ng-container *ngIf="inlineEditActId === a.id">
-            <div style="display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
-              <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" [placeholder]="t('meetings.titlePlaceholder')" class="act-input" style="font-size:12.5px;font-weight:600">
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+            <div style="display:flex;flex-direction:column;gap:8px" (click)="$event.stopPropagation()">
+              <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" [placeholder]="t('meetings.titlePlaceholder')" class="act-input" style="font-size:12px;font-weight:600">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px">
+                <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:4px;font-weight:600">
                   {{ t('activity.form.dateTime') }}
-                  <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
+                  <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:12px">
                 </label>
-                <label *ngIf="a.type!=='note'" style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label *ngIf="a.type!=='note'" style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:4px;font-weight:600">
                   {{ t('activity.form.reminder') }}
-                  <select [(ngModel)]="inlineEditForm.reminder_type" class="act-input" style="font-size:11px">
+                  <select [(ngModel)]="inlineEditForm.reminder_type" class="act-input" style="font-size:12px">
                     <option *ngFor="let r of reminderOptions" [value]="r.value">{{ t(r.labelKey) }}</option>
                   </select>
                 </label>
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:4px;font-weight:600">
                   {{ t('activity.form.owner') }}
-                  <select [(ngModel)]="inlineEditForm.assigned_to" class="act-input" style="font-size:11px">
+                  <select [(ngModel)]="inlineEditForm.assigned_to" class="act-input" style="font-size:12px">
                     <option value="">{{ t('activity.form.none') }}</option>
                     <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
                   </select>
@@ -499,9 +501,9 @@ interface WhatsappConvUiState {
               </div>
               <quill-editor [(ngModel)]="inlineEditForm.body" [modules]="quillModules" [placeholder]="t('activity.form.bodyShortPlaceholder')" style="display:block" theme="snow"></quill-editor>
               <wt-entity-attachments *ngIf="a.type==='task' || a.type==='note'" sourceType="lead-activity" [sourceId]="a.id" [compact]="true" [attachmentCount]="a.attachment_count ?? null" [canUpload]="canEdit" (fileCountChange)="a.attachment_count = $event"></wt-entity-attachments>
-              <div style="display:flex;gap:6px;justify-content:flex-end">
-                <button class="btn-sm" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
-                <button class="btn-sm primary" (click)="saveInlineEdit(a)" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-g btn-sm" (click)="cancelInlineEdit()">{{ 'actions.cancel' | transloco }}</button>
+                <button class="btn btn-p btn-sm" (click)="saveInlineEdit(a)" [disabled]="savingActivity">{{savingActivity?'…':('actions.save' | transloco)}}</button>
               </div>
             </div>
           </ng-container>
@@ -511,18 +513,18 @@ interface WhatsappConvUiState {
 
       <!-- Emaile tab -->
       <div *ngIf="midTab==='emails'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0">
-        <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
           <ng-container *ngIf="settings.settings().crm_training_mode">
-            <button class="btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" [title]="t('email.checkNewTooltip')">{{debugProcessing ? '⏳' : '🔄'}} {{ t('email.checkNew') }}</button>
+            <button class="btn btn-g btn-sm" (click)="debugProcessEmail()" [disabled]="debugProcessing" [title]="t('email.checkNewTooltip')">{{debugProcessing ? '⏳' : '🔄'}} {{ t('email.checkNew') }}</button>
           </ng-container>
-          <button class="btn-sm primary" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ ' + t('email.connecting') : '+ ' + t('email.new')}}</button>
+          <button class="btn btn-p btn-sm" *ngIf="canEdit && !showEmailCompose" [disabled]="connectingEmail" (click)="openEmailCompose()">{{connectingEmail ? '⏳ ' + t('email.connecting') : t('email.new')}}</button>
         </div>
 
         <!-- INLINE COMPOSE -->
-        <div *ngIf="showEmailCompose" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
+        <div *ngIf="showEmailCompose" class="lead-form-box" style="margin-bottom:16px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ {{ t('email.new') }}</div>
-            <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D;display:flex;align-items:center;gap:4px">✉️ {{ t('email.new') }}</div>
+            <button class="close-btn" style="font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
           <!-- Provider row — always visible when compose is open. Every user connects
                their OWN mailbox (triggered from "Nowy email"); this shows which
@@ -534,26 +536,26 @@ interface WhatsappConvUiState {
               <div *ngIf="emailConnected"
                    [style.border]="'1.5px solid ' + emailProviderColor"
                    [style.background]="emailProviderBg"
-                   style="display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;padding-right:8px">
+                   style="display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;font-size:12px;color:#374151;border-radius:8px;overflow:hidden;padding-right:8px">
                 <span style="min-width:0;padding:4px 0 4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                       [title]="emailAddress">{{ t('email.from') }} <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
                 <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">{{ t('email.disconnect') }}</button>
               </div>
-              <div *ngIf="!emailProviderKey" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ {{ t('email.notConfigured') }}</div>
+              <div *ngIf="!emailProviderKey" class="lead-note lead-note-warn">⚠️ {{ t('email.notConfigured') }}</div>
             </div>
             </ng-container>
-            <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 {{ t('email.trainingMode') }}</div>
+            <div *ngIf="settings.settings().crm_training_mode" class="lead-note lead-note-warn">🎓 {{ t('email.trainingMode') }}</div>
           </div>
           <!-- Email form — shown when connected or training mode -->
           <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
-                      style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
+                      class="act-sel" style="flex-shrink:0">
                 <option value="">{{ t('email.noTemplate') }}</option>
                 <option *ngFor="let t of emailTemplates" [value]="t.id">{{t.name}}</option>
               </select>
             </div>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.to') }}
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
               <div class="participant-chips">
                 <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
                 <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
@@ -562,7 +564,7 @@ interface WhatsappConvUiState {
                 </div>
               </div>
             </label>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.cc') }}
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
               <div class="participant-chips">
                 <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button></span>
                 <input class="participant-input" [(ngModel)]="ccQuery" (input)="onCcInput()" (keydown.enter)="addCc()" (keydown.Tab)="addCc()" (blur)="showCcSug=false" [placeholder]="t('email.placeholders.cc')" autocomplete="off">
@@ -571,24 +573,24 @@ interface WhatsappConvUiState {
                 </div>
               </div>
             </label>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.subject') }}
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
               <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')">
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.body')" style="display:block" theme="snow"></quill-editor>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromGoogleDrive')}}</button>
+              <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0" (click)="openDrivePicker()" [disabled]="drivePickerLoading">{{drivePickerLoading ? '⏳ ' + ('states.loading' | transloco) : '📁 ' + t('email.fromGoogleDrive')}}</button>
             </div>
-            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px">
+            <div *ngIf="driveNeedsReauth" class="lead-note lead-note-warn">
               ⚠️ {{ t('email.driveReauthRequired') }}
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-              <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+              <span *ngFor="let f of emailAttachments; let i=index" class="file-chip">📎{{f.name}}<button (click)="removeAttachment(i)">✕</button></span>
             </div>
-            <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
-            <div style="display:flex;gap:6px;justify-content:flex-end">
-              <button class="btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
-              <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ ' + t('email.sending') : '📤 ' + t('email.sendAction')}}</button>
+            <div *ngIf="emailError" class="lead-note lead-note-err">⚠️ {{emailError}}</div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button class="btn btn-g btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
+              <button class="btn btn-p btn-sm" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ ' + t('email.sending') : '📤 ' + t('email.sendAction')}}</button>
             </div>
           </ng-container>
         </div>
@@ -596,15 +598,15 @@ interface WhatsappConvUiState {
         <div *ngIf="emailActivities.length===0" class="empty-act">{{ emailStatus?.configured===false ? t('email.notConfigured') : t('email.empty') }}</div>
 
         <!-- Email cards — expand/collapse inline -->
-        <div *ngFor="let a of emailActivities; trackBy: trackEmailActivity" style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;background:white"
+        <div *ngFor="let a of emailActivities; trackBy: trackEmailActivity" class="conv-card" style="margin-bottom:12px"
              [style.border-left]="expandedEmailId===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'">
-          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
+          <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;user-select:none"
                [style.background]="expandedEmailId===a.id ? '#eff6ff' : hasUnreadInActivity(a) ? '#fef2f2' : 'white'"
                (click)="toggleEmailExpand(a)">
             <span style="font-size:16px;flex-shrink:0">📧</span>
             <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:6px">
-                <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
+              <div style="display:flex;align-items:center;gap:8px">
+                <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
                 <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
               </div>
               <div style="font-size:10px;color:#9ca3af;margin-top:1px">
@@ -614,15 +616,15 @@ interface WhatsappConvUiState {
             </div>
             <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
           </div>
-          <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
+          <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid #f3f4f6;padding:12px 16px;display:flex;flex-direction:column;gap:8px">
             <ng-container *ngIf="a.gmail_thread_id && !settings.settings().crm_training_mode; else singleBody">
               <div *ngIf="loadingThread" style="font-size:12px;color:#9ca3af;padding:4px 0">{{ t('email.thread.loading') }}</div>
-              <div *ngIf="!loadingThread && threadUnavailableReason" style="font-size:12px;color:#92400e;background:#fef3c7;border-radius:6px;padding:8px 10px">{{threadUnavailableReason}}</div>
+              <div *ngIf="!loadingThread && threadUnavailableReason" class="lead-note lead-note-warn" style="font-size:12px">{{threadUnavailableReason}}</div>
               <div *ngFor="let m of threadMessages"
                    [style.background]="m.created_by ? 'white' : '#fffbeb'"
                    [style.border]="m.created_by ? '1px solid #e5e7eb' : '1px solid #fbbf24'"
-                   style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
-                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                   style="border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#6b7280">
                   <span style="display:flex;align-items:center;gap:4px">
                     <span style="font-size:10px;color:#9ca3af">{{m.created_by ? t('email.to') : t('email.from')}}</span>
                     <span style="font-weight:600">{{m.created_by ? firstAddressDisplay(m.to) : firstAddressDisplay(m.from)}}</span>
@@ -630,65 +632,65 @@ interface WhatsappConvUiState {
                   </span>
                   <span>{{m.date | date:'dd.MM.yyyy HH:mm'}}</span>
                 </div>
-                <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
+                <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:8px;padding:8px 12px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
                 <ng-container *ngIf="m.quotedBody">
-                  <button (click)="m._showQuote = !m._showQuote" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
+                  <button (click)="m._showQuote = !m._showQuote" style="font-size:12px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
                     {{m._showQuote ? '▲ ' + t('email.hideQuoted') : '▾ ' + t('email.showQuoted')}}
                   </button>
-                  <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
+                  <div *ngIf="m._showQuote" style="font-size:12px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
                 </ng-container>
               </div>
             </ng-container>
             <ng-template #singleBody>
-              <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:10px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
+              <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:8px;padding:12px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
             </ng-template>
             <!-- Inline reply form -->
-            <div *ngIf="showReplyInline" style="border:1px solid #dbeafe;border-radius:8px;padding:12px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
+            <div *ngIf="showReplyInline" style="border-radius:12px;padding:16px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
               <!-- Compact header -->
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <div style="font-size:11px;color:#374151;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                <div style="font-size:12px;color:#374151;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                   ↩ <strong>{{ t('email.reply.replyingTo') }}</strong> {{inlineReplyForm.recipientList[0] || '—'}}
                   <span style="color:#9ca3af"> · </span>{{inlineReplyForm.subject}}
                 </div>
-                <button (click)="showReplyDetails=!showReplyDetails"
-                        style="flex-shrink:0;background:none;border:1px solid #d1d5db;border-radius:5px;color:#6b7280;font-size:10px;padding:2px 7px;cursor:pointer">
+                <button class="btn btn-g btn-sm" (click)="showReplyDetails=!showReplyDetails"
+                        style="flex-shrink:0">
                   {{showReplyDetails ? '▲ ' + t('email.reply.hideDetails') : '▾ ' + t('email.reply.showDetails')}}
                 </button>
               </div>
               <!-- Collapsible fields -->
               <ng-container *ngIf="showReplyDetails">
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.to') }}
+                <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
                   <div class="participant-chips">
                     <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
                     <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                   </div>
                 </label>
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.cc') }}
+                <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
                   <div class="participant-chips">
                     <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
                     <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" [placeholder]="t('email.placeholders.cc')" autocomplete="off">
                   </div>
                 </label>
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.subject') }}
+                <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
                   <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
                 </label>
               </ng-container>
               <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"></quill-editor>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromDrive')}}</button>
+                <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+                <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0" (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading">{{drivePickerLoading ? '⏳ ' + ('states.loading' | transloco) : '📁 ' + t('email.fromDrive')}}</button>
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+                <span *ngFor="let f of inlineReplyAttachments; let i=index" class="file-chip">📎{{f.name}}<button (click)="removeInlineReplyAttachment(i)">✕</button></span>
               </div>
-              <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{inlineReplyError}}</div>
-              <div style="display:flex;gap:6px;justify-content:flex-end">
-                <button class="btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
-                <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
+              <div *ngIf="inlineReplyError" class="lead-note lead-note-err">⚠️ {{inlineReplyError}}</div>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-g btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
+                <button class="btn btn-p btn-sm" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
               </div>
             </div>
-            <div *ngIf="!showReplyInline" style="display:flex;gap:6px">
-              <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn-sm" (click)="startInlineReply(a)"
+            <div *ngIf="!showReplyInline" style="display:flex;gap:8px">
+              <button *ngIf="a.gmail_thread_id && canEdit && canReplyToActivity(a)" class="btn btn-g btn-sm" (click)="startInlineReply(a)"
                       [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">
                 {{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}
               </button>
@@ -700,50 +702,50 @@ interface WhatsappConvUiState {
       <!-- WhatsApp tab -->
       <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
 
-        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">{{ t('whatsapp.checkingConfig') }}</div>
+        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:14px">{{ t('whatsapp.checkingConfig') }}</div>
 
         <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania. -->
         <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
           <div style="font-size:32px">💬</div>
-          <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-          <div style="font-size:13px;color:#9ca3af;text-align:center">{{ t('whatsapp.notConfigured') }}</div>
+          <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#333333">WhatsApp</div>
+          <div style="font-size:14px;color:#9ca3af;text-align:center">{{ t('whatsapp.notConfigured') }}</div>
         </div>
 
-        <div *ngIf="whatsappConfigured===true" id="wa-new-message" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 {{ t('whatsapp.newMessage') }}</div>
+        <div *ngIf="whatsappConfigured===true" id="wa-new-message" class="lead-form-box">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D;display:flex;align-items:center;gap:4px">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:#f0fdf4;border-radius:6px;overflow:hidden">
-              <span style="padding:4px 10px;font-size:11px;color:#374151">{{ t('whatsapp.from') }} <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
+            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:#f0fdf4;border-radius:8px;overflow:hidden">
+              <span style="padding:4px 10px;font-size:12px;color:#374151">{{ t('whatsapp.from') }} <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
             </div>
           </div>
 
-          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.toField') }}
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.toField') }}
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
                    placeholder="+48 123 123 123">
           </label>
-          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">{{ t('whatsapp.missingCountryCode') }}</div>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:#b45309">{{ t('whatsapp.missingCountryCode') }}</div>
 
           <div class="wa-mode-switch">
-            <button type="button" [class.active]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
-            <button type="button" [class.active]="whatsappMode==='text'" [disabled]="whatsappSending" (click)="whatsappMode='text'">✏️ {{ t('whatsapp.mode.text') }}</button>
+            <button type="button" class="fchip" [class.on]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
+            <button type="button" class="fchip" [class.on]="whatsappMode==='text'" [disabled]="whatsappSending" (click)="whatsappMode='text'">✏️ {{ t('whatsapp.mode.text') }}</button>
           </div>
           <div *ngIf="whatsappMode==='text' && whatsappToPhone.trim() && !whatsappToPhoneMissingCountryCode && !isWhatsappWindowOpen(whatsappToPhone)" class="wa-window-hint">
             🕒 {{ t('whatsapp.window.closedHint') }}
           </div>
 
-          <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.messageBody') }}
+          <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.messageBody') }}
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
                       [placeholder]="t('whatsapp.messagePlaceholder')"></textarea>
           </label>
           <wt-whatsapp-template-picker *ngIf="whatsappMode==='template'" [disabled]="!canEdit || whatsappSending"
                                        (selectionChange)="whatsappTemplateSelection=$event" />
 
-          <div *ngIf="whatsappError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
-          <div *ngIf="whatsappSuccess" style="color:#16a34a;font-size:12px;background:#f0fdf4;border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
+          <div *ngIf="whatsappError" class="lead-note lead-note-err">⚠️ {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" class="lead-note lead-note-ok">✅ {{ t('whatsapp.sent') }}</div>
 
-          <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-p btn-sm" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
                     (click)="sendWhatsapp()">
               {{ whatsappSending ? t('whatsapp.sending') : t('whatsapp.send') }}
             </button>
@@ -756,15 +758,15 @@ interface WhatsappConvUiState {
           <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">{{ t('whatsapp.loadingHistory') }}</div>
           <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">{{ t('whatsapp.empty') }}</div>
 
-          <div *ngFor="let conv of whatsappConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white"
+          <div *ngFor="let conv of whatsappConversations" class="conv-card"
                [style.border-left]="getWhatsappConvState(conv.phone).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
-            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
+            <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;user-select:none"
                  [style.background]="getWhatsappConvState(conv.phone).expanded ? '#eff6ff' : 'white'"
                  (click)="toggleWhatsappConvExpanded(conv.phone)">
               <span style="font-size:16px;flex-shrink:0">💬</span>
               <div style="flex:1;min-width:0">
-                <div style="display:flex;align-items:center;gap:6px">
-                  <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t('whatsapp.conversation') }}</strong>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t('whatsapp.conversation') }}</strong>
                 </div>
                 <div style="font-size:10px;color:#9ca3af;margin-top:1px">
                   {{formatWhatsappHistoryPhone(conv.phone)}} · {{ t('whatsapp.lastMessage') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
@@ -773,22 +775,22 @@ interface WhatsappConvUiState {
               <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getWhatsappConvState(conv.phone).expanded ? '▲' : '▾'}}</span>
             </div>
 
-            <div *ngIf="getWhatsappConvState(conv.phone).expanded" style="border-top:1px solid #e5e7eb;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div *ngIf="getWhatsappConvState(conv.phone).expanded" style="border-top:1px solid #f3f4f6;padding:12px 16px;display:flex;flex-direction:column;gap:8px">
               <div *ngFor="let h of conv.messages"
                    [style.background]="h.direction==='incoming' ? '#fffbeb' : 'white'"
                    [style.border]="h.direction==='incoming' ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
-                   style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
-                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                   style="border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#6b7280">
                   <span style="display:flex;align-items:center;gap:4px">
                     <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? t('whatsapp.to') : t('whatsapp.from')}}</span>
                     <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
                   </span>
-                  <span style="display:flex;align-items:center;gap:6px">
+                  <span style="display:flex;align-items:center;gap:8px">
                     <span *ngIf="h.direction==='outgoing' && h.status==='failed'" class="wa-failed" [title]="t('whatsapp.status.failedHint')">⚠️ {{ t('whatsapp.status.failed') }}</span>
                     <span>{{h.created_at | date:'dd.MM.yyyy HH:mm'}}</span>
                   </span>
                 </div>
-                <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap">
+                <div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:8px;padding:8px 12px;max-height:200px;overflow-y:auto;white-space:pre-wrap">
                   <div [class.wa-body-clamp]="!isWhatsappExpanded(h.id)">{{h.message}}</div>
                 </div>
                 <button *ngIf="h.message && h.message.length > 200" class="wa-expand-btn" (click)="toggleWhatsappExpand(h.id)">
@@ -796,25 +798,25 @@ interface WhatsappConvUiState {
                 </button>
               </div>
 
-              <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-                <button *ngIf="isWhatsappWindowOpen(conv.phone)" class="btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩ {{ t('whatsapp.reply.action') }}</button>
+              <div *ngIf="!getWhatsappConvState(conv.phone).replyOpen" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button *ngIf="isWhatsappWindowOpen(conv.phone)" class="btn btn-g btn-sm" (click)="startWhatsappConvReply(conv.phone)">↩{{ t('whatsapp.reply.action') }}</button>
                 <ng-container *ngIf="!isWhatsappWindowOpen(conv.phone)">
-                  <button class="btn-sm" (click)="startWhatsappTemplateTo(conv.phone)">📋 {{ t('whatsapp.window.sendTemplate') }}</button>
+                  <button class="btn btn-g btn-sm" (click)="startWhatsappTemplateTo(conv.phone)">📋{{ t('whatsapp.window.sendTemplate') }}</button>
                   <span class="wa-window-note">🕒 {{ t('whatsapp.window.closedShort') }}</span>
                 </ng-container>
               </div>
 
-              <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa;display:flex;flex-direction:column;gap:8px">
-                <div style="font-size:11px;color:#374151"><strong>↩ {{ t('whatsapp.reply.replyingVia') }}</strong></div>
-                <div style="font-size:11px;color:#6b7280">{{ t('whatsapp.to') }} {{formatWhatsappHistoryPhone(conv.phone)}}</div>
+              <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" class="lead-form-box">
+                <div style="font-size:12px;color:#374151"><strong>↩ {{ t('whatsapp.reply.replyingVia') }}</strong></div>
+                <div style="font-size:12px;color:#6b7280">{{ t('whatsapp.to') }} {{formatWhatsappHistoryPhone(conv.phone)}}</div>
                 <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
                           [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
-                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
-                <div style="display:flex;gap:6px;justify-content:flex-end">
-                  <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
-                  <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" class="lead-note lead-note-err">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                <div style="display:flex;gap:8px;justify-content:flex-end">
+                  <button class="btn btn-g btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
+                  <button class="btn btn-p btn-sm" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
                     {{ getWhatsappConvState(conv.phone).replySending ? '⏳ ' + t('whatsapp.reply.sending') : '📤 ' + t('whatsapp.reply.send') }}
                   </button>
                 </div>
@@ -827,36 +829,36 @@ interface WhatsappConvUiState {
       <!-- SMS tab -->
       <div *ngIf="midTab==='sms'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
 
-        <div *ngIf="smsThreadError" style="font-size:13px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
+        <div *ngIf="smsThreadError" class="lead-note lead-note-warn" style="font-size:14px;padding:12px 16px">
           ⚠️ {{smsThreadError}}
         </div>
 
         <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:#9ca3af;padding:4px 0">{{ 'states.loading' | transloco }}</div>
         <div *ngIf="!smsLoading && !smsThreadError && smsConversations.length===0" class="empty-act">{{ t('sms.noNumbers') }}</div>
 
-        <div *ngFor="let conv of smsConversations" style="border:1px solid #e5e7eb;border-radius:10px;background:white;overflow:hidden"
+        <div *ngFor="let conv of smsConversations" class="conv-card"
              [style.border-left]="getSmsConvState(conv.number).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer"
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer"
                [style.background]="getSmsConvState(conv.number).expanded ? '#eff6ff' : 'white'"
                (click)="toggleSmsConvExpanded(conv.number)">
             <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
-              <strong style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
-              <span style="font-size:11px;color:#9ca3af" *ngIf="conv.messages.length">
+              <strong style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
+              <span style="font-size:12px;color:#9ca3af" *ngIf="conv.messages.length">
                 {{ t('sms.last') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
               </span>
-              <span style="font-size:11px;color:#9ca3af" *ngIf="!conv.messages.length">{{ t('sms.noMessages') }}</span>
+              <span style="font-size:12px;color:#9ca3af" *ngIf="!conv.messages.length">{{ t('sms.noMessages') }}</span>
             </div>
             <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getSmsConvState(conv.number).expanded ? '▲' : '▾'}}</span>
           </div>
 
-          <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid #e5e7eb;display:flex;flex-direction:column">
+          <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid #f3f4f6;display:flex;flex-direction:column">
             <div [id]="'sms-scroll-lead-' + smsDomId(conv.number)" style="max-height:360px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f9fafb">
               <div *ngIf="!conv.messages.length" style="font-size:12px;color:#9ca3af;text-align:center;padding:12px 0">{{ t('sms.emptyConversation') }}</div>
               <div *ngFor="let m of conv.messages" style="display:flex" [style.justify-content]="m.direction==='outbound' ? 'flex-end' : 'flex-start'">
                 <div [style.background]="m.direction==='outbound' ? '#3BAA5D' : 'white'"
                      [style.color]="m.direction==='outbound' ? 'white' : '#111827'"
                      [style.border]="m.direction==='outbound' ? 'none' : '1px solid #e5e7eb'"
-                     style="max-width:75%;border-radius:12px;padding:8px 12px;font-size:13px;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,.06)">
+                     style="max-width:75%;border-radius:12px;padding:8px 12px;font-size:14px;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,.06)">
                   <div>{{m.body}}</div>
                   <div style="font-size:10px;opacity:.75;margin-top:4px;text-align:right">
                     {{m.created_at | date:'HH:mm'}} · {{smsStatusLabel(m.status)}}
@@ -864,17 +866,17 @@ interface WhatsappConvUiState {
                 </div>
               </div>
             </div>
-            <div style="position:sticky;bottom:0;background:white;border-top:1px solid #e5e7eb;padding:10px;display:flex;gap:8px;align-items:flex-end">
+            <div style="position:sticky;bottom:0;background:white;border-top:1px solid #f3f4f6;padding:12px;display:flex;gap:8px;align-items:flex-end">
               <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
                         (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
-                        rows="1" style="flex:1;resize:none;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit"
+                        rows="1" class="fta" style="flex:1;resize:none;min-height:0"
                         [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
-              <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
+              <button class="btn btn-p btn-sm" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
                       (click)="sendSmsToConv(conv)">
                 {{ getSmsConvState(conv.number).sending ? '⏳' : t('sms.send') }}
               </button>
             </div>
-            <div *ngIf="getSmsConvState(conv.number).error" style="color:#ef4444;font-size:11px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:#dc2626;font-size:12px;padding:0 12px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
           </div>
         </div>
       </div>
@@ -882,11 +884,11 @@ interface WhatsappConvUiState {
     </div>
 
     <!-- PRAWA: Mock call/email + Konwertuj info -->
-    <div style="border-left:1px solid #e5e7eb;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+    <div style="overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0">
 
       <!-- Komunikacja -->
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:10px">📞 {{ t('activity.communication') }}</div>
+      <div class="side-box">
+        <div class="side-box-title">📞 {{ t('activity.communication') }}</div>
         <button class="comm-btn" *ngIf="canEdit" (click)="mockCall()" [disabled]="!lead.phone">
           <span style="font-size:16px">📞</span>
           <div style="flex:1;text-align:left">
@@ -894,7 +896,7 @@ interface WhatsappConvUiState {
             <div style="font-size:10px;color:#9ca3af">{{lead.phone || t('calls.noNumber')}}</div>
           </div>
         </button>
-        <button class="comm-btn" *ngIf="canEdit" (click)="openEmailCompose()" [disabled]="!lead.email" style="margin-top:6px">
+        <button class="comm-btn" *ngIf="canEdit" (click)="openEmailCompose()" [disabled]="!lead.email" style="margin-top:8px">
           <span style="font-size:16px">✉️</span>
           <div style="flex:1;text-align:left">
             <div style="font-size:12px;font-weight:600">{{ t('email.send') }}</div>
@@ -905,55 +907,55 @@ interface WhatsappConvUiState {
       </div>
 
       <!-- Powiązane dokumenty -->
-      <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af">📎 {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
-          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:10px">+ {{ t('documents.add') }}</button>
+      <div class="side-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+          <div class="side-box-title" style="margin-bottom:0">📎 {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
+          <button class="btn btn-g btn-sm" *ngIf="canEdit" (click)="showDocPicker=true">+ {{ t('documents.add') }}</button>
         </div>
-        <div *ngIf="linkedDocs.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">{{ t('documents.none') }}</div>
-        <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer" (click)="openDocument(d)" [title]="t('documents.open')">
+        <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px">{{ t('documents.none') }}</div>
+        <div *ngFor="let d of linkedDocs" style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #f3f4f6;cursor:pointer" (click)="openDocument(d)" [title]="t('documents.open')">
           <span style="font-size:13px">📄</span>
           <div style="flex:1;min-width:0">
-            <div style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title||'#'+d.document_id}}</div>
+            <div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title||'#'+d.document_id}}</div>
             <div style="font-size:10px;color:#9ca3af"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span>{{d.doc_type}}</div>
           </div>
-          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:11px;padding:2px" (click)="$event.stopPropagation();unlinkDoc(d)">✕</button>
+          <button class="act-ctrl-btn del" (click)="$event.stopPropagation();unlinkDoc(d)">✕</button>
         </div>
       </div>
 
       <!-- Historia zmian — mini sekcja -->
-      <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af">🕐 {{ t('history.title') }}</div>
-          <button *ngIf="history.length" class="btn-sm" style="font-size:10px" (click)="showHistoryModal=true">{{ t('history.showAll') }}</button>
+      <div class="side-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+          <div class="side-box-title" style="margin-bottom:0">🕐 {{ t('history.title') }}</div>
+          <button *ngIf="history.length" class="btn btn-g btn-sm" (click)="showHistoryModal=true">{{ t('history.showAll') }}</button>
         </div>
         <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px">{{ 'states.loading' | transloco }}</div>
-        <div *ngIf="!historyLoading && history.length===0" style="font-size:11px;color:#9ca3af;text-align:center;padding:6px">{{ t('history.empty') }}</div>
+        <div *ngIf="!historyLoading && history.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:6px">{{ t('history.empty') }}</div>
         <div *ngFor="let h of history.slice(0,10)" class="hist-item">
           <div class="hist-dot" [style.background]="histColor(h.action)"></div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:11px;font-weight:600;color:#374151;line-height:1.35">{{histLabel(h)}}</div>
+            <div style="font-size:12px;font-weight:600;color:#374151;line-height:1.35">{{histLabel(h)}}</div>
             <div style="font-size:10px;color:#9ca3af;margin-top:1px">{{h.created_at|date:'dd.MM.yyyy HH:mm'}} · {{h.user_name||h.user_email|| t('history.systemUser')}}</div>
           </div>
         </div>
       </div>
 
       <!-- Onboarding -->
-      <div *ngIf="!lead.converted_at && canEdit" style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange-dark);margin-bottom:8px">🚀 {{ t('leadDetail.onboarding.start') }}</div>
-        <div style="font-size:12px;color:var(--orange-dark);margin-bottom:10px">{{ t('leadDetail.onboarding.hint') }}</div>
-        <button class="hdr-btn hdr-btn-primary" style="width:100%;justify-content:center" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }} →</button>
+      <div *ngIf="!lead.converted_at && canEdit" class="side-box" style="background:var(--orange-pale)">
+        <div class="side-box-title" style="color:var(--orange-dark)">🚀 {{ t('leadDetail.onboarding.start') }}</div>
+        <div style="font-size:12px;color:var(--orange-dark);margin-bottom:12px">{{ t('leadDetail.onboarding.hint') }}</div>
+        <button class="btn btn-p btn-sm" style="width:100%;box-shadow:none" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }} →</button>
       </div>
-      <div *ngIf="lead.converted_at && lead.stage==='onboarding'" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px">⏳ {{ t('leadDetail.onboarding.inProgress') }}</div>
-        <div style="font-size:11px;color:#9ca3af;margin-bottom:6px">{{ t('leadDetail.onboarding.startedAt') }} {{lead.converted_at|date:'dd.MM.yyyy'}}</div>
-        <div style="font-size:11px;color:#6b7280;margin-bottom:8px">{{ t('leadDetail.onboarding.inProgressHint') }}</div>
+      <div *ngIf="lead.converted_at && lead.stage==='onboarding'" class="side-box" style="background:#eff6ff">
+        <div style="font-size:12px;font-weight:700;color:#1d4ed8;margin-bottom:4px;display:flex;align-items:center;gap:4px">⏳ {{ t('leadDetail.onboarding.inProgress') }}</div>
+        <div style="font-size:12px;color:#9ca3af;margin-bottom:6px">{{ t('leadDetail.onboarding.startedAt') }} {{lead.converted_at|date:'dd.MM.yyyy'}}</div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:8px">{{ t('leadDetail.onboarding.inProgressHint') }}</div>
         <a routerLink="/crm/onboarding" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none">→ {{ t('leadDetail.onboarding.goTo') }}</a>
       </div>
-      <div *ngIf="lead.stage==='onboarded'" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
-        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">✓ {{ t('leadDetail.onboarding.completed') }}</div>
-        <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
-        <div style="font-size:11px;color:#6b7280">{{ t('leadDetail.onboarding.partnerAfterSync') }}</div>
+      <div *ngIf="lead.stage==='onboarded'" class="side-box" style="background:#f0fdf4">
+        <div style="font-size:12px;font-weight:700;color:#15803d;margin-bottom:4px">✓ {{ t('leadDetail.onboarding.completed') }}</div>
+        <div style="font-size:12px;color:#9ca3af;margin-bottom:4px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
+        <div style="font-size:12px;color:#6b7280">{{ t('leadDetail.onboarding.partnerAfterSync') }}</div>
       </div>
     </div>
   </div>
@@ -967,20 +969,20 @@ interface WhatsappConvUiState {
 <!-- ── Historia zmian Modal ──────────────────────────────────────────────── -->
 <div class="modal-overlay" *ngIf="showHistoryModal" (click)="showHistoryModal=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(600px,100%);max-height:80vh;display:flex;flex-direction:column;gap:0;padding:0">
-    <div class="modal-header" style="padding:16px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0">
-      <h3 style="margin:0;font-size:15px;font-weight:700">🕐 {{ t('history.title') }}</h3>
+    <div class="modal-header" style="flex-shrink:0">
+      <h3>🕐 {{ t('history.title') }}</h3>
       <button class="close-btn" (click)="showHistoryModal=false">✕</button>
     </div>
-    <div style="padding:12px 16px;flex-shrink:0;border-bottom:1px solid #f3f4f6">
-      <input class="act-input" [(ngModel)]="historySearch" [placeholder]="t('history.searchPlaceholder')" style="width:100%;box-sizing:border-box">
+    <div style="padding:12px 24px;flex-shrink:0;border-bottom:1px solid #f3f4f6">
+      <input type="search" class="fi" [(ngModel)]="historySearch" [placeholder]="t('history.searchPlaceholder')">
     </div>
-    <div style="overflow-y:auto;padding:8px 16px 16px">
+    <div style="overflow-y:auto;padding:8px 24px 24px">
       <div *ngFor="let h of filteredHistory" class="hist-item">
         <div class="hist-dot" [style.background]="histColor(h.action)"></div>
         <div style="flex:1;min-width:0">
           <div style="font-size:12px;font-weight:600;color:#374151">{{histLabel(h)}}</div>
           <div style="font-size:10px;color:#9ca3af;margin-top:1px">{{h.created_at|date:'dd.MM.yyyy HH:mm'}} · {{h.user_name||h.user_email|| t('history.systemUser')}}</div>
-          <div *ngIf="histDetail(h)" style="font-size:11px;color:#6b7280;margin-top:3px;background:#f9fafb;border-radius:4px;padding:4px 6px">{{histDetail(h)}}</div>
+          <div *ngIf="histDetail(h)" style="font-size:12px;color:#6b7280;margin-top:4px;background:#f9fafb;border-radius:8px;padding:4px 8px">{{histDetail(h)}}</div>
         </div>
       </div>
       <div *ngIf="!filteredHistory.length" style="text-align:center;color:#9ca3af;font-size:12px;padding:20px">{{ t('history.noResults') }}</div>
@@ -1000,16 +1002,16 @@ interface WhatsappConvUiState {
       <div *ngFor="let m of threadMessages"
            [style.border]="!m.is_read && !m.created_by ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
            [style.background]="!m.is_read && !m.created_by ? '#fffbeb' : 'white'"
-           style="border-radius:8px;padding:12px;font-size:12px;cursor:pointer;transition:background .15s"
+           style="border-radius:12px;padding:12px 16px;font-size:12px;cursor:pointer;transition:background .15s"
            (click)="openMsgModal(m)"
            (mouseenter)="$any($event.currentTarget).style.background='#f9fafb'"
            (mouseleave)="$any($event.currentTarget).style.background=(!m.is_read && !m.created_by) ? '#fffbeb' : 'white'">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
           <span [style.font-weight]="!m.is_read && !m.created_by ? '700' : '600'" style="color:#374151">{{firstAddressDisplay(m.from)}}</span>
-          <span style="color:#9ca3af;font-size:11px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
+          <span style="color:#9ca3af;font-size:12px">{{m.date|date:'dd.MM.yyyy HH:mm'}}</span>
         </div>
-        <div style="color:#6b7280;font-size:11px;margin-bottom:1px">{{ t('email.to') }} {{decodeAddress(m.to)}}</div>
-        <div *ngIf="m.cc" style="color:#6b7280;font-size:11px;margin-bottom:4px">{{ t('email.cc') }} {{decodeAddress(m.cc)}}</div>
+        <div style="color:#6b7280;font-size:12px;margin-bottom:1px">{{ t('email.to') }} {{decodeAddress(m.to)}}</div>
+        <div *ngIf="m.cc" style="color:#6b7280;font-size:12px;margin-bottom:4px">{{ t('email.cc') }} {{decodeAddress(m.cc)}}</div>
         <div style="color:#374151;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px">{{m.snippet}}</div>
         <!-- Wszystkie załączniki (odebrane + wysłane) -->
         <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
@@ -1031,11 +1033,11 @@ interface WhatsappConvUiState {
         </div>
       </div>
       <div *ngIf="!loadingThread&&threadMessages.length===0&&!threadUnavailableReason" style="text-align:center;color:#9ca3af;padding:16px">{{ t('email.thread.empty') }}</div>
-      <div *ngIf="!loadingThread&&threadUnavailableReason" style="text-align:center;color:#92400e;background:#fef3c7;border-radius:6px;padding:12px;font-size:12px">{{threadUnavailableReason}}</div>
+      <div *ngIf="!loadingThread&&threadUnavailableReason" class="lead-note lead-note-warn" style="justify-content:center;padding:12px;font-size:12px">{{threadUnavailableReason}}</div>
     </div>
     <div class="modal-footer">
-      <button class="btn-outline" (click)="showThreadModal=false">{{ 'actions.close' | transloco }}</button>
-      <button class="btn-primary" (click)="replyToCurrentThread()" [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
+      <button class="btn btn-g" (click)="showThreadModal=false">{{ 'actions.close' | transloco }}</button>
+      <button class="btn btn-p" (click)="replyToCurrentThread()" [title]="threadCanReply ? '' : t('email.thread.ownedByTooltip', { owner: threadOwnerEmail || t('email.thread.anotherUser') })">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
     </div>
   </div>
 </div>
@@ -1047,28 +1049,28 @@ interface WhatsappConvUiState {
       <h3>📧 {{msgModalMsg?.subject}}</h3>
       <button class="close-btn" (click)="closeMsgModal()">✕</button>
     </div>
-    <div class="modal-body" style="gap:10px;overflow-y:auto;flex:1" *ngIf="msgModalMsg">
+    <div class="modal-body" style="gap:12px;overflow-y:auto;flex:1" *ngIf="msgModalMsg">
       <!-- Metadane -->
-      <div style="background:#f9fafb;border-radius:8px;padding:12px;font-size:12px;display:flex;flex-direction:column;gap:4px">
+      <div style="background:#f9fafb;border-radius:12px;padding:12px 16px;font-size:12px;display:flex;flex-direction:column;gap:4px">
         <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.from') }}</span><span style="color:#374151;font-weight:600">{{firstAddressDisplay(msgModalMsg.from)}}</span></div>
         <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.to') }}</span><span style="color:#374151">{{decodeAddress(msgModalMsg.to)}}</span></div>
         <div *ngIf="msgModalMsg.cc" style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.cc') }}</span><span style="color:#374151">{{decodeAddress(msgModalMsg.cc)}}</span></div>
         <div style="display:flex;gap:8px"><span style="color:#9ca3af;min-width:40px">{{ t('email.date') }}</span><span style="color:#374151">{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span></div>
       </div>
       <!-- Treść -->
-      <div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px;line-height:1.6;color:#374151;white-space:pre-line;max-height:320px;overflow-y:auto"
+      <div style="border:1px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:14px;line-height:1.6;color:#374151;white-space:pre-line;max-height:320px;overflow-y:auto"
            [innerHTML]="msgModalMsg.body || msgModalMsg.snippet"></div>
       <!-- Załączniki -->
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:6px">
-        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
-        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:11px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
@@ -1080,7 +1082,7 @@ interface WhatsappConvUiState {
       <div *ngIf="msgModalReply" style="border-top:1px solid #e5e7eb;padding-top:12px;display:flex;flex-direction:column;gap:8px">
         <div style="font-size:12px;font-weight:700;color:#374151">↩ {{ t('email.reply.action') }}</div>
         <!-- Do -->
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           {{ t('email.fields.to') }}
           <div class="participant-chips">
             <span *ngFor="let r of msgModalForm.recipientList; let i=index" class="participant-chip">
@@ -1092,7 +1094,7 @@ interface WhatsappConvUiState {
           </div>
         </label>
         <!-- DW -->
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           {{ t('email.fields.cc') }}
           <div class="participant-chips">
             <span *ngFor="let r of msgModalForm.ccList; let i=index" class="participant-chip">
@@ -1104,12 +1106,12 @@ interface WhatsappConvUiState {
           </div>
         </label>
         <!-- Temat -->
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           {{ t('email.fields.subject') }}
           <input class="act-input" [(ngModel)]="msgModalForm.subject" [placeholder]="t('email.placeholders.subject')">
         </label>
         <!-- Treść -->
-        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
           {{ t('email.fields.body') }}
           <textarea class="act-input" id="msg-reply-textarea" [(ngModel)]="msgModalForm.body" rows="5" [placeholder]="t('email.placeholders.replyBody')"></textarea>
         </label>
@@ -1118,28 +1120,26 @@ interface WhatsappConvUiState {
           <span style="font-size:12px;font-weight:600">{{ t('email.fields.attachments') }}</span>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
-            <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
-                    (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
-                    style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+            <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" class="btn btn-g btn-sm" style="flex-shrink:0"
+                    (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading">
               <span *ngIf="!drivePickerLoading">📁 {{ t('email.fromGoogleDrive') }}</span>
               <span *ngIf="drivePickerLoading">⏳ {{ 'states.loading' | transloco }}</span>
             </button>
           </div>
           <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-            <span *ngFor="let f of msgModalAttachments; let i=index"
-                  style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
-              📎 {{f.name}}
-              <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+            <span *ngFor="let f of msgModalAttachments; let i=index" class="file-chip">
+              📎{{f.name}}
+              <button (click)="removeMsgReplyAttachment(i)">✕</button>
             </span>
           </div>
         </div>
-        <div *ngIf="msgModalError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{msgModalError}}</div>
+        <div *ngIf="msgModalError" class="lead-note lead-note-err">⚠️ {{msgModalError}}</div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-outline" (click)="closeMsgModal()">{{ 'actions.close' | transloco }}</button>
-      <button *ngIf="!msgModalReply && emailConnected" class="btn-outline" (click)="startMsgReply()">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
-      <button *ngIf="msgModalReply && emailConnected" class="btn-primary" (click)="sendMsgReply()"
+      <button class="btn btn-g" (click)="closeMsgModal()">{{ 'actions.close' | transloco }}</button>
+      <button *ngIf="!msgModalReply && emailConnected" class="btn btn-g" (click)="startMsgReply()">{{threadCanReply ? '↩ ' + t('email.reply.action') : '✉️ ' + t('email.writeNew')}}</button>
+      <button *ngIf="msgModalReply && emailConnected" class="btn btn-p" (click)="sendMsgReply()"
               [disabled]="msgModalSending || !msgModalForm.recipientList?.length || !msgModalForm.subject">
         {{msgModalSending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}
       </button>
@@ -1158,33 +1158,36 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.edit.sections.basic') }}</div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.companyName') }} *<input [(ngModel)]="editForm.company" [placeholder]="t('leadDetail.fields.companyName')" required></label>
+          <label>{{ t('leadDetail.fields.companyName') }} *<input [(ngModel)]="editForm.company" [placeholder]="t('leadDetail.fields.companyName')" required [class.fi-err]="editMissing('company')">@if (editMissing('company')) { <span class="ferr">{{ t('fieldErrors.company') }}</span> }</label>
           <label>{{ t('leadDetail.fields.stage') }}<select [(ngModel)]="editForm.stage"><option *ngFor="let s of allowedStageOptions" [value]="s.key">{{s.label}}</option></select></label>
         </div>
         <div class="edit-row" *ngIf="stages.isLost(editForm.stage)">
           <label class="full" style="color:#991b1b">{{ t('leadDetail.fields.lostReason') }} *
             <select [(ngModel)]="editForm.lost_reason"
-                    [style.border-color]="!editForm.lost_reason ? '#ef4444' : ''">
+                    [class.fi-err]="editMissing('lostReason')">
               <option value="">{{ t('leadDetail.edit.chooseReason') }}</option>
               <option *ngFor="let r of lostReasons" [value]="r">{{r}}</option>
             </select>
+            @if (editMissing('lostReason')) { <span class="ferr">{{ t('fieldErrors.lostReason') }}</span> }
           </label>
         </div>
-        <div class="edit-row"><label class="check-label"><input type="checkbox" [(ngModel)]="editForm.hot"> 🔥 {{ t('leadDetail.fields.hotLead') }}</label></div>
+        <div class="edit-row"><button type="button" class="fchip hot-chip" [class.on]="editForm.hot" [attr.aria-pressed]="!!editForm.hot" [title]="t('leadsList.newLead.hotHint')" (click)="editForm.hot = !editForm.hot">🔥 {{ t('leadDetail.fields.hotLead') }}</button></div>
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">{{ t('leadDetail.fields.website') }}</div>
+        <div class="edit-section-title">{{ t('leadDetail.fields.website') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></div>
         <div style="display:flex;gap:8px;align-items:center">
-          <input style="flex:1;border:1px solid #d1d5db;border-radius:6px;padding:7px 10px;font-size:13px;outline:none;font-family:inherit"
+          <input class="fi" style="flex:1"
                  [(ngModel)]="editForm.website" [placeholder]="t('leadDetail.edit.placeholders.website')"
+                 [class.fi-err]="editMissing('website')"
                  (keydown.enter)="runDetailEnrich()">
-          <button class="btn-outline" style="white-space:nowrap;flex-shrink:0"
+          <button class="btn btn-g" style="flex-shrink:0"
                   (click)="runDetailEnrich()"
                   [disabled]="!editForm.website||detailEnriching">
             {{detailEnriching ? '⏳ ' + t('leadDetail.enrich.loading') : '🔍 ' + t('leadDetail.enrich.action')}}
           </button>
         </div>
-        <div *ngIf="detailEnrichDone" style="margin-top:6px;font-size:11px;color:#15803d;background:#f0fdf4;border-radius:6px;padding:5px 10px">
+        @if (editMissing('website')) { <span class="ferr">{{ t('fieldErrors.website') }}</span> }
+        <div *ngIf="detailEnrichDone" class="lead-note lead-note-ok" style="margin-top:8px">
           ✓ {{ t('leadDetail.enrich.done') }}
         </div>
       </div>
@@ -1193,37 +1196,39 @@ interface WhatsappConvUiState {
         <div class="edit-row">
           <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.fullName') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
             <input [(ngModel)]="editForm.contact_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"
-                   [style.border-color]="requiresFullFields && !editForm.contact_name ? '#fca5a5' : ''">
+                   [class.fi-err]="editMissing('contactName')">
+            @if (editMissing('contactName')) { <span class="ferr">{{ t('fieldErrors.contactName') }}</span> }
           </label>
           <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.contactTitle') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span><select [(ngModel)]="editForm.contact_title"
-                   [style.border-color]="requiresFullFields && !editForm.contact_title ? '#fca5a5' : ''"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
+                   [class.fi-err]="editMissing('contactTitle')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select>@if (editMissing('contactTitle')) { <span class="ferr">{{ t('fieldErrors.contactTitle') }}</span> }</label>
         </div>
         <div class="edit-row">
           <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.email') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
             <input [(ngModel)]="editForm.email" type="email" [placeholder]="t('leadDetail.edit.placeholders.email')"
-                   [style.border-color]="requiresFullFields && !editForm.email ? '#fca5a5' : ''">
+                   [class.fi-err]="editMissing('email')">
+            @if (editMissing('email')) { <span class="ferr">{{ t('fieldErrors.email') }}</span> }
           </label>
           <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.phone') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span></span>
-            <input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"
-                   [style.border-color]="requiresFullFields && !editForm.phone ? '#fca5a5' : ''">
+            <wt-phone-input [(ngModel)]="editForm.phone" [invalid]="editMissing('phone')" />
+            @if (editMissing('phone')) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
           </label>
         </div>
       </div>
       <div class="edit-section">
         <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
           <span>{{ t('leadDetail.sections.extraContacts') }}</span>
-          <button style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ {{ t('leadDetail.edit.addContact') }}</button>
+          <button class="btn btn-g btn-sm" style="text-transform:none;letter-spacing:0" (click)="addExtraContact()">+ {{ t('leadDetail.edit.addContact') }}</button>
         </div>
         @for (ec of extraContacts; track $index; let i = $index) {
-          <div style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
-            <button style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)">✕</button>
+          <div style="background:#f9fafb;border-radius:12px;padding:12px 16px;margin-bottom:8px;position:relative">
+            <button class="act-ctrl-btn del" style="position:absolute;top:8px;right:8px;line-height:1" (click)="removeExtraContact(i)">✕</button>
             <div class="edit-row">
               <label>{{ t('leadDetail.fields.fullName') }}<input [(ngModel)]="ec.contact_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"></label>
               <label>{{ t('leadDetail.fields.contactTitle') }}<select [(ngModel)]="ec.contact_title"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select></label>
             </div>
             <div class="edit-row">
               <label>{{ t('leadDetail.fields.email') }}<input [(ngModel)]="ec.email" type="email" [placeholder]="t('leadDetail.edit.placeholders.email')"></label>
-              <label>{{ t('leadDetail.fields.phone') }}<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
+              <label>{{ t('leadDetail.fields.phone') }}<wt-phone-input [(ngModel)]="ec.phone" /></label>
             </div>
           </div>
         }
@@ -1236,43 +1241,42 @@ interface WhatsappConvUiState {
         <div class="edit-row">
           <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">{{ t('leadDetail.fields.nip') }} <span style="color:#f97316">*</span></span>
             <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
-                   style="font-family:monospace"
                    (ngModelChange)="validateEditNip()"
-                   [style.border-color]="editNipError ? '#ef4444' : ''">
-            <span *ngIf="editNipError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ editNipError }}</span>
+                   [class.fi-err]="!!editNipError">
+            @if (editNipError) { <span class="ferr">{{ editNipError }}</span> }
           </label>
         </div>
       </div>
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.edit.sections.sales') }}</div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.annualTurnover') }}<div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div></label>
-          <label>{{ t('leadDetail.fields.onlinePct') }}<select [(ngModel)]="editForm.online_pct"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+          <label>{{ t('leadDetail.fields.annualTurnover') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1" [class.fi-err]="editMissing('value') || !!amountError(editForm.value_pln)"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>@if (editMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }@if (amountError(editForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }</label>
+          <label>{{ t('leadDetail.fields.onlinePct') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><select [(ngModel)]="editForm.online_pct" [class.fi-err]="editMissing('onlinePct')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('onlinePct')) { <span class="ferr">{{ t('fieldErrors.onlinePct') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.firstContact') }}<input [(ngModel)]="editForm.first_contact_date" type="date"></label>
-          <label>{{ t('leadDetail.fields.closeDate') }}<input [(ngModel)]="editForm.close_date" type="date"></label>
+          <label>{{ t('leadDetail.fields.firstContact') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><input [(ngModel)]="editForm.first_contact_date" type="date" [class.fi-err]="editMissing('firstContact')">@if (editMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.closeDate') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><input [(ngModel)]="editForm.close_date" type="date" [class.fi-err]="editMissing('closeDate')">@if (editMissing('closeDate')) { <span class="ferr">{{ t('fieldErrors.closeDate') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.source') }}<select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()"><option value="">{{ t('leadDetail.edit.none') }}</option>
+          <label>{{ t('leadDetail.fields.source') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()" [class.fi-err]="editMissing('source')"><option value="">{{ t('leadDetail.edit.none') }}</option>
                   @for (s of sourcesWithoutGroup(); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }
                   @for (g of sourceGroups(); track g) { <optgroup [label]="g">@for (s of sourcesInGroup(g); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }</optgroup> }
-                  </select></label>
-          <label>{{ t('leadDetail.fields.industry') }}<select [(ngModel)]="editForm.industry"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select></label>
+                  </select>@if (editMissing('source')) { <span class="ferr">{{ t('fieldErrors.source') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.industry') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><select [(ngModel)]="editForm.industry" [class.fi-err]="editMissing('industry')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select>@if (editMissing('industry')) { <span class="ferr">{{ t('fieldErrors.industry') }}</span> }</label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
-          <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;margin-top:4px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange)">🤝 {{ t('leadDetail.edit.sections.agent') }}</div>
+          <div style="background:var(--orange-pale);border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange);display:flex;align-items:center;gap:4px">🤝 {{ t('leadDetail.edit.sections.agent') }}</div>
             <div class="edit-row">
               <label>{{ t('leadDetail.fields.fullName') }}<input [(ngModel)]="editForm.agent_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"></label>
-              <label>{{ t('leadDetail.fields.phone') }}<input [(ngModel)]="editForm.agent_phone" placeholder="+48 600 000 000"></label>
+              <label>{{ t('leadDetail.fields.phone') }}<wt-phone-input [(ngModel)]="editForm.agent_phone" /></label>
             </div>
             <div class="edit-row"><label class="full">{{ t('leadDetail.fields.email') }}<input [(ngModel)]="editForm.agent_email" type="email" [placeholder]="t('leadDetail.edit.placeholders.agentEmail')"></label></div>
           </div>
         </ng-container>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.salesperson') }}<select [(ngModel)]="editForm.assigned_to"><option value="">{{ t('leadDetail.edit.unassigned') }}</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select></label>
-          <label>{{ t('leadDetail.fields.probabilityPct') }}<select [(ngModel)]="editForm.probability"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select></label>
+          <label>{{ t('leadDetail.fields.salesperson') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><select [(ngModel)]="editForm.assigned_to" [class.fi-err]="editMissing('salesperson')"><option value="">{{ t('leadDetail.edit.unassigned') }}</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>@if (editMissing('salesperson')) { <span class="ferr">{{ t('fieldErrors.salesperson') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.probabilityPct') }} <span *ngIf="requiresFullFields" style="color:#f97316">*</span><select [(ngModel)]="editForm.probability" [class.fi-err]="editMissing('probability')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('probability')) { <span class="ferr">{{ t('fieldErrors.probability') }}</span> }</label>
         </div>
         <div class="edit-row">
           <label class="full">{{ t('leadDetail.fields.tagsHint') }}<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
@@ -1292,17 +1296,13 @@ interface WhatsappConvUiState {
       }
     </div>
 
-      <!-- Błędy walidacji -->
-      @if (editErrors.length > 0) {
-        <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 14px;margin:0 0 8px;font-size:12px;color:#991b1b">
-          <strong>{{ t('leadDetail.edit.requiredForStage', { stage: stageLabel(editForm.stage) }) }}</strong>
-          <div style="margin-top:4px">{{ editErrors.join(', ') }}</div>
-        </div>
-      }
 
+    @if (saveError) {
+      <div class="ferr" role="alert" style="margin:0 24px 8px">{{ saveError }}</div>
+    }
     <div class="modal-footer">
-      <button class="btn-outline" (click)="showEdit=false">{{ 'actions.cancel' | transloco }}</button>
-      <button class="btn-primary" (click)="saveLead()" [disabled]="saving||!editForm.company">{{saving ? t('leadDetail.edit.saving') : t('leadDetail.edit.saveChanges')}}</button>
+      <button class="btn btn-g" (click)="showEdit=false">{{ 'actions.cancel' | transloco }}</button>
+      <button class="btn btn-p" (click)="saveLead()" [disabled]="saving">{{saving ? t('leadDetail.edit.saving') : t('leadDetail.edit.saveChanges')}}</button>
     </div>
   </div>
 </div>
@@ -1311,14 +1311,14 @@ interface WhatsappConvUiState {
 <div class="modal-overlay" *ngIf="showDocPicker" (click)="showDocPicker=false">
   <div class="modal modal-wide" (click)="$event.stopPropagation()" style="width:min(640px,100%)">
     <div class="modal-header"><h3>📎 {{ t('documents.picker.title') }}</h3><button class="close-btn" (click)="showDocPicker=false">✕</button></div>
-    <div class="modal-body" style="gap:10px">
+    <div class="modal-body" style="gap:12px">
       <div style="font-size:12px;color:#6b7280">{{ t('documents.picker.hint') }}</div>
-      <input class="act-input" style="font-size:13px;padding:8px 12px" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch()" [placeholder]="t('documents.picker.searchPlaceholder')">
+      <input type="search" class="fi" [(ngModel)]="docSearch" (ngModelChange)="onDocSearch()" [placeholder]="t('documents.picker.searchPlaceholder')">
       <div *ngIf="docSearching" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">{{ t('documents.picker.searching') }}</div>
       <div *ngIf="!docSearching&&docResults.length===0&&docSearch.length>1" style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">{{ t('documents.picker.noResults') }}</div>
       <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
         <div *ngFor="let doc of docResults"
-             style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;transition:background .1s"
+             style="display:flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid #e5e7eb;border-radius:10px;transition:background .1s"
              [style.cursor]="doc._access==='read' ? 'default' : 'pointer'"
              [style.opacity]="doc._access==='read' ? '0.55' : '1'"
              [title]="doc._access==='read' ? t('documents.picker.readOnlyTooltip') : ''"
@@ -1326,16 +1326,16 @@ interface WhatsappConvUiState {
              (click)="toggleLinkDoc(doc)">
           <span style="font-size:16px">📄</span>
           <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div><div style="font-size:10px;color:#9ca3af"><span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>{{doc.doc_type}}</div></div>
-          <span *ngIf="doc._access==='read'" style="font-size:11px;color:#9ca3af">🔒 {{ t('documents.picker.readOnly') }}</span>
-          <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ {{ t('documents.picker.added') }}</span>
-          <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:11px;color:#9ca3af">{{ t('documents.add') }}</span>
+          <span *ngIf="doc._access==='read'" style="font-size:12px;color:#9ca3af">🔒 {{ t('documents.picker.readOnly') }}</span>
+          <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:#16a34a">✓ {{ t('documents.picker.added') }}</span>
+          <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:12px;color:#9ca3af">{{ t('documents.add') }}</span>
         </div>
       </div>
-      <div *ngIf="linkDocError" style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626">
+      <div *ngIf="linkDocError" class="lead-note lead-note-err">
         ⚠ {{linkDocError}}
       </div>
     </div>
-    <div class="modal-footer"><button class="btn-outline" (click)="showDocPicker=false">{{ 'actions.close' | transloco }}</button></div>
+    <div class="modal-footer"><button class="btn btn-g" (click)="showDocPicker=false">{{ 'actions.close' | transloco }}</button></div>
   </div>
 </div>
 
@@ -1345,7 +1345,7 @@ interface WhatsappConvUiState {
     <div class="modal-header">
       <div style="display:flex;flex-direction:column;gap:2px">
         <h3>🖥️ {{ t('leadDetail.testAccount.title') }}</h3>
-        <div style="font-size:11px;color:#9ca3af;font-weight:400">{{lead?.company}}<span *ngIf="lead?.nip"> · {{ t('leadDetail.fields.nip') }}: {{lead?.nip}}</span></div>
+        <div style="font-size:12px;color:#9ca3af;font-weight:400">{{lead?.company}}<span *ngIf="lead?.nip"> · {{ t('leadDetail.fields.nip') }}: {{lead?.nip}}</span></div>
       </div>
       <button class="close-btn" (click)="closeTestAccountModal()">✕</button>
     </div>
@@ -1363,7 +1363,7 @@ interface WhatsappConvUiState {
           </div>
           <div *ngIf="testAccount!.price_list_url" style="margin-top:4px">
             <a [href]="testAccount!.price_list_url" target="_blank"
-               style="font-size:11px;color:#2563eb;text-decoration:underline">
+               style="font-size:12px;color:#2563eb;text-decoration:underline">
               📋 {{ t('leadDetail.testAccount.openPriceList') }}
             </a>
           </div>
@@ -1493,8 +1493,8 @@ interface WhatsappConvUiState {
     </div>
 
     <div class="modal-footer">
-      <button class="btn-outline" (click)="closeTestAccountModal()">{{ 'actions.cancel' | transloco }}</button>
-      <button class="btn-primary" (click)="submitTestAccount()" [disabled]="submittingTestAccount" style="background:#1d4ed8;border-color:#1d4ed8;min-width:180px">
+      <button class="btn btn-g" (click)="closeTestAccountModal()">{{ 'actions.cancel' | transloco }}</button>
+      <button class="btn btn-p" (click)="submitTestAccount()" [disabled]="submittingTestAccount" style="min-width:180px">
         <span *ngIf="!submittingTestAccount">🖥️ {{testAccount?.status==='created' ? t('leadDetail.testAccount.retry') : t('leadDetail.testAccount.create')}}</span>
         <span *ngIf="submittingTestAccount">⏳ {{ t('leadDetail.testAccount.creating') }}</span>
       </button>
@@ -1507,32 +1507,30 @@ interface WhatsappConvUiState {
   <div class="modal" (click)="$event.stopPropagation()">
     <h3>⏸️ {{ lead?.hold_active ? t('leadDetail.hold.edit') : t('leadDetail.hold.set') }}</h3>
     <p style="margin-bottom:16px">{{ t('leadDetail.hold.introBefore') }} <strong>{{lead?.company}}</strong> {{ t('leadDetail.hold.introAfter') }}</p>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
-      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:8px">
+      <label style="font-size:14px;color:#374151;display:flex;flex-direction:column;gap:4px">
         {{ t('leadDetail.hold.reason') }}
-        <select [(ngModel)]="holdForm.reason"
-                [style.border-color]="holdSubmitted && !holdForm.reason ? '#ef4444' : '#d1d5db'"
-                style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
+        <select [(ngModel)]="holdForm.reason" class="fsel"
+                [style.border-color]="holdSubmitted && !holdForm.reason ? '#ef4444' : ''">
           <option value="" disabled>{{ t('leadDetail.edit.chooseReason') }}</option>
           <option *ngFor="let r of holdReasons" [value]="r">{{r}}</option>
         </select>
-        <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:11px;color:#ef4444">{{ t('leadDetail.hold.reasonRequired') }}</span>
+        <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:12px;color:#ef4444">{{ t('leadDetail.hold.reasonRequired') }}</span>
       </label>
-      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+      <label style="font-size:14px;color:#374151;display:flex;flex-direction:column;gap:4px">
         {{ t('leadDetail.hold.activeUntil') }}
-        <input type="date" [(ngModel)]="holdForm.until" [min]="todayStr"
-               [style.border-color]="holdSubmitted && !holdForm.until ? '#ef4444' : '#d1d5db'"
-               style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
-        <span *ngIf="holdSubmitted && !holdForm.until" style="font-size:11px;color:#ef4444">{{ t('leadDetail.hold.dateRequired') }}</span>
+        <input type="date" class="fi" [(ngModel)]="holdForm.until" [min]="todayStr"
+               [style.border-color]="holdSubmitted && !holdForm.until ? '#ef4444' : ''">
+        <span *ngIf="holdSubmitted && !holdForm.until" style="font-size:14px;color:#ef4444">{{ t('leadDetail.hold.dateRequired') }}</span>
       </label>
     </div>
     <div *ngIf="holdError" style="font-size:12px;color:#ef4444;margin-bottom:8px">{{holdError}}</div>
     <div class="modal-actions" style="justify-content:space-between">
-      <button *ngIf="lead?.hold_active" class="btn-outline" style="color:#ef4444;border-color:#fecaca" (click)="cancelHold()" [disabled]="holdSaving">{{ t('leadDetail.hold.remove') }}</button>
+      <button *ngIf="lead?.hold_active" class="btn btn-d" (click)="cancelHold()" [disabled]="holdSaving">{{ t('leadDetail.hold.remove') }}</button>
       <span *ngIf="!lead?.hold_active"></span>
       <div style="display:flex;gap:8px">
-        <button class="btn-outline" (click)="showHoldModal=false">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn-primary" (click)="saveHold()" [disabled]="holdSaving">{{holdSaving ? '…' : (lead?.hold_active ? ('actions.save' | transloco) : '⏸️ ' + t('leadDetail.hold.set'))}}</button>
+        <button class="btn btn-g" (click)="showHoldModal=false">{{ 'actions.cancel' | transloco }}</button>
+        <button class="btn btn-p" (click)="saveHold()" [disabled]="holdSaving">{{holdSaving ? '…' : (lead?.hold_active ? ('actions.save' | transloco) : '⏸️ ' + t('leadDetail.hold.set'))}}</button>
       </div>
     </div>
   </div>
@@ -1543,79 +1541,77 @@ interface WhatsappConvUiState {
   <div class="modal" (click)="$event.stopPropagation()">
     <h3>🚀 {{ t('leadDetail.onboarding.start') }}</h3>
     <p style="margin-bottom:16px">{{ t('leadDetail.onboarding.introBefore') }} <strong>{{lead?.company}}</strong> {{ t('leadDetail.onboarding.introAfter') }}</p>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+      <label style="font-size:14px;color:#374151;display:flex;flex-direction:column;gap:4px">
         {{ t('leadDetail.onboarding.contractValue') }}
-        <input type="number" min="0" step="1000"
+        <input type="number" min="0" step="1000" class="fi"
                [(ngModel)]="convertForm.contract_value"
-               [placeholder]="t('leadDetail.onboarding.contractValuePlaceholder')"
-               style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
+               [placeholder]="t('leadDetail.onboarding.contractValuePlaceholder')">
       </label>
-      <label style="font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px">
+      <label style="font-size:14px;color:#374151;display:flex;flex-direction:column;gap:4px">
         {{ t('leadDetail.onboarding.contractSigned') }}
-        <input type="date"
-               [(ngModel)]="convertForm.contract_signed"
-               style="border:1px solid #d1d5db;border-radius:6px;padding:8px 10px;font-size:13px">
+        <input type="date" class="fi"
+               [(ngModel)]="convertForm.contract_signed">
       </label>
     </div>
     <div class="modal-actions">
-      <button class="btn-outline" (click)="showConvert=false">{{ 'actions.cancel' | transloco }}</button>
-      <button class="btn-primary" (click)="convertLead()" [disabled]="converting">{{converting?'…':'🚀 ' + t('leadDetail.onboarding.start')}}</button>
+      <button class="btn btn-g" (click)="showConvert=false">{{ 'actions.cancel' | transloco }}</button>
+      <button class="btn btn-p" (click)="convertLead()" [disabled]="converting">{{converting?'…':'🚀 ' + t('leadDetail.onboarding.start')}}</button>
     </div>
   </div>
 </div>
 
 <!-- �?�? MODAL SZCZEGÓ�?ÓW AKTYWNOŚCI (Lead) �?�? -->
 <div *ngIf="selectedAct" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px" (click)="closeActModal()">
-  <div style="background:white;border-radius:14px;width:min(520px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;flex-direction:column" (click)="$event.stopPropagation()">
+  <div style="background:white;border-radius:12px;width:min(520px,100%);max-height:85vh;overflow-y:auto;box-shadow:0 11px 29px rgba(0,0,0,0.135);display:flex;flex-direction:column" (click)="$event.stopPropagation()">
     <!-- Nagłówek -->
-    <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1">
+    <div style="padding:16px 24px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:8px;position:sticky;top:0;background:white;z-index:1">
       <span style="font-size:12px;font-weight:600;color:#6b7280">{{actTypeName(selectedAct.type)}}</span>
       <span class="act-status-badge act-status-{{selectedAct.status||'new'}}">{{actStatusLabel(selectedAct.status||'new')}}</span>
       <span style="flex:1"></span>
-      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" style="background:var(--orange-pale);border:1px solid var(--orange-muted);color:var(--orange-dark);border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600" (click)="startEditActModal()">✏️ {{ t('activity.modal.edit') }}</button>
-      <button style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer" (click)="closeActModal()">✕</button>
+      <button *ngIf="!actModalEditMode && canEditActivity(selectedAct)" class="btn btn-g btn-sm" (click)="startEditActModal()">✏️ {{ t('activity.modal.edit') }}</button>
+      <button class="close-btn" (click)="closeActModal()">✕</button>
     </div>
     <!-- Widok -->
-    <div *ngIf="!actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
-      <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">{{selectedAct.title}}</div>
-      <div *ngIf="selectedAct.activity_at" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📅 {{ t('activity.modal.dateTime') }}</span>
+    <div *ngIf="!actModalEditMode" style="padding:20px 24px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#333333">{{selectedAct.title}}</div>
+      <div *ngIf="selectedAct.activity_at" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
+        <span class="act-modal-lbl">📅 {{ t('activity.modal.dateTime') }}</span>
         <span>{{selectedAct.activity_at | date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
-      <div *ngIf="selectedAct.assigned_to_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👤 {{ t('activity.modal.assignedTo') }}</span>
+      <div *ngIf="selectedAct.assigned_to_name" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
+        <span class="act-modal-lbl">👤 {{ t('activity.modal.assignedTo') }}</span>
         <span>{{selectedAct.assigned_to_name}}</span>
       </div>
-      <div *ngIf="selectedAct.created_by_name" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">✍️ {{ t('activity.modal.addedBy') }}</span>
+      <div *ngIf="selectedAct.created_by_name" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
+        <span class="act-modal-lbl">✍️ {{ t('activity.modal.addedBy') }}</span>
         <span>{{selectedAct.created_by_name}}</span>
       </div>
-      <div *ngIf="selectedAct.meeting_location" style="display:flex;gap:12px;font-size:13px">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📍 {{ t('meetings.location') }}</span>
+      <div *ngIf="selectedAct.meeting_location" style="display:flex;gap:12px;font-size:14px">
+        <span class="act-modal-lbl">📍 {{ t('meetings.location') }}</span>
         <span>{{selectedAct.meeting_location}}</span>
       </div>
-      <div *ngIf="selectedAct.participants" style="display:flex;gap:12px;font-size:13px">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">👥 {{ t('meetings.participants') }}</span>
+      <div *ngIf="selectedAct.participants" style="display:flex;gap:12px;font-size:14px">
+        <span class="act-modal-lbl">👥 {{ t('meetings.participants') }}</span>
         <span style="word-break:break-all">{{selectedAct.participants}}</span>
       </div>
-      <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:13px;align-items:flex-start">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">📝 {{ t('activity.modal.description') }}</span>
+      <div *ngIf="selectedAct.body" style="display:flex;gap:12px;font-size:14px;align-items:flex-start">
+        <span class="act-modal-lbl">📝 {{ t('activity.modal.description') }}</span>
         <span style="white-space:pre-line">{{selectedAct.body}}</span>
       </div>
       <wt-entity-attachments *ngIf="selectedAct.type==='task' || selectedAct.type==='note'" sourceType="lead-activity" [sourceId]="selectedAct.id"></wt-entity-attachments>
-      <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:13px">
-        <span style="color:#9ca3af;font-size:12px;min-width:100px;flex-shrink:0">💬 {{ t('activity.modal.comment') }}</span>
+      <div *ngIf="selectedAct.close_comment" style="display:flex;gap:12px;font-size:14px">
+        <span class="act-modal-lbl">💬 {{ t('activity.modal.comment') }}</span>
         <span style="font-style:italic">{{selectedAct.close_comment}}</span>
       </div>
       <!-- Zamknij — tylko dla zadań, bez komentarza -->
       <div *ngIf="selectedAct.type==='task' && selectedAct.status !== 'closed' && canEditActivity(selectedAct)" style="margin-top:4px;display:flex;justify-content:flex-end">
-        <button style="background:#3BAA5D;color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="confirmCloseActModal()" [disabled]="savingActivity">{{savingActivity ? '…' : '✓ ' + t('activity.card.closeTask')}}</button>
+        <button class="btn btn-p" (click)="confirmCloseActModal()" [disabled]="savingActivity">{{savingActivity ? '…' : '✓ ' + t('activity.card.closeTask')}}</button>
       </div>
     </div>
     <!-- Edycja -->
-    <div *ngIf="actModalEditMode" style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;flex-direction:column;gap:5px">
+    <div *ngIf="actModalEditMode" style="padding:20px 24px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px">
         <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.type') }}</label>
         <select [(ngModel)]="actEditForm.type" class="act-sel">
           <option value="task">✅ {{ t('labels.activityTypes.task') }}</option>
@@ -1628,16 +1624,16 @@ interface WhatsappConvUiState {
           <option value="opportunity">💡 {{ t('labels.activityTypes.opportunity') }}</option>
         </select>
       </div>
-      <div style="display:flex;flex-direction:column;gap:5px">
+      <div style="display:flex;flex-direction:column;gap:4px">
         <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.title') }} <span style="color:#dc2626">*</span></label>
         <input [(ngModel)]="actEditForm.title" class="act-input">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="display:flex;flex-direction:column;gap:5px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:4px">
           <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.form.dateTime') }}</label>
           <input type="datetime-local" [(ngModel)]="actEditForm.activity_at" class="act-input">
         </div>
-        <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;flex-direction:column;gap:4px">
           <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.assignToSalesperson') }}</label>
           <select [(ngModel)]="actEditForm.assigned_to" class="act-sel">
             <option value="">{{ t('activity.modal.unassigned') }}</option>
@@ -1646,22 +1642,22 @@ interface WhatsappConvUiState {
         </div>
       </div>
       <ng-container *ngIf="actEditForm.type === 'meeting'">
-        <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;flex-direction:column;gap:4px">
           <label style="font-size:12px;font-weight:600;color:#374151">{{ t('meetings.meetingLocation') }}</label>
           <input [(ngModel)]="actEditForm.meeting_location" class="act-input">
         </div>
-        <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;flex-direction:column;gap:4px">
           <label style="font-size:12px;font-weight:600;color:#374151">{{ t('meetings.participants') }}</label>
           <input [(ngModel)]="actEditForm.participants" class="act-input" [placeholder]="t('meetings.participantsHint')">
         </div>
       </ng-container>
-      <div style="display:flex;flex-direction:column;gap:5px">
+      <div style="display:flex;flex-direction:column;gap:4px">
         <label style="font-size:12px;font-weight:600;color:#374151">{{ t('activity.modal.descriptionNotes') }}</label>
         <textarea [(ngModel)]="actEditForm.body" rows="4" class="act-input" style="resize:vertical"></textarea>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-        <button style="background:white;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer" (click)="actModalEditMode=false">{{ 'actions.cancel' | transloco }}</button>
-        <button style="background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : t('activity.modal.saveChanges')}}</button>
+        <button class="btn btn-g" (click)="actModalEditMode=false">{{ 'actions.cancel' | transloco }}</button>
+        <button class="btn btn-p" (click)="saveEditActivityModal()" [disabled]="!actEditForm.title || savingActivity">{{savingActivity ? '…' : t('activity.modal.saveChanges')}}</button>
       </div>
     </div>
   </div>
@@ -1679,168 +1675,178 @@ interface WhatsappConvUiState {
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
-    .hdr-btn { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:5px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; position:relative; }
-    .hdr-btn:hover { background:#f9fafb; }
-    .hdr-btn:disabled { opacity:.45; cursor:not-allowed; pointer-events:auto; }
-    .hdr-btn-edit { border-color:#d1d5db; }
-    .hdr-btn-primary { background:var(--orange); color:white; border-color:var(--orange); }
-    .hdr-btn-primary:hover { background:var(--orange-dark); }
-    .hdr-btn-test { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
-    .hdr-btn-test:hover { background:#dbeafe; }
-    .ta-badge-ok { background:#16a34a; color:white; border-radius:10px; font-size:9px; font-weight:700; padding:0 5px; line-height:15px; display:inline-block; margin-left:2px; }
-    .ta-badge-err { background:#ef4444; color:white; border-radius:10px; font-size:9px; font-weight:700; padding:0 5px; line-height:15px; display:inline-block; margin-left:2px; }
-    .ta-section { display:flex; flex-direction:column; gap:10px; }
+    .hdr-btn { position:relative; box-sizing:border-box; height:32px; padding:0 12px !important; font-size:12px !important; border-radius:10px !important; }
+    .hdr-btn:has(> svg:first-child) { padding-left:10px !important; }
+    .lead-card { background:white; border-radius:12px; box-shadow:var(--shadow-sm); overflow:hidden; }
+    .side-box { background:white; border-radius:14px; box-shadow:var(--shadow-sm); padding:16px; flex-shrink:0; }
+    .side-box-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#333333; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .side-box-title svg { color:inherit; }
+    .lead-form-box { background:#f9fafb; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .conv-card { background:white; border-radius:14px; box-shadow:var(--shadow-sm); overflow:hidden; flex-shrink:0; }
+    .conv-ic { width:16px; height:16px; color:var(--gray-500); }
+    .comm-ic { width:16px; height:16px; color:var(--orange); }
+    .lead-note { display:flex; align-items:center; gap:8px; font-size:12px; border-radius:10px; padding:8px 12px; }
+    .lead-note-warn { background:#fef3c7; color:#92400e; }
+    .lead-note-err { background:#fef2f2; color:#dc2626; }
+    .lead-note-ok { background:#f0fdf4; color:#15803d; }
+    .file-chip { display:inline-flex; align-items:center; gap:4px; background:#eff6ff; color:#1d4ed8; border-radius:12px; padding:2px 8px; font-size:12px; }
+    .file-chip button { background:none; border:none; cursor:pointer; color:#9ca3af; font-size:12px; padding:0; }
+    .file-chip button:hover { color:#dc2626; }
+    .info-icon-btn { background:none; border:none; cursor:pointer; color:var(--gray-400); padding:0 4px; display:inline-flex; align-items:center; }
+    .info-icon-btn:hover { color:var(--orange); }
+    .act-modal-lbl { color:#9ca3af; font-size:12px; min-width:100px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
+    .ic-spin { animation:lead-spin 1s linear infinite; }
+    @keyframes lead-spin { to { transform:rotate(360deg); } }
+    .ta-badge-ok { background:#16a34a; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:15px; display:inline-block; margin-left:2px; }
+    .ta-badge-err { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:15px; display:inline-block; margin-left:2px; }
+    .ta-section { display:flex; flex-direction:column; gap:12px; }
     .ta-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; padding-bottom:4px; border-bottom:1px solid #f3f4f6; }
-    .ta-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .ta-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .ta-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .ta-row label.full { grid-column:1/-1; }
-    .ta-row label input, .ta-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
-    .ta-row label input:focus, .ta-row label select:focus { border-color:#1d4ed8; }
-    .ta-status-ok  { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px; }
-    .ta-status-err { background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px; }
-    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 5px; line-height:16px; display:inline-block; }
+    .ta-row label input, .ta-row label select { border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:14px; outline:none; font-family:inherit; background:white; color:var(--gray-800); transition:border-color .15s; }
+    .ta-row label input:focus, .ta-row label select:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .ta-status-ok  { background:#f0fdf4; border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+    .ta-status-err { background:#fef2f2; border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:16px; display:inline-block; }
     .info-section { margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #f3f4f6; }
     .info-section:last-child { border-bottom:none; }
-    .info-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#9ca3af; margin-bottom:8px; }
-    .info-kv { display:flex; gap:8px; align-items:flex-start; margin-bottom:5px; font-size:12.5px; }
-    .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; min-width:72px; padding-top:1px; }
-    .val { color:#374151; flex:1; }
-    .val.fw { font-weight:600; color:#18181b; }
+    .info-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#9ca3af; margin-bottom:8px; display:flex; align-items:center; gap:4px; }
+    .info-kv { display:flex; gap:8px; align-items:baseline; margin-bottom:6px; font-size:12px; line-height:1.5; }
+    .lbl { color:var(--gray-500); font-size:12px; white-space:nowrap; min-width:80px; }
+    .val { color:var(--gray-800); flex:1; min-width:0; font-weight:500; overflow-wrap:break-word; font-variant-numeric:tabular-nums; }
+    /* E-mail, phone and website stay on one line; a long one ends with … (full text on hover). */
+    .val-line { display:flex; align-items:center; gap:4px; min-width:0; }
+    .val-line .link { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .info-icon-btn { height:20px; }
+    .info-icon-btn svg.ic { vertical-align:0; }
+    .val.fw { font-weight:600; color:#333333; }
     .link { color:var(--orange); text-decoration:none; }
     .link:hover { text-decoration:underline; }
-    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; padding:10px 14px; font-size:12.5px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; border-radius:6px 6px 0 0; transition:all .15s; }
-    .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
-    .tab-btn:hover:not(.active) { color:#374151; }
+    .tabs > .tab-btn { flex:0 0 auto; padding:10px 12px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; }
     /* Kolory etapu idą inline z LeadStagesService — etapy są konfigurowalne,
        więc etap dodany przez tenanta nie miałby tu swojej klasy. */
-    .stage-badge { padding:2px 9px; border-radius:10px; font-size:11px; font-weight:700; }
-    .stage-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:7px; background:white; font-size:12px; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
+    .stage-badge { padding:2px 8px; border-radius:10px; font-size:12px; font-weight:700; }
+    .stage-btn { display:flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid var(--gray-200); border-radius:10px; background:white; font-size:12px; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
     .stage-btn:hover:not(:disabled) { background:var(--orange-pale); border-color:var(--orange); }
     .stage-btn.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:600; }
     .stage-btn:disabled { cursor:default; }
     .stage-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-    .comm-btn { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid #bbf7d0; border-radius:8px; background:white; cursor:pointer; width:100%; transition:background .15s; }
-    .comm-btn:hover:not(:disabled) { background:#f0fdf4; }
+    .comm-btn { display:flex; align-items:center; gap:12px; padding:8px 12px; border:1px solid var(--gray-200); border-radius:10px; background:white; cursor:pointer; width:100%; transition:background .15s, border-color .15s; font-family:inherit; color:var(--gray-800); }
+    .comm-btn:hover:not(:disabled) { background:var(--orange-pale); border-color:var(--orange); }
     .comm-btn:disabled { opacity:.5; cursor:not-allowed; }
-    .act-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #f4f4f5; transition:background .1s; border-radius:6px; }
+    .act-item { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #f4f4f5; transition:background .1s; border-radius:8px; }
     .act-item:last-child { border-bottom:none; }
     .act-item:hover { background:#f0fdf4; }
     .act-item.act-closed { opacity:.6; }
-    .act-item.act-overdue { border-left:3px solid #ef4444; padding-left:7px; }
-    .act-item.act-today { border-left:3px solid #3BAA5D; padding-left:7px; }
-    .act-card { background:white; border:1px solid #e5e7eb; border-radius:10px; padding:12px 14px; margin-bottom:8px; position:relative; transition:box-shadow .15s; }
-    .act-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.07); }
+    .act-item.act-overdue { border-left:3px solid #ef4444; padding-left:8px; }
+    .act-item.act-today { border-left:3px solid #3BAA5D; padding-left:8px; }
+    .act-card { background:white; border:none; border-radius:14px; box-shadow:var(--shadow-sm); padding:12px 16px; margin-bottom:12px; position:relative; transition:box-shadow .15s; flex-shrink:0; }
+    .act-card:hover { box-shadow:0 7px 18px rgba(0,0,0,0.099); }
     .act-card.act-card-editable { cursor:pointer; }
     .act-card.act-card-closed { opacity:.65; }
     .act-card.act-card-overdue { border-left:3px solid #ef4444; }
     .act-card.act-card-today { border-left:3px solid #3BAA5D; }
-    .act-card-body { margin-top:4px; font-size:11.5px; color:#6b7280; }
+    .act-card-body { margin-top:4px; font-size:12px; color:#6b7280; }
     .act-body-clamp { display:-webkit-box; -webkit-line-clamp:7; -webkit-box-orient:vertical; overflow:hidden; }
-    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:10.5px; color:#3BAA5D; padding:2px 0; font-weight:600; }
+    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:#3BAA5D; padding:2px 0; font-weight:600; }
     .act-card-controls { display:flex; gap:4px; margin-top:8px; opacity:0; transition:opacity .15s; }
     .act-card:hover .act-card-controls { opacity:1; }
-    .act-status-badge { font-size:10px; font-weight:700; padding:1px 7px; border-radius:9px; white-space:nowrap; }
+    .act-status-badge { font-size:10px; font-weight:700; padding:1px 8px; border-radius:9px; white-space:nowrap; }
     .act-status-new { background:#f3f4f6; color:#374151; }
     .act-status-open { background:#dbeafe; color:#1e40af; }
     .act-status-closed { background:#dcfce7; color:#166534; }
-    .priority-badge { font-size:9px; font-weight:700; padding:1px 6px; border-radius:4px; white-space:nowrap; text-transform:uppercase; }
+    .priority-badge { font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; white-space:nowrap; text-transform:uppercase; }
     .priority-asap { background:#fee2e2; color:#991b1b; }
     .priority-important { background:#ffedd5; color:#c2410c; }
     .priority-medium { background:#fef9c3; color:#854d0e; }
     .priority-low { background:#dbeafe; color:#1e40af; }
     .act-type-icon { font-size:18px; flex-shrink:0; }
     .act-body { flex:1; }
-    .act-body strong { font-size:12.5px; }
+    .act-body strong { font-size:12px; }
     .act-meta { font-size:10px; color:#9ca3af; margin-top:1px; }
-    .act-text { font-size:11.5px; color:#6b7280; margin-top:2px; white-space:pre-line; }
+    .act-text { font-size:12px; color:#6b7280; margin-top:2px; white-space:pre-line; }
     .act-edit-form { display:flex; flex-direction:column; gap:6px; }
     .act-controls { display:flex; gap:4px; align-self:flex-start; opacity:0; transition:opacity .15s; }
     .act-item:hover .act-controls { opacity:1; }
-    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 6px; border-radius:4px; color:#9ca3af; }
+    .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:4px 8px; border-radius:8px; color:#9ca3af; display:inline-flex; align-items:center; justify-content:center; font-family:inherit; }
     .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
-    .act-ctrl-btn.del:hover { color:#ef4444; }
-    .task-actions-row { display:flex; gap:6px; margin-top:8px; }
-    .btn-task-close { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
-    .btn-task-close:hover:not(:disabled) { background:#dcfce7; border-color:#86efac; }
-    .btn-task-close:disabled { opacity:.5; cursor:default; }
-    .btn-task-reopen { background:#f3f4f6; border:1px solid #d1d5db; color:#374151; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
-    .btn-task-reopen:hover:not(:disabled) { background:#e5e7eb; }
-    .btn-task-reopen:disabled { opacity:.5; cursor:default; }
-    .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
-    .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; outline:none; }
-    .act-input:focus { border-color:#3BAA5D; }
-    .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:4px 12px; cursor:pointer; }
-    .btn-sm.primary { background:#3BAA5D; color:white; border-color:#3BAA5D; }
-    .btn-sm:disabled { opacity:.6; cursor:not-allowed; }
-    .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:20px 0; }
+    .act-ctrl-btn.del { color:#dc2626; opacity:.7; }
+    .act-ctrl-btn.del:hover { background:#fef2f2; color:#dc2626; opacity:1; }
+    .task-actions-row { display:flex; gap:8px; margin-top:8px; }
+    .act-sel, .act-input { border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:12px; font-family:inherit; outline:none; background:white; color:var(--gray-800); transition:border-color .15s; box-sizing:border-box; }
+    .act-sel { cursor:pointer; }
+    .act-input { resize:vertical; }
+    .act-sel:focus, .act-input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:24px 0; }
     .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
-    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10.5px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
-    .wa-mode-switch { display:inline-flex; align-self:flex-start; border:1px solid #d1d5db; border-radius:6px; overflow:hidden; }
-    .wa-mode-switch button { background:white; border:none; padding:5px 12px; font-size:11.5px; font-weight:600; color:#6b7280; cursor:pointer; font-family:inherit; }
-    .wa-mode-switch button + button { border-left:1px solid #d1d5db; }
-    .wa-mode-switch button.active { background:#E6F4EA; color:#2F8F4D; }
-    .wa-window-hint { font-size:11.5px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:6px 10px; }
-    .wa-window-note { font-size:11px; color:#92400e; }
-    .wa-failed { font-size:10.5px; font-weight:700; color:#b91c1c; background:#fef2f2; border-radius:4px; padding:1px 6px; }
+    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
+    .wa-mode-switch { display:inline-flex; align-self:flex-start; gap:6px; }
+    .wa-window-hint { font-size:12px; color:#92400e; background:#fffbeb; border-radius:10px; padding:8px 12px; }
+    .wa-window-note { font-size:12px; color:#92400e; }
+    .wa-failed { font-size:10px; font-weight:700; color:#b91c1c; background:#fef2f2; border-radius:6px; padding:1px 6px; }
     .participant-input-wrap { position:relative; }
-    .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;min-height:32px;background:white;position:relative; }
-    .suggest-dropdown { position:absolute; background:white; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.1); z-index:100; min-width:240px; max-height:180px; overflow-y:auto; }
-    .suggest-item { padding:7px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; }
+    .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1.5px solid var(--gray-200);border-radius:10px;padding:4px 8px;min-height:36px;background:white;position:relative;box-sizing:border-box; }
+    .participant-chips:focus-within { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .suggest-dropdown { position:absolute; background:white; border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 7px 22px rgba(0,0,0,0.108); z-index:100; min-width:240px; max-height:180px; overflow-y:auto; }
+    .suggest-item { padding:8px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; }
     .suggest-item:hover { background:#f3f4f6; }
-    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px; }
-    .participant-chip button { background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px;padding:0;line-height:1; }
+    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:12px; }
+    .participant-chip button { background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:0;line-height:1; }
     .participant-input { border:none;outline:none;font-size:12px;min-width:100px;flex:1;font-family:inherit; }
-    .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:160px;overflow-y:auto;margin-top:2px; }
-    .suggestion-item { padding:7px 12px;font-size:12px;cursor:pointer; }
+    .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:white;border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 7px 22px rgba(0,0,0,0.108);max-height:160px;overflow-y:auto;margin-top:4px; }
+    .suggestion-item { padding:8px 12px;font-size:12px;cursor:pointer; }
     .suggestion-item:hover { background:#f9fafb; }
     .hist-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #f4f4f5; align-items:flex-start; }
     .hist-item:last-child { border-bottom:none; }
     .hist-dot { width:8px; height:8px; border-radius:50%; margin-top:4px; flex-shrink:0; }
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
-    .modal { background:white; border-radius:14px; padding:24px; width:380px; display:flex; flex-direction:column; gap:12px; }
-    .modal h3 { margin:0; font-size:16px; font-weight:700; }
-    .modal p { margin:0; font-size:13px; color:#6b7280; }
+    .modal { background:white; border-radius:12px; padding:24px; width:380px; display:flex; flex-direction:column; gap:12px; }
+    .modal h3 { margin:0; font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .modal h3 svg.ic { width:18px; height:18px; color:var(--orange); }
+    .modal p { margin:0; font-size:12px; color:#6b7280; }
     .modal label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
-    .modal input { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; }
+    .modal input:not([type=checkbox]):not([type=file]) { border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:14px; outline:none; font-family:inherit; background:white; color:var(--gray-800); transition:border-color .15s; }
+    .modal input:not([type=checkbox]):not([type=file]):focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .modal .participant-chips input.participant-input { border:none; padding:0; box-shadow:none; }
     .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
     .modal-wide { width:min(700px,100%); max-height:86vh; overflow-y:auto; padding:0; gap:0; }
-    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px 14px; border-bottom:1px solid #f3f4f6; position:sticky; top:0; background:white; z-index:1; }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 24px 16px; border-bottom:1px solid #f3f4f6; position:sticky; top:0; background:white; z-index:1; }
     .modal-header h3 { margin:0; font-size:16px; font-weight:700; }
-    .close-btn { background:none; border:none; font-size:18px; color:#9ca3af; cursor:pointer; }
+    .close-btn { background:none; border:none; font-size:18px; line-height:1; padding:4px; color:#9ca3af; cursor:pointer; border-radius:8px; }
+    .close-btn:hover { color:#374151; background:#f3f4f6; }
     .modal-body { padding:20px 24px; display:flex; flex-direction:column; gap:16px; }
-    .modal-footer { padding:14px 24px; border-top:1px solid #f3f4f6; display:flex; justify-content:flex-end; gap:8px; position:sticky; bottom:0; background:white; }
-    .edit-section { display:flex; flex-direction:column; gap:10px; }
-    .edit-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; }
-    .edit-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .modal-footer { padding:16px 24px; border-top:1px solid #f3f4f6; display:flex; justify-content:flex-end; gap:8px; position:sticky; bottom:0; background:white; }
+    .edit-section { display:flex; flex-direction:column; gap:12px; }
+    .edit-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; }
+    .edit-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .edit-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .edit-row label.full { grid-column:1/-1; }
-    .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
-    .edit-row label input:focus, .edit-row label select:focus { border-color:var(--orange); }
-    .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
-    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
-    .btn-primary:disabled { opacity:.6; }
-    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .check-label { flex-direction:row !important; align-items:center; gap:8px !important; font-size:13px !important; font-weight:400 !important; cursor:pointer; }
+    .edit-row label input:not([type=checkbox]), .edit-row label select { border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:14px; outline:none; font-family:inherit; background:white; color:var(--gray-800); transition:border-color .15s; }
+    .edit-row label input:not([type=checkbox]):focus, .edit-row label select:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .edit-textarea { width:100%; border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; color:var(--gray-800); }
+    .edit-textarea:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
+    .check-label { flex-direction:row !important; align-items:center; gap:8px !important; font-size:12px !important; font-weight:400 !important; cursor:pointer; }
     .check-label input { width:auto; }
-    .att-chip { position:relative; display:inline-flex; align-items:center; gap:4px; border-radius:5px; padding:2px 7px; font-size:10px; cursor:default; user-select:none; }
+    .hot-chip { height:36px !important; font-size:14px !important; padding:0 14px !important; justify-self:start; }
+    .att-chip { position:relative; display:inline-flex; align-items:center; gap:4px; border-radius:8px; padding:2px 8px; font-size:10px; cursor:default; user-select:none; }
     .att-chip::after { content:''; position:absolute; top:100%; left:0; right:0; height:6px; }
-    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:white; border:1px solid #e5e7eb; border-radius:7px; box-shadow:0 3px 10px rgba(0,0,0,.13); padding:3px; gap:2px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
+    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:white; border:1px solid var(--gray-200); border-radius:10px; box-shadow:0 7px 22px rgba(0,0,0,0.108); padding:4px; gap:4px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
     .att-chip:hover .att-chip-actions { display:flex; }
     .att-chip-actions:hover { display:flex; }
-    .att-action-btn { background:none; border:none; cursor:pointer; padding:3px 10px; border-radius:5px; font-size:11px; white-space:nowrap; }
+    .att-action-btn { background:none; border:none; cursor:pointer; padding:4px 12px; border-radius:6px; font-size:12px; white-space:nowrap; font-family:inherit; }
     .att-action-btn:hover { background:#f3f4f6; }
     .att-action-btn.dl { color:#1d4ed8; }
     .att-action-btn.view { color:#374151; }
-    .stage-arrow-btn { background:white;border:1px solid #e5e7eb;border-radius:6px;padding:5px 12px;font-size:18px;cursor:pointer;color:#374151;flex-shrink:0;line-height:1;transition:background .15s; }
-    .stage-arrow-btn:hover:not(:disabled) { background:#f9fafb; }
-    .stage-arrow-btn:disabled { opacity:.35;cursor:default; }
-    .stepper-dot { width:14px;height:14px;border-radius:50%;background:#d1d5db;border:2px solid #d1d5db;transition:background .2s,border-color .2s,transform .2s;flex-shrink:0; }
-    .stepper-label { font-size:9px;font-weight:500;color:#9ca3af;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;transition:color .2s; }
+    .stepper-slot { height:18px; display:flex; align-items:center; justify-content:center; }
+    .stepper-dot { box-sizing:border-box;width:14px;height:14px;border-radius:50%;background:#d1d5db;border:2px solid #d1d5db;transition:background .2s,border-color .2s,transform .2s;flex-shrink:0; }
+    .stepper-label { display:block;height:14px;line-height:14px;font-size:10px;font-weight:500;color:#9ca3af;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;transition:color .2s; }
     /* Left panel collapse */
-    .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 12px 6px; flex-shrink:0; border-bottom:1px solid #f3f4f6; }
-    .left-panel-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#9ca3af; }
-    .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid #e5e7eb; background:white; cursor:pointer; font-size:15px; line-height:1; color:#9ca3af; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
-    .panel-collapse-btn:hover { background:#E6F4EA; color:#3BAA5D; border-color:#a7d7b5; }
+    .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 16px; flex-shrink:0; border-bottom:1px solid #f3f4f6; }
+    .left-panel-collapsed .left-panel-hdr { padding:12px 4px; justify-content:center; border-bottom:none; }
+    .left-panel-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#333333; }
+    .panel-collapse-btn { width:28px; height:28px; border-radius:8px; border:1px solid var(--gray-200); background:white; cursor:pointer; color:var(--gray-600); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:border-color .15s, color .15s; padding:0; box-shadow:0 3px 9px rgba(0,0,0,.072); }
+    .panel-collapse-btn:hover { border-color:var(--orange); color:var(--orange-dark); }
     .left-panel-collapsed { overflow:hidden; }
   `],
 })
@@ -1919,6 +1925,9 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
 
   editForm: any  = {};
   editNipError = '';
+  editSubmitted = false;
+  saveError = '';
+  readonly amountError = amountError;
 
   // ── Dodatkowe kontakty ────────────────────────────────────────────────────
   extraContacts: LeadContact[] = [];
@@ -1943,6 +1952,30 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (!stage) return false;
     const seq = this.stageSeq;
     return seq.indexOf(stage) > 0;
+  }
+
+  editMissing(field: string): boolean {
+    if (!this.editSubmitted) return false;
+    const f = this.editForm;
+    if (field === 'company') return !f.company;
+    if (field === 'lostReason') return this.stages.isLost(f.stage) && !f.lost_reason;
+    if (!this.requiresFullFields) return false;
+    switch (field) {
+      case 'website':      return !f.website;
+      case 'contactName':  return !f.contact_name;
+      case 'contactTitle': return !f.contact_title;
+      case 'email':        return !f.email;
+      case 'phone':        return !f.phone;
+      case 'value':        return !f.value_pln && f.value_pln !== 0;
+      case 'onlinePct':    return f.online_pct === '' || f.online_pct == null;
+      case 'firstContact': return !f.first_contact_date;
+      case 'closeDate':    return !f.close_date;
+      case 'source':       return !f.source;
+      case 'industry':     return !f.industry;
+      case 'salesperson':  return !f.assigned_to;
+      case 'probability':  return f.probability === '' || f.probability == null;
+      default:             return false;
+    }
   }
 
   get editErrors(): string[] {
@@ -4008,6 +4041,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       lost_reason:  this.lead.lost_reason || '',
     };
     this.editNipError = '';
+    this.editSubmitted = false;
+    this.saveError = '';
     this.detailEnrichDone = false;
     // Zawsze inicjalizuj extraContacts z aktualnych danych leada przy otwarciu formularza
     this.extraContacts = ((this.lead as any).extra_contacts || []).map((ec: any) => ({
@@ -4029,12 +4064,12 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
   }
 
   saveLead() {
-    if (!this.lead || !this.editForm.company) return;
+    if (!this.lead) return;
+    this.editSubmitted = true;
+    this.saveError = '';
     this.validateEditNip();
-    if (this.editNipError) return;
-    // Walidacja wymagalności wg etapu
-    if (this.editErrors.length > 0) {
-      alert(this.transloco.translate('crm.leadDetail.edit.requiredFields') + '\n• ' + this.editErrors.join('\n• '));
+    if (!this.editForm.company || this.editNipError || this.editErrors.length > 0 || amountError(this.editForm.value_pln)) {
+      scrollToFirstFieldError();
       return;
     }
     this.saving = true;
@@ -4067,7 +4102,7 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       // Puste = formularz nie dotknął pól dodatkowych; backend pomija wtedy kolumnę.
       ...(Object.keys(this.customValues).length ? { custom_values: this.customValues } : {}),
     } as any;
-    this.api.updateLead(this.lead.id, payload).subscribe({
+    this.api.updateLead(this.lead.id, payload, { showsOwnError: true }).subscribe({
       next: updated => {
         this.zone.run(() => {
           this.lead = { ...this.lead!, ...updated, activities: this.lead!.activities };
@@ -4097,7 +4132,8 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => { this.zone.run(() => {
         this.saving = false;
-        if (err?.status === 409) this.editNipError = localizedApiErrorMessage(err?.error?.error, this.transloco) || this.transloco.translate('crm.leadDetail.nip.duplicate');
+        if (err?.status === 409) { this.editNipError = this.transloco.translate('crm.leadDetail.nip.duplicate'); scrollToFirstFieldError(); }
+        else this.saveError = describeHttpError(err, this.transloco);
         this.cdr.markForCheck();
       }); },
     });
@@ -4555,6 +4591,15 @@ export class CrmLeadDetailComponent implements OnInit, OnDestroy {
     if (a === 'crm_lead_create')    return this.transloco.translate('crm.leadDetail.history.created');
     if (a === 'crm_lead_delete')    return this.transloco.translate('crm.leadDetail.history.deleted');
     if (a === 'crm_lead_converted') return this.transloco.translate('crm.leadDetail.history.converted');
+    if (a === 'crm_lead_hold_set') {
+      const date = after.hold_until ? new Date(after.hold_until).toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+      const label = this.transloco.translate('crm.leadDetail.history.holdSet', { date });
+      return after.hold_reason ? `${label} · ${after.hold_reason}` : label;
+    }
+    if (a === 'crm_lead_hold_cancel')  return this.transloco.translate('crm.leadDetail.history.holdCancelled');
+    if (a === 'crm_lead_archived')     return this.transloco.translate('crm.leadDetail.history.archived');
+    if (a === 'crm_lead_test_account') return this.transloco.translate('crm.leadDetail.history.testAccount');
+    if (a === 'crm_lead_migrated')     return this.transloco.translate('crm.leadDetail.history.migrated');
     if (a === 'crm_lead_consent_update') {
       const m = (h as any).metadata || {};
       const lbl = m.consent_label || after.consent_key || '';

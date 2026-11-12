@@ -1,5 +1,6 @@
 // src/app/pages/crm/partners/crm-partner-detail.component.ts
 import { Component, OnInit, OnDestroy, inject, Input, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
+import { PhoneInputComponent } from '../../../shared/components/phone-input/phone-input.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { sanitizeEmailHtml } from '../../../shared/utils/email-html.util';
 import { CommonModule } from '@angular/common';
@@ -64,14 +65,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
 @Component({
   selector: 'wt-crm-partner-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ActivityCountBadgeComponent, QuillModule,
+  imports: [CommonModule, RouterModule, FormsModule, PhoneInputComponent, ActivityCountBadgeComponent, QuillModule,
             AddToCalendarComponent, LinkedProjectTasksComponent, EntityAttachmentsComponent, PendingAttachmentsComponent, CustomFieldsComponent, WhatsappTemplatePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [EmailOauthListenerService, provideTranslocoScope('crm')],
   template: `
 <ng-container *transloco="let t; prefix: 'crm'">
 <div class="detail-page" *ngIf="partner">
   <div class="detail-header">
-    <button class="back-btn" routerLink="/crm/partners">← {{ t('partnerDetail.header.backToPartners') }}</button>
+    <button type="button" class="back-link" routerLink="/crm/partners"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>{{ t('partnerDetail.header.backToPartners') }}</button>
     <h1>{{(partner.dwh_partner_id ? (partner.dwh_company_name || partner.company) : partner.company)}}</h1>
     <span *ngIf="partner.switched_to_prod_at" style="font-size:12px;color:var(--gray-500);margin-left:8px;align-self:center">
       {{ t('partnerDetail.header.activeSince', { date: (partner.switched_to_prod_at | date:'dd.MM.yyyy') }) }}
@@ -112,17 +113,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
     <div class="step-tasks-panel">
       <div class="step-tasks-header">
         <span class="step-tasks-title">📋 {{ t('partnerDetail.onboarding.tasksFor') }} <strong>{{ t(onboardingSteps[activeStep]) }}</strong></span>
-        <button class="btn-sm" *ngIf="canEdit" (click)="openAddTask()" style="font-size:12px">+ {{ t('partnerDetail.onboarding.addTask') }}</button>
-        <button class="btn-sm"
+        <button class="btn-sm" *ngIf="canEdit" (click)="openAddTask()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('partnerDetail.onboarding.addTask') }}</button>
+        <button class="btn-sm primary"
                 *ngIf="partner.onboarding_step === activeStep && isManager && allTasksDone(activeStep) && activeStep < 3"
-                (click)="advanceStep(activeStep + 1)"
-                style="background:#22c55e;color:white;border:none">
+                (click)="advanceStep(activeStep + 1)">
           {{ t('partnerDetail.onboarding.nextStep') }} →
         </button>
-        <button class="btn-sm"
+        <button class="btn-sm primary"
                 *ngIf="partner.onboarding_step === activeStep && isManager && allTasksDone(activeStep) && activeStep === 3"
-                (click)="finishOnboarding()"
-                style="background:#22c55e;color:white;border:none">
+                (click)="finishOnboarding()">
           {{ t('partnerDetail.onboarding.finish') }} ✓
         </button>
       </div>
@@ -145,7 +144,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <option value="">{{ t('partnerDetail.onboarding.responsiblePerson') }}</option>
             <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
           </select>
-          <label style="font-size:11px;color:#9ca3af;display:flex;align-items:center;gap:4px;white-space:nowrap">
+          <label style="font-size:12px;color:#9ca3af;display:flex;align-items:center;gap:4px;white-space:nowrap">
             {{ t('activity.form.dueDate') }}: <input type="date" [(ngModel)]="taskForm.due_date" class="tf-input" style="width:140px">
           </label>
         </div>
@@ -216,7 +215,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
   <div class="detail-body" [class.left-collapsed]="leftCollapsed">
     <div class="info-card" [class.is-collapsed]="leftCollapsed">
       <div class="left-panel-hdr">
-        <h3 *ngIf="!leftCollapsed" style="margin:0;font-size:13px;font-weight:700;color:#374151">{{ t('partnerDetail.info.title') }}</h3>
+        <h3 *ngIf="!leftCollapsed" style="margin:0;font-size:14px;font-weight:700;color:#374151">{{ t('partnerDetail.info.title') }}</h3>
         <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('partnerDetail.info.expandPanel') : t('partnerDetail.info.collapsePanel')">{{leftCollapsed?'›':'‹'}}</button>
       </div>
       <ng-container *ngIf="!leftCollapsed">
@@ -285,8 +284,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div style="font-size:12px;font-weight:600;color:#374151">
             {{ec.contact_name || '—'}}<span style="color:#9ca3af;font-weight:400" *ngIf="ec.contact_title"> · {{ec.contact_title}}</span>
           </div>
-          <div *ngIf="ec.email" style="font-size:11px;color:#6b7280;margin-top:2px"><a class="link" href="mailto:{{ec.email}}">{{ec.email}}</a></div>
-          <div *ngIf="ec.phone" style="font-size:11px;color:#6b7280;margin-top:1px"><a class="link" href="tel:{{ec.phone}}">{{ec.phone}}</a></div>
+          <div *ngIf="ec.email" style="font-size:12px;color:#6b7280;margin-top:2px"><a class="link" href="mailto:{{ec.email}}">{{ec.email}}</a></div>
+          <div *ngIf="ec.phone" style="font-size:12px;color:#6b7280;margin-top:1px"><a class="link" href="tel:{{ec.phone}}">{{ec.phone}}</a></div>
         </div>
       </div>
 
@@ -405,11 +404,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div class="info-subsection">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div class="info-subsection-title" style="margin-bottom:0">📎 {{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
-          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker = true" style="font-size:11px">+ {{ t('documents.add') }}</button>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker = true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('documents.add') }}</button>
         </div>
         <div *ngIf="linkedDocs.length === 0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px">{{ t('partnerDetail.documents.empty') }}</div>
         <div *ngFor="let d of linkedDocs"
-             style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f9fafb;cursor:pointer"
+             style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer"
              (click)="openDocument(d)" [title]="t('partnerDetail.documents.goTo')">
           <span style="font-size:14px">📄</span>
           <div style="flex:1;min-width:0">
@@ -421,7 +420,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <span *ngIf="d.doc_type">{{d.doc_type}}</span>
             </div>
           </div>
-          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:13px;padding:2px 4px;border-radius:4px"
+          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:14px;padding:2px 4px;border-radius:4px"
                   (click)="$event.stopPropagation(); unlinkDoc(d)" [title]="t('partnerDetail.documents.unlink')">✕</button>
         </div>
       </div>
@@ -440,7 +439,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
     <div class="activities-card">
       <!-- Pasek tabów -->
-      <div class="mid-tabs">
+      <div class="mid-tabs one-line">
         <button class="tab-btn" [class.active]="midTab==='all'" (click)="midTab='all'">
           {{ t('activity.tabs.all') }}
           <wt-activity-count-badge [activities]="partner.activities||[]"></wt-activity-count-badge>
@@ -464,30 +463,30 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
       <div *ngIf="midTab!=='attachments' && midTab!=='emails' && midTab!=='whatsapp' && midTab!=='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:flex-end">
-          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()">+ {{ t('activity.add') }}</button>
+          <button class="btn-sm primary" *ngIf="canEdit" (click)="openNewActivityForm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('activity.add') }}</button>
         </div>
 
         <wt-linked-project-tasks *ngIf="partnerRouteId && (midTab==='tasks' || midTab==='all')"
                                  sourceType="partner" [sourceId]="partnerRouteId" [sourceName]="partner.company"></wt-linked-project-tasks>
         <div class="new-activity-form" *ngIf="showNewActivity">
           <!-- Typ (ustalany kontekstem zakładki, nie wybierany ręcznie — jak w crm-lead-detail.component.ts) -->
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">
             {{actIcon(actForm.type)}} {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
           <input *ngIf="actForm.type==='meeting'" [(ngModel)]="actForm.title" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')" class="act-input">
           <!-- Termin + przypomnienie + przypisz + priorytet — layout matches crm-lead-detail.component.ts 1:1 -->
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px;align-items:start">
-            <label style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.dueDate') }}
+            <label style="font-size:12px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.dueDate') }}
               <div style="position:relative">
                 <div *ngIf="actDueDateOpen" style="position:fixed;inset:0;z-index:99" (click)="actDueDateOpen=false"></div>
                 <button type="button" class="act-input"
-                        style="display:flex;align-items:center;gap:4px;width:100%;text-align:left;cursor:pointer;background:white;padding:5px 8px"
+                        style="display:flex;align-items:center;gap:4px;width:100%;text-align:left;cursor:pointer;background:white;padding:4px 8px"
                         (click)="actDueDateOpen=!actDueDateOpen">
-                  <span style="flex:1;font-size:11px" [style.color]="actDueDatePreset ? '#111827' : '#9ca3af'">
+                  <span style="flex:1;font-size:12px" [style.color]="actDueDatePreset ? '#111827' : '#9ca3af'">
                     {{actDueDateSelectedLabel || t('activity.dueDate.none')}}
                   </span>
-                  <span style="font-size:9px;color:#9ca3af">{{actDueDateOpen ? '▲' : '▾'}}</span>
+                  <span style="font-size:10px;color:#9ca3af">{{actDueDateOpen ? '▲' : '▾'}}</span>
                 </button>
                 <div *ngIf="actDueDateOpen"
                      style="position:absolute;top:calc(100% + 2px);left:0;min-width:200px;background:white;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.14);z-index:100;overflow:hidden">
@@ -505,25 +504,25 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 </div>
               </div>
               <div *ngIf="actDueDatePreset && actDueDatePreset!=='custom' && actForm.type!=='task'" style="display:flex;align-items:center;gap:4px;margin-top:2px">
-                <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:90px;font-size:11px;padding:4px 6px">
+                <input type="time" [(ngModel)]="actDueDateHour" (change)="setActDueDateHour(actDueDateHour)" class="act-input" style="width:90px;font-size:12px;padding:4px 6px">
                 <button type="button" (click)="clearDueDate()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:0">🗑</button>
               </div>
-              <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:11px;margin-top:2px">
+              <input *ngIf="actDueDatePreset==='custom'" type="datetime-local" [(ngModel)]="actForm.activity_at" class="act-input" style="font-size:12px;margin-top:2px">
             </label>
-            <label style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.reminder') }}
-              <select [(ngModel)]="actReminderType" class="act-input" style="font-size:11px">
+            <label style="font-size:12px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.reminder') }}
+              <select [(ngModel)]="actReminderType" class="act-input" style="font-size:12px">
                 <option *ngFor="let r of reminderOptions" [value]="r.value">{{ t(r.labelKey) }}</option>
               </select>
-              <input *ngIf="actReminderType==='custom'" type="datetime-local" [(ngModel)]="actReminderAt" class="act-input" style="font-size:11px;margin-top:2px">
+              <input *ngIf="actReminderType==='custom'" type="datetime-local" [(ngModel)]="actReminderAt" class="act-input" style="font-size:12px;margin-top:2px">
             </label>
-            <label style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.owner') }}
-              <select [(ngModel)]="actForm.assigned_to" class="act-input" style="font-size:11px">
+            <label style="font-size:12px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.owner') }}
+              <select [(ngModel)]="actForm.assigned_to" class="act-input" style="font-size:12px">
                 <option value="">{{ t('partnerDetail.activity.ownerMeDefault') }}</option>
                 <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
               </select>
             </label>
-            <label *ngIf="actForm.type==='task'" style="font-size:11px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('activity.form.priority') }}
-              <select [(ngModel)]="actForm.priority" class="act-input" style="font-size:11px">
+            <label *ngIf="actForm.type==='task'" style="font-size:12px;color:#9ca3af;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('activity.form.priority') }}
+              <select [(ngModel)]="actForm.priority" class="act-input" style="font-size:12px">
                 <option value="">{{ t('activity.form.none') }}</option>
                 <option value="asap">{{ t('labels.priorities.asap') }}</option>
                 <option value="important">{{ t('labels.priorities.important') }}</option>
@@ -535,16 +534,16 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <!-- Spotkanie: miejsce + uczestnicy -->
           <ng-container *ngIf="actForm.type === 'meeting'">
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
-              <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+              <label style="font-size:12px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
                 {{ t('meetings.durationMin') }}
-                <input type="number" min="0" [(ngModel)]="actForm.duration_min" [placeholder]="t('partnerDetail.activity.durationPlaceholder')" class="act-input" style="font-size:11px">
+                <input type="number" min="0" [(ngModel)]="actForm.duration_min" [placeholder]="t('partnerDetail.activity.durationPlaceholder')" class="act-input" style="font-size:12px">
               </label>
             </div>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+            <label style="font-size:12px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
               {{ t('meetings.meetingLocation') }}
-              <input [(ngModel)]="actForm.meeting_location" [placeholder]="t('meetings.locationPlaceholder')" class="act-input" style="font-size:11px">
+              <input [(ngModel)]="actForm.meeting_location" [placeholder]="t('meetings.locationPlaceholder')" class="act-input" style="font-size:12px">
             </label>
-            <label style="font-size:11px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
+            <label style="font-size:12px;color:#9ca3af;display:flex;flex-direction:column;gap:2px">
               {{ t('partnerDetail.activity.participantsEmails') }}
               <div class="participant-input-wrap">
                 <div class="participant-chips">
@@ -561,7 +560,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                   <div *ngFor="let s of filteredSuggestions" class="suggestion-item"
                        (mousedown)="pickSuggestion(actForm, s)">
                     <span style="font-weight:600">{{s.name}}</span>
-                    <span style="color:#9ca3af;margin-left:6px;font-size:11px">{{s.email}}</span>
+                    <span style="color:#9ca3af;margin-left:6px;font-size:12px">{{s.email}}</span>
                   </div>
                 </div>
               </div>
@@ -620,20 +619,20 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div *ngIf="inlineEditActId===a.id" style="margin-top:10px;display:flex;flex-direction:column;gap:6px" (click)="$event.stopPropagation()">
             <input *ngIf="a.type==='meeting'" [(ngModel)]="inlineEditForm.title" class="act-input" [placeholder]="t('partnerDetail.activity.meetingSubjectPlaceholder')">
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:6px">
-              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+              <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                 {{ t('activity.form.dateTime') }}
-                <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:11px">
+                <input type="datetime-local" [(ngModel)]="inlineEditForm.activity_at" class="act-input" style="font-size:12px">
               </label>
-              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+              <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                 {{ t('activity.form.reminder') }}
-                <select [(ngModel)]="inlineEditForm.reminder_type" class="act-sel" style="font-size:11px">
+                <select [(ngModel)]="inlineEditForm.reminder_type" class="act-sel" style="font-size:12px">
                   <option value="">{{ t('activity.form.none') }}</option>
                   <option *ngFor="let r of reminderOptions" [value]="r.value">{{ t(r.labelKey) }}</option>
                 </select>
               </label>
-              <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+              <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                 {{ t('activity.form.owner') }}
-                <select [(ngModel)]="inlineEditForm.assigned_to" class="act-sel" style="font-size:11px">
+                <select [(ngModel)]="inlineEditForm.assigned_to" class="act-sel" style="font-size:12px">
                   <option value="">{{ t('activity.form.none') }}</option>
                   <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
                 </select>
@@ -641,27 +640,27 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
             <ng-container *ngIf="a.type === 'opportunity'">
               <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:6px">
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   {{ t('partnerDetail.opportunities.status') }}
-                  <select [(ngModel)]="inlineEditForm.opp_status" class="act-sel" style="font-size:11px">
+                  <select [(ngModel)]="inlineEditForm.opp_status" class="act-sel" style="font-size:12px">
                     <option value="new">{{ t('partnerDetail.opportunities.statuses.new') }}</option>
                     <option value="in_progress">{{ t('partnerDetail.opportunities.statuses.in_progress') }}</option>
                     <option value="closed">{{ t('partnerDetail.opportunities.statuses.closed') }}</option>
                   </select>
                 </label>
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   {{ t('activity.form.dueDate') }}
-                  <input type="date" [(ngModel)]="inlineEditForm.opp_due_date" class="act-input" style="font-size:11px">
+                  <input type="date" [(ngModel)]="inlineEditForm.opp_due_date" class="act-input" style="font-size:12px">
                 </label>
               </div>
               <div style="display:grid;grid-template-columns:2fr 1fr;gap:6px">
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   {{ t('partnerDetail.fields.value') }}
-                  <input type="number" min="0" step="0.01" [(ngModel)]="inlineEditForm.opp_value" class="act-input" style="font-size:11px">
+                  <input type="number" min="0" step="0.01" [(ngModel)]="inlineEditForm.opp_value" class="act-input" style="font-size:12px">
                 </label>
-                <label style="font-size:11px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
+                <label style="font-size:12px;color:#6b7280;display:flex;flex-direction:column;gap:2px;font-weight:600">
                   {{ t('partnerDetail.fields.currency') }}
-                  <select [(ngModel)]="inlineEditForm.opp_currency" class="act-sel" style="font-size:11px">
+                  <select [(ngModel)]="inlineEditForm.opp_currency" class="act-sel" style="font-size:12px">
                     <option value="PLN">PLN</option><option value="EUR">EUR</option>
                     <option value="USD">USD</option><option value="GBP">GBP</option>
                   </select>
@@ -688,7 +687,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <!-- INLINE COMPOSE -->
         <div *ngIf="showEmailCompose" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ {{ t('email.new') }}</div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">✉️ {{ t('email.new') }}</div>
             <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
           <!-- Provider row — always visible when compose is open. Every user connects
@@ -700,25 +699,25 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <div *ngIf="emailConnected"
                    [style.border]="'1.5px solid ' + emailProviderColor"
                    [style.background]="emailProviderBg"
-                   style="display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;font-size:11px;color:#374151;border-radius:6px;overflow:hidden;padding-right:8px">
+                   style="display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;font-size:12px;color:#374151;border-radius:6px;overflow:hidden;padding-right:8px">
                 <span style="min-width:0;padding:4px 0 4px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                       [title]="emailAddress">{{ t('email.from') }} <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
                 <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">{{ t('email.disconnect') }}</button>
               </div>
-              <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">⚠️ {{ t('email.notConfigured') }}</div>
+              <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:12px;color:#92400e;background:#fef3c7;border-radius:6px;padding:4px 10px">⚠️ {{ t('email.notConfigured') }}</div>
             </div>
-            <div *ngIf="settings.settings().crm_training_mode" style="font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:5px 10px">🎓 {{ t('email.trainingMode') }}</div>
+            <div *ngIf="settings.settings().crm_training_mode" style="font-size:12px;color:#92400e;background:#fef3c7;border-radius:6px;padding:4px 10px">🎓 {{ t('email.trainingMode') }}</div>
           </div>
           <!-- Email form — shown when connected or training mode -->
           <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <select *ngIf="emailTemplates.length>0" (change)="applyEmailTemplate(emailTemplates[$any($event.target).selectedIndex-1])"
-                      style="font-size:11px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
+                      style="font-size:12px;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;color:#374151;flex-shrink:0">
                 <option value="">{{ t('email.noTemplate') }}</option>
                 <option *ngFor="let template of emailTemplates" [value]="template.id">{{template.name}}</option>
               </select>
             </div>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.to') }}
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
               <div class="participant-chips">
                 <span *ngFor="let r of emailForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.recipientList.splice(i,1)" type="button">✕</button></span>
                 <input class="participant-input" [(ngModel)]="recipientQuery" (input)="onRecipientInput()" (keydown.enter)="addRecipient()" (keydown.Tab)="addRecipient()" (blur)="showRecipientSug=false" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
@@ -727,7 +726,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 </div>
               </div>
             </label>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.cc') }}
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
               <div class="participant-chips">
                 <span *ngFor="let r of emailForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="emailForm.ccList.splice(i,1)" type="button">✕</button></span>
                 <input class="participant-input" [(ngModel)]="ccQuery" (input)="onCcInput()" (keydown.enter)="addCc()" (keydown.Tab)="addCc()" (blur)="showCcSug=false" [placeholder]="t('email.placeholders.cc')" autocomplete="off">
@@ -736,19 +735,19 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 </div>
               </div>
             </label>
-            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.subject') }}
+            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
               <input class="act-input" [(ngModel)]="emailForm.subject" [placeholder]="t('email.placeholders.subject')">
             </label>
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.body')" style="display:block" theme="snow"></quill-editor>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
-              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromGoogleDrive')}}</button>
+              <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromGoogleDrive')}}</button>
             </div>
-            <div *ngIf="driveNeedsReauth" style="font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px">
+            <div *ngIf="driveNeedsReauth" style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 10px">
               ⚠️ {{ t('email.driveReauthRequired') }}
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-              <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+              <span *ngFor="let f of emailAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px">✕</button></span>
             </div>
             <div *ngIf="emailError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
@@ -769,7 +768,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <span style="font-size:16px;flex-shrink:0">📧</span>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px">
-                <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
+                <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{a.title}}</strong>
                 <span *ngIf="hasUnreadInActivity(a)" style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
               </div>
               <div style="font-size:10px;color:#9ca3af;margin-top:1px">
@@ -788,7 +787,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                    [style.background]="m.created_by ? 'white' : '#fffbeb'"
                    [style.border]="m.created_by ? '1px solid #e5e7eb' : '1px solid #fbbf24'"
                    style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
-                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#6b7280">
                   <span style="display:flex;align-items:center;gap:4px">
                     <span style="font-size:10px;color:#9ca3af">{{m.created_by ? t('email.to') : t('email.from')}}</span>
                     <span style="font-weight:600">{{m.created_by ? firstAddressDisplay(m.to) : firstAddressDisplay(m.from)}}</span>
@@ -798,10 +797,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 </div>
                 <div *ngIf="m.cleanBody || m.snippet" style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto" [innerHTML]="m.cleanBody || m.snippet"></div>
                 <ng-container *ngIf="m.quotedBody">
-                  <button (click)="m._showQuote = !m._showQuote" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
+                  <button (click)="m._showQuote = !m._showQuote" style="font-size:12px;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-align:left">
                     {{m._showQuote ? '▲ ' + t('email.hideQuoted') : '▾ ' + t('email.showQuoted')}}
                   </button>
-                  <div *ngIf="m._showQuote" style="font-size:11px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
+                  <div *ngIf="m._showQuote" style="font-size:12px;line-height:1.6;color:#6b7280;border-left:3px solid #d1d5db;padding:8px;margin-top:2px;max-height:200px;overflow-y:auto" [innerHTML]="m.quotedBody"></div>
                 </ng-container>
               </div>
             </ng-container>
@@ -811,41 +810,41 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <div *ngIf="showReplyInline" style="border:1px solid #dbeafe;border-radius:8px;padding:12px;background:#f8faff;display:flex;flex-direction:column;gap:8px">
               <!-- Compact header -->
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <div style="font-size:11px;color:#374151;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                <div style="font-size:12px;color:#374151;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                   ↩ <strong>{{ t('email.reply.replyingTo') }}</strong> {{inlineReplyForm.recipientList[0] || '—'}}
                   <span style="color:#9ca3af"> · </span>{{inlineReplyForm.subject}}
                 </div>
                 <button (click)="showReplyDetails=!showReplyDetails"
-                        style="flex-shrink:0;background:none;border:1px solid #d1d5db;border-radius:5px;color:#6b7280;font-size:10px;padding:2px 7px;cursor:pointer">
+                        style="flex-shrink:0;background:none;border:1px solid #d1d5db;border-radius:5px;color:#6b7280;font-size:10px;padding:2px 8px;cursor:pointer">
                   {{showReplyDetails ? '▲ ' + t('email.reply.hideDetails') : '▾ ' + t('email.reply.showDetails')}}
                 </button>
               </div>
               <!-- Collapsible fields -->
               <ng-container *ngIf="showReplyDetails">
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.to') }}
+                <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.to') }}
                   <div class="participant-chips">
                     <span *ngFor="let r of inlineReplyForm.recipientList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.recipientList.splice(i,1)" type="button">✕</button></span>
                     <input class="participant-input" [(ngModel)]="inlineReplyRecipientQuery" (keydown.enter)="addInlineReplyRecipient()" (keydown.Tab)="addInlineReplyRecipient()" [placeholder]="t('email.placeholders.recipient')" autocomplete="off">
                   </div>
                 </label>
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.cc') }}
+                <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.cc') }}
                   <div class="participant-chips">
                     <span *ngFor="let r of inlineReplyForm.ccList; let i=index" class="participant-chip">{{r}}<button (click)="inlineReplyForm.ccList.splice(i,1)" type="button">✕</button></span>
                     <input class="participant-input" [(ngModel)]="inlineReplyCcQuery" (keydown.enter)="addInlineReplyCc()" (keydown.Tab)="addInlineReplyCc()" [placeholder]="t('email.placeholders.cc')" autocomplete="off">
                   </div>
                 </label>
-                <label style="font-size:11px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('email.fields.subject') }}
+                <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('email.fields.subject') }}
                   <input class="act-input" [(ngModel)]="inlineReplyForm.subject">
                 </label>
               </ng-container>
               <quill-editor [(ngModel)]="inlineReplyForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.replyBody')" style="display:block" theme="snow"></quill-editor>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:11px;color:#6b7280;flex:1;min-width:0">
+                <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button></span>
+                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px">✕</button></span>
               </div>
-              <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{inlineReplyError}}</div>
+              <div *ngIf="inlineReplyError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:4px 10px">⚠️ {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
                 <button class="btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
                 <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
@@ -864,29 +863,29 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- WhatsApp tab -->
       <div *ngIf="midTab==='whatsapp'" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
 
-        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">{{ t('whatsapp.checkingConfig') }}</div>
+        <div *ngIf="whatsappConfigured===null && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:14px">{{ t('whatsapp.checkingConfig') }}</div>
 
         <!-- "Brak numeru" tylko gdy naprawdę nie ma też żadnej historii do pokazania. -->
         <div *ngIf="whatsappConfigured===false && !whatsappHistoryLoading && whatsappConversations.length===0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
           <div style="font-size:32px">💬</div>
-          <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#18181b">WhatsApp</div>
-          <div style="font-size:13px;color:#9ca3af;text-align:center">{{ t('whatsapp.notConfigured') }}</div>
+          <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#333333">WhatsApp</div>
+          <div style="font-size:14px;color:#9ca3af;text-align:center">{{ t('whatsapp.notConfigured') }}</div>
         </div>
 
         <div *ngIf="whatsappConfigured===true" id="wa-new-message" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 {{ t('whatsapp.newMessage') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3BAA5D">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:#f0fdf4;border-radius:6px;overflow:hidden">
-              <span style="padding:4px 10px;font-size:11px;color:#374151">{{ t('whatsapp.from') }} <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
+              <span style="padding:4px 10px;font-size:12px;color:#374151">{{ t('whatsapp.from') }} <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
             </div>
           </div>
 
-          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.toField') }}
+          <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.toField') }}
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
                    placeholder="+48 123 123 123">
           </label>
-          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:11.5px;color:#b45309">{{ t('whatsapp.missingCountryCode') }}</div>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:#b45309">{{ t('whatsapp.missingCountryCode') }}</div>
 
           <div class="wa-mode-switch">
             <button type="button" [class.active]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
@@ -896,7 +895,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             🕒 {{ t('whatsapp.window.closedHint') }}
           </div>
 
-          <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:3px">{{ t('whatsapp.messageBody') }}
+          <label *ngIf="whatsappMode==='text'" style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">{{ t('whatsapp.messageBody') }}
             <textarea class="act-input" [(ngModel)]="whatsappMessage" [disabled]="!canEdit || whatsappSending" rows="5"
                       [placeholder]="t('whatsapp.messagePlaceholder')"></textarea>
           </label>
@@ -928,7 +927,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <span style="font-size:16px;flex-shrink:0">💬</span>
               <div style="flex:1;min-width:0">
                 <div style="display:flex;align-items:center;gap:6px">
-                  <strong style="font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t('whatsapp.conversation') }}</strong>
+                  <strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t('whatsapp.conversation') }}</strong>
                 </div>
                 <div style="font-size:10px;color:#9ca3af;margin-top:1px">
                   {{formatWhatsappHistoryPhone(conv.phone)}} · {{ t('whatsapp.lastMessage') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
@@ -942,7 +941,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                    [style.background]="h.direction==='incoming' ? '#fffbeb' : 'white'"
                    [style.border]="h.direction==='incoming' ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
                    style="border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
-                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#6b7280">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#6b7280">
                   <span style="display:flex;align-items:center;gap:4px">
                     <span style="font-size:10px;color:#9ca3af">{{h.direction==='outgoing' ? t('whatsapp.to') : t('whatsapp.from')}}</span>
                     <span style="font-weight:600">{{formatWhatsappHistoryPhone(h.direction==='outgoing' ? h.to_phone : h.from_phone)}}</span>
@@ -969,13 +968,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
 
               <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fafafa;display:flex;flex-direction:column;gap:8px">
-                <div style="font-size:11px;color:#374151"><strong>↩ {{ t('whatsapp.reply.replyingVia') }}</strong></div>
-                <div style="font-size:11px;color:#6b7280">{{ t('whatsapp.to') }} {{formatWhatsappHistoryPhone(conv.phone)}}</div>
+                <div style="font-size:12px;color:#374151"><strong>↩ {{ t('whatsapp.reply.replyingVia') }}</strong></div>
+                <div style="font-size:12px;color:#6b7280">{{ t('whatsapp.to') }} {{formatWhatsappHistoryPhone(conv.phone)}}</div>
                 <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
                           [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
-                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:#ef4444;font-size:11px;background:#fef2f2;border-radius:6px;padding:5px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:#ef4444;font-size:12px;background:#fef2f2;border-radius:6px;padding:4px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
                 <div style="display:flex;gap:6px;justify-content:flex-end">
                   <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
                   <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
@@ -991,7 +990,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- SMS tab -->
       <div *ngIf="midTab==='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:12px">
 
-        <div *ngIf="smsThreadError" style="font-size:13px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
+        <div *ngIf="smsThreadError" style="font-size:14px;color:#854d0e;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
           ⚠️ {{smsThreadError}}
         </div>
 
@@ -1004,11 +1003,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
                [style.background]="getSmsConvState(conv.number).expanded ? '#eff6ff' : 'white'"
                (click)="toggleSmsConvExpanded(conv.number)">
             <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden">
-              <strong style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
-              <span style="font-size:11px;color:#9ca3af" *ngIf="conv.messages.length">
+              <strong style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 {{conv.label}}</strong>
+              <span style="font-size:12px;color:#9ca3af" *ngIf="conv.messages.length">
                 {{ t('sms.last') }} {{conv.messages[conv.messages.length-1].created_at | date:'dd.MM.yyyy HH:mm'}}
               </span>
-              <span style="font-size:11px;color:#9ca3af" *ngIf="!conv.messages.length">{{ t('sms.noMessages') }}</span>
+              <span style="font-size:12px;color:#9ca3af" *ngIf="!conv.messages.length">{{ t('sms.noMessages') }}</span>
             </div>
             <span style="font-size:12px;color:#9ca3af;flex-shrink:0">{{getSmsConvState(conv.number).expanded ? '▲' : '▾'}}</span>
           </div>
@@ -1020,7 +1019,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <div [style.background]="m.direction==='outbound' ? '#3BAA5D' : 'white'"
                      [style.color]="m.direction==='outbound' ? 'white' : '#111827'"
                      [style.border]="m.direction==='outbound' ? 'none' : '1px solid #e5e7eb'"
-                     style="max-width:75%;border-radius:12px;padding:8px 12px;font-size:13px;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,.06)">
+                     style="max-width:75%;border-radius:12px;padding:8px 12px;font-size:14px;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,.06)">
                   <div>{{m.body}}</div>
                   <div style="font-size:10px;opacity:.75;margin-top:4px;text-align:right">
                     {{m.created_at | date:'HH:mm'}} · {{smsStatusLabel(m.status)}}
@@ -1031,14 +1030,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <div style="position:sticky;bottom:0;background:white;border-top:1px solid #e5e7eb;padding:10px;display:flex;gap:8px;align-items:flex-end">
               <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
                         (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
-                        rows="1" style="flex:1;resize:none;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit"
+                        rows="1" style="flex:1;resize:none;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit"
                         [placeholder]="t('sms.messagePlaceholder')" [disabled]="!canEdit || getSmsConvState(conv.number).sending"></textarea>
               <button class="btn-sm primary" [disabled]="!canEdit || getSmsConvState(conv.number).sending || !getSmsConvState(conv.number).replyMessage.trim()"
                       (click)="sendSmsToConv(conv)">
                 {{ getSmsConvState(conv.number).sending ? '⏳' : t('sms.send') }}
               </button>
             </div>
-            <div *ngIf="getSmsConvState(conv.number).error" style="color:#ef4444;font-size:11px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:#ef4444;font-size:12px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
           </div>
         </div>
       </div>
@@ -1056,7 +1055,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             {{ t('partnerDetail.sales.title') }}
           </div>
           <select [(ngModel)]="salesPeriod" (ngModelChange)="onSalesPeriodChange()"
-                  style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:6px;color:white;font-size:10px;padding:2px 5px;cursor:pointer;outline:none;max-width:110px">
+                  style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:6px;color:white;font-size:10px;padding:2px 4px;cursor:pointer;outline:none;max-width:110px">
             <option value="1m" style="color:#374151">{{ t('partnerDetail.sales.periods.currentMonth') }}</option>
             <option value="3m" style="color:#374151">{{ t('partnerDetail.sales.periods.last3Months') }}</option>
             <option value="6m" style="color:#374151">{{ t('partnerDetail.sales.periods.last6Months') }}</option>
@@ -1117,15 +1116,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Historia zmian mini-widget -->
       <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">🕐 {{ t('history.title') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">🕐 {{ t('history.title') }}</div>
           <button *ngIf="history.length" class="btn-sm" (click)="showHistoryModal=true">{{ t('history.showAll') }}</button>
         </div>
         <div *ngIf="historyLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:6px">{{ 'states.loading' | transloco }}</div>
         <div *ngIf="!historyLoading && history.length===0 && historyLoaded" style="font-size:12px;color:#9ca3af;text-align:center;padding:6px">{{ t('history.empty') }}</div>
         <div *ngFor="let h of history.slice(0,10)" class="hist-item">
           <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:#111827">{{histLabel(h)}}</div>
-            <div style="font-size:11px;color:#9ca3af;margin-top:1px">
+            <div style="font-size:12px;font-weight:600;color:#333333">{{histLabel(h)}}</div>
+            <div style="font-size:12px;color:#9ca3af;margin-top:1px">
               <span *ngIf="h.user_name">{{h.user_name}}</span>
               <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
               <span *ngIf="!h.user_name && !h.user_email">{{ t('history.systemUser') }}</span>
@@ -1138,8 +1137,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Powiazane dokumenty -->
       <div class="docs-box">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">{{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
-          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true" style="font-size:11px">+ {{ t('documents.add') }}</button>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">{{ t('documents.titleWithCount', { count: linkedDocs.length }) }}</div>
+          <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('documents.add') }}</button>
         </div>
         <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
              style="display:flex;align-items:center;gap:6px;background:#E6F4EA;border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#166534">
@@ -1148,14 +1147,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:#9ca3af;text-align:center;padding:8px 0">{{ t('partnerDetail.documents.empty') }}</div>
         <div *ngFor="let d of linkedDocs"
-             style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f9fafb;cursor:pointer"
+             style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #f9fafb;cursor:pointer"
              (click)="openDocument(d)">
           <span style="font-size:14px">&#x1F4C4;</span>
           <div style="flex:1;min-width:0">
             <div style="font-size:12px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{d.document_title || d.doc_number || t('partnerDetail.documents.fallbackTitle', { id: d.document_id })}}</div>
             <div style="font-size:10px;color:#9ca3af"><span *ngIf="d.doc_number">#{{d.doc_number}} · </span><span *ngIf="d.doc_type">{{d.doc_type}}</span></div>
           </div>
-          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:13px;padding:2px 4px;border-radius:4px"
+          <button style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:14px;padding:2px 4px;border-radius:4px"
                   (click)="$event.stopPropagation(); unlinkDoc(d)">&#x2715;</button>
         </div>
       </div>
@@ -1163,21 +1162,21 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Zgody marketingowe -->
       <div class="docs-box" style="margin-top:0">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">✅ {{ t('consents.title') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af">✅ {{ t('consents.title') }}</div>
         </div>
         <div *ngIf="consentLoading" style="text-align:center;color:#9ca3af;font-size:12px;padding:8px 0">{{ 'states.loading' | transloco }}</div>
         <div *ngFor="let ct of consents" style="margin-bottom:12px">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:5px">
-            <div style="font-size:11.5px;font-weight:600;color:#374151;line-height:1.4;flex:1">{{ct.label}}</div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
+            <div style="font-size:12px;font-weight:600;color:#374151;line-height:1.4;flex:1">{{ct.label}}</div>
             <button (click)="toggleConsentExpand(ct.consent_key)"
                     style="background:none;border:none;cursor:pointer;font-size:10px;color:#9ca3af;white-space:nowrap;padding:0;flex-shrink:0;line-height:1.8">
               {{expandedConsent===ct.consent_key ? '▲ ' + t('consents.collapse') : '▾ ' + t('consents.details')}}
             </button>
           </div>
           <div *ngIf="expandedConsent===ct.consent_key"
-               style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:6px;padding:8px 10px;margin-bottom:7px;line-height:1.55;border-left:3px solid #e5e7eb">
+               style="font-size:12px;color:#6b7280;background:#f9fafb;border-radius:6px;padding:8px 10px;margin-bottom:8px;line-height:1.55;border-left:3px solid #e5e7eb">
             {{ct.description}}
-            <div *ngIf="ct.updated_at" style="margin-top:5px;font-size:10px;color:#9ca3af">
+            <div *ngIf="ct.updated_at" style="margin-top:4px;font-size:10px;color:#9ca3af">
               {{ t('consents.lastChange') }} {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
               <span *ngIf="ct.updated_by_name"> · {{ct.updated_by_name}}</span>
             </div>
@@ -1189,14 +1188,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
                     [style.color]="consentDraft[ct.consent_key]===v.val ? 'white' : '#6b7280'"
                     [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : '#e5e7eb')"
                     [style.cursor]="canEdit ? 'pointer' : 'default'"
-                    style="flex:1;font-size:10.5px;font-weight:600;padding:5px 2px;border-radius:6px;transition:all .12s;text-align:center;line-height:1.3">
+                    style="flex:1;font-size:10px;font-weight:600;padding:4px 2px;border-radius:6px;transition:all .12s;text-align:center;line-height:1.3">
               {{ t(v.labelKey) }}
             </button>
           </div>
         </div>
         <button *ngIf="canEdit && consents.length" (click)="saveConsents()"
                 [disabled]="savingConsents || !consentsDirty"
-                style="width:100%;margin-top:2px;font-size:12px;padding:7px;border-radius:8px;font-weight:600;border:none;transition:background .15s"
+                style="width:100%;margin-top:2px;font-size:12px;padding:8px;border-radius:8px;font-weight:600;border:none;transition:background .15s"
                 [style.background]="consentsDirty ? '#3BAA5D' : '#f4f4f5'"
                 [style.color]="consentsDirty ? 'white' : '#a1a1aa'"
                 [style.cursor]="consentsDirty ? 'pointer' : 'default'">
@@ -1209,17 +1208,17 @@ function getMonthRange(preset: string): { from: string; to: string } {
 
   <!-- Historia zmian — modal -->
   <div *ngIf="showHistoryModal" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px" (click)="showHistoryModal=false">
-    <div style="background:white;border-radius:14px;width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.15)" (click)="$event.stopPropagation()">
+    <div style="background:white;border-radius:14px;width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 11px 29px rgba(0,0,0,0.135)" (click)="$event.stopPropagation()">
       <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1">
-        <span style="font-size:14px;font-weight:700;color:#111827">🕐 {{ t('history.title') }}</span>
-        <input [(ngModel)]="historySearch" [placeholder]="t('partnerDetail.history.searchPlaceholder')" style="flex:1;border:1px solid #e5e7eb;border-radius:6px;padding:5px 10px;font-size:12px;outline:none">
+        <span style="font-size:14px;font-weight:700;color:#333333">🕐 {{ t('history.title') }}</span>
+        <input type="search" [(ngModel)]="historySearch" [placeholder]="t('partnerDetail.history.searchPlaceholder')">
         <button (click)="showHistoryModal=false" style="background:none;border:none;font-size:18px;color:#9ca3af;cursor:pointer">✕</button>
       </div>
       <div style="overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:0">
         <div *ngFor="let h of filteredHistory" class="hist-item">
           <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:#111827">{{histLabel(h)}}</div>
-            <div style="font-size:11px;color:#9ca3af;margin-top:1px">
+            <div style="font-size:12px;font-weight:600;color:#333333">{{histLabel(h)}}</div>
+            <div style="font-size:12px;color:#9ca3af;margin-top:1px">
               <span *ngIf="h.user_name">{{h.user_name}}</span>
               <span *ngIf="!h.user_name && h.user_email">{{h.user_email}}</span>
               <span *ngIf="!h.user_name && !h.user_email">{{ t('history.systemUser') }}</span>
@@ -1227,7 +1226,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
         </div>
-        <div *ngIf="filteredHistory.length===0" style="text-align:center;color:#9ca3af;font-size:13px;padding:24px">{{ t('history.noResults') }}</div>
+        <div *ngIf="filteredHistory.length===0" style="text-align:center;color:#9ca3af;font-size:14px;padding:24px">{{ t('history.noResults') }}</div>
       </div>
     </div>
   </div>
@@ -1242,7 +1241,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
       <div class="modal-body" style="gap:10px">
         <div style="font-size:12px;color:#6b7280">{{ t('partnerDetail.documents.pickerHint') }}</div>
-        <input class="act-input" style="font-size:13px;padding:8px 12px"
+        <input class="act-input" style="font-size:14px;padding:8px 12px"
                [(ngModel)]="docSearch"
                (ngModelChange)="onDocSearch()"
                [placeholder]="t('documents.picker.searchPlaceholder')">
@@ -1265,9 +1264,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <span>{{doc.doc_type}}</span>
               </div>
             </div>
-            <span *ngIf="doc._access==='read'" style="font-size:11px;color:#9ca3af">🔒 {{ t('documents.picker.readOnly') }}</span>
-            <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:11px;font-weight:700;color:#16a34a">✓ {{ t('documents.picker.added') }}</span>
-            <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:11px;color:#9ca3af">{{ t('documents.add') }}</span>
+            <span *ngIf="doc._access==='read'" style="font-size:12px;color:#9ca3af">🔒 {{ t('documents.picker.readOnly') }}</span>
+            <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:#16a34a">✓ {{ t('documents.picker.added') }}</span>
+            <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:12px;color:#9ca3af">{{ t('documents.add') }}</span>
           </div>
         </div>
         <div *ngIf="linkDocError" style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626">
@@ -1308,7 +1307,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <label>
               {{ t('partnerDetail.fields.crmtreePartnerId') }}
               <input [(ngModel)]="editForm.dwh_partner_id" type="number" [placeholder]="t('partnerDetail.edit.placeholders.partnerId')"
-                     style="font-family:monospace" [disabled]="!isManager">
+                     [disabled]="!isManager">
               <span style="font-size:10px;color:#7c3aed;margin-top:2px;display:block">
                 {{ t('partnerDetail.edit.partnerIdHint') }}<span *ngIf="!isManager"> · {{ t('partnerDetail.edit.managersOnly') }}</span>
               </span>
@@ -1319,12 +1318,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                      (ngModelChange)="validatePartnerNip()"
                      [style.border-color]="partnerNipEditError ? '#ef4444' : ''">
-              <span *ngIf="partnerNipEditError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipEditError }}</span>
+              <span *ngIf="partnerNipEditError" style="font-size:12px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipEditError }}</span>
             </label>
             <label *ngIf="partner?.dwh_partner_id">
               {{ t('partnerDetail.fields.nip') }} <span class="dwh-badge">DWH</span>
               <input [value]="partner?.dwh_nip || partner?.nip || ''" readonly
-                     style="background:#f8f8f8;color:#9ca3af;cursor:not-allowed;font-family:monospace">
+                     style="background:#f8f8f8;color:#9ca3af;cursor:not-allowed">
               <span style="font-size:10px;color:#7c3aed;margin-top:2px;display:block">{{ t('partnerDetail.edit.syncedWithDwh') }}</span>
             </label>
           </div>
@@ -1368,7 +1367,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
           <div *ngIf="isDwhFieldReadOnly('admin_first_name') || isDwhFieldReadOnly('admin_last_name') || isDwhFieldReadOnly('admin_email')"
-               style="font-size:11px;color:#7c3aed;margin-top:4px">
+               style="font-size:12px;color:#7c3aed;margin-top:4px">
             🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
@@ -1391,8 +1390,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                      [class.input-warn]="submitAttempted && !editForm.email">
             </label>
             <label>{{ t('partnerDetail.fields.phone') }} *
-              <input [(ngModel)]="editForm.phone" placeholder="+48 600 000 000"
-                     [class.input-warn]="submitAttempted && !editForm.phone">
+              <wt-phone-input [(ngModel)]="editForm.phone" [invalid]="submitAttempted && !editForm.phone" />
             </label>
           </div>
           <div class="validation-msg" *ngIf="submitAttempted && (!editForm.contact_name || !editForm.contact_title || !editForm.email || !editForm.phone)" style="color:#f59e0b">
@@ -1403,7 +1401,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div class="edit-section">
           <div class="edit-section-title" style="display:flex;align-items:center;justify-content:space-between">
             <span>{{ t('partnerDetail.sections.extraContacts') }}</span>
-            <button type="button" style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ {{ t('partnerDetail.edit.addContact') }}</button>
+            <button type="button" style="background:none;border:1px solid var(--orange-muted);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--orange)" (click)="addExtraContact()">+ {{ t('partnerDetail.edit.addContact') }}</button>
           </div>
           <div *ngFor="let ec of extraContacts; let i = index" style="border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative">
             <button type="button" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--gray-400);font-size:14px;cursor:pointer;line-height:1" (click)="removeExtraContact(i)" [title]="t('partnerDetail.edit.removeContact')">✕</button>
@@ -1413,7 +1411,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
             <div class="edit-row">
               <label>{{ t('partnerDetail.fields.email') }}<input [(ngModel)]="ec.email" type="email" [placeholder]="t('partnerDetail.edit.placeholders.email')"></label>
-              <label>{{ t('partnerDetail.fields.phone') }}<input [(ngModel)]="ec.phone" placeholder="+48 600 000 000"></label>
+              <label>{{ t('partnerDetail.fields.phone') }}<wt-phone-input [(ngModel)]="ec.phone" /></label>
             </div>
           </div>
           <div *ngIf="extraContacts.length === 0" style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px">{{ t('partnerDetail.edit.noExtraContacts') }}</div>
@@ -1437,8 +1435,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                      [class.input-warn]="submitAttempted && !editForm.billing_email">
             </label>
             <label>{{ t('partnerDetail.fields.phone') }} *
-              <input [(ngModel)]="editForm.billing_phone" placeholder="+48 600 000 000"
-                     [class.input-warn]="submitAttempted && !editForm.billing_phone">
+              <wt-phone-input [(ngModel)]="editForm.billing_phone" [invalid]="submitAttempted && !editForm.billing_phone" />
             </label>
           </div>
           <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_contact_name || !editForm.billing_contact_title || !editForm.billing_email || !editForm.billing_phone)" style="color:#f59e0b">
@@ -1506,7 +1503,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
           <div *ngIf="isDwhFieldReadOnly('billing_address') || isDwhFieldReadOnly('billing_zip') || isDwhFieldReadOnly('billing_city') || isDwhFieldReadOnly('billing_country') || isDwhFieldReadOnly('billing_email_address')"
-               style="font-size:11px;color:#7c3aed;margin-top:4px">
+               style="font-size:12px;color:#7c3aed;margin-top:4px">
             🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
@@ -1641,7 +1638,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div class="edit-row">
             <ng-container *ngIf="!isDwhFieldReadOnly('subdomain')">
               <label class="full">{{ t('partnerDetail.fields.subdomain') }}
-                <input [(ngModel)]="editForm.subdomain" [placeholder]="t('partnerDetail.edit.placeholders.subdomain')" style="font-family:monospace">
+                <input [(ngModel)]="editForm.subdomain" [placeholder]="t('partnerDetail.edit.placeholders.subdomain')">
                 <span style="font-size:10px;color:#9ca3af;margin-top:2px;display:block">{{ t('partnerDetail.edit.subdomainHint') }}</span>
               </label>
             </ng-container>
@@ -1687,7 +1684,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
           <div *ngIf="isDwhFieldReadOnly('subdomain') || isDwhFieldReadOnly('language') || isDwhFieldReadOnly('partner_currency') || isDwhFieldReadOnly('country')"
-               style="font-size:11px;color:#7c3aed;margin-top:4px">
+               style="font-size:12px;color:#7c3aed;margin-top:4px">
             🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
@@ -1735,19 +1732,19 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <span *ngIf="msgModalMsg.cc">{{decodeAddress(msgModalMsg.cc)}}</span>
         <span style="color:#9ca3af">{{ t('email.date') }}</span><span>{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span>
       </div>
-      <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:13px;color:#374151;max-height:320px;overflow-y:auto"
+      <div style="border-top:1px solid #f3f4f6;padding-top:10px;font-size:14px;color:#374151;max-height:320px;overflow-y:auto"
            [innerHTML]="msgModalMsg.body || msgModalMsg.snippet"></div>
       <!-- Attachments -->
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:4px">
-        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
-        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:11px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
@@ -1784,16 +1781,16 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:#6b7280;flex:1;min-width:0">
           <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
                   (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
-                  style="flex-shrink:0;font-size:11px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+                  style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:#eef2ff;color:#4338ca;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
             <span *ngIf="!drivePickerLoading">📁 {{ t('email.fromGoogleDrive') }}</span>
             <span *ngIf="drivePickerLoading">⏳ {{ 'states.loading' | transloco }}</span>
           </button>
         </div>
         <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
           <span *ngFor="let f of msgModalAttachments; let i=index"
-                style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:11px;display:flex;align-items:center;gap:4px">
+                style="background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">
             📎 {{f.name}}
-            <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px">✕</button>
+            <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px">✕</button>
           </span>
         </div>
       </div>
@@ -1813,22 +1810,21 @@ function getMonthRange(preset: string): { from: string; to: string } {
   `,
   styles: [`
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
-    .detail-page { padding:20px; max-width:1400px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
-    .detail-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; flex-shrink:0; }
-    .back-btn { background:none; border:none; color:#3BAA5D; cursor:pointer; font-size:13px; }
+    .detail-page { padding:24px; max-width:1400px; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; }
+    .detail-header { display:flex; align-items:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; flex-shrink:0; }
     .detail-header h1 { font-size:22px; font-weight:800; margin:0; flex:1; }
-    .pbadge { padding:3px 10px; border-radius:10px; font-size:12px; font-weight:700; }
+    .pbadge { padding:4px 10px; border-radius:10px; font-size:12px; font-weight:700; }
     .pbadge-active{background:#dcfce7;color:#166534} .pbadge-onboarding{background:#dbeafe;color:#1e40af}
     .pbadge-inactive{background:#f3f4f6;color:#374151} .pbadge-churned{background:#fee2e2;color:#991b1b}
-    .group-badge { background:#f3f4f6; border-radius:8px; padding:3px 10px; font-size:11px; }
-    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .btn-primary { background:#3BAA5D; color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+    .group-badge { background:#f3f4f6; border-radius:999px; padding:4px 12px; font-size:12px; display:inline-flex; align-items:center; gap:4px; }
+    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:10px; padding:8px 16px; font-size:14px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-family:inherit; }
+    .btn-primary { background:#3BAA5D; color:white; border:none; border-radius:10px; padding:8px 16px; font-size:14px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-family:inherit; }
     .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
     /* Onboarding */
     /* Onboarding panel */
-    .onboarding-panel { flex-shrink:0; margin-bottom:16px; background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
+    .onboarding-panel { flex-shrink:0; margin-bottom:24px; background:white; border:none; border-radius:12px; box-shadow:var(--shadow-sm); overflow:hidden; }
     .onboarding-steps { display:flex; padding:16px 16px 0; border-bottom:1px solid #f3f4f6; }
-    .step { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative; padding-bottom:12px; }
+    .step { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; position:relative; padding-bottom:12px; }
     .step:not(:last-child)::after { content:''; position:absolute; top:14px; left:calc(50% + 16px); right:0; height:2px; background:#e5e7eb; }
     .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid #e5e7eb; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:white; position:relative; z-index:1; transition:all .2s; }
     .step.done .step-circle { background:#3BAA5D; border-color:#3BAA5D; color:white; }
@@ -1836,17 +1832,17 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .step-label { font-size:10px; color:#9ca3af; text-align:center; }
     .step.current .step-label { color:#3BAA5D; font-weight:700; }
     .step.done .step-label { color:#6b7280; }
-    .step-tasks-count { font-size:10px; font-weight:700; padding:1px 5px; border-radius:8px; background:#f3f4f6; color:#6b7280; }
+    .step-tasks-count { font-size:10px; font-weight:700; padding:1px 4px; border-radius:8px; background:#f3f4f6; color:#6b7280; }
     .step-tasks-count .all-done { color:#22c55e; }
     /* Tasks panel */
     .step-tasks-panel { padding:14px 16px; }
     .step-tasks-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
     .step-tasks-title { font-size:12px; color:#374151; flex:1; }
-    .step-tasks-title strong { color:#111827; }
+    .step-tasks-title strong { color:#333333; }
     /* Task form */
-    .task-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:7px; }
-    .task-form-row { display:flex; gap:7px; align-items:center; }
-    .tf-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; background:white; outline:none; font-family:inherit; }
+    .task-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px; }
+    .task-form-row { display:flex; gap:8px; align-items:center; }
+    .tf-sel { border:1px solid #d1d5db; border-radius:6px; padding:4px 8px; font-size:12px; background:white; outline:none; font-family:inherit; }
     .tf-sel:focus { border-color:#3BAA5D; }
     .tf-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; outline:none; }
     .tf-input:focus { border-color:#3BAA5D; }
@@ -1858,18 +1854,18 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-item:hover { background:#fafafa; }
     .task-item.task-done { background:#f9fafb; }
     .task-item.task-done .task-title { text-decoration:line-through; color:#9ca3af; }
-    .task-check { width:22px; height:22px; border-radius:50%; border:2px solid #d1d5db; background:white; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer; flex-shrink:0; font-weight:700; transition:all .15s; }
+    .task-check { width:22px; height:22px; border-radius:50%; border:2px solid #d1d5db; background:white; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; flex-shrink:0; font-weight:700; transition:all .15s; }
     .task-item.task-done .task-check { background:#22c55e; border-color:#22c55e; color:white; }
     .task-check:hover { border-color:#3BAA5D; }
     .task-body { flex:1; min-width:0; }
-    .task-title { font-size:12.5px; font-weight:600; color:#111827; display:flex; align-items:center; gap:5px; }
-    .task-type-icon { font-size:13px; }
-    .task-meta { display:flex; gap:10px; flex-wrap:wrap; font-size:11px; color:#9ca3af; margin-top:3px; }
+    .task-title { font-size:12px; font-weight:600; color:#333333; display:flex; align-items:center; gap:4px; }
+    .task-type-icon { font-size:14px; }
+    .task-meta { display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:#9ca3af; margin-top:4px; }
     .task-meta .overdue { color:#ef4444; }
-    .overdue-badge { background:#fee2e2; color:#991b1b; border-radius:4px; padding:0 5px; font-size:10px; font-weight:600; }
-    .task-desc { font-size:11px; color:#6b7280; margin-top:3px; white-space:pre-line; }
+    .overdue-badge { background:#fee2e2; color:#991b1b; border-radius:4px; padding:0 4px; font-size:10px; font-weight:600; }
+    .task-desc { font-size:12px; color:#6b7280; margin-top:4px; white-space:pre-line; }
     .task-edit { display:flex; flex-direction:column; gap:6px; }
-    .task-actions { display:flex; gap:3px; opacity:0; transition:opacity .15s; flex-shrink:0; }
+    .task-actions { display:flex; gap:4px; opacity:0; transition:opacity .15s; flex-shrink:0; }
     .task-item:hover .task-actions { opacity:1; }
     .task-act-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 4px; border-radius:4px; color:#9ca3af; }
     .task-act-btn:hover { background:#f3f4f6; color:#374151; }
@@ -1882,60 +1878,60 @@ function getMonthRange(preset: string): { from: string; to: string } {
     @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
     /* Left panel collapse */
     .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink:0; }
-    .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid #e5e7eb; background:white; cursor:pointer; font-size:15px; line-height:1; color:#9ca3af; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
+    .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid #e5e7eb; background:white; cursor:pointer; font-size:16px; line-height:1; color:#9ca3af; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
     .panel-collapse-btn:hover { background:#E6F4EA; color:#3BAA5D; border-color:#a7d7b5; }
     .info-card.is-collapsed { padding:10px 4px; overflow:hidden; align-items:center; display:flex; flex-direction:column; }
-    .info-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; overflow-y:auto; min-height:0; }
-    .activities-card { background:white; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; min-height:0; display:flex; flex-direction:column; }
+    .info-card { background:white; border:none; border-radius:12px; box-shadow:var(--shadow-sm); padding:16px; overflow-y:auto; min-height:0; }
+    .activities-card { background:white; border:none; border-radius:12px; box-shadow:var(--shadow-sm); overflow:hidden; min-height:0; display:flex; flex-direction:column; }
     .right-panel { display:flex; flex-direction:column; gap:12px; overflow-y:auto; min-height:0; }
     .dwh-box { background:linear-gradient(135deg,#166534 0%,#14532d 100%); border-radius:12px; padding:16px; color:white; flex-shrink:0; }
-    .dwh-box-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:rgba(255,255,255,.6); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .dwh-box-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:rgba(255,255,255,.6); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
     .dwh-kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
     .dwh-kpi { background:rgba(255,255,255,.1); border-radius:8px; padding:8px 10px; }
     .dwh-kpi-val { font-size:16px; font-weight:800; color:white; line-height:1; }
-    .dwh-kpi-lbl { font-size:10px; color:rgba(255,255,255,.6); margin-top:3px; }
+    .dwh-kpi-lbl { font-size:10px; color:rgba(255,255,255,.6); margin-top:4px; }
     .dwh-kpi-wide { grid-column:span 2; }
     .prod-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
-    .prod-box-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; }
-    .prod-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:11px; }
+    .prod-box-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; }
+    .prod-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; }
     .prod-name { width:90px; color:#374151; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
     .prod-bar-wrap { flex:1; background:#f3f4f6; border-radius:4px; height:6px; overflow:hidden; }
     .prod-bar { height:100%; background:#3BAA5D; border-radius:4px; transition:width .4s; }
     .prod-val { width:64px; text-align:right; color:#9ca3af; flex-shrink:0; }
     .churn-widget { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
-    .churn-widget-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+    .churn-widget-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
     .churn-widget-loading { font-size:12px; color:#9ca3af; text-align:center; padding:4px 0; }
     .churn-widget-ok { display:flex; align-items:center; gap:6px; font-size:12px; color:#16a34a; font-weight:600; }
     .churn-widget-body { display:flex; flex-direction:column; gap:8px; }
-    .churn-widget-score { font-size:11px; color:#6b7280; }
+    .churn-widget-score { font-size:12px; color:#6b7280; }
     .churn-widget-rows { display:flex; flex-direction:column; gap:4px; border-top:1px solid #f3f4f6; padding-top:8px; }
     .churn-widget-row { display:flex; justify-content:space-between; align-items:center; }
     .cwrow-lbl { font-size:12px; color:#6b7280; }
-    .cwrow-val { font-size:13px; font-weight:700; color:#111827; }
+    .cwrow-val { font-size:14px; font-weight:700; color:#333333; }
     .cwrow-drop { color:#ef4444; }
-    .churn-badge-inline { padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; }
+    .churn-badge-inline { padding:4px 10px; border-radius:16px; font-size:12px; font-weight:700; }
     .risk-badge-critical { background:#fee2e2; color:#991b1b; }
     .risk-badge-high     { background:#fed7aa; color:#9a3412; }
     .risk-badge-medium   { background:#fef3c7; color:#92400e; }
     .risk-badge-low      { background:#dbeafe; color:#1e40af; }
     .panel-email-box { background:white; border:1px solid #bfdbfe; border-radius:12px; padding:14px; flex-shrink:0; }
-    .panel-email-title { font-size:11px; font-weight:700; color:#1d4ed8; margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
-    .panel-msg { border:1px solid #e5e7eb; border-radius:8px; padding:8px; margin-bottom:6px; font-size:11px; }
+    .panel-email-title { font-size:12px; font-weight:700; color:#1d4ed8; margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
+    .panel-msg { border:1px solid #e5e7eb; border-radius:8px; padding:8px; margin-bottom:6px; font-size:12px; }
     .panel-msg.unread { border-left:3px solid #ef4444; }
     .panel-msg.read { border-left:3px solid #e5e7eb; }
     .docs-box { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; flex-shrink:0; }
-    .info-card h3, .activities-card h3 { font-size:13px; font-weight:700; margin:0 0 12px; }
-    .churn-hdr-badge { padding:3px 10px; border-radius:10px; font-size:11px; font-weight:700; }
+    .info-card h3, .activities-card h3 { font-size:14px; font-weight:700; margin:0 0 12px; }
+    .churn-hdr-badge { padding:4px 10px; border-radius:10px; font-size:12px; font-weight:700; }
     .churn-hdr-critical { background:#fee2e2; color:#991b1b; }
     .churn-hdr-high { background:#ffedd5; color:#c2410c; }
     .churn-hdr-medium { background:#fef9c3; color:#854d0e; }
     .churn-hdr-low { background:#dbeafe; color:#1e40af; }
-    .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:2px solid #f3f4f6; flex-shrink:0; flex-wrap:wrap; }
-    .tab-btn { background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; padding:10px 12px; font-size:12px; font-weight:600; color:#9ca3af; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; transition:all .15s; border-radius:6px 6px 0 0; }
-    .tab-btn.active { color:#3BAA5D; border-bottom-color:#3BAA5D; background:#f0fdf4; }
+    .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:1px solid var(--gray-200); flex-shrink:0; flex-wrap:wrap; }
+    .tab-btn { background:none; border:none; border-bottom:2.5px solid transparent; margin-bottom:-1px; padding:10px 12px; font-size:12px; font-weight:500; color:var(--gray-500); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:6px; transition:all .15s; }
+    .tab-btn.active { color:var(--orange-dark); font-weight:700; border-bottom-color:var(--orange); background:none; }
     .tab-btn:hover:not(.active) { color:#374151; }
-    .info-grid { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; }
-    .lbl { color:#9ca3af; font-size:11px; white-space:nowrap; padding-top:2px; }
+    .info-grid { display:grid; grid-template-columns:auto 1fr; gap:4px 10px; font-size:14px; }
+    .lbl { color:#9ca3af; font-size:12px; white-space:nowrap; padding-top:2px; }
     .sub { color:#9ca3af; }
     .accent { color:#3BAA5D; font-weight:700; }
     .notes { white-space:pre-line; }
@@ -1950,8 +1946,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .opp-item { font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .opp-title { flex:1; font-weight:600; }
     .opp-value { font-weight:700; color:#3BAA5D; }
-    .opp-due { color:#9ca3af; font-size:11px; }
-    .opp-status-badge { font-size:10px; font-weight:700; padding:1px 7px; border-radius:8px; white-space:nowrap; }
+    .opp-due { color:#9ca3af; font-size:12px; }
+    .opp-status-badge { font-size:10px; font-weight:700; padding:1px 8px; border-radius:8px; white-space:nowrap; }
     .opp-st-new { background:#dbeafe; color:#1e40af; }
     .opp-st-in_progress { background:#fef3c7; color:#92400e; }
     .opp-st-closed { background:#f3f4f6; color:#6b7280; }
@@ -1960,10 +1956,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .opp-value { color:#3BAA5D; font-weight:700; }
     .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
     .card-header h3 { margin:0; }
-    .btn-sm { font-size:12px; border:1px solid #e5e7eb; background:white; border-radius:6px; padding:3px 10px; cursor:pointer; }
+    .btn-sm { font-size:12px; font-weight:500; font-family:inherit; color:var(--gray-700); border:1px solid var(--gray-200); background:white; border-radius:9px; padding:4px 12px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; box-shadow:0 4px 14px rgba(24,24,27,0.081); }
+    .btn-sm:hover:not(:disabled):not(.primary) { border-color:var(--orange); color:var(--orange-dark); }
+    .btn-sm:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-sm svg { width:14px; height:14px; }
     .btn-sm.primary { background:#3BAA5D; color:white; border-color:#3BAA5D; }
-    .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; margin-top:4px; display:flex; flex-direction:column; gap:7px; }
-    .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:5px 8px; font-size:12px; }
+    .new-activity-form { background:#fafafa; border-radius:8px; padding:10px; margin-bottom:12px; margin-top:4px; display:flex; flex-direction:column; gap:8px; }
+    .act-sel { border:1px solid #d1d5db; border-radius:6px; padding:4px 8px; font-size:12px; }
     .act-input { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:12px; font-family:inherit; resize:vertical; }
     .act-actions { display:flex; gap:6px; justify-content:flex-end; }
     .activity-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
@@ -1971,44 +1970,44 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-item.act-today { border-left-color:#3BAA5D; background:#E6F4EA; border-radius:6px; }
     .act-item.act-overdue { border-left-color:#fca5a5; background:#fef2f2; border-radius:6px; }
     .act-item.act-closed { opacity:.65; }
-    .act-status-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
+    .act-status-badge { font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
     .act-status-new { background:#f3f4f6; color:#6b7280; }
     .act-status-open { background:#dbeafe; color:#1d4ed8; }
     .act-status-closed { background:#d1fae5; color:#065f46; }
-    .priority-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
+    .priority-badge { font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
     .priority-asap { background:#fee2e2; color:#991b1b; }
     .priority-important { background:#ffedd5; color:#c2410c; }
     .priority-medium { background:#fef9c3; color:#854d0e; }
     .priority-low { background:#dbeafe; color:#1e40af; }
     .act-icon { font-size:18px; }
-    .act-item strong { font-size:13px; }
+    .act-item strong { font-size:14px; }
     .act-meta { font-size:10px; color:#9ca3af; }
     .act-text { font-size:12px; color:#6b7280; margin-top:2px; white-space:pre-line; }
     .act-edit-form { display:flex;flex-direction:column;gap:6px;flex:1; }
     .act-controls { display:flex;gap:4px;align-self:flex-start;opacity:0;transition:opacity .15s; }
     .act-item:hover .act-controls { opacity:1; }
-    .act-ctrl-btn { background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;color:#9ca3af; }
+    .act-ctrl-btn { background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;color:#9ca3af; }
     .act-ctrl-btn:hover { background:#f3f4f6;color:#374151; }
     .act-ctrl-btn.del:hover { color:#ef4444; }
     .participant-input-wrap { position:relative; }
     .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;min-height:32px;background:white; }
-    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:11px; }
-    .participant-chip button { background:none;border:none;cursor:pointer;color:#9ca3af;font-size:11px;padding:0;line-height:1; }
+    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:1px 8px;font-size:12px; }
+    .participant-chip button { background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:0;line-height:1; }
     .participant-chip button:hover { color:#ef4444; }
     .participant-input { border:none;outline:none;font-size:12px;min-width:120px;flex:1;font-family:inherit; }
     .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:160px;overflow-y:auto;margin-top:2px; }
-    .suggestion-item { padding:7px 12px;font-size:12px;cursor:pointer; }
+    .suggestion-item { padding:8px 12px;font-size:12px;cursor:pointer; }
     .suggestion-item:hover { background:#f9fafb; }
     .empty-act { color:#9ca3af; font-size:12px; text-align:center; padding:16px; }
     .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
-    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10.5px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
+    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:#3BAA5D; padding:2px 0; font-weight:600; margin-top:4px; }
     .wa-mode-switch { display:inline-flex; align-self:flex-start; border:1px solid #d1d5db; border-radius:6px; overflow:hidden; }
-    .wa-mode-switch button { background:white; border:none; padding:5px 12px; font-size:11.5px; font-weight:600; color:#6b7280; cursor:pointer; font-family:inherit; }
+    .wa-mode-switch button { background:white; border:none; padding:4px 12px; font-size:12px; font-weight:600; color:#6b7280; cursor:pointer; font-family:inherit; }
     .wa-mode-switch button + button { border-left:1px solid #d1d5db; }
     .wa-mode-switch button.active { background:#E6F4EA; color:#2F8F4D; }
-    .wa-window-hint { font-size:11.5px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:6px 10px; }
-    .wa-window-note { font-size:11px; color:#92400e; }
-    .wa-failed { font-size:10.5px; font-weight:700; color:#b91c1c; background:#fef2f2; border-radius:4px; padding:1px 6px; }
+    .wa-window-hint { font-size:12px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:6px 10px; }
+    .wa-window-note { font-size:12px; color:#92400e; }
+    .wa-failed { font-size:10px; font-weight:700; color:#b91c1c; background:#fef2f2; border-radius:4px; padding:1px 6px; }
     .loading, .not-found { padding:40px; text-align:center; color:#9ca3af; }
     /* Modal */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
@@ -2017,38 +2016,38 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .modal-header h3 { margin:0; font-size:16px; font-weight:700; }
     .close-btn { background:none; border:none; font-size:18px; color:#9ca3af; cursor:pointer; }
     .modal-body { padding:20px 24px; display:flex; flex-direction:column; gap:16px; }
-    .modal-footer { padding:14px 24px; border-top:1px solid #f3f4f6; display:flex; justify-content:flex-end; gap:8px; position:sticky; bottom:0; background:white; }
+    .modal-footer { padding:16px 24px; border-top:1px solid #f3f4f6; display:flex; justify-content:flex-end; gap:8px; position:sticky; bottom:0; background:white; }
     .edit-section { display:flex; flex-direction:column; gap:10px; }
-    .edit-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; }
+    .edit-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; }
     .edit-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .edit-row label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .edit-row label.full { grid-column:1/-1; }
-    .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; background:white; }
+    .edit-row label input, .edit-row label select { border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:14px; outline:none; font-family:inherit; background:white; }
     .edit-row label input:focus, .edit-row label select:focus { border-color:#3BAA5D; }
-    .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
+    .edit-textarea { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
     .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid #f3f4f6; }
     .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#3BAA5D; margin-bottom:8px; }
     .link { color:var(--orange); text-decoration:none; }
     .link:hover { text-decoration:underline; }
-    .dwh-badge { display:inline-block; background:#ede9fe; color:#7c3aed; font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
+    .dwh-badge { display:inline-block; background:#ede9fe; color:#7c3aed; font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
     .dwh-readonly-field { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#374151; }
     .dwh-readonly-field.full { grid-column:1/-1; }
     .dwh-readonly-field label { font-size:12px; font-weight:600; color:#374151; display:flex; align-items:center; gap:4px; }
-    .dwh-readonly-value { background:#faf5ff; border:1px solid #e9d5ff; border-radius:6px; padding:7px 10px; font-size:13px; color:#6b7280; cursor:not-allowed; }
+    .dwh-readonly-value { background:#faf5ff; border:1px solid #e9d5ff; border-radius:6px; padding:8px 10px; font-size:14px; color:#6b7280; cursor:not-allowed; }
     .input-error { border-color:#ef4444 !important; background:#fff5f5; }
     .input-warn  { border-color:#f59e0b !important; background:#fffbeb; }
-    .validation-msg { font-size:11px; color:#ef4444; margin-top:2px; }
-    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 5px; line-height:16px; display:inline-block; }
+    .validation-msg { font-size:12px; color:#ef4444; margin-top:2px; }
+    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:16px; display:inline-block; }
     .suggest-dropdown { position:absolute;top:100%;left:0;right:0;z-index:300;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;margin-top:2px; }
-    .suggest-item { padding:7px 12px;font-size:12px;cursor:pointer; }
+    .suggest-item { padding:8px 12px;font-size:12px;cursor:pointer; }
     .suggest-item:hover { background:#f9fafb; }
-    .att-chip { position:relative; display:inline-flex; align-items:center; gap:4px; border-radius:5px; padding:2px 7px; font-size:10px; cursor:default; user-select:none; }
+    .att-chip { position:relative; display:inline-flex; align-items:center; gap:4px; border-radius:5px; padding:2px 8px; font-size:10px; cursor:default; user-select:none; }
     .att-chip::after { content:''; position:absolute; top:100%; left:0; right:0; height:6px; }
-    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:white; border:1px solid #e5e7eb; border-radius:7px; box-shadow:0 3px 10px rgba(0,0,0,.13); padding:3px; gap:2px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
+    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:white; border:1px solid #e5e7eb; border-radius:7px; box-shadow:0 3px 10px rgba(0,0,0,.13); padding:4px; gap:2px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
     .att-chip:hover .att-chip-actions { display:flex; }
     .att-chip-actions:hover { display:flex; }
-    .att-action-btn { background:none; border:none; cursor:pointer; padding:3px 10px; border-radius:5px; font-size:11px; white-space:nowrap; }
+    .att-action-btn { background:none; border:none; cursor:pointer; padding:4px 10px; border-radius:5px; font-size:12px; white-space:nowrap; }
     .att-action-btn:hover { background:#f3f4f6; }
     .att-action-btn.dl { color:#1d4ed8; }
     .att-action-btn.view { color:#374151; }
@@ -2056,19 +2055,19 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-card { border:1px solid #e5e7eb; border-radius:10px; padding:12px 14px; background:white; cursor:pointer; transition:box-shadow .15s; position:relative; }
     .act-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08); }
     .act-card.act-card-expanded { border-color:#3BAA5D; }
-    .act-card-title { font-size:12.5px; font-weight:600; color:#111827; margin-bottom:2px; }
+    .act-card-title { font-size:12px; font-weight:600; color:#333333; margin-bottom:2px; }
     .act-body-clamp { font-size:12px; color:#6b7280; margin-top:6px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
-    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:11px; color:#9ca3af; padding:2px 0; margin-top:4px; }
+    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:12px; color:#9ca3af; padding:2px 0; margin-top:4px; }
     .act-expand-btn:hover { color:#3BAA5D; }
     .act-card-controls { display:flex; gap:4px; align-items:center; flex-shrink:0; margin-top:8px; }
     .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 6px; border-radius:5px; color:#9ca3af; line-height:1; }
     .act-ctrl-btn:hover { background:#f3f4f6; color:#374151; }
     .act-ctrl-btn.del:hover { color:#ef4444; }
     .task-actions-row { display:flex; gap:6px; margin-top:8px; }
-    .btn-task-close { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-close { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; }
     .btn-task-close:hover:not(:disabled) { background:#dcfce7; border-color:#86efac; }
     .btn-task-close:disabled { opacity:.5; cursor:default; }
-    .btn-task-reopen { background:#f3f4f6; border:1px solid #d1d5db; color:#374151; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-reopen { background:#f3f4f6; border:1px solid #d1d5db; color:#374151; font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; }
     .btn-task-reopen:hover:not(:disabled) { background:#e5e7eb; }
     .btn-task-reopen:disabled { opacity:.5; cursor:default; }
     .hist-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid #f3f4f6; font-size:12px; }

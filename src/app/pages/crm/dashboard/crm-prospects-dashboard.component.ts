@@ -93,12 +93,12 @@ function maxOf(rows: BarRow[]): number {
 
 <!-- TOPBAR -->
 <div style="height:60px;background:white;border-bottom:1px solid var(--gray-200,#e5e7eb);display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">{{ t('dashboard.title') }}</span>
+  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#333333">{{ t('dashboard.title') }}</span>
   <span style="font-size:12px;color:#a1a1aa">{{ t('dashboard.subtitle') }}</span>
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:24px;min-width:0">
+<div style="flex:1;overflow-y:auto;padding:20px 24px 24px;min-width:0">
 <div class="pd-content">
 
   <!-- ══════════════════════════════════════════════════════
@@ -113,7 +113,7 @@ function maxOf(rows: BarRow[]): number {
         </select>
         <ng-container *ngIf="period1 === 'custom'">
           <input type="date" class="pd-sel" [(ngModel)]="customFrom1" (ngModelChange)="loadChart1()">
-          <span style="font-size:11px;color:var(--gray-400,#9ca3af);flex-shrink:0">–</span>
+          <span style="font-size:12px;color:var(--gray-400,#9ca3af);flex-shrink:0">–</span>
           <input type="date" class="pd-sel" [(ngModel)]="customTo1" (ngModelChange)="loadChart1()">
         </ng-container>
         <select class="pd-sel" [(ngModel)]="filter1Stage" (ngModelChange)="loadChart1()">
@@ -185,7 +185,7 @@ function maxOf(rows: BarRow[]): number {
           <div *ngIf="filter2DbDropdownOpen" class="pd-ms-overlay" (click)="filter2DbDropdownOpen = false"></div>
           <button type="button" class="pd-ms-trigger" (click)="filter2DbDropdownOpen = !filter2DbDropdownOpen">
             <span>{{ dbFilterLabel }}</span>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M5.5 8l4.5 4.5L14.5 8"/></svg>
+            <svg class="ic" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div *ngIf="filter2DbDropdownOpen" class="pd-ms-dropdown" (click)="$event.stopPropagation()">
             <input
@@ -353,7 +353,7 @@ function maxOf(rows: BarRow[]): number {
         </select>
         <ng-container *ngIf="period5 === 'custom'">
           <input type="date" class="pd-sel" [(ngModel)]="customFrom5" (ngModelChange)="loadChart5()">
-          <span style="font-size:11px;color:var(--gray-400,#9ca3af);flex-shrink:0">–</span>
+          <span style="font-size:12px;color:var(--gray-400,#9ca3af);flex-shrink:0">–</span>
           <input type="date" class="pd-sel" [(ngModel)]="customTo5" (ngModelChange)="loadChart5()">
         </ng-container>
         <select class="pd-sel" [(ngModel)]="filter5Direction" (ngModelChange)="loadChart5()">
@@ -369,8 +369,8 @@ function maxOf(rows: BarRow[]): number {
           <option value="rejected">{{ t('callStatus.rejected') }}</option>
           <option value="error">{{ t('callStatusShort.error') }}</option>
         </select>
-        <label class="pd-chk" style="display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap">
-          <input type="checkbox" [(ngModel)]="filterMinDuration" (ngModelChange)="loadChart5()" style="accent-color:var(--orange,#3BAA5D)">
+        <label class="pd-chk">
+          <input type="checkbox" [(ngModel)]="filterMinDuration" (ngModelChange)="loadChart5()">
           <span>≥ {{ minCallDurationSec }} s</span>
         </label>
       </div>
@@ -419,8 +419,7 @@ function maxOf(rows: BarRow[]): number {
     .pd-panel {
       box-sizing: border-box; width: 100%;
       background: var(--white, #fff);
-      border: 1px solid var(--gray-200, #e5e7eb);
-      border-radius: 12px;
+      border-radius: 12px; box-shadow: var(--shadow-sm);
       padding: 20px;
       margin-bottom: 20px;
     }
@@ -428,51 +427,46 @@ function maxOf(rows: BarRow[]): number {
 
     /* ── Panel head ────────────────────────────────────────────── */
     .pd-panel-head {
-      display: flex; align-items: flex-start; gap: 10px;
-      flex-wrap: wrap; margin-bottom: 18px; min-width: 0;
+      display: flex; align-items: center; gap: 8px 12px;
+      flex-wrap: wrap; margin-bottom: 16px; min-width: 0;
     }
     .pd-panel-head h2 {
-      font-size: 13px; font-weight: 600;
+      font-size: 14px; font-weight: 600;
       color: var(--gray-800, #1f2937);
       flex: 1; min-width: 120px; margin: 0; line-height: 1.5;
     }
-    .pd-filters { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+    .pd-filters { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; flex-shrink: 0; }
 
     /* ── Selects / inputs ──────────────────────────────────────── */
-    .pd-sel {
-      font-size: 12px; padding: 4px 8px; border-radius: 6px;
-      border: 1px solid var(--gray-300, #d1d5db);
-      background: var(--white, #fff); cursor: pointer;
-      color: var(--gray-700, #374151); max-width: 150px;
-    }
+    .pd-sel { height: 36px; box-sizing: border-box; }
+    select.pd-sel { max-width: 180px; }
 
     /* ── Multi-select dropdown ─────────────────────────────────── */
     .pd-ms-wrap { position: relative; }
     .pd-ms-overlay { position: fixed; inset: 0; z-index: 10; }
     .pd-ms-trigger {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 12px; padding: 4px 8px; border-radius: 6px;
-      border: 1px solid var(--gray-300, #d1d5db);
+      display: flex; align-items: center; gap: 8px; box-sizing: border-box;
+      height: 36px; font-size: 12px; font-weight: 500; font-family: inherit; padding: 0 14px; border-radius: 12px;
+      border: 1px solid var(--gray-200, #e5e7eb); box-shadow: 0 1px 2px rgba(0,0,0,.05);
       background: var(--white, #fff); cursor: pointer;
-      color: var(--gray-700, #374151); max-width: 150px;
+      color: var(--gray-800, #1f2937); max-width: 200px;
     }
     .pd-ms-trigger span {
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
     }
-    .pd-ms-trigger svg { flex-shrink: 0; }
+    .pd-ms-trigger:hover { border-color: var(--orange, #3BAA5D); }
+    .pd-ms-trigger svg { flex-shrink: 0; color: var(--gray-500, #71717A); }
     /* Otwiera się w LEWĄ stronę — nie wychodzi poza prawą krawędź */
     .pd-ms-dropdown {
       position: absolute; top: calc(100% + 4px); right: 0; z-index: 20;
       background: var(--white, #fff);
-      border: 1px solid var(--gray-200, #e5e7eb);
-      border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.12);
-      width: 220px; padding: 8px 0;
+      width: 240px; padding: 8px 0;
     }
     .pd-ms-search {
       display: block; box-sizing: border-box;
       width: calc(100% - 16px); margin: 0 8px 6px;
-      font-size: 12px; padding: 5px 8px; border-radius: 6px;
-      border: 1px solid var(--gray-300, #d1d5db);
+      height: 32px; font-size: 12px; padding: 0 12px; border-radius: 10px;
+      border: 1px solid var(--gray-200, #e5e7eb);
       background: var(--white, #fff); color: var(--gray-700, #374151); outline: none;
     }
     .pd-ms-search:focus { border-color: var(--orange, #3BAA5D); }
@@ -481,7 +475,7 @@ function maxOf(rows: BarRow[]): number {
       border-bottom: 1px solid var(--gray-100, #f3f4f6);
     }
     .pd-ms-actions button {
-      font-size: 11px; padding: 2px 8px; border-radius: 4px; cursor: pointer;
+      font-size: 12px; padding: 4px 8px; border-radius: 8px; cursor: pointer; font-family: inherit;
       border: 1px solid var(--gray-200, #e5e7eb);
       background: transparent; color: var(--gray-500, #6b7280);
     }
@@ -489,38 +483,38 @@ function maxOf(rows: BarRow[]): number {
     .pd-ms-list { min-height: 0; max-height: 242px; overflow-y: auto; padding: 4px 0; }
     .pd-ms-item {
       display: flex; align-items: center; gap: 8px;
-      padding: 5px 12px; cursor: pointer; font-size: 12px;
+      padding: 8px 12px; cursor: pointer; font-size: 12px;
       color: var(--gray-700, #374151);
     }
     .pd-ms-item:hover { background: var(--gray-50, #f9fafb); }
-    .pd-ms-item input[type="checkbox"] { accent-color: var(--orange, #3BAA5D); flex-shrink: 0; }
+    .pd-ms-item input[type="checkbox"] { flex-shrink: 0; }
     .pd-ms-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .pd-ms-empty { font-size: 12px; color: var(--gray-400, #9ca3af); padding: 8px 12px; }
 
     /* ── Stany ─────────────────────────────────────────────────── */
-    .pd-loading { color: var(--gray-400, #9ca3af); font-size: 13px; padding: 16px 0; }
-    .pd-empty   { color: var(--gray-400, #9ca3af); font-size: 13px; padding: 16px 0; }
+    .pd-loading { color: var(--gray-400, #9ca3af); font-size: 14px; padding: 16px 0; }
+    .pd-empty   { color: var(--gray-400, #9ca3af); font-size: 14px; padding: 16px 0; }
 
     /* ── Period tabs ───────────────────────────────────────────── */
     .pd-period-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
     .pd-ptab {
-      font-size: 11px; padding: 3px 10px; border-radius: 20px;
-      border: 1px solid var(--gray-300, #d1d5db);
-      background: transparent; cursor: pointer;
-      color: var(--gray-600, #4b5563); white-space: nowrap;
+      font-size: 12px; padding: 4px 12px; border-radius: 999px;
+      border: 1px solid var(--gray-200, #e5e7eb);
+      background: white; cursor: pointer; box-shadow: var(--shadow-sm);
+      color: var(--gray-600, #4b5563); white-space: nowrap; font-family: inherit; font-weight: 500;
     }
     .pd-ptab.active {
-      background: var(--orange, #3BAA5D); color: #fff; border-color: var(--orange, #3BAA5D);
+      background: rgba(59,170,93,.18); color: var(--orange-dark, #2F8F4D); border-color: rgba(59,170,93,.45);
     }
 
     /* ── Słupki ────────────────────────────────────────────────── */
     .pd-chart-wrap { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-    .pd-bars { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+    .pd-bars { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 
     .pd-bar-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .pd-bar-label {
       width: 130px; min-width: 70px; max-width: 130px;
-      font-size: 11px; color: var(--gray-700, #374151); text-align: right;
+      font-size: 12px; color: var(--gray-700, #374151); text-align: right;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;
     }
     .pd-bar-track {
@@ -534,22 +528,22 @@ function maxOf(rows: BarRow[]): number {
     .pd-seg { transition: flex .3s; min-width: 2px; }
     .pd-bar-single { height: 18px; border-radius: 4px; min-width: 4px; transition: width .3s; }
     .pd-bar-val {
-      font-size: 11px; font-weight: 600; color: var(--gray-600, #4b5563);
+      font-size: 12px; font-weight: 600; color: var(--gray-600, #4b5563);
       min-width: 26px; flex-shrink: 0;
     }
 
     /* ── Legenda ───────────────────────────────────────────────── */
     .pd-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-    .pd-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray-600, #4b5563); }
+    .pd-leg-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray-600, #4b5563); }
     .pd-leg-dot  { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
     /* ── Checkbox filter ──────────────────────────────────────────── */
     .pd-chk {
-      display: flex; align-items: center; gap: 5px; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; cursor: pointer;
       font-size: 12px; color: var(--gray-800, #1f2937); white-space: nowrap;
       user-select: none;
     }
-    .pd-chk input[type="checkbox"] { accent-color: var(--orange, #3BAA5D); margin: 0; cursor: pointer; }
+    .pd-chk input[type="checkbox"] { margin: 0; cursor: pointer; }
 
     /* AI tag label — kolorowy tekst */
     .pd-bar-label-tag { font-weight: 600; }
@@ -559,40 +553,22 @@ function maxOf(rows: BarRow[]): number {
       position: relative; display: flex; align-items: center;
     }
     .pd-search-icon {
-      position: absolute; left: 7px; color: var(--gray-400, #9ca3af); pointer-events: none; flex-shrink: 0;
+      position: absolute; left: 12px; color: var(--gray-400, #9ca3af); pointer-events: none; flex-shrink: 0;
     }
     .pd-search-input {
-      font-size: 12px; padding: 4px 24px 4px 24px; border-radius: 6px;
-      border: 1px solid var(--gray-300, #d1d5db);
-      background: var(--white, #fff); color: var(--gray-700, #374151);
-      width: 180px; outline: none;
+      box-sizing: border-box; height: 36px; font-size: 12px; font-family: inherit;
+      padding: 0 32px 0 34px; border-radius: 12px;
+      border: 1px solid var(--gray-200, #e5e7eb); box-shadow: 0 5px 16px rgba(0,0,0,0.099);
+      background: var(--white, #fff); color: var(--gray-800, #1f2937);
+      width: 220px; outline: none;
     }
-    .pd-search-input:focus { border-color: var(--orange, #3BAA5D); }
+    .pd-search-input:focus { border-color: var(--orange, #3BAA5D); box-shadow: 0 5px 16px rgba(0,0,0,0.099), 0 0 2px 4px rgba(59,170,93,.2); }
     .pd-search-clear {
-      position: absolute; right: 6px; background: none; border: none;
-      font-size: 11px; color: var(--gray-400, #9ca3af); cursor: pointer; line-height: 1; padding: 0;
+      position: absolute; right: 12px; background: none; border: none; display: inline-flex;
+      font-size: 12px; color: var(--gray-400, #9ca3af); cursor: pointer; line-height: 1; padding: 0;
     }
     .pd-search-clear:hover { color: var(--gray-600, #4b5563); }
 
-    /* ── Dark mode ─────────────────────────────────────────────── */
-    @media (prefers-color-scheme: dark) {
-      .pd-header h1 { color: #f9fafb; }
-      .pd-panel { background: #1f2937; border-color: #374151; }
-      .pd-panel-head h2 { color: #f3f4f6; }
-      .pd-sel { background: #374151; border-color: #4b5563; color: #f3f4f6; }
-      .pd-ms-trigger { background: #374151; border-color: #4b5563; color: #f3f4f6; }
-      .pd-ms-dropdown { background: #1f2937; border-color: #374151; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
-      .pd-ms-search { background: #374151; border-color: #4b5563; color: #f3f4f6; }
-      .pd-ms-actions { border-color: #374151; }
-      .pd-ms-actions button { border-color: #4b5563; color: #9ca3af; }
-      .pd-ms-actions button:hover { background: #374151; }
-      .pd-ms-item { color: #d1d5db; }
-      .pd-ms-item:hover { background: #374151; }
-      .pd-search-input { background: #374151; border-color: #4b5563; color: #f3f4f6; }
-      .pd-chk { color: #f3f4f6; }
-      .pd-bar-label, .pd-bar-val, .pd-leg-item { color: #d1d5db; }
-      .pd-ptab { border-color: #4b5563; color: #d1d5db; }
-    }
   `],
 })
 export class CrmProspectsDashboardComponent implements OnInit {

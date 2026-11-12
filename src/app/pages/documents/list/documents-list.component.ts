@@ -35,8 +35,8 @@ const BUILT_IN_DOC_TYPES = ['partner_agreement', 'it_supplier_agreement', 'emplo
 const BACKEND_SORT_COLS = new Set(['doc_number','name','status','expiration_date']);
 type SortDir = 'asc' | 'desc';
 
-// Grid: checkbox | number | name | type | group | gdpr | status | active-tasks | expiry | owner
-const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
+// Grid: checkbox | name (number below it) | type | group | gdpr | status | active-tasks | expiry | owner
+const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
 
 @Component({
   selector: 'wt-documents-list',
@@ -61,10 +61,10 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     </div>
 
     @if (partnerFilterName) {
-      <div style="display:flex;align-items:center;gap:8px;background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:6px 20px;font-size:12px;color:var(--orange-dark)">
+      <div style="display:flex;align-items:center;gap:8px;background:var(--orange-pale);border-bottom:1px solid var(--orange-muted);padding:8px 24px;font-size:12px;color:var(--orange-dark)">
         <span style="font-size:14px">🏢</span>
         <span>{{ t('list.partnerFilter.label') }} <strong>{{partnerFilterName}}</strong></span>
-        <button (click)="clearPartnerFilter()" style="margin-left:auto;background:none;border:1px solid var(--orange-muted);border-radius:6px;color:var(--orange-dark);font-size:11px;padding:2px 8px;cursor:pointer">✕ {{ t('list.partnerFilter.clear') }}</button>
+        <button class="btn btn-g btn-sm" (click)="clearPartnerFilter()" style="margin-left:auto">✕ {{ t('list.partnerFilter.clear') }}</button>
       </div>
     }
 
@@ -97,15 +97,14 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       <div class="tw">
         <div class="thead" [style.grid-template-columns]="grid">
           <div class="th"><input type="checkbox" class="chk"></div>
-          <div class="th sortable" (click)="sortBy('doc_number')">{{ t('labels.columns.number') }} <span class="sort-icon">{{ sortIcon('doc_number') }}</span></div>
           <div class="th sortable" (click)="sortBy('name')">{{ t('labels.columns.name') }} <span class="sort-icon">{{ sortIcon('name') }}</span></div>
           <div class="th sortable" (click)="sortBy('doc_type')">{{ t('list.columns.type') }} <span class="sort-icon">{{ sortIcon('doc_type') }}</span></div>
           <div class="th sortable" (click)="sortBy('group_name')">{{ t('labels.fields.group') }} <span class="sort-icon">{{ sortIcon('group_name') }}</span></div>
           <div class="th sortable" (click)="sortBy('gdpr_type')">{{ t('list.columns.gdpr') }} <span class="sort-icon">{{ sortIcon('gdpr_type') }}</span></div>
           <div class="th sortable" (click)="sortBy('status')">{{ t('labels.fields.status') }} <span class="sort-icon">{{ sortIcon('status') }}</span></div>
-          <div class="th" style="color:var(--orange)">
+          <div class="th">
             {{ t('labels.activeTasks') }}
-            <span style="font-size:8.5px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">{{ t('list.columns.newBadge') }}</span>
+            <span style="font-size:8px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">{{ t('list.columns.newBadge') }}</span>
           </div>
           <div class="th sortable" (click)="sortBy('expiration_date')">{{ t('labels.columns.validity') }} <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
           <div class="th sortable" (click)="sortBy('owner_name')">{{ t('labels.fields.owner') }} <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
@@ -119,15 +118,15 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
           <div class="tr" [style.grid-template-columns]="grid" [style.align-items]="doc.active_task_details?.length ? 'start' : 'center'"
                (click)="openDocument(doc)">
             <div class="td"><input type="checkbox" class="chk" (click)="$event.stopPropagation()"></div>
-            <div class="td td-num">{{ doc.doc_number }}</div>
             <div class="td td-n-wrap">
               <span class="td-n" [title]="doc.name">{{ doc.name }}</span>
+              <span class="td-sub">{{ doc.doc_number }}</span>
               @if (doc.doc_type === 'partner_agreement' && !doc.has_partner) {
                 <span class="no-partner-tri" [title]="t('list.noPartnerWarning')">⚠️</span>
               }
             </div>
-            <div class="td"><wt-type-badge [type]="doc.doc_type" /></div>
-            <div class="td"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
+            <div class="td td-muted"><wt-type-badge [type]="doc.doc_type" /></div>
+            <div class="td"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" [isNeutral]="true" /></div>
             <div class="td"><wt-gdpr-badge [gdpr]="doc.gdpr_type" /></div>
             <div class="td td-status">
               <wt-status-badge [status]="doc.status" />
@@ -140,7 +139,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
                 @for (task of doc.active_task_details!; track task.id) {
                   <div class="task-cell-row" [title]="taskTooltip(task)">
                     <wt-avatar [name]="task.assignee_name" [size]="18" />
-                    <span class="tbadge" [class]="'tbadge-' + task.task_type">{{ task.task_type.toUpperCase() }}</span>
+                    <span class="task-type">{{ t('labels.taskTypes.' + task.task_type) }}</span>
                     <span class="task-assignee">{{ task.assignee_name }}</span>
                     @if (task.due_date) {
                       <span class="task-due" [class.overdue]="isDue(task.due_date)">
@@ -177,7 +176,7 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
       @if (totalPages() > 1) {
         <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:flex-end">
           <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page() - 1)">← {{ t('list.pagination.previous') }}</button>
-          <span style="font-size:12.5px;color:var(--gray-500)">{{ t('list.pagination.page', { page: page(), total: totalPages() }) }}</span>
+          <span style="font-size:12px;color:var(--gray-500)">{{ t('list.pagination.page', { page: page(), total: totalPages() }) }}</span>
           <button class="btn btn-g btn-sm" [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">{{ t('list.pagination.next') }} →</button>
         </div>
       }
@@ -205,41 +204,43 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
   `,
   styles: [`
     #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
-    .page-title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; color: var(--gray-900); }
+    .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); }
     .tsp { flex: 1; }
     .srch-wrap { position: relative; display: flex; align-items: center; }
     .srch-wrap svg { position: absolute; left: 10px; width: 15px; height: 15px; color: var(--gray-400); pointer-events: none; }
-    .srch { background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px; padding: 7px 14px 7px 34px; font-size: 13px; color: var(--gray-800); width: 260px; outline: none; font-family: inherit; }
+    .srch { background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px; padding: 8px 14px 8px 34px; font-size: 14px; color: var(--gray-800); width: 260px; outline: none; font-family: inherit; }
     .srch:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(59,170,93,.1); background: white; }
-    #content { flex: 1; overflow-y: auto; padding: 24px; }
-    .toolbar { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
-    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
+    #content { flex: 1; overflow-y: auto; padding: 20px 24px 24px; }
+    .toolbar { background: white; border-radius: 14px; padding: 12px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px 12px; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
+    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
     .sel:focus { border-color:var(--orange); }
     .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
-    .th { padding: 10px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; gap: 4px; }
+    .th { padding: 10px 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; gap: 4px; }
     .th.sortable { cursor: pointer; user-select: none; }
     .th.sortable:hover { color: var(--gray-800); }
     .sort-icon { font-size: 10px; color: var(--gray-400); min-width: 10px; }
     .tr { display: grid; padding: 0 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .1s; }
     .tr:last-child { border-bottom: none; }
     .tr:hover { background: var(--gray-50); }
-    .td { padding: 10px 8px; font-size: 13px; color: var(--gray-700); overflow: hidden; }
+    .td { padding: 10px 8px; font-size: 14px; color: var(--gray-700); overflow: hidden; }
     .td-n-wrap { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
-    .td-n { font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .no-partner-tri { font-size: 13px; color: #f97316; cursor: default; line-height: 1; width: fit-content; }
-    .td-num { font-family: 'Sora', monospace; font-size: 11px; color: var(--gray-500); font-weight: 600; }
-    .td-status { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+    .td-n { font-weight: 600; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .no-partner-tri { font-size: 14px; color: #f97316; cursor: default; line-height: 1; width: fit-content; }
+    .td-sub { font-size: 12px; color: var(--gray-400); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .td-muted { color: var(--gray-500); font-size: 13px; }
+    .td-status { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 
     /* ── Active Tasks column ── */
     .task-col { display: flex; flex-direction: column; gap: 4px; overflow: visible; }
     .task-cell-row {
-      display: flex; align-items: center; gap: 4px;
-      background: #FFF8F0; border: 1px solid #FDDBB4;
-      border-radius: 6px; padding: 3px 6px;
+      display: flex; align-items: center; gap: 6px;
+      background: #F7F7F8; border: 1px solid #EFEFF1;
+      border-radius: 8px; padding: 3px 8px 3px 3px;
       cursor: default;
     }
-    .task-assignee { font-size: 11px; font-weight: 600; color: #92400E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .task-due { font-size: 10px; font-weight: 700; color: #065F46; white-space: nowrap; flex-shrink: 0; }
+    .task-type { font-size: 12px; font-weight: 500; color: var(--gray-500); white-space: nowrap; flex-shrink: 0; }
+    .task-assignee { font-size: 12px; font-weight: 500; color: var(--gray-700); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .task-due { font-size: 12px; font-weight: 600; color: var(--gray-500); white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; }
     .task-due.overdue { color: #DC2626; }
     .task-none { font-size: 12px; color: var(--gray-300); }
 
@@ -251,12 +252,6 @@ const GRID = '36px 110px 1fr 110px 110px 95px 105px 180px 82px 50px';
     }
     .chk-label input { cursor: pointer; accent-color: var(--orange); }
 
-    /* ── Task type badges ── */
-    .tbadge { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
-    .tbadge-sign    { background: #EDE9FE; color: #5B21B6; }
-    .tbadge-edit    { background: #DBEAFE; color: #1E40AF; }
-    .tbadge-approve { background: #FEF3C7; color: #92400E; }
-    .tbadge-read    { background: var(--gray-100); color: var(--gray-600); }
   `],
 })
 export class DocumentsListComponent implements OnInit {

@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { Component, PLATFORM_ID, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastContainerComponent } from './shared/components/toast/toast-container.component';
+import { enableCustomDatePicker } from './shared/date-picker/custom-date-picker';
+import { preventBackdropCloseOnDrag } from './shared/utils/backdrop-drag-guard';
 import { TestEnvironmentBannerComponent } from './shared/components/test-environment-banner/test-environment-banner.component';
 
 @Component({
@@ -13,4 +16,12 @@ import { TestEnvironmentBannerComponent } from './shared/components/test-environ
     <wt-toast-container />
   `,
 })
-export class AppComponent {}
+export class AppComponent {
+  constructor() {
+    if (isPlatformBrowser(inject(PLATFORM_ID))) {
+      const doc = inject(DOCUMENT);
+      enableCustomDatePicker(doc);
+      preventBackdropCloseOnDrag(doc);
+    }
+  }
+}

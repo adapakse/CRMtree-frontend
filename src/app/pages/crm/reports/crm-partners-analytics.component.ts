@@ -28,82 +28,84 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div style="min-height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:8px 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#18181b">
+<div id="topbar" style="height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
+  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#333333">
     {{ t('reports.partnerAnalytics.title') }}
   </span>
   <span style="flex:1"></span>
 
-  <div style="display:flex;background:#f4f4f5;border-radius:8px;padding:2px;gap:2px">
-    <button *ngFor="let y of availableYears" class="mode-btn"
-            [class.mode-active]="isYearA(y)"
-            [class.mode-year-b]="isYearB(y)"
-            (click)="toggleYear(y)">
-      {{y}}
-    </button>
-    <button class="mode-btn"
-            [class.mode-active]="selectedYears.length===0"
-            (click)="clearYears()">
-      {{ t('reports.partnerAnalytics.filterMode') }}
-    </button>
-  </div>
-
-  <div style="display:flex;background:#f4f4f5;border-radius:8px;padding:2px;gap:2px">
-    <button *ngFor="let m of modes" [class.mode-active]="mode===m.v" class="mode-btn" (click)="setMode(m.v)">
-      {{ t('reports.partnerAnalytics.modes.' + m.v) }}
-    </button>
-  </div>
-
-  <period-filter [preset]="periodPreset"
-                 (periodChange)="onPeriodChange($event)"></period-filter>
-
-  <select *ngIf="isManager" class="sel" [(ngModel)]="repId" (ngModelChange)="load()">
-    <option value="">{{ t('partnersList.toolbar.allSalesReps') }}</option>
-    <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
-  </select>
-
-  <button class="btn-refresh" (click)="load()">{{loading ? '…' : '↻ ' + t('reports.partnerAnalytics.refresh')}}</button>
-</div>
-
-<!-- PERIOD BAR -->
-<div style="background:white;border-bottom:1px solid #e4e4e7;padding:8px 24px;display:flex;align-items:center;gap:10px;flex-shrink:0">
-  <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600">
-    <span style="width:10px;height:10px;border-radius:50%;background:#3BAA5D;display:inline-block"></span>
-    {{ t('reports.partnerAnalytics.period.a') }} <span style="color:#3BAA5D">{{labelA}}</span>
-  </span>
-  <span style="font-size:11px;font-weight:700;color:#a1a1aa;padding:2px 8px;background:#f4f4f5;border-radius:6px">VS</span>
-  <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600">
-    <span style="width:10px;height:10px;border-radius:50%;background:#3b82f6;display:inline-block"></span>
-    {{ t('reports.partnerAnalytics.period.b') }} <span style="color:#3b82f6">{{labelB || '—'}}</span>
-  </span>
-
-  <ng-container *ngIf="mode==='custom'">
-    <span style="font-size:11px;color:#a1a1aa;margin-left:8px">{{ t('reports.partnerAnalytics.period.customB') }}</span>
-    <input type="month" class="sel" [(ngModel)]="customFromB" style="width:140px" (change)="onCustomB()">
-    <span style="font-size:11px;color:#a1a1aa">{{ t('reports.partnerAnalytics.period.to') }}</span>
-    <input type="month" class="sel" [(ngModel)]="customToB"   style="width:140px" (change)="onCustomB()">
-  </ng-container>
-
-  <span style="flex:1"></span>
-  <span *ngIf="data" style="font-size:11px;color:#a1a1aa">
-    {{ t('reports.partnerAnalytics.period.summary', { partners: +data.a.kpi.partners_count, products: +data.a.kpi.transactions_count }) }}
-  </span>
+  <button class="btn btn-g btn-sm" (click)="load()">{{loading ? '…' : '↻ ' + t('reports.partnerAnalytics.refresh')}}</button>
 </div>
 
 <!-- CONTENT -->
-<div style="flex:1;overflow-y:auto;padding:20px 24px">
+<div style="flex:1;overflow-y:auto;padding:20px 24px 24px">
+
+  <!-- Filtry -->
+  <div class="toolbar">
+    <div class="seg">
+      <button *ngFor="let y of availableYears" class="mode-btn"
+              [class.mode-active]="isYearA(y)"
+              [class.mode-year-b]="isYearB(y)"
+              (click)="toggleYear(y)">
+        {{y}}
+      </button>
+      <button class="mode-btn"
+              [class.mode-active]="selectedYears.length===0"
+              (click)="clearYears()">
+        {{ t('reports.partnerAnalytics.filterMode') }}
+      </button>
+    </div>
+
+    <div class="seg">
+      <button *ngFor="let m of modes" [class.mode-active]="mode===m.v" class="mode-btn" (click)="setMode(m.v)">
+        {{ t('reports.partnerAnalytics.modes.' + m.v) }}
+      </button>
+    </div>
+
+    <period-filter [preset]="periodPreset"
+                   (periodChange)="onPeriodChange($event)"></period-filter>
+
+    <select class="sel" *ngIf="isManager" [(ngModel)]="repId" (ngModelChange)="load()">
+      <option value="">{{ t('partnersList.toolbar.allSalesReps') }}</option>
+      <option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option>
+    </select>
+
+    <div class="pa-period">
+      <span class="pa-leg">
+        <span class="pa-dot" style="background:#3BAA5D"></span>
+        <span>{{ t('reports.partnerAnalytics.period.a') }}</span> <span class="pa-leg-val" style="color:var(--orange-dark)">{{labelA}}</span>
+      </span>
+      <span class="pa-vs">VS</span>
+      <span class="pa-leg">
+        <span class="pa-dot" style="background:#3b82f6"></span>
+        <span>{{ t('reports.partnerAnalytics.period.b') }}</span> <span class="pa-leg-val" style="color:#2563eb">{{labelB || '—'}}</span>
+      </span>
+
+      <ng-container *ngIf="mode==='custom'">
+        <span style="font-size:12px;color:#a1a1aa;margin-left:8px;white-space:nowrap">{{ t('reports.partnerAnalytics.period.customB') }}</span>
+        <input type="month" [(ngModel)]="customFromB" style="width:140px" (change)="onCustomB()">
+        <span style="font-size:12px;color:#a1a1aa">{{ t('reports.partnerAnalytics.period.to') }}</span>
+        <input type="month" [(ngModel)]="customToB"   style="width:140px" (change)="onCustomB()">
+      </ng-container>
+
+      <span style="flex:1"></span>
+      <span *ngIf="data" style="font-size:12px;color:#a1a1aa">
+        {{ t('reports.partnerAnalytics.period.summary', { partners: +data.a.kpi.partners_count, products: +data.a.kpi.transactions_count }) }}
+      </span>
+    </div>
+  </div>
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac);border-radius:2px;margin-bottom:16px"></div>
 
   <div *ngIf="!loading && !data" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
     <div style="font-size:48px;margin-bottom:12px">📊</div>
-    <div style="font-size:15px;font-weight:600">{{ t('reports.partnerAnalytics.emptyPeriod') }}</div>
+    <div style="font-size:16px;font-weight:600">{{ t('reports.partnerAnalytics.emptyPeriod') }}</div>
   </div>
 
   <ng-container *ngIf="data">
 
   <!-- KPI CARDS -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
 
     <div class="kpi-card">
       <div class="kpi-lbl">{{ t('reports.partnerAnalytics.kpi.grossTurnoverPln') }}</div>
@@ -166,11 +168,10 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
       <div class="card-title">
         <span>{{ t('reports.partnerAnalytics.trend.title', { metric: trendMetricLabel }) }}</span>
         <div style="display:flex;align-items:center;gap:12px">
-          <select class="sel" [(ngModel)]="trendMetric" (ngModelChange)="onTrendMetricChange()"
-                  style="font-size:11px;padding:3px 7px;border-radius:6px;font-weight:400">
+          <select class="sel" [(ngModel)]="trendMetric" (ngModelChange)="onTrendMetricChange()">
             <option *ngFor="let m of trendMetrics" [value]="m.v">{{ t('reports.partnerAnalytics.trendMetrics.' + m.v) }}</option>
           </select>
-          <div style="display:flex;gap:12px;font-size:11px">
+          <div style="display:flex;gap:12px;font-size:12px">
             <span style="display:flex;align-items:center;gap:4px">
               <span style="width:9px;height:9px;background:#3BAA5D;border-radius:2px;display:inline-block"></span>
               {{labelA}}
@@ -220,7 +221,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
         <tr *ngFor="let r of data.a.by_rep; let last=last" [style.border-bottom]="last?'none':'1px solid #f4f4f5'">
           <td>
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;background:#9ca3af;flex-shrink:0">
+              <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;background:#9ca3af;flex-shrink:0">
                 {{initials(r.salesperson_name||'?')}}
               </div>
               <span style="font-weight:600;white-space:nowrap">{{r.salesperson_name || t('reports.partnerAnalytics.reps.noSalesperson')}}</span>
@@ -278,17 +279,17 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
         {{ t('reports.partnerAnalytics.partners.title') }}
         <span class="card-subtitle">{{labelA}}{{data.b ? ' vs ' + labelB : ''}}</span>
       </div>
-      <input type="text" class="sel" [(ngModel)]="partnerFilter" (ngModelChange)="onFilterChange()"
-             [placeholder]="'🔍 ' + t('reports.partnerAnalytics.partners.searchPlaceholder')" style="width:190px;cursor:text">
-      <select class="sel" [(ngModel)]="groupFilter" (ngModelChange)="onFilterChange()" style="min-width:150px">
+      <input type="search" [(ngModel)]="partnerFilter" (ngModelChange)="onFilterChange()"
+             [placeholder]="t('reports.partnerAnalytics.partners.searchPlaceholder')" style="width:220px">
+      <select class="sel" [(ngModel)]="groupFilter" (ngModelChange)="onFilterChange()">
         <option value="">{{ t('reports.partnerAnalytics.partners.allGroups') }}</option>
         <option *ngFor="let g of availableGroups" [value]="g">{{g}}</option>
       </select>
-      <select class="sel" [(ngModel)]="industryFilter" (ngModelChange)="onFilterChange()" style="min-width:150px">
+      <select class="sel" [(ngModel)]="industryFilter" (ngModelChange)="onFilterChange()">
         <option value="">{{ t('reports.partnerAnalytics.partners.allIndustries') }}</option>
         <option *ngFor="let ind of availableIndustries" [value]="ind">{{ind}}</option>
       </select>
-      <span style="font-size:11px;color:#a1a1aa;white-space:nowrap">
+      <span style="font-size:12px;color:#a1a1aa;white-space:nowrap">
         {{ t('reports.partnerAnalytics.partners.count', { count: filteredPartners.length }) }}
       </span>
     </div>
@@ -371,7 +372,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 
     <div *ngIf="filteredPartners.length > displayLimit"
          style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid #f4f4f5">
-      <button class="btn-more" (click)="showMore()">
+      <button class="btn btn-g" (click)="showMore()">
         {{ t('reports.partnerAnalytics.partners.showMore', { count: filteredPartners.length - displayLimit }) }}
       </button>
     </div>
@@ -384,24 +385,28 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 </ng-container>
   `,
   styles: [`
-    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
-    .sel:focus { border-color:var(--orange); }
-    .mode-btn { background:none;border:none;padding:4px 10px;border-radius:6px;font-size:11.5px;font-weight:600;color:#71717a;cursor:pointer;font-family:inherit }
+    /* Filter card under the title bar — same as the leads list (shadow/radius/padding from global .toolbar). */
+    .toolbar { background:white; display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; margin-bottom:16px; }
+    .pa-period { flex-basis:100%; display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; padding-top:12px; border-top:1px solid var(--gray-100); }
+    input[type=search], input[type=month] { height:36px; box-sizing:border-box; }
+    .btn-sm { height:36px; }
+    .seg { display:flex;align-items:center;height:36px;box-sizing:border-box;background:#f4f4f5;border-radius:12px;padding:4px;gap:4px }
+    .mode-btn { height:28px;background:none;border:none;padding:0 12px;border-radius:9px;font-size:12px;font-weight:600;color:#71717a;cursor:pointer;font-family:inherit }
     .mode-active  { background:white;color:#3BAA5D;box-shadow:0 1px 3px rgba(0,0,0,.1) }
     .mode-year-b  { background:white;color:#3b82f6;box-shadow:0 1px 3px rgba(0,0,0,.1) }
-    .btn-refresh { background:white;border:1px solid #e4e4e7;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit }
-    .btn-refresh:hover { background:#fafafa }
-    .btn-more { background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:7px 22px;font-size:12px;font-weight:600;cursor:pointer;color:#3f3f46;font-family:inherit }
-    .btn-more:hover { background:#3BAA5D;border-color:#3BAA5D;color:white }
-    .kpi-card { background:white;border:1px solid #e4e4e7;border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.06) }
-    .kpi-lbl { font-size:11px;color:#a1a1aa;font-weight:500;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px }
-    .kpi-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#18181b }
+    .kpi-card { background:white;border-radius:12px;padding:16px 18px;box-shadow:var(--shadow-sm) }
+    .kpi-lbl { font-size:12px;color:var(--gray-400);font-weight:500;margin-bottom:6px }
+    /* Numbers in the body font: the rounded display face made big amounts look playful. */
+    .kpi-val { font-family:inherit;font-size:22px;font-weight:600;line-height:1.2;letter-spacing:-.01em;color:#333333;font-variant-numeric:tabular-nums }
+    .pa-leg { display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;line-height:20px;color:var(--gray-700) }
+    .pa-leg-val { font-weight:600 }
+    .pa-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0 }
+    .pa-vs { font-size:12px;font-weight:600;color:var(--gray-400);padding:2px 8px;background:var(--gray-100);border-radius:999px;line-height:16px }
     .kpi-compare { display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #f4f4f5 }
-    .kpi-b { font-size:11px;color:#a1a1aa }
-    .card { background:white;border:1px solid #e4e4e7;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.06) }
-    .card-title { font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#18181b;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between }
-    .card-subtitle { font-size:11px;color:#a1a1aa;font-weight:400 }
-    .delta-pill { display:inline-flex;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:20px }
+    .kpi-b { font-size:12px;color:#a1a1aa }
+    .card-title { font-family:inherit;font-size:14px;font-weight:600;color:#333333;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between }
+    .card-subtitle { font-size:14px;color:#a1a1aa;font-weight:400 }
+    .delta-pill { display:inline-flex;align-items:center;gap:2px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px }
     .delta-pill.up   { background:#dcfce7;color:#16a34a }
     .delta-pill.down { background:#fee2e2;color:#dc2626 }
     .delta-pill.flat { background:#f4f4f5;color:#71717a }
@@ -410,12 +415,12 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     th { text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600;letter-spacing:.3px;white-space:nowrap }
     th.r,td.r { text-align:right }
     tbody tr { cursor:default }
-    td { padding:7px 8px;color:#374151 }
+    td { padding:8px 8px;color:#374151 }
     td.num   { color:#374151;font-variant-numeric:tabular-nums }
-    td.num-a { color:#18181b;font-weight:600;font-variant-numeric:tabular-nums }
+    td.num-a { color:#333333;font-weight:600;font-variant-numeric:tabular-nums }
     td.num-b { color:#a1a1aa;font-variant-numeric:tabular-nums }
-    td.muted { color:#71717a;font-size:11.5px }
-    td.idx   { color:#a1a1aa;font-size:11px;width:24px }
+    td.muted { color:#71717a;font-size:12px }
+    td.idx   { color:#a1a1aa;font-size:12px;width:24px }
   `],
 })
 export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
@@ -771,7 +776,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
 
     if (h > 0) {
       const lbl = document.createElement('div');
-      lbl.style.cssText = `font-size:8.5px;font-weight:600;color:${labelColor};margin-bottom:2px;white-space:nowrap;line-height:1`;
+      lbl.style.cssText = `font-size:8px;font-weight:600;color:${labelColor};margin-bottom:2px;white-space:nowrap;line-height:1`;
       lbl.textContent = this.metricBarLabel(value);
 
       const bar = document.createElement('div');
@@ -827,7 +832,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
       el.appendChild(group);
 
       const lbl = document.createElement('div');
-      lbl.style.cssText = 'flex:1;text-align:center;font-size:10.5px;color:#a1a1aa';
+      lbl.style.cssText = 'flex:1;text-align:center;font-size:10px;color:#a1a1aa';
       lbl.textContent = rowA
         ? this.shortMonthName(parseInt(rowA.period.substring(5, 7)))
         : (rowB ? this.shortMonthName(parseInt(rowB.period.substring(5, 7))) : '');
@@ -856,10 +861,10 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
       row.style.marginBottom = '8px';
       const delta = bRow ? +p.gross_turnover_pln - +bRow.gross_turnover_pln : null;
       const deltaHtml = bRow
-        ? `<span style="margin-left:6px;font-size:10.5px;font-weight:700;padding:1px 5px;border-radius:10px;${delta! >= 0 ? 'background:#dcfce7;color:#16a34a' : 'background:#fee2e2;color:#dc2626'}">${this.fmtDelta(+p.gross_turnover_pln, +bRow.gross_turnover_pln)}</span>`
+        ? `<span style="margin-left:6px;font-size:10px;font-weight:700;padding:1px 4px;border-radius:10px;${delta! >= 0 ? 'background:#dcfce7;color:#16a34a' : 'background:#fee2e2;color:#dc2626'}">${this.fmtDelta(+p.gross_turnover_pln, +bRow.gross_turnover_pln)}</span>`
         : '';
       row.innerHTML = `
-        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
           <span style="font-size:12px;color:#52525b">${icon} ${label}</span>
           <span style="display:flex;align-items:center;font-size:12px;font-weight:600;color:#374151">
             ${(+p.gross_turnover_pln/1000).toFixed(0)}k${deltaHtml}

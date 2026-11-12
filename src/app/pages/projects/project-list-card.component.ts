@@ -50,8 +50,8 @@ import { ProjectFinanceTotalsComponent } from '../../shared/components/project-f
     .project-card { flex:1; min-width:0; text-align:left; padding:16px; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; gap:8px; transition:box-shadow .15s, border-color .15s; }
     .project-card:hover { box-shadow:var(--shadow); border-color:var(--orange-muted); }
     .project-head { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-    .project-name { font-size:15px; font-weight:700; color:var(--gray-900); }
-    .project-description { font-size:12.5px; color:var(--gray-500); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .project-name { font-size:16px; font-weight:700; color:var(--gray-900); }
+    .project-description { font-size:12px; color:var(--gray-500); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .project-dates { font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .project-stats { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--gray-500); margin-top:auto; }
     .project-stats .mine strong { color:var(--orange); }

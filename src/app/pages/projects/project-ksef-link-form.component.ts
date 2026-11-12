@@ -127,7 +127,7 @@ const OPTION_INDENT = '   ';
     .mob { overflow-y:auto; }
     .summary { padding:12px 14px; border:1px solid var(--gray-200); border-radius:9px; background:var(--gray-50); }
     .notice { display:flex; flex-direction:column; gap:8px; }
-    .attach-note { margin:0; font-size:13px; color:var(--gray-800); line-height:1.5; }
+    .attach-note { margin:0; font-size:14px; color:var(--gray-800); line-height:1.5; }
   `],
 })
 export class ProjectKsefLinkFormComponent implements OnInit {

@@ -31,6 +31,7 @@ interface InvoiceListResponse {
           <p class="page-sub">{{ total() }} faktur{{ total() === 1 ? 'a' : '' }}</p>
         </div>
       </div>
+      <div class="page-body">
 
       <!-- Dane sprzedawcy (CRMtree) — platform-wide, drives every invoice PDF -->
       <div class="seller-panel">
@@ -63,7 +64,7 @@ interface InvoiceListResponse {
             </div>
           </div>
           <div class="seller-panel-footer">
-            <button class="btn-primary" [disabled]="savingSellerConfig()" (click)="saveSellerConfig()">
+            <button class="btn btn-p" [disabled]="savingSellerConfig()" (click)="saveSellerConfig()">
               {{ savingSellerConfig() ? 'Zapisuję...' : 'Zapisz dane sprzedawcy' }}
             </button>
           </div>
@@ -162,9 +163,9 @@ interface InvoiceListResponse {
 
         @if (pages() > 1) {
           <div class="pagination">
-            <button class="btn-secondary" [disabled]="page() === 1" (click)="setPage(page() - 1)">← Poprzednia</button>
+            <button class="btn btn-g btn-sm" [disabled]="page() === 1" (click)="setPage(page() - 1)">← Poprzednia</button>
             <span class="td-muted">Strona {{ page() }} z {{ pages() }}</span>
-            <button class="btn-secondary" [disabled]="page() === pages()" (click)="setPage(page() + 1)">Następna →</button>
+            <button class="btn btn-g btn-sm" [disabled]="page() === pages()" (click)="setPage(page() + 1)">Następna →</button>
           </div>
         }
       }
@@ -194,56 +195,52 @@ interface InvoiceListResponse {
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn-secondary" (click)="cancelVoid()">Anuluj</button>
-              <button class="btn-danger" [disabled]="voidSaving() || voidReason.trim().length < 3" (click)="confirmVoid()">
+              <button class="btn btn-g" (click)="cancelVoid()">Anuluj</button>
+              <button class="btn btn-d" [disabled]="voidSaving() || voidReason.trim().length < 3" (click)="confirmVoid()">
                 {{ voidSaving() ? 'Anuluję...' : 'Anuluj fakturę' }}
               </button>
             </div>
           </div>
         </div>
       }
+      </div>
     </div>
   `,
   styles: [`
-    .page { padding: 28px 32px; max-width: 1400px; }
-    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
-    .page-title { font-size: 22px; font-weight: 600; color: var(--gray-900); margin: 0 0 2px; }
-    .page-sub   { font-size: 13px; color: var(--gray-500); margin: 0; }
+    .page { padding: 0; }
+    .page-header { display: flex; align-items: center; height: 60px; padding: 0 24px; background: white; border-bottom: 1px solid var(--gray-200); }
+    .page-header > div { display: flex; align-items: baseline; gap: 12px; }
+    .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); margin: 0; }
+    .page-sub   { font-size: 12px; color: var(--gray-500); margin: 0; }
+    .page-body { padding: 20px 24px 24px; max-width: 1400px; }
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
 
     .toolbar {
-      display: flex; gap: 16px; background: white; border: 1px solid var(--gray-200);
-      border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;
+      display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; background: white;
+      border-radius: 14px; padding: 12px 18px; margin-bottom: 16px; box-shadow: var(--shadow-sm);
     }
     .field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
-    .field select {
-      padding: 7px 28px 7px 10px; border: 1px solid var(--gray-300); border-radius: 6px;
-      font-size: 13px; background: white; min-width: 180px;
-    }
-    .field select:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field select { height: 36px; min-width: 180px; box-sizing: border-box; }
 
-    .table-wrap { overflow-x: auto; }
-    .data-table {
-      width: 100%; border-collapse: collapse; font-size: 13.5px;
-      background: white; border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;
-    }
+    .table-wrap { overflow-x: auto; background: white; border-radius: 12px; box-shadow: var(--shadow-sm); }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .data-table th {
       background: var(--gray-50); padding: 10px 14px; text-align: left;
-      font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px;
+      font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .4px;
       color: var(--gray-500); border-bottom: 1px solid var(--gray-200);
     }
     .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
     .data-table tr:last-child > td { border-bottom: none; }
 
-    .inv-number { background: var(--gray-100); padding: 2px 7px; border-radius: 4px; font-size: 12px; color: var(--gray-700); }
-    .td-muted { color: var(--gray-500); font-size: 13px; }
+    .inv-number { background: var(--gray-100); padding: 2px 8px; border-radius: 999px; font-size: 12px; color: var(--gray-700); }
+    .td-muted { color: var(--gray-500); font-size: 14px; }
 
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
     .badge-on  { background: #dcfce7; color: #16a34a; }
     .badge-off { background: var(--gray-100); color: var(--gray-500); }
 
     .btn-icon {
-      width: 30px; height: 30px; border-radius: 6px; border: none; background: none;
+      width: 32px; height: 32px; border-radius: 999px; border: none; background: none;
       cursor: pointer; color: var(--gray-500);
       display: flex; align-items: center; justify-content: center; transition: background .12s, color .12s;
     }
@@ -251,50 +248,30 @@ interface InvoiceListResponse {
     .btn-icon:disabled { opacity: .35; cursor: not-allowed; }
     .btn-icon svg { width: 15px; height: 15px; }
 
-    .btn-secondary {
-      padding: 8px 18px; background: white; color: var(--gray-700);
-      border: 1px solid var(--gray-300); border-radius: 7px; font-size: 13.5px;
-      cursor: pointer; transition: background .12s;
-    }
-    .btn-secondary:hover:not(:disabled) { background: var(--gray-50); }
-    .btn-secondary:disabled { opacity: .55; cursor: not-allowed; }
-
     .pagination { display: flex; align-items: center; gap: 12px; justify-content: flex-end; margin-top: 16px; }
 
     .field input:not([type=checkbox]), .field textarea {
-      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
-      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box; font-family: inherit;
+      width: 100%; padding: 8px 12px; border: 1px solid var(--gray-200);
+      border-radius: 10px; font-size: 14px; background: white; box-sizing: border-box; font-family: inherit;
     }
-    .field input:focus, .field textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
+    .field input:not([type=checkbox]) { height: 36px; }
+    .field input:focus, .field textarea:focus { outline: none; border-color: var(--orange); }
     .field textarea { resize: vertical; }
 
     .seller-panel {
-      background: white; border: 1px solid var(--gray-200); border-radius: 8px;
-      padding: 16px; margin-bottom: 16px;
+      background: white; border-radius: 12px; box-shadow: var(--shadow-sm);
+      padding: 20px; margin-bottom: 16px;
     }
-    .seller-panel-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+    .seller-panel-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
     .seller-panel-header strong { font-size: 14px; }
     .seller-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px 16px; margin-bottom: 14px;
+      gap: 12px 16px; margin-bottom: 16px;
     }
     .seller-panel-footer { display: flex; justify-content: flex-end; }
 
     .td-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
-    .btn-primary {
-      padding: 8px 18px; background: var(--orange); color: white;
-      border: none; border-radius: 7px; font-size: 13.5px; font-weight: 500;
-      cursor: pointer; transition: background .12s;
-    }
-    .btn-primary:hover:not(:disabled) { background: var(--orange-dark); }
-    .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
-    .btn-danger {
-      padding: 8px 18px; background: #dc2626; color: white;
-      border: none; border-radius: 7px; font-size: 13.5px; font-weight: 500; cursor: pointer;
-    }
-    .btn-danger:hover:not(:disabled) { background: #b91c1c; }
-    .btn-danger:disabled { opacity: .55; cursor: not-allowed; }
     .btn-icon.btn-danger-icon { color: #dc2626; }
     .btn-icon.btn-danger-icon:hover { background: #fee2e2; color: #b91c1c; }
 
@@ -303,18 +280,18 @@ interface InvoiceListResponse {
       position: fixed; inset: 0; background: rgba(0,0,0,.45);
       display: flex; align-items: center; justify-content: center; z-index: 1000;
     }
-    .modal { background: white; border-radius: 12px; width: 480px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    .modal { background: white; border-radius: 16px; width: 480px; max-width: 95vw; box-shadow: 0 12px 39px rgba(0,0,0,0.163); }
     .modal-sm { width: 360px; }
     .modal-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 22px 14px; border-bottom: 1px solid var(--gray-200);
+      padding: 16px 24px; border-bottom: 1px solid var(--gray-200);
     }
     .modal-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
-    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
     .modal-body p { margin: 0; font-size: 14px; color: var(--gray-700); }
     .modal-footer {
       display: flex; gap: 8px; justify-content: flex-end;
-      padding: 14px 22px 18px; border-top: 1px solid var(--gray-200);
+      padding: 16px 24px; border-top: 1px solid var(--gray-200);
     }
   `],
 })

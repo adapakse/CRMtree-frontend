@@ -21,7 +21,7 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
   <div class="dash-header">
     <h1>{{ t('crmDashboard.title') }}</h1>
     <span style="flex:1"></span>
-    <button *ngIf="persistRepName" style="font-size:11.5px;border:1px solid #BFDBFE;color:#1D4ED8;background:#EFF6FF;border-radius:8px;padding:6px 12px;cursor:pointer;margin-right:4px" (click)="clearRepFilter()">
+    <button *ngIf="persistRepName" class="btn btn-g btn-sm" (click)="clearRepFilter()">
       × {{ persistRepName }}
     </button>
     <select *ngIf="isManager" [(ngModel)]="repFilter" (ngModelChange)="onRepFilterChange($event)" class="period-sel">
@@ -136,48 +136,48 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
     .dash-page { padding:20px; overflow:auto; }
     .dash-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
     .dash-header h1 { font-size:20px; font-weight:800; margin:0; flex:1; }
-    .period-sel { border:1px solid #d1d5db; border-radius:8px; padding:7px 12px; font-size:13px; outline:none; }
+    select.period-sel { height:36px; }
     .kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
-    .kpi-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px 18px; min-width:140px; }
-    .kpi-card.accent { border-color:#fed7aa; background:#fff7ed; }
+    .kpi-card { background:white; box-shadow:var(--shadow-sm); border-radius:12px; padding:14px 18px; min-width:140px; }
+    .kpi-card.accent { border-color:#BBF7D0; background:#F0FDF4; }
     .kv { font-size:20px; font-weight:800; }
     .kpi-card.accent .kv { color:#f97316; }
     .kl { font-size:10px; color:#9ca3af; text-transform:uppercase; margin-top:2px; }
     .dash-body { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .dash-panel { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; }
     .dash-panel.wide { grid-column:1/-1; }
-    .dash-panel h3 { font-size:13px; font-weight:700; margin:0 0 12px; color:#374151; }
+    .dash-panel h3 { font-size:14px; font-weight:700; margin:0 0 12px; color:#374151; }
     .empty { color:#9ca3af; font-size:12px; }
     /* Pipeline */
     .pipeline-bars { display:flex; flex-direction:column; gap:8px; }
     .pipe-row { display:flex; align-items:center; gap:8px; }
-    .pipe-label { font-size:11px; color:#6b7280; min-width:90px; }
+    .pipe-label { font-size:12px; color:#6b7280; min-width:90px; }
     .pipe-bar-wrap { flex:1; height:8px; background:#f3f4f6; border-radius:4px; overflow:hidden; }
     .pipe-bar { height:100%; background:#f97316; border-radius:4px; transition:width .3s; }
-    .pipe-count { font-size:11px; font-weight:700; min-width:22px; text-align:right; }
+    .pipe-count { font-size:12px; font-weight:700; min-width:22px; text-align:right; }
     .pipe-value { font-size:10px; color:#9ca3af; min-width:80px; text-align:right; }
     /* Mix */
-    .mix-list { display:flex; flex-direction:column; gap:7px; }
+    .mix-list { display:flex; flex-direction:column; gap:8px; }
     .mix-row { display:flex; align-items:center; gap:8px; }
     .mix-icon { font-size:16px; }
-    .mix-name { font-size:11px; min-width:100px; }
+    .mix-name { font-size:12px; min-width:100px; }
     .mix-bar-wrap { flex:1; height:6px; background:#f3f4f6; border-radius:4px; overflow:hidden; }
     .mix-bar { height:100%; background:#f97316; border-radius:4px; }
     .mix-val { font-size:10px; color:#6b7280; min-width:80px; text-align:right; }
     /* Renewals */
     .mini-table { width:100%; border-collapse:collapse; font-size:12px; }
     .mini-table th { color:#9ca3af; padding:4px 6px; font-weight:600; font-size:10px; border-bottom:1px solid #f3f4f6; text-align:left; }
-    .mini-table td { padding:5px 6px; border-bottom:1px solid #f9fafb; }
+    .mini-table td { padding:4px 6px; border-bottom:1px solid #f9fafb; }
     .muted { color:#9ca3af; }
     .urgent { color:#dc2626; font-weight:700; }
     /* Score table */
     .score-table { width:100%; border-collapse:collapse; font-size:12px; }
     .score-table th { color:#9ca3af; padding:6px 10px; font-size:10px; font-weight:600; border-bottom:1px solid #f3f4f6; text-align:left; }
-    .score-table td { padding:7px 10px; border-bottom:1px solid #f9fafb; vertical-align:middle; }
+    .score-table td { padding:8px 10px; border-bottom:1px solid #f9fafb; vertical-align:middle; }
     .num { text-align:right; }
     .link { color:var(--orange); text-decoration:none; font-weight:600; }
     .link:hover { text-decoration:underline; }
-    .sbadge { padding:1px 7px; border-radius:8px; font-size:10px; font-weight:700; }
+    .sbadge { padding:1px 8px; border-radius:8px; font-size:10px; font-weight:700; }
     .sbadge-active { background:#dcfce7; color:#166534; }
     .sbadge-onboarding { background:#dbeafe; color:#1e40af; }
     .sbadge-inactive { background:#f3f4f6; color:#374151; }

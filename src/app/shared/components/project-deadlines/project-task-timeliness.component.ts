@@ -43,7 +43,7 @@ type TimelinessFacts = Pick<TaskDeadlineInfo, 'timeliness' | 'days_overdue' | 'i
   `,
   styles: [`
     :host { display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px; }
-    .marker { display:inline-flex; align-items:center; padding:1px 8px; border-radius:10px; font-size:11px; font-weight:600; white-space:nowrap; line-height:1.5; }
+    .marker { display:inline-flex; align-items:center; padding:1px 8px; border-radius:10px; font-size:12px; font-weight:600; white-space:nowrap; line-height:1.5; }
     .overdue { background:#FEE2E2; color:#B91C1C; }
     .at-risk { background:#FEF3C7; color:#92400E; }
     .late { background:#F4F4F5; color:#71717A; }

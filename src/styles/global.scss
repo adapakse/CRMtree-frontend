@@ -3,7 +3,7 @@
    Fonts: Sora (headings) + DM Sans (body)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap');
 
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
@@ -20,12 +20,20 @@
   --gray-500:      #71717A;
   --gray-600:      #52525B;
   --gray-700:      #3F3F46;
-  --gray-800:      #27272A;
-  --gray-900:      #18181B;
-  --radius:        10px;
-  --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
-  --shadow:        0 4px 12px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
-  --shadow-lg:     0 12px 32px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.07);
+  --gray-800:      #333333;
+  --gray-900:      #333333;
+  --graphite:      #28292D;
+  --glass:         linear-gradient(180deg, #45464C 0%, #2E2F34 100%);
+  --green-gradient: linear-gradient(180deg, #46B467 0%, #36A057 100%);
+  --page-bg:       #F8F9FB;
+  --radius:        12px;
+  /* Same shadows as the mobile app: cards/buttons black .09 blur16 y5,
+     floating bars and menus black .14 blur18 y6. */
+  --shadow-sm:     0 5px 14px rgba(0,0,0,.081);
+  /* Filter bars keep the original, slightly stronger lift; large cards use --shadow-sm (80%). */
+  --shadow-filter: 0 5px 14px rgba(0,0,0,.081);
+  --shadow:        0 5px 16px rgba(0,0,0,.108);
+  --shadow-lg:     0 5px 16px rgba(0,0,0,.126), 0 13px 31px rgba(0,0,0,.09);
   --test-banner-height: 0px;
 }
 
@@ -39,7 +47,9 @@ html, body {
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background: var(--gray-50);
+  /* Real weights from the variable font, never a browser-faked bold. */
+  font-synthesis-weight: none;
+  background: var(--page-bg);
   color: var(--gray-800);
   font-size: 14px;
   line-height: 1.5;
@@ -68,31 +78,45 @@ router-outlet + * {
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: all .15s;
+  transition: transform .15s, box-shadow .15s, border-color .15s, background .15s, filter .15s;
   font-family: inherit;
   white-space: nowrap;
   text-decoration: none;
   svg { width: 15px; height: 15px; }
+  &:active { transform: translateY(1px); }
 }
-.btn-p { background: var(--orange); color: white; &:hover { background: var(--orange-dark); } }
+.btn-p {
+  background: var(--green-gradient);
+  color: white;
+  border: 1px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 4px 9px rgba(59,170,93,.144);
+  &:hover { filter: brightness(1.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 5px 11px rgba(59,170,93,.198); }
+  &:disabled { background: var(--gray-300); box-shadow: none; }
+}
 .btn-g {
-  background: transparent; color: var(--gray-600);
+  background: white; color: var(--gray-600);
+  font-weight: 500;
   border: 1px solid var(--gray-200);
-  &:hover { background: var(--gray-100); }
+  box-shadow: 0 5px 14px rgba(0,0,0,.081);
+  &:hover { border-color: var(--orange); color: var(--orange-dark); box-shadow: 0 5px 14px rgba(0,0,0,.081), 0 0 0 3px rgba(59,170,93,.12); }
 }
 .btn-d {
-  background: #FEF2F2; color: #DC2626;
-  border: 1px solid #FECACA;
-  &:hover { background: #FEE2E2; }
+  /* Delete is always red (Kacper's rule): a solid fill, so it reads as a real action. */
+  background: rgba(220,38,38,.12); color: #C81E1E;
+  border: 1px solid rgba(220,38,38,.22);
+  &:hover { background: rgba(220,38,38,.18); }
 }
-.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-sm { padding: 4px 12px; font-size: 12px; border-radius: 9px; gap: 4px; }
+/* A leading icon carries its own whitespace — the text starts as close to the edge as on text-only buttons. */
+.btn-sm:has(> svg:first-child) { padding-left: 10px; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
 /* ── Status Badges ─────────────────────────────────────── */
@@ -102,8 +126,8 @@ router-outlet + * {
   gap: 4px;
   padding: 2px 8px;
   border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
 }
 .bdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
@@ -117,13 +141,14 @@ router-outlet + * {
 .s-rejected  { background: #FFF1F2; color: #BE123C;  .bdot { background: #F43F5E; } }
 
 /* ── GDPR Badges ───────────────────────────────────────── */
-.gbadge { padding: 2px 7px; border-radius: 5px; font-size: 10.5px; font-weight: 600; }
+.gbadge { padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 500; }
 .gp { background: #FEF3C7; color: #92400E; }
 .ga { background: #FEE2E2; color: #991B1B; }
 .gn { background: var(--gray-100); color: var(--gray-500); }
 
 /* ── Group Pills ───────────────────────────────────────── */
-.pill { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.pill { padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+.pill-neutral { background: var(--gray-100); color: var(--gray-600); }
 .g-management { background: var(--orange-pale); color: var(--orange-dark); }
 .g-sales      { background: #EFF6FF; color: #1D4ED8; }
 .g-marketing  { background: #FDF4FF; color: #7E22CE; }
@@ -141,11 +166,11 @@ router-outlet + * {
 
 /* ── Form Elements ─────────────────────────────────────── */
 .fi, .fsel, .fta {
-  background: var(--gray-50);
+  background: white;
   border: 1.5px solid var(--gray-200);
-  border-radius: 8px;
-  padding: 8px 11px;
-  font-size: 13.5px;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
   color: var(--gray-800);
   outline: none;
   font-family: inherit;
@@ -153,7 +178,7 @@ router-outlet + * {
   width: 100%;
   &:focus {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(59,170,93,.1);
+    box-shadow: 0 0 0 3px rgba(59,170,93,.2);
     background: white;
   }
 }
@@ -166,13 +191,13 @@ router-outlet + * {
   color: var(--gray-600);
   .req { color: var(--orange); }
 }
-.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg { display: flex; flex-direction: column; gap: 4px; }
 .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .fg.full { grid-column: 1 / -1; }
 
 .sec-title {
   font-family: 'Sora', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--gray-500);
   margin: 4px 0 14px;
@@ -195,30 +220,29 @@ router-outlet + * {
 /* ── Tabs ──────────────────────────────────────────────── */
 .tabs {
   display: flex;
-  gap: 2px;
-  background: var(--gray-100);
-  border-radius: 9px;
-  padding: 3px;
+  gap: 0;
+  border-bottom: 1px solid var(--gray-200);
   margin-bottom: 20px;
 }
 .tab-btn {
   flex: 1;
-  padding: 7px 10px;
-  border-radius: 7px;
-  font-size: 12.5px;
+  padding: 10px 12px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--gray-500);
   cursor: pointer;
   border: none;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px;
   background: transparent;
   font-family: inherit;
-  transition: all .15s;
+  transition: color .15s, border-color .15s;
   text-align: center;
+  &:hover { color: var(--gray-800); }
   &.active {
-    background: white;
-    color: var(--orange);
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
+    color: var(--orange-dark);
+    font-weight: 700;
+    border-bottom-color: var(--orange);
   }
 }
 
@@ -257,15 +281,15 @@ router-outlet + * {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 14px;
   z-index: 1;
 }
 .dot-a  { background: var(--orange-pale); border: 2px solid var(--orange-muted); }
 .dot-s  { background: #F5F3FF; border: 2px solid #DDD6FE; }
 .dot-ok { background: #F0FDF4; border: 2px solid #BBF7D0; }
 .dot-w  { background: #EFF6FF; border: 2px solid #BFDBFE; }
-.tlt { font-size: 13px; font-weight: 600; color: var(--gray-800); }
-.tlm { font-size: 11.5px; color: var(--gray-400); margin-top: 2px; }
+.tlt { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+.tlm { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
 
 /* ── Upload Zone ───────────────────────────────────────── */
 .upz {
@@ -311,7 +335,7 @@ router-outlet + * {
 .fchip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: var(--gray-100);
   border: 1px solid var(--gray-200);
   border-radius: 20px;
@@ -322,7 +346,6 @@ router-outlet + * {
   cursor: pointer;
   transition: all .12s;
   &:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-pale); }
-  &.on { background: var(--orange); color: white; border-color: var(--orange); }
 }
 
 /* ── Toast ─────────────────────────────────────────────── */
@@ -341,7 +364,7 @@ router-outlet + * {
   color: white;
   padding: 12px 16px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   box-shadow: var(--shadow-lg);
   display: flex;
@@ -359,7 +382,7 @@ router-outlet + * {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     flex-shrink: 0;
   }
@@ -371,7 +394,7 @@ router-outlet + * {
   padding: 48px 24px;
   text-align: center;
   color: var(--gray-400);
-  font-size: 13.5px;
+  font-size: 14px;
   .empty-icon { font-size: 36px; margin-bottom: 12px; }
   .empty-title { font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
 }
@@ -417,18 +440,10 @@ router-outlet + * {
 .mb-3 { margin-bottom: 16px; }
 .w-full { width: 100%; }
 
-/* ── Checkbox ──────────────────────────────────────────── */
-input[type="checkbox"] {
-  width: 14px; height: 14px;
-  border-radius: 3px;
-  accent-color: var(--orange);
-  cursor: pointer;
-}
-
 /* ── Number monospace ──────────────────────────────────── */
 .mono {
   font-family: 'Sora', monospace;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--gray-500);
   font-weight: 600;
 }
@@ -462,7 +477,7 @@ quill-editor { display: block; }
   border: 1px solid #e5e7eb !important;
   border-radius: 0 0 6px 6px !important;
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   height: auto !important;
 }
 .ql-editor {
@@ -483,3 +498,677 @@ quill-editor:focus-within .ql-container.ql-snow {
   border-color: #3BAA5D !important;
 }
 .ql-snow .ql-tooltip { display: none !important; }
+
+
+/* ── Dropdowns: the open list hangs under the field as a floating card ──
+   Same approach as TestBot: a native <select> styled with appearance:
+   base-select, so keyboard, screen readers and (change) keep working.
+   Browsers without support show the system list. Multi-selects untouched. */
+@supports (appearance: base-select) {
+  select:not([multiple]):not([data-n1]):not([data-n2]),
+  select:not([multiple]):not([data-n1]):not([data-n2])::picker(select) {
+    appearance: base-select;
+    -webkit-appearance: base-select;
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]) {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: clip;
+    overflow-clip-margin: content-box;
+  }
+    select:not([multiple]):not([data-n1]):not([data-n2]) option { white-space: normal; }
+
+  /* One chevron for every dropdown (the system triangle is hidden and the
+     components' own background chevrons are replaced), 14px from the edge. */
+  select:not([multiple]):not([data-n1]):not([data-n2])::picker-icon { display: none; }
+  select:not([multiple]):not([data-n1]):not([data-n2]) {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-800);
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 14px;
+    /* The chevron is drawn here for every select, so its gutter must win over
+       screens that set their own tighter padding. */
+    padding-right: 38px !important;
+    /* Same left inset everywhere, also on screens that never styled their selects. */
+    padding-left: 14px;
+    min-height: 34px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    box-shadow: var(--shadow-field);
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]):is(:hover, :open) {
+    border-color: var(--orange);
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]):open {
+    box-shadow: 0 0 0 3px rgba(59,170,93,.15);
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]):disabled {
+    background-color: var(--gray-100);
+    color: var(--gray-400);
+    cursor: not-allowed;
+  }
+
+
+  select:not([multiple]):not([data-n1]):not([data-n2])::picker(select) {
+    margin-top: 6px;
+    padding: 8px;
+    min-width: anchor-size(width);
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    opacity: 1;
+    transform: none;
+    transition: opacity .16s ease, transform .16s ease, overlay .16s allow-discrete, display .16s allow-discrete;
+    @starting-style { opacity: 0; transform: translateY(-6px) scale(.98); }
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]) option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-800);
+    cursor: pointer;
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]) optgroup {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-400);
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]) optgroup option { color: var(--gray-800); }
+  select:not([multiple]):not([data-n1]):not([data-n2]) option:is(:hover, :focus-visible) {
+    background: var(--gray-100);
+    outline: none;
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]) option:checked {
+    background: rgba(59,170,93,.18);
+    color: var(--orange-dark);
+    font-weight: 600;
+  }
+  select:not([multiple]):not([data-n1]):not([data-n2]) option::checkmark {
+    order: 1;
+    margin-left: auto;
+    color: var(--orange);
+  }
+}
+
+
+/* ── Button skin shared by every screen (same as the mobile app) ─────────
+   Many components keep their own copy of .btn-primary / .btn-outline / …
+   whose flat colours would hide the shadows. This rule only sets colour,
+   border and shadow — never size or layout — and its specificity beats the
+   components' own (class + attribute) selectors. */
+$btn-secondary: '.btn-g, .btn-outline, .btn-secondary, .btn-ghost, .btn-cancel, .btn-refresh, .btn-view';
+$btn-primary: '.btn-p, .btn-primary, .btn-accent, .btn-sm.primary, .churn-gen-btn, .dp-btn-p';
+$btn-danger: '.btn-d, .btn-danger, .btn-reject';
+
+:is(button, a):is(#{$btn-secondary}):not(:disabled):not(.active) {
+  background: white;
+  color: var(--gray-700);
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 5px 14px rgba(0,0,0,.081);
+  transition: border-color .15s, box-shadow .15s, color .15s, transform .15s;
+  &:hover {
+    background: white;
+    border-color: var(--orange);
+    color: var(--orange-dark);
+    box-shadow: 0 5px 14px rgba(0,0,0,.081), 0 0 0 3px rgba(59,170,93,.12);
+  }
+}
+:is(button, a):is(#{$btn-primary}):not(:disabled) {
+  background: var(--green-gradient);
+  color: white;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 4px 9px rgba(59,170,93,.144);
+  transition: filter .15s, box-shadow .15s, transform .15s;
+  &:hover {
+    background: var(--green-gradient);
+    filter: brightness(1.05);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 5px 11px rgba(59,170,93,.198);
+  }
+}
+:is(button, a):is(#{$btn-danger}):not(:disabled) {
+  /* Same tinted style as the selected green pills: ~12% red fill, red text. */
+  background: rgba(220,38,38,.12);
+  color: #C81E1E;
+  border: 1px solid rgba(220,38,38,.22);
+  box-shadow: none;
+  font-weight: 500;
+  transition: background .15s, border-color .15s;
+  &:hover { background: rgba(220,38,38,.18); border-color: rgba(220,38,38,.32); }
+}
+:is(button, a):is(#{$btn-danger}):disabled { background: rgba(220,38,38,.06); color: rgba(200,30,30,.5); border-color: rgba(220,38,38,.12); }
+:is(button, a):is(#{$btn-primary}, #{$btn-secondary}, #{$btn-danger}):active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+
+
+/* Custom dropdowns, suggestion lists and popovers: the same hanging card. */
+:is(.suggest-dropdown, .suggestions-dropdown, .popover, .row-menu, .pd-ms-dropdown, .menu):not([data-n1]):not([data-n2]) {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+
+/* Buttons side by side in a screen's top bar are all one size, whether or
+   not they carry .btn-sm (e.g. "Import CSV" next to "New lead"). */
+#main :is(#topbar, .topbar, .ph, .page-hdr) :is(.btn, .btn-sm, .btn-primary, .btn-outline, .btn-secondary, .btn-ghost) {
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+
+/* Choice pills (All / Mine / Hot …) — the app's ChoiceChip 1:1: white with a
+   light outline and a small lift; selected = light green, green outline, check. */
+.fchip:not([data-n1]):not([data-n2]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  background: white;
+  color: var(--gray-700);
+  border: 1.5px solid #E3E5E9;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,.108);
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s, border-color .15s, color .15s;
+  &:hover { border-color: var(--gray-300); background: white; color: var(--gray-900); }
+  &.on {
+    background: var(--orange-pale);
+    color: var(--orange-dark);
+    border-color: var(--orange);
+    box-shadow: none;
+    &::before {
+      content: '';
+      width: 14px;
+      height: 14px;
+      margin-left: -4px;
+      flex-shrink: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233BAA5D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 14px 14px no-repeat;
+    }
+  }
+}
+
+/* Date fields: same field look as dropdowns, with a calendar icon 14px from the edge. */
+input:is([type=date], [type=datetime-local], [type=month], [type=time]):not([data-n1]):not([data-n2]) {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-800);
+  background-color: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 8px 14px;
+  box-shadow: var(--shadow-field);
+  transition: border-color .15s, box-shadow .15s;
+  &:hover { border-color: var(--orange); }
+  &:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(59,170,93,.2); }
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: .75;
+    margin-left: 8px;
+    margin-right: 0;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='3'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+    &:hover { opacity: 1; }
+  }
+}
+
+/* ── Custom date picker ── */
+.crm-dp {
+  position: fixed;
+  z-index: 10000;
+  width: 292px;
+  padding: 14px;
+  box-sizing: border-box;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  font-family: inherit;
+  animation: scaleIn .16s ease;
+
+  button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; }
+  button:disabled { cursor: default; }
+}
+.crm-dp__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.crm-dp__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+  text-transform: capitalize;
+}
+.crm-dp__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--gray-600);
+  &:hover { background: var(--gray-100); }
+}
+.crm-dp__weekdays,
+.crm-dp__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+}
+.crm-dp__weekdays {
+  margin-bottom: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+.crm-dp__grid { row-gap: 2px; }
+.crm-dp__day {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 12px;
+  color: var(--gray-800);
+  box-sizing: border-box;
+  &:hover:not(:disabled) { background: var(--gray-100); }
+  &:disabled { opacity: .35; }
+}
+.crm-dp__day--today { box-shadow: inset 0 0 0 1.5px #3BAA5D; }
+.crm-dp__day--selected,
+.crm-dp__day--selected:hover:not(:disabled) {
+  background: linear-gradient(135deg, #46B467, #36A057);
+  color: white;
+  font-weight: 700;
+}
+.crm-dp__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-100);
+}
+.crm-dp__today {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3BAA5D;
+  padding: 4px 6px;
+  border-radius: 8px;
+  &:hover:not(:disabled) { background: var(--gray-100); }
+  &:disabled { opacity: .35; }
+}
+.crm-dp__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--gray-400);
+  &:hover { background: var(--gray-100); color: var(--gray-600); }
+}
+
+/* The custom calendar opens from a click on the icon area, so the native
+   popup is switched off only for plain date fields (other types stay native). */
+input[type=date]::-webkit-calendar-picker-indicator { pointer-events: none; }
+
+
+/* ── Numbers first, fewer borders (app-style) ───────────────────────── */
+/* Stat tiles: the label sits above a big number, no outline, soft shadow. */
+.stat-card:not([data-n1]):not([data-n2]) {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 6px;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card:not([data-n1]):not([data-n2]) .stat-val {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card:not([data-n1]):not([data-n2]) .stat-lbl {
+  order: -1; /* label above the number; extra rows keep their order */
+  margin-top: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Filter bar and kanban cards: shadow instead of outline. */
+.toolbar:not([data-n1]):not([data-n2]) {
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-filter);
+  padding: 12px 18px;
+}
+.lead-card:not([data-n1]):not([data-n2]) {
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s, box-shadow .15s;
+  &:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  &.selected { box-shadow: 0 0 0 2px var(--orange), var(--shadow-sm); }
+}
+/* Line icons that replace emoji in labels. */
+svg.ic {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: inline-block;
+  /* Centres the icon on the text's x-height wherever it sits inline. */
+  vertical-align: -0.16em;
+}
+
+
+
+/* Search fields: the app's pill search (rounded, light outline, soft glow on focus). */
+:is(.srch, .tb-search, input[type=search]):not([data-n1]):not([data-n2]) {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gray-800);
+  padding-right: 16px;
+  /* Same as the app's pill search: soft resting shadow, tight green glow on focus. */
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  &::placeholder { color: var(--gray-400); }
+  &:hover { border-color: var(--gray-300); }
+}
+.tb-search:not([data-n1]):not([data-n2]) { padding-left: 16px; }
+/* .srch sits in .srch-wrap with a magnifier icon on the left; size it here so a
+   screen that drops its own copy of the style still lays out correctly. */
+.srch:not([data-n1]):not([data-n2]) {
+  box-sizing: border-box;
+  height: 36px;
+  width: 260px;
+  max-width: 100%;
+  padding: 0 16px 0 36px;
+}
+.srch-wrap > svg { left: 12px; }
+
+
+/* ── Checkboxes: rounded, CRMtree green, one look everywhere ───────────── */
+input[type="checkbox"]:not([data-n1]):not([data-n2]) {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  background: white;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background .15s, border-color .15s, box-shadow .15s;
+  &:hover:not(:disabled) { border-color: var(--orange); }
+  &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(59,170,93,.25); }
+  &:checked, &:indeterminate {
+    background-color: var(--orange);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"), var(--green-gradient);
+    background-size: 10px 10px, auto;
+    background-position: center, center;
+    background-repeat: no-repeat;
+    border-color: transparent;
+  }
+  &:indeterminate {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M6 12h12'/%3E%3C/svg%3E"), var(--green-gradient);
+  }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+
+/* ── Arrow buttons (previous/next month, week, stage…) are round ───────── */
+:is(.nav-btn, .stage-arrow-btn, .cal-nav, .vp-arrow):not([data-n1]):not([data-n2]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: white;
+  color: var(--gray-600);
+  border: 1px solid var(--gray-200);
+  border-radius: 50%;
+  box-shadow: 0 3px 9px rgba(0,0,0,.072);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, box-shadow .15s;
+  &:hover:not(:disabled) { background: white; border-color: var(--orange); color: var(--orange-dark); }
+  &:disabled { opacity: .4; cursor: not-allowed; }
+}
+.pager-btn:not([data-n1]):not([data-n2]) {
+  border-radius: 999px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 3px 9px rgba(0,0,0,.072);
+}
+
+/* Form fields use the app font everywhere; browsers default inputs to the system font and
+   some older component styles forced monospace on token/code fields. */
+:is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]), textarea, select) {
+  font-family: inherit;
+}
+
+/* Buttons space their icon with `gap`; old inline icon margins doubled the gap. */
+:is(.btn, .btn-p, .btn-g, .btn-d, .btn-primary, .btn-outline, .btn-secondary) > svg { margin-left: 0 !important; margin-right: 0 !important; }
+
+/* `.sel` is the filter-bar select used by many screens; several never styled
+   it themselves, so it gets the standard field size here (a screen's own
+   `.sel` rule still wins). Inputs next to it match the height. */
+.sel {
+  box-sizing: border-box;
+  height: 36px;
+  min-width: 160px;
+  padding-left: 14px;
+}
+:is(.filters, .toolbar, .fbar, .filter-bar) :is(.fi, .fsel) { height: 36px; box-sizing: border-box; }
+
+
+/* Every search field looks like the one on the Users screen: a magnifier on
+   the left, same size. Fields wrapped in .srch-wrap already draw the icon. */
+:is(input[type=search], .srch, .tb-search, .ap-search):not([data-n1]):not([data-n2]) {
+  box-sizing: border-box;
+  height: 36px;
+  width: 260px;
+  max-width: 100%;
+  padding: 0 16px 0 36px !important;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A1A1AA' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center / 15px 15px;
+}
+.srch-wrap > :is(input[type=search], .srch):not([data-n1]):not([data-n2]) { background-image: none; }
+input[type=search]::-webkit-search-cancel-button { cursor: pointer; }
+
+/* Cards and table wrappers: shadow only, no outline (app-style, like the mobile cards). */
+:is(.card, .tw):not([data-n1]):not([data-n2]) {
+  border: none;
+}
+
+/* Native file inputs ("Choose file"): the button looks like the app's light
+   button and the file name next to it like regular field text. */
+input[type="file"] {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--gray-600);
+  max-width: 100%;
+  &::file-selector-button {
+    margin-right: 12px;
+    height: 36px;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-700);
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,.054);
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  &::file-selector-button:hover { border-color: var(--orange); color: var(--orange-dark); }
+  &:disabled::file-selector-button { opacity: .5; cursor: not-allowed; }
+}
+
+
+/* One field look everywhere: the same soft resting shadow and the same green
+   focus ring for every text field, select, date and search box — including
+   screens that style their own inputs (e.g. Billing). */
+:root { --shadow-field: 0 5px 16px rgba(0,0,0,.099); --ring-field: 0 0 0 3px rgba(59,170,93,.18); }
+:is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]):not([type=hidden]):not([type=submit]):not([type=button]), textarea, select):not([data-n1]):not([data-n2]) {
+  box-shadow: var(--shadow-field);
+  &:focus { outline: none; border-color: var(--orange); box-shadow: var(--shadow-field), var(--ring-field); }
+}
+
+/* A field with an error, anywhere in the CRM: red frame (red ring on focus)
+   and a short message directly under the field. */
+:is(input, textarea, select).fi-err:not([data-n1]):not([data-n2]) {
+  border-color: #DC2626 !important;
+  &:focus { border-color: #DC2626 !important; box-shadow: var(--shadow-field), 0 0 0 3px rgba(220,38,38,.15) !important; }
+}
+.ferr, .field-err {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #DC2626;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Tab bar of a lead / partner card: always one line with slightly smaller
+   labels; when the column is too narrow it scrolls sideways instead of wrapping. */
+.tabs.one-line, .mid-tabs.one-line { flex-wrap: nowrap !important; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+:is(.tabs, .mid-tabs).one-line::-webkit-scrollbar { display: none; }
+:is(.tabs, .mid-tabs).one-line .tab-btn { flex: 0 0 auto; padding: 10px; font-size: 12px; white-space: nowrap; }
+
+/* "← Leads" / "← Partners" on a detail card: a quiet text link with a chevron,
+   grey at rest, green on hover — no box around it. */
+.back-link:not([data-n1]):not([data-n2]) {
+  display: inline-flex; align-items: center; gap: 2px; padding: 4px 6px 4px 0; margin-left: -4px;
+  border: none; background: none; border-radius: 8px; box-shadow: none;
+  color: var(--orange); font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1;
+  cursor: pointer; flex-shrink: 0; transition: color .15s;
+  svg { width: 18px; height: 18px; transition: transform .15s; }
+  &:hover { color: var(--orange-dark); svg { transform: translateX(-2px); } }
+}
+
+/* Line icons that replaced emoji keep the emoji's colour. On a filled
+   (green / red) button the icon takes the button's text colour instead. */
+svg.ic.ic-amber  { color: #F59E0B; }
+svg.ic.ic-blue   { color: #3B82F6; }
+svg.ic.ic-green  { color: #16A34A; }
+svg.ic.ic-red    { color: #DC2626; }
+svg.ic.ic-orange { color: #F97316; }
+svg.ic.ic-brown  { color: #B45309; }
+svg.ic.ic-gray   { color: #6B7280; }
+svg.ic.ic-purple { color: #8B5CF6; }
+:is(.btn-p, .btn-primary, .btn-accent, .btn-sm.primary, .churn-gen-btn, .dp-btn-p, .btn-d, .btn-danger, .btn-reject) svg.ic[class*="ic-"] { color: inherit; }
+
+/* Filter cards on every screen (local class names vary) use the filter shadow. */
+:is(.filters, .fbar, .filter-bar, .ca-filters, .list-bar, wt-filter-bar, wt-list-filter-bar):not([data-n1]):not([data-n2]) { box-shadow: var(--shadow-filter); }
+
+
+/* Segmented tabs (`.tabs.seg`): for switching between a screen's main views,
+   e.g. Workflow "My tasks / Kanban". Grey track, the active view is a white tile. */
+.tabs.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  border-bottom: none;
+  background: var(--gray-100);
+  border-radius: 12px;
+  .tab-btn {
+    flex: 1;
+    height: 32px;
+    padding: 0 16px;
+    margin-bottom: 0;
+    border: none;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-500);
+    background: transparent;
+    &:hover { color: var(--gray-800); }
+    &.active { background: white; color: var(--gray-900); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.10); border-bottom: none; }
+  }
+}
+
+/* View switch (Kanban / Table / Cards …) always on its own row, bottom-right of
+   the filter card — same on Leads, Partners and Onboarding. */
+.view-row { flex-basis: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+/* Something placed first in the view row (e.g. the date range on Leads) sits
+   on the left, the views stay on the right — two rows instead of three. */
+.view-row > .view-row-start { margin-right: auto; }
+
+/* An open (clicked) dropdown shows the same green state as on hover, plus the
+   focus ring — the shared field rule above is more specific, hence !important. */
+select:not([multiple]):is(:focus, :focus-visible, :open) {
+  border-color: var(--orange) !important;
+  box-shadow: var(--shadow-field), var(--ring-field) !important;
+}
+
+/* Buttons that start with an icon: tighter left edge and icon-to-text gap, everywhere
+   (small buttons keep their own 10px from .btn-sm). */
+:is(button, a):is(.btn, .btn-p, .btn-g, .btn-d, .btn-primary, .btn-outline, .btn-secondary, .btn-ghost, .btn-danger):not(.btn-sm):has(> svg:first-child):not([data-n1]):not([data-n2]) {
+  gap: 4px;
+  padding-left: 12px;
+}
+#main :is(#topbar, .topbar, .ph, .page-hdr) :is(.btn, .btn-sm, .btn-primary, .btn-outline, .btn-secondary, .btn-ghost):has(> svg:first-child) {
+  gap: 4px;
+  padding-left: 12px;
+}

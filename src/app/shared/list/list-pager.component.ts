@@ -23,7 +23,7 @@ import { LIST_PAGE_SIZE, ListQueryState } from './list-query';
   `,
   styles: [`
     :host { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
-    .range { font-size:12.5px; color:var(--gray-500); font-variant-numeric:tabular-nums; margin-right:4px; }
+    .range { font-size:12px; color:var(--gray-500); font-variant-numeric:tabular-nums; margin-right:4px; }
   `],
 })
 export class ListPagerComponent {

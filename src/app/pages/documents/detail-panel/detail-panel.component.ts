@@ -72,7 +72,7 @@ interface SelectOption { value: string; label: string; }
 
         <!-- Tabs -->
         <div style="padding:16px 24px 0">
-          <div class="tabs">
+          <div class="tabs" style="margin-bottom:0">
             @for (tab of tabs; track tab.id) {
               <button class="tab-btn" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
                 {{ t(tab.labelKey) }}<wt-tooltip [key]="tab.tooltip"></wt-tooltip>
@@ -153,7 +153,7 @@ interface SelectOption { value: string; label: string; }
                 } @else {
                   <div style="display:flex;align-items:center;gap:8px;padding-top:4px">
                     <wt-avatar [name]="doc.owner_name ?? ''" [size]="28" />
-                    <span style="font-size:13px">{{ doc.owner_name }}</span>
+                    <span style="font-size:14px">{{ doc.owner_name }}</span>
                   </div>
                 }
               </div>
@@ -247,14 +247,14 @@ interface SelectOption { value: string; label: string; }
             <!-- Pola dodatkowe tenanta (migracja 0328). Zapisują się razem z resztą
                  metadanych, tym samym przyciskiem co one. -->
             @if (doc.custom_fields?.length) {
-              <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.customFields') }}</div>
+              <div class="sec-title" style="margin-top:24px">{{ t('labels.fields.customFields') }}</div>
               <app-custom-fields [fields]="doc.custom_fields!"
                                  [readonly]="doc._access !== 'full'"
                                  (valuesChange)="customValues = $event" />
             }
 
             <!-- Dane kontaktowe ds. umowy -->
-            <div class="sec-title" style="margin-top:20px">{{ t('labels.fields.contactSection') }}</div>
+            <div class="sec-title" style="margin-top:24px">{{ t('labels.fields.contactSection') }}</div>
             <div class="fgrid">
               <div class="fg full">
                 <label class="fl">{{ t('labels.fields.contactName') }}</label>
@@ -280,12 +280,12 @@ interface SelectOption { value: string; label: string; }
             </div>
 
             <!-- Tags -->
-            <div class="sec-title" style="margin-top:20px">{{ t('detail.tags.title') }}</div>
+            <div class="sec-title" style="margin-top:24px">{{ t('detail.tags.title') }}</div>
             @if (tags.length > 0) {
-              <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:13px">
+              <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:14px">
                 <thead>
                   <tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
-                    <th style="text-align:left;padding:6px 10px;font-weight:600;color:var(--gray-500);font-size:11px;text-transform:uppercase">{{ t('detail.tags.key') }}</th>
+                    <th style="text-align:left;padding:6px 10px;font-weight:600;color:var(--gray-500);font-size:12px;text-transform:uppercase">{{ t('detail.tags.key') }}</th>
                     @if (doc._access === 'full') {
                       <th style="width:36px"></th>
                     }
@@ -294,9 +294,9 @@ interface SelectOption { value: string; label: string; }
                 <tbody>
                   @for (tag of tags; track tag.id) {
                     <tr style="border-bottom:1px solid var(--gray-100)">
-                      <td style="padding:7px 10px;color:var(--gray-700);font-weight:600">{{ tag.key }}</td>
+                      <td style="padding:8px 10px;color:var(--gray-700);font-weight:600">{{ tag.key }}</td>
                       @if (doc._access === 'full') {
-                        <td style="padding:7px 6px;text-align:center">
+                        <td style="padding:8px 6px;text-align:center">
                           <span style="cursor:pointer;color:var(--gray-400);font-size:16px;line-height:1" (click)="deleteTag(tag.id)">&times;</span>
                         </td>
                       }
@@ -305,38 +305,38 @@ interface SelectOption { value: string; label: string; }
                 </tbody>
               </table>
             } @else {
-              <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:12px">{{ t('detail.tags.empty') }}</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-bottom:12px">{{ t('detail.tags.empty') }}</div>
             }
             @if (doc._access === 'full') {
               <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-                <input class="fi" style="flex:1;min-width:0;padding:6px 10px;font-size:13px" [placeholder]="t('detail.tags.keyPlaceholder')" [(ngModel)]="newTagKey">
-                <button class="btn btn-g btn-sm" style="white-space:nowrap" (click)="addTag()">+ {{ t('labels.addTag') }}</button>
+                <input class="fi" style="flex:1;min-width:0" [placeholder]="t('detail.tags.keyPlaceholder')" [(ngModel)]="newTagKey">
+                <button class="btn btn-g" style="white-space:nowrap" (click)="addTag()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('labels.addTag') }}</button>
               </div>
             }
 
             <!-- Powiązani Partnerzy -->
-            <div class="sec-title" style="margin-top:20px">{{ t('detail.partners.title') }}</div>
+            <div class="sec-title" style="margin-top:24px">{{ t('detail.partners.title') }}</div>
             @if (linkedPartnersLoading) {
               <div style="font-size:12px;color:var(--gray-400)">{{ 'states.loading' | transloco }}</div>
             } @else {
               @if (linkedPartners().length > 0) {
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
                   @for (p of linkedPartners(); track p.id) {
-                    <div style="display:flex;align-items:center;gap:8px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px">
+                    <div style="display:flex;align-items:center;gap:8px;background:var(--gray-50);border-radius:12px;padding:8px 12px">
                       <span style="font-size:14px">🤝</span>
-                      <span style="font-size:13px;font-weight:600;flex:1">{{ p.company }}</span>
+                      <span style="font-size:14px;font-weight:600;flex:1">{{ p.company }}</span>
                       @if (doc._access === 'full') {
-                        <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:14px;line-height:1" (click)="unlinkPartner(p)" [title]="t('detail.partners.unlink')">✕</button>
+                        <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;line-height:1;display:inline-flex;padding:4px" (click)="unlinkPartner(p)" [title]="t('detail.partners.unlink')">✕</button>
                       }
                     </div>
                   }
                 </div>
               } @else {
-                <div style="font-size:12.5px;color:var(--gray-400);margin-bottom:8px">{{ t('detail.partners.empty') }}</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px">{{ t('detail.partners.empty') }}</div>
               }
               @if (doc._access === 'full') {
                 <div style="position:relative;margin-bottom:12px">
-                  <input class="fi" style="width:100%;box-sizing:border-box;padding:6px 10px;font-size:13px"
+                  <input class="fi" style="width:100%;box-sizing:border-box"
                          [placeholder]="t('detail.partners.searchPlaceholder')"
                          [(ngModel)]="partnerSearch"
                          (ngModelChange)="onPartnerSearch($event)"
@@ -346,8 +346,8 @@ interface SelectOption { value: string; label: string; }
                       @for (p of partnerDropdown(); track p.id) {
                         <div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--gray-100)"
                              (mousedown)="linkPartner(p)">
-                          <div style="font-weight:500;font-size:13px">{{ p.company }}</div>
-                          @if (p.nip) { <div style="font-size:11px;color:var(--gray-400)">{{ t('detail.partners.taxId', { nip: p.nip }) }}</div> }
+                          <div style="font-weight:500;font-size:14px">{{ p.company }}</div>
+                          @if (p.nip) { <div style="font-size:12px;color:var(--gray-400)">{{ t('detail.partners.taxId', { nip: p.nip }) }}</div> }
                         </div>
                       }
                     </div>
@@ -361,7 +361,7 @@ interface SelectOption { value: string; label: string; }
             }
 
             @if (doc.document_group_name) {
-              <div style="background:var(--orange-pale);border:1px solid var(--orange-muted);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--orange-dark)">
+              <div style="background:var(--orange-pale);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--orange-dark)">
                 📎 {{ t('detail.overview.packagePart') }} <strong>{{ doc.document_group_name }}</strong>
               </div>
             }
@@ -370,7 +370,7 @@ interface SelectOption { value: string; label: string; }
           <!-- DOKUMENT GŁÓWNY -->
           @if (activeTab === 'preview') {
             @if (isStoredInvoice && doc.ksef_invoice_id && doc.blob_name) {
-              <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.5;color:#92400E">
+              <div style="background:#FFFBEB;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;line-height:1.5;color:#92400E">
                 {{ t('invoice.ksefVisualisationNote') }}
               </div>
             }
@@ -379,13 +379,13 @@ interface SelectOption { value: string; label: string; }
                 <div class="empty-state">
                   <div class="empty-icon">📄</div>
                   <div class="empty-title">{{ t('detail.preview.unavailable') }}</div>
-                  <div style="font-size:12.5px;color:var(--gray-400);margin-top:6px;text-align:center;max-width:320px">
+                  <div style="font-size:12px;color:var(--gray-400);margin-top:6px;text-align:center;max-width:320px">
                     {{ t('detail.preview.unavailableFormat') }}<br>{{ t('detail.preview.unavailableHint') }}
                   </div>
-                  <button class="btn btn-g" style="margin-top:14px" (click)="downloadDoc()">⬇ {{ t('detail.preview.downloadFile') }}</button>
+                  <button class="btn btn-g" style="margin-top:16px" (click)="downloadDoc()">⬇ {{ t('detail.preview.downloadFile') }}</button>
                 </div>
               } @else {
-                <div style="background:var(--gray-100);border-radius:8px;overflow:hidden;height:600px;position:relative">
+                <div style="background:var(--gray-100);border-radius:14px;overflow:hidden;height:600px;position:relative">
                   @if (previewLoading()) {
                     <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--gray-100)">
                       <div class="spinner"></div>
@@ -394,7 +394,7 @@ interface SelectOption { value: string; label: string; }
                   @if (previewError()) {
                     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-500)">
                       <span style="font-size:32px">⚠️</span>
-                      <span style="font-size:13px">{{ previewError() }}</span>
+                      <span style="font-size:14px">{{ previewError() }}</span>
                     </div>
                   }
                   @if (previewBlobUrl()) {
@@ -419,9 +419,9 @@ interface SelectOption { value: string; label: string; }
           <!-- VERSIONS -->
           @if (activeTab === 'versions') {
             @if (doc._access === 'full' && doc.blob_name) {
-              <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-                <label class="btn btn-p btn-sm" style="cursor:pointer">
-                  &#11014; {{ t('detail.versions.uploadNew') }}
+              <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+                <label class="btn btn-p" style="cursor:pointer">
+                  <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> {{ t('detail.versions.uploadNew') }}
                   <input type="file" hidden accept=".pdf,.docx,.doc" (change)="uploadNewVersion($event)">
                 </label>
               </div>
@@ -432,8 +432,8 @@ interface SelectOption { value: string; label: string; }
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
                 </div>
                 <div style="flex:1">
-                  <div style="font-size:13px;font-weight:600;color:var(--gray-900)">v{{ v.version_number }} · {{ v.label }}</div>
-                  <div style="font-size:11.5px;color:var(--gray-400)">
+                  <div style="font-size:14px;font-weight:600;color:var(--gray-900)">v{{ v.version_number }} · {{ v.label }}</div>
+                  <div style="font-size:12px;color:var(--gray-400)">
                     {{ v.created_at | date:'dd.MM.yyyy HH:mm' }}
                     @if (v.signatory_name) { · {{ t('detail.versions.signedBy', { name: v.signatory_name }) }} }
                     @if (v.blob_size_bytes) { · {{ formatSize(v.blob_size_bytes) }} }
@@ -450,43 +450,43 @@ interface SelectOption { value: string; label: string; }
           <!-- ATTACHMENTS -->
           @if (activeTab === 'attachments') {
             @if (doc._access === 'full') {
-              <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-                <label class="btn btn-p btn-sm" style="cursor:pointer">
-                  &#11014; {{ t('detail.attachments.add') }}
+              <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+                <label class="btn btn-p" style="cursor:pointer">
+                  <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> {{ t('detail.attachments.add') }}
                   <input type="file" hidden (change)="uploadAttachment($event)">
                 </label>
               </div>
             }
             @for (att of attachments(); track att.id) {
-              <div style="border:1px solid var(--gray-200);border-radius:8px;margin-bottom:12px;overflow:hidden">
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--gray-50)">
-                  <span style="font-size:18px">&#128206;</span>
+              <div style="border:1px solid var(--gray-200);border-radius:12px;margin-bottom:12px;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--gray-50)">
+                  <svg class="ic" style="width:18px;height:18px;color:var(--gray-500)" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                   <div style="flex:1">
-                    <div style="font-size:13px;font-weight:600;color:var(--gray-900)">{{ att.name }}</div>
-                    <div style="font-size:11.5px;color:var(--gray-400)">
+                    <div style="font-size:14px;font-weight:600;color:var(--gray-900)">{{ att.name }}</div>
+                    <div style="font-size:12px;color:var(--gray-400)">
                       {{ t('detail.attachments.versionCount', { count: att.versions?.length ?? 0 }) }} &middot; {{ att.mime_type }}
                       @if (att.blob_size_bytes) { &middot; {{ formatSize(att.blob_size_bytes) }} }
                     </div>
                   </div>
-                  <button class="btn btn-g btn-sm" (click)="downloadAttachment(att)">&#11015; {{ t('detail.actions.download') }}</button>
+                  <button class="btn btn-g btn-sm" (click)="downloadAttachment(att)"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> {{ t('detail.actions.download') }}</button>
                   @if (doc._access === 'full') {
                     <label class="btn btn-g btn-sm" style="cursor:pointer">
-                      &#11014; {{ t('detail.attachments.newVersion') }}
+                      <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> {{ t('detail.attachments.newVersion') }}
                       <input type="file" hidden (change)="uploadAttachmentVersion($event, att.id)">
                     </label>
-                    <button class="btn btn-d btn-sm" (click)="deleteAttachment(att.id)">&#10005;</button>
+                    <button class="btn btn-d btn-sm" (click)="deleteAttachment(att.id)"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
                   }
                 </div>
                 @if (att.versions?.length > 1) {
-                  <div style="padding:8px 14px;border-top:1px solid var(--gray-100)">
-                    <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;margin-bottom:6px">{{ t('detail.tabs.versions') }}</div>
+                  <div style="padding:8px 16px;border-top:1px solid var(--gray-100)">
+                    <div style="font-size:12px;font-weight:600;color:var(--gray-400);text-transform:uppercase;margin-bottom:8px">{{ t('detail.tabs.versions') }}</div>
                     @for (ver of att.versions; track ver.id) {
                       <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-100);font-size:12px">
                         <span style="color:var(--gray-500);min-width:24px">v{{ ver.version_number }}</span>
                         <span style="flex:1;color:var(--gray-700)">{{ ver.label }}</span>
                         <span style="color:var(--gray-400)">{{ ver.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
                         @if (ver.blob_size_bytes) { <span style="color:var(--gray-400)">{{ formatSize(ver.blob_size_bytes) }}</span> }
-                        <button class="btn btn-g btn-sm" style="padding:2px 8px;font-size:11px" (click)="downloadAttachmentVersion(att, ver)">&#11015;</button>
+                        <button class="btn btn-g btn-sm" (click)="downloadAttachmentVersion(att, ver)"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
                       </div>
                     }
                   </div>
@@ -495,7 +495,7 @@ interface SelectOption { value: string; label: string; }
             }
             @empty {
               <div class="empty-state">
-                <div class="empty-icon">&#128206;</div>
+                <div class="empty-icon"><svg class="ic" style="width:32px;height:32px" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></div>
                 <div class="empty-title">{{ t('detail.attachments.empty') }}</div>
                 @if (doc._access === 'full') {
                   <label class="btn btn-p" style="margin-top:12px;cursor:pointer">
@@ -546,8 +546,8 @@ interface SelectOption { value: string; label: string; }
                       <div class="udrop">
                         @for (u of userDropdown(); track u.id) {
                           <div class="udrop-item" (mousedown)="selectUser(u)">
-                            <div style="font-weight:500;font-size:13px">{{ u.display_name }}</div>
-                            <div style="font-size:11px;color:var(--gray-400)">{{ u.email }}</div>
+                            <div style="font-weight:500;font-size:14px">{{ u.display_name }}</div>
+                            <div style="font-size:12px;color:var(--gray-400)">{{ u.email }}</div>
                           </div>
                         }
                       </div>
@@ -577,7 +577,7 @@ interface SelectOption { value: string; label: string; }
                   <textarea class="fta" [placeholder]="t('detail.workflow.messagePlaceholder')" [(ngModel)]="wf.message"></textarea>
                 </div>
               </div>
-              <button class="btn btn-p" style="margin-top:16px" [disabled]="!wf.assignTo" (click)="assignTask()">
+              <button class="btn btn-p" style="margin-top:20px" [disabled]="!wf.assignTo" (click)="assignTask()">
                 📨 {{ t('detail.workflow.assign') }}
               </button>
             }
@@ -592,11 +592,11 @@ interface SelectOption { value: string; label: string; }
             <div class="sec-title" style="margin-top:24px">{{ t('labels.activeTasks') }}</div>
             @for (task of doc.workflow_tasks ?? []; track task.id) {
               @if (task.task_status === 'pending' || task.task_status === 'in_progress') {
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)">
                   <wt-task-badge [taskType]="task.task_type" />
                   <wt-avatar [name]="task.assignee_name ?? ''" [size]="24" />
-                  <span style="font-size:13px;flex:1">{{ task.assignee_name }}</span>
-                  <span style="font-size:11px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM.yy' }}</span>
+                  <span style="font-size:14px;flex:1">{{ task.assignee_name }}</span>
+                  <span style="font-size:12px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM.yy' }}</span>
                   @if (doc._access === 'full') {
                     <button class="btn btn-d btn-sm" (click)="cancelTask(task.id)">{{ 'actions.cancel' | transloco }}</button>
                   }
@@ -627,22 +627,22 @@ interface SelectOption { value: string; label: string; }
       <div class="mol open" (click)="signusOpen = false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:#F5F3FF">✍</div>
+            <div class="moico" style="background:#F5F3FF;color:#7E22CE">✍</div>
             <div>
               <div class="mot">{{ t('detail.signus.modalTitle') }}</div>
               <div class="mos">{{ doc.doc_number }} · {{ doc.name }}</div>
             </div>
           </div>
-          <div style="padding:20px 24px">
-            <div class="fg" style="margin-bottom:14px">
+          <div style="padding:24px">
+            <div class="fg" style="margin-bottom:16px">
               <label class="fl">{{ t('detail.signus.signatories') }} <span class="req">*</span></label>
               <textarea class="fta" style="min-height:60px" [placeholder]="t('detail.signus.emailsPlaceholder')" [(ngModel)]="signusEmails"></textarea>
             </div>
-            <div style="background:var(--gray-50);border-radius:8px;padding:12px;font-size:12px;color:var(--gray-500)">
+            <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--gray-500)">
               ℹ {{ t('detail.signus.info') }}
             </div>
           </div>
-          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end">
+          <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50)">
             <button class="btn btn-g" (click)="signusOpen = false">{{ 'actions.close' | transloco }}</button>
             <button class="btn btn-p" [disabled]="!signusEmails.trim()" (click)="confirmSignus()">{{ t('detail.signus.send') }} →</button>
           </div>
@@ -660,16 +660,16 @@ interface SelectOption { value: string; label: string; }
     .panel { width: 680px; height: 100vh; background: white; box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
     .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; background: white; position: sticky; top: 0; z-index: 1; }
     .pt { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
-    .ps { font-size: 12px; color: var(--gray-500); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+    .ps { font-size: 12px; color: var(--gray-500); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
     .pc { margin-left: auto; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 6px; }
     .pc:hover { background: var(--gray-100); color: var(--gray-700); }
     .pb { padding: 24px; flex: 1; }
-    .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 10px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
+    .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
     .mol { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); animation: fadeIn .15s ease; }
-    .mo { background: white; border-radius: 14px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
+    .mo { background: white; border-radius: 12px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
     .moh { padding: 20px 24px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
     .moico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
-    .mot { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--gray-900); }
+    .mot { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
     .mos { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
   `],
 })

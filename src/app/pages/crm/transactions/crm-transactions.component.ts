@@ -156,15 +156,15 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .kpi.accent .kpi-val { color:#f97316; }
     .kpi.green .kpi-val { color:#16a34a; }
     .product-mix { display:flex; gap:6px; flex-wrap:wrap; }
-    .mix-chip { background:#f3f4f6; border-radius:8px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .mix-chip { background:#f3f4f6; border-radius:8px; padding:4px 10px; font-size:12px; font-weight:600; }
     .txn-filters { display:flex; gap:10px; padding:10px 20px; border-bottom:1px solid #f3f4f6; align-items:center; flex-wrap:wrap; }
     .filter-input { border:1px solid #d1d5db; border-radius:8px; padding:6px 10px; font-size:12px; outline:none; }
     .filter-input:focus { border-color:#f97316; }
-    .result-count { font-size:11px; color:#9ca3af; margin-left:auto; }
+    .result-count { font-size:12px; color:#9ca3af; margin-left:auto; }
     .loading { padding:40px; text-align:center; color:#9ca3af; }
     .txn-table-wrap { flex:1; overflow:auto; }
     .txn-table { width:100%; border-collapse:collapse; }
-    .txn-table th { text-align:left; padding:10px 12px; font-size:11px; color:#6b7280; font-weight:600; border-bottom:2px solid #f3f4f6; white-space:nowrap; }
+    .txn-table th { text-align:left; padding:10px 12px; font-size:12px; color:#6b7280; font-weight:600; border-bottom:2px solid #f3f4f6; white-space:nowrap; }
     .txn-row { cursor:pointer; }
     .txn-row:hover td { background:#fafafa; }
     .txn-row.expanded td { background:#fff7ed; }
@@ -174,19 +174,19 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .green-cell { color:#16a34a; font-weight:700; }
     .muted { color:#9ca3af; }
     .row-sub { font-size:10px; color:#9ca3af; }
-    code { font-size:11px; background:#f3f4f6; border-radius:4px; padding:1px 5px; }
-    .product-tags { display:flex; flex-wrap:wrap; gap:3px; }
+    code { font-size:12px; background:#f3f4f6; border-radius:4px; padding:1px 4px; }
+    .product-tags { display:flex; flex-wrap:wrap; gap:4px; }
     .ptag { font-size:10px; background:#f3f4f6; border-radius:6px; padding:1px 6px; }
     .ptag.more { background:#e5e7eb; color:#6b7280; }
-    .status-chip { padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; }
+    .status-chip { padding:2px 8px; border-radius:8px; font-size:12px; font-weight:600; }
     .status-confirmed { background:#dcfce7; color:#166534; }
     .status-cancelled  { background:#fee2e2; color:#991b1b; }
     .status-refunded   { background:#fef3c7; color:#92400e; }
-    .expand-btn { background:none; border:none; cursor:pointer; font-size:11px; color:#9ca3af; padding:2px 6px; }
+    .expand-btn { background:none; border:none; cursor:pointer; font-size:12px; color:#9ca3af; padding:2px 6px; }
     .detail-row td { background:#fff7ed; padding:0; }
     .products-table { width:100%; border-collapse:collapse; padding:8px 16px; }
     .products-table th { font-size:10px; color:#9ca3af; padding:6px 10px; border-bottom:1px solid #f3f4f6; text-align:left; }
-    .products-table td { font-size:11px; padding:6px 10px; border-bottom:1px solid #f9fafb; vertical-align:top; }
+    .products-table td { font-size:12px; padding:6px 10px; border-bottom:1px solid #f9fafb; vertical-align:top; }
     .empty-msg { text-align:center; color:#9ca3af; padding:32px; }
     .pager { display:flex; justify-content:center; gap:12px; align-items:center; padding:12px; }
     .pager button { border:1px solid #e5e7eb; background:white; border-radius:6px; padding:4px 12px; cursor:pointer; }

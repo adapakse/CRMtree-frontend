@@ -57,14 +57,14 @@ const RESULTS_PER_KIND = 10;
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:8px; }
-    .link-row { display:flex; align-items:center; gap:10px; font-size:13px; }
+    .link-row { display:flex; align-items:center; gap:10px; font-size:14px; }
     .label { font-size:12px; font-weight:600; color:var(--gray-600); }
     .target { color:#5b21b6; font-weight:600; text-decoration:none; }
     .target.plain { color:var(--gray-800); }
     .none { color:var(--gray-400); }
-    .link-danger { border:none; background:none; color:#B91C1C; font-size:12.5px; cursor:pointer; font-family:inherit; }
+    .link-danger { border:none; background:none; color:#B91C1C; font-size:12px; cursor:pointer; font-family:inherit; }
     .picker { display:grid; grid-template-columns:minmax(0, 520px) auto; gap:8px; align-items:center; justify-content:start; }
-    .hint { font-size:11.5px; color:var(--gray-400); }
+    .hint { font-size:12px; color:var(--gray-400); }
   `],
 })
 export class ProjectCrmLinkComponent {

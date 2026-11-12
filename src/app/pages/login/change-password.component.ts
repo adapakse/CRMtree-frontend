@@ -23,9 +23,15 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
           <form (ngSubmit)="submit()">
             <div class="field">
               <label>{{ t('changePassword.newPassword') }}</label>
-              <input [type]="show() ? 'text' : 'password'" [(ngModel)]="newPass" name="newPass"
-                     [placeholder]="t('changePassword.newPasswordPlaceholder')" autocomplete="new-password">
-              <button type="button" class="pass-toggle" (click)="show.set(!show())">{{ t(show() ? 'login.hidePassword' : 'login.showPassword') }}</button>
+              <div class="pw-wrap">
+                <input [type]="show() ? 'text' : 'password'" [(ngModel)]="newPass" name="newPass"
+                       [placeholder]="t('changePassword.newPasswordPlaceholder')" autocomplete="new-password">
+                <button type="button" class="pw-eye" (click)="show.set(!show())"
+                        [attr.aria-label]="t(show() ? 'login.hidePassword' : 'login.showPassword')"
+                        [title]="t(show() ? 'login.hidePassword' : 'login.showPassword')">
+                  @if (show()) { <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg> } @else { <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+                </button>
+              </div>
             </div>
             <div class="field">
               <label>{{ t('changePassword.repeatPassword') }}</label>
@@ -43,23 +49,26 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     </div>
   `,
   styles: [`
-    #login-screen { position:fixed; top:var(--test-banner-height, 0px); right:0; bottom:0; left:0; background:var(--gray-900); display:flex; align-items:center; justify-content:center; }
-    .login-card { background:white; border-radius:16px; width:420px; max-width:95vw; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.4); }
-    .login-top { background:#292A2D; padding:24px 32px 20px; text-align:center; }
+    #login-screen { position:fixed; top:var(--test-banner-height, 0px); right:0; bottom:0; left:0; background:radial-gradient(circle at 20% 10%, var(--orange-pale), var(--gray-50) 60%); display:flex; align-items:center; justify-content:center; }
+    .login-card { background:white; border-radius:16px; width:420px; max-width:95vw; overflow:hidden; box-shadow:var(--shadow-lg); }
+    .login-top { background:#292A2D; padding:28px 32px 24px; text-align:center; }
     .login-logo-img { width:340px; max-width:100%; height:auto; display:block; margin:0 auto 4px; }
-    .login-sub { font-size:13px; color:#888; }
-    .login-body { padding:24px 32px 28px; }
-    .cp-title { font-size:17px; font-weight:600; color:var(--gray-900); margin-bottom:6px; }
-    .cp-hint  { font-size:13px; color:var(--gray-500); margin:0 0 18px; line-height:1.6; }
-    .field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; position:relative; }
-    .field label { font-size:12px; font-weight:600; color:var(--gray-600); }
-    .field input { padding:9px 12px; border:1px solid var(--gray-300); border-radius:8px; font-size:14px; outline:none; transition:border-color .12s; }
-    .field input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.12); }
-    .pass-toggle { position:absolute; right:10px; bottom:9px; background:none; border:none; font-size:12px; color:var(--gray-400); cursor:pointer; }
-    .lbtn { width:100%; background:var(--orange); color:white; border:none; border-radius:8px; padding:12px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s; margin-top:4px; }
-    .lbtn:hover:not(:disabled) { background:var(--orange-dark); }
+    .login-sub { font-size:14px; color:#888; }
+    .login-body { padding:28px 32px 32px; }
+    .cp-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin-bottom:6px; }
+    .cp-hint  { font-size:14px; color:var(--gray-500); margin:0 0 18px; line-height:1.6; }
+    .field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; position:relative; }
+    .field label { font-size:12px; font-weight:500; color:var(--gray-600); }
+    .field input { padding:12px 14px; border:1px solid var(--gray-200); border-radius:12px; font-size:14px; outline:none; background:white; transition:border-color .12s, box-shadow .12s; }
+    .field input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.15); }
+    .pw-wrap { position:relative; }
+    .pw-wrap input { width:100%; box-sizing:border-box; padding-right:44px !important; }
+    .pw-eye { position:absolute; right:4px; top:50%; transform:translateY(-50%); width:32px; height:32px; padding:0; border:none; border-radius:50%; background:none; display:flex; align-items:center; justify-content:center; color:var(--gray-400); cursor:pointer; transition:background .15s, color .15s; }
+    .pw-eye:hover { background:var(--gray-100); color:var(--gray-700); }
+    .lbtn { width:100%; background:var(--green-gradient); color:white; border:none; border-radius:12px; padding:12px; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm); transition:filter .15s, box-shadow .15s; margin-top:4px; }
+    .lbtn:hover:not(:disabled) { filter:brightness(.95); box-shadow:var(--shadow); }
     .lbtn:disabled { opacity:.6; cursor:not-allowed; }
-    .l-error { background:#fef2f2; border:1px solid #fecaca; border-radius:7px; padding:9px 12px; font-size:13px; color:#dc2626; margin-bottom:12px; }
+    .l-error { background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:8px 12px; font-size:14px; color:#dc2626; margin-bottom:12px; }
     .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
     @keyframes spin { to { transform:rotate(360deg); } }
   `],

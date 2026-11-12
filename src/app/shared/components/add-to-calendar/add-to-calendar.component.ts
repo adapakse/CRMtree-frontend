@@ -45,8 +45,8 @@ const MENU_GAP_PX = 4;
     .trigger:hover { color:#2F8F4D; border-color:#A8D9B6; }
     .trigger.labelled { padding:6px 10px; }
     .trigger svg { width:15px; height:15px; }
-    .menu { position:fixed; z-index:1000; width:200px; background:white; border:1px solid #e5e7eb; border-radius:9px; box-shadow:0 8px 24px rgba(0,0,0,.12); padding:4px; display:flex; flex-direction:column; }
-    .menu a, .menu button { text-align:left; padding:7px 10px; border:none; background:none; border-radius:6px; font-size:12.5px; color:#111827; text-decoration:none; cursor:pointer; font-family:inherit; }
+    .menu { position:fixed; z-index:1000; width:200px; background:white; border:1px solid #e5e7eb; border-radius:9px; box-shadow:0 7px 22px rgba(0,0,0,0.108); padding:4px; display:flex; flex-direction:column; }
+    .menu a, .menu button { text-align:left; padding:8px 10px; border:none; background:none; border-radius:6px; font-size:12px; color:#333333; text-decoration:none; cursor:pointer; font-family:inherit; }
     .menu a:hover, .menu button:hover { background:#f3f4f6; }
   `],
 })

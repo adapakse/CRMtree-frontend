@@ -52,7 +52,7 @@ import { ProjectTaskTableComponent } from './project-task-table.component';
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:12px; }
-    .toggle { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--gray-700); cursor:pointer; white-space:nowrap; }
+    .toggle { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-700); cursor:pointer; white-space:nowrap; }
   `],
 })
 export class ProjectTasksTabComponent {

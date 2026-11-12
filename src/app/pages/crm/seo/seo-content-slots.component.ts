@@ -64,7 +64,7 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
                           — {{ s.author }}{{ s.author_role ? ', ' + s.author_role : '' }} ·
                           <a [href]="s.source_url" target="_blank" rel="noopener noreferrer">{{ s.source_title || s.source_url }}</a>
                         </p>
-                        <button type="button" class="btn-ghost btn-sm" (click)="useSuggestion(slot)">{{ t('seo.contentSlots.suggestion.use') }}</button>
+                        <button type="button" class="btn btn-g btn-sm" (click)="useSuggestion(slot)">{{ t('seo.contentSlots.suggestion.use') }}</button>
                       </div>
                     }
                     <label class="field-label" [for]="slot.id + '-text'">{{ t('seo.contentSlots.fields.quote') }}</label>
@@ -108,18 +108,18 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
                       <input #fileInput type="file" accept="image/png,image/jpeg,image/webp" (change)="newFile = fileInput.files?.[0] ?? null">
                       <label class="field-label" [for]="slot.id + '-caption'">{{ t('seo.contentSlots.fields.caption') }}</label>
                       <input class="field-input" [id]="slot.id + '-caption'" [(ngModel)]="newCaption">
-                      <button type="button" class="btn-ghost btn-sm" (click)="uploadAndSelect(slot)" [disabled]="!newFile || !newCaption.trim() || busy()">{{ t('seo.contentSlots.screenshots.uploadToLibrary') }}</button>
+                      <button type="button" class="btn btn-g btn-sm" (click)="uploadAndSelect(slot)" [disabled]="!newFile || !newCaption.trim() || busy()">{{ t('seo.contentSlots.screenshots.uploadToLibrary') }}</button>
                     </details>
                   }
                 }
                 <div class="slot-actions">
-                  <button type="button" class="btn-accent btn-sm" (click)="fill(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.insert') }}</button>
-                  <button type="button" class="btn-ghost btn-sm" (click)="activeSlotId.set(null)">{{ 'actions.cancel' | transloco }}</button>
+                  <button type="button" class="btn btn-p btn-sm" (click)="fill(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.insert') }}</button>
+                  <button type="button" class="btn btn-g btn-sm" (click)="activeSlotId.set(null)">{{ 'actions.cancel' | transloco }}</button>
                 </div>
               } @else {
                 <div class="slot-actions">
-                  <button type="button" class="btn-accent btn-sm" (click)="open(slot)">{{ t('seo.contentSlots.actions.fill') }}</button>
-                  <button type="button" class="btn-reject btn-sm" (click)="remove(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.remove') }}</button>
+                  <button type="button" class="btn btn-p btn-sm" (click)="open(slot)">{{ t('seo.contentSlots.actions.fill') }}</button>
+                  <button type="button" class="btn btn-d btn-sm" (click)="remove(slot)" [disabled]="busy()">{{ t('seo.contentSlots.actions.remove') }}</button>
                 </div>
               }
             }
@@ -157,10 +157,6 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
     .upload-new summary { cursor: pointer; color: var(--gray-700); font-weight: 600; }
     .upload-new input[type="file"] { margin-top: 0.4rem; font-size: 0.75rem; }
     .slot-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
-    .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.8rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    .btn-accent { background: var(--orange); color: #fff; }
-    .btn-ghost { background: var(--gray-100); color: var(--gray-800); }
-    .btn-reject { background: #FEE2E2; color: #991B1B; }
   `],
 })
 export class SeoContentSlotsComponent {

@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/auth/jwt.interceptor';
+import { saveErrorInterceptor } from './core/services/save-error.interceptor';
 import { ssrApiBaseUrlInterceptor } from './core/services/ssr-api-base-url.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { AppSettingsService } from './core/services/app-settings.service';
@@ -30,7 +31,7 @@ function initApp(auth: AuthService, settings: AppSettingsService, locale: Locale
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withComponentInputBinding()),
-    provideHttpClient(withFetch(), withInterceptors([ssrApiBaseUrlInterceptor, jwtInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([ssrApiBaseUrlInterceptor, jwtInterceptor, saveErrorInterceptor])),
     provideAnimations(),
     ...provideI18n(),
     {

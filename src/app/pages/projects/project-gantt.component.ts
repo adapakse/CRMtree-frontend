@@ -43,7 +43,7 @@ interface DayTick { label: number; leftPx: number; isWeekend: boolean; }
       } @else {
         <div class="zoom">
           @for (option of zoomOptions; track option.value) {
-            <button class="zoom-btn" [class.active]="zoom() === option.value" (click)="zoom.set(option.value)">{{ t(option.labelKey) }}</button>
+            <button class="fchip" [class.on]="zoom() === option.value" (click)="zoom.set(option.value)">{{ t(option.labelKey) }}</button>
           }
           @if (undatedCount() > 0) {
             <span class="undated-note">{{ t('gantt.undatedNote', { count: undatedCount() }) }}</span>
@@ -128,26 +128,24 @@ interface DayTick { label: number; leftPx: number; isWeekend: boolean; }
   styles: [`
     :host { display:flex; flex-direction:column; gap:10px; }
     .zoom { display:flex; align-items:center; gap:6px; }
-    .zoom-btn { border:1.5px solid var(--gray-200); background:white; border-radius:8px; padding:5px 11px; font-size:12.5px; cursor:pointer; color:var(--gray-600); font-family:inherit; }
-    .zoom-btn.active { border-color:var(--orange); color:var(--orange-dark); background:var(--orange-pale); font-weight:600; }
     .undated-note { font-size:12px; color:var(--gray-400); margin-left:8px; }
 
     .gantt { display:flex; background:white; border:1px solid var(--gray-200); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:hidden; }
     .names { width:340px; flex-shrink:0; border-right:1px solid var(--gray-200); }
-    .names-head { display:flex; align-items:flex-end; padding:0 12px 8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-500); background:var(--gray-50); border-bottom:1px solid var(--gray-200); box-sizing:border-box; }
-    .name-cell { height:34px; display:flex; align-items:center; gap:6px; padding:0 12px; font-size:13px; color:var(--gray-800); border-bottom:1px solid var(--gray-100); cursor:pointer; white-space:nowrap; overflow:hidden; box-sizing:border-box; }
+    .names-head { display:flex; align-items:flex-end; padding:0 12px 8px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-500); background:var(--gray-50); border-bottom:1px solid var(--gray-200); box-sizing:border-box; }
+    .name-cell { height:34px; display:flex; align-items:center; gap:6px; padding:0 12px; font-size:14px; color:var(--gray-800); border-bottom:1px solid var(--gray-100); cursor:pointer; white-space:nowrap; overflow:hidden; box-sizing:border-box; }
     .name-cell > span:first-child { overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
     .name-cell:hover { background:var(--gray-50); }
     .name-cell .root { font-weight:600; }
     .name-cell.project-cell { background:var(--gray-100); font-weight:700; cursor:default; }
     .beyond-flag { color:#DC2626; font-size:12px; flex-shrink:0; }
-    .mono { font-family:'Sora',monospace; font-size:11px; color:var(--gray-500); font-weight:600; }
+    .mono { font-family:'Sora',monospace; font-size:12px; color:var(--gray-500); font-weight:600; }
 
     .timeline { flex:1; overflow-x:auto; min-width:0; }
     .canvas { position:relative; }
     .months, .days { position:relative; height:28px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); box-sizing:border-box; }
-    .month { position:absolute; top:0; height:100%; display:flex; align-items:center; padding-left:8px; font-size:11.5px; font-weight:600; color:var(--gray-600); border-left:1px solid var(--gray-200); box-sizing:border-box; white-space:nowrap; overflow:hidden; }
-    .day { position:absolute; top:0; height:100%; display:flex; align-items:center; justify-content:center; font-size:10.5px; color:var(--gray-500); box-sizing:border-box; }
+    .month { position:absolute; top:0; height:100%; display:flex; align-items:center; padding-left:8px; font-size:12px; font-weight:600; color:var(--gray-600); border-left:1px solid var(--gray-200); box-sizing:border-box; white-space:nowrap; overflow:hidden; }
+    .day { position:absolute; top:0; height:100%; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--gray-500); box-sizing:border-box; }
     .day.weekend { background:var(--gray-100); color:var(--gray-400); }
     .body { position:relative; }
     .month-line { position:absolute; top:0; bottom:0; width:1px; background:var(--gray-200); }

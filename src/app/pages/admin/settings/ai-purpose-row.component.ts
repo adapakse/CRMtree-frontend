@@ -187,7 +187,7 @@ export interface SavedProvider {
             {{ busy() ? t('settings.ai.verifying') : t('settings.ai.saveAndVerify') }}
           </button>
           @if (config()) {
-            <button class="btn btn-g" [disabled]="busy()" (click)="remove()">
+            <button class="btn btn-d" [disabled]="busy()" (click)="remove()">
               {{ t('settings.ai.remove') }}
             </button>
           }
@@ -196,11 +196,11 @@ export interface SavedProvider {
     </div>
   `,
   styles: [`
-    .pr { padding:14px 0; border-top:1px solid var(--gray-100); }
+    .pr { padding:16px 0; border-top:1px solid var(--gray-100); }
     .pr:first-of-type { border-top:0; }
-    .pr-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-    .pr-name { font-size:13.5px; font-weight:600; color:var(--gray-800); }
-    .badge { font-size:11px; padding:2px 8px; border-radius:999px; font-weight:600; }
+    .pr-head { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .pr-name { font-size:14px; font-weight:600; color:var(--gray-800); }
+    .badge { font-size:12px; padding:2px 8px; border-radius:999px; font-weight:600; }
     .badge.ok   { background:#DCFCE7; color:#166534; }
     .badge.bad  { background:#FEE2E2; color:#991B1B; }
     .badge.warn { background:#FEF3C7; color:#92400E; }
@@ -209,10 +209,10 @@ export interface SavedProvider {
     .pr-grid {
       display:grid; grid-template-columns:110px minmax(0,1fr); gap:8px 12px; align-items:center;
     }
-    .lbl { font-size:12.5px; color:var(--gray-600); }
+    .lbl { font-size:12px; color:var(--gray-600); }
     .cell { display:flex; align-items:center; gap:10px; min-width:0; flex-wrap:wrap; }
     .cell .fi, .cell .fsel { flex:1; min-width:200px; max-width:420px; }
-    .prov { font-size:13px; font-weight:600; color:var(--gray-800); }
+    .prov { font-size:14px; font-weight:600; color:var(--gray-800); }
 
     /* Zapisany klucz jako plakietka, nie puste pole hasła z placeholderem —
        pole wyglądające na niewypełnione sugeruje, że klucza nie ma. */
@@ -232,17 +232,17 @@ export interface SavedProvider {
     }
     .linkbtn:disabled { color:var(--gray-400); cursor:default; }
 
-    .note { font-size:11.5px; color:var(--gray-400); }
+    .note { font-size:12px; color:var(--gray-400); }
     .note.wide { flex-basis:100%; }
     .ok-text { color:#166534; }
     .warn-text { color:#92400E; }
     .pr-note {
       font-size:12px; color:var(--gray-500); background:var(--gray-50);
-      border:1px dashed var(--gray-200); border-radius:8px; padding:8px 10px;
+      border:1px dashed var(--gray-200); border-radius:12px; padding:8px 12px;
     }
     .pr-error {
-      font-size:11.5px; color:#B91C1C; background:#FEF2F2; border:1px solid #FECACA;
-      border-radius:8px; padding:7px 10px; margin-bottom:10px;
+      font-size:12px; color:#B91C1C; background:#FEF2F2; border:1px solid #FECACA;
+      border-radius:12px; padding:8px 12px; margin-bottom:12px;
       overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:help;
     }
     /* Przyciski biorą globalny system aplikacji (.btn + .btn-p / .btn-g ze
@@ -250,7 +250,7 @@ export interface SavedProvider {
        „btn-primary" i „btn-danger-sm", które istnieją WYŁĄCZNIE wewnątrz
        komponentu ustawień — w osobnym komponencie nie dosięgały ich żadne style
        i przyciski wyglądały jak surowe, systemowe. */
-    .pr-actions { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+    .pr-actions { display:flex; gap:8px; margin-top:20px; flex-wrap:wrap; }
     @media (max-width: 720px) { .pr-grid { grid-template-columns:1fr; } }
   `],
 })

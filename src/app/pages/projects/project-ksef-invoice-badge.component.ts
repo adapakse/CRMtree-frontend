@@ -31,7 +31,7 @@ import { ProjectKsefInvoiceDetailComponent } from './project-ksef-invoice-detail
   `,
   styles: [`
     :host { display:inline-block; max-width:100%; }
-    .badge-link { display:inline-flex; align-items:baseline; gap:5px; max-width:100%; padding:2px 8px; border-radius:6px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; font-size:12px; font-family:inherit; font-weight:600; cursor:pointer; text-align:left; overflow-wrap:anywhere; }
+    .badge-link { display:inline-flex; align-items:baseline; gap:4px; max-width:100%; padding:2px 8px; border-radius:6px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; font-size:12px; font-family:inherit; font-weight:600; cursor:pointer; text-align:left; overflow-wrap:anywhere; }
     .badge-link:hover { background:#DBEAFE; }
     .badge-link.static { cursor:default; }
     .badge-link.static:hover { background:#EFF6FF; }

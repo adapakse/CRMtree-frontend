@@ -22,6 +22,7 @@
     },
     "password": {
       "current": "Contraseña actual",
+      "hide": "Ocultar contraseña",
       "hint": "Introduce tu contraseña actual y una nueva, de al menos 8 caracteres. El cambio cierra la sesión de tu cuenta en la app móvil.",
       "mismatch": "Las contraseñas no coinciden",
       "new": "Nueva contraseña",
@@ -29,6 +30,7 @@
       "saveFailed": "No se pudo cambiar la contraseña",
       "saved": "Contraseña cambiada",
       "saving": "Guardando…",
+      "show": "Mostrar contraseña",
       "submit": "Cambiar contraseña",
       "title": "Cambiar contraseña",
       "tooShort": "La contraseña debe tener al menos 8 caracteres"

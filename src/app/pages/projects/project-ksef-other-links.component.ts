@@ -30,7 +30,7 @@ import { taskLabel } from './project-ksef.styles';
   styles: [`
     :host { display:contents; }
     .warning { display:block; color:#DC2626; font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
-    .target { font-weight:600; margin-right:3px; }
+    .target { font-weight:600; margin-right:4px; }
   `],
 })
 export class ProjectKsefOtherLinksComponent {

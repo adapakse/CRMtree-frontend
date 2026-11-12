@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
@@ -20,7 +20,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
     <div id="topbar">
       <span class="page-title">{{ t('dashboard.title') }}</span>
       <span class="tsp"></span>
-      <span style="font-size:12px;color:var(--gray-400)">{{ today }}</span>
+      <span style="font-size:12px;color:var(--gray-400)">{{ today() }}</span>
     </div>
 
     <div id="content">
@@ -58,7 +58,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start">
 
         <!-- Recent Documents -->
         <div>
@@ -140,24 +140,24 @@ import { LocaleService } from '../../core/i18n/locale.service';
                    [routerLink]="['/documents']" [queryParams]="{ open: task.document_id }">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
                   <wt-task-badge [taskType]="task.task_type" />
-                  <span style="font-size:11px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM' }}</span>
+                  <span style="font-size:12px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM' }}</span>
                   @if (task.due_date) {
-                    <span style="font-size:10.5px;font-weight:600;margin-left:auto"
+                    <span style="font-size:10px;font-weight:600;margin-left:auto"
                           [style.color]="isDue(task.due_date) ? '#DC2626' : '#065F46'">
                       ⏰ {{ task.due_date | date:'dd.MM.yy' }}
                     </span>
                   }
                 </div>
-                <div style="font-size:13px;font-weight:500;color:var(--gray-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                <div style="font-size:14px;font-weight:500;color:var(--gray-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                   {{ task.document_name }}
                 </div>
-                <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
+                <div style="font-size:12px;color:var(--gray-400);margin-top:2px">
                   {{ t('labels.from', { name: task.assigner_name }) }}
                 </div>
               </div>
             }
             @empty {
-              <div class="empty-state" style="padding:28px 16px">
+              <div class="empty-state" style="padding:32px 16px">
                 <div class="empty-icon">✅</div>
                 <div class="empty-title">{{ t('labels.noPendingTasks') }}</div>
               </div>
@@ -170,41 +170,43 @@ import { LocaleService } from '../../core/i18n/locale.service';
   `,
   styles: [`
     #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
-    .page-title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; color: var(--gray-900); }
+    .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); }
     .tsp { flex: 1; }
     #content { flex: 1; overflow-y: auto; padding: 24px; }
-    .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
     .stat-card { background: white; border-radius: var(--radius); padding: 16px 18px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px; transition: box-shadow .15s; }
     .stat-card:hover { box-shadow: var(--shadow); }
-    .stat-lbl { font-size: 11.5px; font-weight: 500; color: var(--gray-500); text-transform: uppercase; letter-spacing: .4px; }
+    /* Icon, label, number, hint top to bottom; the global stat tile reverses only a two-line tile. */
+    :host .stats-bar .stat-card { flex-direction: column; justify-content: flex-start; gap: 4px; padding: 16px 20px; }
+    .stat-lbl { font-size: 12px; font-weight: 500; color: var(--gray-500); text-transform: uppercase; letter-spacing: .4px; }
     .stat-val { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; color: var(--gray-900); line-height: 1; }
-    .stat-sub { font-size: 11.5px; color: var(--gray-400); }
-    .stat-ico { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; font-size: 16px; }
+    .stat-sub { font-size: 12px; color: var(--gray-400); }
+    .stat-ico { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
     .ico-or { background: var(--orange-pale); } .ico-bl { background: #EFF6FF; } .ico-gr { background: #F0FDF4; } .ico-pu { background: #F5F3FF; } .ico-re { background: #FEF2F2; }
     .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
-    .th { padding: 10px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; }
+    .th { padding: 10px 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; }
     .tr { display: grid; padding: 0 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .1s; }
     .tr:last-child { border-bottom: none; }
     .tr:hover { background: var(--gray-50); }
-    .td { padding: 11px 8px; font-size: 13px; color: var(--gray-700); overflow: hidden; }
+    .td { padding: 12px 8px; font-size: 14px; color: var(--gray-700); overflow: hidden; }
     .td-n { overflow: visible; }
-    .td-num { font-family: 'Sora', monospace; font-size: 11px; color: var(--gray-500); font-weight: 600; }
+    .td-num { font-family: 'Sora', monospace; font-size: 12px; color: var(--gray-500); font-weight: 600; }
 
     /* ── Task strip ── */
     .task-strip {
-      display: flex; align-items: flex-start; gap: 7px;
+      display: flex; align-items: flex-start; gap: 8px;
       background: #FFF8F0; border: 1px solid #FDDBB4;
-      border-radius: 7px; padding: 5px 8px;
+      border-radius: 8px; padding: 4px 8px;
     }
     .task-type-ico { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
     .task-strip-body { flex: 1; min-width: 0; }
-    .task-strip-line1 { font-size: 11.5px; font-weight: 600; color: #92400E; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-    .task-strip-line2 { font-size: 11px; color: #B45309; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-    .task-due { font-size: 10.5px; font-weight: 600; background: #D1FAE5; color: #065F46; padding: 1px 5px; border-radius: 4px; }
+    .task-strip-line1 { font-size: 12px; font-weight: 600; color: #92400E; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .task-strip-line2 { font-size: 12px; color: #B45309; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .task-due { font-size: 10px; font-weight: 600; background: #D1FAE5; color: #065F46; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; }
     .task-due.overdue { background: #FEE2E2; color: #DC2626; }
 
     /* ── Task type badges ── */
-    .tbadge { display: inline-flex; align-items: center; font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }
+    .tbadge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 3px; }
     .tbadge-sign    { background: #EDE9FE; color: #5B21B6; }
     .tbadge-edit    { background: #DBEAFE; color: #1E40AF; }
     .tbadge-approve { background: #FEF3C7; color: #92400E; }
@@ -220,7 +222,7 @@ export class DashboardComponent implements OnInit {
   recentDocs = signal<Document[]>([]);
   myTasks    = signal<WorkflowTask[]>([]);
   stats      = signal({ total: 0, inWorkflow: 0, signed: 0, expiring: 0 });
-  today      = new Date().toLocaleDateString(this.locale.activeLocale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  today      = computed(() => new Date().toLocaleDateString(this.locale.activeLocale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
 
   isExpiring = (d?: string) => isExpiringSoon(d, 30);
 

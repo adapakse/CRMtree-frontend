@@ -55,7 +55,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
   `,
   styles: [PROJECT_FINANCE_STYLES, `
     .plan-grid { display:grid; grid-template-columns:200px minmax(220px, 320px); gap:16px; align-items:start; }
-    .toggle { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-700); cursor:pointer; }
+    .toggle { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--gray-700); cursor:pointer; }
     @media (max-width: 700px) { .plan-grid { grid-template-columns:1fr; } }
   `],
 })

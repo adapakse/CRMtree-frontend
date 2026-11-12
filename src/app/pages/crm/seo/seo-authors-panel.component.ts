@@ -32,10 +32,10 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
             <input class="field-input" [(ngModel)]="editLinkedinUrl" placeholder="https://linkedin.com/in/...">
             <div class="author-edit-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(a.id)" [disabled]="!editName.trim() || savingEdit()">
+              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(a.id)" [disabled]="!editName.trim() || savingEdit()">
                 @if (savingEdit()) { {{ t('seo.authors.actions.saving') }} } @else { {{ 'actions.save' | transloco }} }
               </button>
-              <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="cancelEdit()">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
             <div class="author-card-top">
@@ -55,11 +55,11 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
             }
             @if (!a.is_active) { <span class="author-inactive-badge">{{ t('seo.authors.inactiveBadge') }}</span> }
             <div class="author-card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(a)">{{ t('seo.authors.actions.edit') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="startEdit(a)">{{ t('seo.authors.actions.edit') }}</button>
               @if (a.is_active) {
-                <button type="button" class="btn-warn btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.deactivate') }}</button>
+                <button type="button" class="btn btn-g btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.deactivate') }}</button>
               } @else {
-                <button type="button" class="btn-ghost btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.activate') }}</button>
+                <button type="button" class="btn btn-g btn-sm" (click)="toggleActive(a)">{{ t('seo.authors.actions.activate') }}</button>
               }
               <button type="button" class="btn-delete" (click)="remove(a.id)" [title]="t('seo.authors.actions.delete')" [attr.aria-label]="t('seo.authors.actions.delete')">
                 <svg lucideTrash2 [size]="14"></svg>
@@ -82,10 +82,10 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
           <label class="field-label">{{ t('seo.authors.fields.linkedinProfile') }}</label>
           <input class="field-input" [(ngModel)]="newLinkedinUrl" placeholder="https://linkedin.com/in/...">
           <div class="author-edit-actions">
-            <button type="button" class="btn-ghost btn-sm" (click)="add()" [disabled]="!newName.trim() || savingNew()">
+            <button type="button" class="btn btn-g btn-sm" (click)="add()" [disabled]="!newName.trim() || savingNew()">
               @if (savingNew()) { {{ t('seo.authors.actions.adding') }} } @else { {{ t('seo.authors.actions.add') }} }
             </button>
-            <button type="button" class="btn-ghost btn-sm" (click)="adding.set(false)">{{ 'actions.cancel' | transloco }}</button>
+            <button type="button" class="btn btn-g btn-sm" (click)="adding.set(false)">{{ 'actions.cancel' | transloco }}</button>
           </div>
         } @else {
           <button type="button" class="btn-add-author" (click)="adding.set(true)">{{ t('seo.authors.actions.addNew') }}</button>
@@ -126,13 +126,10 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
       cursor: pointer; padding: 1rem 0; width: 100%; text-align: center;
     }
     .btn-add-author:hover { color: var(--orange-dark); }
-    .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
-    .btn-warn { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #FEF3C7; color: #92400E; }
-    .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .btn-delete {
       display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 8px; background: #FEE2E2; color: #991B1B;
-      cursor: pointer; padding: 0.5rem 0.6rem; flex-shrink: 0;
+      border: none; border-radius: 9px; background: #FEE2E2; color: #991B1B;
+      cursor: pointer; padding: 4px 10px; flex-shrink: 0;
     }
     .btn-delete:hover { background: #FECACA; }
     .empty { color: var(--gray-500); font-size: 0.82rem; margin: 0.75rem 0 0; }

@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { WorkflowService } from '../../core/services/api.services';
-import { AvatarComponent } from '../../shared/components/badges.components';
 import { initials } from '../../core/services/helpers';
 import { PbxService } from '../../core/services/pbx.service';
 import { SoftphoneOverlayComponent } from '../../shared/components/softphone/softphone-overlay.component';
@@ -13,7 +12,7 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
 @Component({
   selector: 'wt-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, AvatarComponent, SoftphoneOverlayComponent, TranslocoDirective],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, SoftphoneOverlayComponent, TranslocoDirective],
   providers: [provideTranslocoScope('shell')],
   template: `
     <div class="app-wrap" *transloco="let t; prefix: 'shell'">
@@ -21,17 +20,14 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
       <!-- SIDEBAR -->
       <nav id="sidebar" [class.collapsed]="collapsed">
 
-        <!-- Logo -->
-        <div class="s-logo">
-          <img class="s-logo-img" src="assets/crmtree-logo.png" alt="CRMtree">
+        <div class="s-head">
+          <button class="s-mark-btn" type="button" [disabled]="!collapsed" (click)="toggleSidebar()" [attr.title]="collapsed ? t('sidebar.expand') : null">
+            <img class="s-mark" src="assets/crmtree-tree-black.png" alt="">
+            <span class="s-mark-expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="9" y1="4" x2="9" y2="20"/></svg></span>
+          </button>
+          <img class="s-logo-full" src="assets/crmtree-logo-reverse.png" alt="CRMtree">
+          <button class="toggle-btn" type="button" (click)="toggleSidebar()" [attr.title]="t('sidebar.collapse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="9" y1="4" x2="9" y2="20"/></svg></button>
         </div>
-
-        <!-- Toggle button — always visible -->
-        <button class="toggle-btn" (click)="toggleSidebar()" [attr.title]="t(collapsed ? 'sidebar.expand' : 'sidebar.collapse')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline [attr.points]="collapsed ? '9,18 15,12 9,6' : '15,18 9,12 15,6'"/>
-          </svg>
-        </button>
 
         <!-- Scrollable nav content -->
         <div class="s-scroll">
@@ -264,13 +260,13 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
 
         <!-- User card at bottom -->
         <div class="s-bottom">
-          <a class="nav-item settings-item" routerLink="/my-settings" routerLinkActive="active" style="margin-bottom:4px">
+          <a class="nav-item" routerLink="/my-settings" routerLinkActive="active">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             <span class="nav-label">{{ t('nav.mySettings') }}</span>
             <span class="nav-tip">{{ t('nav.mySettings') }}</span>
           </a>
-          <div class="u-card" (click)="auth.logout()">
-            <wt-avatar [name]="auth.user()?.display_name ?? ''" [size]="32" />
+          <div class="u-card" (click)="auth.logout()" [attr.title]="t('user.logout')">
+            <span class="u-avatar">{{ initials(auth.user()?.display_name ?? '') }}</span>
             <div class="u-info">
               <div class="u-name">{{ auth.user()?.display_name }}</div>
               <div class="u-role">{{ t(auth.isAdmin() ? 'user.admin' : 'user.user') }} · {{ t('user.logout') }}</div>
@@ -289,66 +285,68 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
   `,
   styles: [`
     /* ── Layout ─────────────────────────────────────────────────────── */
-    .app-wrap { display: flex; height: calc(100vh - var(--test-banner-height, 0px)); overflow: hidden; }
+    .app-wrap { display: flex; height: calc(100vh - var(--test-banner-height, 0px)); overflow: hidden;
+      /* Neutral grey a step darker than the content panel, so the panel sits in front. */
+      background: #F1F1F2; }
 
-    /* ── Sidebar shell ───────────────────────────────────────────────── */
+    /* ── Sidebar: lies directly on the white frame; the grey content panel sits beside it ── */
     #sidebar {
-      width: 230px;
-      background: #292A2D;
+      width: 248px;
+      background: transparent;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
-      /* overflow MUST be visible so tooltips can escape the 56 px boundary */
+      /* overflow MUST be visible so tooltips can escape the sidebar */
       overflow: visible;
       transition: width .22s cubic-bezier(.4,0,.2,1);
-      /* shadow to separate from content */
-      box-shadow: 1px 0 0 0 rgba(255,255,255,.06);
+      position: relative;
+      z-index: 3;
     }
-    #sidebar.collapsed { width: 56px; }
+    #sidebar.collapsed { width: 68px; }
 
-    /* ── Logo ────────────────────────────────────────────────────────── */
-    .s-logo {
-      height: 89px;
+    /* ── Header: app mark, name, collapse button ─────────────────────── */
+    .s-head {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 0 12px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
+      gap: 10px;
+      padding: 14px 12px 10px 14px;
       flex-shrink: 0;
-      overflow: hidden;
     }
-    .s-logo-img {
-      height: 74px;
-      width: auto;
-      object-fit: contain;
-      transition: height .22s, width .22s;
-    }
-    /* collapsed: show just the tree crop (upper-center of image) */
-    #sidebar.collapsed .s-logo { padding: 0 8px; }
-    #sidebar.collapsed .s-logo-img {
-      height: 55px;
-      width: 55px;
-      object-fit: cover;
-      object-position: 50% 38%;
-    }
+    .s-mark { width: 36px; height: 36px; flex-shrink: 0; object-fit: contain; transition: opacity .12s; }
+    /* Expanded: the full black logo; collapsed: only its tree (the mark button). */
+    .s-logo-full { height: 52px; width: auto; margin-right: auto; object-fit: contain; }
+    .s-mark-btn { display: none; }
+    #sidebar.collapsed .s-mark-btn { display: flex; }
+    #sidebar.collapsed .s-head { justify-content: center; padding: 14px 0 10px; }
+    #sidebar.collapsed .s-logo-full,
+    #sidebar.collapsed .toggle-btn { display: none; }
 
-    /* ── Toggle button ───────────────────────────────────────────────── */
+    /* Collapsed: hovering the app mark turns it into the expand button, in the same spot. */
+    .s-mark-btn { position: relative; padding: 0; border: none; background: none; border-radius: 10px; flex-shrink: 0; cursor: pointer; }
+    .s-mark-expand {
+      position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+      border-radius: 10px; background: rgba(24,24,27,.08); color: #18181B;
+    }
+    .s-mark-expand svg { width: 18px; height: 18px; }
+    #sidebar.collapsed .s-mark-btn:hover .s-mark { opacity: 0; }
+    #sidebar.collapsed .s-mark-btn:hover .s-mark-expand { display: flex; }
+
     .toggle-btn {
-      width: 100%;
-      padding: 5px 0;
+      width: 30px;
+      height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: none;
       border: none;
-      border-bottom: 1px solid rgba(255,255,255,.07);
+      border-radius: 8px;
       cursor: pointer;
-      color: var(--gray-500);
+      color: #7B8494;
       flex-shrink: 0;
       transition: background .15s, color .15s;
     }
-    .toggle-btn:hover { background: rgba(255,255,255,.05); color: var(--gray-200); }
-    .toggle-btn svg { width: 15px; height: 15px; }
+    .toggle-btn:hover { background: rgba(24,24,27,.06); color: #18181B; }
+    .toggle-btn svg { width: 18px; height: 18px; }
 
     /* ── Scrollable nav area ─────────────────────────────────────────── */
     /* This is the ONLY element that scrolls.
@@ -361,51 +359,55 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
     }
     .s-scroll::-webkit-scrollbar { width: 3px; }
     .s-scroll::-webkit-scrollbar-track { background: transparent; }
-    .s-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 2px; }
+    .s-scroll::-webkit-scrollbar-thumb { background: rgba(24,24,27,.12); border-radius: 2px; }
 
     /* ── Sections & separators ───────────────────────────────────────── */
-    .s-sec { padding: 4px 8px; margin-top: 2px; }
+    .s-sec { padding: 0 10px; }
     .s-lbl {
-      font-size: 10px; font-weight: 600; letter-spacing: .8px;
-      text-transform: uppercase; color: var(--gray-500);
-      padding: 6px 6px 3px;
+      font-size: 12px; font-weight: 500;
+      color: #7B8494;
+      padding: 16px 12px 6px;
       white-space: nowrap;
-      max-height: 28px; overflow: hidden;
+      max-height: 40px; overflow: hidden;
       transition: max-height .2s, opacity .15s, padding .2s;
     }
     #sidebar.collapsed .s-lbl { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
 
-    .nav-sep {
-      height: 1px; background: rgba(255,255,255,.07);
-      margin: 3px 8px;
-      transition: margin .2s, opacity .15s;
-    }
-    #sidebar.collapsed .nav-sep { margin: 2px 8px; opacity: 0.3; }
+    .nav-sep { height: 0; margin: 0; }
+    #sidebar.collapsed .nav-sep { height: 1px; background: rgba(24,24,27,.08); margin: 8px 16px; }
 
     /* ── Nav items ───────────────────────────────────────────────────── */
     .nav-item {
       position: relative;          /* tooltip anchored here */
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 7px 8px;
-      border-radius: 8px;
+      gap: 12px;
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 10px;
       cursor: pointer;
-      color: var(--gray-400);
-      font-size: 13.5px;
-      font-weight: 400;
+      color: #3F4654;
+      font-size: 14px;
+      font-weight: 500;
       text-decoration: none;
-      margin-bottom: 1px;
+      margin-bottom: 2px;
       user-select: none;
       white-space: nowrap;
-      transition: background .12s, color .12s, padding .22s, justify-content .22s;
+      transition: background .12s, color .12s, padding .22s;
     }
-    .nav-item:hover { background: rgba(255,255,255,.07); color: var(--gray-200); }
-    .nav-item.active { background: rgba(59,170,93,.16); color: var(--orange-light); font-weight: 500; }
-    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; color: #7B8494; stroke-width: 1.8; transition: color .12s; }
+    .nav-item:hover { background: rgba(24,24,27,.04); color: #18181B; }
+    .nav-item:hover svg { color: #3F4654; }
+    /* Active item: a white pill with a soft shadow; the icon in brand green. */
+    .nav-item.active { background: rgba(255,255,255,.9); color: #18181B; box-shadow: 0 0 0 1px rgba(24,24,27,.05), 0 1px 3px rgba(16,24,40,.07); }
+    .nav-item.active svg { color: var(--orange); }
+
+    /* No browser focus box after a click; a soft green ring only for keyboard focus. */
+    .nav-item:focus { outline: none; }
+    .nav-item:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(59,170,93,.45); }
 
     /* Collapsed: center the icon */
-    #sidebar.collapsed .nav-item { padding: 8px 0; justify-content: center; gap: 0; }
+    #sidebar.collapsed .nav-item { padding: 0; justify-content: center; gap: 0; }
 
     /* ── Label (visible text) ────────────────────────────────────────── */
     .nav-label {
@@ -418,79 +420,73 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
 
     /* ── Badge ───────────────────────────────────────────────────────── */
     .nbadge {
-      background: var(--orange); color: white;
-      font-size: 10px; font-weight: 700;
-      padding: 1px 6px; border-radius: 10px;
+      margin-left: auto;
+      background: var(--orange); color: #FFFFFF;
+      font-size: 11px; font-weight: 600;
+      padding: 1px 7px; border-radius: 10px;
     }
+    .nav-item.active .nbadge { background: var(--orange); color: #FFFFFF; }
 
-    /* ── Tooltip ─────────────────────────────────────────────────────── */
-    /* Hidden by default. Shown only when sidebar is collapsed + item hovered. */
+    /* ── Tooltip (collapsed only) ────────────────────────────────────── */
     .nav-tip {
-      /* Absolutely positioned, escapes the sidebar because overflow:visible */
       position: absolute;
-      left: calc(100% + 10px);
+      left: calc(100% + 14px);
       top: 50%;
       transform: translateY(-50%);
-      /* Styling */
-      background: #1e293b;
-      color: #f1f5f9;
-      font-size: 12.5px;
+      background: #18181B;
+      color: #FFFFFF;
+      font-size: 12px;
       font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 7px;
+      padding: 6px 10px;
+      border-radius: 8px;
       white-space: nowrap;
       pointer-events: none;
       z-index: 9999;
-      box-shadow: 0 6px 20px rgba(0,0,0,.5);
-      border: 1px solid rgba(255,255,255,.13);
-      /* Arrow */
+      box-shadow: 0 6px 16px rgba(0,0,0,.18);
       display: none;
+      align-items: center;
+      gap: 6px;
     }
-    /* Arrow pointing left */
-    .nav-tip::before {
-      content: '';
-      position: absolute;
-      right: 100%; top: 50%;
-      transform: translateY(-50%);
-      border: 6px solid transparent;
-      border-right-color: rgba(255,255,255,.13);
-    }
-    .nav-tip::after {
-      content: '';
-      position: absolute;
-      right: calc(100% - 1px); top: 50%;
-      transform: translateY(-50%);
-      border: 6px solid transparent;
-      border-right-color: #1e293b;
-    }
-    /* Show on hover when collapsed */
-    #sidebar.collapsed .nav-item:hover .nav-tip { display: block; }
+    #sidebar.collapsed .nav-item:hover .nav-tip { display: flex; }
 
-    /* ── User card ───────────────────────────────────────────────────── */
+    /* ── Bottom: My settings under a divider, then the profile card (a click logs out) ── */
     .s-bottom {
-      border-top: 1px solid rgba(255,255,255,.07);
-      padding: 10px 8px;
+      border-top: 1px solid rgba(24,24,27,.07);
+      padding: 8px 10px 10px;
       flex-shrink: 0;
     }
     .u-card {
       display: flex; align-items: center; gap: 10px;
-      padding: 7px 6px; border-radius: 8px; cursor: pointer;
+      padding: 8px; border-radius: 12px; cursor: pointer;
       overflow: hidden; white-space: nowrap;
       transition: background .15s;
     }
-    .u-card:hover { background: rgba(255,255,255,.06); }
-    .u-info { overflow: hidden; transition: opacity .15s, width .22s; }
-    .u-name  { font-size: 13px; font-weight: 500; color: var(--gray-200); }
-    .u-role  { font-size: 11px; color: var(--gray-500); }
-    #sidebar.collapsed .u-info { opacity: 0; width: 0; }
-    #sidebar.collapsed .u-card { gap: 0; justify-content: center; }
+    .u-card:hover { background: rgba(24,24,27,.05); }
+    .u-avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--orange-pale); color: var(--orange-dark);
+      font-size: 13px; font-weight: 600;
+    }
+    .u-info { flex: 1; min-width: 0; overflow: hidden; transition: opacity .15s, width .22s; }
+    .u-name  { font-size: 14px; font-weight: 500; color: #18181B; overflow: hidden; text-overflow: ellipsis; }
+    .u-role  { font-size: 12px; color: #7B8494; overflow: hidden; text-overflow: ellipsis; }
+    #sidebar.collapsed .u-card { gap: 0; justify-content: center; padding: 8px 0; }
+    #sidebar.collapsed .u-info { display: none; }
 
     /* ── Main area ───────────────────────────────────────────────────── */
-    #main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; min-width: 0; }
+    #main {
+      background: var(--page-bg); flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; min-width: 0;
+      margin: 0;
+      border-radius: 28px 0 0 28px;
+      border-left: 1px solid rgba(24,24,27,.08);
+      box-shadow: 0 1px 3px rgba(16,24,40,.06);
+    }
   `],
 })
 export class ShellComponent implements OnInit {
   auth = inject(AuthService);
+  readonly initials = initials;
   private pbx = inject(PbxService);
 
   isSalesManager = computed(() => (this.auth.user() as any)?.crm_role === 'sales_manager');

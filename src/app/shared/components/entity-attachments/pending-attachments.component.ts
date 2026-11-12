@@ -29,7 +29,7 @@ import { ATTACHMENT_ACCEPTED_EXTENSIONS, ATTACHMENT_MAX_SIZE_MB, formatAttachmen
     .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-radius:8px;border:1px dashed transparent;font-size:12px}.chips.drop-active{border-color:var(--orange,#3BAA5D);background:var(--orange-pale,#E6F4EA);padding:6px}
     .chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-width:0;height:28px;padding:0 4px 0 10px;border:1px solid #e5e7eb;border-radius:999px;background:#fff}
     .chip-name{color:var(--gray-800,#1f2937);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
-    .chip-size{color:#9ca3af;font-size:11px;white-space:nowrap}.chip-remove{font:inherit;border:0;background:none;color:#9ca3af;cursor:pointer;width:20px;height:20px;border-radius:50%;line-height:1;font-size:15px;padding:0}.chip-remove:hover{background:#fee2e2;color:#b91c1c}
+    .chip-size{color:#9ca3af;font-size:12px;white-space:nowrap}.chip-remove{font:inherit;border:0;background:none;color:#9ca3af;cursor:pointer;width:20px;height:20px;border-radius:50%;line-height:1;font-size:16px;padding:0}.chip-remove:hover{background:#fee2e2;color:#b91c1c}
     .chip.add{color:var(--orange-dark,#2F8F4D);border-style:dashed;padding:0 10px;cursor:pointer;position:relative;overflow:hidden}.chip.add:hover{background:var(--orange-pale,#E6F4EA)}.chip.add input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}.chip.add:focus-within{outline:2px solid var(--orange,#3BAA5D);outline-offset:2px}
   `],
 })

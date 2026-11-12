@@ -529,6 +529,26 @@
     "trainingMode": "Mode formation",
     "writeNew": "Rédiger un nouvel e-mail"
   },
+  "fieldErrors": {
+    "closeDate": "Choisissez la date de clôture prévue",
+    "company": "Indiquez le nom de l'entreprise",
+    "contactName": "Indiquez le nom complet du contact",
+    "contactTitle": "Choisissez le poste du contact",
+    "email": "Indiquez une adresse e-mail, p. ex. jean@entreprise.fr",
+    "firstContact": "Choisissez la date du premier contact",
+    "industry": "Choisissez un secteur",
+    "lostReason": "Choisissez le motif de la perte",
+    "onlinePct": "Choisissez la part des ventes en ligne",
+    "phone": "Indiquez un numéro de téléphone, p. ex. +48 600 000 000",
+    "probability": "Choisissez la probabilité de gain",
+    "salesperson": "Attribuez un commercial",
+    "saveFailed": "Échec de l'enregistrement. Réessayez — si l'erreur persiste, signalez-la à votre administrateur.",
+    "source": "Choisissez d'où vient le lead",
+    "value": "Indiquez un montant — si vous ne le connaissez pas, saisissez 0",
+    "valueNegative": "Le montant ne peut pas être négatif",
+    "valueTooLarge": "Montant trop élevé — maximum 999 999 999 999",
+    "website": "Indiquez le site web de l'entreprise, p. ex. entreprise.fr"
+  },
   "history": {
     "activityAdded": "Activité ajoutée : {title}",
     "activityClosed": "Activité clôturée : {title}",
@@ -741,9 +761,14 @@
       "hot": "Chaud"
     },
     "history": {
+      "archived": "Lead déplacé dans les archives",
       "converted": "Lead converti en partenaire",
       "created": "Lead créé",
       "deleted": "Lead supprimé",
+      "holdCancelled": "Mise en attente levée",
+      "holdSet": "En attente jusqu'au {date}",
+      "migrated": "Lead déplacé",
+      "testAccount": "Compte d’essai",
       "updated": "Lead mis à jour"
     },
     "hold": {
@@ -770,11 +795,11 @@
     },
     "loadError": "Erreur lors du chargement du lead.",
     "nip": {
-      "countryCodeRequired": "Indiquez le code pays (2 lettres), p. ex. PL",
-      "duplicate": "Ce numéro fiscal est déjà attribué à une autre fiche.",
-      "numberRequired": "Indiquez le numéro après le code pays",
-      "plTenDigits": "Pour PL, 10 chiffres sont requis après le code pays",
-      "required": "Le numéro fiscal est obligatoire"
+      "countryCodeRequired": "Commencez par le code pays (2 lettres), p. ex. PL",
+      "duplicate": "Ce numéro fiscal est déjà attribué à une autre entreprise dans le CRM",
+      "numberRequired": "Après le code pays, saisissez le numéro",
+      "plTenDigits": "Un numéro fiscal polonais comporte 10 chiffres après « PL », p. ex. PL1234567890",
+      "required": "Indiquez le numéro fiscal de l'entreprise, p. ex. PL1234567890"
     },
     "notFound": "Lead introuvable.",
     "onboarding": {
@@ -975,6 +1000,7 @@
       "fillRequired": "Renseignez les champs obligatoires :",
       "fullName": "Prénom et nom",
       "hot": "Lead chaud",
+      "hotHint": "Le client est proche de l'achat — le lead reçoit 🔥 dans la liste et dans le kanban",
       "namePlaceholder": "Jean Dupont",
       "noExtraContacts": "Aucun contact supplémentaire",
       "notes": "Notes",
@@ -985,10 +1011,11 @@
       "subtitle": "Ajoutez une nouvelle opportunité commerciale",
       "taxId": "Numéro fiscal",
       "taxIdErrors": {
-        "countryCode": "Indiquez le code pays (2 lettres), p. ex. PL",
-        "numberMissing": "Indiquez le numéro après le code pays",
-        "polishDigits": "Pour PL, 10 chiffres sont requis après le code pays",
-        "required": "Le numéro fiscal est obligatoire"
+        "countryCode": "Commencez par le code pays (2 lettres), p. ex. PL",
+        "duplicate": "Ce numéro fiscal est déjà attribué à une autre entreprise dans le CRM",
+        "numberMissing": "Après le code pays, saisissez le numéro",
+        "polishDigits": "Un numéro fiscal polonais comporte 10 chiffres après « PL », p. ex. PL1234567890",
+        "required": "Indiquez le numéro fiscal de l'entreprise, p. ex. PL1234567890"
       },
       "title": "Nouveau lead",
       "unassigned": "— non assigné —",
@@ -1321,10 +1348,10 @@
     },
     "loadError": "Erreur de chargement.",
     "nip": {
-      "countryCodeRequired": "Indiquez le code pays (2 lettres), p. ex. PL",
-      "numberRequired": "Indiquez le numéro après le code pays",
-      "plTenDigits": "Pour PL, 10 chiffres sont requis après le code pays",
-      "required": "Le numéro fiscal est obligatoire"
+      "countryCodeRequired": "Commencez par le code pays (2 lettres), p. ex. PL",
+      "numberRequired": "Après le code pays, saisissez le numéro",
+      "plTenDigits": "Un numéro fiscal polonais comporte 10 chiffres après « PL », p. ex. PL1234567890",
+      "required": "Indiquez le numéro fiscal de l'entreprise, p. ex. PL1234567890"
     },
     "notFound": "Partenaire introuvable.",
     "onboarding": {
@@ -1477,11 +1504,11 @@
       "dwhTurnoverHint": "Chiffre d’affaires brut YTD issu du DWH"
     },
     "taxIdErrors": {
-      "countryCode": "Indiquez le code pays (2 lettres), p. ex. PL",
-      "duplicate": "Ce numéro fiscal est déjà attribué à une autre fiche.",
-      "numberMissing": "Indiquez le numéro après le code pays",
-      "polishDigits": "Pour PL, 10 chiffres sont requis après le code pays",
-      "required": "Le numéro fiscal est obligatoire"
+      "countryCode": "Commencez par le code pays (2 lettres), p. ex. PL",
+      "duplicate": "Ce numéro fiscal est déjà attribué à une autre entreprise dans le CRM",
+      "numberMissing": "Après le code pays, saisissez le numéro",
+      "polishDigits": "Un numéro fiscal polonais comporte 10 chiffres après « PL », p. ex. PL1234567890",
+      "required": "Indiquez le numéro fiscal de l'entreprise, p. ex. PL1234567890"
     },
     "title": "Registre des partenaires",
     "toolbar": {
@@ -1913,6 +1940,8 @@
       "showAll": "Afficher tous les partenaires à risque d’attrition →"
     },
     "currency": {
+      "billionsPln": "{value} Md PLN",
+      "millionsPln": "{value} M PLN",
       "pln": "{value} PLN",
       "thousandsPln": "{value} k PLN"
     },

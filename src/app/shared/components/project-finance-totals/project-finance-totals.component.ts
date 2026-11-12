@@ -36,9 +36,9 @@ import { ProjectFinanceTotals } from '../../../core/services/projects-api.servic
   `,
   styles: [`
     :host { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:12px; color:#6b7280; }
-    .figure { display:inline-flex; align-items:baseline; gap:5px; white-space:nowrap; font-variant-numeric:tabular-nums; }
-    .label { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:#9ca3af; }
-    strong { color:#111827; font-weight:600; }
+    .figure { display:inline-flex; align-items:baseline; gap:4px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:#9ca3af; }
+    strong { color:#333333; font-weight:600; }
     .danger, strong.danger { color:#DC2626; }
   `],
 })

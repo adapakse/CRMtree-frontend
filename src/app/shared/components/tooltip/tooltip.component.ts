@@ -19,8 +19,8 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
       display:inline-flex; align-items:center; justify-content:center;
       width:15px; height:15px; border-radius:50%;
       background:#e5e7eb; color:#9ca3af;
-      font-size:9px; font-weight:800; font-family:sans-serif;
-      cursor:default; margin-left:5px; flex-shrink:0; line-height:1;
+      font-size:10px; font-weight:800; font-family:sans-serif;
+      cursor:default; margin-left:4px; flex-shrink:0; line-height:1;
       transition:background .15s, color .15s; user-select:none;
     }
     .tt-wrap:hover .tt-icon { background:#d1d5db; color:#374151; }

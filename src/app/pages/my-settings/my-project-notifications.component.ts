@@ -23,10 +23,10 @@ import { ToastService } from '../../core/services/toast.service';
     </div>
   `,
   styles: [`
-    .block { padding:24px; display:flex; flex-direction:column; gap:10px; }
-    h2 { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:#18181b; margin:0; }
-    .switch { display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:#27272a; cursor:pointer; }
-    .hint { margin:0; font-size:12.5px; color:#6b7280; line-height:1.5; }
+    .block { padding:24px; display:flex; flex-direction:column; gap:12px; }
+    h2 { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:#333333; margin:0; }
+    .switch { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:#333333; cursor:pointer; }
+    .hint { margin:0; font-size:12px; color:#6b7280; line-height:1.5; }
   `],
 })
 export class MyProjectNotificationsComponent {

@@ -23,19 +23,17 @@ type SortDir = 'asc' | 'desc';
   <div class="topbar">
     <h1>{{ t('partnersList.title') }}</h1>
     <span style="flex:1"></span>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;white-space:nowrap;margin-right:8px">
-      <input type="checkbox" style="width:auto;margin:0;cursor:pointer;accent-color:var(--orange)"
-             [(ngModel)]="onlyMine" (ngModelChange)="onOnlyMineChange()">
-      {{ t('partnersList.toolbar.onlyMine') }}
-    </label>
-    <button class="btn-view" [class.active]="viewMode==='cards'" (click)="viewMode='cards'">⊞ {{ t('partnersList.view.cards') }}</button>
-    <button class="btn-view" [class.active]="viewMode==='table'" (click)="viewMode='table'">☰ {{ t('partnersList.view.table') }}</button>
-    <button class="btn-primary" (click)="openCreateForm()">+ {{ t('partnersList.create.title') }}</button>
+    <div class="srch-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="srch" type="search" [(ngModel)]="search" (ngModelChange)="onSearch()" [placeholder]="t('partnersList.toolbar.searchPlaceholder')">
+    </div>
+    <button class="btn btn-p" (click)="openCreateForm()">+ {{ t('partnersList.create.title') }}</button>
   </div>
 
+  <div class="content">
   <!-- TOOLBAR -->
   <div class="toolbar">
-    <input class="tb-search" [(ngModel)]="search" (ngModelChange)="onSearch()" [placeholder]="'🔍 ' + t('partnersList.toolbar.searchPlaceholder')">
+    <button class="fchip" [class.on]="onlyMine" (click)="onlyMine = !onlyMine; onOnlyMineChange()">{{ t('partnersList.toolbar.onlyMine') }}</button>
     <select class="sel" [(ngModel)]="filterStatus" (ngModelChange)="reload()">
       <option value="">{{ t('partnersList.toolbar.allStatuses') }}</option>
       <option *ngFor="let s of statusOptions" [value]="s.key">{{ t(s.labelKey) }}</option>
@@ -52,7 +50,11 @@ type SortDir = 'asc' | 'desc';
       <option value="">{{ t('partnersList.toolbar.allIndustries') }}</option>
       <option *ngFor="let i of industries" [value]="i">{{i}}</option>
     </select>
-    <button class="btn-clear" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()">✕ {{ t('partnersList.toolbar.clear') }}</button>
+    <button class="btn btn-g btn-sm" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()">✕ {{ t('partnersList.toolbar.clear') }}</button>
+    <div class="view-row">
+      <button class="fchip" [class.on]="viewMode==='cards'" (click)="viewMode='cards'">⊞ {{ t('partnersList.view.cards') }}</button>
+      <button class="fchip" [class.on]="viewMode==='table'" (click)="viewMode='table'">☰ {{ t('partnersList.view.table') }}</button>
+    </div>
   </div>
 
   <!-- Banner filtru z raportu -->
@@ -70,11 +72,11 @@ type SortDir = 'asc' | 'desc';
       <div class="pc-top">
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
-          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
-          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle">DWH</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
-                style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                style="color:#6b7280;font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
                 (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
@@ -103,10 +105,10 @@ type SortDir = 'asc' | 'desc';
         </span>
       </div>
       <ng-container *ngIf="partnerSales(p) as s">
-        <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-          <span style="font-size:11px;font-weight:700;color:#f97316">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
-          <span style="font-size:11px;font-weight:600;color:#16a34a">▲ {{ t('partnersList.card.marginAmount', { amount: (s.revenue_pln|number:'1.0-0') }) }}</span>
-          <span style="font-size:9px;color:#9ca3af">YTD</span>
+        <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:#f97316">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
+          <span style="font-size:12px;font-weight:600;color:#16a34a">▲ {{ t('partnersList.card.marginAmount', { amount: (s.revenue_pln|number:'1.0-0') }) }}</span>
+          <span style="font-size:10px;color:#9ca3af">YTD</span>
         </div>
       </ng-container>
       <div class="pc-onboarding" *ngIf="p.status==='onboarding'">
@@ -119,6 +121,7 @@ type SortDir = 'asc' | 'desc';
 
   <!-- ══ TABELA ══ -->
   <div *ngIf="!loading && viewMode==='table'" class="table-wrap">
+  <div class="tw">
     <div class="tw-head" style="grid-template-columns:2fr 100px 110px 110px 110px 110px 90px 100px 90px 95px">
       <div class="th sortable" (click)="sortBy('company')">{{ t('partnersList.fields.company') }} <span class="si">{{sortIcon('company')}}</span></div>
       <div class="th">{{ t('partnersList.fields.status') }}</div>
@@ -135,7 +138,7 @@ type SortDir = 'asc' | 'desc';
          (click)="goPartner(p.id, p.crm_uuid)">
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
-          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle">DWH</span>
+          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle">DWH</span>
           <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
           <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0"
@@ -144,10 +147,10 @@ type SortDir = 'asc' | 'desc';
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
           <span *ngIf="hasUnreadReply(p)"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
-          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:13px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
-                style="color:#6b7280;font-size:13px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                style="color:#6b7280;font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
                 (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
@@ -178,13 +181,15 @@ type SortDir = 'asc' | 'desc';
     </div>
     <div class="no-data" style="grid-column:1/-1" *ngIf="partners.length===0">{{ t('partnersList.empty') }}</div>
   </div>
+  </div>
 
   <!-- Pager -->
   <div class="pager" *ngIf="totalPages>1">
-    <button (click)="prevPage()" [disabled]="page<=1">‹</button>
+    <button class="nav-btn" (click)="prevPage()" [disabled]="page<=1">‹</button>
     <span>{{page}} / {{totalPages}}</span>
-    <button (click)="nextPage()" [disabled]="page>=totalPages">›</button>
+    <button class="nav-btn" (click)="nextPage()" [disabled]="page>=totalPages">›</button>
   </div>
+  </div><!-- /content -->
 
   <!-- Create panel -->
   <div class="side-panel" *ngIf="showCreate" (click)="showCreate=false">
@@ -196,7 +201,7 @@ type SortDir = 'asc' | 'desc';
         <input [(ngModel)]="newP.nip" placeholder="PL1234567890" maxlength="14"
                (ngModelChange)="onPartnerNipChange()"
                [style.border-color]="partnerNipError ? '#ef4444' : ''">
-        <span *ngIf="partnerNipError" style="font-size:11px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipError }}</span>
+        <span *ngIf="partnerNipError" style="font-size:12px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipError }}</span>
       </label>
       <label>{{ t('partnersList.fields.contact') }}<input [(ngModel)]="newP.contact_name"></label>
       <label>{{ t('partnersList.fields.email') }}<input [(ngModel)]="newP.email" type="email"></label>
@@ -210,8 +215,8 @@ type SortDir = 'asc' | 'desc';
         </select>
       </label>
       <div class="panel-actions">
-        <button class="btn-outline" (click)="showCreate=false">{{ 'actions.cancel' | transloco }}</button>
-        <button class="btn-primary" (click)="createPartner()" [disabled]="!newP.company||!!partnerNipError||saving">
+        <button class="btn btn-g" (click)="showCreate=false">{{ 'actions.cancel' | transloco }}</button>
+        <button class="btn btn-p" (click)="createPartner()" [disabled]="!newP.company||!!partnerNipError||saving">
           {{ saving ? t('partnersList.create.saving') : t('partnersList.create.submit') }}
         </button>
       </div>
@@ -223,35 +228,29 @@ type SortDir = 'asc' | 'desc';
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-    .topbar { display:flex; align-items:center; gap:10px; padding:12px 20px; border-bottom:1px solid #e5e7eb; flex-shrink:0; }
-    .topbar h1 { font-size:17px; font-weight:700; margin:0; }
-    .btn-primary { background:var(--orange); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
-    .btn-outline { background:white; color:#374151; border:1px solid #d1d5db; border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; }
-    .btn-view { background:none; border:1px solid #e5e7eb; border-radius:7px; padding:5px 10px; font-size:12px; cursor:pointer; color:#6b7280; }
-    .btn-view.active { background:var(--orange-pale); border-color:var(--orange); color:var(--orange-dark); font-weight:700; }
+    .topbar { display:flex; align-items:center; gap:12px; height:60px; padding:0 24px; background:white; border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+    .topbar h1 { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin:0; }
     /* Toolbar */
-    .toolbar { display:flex; align-items:center; gap:8px; padding:10px 20px; border-bottom:1px solid #f4f4f5; flex-shrink:0; flex-wrap:wrap; }
-    .tb-search { border:1px solid #d1d5db; border-radius:8px; padding:6px 12px; font-size:12px; outline:none; width:200px; }
-    .tb-search:focus { border-color:var(--orange); }
-    .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12.5px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
-    .sel:focus { border-color:var(--orange); }
-    .btn-clear { background:#fee2e2; color:#991b1b; border:none; border-radius:8px; padding:6px 10px; font-size:11px; cursor:pointer; font-weight:600; }
+    .content { flex:1; min-height:0; display:flex; flex-direction:column; padding:20px 24px 24px; overflow:hidden; }
+    .toolbar { display:flex; align-items:center; gap:8px 12px; margin-bottom:16px; flex-shrink:0; flex-wrap:wrap; }
+    .srch-wrap { position:relative; display:flex; align-items:center; }
+    .srch-wrap svg { position:absolute; left:12px; width:15px; height:15px; color:var(--gray-400); pointer-events:none; }
     /* Cards */
-    .cards-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:12px; padding:16px 20px; align-content:start; }
-    .partner-card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:14px; cursor:pointer; transition:box-shadow .15s; }
-    .partner-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.08); }
+    .cards-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; padding:0 0 8px; align-content:start; }
+    .partner-card { background:white; border-radius:var(--radius); padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s; }
+    .partner-card:hover { box-shadow:var(--shadow); }
     .pc-top { display:flex; align-items:flex-start; gap:8px; margin-bottom:4px; }
-    .pc-company { font-weight:700; font-size:14px; flex:1; color:#18181b; }
-    .pc-contact { font-size:11px; color:#6b7280; margin-bottom:6px; }
+    .pc-company { font-weight:700; font-size:14px; flex:1; color:#333333; }
+    .pc-contact { font-size:12px; color:#6b7280; margin-bottom:6px; }
     .pc-meta { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px; }
     .pc-tag { font-size:10px; color:#6b7280; background:#f4f4f5; padding:1px 6px; border-radius:4px; }
     .pc-financials { display:flex; gap:8px; align-items:center; }
     .pc-arr { font-size:12px; font-weight:700; color:#f97316; }
     .pc-online { font-size:10px; font-weight:600; color:#3b82f6; }
-    .pc-opp { font-size:10px; background:#dbeafe; color:#1e40af; padding:2px 7px; border-radius:6px; font-weight:600; }
+    .pc-opp { font-size:10px; background:#dbeafe; color:#1e40af; padding:2px 8px; border-radius:6px; font-weight:600; }
     .pc-opp-valued { background:#fff7ed; color:#c2410c; }
     .pc-onboarding { margin-top:8px; }
-    .onb-bar { height:4px; background:#e5e7eb; border-radius:2px; overflow:hidden; margin-bottom:3px; }
+    .onb-bar { height:4px; background:#e5e7eb; border-radius:2px; overflow:hidden; margin-bottom:4px; }
     .onb-fill { height:100%; background:#3b82f6; }
     .onb-label { font-size:10px; color:#6b7280; }
     /* Badges */
@@ -263,25 +262,24 @@ type SortDir = 'asc' | 'desc';
     /* Table */
     .table-wrap { flex:1; overflow:auto; }
     .tw-head, .tw-row { display:grid; gap:0; }
-    .tw-head { background:#fafafa; border-bottom:2px solid #e5e7eb; position:sticky; top:0; z-index:1; }
-    .th { padding:9px 12px; font-size:10px; font-weight:700; text-transform:uppercase; color:#9ca3af; letter-spacing:.4px; display:flex; align-items:center; gap:4px; }
+    .tw-head { background:var(--gray-50); border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:1; }
+    .th { padding:8px 12px; font-size:10px; font-weight:700; text-transform:uppercase; color:#9ca3af; letter-spacing:.4px; display:flex; align-items:center; gap:4px; }
     .th.sortable { cursor:pointer; user-select:none; }
     .th.sortable:hover { color:#374151; }
     .si { font-size:10px; color:#d1d5db; }
     .tw-row { border-bottom:1px solid #f4f4f5; cursor:pointer; }
-    .tw-row:hover { background:#fffbf7; }
-    .td { padding:10px 12px; font-size:13px; color:#374151; display:flex; flex-direction:column; justify-content:center; }
-    .td-main { font-weight:600; color:#18181b; }
-    .td-sub { font-size:11px; color:#9ca3af; }
+    .tw-row:hover { background:var(--gray-50); }
+    .td { padding:10px 12px; font-size:14px; color:#374151; display:flex; flex-direction:column; justify-content:center; }
+    .td-main { font-weight:600; color:#333333; }
+    .td-sub { font-size:12px; color:#9ca3af; }
     .td-sm { font-size:12px; }
     .expiring { color:#dc2626; font-weight:600; }
     .no-data { text-align:center; color:#9ca3af; padding:40px; }
     /* Pager */
     .pager { display:flex; justify-content:center; gap:12px; align-items:center; padding:12px; flex-shrink:0; }
-    .pager button { border:1px solid #e5e7eb; background:white; border-radius:6px; padding:4px 12px; cursor:pointer; }
-    .pager button:disabled { opacity:.4; }
+        .pager button:disabled { opacity:.4; }
     /* Churn badges */
-    .churn-badge { display:inline-flex; align-items:center; padding:1px 7px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; margin-top:3px; }
+    .churn-badge { display:inline-flex; align-items:center; padding:1px 8px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; margin-top:4px; }
     .churn-critical { background:#fee2e2; color:#991b1b; }
     .churn-high { background:#ffedd5; color:#c2410c; }
     .churn-medium { background:#fef9c3; color:#854d0e; }
@@ -292,7 +290,7 @@ type SortDir = 'asc' | 'desc';
     .side-panel-inner h3 { margin:0; font-size:16px; font-weight:700; }
     .hint { font-size:12px; color:#9ca3af; margin:0; }
     .side-panel-inner label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
-    .side-panel-inner input, .side-panel-inner select { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; }
+    .side-panel-inner input, .side-panel-inner select { border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:14px; outline:none; }
     .panel-actions { display:flex; gap:8px; margin-top:8px; }
   `],
 })

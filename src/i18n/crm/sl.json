@@ -529,6 +529,26 @@
     "trainingMode": "Način usposabljanja",
     "writeNew": "Napiši novo e-sporočilo"
   },
+  "fieldErrors": {
+    "closeDate": "Izberite predviden datum zaključka",
+    "company": "Vnesite ime podjetja",
+    "contactName": "Vnesite ime in priimek kontaktne osebe",
+    "contactTitle": "Izberite delovno mesto kontaktne osebe",
+    "email": "Vnesite e-poštni naslov, npr. janez@podjetje.si",
+    "firstContact": "Izberite datum prvega stika",
+    "industry": "Izberite panogo",
+    "lostReason": "Izberite razlog za izgubo",
+    "onlinePct": "Izberite delež spletne prodaje",
+    "phone": "Vnesite telefonsko številko, npr. +48 600 000 000",
+    "probability": "Izberite možnost uspeha",
+    "salesperson": "Dodelite prodajalca",
+    "saveFailed": "Shranjevanje ni uspelo. Poskusite znova – če se napaka ponovi, jo sporočite skrbniku.",
+    "source": "Izberite, od kod je prišel lead",
+    "value": "Vnesite znesek – če ga ne poznate, vpišite 0",
+    "valueNegative": "Znesek ne sme biti negativen",
+    "valueTooLarge": "Znesek je prevelik – največ 999.999.999.999",
+    "website": "Vnesite spletno stran podjetja, npr. podjetje.si"
+  },
   "history": {
     "activityAdded": "Aktivnost dodana: {title}",
     "activityClosed": "Aktivnost zaprta: {title}",
@@ -741,9 +761,14 @@
       "hot": "Vroč"
     },
     "history": {
+      "archived": "Lead premaknjen v arhiv",
       "converted": "Lead pretvorjen v partnerja",
       "created": "Lead ustvarjen",
       "deleted": "Lead izbrisan",
+      "holdCancelled": "Zadržanje odstranjeno",
+      "holdSet": "Zadržano do {date}",
+      "migrated": "Lead premaknjen",
+      "testAccount": "Testni račun",
       "updated": "Lead posodobljen"
     },
     "hold": {
@@ -770,11 +795,11 @@
     },
     "loadError": "Napaka pri nalaganju leada.",
     "nip": {
-      "countryCodeRequired": "Vnesite kodo države (2 črki), npr. PL",
-      "duplicate": "Ta davčna številka je že dodeljena drugemu zapisu.",
-      "numberRequired": "Vnesite številko za kodo države",
-      "plTenDigits": "Za PL je zahtevanih 10 števk za kodo države",
-      "required": "Davčna številka je obvezna"
+      "countryCodeRequired": "Začnite s kodo države (2 črki), npr. PL",
+      "duplicate": "Ta davčna številka je v CRM že dodeljena drugemu podjetju",
+      "numberRequired": "Za kodo države vpišite številko",
+      "plTenDigits": "Poljska davčna številka ima 10 števk za »PL«, npr. PL1234567890",
+      "required": "Vnesite davčno številko podjetja, npr. PL1234567890"
     },
     "notFound": "Leada ni bilo mogoče najti.",
     "onboarding": {
@@ -975,6 +1000,7 @@
       "fillRequired": "Izpolnite obvezna polja:",
       "fullName": "Ime in priimek",
       "hot": "Vroč lead",
+      "hotHint": "Stranka je blizu nakupa – lead dobi 🔥 na seznamu in v kanbanu",
       "namePlaceholder": "Janez Novak",
       "noExtraContacts": "Ni dodatnih kontaktov",
       "notes": "Zapiski",
@@ -985,10 +1011,11 @@
       "subtitle": "Dodajte novo prodajno priložnost",
       "taxId": "Davčna številka",
       "taxIdErrors": {
-        "countryCode": "Vnesite kodo države (2 črki), npr. PL",
-        "numberMissing": "Vnesite številko za kodo države",
-        "polishDigits": "Za PL je zahtevanih 10 števk za kodo države",
-        "required": "Davčna številka je obvezna"
+        "countryCode": "Začnite s kodo države (2 črki), npr. PL",
+        "duplicate": "Ta davčna številka je v CRM že dodeljena drugemu podjetju",
+        "numberMissing": "Za kodo države vpišite številko",
+        "polishDigits": "Poljska davčna številka ima 10 števk za »PL«, npr. PL1234567890",
+        "required": "Vnesite davčno številko podjetja, npr. PL1234567890"
       },
       "title": "Nov lead",
       "unassigned": "— nedodeljen —",
@@ -1321,10 +1348,10 @@
     },
     "loadError": "Napaka pri nalaganju.",
     "nip": {
-      "countryCodeRequired": "Vnesite kodo države (2 črki), npr. PL",
-      "numberRequired": "Vnesite številko za kodo države",
-      "plTenDigits": "Za PL je zahtevanih 10 števk za kodo države",
-      "required": "Davčna številka je obvezna"
+      "countryCodeRequired": "Začnite s kodo države (2 črki), npr. PL",
+      "numberRequired": "Za kodo države vpišite številko",
+      "plTenDigits": "Poljska davčna številka ima 10 števk za »PL«, npr. PL1234567890",
+      "required": "Vnesite davčno številko podjetja, npr. PL1234567890"
     },
     "notFound": "Partnerja ni bilo mogoče najti.",
     "onboarding": {
@@ -1477,11 +1504,11 @@
       "dwhTurnoverHint": "Bruto promet YTD iz DWH"
     },
     "taxIdErrors": {
-      "countryCode": "Vnesite kodo države (2 črki), npr. PL",
-      "duplicate": "Ta davčna številka je že dodeljena drugemu zapisu.",
-      "numberMissing": "Vnesite številko za kodo države",
-      "polishDigits": "Za PL je zahtevanih 10 števk za kodo države",
-      "required": "Davčna številka je obvezna"
+      "countryCode": "Začnite s kodo države (2 črki), npr. PL",
+      "duplicate": "Ta davčna številka je v CRM že dodeljena drugemu podjetju",
+      "numberMissing": "Za kodo države vpišite številko",
+      "polishDigits": "Poljska davčna številka ima 10 števk za »PL«, npr. PL1234567890",
+      "required": "Vnesite davčno številko podjetja, npr. PL1234567890"
     },
     "title": "Register partnerjev",
     "toolbar": {
@@ -1913,6 +1940,8 @@
       "showAll": "Pokaži vse partnerje s tveganjem odhoda →"
     },
     "currency": {
+      "billionsPln": "{value} mrd. PLN",
+      "millionsPln": "{value} mio. PLN",
       "pln": "{value} PLN",
       "thousandsPln": "{value} tis. PLN"
     },

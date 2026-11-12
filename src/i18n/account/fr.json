@@ -22,6 +22,7 @@
     },
     "password": {
       "current": "Mot de passe actuel",
+      "hide": "Masquer le mot de passe",
       "hint": "Saisissez votre mot de passe actuel et un nouveau, d au moins 8 caractères. Le changement déconnecte votre compte de l application mobile.",
       "mismatch": "Les mots de passe ne correspondent pas",
       "new": "Nouveau mot de passe",
@@ -29,6 +30,7 @@
       "saveFailed": "Impossible de changer le mot de passe",
       "saved": "Mot de passe modifié",
       "saving": "Enregistrement…",
+      "show": "Afficher le mot de passe",
       "submit": "Changer le mot de passe",
       "title": "Changer le mot de passe",
       "tooShort": "Le mot de passe doit comporter au moins 8 caractères"

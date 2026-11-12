@@ -36,7 +36,7 @@ import { ListFilter, ListQueryState, ListSortOption } from './list-query';
     .head { display:inline-flex; align-items:center; gap:4px; }
     .sort { display:inline-flex; align-items:center; gap:4px; border:none; background:none; padding:0; font:inherit; color:inherit; text-transform:inherit; letter-spacing:inherit; cursor:pointer; }
     .sort:hover { color:var(--gray-800); }
-    .arrow { font-size:13px; line-height:1; color:var(--gray-400); }
+    .arrow { font-size:14px; line-height:1; color:var(--gray-400); }
     /* An unsorted column shows its arrow only on hover, so every visible arrow is a real direction. */
     .arrow.idle { visibility:hidden; }
     .sort:hover .arrow.idle, .sort:focus-visible .arrow.idle { visibility:visible; }

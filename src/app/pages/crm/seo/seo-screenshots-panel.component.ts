@@ -26,14 +26,14 @@ import { ToastService } from '../../../core/services/toast.service';
             <label class="field-label" [for]="'caption-' + s.id">{{ t('seo.screenshots.fields.caption') }}</label>
             <input class="field-input" [id]="'caption-' + s.id" [(ngModel)]="editCaption">
             <div class="card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="saveEdit(s.id)" [disabled]="!editTag.trim() || !editCaption.trim()">{{ 'actions.save' | transloco }}</button>
-              <button type="button" class="btn-ghost btn-sm" (click)="editingId.set(null)">{{ 'actions.cancel' | transloco }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="saveEdit(s.id)" [disabled]="!editTag.trim() || !editCaption.trim()">{{ 'actions.save' | transloco }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="editingId.set(null)">{{ 'actions.cancel' | transloco }}</button>
             </div>
           } @else {
             <span class="shot-tag">{{ s.feature_tag }}</span>
             <p class="shot-caption">{{ s.caption }}</p>
             <div class="card-actions">
-              <button type="button" class="btn-ghost btn-sm" (click)="startEdit(s)">{{ t('seo.screenshots.actions.edit') }}</button>
+              <button type="button" class="btn btn-g btn-sm" (click)="startEdit(s)">{{ t('seo.screenshots.actions.edit') }}</button>
               <button type="button" class="btn-delete" (click)="remove(s.id)" [title]="t('seo.screenshots.actions.delete')" [attr.aria-label]="t('seo.screenshots.actions.delete')">
                 <svg lucideTrash2 [size]="14"></svg>
               </button>
@@ -48,7 +48,7 @@ import { ToastService } from '../../../core/services/toast.service';
         <input id="newShotTag" class="field-input" [(ngModel)]="newTag" [placeholder]="t('seo.screenshots.placeholders.feature')">
         <label class="field-label" for="newShotCaption">{{ t('seo.screenshots.fields.captionUnderImage') }}</label>
         <input id="newShotCaption" class="field-input" [(ngModel)]="newCaption" [placeholder]="t('seo.screenshots.placeholders.caption')">
-        <button type="button" class="btn-ghost btn-sm" (click)="upload(fileInput)" [disabled]="!newFile || !newTag.trim() || !newCaption.trim() || uploading()">
+        <button type="button" class="btn btn-g btn-sm" (click)="upload(fileInput)" [disabled]="!newFile || !newTag.trim() || !newCaption.trim() || uploading()">
           @if (uploading()) { {{ t('seo.screenshots.actions.uploading') }} } @else { {{ t('seo.screenshots.actions.add') }} }
         </button>
       </div>
@@ -71,11 +71,9 @@ import { ToastService } from '../../../core/services/toast.service';
     .field-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.55rem; font-family: inherit; font-size: 0.8rem; }
     input[type="file"] { font-size: 0.75rem; width: 100%; }
     .shot-card-new .btn-sm { margin-top: 0.7rem; width: 100%; }
-    .btn-ghost { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--gray-100); color: var(--gray-800); }
-    .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.82rem; white-space: nowrap; }
     .btn-delete {
       display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 8px; background: #FEE2E2; color: #991B1B; cursor: pointer; padding: 0.5rem 0.6rem;
+      border: none; border-radius: 9px; background: #FEE2E2; color: #991B1B; cursor: pointer; padding: 4px 10px;
     }
   `],
 })

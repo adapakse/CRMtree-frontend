@@ -88,10 +88,12 @@ export class TaskBadgeComponent {
 @Component({
   selector: 'wt-group-pill',
   standalone: true,
-  template: `<span class="pill" [class]="cls">{{ name }}</span>`,
+  template: `<span class="pill" [class]="isNeutral ? 'pill-neutral' : cls">{{ name }}</span>`,
 })
 export class GroupPillComponent {
   @Input({ required: true }) name = '';
+  /** Grey instead of the group's colour, where colour is kept for the status. */
+  @Input() isNeutral = false;
   get cls() { return groupCssClass(this.name); }
 }
 
@@ -105,6 +107,20 @@ export class GroupPillComponent {
       {{ init }}
     </div>
   `,
+  // Same tinted initials circle as the mobile app (it had no styles of its own,
+  // so the initials were invisible, e.g. dark-on-dark in the sidebar).
+  styles: [`
+    :host { display: inline-flex; flex-shrink: 0; }
+    .av {
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: rgba(59,170,93,.16);
+      color: var(--orange-dark, #2F8F4D);
+      font-weight: 600;
+      line-height: 1;
+      user-select: none;
+    }
+  `],
 })
 export class AvatarComponent {
   @Input({ required: true }) set name(n: string) { this.init = initials(n); }

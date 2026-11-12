@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -58,15 +58,15 @@ const TODAY_CALLS_GOAL = 37;
 <div class="crm-dash" *ngIf="!loading; else loadingTpl">
 
   <!-- ── TABS ── -->
-  <div class="dash-tabs">
-    <button class="dash-tab" [class.active]="activeTab === 'dashboard'" (click)="activeTab = 'dashboard'">
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'dashboard'" (click)="activeTab = 'dashboard'">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
         <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
         <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
       </svg>
       {{ t('salesDashboard.tabs.dashboard') }}
     </button>
-    <button class="dash-tab" [class.active]="activeTab === 'churn'"
+    <button class="tab-btn" [class.active]="activeTab === 'churn'"
             (click)="activeTab = 'churn'; loadChurn()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
         <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/>
@@ -82,23 +82,23 @@ const TODAY_CALLS_GOAL = 37;
     <div class="churn-section">
 
       <!-- Filtry -->
-      <div class="churn-filters">
-        <input class="churn-filter-inp" [(ngModel)]="churnFilterName"
+      <div class="toolbar">
+        <input type="search" class="churn-filter-inp" [(ngModel)]="churnFilterName"
                (ngModelChange)="onChurnFilter()" [placeholder]="t('salesDashboard.churn.searchPlaceholder')"/>
-        <select class="churn-filter-sel" [(ngModel)]="churnFilterRisk" (ngModelChange)="onChurnFilter()">
+        <select [(ngModel)]="churnFilterRisk" (ngModelChange)="onChurnFilter()">
           <option value="">{{ t('salesDashboard.churn.allLevels') }}</option>
           <option value="critical">{{ t('partnerDetail.churn.levels.critical') }}</option>
           <option value="high">{{ t('partnerDetail.churn.levels.high') }}</option>
           <option value="medium">{{ t('partnerDetail.churn.levels.medium') }}</option>
           <option value="low">{{ t('partnerDetail.churn.levels.low') }}</option>
         </select>
-        <select class="churn-filter-sel" *ngIf="isCrmManager"
+        <select *ngIf="isCrmManager"
                 [(ngModel)]="churnFilterSalesperson" (ngModelChange)="onChurnFilter()">
           <option value="">{{ t('leadsList.filters.allReps') }}</option>
           <option *ngFor="let u of churnSalespersons" [value]="u.id">{{ u.name }}</option>
         </select>
         <div class="churn-filter-spacer"></div>
-        <button class="churn-gen-btn" *ngIf="isCrmManager"
+        <button class="btn btn-p" *ngIf="isCrmManager"
                 [disabled]="churnGenerating"
                 (click)="generateChurnTasks()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -216,8 +216,8 @@ const TODAY_CALLS_GOAL = 37;
   <div class="kpi-row">
 
     <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: t('salesDashboard.kpi.filters.newLeadsThisWeek') })">
-      <div class="kpi-icon" style="background:#E6F4EA">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
           <circle cx="9" cy="7" r="4"/>
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -236,8 +236,8 @@ const TODAY_CALLS_GOAL = 37;
     </div>
 
     <div class="kpi-card clickable" (click)="goToLeads({ created_from: weekNavStart, created_to: weekNavEnd, label: t('salesDashboard.kpi.filters.newLeadsValueThisWeek') })">
-      <div class="kpi-icon" style="background:#E6F4EA">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
           <line x1="12" y1="1" x2="12" y2="23"/>
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
@@ -254,8 +254,8 @@ const TODAY_CALLS_GOAL = 37;
     </div>
 
     <div class="kpi-card clickable" (click)="goToLeads({ label: t('salesDashboard.kpi.filters.activeOpportunities') })">
-      <div class="kpi-icon" style="background:#EDE9FE">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" width="22" height="22">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
           <line x1="12" y1="1" x2="12" y2="23"/>
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
@@ -270,8 +270,8 @@ const TODAY_CALLS_GOAL = 37;
     </div>
 
     <div class="kpi-card clickable" (click)="goToLeads({ label: t('salesDashboard.kpi.filters.pipelineValue') })">
-      <div class="kpi-icon" style="background:#FEF3C7">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" width="22" height="22">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
           <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/>
         </svg>
       </div>
@@ -287,8 +287,8 @@ const TODAY_CALLS_GOAL = 37;
     <!-- Kafelek wygranych ma sens tylko u tenanta, który ma etap wygranej -->
     <div class="kpi-card clickable" *ngIf="stages.wonKey() as wonKey"
          (click)="goToLeads({ stage: wonKey, label: t('salesDashboard.kpi.wonOpportunities') })">
-      <div class="kpi-icon" style="background:#E6F4EA">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3BAA5D" stroke-width="2" width="22" height="22">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
           <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/>
           <polyline points="16,7 22,7 22,13"/>
         </svg>
@@ -324,7 +324,7 @@ const TODAY_CALLS_GOAL = 37;
             <span class="pipe-sub">{{ t('salesDashboard.pipeline.opportunityCount', { count: row.count }) }}</span>
           </div>
           <div class="pipe-bar-wrap">
-            <div class="pipe-bar" [style.width.%]="row.barPct" [style.background]="row.color"></div>
+            <div class="pipe-bar" [style.width.%]="row.barPct"></div>
           </div>
           <span class="pipe-val">
             {{ pipelineMode === 'value' ? t('salesDashboard.currency.pln', { value: (row.value | number:'1.0-0') }) : row.count }}
@@ -395,27 +395,42 @@ const TODAY_CALLS_GOAL = 37;
       <div class="task-list" *ngIf="todayTasks.length; else emptyTasks">
         <div *ngFor="let t of todayTasks; trackBy: trackById">
           <div class="task-item" [class.task-done]="t.status === 'closed'">
-            <label class="task-check" (click)="$event.stopPropagation(); toggleTask(t)">
-              <span class="check-box" [class.checked]="t.status === 'closed'">
-                <svg *ngIf="t.status === 'closed'" viewBox="0 0 24 24" fill="none"
-                     stroke="white" stroke-width="3" width="11" height="11">
-                  <polyline points="20,6 9,17 4,12"/>
-                </svg>
+            @if (t.source_type === 'lead' || t.source_type === 'partner') {
+              <span class="task-type-ic" aria-hidden="true">
+                @switch (t.type) {
+                  @case ('call') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> }
+                  @case ('email') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg> }
+                  @case ('meeting') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> }
+                  @case ('sms') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> }
+                  @default { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h6M10 13h7M7 17h5"/></svg> }
+                }
               </span>
-            </label>
+            } @else {
+              <!-- Project tasks are read-only here (closed in Projects), so no checkbox. -->
+              <span class="task-check task-check-static" aria-hidden="true">
+                <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h6M10 13h7M7 17h5"/></svg>
+              </span>
+            }
             <div class="task-body clickable" (click)="goToTaskSource(t)">
               <div class="task-title">{{ t.title }}</div>
               <div class="task-sub">{{ t.source_name }}</div>
             </div>
             <span class="task-time" [class.task-overdue]="isOverdue(t)">{{ taskTime(t) }}</span>
             <wt-add-to-calendar [entry]="calendarEntryOf(t)" (click)="$event.stopPropagation()"></wt-add-to-calendar>
+            @if (t.source_type === 'lead' || t.source_type === 'partner') {
+              <button type="button" class="task-close-pill" [class.done]="t.status === 'closed'"
+                      (click)="$event.stopPropagation(); toggleTask(t)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+                @if (t.status !== 'closed') { {{ 'actions.close' | transloco }} }
+              </button>
+            }
           </div>
-          <div *ngIf="closingTask?.uid === t.uid" class="task-close-form" (click)="$event.stopPropagation()">
+          <div *ngIf="closingTask === t" class="task-close-form" (click)="$event.stopPropagation()">
             <textarea class="task-close-ta" [(ngModel)]="taskCloseComment"
                       [placeholder]="'crm.salesDashboard.tasks.closeCommentPlaceholder' | transloco" rows="2" autoFocus></textarea>
             <div class="task-close-btns">
-              <button class="task-close-cancel" (click)="cancelCloseTask()">{{ 'actions.cancel' | transloco }}</button>
-              <button class="task-close-confirm" [disabled]="!taskCloseComment.trim()"
+              <button class="btn btn-g btn-sm" (click)="cancelCloseTask()">{{ 'actions.cancel' | transloco }}</button>
+              <button class="btn btn-p btn-sm" [disabled]="!taskCloseComment.trim()"
                       (click)="confirmCloseTaskDash()">{{ 'actions.close' | transloco }}</button>
             </div>
           </div>
@@ -494,14 +509,24 @@ const TODAY_CALLS_GOAL = 37;
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">{{ t('salesDashboard.activity.title') }} <wt-tooltip key="crm.sales.activity"></wt-tooltip></span>
-        <button class="panel-refresh-btn" (click)="refreshActivities()" [title]="t('salesDashboard.activity.refresh')">↺</button>
+        <button class="panel-refresh-btn" (click)="refreshActivities()" [title]="t('salesDashboard.activity.refresh')"><svg class="ic" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
       </div>
 
       <div class="activity-feed" *ngIf="recentActivities.length; else emptyAct"
            (scroll)="onActivityScroll($event)">
         <div class="act-item clickable" *ngFor="let a of recentActivities" (click)="goToSource(a)">
-          <div class="act-icon-wrap" [style.background]="actBg(a.type)">
-            {{ actIcon(a.type) }}
+          <div class="act-icon-wrap">
+            <ng-container [ngSwitch]="a.type">
+              <svg *ngSwitchCase="'task'" class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg *ngSwitchCase="'call'" class="ic" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <svg *ngSwitchCase="'email'" class="ic" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></svg>
+              <svg *ngSwitchCase="'meeting'" class="ic" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <svg *ngSwitchCase="'note'" class="ic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+              <svg *ngSwitchCase="'doc_sent'" class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <svg *ngSwitchCase="'training'" class="ic" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
+              <svg *ngSwitchCase="'qbr'" class="ic" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <svg *ngSwitchDefault class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </ng-container>
           </div>
           <div class="act-body">
             <div class="act-title">{{ a.title }}</div>
@@ -531,11 +556,11 @@ const TODAY_CALLS_GOAL = 37;
            style="display:flex;flex-direction:column;gap:6px;flex:1">
         <div *ngFor="let p of churnRows.slice(0, 5)"
              (click)="goToPartner(p.partner_id)"
-             style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 8px;border-radius:8px;transition:background .12s"
+             style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 8px;border-radius:8px;transition:background .12s"
              (mouseenter)="$any($event.currentTarget).style.background='#F9FAFB'"
              (mouseleave)="$any($event.currentTarget).style.background=''">
           <span class="churn-badge" [class]="'risk-badge-' + p.risk_level">{{ riskLabel(p.risk_level) }}</span>
-          <span style="flex:1;font-size:13px;font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
+          <span style="flex:1;font-size:14px;font-weight:600;color:#333333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
           <span style="font-size:12px;font-weight:700;color:#6B7280;flex-shrink:0">{{ t('partnerDetail.churn.score', { score: p.total_score }) }}</span>
         </div>
       </div>
@@ -586,9 +611,10 @@ const TODAY_CALLS_GOAL = 37;
     .dash-greeting { min-width: 0; }
     /* Wraps so a long first name on a narrow screen pushes the medal below the
        greeting instead of overflowing into the date chip. */
-    .dash-greeting h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; color: #111827; display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; }
-    .dash-greeting p { margin: 0; font-size: 13.5px; color: #6B7280; }
-    .date-chip { display: flex; align-items: center; gap: 6px; border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 14px; font-size: 13px; color: #374151; background: white; white-space: nowrap; }
+    .dash-greeting h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; color: #333333; display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; }
+    .dash-greeting p { margin: 0; font-size: 14px; color: #6B7280; }
+    /* A plain label, not a control: it only names the week the numbers cover. */
+    .date-chip { display: flex; align-items: center; gap: 6px; padding: 8px 0; font-size: 12px; font-weight: 500; color: var(--gray-500); white-space: nowrap; }
 
     /* "Calls today" medal: ribbons + disc + count, always gold. */
     .calls-goal { display: inline-flex; align-items: center; align-self: center; margin-left: -2px; padding-left: 0; }
@@ -613,74 +639,73 @@ const TODAY_CALLS_GOAL = 37;
     .calls-goal-medal-disc   { stroke-width: 1.25; fill: #CB962A; stroke: #9C6E18; }
     .calls-goal-medal-inline { stroke-width: 1; stroke-opacity: .5; stroke: #F6E3AC; }
     .calls-goal-medal-ribbon { fill: #8A5E0E; fill-opacity: .62; }
-    .calls-goal-text { margin-left: 4px; font-size: 13px; font-weight: 800; color: #6B7280; white-space: nowrap; }
+    .calls-goal-text { margin-left: 4px; font-size: 14px; font-weight: 800; color: #6B7280; white-space: nowrap; }
 
     /* My phone calls */
     .mc-check-label { display: flex; align-items: center; font-size: 12px; color: #374151; white-space: nowrap; cursor: pointer; gap: 2px; }
-    .mc-check-label input { cursor: pointer; accent-color: var(--orange); }
     .mc-loading { display: flex; justify-content: center; padding: 24px 0; }
     .mc-bars { display: flex; flex-direction: column; gap: 14px; }
     .mc-bar-row { display: grid; grid-template-columns: 200px 1fr 36px; align-items: center; gap: 10px; }
-    .mc-bar-label { font-size: 12.5px; color: #374151; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mc-bar-label { font-size: 12px; color: #374151; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mc-bar-track { height: 18px; background: #F3F4F6; border-radius: 4px; overflow: hidden; min-width: 0; }
     .mc-bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
-    .mc-bar-count { font-size: 13px; font-weight: 700; color: #1F2937; text-align: right; font-variant-numeric: tabular-nums; }
+    .mc-bar-count { font-size: 14px; font-weight: 700; color: #333333; text-align: right; font-variant-numeric: tabular-nums; }
 
     /* KPI */
-    .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
-    .kpi-card { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 16px 18px; display: flex; align-items: flex-start; gap: 14px; }
-    .kpi-icon { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .kpi-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+    .kpi-card { background: white; border-radius: 12px; padding: 16px 18px; display: flex; align-items: flex-start; gap: 14px; box-shadow: var(--shadow-sm); }
+    .kpi-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--orange-pale); color: var(--orange-dark); }
     .kpi-info { flex: 1; min-width: 0; }
-    .kpi-label { font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px; }
-    .kpi-value { font-size: 28px; font-weight: 800; color: #111827; line-height: 1.1; }
-    .kpi-value-sm { font-size: 18px; }
-    .kpi-trend { display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 12px; font-weight: 600; }
+    .kpi-label { font-size: 12px; color: var(--gray-400); font-weight: 500; margin-bottom: 4px; }
+    .kpi-value { font-size: 24px; font-weight: 600; color: var(--gray-900); line-height: 1.15; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+    .kpi-value-sm { font-size: 20px; }
+    .kpi-trend { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 12px; font-weight: 600; }
     .kpi-trend.pos { color: #3BAA5D; }
     .kpi-trend.neg { color: #EF4444; }
     .kpi-trend span { font-weight: 400; color: #9CA3AF; }
 
     /* Grid layout */
-    .mid-row { display: grid; grid-template-columns: 1fr 1.05fr 0.85fr; gap: 16px; }
-    .bot-row { display: grid; grid-template-columns: 1.7fr 1fr 1fr; gap: 16px; }
+    .mid-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 0.85fr); gap: 16px; }
+    .bot-row { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 
     /* Panel */
-    .panel { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; }
+    .panel { background: white; border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
     .panel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-    .panel-title { font-size: 14px; font-weight: 700; color: #1F2937; flex: 1; }
-    .mini-sel { border: 1px solid #E5E7EB; border-radius: 7px; padding: 5px 10px; font-size: 12px; color: #374151; outline: none; cursor: pointer; background: white; }
-    .panel-refresh-btn { background: none; border: none; cursor: pointer; color: #9CA3AF; font-size: 16px; padding: 2px 4px; border-radius: 4px; line-height: 1; transition: color .15s; }
-    .panel-refresh-btn:hover { color: #3BAA5D; }
-    .count-badge { background: var(--orange, #3BAA5D); color: white; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 2px 8px; }
-    .icon-btn { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 1px solid #E5E7EB; border-radius: 6px; color: #6B7280; text-decoration: none; }
+    .panel-title { font-size: 14px; font-weight: 600; color: var(--gray-800); flex: 1; }
+    select.mini-sel { height: 32px; font-size: 12px; }
+    .panel-refresh-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: white; border: 1px solid var(--gray-200); border-radius: 50%; cursor: pointer; color: var(--gray-500); padding: 0; transition: color .15s, border-color .15s; }
+    .panel-refresh-btn:hover { color: var(--orange-dark); border-color: var(--orange); }
+    .count-badge { background: var(--orange); color: white; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 8px; }
+    .icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--gray-200); border-radius: 50%; color: var(--gray-500); text-decoration: none; background: white; }
     .icon-btn:hover { background: #F9FAFB; color: var(--orange, #3BAA5D); }
-    .empty-msg { color: #9CA3AF; font-size: 13px; padding: 16px 0; text-align: center; flex: 1; }
-    .panel-link { display: block; margin-top: auto; padding-top: 14px; font-size: 12.5px; color: var(--orange, #3BAA5D); text-decoration: none; font-weight: 600; }
+    .empty-msg { color: #9CA3AF; font-size: 14px; padding: 16px 0; text-align: center; flex: 1; }
+    .panel-link { display: block; margin-top: auto; padding-top: 14px; font-size: 12px; color: var(--orange, #3BAA5D); text-decoration: none; font-weight: 600; }
     .panel-link:hover { text-decoration: underline; }
 
     /* Pipeline */
-    .pipeline-list { display: flex; flex-direction: column; gap: 11px; flex: 1; }
+    .pipeline-list { display: flex; flex-direction: column; gap: 12px; flex: 1; }
     .pipe-row { display: flex; align-items: center; gap: 10px; }
     .pipe-meta { width: 90px; flex-shrink: 0; }
-    .pipe-label { display: block; font-size: 12.5px; font-weight: 600; color: #374151; }
-    .pipe-sub { font-size: 10.5px; color: #9CA3AF; }
-    .pipe-bar-wrap { flex: 1; height: 10px; background: #F3F4F6; border-radius: 5px; overflow: hidden; }
-    .pipe-bar { height: 100%; border-radius: 5px; transition: width .4s ease; }
+    .pipe-label { display: block; font-size: 12px; font-weight: 600; color: #374151; }
+    .pipe-sub { font-size: 10px; color: #9CA3AF; }
+    .pipe-bar-wrap { flex: 1; height: 10px; background: #ECEEF1; border-radius: 5px; overflow: hidden; }
+    .pipe-bar { height: 100%; min-width: 4px; background: var(--orange); border-radius: 5px; transition: width .4s ease; }
     .pipe-val { font-size: 12px; font-weight: 600; color: #374151; min-width: 76px; text-align: right; white-space: nowrap; }
     .pipe-total { margin-top: 14px; padding-top: 12px; border-top: 1px solid #F3F4F6; font-size: 12px; color: #6B7280; }
-    .pipe-total strong { color: #111827; }
+    .pipe-total strong { color: #333333; }
 
     /* Chart */
     .chart-panel { }
     .chart-summary { margin-bottom: 10px; }
-    .chart-main-val { font-size: 24px; font-weight: 800; color: #111827; }
-    .chart-change { font-size: 13px; font-weight: 600; margin-top: 3px; }
+    .chart-main-val { font-size: 24px; font-weight: 600; color: var(--gray-900); font-variant-numeric: tabular-nums; }
+    .chart-change { font-size: 14px; font-weight: 600; margin-top: 4px; }
     .chart-change.pos { color: #3BAA5D; }
     .chart-change.neg { color: #EF4444; }
     .chart-change-label { font-weight: 400; color: #9CA3AF; margin-left: 4px; }
     .chart-svg { width: 100%; height: 120px; display: block; flex: 1; }
-    .chart-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 13px; min-height: 100px; }
+    .chart-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 14px; min-height: 100px; }
     .chart-x { display: flex; justify-content: space-between; padding-top: 6px; }
-    .chart-x span { font-size: 10.5px; color: #9CA3AF; }
+    .chart-x span { font-size: 10px; color: #9CA3AF; }
 
     /* Tasks */
     .tasks-panel { }
@@ -690,26 +715,37 @@ const TODAY_CALLS_GOAL = 37;
     .task-item:last-child { border-bottom: none; }
     .task-done .task-title { text-decoration: line-through; color: #9CA3AF; }
     .task-check { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
-    .check-box { width: 18px; height: 18px; border: 2px solid #D1D5DB; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
-    .check-box.checked { background: var(--orange, #3BAA5D); border-color: var(--orange, #3BAA5D); }
+    .task-check-static { cursor: default; width: 18px; justify-content: center; color: var(--gray-400); }
+    .task-type-ic { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #F1F2F4; color: var(--gray-500); }
+    .task-type-ic svg { width: 14px; height: 14px; }
+    .task-close-pill {
+      display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
+      padding: 4px 10px 4px 8px; border: none; border-radius: 14px; cursor: pointer;
+      background: rgba(59,170,93,.12); color: var(--orange-dark, #2F8F4D);
+      font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap;
+      transition: background .15s;
+    }
+    .task-close-pill:hover { background: rgba(59,170,93,.2); }
+    .task-close-pill svg { width: 13px; height: 13px; }
+    .task-close-pill.done { padding: 4px 6px; background: var(--orange, #3BAA5D); color: #FFFFFF; }
     .task-body { flex: 1; min-width: 0; }
-    .task-title { font-size: 12.5px; font-weight: 600; color: #1F2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .task-sub { font-size: 11px; color: #9CA3AF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-title { font-size: 12px; font-weight: 600; color: #333333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-sub { font-size: 12px; color: #9CA3AF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .task-time { font-size: 12px; font-weight: 600; color: #3B82F6; flex-shrink: 0; }
     .task-overdue { color: #EF4444; }
 
     /* Leads table */
-    .leads-table { width: 100%; border-collapse: collapse; font-size: 12.5px; flex: 1; }
-    .leads-table th { text-align: left; padding: 6px 10px; color: #9CA3AF; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid #F3F4F6; }
+    .leads-table { width: 100%; border-collapse: collapse; font-size: 12px; flex: 1; }
+    .leads-table th { text-align: left; padding: 6px 10px; color: #9CA3AF; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid #F3F4F6; }
     .leads-table td { padding: 10px 10px; border-bottom: 1px solid #F9FAFB; vertical-align: middle; }
     .leads-table tr:last-child td { border-bottom: none; }
-    .lead-link { color: #1F2937; font-weight: 600; text-decoration: none; }
+    .lead-link { color: #333333; font-weight: 600; text-decoration: none; }
     .lead-link:hover { color: var(--orange, #3BAA5D); }
     .text-muted { color: #9CA3AF; }
 
     /* Stage badges */
     /* Kolor etapu idzie inline z LeadStagesService — etapy są konfigurowalne. */
-    .stage-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+    .stage-badge { display: inline-block; padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 
     /* Probability */
     .prob-wrap { display: flex; align-items: center; gap: 8px; }
@@ -717,7 +753,7 @@ const TODAY_CALLS_GOAL = 37;
     .prob-fill { height: 100%; background: #D1D5DB; border-radius: 3px; }
     .prob-fill.high { background: #3BAA5D; }
     .prob-fill.med  { background: #F59E0B; }
-    .prob-label { font-size: 11.5px; color: #6B7280; min-width: 30px; }
+    .prob-label { font-size: 12px; color: #6B7280; min-width: 30px; }
 
     /* Activity */
     .activity-feed { display: flex; flex-direction: column; gap: 14px; height: 300px; overflow-y: auto; overflow-x: hidden; flex-shrink: 0; scrollbar-width: thin; scrollbar-color: #E5E7EB transparent; }
@@ -725,14 +761,15 @@ const TODAY_CALLS_GOAL = 37;
     .activity-feed::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
     .activity-feed::-webkit-scrollbar-track { background: transparent; }
     .act-item { display: flex; align-items: flex-start; gap: 12px; flex-shrink: 0; min-width: 0; }
-    .act-icon-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+    .act-icon-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--gray-700); background: var(--gray-100); }
+    .act-icon-wrap svg { width: 16px; height: 16px; }
     .act-body { flex: 1; min-width: 0; overflow: hidden; }
-    .act-title { font-size: 13px; font-weight: 600; color: #1F2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .act-sub { font-size: 11.5px; color: #9CA3AF; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .act-time { font-size: 11.5px; color: #9CA3AF; flex-shrink: 0; }
+    .act-title { font-size: 14px; font-weight: 500; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .act-sub { font-size: 12px; color: #9CA3AF; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .act-time { font-size: 12px; color: #9CA3AF; flex-shrink: 0; }
     .act-loading { display: flex; justify-content: center; padding: 10px 0; flex-shrink: 0; }
     .act-spinner { width: 16px; height: 16px; border: 2px solid #E5E7EB; border-top-color: #3BAA5D; border-radius: 50%; animation: spin .7s linear infinite; }
-    .act-end { font-size: 11px; color: #D1D5DB; text-align: center; padding: 8px 0; flex-shrink: 0; }
+    .act-end { font-size: 12px; color: #D1D5DB; text-align: center; padding: 8px 0; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Clickable */
@@ -749,59 +786,48 @@ const TODAY_CALLS_GOAL = 37;
     .task-close-ta { width: 100%; border: 1px solid #D1D5DB; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; outline: none; }
     .task-close-ta:focus { border-color: var(--orange, #3BAA5D); box-shadow: 0 0 0 2px rgba(59,170,93,.1); }
     .task-close-btns { display: flex; gap: 6px; justify-content: flex-end; }
-    .task-close-cancel { background: white; border: 1px solid #E5E7EB; border-radius: 6px; padding: 4px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
-    .task-close-cancel:hover { background: #F9FAFB; }
-    .task-close-confirm { background: var(--orange, #3BAA5D); color: white; border: none; border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
-    .task-close-confirm:disabled { background: #D1D5DB; cursor: not-allowed; }
-    .task-close-confirm:not(:disabled):hover { background: #2F8F4D; }
 
     /* Loading */
     .dash-loading { display: flex; align-items: center; justify-content: center; height: 50vh; }
 
     /* Tabs */
-    .dash-tabs { display: flex; gap: 4px; border-bottom: 1px solid #E5E7EB; padding-bottom: 0; margin-bottom: 4px; }
-    .dash-tab { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border: none; background: none; font-size: 13.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: 0; transition: color .15s; }
-    .dash-tab:hover { color: #374151; }
-    .dash-tab.active { color: var(--orange, #3BAA5D); border-bottom-color: var(--orange, #3BAA5D); }
+    .tabs { margin-bottom: 4px; }
+    .tab-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; }
     .tab-badge-red { background: #EF4444; color: white; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; }
 
     /* Churn Section */
     .churn-section { display: flex; flex-direction: column; gap: 14px; }
-    .churn-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .churn-filter-inp { border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-family: inherit; outline: none; min-width: 200px; }
-    .churn-filter-inp:focus { border-color: var(--orange, #3BAA5D); box-shadow: 0 0 0 2px rgba(59,170,93,.1); }
-    .churn-filter-sel { border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer; background: white; }
+    .toolbar { background: white; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .toolbar select, .toolbar .btn, .toolbar input { height: 36px; box-sizing: border-box; }
+    .churn-filter-inp { padding: 0 16px; min-width: 200px; }
     .churn-filter-spacer { flex: 1; }
-    .churn-gen-btn { display: flex; align-items: center; gap: 6px; background: var(--orange, #3BAA5D); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background .15s; white-space: nowrap; }
-    .churn-gen-btn:hover:not(:disabled) { background: var(--orange-dark, #2F8F4D); }
-    .churn-gen-btn:disabled { background: #D1D5DB; cursor: not-allowed; }
-    .churn-gen-result { display: flex; align-items: center; gap: 8px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #166534; }
+    .churn-gen-result { display: flex; align-items: center; gap: 8px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #166534; }
     .churn-gen-close { background: none; border: none; cursor: pointer; color: #166534; font-size: 14px; padding: 0 0 0 8px; margin-left: auto; }
     .churn-list { display: flex; flex-direction: column; gap: 8px; }
-    .churn-empty { text-align: center; color: #9CA3AF; font-size: 13.5px; padding: 40px 0; }
+    .churn-empty { text-align: center; color: #9CA3AF; font-size: 14px; padding: 40px 0; }
     .churn-loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
-    .churn-item { display: flex; align-items: center; gap: 14px; background: white; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 18px 14px 0; cursor: pointer; transition: box-shadow .15s, border-color .15s; overflow: hidden; }
-    .churn-item:hover { border-color: #D1D5DB; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .churn-item { display: flex; align-items: center; gap: 14px; background: white; border-radius: 12px; padding: 14px 18px 14px 0; cursor: pointer; box-shadow: var(--shadow-sm); transition: box-shadow .15s, transform .15s; }
+    .churn-item:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
     .churn-risk-bar { width: 4px; height: 56px; border-radius: 0 2px 2px 0; flex-shrink: 0; }
     .risk-critical .churn-risk-bar, .churn-risk-bar.risk-critical { background: #EF4444; }
     .risk-high     .churn-risk-bar, .churn-risk-bar.risk-high     { background: #F97316; }
     .risk-medium   .churn-risk-bar, .churn-risk-bar.risk-medium   { background: #F59E0B; }
     .risk-low      .churn-risk-bar, .churn-risk-bar.risk-low      { background: #3B82F6; }
     .churn-main { flex: 1; min-width: 0; }
-    .churn-name { font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .churn-meta { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #9CA3AF; margin-top: 3px; }
+    .churn-name { font-size: 14px; font-weight: 700; color: #333333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .churn-meta { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #9CA3AF; margin-top: 4px; }
     .churn-stats { display: flex; gap: 20px; flex-shrink: 0; }
     .churn-stat { display: flex; flex-direction: column; align-items: flex-end; }
-    .churn-stat-val { font-size: 16px; font-weight: 700; color: #111827; }
+    .churn-stat-val { font-size: 16px; font-weight: 700; color: #333333; }
     .churn-drop { color: #EF4444; }
-    .churn-stat-lbl { font-size: 10.5px; color: #9CA3AF; white-space: nowrap; }
+    .churn-stat-lbl { font-size: 10px; color: #9CA3AF; white-space: nowrap; }
     .churn-score-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 90px; flex-shrink: 0; }
-    .churn-badge { padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+    .churn-badge { padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 700; white-space: nowrap; }
     .risk-badge-critical { background: #FEE2E2; color: #991B1B; }
     .risk-badge-high     { background: #FED7AA; color: #9A3412; }
     .risk-badge-medium   { background: #FEF3C7; color: #92400E; }
     .risk-badge-low      { background: #DBEAFE; color: #1E40AF; }
-    .churn-score { font-size: 11.5px; color: #6B7280; }
+    .churn-score { font-size: 12px; color: #6B7280; }
     .churn-chevron { color: #D1D5DB; flex-shrink: 0; }
   `],
 })
@@ -809,6 +835,7 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
   private api      = inject(CrmApiService);
   private auth     = inject(AuthService);
   private cdr      = inject(ChangeDetectorRef);
+  private host     = inject<ElementRef<HTMLElement>>(ElementRef);
   private router   = inject(Router);
   private projectTaskNavigation = inject(ProjectTaskNavigationService);
   private route    = inject(ActivatedRoute);
@@ -1314,6 +1341,10 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     } else {
       this.closingTask = task;
       this.taskCloseComment = '';
+      // The task list has a fixed height and a hidden scrollbar: without this the
+      // comment form can open below the visible part and the click looks dead.
+      setTimeout(() => this.host.nativeElement.querySelector('.task-close-form')
+        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
     }
     this.cdr.markForCheck();
   }
@@ -1364,18 +1395,20 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
     return !!t.activity_at && new Date(t.activity_at).toDateString() === new Date().toDateString();
   }
 
+  /** Money in the unit that fits its size: zł, thousands, millions or billions. */
   fmtValue(v: number): string {
     const locale = this.locale.activeLocale();
-    if (!v) return this.transloco.translate('crm.salesDashboard.currency.pln', { value: '0' });
-    if (v >= 1_000) return this.transloco.translate('crm.salesDashboard.currency.thousandsPln', { value: Math.round(v / 1_000).toLocaleString(locale) });
-    return this.transloco.translate('crm.salesDashboard.currency.pln', { value: v.toLocaleString(locale) });
+    const key = 'crm.salesDashboard.currency.';
+    const abs = Math.abs(v || 0);
+    const short = (n: number) => n.toLocaleString(locale, { maximumFractionDigits: 1 });
+    if (abs >= 1_000_000_000) return this.transloco.translate(key + 'billionsPln', { value: short(v / 1_000_000_000) });
+    if (abs >= 1_000_000)     return this.transloco.translate(key + 'millionsPln', { value: short(v / 1_000_000) });
+    if (abs >= 1_000)         return this.transloco.translate(key + 'thousandsPln', { value: Math.round(v / 1_000).toLocaleString(locale) });
+    return this.transloco.translate(key + 'pln', { value: Math.round(v || 0).toLocaleString(locale) });
   }
 
   fmtValueShort(v: number): string {
-    const locale = this.locale.activeLocale();
-    if (!v) return this.transloco.translate('crm.salesDashboard.currency.pln', { value: '0' });
-    if (v >= 1_000) return this.transloco.translate('crm.salesDashboard.currency.thousandsPln', { value: Math.round(v / 1_000).toLocaleString(locale) });
-    return this.transloco.translate('crm.salesDashboard.currency.pln', { value: Math.round(v).toLocaleString(locale) });
+    return this.fmtValue(v);
   }
 
   calendarEntryOf(task: ActivityTask): CalendarEntry | null {

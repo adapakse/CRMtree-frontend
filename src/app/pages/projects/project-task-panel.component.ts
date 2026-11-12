@@ -317,18 +317,18 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
     .panel-body { flex:1; overflow-y:auto; padding:20px 24px; display:flex; flex-direction:column; gap:14px; }
     .panel-body > * { flex-shrink:0; }
     .deadline { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:6px; }
-    .deadline-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); }
+    .deadline-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); }
     .history-reason { color:var(--gray-500); font-style:italic; margin-top:1px; }
     .panel-foot { padding:14px 24px; border-top:1px solid var(--gray-200); display:flex; align-items:center; gap:8px; }
     .foot-spacer { flex:1; }
     .assignee-list { display:flex; flex-wrap:wrap; gap:6px 16px; }
-    .assignee { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-700); }
+    .assignee { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--gray-700); }
     .money { display:grid; grid-template-columns:1fr 90px; gap:8px; }
     .add-field { display:flex; gap:8px; align-items:center; }
     .add-field .fsel { max-width:280px; }
     .field-hint { font-size:12px; color:var(--gray-400); }
-    .history-toggle { align-self:flex-start; border:none; background:none; color:var(--gray-600); font-size:12.5px; font-weight:600; cursor:pointer; padding:0; font-family:inherit; }
-    .history { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--gray-700); }
+    .history-toggle { align-self:flex-start; border:none; background:none; color:var(--gray-600); font-size:12px; font-weight:600; cursor:pointer; padding:0; font-family:inherit; }
+    .history { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--gray-700); }
     input:disabled, select:disabled, textarea:disabled { opacity:.75; cursor:not-allowed; }
   `],
 })

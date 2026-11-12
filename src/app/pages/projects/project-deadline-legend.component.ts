@@ -22,8 +22,8 @@ import { TranslocoDirective, provideTranslocoScope } from '@jsverse/transloco';
     </ng-container>
   `,
   styles: [`
-    :host { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:11.5px; color:var(--gray-500); }
-    .item { display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+    :host { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--gray-500); }
+    .item { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
     .swatch { width:10px; height:10px; border-radius:50%; flex-shrink:0; box-sizing:border-box; }
     .overdue { background:#DC2626; }
     .at-risk { background:#F59E0B; }

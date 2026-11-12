@@ -26,8 +26,9 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
 <div class="dm-page">
   <div class="dm-header">
     <h1>🗄️ {{ t('dataManagement.title') }}</h1>
-    <p class="sub">{{ t('dataManagement.subtitle') }}</p>
   </div>
+  <div class="dm-body">
+    <p class="sub">{{ t('dataManagement.subtitle') }}</p>
 
   <!-- ── Sekcja 1: Kasowanie pojedynczych elementów ── -->
   <div class="dm-section">
@@ -64,7 +65,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <span class="sel-name">📄 {{ docSelected.label }}</span>
           <button class="sel-clear" (click)="clearDocSel()">✕</button>
         </div>
-        <button class="btn-danger" (click)="deleteDocument()" [disabled]="!docSelected || deleting() === 'doc'">
+        <button class="btn btn-d" (click)="deleteDocument()" [disabled]="!docSelected || deleting() === 'doc'">
           {{ deleting() === 'doc' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.document.action') }}
         </button>
         <div *ngIf="deleteDocResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteDocResult }) }}</div>
@@ -93,7 +94,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <span class="sel-name">👤 {{ leadSelected.label }}</span>
           <button class="sel-clear" (click)="clearLeadSel()">✕</button>
         </div>
-        <button class="btn-danger" (click)="deleteLead()" [disabled]="!leadSelected || deleting() === 'lead'">
+        <button class="btn btn-d" (click)="deleteLead()" [disabled]="!leadSelected || deleting() === 'lead'">
           {{ deleting() === 'lead' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.lead.action') }}
         </button>
         <div *ngIf="deleteLeadResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deleteLeadResult }) }}</div>
@@ -122,14 +123,14 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
           <span class="sel-name">🤝 {{ partnerSelected.label }}</span>
           <button class="sel-clear" (click)="clearPartnerSel()">✕</button>
         </div>
-        <button class="btn-danger" (click)="deletePartner()" [disabled]="!partnerSelected || deleting() === 'partner'">
+        <button class="btn btn-d" (click)="deletePartner()" [disabled]="!partnerSelected || deleting() === 'partner'">
           {{ deleting() === 'partner' ? '⏳ ' + t('dataManagement.delete.inProgress') : '🗑️ ' + t('dataManagement.delete.partner.action') }}
         </button>
         <div *ngIf="deletePartnerResult" class="result-ok">✓ {{ t('dataManagement.delete.deleted', { name: deletePartnerResult }) }}</div>
       </div>
 
     </div>
-    <div *ngIf="deleteError" class="result-err" style="margin-top:8px">✗ {{ deleteError }}</div>
+    <div *ngIf="deleteError" class="result-err mt-2">✗ {{ deleteError }}</div>
   </div>
 
   <!-- ── Sekcja 2: Czyszczenie grup danych ── -->
@@ -147,80 +148,80 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <!-- Purge Documents -->
       <div class="purge-card">
         <div class="purge-card-head">
-          <span style="font-size:22px">📄</span>
+          <span class="dc-icon">📄</span>
           <div>
             <div class="purge-card-title">{{ t('dataManagement.purge.docs.title') }}</div>
             <div class="purge-card-desc">{{ t('dataManagement.purge.docs.description') }}</div>
           </div>
         </div>
-        <div *ngIf="purgeConfirming !== 'docs'" style="text-align:center;margin-top:8px">
-          <button class="btn-danger" (click)="purgeConfirming='docs'">🗑️ {{ t('dataManagement.purge.docs.action') }}</button>
+        <div *ngIf="purgeConfirming !== 'docs'" class="purge-act">
+          <button class="btn btn-d" (click)="purgeConfirming='docs'">🗑️ {{ t('dataManagement.purge.docs.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'docs'" class="inline-confirm">
           <input class="dm-input" [(ngModel)]="purgeTexts.docs" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.docs.confirmPhrase') })">
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <button class="btn-danger" (click)="purgeCategory('docs')"
+          <div class="confirm-actions">
+            <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn btn-d btn-sm" (click)="purgeCategory('docs')"
                     [disabled]="purgeTexts.docs !== t('dataManagement.purge.docs.confirmPhrase') || purging() === 'docs'">
               {{ purging() === 'docs' ? '⏳…' : t('dataManagement.purge.confirm') }}
             </button>
-            <button class="btn-cancel" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
           </div>
         </div>
-        <div *ngIf="purgeResults.docs" class="result-ok" style="margin-top:8px">✓ {{ purgeResults.docs }}</div>
+        <div *ngIf="purgeResults.docs" class="result-ok mt-2">✓ {{ purgeResults.docs }}</div>
       </div>
 
       <!-- Purge Leads -->
       <div class="purge-card">
         <div class="purge-card-head">
-          <span style="font-size:22px">👤</span>
+          <span class="dc-icon">👤</span>
           <div>
             <div class="purge-card-title">{{ t('dataManagement.purge.leads.title') }}</div>
             <div class="purge-card-desc">{{ t('dataManagement.purge.leads.description') }}</div>
           </div>
         </div>
-        <div *ngIf="purgeConfirming !== 'leads'" style="text-align:center;margin-top:8px">
-          <button class="btn-danger" (click)="purgeConfirming='leads'">🗑️ {{ t('dataManagement.purge.leads.action') }}</button>
+        <div *ngIf="purgeConfirming !== 'leads'" class="purge-act">
+          <button class="btn btn-d" (click)="purgeConfirming='leads'">🗑️ {{ t('dataManagement.purge.leads.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'leads'" class="inline-confirm">
           <input class="dm-input" [(ngModel)]="purgeTexts.leads" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.leads.confirmPhrase') })">
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <button class="btn-danger" (click)="purgeCategory('leads')"
+          <div class="confirm-actions">
+            <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn btn-d btn-sm" (click)="purgeCategory('leads')"
                     [disabled]="purgeTexts.leads !== t('dataManagement.purge.leads.confirmPhrase') || purging() === 'leads'">
               {{ purging() === 'leads' ? '⏳…' : t('dataManagement.purge.confirm') }}
             </button>
-            <button class="btn-cancel" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
           </div>
         </div>
-        <div *ngIf="purgeResults.leads" class="result-ok" style="margin-top:8px">✓ {{ purgeResults.leads }}</div>
+        <div *ngIf="purgeResults.leads" class="result-ok mt-2">✓ {{ purgeResults.leads }}</div>
       </div>
 
       <!-- Purge Partners -->
       <div class="purge-card">
         <div class="purge-card-head">
-          <span style="font-size:22px">🤝</span>
+          <span class="dc-icon">🤝</span>
           <div>
             <div class="purge-card-title">{{ t('dataManagement.purge.partners.title') }}</div>
             <div class="purge-card-desc">{{ t('dataManagement.purge.partners.description') }}</div>
           </div>
         </div>
-        <div *ngIf="purgeConfirming !== 'partners'" style="text-align:center;margin-top:8px">
-          <button class="btn-danger" (click)="purgeConfirming='partners'">🗑️ {{ t('dataManagement.purge.partners.action') }}</button>
+        <div *ngIf="purgeConfirming !== 'partners'" class="purge-act">
+          <button class="btn btn-d" (click)="purgeConfirming='partners'">🗑️ {{ t('dataManagement.purge.partners.action') }}</button>
         </div>
         <div *ngIf="purgeConfirming === 'partners'" class="inline-confirm">
           <input class="dm-input" [(ngModel)]="purgeTexts.partners" [placeholder]="t('dataManagement.purge.typePhrase', { phrase: t('dataManagement.purge.partners.confirmPhrase') })">
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <button class="btn-danger" (click)="purgeCategory('partners')"
+          <div class="confirm-actions">
+            <button class="btn btn-g btn-sm" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
+            <button class="btn btn-d btn-sm" (click)="purgeCategory('partners')"
                     [disabled]="purgeTexts.partners !== t('dataManagement.purge.partners.confirmPhrase') || purging() === 'partners'">
               {{ purging() === 'partners' ? '⏳…' : t('dataManagement.purge.confirm') }}
             </button>
-            <button class="btn-cancel" (click)="purgeConfirming=''">{{ 'actions.cancel' | transloco }}</button>
           </div>
         </div>
-        <div *ngIf="purgeResults.partners" class="result-ok" style="margin-top:8px">✓ {{ purgeResults.partners }}</div>
+        <div *ngIf="purgeResults.partners" class="result-ok mt-2">✓ {{ purgeResults.partners }}</div>
       </div>
 
     </div>
-    <div *ngIf="purgeError" class="result-err" style="margin-top:12px">✗ {{ purgeError }}</div>
+    <div *ngIf="purgeError" class="result-err mt-12">✗ {{ purgeError }}</div>
   </div>
 
   <!-- ── Sekcja 3: Eksport / Import ustawień ── -->
@@ -237,8 +238,8 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <div class="ei-card">
         <div class="ei-title">📥 {{ t('dataManagement.settings.export.title') }}</div>
         <div class="ei-desc">{{ t('dataManagement.settings.export.description') }}</div>
-        <div style="margin-top:12px">
-          <button class="btn-primary" (click)="exportSettings()" [disabled]="exporting()">
+        <div class="mt-12">
+          <button class="btn btn-p" (click)="exportSettings()" [disabled]="exporting()">
             {{ exporting() ? '⏳ ' + t('dataManagement.settings.export.generating') : '📥 ' + t('dataManagement.settings.export.download') }}
           </button>
         </div>
@@ -247,7 +248,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
       <div class="ei-card">
         <div class="ei-title">📤 {{ t('dataManagement.settings.import.title') }}</div>
         <div class="ei-desc">{{ t('dataManagement.settings.import.description') }}</div>
-        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+        <div class="mt-12 import-col">
           <div class="drop-zone" [class.drag-over]="isDragging"
                (dragover)="$event.preventDefault(); isDragging=true"
                (dragleave)="isDragging=false" (drop)="onDrop($event)" (click)="fileInput.click()">
@@ -256,72 +257,74 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
             <span *ngIf="selectedFile && !importing()">📄 {{ selectedFile.name }}</span>
             <span *ngIf="importing()">⏳ {{ t('dataManagement.settings.import.inProgress') }}</span>
           </div>
-          <button class="btn-primary" (click)="importSettings()" [disabled]="!selectedFile || importing()">
+          <button class="btn btn-p" (click)="importSettings()" [disabled]="!selectedFile || importing()">
             {{ importing() ? '⏳ ' + t('dataManagement.settings.import.inProgress') : '📤 ' + t('dataManagement.settings.import.action') }}
           </button>
         </div>
-        <div *ngIf="importResult" class="result-ok" style="margin-top:8px">
+        <div *ngIf="importResult" class="result-ok mt-2">
           ✓ {{ t('dataManagement.settings.import.result', { settingsUpdated: importResult.settingsUpdated, groupsUpdated: importResult.groupsUpdated }) }}
         </div>
-        <div *ngIf="importError" class="result-err" style="margin-top:8px">✗ {{ importError }}</div>
+        <div *ngIf="importError" class="result-err mt-2">✗ {{ importError }}</div>
       </div>
     </div>
+  </div>
   </div>
 </div>
 </ng-container>
   `,
   styles: [`
-    .dm-page { padding:24px; max-width:1000px; overflow-y:auto; height:100%; box-sizing:border-box; }
-    .dm-header { margin-bottom:28px; }
-    .dm-header h1 { font-size:20px; font-weight:700; margin:0 0 6px; }
-    .sub { color:#6b7280; font-size:13px; margin:0; }
-    .dm-section { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:20px; margin-bottom:20px; }
-    .section-head { display:flex; gap:14px; align-items:flex-start; margin-bottom:18px; }
-    .section-icon { width:40px;height:40px;border-radius:10px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0; }
-    .section-icon.danger { background:#fee2e2; }
-    .section-title { font-size:15px; font-weight:700; color:#111827; }
-    .section-sub { font-size:12.5px; color:#6b7280; margin-top:3px; line-height:1.5; }
-    .delete-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .dm-page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
+    .dm-header { height:60px; padding:0 24px; display:flex; align-items:center; gap:12px; background:white; border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+    .dm-header h1 { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin:0; display:flex; align-items:center; gap:8px; }
+    .dm-body { flex:1; overflow-y:auto; padding:20px 24px 24px; box-sizing:border-box; }
+    .dm-body > * { max-width:1000px; }
+    .sub { color:#6b7280; font-size:12px; margin:0 0 16px; }
+    .dm-section { background:white; border-radius:12px; box-shadow:var(--shadow-sm); padding:20px; margin-bottom:16px; }
+    .section-head { display:flex; gap:12px; align-items:flex-start; margin-bottom:16px; }
+    .section-icon { width:40px; height:40px; border-radius:10px; background:var(--gray-50); display:flex; align-items:center; justify-content:center; font-size:20px; line-height:1; flex-shrink:0; }
+    .section-title { font-size:16px; font-weight:700; color:#333333; }
+    .section-sub { font-size:12px; color:#6b7280; margin-top:4px; line-height:1.5; }
+    .delete-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     @media(max-width:800px) { .delete-grid { grid-template-columns:1fr; } }
-    .delete-card { border:1px solid #e5e7eb; border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:10px; }
-    .dc-head { display:flex; gap:10px; align-items:flex-start; }
-    .dc-icon { font-size:22px; flex-shrink:0; }
-    .dc-title { font-size:13px; font-weight:700; color:#111827; }
-    .dc-desc { font-size:11px; color:#9ca3af; line-height:1.5; margin-top:2px; }
+    .delete-card { background:var(--gray-50); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .dc-head { display:flex; gap:12px; align-items:flex-start; }
+    .dc-icon { width:40px; height:40px; border-radius:10px; background:white; display:flex; align-items:center; justify-content:center; font-size:20px; line-height:1; flex-shrink:0; }
+    .dc-title { font-size:14px; font-weight:700; color:#333333; }
+    .dc-desc { font-size:12px; color:#9ca3af; line-height:1.5; margin-top:2px; }
     .search-wrap { position:relative; }
-    .suggestions { position:absolute; top:100%; left:0; right:0; z-index:100; background:white; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.1); max-height:200px; overflow-y:auto; margin-top:2px; }
-    .suggestion-item { padding:8px 12px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:12px; }
-    .suggestion-item:hover { background:#f9fafb; }
-    .sug-label { font-weight:600; color:#111827; }
-    .sug-sub { color:#9ca3af; font-size:11px; }
-    .selected-badge { display:flex; align-items:center; justify-content:space-between; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:6px 10px; font-size:12px; }
-    .sel-name { color:#15803d; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .sel-clear { background:none; border:none; cursor:pointer; color:#9ca3af; font-size:14px; padding:0 2px; flex-shrink:0; }
+    .suggestions { position:absolute; top:100%; left:0; right:0; z-index:100; background:white; border-radius:12px; box-shadow:var(--shadow-lg); max-height:200px; overflow-y:auto; margin-top:4px; padding:4px; }
+    .suggestion-item { padding:8px 12px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:12px; }
+    .suggestion-item:hover { background:var(--orange-pale); }
+    .sug-label { font-weight:600; color:#333333; }
+    .sug-sub { color:#9ca3af; font-size:12px; }
+    .selected-badge { display:flex; align-items:center; justify-content:space-between; gap:8px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:8px 12px; font-size:12px; }
+    .sel-name { display:flex; align-items:center; gap:6px; min-width:0; color:#15803d; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .sel-clear { display:inline-flex; background:none; border:none; cursor:pointer; color:#9ca3af; padding:0; flex-shrink:0; }
     .sel-clear:hover { color:#ef4444; }
-    .dm-input { border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; font-family:inherit; width:100%; box-sizing:border-box; }
+    .dm-input { height:36px; border:1px solid var(--gray-200); border-radius:10px; padding:0 12px; font-size:14px; outline:none; font-family:inherit; width:100%; box-sizing:border-box; background:white; }
     .dm-input:focus { border-color:var(--orange); }
-    .btn-danger { background:#ef4444; color:white; border:none; border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
-    .btn-danger:hover:not(:disabled) { background:#dc2626; }
-    .btn-danger:disabled { opacity:.6; cursor:not-allowed; }
-    .btn-primary { background:var(--orange); color:white; border:none; border-radius:7px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; }
-    .btn-primary:hover:not(:disabled) { background:var(--orange-dark); }
-    .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
-    .btn-cancel { background:white; color:#374151; border:1px solid #d1d5db; border-radius:7px; padding:7px 14px; font-size:12px; cursor:pointer; }
-    .result-ok { color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:8px 12px; font-size:12px; }
-    .result-err { color:#dc2626; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:8px 12px; font-size:12px; }
-    .purge-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .mt-12 { margin-top:12px; }
+    .result-ok, .result-err { display:flex; align-items:center; gap:8px; border-radius:10px; padding:8px 12px; font-size:12px; }
+    .result-ok { color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; }
+    .result-err { color:#dc2626; background:#fef2f2; border:1px solid #fecaca; }
+    .purge-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     @media(max-width:800px) { .purge-grid { grid-template-columns:1fr; } }
-    .purge-card { border:2px solid #fee2e2; border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px; }
-    .purge-card-head { display:flex; gap:10px; align-items:flex-start; }
-    .purge-card-title { font-size:13px; font-weight:700; color:#991b1b; }
-    .purge-card-desc { font-size:11px; color:#9ca3af; line-height:1.5; margin-top:2px; }
-    .inline-confirm { background:#fef2f2; border-radius:8px; padding:10px; margin-top:4px; }
+    .purge-card { background:#FFF7F7; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:8px; }
+    .purge-card-head { display:flex; gap:12px; align-items:flex-start; }
+    .purge-card-title { font-size:14px; font-weight:700; color:#991b1b; }
+    .purge-card-desc { font-size:12px; color:#9ca3af; line-height:1.5; margin-top:2px; }
+    .purge-act { display:flex; justify-content:center; margin-top:8px; }
+    .inline-confirm { background:white; border-radius:12px; box-shadow:var(--shadow-sm); padding:12px; margin-top:4px; }
+    .confirm-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:8px; }
     .export-import-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     @media(max-width:600px) { .export-import-grid { grid-template-columns:1fr; } }
-    .ei-card { border:1px solid #e5e7eb; border-radius:10px; padding:16px; }
-    .ei-title { font-size:14px; font-weight:700; margin-bottom:6px; }
+    .ei-card { background:var(--gray-50); border-radius:12px; padding:16px; }
+    .ei-title { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; margin-bottom:8px; }
     .ei-desc { font-size:12px; color:#6b7280; line-height:1.5; }
-    .drop-zone { border:2px dashed #d1d5db; border-radius:8px; padding:20px; text-align:center; cursor:pointer; font-size:13px; color:#9ca3af; transition:.2s; }
+    .import-col { display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+    .import-col .drop-zone { align-self:stretch; }
+    .drop-zone { display:flex; align-items:center; justify-content:center; gap:8px; border:2px dashed var(--gray-300); border-radius:12px; padding:20px; background:white; text-align:center; cursor:pointer; font-size:12px; color:#9ca3af; transition:.2s; }
+    .drop-zone span { display:inline-flex; align-items:center; gap:8px; }
     .drop-zone:hover, .drop-zone.drag-over { border-color:var(--orange); color:var(--orange); background:var(--orange-pale); }
   `],
 })

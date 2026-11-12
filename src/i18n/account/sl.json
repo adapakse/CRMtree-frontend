@@ -22,6 +22,7 @@
     },
     "password": {
       "current": "Trenutno geslo",
+      "hide": "Skrij geslo",
       "hint": "Vnesite trenutno in novo geslo, vsaj 8 znakov. Sprememba odjavi vaš račun iz mobilne aplikacije.",
       "mismatch": "Gesli se ne ujemata",
       "new": "Novo geslo",
@@ -29,6 +30,7 @@
       "saveFailed": "Gesla ni bilo mogoče spremeniti",
       "saved": "Geslo je spremenjeno",
       "saving": "Shranjevanje…",
+      "show": "Pokaži geslo",
       "submit": "Spremeni geslo",
       "title": "Sprememba gesla",
       "tooShort": "Geslo mora imeti vsaj 8 znakov"

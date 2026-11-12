@@ -20,7 +20,7 @@ export interface PeriodChangeEvent extends PeriodDates {
 <ng-container *transloco="let t; prefix: 'crm'">
 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
 
-  <select [ngStyle]="selStyle" [(ngModel)]="preset" (ngModelChange)="onPresetChange($event)">
+  <select [ngStyle]="selStyle" [class.sel]="variant !== 'inverted'" [(ngModel)]="preset" (ngModelChange)="onPresetChange($event)">
     <optgroup [label]="t('periodFilter.groups.current')">
       <option value="cw"   style="color:#374151">{{ t('periodFilter.presets.currentWeek') }}</option>
       <option value="cm"   style="color:#374151">{{ t('periodFilter.presets.currentMonth') }}</option>
@@ -42,7 +42,7 @@ export interface PeriodChangeEvent extends PeriodDates {
     <input type="date" [ngStyle]="inputStyle"
            [(ngModel)]="customFrom" (ngModelChange)="onCustomChange()" />
     <span [style.color]="variant === 'inverted' ? 'rgba(255,255,255,.6)' : '#71717a'"
-          style="font-size:11px">–</span>
+          style="font-size:12px">–</span>
     <input type="date" [ngStyle]="inputStyle"
            [(ngModel)]="customTo" (ngModelChange)="onCustomChange()" />
   </ng-container>
@@ -74,16 +74,8 @@ export class PeriodFilterComponent {
         'max-width':     '140px',
       };
     }
-    return {
-      border:          '1px solid #d1d5db',
-      'border-radius': '6px',
-      padding:         '5px 8px',
-      'font-size':     '12px',
-      color:           '#374151',
-      background:      'white',
-      cursor:          'pointer',
-      outline:         'none',
-    };
+    // The default look comes from the shared select style in global.scss.
+    return {};
   }
 
   get inputStyle(): Record<string, string> {
@@ -99,16 +91,8 @@ export class PeriodFilterComponent {
         width:           '108px',
       };
     }
-    return {
-      border:          '1px solid #d1d5db',
-      'border-radius': '6px',
-      padding:         '5px 6px',
-      'font-size':     '12px',
-      color:           '#374151',
-      background:      'white',
-      outline:         'none',
-      width:           '120px',
-    };
+    // Same: only the width is specific to this filter.
+    return { width: '150px' };
   }
 
   onPresetChange(preset: string): void {

@@ -272,7 +272,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       <div style="max-width:820px">
 
         <a class="survey-link" routerLink="/admin/onboarding-survey">
-          <span style="font-size:18px">📝</span>
+          <span style="font-size:18px;flex-shrink:0">📝</span>
           <span>
             <strong>{{ t('settings.survey.title') }}</strong> {{ t('settings.survey.description') }}
           </span>
@@ -324,11 +324,11 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Parametry globalne -->
         @if (activeTab() === 'global') {
 
-          <div class="card" style="padding:18px 20px;margin-bottom:24px">
+          <div class="card" style="padding:20px;margin-bottom:24px">
             <wt-language-picker mode="tenant" />
           </div>
 
-          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#1D4ED8;display:flex;gap:12px;align-items:flex-start">
+          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#1D4ED8;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">ℹ️</span>
             <div>
               <strong>{{ t('settings.tabs.global') }}</strong> {{ t('settings.global.intro') }}
@@ -350,9 +350,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                (wyszukiwanie w internecie, wymuszony format odpowiedzi), są
                wyszarzone z podanym powodem — nigdy po cichu nieaktywne. -->
           @if (aiFeatureEnabled()) {
-          <div class="card" style="margin-bottom:20px;overflow:hidden">
+          <div class="card" style="margin-bottom:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px">🤖</span>
+              <span style="font-size:18px;flex-shrink:0">🤖</span>
               <span class="cat-title">{{ t('settings.ai.title') }}</span>
             </div>
 
@@ -376,7 +376,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           }
 
           @for (cat of globalCategories(); track cat.key) {
-            <div class="card" style="margin-bottom:20px;overflow:hidden">
+            <div class="card" style="margin-bottom:24px;overflow:hidden">
               <div class="cat-header">
                 <span style="font-size:18px">{{ cat.icon }}</span>
                 <span class="cat-title">{{ cat.label }}</span>
@@ -418,18 +418,18 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           }
 
           <!-- Preview -->
-          <div class="card" style="padding:20px;margin-bottom:20px">
-            <div class="cat-title" style="margin-bottom:14px">🔍 {{ t('settings.global.preview.title') }}</div>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
-              <div style="display:flex;align-items:center;gap:10px">
+          <div class="card" style="padding:20px;margin-bottom:24px">
+            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">🔍 {{ t('settings.global.preview.title') }}</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
+              <div style="display:flex;align-items:center;gap:12px">
                 <div style="width:16px;height:16px;background:var(--gray-800);border-radius:3px"></div>
                 <span>{{ t('settings.global.preview.moreThan') }} <strong>{{ previewRedDays() }}</strong> {{ t('settings.global.preview.noWarning') }}</span>
               </div>
-              <div style="display:flex;align-items:center;gap:10px">
+              <div style="display:flex;align-items:center;gap:12px">
                 <div style="width:16px;height:16px;background:#DC2626;border-radius:3px"></div>
                 <span>≤ <strong>{{ previewRedDays() }}</strong> {{ t('settings.global.preview.urgent') }}</span>
               </div>
-              <div style="display:flex;align-items:center;gap:10px">
+              <div style="display:flex;align-items:center;gap:12px">
                 <div style="width:16px;height:16px;background:#F59E0B;border-radius:3px"></div>
                 <span>≤ <strong>{{ previewSoonDays() }}</strong> {{ t('settings.global.preview.expiringSoon') }}</span>
               </div>
@@ -440,7 +440,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Parametry biznesowe CRM -->
         @if (activeTab() === 'crm') {
 
-          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">💼</span>
             <div>
               <strong>{{ t('settings.tabs.crm') }}</strong> {{ t('settings.crm.intro') }}
@@ -453,10 +453,10 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             }
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
+                <span class="cat-title" style="font-size:14px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span> }
               </div>
-              <div style="padding:14px 20px">
+              <div style="padding:16px 20px">
                 <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 @if (field.value_type === 'json') {
@@ -478,7 +478,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                            [placeholder]="field.key === 'crm_lost_reasons' ? t('settings.fields.newValueExample') : t('settings.fields.newValueCode')"
                            [(ngModel)]="jsonNewItem[field.key]"
                            (keydown.enter)="addJsonItem(field)">
-                    <button class="btn btn-p" style="padding:6px 14px;font-size:12px"
+                    <button class="btn btn-p"
                             (click)="addJsonItem(field)">+ {{ t('settings.actions.add') }}</button>
                   </div>
                   @if (field.error) { <div class="field-err" style="margin-top:4px">{{ field.error }}</div> }
@@ -498,7 +498,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 }
 
                 @if (field.updated_by_name) {
-                  <div class="field-meta" style="margin-top:10px">
+                  <div class="field-meta" style="margin-top:12px">
                     {{ t('settings.fields.changedBy') }} <strong>{{ field.updated_by_name }}</strong> · {{ field.updated_at | date:'dd.MM.yyyy HH:mm' }}
                   </div>
                 }
@@ -520,9 +520,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                  bo niosą kolejność, kolor, prawdopodobieństwo i zachowanie. -->
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">{{ t('settings.leadStages.cardTitle') }}</span>
+                <span class="cat-title" style="font-size:14px">{{ t('settings.leadStages.cardTitle') }}</span>
               </div>
-              <div style="padding:14px 20px">
+              <div style="padding:16px 20px">
                 <div class="field-desc" style="margin-bottom:12px">{{ t('settings.leadStages.intro') }}</div>
 
                 @if (stagesLoading()) {
@@ -585,12 +585,12 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (churnFields().length > 0) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">📉 {{ t('settings.crm.scoring.churnTitle') }}</span>
+                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px">📉 {{ t('settings.crm.scoring.churnTitle') }}</span>
                 @if (churnFields().some(f => f.dirty)) {
                   <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span>
                 }
               </div>
-              <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
                 <thead>
                   <tr style="background:var(--gray-50)">
                     <th style="padding:8px 20px;text-align:left;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)">{{ t('settings.crm.scoring.parameter') }}</th>
@@ -600,54 +600,54 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 </thead>
                 <tbody>
                   <tr style="background:#fafafa">
-                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.noOrdersDays') }}</td>
+                    <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.noOrdersDays') }}</td>
                   </tr>
                   @for (f of churnDayFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
-                      <td style="padding:9px 16px;text-align:right">
-                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
+                      <td style="padding:8px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:4px 8px;font-size:12px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
                       </td>
                     </tr>
                   }
                   <tr style="background:#fafafa">
-                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.salesDrop') }}</td>
+                    <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.salesDrop') }}</td>
                   </tr>
                   @for (f of churnSalesFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
-                      <td style="padding:9px 16px;text-align:right">
-                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
+                      <td style="padding:8px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:4px 8px;font-size:12px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
                       </td>
                     </tr>
                   }
                   <tr style="background:#fafafa">
-                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.riskThresholds') }}</td>
+                    <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.riskThresholds') }}</td>
                   </tr>
                   @for (f of churnRiskFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
-                      <td style="padding:9px 16px;text-align:right">
-                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
+                      <td style="padding:8px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:4px 8px;font-size:12px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
                       </td>
                     </tr>
                   }
                   @if (churnTimeField()) {
                     <tr style="background:#fafafa">
-                      <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.schedule') }}</td>
+                      <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.schedule') }}</td>
                     </tr>
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ churnTimeField()!.label }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ churnTimeField()!.description }}</td>
-                      <td style="padding:9px 16px;text-align:right">
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ churnTimeField()!.label }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ churnTimeField()!.description }}</td>
+                      <td style="padding:8px 16px;text-align:right">
                         <input class="fi" type="text" placeholder="HH:MM"
-                               style="width:76px;text-align:center;padding:5px 8px;font-size:12.5px"
+                               style="width:76px;text-align:center;padding:4px 8px;font-size:12px"
                                [(ngModel)]="churnTimeField()!.draft"
                                (ngModelChange)="onFieldChange(churnTimeField()!)"
                                [class.fi-err]="!!churnTimeField()!.error">
@@ -663,12 +663,12 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (healthFields().length > 0) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">💚 {{ t('settings.crm.scoring.healthTitle') }}</span>
+                <span class="cat-title" style="font-size:14px;display:inline-flex;align-items:center;gap:8px">💚 {{ t('settings.crm.scoring.healthTitle') }}</span>
                 @if (healthFields().some(f => f.dirty)) {
                   <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span>
                 }
               </div>
-              <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
                 <thead>
                   <tr style="background:var(--gray-50)">
                     <th style="padding:8px 20px;text-align:left;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)">{{ t('settings.crm.scoring.parameter') }}</th>
@@ -678,40 +678,40 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 </thead>
                 <tbody>
                   <tr style="background:#fafafa">
-                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.activityLast20Days') }}</td>
+                    <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.activityLast20Days') }}</td>
                   </tr>
                   @for (f of healthActFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
-                      <td style="padding:9px 16px;text-align:right">
-                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
+                      <td style="padding:8px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:4px 8px;font-size:12px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
                       </td>
                     </tr>
                   }
                   <tr style="background:#fafafa">
-                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.revenueGrowth') }}</td>
+                    <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.revenueGrowth') }}</td>
                   </tr>
                   @for (f of healthRevFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
-                      <td style="padding:9px 16px;text-align:right">
-                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
+                      <td style="padding:8px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:4px 8px;font-size:12px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
                       </td>
                     </tr>
                   }
                   <tr style="background:#fafafa">
-                    <td colspan="3" style="padding:5px 20px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.healthLevelThresholds') }}</td>
+                    <td colspan="3" style="padding:4px 20px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px">{{ t('settings.crm.scoring.healthLevelThresholds') }}</td>
                   </tr>
                   @for (f of healthLevelFields(); track f.key) {
                     <tr style="border-top:1px solid var(--gray-100)">
-                      <td style="padding:9px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
-                      <td style="padding:9px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
-                      <td style="padding:9px 16px;text-align:right">
-                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:5px 8px;font-size:12.5px"
+                      <td style="padding:8px 20px;color:var(--gray-700)">{{ fieldLabel(f) }}</td>
+                      <td style="padding:8px 12px;color:var(--gray-400);font-size:12px">{{ fieldDescription(f) }}</td>
+                      <td style="padding:8px 16px;text-align:right">
+                        <input class="fi" type="number" min="0" style="width:76px;text-align:right;padding:4px 8px;font-size:12px"
                                [(ngModel)]="f.draft" (ngModelChange)="onFieldChange(f)" [class.fi-err]="!!f.error">
                       </td>
                     </tr>
@@ -723,9 +723,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <!-- Pola dodatkowe formatek leada i partnera. Dwie osobne listy, bo
                pola są rozłączne — pole partnera nie pojawia się na leadzie. -->
-          <div class="card" style="margin-top:20px;overflow:hidden">
+          <div class="card" style="margin-top:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px">🧩</span>
+              <span style="font-size:18px;flex-shrink:0">🧩</span>
               <span class="cat-title">{{ t('settings.customFields.titleLead') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -738,7 +738,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <div class="card" style="margin-top:16px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px">🧩</span>
+              <span style="font-size:18px;flex-shrink:0">🧩</span>
               <span class="cat-title">{{ t('settings.customFields.titlePartner') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -753,7 +753,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Słowniki dokumentów -->
         @if (activeTab() === 'documents') {
 
-          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#166534;display:flex;gap:12px;align-items:flex-start">
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#166534;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">📄</span>
             <div>
               <strong>{{ t('settings.tabs.documents') }}</strong> {{ t('settings.documents.intro') }}
@@ -763,10 +763,10 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @for (field of docFields(); track field.key) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px">
-                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
+                <span class="cat-title" style="font-size:14px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:auto">● {{ t('settings.fields.changed') }}</span> }
               </div>
-              <div style="padding:14px 20px">
+              <div style="padding:16px 20px">
                 <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 @if (field.value_type === 'json') {
@@ -786,13 +786,13 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                     <input class="fi" style="flex:1" type="text" [placeholder]="t('settings.fields.newValueTechnicalKey')"
                            [(ngModel)]="jsonNewItem[field.key]"
                            (keydown.enter)="addJsonItem(field)">
-                    <button class="btn btn-p btn-sm" (click)="addJsonItem(field)">+ {{ t('settings.actions.add') }}</button>
+                    <button class="btn btn-p" (click)="addJsonItem(field)">+ {{ t('settings.actions.add') }}</button>
                   </div>
                   @if (field.error) { <span class="field-err">{{ field.error }}</span> }
                 }
 
                 @if (field.updated_by_name) {
-                  <div class="field-meta" style="margin-top:10px">
+                  <div class="field-meta" style="margin-top:12px">
                     {{ t('settings.fields.changedBy') }} <strong>{{ field.updated_by_name }}</strong> · {{ field.updated_at | date:'dd.MM.yyyy HH:mm' }}
                   </div>
                 }
@@ -801,7 +801,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           }
 
           @if (docFields().length === 0) {
-            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:14px">
               {{ t('settings.documents.empty') }}
             </div>
           }
@@ -811,7 +811,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                dokumentów tak samo jak typy i statusy wyżej. -->
           <div class="card" style="margin-top:24px;overflow:hidden">
             <div class="cat-header">
-              <span style="font-size:18px">🧩</span>
+              <span style="font-size:18px;flex-shrink:0">🧩</span>
               <span class="cat-title">{{ t('settings.customFields.titleDocument') }}</span>
             </div>
             <div style="padding:16px 20px">
@@ -826,7 +826,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Grupy użytkowników -->
         @if (activeTab() === 'users') {
 
-          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#0369A1;display:flex;gap:12px;align-items:flex-start">
+          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#0369A1;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">👥</span>
             <div>
               <strong>{{ t('settings.tabs.users') }}</strong> {{ t('settings.groups.intro') }}
@@ -834,38 +834,38 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           </div>
 
           <!-- Formularz dodawania grupy -->
-          <div class="card" style="margin-bottom:20px;padding:20px">
-            <div class="cat-title" style="margin-bottom:14px">➕ {{ t('settings.groups.addTitle') }}</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="card" style="margin-bottom:24px;padding:20px">
+            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">➕ {{ t('settings.groups.addTitle') }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
                 <label class="field-label">{{ t('settings.groups.technicalName') }} <span style="color:#ef4444">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.technicalNameHint') }}</div>
-                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:4px"
+                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.technicalNamePlaceholder')"
                        [(ngModel)]="newGroup.name">
               </div>
               <div>
                 <label class="field-label">{{ t('settings.groups.displayName') }} <span style="color:#ef4444">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.displayNameHint') }}</div>
-                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:4px"
+                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.displayNamePlaceholder')"
                        [(ngModel)]="newGroup.display_name">
               </div>
               <div>
                 <label class="field-label">{{ t('settings.groups.description') }}</label>
-                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:4px"
+                <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.descriptionPlaceholder')"
                        [(ngModel)]="newGroup.description">
               </div>
               <div style="display:flex;flex-direction:column;justify-content:flex-end">
-                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:12px">
+                <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;margin-bottom:12px">
                   <input type="checkbox" [(ngModel)]="newGroup.has_owner_restriction">
                   {{ t('settings.groups.ownerRestrictionOption') }}
                 </label>
               </div>
             </div>
             @if (groupError()) {
-              <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#DC2626;margin-bottom:12px">
+              <div style="background:#FEF2F2;border-radius:12px;padding:12px 16px;font-size:12px;color:#DC2626;margin-bottom:20px;display:flex;align-items:center;gap:8px">
                 ⚠️ {{ groupError() }}
               </div>
             }
@@ -880,17 +880,17 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @if (groupsLoading()) {
             <div style="text-align:center;padding:40px"><div class="spinner"></div></div>
           } @else if (groups().length === 0) {
-            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:14px">
               {{ t('settings.groups.empty') }}
             </div>
           } @else {
             @for (g of groups(); track g.id) {
               <div class="card" style="margin-bottom:12px;overflow:hidden">
-                <div style="padding:14px 20px;display:flex;align-items:center;gap:12px">
-                  <div style="width:36px;height:36px;background:#EFF6FF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👥</div>
+                <div style="padding:16px 20px;display:flex;align-items:center;gap:12px">
+                  <div style="width:36px;height:36px;background:#EFF6FF;color:#1D4ED8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;flex-shrink:0">👥</span></div>
                   <div style="flex:1;min-width:0">
-                    <div style="font-size:13.5px;font-weight:700;color:var(--gray-900)">{{ groupDisplayName(g) }}</div>
-                    <div style="font-size:11.5px;color:var(--gray-400);margin-top:1px">
+                    <div style="font-size:14px;font-weight:700;color:var(--gray-900)">{{ groupDisplayName(g) }}</div>
+                    <div style="font-size:12px;color:var(--gray-400);margin-top:1px">
                       <span style="font-family:monospace;background:var(--gray-100);padding:1px 6px;border-radius:4px">{{ g.name }}</span>
                       <span style="margin:0 6px">·</span>
                       <span>{{ t('settings.groups.memberCount', { count: g.member_count }) }}</span>
@@ -904,7 +904,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       }
                     </div>
                     @if (g.description) {
-                      <div style="font-size:12px;color:var(--gray-500);margin-top:3px">{{ groupDescription(g) }}</div>
+                      <div style="font-size:12px;color:var(--gray-500);margin-top:4px">{{ groupDescription(g) }}</div>
                     }
                   </div>
                   <button class="btn btn-d btn-sm"
@@ -922,11 +922,11 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Szablony zadań onboardingowych -->
         @if (activeTab() === 'onboarding') {
 
-          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">🚀</span>
             <div>
               <strong>{{ t('settings.onboarding.introTitle') }}</strong> {{ t('settings.onboarding.intro') }}
-              {{ t('settings.onboarding.jsonFormat') }} <code style="background:#fff;padding:1px 6px;border-radius:4px;font-size:11px">[ {{ '{' }}"id":"...", "title":"...", "type":"task|call|...", "step":0{{ '}' }} ]</code>
+              {{ t('settings.onboarding.jsonFormat') }} <code style="background:#fff;padding:1px 6px;border-radius:4px;font-size:12px">[ {{ '{' }}"id":"...", "title":"...", "type":"task|call|...", "step":0{{ '}' }} ]</code>
               {{ t('settings.onboarding.stepsLegend') }}
             </div>
           </div>
@@ -934,15 +934,15 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           @for (field of crmDictFields(); track field.key) {
             <div class="card" style="margin-bottom:16px;overflow:hidden">
               <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center">
-                <span class="cat-title" style="font-size:13px">{{ fieldLabel(field) }}</span>
+                <span class="cat-title" style="font-size:14px">{{ fieldLabel(field) }}</span>
                 @if (field.dirty) { <span class="field-dirty" style="margin-left:8px">● {{ t('settings.fields.changed') }}</span> }
                 @if (field.updated_by_name) {
-                  <span class="field-meta" style="margin-left:auto;font-size:11px;color:var(--gray-400)">
+                  <span class="field-meta" style="margin-left:auto;font-size:12px;color:var(--gray-400)">
                     {{ t('settings.fields.changedBy') }} {{ field.updated_by_name }} · {{ field.updated_at | date:'dd.MM.yyyy' }}
                   </span>
                 }
               </div>
-              <div style="padding:14px 20px">
+              <div style="padding:16px 20px">
                 <div class="field-desc" style="margin-bottom:12px">{{ fieldDescription(field) }}</div>
 
                 <!-- Edytor tabeli szablonów -->
@@ -963,7 +963,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                           <tr style="border-bottom:1px solid var(--gray-100)"
                               [style.background]="src.group ? '#eff6ff' : 'white'">
                             <td style="padding:6px 10px">
-                              <input style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box;font-family:monospace"
+                              <input style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box"
                                      [ngModel]="src.value"
                                      (ngModelChange)="updateTemplate(field, idx, 'value', $event)">
                             </td>
@@ -979,7 +979,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                                      [placeholder]="t('settings.onboarding.leadSources.noGroup')">
                             </td>
                             <td style="padding:6px 10px;text-align:center">
-                              <button style="background:#fee2e2;border:none;border-radius:4px;padding:3px 7px;cursor:pointer;color:#991b1b;font-size:12px"
+                              <button class="btn btn-d btn-sm"
                                       (click)="removeTemplate(field, idx)">✕</button>
                             </td>
                           </tr>
@@ -987,10 +987,10 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       </tbody>
                     </table>
                   </div>
-                  <div style="margin-top:8px;font-size:11px;color:var(--gray-400)">
+                  <div style="margin-top:8px;font-size:12px;color:var(--gray-400)">
                     🔵 {{ t('settings.onboarding.leadSources.legend') }}
                   </div>
-                  <button class="btn btn-g btn-sm" style="margin-top:8px"
+                  <button class="btn btn-g" style="margin-top:12px"
                           (click)="addLeadSource(field)">+ {{ t('settings.onboarding.leadSources.add') }}</button>
                 }
 
@@ -1049,7 +1049,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                             </td>
                             <td style="padding:6px 10px">
                               @if (tpl.step === 0) {
-                                <span style="font-size:11px;color:var(--orange);font-style:italic">← {{ t('settings.onboarding.templates.leadOwner') }}</span>
+                                <span style="font-size:12px;color:var(--orange);font-style:italic">← {{ t('settings.onboarding.templates.leadOwner') }}</span>
                               } @else {
                                 <select style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px"
                                         [ngModel]="tpl.assignee"
@@ -1063,13 +1063,13 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                             </td>
                             <td style="padding:6px 10px;text-align:center">
                               <input type="number" min="0" max="365"
-                                     style="width:54px;border:1px solid var(--gray-200);border-radius:4px;padding:3px 6px;font-size:12px;text-align:center"
+                                     style="width:54px;border:1px solid var(--gray-200);border-radius:4px;padding:4px 6px;font-size:12px;text-align:center"
                                      [ngModel]="tpl.days"
                                      (ngModelChange)="updateTemplate(field, idx, 'days', $event === '' || $event === null ? null : +$event)"
                                      placeholder="—">
                             </td>
                             <td style="padding:6px 10px;text-align:center">
-                              <button style="background:#fee2e2;border:none;border-radius:4px;padding:3px 7px;cursor:pointer;color:#991b1b;font-size:12px"
+                              <button class="btn btn-d btn-sm"
                                       (click)="removeTemplate(field, idx)">✕</button>
                             </td>
                           </tr>
@@ -1077,10 +1077,10 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       </tbody>
                     </table>
                   </div>
-                  <div style="margin-top:8px;font-size:11px;color:var(--gray-400)">
+                  <div style="margin-top:8px;font-size:12px;color:var(--gray-400)">
                     🟢 {{ t('settings.onboarding.templates.legend') }}
                   </div>
-                  <button class="btn btn-g btn-sm" style="margin-top:8px"
+                  <button class="btn btn-g" style="margin-top:12px"
                           (click)="addTemplate(field)">+ {{ t('settings.onboarding.templates.add') }}</button>
                 }
 
@@ -1090,7 +1090,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
           }
 
           @if (crmDictFields().length === 0) {
-            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:14px">
               {{ t('settings.onboarding.templates.empty') }}
             </div>
           }
@@ -1099,21 +1099,21 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Podpowiedzi (Tooltips) -->
         @if (activeTab() === 'tooltips') {
 
-          <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#5B21B6;display:flex;gap:12px;align-items:flex-start">
+          <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5B21B6;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">💬</span>
             <div>
               <strong>{{ t('settings.tooltips.introTitle') }}</strong> {{ t('settings.tooltips.introBeforeIcon') }}
-              <strong style="font-family:sans-serif;background:#e5e7eb;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800">?</strong>
+              <strong style="font-family:sans-serif;background:#e5e7eb;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">?</strong>
               {{ t('settings.tooltips.introAfterIcon') }}
             </div>
           </div>
 
           <!-- Formularz dodawania nowego -->
           <div class="card" style="padding:20px;margin-bottom:24px">
-            <div class="cat-title" style="margin-bottom:16px">+ {{ t('settings.tooltips.add') }}</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">+ {{ t('settings.tooltips.add') }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
-                <label class="field-label" style="display:block;margin-bottom:4px">{{ t('settings.tooltips.screen') }} <span style="color:#ef4444">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.screen') }} <span style="color:#ef4444">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipScreen" (ngModelChange)="onNewTipScreenChange()">
                   <option value="">{{ t('settings.tooltips.chooseScreen') }}</option>
                   @for (s of catalogScreens; track s) {
@@ -1122,7 +1122,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 </select>
               </div>
               <div>
-                <label class="field-label" style="display:block;margin-bottom:4px">{{ t('settings.tooltips.label') }} <span style="color:#ef4444">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.label') }} <span style="color:#ef4444">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipLabelKey" [disabled]="!newTipScreen">
                   <option value="">{{ t('settings.tooltips.chooseLabel') }}</option>
                   @for (e of catalogForScreen; track e.key) {
@@ -1133,16 +1133,16 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 </select>
               </div>
             </div>
-            <div style="margin-bottom:12px">
-              <label class="field-label" style="display:block;margin-bottom:4px">{{ t('settings.tooltips.content') }} <span style="color:#ef4444">*</span></label>
+            <div style="margin-bottom:20px">
+              <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.content') }} <span style="color:#ef4444">*</span></label>
               <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:72px"
                         [(ngModel)]="newTipValue"
                         [placeholder]="t('settings.tooltips.contentPlaceholder')"></textarea>
             </div>
             @if (tipError()) {
-              <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:12px;color:#dc2626;margin-bottom:10px">⚠ {{ tipError() }}</div>
+              <div style="background:#fef2f2;border-radius:12px;padding:12px 16px;font-size:12px;color:#dc2626;margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
             }
-            <button class="btn btn-p" style="padding:8px 20px"
+            <button class="btn btn-p"
                     [disabled]="tipSaving() || !newTipLabelKey || !newTipValue.trim()"
                     (click)="addTooltip()">
               {{ tipSaving() ? t('settings.actions.saving') : '+ ' + t('settings.tooltips.add') }}
@@ -1151,33 +1151,33 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <!-- Lista istniejących, pogrupowana po ekranach -->
           @if (tooltipFields().length === 0) {
-            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:13px">
+            <div style="text-align:center;color:var(--gray-400);padding:40px;font-size:14px">
               {{ t('settings.tooltips.empty') }}
             </div>
           }
 
           @for (screen of catalogScreens; track screen) {
             @if (tooltipFieldsForScreen(screen).length > 0) {
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin:20px 0 8px;padding-left:2px">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin:24px 0 8px;padding-left:2px">
                 {{ t('settings.tooltips.screens.' + screen) }}
               </div>
               @for (tip of tooltipFieldsForScreen(screen); track tip.key) {
-                <div class="card" style="margin-bottom:10px;overflow:hidden">
-                  <div class="cat-header" style="padding:10px 18px;display:flex;align-items:center;gap:10px">
-                    <span class="cat-title" style="font-size:13px;font-weight:600">{{ t('settings.tooltips.catalog.' + catalogEntry(tip.key)?.labelKey) }}</span>
+                <div class="card" style="margin-bottom:12px;overflow:hidden">
+                  <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center;gap:12px">
+                    <span class="cat-title" style="font-size:14px;font-weight:600">{{ t('settings.tooltips.catalog.' + catalogEntry(tip.key)?.labelKey) }}</span>
                     <code style="font-size:10px;font-family:monospace;color:#a78bfa;background:#f3f0ff;padding:1px 6px;border-radius:4px">{{ tip.key }}</code>
                     <span style="flex:1"></span>
                     @if (tip.updated_by_name) {
                       <span class="field-meta">{{ tip.updated_by_name }} · {{ tip.updated_at | date:'dd.MM.yy HH:mm' }}</span>
                     }
-                    <button style="background:#fee2e2;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;color:#991b1b;font-size:12px;flex-shrink:0"
+                    <button class="btn btn-d btn-sm" style="flex-shrink:0"
                             (click)="deleteTooltip(tip.key)">🗑 {{ t('settings.actions.delete') }}</button>
                   </div>
-                  <div style="padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
-                    <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:13px"
+                  <div style="padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
+                    <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:14px"
                               [(ngModel)]="tipDrafts[tip.key]"
                               (ngModelChange)="tipDirty[tip.key] = true"></textarea>
-                    <button class="btn btn-p" style="padding:7px 16px;font-size:12px;white-space:nowrap"
+                    <button class="btn btn-p"
                             [disabled]="!tipDirty[tip.key] || tipSaving()"
                             (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
                       💾 {{ 'actions.save' | transloco }}
@@ -1190,26 +1190,26 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
           <!-- Klucze spoza katalogu (legacy / ręcznie dodane wcześniej) -->
           @if (uncategorizedTooltips().length > 0) {
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin:20px 0 8px;padding-left:2px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin:24px 0 8px;padding-left:2px">
               {{ t('settings.tooltips.other') }}
             </div>
             @for (tip of uncategorizedTooltips(); track tip.key) {
-              <div class="card" style="margin-bottom:10px;overflow:hidden">
-                <div class="cat-header" style="padding:10px 18px;display:flex;align-items:center;gap:10px">
-                  <code style="font-size:11px;font-family:monospace;color:#7c3aed;background:#f3f0ff;padding:2px 8px;border-radius:4px">{{ tip.key }}</code>
+              <div class="card" style="margin-bottom:12px;overflow:hidden">
+                <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center;gap:12px">
+                  <code style="font-size:12px;font-family:monospace;color:#7c3aed;background:#f3f0ff;padding:2px 8px;border-radius:4px">{{ tip.key }}</code>
                   <span class="cat-title" style="font-size:12px;color:var(--gray-600);font-weight:500">{{ tip.label }}</span>
                   <span style="flex:1"></span>
                   @if (tip.updated_by_name) {
                     <span class="field-meta">{{ tip.updated_by_name }} · {{ tip.updated_at | date:'dd.MM.yy HH:mm' }}</span>
                   }
-                  <button style="background:#fee2e2;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;color:#991b1b;font-size:12px;flex-shrink:0"
+                  <button class="btn btn-d btn-sm" style="flex-shrink:0"
                           (click)="deleteTooltip(tip.key)">🗑 {{ t('settings.actions.delete') }}</button>
                 </div>
-                <div style="padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
-                  <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:13px"
+                <div style="padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
+                  <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:60px;font-size:14px"
                             [(ngModel)]="tipDrafts[tip.key]"
                             (ngModelChange)="tipDirty[tip.key] = true"></textarea>
-                  <button class="btn btn-p" style="padding:7px 16px;font-size:12px;white-space:nowrap"
+                  <button class="btn btn-p"
                           [disabled]="!tipDirty[tip.key] || tipSaving()"
                           (click)="saveTooltip(tip.key, tipDrafts[tip.key])">
                     💾 {{ 'actions.save' | transloco }}
@@ -1226,7 +1226,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
              dostaje dodatkowo dropdown i edytuje dowolnego, tą samą logiką
              ekranu — patrz icpApiBase(). -->
         @if (activeTab() === 'icp') {
-          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#9A3412;display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">🎯</span>
             <div>
               <strong>{{ t('settings.icp.introTitle') }}</strong> {{ t('settings.icp.intro') }}
@@ -1382,35 +1382,31 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     </ng-container>
   `,
   styles: [`
-    #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0; }
-    .page-title { font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--gray-900); }
+    #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:8px;padding:0 24px;flex-shrink:0; }
+    .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900); }
     .tsp { flex:1; }
     #content { flex:1;overflow-y:auto;padding:24px; }
     /* flex-wrap: zakładek jest już 9 (Etapy leada + Projekty za flagą) i przy
        kontenerze 820px nie mieszczą się w jednym rzędzie — bez zawijania
        wychodziły poza szary obszar. Zawijają się teraz pod spód. */
-    .tabs { display:flex;flex-wrap:wrap;column-gap:4px;row-gap:2px;margin-bottom:24px;border-bottom:2px solid var(--gray-200);padding-bottom:0; }
-    .tab-btn { background:none;border:none;padding:10px 15px;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s; }
-    .tab-btn.active { color:var(--orange);border-bottom-color:var(--orange); }
+    .tabs { display:flex;flex-wrap:wrap;column-gap:4px;row-gap:4px;margin-bottom:24px;border-bottom:1px solid var(--gray-200);padding-bottom:0; }
+    .tab-btn { background:none;border:none;padding:10px 16px;font-size:14px;font-weight:500;color:var(--gray-500);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:8px; }
+    .tab-btn.active { color:var(--orange-dark);font-weight:700;border-bottom-color:var(--orange); }
     .tab-btn:hover:not(.active) { color:var(--gray-700); }
-    .cat-header { padding:14px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px; }
+    .cat-header { padding:16px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:12px; }
     .cat-title { font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900); }
-    .field-label { font-size:13.5px;font-weight:600;color:var(--gray-900);margin-bottom:3px; }
-    .field-desc { font-size:12px;color:var(--gray-500);line-height:1.5;margin-bottom:6px; }
-    .field-meta { font-size:11px;color:var(--gray-400); }
-    .field-err { font-size:11px;color:#EF4444; }
-    .field-dirty { font-size:11px;color:var(--orange); }
-    .fi { border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;transition:border .15s; }
-    .fi:focus { border-color:var(--orange); }
+    .field-label { font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:4px; }
+    .field-desc { font-size:12px;color:var(--gray-500);line-height:1.5;margin-bottom:8px; }
+    .field-meta { font-size:12px;color:var(--gray-400); }
+    .field-err { font-size:12px;color:#EF4444; }
+    .field-dirty { font-size:12px;color:var(--orange); }
     .fi-err { border-color:#EF4444 !important; }
-    .fsel { border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;background:white;width:100%; }
-    .fsel:focus { border-color:var(--orange); }
     /* JSON list editor */
-    .json-list { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px; }
-    .json-item { display:flex;align-items:center;gap:6px;background:#f3f4f6;border-radius:8px;padding:5px 10px;font-size:12px; }
+    .json-list { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px; }
+    .json-item { display:flex;align-items:center;gap:8px;background:#f3f4f6;border-radius:999px;padding:4px 12px;font-size:12px; }
     .json-item-val { font-weight:600;color:#374151; }
     .json-item-raw { color:#9ca3af;font-family:monospace;font-size:10px; }
-    .json-del { background:none;border:none;color:#9ca3af;cursor:pointer;font-size:13px;padding:0 2px;line-height:1; }
+    .json-del { background:none;border:none;color:#9ca3af;cursor:pointer;font-size:14px;padding:0 2px;line-height:1; }
     .json-del:hover { color:#ef4444; }
     .json-add-row { display:flex;gap:8px;align-items:center; }
     .loading-overlay { display:flex;align-items:center;justify-content:center;padding:60px; }
@@ -1420,7 +1416,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     /* Etapy leada */
     .stage-list { border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; }
     .stage-row {
-      display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+      display: flex; align-items: center; gap: 12px; padding: 8px 12px;
       border-bottom: 1px solid var(--gray-100); background: white;
     }
     .stage-row:last-child { border-bottom: none; }
@@ -1431,9 +1427,9 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       color: var(--gray-400); font-variant-numeric: tabular-nums;
     }
     .stage-kind-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin: 0 6px; }
-    .stage-kind { font-size: 11.5px; color: var(--gray-400); white-space: nowrap; }
+    .stage-kind { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
     .stage-name-input {
-      flex: 0 1 240px; min-width: 120px; padding: 6px 9px; font-size: 13.5px; font-weight: 600;
+      flex: 0 1 240px; min-width: 120px; padding: 6px 8px; font-size: 14px; font-weight: 600;
       color: var(--gray-800); background: white;
       border: 1px solid var(--gray-200); border-radius: 6px;
     }
@@ -1441,11 +1437,11 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .stage-name-input:disabled { background: var(--gray-50); color: var(--gray-400); }
     .stage-save {
       border: none; background: #16a34a; color: white; border-radius: 6px;
-      padding: 4px 9px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+      padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
     }
     .stage-del {
       border: 1px solid #fecaca; background: #fef2f2; color: #dc2626;
-      border-radius: 6px; padding: 4px 11px; font-size: 12px; font-weight: 600;
+      border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 600;
       cursor: pointer; flex-shrink: 0; min-width: 62px;
     }
     .stage-del:hover:not(:disabled) { background: #dc2626; border-color: #dc2626; color: white; }
@@ -1461,7 +1457,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .stage-no-del:hover { color: var(--gray-700); }
     .stage-add {
       border: none; background: var(--orange); color: white; border-radius: 6px;
-      padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+      padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;
     }
     .stage-add:disabled { opacity: .45; cursor: not-allowed; }
 
@@ -1470,17 +1466,17 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
 
     /* Dostawca AI */
     .ai-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
-    .ai-label { flex:0 0 190px; font-size:13px; font-weight:600; color:var(--gray-800); }
+    .ai-label { flex:0 0 190px; font-size:14px; font-weight:600; color:var(--gray-800); }
     .ai-row .fsel, .ai-row .fi {
-      flex:1; max-width:340px; padding:7px 10px; font-size:13px;
+      flex:1; max-width:340px; padding:8px 10px; font-size:14px;
       border:1px solid var(--gray-200); border-radius:7px; background:white; color:var(--gray-800);
     }
     .ai-row .fi:focus, .ai-row .fsel:focus { outline:none; border-color:var(--orange); }
-    .ai-sub { font-size:11.5px; color:var(--gray-400); margin:0 0 14px 202px; line-height:1.5; }
-    .ai-models-state { display:block; margin-top:3px; color:var(--gray-400); font-style:italic; }
+    .ai-sub { font-size:12px; color:var(--gray-400); margin:0 0 14px 202px; line-height:1.5; }
+    .ai-models-state { display:block; margin-top:4px; color:var(--gray-400); font-style:italic; }
     .ai-link-btn {
-      display:inline-block; margin-top:3px; padding:0; border:0; background:none;
-      font-size:11.5px; color:var(--orange-dark); text-decoration:underline; cursor:pointer;
+      display:inline-block; margin-top:4px; padding:0; border:0; background:none;
+      font-size:12px; color:var(--orange-dark); text-decoration:underline; cursor:pointer;
     }
     .ai-link-btn:disabled { color:var(--gray-400); cursor:default; }
     .ai-models-title {
@@ -1493,46 +1489,46 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .ai-unavailable {
       flex:1; min-width:0; font-size:12px; color:var(--gray-400);
       background:var(--gray-50); border:1px dashed var(--gray-200);
-      border-radius:8px; padding:7px 10px;
+      border-radius:8px; padding:8px 10px;
     }
-    .ai-hint-link { font-size:11.5px; color:#1D4ED8; text-decoration:none; white-space:nowrap; }
+    .ai-hint-link { font-size:12px; color:#1D4ED8; text-decoration:none; white-space:nowrap; }
     .ai-hint-link:hover { text-decoration:underline; }
-    .ai-badge { margin-left:auto; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; }
+    .ai-badge { margin-left:auto; font-size:12px; font-weight:700; padding:4px 8px; border-radius:10px; }
     .ai-badge-ok  { background:#DCFCE7; color:#166534; }
     .ai-badge-bad { background:#FEE2E2; color:#991B1B; }
     .ai-badge-off { background:var(--gray-100); color:var(--gray-500); }
     .ai-error {
       background:#FEF2F2; border:1px solid #FECACA; color:#991B1B;
-      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-bottom:14px;
+      border-radius:8px; padding:10px 12px; font-size:12px; margin-bottom:14px;
     }
     .ai-ok {
       background:#F0FDF4; border:1px solid #BBF7D0; color:#166534;
-      border-radius:8px; padding:10px 12px; font-size:12.5px; margin-top:14px;
+      border-radius:8px; padding:10px 12px; font-size:12px; margin-top:14px;
     }
-    .td-muted { color: var(--gray-500); font-size: 13px; }
-    .hint { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; }
-    .hint-inline { font-size: 11px; color: var(--gray-400); font-weight: 400; }
+    .td-muted { color: var(--gray-500); font-size: 14px; }
+    .hint { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+    .hint-inline { font-size: 12px; color: var(--gray-400); font-weight: 400; }
     .req { color: #dc2626; }
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
     .badge-off { background: var(--gray-100); color: var(--gray-500); }
-    .panel-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+    .panel-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
     .icp-tenant-bar {
       display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
       padding: 12px 16px; margin-bottom: 14px; border-radius: 10px;
       background: #EFF6FF; border: 1px solid #BFDBFE;
     }
-    .icp-tenant-current { font-size: 12.5px; color: #1D4ED8; margin-left: auto; }
+    .icp-tenant-current { font-size: 12px; color: #1D4ED8; margin-left: auto; }
     .icp-summary {
       display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
-      padding: 10px 16px; font-size: 12.5px; color: var(--gray-600);
+      padding: 10px 16px; font-size: 12px; color: var(--gray-600);
       background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px;
     }
     .icp-error {
       border: 1px solid #FECACA; background: #FEF2F2; color: #991B1B;
-      border-radius: 10px; padding: 16px 18px; font-size: 13px;
+      border-radius: 10px; padding: 16px 18px; font-size: 14px;
     }
-    .icp-list { border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; margin-top: 14px; }
+    .icp-list { border: 1px solid var(--gray-100); border-radius: 12px; overflow: hidden; margin-top: 16px; }
     .icp-row {
       display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
       padding: 10px 14px; border-bottom: 1px solid var(--gray-100); background: white;
@@ -1540,7 +1536,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .icp-row:last-child { border-bottom: none; }
     .icp-row-main { display: flex; align-items: flex-start; gap: 10px; min-width: 0; flex: 1; }
     .icp-row-text { min-width: 0; }
-    .icp-row-name { font-size: 13.5px; font-weight: 600; color: var(--gray-800); }
+    .icp-row-name { font-size: 14px; font-weight: 600; color: var(--gray-800); }
     .icp-row-name.inactive { color: var(--gray-400); font-weight: 500; }
     .icp-row-desc {
       font-size: 12px; color: var(--gray-500); margin-top: 2px; max-width: 480px;
@@ -1549,7 +1545,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .icp-row-side { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .icp-points-input {
       width: 40px; padding: 4px 4px; border: 1px solid var(--gray-200); border-radius: 6px;
-      font-size: 12.5px; text-align: center;
+      font-size: 12px; text-align: center;
     }
     .icp-save-check {
       width: 22px; height: 22px; border-radius: 50%; border: none; background: #dcfce7; color: #16a34a;
@@ -1573,16 +1569,16 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       position: fixed; inset: 0; background: rgba(0,0,0,.45);
       display: flex; align-items: center; justify-content: center; z-index: 1000;
     }
-    .modal { background: white; border-radius: 12px; width: 480px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    .modal { background: white; border-radius: 12px; width: 480px; max-width: 95vw; box-shadow: 0 12px 39px rgba(0,0,0,0.163); }
     .modal-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 22px 14px; border-bottom: 1px solid var(--gray-200);
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--gray-200);
     }
     .modal-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
-    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .modal-footer {
       display: flex; gap: 8px; justify-content: flex-end;
-      padding: 14px 22px 18px; border-top: 1px solid var(--gray-200);
+      padding: 16px 24px; border-top: 1px solid var(--gray-200);
     }
     .btn-icon {
       width: 30px; height: 30px; border-radius: 6px; border: none; background: none;
@@ -1597,33 +1593,33 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     }
     .field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
     .field input:not([type=checkbox]) {
-      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
-      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+      width: 100%; padding: 8px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 14px; background: white; box-sizing: border-box;
     }
     .field input:focus, .field textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(59,170,93,.15); }
     .field textarea {
-      width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
-      border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box;
+      width: 100%; padding: 8px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 14px; background: white; box-sizing: border-box;
       font-family: inherit; resize: vertical;
     }
     .field-check { display: flex; align-items: flex-end; padding-bottom: 2px; }
-    .check-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); cursor: pointer; }
+    .check-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--gray-700); cursor: pointer; }
     .btn-primary {
       padding: 8px 18px; background: var(--orange); color: white;
-      border: none; border-radius: 7px; font-size: 13.5px; font-weight: 500;
+      border: none; border-radius: 7px; font-size: 14px; font-weight: 500;
       cursor: pointer; transition: background .12s;
     }
     .btn-primary:hover:not(:disabled) { background: var(--orange-dark); }
     .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
     .btn-secondary {
       padding: 8px 18px; background: white; color: var(--gray-700);
-      border: 1px solid var(--gray-300); border-radius: 7px; font-size: 13.5px;
+      border: 1px solid var(--gray-300); border-radius: 7px; font-size: 14px;
       cursor: pointer; transition: background .12s;
     }
     .btn-secondary:hover { background: var(--gray-50); }
     .btn-danger-sm {
       padding: 6px 12px; background: #fee2e2; color: #dc2626;
-      border: 1px solid #fca5a5; border-radius: 6px; font-size: 12.5px; cursor: pointer;
+      border: 1px solid #fca5a5; border-radius: 6px; font-size: 12px; cursor: pointer;
       transition: background .12s;
     }
     .btn-danger-sm:hover:not(:disabled) { background: #fecaca; }
@@ -1631,7 +1627,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .survey-link {
       display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 12px 18px;
       background: var(--orange-pale); border: 1px solid var(--orange); border-radius: 10px;
-      font-size: 13px; color: var(--gray-800); text-decoration: none;
+      font-size: 14px; color: var(--gray-800); text-decoration: none;
     }
     .survey-link:hover { background: white; }
     .survey-link-cta { margin-left: auto; font-weight: 600; color: var(--orange-dark); white-space: nowrap; }

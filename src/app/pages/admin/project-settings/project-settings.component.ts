@@ -86,13 +86,13 @@ const MAX_AT_RISK_DAYS = 30;
   `,
   styles: [`
     :host { display:flex; flex-direction:column; gap:16px; max-width:1100px; }
-    .block { padding:18px 20px; display:flex; flex-direction:column; gap:10px; }
+    .block { padding:20px; display:flex; flex-direction:column; gap:12px; }
     .block .sec-title { margin:0 0 4px; }
-    .hint { margin:0; font-size:12.5px; color:var(--gray-500); line-height:1.6; }
+    .hint { margin:0; font-size:12px; color:var(--gray-500); line-height:1.6; }
     .block .sec-title.sub { margin-top:8px; }
-    .threshold { display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:600; color:var(--gray-800); }
+    .threshold { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:var(--gray-800); }
     .threshold .fi { width:80px; }
-    .finance-toggle { display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:var(--gray-800); cursor:pointer; }
+    .finance-toggle { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--gray-800); cursor:pointer; }
     .two-columns { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     @media (max-width: 900px) { .two-columns { grid-template-columns:1fr; } }
   `],

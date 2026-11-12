@@ -169,7 +169,7 @@ export function invoiceFieldsPayload(draft: InvoiceFieldsDraft, stored?: Documen
   styles: [`
     :host { display:block; margin-top:20px; }
     .fi.read-only { background:var(--gray-100); color:var(--gray-600); }
-    .badge-cell { padding-top:6px; font-size:13px; color:var(--gray-600); }
+    .badge-cell { padding-top:6px; font-size:14px; color:var(--gray-600); }
   `],
 })
 export class InvoiceFieldsComponent {

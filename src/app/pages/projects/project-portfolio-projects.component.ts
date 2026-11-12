@@ -86,8 +86,8 @@ const FINANCE_COLUMN_COUNT = 2;
     .project-row { cursor:pointer; }
     .project-row:hover td { background:var(--gray-50); }
     .project-name { font-weight:600; }
-    .secondary-cell { color:var(--gray-600); font-size:12.5px; }
-    .date { white-space:nowrap; font-size:12.5px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
+    .secondary-cell { color:var(--gray-600); font-size:12px; }
+    .date { white-space:nowrap; font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .progress { display:flex; align-items:center; gap:8px; white-space:nowrap; }
     .progress-track { width:70px; height:6px; border-radius:3px; background:var(--gray-100); overflow:hidden; }
     .progress-fill { display:block; height:100%; background:var(--orange); }
