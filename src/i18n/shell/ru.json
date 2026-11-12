@@ -42,7 +42,11 @@
   },
   "sidebar": {
     "collapse": "Свернуть меню",
-    "expand": "Развернуть меню"
+    "doneEditing": "Готово",
+    "editMenu": "Изменить меню",
+    "expand": "Развернуть меню",
+    "hideItem": "Скрыть",
+    "showItem": "Показать"
   },
   "user": {
     "admin": "Администратор",

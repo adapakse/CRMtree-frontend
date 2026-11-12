@@ -42,7 +42,11 @@
   },
   "sidebar": {
     "collapse": "Strni meni",
-    "expand": "Razširi meni"
+    "doneEditing": "Končano",
+    "editMenu": "Uredi meni",
+    "expand": "Razširi meni",
+    "hideItem": "Skrij",
+    "showItem": "Prikaži"
   },
   "user": {
     "admin": "Administrator",

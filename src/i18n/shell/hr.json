@@ -42,7 +42,11 @@
   },
   "sidebar": {
     "collapse": "Sažmi izbornik",
-    "expand": "Proširi izbornik"
+    "doneEditing": "Gotovo",
+    "editMenu": "Uredi izbornik",
+    "expand": "Proširi izbornik",
+    "hideItem": "Sakrij",
+    "showItem": "Prikaži"
   },
   "user": {
     "admin": "Administrator",
