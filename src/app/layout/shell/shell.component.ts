@@ -287,7 +287,7 @@ import { SoftphoneOverlayComponent } from '../../shared/components/softphone/sof
     /* ── Layout ─────────────────────────────────────────────────────── */
     .app-wrap { display: flex; height: calc(100vh - var(--test-banner-height, 0px)); overflow: hidden;
       /* Neutral grey a step darker than the content panel, so the panel sits in front. */
-      background: #F1F1F2; }
+      background: #EEEEF0; }
 
     /* ── Sidebar: lies directly on the white frame; the grey content panel sits beside it ── */
     #sidebar {

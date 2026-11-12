@@ -397,7 +397,7 @@ const TODAY_CALLS_GOAL = 37;
           <div class="task-item" [class.task-done]="t.status === 'closed'">
             @if (t.source_type === 'lead' || t.source_type === 'partner') {
               <span class="task-type-ic" aria-hidden="true">
-                @switch (t.type) {
+                @switch (taskIconType(t)) {
                   @case ('call') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> }
                   @case ('email') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg> }
                   @case ('meeting') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> }
@@ -659,7 +659,8 @@ const TODAY_CALLS_GOAL = 37;
     .kpi-label { font-size: 12px; color: var(--gray-400); font-weight: 500; margin-bottom: 4px; }
     .kpi-value { font-size: 24px; font-weight: 600; color: var(--gray-900); line-height: 1.15; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
     .kpi-value-sm { font-size: 20px; }
-    .kpi-trend { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 12px; font-weight: 600; }
+    /* "↑ 140%" stays together; "vs poprzedni miesiąc" sits next to it or moves whole to the next line. */
+    .kpi-trend { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 4px; margin-top: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; }
     .kpi-trend.pos { color: #3BAA5D; }
     .kpi-trend.neg { color: #EF4444; }
     .kpi-trend span { font-weight: 400; color: #9CA3AF; }
@@ -716,16 +717,18 @@ const TODAY_CALLS_GOAL = 37;
     .task-done .task-title { text-decoration: line-through; color: #9CA3AF; }
     .task-check { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
     .task-check-static { cursor: default; width: 18px; justify-content: center; color: var(--gray-400); }
-    .task-type-ic { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #F1F2F4; color: var(--gray-500); }
-    .task-type-ic svg { width: 14px; height: 14px; }
+    /* Same size and colour as the project-task icon above it: a bare icon, no circle. */
+    .task-type-ic { width: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--gray-400); }
+    .task-type-ic svg { width: 14px; height: 14px; stroke-width: 2; }
     .task-close-pill {
       display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
-      padding: 4px 10px 4px 8px; border: none; border-radius: 14px; cursor: pointer;
-      background: rgba(59,170,93,.12); color: var(--orange-dark, #2F8F4D);
-      font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap;
-      transition: background .15s;
+      padding: 4px 10px 4px 8px; border-radius: 14px; cursor: pointer;
+      background: #FFFFFF; color: var(--gray-600); border: 1px solid var(--gray-200);
+      font: inherit; font-size: 12px; font-weight: 500; white-space: nowrap;
+      transition: background .15s, color .15s, border-color .15s;
     }
-    .task-close-pill:hover { background: rgba(59,170,93,.2); }
+    /* Neutral until hovered, so it reads as an action and not as a "done" status. */
+    .task-close-pill:hover { border-color: var(--orange, #3BAA5D); color: var(--orange-dark, #2F8F4D); background: rgba(59,170,93,.06); }
     .task-close-pill svg { width: 13px; height: 13px; }
     .task-close-pill.done { padding: 4px 6px; background: var(--orange, #3BAA5D); color: #FFFFFF; }
     .task-body { flex: 1; min-width: 0; }
@@ -1409,6 +1412,13 @@ export class CrmSalesDashboardComponent implements OnInit, OnDestroy {
 
   fmtValueShort(v: number): string {
     return this.fmtValue(v);
+  }
+
+  /** Which icon a task row shows. A task created by the call analyser ("Follow-up telefoniczny") is a
+   *  call-back, so it gets the phone icon even though it is stored as a plain task. */
+  taskIconType(task: ActivityTask): string {
+    if (task.type === 'task' && /telefon|phone|call/i.test(task.title ?? '')) return 'call';
+    return task.type;
   }
 
   calendarEntryOf(task: ActivityTask): CalendarEntry | null {
