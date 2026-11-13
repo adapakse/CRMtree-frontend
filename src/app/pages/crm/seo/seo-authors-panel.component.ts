@@ -107,7 +107,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .author-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
     .author-job-title { font-size: 0.72rem; color: var(--gray-500); }
     .author-bio { font-size: 0.78rem; color: var(--gray-600); margin: 0.5rem 0 0; line-height: 1.4; }
-    .author-linkedin { display: inline-flex; align-items: center; margin-top: 0.5rem; color: color-mix(in srgb, #0a66c2 var(--tint-text-mix), #FFFFFF); }
+    .author-linkedin { display: inline-flex; align-items: center; margin-top: 0.5rem; color: oklch(from #0a66c2 max(l, var(--text-min-l)) c h); }
     .author-linkedin:hover { opacity: 0.75; }
     .linkedin-icon { flex-shrink: 0; }
     .author-inactive-badge {
@@ -119,7 +119,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .author-card .field-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--gray-700); margin: 0.45rem 0 0.2rem; }
     .author-card .field-label:first-child { margin-top: 0; }
     .author-card .field-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.55rem; font-family: inherit; font-size: 0.8rem; }
-    .required-star { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .required-star { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .author-card-new { display: flex; flex-direction: column; justify-content: center; border-style: dashed; }
     .btn-add-author {
       border: none; background: transparent; color: var(--gray-500); font-weight: 600; font-size: 0.85rem;
@@ -128,7 +128,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .btn-add-author:hover { color: var(--orange-dark); }
     .btn-delete {
       display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 9px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);
+      border: none; border-radius: 9px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h);
       cursor: pointer; padding: 4px 10px; flex-shrink: 0;
     }
     .btn-delete:hover { background: color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); }

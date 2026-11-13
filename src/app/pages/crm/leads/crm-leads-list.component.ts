@@ -58,7 +58,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="stat-lbl">{{ t('leadsList.stats.opportunities') }}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-val" style="color:color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF)">{{ stats.hot }}</div>
+      <div class="stat-val" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h)">{{ stats.hot }}</div>
       <div class="stat-lbl">🔥 {{ t('leadsList.stats.hot') }}</div>
     </div>
     <div class="stat-card">
@@ -66,25 +66,25 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <div class="stat-lbl">{{ t('leadsList.stats.pipeline') }}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-val" style="color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">{{ stats.won }}</div>
+      <div class="stat-val" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">{{ stats.won }}</div>
       <div class="stat-lbl">✓ {{ t('leadsList.stats.won') }}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-val" style="color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">{{ stats.lost }}</div>
+      <div class="stat-val" style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">{{ stats.lost }}</div>
       <div class="stat-lbl"><svg class="ic ic-red" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg> {{ t('leadsList.stats.lost') }}</div>
     </div>
   </div>
 
   <!-- ── Toolbar ── -->
   <div *ngIf="reportFilterLabel" style="display:flex;align-items:center;gap:8px;padding:6px 0 0 0;margin-bottom:-4px">
-    <span style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF);display:flex;align-items:center;gap:6px">
+    <span style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:6px">
       📊 {{ t('leadsList.filters.reportFilter', { label: reportFilterLabel }) }}
-      <span style="cursor:pointer;font-size:14px;color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF);line-height:1" (click)="clearReportFilter()">×</span>
+      <span style="cursor:pointer;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);line-height:1" (click)="clearReportFilter()">×</span>
     </span>
   </div>
   <!-- Persistent rep filter chip -->
   <div *ngIf="persistRepName" style="display:flex;align-items:center;gap:8px;padding:4px 0 0 0;margin-bottom:-4px">
-    <span style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);display:flex;align-items:center;gap:6px">
+    <span style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:6px">
       👤 {{ t('leadsList.filters.repChip', { name: persistRepName }) }}
       <span style="cursor:pointer;font-size:14px;line-height:1" (click)="clearPersistRepFilter()">×</span>
     </span>
@@ -170,7 +170,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                (click)="selectLead(lead)">
             <div class="lead-company" style="display:flex;align-items:center;gap:6px">
               <span *ngIf="hasLogo(lead)" class="logo-circle" [style.background-image]="logoSasMap[lead.id] || ''"></span>
-              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
+              {{ lead.company }}<span *ngIf="lead.hot" class="hot-dot">🔥</span><span *ngIf="lead.hold_active" class="hold-badge" [title]="lead.hold_reason">⏸️ {{ t('leadsList.kanban.holdBadge') }}</span><span *ngIf="lead.stage==='onboarded'" [title]="t('leadsList.kanban.onboardedTitle')" style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h);border-radius:6px;padding:1px 4px;margin-left:4px;font-weight:700;vertical-align:middle">✓ {{ t('leadsList.kanban.partnerBadge') }}</span>
             </div>
             <div class="lead-contact" *ngIf="lead.contact_name">
               {{ lead.contact_name }}<span *ngIf="lead.contact_title" style="color:var(--gray-400)"> · {{ lead.contact_title }}</span>
@@ -381,9 +381,9 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
                   style="background:#DC2626;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(lead)}}</span>
           </div>
           <div style="font-size:12px;color:var(--gray-400)">{{ lead.contact_name }}</div>
-          <div *ngIf="lead.converted_at" style="font-size:10px;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);font-weight:600;margin-top:2px">
+          <div *ngIf="lead.converted_at" style="font-size:10px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);font-weight:600;margin-top:2px">
             ✦ {{ t('leadsList.table.migrated') }} →
-            <a [routerLink]="['/crm/partners', lead.converted_partner_id]" style="color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF)" (click)="$event.stopPropagation()">{{ t('labels.sourceTypes.partner') }}</a>
+            <a [routerLink]="['/crm/partners', lead.converted_partner_id]" style="color:oklch(from #7c3aed max(l, var(--text-min-l)) c h)" (click)="$event.stopPropagation()">{{ t('labels.sourceTypes.partner') }}</a>
           </div>
         </div>
       </div>
@@ -457,7 +457,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:12px" (click)="enrichPrompt=false">{{ t('leadsList.newLead.enrichDecline') }}</button>
           </div>
           <!-- Enrich result badge -->
-          <div *ngIf="enrichResult" style="margin-top:6px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:8px;padding:6px 12px;font-size:12px;color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF)">
+          <div *ngIf="enrichResult" style="margin-top:6px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:8px;padding:6px 12px;font-size:12px;color:oklch(from #15803d max(l, var(--text-min-l)) c h)">
             ✓ {{ t('leadsList.newLead.enrichDone') }}
           </div>
           </div>
@@ -909,11 +909,11 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .tag { display:inline-flex; align-items:center; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600; }
     /* Lead source: one neutral, readable chip for every source (the colour never meant anything). */
     .tag-src { background:var(--chip-bg); color:var(--chip-text); }
-    .tag-blue { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); }
-    .tag-purple { background:var(--gray-50); color:color-mix(in srgb, #7e22ce var(--tint-text-mix), #FFFFFF); }
-    .tag-green { background:var(--gray-50); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
+    .tag-blue { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
+    .tag-purple { background:var(--gray-50); color:oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
+    .tag-green { background:var(--gray-50); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
     .tag-orange { background:var(--orange-pale); color:var(--orange-dark); }
-    .tag-red { background:var(--gray-50); color:color-mix(in srgb, #be123c var(--tint-text-mix), #FFFFFF); }
+    .tag-red { background:var(--gray-50); color:oklch(from #be123c max(l, var(--text-min-l)) c h); }
     .tag-gray { background:var(--gray-100); color:var(--gray-600); }
     .pipe-bar { height:4px; background:var(--gray-100); border-radius:2px; overflow:hidden; margin-top:8px; }
     .pipe-fill { height:100%; background:var(--orange); border-radius:2px; }
@@ -1038,7 +1038,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .tl-head-left { display:flex; align-items:center; gap:10px; }
     .tl-head-icon {
       width: 34px; height: 34px; border-radius: 9px;
-      background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);
+      background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h);
       display: flex; align-items:center; justify-content:center; flex-shrink:0;
     }
     .tl-head-title { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:var(--gray-900); }
@@ -1089,7 +1089,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     /* Today separator — highlighted */
     .tl-sep-today { background: linear-gradient(180deg, var(--gray-50), var(--surface)); padding-top:16px; }
     .tl-sep-today .tl-sep-line { background: #86EFAC; }
-    .tl-sep-today .tl-sep-badge { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); border-color: #86EFAC; color: color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF); font-size:12px; }
+    .tl-sep-today .tl-sep-badge { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); border-color: #86EFAC; color: oklch(from #15803d max(l, var(--text-min-l)) c h); font-size:12px; }
     .tl-today-dot { width:7px; height:7px; background:#22C55E; border-radius:50%; display:inline-block; flex-shrink:0; }
     .tl-today-tag { background:#22C55E; color:white; font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; }
     /* Past separator — muted */
@@ -1156,8 +1156,8 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       font-size: 10px; font-weight: 700; text-transform:uppercase; letter-spacing:.4px;
       padding: 1px 4px; border-radius: 4px; flex-shrink:0;
     }
-    .tl-src-lead    { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); }
-    .tl-src-partner { background: var(--gray-50); color: color-mix(in srgb, #7e22ce var(--tint-text-mix), #FFFFFF); }
+    .tl-src-lead    { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
+    .tl-src-partner { background: var(--gray-50); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
     .tl-item-company { font-size:12px; color:var(--gray-500); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .tl-item-title { font-size:12px; font-weight:700; color:var(--gray-900); line-height:1.35; margin-bottom:4px; }
     .tl-item-meta { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }

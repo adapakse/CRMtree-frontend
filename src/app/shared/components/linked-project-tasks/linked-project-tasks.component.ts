@@ -77,11 +77,11 @@ import { CalendarEntry, projectTaskCalendarEntry } from '../../utils/calendar-ex
   `,
   styles: [`
     .linked { margin:12px 0; border:1px solid var(--gray-200); border-radius:10px; background:var(--surface); overflow:hidden; }
-    .linked-title { padding:8px 14px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF); background:var(--gray-50); }
+    .linked-title { padding:8px 14px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h); background:var(--gray-50); }
     .project + .project { border-top:1px solid var(--gray-200); }
     .project-head { width:100%; display:flex; align-items:center; gap:8px; padding:8px 14px; border:none; background:var(--gray-50); cursor:pointer; font-family:inherit; text-align:left; }
     .project-head:hover { background:var(--gray-100); }
-    .key { font-size:12px; font-weight:700; color:color-mix(in srgb, #2f8f4d var(--tint-text-mix), #FFFFFF); background:var(--gray-200); border-radius:5px; padding:1px 8px; }
+    .key { font-size:12px; font-weight:700; color:oklch(from #2f8f4d max(l, var(--text-min-l)) c h); background:var(--gray-200); border-radius:5px; padding:1px 8px; }
     .name { font-size:14px; font-weight:700; color:var(--gray-800); flex:1; }
     .closed { font-size:12px; color:var(--gray-500); background:var(--gray-100); border-radius:10px; padding:1px 8px; }
     .count { font-size:12px; color:var(--gray-500); }

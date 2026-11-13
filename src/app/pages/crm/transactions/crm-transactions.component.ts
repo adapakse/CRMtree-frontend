@@ -153,8 +153,8 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .kpi { }
     .kpi-val { font-size:18px; font-weight:800; }
     .kpi-lbl { font-size:10px; color:var(--gray-400); text-transform:uppercase; }
-    .kpi.accent .kpi-val { color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF); }
-    .kpi.green .kpi-val { color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
+    .kpi.accent .kpi-val { color:oklch(from #f97316 max(l, var(--text-min-l)) c h); }
+    .kpi.green .kpi-val { color:oklch(from #16a34a max(l, var(--text-min-l)) c h); }
     .product-mix { display:flex; gap:6px; flex-wrap:wrap; }
     .mix-chip { background:var(--gray-100); border-radius:8px; padding:4px 10px; font-size:12px; font-weight:600; }
     .txn-filters { display:flex; gap:10px; padding:10px 20px; border-bottom:1px solid var(--gray-100); align-items:center; flex-wrap:wrap; }
@@ -170,8 +170,8 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .txn-row.expanded td { background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); }
     .txn-table td { padding:8px 12px; border-bottom:1px solid var(--gray-100); font-size:12px; vertical-align:middle; }
     .num { text-align:right; font-variant-numeric:tabular-nums; }
-    .green-th { color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
-    .green-cell { color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .green-th { color:oklch(from #16a34a max(l, var(--text-min-l)) c h); }
+    .green-cell { color:oklch(from #16a34a max(l, var(--text-min-l)) c h); font-weight:700; }
     .muted { color:var(--gray-400); }
     .row-sub { font-size:10px; color:var(--gray-400); }
     code { font-size:12px; background:var(--gray-100); border-radius:4px; padding:1px 4px; }
@@ -179,9 +179,9 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .ptag { font-size:10px; background:var(--gray-100); border-radius:6px; padding:1px 6px; }
     .ptag.more { background:var(--gray-200); color:var(--gray-500); }
     .status-chip { padding:2px 8px; border-radius:8px; font-size:12px; font-weight:600; }
-    .status-confirmed { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
-    .status-cancelled  { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .status-refunded   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .status-confirmed { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .status-cancelled  { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .status-refunded   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .expand-btn { background:none; border:none; cursor:pointer; font-size:12px; color:var(--gray-400); padding:2px 6px; }
     .detail-row td { background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); padding:0; }
     .products-table { width:100%; border-collapse:collapse; padding:8px 16px; }

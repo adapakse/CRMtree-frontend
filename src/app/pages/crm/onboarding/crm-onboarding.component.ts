@@ -78,13 +78,13 @@ const TYPE_LABELS: Record<string, string> = {
     <div style="background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
       <span style="font-size:22px">🎉</span>
       <div style="flex:1">
-        <div style="font-weight:700;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
-        <div style="font-size:12px;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
+        <div style="font-weight:700;color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
+        <div style="font-size:12px;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
       </div>
       <a [routerLink]="['/crm/partners', launchResult()!.id]" style="background:#3BAA5D;color:white;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none">
         → {{ t('onboardingBoard.launch.partnerProfile') }}
       </a>
-      <button (click)="launchResult.set(null)" style="background:none;border:none;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);font-size:18px;cursor:pointer;line-height:1">✕</button>
+      <button (click)="launchResult.set(null)" style="background:none;border:none;color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:18px;cursor:pointer;line-height:1">✕</button>
     </div>
   }
 
@@ -135,7 +135,7 @@ const TYPE_LABELS: Record<string, string> = {
             <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
               @if (p.lead_id) {
                 <a [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()"
-                   style="font-size:12px;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF);font-weight:600;text-decoration:none;border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:6px;padding:4px 8px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
+                   style="font-size:12px;color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none;border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:6px;padding:4px 8px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
                   🎯 {{ t('onboardingBoard.partners.leadData') }}
                 </a>
               }
@@ -448,7 +448,7 @@ const TYPE_LABELS: Record<string, string> = {
     .step-badge { background:var(--orange-pale);color:var(--orange-dark);border:1px solid var(--orange-muted);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;white-space:nowrap }
     .pc-progress { display:flex;gap:4px;margin-bottom:10px }
     .pc-step { flex:1;text-align:center;padding:6px 2px;border-radius:6px;background:var(--gray-100);font-size:10px;color:var(--gray-500) }
-    .pc-step.done   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF) }
+    .pc-step.done   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
     .pc-step.active { background:var(--orange-pale);color:var(--orange-dark);font-weight:700;border:1px solid var(--orange) }
     .pc-step-lbl { display:block;font-size:10px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
     .pc-tasks { display:flex;align-items:center;gap:8px;margin-bottom:6px }
@@ -498,7 +498,7 @@ const TYPE_LABELS: Record<string, string> = {
     .kb-partner { flex:1;font-size:10px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
     .kb-card-title { font-size:12px;font-weight:600;color:var(--gray-800);margin-bottom:4px }
     .kb-due { font-size:12px;color:var(--gray-400) }
-    .kb-due.overdue { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-weight:600 }
+    .kb-due.overdue { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-weight:600 }
     .kb-assignee { font-size:12px;color:var(--gray-400);margin-top:2px }
     .kb-empty { text-align:center;font-size:12px;color:var(--gray-400);padding:16px }
     .kb-add { width:100%;border:1px dashed var(--gray-300);background:none;border-radius:6px;padding:6px;font-size:12px;color:var(--gray-400);cursor:pointer;margin-top:4px }
@@ -506,7 +506,7 @@ const TYPE_LABELS: Record<string, string> = {
     .kb-del-btn { background:none;border:none;font-size:12px;cursor:pointer;opacity:.3;padding:2px 4px;border-radius:4px }
     .kb-del-btn:hover { opacity:1;background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)) }
     .kb-add:hover { border-color:var(--orange);color: var(--orange-text) }
-    .done-badge { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);border-radius:4px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .done-badge { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);border-radius:4px;padding:1px 4px;font-size:10px;font-weight:700 }
 
     /* Timeline */
     .timeline-wrap { max-width:720px;margin:0 auto;padding-bottom:40px }
@@ -537,12 +537,12 @@ const TYPE_LABELS: Record<string, string> = {
     .cal-cell.cal-today { background:var(--orange-pale) }
     .cal-day-num { font-size:12px;font-weight:600;color:var(--gray-400);margin-bottom:4px }
     .cal-today .cal-day-num { color: var(--orange-text);font-weight:700 }
-    .cal-event { font-size:10px;padding:2px 4px;border-radius:4px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF) }
+    .cal-event { font-size:10px;padding:2px 4px;border-radius:4px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h) }
     .cal-event.cal-done { opacity:.5;text-decoration:line-through }
-    .cal-step-0 { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF) }
-    .cal-step-1 { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF) }
-    .cal-step-2 { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF) }
-    .cal-step-3 { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface));color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF) }
+    .cal-step-0 { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h) }
+    .cal-step-1 { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h) }
+    .cal-step-2 { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
+    .cal-step-3 { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface));color:oklch(from #9a3412 max(l, var(--text-min-l)) c h) }
 
     /* Modal */
     .overlay { position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px) }

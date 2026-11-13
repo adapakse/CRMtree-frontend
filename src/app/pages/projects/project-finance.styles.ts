@@ -8,15 +8,15 @@ export const PROJECT_FINANCE_STYLES = `
   .amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
   table.grid th.amount { text-align:right; }
   .secondary { display:block; font-size:12px; color:var(--gray-500); font-weight:400; }
-  .danger { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+  .danger { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
   .nowrap { white-space:nowrap; }
   .row-action { text-align:right; white-space:nowrap; }
   .link, .link-danger { border:none; background:none; padding:0; font-size:12px; cursor:pointer; font-family:inherit; }
-  .link { color:var(--accent-blue, color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)); text-align:left; }
-  .link-danger { color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); margin-left:10px; }
+  .link { color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); text-align:left; }
+  .link-danger { color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); margin-left:10px; }
   .status-pill { background:var(--gray-100); color:var(--gray-600); white-space:nowrap; }
   .status-pill.incurred, .status-pill.paid { background:var(--orange-pale); color:var(--orange-dark); }
-  .status-pill.invoiced { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); }
+  .status-pill.invoiced { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
   .cell-input { width:130px; padding:4px 8px; font-size:14px; text-align:right; }
   tfoot td { font-weight:700; background:var(--gray-50); border-top:1px solid var(--gray-200); }
   input:disabled, select:disabled { opacity:.75; cursor:not-allowed; }

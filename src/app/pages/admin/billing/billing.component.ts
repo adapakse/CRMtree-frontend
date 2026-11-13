@@ -236,7 +236,7 @@ interface InvoiceListResponse {
     .td-muted { color: var(--gray-500); font-size: 14px; }
 
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
+    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
     .badge-off { background: var(--gray-100); color: var(--gray-500); }
 
     .btn-icon {
@@ -272,8 +272,8 @@ interface InvoiceListResponse {
 
     .td-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
-    .btn-icon.btn-danger-icon { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
-    .btn-icon.btn-danger-icon:hover { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
+    .btn-icon.btn-danger-icon { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
+    .btn-icon.btn-danger-icon:hover { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
 
     /* Modal */
     .modal-backdrop {

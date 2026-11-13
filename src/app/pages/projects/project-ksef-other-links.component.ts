@@ -29,7 +29,7 @@ import { taskLabel } from './project-ksef.styles';
   `,
   styles: [`
     :host { display:contents; }
-    .warning { display:block; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+    .warning { display:block; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
     .target { font-weight:600; margin-right:4px; }
   `],
 })

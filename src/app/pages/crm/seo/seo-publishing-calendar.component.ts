@@ -126,7 +126,7 @@ const EMPTY_CONFIG: SeoCalendarConfig = {
     .config-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
     .config-header h3 { font-size: 0.95rem; margin: 0; }
     .enable-toggle { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--gray-700); cursor: pointer; }
-    .warning-note { font-size: 0.78rem; color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); border-radius: 8px; padding: 0.5rem 0.7rem; margin: 0.6rem 0 0; }
+    .warning-note { font-size: 0.78rem; color: oklch(from #92400e max(l, var(--text-min-l)) c h); background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); border-radius: 8px; padding: 0.5rem 0.7rem; margin: 0.6rem 0 0; }
     .weekday-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-top: 0.9rem; }
     .weekday-cell .field-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.25rem; text-align: center; }
     .count-input { width: 100%; text-align: center; }

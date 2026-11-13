@@ -80,7 +80,7 @@ interface WhatsappConvUiState {
     <span class="stage-badge"
           [style.background]="stages.pillBackground(lead.stage)"
           [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span>
-    <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥{{ t('leadDetail.header.hot') }}</span>
+    <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥{{ t('leadDetail.header.hot') }}</span>
     <span *ngIf="lead.hold_active" style="background:var(--gray-200);color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-g btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
@@ -129,7 +129,7 @@ interface WhatsappConvUiState {
           <span class="val val-line"><a class="link" [href]="'https://'+lead.website" target="_blank" [title]="lead.website">{{lead.website}}</a></span>
         </div>
         <div class="info-kv" *ngIf="lead.industry"><span class="lbl">{{ t('leadDetail.fields.industry') }}</span><span class="val">{{lead.industry}}</span></div>
-        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥{{ t('leadDetail.fields.hotLead') }}</div>
+        <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥{{ t('leadDetail.fields.hotLead') }}</div>
         <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:4px;background:var(--gray-100);color:var(--gray-700);font-size:12px;padding:8px 12px;border-radius:10px;font-weight:600;margin-top:4px">
           <span style="display:inline-flex;align-items:center;gap:4px">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
           <span style="font-weight:400;color:var(--gray-500)">{{lead.hold_reason}}</span>
@@ -192,7 +192,7 @@ interface WhatsappConvUiState {
             [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span></span></div>
         <div class="info-kv" *ngIf="stages.isLost(lead.stage) && lead.lost_reason">
           <span class="lbl">{{ t('leadDetail.fields.lostReason') }}</span>
-          <span class="val" style="color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)">{{lead.lost_reason}}</span>
+          <span class="val" style="color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">{{lead.lost_reason}}</span>
         </div>
         <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.probability') }}</span><span class="val">{{lead.probability||0}}%</span></div>
         <div class="info-kv" *ngIf="lead.value_pln">
@@ -211,7 +211,7 @@ interface WhatsappConvUiState {
       <div class="info-section" *ngIf="lead.tags?.length || lead.notes">
         <div class="info-section-title">{{ t('leadDetail.sections.notes') }}</div>
         <div *ngIf="lead.tags?.length" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
-          <span *ngFor="let t of lead.tags" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:12px;padding:1px 8px;font-size:12px">{{t}}</span>
+          <span *ngFor="let t of lead.tags" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:1px 8px;font-size:12px">{{t}}</span>
         </div>
         <div *ngIf="lead.notes" style="font-size:12px;color:var(--gray-500);white-space:pre-line;line-height:1.5">{{lead.notes}}</div>
       </div>
@@ -275,27 +275,27 @@ interface WhatsappConvUiState {
         <!-- Onboarding in progress: blue banner -->
         <ng-container *ngIf="lead.stage==='onboarding'">
           <span style="font-size:15px">⏳</span>
-          <span style="color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.inProgress') }}</span>
+          <span style="color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.inProgress') }}</span>
           <span style="font-size:12px;color:var(--gray-500);margin-left:4px">— {{ t('leadDetail.onboarding.partnerInProgress') }}</span>
           <span style="flex:1"></span>
           <span style="font-size:12px;color:var(--gray-400)">{{ t('leadDetail.onboarding.leadLocked') }}</span>
-          <a routerLink="/crm/onboarding" style="font-size:12px;color:color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF);font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.panelLink') }}</a>
+          <a routerLink="/crm/onboarding" style="font-size:12px;color:oklch(from #2563eb max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.panelLink') }}</a>
         </ng-container>
         <!-- Onboarded: locked banner -->
         <ng-container *ngIf="lead.stage==='onboarded'">
           <span style="font-size:15px">✅</span>
-          <span style="color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF);font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.completedPartnerActive') }}</span>
+          <span style="color:oklch(from #15803d max(l, var(--text-min-l)) c h);font-weight:700;font-size:14px">{{ t('leadDetail.onboarding.completedPartnerActive') }}</span>
           <span style="flex:1"></span>
           <span style="font-size:12px;color:var(--gray-400)">{{ t('leadDetail.onboarding.leadLocked') }}</span>
-          <a routerLink="/crm/partners" style="font-size:12px;color:color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF);font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.partnerRegistryLink') }}</a>
+          <a routerLink="/crm/partners" style="font-size:12px;color:oklch(from #2563eb max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none;margin-left:8px">→ {{ t('leadDetail.onboarding.partnerRegistryLink') }}</a>
         </ng-container>
         <!-- Closed lost: red banner mode -->
         <ng-container *ngIf="stages.isLost(lead.stage)">
           <span style="font-size:15px">⛔</span>
-          <span style="color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);font-weight:700;font-size:14px">{{ stageLabel(lead.stage) }}</span>
-          <span *ngIf="lead.lost_reason" style="font-size:12px;color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)">· {{lead.lost_reason}}</span>
+          <span style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-weight:700;font-size:14px">{{ stageLabel(lead.stage) }}</span>
+          <span *ngIf="lead.lost_reason" style="font-size:12px;color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">· {{lead.lost_reason}}</span>
           <span style="flex:1"></span>
-          <button *ngIf="canEdit" class="btn btn-g btn-sm" style="color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF)" (click)="quickChangeStage(entryStageKey)">↩ {{ t('leadDetail.stage.backToNew') }}</button>
+          <button *ngIf="canEdit" class="btn btn-g btn-sm" style="color:oklch(from #15803d max(l, var(--text-min-l)) c h)" (click)="quickChangeStage(entryStageKey)">↩ {{ t('leadDetail.stage.backToNew') }}</button>
         </ng-container>
         <!-- Normal stepper mode -->
         <ng-container *ngIf="!stages.isLost(lead.stage) && lead.stage!=='onboarded' && lead.stage!=='onboarding'">
@@ -315,7 +315,7 @@ interface WhatsappConvUiState {
           </div>
           <button class="stage-arrow-btn" [disabled]="!nextStage() || !canEdit" (click)="quickChangeStage(nextStage()!)" [title]="t('leadDetail.stage.next')">›</button>
           <!-- Awaryjne wyjście w przegraną istnieje tylko, gdy tenant ma taki etap -->
-          <button *ngIf="canEdit && !stages.isWon(lead.stage) && stages.lostKey() as lostKey" class="stage-arrow-btn" style="color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);border-color:color-mix(in srgb, #fecaca var(--tint-mix), var(--surface))" (click)="quickChangeStage(lostKey)" [title]="stageLabel(lostKey)">⛔</button>
+          <button *ngIf="canEdit && !stages.isWon(lead.stage) && stages.lostKey() as lostKey" class="stage-arrow-btn" style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);border-color:color-mix(in srgb, #fecaca var(--tint-mix), var(--surface))" (click)="quickChangeStage(lostKey)" [title]="stageLabel(lostKey)">⛔</button>
         </ng-container>
       </div>
 
@@ -351,7 +351,7 @@ interface WhatsappConvUiState {
 
         <!-- Nowa aktywność form -->
         <div *ngIf="showNewActivity" class="lead-form-box" style="margin-bottom:12px">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);display:flex;align-items:center;gap:4px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px">
             <wt-act-type-icon [type]="actForm.type"></wt-act-type-icon> {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
@@ -373,12 +373,12 @@ interface WhatsappConvUiState {
                   <div *ngFor="let p of computedDueDatePresets"
                        style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--gray-100);white-space:nowrap"
                        [style.background]="actDueDatePreset===p.value ? 'var(--gray-200)' : 'var(--surface)'"
-                       [style.color]="actDueDatePreset===p.value ? 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' : 'var(--gray-700)'"
+                       [style.color]="actDueDatePreset===p.value ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset===p.value ? '600' : '400'"
                        (mousedown)="selectDueDatePreset(p.value)">{{p.label}}</div>
                   <div style="padding:8px 12px;font-size:12px;cursor:pointer;white-space:nowrap"
                        [style.background]="actDueDatePreset==='custom' ? 'var(--gray-200)' : 'var(--surface)'"
-                       [style.color]="actDueDatePreset==='custom' ? 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' : 'var(--gray-700)'"
+                       [style.color]="actDueDatePreset==='custom' ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
                        (mousedown)="selectDueDatePreset('custom')">📅 {{ t('activity.customDate') }}</div>
                 </div>
@@ -523,7 +523,7 @@ interface WhatsappConvUiState {
         <!-- INLINE COMPOSE -->
         <div *ngIf="showEmailCompose" class="lead-form-box" style="margin-bottom:16px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);display:flex;align-items:center;gap:4px">✉️ {{ t('email.new') }}</div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px">✉️ {{ t('email.new') }}</div>
             <button class="close-btn" style="font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
           <!-- Provider row — always visible when compose is open. Every user connects
@@ -712,7 +712,7 @@ interface WhatsappConvUiState {
         </div>
 
         <div *ngIf="whatsappConfigured===true" id="wa-new-message" class="lead-form-box">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);display:flex;align-items:center;gap:4px">💬 {{ t('whatsapp.newMessage') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:var(--gray-50);border-radius:8px;overflow:hidden">
@@ -724,7 +724,7 @@ interface WhatsappConvUiState {
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
                    placeholder="+48 123 123 123">
           </label>
-          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:color-mix(in srgb, #b45309 var(--tint-text-mix), #FFFFFF)">{{ t('whatsapp.missingCountryCode') }}</div>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:oklch(from #b45309 max(l, var(--text-min-l)) c h)">{{ t('whatsapp.missingCountryCode') }}</div>
 
           <div class="wa-mode-switch">
             <button type="button" class="fchip" [class.on]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
@@ -876,7 +876,7 @@ interface WhatsappConvUiState {
                 {{ getSmsConvState(conv.number).sending ? '⏳' : t('sms.send') }}
               </button>
             </div>
-            <div *ngIf="getSmsConvState(conv.number).error" style="color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);font-size:12px;padding:0 12px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-size:12px;padding:0 12px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
           </div>
         </div>
       </div>
@@ -947,13 +947,13 @@ interface WhatsappConvUiState {
         <button class="btn btn-p btn-sm" style="width:100%;box-shadow:none" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }} →</button>
       </div>
       <div *ngIf="lead.converted_at && lead.stage==='onboarding'" class="side-box" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
-        <div style="font-size:12px;font-weight:700;color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);margin-bottom:4px;display:flex;align-items:center;gap:4px">⏳ {{ t('leadDetail.onboarding.inProgress') }}</div>
+        <div style="font-size:12px;font-weight:700;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);margin-bottom:4px;display:flex;align-items:center;gap:4px">⏳ {{ t('leadDetail.onboarding.inProgress') }}</div>
         <div style="font-size:12px;color:var(--gray-400);margin-bottom:6px">{{ t('leadDetail.onboarding.startedAt') }} {{lead.converted_at|date:'dd.MM.yyyy'}}</div>
         <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px">{{ t('leadDetail.onboarding.inProgressHint') }}</div>
-        <a routerLink="/crm/onboarding" style="font-size:12px;color:color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF);font-weight:600;text-decoration:none">→ {{ t('leadDetail.onboarding.goTo') }}</a>
+        <a routerLink="/crm/onboarding" style="font-size:12px;color:oklch(from #2563eb max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none">→ {{ t('leadDetail.onboarding.goTo') }}</a>
       </div>
       <div *ngIf="lead.stage==='onboarded'" class="side-box" style="background:var(--gray-50)">
-        <div style="font-size:12px;font-weight:700;color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF);margin-bottom:4px">✓ {{ t('leadDetail.onboarding.completed') }}</div>
+        <div style="font-size:12px;font-weight:700;color:oklch(from #15803d max(l, var(--text-min-l)) c h);margin-bottom:4px">✓ {{ t('leadDetail.onboarding.completed') }}</div>
         <div style="font-size:12px;color:var(--gray-400);margin-bottom:4px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
         <div style="font-size:12px;color:var(--gray-500)">{{ t('leadDetail.onboarding.partnerAfterSync') }}</div>
       </div>
@@ -1016,14 +1016,14 @@ interface WhatsappConvUiState {
         <!-- Wszystkie załączniki (odebrane + wysłane) -->
         <div *ngIf="(m.attachments?.length||0)+(m.sentAttachments?.length||0)>0"
              style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px" (click)="$event.stopPropagation()">
-          <span *ngFor="let att of m.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF)">
+          <span *ngFor="let att of m.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h)">
             📎 {{att.filename}}
             <span class="att-chip-actions">
               <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
               <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,m.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
             </span>
           </span>
-          <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">
+          <span *ngFor="let att of m.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
             📎 {{att.filename}}
             <span class="att-chip-actions">
               <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,m.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
@@ -1063,14 +1063,14 @@ interface WhatsappConvUiState {
       <!-- Załączniki -->
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:6px">
-        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);font-size:12px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg.id)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
-        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);font-size:12px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg.id)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
@@ -1162,7 +1162,7 @@ interface WhatsappConvUiState {
           <label>{{ t('leadDetail.fields.stage') }}<select [(ngModel)]="editForm.stage"><option *ngFor="let s of allowedStageOptions" [value]="s.key">{{s.label}}</option></select></label>
         </div>
         <div class="edit-row" *ngIf="stages.isLost(editForm.stage)">
-          <label class="full" style="color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)">{{ t('leadDetail.fields.lostReason') }} *
+          <label class="full" style="color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">{{ t('leadDetail.fields.lostReason') }} *
             <select [(ngModel)]="editForm.lost_reason"
                     [class.fi-err]="editMissing('lostReason')">
               <option value="">{{ t('leadDetail.edit.chooseReason') }}</option>
@@ -1174,7 +1174,7 @@ interface WhatsappConvUiState {
         <div class="edit-row"><button type="button" class="fchip hot-chip" [class.on]="editForm.hot" [attr.aria-pressed]="!!editForm.hot" [title]="t('leadsList.newLead.hotHint')" (click)="editForm.hot = !editForm.hot">🔥 {{ t('leadDetail.fields.hotLead') }}</button></div>
       </div>
       <div class="edit-section">
-        <div class="edit-section-title">{{ t('leadDetail.fields.website') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span></div>
+        <div class="edit-section-title">{{ t('leadDetail.fields.website') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></div>
         <div style="display:flex;gap:8px;align-items:center">
           <input class="fi" style="flex:1"
                  [(ngModel)]="editForm.website" [placeholder]="t('leadDetail.edit.placeholders.website')"
@@ -1194,21 +1194,21 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.sections.contact') }}</div>
         <div class="edit-row">
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.fullName') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span></span>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.fullName') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
             <input [(ngModel)]="editForm.contact_name" [placeholder]="t('leadDetail.edit.placeholders.fullName')"
                    [class.fi-err]="editMissing('contactName')">
             @if (editMissing('contactName')) { <span class="ferr">{{ t('fieldErrors.contactName') }}</span> }
           </label>
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.contactTitle') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span></span><select [(ngModel)]="editForm.contact_title"
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.contactTitle') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span><select [(ngModel)]="editForm.contact_title"
                    [class.fi-err]="editMissing('contactTitle')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let t of dictTitles" [value]="t">{{t}}</option></select>@if (editMissing('contactTitle')) { <span class="ferr">{{ t('fieldErrors.contactTitle') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.email') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span></span>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.email') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
             <input [(ngModel)]="editForm.email" type="email" [placeholder]="t('leadDetail.edit.placeholders.email')"
                    [class.fi-err]="editMissing('email')">
             @if (editMissing('email')) { <span class="ferr">{{ t('fieldErrors.email') }}</span> }
           </label>
-          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.phone') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span></span>
+          <label><span style="display:flex;align-items:center;gap:4px">{{ t('leadDetail.fields.phone') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
             <wt-phone-input [(ngModel)]="editForm.phone" [invalid]="editMissing('phone')" />
             @if (editMissing('phone')) { <span class="ferr">{{ t('fieldErrors.phone') }}</span> }
           </label>
@@ -1239,7 +1239,7 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.fields.nip') }}</div>
         <div class="edit-row">
-          <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">{{ t('leadDetail.fields.nip') }} <span style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span></span>
+          <label class="full"><span style="display:flex;align-items:center;gap:4px;margin-bottom:4px">{{ t('leadDetail.fields.nip') }} <span style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span></span>
             <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                    (ngModelChange)="validateEditNip()"
                    [class.fi-err]="!!editNipError">
@@ -1250,19 +1250,19 @@ interface WhatsappConvUiState {
       <div class="edit-section">
         <div class="edit-section-title">{{ t('leadDetail.edit.sections.sales') }}</div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.annualTurnover') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1" [class.fi-err]="editMissing('value') || !!amountError(editForm.value_pln)"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>@if (editMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }@if (amountError(editForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }</label>
-          <label>{{ t('leadDetail.fields.onlinePct') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><select [(ngModel)]="editForm.online_pct" [class.fi-err]="editMissing('onlinePct')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('onlinePct')) { <span class="ferr">{{ t('fieldErrors.onlinePct') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.annualTurnover') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><div style="display:flex;gap:6px"><input [(ngModel)]="editForm.value_pln" type="number" min="0" placeholder="0" style="flex:1" [class.fi-err]="editMissing('value') || !!amountError(editForm.value_pln)"><select [(ngModel)]="editForm.annual_turnover_currency" style="width:80px"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>@if (editMissing('value')) { <span class="ferr">{{ t('fieldErrors.value') }}</span> }@if (amountError(editForm.value_pln); as amountKey) { <span class="ferr">{{ t('fieldErrors.' + amountKey) }}</span> }</label>
+          <label>{{ t('leadDetail.fields.onlinePct') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.online_pct" [class.fi-err]="editMissing('onlinePct')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('onlinePct')) { <span class="ferr">{{ t('fieldErrors.onlinePct') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.firstContact') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><input [(ngModel)]="editForm.first_contact_date" type="date" [class.fi-err]="editMissing('firstContact')">@if (editMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }</label>
-          <label>{{ t('leadDetail.fields.closeDate') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><input [(ngModel)]="editForm.close_date" type="date" [class.fi-err]="editMissing('closeDate')">@if (editMissing('closeDate')) { <span class="ferr">{{ t('fieldErrors.closeDate') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.firstContact') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><input [(ngModel)]="editForm.first_contact_date" type="date" [class.fi-err]="editMissing('firstContact')">@if (editMissing('firstContact')) { <span class="ferr">{{ t('fieldErrors.firstContact') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.closeDate') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><input [(ngModel)]="editForm.close_date" type="date" [class.fi-err]="editMissing('closeDate')">@if (editMissing('closeDate')) { <span class="ferr">{{ t('fieldErrors.closeDate') }}</span> }</label>
         </div>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.source') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()" [class.fi-err]="editMissing('source')"><option value="">{{ t('leadDetail.edit.none') }}</option>
+          <label>{{ t('leadDetail.fields.source') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.source" (ngModelChange)="onSourceChange()" [class.fi-err]="editMissing('source')"><option value="">{{ t('leadDetail.edit.none') }}</option>
                   @for (s of sourcesWithoutGroup(); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }
                   @for (g of sourceGroups(); track g) { <optgroup [label]="g">@for (s of sourcesInGroup(g); track s.value) { <option [value]="s.value">{{sourceOptionLabel(s)}}</option> }</optgroup> }
                   </select>@if (editMissing('source')) { <span class="ferr">{{ t('fieldErrors.source') }}</span> }</label>
-          <label>{{ t('leadDetail.fields.industry') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><select [(ngModel)]="editForm.industry" [class.fi-err]="editMissing('industry')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select>@if (editMissing('industry')) { <span class="ferr">{{ t('fieldErrors.industry') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.industry') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.industry" [class.fi-err]="editMissing('industry')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let ind of dictIndustries" [value]="ind">{{ind}}</option></select>@if (editMissing('industry')) { <span class="ferr">{{ t('fieldErrors.industry') }}</span> }</label>
         </div>
         <ng-container *ngIf="editForm.source==='agent'">
           <div style="background:var(--orange-pale);border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:12px;margin-top:4px">
@@ -1275,8 +1275,8 @@ interface WhatsappConvUiState {
           </div>
         </ng-container>
         <div class="edit-row">
-          <label>{{ t('leadDetail.fields.salesperson') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><select [(ngModel)]="editForm.assigned_to" [class.fi-err]="editMissing('salesperson')"><option value="">{{ t('leadDetail.edit.unassigned') }}</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>@if (editMissing('salesperson')) { <span class="ferr">{{ t('fieldErrors.salesperson') }}</span> }</label>
-          <label>{{ t('leadDetail.fields.probabilityPct') }} <span *ngIf="requiresFullFields" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span><select [(ngModel)]="editForm.probability" [class.fi-err]="editMissing('probability')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('probability')) { <span class="ferr">{{ t('fieldErrors.probability') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.salesperson') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.assigned_to" [class.fi-err]="editMissing('salesperson')"><option value="">{{ t('leadDetail.edit.unassigned') }}</option><option *ngFor="let u of crmUsers" [value]="u.id">{{u.display_name}}</option></select>@if (editMissing('salesperson')) { <span class="ferr">{{ t('fieldErrors.salesperson') }}</span> }</label>
+          <label>{{ t('leadDetail.fields.probabilityPct') }} <span *ngIf="requiresFullFields" style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span><select [(ngModel)]="editForm.probability" [class.fi-err]="editMissing('probability')"><option value="">{{ t('leadDetail.edit.none') }}</option><option *ngFor="let v of [0,10,20,30,40,50,60,70,80,90,100]" [value]="v">{{v}}%</option></select>@if (editMissing('probability')) { <span class="ferr">{{ t('fieldErrors.probability') }}</span> }</label>
         </div>
         <div class="edit-row">
           <label class="full">{{ t('leadDetail.fields.tagsHint') }}<input [(ngModel)]="editForm.tagsStr" placeholder="tag1, tag2"></label>
@@ -1327,7 +1327,7 @@ interface WhatsappConvUiState {
           <span style="font-size:16px">📄</span>
           <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--gray-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div><div style="font-size:10px;color:var(--gray-400)"><span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>{{doc.doc_type}}</div></div>
           <span *ngIf="doc._access==='read'" style="font-size:12px;color:var(--gray-400)">🔒 {{ t('documents.picker.readOnly') }}</span>
-          <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">✓ {{ t('documents.picker.added') }}</span>
+          <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('documents.picker.added') }}</span>
           <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:12px;color:var(--gray-400)">{{ t('documents.add') }}</span>
         </div>
       </div>
@@ -1356,14 +1356,14 @@ interface WhatsappConvUiState {
       <div *ngIf="testAccount?.status==='created'" class="ta-status-ok">
         <span style="font-size:22px">✅</span>
         <div style="flex:1">
-          <div style="font-size:12px;font-weight:700;color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF)">{{ t('leadDetail.testAccount.created') }}</div>
-          <div style="font-size:12px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-family:monospace;margin-top:2px">
+          <div style="font-size:12px;font-weight:700;color:oklch(from #15803d max(l, var(--text-min-l)) c h)">{{ t('leadDetail.testAccount.created') }}</div>
+          <div style="font-size:12px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-family:monospace;margin-top:2px">
             {{ t('leadDetail.testAccount.numberLabel') }} {{testAccount!.test_account_number}}
             <span *ngIf="testAccount!.htcd_partner_id" style="color:var(--gray-500)"> · ID HTCD: {{testAccount!.htcd_partner_id}}</span>
           </div>
           <div *ngIf="testAccount!.price_list_url" style="margin-top:4px">
             <a [href]="testAccount!.price_list_url" target="_blank"
-               style="font-size:12px;color:color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF);text-decoration:underline">
+               style="font-size:12px;color:oklch(from #2563eb max(l, var(--text-min-l)) c h);text-decoration:underline">
               📋 {{ t('leadDetail.testAccount.openPriceList') }}
             </a>
           </div>
@@ -1375,8 +1375,8 @@ interface WhatsappConvUiState {
       <div *ngIf="testAccount?.status==='error'" class="ta-status-err">
         <span style="font-size:22px">⚠️</span>
         <div>
-          <div style="font-size:12px;font-weight:700;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">{{ t('leadDetail.testAccount.previousError') }}</div>
-          <div style="font-size:12px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);margin-top:2px">{{testAccount!.last_error}}</div>
+          <div style="font-size:12px;font-weight:700;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">{{ t('leadDetail.testAccount.previousError') }}</div>
+          <div style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);margin-top:2px">{{testAccount!.last_error}}</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px">{{ t('leadDetail.testAccount.fixAndRetry') }}</div>
         </div>
       </div>
@@ -1384,7 +1384,7 @@ interface WhatsappConvUiState {
       <!-- Błąd bieżącego wywołania -->
       <div *ngIf="testAccountError" class="ta-status-err">
         <span style="font-size:20px">❌</span>
-        <div style="font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);font-weight:600">{{testAccountError}}</div>
+        <div style="font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-weight:600">{{testAccountError}}</div>
       </div>
 
       <!-- Sekcja A: Dane techniczne -->
@@ -1515,16 +1515,16 @@ interface WhatsappConvUiState {
           <option value="" disabled>{{ t('leadDetail.edit.chooseReason') }}</option>
           <option *ngFor="let r of holdReasons" [value]="r">{{r}}</option>
         </select>
-        <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:12px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)">{{ t('leadDetail.hold.reasonRequired') }}</span>
+        <span *ngIf="holdSubmitted && !holdForm.reason" style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">{{ t('leadDetail.hold.reasonRequired') }}</span>
       </label>
       <label style="font-size:14px;color:var(--gray-700);display:flex;flex-direction:column;gap:4px">
         {{ t('leadDetail.hold.activeUntil') }}
         <input type="date" class="fi" [(ngModel)]="holdForm.until" [min]="todayStr"
                [style.border-color]="holdSubmitted && !holdForm.until ? '#ef4444' : ''">
-        <span *ngIf="holdSubmitted && !holdForm.until" style="font-size:14px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)">{{ t('leadDetail.hold.dateRequired') }}</span>
+        <span *ngIf="holdSubmitted && !holdForm.until" style="font-size:14px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">{{ t('leadDetail.hold.dateRequired') }}</span>
       </label>
     </div>
-    <div *ngIf="holdError" style="font-size:12px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);margin-bottom:8px">{{holdError}}</div>
+    <div *ngIf="holdError" style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);margin-bottom:8px">{{holdError}}</div>
     <div class="modal-actions" style="justify-content:space-between">
       <button *ngIf="lead?.hold_active" class="btn btn-d" (click)="cancelHold()" [disabled]="holdSaving">{{ t('leadDetail.hold.remove') }}</button>
       <span *ngIf="!lead?.hold_active"></span>
@@ -1625,7 +1625,7 @@ interface WhatsappConvUiState {
         </select>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} <span style="color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">*</span></label>
+        <label style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ t('activity.modal.title') }} <span style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">*</span></label>
         <input [(ngModel)]="actEditForm.title" class="act-input">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -1686,12 +1686,12 @@ interface WhatsappConvUiState {
     .conv-ic { width:16px; height:16px; color:var(--gray-500); }
     .comm-ic { width:16px; height:16px; color: var(--orange-text); }
     .lead-note { display:flex; align-items:center; gap:8px; font-size:12px; border-radius:10px; padding:8px 12px; }
-    .lead-note-warn { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .lead-note-err { background:var(--gray-50); color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
-    .lead-note-ok { background:var(--gray-50); color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF); }
-    .file-chip { display:inline-flex; align-items:center; gap:4px; background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); border-radius:12px; padding:2px 8px; font-size:12px; }
+    .lead-note-warn { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .lead-note-err { background:var(--gray-50); color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
+    .lead-note-ok { background:var(--gray-50); color:oklch(from #15803d max(l, var(--text-min-l)) c h); }
+    .file-chip { display:inline-flex; align-items:center; gap:4px; background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:12px; padding:2px 8px; font-size:12px; }
     .file-chip button { background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:12px; padding:0; }
-    .file-chip button:hover { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .file-chip button:hover { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .info-icon-btn { background:none; border:none; cursor:pointer; color:var(--gray-400); padding:0 4px; display:inline-flex; align-items:center; }
     .info-icon-btn:hover { color: var(--orange-text); }
     .act-modal-lbl { color:var(--gray-400); font-size:12px; min-width:100px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
@@ -1749,18 +1749,18 @@ interface WhatsappConvUiState {
     .act-card.act-card-today { border-left:3px solid #3BAA5D; }
     .act-card-body { margin-top:4px; font-size:12px; color:var(--gray-500); }
     .act-body-clamp { display:-webkit-box; -webkit-line-clamp:7; -webkit-box-orient:vertical; overflow:hidden; }
-    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); padding:2px 0; font-weight:600; }
+    .act-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); padding:2px 0; font-weight:600; }
     .act-card-controls { display:flex; gap:4px; margin-top:8px; opacity:0; transition:opacity .15s; }
     .act-card:hover .act-card-controls { opacity:1; }
     .act-status-badge { font-size:10px; font-weight:700; padding:1px 8px; border-radius:9px; white-space:nowrap; }
     .act-status-new { background:var(--gray-100); color:var(--gray-700); }
-    .act-status-open { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
-    .act-status-closed { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
+    .act-status-open { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .act-status-closed { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
     .priority-badge { font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; white-space:nowrap; text-transform:uppercase; }
-    .priority-asap { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .priority-important { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #c2410c var(--tint-text-mix), #FFFFFF); }
-    .priority-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #854d0e var(--tint-text-mix), #FFFFFF); }
-    .priority-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .priority-asap { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .priority-important { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
+    .priority-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:oklch(from #854d0e max(l, var(--text-min-l)) c h); }
+    .priority-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .act-type-icon { font-size:18px; flex-shrink:0; }
     .act-body { flex:1; }
     .act-body strong { font-size:12px; }
@@ -1771,8 +1771,8 @@ interface WhatsappConvUiState {
     .act-item:hover .act-controls { opacity:1; }
     .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:4px 8px; border-radius:8px; color:var(--gray-400); display:inline-flex; align-items:center; justify-content:center; font-family:inherit; }
     .act-ctrl-btn:hover { background:var(--gray-100); color:var(--gray-700); }
-    .act-ctrl-btn.del { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); opacity:.7; }
-    .act-ctrl-btn.del:hover { background:var(--gray-50); color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); opacity:1; }
+    .act-ctrl-btn.del { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); opacity:.7; }
+    .act-ctrl-btn.del:hover { background:var(--gray-50); color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); opacity:1; }
     .task-actions-row { display:flex; gap:8px; margin-top:8px; }
     .act-sel, .act-input { border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:12px; font-family:inherit; outline:none; background:var(--surface); color:var(--gray-800); transition:border-color .15s; box-sizing:border-box; }
     .act-sel { cursor:pointer; }
@@ -1780,18 +1780,18 @@ interface WhatsappConvUiState {
     .act-sel:focus, .act-input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
     .empty-act { color:var(--gray-400); font-size:12px; text-align:center; padding:24px 0; }
     .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
-    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); padding:2px 0; font-weight:600; margin-top:4px; }
+    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); padding:2px 0; font-weight:600; margin-top:4px; }
     .wa-mode-switch { display:inline-flex; align-self:flex-start; gap:6px; }
-    .wa-window-hint { font-size:12px; color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border-radius:10px; padding:8px 12px; }
-    .wa-window-note { font-size:12px; color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .wa-failed { font-size:10px; font-weight:700; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); background:var(--gray-50); border-radius:6px; padding:1px 6px; }
+    .wa-window-hint { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border-radius:10px; padding:8px 12px; }
+    .wa-window-note { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .wa-failed { font-size:10px; font-weight:700; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:var(--gray-50); border-radius:6px; padding:1px 6px; }
     .participant-input-wrap { position:relative; }
     .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1.5px solid var(--gray-200);border-radius:10px;padding:4px 8px;min-height:36px;background:var(--surface);position:relative;box-sizing:border-box; }
     .participant-chips:focus-within { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
     .suggest-dropdown { position:absolute; background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 7px 22px rgba(0,0,0,0.108); z-index:100; min-width:240px; max-height:180px; overflow-y:auto; }
     .suggest-item { padding:8px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; }
     .suggest-item:hover { background:var(--gray-100); }
-    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:12px;padding:1px 8px;font-size:12px; }
+    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:1px 8px;font-size:12px; }
     .participant-chip button { background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:0;line-height:1; }
     .participant-input { border:none;outline:none;font-size:12px;min-width:100px;flex:1;font-family:inherit; }
     .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:var(--surface);border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 7px 22px rgba(0,0,0,0.108);max-height:160px;overflow-y:auto;margin-top:4px; }
@@ -1836,7 +1836,7 @@ interface WhatsappConvUiState {
     .att-chip-actions:hover { display:flex; }
     .att-action-btn { background:none; border:none; cursor:pointer; padding:4px 12px; border-radius:6px; font-size:12px; white-space:nowrap; font-family:inherit; }
     .att-action-btn:hover { background:var(--gray-100); }
-    .att-action-btn.dl { color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); }
+    .att-action-btn.dl { color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
     .att-action-btn.view { color:var(--gray-700); }
     .stepper-slot { height:18px; display:flex; align-items:center; justify-content:center; }
     .stepper-dot { box-sizing:border-box;width:14px;height:14px;border-radius:50%;background:var(--gray-300);border:2px solid var(--gray-300);transition:background .2s,border-color .2s,transform .2s;flex-shrink:0; }

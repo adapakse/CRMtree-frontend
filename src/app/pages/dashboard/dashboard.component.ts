@@ -115,7 +115,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
                   </div>
                   <div class="td" style="padding-top:14px"><wt-group-pill [name]="doc.group_display ?? doc.group_name ?? ''" /></div>
                   <div class="td" style="padding-top:14px"><wt-status-badge [status]="doc.status" /></div>
-                  <div class="td" style="padding-top:14px" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)' : ''"
+                  <div class="td" style="padding-top:14px" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : ''"
                        [title]="doc.doc_type === 'invoice' ? t('labels.fields.paymentDueDate') : ''">
                     {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
                   </div>
@@ -143,7 +143,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
                   <span style="font-size:12px;color:var(--gray-400)">{{ task.created_at | date:'dd.MM' }}</span>
                   @if (task.due_date) {
                     <span style="font-size:10px;font-weight:600;margin-left:auto"
-                          [style.color]="isDue(task.due_date) ? 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF)'">
+                          [style.color]="isDue(task.due_date) ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : 'oklch(from #065f46 max(l, var(--text-min-l)) c h)'">
                       ⏰ {{ task.due_date | date:'dd.MM.yy' }}
                     </span>
                   }
@@ -200,16 +200,16 @@ import { LocaleService } from '../../core/i18n/locale.service';
     }
     .task-type-ico { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
     .task-strip-body { flex: 1; min-width: 0; }
-    .task-strip-line1 { font-size: 12px; font-weight: 600; color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); margin-bottom: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-    .task-strip-line2 { font-size: 12px; color: color-mix(in srgb, #b45309 var(--tint-text-mix), #FFFFFF); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-    .task-due { font-size: 10px; font-weight: 600; background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; }
-    .task-due.overdue { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .task-strip-line1 { font-size: 12px; font-weight: 600; color: oklch(from #92400e max(l, var(--text-min-l)) c h); margin-bottom: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .task-strip-line2 { font-size: 12px; color: oklch(from #b45309 max(l, var(--text-min-l)) c h); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .task-due { font-size: 10px; font-weight: 600; background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; }
+    .task-due.overdue { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
 
     /* ── Task type badges ── */
     .tbadge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 3px; }
-    .tbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF); }
-    .tbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
-    .tbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .tbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: oklch(from #5b21b6 max(l, var(--text-min-l)) c h); }
+    .tbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .tbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .tbadge-read    { background: var(--gray-100); color: var(--gray-600); }
   `],
 })

@@ -31,7 +31,7 @@ import { ProjectKsefInvoiceDetailComponent } from './project-ksef-invoice-detail
   `,
   styles: [`
     :host { display:inline-block; max-width:100%; }
-    .badge-link { display:inline-flex; align-items:baseline; gap:4px; max-width:100%; padding:2px 8px; border-radius:6px; border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); font-size:12px; font-family:inherit; font-weight:600; cursor:pointer; text-align:left; overflow-wrap:anywhere; }
+    .badge-link { display:inline-flex; align-items:baseline; gap:4px; max-width:100%; padding:2px 8px; border-radius:6px; border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); font-size:12px; font-family:inherit; font-weight:600; cursor:pointer; text-align:left; overflow-wrap:anywhere; }
     .badge-link:hover { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); }
     .badge-link.static { cursor:default; }
     .badge-link.static:hover { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); }

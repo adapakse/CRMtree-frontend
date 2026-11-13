@@ -201,9 +201,9 @@ export interface SavedProvider {
     .pr-head { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
     .pr-name { font-size:14px; font-weight:600; color:var(--gray-800); }
     .badge { font-size:12px; padding:2px 8px; border-radius:999px; font-weight:600; }
-    .badge.ok   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
-    .badge.bad  { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .badge.warn { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .badge.ok   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .badge.bad  { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .badge.warn { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .badge.off  { background:var(--gray-100); color:var(--gray-500); }
 
     .pr-grid {
@@ -234,14 +234,14 @@ export interface SavedProvider {
 
     .note { font-size:12px; color:var(--gray-400); }
     .note.wide { flex-basis:100%; }
-    .ok-text { color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
-    .warn-text { color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .ok-text { color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .warn-text { color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .pr-note {
       font-size:12px; color:var(--gray-500); background:var(--gray-50);
       border:1px dashed var(--gray-200); border-radius:12px; padding:8px 12px;
     }
     .pr-error {
-      font-size:12px; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface));
+      font-size:12px; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface));
       border-radius:12px; padding:8px 12px; margin-bottom:12px;
       overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:help;
     }

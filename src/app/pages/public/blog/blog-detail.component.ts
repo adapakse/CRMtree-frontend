@@ -178,7 +178,7 @@ import { renderSeoMarkdown } from '../../../shared/utils/seo-markdown.util';
     .author-bio { font-size:0.88rem; color:var(--gray-600); line-height:1.5; margin:0.5rem 0 0; }
     .author-linkedin {
       display:inline-flex; align-items:center; gap:0.35rem; margin-top:0.5rem;
-      font-size:0.82rem; font-weight:600; color:color-mix(in srgb, #0a66c2 var(--tint-text-mix), #FFFFFF); text-decoration:none;
+      font-size:0.82rem; font-weight:600; color:oklch(from #0a66c2 max(l, var(--text-min-l)) c h); text-decoration:none;
     }
     .author-linkedin:hover { text-decoration:underline; }
     .linkedin-icon { flex-shrink:0; }

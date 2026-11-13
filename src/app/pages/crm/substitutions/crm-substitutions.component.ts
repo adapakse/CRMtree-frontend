@@ -290,16 +290,16 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
     /* salesperson: „Osoba nieobecna" to on sam — pole tylko do odczytu, lekko wyszarzone */
     .form-grid input:disabled { background:var(--gray-100); color:var(--gray-500); cursor:not-allowed; }
     .form-grid .invalid { border-color:#dc2626; }
-    .field-err { font-size:12px; font-weight:400; text-transform:none; letter-spacing:0; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .field-err { font-size:12px; font-weight:400; text-transform:none; letter-spacing:0; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
 
     .form-actions { display:flex; gap:8px 12px; align-items:center; flex-wrap:wrap; margin-top:16px; }
-    .msg-error { font-size:12px; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .msg-error { font-size:12px; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .msg-error.block { display:block; margin-bottom:12px; }
-    .msg-ok { font-size:12px; color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); font-weight:600; }
+    .msg-ok { font-size:12px; color:oklch(from #16a34a max(l, var(--text-min-l)) c h); font-weight:600; }
 
     .state { font-size:12px; color:var(--gray-700); padding:8px 0; }
     .state.muted { color:var(--gray-400); font-style:italic; }
-    .state-error { display:flex; align-items:center; gap:12px; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
+    .state-error { display:flex; align-items:center; gap:12px; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
 
     .table-wrap { overflow-x:auto; margin-top:4px; }
     .subs-table { width:100%; border-collapse:collapse; font-size:14px; }
@@ -317,7 +317,7 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
     .subs-table .dash { color:var(--gray-400); }
     .note-text { white-space:pre-wrap; }
     .note-toggle { margin-left:6px; background:none; border:none; padding:0; cursor:pointer;
-      color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); font-size:12px; font-weight:600; }
+      color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-size:12px; font-weight:600; }
 
     .history { margin-top:16px; }
     .history-toggle { background:none; border:none; padding:4px 0; cursor:pointer;
@@ -333,10 +333,10 @@ const REASON_LABEL: Record<AbsenceReason, string> = {
     .pager-btn:hover:not(:disabled), .pager-num:hover:not(.active) { background:var(--gray-50); }
 
     .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:600; white-space:nowrap; }
-    .badge.upcoming  { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); }
-    .badge.active    { background:var(--gray-50); color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF); }
+    .badge.upcoming  { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
+    .badge.active    { background:var(--gray-50); color:oklch(from #15803d max(l, var(--text-min-l)) c h); }
     .badge.ended     { background:var(--gray-100); color:var(--gray-500); }
-    .badge.cancelled { background:var(--gray-50); color:color-mix(in srgb, #be123c var(--tint-text-mix), #FFFFFF); }
+    .badge.cancelled { background:var(--gray-50); color:oklch(from #be123c max(l, var(--text-min-l)) c h); }
 
     @media (max-width: 640px) {
       .form-grid { grid-template-columns:1fr; }

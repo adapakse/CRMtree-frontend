@@ -78,7 +78,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
       <span class="pa-vs">VS</span>
       <span class="pa-leg">
         <span class="pa-dot" style="background:#3b82f6"></span>
-        <span>{{ t('reports.partnerAnalytics.period.b') }}</span> <span class="pa-leg-val" style="color:color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF)">{{labelB || '—'}}</span>
+        <span>{{ t('reports.partnerAnalytics.period.b') }}</span> <span class="pa-leg-val" style="color:oklch(from #2563eb max(l, var(--text-min-l)) c h)">{{labelB || '—'}}</span>
       </span>
 
       <ng-container *ngIf="mode==='custom'">
@@ -392,8 +392,8 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     .btn-sm { height:36px; }
     .seg { display:flex;align-items:center;height:36px;box-sizing:border-box;background:var(--gray-100);border-radius:12px;padding:4px;gap:4px }
     .mode-btn { height:28px;background:none;border:none;padding:0 12px;border-radius:9px;font-size:12px;font-weight:600;color:var(--gray-500);cursor:pointer;font-family:inherit }
-    .mode-active  { background:var(--surface);color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);box-shadow:0 1px 3px rgba(0,0,0,.1) }
-    .mode-year-b  { background:var(--surface);color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF);box-shadow:0 1px 3px rgba(0,0,0,.1) }
+    .mode-active  { background:var(--surface);color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);box-shadow:0 1px 3px rgba(0,0,0,.1) }
+    .mode-year-b  { background:var(--surface);color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h);box-shadow:0 1px 3px rgba(0,0,0,.1) }
     .kpi-card { background:var(--surface);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow-sm) }
     .kpi-lbl { font-size:12px;color:var(--gray-400);font-weight:500;margin-bottom:6px }
     /* Numbers in the body font: the rounded display face made big amounts look playful. */
@@ -407,8 +407,8 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
     .card-title { font-family:inherit;font-size:14px;font-weight:600;color:var(--gray-800);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between }
     .card-subtitle { font-size:14px;color:var(--gray-400);font-weight:400 }
     .delta-pill { display:inline-flex;align-items:center;gap:2px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px }
-    .delta-pill.up   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF) }
-    .delta-pill.down { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF) }
+    .delta-pill.up   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #16a34a max(l, var(--text-min-l)) c h) }
+    .delta-pill.down { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #dc2626 max(l, var(--text-min-l)) c h) }
     .delta-pill.flat { background:var(--gray-100);color:var(--gray-500) }
     table { width:100%;border-collapse:collapse;font-size:12px }
     thead tr { border-bottom:1px solid var(--gray-200) }
@@ -861,7 +861,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
       row.style.marginBottom = '8px';
       const delta = bRow ? +p.gross_turnover_pln - +bRow.gross_turnover_pln : null;
       const deltaHtml = bRow
-        ? `<span style="margin-left:6px;font-size:10px;font-weight:700;padding:1px 4px;border-radius:10px;${delta! >= 0 ? 'background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'background:#fee2e2;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'}">${this.fmtDelta(+p.gross_turnover_pln, +bRow.gross_turnover_pln)}</span>`
+        ? `<span style="margin-left:6px;font-size:10px;font-weight:700;padding:1px 4px;border-radius:10px;${delta! >= 0 ? 'background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #16a34a max(l, var(--text-min-l)) c h)' : 'background:#fee2e2;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)'}">${this.fmtDelta(+p.gross_turnover_pln, +bRow.gross_turnover_pln)}</span>`
         : '';
       row.innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">

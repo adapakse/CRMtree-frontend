@@ -56,7 +56,7 @@ import { ListFilter, ListQueryState, ListSortOption, ListSortOrder } from './lis
     .order { height:30px; min-width:30px; border:1px solid var(--gray-200); background:var(--surface); border-radius:8px; padding:0 10px; font-size:10px; color:var(--gray-600); cursor:pointer; box-shadow:var(--shadow-field); }
     .order:disabled { opacity:.4; cursor:default; }
     .active-count { font-size:12px; font-weight:600; color:var(--orange-dark); background:var(--orange-pale); border-radius:12px; padding:4px 10px; white-space:nowrap; }
-    .clear { border:none; background:none; padding:0; font-size:12px; color:var(--accent-blue, color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)); cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .clear { border:none; background:none; padding:0; font-size:12px; color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); cursor:pointer; font-family:inherit; white-space:nowrap; }
   `],
 })
 export class ListFilterBarComponent {

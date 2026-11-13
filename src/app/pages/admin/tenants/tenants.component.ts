@@ -1129,8 +1129,8 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       border-radius: 12px; padding: 12px 16px; margin-top: 12px; font-size: 14px;
     }
-    .billing-hint-warn { background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border: 1px solid #fde68a; color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .billing-hint-ok   { background: color-mix(in srgb, #ecfdf5 var(--tint-mix), var(--surface)); border: 1px solid #a7f3d0; color: color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); }
+    .billing-hint-warn { background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border: 1px solid #fde68a; color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .billing-hint-ok   { background: color-mix(in srgb, #ecfdf5 var(--tint-mix), var(--surface)); border: 1px solid #a7f3d0; color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
     .billing-hint .btn-secondary { flex-shrink: 0; padding: 4px 12px; font-size: 12px; border-radius: 9px; }
 
     /* Table */
@@ -1152,9 +1152,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .td-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on    { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
+    .badge-on    { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
     .badge-off   { background: var(--gray-100); color: var(--gray-500); }
-    .badge-admin { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF); }
+    .badge-admin { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #2563eb max(l, var(--text-min-l)) c h); }
 
     .feat-pills { display: flex; flex-wrap: wrap; gap: 4px; }
     .pill { background: var(--orange-pale); color: var(--orange-dark); font-size: 12px; padding: 2px 8px; border-radius: 99px; }
@@ -1166,9 +1166,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     }
     .btn-icon:hover { background: var(--gray-100); color: var(--gray-700); }
     .btn-icon svg { width: 15px; height: 15px; transition: transform .2s; }
-    .btn-icon.btn-imp:hover { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF); }
-    .btn-icon.btn-danger-icon { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
-    .btn-icon.btn-danger-icon:hover { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
+    .btn-icon.btn-imp:hover { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #2563eb max(l, var(--text-min-l)) c h); }
+    .btn-icon.btn-danger-icon { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
+    .btn-icon.btn-danger-icon:hover { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
 
     /* Edit panel */
     .edit-panel { background: var(--orange-pale); }
@@ -1244,7 +1244,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .btn-secondary:hover { background: var(--gray-50); }
     .btn-danger {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px 16px; background: var(--gray-50); color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);
+      padding: 8px 16px; background: var(--gray-50); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
       border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
     }
     .btn-danger:hover:not(:disabled) { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); }
@@ -1312,7 +1312,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .provider-form { padding: 14px 16px 16px; }
     .provider-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
     .btn-danger-sm {
-      padding: 8px 16px; background: var(--gray-50); color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);
+      padding: 8px 16px; background: var(--gray-50); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
       border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
       transition: background .12s;
     }
@@ -1332,9 +1332,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
 
     .hint { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
     .hint-inline { font-size: 12px; color: var(--gray-400); font-weight: 400; }
-    .token-warning { margin-top: 8px; font-size: 12px; color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); background: var(--gray-50); border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; padding: 8px 12px; line-height: 1.5; }
-    .req  { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
-    .info-box { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border: 1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius: 10px; padding: 12px 16px; font-size: 14px; color: color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .token-warning { margin-top: 8px; font-size: 12px; color: oklch(from #b91c1c max(l, var(--text-min-l)) c h); background: var(--gray-50); border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; padding: 8px 12px; line-height: 1.5; }
+    .req  { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
+    .info-box { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border: 1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius: 10px; padding: 12px 16px; font-size: 14px; color: oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .temp-pass-box {
       font-family: monospace; font-size: 20px; font-weight: 700; letter-spacing: 2px;
       background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 12px;

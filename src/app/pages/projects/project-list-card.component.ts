@@ -55,8 +55,8 @@ import { ProjectFinanceTotalsComponent } from '../../shared/components/project-f
     .project-dates { font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .project-stats { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--gray-500); margin-top:auto; }
     .project-stats .mine strong { color: var(--orange-text); }
-    .project-stats .overdue, .project-stats .overdue strong { color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
-    .project-stats .at-risk, .project-stats .at-risk strong { color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .project-stats .overdue, .project-stats .overdue strong { color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
+    .project-stats .at-risk, .project-stats .at-risk strong { color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .project-finance { padding-top:8px; border-top:1px solid var(--gray-100); }
     .pill.role { background:var(--orange-pale); color:var(--orange-dark); }
     .pill.closed { background:var(--gray-100); color:var(--gray-500); }

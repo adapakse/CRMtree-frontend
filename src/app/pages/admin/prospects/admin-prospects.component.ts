@@ -290,14 +290,14 @@ interface DiscoveredCompany {
         @if (importResult()) {
           @if (importResult()!.fatal_error) {
             <div style="margin-top:12px;font-size:14px;padding:8px 12px;border-radius:12px;
-                        border:1px solid #fca5a5;background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)">
+                        border:1px solid #fca5a5;background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">
               ✗ {{ t('admin.import.fatalError') }} <b>{{ importResult()!.fatal_error }}</b>
             </div>
           } @else {
             <div style="margin-top:12px;font-size:14px;padding:8px 12px;border-radius:12px;border:1px solid"
               [style.background]="importResult()!.errors! > 0 ? 'color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface))' : 'var(--gray-50)'"
               [style.borderColor]="importResult()!.errors! > 0 ? '#fcd34d' : '#86efac'"
-              [style.color]="importResult()!.errors! > 0 ? 'color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)'">
+              [style.color]="importResult()!.errors! > 0 ? 'oklch(from #92400e max(l, var(--text-min-l)) c h)' : 'oklch(from #166534 max(l, var(--text-min-l)) c h)'">
               ✓ {{ t('admin.import.added') }} <b>{{ importResult()!.added }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.skipped') }} <b>{{ importResult()!.skipped }}</b> &nbsp;|&nbsp;
               {{ t('admin.import.errors') }} <b>{{ importResult()!.errors }}</b> &nbsp;|&nbsp;
@@ -503,19 +503,19 @@ interface DiscoveredCompany {
                   @if (p.has_partner) {
                     <button (click)="$event.stopPropagation(); goToPartner(p.partner_nav_id!, p.nip)"
                       [title]="t('admin.table.partnerBadgeTooltip')"
-                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));border:1px solid #6ee7b7;color:color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));border:1px solid #6ee7b7;color:oklch(from #065f46 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🤝 Partner
                     </button>
                   } @else if (p.crm_lead_id) {
                     <button (click)="$event.stopPropagation(); goToLead(p.crm_lead_id!, p.nip)"
                       [title]="t('admin.table.convertedLeadTooltip')"
-                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
                   } @else if (p.has_lead) {
                     <button (click)="$event.stopPropagation(); goToLead(p.lead_id!, p.nip)"
                       [title]="t('admin.table.leadBadgeTooltip')"
-                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
+                      style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));border:1px solid #93c5fd;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);cursor:pointer;font-size:10px;font-weight:700;line-height:1">
                       🏷 Lead
                     </button>
                   }
@@ -531,15 +531,15 @@ interface DiscoveredCompany {
                         🌐 {{ shortUrl(p.website_url) }}
                       </a>
                       @if (p.website_status === 'ok') {
-                        <span style="font-size:10px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-weight:700;line-height:1" [title]="t('admin.website.okShort')">✓</span>
+                        <span style="font-size:10px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.okShort')">✓</span>
                       } @else if (p.website_status === 'blocked') {
-                        <span style="font-size:10px;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);font-weight:700;line-height:1" [title]="t('admin.website.blockedShort')">!</span>
+                        <span style="font-size:10px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.blockedShort')">!</span>
                       } @else if (p.website_status === 'failed') {
-                        <span style="font-size:10px;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);font-weight:700;line-height:1" [title]="t('admin.website.failedShort')">!</span>
+                        <span style="font-size:10px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.failedShort')">!</span>
                       } @else if (p.website_status === 'not_found') {
                         <span style="font-size:10px;color:var(--gray-400);font-weight:700;line-height:1" [title]="t('admin.website.notFoundShort')">–</span>
                       } @else if (p.website_status === 'unconfirmed') {
-                        <span style="font-size:10px;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);font-weight:700;line-height:1" [title]="t('admin.website.unconfirmedShort')">?</span>
+                        <span style="font-size:10px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:700;line-height:1" [title]="t('admin.website.unconfirmedShort')">?</span>
                       }
                     </span>
                   }
@@ -617,7 +617,7 @@ interface DiscoveredCompany {
               </td>
               <td (click)="$event.stopPropagation()">
                 @if (p.has_partner) {
-                  <button class="btn btn-g btn-sm" style="background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));color:color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF);border-color:#6ee7b7"
+                  <button class="btn btn-g btn-sm" style="background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));color:oklch(from #065f46 max(l, var(--text-min-l)) c h);border-color:#6ee7b7"
                     (click)="goToPartner(p.partner_nav_id!, p.nip)"
                     [title]="t('admin.table.goToPartnerTooltip')">
                     ↗ {{ t('admin.table.partner') }}
@@ -629,7 +629,7 @@ interface DiscoveredCompany {
                     ↗ CRM
                   </button>
                 } @else if (p.has_lead) {
-                  <button class="btn btn-g btn-sm" style="background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-color:#93c5fd"
+                  <button class="btn btn-g btn-sm" style="background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-color:#93c5fd"
                     (click)="goToLead(p.lead_id!, p.nip)"
                     [title]="t('admin.table.goToLeadTooltip')">
                     ↗ {{ t('admin.table.lead') }}
@@ -706,7 +706,7 @@ interface DiscoveredCompany {
                               <span [title]="s.desc" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:12px;border:1px solid"
                                 [style.background]="getSignal(p, s.key) === true ? 'color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface))' : getSignal(p, s.key) === false ? 'color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface))' : 'var(--gray-100)'"
                                 [style.borderColor]="getSignal(p, s.key) === true ? '#4ade80' : getSignal(p, s.key) === false ? '#fca5a5' : '#d1d5db'"
-                                [style.color]="getSignal(p, s.key) === true ? 'color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)' : getSignal(p, s.key) === false ? 'color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)' : 'var(--gray-500)'">
+                                [style.color]="getSignal(p, s.key) === true ? 'oklch(from #166534 max(l, var(--text-min-l)) c h)' : getSignal(p, s.key) === false ? 'oklch(from #991b1b max(l, var(--text-min-l)) c h)' : 'var(--gray-500)'">
                                 {{ getSignal(p, s.key) === true ? '✓' : getSignal(p, s.key) === false ? '✗' : '—' }}
                                 {{ s.label }}
                               </span>
@@ -760,19 +760,19 @@ interface DiscoveredCompany {
                               🌐 {{ p.website_url }}
                             </a>
                             @if (p.website_status === 'ok') {
-                              <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.website_status === 'blocked') {
-                              <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.blocked')">⚠ Cloudflare</span>
                             } @else if (p.website_status === 'failed') {
-                              <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.failed')">⚠ {{ t('admin.website.noContent') }}</span>
                             } @else if (p.website_status === 'not_found') {
                               <span style="font-size:10px;font-weight:600;color:var(--gray-400);white-space:nowrap"
                                 [title]="t('admin.website.notFound')">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
                             } @else if (p.website_status === 'unconfirmed') {
-                              <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.website.unconfirmed')">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
                             }
                           </div>
@@ -780,7 +780,7 @@ interface DiscoveredCompany {
                         @if (p.facebook_url) {
                           <div>
                             <a [href]="p.facebook_url" target="_blank" (click)="$event.stopPropagation()"
-                              style="color:color-mix(in srgb, #1877f2 var(--tint-text-mix), #FFFFFF);text-decoration:none;font-size:12px">
+                              style="color:oklch(from #1877f2 max(l, var(--text-min-l)) c h);text-decoration:none;font-size:12px">
                               <b>f</b> {{ p.facebook_url }}
                             </a>
                           </div>
@@ -788,14 +788,14 @@ interface DiscoveredCompany {
                         @if (p.linkedin_url) {
                           <div style="display:flex;align-items:center;gap:8px">
                             <a [href]="p.linkedin_url" target="_blank" (click)="$event.stopPropagation()"
-                              style="color:color-mix(in srgb, #0a66c2 var(--tint-text-mix), #FFFFFF);text-decoration:none;font-size:12px">
+                              style="color:oklch(from #0a66c2 max(l, var(--text-min-l)) c h);text-decoration:none;font-size:12px">
                               <b>in</b> {{ p.linkedin_url }}
                             </a>
                             @if (p.linkedin_status === 'ok') {
-                              <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.linkedin.ok')">✓ {{ t('admin.website.fetched') }}</span>
                             } @else if (p.linkedin_status === 'blocked') {
-                              <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);white-space:nowrap"
+                              <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);white-space:nowrap"
                                 [title]="t('admin.linkedin.blocked')">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
                             } @else if (p.linkedin_status === 'not_found') {
                               <span style="font-size:10px;font-weight:600;color:var(--gray-400);white-space:nowrap"
@@ -804,12 +804,12 @@ interface DiscoveredCompany {
                           </div>
                         }
                         @if (p.enrichment_status === 'no_website') {
-                          <div style="color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));padding:4px 8px;border-radius:8px;margin-top:4px;font-size:12px">
+                          <div style="color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));padding:4px 8px;border-radius:8px;margin-top:4px;font-size:12px">
                             ⚠ {{ t('admin.detail.noWebsiteHalted') }}
                           </div>
                         }
                         @if (p.enrichment_error) {
-                          <div style="color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);margin-top:4px">
+                          <div style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-top:4px">
                             <b>{{ t('admin.detail.enrichmentError') }}</b> {{ p.enrichment_error }}
                           </div>
                         }
@@ -877,14 +877,14 @@ interface DiscoveredCompany {
                             }
                             @if (p.decision_maker_linkedin) {
                               <a [href]="p.decision_maker_linkedin" target="_blank"
-                                style="color:color-mix(in srgb, #0a66c2 var(--tint-text-mix), #FFFFFF);text-decoration:none;font-weight:600"
+                                style="color:oklch(from #0a66c2 max(l, var(--text-min-l)) c h);text-decoration:none;font-weight:600"
                                 (click)="$event.stopPropagation()">
                                 in LI
                               </a>
                             }
                             @if (p.decision_maker_facebook) {
                               <a [href]="p.decision_maker_facebook" target="_blank"
-                                style="color:color-mix(in srgb, #1877f2 var(--tint-text-mix), #FFFFFF);text-decoration:none;font-weight:600"
+                                style="color:oklch(from #1877f2 max(l, var(--text-min-l)) c h);text-decoration:none;font-weight:600"
                                 (click)="$event.stopPropagation()">
                                 f FB
                               </a>
@@ -1197,7 +1197,7 @@ interface DiscoveredCompany {
             maxlength="13"
             placeholder="0000000000">
           @if (toLeadNipDigits !== toLeadDialog()!.nip) {
-            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF);font-weight:600">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:oklch(from #d97706 max(l, var(--text-min-l)) c h);font-weight:600">
               {{ t('admin.toLead.changed') }}
             </span>
           }
@@ -1205,7 +1205,7 @@ interface DiscoveredCompany {
         <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px">
           {{ t('admin.toLead.taxIdHint') }}
           @if (toLeadNipDigits !== toLeadDialog()!.nip && toLeadNipDigits.length === 10) {
-            <span style="color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF)"> {{ t('admin.toLead.prospectWillUpdate') }}</span>
+            <span style="color:oklch(from #d97706 max(l, var(--text-min-l)) c h)"> {{ t('admin.toLead.prospectWillUpdate') }}</span>
           }
         </div>
 
@@ -1230,7 +1230,7 @@ interface DiscoveredCompany {
           [placeholder]="t('admin.toLead.tagPlaceholder')">
 
         @if (toLeadDuplicateError()) {
-          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #fecdd3 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #fecdd3 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">
             {{ t('admin.toLead.duplicateWarning') }}
             <strong>{{ toLeadDuplicateError()!.src === 'lead' ? t('admin.table.lead') : t('admin.table.partner') }}</strong>:
             „{{ toLeadDuplicateError()!.company }}"
@@ -1439,7 +1439,7 @@ interface DiscoveredCompany {
             @if (inspectTarget()!.enrichment_log!.claude) {
               <div class="inspect-card" style="background:var(--gray-50);border-color:color-mix(in srgb, #bae6fd var(--tint-mix), var(--surface))">
                 <div class="inspect-card-header">
-                  <span class="inspect-badge" style="background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #3730a3 var(--tint-text-mix), #FFFFFF)">AI</span>
+                  <span class="inspect-badge" style="background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface));color:oklch(from #3730a3 max(l, var(--text-min-l)) c h)">AI</span>
                   <span style="font-size:12px">Claude</span>
                 </div>
                 <div class="inspect-kv">
@@ -1587,15 +1587,15 @@ interface DiscoveredCompany {
         <label style="font-size:12px;font-weight:500;color:var(--gray-700);display:flex;align-items:center;gap:8px;margin-bottom:4px">
           {{ t('admin.reprocess.website') }}
           @if (reprocessTarget()?.website_status === 'ok') {
-            <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">✓ {{ t('admin.website.fetched') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.website_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF)" [title]="t('admin.website.blockedShort')">⚠ Cloudflare</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)" [title]="t('admin.website.blockedShort')">⚠ Cloudflare</span>
           } @else if (reprocessTarget()?.website_status === 'failed') {
-            <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF)">⚠ {{ t('admin.website.noContent') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.website.noContent') }}</span>
           } @else if (reprocessTarget()?.website_status === 'not_found') {
             <span style="font-size:10px;font-weight:600;color:var(--gray-400)">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           } @else if (reprocessTarget()?.website_status === 'unconfirmed') {
-            <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF)">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.website.unconfirmedLabel') }}</span>
           }
         </label>
         <input class="inp" style="width:100%;box-sizing:border-box;margin-bottom:12px"
@@ -1605,9 +1605,9 @@ interface DiscoveredCompany {
         <label style="font-size:12px;font-weight:500;color:var(--gray-700);display:flex;align-items:center;gap:8px;margin-bottom:4px">
           LinkedIn
           @if (reprocessTarget()?.linkedin_status === 'ok') {
-            <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">✓ {{ t('admin.website.fetched') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('admin.website.fetched') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'blocked') {
-            <span style="font-size:10px;font-weight:600;color:color-mix(in srgb, #d97706 var(--tint-text-mix), #FFFFFF)">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
+            <span style="font-size:10px;font-weight:600;color:oklch(from #d97706 max(l, var(--text-min-l)) c h)">⚠ {{ t('admin.linkedin.blockedLabel') }}</span>
           } @else if (reprocessTarget()?.linkedin_status === 'not_found') {
             <span style="font-size:10px;font-weight:600;color:var(--gray-400)">✗ {{ t('admin.website.notFoundShortLabel') }}</span>
           }
@@ -1735,14 +1735,14 @@ interface DiscoveredCompany {
                 <div>
                   @if (c.nip_verified) {
                     <span style="font-family:monospace;font-size:12px;color:var(--gray-700)">{{ c.nip }}</span>
-                    <span style="margin-left:4px;font-size:10px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)" [title]="t('admin.discoveryModal.verifiedInGus')">✓</span>
+                    <span style="margin-left:4px;font-size:10px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)" [title]="t('admin.discoveryModal.verifiedInGus')">✓</span>
                   } @else {
                     <input class="inp" style="width:100px;font-size:12px;padding:2px 4px;height:24px"
                       [(ngModel)]="c.nip_edit"
                       [placeholder]="t('admin.table.taxId')"
                       [title]="t('admin.discoveryModal.enterTaxIdManually')">
                     @if (c.nip) {
-                      <div style="font-size:10px;color:color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF);margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
+                      <div style="font-size:10px;color:oklch(from #f59e0b max(l, var(--text-min-l)) c h);margin-top:1px">⚠ {{ t('admin.discoveryModal.unverified') }}</div>
                     }
                     <!-- Wyszukiwanie NIP-u w internecie jest płatne, więc odpala
                          się tylko z tego przycisku — nigdy automatycznie dla
@@ -1774,7 +1774,7 @@ interface DiscoveredCompany {
 
                 <div style="font-size:12px;color:var(--gray-700)">
                   @if (c.pkd_main) {
-                    <span style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:3px;padding:1px 4px;font-size:10px">{{ c.pkd_main }}</span>
+                    <span style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:3px;padding:1px 4px;font-size:10px">{{ c.pkd_main }}</span>
                   } @else {
                     <span style="color:var(--gray-400)">—</span>
                   }
@@ -1800,7 +1800,7 @@ interface DiscoveredCompany {
             </span>
             <span class="tsp"></span>
             @if (discoveryDone()) {
-              <div style="font-size:12px;padding:8px 12px;background:var(--gray-50);border:1px solid #86efac;border-radius:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">
+              <div style="font-size:12px;padding:8px 12px;background:var(--gray-50);border:1px solid #86efac;border-radius:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
                 ✓ {{ t('admin.discoveryModal.addedPrefix') }} <b>{{ discoveryDone()!.added }}</b> {{ t('admin.discoveryModal.addedSuffix') }}
                 <b>„{{ discoveryDone()!.source_database }}"</b>
                 @if (discoveryDone()!.batchStarted) { {{ t('admin.discoveryModal.andEnrichmentStarted') }} }
@@ -1851,8 +1851,8 @@ interface DiscoveredCompany {
     }
     /* Obecność w zasobach TEGO tenanta: P = prospekt, L = lead, PA = partner */
     .badge-cp  { background:var(--orange-pale);color: var(--orange-text);border:1px solid #a7d8b6;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
-    .badge-cl  { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border:1px solid #93c5fd;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
-    .badge-cpa { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF);border:1px solid color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface));border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .badge-cl  { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border:1px solid #93c5fd;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .badge-cpa { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h);border:1px solid color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface));border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700 }
 
     .reprocess-overlay {
       position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.35);
@@ -1892,7 +1892,7 @@ interface DiscoveredCompany {
       font-size:12px; line-height:1; color:var(--gray-500); opacity:.7;
     }
     .icon-btn:hover { opacity:1; }
-    .icon-btn-danger { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .icon-btn-danger { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .dm-badge {
       background:var(--orange-pale); color: var(--orange-text); font-size:10px; font-weight:700;
       padding:1px 6px; border-radius:4px;
@@ -1905,7 +1905,7 @@ interface DiscoveredCompany {
       background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border: 1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius: 14px;
       font-size: 14px;
     }
-    .bulk-count { font-weight: 600; color: color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); margin-right: 4px; white-space: nowrap; }
+    .bulk-count { font-weight: 600; color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); margin-right: 4px; white-space: nowrap; }
 
     /* overflow: clip rounds the corners without creating a scroll box, so the
        sticky table header keeps sticking to the page scroll. */
@@ -2030,7 +2030,7 @@ interface DiscoveredCompany {
     }
 
     .tag { display:inline-block; padding:2px 6px; border-radius:4px;
-           font-size:12px; background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color:color-mix(in srgb, #c2410c var(--tint-text-mix), #FFFFFF); }
+           font-size:12px; background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
     .tag-sm { font-size:10px; }
 
     /* Zasięg geograficzny */
@@ -2058,15 +2058,15 @@ interface DiscoveredCompany {
     }
 
     .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:500; }
-    .badge-pending   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .badge-done      { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); }
-    .badge-error     { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .badge-pending   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .badge-done      { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color:oklch(from #065f46 max(l, var(--text-min-l)) c h); }
+    .badge-error     { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .badge-no_website { background:var(--gray-100); color:var(--gray-500); }
     .badge-no_krs    { background:var(--gray-100); color:var(--gray-500); }
-    .badge-hold      { background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface)); color:color-mix(in srgb, #3730a3 var(--tint-text-mix), #FFFFFF); }
+    .badge-hold      { background:color-mix(in srgb, #e0e7ff var(--tint-mix), var(--surface)); color:oklch(from #3730a3 max(l, var(--text-min-l)) c h); }
     .badge-archived  { background:var(--gray-100); color:var(--gray-500); }
-    .badge-lead      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
-    .badge-db        { background:color-mix(in srgb, #fef0e9 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #c2410c var(--tint-text-mix), #FFFFFF); font-size:10px; padding:1px 6px; border-radius:8px; }
+    .badge-lead      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .badge-db        { background:color-mix(in srgb, #fef0e9 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); font-size:10px; padding:1px 6px; border-radius:8px; }
 
     .btn-menu {
       width:28px; height:28px; border:1px solid var(--gray-200); border-radius:10px;
@@ -2091,7 +2091,7 @@ interface DiscoveredCompany {
       border-radius:10px; color:var(--gray-700); white-space:nowrap;
     }
     .mi:hover { background:var(--gray-100); }
-    .mi-danger { color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .mi-danger { color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .mi-danger:hover { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); }
     .mi-sep { height:1px; background:var(--gray-100); margin:4px 0; }
 
@@ -2121,17 +2121,17 @@ interface DiscoveredCompany {
       display: flex; align-items: center; justify-content: center;
       background: var(--gray-100); color: var(--gray-500);
     }
-    .log-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); }
-    .log-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .log-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
+    .log-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .log-step-body { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; flex: 1; }
-    .log-ok   { color: color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); font-weight: 500; }
-    .log-err  { color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); font-weight: 500; }
+    .log-ok   { color: oklch(from #065f46 max(l, var(--text-min-l)) c h); font-weight: 500; }
+    .log-err  { color: oklch(from #991b1b max(l, var(--text-min-l)) c h); font-weight: 500; }
     .log-detail { color: var(--gray-700); }
     .log-muted  { color: var(--gray-400); font-style: italic; }
     .log-expand-btn {
       background: none; border: none; padding: 0 0 0 4px; margin: 0;
       color: var(--gray-500); font-size: 12px; font-style: italic; cursor: pointer;
-      &:hover { color: color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); text-decoration: underline; }
+      &:hover { color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); text-decoration: underline; }
     }
 
     /* Sekcja sygnałów w logu Claude */
@@ -2232,8 +2232,8 @@ interface DiscoveredCompany {
       padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700;
       background: var(--gray-100); color: var(--gray-500); flex-shrink: 0;
     }
-    .inspect-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); }
-    .inspect-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .inspect-badge-ok  { background: color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
+    .inspect-badge-err { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .inspect-kv { display: flex; flex-direction: column; gap: 4px; }
     .inspect-row { display: flex; gap: 6px; font-size: 12px; line-height: 1.4; }
     .ik { color: var(--gray-500); flex-shrink: 0; min-width: 84px; }
@@ -2276,8 +2276,8 @@ interface DiscoveredCompany {
       border-top: 2px solid color-mix(in srgb, #fbd0b6 var(--tint-mix), var(--surface)) !important;
     }
     .sb-value { font-weight: 600; }
-    .sb-plus { color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
-    .sb-minus { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .sb-plus { color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
+    .sb-minus { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
 
     .inspect-footer {
       border-top: 1px solid var(--gray-200);

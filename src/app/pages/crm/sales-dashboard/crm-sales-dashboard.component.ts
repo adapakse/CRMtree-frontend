@@ -37,10 +37,10 @@ interface CallBarRow {
 
 const MISSED_CALL_STATUSES = ['missed', 'not_answered', 'rejected', 'error'];
 const MY_CALL_TYPES: { direction: string; statuses: string[]; labelKey: string; color: string }[] = [
-  { direction: 'outbound', statuses: ['answered'],         labelKey: 'outboundAnswered', color: 'color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)' },
-  { direction: 'outbound', statuses: MISSED_CALL_STATUSES, labelKey: 'outboundMissed',   color: 'color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)' },
-  { direction: 'inbound',  statuses: ['answered'],         labelKey: 'inboundAnswered',  color: 'color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)' },
-  { direction: 'inbound',  statuses: MISSED_CALL_STATUSES, labelKey: 'inboundMissed',    color: 'color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)' },
+  { direction: 'outbound', statuses: ['answered'],         labelKey: 'outboundAnswered', color: 'oklch(from #22c55e max(l, var(--text-min-l)) c h)' },
+  { direction: 'outbound', statuses: MISSED_CALL_STATUSES, labelKey: 'outboundMissed',   color: 'oklch(from #f97316 max(l, var(--text-min-l)) c h)' },
+  { direction: 'inbound',  statuses: ['answered'],         labelKey: 'inboundAnswered',  color: 'oklch(from #3b82f6 max(l, var(--text-min-l)) c h)' },
+  { direction: 'inbound',  statuses: MISSED_CALL_STATUSES, labelKey: 'inboundMissed',    color: 'oklch(from #ef4444 max(l, var(--text-min-l)) c h)' },
 ];
 
 // Daily calls goal. Once it is reached (Adam's feedback) only the gold medal is
@@ -661,8 +661,8 @@ const TODAY_CALLS_GOAL = 37;
     .kpi-value-sm { font-size: 20px; }
     /* "↑ 140%" stays together; "vs poprzedni miesiąc" sits next to it or moves whole to the next line. */
     .kpi-trend { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 4px; margin-top: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-    .kpi-trend.pos { color: color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); }
-    .kpi-trend.neg { color: color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .kpi-trend.pos { color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
+    .kpi-trend.neg { color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .kpi-trend span { font-weight: 400; color: var(--gray-400); }
 
     /* Grid layout */
@@ -678,9 +678,9 @@ const TODAY_CALLS_GOAL = 37;
     .panel-refresh-btn:hover { color: var(--orange-dark); border-color: var(--orange); }
     .count-badge { background: var(--orange-strong); color: white; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 8px; }
     .icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--gray-200); border-radius: 50%; color: var(--gray-500); text-decoration: none; background: var(--surface); }
-    .icon-btn:hover { background: var(--gray-50); color: var(--orange, color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)); }
+    .icon-btn:hover { background: var(--gray-50); color: var(--orange, oklch(from #3baa5d max(l, var(--text-min-l)) c h)); }
     .empty-msg { color: var(--gray-400); font-size: 14px; padding: 16px 0; text-align: center; flex: 1; }
-    .panel-link { display: block; margin-top: auto; padding-top: 14px; font-size: 12px; color: var(--orange, color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)); text-decoration: none; font-weight: 600; }
+    .panel-link { display: block; margin-top: auto; padding-top: 14px; font-size: 12px; color: var(--orange, oklch(from #3baa5d max(l, var(--text-min-l)) c h)); text-decoration: none; font-weight: 600; }
     .panel-link:hover { text-decoration: underline; }
 
     /* Pipeline */
@@ -700,8 +700,8 @@ const TODAY_CALLS_GOAL = 37;
     .chart-summary { margin-bottom: 10px; }
     .chart-main-val { font-size: 24px; font-weight: 600; color: var(--gray-900); font-variant-numeric: tabular-nums; }
     .chart-change { font-size: 14px; font-weight: 600; margin-top: 4px; }
-    .chart-change.pos { color: color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); }
-    .chart-change.neg { color: color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .chart-change.pos { color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
+    .chart-change.neg { color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .chart-change-label { font-weight: 400; color: var(--gray-400); margin-left: 4px; }
     .chart-svg { width: 100%; height: 120px; display: block; flex: 1; }
     .chart-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--gray-400); font-size: 14px; min-height: 100px; }
@@ -728,14 +728,14 @@ const TODAY_CALLS_GOAL = 37;
       transition: background .15s, color .15s, border-color .15s;
     }
     /* Neutral until hovered, so it reads as an action and not as a "done" status. */
-    .task-close-pill:hover { border-color: var(--orange, #3BAA5D); color: var(--orange-dark, color-mix(in srgb, #2f8f4d var(--tint-text-mix), #FFFFFF)); background: rgba(59,170,93,.06); }
+    .task-close-pill:hover { border-color: var(--orange, #3BAA5D); color: var(--orange-dark, oklch(from #2f8f4d max(l, var(--text-min-l)) c h)); background: rgba(59,170,93,.06); }
     .task-close-pill svg { width: 13px; height: 13px; }
     .task-close-pill.done { padding: 4px 6px; background: var(--orange, #3BAA5D); color: #FFFFFF; }
     .task-body { flex: 1; min-width: 0; }
     .task-title { font-size: 12px; font-weight: 600; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .task-sub { font-size: 12px; color: var(--gray-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .task-time { font-size: 12px; font-weight: 600; color: color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF); flex-shrink: 0; }
-    .task-overdue { color: color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .task-time { font-size: 12px; font-weight: 600; color: oklch(from #3b82f6 max(l, var(--text-min-l)) c h); flex-shrink: 0; }
+    .task-overdue { color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
 
     /* Leads table */
     .leads-table { width: 100%; border-collapse: collapse; font-size: 12px; flex: 1; }
@@ -743,7 +743,7 @@ const TODAY_CALLS_GOAL = 37;
     .leads-table td { padding: 10px 10px; border-bottom: 1px solid var(--gray-50); vertical-align: middle; }
     .leads-table tr:last-child td { border-bottom: none; }
     .lead-link { color: var(--gray-800); font-weight: 600; text-decoration: none; }
-    .lead-link:hover { color: var(--orange, color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)); }
+    .lead-link:hover { color: var(--orange, oklch(from #3baa5d max(l, var(--text-min-l)) c h)); }
     .text-muted { color: var(--gray-400); }
 
     /* Stage badges */
@@ -780,9 +780,9 @@ const TODAY_CALLS_GOAL = 37;
     .kpi-card.clickable:hover { border-color: var(--orange, #3BAA5D); box-shadow: 0 2px 12px rgba(59,170,93,.12); transform: translateY(-1px); transition: all .15s; }
     .pipe-row.clickable:hover { background: var(--gray-50); border-radius: 8px; margin: 0 -6px; padding: 0 6px; }
     .act-item.clickable:hover { background: var(--gray-50); border-radius: 8px; margin: 0 -8px; padding: 4px 8px; }
-    .task-body.clickable:hover .task-title { color: var(--orange, color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)); }
+    .task-body.clickable:hover .task-title { color: var(--orange, oklch(from #3baa5d max(l, var(--text-min-l)) c h)); }
     .leads-table tr.clickable:hover td { background: var(--gray-50); }
-    .leads-table tr.clickable:hover .lead-link { color: var(--orange, color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)); }
+    .leads-table tr.clickable:hover .lead-link { color: var(--orange, oklch(from #3baa5d max(l, var(--text-min-l)) c h)); }
 
     /* Task close form */
     .task-close-form { padding: 6px 0 8px 28px; display: flex; flex-direction: column; gap: 6px; }
@@ -804,8 +804,8 @@ const TODAY_CALLS_GOAL = 37;
     .toolbar select, .toolbar .btn, .toolbar input { height: 36px; box-sizing: border-box; }
     .churn-filter-inp { padding: 0 16px; min-width: 200px; }
     .churn-filter-spacer { flex: 1; }
-    .churn-gen-result { display: flex; align-items: center; gap: 8px; background: var(--gray-50); border: 1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); border-radius: 8px; padding: 10px 14px; font-size: 14px; color: color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
-    .churn-gen-close { background: none; border: none; cursor: pointer; color: color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); font-size: 14px; padding: 0 0 0 8px; margin-left: auto; }
+    .churn-gen-result { display: flex; align-items: center; gap: 8px; background: var(--gray-50); border: 1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); border-radius: 8px; padding: 10px 14px; font-size: 14px; color: oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .churn-gen-close { background: none; border: none; cursor: pointer; color: oklch(from #166534 max(l, var(--text-min-l)) c h); font-size: 14px; padding: 0 0 0 8px; margin-left: auto; }
     .churn-list { display: flex; flex-direction: column; gap: 8px; }
     .churn-empty { text-align: center; color: var(--gray-400); font-size: 14px; padding: 40px 0; }
     .churn-loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
@@ -822,14 +822,14 @@ const TODAY_CALLS_GOAL = 37;
     .churn-stats { display: flex; gap: 20px; flex-shrink: 0; }
     .churn-stat { display: flex; flex-direction: column; align-items: flex-end; }
     .churn-stat-val { font-size: 16px; font-weight: 700; color: var(--gray-800); }
-    .churn-drop { color: color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .churn-drop { color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .churn-stat-lbl { font-size: 10px; color: var(--gray-400); white-space: nowrap; }
     .churn-score-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 90px; flex-shrink: 0; }
     .churn-badge { padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-    .risk-badge-critical { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .risk-badge-high     { background: color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface)); color: color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF); }
-    .risk-badge-medium   { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .risk-badge-low      { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .risk-badge-critical { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .risk-badge-high     { background: color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface)); color: oklch(from #9a3412 max(l, var(--text-min-l)) c h); }
+    .risk-badge-medium   { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .risk-badge-low      { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .churn-score { font-size: 12px; color: var(--gray-500); }
     .churn-chevron { color: #D1D5DB; flex-shrink: 0; }
   `],

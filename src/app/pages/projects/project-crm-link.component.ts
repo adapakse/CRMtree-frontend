@@ -59,10 +59,10 @@ const RESULTS_PER_KIND = 10;
     :host { display:flex; flex-direction:column; gap:8px; }
     .link-row { display:flex; align-items:center; gap:10px; font-size:14px; }
     .label { font-size:12px; font-weight:600; color:var(--gray-600); }
-    .target { color:color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF); font-weight:600; text-decoration:none; }
+    .target { color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h); font-weight:600; text-decoration:none; }
     .target.plain { color:var(--gray-800); }
     .none { color:var(--gray-400); }
-    .link-danger { border:none; background:none; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); font-size:12px; cursor:pointer; font-family:inherit; }
+    .link-danger { border:none; background:none; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); font-size:12px; cursor:pointer; font-family:inherit; }
     .picker { display:grid; grid-template-columns:minmax(0, 520px) auto; gap:8px; align-items:center; justify-content:start; }
     .hint { font-size:12px; color:var(--gray-400); }
   `],

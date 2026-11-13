@@ -504,7 +504,7 @@ function maxOf(rows: BarRow[]): number {
       color: var(--gray-600, var(--gray-600)); white-space: nowrap; font-family: inherit; font-weight: 500;
     }
     .pd-ptab.active {
-      background: rgba(59,170,93,.18); color: var(--orange-dark, color-mix(in srgb, #2f8f4d var(--tint-text-mix), #FFFFFF)); border-color: rgba(59,170,93,.45);
+      background: rgba(59,170,93,.18); color: var(--orange-dark, oklch(from #2f8f4d max(l, var(--text-min-l)) c h)); border-color: rgba(59,170,93,.45);
     }
 
     /* ── Słupki ────────────────────────────────────────────────── */

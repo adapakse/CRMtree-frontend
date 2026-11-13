@@ -153,7 +153,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
               }
             </div>
 
-            <div class="td" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)' : ''"
+            <div class="td" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : ''"
                  [title]="doc.doc_type === invoiceDocType ? t('labels.fields.paymentDueDate') : ''">
               {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
             </div>
@@ -225,7 +225,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
     .td { padding: 10px 8px; font-size: 14px; color: var(--gray-700); overflow: hidden; }
     .td-n-wrap { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
     .td-n { font-weight: 600; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .no-partner-tri { font-size: 14px; color: color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF); cursor: default; line-height: 1; width: fit-content; }
+    .no-partner-tri { font-size: 14px; color: oklch(from #f97316 max(l, var(--text-min-l)) c h); cursor: default; line-height: 1; width: fit-content; }
     .td-sub { font-size: 12px; color: var(--gray-400); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .td-muted { color: var(--gray-500); font-size: 13px; }
     .td-status { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
@@ -241,7 +241,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
     .task-type { font-size: 12px; font-weight: 500; color: var(--gray-500); white-space: nowrap; flex-shrink: 0; }
     .task-assignee { font-size: 12px; font-weight: 500; color: var(--gray-700); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .task-due { font-size: 12px; font-weight: 600; color: var(--gray-500); white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; }
-    .task-due.overdue { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .task-due.overdue { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .task-none { font-size: 12px; color: var(--gray-300); }
 
     /* ── No-files checkbox ── */

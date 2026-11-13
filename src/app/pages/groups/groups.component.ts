@@ -35,7 +35,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
               <div>
                 <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
                 @if (g.has_owner_restriction) {
-                  <span style="font-size:10px;font-weight:600;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);padding:1px 8px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
+                  <span style="font-size:10px;font-weight:600;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);padding:1px 8px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
                 }
               </div>
               <span style="margin-left:auto">

@@ -117,19 +117,19 @@ function healthColor(engagement: number): string {
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px">
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.grossTurnoverPln') }}<wt-tooltip key="crm.partners.kpi.gross_turnover"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? 'color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'">
+      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? 'oklch(from #16a34a max(l, var(--text-min-l)) c h)' : 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ t('reports.partners.kpi.vsPrevious', { delta: deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }) }}
       </div>
     </div>
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:oklch(from #22c55e max(l, var(--text-min-l)) c h);font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.revenueMarginPln') }}<wt-tooltip key="crm.partners.kpi.revenue"></wt-tooltip></div>
       <div class="stat-trend" style="color:var(--gray-400)">{{ t('reports.partners.marginShare', { percent: (kpi.margin_pct | number:'1.0-1') }) }}</div>
     </div>
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h);font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.feesPln') }}<wt-tooltip key="crm.partners.kpi.fees"></wt-tooltip></div>
       <div class="stat-trend" style="color:var(--gray-400)">{{ t('reports.partners.kpi.feeRateShare', { percent: (kpi.fee_rate_pct | number:'1.0-1') }) }}</div>
     </div>
@@ -139,9 +139,9 @@ function healthColor(engagement: number): string {
       <div class="stat-trend" style="color:var(--gray-400)">{{ t('reports.partners.kpi.productsCount', { count: (kpi.pax_count | number) }) }}</div>
     </div>
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.partners_count }}</div>
+      <div class="stat-val" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h);font-size:20px">{{ kpi.partners_count }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.activePartners') }}<wt-tooltip key="crm.partners.kpi.active_partners"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? 'color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'">
+      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? 'oklch(from #16a34a max(l, var(--text-min-l)) c h)' : 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ t('reports.partners.kpi.revenueTrend') }}
       </div>
     </div>
@@ -189,7 +189,7 @@ function healthColor(engagement: number): string {
                 </div>
               </td>
               <td *ngIf="isManager" style="padding:10px;text-align:center;font-size:12px;color:var(--gray-500)">{{ p.salesperson_name || '—' }}</td>
-              <td style="padding:10px;text-align:center;font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
+              <td style="padding:10px;text-align:center;font-family:'Sora',sans-serif;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
               <td style="padding:10px;text-align:center">
                 <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;width:60px;margin:0 auto">
                   <div [style.width.%]="marginPct(p.gross_turnover_pln, p.revenue_pln)" [style.background]="marginColor(p.gross_turnover_pln, p.revenue_pln)" style="height:100%;border-radius:3px"></div>
@@ -222,7 +222,7 @@ function healthColor(engagement: number): string {
         <div *ngFor="let p of byProduct; let i = index">
           <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
             <span style="color:var(--gray-700)">{{ productIcon(p.product_type) }} {{ productLabel(p.product_type) }}</span>
-            <span style="font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ (p.gross_turnover_pln/1000).toFixed(0) }}k PLN</span>
+            <span style="font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">{{ (p.gross_turnover_pln/1000).toFixed(0) }}k PLN</span>
           </div>
           <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
             <div [style.width.%]="barPct(p.gross_turnover_pln, byProduct[0]?.gross_turnover_pln)" [style.background]="PROD_COLORS[i % PROD_COLORS.length]" style="height:100%;border-radius:3px;opacity:.85"></div>
@@ -245,7 +245,7 @@ function healthColor(engagement: number): string {
       <div #revLabels style="display:flex;gap:4px;margin-top:4px"></div>
       <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;font-size:12px">
         <span style="color:var(--gray-500)">{{ t('reports.partners.trend.totalTurnover') }}</span>
-        <span style="font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }} PLN</span>
+        <span style="font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }} PLN</span>
       </div>
     </div>
 
@@ -264,8 +264,8 @@ function healthColor(engagement: number): string {
             <div style="font-size:10px;color:var(--gray-400)">{{ t('reports.partners.partnersCount', { count: +r.partners_count }) }}</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:12px;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ (r.gross_turnover_pln/1000).toFixed(0) }}k</div>
-            <div style="font-size:10px;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.marginShare', { percent: calcMargin(r.gross_turnover_pln, r.revenue_pln) }) }}</div>
+            <div style="font-size:12px;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">{{ (r.gross_turnover_pln/1000).toFixed(0) }}k</div>
+            <div style="font-size:10px;color:oklch(from #22c55e max(l, var(--text-min-l)) c h)">{{ t('reports.partners.marginShare', { percent: calcMargin(r.gross_turnover_pln, r.revenue_pln) }) }}</div>
           </div>
         </div>
         <div style="height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden">
@@ -280,16 +280,16 @@ function healthColor(engagement: number): string {
       <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px">{{ t('reports.partners.summary.title') }}</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px">
-          <span style="font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.columns.grossTurnover') }}</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</span>
+          <span style="font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">{{ t('reports.partners.columns.grossTurnover') }}</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px">
-          <span style="font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.summary.revenueMargin') }}</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">{{ kpi.revenue_pln | number:'1.0-0' }}</span>
+          <span style="font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">{{ t('reports.partners.summary.revenueMargin') }}</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;color:oklch(from #22c55e max(l, var(--text-min-l)) c h)">{{ kpi.revenue_pln | number:'1.0-0' }}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:12px">
-          <span style="font-size:12px;color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.summary.feesCommissions') }}</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)">{{ kpi.fees_pln | number:'1.0-0' }}</span>
+          <span style="font-size:12px;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h)">{{ t('reports.partners.summary.feesCommissions') }}</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h)">{{ kpi.fees_pln | number:'1.0-0' }}</span>
         </div>
         <div style="margin-top:4px;padding:12px;background:var(--gray-50);border-radius:12px;display:flex;flex-direction:column;gap:4px;font-size:12px">
           <div style="display:flex;justify-content:space-between"><span style="color:var(--gray-500)">{{ t('reports.partners.summary.marginPct') }}</span><span style="font-weight:700">{{ kpi.margin_pct | number:'1.0-1' }}%</span></div>
@@ -306,7 +306,7 @@ function healthColor(engagement: number): string {
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <span style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);flex:1">{{ t('reports.partners.churn.title') }}</span>
       <span *ngIf="churnRows.filter(r => r.risk_level === 'critical').length > 0"
-            style="background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px">
+            style="background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #991b1b max(l, var(--text-min-l)) c h);font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px">
         {{ t('reports.partners.churn.criticalCount', { count: churnRows.filter(r => r.risk_level === 'critical').length }) }}
       </span>
     </div>
@@ -320,7 +320,7 @@ function healthColor(engagement: number): string {
            (mouseenter)="$any($event.currentTarget).style.background='#fafafa'"
            (mouseleave)="$any($event.currentTarget).style.background=''">
         <span [style.background]="p.risk_level === 'critical' ? 'color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface))' : p.risk_level === 'high' ? 'color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface))' : p.risk_level === 'medium' ? 'color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface))' : 'color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface))'"
-              [style.color]="p.risk_level === 'critical' ? 'color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)' : p.risk_level === 'high' ? 'color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)' : p.risk_level === 'medium' ? 'color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF)'"
+              [style.color]="p.risk_level === 'critical' ? 'oklch(from #991b1b max(l, var(--text-min-l)) c h)' : p.risk_level === 'high' ? 'oklch(from #166534 max(l, var(--text-min-l)) c h)' : p.risk_level === 'medium' ? 'oklch(from #92400e max(l, var(--text-min-l)) c h)' : 'oklch(from #1e40af max(l, var(--text-min-l)) c h)'"
               style="font-size:12px;font-weight:700;border-radius:16px;padding:2px 8px;white-space:nowrap;flex-shrink:0">
           {{ churnRiskLabel(p.risk_level) }}
         </span>
@@ -330,7 +330,7 @@ function healthColor(engagement: number): string {
       </div>
     </div>
     <a routerLink="/crm/dashboard" [queryParams]="{tab: 'churn'}"
-       style="display:block;margin-top:14px;font-size:12px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-weight:600;text-decoration:none"
+       style="display:block;margin-top:14px;font-size:12px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none"
        (mouseenter)="$any($event.currentTarget).style.textDecoration='underline'"
        (mouseleave)="$any($event.currentTarget).style.textDecoration='none'">
       {{ t('reports.partners.churn.showAll') }} →
@@ -366,16 +366,16 @@ function healthColor(engagement: number): string {
               (mouseleave)="$any($event.currentTarget).style.background=''"
               [title]="p.partner_id ? t('reports.partners.openPartnerTooltip') : ''">
             <td style="padding:8px 14px">
-              <span *ngIf="p.partner_id" style="font-weight:600;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ p.partner_name }}</span>
+              <span *ngIf="p.partner_id" style="font-weight:600;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">{{ p.partner_name }}</span>
               <span *ngIf="!p.partner_id" style="color:var(--gray-500)">{{ p.partner_name }}</span>
             </td>
             <td *ngIf="isManager" style="padding:8px 10px;color:var(--gray-400);font-size:12px">{{ p.salesperson_name || '—' }}</td>
-            <td style="padding:8px 10px;text-align:right;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-family:'Sora',sans-serif">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
             <td style="padding:8px 10px;text-align:right;color:var(--gray-700)">{{ p.net_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)">{{ p.fees_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);font-weight:600">{{ p.revenue_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h)">{{ p.fees_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:oklch(from #22c55e max(l, var(--text-min-l)) c h);font-weight:600">{{ p.revenue_pln | number:'1.0-0' }}</td>
             <td style="padding:8px 10px;text-align:right">
-              <span [style.background]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? 'color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface))' : 'var(--gray-100)'" [style.color]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? 'color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)' : 'var(--gray-500)'" style="border-radius:999px;padding:2px 8px;font-size:12px">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</span>
+              <span [style.background]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? 'color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface))' : 'var(--gray-100)'" [style.color]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? 'oklch(from #166534 max(l, var(--text-min-l)) c h)' : 'var(--gray-500)'" style="border-radius:999px;padding:2px 8px;font-size:12px">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</span>
             </td>
             <td style="padding:8px 10px;text-align:right;color:var(--gray-500)">{{ p.transactions_count }}</td>
             <td style="padding:8px 10px;text-align:center">
@@ -394,10 +394,10 @@ function healthColor(engagement: number): string {
           <tr style="background:var(--gray-50);border-top:2px solid var(--gray-200);font-weight:700">
             <td style="padding:8px 14px">{{ t('reports.partners.allPartners.total') }}</td>
             <td *ngIf="isManager"></td>
-            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</td>
             <td style="padding:8px 10px;text-align:right">{{ kpi.net_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)">{{ kpi.fees_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">{{ kpi.revenue_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:oklch(from #3b82f6 max(l, var(--text-min-l)) c h)">{{ kpi.fees_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:oklch(from #22c55e max(l, var(--text-min-l)) c h)">{{ kpi.revenue_pln | number:'1.0-0' }}</td>
             <td style="padding:8px 10px;text-align:right">{{ kpi.margin_pct | number:'1.0-1' }}%</td>
             <td style="padding:8px 10px;text-align:right">{{ kpi.transactions_count | number }}</td>
             <td></td>
@@ -588,7 +588,7 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
       const col = document.createElement('div');
       col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px';
       col.innerHTML = `
-        <div style="font-size:10px;font-weight:700;color:${isLast?'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)':'var(--gray-400)'}">${d.gross_turnover_pln>0?(d.gross_turnover_pln/1000).toFixed(0)+'k':''}</div>
+        <div style="font-size:10px;font-weight:700;color:${isLast?'oklch(from #3baa5d max(l, var(--text-min-l)) c h)':'var(--gray-400)'}">${d.gross_turnover_pln>0?(d.gross_turnover_pln/1000).toFixed(0)+'k':''}</div>
         <div style="width:100%;height:${h}px;background:${isLast?'#3BAA5D':'color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface))'};border-radius:3px 3px 0 0"></div>`;
       el.appendChild(col);
       const lbl = document.createElement('div');

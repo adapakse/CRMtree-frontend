@@ -328,7 +328,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <wt-language-picker mode="tenant" />
           </div>
 
-          <div style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);display:flex;gap:12px;align-items:flex-start">
+          <div style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">ℹ️</span>
             <div>
               <strong>{{ t('settings.tabs.global') }}</strong> {{ t('settings.global.intro') }}
@@ -440,7 +440,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Parametry biznesowe CRM -->
         @if (activeTab() === 'crm') {
 
-          <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF);display:flex;gap:12px;align-items:flex-start">
+          <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">💼</span>
             <div>
               <strong>{{ t('settings.tabs.crm') }}</strong> {{ t('settings.crm.intro') }}
@@ -753,7 +753,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Słowniki dokumentów -->
         @if (activeTab() === 'documents') {
 
-          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);display:flex;gap:12px;align-items:flex-start">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #166534 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">📄</span>
             <div>
               <strong>{{ t('settings.tabs.documents') }}</strong> {{ t('settings.documents.intro') }}
@@ -826,7 +826,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Grupy użytkowników -->
         @if (activeTab() === 'users') {
 
-          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bae6fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:color-mix(in srgb, #0369a1 var(--tint-text-mix), #FFFFFF);display:flex;gap:12px;align-items:flex-start">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bae6fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #0369a1 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">👥</span>
             <div>
               <strong>{{ t('settings.tabs.users') }}</strong> {{ t('settings.groups.intro') }}
@@ -838,14 +838,14 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">➕ {{ t('settings.groups.addTitle') }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
-                <label class="field-label">{{ t('settings.groups.technicalName') }} <span style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)">*</span></label>
+                <label class="field-label">{{ t('settings.groups.technicalName') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.technicalNameHint') }}</div>
                 <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.technicalNamePlaceholder')"
                        [(ngModel)]="newGroup.name">
               </div>
               <div>
-                <label class="field-label">{{ t('settings.groups.displayName') }} <span style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)">*</span></label>
+                <label class="field-label">{{ t('settings.groups.displayName') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
                 <div class="field-desc">{{ t('settings.groups.displayNameHint') }}</div>
                 <input class="fi" style="width:100%;box-sizing:border-box;margin-top:8px"
                        [placeholder]="t('settings.groups.displayNamePlaceholder')"
@@ -865,7 +865,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
               </div>
             </div>
             @if (groupError()) {
-              <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);margin-bottom:20px;display:flex;align-items:center;gap:8px">
+              <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">
                 ⚠️ {{ groupError() }}
               </div>
             }
@@ -887,7 +887,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             @for (g of groups(); track g.id) {
               <div class="card" style="margin-bottom:12px;overflow:hidden">
                 <div style="padding:16px 20px;display:flex;align-items:center;gap:12px">
-                  <div style="width:36px;height:36px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;flex-shrink:0">👥</span></div>
+                  <div style="width:36px;height:36px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;flex-shrink:0">👥</span></div>
                   <div style="flex:1;min-width:0">
                     <div style="font-size:14px;font-weight:700;color:var(--gray-900)">{{ groupDisplayName(g) }}</div>
                     <div style="font-size:12px;color:var(--gray-400);margin-top:1px">
@@ -897,7 +897,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       <span style="margin:0 6px">·</span>
                       <span>{{ t('settings.groups.documentCount', { count: g.document_count }) }}</span>
                       @if (g.has_owner_restriction) {
-                        <span style="margin-left:8px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">{{ t('settings.groups.ownerRestriction') }}</span>
+                        <span style="margin-left:8px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">{{ t('settings.groups.ownerRestriction') }}</span>
                       }
                       @if (!g.is_active) {
                         <span style="margin-left:8px;background:var(--gray-100);color:var(--gray-500);padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">{{ t('settings.groups.inactive') }}</span>
@@ -922,7 +922,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Szablony zadań onboardingowych -->
         @if (activeTab() === 'onboarding') {
 
-          <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF);display:flex;gap:12px;align-items:flex-start">
+          <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">🚀</span>
             <div>
               <strong>{{ t('settings.onboarding.introTitle') }}</strong> {{ t('settings.onboarding.intro') }}
@@ -1099,7 +1099,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
         <!-- TAB: Podpowiedzi (Tooltips) -->
         @if (activeTab() === 'tooltips') {
 
-          <div style="background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF);display:flex;gap:12px;align-items:flex-start">
+          <div style="background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">💬</span>
             <div>
               <strong>{{ t('settings.tooltips.introTitle') }}</strong> {{ t('settings.tooltips.introBeforeIcon') }}
@@ -1113,7 +1113,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <div class="cat-title" style="margin-bottom:16px;display:flex;align-items:center;gap:8px">+ {{ t('settings.tooltips.add') }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
               <div>
-                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.screen') }} <span style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.screen') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipScreen" (ngModelChange)="onNewTipScreenChange()">
                   <option value="">{{ t('settings.tooltips.chooseScreen') }}</option>
                   @for (s of catalogScreens; track s) {
@@ -1122,7 +1122,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 </select>
               </div>
               <div>
-                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.label') }} <span style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)">*</span></label>
+                <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.label') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
                 <select class="fsel" [(ngModel)]="newTipLabelKey" [disabled]="!newTipScreen">
                   <option value="">{{ t('settings.tooltips.chooseLabel') }}</option>
                   @for (e of catalogForScreen; track e.key) {
@@ -1134,13 +1134,13 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
               </div>
             </div>
             <div style="margin-bottom:20px">
-              <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.content') }} <span style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)">*</span></label>
+              <label class="field-label" style="display:block;margin-bottom:8px">{{ t('settings.tooltips.content') }} <span style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)">*</span></label>
               <textarea class="fi" style="width:100%;box-sizing:border-box;resize:vertical;min-height:72px"
                         [(ngModel)]="newTipValue"
                         [placeholder]="t('settings.tooltips.contentPlaceholder')"></textarea>
             </div>
             @if (tipError()) {
-              <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
+              <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
             }
             <button class="btn btn-p"
                     [disabled]="tipSaving() || !newTipLabelKey || !newTipValue.trim()"
@@ -1196,7 +1196,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             @for (tip of uncategorizedTooltips(); track tip.key) {
               <div class="card" style="margin-bottom:12px;overflow:hidden">
                 <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center;gap:12px">
-                  <code style="font-size:12px;font-family:monospace;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);background:var(--gray-50);padding:2px 8px;border-radius:4px">{{ tip.key }}</code>
+                  <code style="font-size:12px;font-family:monospace;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);background:var(--gray-50);padding:2px 8px;border-radius:4px">{{ tip.key }}</code>
                   <span class="cat-title" style="font-size:12px;color:var(--gray-600);font-weight:500">{{ tip.label }}</span>
                   <span style="flex:1"></span>
                   @if (tip.updated_by_name) {
@@ -1226,7 +1226,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
              dostaje dodatkowo dropdown i edytuje dowolnego, tą samą logiką
              ekranu — patrz icpApiBase(). -->
         @if (activeTab() === 'icp') {
-          <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF);display:flex;gap:12px;align-items:flex-start">
+          <div style="background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:18px;flex-shrink:0">🎯</span>
             <div>
               <strong>{{ t('settings.icp.introTitle') }}</strong> {{ t('settings.icp.intro') }}
@@ -1264,11 +1264,11 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <div class="icp-summary">
               <span>
                 {{ t('settings.icp.pointsSum') }}
-                <strong [style.color]="cfg.is_valid ? null : 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'">{{ cfg.final_max_score }} / 100</strong>
+                <strong [style.color]="cfg.is_valid ? null : 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)'">{{ cfg.final_max_score }} / 100</strong>
               </span>
             </div>
             @if (!cfg.is_valid) {
-              <div class="hint-inline" style="margin-top:6px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
+              <div class="hint-inline" style="margin-top:6px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">
                 {{ t('settings.icp.draftInvalid', { score: cfg.final_max_score }) }}
               </div>
             }
@@ -1398,7 +1398,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .field-label { font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:4px; }
     .field-desc { font-size:12px;color:var(--gray-500);line-height:1.5;margin-bottom:8px; }
     .field-meta { font-size:12px;color:var(--gray-400); }
-    .field-err { font-size:12px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .field-err { font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .field-dirty { font-size:12px;color: var(--orange-text); }
     .fi-err { border-color:#EF4444 !important; }
     /* JSON list editor */
@@ -1407,7 +1407,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     .json-item-val { font-weight:600;color:var(--gray-700); }
     .json-item-raw { color:var(--gray-400);font-family:monospace;font-size:10px; }
     .json-del { background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:14px;padding:0 2px;line-height:1; }
-    .json-del:hover { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .json-del:hover { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .json-add-row { display:flex;gap:8px;align-items:center; }
     .loading-overlay { display:flex;align-items:center;justify-content:center;padding:60px; }
     .spinner { width:32px;height:32px;border:3px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite; }
@@ -1440,7 +1440,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
     }
     .stage-del {
-      border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); background: var(--gray-50); color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);
+      border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); background: var(--gray-50); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
       border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 600;
       cursor: pointer; flex-shrink: 0; min-width: 62px;
     }
@@ -1491,24 +1491,24 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       background:var(--gray-50); border:1px dashed var(--gray-200);
       border-radius:8px; padding:8px 10px;
     }
-    .ai-hint-link { font-size:12px; color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); text-decoration:none; white-space:nowrap; }
+    .ai-hint-link { font-size:12px; color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); text-decoration:none; white-space:nowrap; }
     .ai-hint-link:hover { text-decoration:underline; }
     .ai-badge { margin-left:auto; font-size:12px; font-weight:700; padding:4px 8px; border-radius:10px; }
-    .ai-badge-ok  { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
-    .ai-badge-bad { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .ai-badge-ok  { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .ai-badge-bad { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .ai-badge-off { background:var(--gray-100); color:var(--gray-500); }
     .ai-error {
-      background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);
+      background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h);
       border-radius:8px; padding:10px 12px; font-size:12px; margin-bottom:14px;
     }
     .ai-ok {
-      background:var(--gray-50); border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);
+      background:var(--gray-50); border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h);
       border-radius:8px; padding:10px 12px; font-size:12px; margin-top:14px;
     }
     .td-muted { color: var(--gray-500); font-size: 14px; }
     .hint { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
     .hint-inline { font-size: 12px; color: var(--gray-400); font-weight: 400; }
-    .req { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .req { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
     .badge-off { background: var(--gray-100); color: var(--gray-500); }
     .panel-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
@@ -1518,14 +1518,14 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       padding: 12px 16px; margin-bottom: 14px; border-radius: 10px;
       background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border: 1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));
     }
-    .icp-tenant-current { font-size: 12px; color: color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); margin-left: auto; }
+    .icp-tenant-current { font-size: 12px; color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); margin-left: auto; }
     .icp-summary {
       display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
       padding: 10px 16px; font-size: 12px; color: var(--gray-600);
       background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px;
     }
     .icp-error {
-      border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); background: var(--gray-50); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);
+      border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); background: var(--gray-50); color: oklch(from #991b1b max(l, var(--text-min-l)) c h);
       border-radius: 10px; padding: 16px 18px; font-size: 14px;
     }
     .icp-list { border: 1px solid var(--gray-100); border-radius: 12px; overflow: hidden; margin-top: 16px; }
@@ -1548,7 +1548,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
       font-size: 12px; text-align: center;
     }
     .icp-save-check {
-      width: 22px; height: 22px; border-radius: 50%; border: none; background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);
+      width: 22px; height: 22px; border-radius: 50%; border: none; background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h);
       cursor: pointer; font-size: 12px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
     }
     .icp-save-check:disabled { opacity: .55; cursor: not-allowed; }
@@ -1618,7 +1618,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
     }
     .btn-secondary:hover { background: var(--gray-50); }
     .btn-danger-sm {
-      padding: 6px 12px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);
+      padding: 6px 12px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
       border: 1px solid #fca5a5; border-radius: 6px; font-size: 12px; cursor: pointer;
       transition: background .12s;
     }

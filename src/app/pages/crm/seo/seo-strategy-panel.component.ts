@@ -159,7 +159,7 @@ import { ToastService } from '../../../core/services/toast.service';
       border: none; background: transparent; color: var(--gray-400); font-size: 1.1rem;
       cursor: pointer; line-height: 1; padding: 0 0.3rem; flex-shrink: 0;
     }
-    .btn-remove:hover { color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .btn-remove:hover { color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .competitor-form { display: flex; gap: 0.5rem; }
     .competitor-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
     .empty { color: var(--gray-500); font-size: 0.82rem; margin: 0; }
@@ -178,7 +178,7 @@ import { ToastService } from '../../../core/services/toast.service';
       padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
     }
     .backlink-status[data-status="accepted"] { background: var(--orange-pale); color: var(--orange-dark); }
-    .backlink-status[data-status="rejected"] { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .backlink-status[data-status="rejected"] { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); }
   `],
 })
 export class SeoStrategyPanelComponent implements OnInit {

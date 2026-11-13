@@ -120,7 +120,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
     .topbar { display:flex; align-items:center; gap:12px; height:60px; padding:0 24px; background:var(--surface); border-bottom:1px solid var(--gray-200); flex-shrink:0; }
     .topbar h1 { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin:0; flex:1; }
-    .dwh-tag { font-size:10px; font-weight:700; background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
+    .dwh-tag { font-size:10px; font-weight:700; background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
     .loading { padding:40px; text-align:center; color:var(--gray-400); }
     .groups-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; padding:20px 24px 24px; align-content:start; }
     .group-card { background:var(--surface); border-radius:12px; padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s, transform .15s; }

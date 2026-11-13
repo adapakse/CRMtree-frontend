@@ -128,7 +128,7 @@ const SCREEN_PARAMS = ['view', 'status'];
     .project-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px; }
     .project-grid.is-loading { opacity:.55; }
     .hint { font-size:12px; color:var(--gray-400); }
-    .hint.danger { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .hint.danger { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
   `],
 })
 export class ProjectsListComponent implements OnInit {

@@ -120,11 +120,11 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
     .survey { max-width: 820px; }
     .survey-intro {
       background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border: 1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius: 10px;
-      padding: 12px 16px; margin-bottom: 16px; font-size: 14px; color: color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); line-height: 1.55;
+      padding: 12px 16px; margin-bottom: 16px; font-size: 14px; color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); line-height: 1.55;
     }
     .survey-errors {
       background: var(--gray-50); border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px;
-      padding: 12px 16px; margin-bottom: 16px; font-size: 14px; color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF);
+      padding: 12px 16px; margin-bottom: 16px; font-size: 14px; color: oklch(from #b91c1c max(l, var(--text-min-l)) c h);
     }
     .survey-errors ul { margin: 8px 0 0; padding-left: 20px; }
     .survey-section { padding: 20px 24px; margin-bottom: 16px; }
@@ -136,9 +136,9 @@ const SURVEY_URL = `${environment.apiUrl}/admin/onboarding-survey`;
     .survey-option { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: var(--gray-700); cursor: pointer; }
     .survey-option input { margin-top: 4px; }
     .survey-option-hint { display: block; font-size: 12px; color: var(--gray-400); }
-    .req { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .req { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .status-badge { margin-left: 12px; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .status-submitted { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
+    .status-submitted { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
     .status-draft { background: var(--gray-100); color: var(--gray-600); }
   `],
 })

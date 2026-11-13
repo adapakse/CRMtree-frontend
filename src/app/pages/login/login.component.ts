@@ -93,7 +93,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
       --shadow-sm: 0 5px 14px rgba(0,0,0,.081); --shadow: 0 5px 16px rgba(0,0,0,.108);
       --shadow-lg: 0 5px 16px rgba(0,0,0,.126), 0 13px 31px rgba(0,0,0,.09);
       --shadow-field: 0 5px 16px rgba(0,0,0,.099);
-      --tint-mix: 100%; --tint-text-mix: 100%;
+      --tint-mix: 100%; --text-min-l: 0;
       --orange: #3BAA5D; --orange-light: #4DC671; --orange-dark: #2B7B43; --orange-pale: #E6F4EA; --orange-muted: #A8D9B6;
       --orange-text: #2B7B43; --orange-strong: #18864A; --ring-field: 0 0 0 3px rgba(59,170,93,.18);
       --green-gradient: linear-gradient(180deg, #18864A 0%, #14833F 100%);
@@ -117,7 +117,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     /* The PNG has ~25% empty space under the mark; pull it in so the logo sits just above the card. */
     .login-logo-img { width:240px; max-width:70vw; height:auto; display:block; margin-bottom:-20px; }
     .login-sub { font-size:12px; color:rgba(255,255,255,.55); }
-    .login-tenant-warning { font-size:12px; color:color-mix(in srgb, #fbbf24 var(--tint-text-mix), #FFFFFF); }
+    .login-tenant-warning { font-size:12px; color:oklch(from #fbbf24 max(l, var(--text-min-l)) c h); }
 
     .login-card {
       position:relative; margin-top:-220px; width:420px; max-width:calc(100vw - 32px);
@@ -165,7 +165,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .l-divider { display:flex; align-items:center; gap:12px; margin:20px 0; font-size:14px; color:var(--gray-400); }
     .l-divider::before, .l-divider::after { content:''; flex:1; height:1px; background:var(--gray-200); }
 
-    .l-error { background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius:12px; padding:10px 16px; font-size:12px; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .l-error { background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius:12px; padding:10px 16px; font-size:12px; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
     .login-note { font-size:12px; color:var(--gray-400); text-align:center; margin-top:12px; }
     .login-language { display:flex; justify-content:center; margin-top:20px; }
 

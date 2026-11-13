@@ -193,7 +193,7 @@ interface PbxUserRow {
     .ap-sub    { font-size: 12px; color: var(--text-muted, var(--gray-500)); margin: 0 0 16px; max-width: 620px; }
 
     .ap-loading { padding: 48px; text-align: center; color: var(--text-muted, var(--gray-500)); }
-    .ap-error   { padding: 16px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); border-radius: 12px; color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
+    .ap-error   { padding: 16px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); border-radius: 12px; color: oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
 
     .ap-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 16px;
                   padding: 12px 18px; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-sm); }
@@ -217,13 +217,13 @@ interface PbxUserRow {
     .ap-uemail { font-size: 12px; color: var(--text-muted, var(--gray-500)); margin-top: 2px; }
     .ap-role   { font-size: 12px; background: var(--bg-muted, var(--gray-100));
                  padding: 2px 8px; border-radius: 10px; color: var(--text, var(--ink-strong)); }
-    .ap-phone  { font-weight: 600; color: var(--orange, color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)); font-family: monospace; }
+    .ap-phone  { font-weight: 600; color: var(--orange, oklch(from #3baa5d max(l, var(--text-min-l)) c h)); font-family: monospace; }
     .ap-none   { color: var(--text-muted, var(--gray-500)); }
     .ap-date   { font-size: 12px; color: var(--text-muted, var(--gray-500)); }
 
     .ap-badge      { font-size: 12px; padding: 4px 8px; border-radius: 10px; font-weight: 600; }
-    .ap-badge-ok   { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
-    .ap-badge-warn { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .ap-badge-ok   { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .ap-badge-warn { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h); }
 
     .ap-actions     { white-space: nowrap; text-align: right; }
     .ap-actions-row { display: flex; gap: 8px; justify-content: flex-end; }

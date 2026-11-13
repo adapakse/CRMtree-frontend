@@ -34,8 +34,8 @@ type Translate = (key: string, params?: Record<string, unknown>) => string;
   styles: [`
     :host { display:inline-flex; align-items:baseline; gap:8px; min-width:0; }
     :host(.is-hidden) { display:none; }
-    .badge { padding:1px 8px; border-radius:10px; font-size:12px; font-weight:600; background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); white-space:nowrap; cursor:default; }
-    .reason { display:inline-flex; flex-direction:column; font-size:12px; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); line-height:1.4; }
+    .badge { padding:1px 8px; border-radius:10px; font-size:12px; font-weight:600; background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); white-space:nowrap; cursor:default; }
+    .reason { display:inline-flex; flex-direction:column; font-size:12px; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); line-height:1.4; }
   `],
 })
 export class ProjectDelayBadgeComponent {

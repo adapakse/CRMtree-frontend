@@ -98,7 +98,7 @@ const BASE = environment.apiUrl;
     </ng-template>
 
     @if (pwdError) {
-      <div style="font-size:12px;color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);margin-top:8px">{{ pwdError }}</div>
+      <div style="font-size:12px;color:oklch(from #991b1b max(l, var(--text-min-l)) c h);margin-top:8px">{{ pwdError }}</div>
     }
     <div style="margin-top:20px">
       <button class="btn btn-p" [disabled]="pwdSaving()" (click)="changePassword()">
@@ -138,10 +138,10 @@ const BASE = environment.apiUrl;
             🗑 {{ t('mySettings.delete') }}
           </button>
         </div>
-        <div *ngIf="saveSuccess" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-weight:600">
+        <div *ngIf="saveSuccess" style="margin-top:8px;font-size:12px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-weight:600">
           ✓ {{ t('mySettings.signature.saved') }}
         </div>
-        <div *ngIf="saveError" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
+        <div *ngIf="saveError" style="margin-top:8px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">
           {{ saveError }}
         </div>
       </div>
@@ -206,7 +206,7 @@ const BASE = environment.apiUrl;
           {{ tplSaving ? '⏳ ' + t('mySettings.saving') : '💾 ' + ('actions.save' | transloco) }}
         </button>
       </div>
-      <div *ngIf="tplError" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">{{tplError}}</div>
+      <div *ngIf="tplError" style="margin-top:8px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">{{tplError}}</div>
     </div>
   </div>
 
@@ -230,8 +230,8 @@ const BASE = environment.apiUrl;
            style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gray-50);border-radius:12px;margin-bottom:16px">
         <span style="font-size:18px;flex-shrink:0">✅</span>
         <div>
-          <div style="font-size:14px;font-weight:600;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">{{ t('mySettings.pbx.configured') }}</div>
-          <div *ngIf="pbxDirectPhone" style="font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);margin-top:1px">
+          <div style="font-size:14px;font-weight:600;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">{{ t('mySettings.pbx.configured') }}</div>
+          <div *ngIf="pbxDirectPhone" style="font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h);margin-top:1px">
             {{ t('mySettings.pbx.directPhone') }} <strong>{{pbxDirectPhone}}</strong>
           </div>
           <div *ngIf="!pbxDirectPhone" style="font-size:12px;color:var(--gray-500);margin-top:1px">
@@ -244,7 +244,7 @@ const BASE = environment.apiUrl;
       <div *ngIf="!pbxConfigured"
            style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:color-mix(in srgb, #fefce8 var(--tint-mix), var(--surface));border-radius:12px;margin-bottom:16px">
         <span style="font-size:18px;flex-shrink:0">⚠️</span>
-        <div style="font-size:14px;color:color-mix(in srgb, #854d0e var(--tint-text-mix), #FFFFFF)">{{ t('mySettings.pbx.notConfigured') }}</div>
+        <div style="font-size:14px;color:oklch(from #854d0e max(l, var(--text-min-l)) c h)">{{ t('mySettings.pbx.notConfigured') }}</div>
       </div>
 
       <!-- Formularz tokenu -->
@@ -280,10 +280,10 @@ const BASE = environment.apiUrl;
         </button>
       </div>
 
-      <div *ngIf="pbxSaveOk" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-weight:600">
+      <div *ngIf="pbxSaveOk" style="margin-top:8px;font-size:12px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-weight:600">
         ✓ {{ pbxDirectPhone ? t('mySettings.pbx.tokenSavedWithPhone', { phone: pbxDirectPhone }) : t('mySettings.pbx.tokenSaved') }}
       </div>
-      <div *ngIf="pbxSaveErr" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
+      <div *ngIf="pbxSaveErr" style="margin-top:8px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">
         {{pbxSaveErr}}
       </div>
 
@@ -298,11 +298,11 @@ const BASE = environment.apiUrl;
 
         <ng-container [ngSwitch]="notifBrowserPerm">
           <div *ngSwitchCase="'granted'"
-               style="font-size:12px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-weight:600">
+               style="font-size:12px;color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-weight:600">
             ✓ {{ t('mySettings.pbx.notifications.enabled') }}
           </div>
           <div *ngSwitchCase="'denied'"
-               style="font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
+               style="font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">
             ✗ {{ t('mySettings.pbx.notifications.blocked') }}<br>
             <span style="color:var(--gray-500)">{{ t('mySettings.pbx.notifications.unblockPath') }}</span>
           </div>

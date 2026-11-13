@@ -39,7 +39,7 @@ import { ProjectFinanceTotals } from '../../../core/services/projects-api.servic
     .figure { display:inline-flex; align-items:baseline; gap:4px; white-space:nowrap; font-variant-numeric:tabular-nums; }
     .label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); }
     strong { color:var(--gray-800); font-weight:600; }
-    .danger, strong.danger { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .danger, strong.danger { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
   `],
 })
 export class ProjectFinanceTotalsComponent {

@@ -106,32 +106,32 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px">
     <div class="stat-card">
-      <div class="stat-val" style="color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);cursor:pointer"
+      <div class="stat-val" style="color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);cursor:pointer"
            (click)="goToLeads({}, t('reports.leads.drilldown.pipelineAll'))"
            [title]="t('reports.leads.tooltips.viewLeads')">{{ kpi.pipeline_value | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('leadsList.stats.pipeline') }}<wt-tooltip key="crm.leads.kpi.pipeline"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="kpi.active > 0" style="color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">↑ {{ t('reports.leads.kpi.activeCount', { count: kpi.active }) }}</div>
+      <div class="stat-trend" *ngIf="kpi.active > 0" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">↑ {{ t('reports.leads.kpi.activeCount', { count: kpi.active }) }}</div>
       <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--gray-200);cursor:pointer"
            (click)="goToLeads({close_date_from: dateFrom, close_date_to: periodEnd}, t('reports.leads.drilldown.plannedInPeriod'))"
            [title]="t('reports.leads.tooltips.viewLeadsClosingInPeriod')">
         <div style="font-size:10px;color:var(--gray-400);font-weight:500">{{ t('reports.leads.kpi.plannedDelivery') }} ↗</div>
-        <div style="font-size:14px;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">
+        <div style="font-size:14px;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">
           {{ (kpi.pipeline_in_period ?? 0) | number:'1.0-0' }} PLN
         </div>
       </div>
     </div>
     <!-- Kafelek wygranych tylko u tenanta, który ma etap wygranej -->
     <div class="stat-card" *ngIf="stages.wonKey() as wonKey">
-      <div class="stat-val" style="color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);cursor:pointer"
+      <div class="stat-val" style="color:oklch(from #22c55e max(l, var(--text-min-l)) c h);cursor:pointer"
            (click)="goToLeads({stage: wonKey}, t('reports.leads.drilldown.won'))"
            [title]="t('reports.leads.tooltips.viewWonLeads')">{{ kpi.won_value | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.common.kpi.wonPln') }}<wt-tooltip key="crm.leads.kpi.won"></wt-tooltip></div>
-      <div class="stat-trend" style="color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">↑ {{ t('reports.leads.kpi.contractsCount', { count: kpi.won }) }}</div>
+      <div class="stat-trend" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">↑ {{ t('reports.leads.kpi.contractsCount', { count: kpi.won }) }}</div>
       <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--gray-200)">
         <div style="font-size:10px;color:var(--gray-400);font-weight:500;cursor:pointer"
              (click)="goToLeads({close_date_from: dateFrom, close_date_to: periodEnd}, t('reports.leads.drilldown.plannedBudget'))"
              [title]="t('reports.leads.tooltips.viewLeadsInPeriod')">{{ t('reports.leads.kpi.plannedBudget') }} ↗</div>
-        <div style="font-size:14px;font-weight:700;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF)">
+        <div style="font-size:14px;font-weight:700;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h)">
           {{ budgetTotal | number:'1.0-0' }} PLN
         </div>
         <div *ngIf="budgetTotal > 0" style="height:4px;background:var(--gray-200);border-radius:2px;margin-top:4px;overflow:hidden">
@@ -152,9 +152,9 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
       <div class="stat-lbl">{{ t('reports.common.kpi.avgSalesCycle') }}<wt-tooltip key="crm.leads.kpi.avg_cycle"></wt-tooltip></div>
     </div>
     <div class="stat-card">
-      <div class="stat-val" style="color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF)">{{ budgetTotal | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:oklch(from #7c3aed max(l, var(--text-min-l)) c h)">{{ budgetTotal | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.leads.kpi.plannedBudgetPln') }}<wt-tooltip key="crm.leads.kpi.budget"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="budgetTotal > 0 && kpi.won_value > 0" [style.color]="kpi.won_value >= budgetTotal ? 'color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'">
+      <div class="stat-trend" *ngIf="budgetTotal > 0 && kpi.won_value > 0" [style.color]="kpi.won_value >= budgetTotal ? 'oklch(from #16a34a max(l, var(--text-min-l)) c h)' : 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)'">
         {{ kpi.won_value >= budgetTotal ? '✓' : '' }} {{ t('reports.leads.kpi.budgetCompletion', { value: ((kpi.won_value / budgetTotal * 100) | number:'1.0-0') }) }}
       </div>
       <div class="stat-trend" *ngIf="budgetTotal === 0" style="color:var(--gray-400)">{{ t('reports.leads.kpi.noPlan') }}</div>
@@ -186,7 +186,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
         </div>
         <div style="background:var(--gray-50);border-radius:8px;padding:8px 10px">
           <div style="color:var(--gray-400);margin-bottom:2px">{{ t('leadsList.stats.hot') }} 🔥<wt-tooltip key="crm.leads.funnel.hot"></wt-tooltip></div>
-          <div style="font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ kpi.hot }}</div>
+          <div style="font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-family:'Sora',sans-serif">{{ kpi.hot }}</div>
         </div>
       </div>
     </div>
@@ -238,8 +238,8 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
               </div>
             </td>
             <td style="text-align:right;padding:8px 8px;color:var(--gray-500)">{{ r.total }}</td>
-            <td style="text-align:right;padding:8px 8px;font-weight:600;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ r.pipeline_value | number:'1.0-0' }}</td>
-            <td style="text-align:right;padding:8px 8px;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);font-weight:600">{{ r.won_value > 0 ? (r.won_value | number:'1.0-0') : '—' }}</td>
+            <td style="text-align:right;padding:8px 8px;font-weight:600;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-family:'Sora',sans-serif">{{ r.pipeline_value | number:'1.0-0' }}</td>
+            <td style="text-align:right;padding:8px 8px;color:oklch(from #22c55e max(l, var(--text-min-l)) c h);font-weight:600">{{ r.won_value > 0 ? (r.won_value | number:'1.0-0') : '—' }}</td>
             <td style="text-align:right;padding:8px 8px;color:var(--gray-500)">{{ r.win_rate || 0 }}%</td>
             <td style="padding:8px 8px">
               <div style="width:80px;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
@@ -291,7 +291,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
         <div style="display:flex;flex-direction:column;gap:4px;font-size:12px">
           <div *ngFor="let s of topSourcesWin" style="display:flex;justify-content:space-between">
             <span>{{ s.label }}</span>
-            <span [style.color]="s.wr >= 50 ? 'color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)' : s.wr >= 30 ? 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' : 'var(--gray-400)'" style="font-weight:700">{{ t('reports.common.leadSources.winRate', { value: s.wr }) }}</span>
+            <span [style.color]="s.wr >= 50 ? 'oklch(from #22c55e max(l, var(--text-min-l)) c h)' : s.wr >= 30 ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-400)'" style="font-weight:700">{{ t('reports.common.leadSources.winRate', { value: s.wr }) }}</span>
           </div>
         </div>
       </div>
@@ -313,7 +313,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
       <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px">{{ t('reports.common.lostReasons') }}<wt-tooltip key="crm.leads.lost.title"></wt-tooltip></div>
       <div #lostEl style="display:flex;flex-direction:column;gap:10px"></div>
       <div *ngIf="!lostReasons.length" style="color:var(--gray-400);font-size:12px;text-align:center;padding:12px">{{ t('reports.leads.lostReasons.empty') }}</div>
-      <div *ngIf="lostReasons.length" style="margin-top:16px;padding:12px 16px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">
+      <div *ngIf="lostReasons.length" style="margin-top:16px;padding:12px 16px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
         💡<strong>{{ t('reports.leads.lostReasons.topReason') }}</strong> {{ lostReasons[0].reason }} ({{ t('reports.leads.lostReasons.leadsCount', { count: lostReasons[0].count }) }})
       </div>
     </div>
@@ -375,11 +375,11 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   activityByRep:    LeadsReportActivityByRep[] = [];
   activitySource:   'all' | 'lead' | 'partner' = 'all';
   readonly ACTIVITY_TYPES = [
-    { key: 'call',    labelKey: 'activity.tabs.calls',                  color: 'color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)' },
-    { key: 'meeting', labelKey: 'activity.tabs.meetings',               color: 'color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)' },
-    { key: 'email',   labelKey: 'reports.leads.activity.types.email',   color: 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' },
+    { key: 'call',    labelKey: 'activity.tabs.calls',                  color: 'oklch(from #3b82f6 max(l, var(--text-min-l)) c h)' },
+    { key: 'meeting', labelKey: 'activity.tabs.meetings',               color: 'oklch(from #22c55e max(l, var(--text-min-l)) c h)' },
+    { key: 'email',   labelKey: 'reports.leads.activity.types.email',   color: 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' },
     { key: 'task',    labelKey: 'activity.tabs.tasks',                  color: '#A855F7' },
-    { key: 'note',    labelKey: 'activity.tabs.notes',                  color: 'color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF)' },
+    { key: 'note',    labelKey: 'activity.tabs.notes',                  color: 'oklch(from #f59e0b max(l, var(--text-min-l)) c h)' },
   ];
   activityTypeFilter: string[] = ['call', 'meeting', 'email', 'task', 'note'];
 
@@ -699,7 +699,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       row.title = this.transloco.translate('crm.reports.leads.tooltips.goToOnboarding');
       row.addEventListener('click', () => this.router.navigate(['/crm/onboarding']));
       row.innerHTML = `<div style="display:flex;align-items:center;gap:8px">
-        <div style="width:88px;font-size:12px;color:color-mix(in srgb, #0891b2 var(--tint-text-mix), #FFFFFF);text-align:right;flex-shrink:0;font-weight:600">${this.stageLabel('onboarding')}</div>
+        <div style="width:88px;font-size:12px;color:oklch(from #0891b2 max(l, var(--text-min-l)) c h);text-align:right;flex-shrink:0;font-weight:600">${this.stageLabel('onboarding')}</div>
         <div style="flex:1;position:relative;height:26px">
           <div style="position:absolute;inset:0;background:var(--gray-100);border-radius:4px"></div>
           <div style="position:absolute;top:0;left:0;width:${pct}%;height:100%;background:#06B6D4;border-radius:4px;opacity:.85"></div>
@@ -708,7 +708,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
             <span style="font-size:10px;font-weight:600;color:var(--gray-700);margin-left:auto">${(onbValue/1000).toFixed(0)}k PLN</span>
           </div>
         </div>
-        <div style="width:34px;text-align:center;font-size:12px;color:color-mix(in srgb, #0891b2 var(--tint-text-mix), #FFFFFF);flex-shrink:0">→</div>
+        <div style="width:34px;text-align:center;font-size:12px;color:oklch(from #0891b2 max(l, var(--text-min-l)) c h);flex-shrink:0">→</div>
       </div>`;
       el.appendChild(row);
     }
@@ -732,7 +732,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
           ${d.active_leads ? `<div style="flex:1;height:${activeH}px;background:color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:3px 3px 0 0" title="${this.transloco.translate('crm.reports.leads.trend.activeTooltip', { count: d.active_leads })}"></div>` : '<div style="flex:1"></div>'}
           ${d.won ? `<div style="flex:1;height:${wonH}px;background:#3BAA5D;border-radius:3px 3px 0 0" title="${this.transloco.translate('crm.reports.leads.trend.wonTooltip', { count: d.won })}"></div>` : '<div style="flex:1"></div>'}
         </div>
-        ${d.won ? `<div style="font-size:10px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-weight:700">${d.won}</div>` : '<div style="height:14px"></div>'}`;
+        ${d.won ? `<div style="font-size:10px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);font-weight:700">${d.won}</div>` : '<div style="height:14px"></div>'}`;
       el.appendChild(col);
       const lbl = document.createElement('div');
       lbl.style.cssText = 'flex:1;text-align:center;font-size:12px;color:var(--gray-400)';

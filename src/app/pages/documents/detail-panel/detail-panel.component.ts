@@ -370,7 +370,7 @@ interface SelectOption { value: string; label: string; }
           <!-- DOKUMENT GŁÓWNY -->
           @if (activeTab === 'preview') {
             @if (isStoredInvoice && doc.ksef_invoice_id && doc.blob_name) {
-              <div style="background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;line-height:1.5;color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF)">
+              <div style="background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;line-height:1.5;color:oklch(from #92400e max(l, var(--text-min-l)) c h)">
                 {{ t('invoice.ksefVisualisationNote') }}
               </div>
             }
@@ -627,7 +627,7 @@ interface SelectOption { value: string; label: string; }
       <div class="mol open" (click)="signusOpen = false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:var(--gray-50);color:color-mix(in srgb, #7e22ce var(--tint-text-mix), #FFFFFF)">✍</div>
+            <div class="moico" style="background:var(--gray-50);color:oklch(from #7e22ce max(l, var(--text-min-l)) c h)">✍</div>
             <div>
               <div class="mot">{{ t('detail.signus.modalTitle') }}</div>
               <div class="mos">{{ doc.doc_number }} · {{ doc.name }}</div>

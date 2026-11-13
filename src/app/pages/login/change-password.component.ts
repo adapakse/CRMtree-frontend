@@ -68,7 +68,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .lbtn { width:100%; background:var(--green-gradient); color:white; border:none; border-radius:12px; padding:12px; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm); transition:filter .15s, box-shadow .15s; margin-top:4px; }
     .lbtn:hover:not(:disabled) { filter:brightness(.95); box-shadow:var(--shadow); }
     .lbtn:disabled { opacity:.6; cursor:not-allowed; }
-    .l-error { background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius:12px; padding:8px 12px; font-size:14px; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); margin-bottom:12px; }
+    .l-error { background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius:12px; padding:8px 12px; font-size:14px; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); margin-bottom:12px; }
     .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:var(--surface); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
     @keyframes spin { to { transform:rotate(360deg); } }
   `],

@@ -171,7 +171,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 📅 {{task.due_date | date:'dd.MM.yyyy'}}
                 <span *ngIf="isOverdue(task)" class="overdue-badge">{{ t('partnerDetail.onboarding.overdue') }}</span>
               </span>
-              <span *ngIf="task.done && task.done_by_name" style="color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">✓ {{task.done_by_name}}</span>
+              <span *ngIf="task.done && task.done_by_name" style="color:oklch(from #22c55e max(l, var(--text-min-l)) c h)">✓ {{task.done_by_name}}</span>
             </div>
             <div class="task-desc" *ngIf="task.body">{{task.body}}</div>
           </div>
@@ -470,7 +470,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                                  sourceType="partner" [sourceId]="partnerRouteId" [sourceName]="partner.company"></wt-linked-project-tasks>
         <div class="new-activity-form" *ngIf="showNewActivity">
           <!-- Typ (ustalany kontekstem zakładki, nie wybierany ręcznie — jak w crm-lead-detail.component.ts) -->
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">
             {{actIcon(actForm.type)}} {{actTypeName(actForm.type)}}
           </div>
           <!-- Edytowalny tytuł tylko dla Spotkania i Maila (Mail ma osobny formularz w zakładce „Maile") -->
@@ -493,12 +493,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
                   <div *ngFor="let p of computedDueDatePresets"
                        style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--gray-100);white-space:nowrap"
                        [style.background]="actDueDatePreset===p.value ? 'var(--gray-200)' : 'var(--surface)'"
-                       [style.color]="actDueDatePreset===p.value ? 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' : 'var(--gray-700)'"
+                       [style.color]="actDueDatePreset===p.value ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset===p.value ? '600' : '400'"
                        (mousedown)="selectDueDatePreset(p.value)">{{p.label}}</div>
                   <div style="padding:8px 12px;font-size:12px;cursor:pointer;white-space:nowrap"
                        [style.background]="actDueDatePreset==='custom' ? 'var(--gray-200)' : 'var(--surface)'"
-                       [style.color]="actDueDatePreset==='custom' ? 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' : 'var(--gray-700)'"
+                       [style.color]="actDueDatePreset==='custom' ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
                        (mousedown)="selectDueDatePreset('custom')">📅 {{ t('activity.customDate') }}</div>
                 </div>
@@ -687,7 +687,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <!-- INLINE COMPOSE -->
         <div *ngIf="showEmailCompose" style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">✉️ {{ t('email.new') }}</div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">✉️ {{ t('email.new') }}</div>
             <button style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:14px" (click)="showEmailCompose=false">✕</button>
           </div>
           <!-- Provider row — always visible when compose is open. Every user connects
@@ -704,9 +704,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
                       [title]="emailAddress">{{ t('email.from') }} <strong>{{emailAddress}}</strong> · {{emailProviderLabel}}</span>
                 <button type="button" (click)="disconnectEmail()" style="background:none;border:none;cursor:pointer;color:var(--gray-500);font-size:10px;text-decoration:underline;flex-shrink:0;padding:0">{{ t('email.disconnect') }}</button>
               </div>
-              <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:12px;color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">⚠️ {{ t('email.notConfigured') }}</div>
+              <div *ngIf="!emailProviderKey && !settings.settings().crm_training_mode" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">⚠️ {{ t('email.notConfigured') }}</div>
             </div>
-            <div *ngIf="settings.settings().crm_training_mode" style="font-size:12px;color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">🎓 {{ t('email.trainingMode') }}</div>
+            <div *ngIf="settings.settings().crm_training_mode" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">🎓 {{ t('email.trainingMode') }}</div>
           </div>
           <!-- Email form — shown when connected or training mode -->
           <ng-container *ngIf="emailConnected || settings.settings().crm_training_mode">
@@ -741,15 +741,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <quill-editor [(ngModel)]="emailForm.body" [modules]="quillModules" [placeholder]="t('email.placeholders.body')" style="display:block" theme="snow"></quill-editor>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="file" multiple (change)="onAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
-              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:color-mix(in srgb, #eef2ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #4338ca var(--tint-text-mix), #FFFFFF);cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromGoogleDrive')}}</button>
+              <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth" (click)="openDrivePicker()" [disabled]="drivePickerLoading" style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:color-mix(in srgb, #eef2ff var(--tint-mix), var(--surface));color:oklch(from #4338ca max(l, var(--text-min-l)) c h);cursor:pointer">{{drivePickerLoading ? '⏳' : '📁 ' + t('email.fromGoogleDrive')}}</button>
             </div>
-            <div *ngIf="driveNeedsReauth" style="font-size:12px;color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF);background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">
+            <div *ngIf="driveNeedsReauth" style="font-size:12px;color:oklch(from #9a3412 max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">
               ⚠️ {{ t('email.driveReauthRequired') }}
             </div>
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-              <span *ngFor="let f of emailAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
+              <span *ngFor="let f of emailAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
             </div>
-            <div *ngIf="emailError" style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+            <div *ngIf="emailError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
               <button class="btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
               <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ ' + t('email.sending') : '📤 ' + t('email.sendAction')}}</button>
@@ -774,7 +774,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <div style="font-size:10px;color:var(--gray-400);margin-top:1px">
                 <span *ngIf="a.activity_at">{{a.activity_at|date:'dd.MM.yyyy HH:mm'}}</span>
                 <span *ngIf="a.created_by_name"> · {{a.created_by_name}}</span>
-                <span *ngIf="!a.created_by_name && !a.assigned_to_name" style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF)"> ↩ {{ t('email.incomingReply') }}</span>
+                <span *ngIf="!a.created_by_name && !a.assigned_to_name" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h)"> ↩ {{ t('email.incomingReply') }}</span>
               </div>
             </div>
             <span style="font-size:12px;color:var(--gray-400);flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
@@ -782,7 +782,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid var(--gray-200);padding:12px;display:flex;flex-direction:column;gap:8px">
             <ng-container *ngIf="a.gmail_thread_id; else singleBody">
               <div *ngIf="loadingThread" style="font-size:12px;color:var(--gray-400);padding:4px 0">{{ t('email.thread.loading') }}</div>
-              <div *ngIf="!loadingThread && threadUnavailableReason" style="font-size:12px;color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:8px 10px">{{threadUnavailableReason}}</div>
+              <div *ngIf="!loadingThread && threadUnavailableReason" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:8px 10px">{{threadUnavailableReason}}</div>
               <div *ngFor="let m of threadMessages"
                    [style.background]="m.created_by ? 'var(--surface)' : 'color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface))'"
                    [style.border]="m.created_by ? '1px solid #e5e7eb' : '1px solid #fbbf24'"
@@ -842,9 +842,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 <input type="file" multiple (change)="onInlineReplyAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
               </div>
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
-                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
+                <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
               </div>
-              <div *ngIf="inlineReplyError" style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-size:12px;background:var(--gray-50);border-radius:6px;padding:4px 10px">⚠️ {{inlineReplyError}}</div>
+              <div *ngIf="inlineReplyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:4px 10px">⚠️ {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
                 <button class="btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
                 <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
@@ -873,7 +873,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
 
         <div *ngIf="whatsappConfigured===true" id="wa-new-message" style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">💬 {{ t('whatsapp.newMessage') }}</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:var(--gray-50);border-radius:6px;overflow:hidden">
@@ -885,7 +885,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <input class="act-input" type="text" [(ngModel)]="whatsappToPhone" (blur)="onWhatsappToPhoneBlur()" [disabled]="!canEdit || whatsappSending"
                    placeholder="+48 123 123 123">
           </label>
-          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:color-mix(in srgb, #b45309 var(--tint-text-mix), #FFFFFF)">{{ t('whatsapp.missingCountryCode') }}</div>
+          <div *ngIf="whatsappToPhoneMissingCountryCode" style="font-size:12px;color:oklch(from #b45309 max(l, var(--text-min-l)) c h)">{{ t('whatsapp.missingCountryCode') }}</div>
 
           <div class="wa-mode-switch">
             <button type="button" [class.active]="whatsappMode==='template'" [disabled]="whatsappSending" (click)="whatsappMode='template'">📋 {{ t('whatsapp.mode.template') }}</button>
@@ -902,8 +902,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <wt-whatsapp-template-picker *ngIf="whatsappMode==='template'" [disabled]="!canEdit || whatsappSending"
                                        (selectionChange)="whatsappTemplateSelection=$event" />
 
-          <div *ngIf="whatsappError" style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
-          <div *ngIf="whatsappSuccess" style="color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
+          <div *ngIf="whatsappError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
 
           <div style="display:flex;gap:6px;justify-content:flex-end">
             <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
@@ -974,7 +974,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
                           [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
-                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-size:12px;background:var(--gray-50);border-radius:6px;padding:4px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:4px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
                 <div style="display:flex;gap:6px;justify-content:flex-end">
                   <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
                   <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
@@ -990,7 +990,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- SMS tab -->
       <div *ngIf="midTab==='sms'" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:12px">
 
-        <div *ngIf="smsThreadError" style="font-size:14px;color:color-mix(in srgb, #854d0e var(--tint-text-mix), #FFFFFF);background:color-mix(in srgb, #fefce8 var(--tint-mix), var(--surface));border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
+        <div *ngIf="smsThreadError" style="font-size:14px;color:oklch(from #854d0e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fefce8 var(--tint-mix), var(--surface));border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
           ⚠️ {{smsThreadError}}
         </div>
 
@@ -1037,7 +1037,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 {{ getSmsConvState(conv.number).sending ? '⏳' : t('sms.send') }}
               </button>
             </div>
-            <div *ngIf="getSmsConvState(conv.number).error" style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-size:12px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
+            <div *ngIf="getSmsConvState(conv.number).error" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;padding:0 10px 8px">⚠️ {{getSmsConvState(conv.number).error}}</div>
           </div>
         </div>
       </div>
@@ -1141,8 +1141,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('documents.add') }}</button>
         </div>
         <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
-             style="display:flex;align-items:center;gap:6px;background:var(--gray-200);border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">
-          <span style="font-size:14px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">⚠️</span>
+             style="display:flex;align-items:center;gap:6px;background:var(--gray-200);border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
+          <span style="font-size:14px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">⚠️</span>
           <span><strong>{{ t('partnerDetail.documents.noContractTitle') }}</strong> {{ t('partnerDetail.documents.noContractHint') }}</span>
         </div>
         <div *ngIf="linkedDocs.length===0" style="font-size:12px;color:var(--gray-400);text-align:center;padding:8px 0">{{ t('partnerDetail.documents.empty') }}</div>
@@ -1265,11 +1265,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
               </div>
             </div>
             <span *ngIf="doc._access==='read'" style="font-size:12px;color:var(--gray-400)">🔒 {{ t('documents.picker.readOnly') }}</span>
-            <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">✓ {{ t('documents.picker.added') }}</span>
+            <span *ngIf="doc._access!=='read' && isLinked(doc.id)" style="font-size:12px;font-weight:700;color:oklch(from #16a34a max(l, var(--text-min-l)) c h)">✓ {{ t('documents.picker.added') }}</span>
             <span *ngIf="doc._access!=='read' && !isLinked(doc.id)" style="font-size:12px;color:var(--gray-400)">{{ t('documents.add') }}</span>
           </div>
         </div>
-        <div *ngIf="linkDocError" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface));border-radius:6px;padding:8px 12px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
+        <div *ngIf="linkDocError" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface));border-radius:6px;padding:8px 12px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h)">
           ⚠ {{linkDocError}}
         </div>
       </div>
@@ -1298,7 +1298,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                   {{statusLabelStr(s)}} {{s==='active' && hasOpenTasks && partner?.status==='onboarding' ? '🔒' : ''}}
                 </option>
               </select>
-              <div *ngIf="hasOpenTasks && partner?.status === 'onboarding'" class="validation-msg" style="color:color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF);margin-top:4px">
+              <div *ngIf="hasOpenTasks && partner?.status === 'onboarding'" class="validation-msg" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h);margin-top:4px">
                 ⚠ {{ t('partnerDetail.edit.openTasksWarning', { count: openTasksCount }) }}
               </div>
             </label>
@@ -1308,23 +1308,23 @@ function getMonthRange(preset: string): { from: string; to: string } {
               {{ t('partnerDetail.fields.crmtreePartnerId') }}
               <input [(ngModel)]="editForm.dwh_partner_id" type="number" [placeholder]="t('partnerDetail.edit.placeholders.partnerId')"
                      [disabled]="!isManager">
-              <span style="font-size:10px;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);margin-top:2px;display:block">
+              <span style="font-size:10px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:2px;display:block">
                 {{ t('partnerDetail.edit.partnerIdHint') }}<span *ngIf="!isManager"> · {{ t('partnerDetail.edit.managersOnly') }}</span>
               </span>
             </label>
             <!-- NIP: edytowalny tylko dla partnerów bez DWH -->
             <label *ngIf="!partner?.dwh_partner_id">
-              {{ t('partnerDetail.fields.nip') }} <span style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">*</span>
+              {{ t('partnerDetail.fields.nip') }} <span style="color:oklch(from #f97316 max(l, var(--text-min-l)) c h)">*</span>
               <input [(ngModel)]="editForm.nip" placeholder="PL1234567890" maxlength="14"
                      (ngModelChange)="validatePartnerNip()"
                      [style.border-color]="partnerNipEditError ? '#ef4444' : ''">
-              <span *ngIf="partnerNipEditError" style="font-size:12px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);margin-top:2px;display:block">{{ partnerNipEditError }}</span>
+              <span *ngIf="partnerNipEditError" style="font-size:12px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);margin-top:2px;display:block">{{ partnerNipEditError }}</span>
             </label>
             <label *ngIf="partner?.dwh_partner_id">
               {{ t('partnerDetail.fields.nip') }} <span class="dwh-badge">DWH</span>
               <input [value]="partner?.dwh_nip || partner?.nip || ''" readonly
                      style="background:var(--gray-50);color:var(--gray-400);cursor:not-allowed">
-              <span style="font-size:10px;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);margin-top:2px;display:block">{{ t('partnerDetail.edit.syncedWithDwh') }}</span>
+              <span style="font-size:10px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:2px;display:block">{{ t('partnerDetail.edit.syncedWithDwh') }}</span>
             </label>
           </div>
         </div>
@@ -1367,7 +1367,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
           <div *ngIf="isDwhFieldReadOnly('admin_first_name') || isDwhFieldReadOnly('admin_last_name') || isDwhFieldReadOnly('admin_email')"
-               style="font-size:12px;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);margin-top:4px">
+               style="font-size:12px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:4px">
             🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
@@ -1393,7 +1393,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <wt-phone-input [(ngModel)]="editForm.phone" [invalid]="submitAttempted && !editForm.phone" />
             </label>
           </div>
-          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.contact_name || !editForm.contact_title || !editForm.email || !editForm.phone)" style="color:color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF)">
+          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.contact_name || !editForm.contact_title || !editForm.email || !editForm.phone)" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h)">
             ⚠ {{ t('partnerDetail.edit.contractContactIncomplete') }}
           </div>
         </div>
@@ -1438,7 +1438,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <wt-phone-input [(ngModel)]="editForm.billing_phone" [invalid]="submitAttempted && !editForm.billing_phone" />
             </label>
           </div>
-          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_contact_name || !editForm.billing_contact_title || !editForm.billing_email || !editForm.billing_phone)" style="color:color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF)">
+          <div class="validation-msg" *ngIf="submitAttempted && (!editForm.billing_contact_name || !editForm.billing_contact_title || !editForm.billing_email || !editForm.billing_phone)" style="color:oklch(from #f59e0b max(l, var(--text-min-l)) c h)">
             ⚠ {{ t('partnerDetail.edit.billingContactIncomplete') }}
           </div>
         </div>
@@ -1503,7 +1503,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
           <div *ngIf="isDwhFieldReadOnly('billing_address') || isDwhFieldReadOnly('billing_zip') || isDwhFieldReadOnly('billing_city') || isDwhFieldReadOnly('billing_country') || isDwhFieldReadOnly('billing_email_address')"
-               style="font-size:12px;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);margin-top:4px">
+               style="font-size:12px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:4px">
             🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
@@ -1684,7 +1684,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
           </div>
           <div *ngIf="isDwhFieldReadOnly('subdomain') || isDwhFieldReadOnly('language') || isDwhFieldReadOnly('partner_currency') || isDwhFieldReadOnly('country')"
-               style="font-size:12px;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);margin-top:4px">
+               style="font-size:12px;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);margin-top:4px">
             🔒 {{ t('partnerDetail.edit.dwhLockedHint') }}
           </div>
         </div>
@@ -1737,14 +1737,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Attachments -->
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
            style="display:flex;flex-wrap:wrap;gap:4px">
-        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);font-size:12px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.attachments" class="att-chip" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
             <button class="att-action-btn dl" (click)="$event.stopPropagation();downloadAtt(att,msgModalMsg)" [title]="t('email.attachments.downloadTooltip')">{{ t('email.attachments.download') }}</button>
           </span>
         </span>
-        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);font-size:12px;padding:4px 10px">
+        <span *ngFor="let att of msgModalMsg.sentAttachments" class="att-chip" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);font-size:12px;padding:4px 10px">
           📎 {{att.filename}}
           <span class="att-chip-actions">
             <button class="att-action-btn view" (click)="$event.stopPropagation();viewAttachment(att,msgModalMsg)" [title]="t('email.attachments.previewTooltip')">{{ t('email.attachments.preview') }}</button>
@@ -1781,20 +1781,20 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <input type="file" multiple (change)="onMsgReplyAttachmentChange($event)" style="font-size:12px;color:var(--gray-500);flex:1;min-width:0">
           <button *ngIf="emailProviderKey==='gmail' && emailConnected && !driveNeedsReauth"
                   (click)="openDrivePicker('reply')" [disabled]="drivePickerLoading"
-                  style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:color-mix(in srgb, #eef2ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #4338ca var(--tint-text-mix), #FFFFFF);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+                  style="flex-shrink:0;font-size:12px;padding:4px 10px;border:1px solid #a5b4fc;border-radius:6px;background:color-mix(in srgb, #eef2ff var(--tint-mix), var(--surface));color:oklch(from #4338ca max(l, var(--text-min-l)) c h);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
             <span *ngIf="!drivePickerLoading">📁 {{ t('email.fromGoogleDrive') }}</span>
             <span *ngIf="drivePickerLoading">⏳ {{ 'states.loading' | transloco }}</span>
           </button>
         </div>
         <div *ngIf="msgModalAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
           <span *ngFor="let f of msgModalAttachments; let i=index"
-                style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">
+                style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">
             📎 {{f.name}}
             <button (click)="removeMsgReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button>
           </span>
         </div>
       </div>
-      <div *ngIf="msgModalError" style="color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-size:12px">⚠️ {{msgModalError}}</div>
+      <div *ngIf="msgModalError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px">⚠️ {{msgModalError}}</div>
     </div>
     <div class="modal-footer">
       <button class="btn-outline" (click)="closeMsgModal()">{{ 'actions.close' | transloco }}</button>
@@ -1814,8 +1814,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .detail-header { display:flex; align-items:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; flex-shrink:0; }
     .detail-header h1 { font-size:22px; font-weight:800; margin:0; flex:1; }
     .pbadge { padding:4px 10px; border-radius:10px; font-size:12px; font-weight:700; }
-    .pbadge-active{background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)} .pbadge-onboarding{background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF)}
-    .pbadge-inactive{background:var(--gray-100);color:var(--gray-700)} .pbadge-churned{background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)}
+    .pbadge-active{background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h)} .pbadge-onboarding{background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h)}
+    .pbadge-inactive{background:var(--gray-100);color:var(--gray-700)} .pbadge-churned{background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #991b1b max(l, var(--text-min-l)) c h)}
     .group-badge { background:var(--gray-100); border-radius:999px; padding:4px 12px; font-size:12px; display:inline-flex; align-items:center; gap:4px; }
     .btn-outline { background:var(--surface); color:var(--gray-700); border:1px solid var(--gray-300); border-radius:10px; padding:8px 16px; font-size:14px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-family:inherit; }
     .btn-primary { background:#3BAA5D; color:white; border:none; border-radius:10px; padding:8px 16px; font-size:14px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-family:inherit; }
@@ -1828,12 +1828,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .step:not(:last-child)::after { content:''; position:absolute; top:14px; left:calc(50% + 16px); right:0; height:2px; background:var(--gray-200); }
     .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid var(--gray-200); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:var(--surface); position:relative; z-index:1; transition:all .2s; }
     .step.done .step-circle { background:#3BAA5D; border-color:#3BAA5D; color:white; }
-    .step.current .step-circle { border-color:#3BAA5D; color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); box-shadow:0 0 0 3px rgba(59,170,93,.15); }
+    .step.current .step-circle { border-color:#3BAA5D; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); box-shadow:0 0 0 3px rgba(59,170,93,.15); }
     .step-label { font-size:10px; color:var(--gray-400); text-align:center; }
-    .step.current .step-label { color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .step.current .step-label { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight:700; }
     .step.done .step-label { color:var(--gray-500); }
     .step-tasks-count { font-size:10px; font-weight:700; padding:1px 4px; border-radius:8px; background:var(--gray-100); color:var(--gray-500); }
-    .step-tasks-count .all-done { color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF); }
+    .step-tasks-count .all-done { color:oklch(from #22c55e max(l, var(--text-min-l)) c h); }
     /* Tasks panel */
     .step-tasks-panel { padding:14px 16px; }
     .step-tasks-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
@@ -1861,15 +1861,15 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .task-title { font-size:12px; font-weight:600; color:var(--gray-800); display:flex; align-items:center; gap:4px; }
     .task-type-icon { font-size:14px; }
     .task-meta { display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--gray-400); margin-top:4px; }
-    .task-meta .overdue { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
-    .overdue-badge { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); border-radius:4px; padding:0 4px; font-size:10px; font-weight:600; }
+    .task-meta .overdue { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
+    .overdue-badge { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); border-radius:4px; padding:0 4px; font-size:10px; font-weight:600; }
     .task-desc { font-size:12px; color:var(--gray-500); margin-top:4px; white-space:pre-line; }
     .task-edit { display:flex; flex-direction:column; gap:6px; }
     .task-actions { display:flex; gap:4px; opacity:0; transition:opacity .15s; flex-shrink:0; }
     .task-item:hover .task-actions { opacity:1; }
     .task-act-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 4px; border-radius:4px; color:var(--gray-400); }
     .task-act-btn:hover { background:var(--gray-100); color:var(--gray-700); }
-    .task-act-btn.del:hover { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .task-act-btn.del:hover { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .task-empty { font-size:12px; color:var(--gray-400); text-align:center; padding:16px; }
     /* Body */
     .detail-body { display:grid; grid-template-columns:260px 1fr 260px; gap:16px; flex:1; overflow:hidden; min-height:0; }
@@ -1879,7 +1879,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     /* Left panel collapse */
     .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink:0; }
     .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid var(--gray-200); background:var(--surface); cursor:pointer; font-size:16px; line-height:1; color:var(--gray-400); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
-    .panel-collapse-btn:hover { background:var(--gray-200); color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); border-color:#a7d7b5; }
+    .panel-collapse-btn:hover { background:var(--gray-200); color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); border-color:#a7d7b5; }
     .info-card.is-collapsed { padding:10px 4px; overflow:hidden; align-items:center; display:flex; flex-direction:column; }
     .info-card { background:var(--surface); border:none; border-radius:12px; box-shadow:var(--shadow-sm); padding:16px; overflow-y:auto; min-height:0; }
     .activities-card { background:var(--surface); border:none; border-radius:12px; box-shadow:var(--shadow-sm); overflow:hidden; min-height:0; display:flex; flex-direction:column; }
@@ -1901,31 +1901,31 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .churn-widget { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:14px; flex-shrink:0; }
     .churn-widget-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-400); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
     .churn-widget-loading { font-size:12px; color:var(--gray-400); text-align:center; padding:4px 0; }
-    .churn-widget-ok { display:flex; align-items:center; gap:6px; font-size:12px; color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); font-weight:600; }
+    .churn-widget-ok { display:flex; align-items:center; gap:6px; font-size:12px; color:oklch(from #16a34a max(l, var(--text-min-l)) c h); font-weight:600; }
     .churn-widget-body { display:flex; flex-direction:column; gap:8px; }
     .churn-widget-score { font-size:12px; color:var(--gray-500); }
     .churn-widget-rows { display:flex; flex-direction:column; gap:4px; border-top:1px solid var(--gray-100); padding-top:8px; }
     .churn-widget-row { display:flex; justify-content:space-between; align-items:center; }
     .cwrow-lbl { font-size:12px; color:var(--gray-500); }
     .cwrow-val { font-size:14px; font-weight:700; color:var(--gray-800); }
-    .cwrow-drop { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .cwrow-drop { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .churn-badge-inline { padding:4px 10px; border-radius:16px; font-size:12px; font-weight:700; }
-    .risk-badge-critical { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .risk-badge-high     { background:color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface)); color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF); }
-    .risk-badge-medium   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .risk-badge-low      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .risk-badge-critical { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .risk-badge-high     { background:color-mix(in srgb, #fed7aa var(--tint-mix), var(--surface)); color:oklch(from #9a3412 max(l, var(--text-min-l)) c h); }
+    .risk-badge-medium   { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .risk-badge-low      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .panel-email-box { background:var(--surface); border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius:12px; padding:14px; flex-shrink:0; }
-    .panel-email-title { font-size:12px; font-weight:700; color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
+    .panel-email-title { font-size:12px; font-weight:700; color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
     .panel-msg { border:1px solid var(--gray-200); border-radius:8px; padding:8px; margin-bottom:6px; font-size:12px; }
     .panel-msg.unread { border-left:3px solid #ef4444; }
     .panel-msg.read { border-left:3px solid var(--gray-200); }
     .docs-box { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:14px; flex-shrink:0; }
     .info-card h3, .activities-card h3 { font-size:14px; font-weight:700; margin:0 0 12px; }
     .churn-hdr-badge { padding:4px 10px; border-radius:10px; font-size:12px; font-weight:700; }
-    .churn-hdr-critical { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .churn-hdr-high { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #c2410c var(--tint-text-mix), #FFFFFF); }
-    .churn-hdr-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #854d0e var(--tint-text-mix), #FFFFFF); }
-    .churn-hdr-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .churn-hdr-critical { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .churn-hdr-high { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
+    .churn-hdr-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:oklch(from #854d0e max(l, var(--text-min-l)) c h); }
+    .churn-hdr-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .mid-tabs { display:flex; align-items:center; gap:0; padding:0 12px; border-bottom:1px solid var(--gray-200); flex-shrink:0; flex-wrap:wrap; }
     .tab-btn { background:none; border:none; border-bottom:2.5px solid transparent; margin-bottom:-1px; padding:10px 12px; font-size:12px; font-weight:500; color:var(--gray-500); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:6px; transition:all .15s; }
     .tab-btn.active { color:var(--orange-dark); font-weight:700; border-bottom-color:var(--orange); background:none; }
@@ -1933,27 +1933,27 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .info-grid { display:grid; grid-template-columns:auto 1fr; gap:4px 10px; font-size:14px; }
     .lbl { color:var(--gray-400); font-size:12px; white-space:nowrap; padding-top:2px; }
     .sub { color:var(--gray-400); }
-    .accent { color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .accent { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight:700; }
     .notes { white-space:pre-line; }
     .dwh-note { white-space:normal; }
     .dwh-note p { margin:4px 0; }
     .dwh-note ul, .dwh-note ol { margin:4px 0 4px 18px; padding:0; }
     .dwh-note li { margin-bottom:2px; }
     .dwh-note strong, .dwh-note b { font-weight:700; }
-    .dwh-note a { color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); text-decoration:underline; }
+    .dwh-note a { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); text-decoration:underline; }
     .opp-section { margin-top:16px; padding-top:12px; border-top:1px solid var(--gray-100); }
     .opp-section h4 { font-size:12px; font-weight:700; margin:0 0 8px; }
     .opp-item { font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .opp-title { flex:1; font-weight:600; }
-    .opp-value { font-weight:700; color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); }
+    .opp-value { font-weight:700; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
     .opp-due { color:var(--gray-400); font-size:12px; }
     .opp-status-badge { font-size:10px; font-weight:700; padding:1px 8px; border-radius:8px; white-space:nowrap; }
-    .opp-st-new { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
-    .opp-st-in_progress { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .opp-st-new { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
+    .opp-st-in_progress { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .opp-st-closed { background:var(--gray-100); color:var(--gray-500); }
     .opp-type { font-size:10px; font-weight:700; padding:1px 6px; border-radius:6px; background:var(--gray-100); margin-right:4px; }
-    .opp-type.upsell { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .opp-value { color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .opp-type.upsell { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .opp-value { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight:700; }
     .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
     .card-header h3 { margin:0; }
     .btn-sm { font-size:12px; font-weight:500; font-family:inherit; color:var(--gray-700); border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; padding:4px 12px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; box-shadow:0 4px 14px rgba(24,24,27,0.081); }
@@ -1972,13 +1972,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-item.act-closed { opacity:.65; }
     .act-status-badge { font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
     .act-status-new { background:var(--gray-100); color:var(--gray-500); }
-    .act-status-open { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); }
-    .act-status-closed { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); }
+    .act-status-open { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
+    .act-status-closed { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface)); color:oklch(from #065f46 max(l, var(--text-min-l)) c h); }
     .priority-badge { font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
-    .priority-asap { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .priority-important { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #c2410c var(--tint-text-mix), #FFFFFF); }
-    .priority-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #854d0e var(--tint-text-mix), #FFFFFF); }
-    .priority-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .priority-asap { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .priority-important { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
+    .priority-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:oklch(from #854d0e max(l, var(--text-min-l)) c h); }
+    .priority-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .act-icon { font-size:18px; }
     .act-item strong { font-size:14px; }
     .act-meta { font-size:10px; color:var(--gray-400); }
@@ -1988,26 +1988,26 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-item:hover .act-controls { opacity:1; }
     .act-ctrl-btn { background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;color:var(--gray-400); }
     .act-ctrl-btn:hover { background:var(--gray-100);color:var(--gray-700); }
-    .act-ctrl-btn.del:hover { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .act-ctrl-btn.del:hover { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .participant-input-wrap { position:relative; }
     .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid var(--gray-300);border-radius:6px;padding:4px 8px;min-height:32px;background:var(--surface); }
-    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);border-radius:12px;padding:1px 8px;font-size:12px; }
+    .participant-chip { display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:1px 8px;font-size:12px; }
     .participant-chip button { background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:0;line-height:1; }
-    .participant-chip button:hover { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .participant-chip button:hover { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .participant-input { border:none;outline:none;font-size:12px;min-width:120px;flex:1;font-family:inherit; }
     .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:var(--surface);border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:160px;overflow-y:auto;margin-top:2px; }
     .suggestion-item { padding:8px 12px;font-size:12px;cursor:pointer; }
     .suggestion-item:hover { background:var(--gray-50); }
     .empty-act { color:var(--gray-400); font-size:12px; text-align:center; padding:16px; }
     .wa-body-clamp { display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
-    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); padding:2px 0; font-weight:600; margin-top:4px; }
+    .wa-expand-btn { background:none; border:none; cursor:pointer; font-size:10px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); padding:2px 0; font-weight:600; margin-top:4px; }
     .wa-mode-switch { display:inline-flex; align-self:flex-start; border:1px solid var(--gray-300); border-radius:6px; overflow:hidden; }
     .wa-mode-switch button { background:var(--surface); border:none; padding:4px 12px; font-size:12px; font-weight:600; color:var(--gray-500); cursor:pointer; font-family:inherit; }
     .wa-mode-switch button + button { border-left:1px solid var(--gray-300); }
-    .wa-mode-switch button.active { background:var(--gray-200); color:color-mix(in srgb, #2f8f4d var(--tint-text-mix), #FFFFFF); }
-    .wa-window-hint { font-size:12px; color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border:1px solid #fde68a; border-radius:6px; padding:6px 10px; }
-    .wa-window-note { font-size:12px; color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
-    .wa-failed { font-size:10px; font-weight:700; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); background:var(--gray-50); border-radius:4px; padding:1px 6px; }
+    .wa-mode-switch button.active { background:var(--gray-200); color:oklch(from #2f8f4d max(l, var(--text-min-l)) c h); }
+    .wa-window-hint { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border:1px solid #fde68a; border-radius:6px; padding:6px 10px; }
+    .wa-window-note { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
+    .wa-failed { font-size:10px; font-weight:700; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:var(--gray-50); border-radius:4px; padding:1px 6px; }
     .loading, .not-found { padding:40px; text-align:center; color:var(--gray-400); }
     /* Modal */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
@@ -2027,17 +2027,17 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .edit-textarea { width:100%; border:1px solid var(--gray-300); border-radius:6px; padding:8px 10px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
     .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid var(--gray-100); }
-    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); margin-bottom:8px; }
+    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); margin-bottom:8px; }
     .link { color: var(--orange-text); text-decoration:none; }
     .link:hover { text-decoration:underline; }
-    .dwh-badge { display:inline-block; background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF); font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
+    .dwh-badge { display:inline-block; background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color:oklch(from #7c3aed max(l, var(--text-min-l)) c h); font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
     .dwh-readonly-field { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:var(--gray-700); }
     .dwh-readonly-field.full { grid-column:1/-1; }
     .dwh-readonly-field label { font-size:12px; font-weight:600; color:var(--gray-700); display:flex; align-items:center; gap:4px; }
     .dwh-readonly-value { background:var(--gray-50); border:1px solid color-mix(in srgb, #e9d5ff var(--tint-mix), var(--surface)); border-radius:6px; padding:8px 10px; font-size:14px; color:var(--gray-500); cursor:not-allowed; }
     .input-error { border-color:#ef4444 !important; background:var(--gray-50); }
     .input-warn  { border-color:#f59e0b !important; background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); }
-    .validation-msg { font-size:12px; color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); margin-top:2px; }
+    .validation-msg { font-size:12px; color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); margin-top:2px; }
     .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:16px; display:inline-block; }
     .suggest-dropdown { position:absolute;top:100%;left:0;right:0;z-index:300;background:var(--surface);border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;margin-top:2px; }
     .suggest-item { padding:8px 12px;font-size:12px;cursor:pointer; }
@@ -2049,7 +2049,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .att-chip-actions:hover { display:flex; }
     .att-action-btn { background:none; border:none; cursor:pointer; padding:4px 10px; border-radius:5px; font-size:12px; white-space:nowrap; }
     .att-action-btn:hover { background:var(--gray-100); }
-    .att-action-btn.dl { color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); }
+    .att-action-btn.dl { color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
     .att-action-btn.view { color:var(--gray-700); }
     .act-input:focus { border-color:#3BAA5D; outline:none; }
     .act-card { border:1px solid var(--gray-200); border-radius:10px; padding:12px 14px; background:var(--surface); cursor:pointer; transition:box-shadow .15s; position:relative; }
@@ -2058,13 +2058,13 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-card-title { font-size:12px; font-weight:600; color:var(--gray-800); margin-bottom:2px; }
     .act-body-clamp { font-size:12px; color:var(--gray-500); margin-top:6px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
     .act-expand-btn { background:none; border:none; cursor:pointer; font-size:12px; color:var(--gray-400); padding:2px 0; margin-top:4px; }
-    .act-expand-btn:hover { color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF); }
+    .act-expand-btn:hover { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
     .act-card-controls { display:flex; gap:4px; align-items:center; flex-shrink:0; margin-top:8px; }
     .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:2px 6px; border-radius:5px; color:var(--gray-400); line-height:1; }
     .act-ctrl-btn:hover { background:var(--gray-100); color:var(--gray-700); }
-    .act-ctrl-btn.del:hover { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .act-ctrl-btn.del:hover { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .task-actions-row { display:flex; gap:6px; margin-top:8px; }
-    .btn-task-close { background:var(--gray-50); border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; }
+    .btn-task-close { background:var(--gray-50); border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; }
     .btn-task-close:hover:not(:disabled) { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); border-color:#86efac; }
     .btn-task-close:disabled { opacity:.5; cursor:default; }
     .btn-task-reopen { background:var(--gray-100); border:1px solid var(--gray-300); color:var(--gray-700); font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; }

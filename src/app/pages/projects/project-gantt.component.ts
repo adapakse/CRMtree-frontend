@@ -138,7 +138,7 @@ interface DayTick { label: number; leftPx: number; isWeekend: boolean; }
     .name-cell:hover { background:var(--gray-50); }
     .name-cell .root { font-weight:600; }
     .name-cell.project-cell { background:var(--gray-100); font-weight:700; cursor:default; }
-    .beyond-flag { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-size:12px; flex-shrink:0; }
+    .beyond-flag { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); font-size:12px; flex-shrink:0; }
     .mono { font-family:'Sora',monospace; font-size:12px; color:var(--gray-500); font-weight:600; }
 
     .timeline { flex:1; overflow-x:auto; min-width:0; }

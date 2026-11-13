@@ -74,7 +74,7 @@ const GAP_BELOW_TRIGGER_PX = 4;
     .sort-option { display:flex; justify-content:space-between; gap:8px; border:1px solid var(--gray-200); background:var(--surface); border-radius:7px; padding:4px 8px; font-size:12px; color:var(--gray-700); cursor:pointer; font-family:inherit; }
     .sort-option.sorted { border-color:var(--orange); color:var(--orange-dark); background:var(--orange-pale); font-weight:600; }
     .popover-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .clear { border:none; background:none; padding:0; font-size:12px; color:var(--accent-blue, color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)); cursor:pointer; font-family:inherit; }
+    .clear { border:none; background:none; padding:0; font-size:12px; color:var(--accent-blue, oklch(from #3b82f6 max(l, var(--text-min-l)) c h)); cursor:pointer; font-family:inherit; }
     .clear:disabled { color:var(--gray-300); cursor:default; }
   `],
 })

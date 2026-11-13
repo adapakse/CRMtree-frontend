@@ -62,8 +62,8 @@ const OPEN_STATUS_CATEGORIES = 'todo,in_progress';
     .name:hover { color:var(--orange-dark); }
     .count { min-width:22px; padding:1px 6px; border-radius:8px; font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; background:var(--gray-100); color:var(--gray-700); }
     .count:hover { filter:brightness(.95); }
-    .count.overdue { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
-    .count.at-risk { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .count.overdue { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); }
+    .count.at-risk { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
     .count.zero { background:var(--gray-50); color:var(--gray-300); }
     .key { font-size:12px; color:var(--gray-400); }
   `],

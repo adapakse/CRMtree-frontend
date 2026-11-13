@@ -73,7 +73,7 @@ import { ToastService } from '../../../core/services/toast.service';
     .shot-card-new .btn-sm { margin-top: 0.7rem; width: 100%; }
     .btn-delete {
       display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 9px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); cursor: pointer; padding: 4px 10px;
+      border: none; border-radius: 9px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: oklch(from #991b1b max(l, var(--text-min-l)) c h); cursor: pointer; padding: 4px 10px;
     }
   `],
 })

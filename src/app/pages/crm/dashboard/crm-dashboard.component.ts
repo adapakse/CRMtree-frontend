@@ -141,7 +141,7 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
     .kpi-card { background:var(--surface); box-shadow:var(--shadow-sm); border-radius:12px; padding:14px 18px; min-width:140px; }
     .kpi-card.accent { border-color:color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface)); background:var(--gray-50); }
     .kv { font-size:20px; font-weight:800; }
-    .kpi-card.accent .kv { color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF); }
+    .kpi-card.accent .kv { color:oklch(from #f97316 max(l, var(--text-min-l)) c h); }
     .kl { font-size:10px; color:var(--gray-400); text-transform:uppercase; margin-top:2px; }
     .dash-body { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .dash-panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:16px; }
@@ -169,7 +169,7 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
     .mini-table th { color:var(--gray-400); padding:4px 6px; font-weight:600; font-size:10px; border-bottom:1px solid var(--gray-100); text-align:left; }
     .mini-table td { padding:4px 6px; border-bottom:1px solid var(--gray-50); }
     .muted { color:var(--gray-400); }
-    .urgent { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .urgent { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); font-weight:700; }
     /* Score table */
     .score-table { width:100%; border-collapse:collapse; font-size:12px; }
     .score-table th { color:var(--gray-400); padding:6px 10px; font-size:10px; font-weight:600; border-bottom:1px solid var(--gray-100); text-align:left; }
@@ -178,11 +178,11 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
     .link { color: var(--orange-text); text-decoration:none; font-weight:600; }
     .link:hover { text-decoration:underline; }
     .sbadge { padding:1px 8px; border-radius:8px; font-size:10px; font-weight:700; }
-    .sbadge-active { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
-    .sbadge-onboarding { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .sbadge-active { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .sbadge-onboarding { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .sbadge-inactive { background:var(--gray-100); color:var(--gray-700); }
-    .sbadge-churned { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
-    .low-adoption { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .sbadge-churned { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
+    .low-adoption { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); font-weight:700; }
     /* Activity feed */
     .activity-feed { display:flex; flex-direction:column; gap:10px; }
     .act-item { display:flex; gap:8px; align-items:flex-start; }

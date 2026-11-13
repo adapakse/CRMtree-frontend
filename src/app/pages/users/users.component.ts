@@ -86,7 +86,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 <!-- Grant widoczności NIE jest przynależnością do grupy — osobna
                      pigułka, żeby admin nie pomylił jej z rolą grupową. -->
                 @for (grant of user.visibility_grants ?? []; track grant.id) {
-                  <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF);padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
+                  <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h);padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
                         [title]="grantTooltip(grant)">
                     👁 {{ grant.group_display || grant.group_name }}
                     <span style="opacity:.7">{{ grant.access_level }}</span>
@@ -96,9 +96,9 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
             </div>
             <div class="td">
               @if (user.crm_role === 'sales_manager') {
-                <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.managerShort') }}</span>
+                <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1e40af max(l, var(--text-min-l)) c h);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.managerShort') }}</span>
               } @else if (user.crm_role === 'salesperson') {
-                <span style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.salespersonShort') }}</span>
+                <span style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.salespersonShort') }}</span>
               } @else {
                 <span style="font-size:12px;color:var(--gray-300)">—</span>
               }
@@ -615,7 +615,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .check-field { grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--gray-800);cursor:pointer; }
     .fl { font-size:12px;font-weight:600;color:var(--gray-600); }
     .fi-err { border-color:#ef4444 !important; }
-    .ferr { font-size:14px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
+    .ferr { font-size:14px;color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .sec-title { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-500);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--gray-100); }
   `],
 })

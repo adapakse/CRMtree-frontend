@@ -71,7 +71,7 @@ function fmtDuration(sec: number): string {
             (click)="goToEntity()"
             style="display:block;width:100%;text-align:left;background:#374151;
                    border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
-                   margin-top:6px;cursor:pointer;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);font-size:12px;
+                   margin-top:6px;cursor:pointer;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);font-size:12px;
                    font-weight:600;font-family:inherit">
       🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
@@ -114,7 +114,7 @@ function fmtDuration(sec: number): string {
             (click)="goToEntity()"
             style="display:block;width:100%;text-align:left;background:#374151;
                    border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
-                   margin-top:6px;cursor:pointer;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);font-size:12px;
+                   margin-top:6px;cursor:pointer;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);font-size:12px;
                    font-weight:600;font-family:inherit">
       🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
@@ -154,7 +154,7 @@ function fmtDuration(sec: number): string {
       <span class="sp-spinner"></span> {{ t('softphone.postCall.transcriptLoading') }}
     </div>
     <div *ngIf="transcriptionState === 'loaded'"
-         style="font-size:12px;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);margin-top:6px">
+         style="font-size:12px;color:oklch(from #4ade80 max(l, var(--text-min-l)) c h);margin-top:6px">
       ✓ {{ t('softphone.postCall.transcriptLoaded') }}
     </div>
     <div *ngIf="transcriptionState === 'unavailable'"
@@ -214,7 +214,7 @@ function fmtDuration(sec: number): string {
   font-size: 12px; font-weight: 700; text-transform: uppercase;
   letter-spacing: .6px; color: var(--gray-400); margin-bottom: 6px;
 }
-.sp-label-active  { color: color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF); }
+.sp-label-active  { color: oklch(from #4ade80 max(l, var(--text-min-l)) c h); }
 .sp-label-incoming { color: #60a5fa; }
 .sp-caller {
   font-size: 16px; font-weight: 600; color: #f9fafb;
