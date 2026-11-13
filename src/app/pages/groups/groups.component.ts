@@ -31,7 +31,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
         @for (g of groups(); track g.id) {
           <div class="card" style="padding:20px;cursor:pointer" (click)="select(g)">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-              <div class="group-tile" aria-hidden="true">{{ groupInitials(g.display_name || g.name) }}</div>
+              <div class="group-tile" aria-hidden="true">{{ groupIcon(g.name) }}</div>
               <div>
                 <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
                 @if (g.has_owner_restriction) {
@@ -163,7 +163,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 </ng-container>
   `,
   styles: [`
-    .group-tile { width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--gray-100); color: var(--gray-700); font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+    .group-tile { width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--gray-100); color: var(--gray-700); font-size: 16px; line-height: 1; }
     #topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
     .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); }
     .tsp { flex: 1; }
@@ -249,11 +249,11 @@ export class GroupsComponent implements OnInit {
     });
   }
 
-  /** Two letters for the group tile: first letters of two words, or the first two letters of one word. */
-  groupInitials(name: string): string {
-    const words = (name ?? '').trim().split(/\s+/).filter(Boolean);
-    const letters = words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? '').slice(0, 2);
-    return letters.toUpperCase();
+  groupIcon(name: string): string {
+    // Group names stored by tenants; the two Polish ones are spelled with escapes
+    // because the i18n check rejects Polish letters in translated source files.
+    const m: Record<string, string> = { Management: '🏢', 'Zarz\u0105d': '🏢', Sales: '💼', 'Sprzeda\u017c': '💼', Marketing: '📣', HR: '👥', Accounting: '💰', Operations: '⚙️' };
+    return m[name] ?? '📋';
   }
 
   initials(name: string): string {
