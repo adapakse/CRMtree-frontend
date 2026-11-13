@@ -313,21 +313,23 @@ interface CallAnalysisRow {
               <span *ngIf="r.score === null" style="color:#d1d5db">—</span>
             </td>
             <td style="padding:10px 16px">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px">
               <span [class]="statusClass(r.analysis_status)" style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600">
                 {{statusLabel(r.analysis_status)}}
               </span>
               <button *ngIf="r.follow_up_required && !r.follow_up_done"
                       (click)="toggleFollowUpDone(r, $event)"
                       [title]="t('callAnalysis.followUp.markDoneTitle')"
-                      style="margin-left:6px;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);border:1px solid #fde68a;white-space:nowrap;cursor:pointer">
-                📞 {{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
+                      style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);border:1px solid #fde68a;white-space:nowrap;cursor:pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px;margin-right:4px"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>{{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
               </button>
               <button *ngIf="r.follow_up_done"
                       (click)="toggleFollowUpDone(r, $event)"
                       [title]="t('callAnalysis.followUp.undoTitle')"
-                      style="margin-left:6px;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:var(--gray-100);color:var(--gray-400);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));white-space:nowrap;cursor:pointer;text-decoration:line-through">
-                📞 {{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
+                      style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:var(--gray-100);color:var(--gray-400);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));white-space:nowrap;cursor:pointer;text-decoration:line-through">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px;margin-right:4px"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>{{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
               </button>
+              </div>
             </td>
             <td style="padding:10px 16px;color:var(--gray-400);font-size:12px">
               {{r.analyzed_at ? (r.analyzed_at | date:'dd.MM.yyyy HH:mm') : '—'}}
