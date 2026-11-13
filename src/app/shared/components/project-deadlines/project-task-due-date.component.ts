@@ -31,14 +31,14 @@ type DueDateFacts = { end_date: string | null } & Pick<TaskDeadlineInfo, 'origin
     </ng-container>
   `,
   styles: [`
-    :host { display:inline-flex; flex-direction:column; gap:1px; white-space:nowrap; font-size:12px; color:var(--gray-600, #52525B); font-variant-numeric:tabular-nums; }
+    :host { display:inline-flex; flex-direction:column; gap:1px; white-space:nowrap; font-size:12px; color:var(--gray-600, var(--gray-600)); font-variant-numeric:tabular-nums; }
     :host(.inline) { flex-direction:row; align-items:baseline; gap:6px; }
-    .current.overdue { color:#DC2626; font-weight:600; }
-    .current.at-risk { color:#B45309; font-weight:600; }
-    .original { display:inline-flex; align-items:baseline; gap:4px; font-size:12px; color:var(--gray-400, #A1A1AA); }
+    .current.overdue { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-weight:600; }
+    .current.at-risk { color:color-mix(in srgb, #b45309 var(--tint-text-mix), #FFFFFF); font-weight:600; }
+    .original { display:inline-flex; align-items:baseline; gap:4px; font-size:12px; color:var(--gray-400, var(--gray-400)); }
     .original-date { text-decoration:line-through; }
-    .slip { font-weight:600; color:#15803D; }
-    .slip.later { color:#B45309; }
+    .slip { font-weight:600; color:color-mix(in srgb, #15803d var(--tint-text-mix), #FFFFFF); }
+    .slip.later { color:color-mix(in srgb, #b45309 var(--tint-text-mix), #FFFFFF); }
   `],
 })
 export class ProjectTaskDueDateComponent {

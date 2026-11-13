@@ -77,7 +77,7 @@ const PLATFORM_LABELS: Record<SocialPlatform, string> = {
     </ng-container>
   `,
   styles: [`
-    .channels-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .channels-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.9rem; }
     .channels-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .channel-row {

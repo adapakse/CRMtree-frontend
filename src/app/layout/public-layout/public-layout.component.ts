@@ -48,9 +48,9 @@ import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie
     .public-logo img { display:block; height:90px; width:auto; }
     .public-nav { display:flex; align-items:center; gap:1.5rem; }
     .public-nav a { color:var(--gray-700); text-decoration:none; font-size:0.95rem; }
-    .public-nav a:hover { color:var(--orange); }
+    .public-nav a:hover { color: var(--orange-text); }
     .public-cta {
-      background:var(--orange); color:#fff !important; padding:0.5rem 1.1rem;
+      background:var(--orange-strong); color:#fff !important; padding:0.5rem 1.1rem;
       border-radius:var(--radius); font-weight:600;
     }
     .public-main { flex:1; }
@@ -61,7 +61,7 @@ import { CookieConsentComponent } from '../../pages/public/cookie-consent/cookie
     }
     .public-footer nav { display:flex; gap:1.2rem; }
     .public-footer a { color:var(--gray-500); text-decoration:none; }
-    .public-footer a:hover { color:var(--orange); }
+    .public-footer a:hover { color: var(--orange-text); }
   `],
 })
 export class PublicLayoutComponent {

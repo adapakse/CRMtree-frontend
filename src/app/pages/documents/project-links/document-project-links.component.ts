@@ -59,12 +59,12 @@ import { ProjectTaskNavigationService } from '../../../core/services/project-tas
   styles: [`
     :host { display:block; margin-top:20px; }
     .empty { font-size:12px; color:var(--gray-400); margin-bottom:12px; }
-    .warning { color:#DC2626; font-size:12px; line-height:1.5; margin-bottom:8px; }
+    .warning { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-size:12px; line-height:1.5; margin-bottom:8px; }
     .links { list-style:none; margin:0 0 12px; padding:0; border:1px solid var(--gray-200); border-radius:8px; }
     .link-row { display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:center; padding:8px 12px; font-size:14px; color:var(--gray-800); }
     .link-row + .link-row { border-top:1px solid var(--gray-100); }
     .target { min-width:0; overflow-wrap:anywhere; }
-    .open { border:none; background:none; padding:0; font:inherit; color:var(--accent-blue, #3B82F6); cursor:pointer; text-align:left; }
+    .open { border:none; background:none; padding:0; font:inherit; color:var(--accent-blue, color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)); cursor:pointer; text-align:left; }
     .open:hover { text-decoration:underline; }
     .key { font-size:12px; font-weight:700; color:var(--orange-dark); background:var(--orange-pale); border-radius:5px; padding:1px 8px; }
     .task { color:var(--gray-600); }

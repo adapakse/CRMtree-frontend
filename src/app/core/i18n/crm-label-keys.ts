@@ -26,6 +26,12 @@ const LEAD_SOURCE_KEYS: Record<string, string> = {
   kampania: 'emailCampaign',
   inbound: 'inbound',
   inne: 'other',
+  // English values written by imports and demo data.
+  conference: 'tradeFair',
+  event: 'tradeFair',
+  recommendation: 'referral',
+  referral: 'referral',
+  website: 'website',
 };
 
 /**

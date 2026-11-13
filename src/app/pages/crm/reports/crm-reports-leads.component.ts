@@ -62,8 +62,8 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div id="topbar" style="height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
-  <span class="page-title" style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#333333">{{ t('reports.common.title') }}</span>
+<div id="topbar" style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
+  <span class="page-title" style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('reports.common.title') }}</span>
   <span style="flex:1"></span>
   <button class="btn btn-g btn-sm" (click)="load()">
     {{ loading ? '…' : '↻ ' + t('reports.common.refresh') }}
@@ -95,7 +95,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#4DC671);border-radius:2px;margin-bottom:16px"></div>
 
   <!-- Brak danych -->
-  <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
+  <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--gray-400)">
     <div style="font-size:48px;margin-bottom:12px">📊</div>
     <div style="font-size:16px;font-weight:600">{{ t('reports.leads.empty.title') }}</div>
     <div style="font-size:14px;margin-top:4px">{{ t('reports.leads.empty.hint') }}</div>
@@ -106,35 +106,35 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px">
     <div class="stat-card">
-      <div class="stat-val" style="color:#3BAA5D;cursor:pointer"
+      <div class="stat-val" style="color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);cursor:pointer"
            (click)="goToLeads({}, t('reports.leads.drilldown.pipelineAll'))"
            [title]="t('reports.leads.tooltips.viewLeads')">{{ kpi.pipeline_value | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('leadsList.stats.pipeline') }}<wt-tooltip key="crm.leads.kpi.pipeline"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="kpi.active > 0" style="color:#16a34a">↑ {{ t('reports.leads.kpi.activeCount', { count: kpi.active }) }}</div>
-      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e4e4e7;cursor:pointer"
+      <div class="stat-trend" *ngIf="kpi.active > 0" style="color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">↑ {{ t('reports.leads.kpi.activeCount', { count: kpi.active }) }}</div>
+      <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--gray-200);cursor:pointer"
            (click)="goToLeads({close_date_from: dateFrom, close_date_to: periodEnd}, t('reports.leads.drilldown.plannedInPeriod'))"
            [title]="t('reports.leads.tooltips.viewLeadsClosingInPeriod')">
-        <div style="font-size:10px;color:#a1a1aa;font-weight:500">{{ t('reports.leads.kpi.plannedDelivery') }} ↗</div>
-        <div style="font-size:14px;font-weight:700;color:#3BAA5D">
+        <div style="font-size:10px;color:var(--gray-400);font-weight:500">{{ t('reports.leads.kpi.plannedDelivery') }} ↗</div>
+        <div style="font-size:14px;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">
           {{ (kpi.pipeline_in_period ?? 0) | number:'1.0-0' }} PLN
         </div>
       </div>
     </div>
     <!-- Kafelek wygranych tylko u tenanta, który ma etap wygranej -->
     <div class="stat-card" *ngIf="stages.wonKey() as wonKey">
-      <div class="stat-val" style="color:#22C55E;cursor:pointer"
+      <div class="stat-val" style="color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);cursor:pointer"
            (click)="goToLeads({stage: wonKey}, t('reports.leads.drilldown.won'))"
            [title]="t('reports.leads.tooltips.viewWonLeads')">{{ kpi.won_value | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.common.kpi.wonPln') }}<wt-tooltip key="crm.leads.kpi.won"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#16a34a">↑ {{ t('reports.leads.kpi.contractsCount', { count: kpi.won }) }}</div>
-      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e4e4e7">
-        <div style="font-size:10px;color:#a1a1aa;font-weight:500;cursor:pointer"
+      <div class="stat-trend" style="color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">↑ {{ t('reports.leads.kpi.contractsCount', { count: kpi.won }) }}</div>
+      <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--gray-200)">
+        <div style="font-size:10px;color:var(--gray-400);font-weight:500;cursor:pointer"
              (click)="goToLeads({close_date_from: dateFrom, close_date_to: periodEnd}, t('reports.leads.drilldown.plannedBudget'))"
              [title]="t('reports.leads.tooltips.viewLeadsInPeriod')">{{ t('reports.leads.kpi.plannedBudget') }} ↗</div>
-        <div style="font-size:14px;font-weight:700;color:#7C3AED">
+        <div style="font-size:14px;font-weight:700;color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF)">
           {{ budgetTotal | number:'1.0-0' }} PLN
         </div>
-        <div *ngIf="budgetTotal > 0" style="height:4px;background:#e4e4e7;border-radius:2px;margin-top:4px;overflow:hidden">
+        <div *ngIf="budgetTotal > 0" style="height:4px;background:var(--gray-200);border-radius:2px;margin-top:4px;overflow:hidden">
           <div [style.width.%]="min100(kpi.won_value / budgetTotal * 100)"
                [style.background]="kpi.won_value >= budgetTotal ? '#22C55E' : '#7C3AED'"
                style="height:100%;border-radius:2px;transition:width .3s"></div>
@@ -145,19 +145,19 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     <div class="stat-card">
       <div class="stat-val">{{ kpi.win_rate || 0 }}%</div>
       <div class="stat-lbl">{{ t('reports.common.kpi.winRate') }}<wt-tooltip key="crm.leads.kpi.win_rate"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ kpi.won }} / {{ kpi.won + kpi.lost }}</div>
+      <div class="stat-trend" style="color:var(--gray-400)">{{ kpi.won }} / {{ kpi.won + kpi.lost }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-val">{{ kpi.avg_cycle_days ? t('reports.common.days', { count: kpi.avg_cycle_days }) : '—' }}</div>
       <div class="stat-lbl">{{ t('reports.common.kpi.avgSalesCycle') }}<wt-tooltip key="crm.leads.kpi.avg_cycle"></wt-tooltip></div>
     </div>
     <div class="stat-card">
-      <div class="stat-val" style="color:#7C3AED">{{ budgetTotal | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF)">{{ budgetTotal | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.leads.kpi.plannedBudgetPln') }}<wt-tooltip key="crm.leads.kpi.budget"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="budgetTotal > 0 && kpi.won_value > 0" [style.color]="kpi.won_value >= budgetTotal ? '#16a34a' : '#dc2626'">
+      <div class="stat-trend" *ngIf="budgetTotal > 0 && kpi.won_value > 0" [style.color]="kpi.won_value >= budgetTotal ? 'color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'">
         {{ kpi.won_value >= budgetTotal ? '✓' : '' }} {{ t('reports.leads.kpi.budgetCompletion', { value: ((kpi.won_value / budgetTotal * 100) | number:'1.0-0') }) }}
       </div>
-      <div class="stat-trend" *ngIf="budgetTotal === 0" style="color:#a1a1aa">{{ t('reports.leads.kpi.noPlan') }}</div>
+      <div class="stat-trend" *ngIf="budgetTotal === 0" style="color:var(--gray-400)">{{ t('reports.leads.kpi.noPlan') }}</div>
     </div>
   </div>
 
@@ -167,26 +167,26 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     <!-- Lejek sprzedażowy -->
     <div class="card" style="padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.common.funnel.title') }}<wt-tooltip key="crm.leads.funnel.title"></wt-tooltip></div>
-        <span style="font-size:12px;color:#a1a1aa">{{ t('reports.common.funnel.subtitle') }}<wt-tooltip key="crm.leads.funnel.pct"></wt-tooltip></span>
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800)">{{ t('reports.common.funnel.title') }}<wt-tooltip key="crm.leads.funnel.title"></wt-tooltip></div>
+        <span style="font-size:12px;color:var(--gray-400)">{{ t('reports.common.funnel.subtitle') }}<wt-tooltip key="crm.leads.funnel.pct"></wt-tooltip></span>
       </div>
       <div #funnelEl></div>
       <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
-        <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">{{ t('reports.leads.funnel.conversionToWon') }}<wt-tooltip key="crm.leads.funnel.conversion"></wt-tooltip></div>
-          <div style="font-weight:700;color:#333333;font-family:'Sora',sans-serif">{{ kpi.win_rate || 0 }}%</div>
+        <div style="background:var(--gray-50);border-radius:8px;padding:8px 10px">
+          <div style="color:var(--gray-400);margin-bottom:2px">{{ t('reports.leads.funnel.conversionToWon') }}<wt-tooltip key="crm.leads.funnel.conversion"></wt-tooltip></div>
+          <div style="font-weight:700;color:var(--gray-800);font-family:'Sora',sans-serif">{{ kpi.win_rate || 0 }}%</div>
         </div>
-        <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">{{ t('reports.common.kpi.avgWonValue') }}<wt-tooltip key="crm.leads.funnel.avg_won"></wt-tooltip></div>
-          <div style="font-weight:700;color:#333333;font-family:'Sora',sans-serif">{{ kpi.won > 0 ? ((kpi.won_value / kpi.won) | number:'1.0-0') : '—' }} PLN</div>
+        <div style="background:var(--gray-50);border-radius:8px;padding:8px 10px">
+          <div style="color:var(--gray-400);margin-bottom:2px">{{ t('reports.common.kpi.avgWonValue') }}<wt-tooltip key="crm.leads.funnel.avg_won"></wt-tooltip></div>
+          <div style="font-weight:700;color:var(--gray-800);font-family:'Sora',sans-serif">{{ kpi.won > 0 ? ((kpi.won_value / kpi.won) | number:'1.0-0') : '—' }} PLN</div>
         </div>
-        <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">{{ t('reports.common.kpi.activeLeads') }}<wt-tooltip key="crm.leads.funnel.active"></wt-tooltip></div>
-          <div style="font-weight:700;color:#333333;font-family:'Sora',sans-serif">{{ kpi.active }}</div>
+        <div style="background:var(--gray-50);border-radius:8px;padding:8px 10px">
+          <div style="color:var(--gray-400);margin-bottom:2px">{{ t('reports.common.kpi.activeLeads') }}<wt-tooltip key="crm.leads.funnel.active"></wt-tooltip></div>
+          <div style="font-weight:700;color:var(--gray-800);font-family:'Sora',sans-serif">{{ kpi.active }}</div>
         </div>
-        <div style="background:#fafafa;border-radius:8px;padding:8px 10px">
-          <div style="color:#a1a1aa;margin-bottom:2px">{{ t('leadsList.stats.hot') }} 🔥<wt-tooltip key="crm.leads.funnel.hot"></wt-tooltip></div>
-          <div style="font-weight:700;color:#3BAA5D;font-family:'Sora',sans-serif">{{ kpi.hot }}</div>
+        <div style="background:var(--gray-50);border-radius:8px;padding:8px 10px">
+          <div style="color:var(--gray-400);margin-bottom:2px">{{ t('leadsList.stats.hot') }} 🔥<wt-tooltip key="crm.leads.funnel.hot"></wt-tooltip></div>
+          <div style="font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ kpi.hot }}</div>
         </div>
       </div>
     </div>
@@ -194,17 +194,17 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     <!-- Przychody miesięczne (bar chart) -->
     <div class="card" style="padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.leads.trend.title') }}<wt-tooltip key="crm.leads.trend.title"></wt-tooltip></div>
-        <div style="display:flex;gap:10px;font-size:12px;color:#a1a1aa">
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800)">{{ t('reports.leads.trend.title') }}<wt-tooltip key="crm.leads.trend.title"></wt-tooltip></div>
+        <div style="display:flex;gap:10px;font-size:12px;color:var(--gray-400)">
           <span style="display:flex;align-items:center;gap:4px">
             <span style="width:10px;height:10px;background:#3BAA5D;border-radius:2px;display:inline-block"></span>{{ t('reports.leads.trend.won') }}
           </span>
           <span style="display:flex;align-items:center;gap:4px">
-            <span style="width:10px;height:10px;background:#BFDBFE;border-radius:2px;display:inline-block"></span>{{ t('reports.leads.trend.new') }}
+            <span style="width:10px;height:10px;background:color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:2px;display:inline-block"></span>{{ t('reports.leads.trend.new') }}
           </span>
         </div>
       </div>
-      <div #barEl style="display:flex;align-items:flex-end;gap:6px;height:160px;padding-bottom:24px;position:relative;border-bottom:1px solid #e4e4e7"></div>
+      <div #barEl style="display:flex;align-items:flex-end;gap:6px;height:160px;padding-bottom:24px;position:relative;border-bottom:1px solid var(--gray-200)"></div>
       <div #barLabels style="display:flex;gap:6px;margin-top:6px"></div>
     </div>
   </div>
@@ -214,16 +214,16 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 
     <!-- Tabela handlowców -->
     <div class="card" style="padding:20px">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:14px">{{ t('reports.common.salespeopleResults') }}<wt-tooltip key="crm.leads.reps.title"></wt-tooltip></div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px">{{ t('reports.common.salespeopleResults') }}<wt-tooltip key="crm.leads.reps.title"></wt-tooltip></div>
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead>
-          <tr style="border-bottom:1px solid #e4e4e7">
-            <th style="text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">{{ t('leadsList.fields.salesRep') }}</th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">{{ t('reports.common.columns.leads') }}<wt-tooltip key="crm.leads.reps.col.leads"></wt-tooltip></th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">{{ t('reports.common.columns.pipeline') }}<wt-tooltip key="crm.leads.reps.col.pipeline"></wt-tooltip></th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">{{ t('reports.common.columns.won') }}<wt-tooltip key="crm.leads.reps.col.won"></wt-tooltip></th>
-            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">{{ t('reports.common.columns.winRatePct') }}<wt-tooltip key="crm.leads.reps.col.win_rate"></wt-tooltip></th>
-            <th style="padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600">{{ t('reports.common.columns.progress') }}<wt-tooltip key="crm.leads.reps.col.progress"></wt-tooltip></th>
+          <tr style="border-bottom:1px solid var(--gray-200)">
+            <th style="text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;color:var(--gray-400);font-weight:600">{{ t('leadsList.fields.salesRep') }}</th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:var(--gray-400);font-weight:600">{{ t('reports.common.columns.leads') }}<wt-tooltip key="crm.leads.reps.col.leads"></wt-tooltip></th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:var(--gray-400);font-weight:600">{{ t('reports.common.columns.pipeline') }}<wt-tooltip key="crm.leads.reps.col.pipeline"></wt-tooltip></th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:var(--gray-400);font-weight:600">{{ t('reports.common.columns.won') }}<wt-tooltip key="crm.leads.reps.col.won"></wt-tooltip></th>
+            <th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;color:var(--gray-400);font-weight:600">{{ t('reports.common.columns.winRatePct') }}<wt-tooltip key="crm.leads.reps.col.win_rate"></wt-tooltip></th>
+            <th style="padding:6px 8px;font-size:10px;text-transform:uppercase;color:var(--gray-400);font-weight:600">{{ t('reports.common.columns.progress') }}<wt-tooltip key="crm.leads.reps.col.progress"></wt-tooltip></th>
           </tr>
         </thead>
         <tbody>
@@ -234,21 +234,21 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
             <td style="padding:8px 8px">
               <div style="display:flex;align-items:center;gap:8px">
                 <div [style.background]="avatarColor(r.rep_name)" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(r.rep_name) }}</div>
-                <span style="font-weight:600;color:#333333">{{ r.rep_name }}</span>
+                <span style="font-weight:600;color:var(--gray-800)">{{ r.rep_name }}</span>
               </div>
             </td>
-            <td style="text-align:right;padding:8px 8px;color:#71717a">{{ r.total }}</td>
-            <td style="text-align:right;padding:8px 8px;font-weight:600;color:#3BAA5D;font-family:'Sora',sans-serif">{{ r.pipeline_value | number:'1.0-0' }}</td>
-            <td style="text-align:right;padding:8px 8px;color:#22C55E;font-weight:600">{{ r.won_value > 0 ? (r.won_value | number:'1.0-0') : '—' }}</td>
-            <td style="text-align:right;padding:8px 8px;color:#71717a">{{ r.win_rate || 0 }}%</td>
+            <td style="text-align:right;padding:8px 8px;color:var(--gray-500)">{{ r.total }}</td>
+            <td style="text-align:right;padding:8px 8px;font-weight:600;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ r.pipeline_value | number:'1.0-0' }}</td>
+            <td style="text-align:right;padding:8px 8px;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);font-weight:600">{{ r.won_value > 0 ? (r.won_value | number:'1.0-0') : '—' }}</td>
+            <td style="text-align:right;padding:8px 8px;color:var(--gray-500)">{{ r.win_rate || 0 }}%</td>
             <td style="padding:8px 8px">
-              <div style="width:80px;height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden">
+              <div style="width:80px;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
                 <div [style.width.%]="r.win_rate || 0" [style.background]="barColor(r.win_rate)" style="height:100%;border-radius:3px"></div>
               </div>
             </td>
           </tr>
           <tr *ngIf="!byRep.length">
-            <td colspan="6" style="text-align:center;padding:20px;color:#a1a1aa;font-size:12px">{{ t('reports.common.noData') }}</td>
+            <td colspan="6" style="text-align:center;padding:20px;color:var(--gray-400);font-size:12px">{{ t('reports.common.noData') }}</td>
           </tr>
         </tbody>
       </table>
@@ -257,7 +257,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
     <!-- Aktywność handlowców -->
     <div class="card" style="padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.leads.activity.title') }}</div>
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800)">{{ t('reports.leads.activity.title') }}</div>
         <div style="display:flex;gap:8px">
           <button class="fchip" [class.on]="activitySource==='all'"     (click)="setActivitySource('all')">{{ t('reports.leads.activity.sourceAll') }}</button>
           <button class="fchip" [class.on]="activitySource==='lead'"    (click)="setActivitySource('lead')">{{ t('reports.leads.activity.sourceLeads') }}</button>
@@ -279,19 +279,19 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
   <!-- ROW 2b: Źródła leadów (donut) — dla wszystkich -->
   <div style="display:grid;grid-template-columns:1fr;gap:20px;margin-bottom:20px">
     <div class="card" style="padding:20px">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:14px">{{ t('reports.common.leadSources.title') }}<wt-tooltip key="crm.leads.sources.title"></wt-tooltip></div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px">{{ t('reports.common.leadSources.title') }}<wt-tooltip key="crm.leads.sources.title"></wt-tooltip></div>
       <div style="display:flex;align-items:center;gap:20px">
         <svg width="120" height="120" viewBox="0 0 120 120" #donutSvg>
           <circle cx="60" cy="60" r="44" fill="none" stroke="#F4F4F5" stroke-width="18"/>
         </svg>
         <div #donutLegend style="flex:1;display:flex;flex-direction:column;gap:8px;font-size:12px"></div>
       </div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e4e4e7">
-        <div style="font-size:12px;font-weight:600;text-transform:uppercase;color:#a1a1aa;letter-spacing:.5px;margin-bottom:8px">{{ t('reports.leads.sourceQuality.title') }}<wt-tooltip key="crm.leads.sources.quality"></wt-tooltip></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray-200)">
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;color:var(--gray-400);letter-spacing:.5px;margin-bottom:8px">{{ t('reports.leads.sourceQuality.title') }}<wt-tooltip key="crm.leads.sources.quality"></wt-tooltip></div>
         <div style="display:flex;flex-direction:column;gap:4px;font-size:12px">
           <div *ngFor="let s of topSourcesWin" style="display:flex;justify-content:space-between">
             <span>{{ s.label }}</span>
-            <span [style.color]="s.wr >= 50 ? '#22C55E' : s.wr >= 30 ? '#3BAA5D' : '#a1a1aa'" style="font-weight:700">{{ t('reports.common.leadSources.winRate', { value: s.wr }) }}</span>
+            <span [style.color]="s.wr >= 50 ? 'color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)' : s.wr >= 30 ? 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' : 'var(--gray-400)'" style="font-weight:700">{{ t('reports.common.leadSources.winRate', { value: s.wr }) }}</span>
           </div>
         </div>
       </div>
@@ -303,17 +303,17 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
 
     <!-- Czas w etapie -->
     <div class="card" style="padding:20px">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:16px">{{ t('reports.leads.velocity.title') }}<wt-tooltip key="crm.leads.velocity.title"></wt-tooltip></div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px">{{ t('reports.leads.velocity.title') }}<wt-tooltip key="crm.leads.velocity.title"></wt-tooltip></div>
       <div #velocityEl style="display:flex;flex-direction:column;gap:10px"></div>
-      <div *ngIf="!velocityData.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">{{ t('reports.common.noData') }}</div>
+      <div *ngIf="!velocityData.length" style="color:var(--gray-400);font-size:12px;text-align:center;padding:20px">{{ t('reports.common.noData') }}</div>
     </div>
 
     <!-- Powody przegranej -->
     <div class="card" style="padding:20px">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:16px">{{ t('reports.common.lostReasons') }}<wt-tooltip key="crm.leads.lost.title"></wt-tooltip></div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px">{{ t('reports.common.lostReasons') }}<wt-tooltip key="crm.leads.lost.title"></wt-tooltip></div>
       <div #lostEl style="display:flex;flex-direction:column;gap:10px"></div>
-      <div *ngIf="!lostReasons.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:12px">{{ t('reports.leads.lostReasons.empty') }}</div>
-      <div *ngIf="lostReasons.length" style="margin-top:16px;padding:12px 16px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;font-size:12px;color:#166534">
+      <div *ngIf="!lostReasons.length" style="color:var(--gray-400);font-size:12px;text-align:center;padding:12px">{{ t('reports.leads.lostReasons.empty') }}</div>
+      <div *ngIf="lostReasons.length" style="margin-top:16px;padding:12px 16px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px;font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">
         💡<strong>{{ t('reports.leads.lostReasons.topReason') }}</strong> {{ lostReasons[0].reason }} ({{ t('reports.leads.lostReasons.leadsCount', { count: lostReasons[0].count }) }})
       </div>
     </div>
@@ -326,7 +326,7 @@ function getPeriodDates(preset: string): { from: string; to: string; periodEnd: 
   `,
   styles: [`
     /* Filter card under the title bar — same as the leads list (shadow/radius/padding from global .toolbar). */
-    .toolbar { background:white; display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; margin-bottom:16px; }
+    .toolbar { background:var(--surface); display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; margin-bottom:16px; }
     .toolbar .btn-sm { height:36px; box-sizing:border-box; }
     .act-types { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
     .act-types .fchip:not(.on) { opacity:.55; }
@@ -375,11 +375,11 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
   activityByRep:    LeadsReportActivityByRep[] = [];
   activitySource:   'all' | 'lead' | 'partner' = 'all';
   readonly ACTIVITY_TYPES = [
-    { key: 'call',    labelKey: 'activity.tabs.calls',                  color: '#3B82F6' },
-    { key: 'meeting', labelKey: 'activity.tabs.meetings',               color: '#22C55E' },
-    { key: 'email',   labelKey: 'reports.leads.activity.types.email',   color: '#3BAA5D' },
+    { key: 'call',    labelKey: 'activity.tabs.calls',                  color: 'color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)' },
+    { key: 'meeting', labelKey: 'activity.tabs.meetings',               color: 'color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)' },
+    { key: 'email',   labelKey: 'reports.leads.activity.types.email',   color: 'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)' },
     { key: 'task',    labelKey: 'activity.tabs.tasks',                  color: '#A855F7' },
-    { key: 'note',    labelKey: 'activity.tabs.notes',                  color: '#F59E0B' },
+    { key: 'note',    labelKey: 'activity.tabs.notes',                  color: 'color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF)' },
   ];
   activityTypeFilter: string[] = ['call', 'meeting', 'email', 'task', 'note'];
 
@@ -562,7 +562,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       : srcData.filter((r: any) => this.activityTypeFilter.includes(r.type));
 
     if (!data?.length) {
-      el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:32px 0">' + this.transloco.translate('crm.reports.leads.activity.empty') + '</div>';
+      el.innerHTML = '<div style="color:var(--gray-400);font-size:12px;text-align:center;padding:32px 0">' + this.transloco.translate('crm.reports.leads.activity.empty') + '</div>';
       return;
     }
 
@@ -585,7 +585,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     const reps = Array.from(repMap.values()).sort((a, b) => b.total - a.total);
     const typesPresent = TYPE_ORDER.filter(t => reps.some(r => r.types[t]));
     if (!typesPresent.length) {
-      el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:32px 0">' + this.transloco.translate('crm.reports.leads.activity.empty') + '</div>';
+      el.innerHTML = '<div style="color:var(--gray-400);font-size:12px;text-align:center;padding:32px 0">' + this.transloco.translate('crm.reports.leads.activity.empty') + '</div>';
       return;
     }
     const maxTotal = reps[0].total || 1;
@@ -594,7 +594,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     legendDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px 10px;margin-bottom:12px;font-size:12px';
     typesPresent.forEach(t => {
       const item = document.createElement('span');
-      item.style.cssText = 'display:flex;align-items:center;gap:4px;color:#52525b';
+      item.style.cssText = 'display:flex;align-items:center;gap:4px;color:var(--gray-600)';
       item.innerHTML = `<span style="width:8px;height:8px;background:${TYPE_COLORS[t]};border-radius:2px;display:inline-block;flex-shrink:0"></span>${TYPE_LABELS[t] || t}`;
       legendDiv.appendChild(item);
     });
@@ -613,12 +613,12 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
         : rep.rep_name;
 
       const nameEl = document.createElement('div');
-      nameEl.style.cssText = 'width:90px;font-size:12px;color:#374151;font-weight:600;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      nameEl.style.cssText = 'width:90px;font-size:12px;color:var(--gray-700);font-weight:600;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
       nameEl.title       = rep.rep_name;
       nameEl.textContent = shortName;
 
       const barOuter = document.createElement('div');
-      barOuter.style.cssText = 'flex:1;background:#f4f4f5;border-radius:4px;height:18px;overflow:hidden';
+      barOuter.style.cssText = 'flex:1;background:var(--gray-100);border-radius:4px;height:18px;overflow:hidden';
 
       const widthPct = Math.max(2, Math.round(rep.total / maxTotal * 100));
       const barInner = document.createElement('div');
@@ -635,7 +635,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       barOuter.appendChild(barInner);
 
       const totalEl = document.createElement('div');
-      totalEl.style.cssText = 'width:24px;font-size:12px;font-weight:700;color:#374151;text-align:right;flex-shrink:0';
+      totalEl.style.cssText = 'width:24px;font-size:12px;font-weight:700;color:var(--gray-700);text-align:right;flex-shrink:0';
       totalEl.textContent = String(rep.total);
 
       row.appendChild(nameEl);
@@ -660,29 +660,29 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     const onbCount = onbRows.reduce((s, d) => s + d.count, 0);
     const onbValue = onbRows.reduce((s, d) => s + parseFloat(d.value), 0);
 
-    if (!all.length && !onbCount) { el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">' + this.transloco.translate('crm.reports.common.noData') + '</div>'; return; }
+    if (!all.length && !onbCount) { el.innerHTML = '<div style="color:var(--gray-400);font-size:12px;text-align:center;padding:20px">' + this.transloco.translate('crm.reports.common.noData') + '</div>'; return; }
     const maxVal = Math.max(...all.map(d => d.value), onbValue, 1);
     all.forEach((d, i) => {
       const pct = Math.round(d.value / maxVal * 100);
       const label = this.stageLabel(d.stage);
       const color = this.stages.color(d.stage);
       const conv = (i < active.length - 1 && all[i+1])
-        ? `<div style="width:34px;text-align:center;font-size:10px;color:#a1a1aa;flex-shrink:0">${d.count>0?Math.round(all[i+1].count/d.count*100):0}%↓</div>`
+        ? `<div style="width:34px;text-align:center;font-size:10px;color:var(--gray-400);flex-shrink:0">${d.count>0?Math.round(all[i+1].count/d.count*100):0}%↓</div>`
         : '<div style="width:34px"></div>';
       const sep = i === active.length - 1 && active.length < all.length
-        ? '<div style="height:1px;background:#f4f4f5;margin:4px 0"></div>' : '';
+        ? '<div style="height:1px;background:var(--gray-100);margin:4px 0"></div>' : '';
       const row = document.createElement('div');
       row.style.cssText = 'margin-bottom:6px;cursor:pointer';
       row.title = this.transloco.translate('crm.reports.leads.tooltips.viewStageLeads', { stage: label });
       row.addEventListener('click', () => this.goToLeads({ stage: d.stage }, this.transloco.translate('crm.reports.leads.drilldown.funnel', { stage: label })));
       row.innerHTML = `${sep}<div style="display:flex;align-items:center;gap:8px">
-        <div style="width:88px;font-size:12px;color:#71717a;text-align:right;flex-shrink:0">${label}</div>
+        <div style="width:88px;font-size:12px;color:var(--gray-500);text-align:right;flex-shrink:0">${label}</div>
         <div style="flex:1;position:relative;height:26px">
-          <div style="position:absolute;inset:0;background:#f4f4f5;border-radius:4px"></div>
+          <div style="position:absolute;inset:0;background:var(--gray-100);border-radius:4px"></div>
           <div style="position:absolute;top:0;left:0;width:${pct}%;height:100%;background:${color};border-radius:4px;opacity:.85"></div>
           <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 8px">
-            <span style="font-size:10px;font-weight:700;color:#374151">${this.transloco.translate('crm.reports.common.leadsShort', { count: d.count })}</span>
-            <span style="font-size:10px;font-weight:600;color:#374151;margin-left:auto">${(d.value/1000).toFixed(0)}k PLN</span>
+            <span style="font-size:10px;font-weight:700;color:var(--gray-700)">${this.transloco.translate('crm.reports.common.leadsShort', { count: d.count })}</span>
+            <span style="font-size:10px;font-weight:600;color:var(--gray-700);margin-left:auto">${(d.value/1000).toFixed(0)}k PLN</span>
           </div>
         </div>${conv}</div>`;
       el.appendChild(row);
@@ -692,23 +692,23 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     if (onbCount > 0) {
       const pct = Math.round(onbValue / maxVal * 100);
       const sep = document.createElement('div');
-      sep.style.cssText = 'height:1px;background:#f4f4f5;margin:6px 0 6px 0';
+      sep.style.cssText = 'height:1px;background:var(--gray-100);margin:6px 0 6px 0';
       el.appendChild(sep);
       const row = document.createElement('div');
       row.style.cssText = 'margin-bottom:6px;cursor:pointer';
       row.title = this.transloco.translate('crm.reports.leads.tooltips.goToOnboarding');
       row.addEventListener('click', () => this.router.navigate(['/crm/onboarding']));
       row.innerHTML = `<div style="display:flex;align-items:center;gap:8px">
-        <div style="width:88px;font-size:12px;color:#0891b2;text-align:right;flex-shrink:0;font-weight:600">${this.stageLabel('onboarding')}</div>
+        <div style="width:88px;font-size:12px;color:color-mix(in srgb, #0891b2 var(--tint-text-mix), #FFFFFF);text-align:right;flex-shrink:0;font-weight:600">${this.stageLabel('onboarding')}</div>
         <div style="flex:1;position:relative;height:26px">
-          <div style="position:absolute;inset:0;background:#f4f4f5;border-radius:4px"></div>
+          <div style="position:absolute;inset:0;background:var(--gray-100);border-radius:4px"></div>
           <div style="position:absolute;top:0;left:0;width:${pct}%;height:100%;background:#06B6D4;border-radius:4px;opacity:.85"></div>
           <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 8px">
-            <span style="font-size:10px;font-weight:700;color:#374151">${this.transloco.translate('crm.reports.common.leadsShort', { count: onbCount })}</span>
-            <span style="font-size:10px;font-weight:600;color:#374151;margin-left:auto">${(onbValue/1000).toFixed(0)}k PLN</span>
+            <span style="font-size:10px;font-weight:700;color:var(--gray-700)">${this.transloco.translate('crm.reports.common.leadsShort', { count: onbCount })}</span>
+            <span style="font-size:10px;font-weight:600;color:var(--gray-700);margin-left:auto">${(onbValue/1000).toFixed(0)}k PLN</span>
           </div>
         </div>
-        <div style="width:34px;text-align:center;font-size:12px;color:#0891b2;flex-shrink:0">→</div>
+        <div style="width:34px;text-align:center;font-size:12px;color:color-mix(in srgb, #0891b2 var(--tint-text-mix), #FFFFFF);flex-shrink:0">→</div>
       </div>`;
       el.appendChild(row);
     }
@@ -719,7 +719,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     const labels = this.barLabels?.nativeElement;
     if (!el || !labels) return;
     el.innerHTML = ''; labels.innerHTML = '';
-    if (!this.monthly.length) { el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:40px 0;width:100%">' + this.transloco.translate('crm.reports.common.noData') + '</div>'; return; }
+    if (!this.monthly.length) { el.innerHTML = '<div style="color:var(--gray-400);font-size:12px;text-align:center;padding:40px 0;width:100%">' + this.transloco.translate('crm.reports.common.noData') + '</div>'; return; }
     const data = this.monthly.slice(-12);
     const maxVal = Math.max(...data.map(d => Math.max(d.active_leads, d.won)), 1);
     data.forEach(d => {
@@ -729,13 +729,13 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:2px';
       col.innerHTML = `
         <div style="width:100%;display:flex;gap:2px;align-items:flex-end;justify-content:center">
-          ${d.active_leads ? `<div style="flex:1;height:${activeH}px;background:#BFDBFE;border-radius:3px 3px 0 0" title="${this.transloco.translate('crm.reports.leads.trend.activeTooltip', { count: d.active_leads })}"></div>` : '<div style="flex:1"></div>'}
+          ${d.active_leads ? `<div style="flex:1;height:${activeH}px;background:color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:3px 3px 0 0" title="${this.transloco.translate('crm.reports.leads.trend.activeTooltip', { count: d.active_leads })}"></div>` : '<div style="flex:1"></div>'}
           ${d.won ? `<div style="flex:1;height:${wonH}px;background:#3BAA5D;border-radius:3px 3px 0 0" title="${this.transloco.translate('crm.reports.leads.trend.wonTooltip', { count: d.won })}"></div>` : '<div style="flex:1"></div>'}
         </div>
-        ${d.won ? `<div style="font-size:10px;color:#3BAA5D;font-weight:700">${d.won}</div>` : '<div style="height:14px"></div>'}`;
+        ${d.won ? `<div style="font-size:10px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-weight:700">${d.won}</div>` : '<div style="height:14px"></div>'}`;
       el.appendChild(col);
       const lbl = document.createElement('div');
-      lbl.style.cssText = 'flex:1;text-align:center;font-size:12px;color:#a1a1aa';
+      lbl.style.cssText = 'flex:1;text-align:center;font-size:12px;color:var(--gray-400)';
       lbl.textContent = d.month.substring(5, 7) + '/' + d.month.substring(2, 4);
       labels.appendChild(lbl);
     });
@@ -789,7 +789,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
       item.style.cursor = 'pointer';
       item.title = this.transloco.translate('crm.reports.leads.tooltips.viewSourceLeads', { source: this.sourceLabel(d.source) });
       item.addEventListener('click', () => this.goToLeads({ source: d.source }, this.transloco.translate('crm.reports.leads.drilldown.source', { source: this.sourceLabel(d.source) })));
-      item.innerHTML = `<span style="width:10px;height:10px;border-radius:2px;background:${colors[i]};flex-shrink:0;display:inline-block"></span><span style="color:#52525b;font-size:12px">${this.sourceLabel(d.source)}</span><span style="margin-left:auto;font-weight:700;color:#333333;font-size:12px">${Math.round(d.count/total*100)}%</span>`;
+      item.innerHTML = `<span style="width:10px;height:10px;border-radius:2px;background:${colors[i]};flex-shrink:0;display:inline-block"></span><span style="color:var(--gray-600);font-size:12px">${this.sourceLabel(d.source)}</span><span style="margin-left:auto;font-weight:700;color:var(--gray-800);font-size:12px">${Math.round(d.count/total*100)}%</span>`;
       legend.appendChild(item);
     });
   }
@@ -802,23 +802,23 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
     const max = Math.max(...this.velocityData.map(d => d.days), 1);
     // Legend: show max scale
     const legend = document.createElement('div');
-    legend.style.cssText = 'font-size:10px;color:#a1a1aa;text-align:right;margin-bottom:8px';
+    legend.style.cssText = 'font-size:10px;color:var(--gray-400);text-align:right;margin-bottom:8px';
     legend.textContent = this.transloco.translate('crm.reports.leads.velocity.scale', { count: max });
     el.appendChild(legend);
     this.velocityData.forEach((d: any) => {
       const pct   = Math.round(d.days / max * 100);
       const color = pct > 80 ? '#EF4444' : pct > 60 ? '#F59E0B' : '#22C55E';
-      const count = d.count ? `<span style="font-size:10px;color:#71717a;font-weight:400">&nbsp;(${this.transloco.translate('crm.reports.common.leadsShort', { count: d.count })})</span>` : '';
+      const count = d.count ? `<span style="font-size:10px;color:var(--gray-500);font-weight:400">&nbsp;(${this.transloco.translate('crm.reports.common.leadsShort', { count: d.count })})</span>` : '';
       const row = document.createElement('div');
       row.style.cssText = 'margin-bottom:10px;cursor:pointer';
       row.title = this.transloco.translate('crm.reports.leads.tooltips.viewStageLeads', { stage: d.label });
       row.addEventListener('click', () => this.goToLeads({ stage: d.stage }, this.transloco.translate('crm.reports.leads.drilldown.velocity', { stage: d.label })));
       row.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-          <span style="font-size:12px;color:#374151;font-weight:600">${d.label}${count}</span>
+          <span style="font-size:12px;color:var(--gray-700);font-weight:600">${d.label}${count}</span>
           <span style="font-size:14px;font-weight:700;color:${color}">${this.transloco.translate('crm.reports.common.days', { count: d.days })}</span>
         </div>
-        <div style="height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">
+        <div style="height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden">
           <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;transition:width .3s"></div>
         </div>`;
       el.appendChild(row);
@@ -841,7 +841,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
         lostReason ? { stage: 'closed_lost', lost_reason: lostReason } : { stage: 'closed_lost' },
         this.transloco.translate('crm.reports.leads.drilldown.lost', { reason: d.reason })
       ));
-      row.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#52525b">${d.reason}</span><span style="font-size:12px;font-weight:700;color:${colors[i]}">${d.count}</span></div><div style="height:8px;background:#f4f4f5;border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[i]};border-radius:4px;opacity:.8"></div></div>`;
+      row.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--gray-600)">${d.reason}</span><span style="font-size:12px;font-weight:700;color:${colors[i]}">${d.count}</span></div><div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[i]};border-radius:4px;opacity:.8"></div></div>`;
       el.appendChild(row);
     });
   }

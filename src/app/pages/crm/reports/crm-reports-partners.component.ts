@@ -62,8 +62,8 @@ function healthColor(engagement: number): string {
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div id="topbar" style="height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#333333;flex-shrink:0">{{ t('reports.partners.title') }}</span>
+<div id="topbar" style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
+  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800);flex-shrink:0">{{ t('reports.partners.title') }}</span>
   <span style="flex:1"></span>
   <button class="btn btn-g btn-sm" (click)="load()"><svg class="ic" viewBox="0 0 24 24" *ngIf="!loading"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg>{{ loading ? '…' : t('reports.partners.refresh') }}</button>
 </div>
@@ -106,7 +106,7 @@ function healthColor(engagement: number): string {
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#4DC671);border-radius:2px"></div>
 
-  <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
+  <div *ngIf="!loading && !kpi" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--gray-400)">
     <div style="font-size:48px;margin-bottom:12px">📈</div>
     <div style="font-size:16px;font-weight:600">{{ t('partnerDetail.sales.noData') }}</div>
     <div style="font-size:14px;margin-top:4px">{{ t('reports.partners.emptyHint') }}</div>
@@ -117,31 +117,31 @@ function healthColor(engagement: number): string {
   <!-- KPI ROW -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px">
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:#3BAA5D;font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.grossTurnoverPln') }}<wt-tooltip key="crm.partners.kpi.gross_turnover"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? '#16a34a' : '#dc2626'">
+      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= prevKpi.gross_turnover_pln ? 'color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ t('reports.partners.kpi.vsPrevious', { delta: deltaLabel(kpi.gross_turnover_pln, prevKpi?.gross_turnover_pln||0) }) }}
       </div>
     </div>
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:#22C55E;font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.revenue_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.revenueMarginPln') }}<wt-tooltip key="crm.partners.kpi.revenue"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.marginShare', { percent: (kpi.margin_pct | number:'1.0-1') }) }}</div>
+      <div class="stat-trend" style="color:var(--gray-400)">{{ t('reports.partners.marginShare', { percent: (kpi.margin_pct | number:'1.0-1') }) }}</div>
     </div>
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:#3B82F6;font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
+      <div class="stat-val" style="color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.fees_pln | number:'1.0-0' }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.feesPln') }}<wt-tooltip key="crm.partners.kpi.fees"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.kpi.feeRateShare', { percent: (kpi.fee_rate_pct | number:'1.0-1') }) }}</div>
+      <div class="stat-trend" style="color:var(--gray-400)">{{ t('reports.partners.kpi.feeRateShare', { percent: (kpi.fee_rate_pct | number:'1.0-1') }) }}</div>
     </div>
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
       <div class="stat-val" style="color:#A855F7;font-size:20px">{{ kpi.transactions_count | number }}</div>
       <div class="stat-lbl">{{ t('partnerDetail.sales.kpi.transactions') }}<wt-tooltip key="crm.partners.kpi.transactions"></wt-tooltip></div>
-      <div class="stat-trend" style="color:#a1a1aa">{{ t('reports.partners.kpi.productsCount', { count: (kpi.pax_count | number) }) }}</div>
+      <div class="stat-trend" style="color:var(--gray-400)">{{ t('reports.partners.kpi.productsCount', { count: (kpi.pax_count | number) }) }}</div>
     </div>
     <div class="stat-card stat-clickable" (click)="goToPartners()" [title]="t('reports.partners.kpi.showPartnersTooltip')">
-      <div class="stat-val" style="color:#F59E0B;font-size:20px">{{ kpi.partners_count }}</div>
+      <div class="stat-val" style="color:color-mix(in srgb, #f59e0b var(--tint-text-mix), #FFFFFF);font-size:20px">{{ kpi.partners_count }}</div>
       <div class="stat-lbl">{{ t('reports.partners.kpi.activePartners') }}<wt-tooltip key="crm.partners.kpi.active_partners"></wt-tooltip></div>
-      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '#16a34a' : '#dc2626'">
+      <div class="stat-trend" *ngIf="prevKpi" [style.color]="kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? 'color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'">
         {{ kpi.gross_turnover_pln >= (prevKpi?.gross_turnover_pln||0) ? '↑' : '↓' }} {{ t('reports.partners.kpi.revenueTrend') }}
       </div>
     </div>
@@ -152,8 +152,8 @@ function healthColor(engagement: number): string {
 
     <!-- Partner scorecard table -->
     <div class="card" style="padding:0;overflow:hidden">
-      <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
-        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.partners.scorecard.title') }}</div>
+      <div style="padding:14px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800)">{{ t('reports.partners.scorecard.title') }}</div>
         <div style="display:flex;gap:6px;font-size:12px">
           <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.good') }}</span>
           <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>{{ t('reports.partners.scorecard.legend.medium') }}</span>
@@ -163,17 +163,17 @@ function healthColor(engagement: number): string {
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12px">
           <thead>
-            <tr style="background:#fafafa;border-bottom:1px solid #e4e4e7">
-              <th style="padding:8px 14px;text-align:left;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.partner') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px" *ngIf="isManager">{{ t('partnersList.fields.salesRep') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.grossTurnover') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.margin') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('partnerDetail.sales.kpi.transactions') }}</th>
-              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.health') }}<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
+            <tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
+              <th style="padding:8px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.partner') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px" *ngIf="isManager">{{ t('partnersList.fields.salesRep') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.grossTurnover') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.margin') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">{{ t('partnerDetail.sales.kpi.transactions') }}</th>
+              <th style="padding:8px 10px;text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">{{ t('reports.partners.columns.health') }}<wt-tooltip key="crm.partners.scorecard.health"></wt-tooltip></th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of topPartners" style="border-bottom:1px solid #f4f4f5" class="tbl-row"
+            <tr *ngFor="let p of topPartners" style="border-bottom:1px solid var(--gray-100)" class="tbl-row"
                 [style.cursor]="p.partner_id ? 'pointer' : 'default'"
                 (click)="p.partner_id && goToPartner(p.partner_id)"
                 (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
@@ -183,20 +183,20 @@ function healthColor(engagement: number): string {
                 <div style="display:flex;align-items:center;gap:8px">
                   <div [style.background]="avatarColor(p.partner_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(p.partner_name) }}</div>
                   <div>
-                    <span style="font-weight:600;color:#333333">{{ p.partner_name }}</span>
-                    <div *ngIf="p.partner_number" style="font-size:10px;color:#a1a1aa;font-family:monospace">{{ p.partner_number }}</div>
+                    <span style="font-weight:600;color:var(--gray-800)">{{ p.partner_name }}</span>
+                    <div *ngIf="p.partner_number" style="font-size:10px;color:var(--gray-400);font-family:monospace">{{ p.partner_number }}</div>
                   </div>
                 </div>
               </td>
-              <td *ngIf="isManager" style="padding:10px;text-align:center;font-size:12px;color:#71717a">{{ p.salesperson_name || '—' }}</td>
-              <td style="padding:10px;text-align:center;font-family:'Sora',sans-serif;font-weight:700;color:#3BAA5D">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
+              <td *ngIf="isManager" style="padding:10px;text-align:center;font-size:12px;color:var(--gray-500)">{{ p.salesperson_name || '—' }}</td>
+              <td style="padding:10px;text-align:center;font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
               <td style="padding:10px;text-align:center">
-                <div style="height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden;width:60px;margin:0 auto">
+                <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;width:60px;margin:0 auto">
                   <div [style.width.%]="marginPct(p.gross_turnover_pln, p.revenue_pln)" [style.background]="marginColor(p.gross_turnover_pln, p.revenue_pln)" style="height:100%;border-radius:3px"></div>
                 </div>
                 <div style="font-size:10px;margin-top:2px" [style.color]="marginColor(p.gross_turnover_pln, p.revenue_pln)">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</div>
               </td>
-              <td style="padding:10px;text-align:center;font-weight:600;color:#3f3f46">{{ p.transactions_count | number }}</td>
+              <td style="padding:10px;text-align:center;font-weight:600;color:var(--gray-700)">{{ p.transactions_count | number }}</td>
               <td style="padding:8px 10px;text-align:center">
                 <span [style.background]="healthBg(p.health_level)"
                       [style.color]="healthColor(p.health_level)"
@@ -206,7 +206,7 @@ function healthColor(engagement: number): string {
               </td>
             </tr>
             <tr *ngIf="!topPartners.length">
-              <td [attr.colspan]="isManager ? 6 : 5" style="text-align:center;padding:20px;color:#a1a1aa;font-size:12px">{{ t('reports.partners.scorecard.empty') }}</td>
+              <td [attr.colspan]="isManager ? 6 : 5" style="text-align:center;padding:20px;color:var(--gray-400);font-size:12px">{{ t('reports.partners.scorecard.empty') }}</td>
             </tr>
           </tbody>
         </table>
@@ -215,21 +215,21 @@ function healthColor(engagement: number): string {
 
     <!-- Produkty -->
     <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
-      <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7">
-        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.partners.products.title') }}</div>
+      <div style="padding:14px 18px;border-bottom:1px solid var(--gray-200)">
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800)">{{ t('reports.partners.products.title') }}</div>
       </div>
       <div style="padding:14px;display:flex;flex-direction:column;gap:10px;flex:1">
         <div *ngFor="let p of byProduct; let i = index">
           <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
-            <span style="color:#3f3f46">{{ productIcon(p.product_type) }} {{ productLabel(p.product_type) }}</span>
-            <span style="font-weight:700;color:#3BAA5D">{{ (p.gross_turnover_pln/1000).toFixed(0) }}k PLN</span>
+            <span style="color:var(--gray-700)">{{ productIcon(p.product_type) }} {{ productLabel(p.product_type) }}</span>
+            <span style="font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ (p.gross_turnover_pln/1000).toFixed(0) }}k PLN</span>
           </div>
-          <div style="height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden">
+          <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
             <div [style.width.%]="barPct(p.gross_turnover_pln, byProduct[0]?.gross_turnover_pln)" [style.background]="PROD_COLORS[i % PROD_COLORS.length]" style="height:100%;border-radius:3px;opacity:.85"></div>
           </div>
-          <div style="font-size:10px;color:#a1a1aa;margin-top:1px;text-align:right">{{ t('reports.partners.marginShare', { percent: calcMargin(p.gross_turnover_pln, p.revenue_pln) }) }}</div>
+          <div style="font-size:10px;color:var(--gray-400);margin-top:1px;text-align:right">{{ t('reports.partners.marginShare', { percent: calcMargin(p.gross_turnover_pln, p.revenue_pln) }) }}</div>
         </div>
-        <div *ngIf="!byProduct.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">{{ t('reports.partners.noData') }}</div>
+        <div *ngIf="!byProduct.length" style="color:var(--gray-400);font-size:12px;text-align:center;padding:20px">{{ t('reports.partners.noData') }}</div>
       </div>
     </div>
   </div>
@@ -239,19 +239,19 @@ function healthColor(engagement: number): string {
 
     <!-- Revenue trend chart -->
     <div class="card" style="padding:18px">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:4px">{{ t('reports.partners.trend.title') }}</div>
-      <div style="font-size:12px;color:#a1a1aa;margin-bottom:16px">{{ t('reports.partners.grossTurnoverPln') }}</div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:4px">{{ t('reports.partners.trend.title') }}</div>
+      <div style="font-size:12px;color:var(--gray-400);margin-bottom:16px">{{ t('reports.partners.grossTurnoverPln') }}</div>
       <div #revenueEl style="display:flex;align-items:flex-end;gap:4px;height:100px"></div>
       <div #revLabels style="display:flex;gap:4px;margin-top:4px"></div>
-      <div style="margin-top:14px;padding-top:10px;border-top:1px solid #f4f4f5;display:flex;justify-content:space-between;font-size:12px">
-        <span style="color:#71717a">{{ t('reports.partners.trend.totalTurnover') }}</span>
-        <span style="font-weight:700;color:#3BAA5D;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }} PLN</span>
+      <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:var(--gray-500)">{{ t('reports.partners.trend.totalTurnover') }}</span>
+        <span style="font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }} PLN</span>
       </div>
     </div>
 
     <!-- Handlowcy (manager) -->
     <div class="card" style="padding:18px" *ngIf="isManager">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:14px">{{ t('reports.partners.reps.title') }}</div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px">{{ t('reports.partners.reps.title') }}</div>
       <div *ngFor="let r of byRep" style="margin-bottom:12px;cursor:pointer;border-radius:12px;padding:8px;transition:background .12s"
            (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
            (mouseleave)="$any($event.currentTarget).style.background=''"
@@ -260,42 +260,42 @@ function healthColor(engagement: number): string {
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <div [style.background]="avatarColor(r.salesperson_name)" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">{{ initials(r.salesperson_name) }}</div>
           <div style="flex:1">
-            <div style="font-size:12px;font-weight:600;color:#3f3f46">{{ r.salesperson_name }}</div>
-            <div style="font-size:10px;color:#a1a1aa">{{ t('reports.partners.partnersCount', { count: +r.partners_count }) }}</div>
+            <div style="font-size:12px;font-weight:600;color:var(--gray-700)">{{ r.salesperson_name }}</div>
+            <div style="font-size:10px;color:var(--gray-400)">{{ t('reports.partners.partnersCount', { count: +r.partners_count }) }}</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:12px;font-weight:700;color:#3BAA5D">{{ (r.gross_turnover_pln/1000).toFixed(0) }}k</div>
-            <div style="font-size:10px;color:#22C55E">{{ t('reports.partners.marginShare', { percent: calcMargin(r.gross_turnover_pln, r.revenue_pln) }) }}</div>
+            <div style="font-size:12px;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ (r.gross_turnover_pln/1000).toFixed(0) }}k</div>
+            <div style="font-size:10px;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.marginShare', { percent: calcMargin(r.gross_turnover_pln, r.revenue_pln) }) }}</div>
           </div>
         </div>
-        <div style="height:5px;background:#f4f4f5;border-radius:3px;overflow:hidden">
+        <div style="height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden">
           <div [style.width.%]="barPct(r.gross_turnover_pln, byRep[0]?.gross_turnover_pln)" style="height:100%;background:#3BAA5D;border-radius:3px"></div>
         </div>
       </div>
-      <div *ngIf="!byRep.length" style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">{{ t('reports.partners.noData') }}</div>
+      <div *ngIf="!byRep.length" style="color:var(--gray-400);font-size:12px;text-align:center;padding:20px">{{ t('reports.partners.noData') }}</div>
     </div>
 
     <!-- Podsumowanie finansowe -->
     <div class="card" style="padding:18px">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;margin-bottom:14px">{{ t('reports.partners.summary.title') }}</div>
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px">{{ t('reports.partners.summary.title') }}</div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px">
-          <span style="font-size:12px;color:#166534">{{ t('reports.partners.columns.grossTurnover') }}</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:#3BAA5D">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px">
+          <span style="font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.columns.grossTurnover') }}</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px">
-          <span style="font-size:12px;color:#166534">{{ t('reports.partners.summary.revenueMargin') }}</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:#22C55E">{{ kpi.revenue_pln | number:'1.0-0' }}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--gray-50);border:1px solid color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface));border-radius:12px">
+          <span style="font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.summary.revenueMargin') }}</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">{{ kpi.revenue_pln | number:'1.0-0' }}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px">
-          <span style="font-size:12px;color:#1d4ed8">{{ t('reports.partners.summary.feesCommissions') }}</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;color:#3B82F6">{{ kpi.fees_pln | number:'1.0-0' }}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:12px">
+          <span style="font-size:12px;color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF)">{{ t('reports.partners.summary.feesCommissions') }}</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)">{{ kpi.fees_pln | number:'1.0-0' }}</span>
         </div>
-        <div style="margin-top:4px;padding:12px;background:#fafafa;border-radius:12px;display:flex;flex-direction:column;gap:4px;font-size:12px">
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('reports.partners.summary.marginPct') }}</span><span style="font-weight:700">{{ kpi.margin_pct | number:'1.0-1' }}%</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('reports.partners.summary.feeRate') }}</span><span style="font-weight:700">{{ kpi.fee_rate_pct | number:'1.0-1' }}%</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('partnerDetail.sales.kpi.transactions') }}</span><span style="font-weight:700">{{ kpi.transactions_count | number }}</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:#71717a">{{ t('partnerDetail.sales.kpi.products') }}</span><span style="font-weight:700">{{ kpi.pax_count | number }}</span></div>
+        <div style="margin-top:4px;padding:12px;background:var(--gray-50);border-radius:12px;display:flex;flex-direction:column;gap:4px;font-size:12px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--gray-500)">{{ t('reports.partners.summary.marginPct') }}</span><span style="font-weight:700">{{ kpi.margin_pct | number:'1.0-1' }}%</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--gray-500)">{{ t('reports.partners.summary.feeRate') }}</span><span style="font-weight:700">{{ kpi.fee_rate_pct | number:'1.0-1' }}%</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--gray-500)">{{ t('partnerDetail.sales.kpi.transactions') }}</span><span style="font-weight:700">{{ kpi.transactions_count | number }}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--gray-500)">{{ t('partnerDetail.sales.kpi.products') }}</span><span style="font-weight:700">{{ kpi.pax_count | number }}</span></div>
         </div>
       </div>
     </div>
@@ -304,33 +304,33 @@ function healthColor(engagement: number): string {
   <!-- ROW CHURN: Widget ryzyka churn -->
   <div class="card" style="padding:18px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333;flex:1">{{ t('reports.partners.churn.title') }}</span>
+      <span style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800);flex:1">{{ t('reports.partners.churn.title') }}</span>
       <span *ngIf="churnRows.filter(r => r.risk_level === 'critical').length > 0"
-            style="background:#FEE2E2;color:#991B1B;font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px">
+            style="background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px">
         {{ t('reports.partners.churn.criticalCount', { count: churnRows.filter(r => r.risk_level === 'critical').length }) }}
       </span>
     </div>
-    <div *ngIf="churnLoading" style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">{{ 'states.loading' | transloco }}</div>
+    <div *ngIf="churnLoading" style="color:var(--gray-400);font-size:12px;text-align:center;padding:16px">{{ 'states.loading' | transloco }}</div>
     <div *ngIf="!churnLoading && churnRows.length === 0"
-         style="color:#a1a1aa;font-size:12px;text-align:center;padding:16px">{{ t('reports.partners.churn.empty') }}</div>
+         style="color:var(--gray-400);font-size:12px;text-align:center;padding:16px">{{ t('reports.partners.churn.empty') }}</div>
     <div *ngIf="!churnLoading && churnRows.length > 0" style="display:flex;flex-direction:column;gap:6px">
       <div *ngFor="let p of churnRows.slice(0, 5)"
            (click)="goToPartner(p.partner_id)"
            style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:8px 12px;border-radius:12px;transition:background .12s"
            (mouseenter)="$any($event.currentTarget).style.background='#fafafa'"
            (mouseleave)="$any($event.currentTarget).style.background=''">
-        <span [style.background]="p.risk_level === 'critical' ? '#FEE2E2' : p.risk_level === 'high' ? '#BBF7D0' : p.risk_level === 'medium' ? '#FEF3C7' : '#DBEAFE'"
-              [style.color]="p.risk_level === 'critical' ? '#991B1B' : p.risk_level === 'high' ? '#166534' : p.risk_level === 'medium' ? '#92400E' : '#1E40AF'"
+        <span [style.background]="p.risk_level === 'critical' ? 'color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface))' : p.risk_level === 'high' ? 'color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface))' : p.risk_level === 'medium' ? 'color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface))' : 'color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface))'"
+              [style.color]="p.risk_level === 'critical' ? 'color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF)' : p.risk_level === 'high' ? 'color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)' : p.risk_level === 'medium' ? 'color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF)'"
               style="font-size:12px;font-weight:700;border-radius:16px;padding:2px 8px;white-space:nowrap;flex-shrink:0">
           {{ churnRiskLabel(p.risk_level) }}
         </span>
-        <span style="flex:1;font-size:14px;font-weight:600;color:#333333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
-        <span style="font-size:12px;font-weight:700;color:#52525b;flex-shrink:0">{{ t('partnersList.churn.points', { score: p.total_score }) }}</span>
-        <span style="font-size:12px;color:#a1a1aa;flex-shrink:0">{{ t('reports.partners.churn.daysShort', { days: p.days_since_order }) }}</span>
+        <span style="flex:1;font-size:14px;font-weight:600;color:var(--gray-800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.display_name }}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--gray-600);flex-shrink:0">{{ t('partnersList.churn.points', { score: p.total_score }) }}</span>
+        <span style="font-size:12px;color:var(--gray-400);flex-shrink:0">{{ t('reports.partners.churn.daysShort', { days: p.days_since_order }) }}</span>
       </div>
     </div>
     <a routerLink="/crm/dashboard" [queryParams]="{tab: 'churn'}"
-       style="display:block;margin-top:14px;font-size:12px;color:#3BAA5D;font-weight:600;text-decoration:none"
+       style="display:block;margin-top:14px;font-size:12px;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-weight:600;text-decoration:none"
        (mouseenter)="$any($event.currentTarget).style.textDecoration='underline'"
        (mouseleave)="$any($event.currentTarget).style.textDecoration='none'">
       {{ t('reports.partners.churn.showAll') }} →
@@ -339,45 +339,45 @@ function healthColor(engagement: number): string {
 
   <!-- ROW 4: Pełna tabela partnerów -->
   <div class="card" style="padding:0;overflow:hidden">
-    <div style="padding:14px 18px;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#333333">{{ t('reports.partners.allPartners.title') }}</div>
-      <span style="font-size:12px;color:#a1a1aa">{{ t('reports.partners.partnersCount', { count: filteredByPartner.length }) }}</span>
+    <div style="padding:14px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-800)">{{ t('reports.partners.allPartners.title') }}</div>
+      <span style="font-size:12px;color:var(--gray-400)">{{ t('reports.partners.partnersCount', { count: filteredByPartner.length }) }}</span>
     </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead>
-          <tr style="background:#fafafa;border-bottom:1px solid #e4e4e7">
-            <th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.partner') }}</th>
-            <th *ngIf="isManager" style="padding:8px 10px;text-align:left;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('partnersList.fields.salesRep') }}</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.grossTurnover') }}</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.netTurnover') }}</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.fees') }}</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.revenue') }}</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.margin') }}</th>
-            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.transactionsShort') }}</th>
-            <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:600;color:#71717a;text-transform:uppercase">{{ t('reports.partners.columns.health') }}</th>
+          <tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
+            <th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.partner') }}</th>
+            <th *ngIf="isManager" style="padding:8px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('partnersList.fields.salesRep') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.grossTurnover') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.netTurnover') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.fees') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.revenue') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.margin') }}</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.transactionsShort') }}</th>
+            <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase">{{ t('reports.partners.columns.health') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid #f4f4f5"
+          <tr *ngFor="let p of filteredByPartner" style="border-bottom:1px solid var(--gray-100)"
               [style.cursor]="p.partner_id ? 'pointer' : 'default'"
               (click)="p.partner_id && goToPartner(p.partner_id)"
               (mouseenter)="$any($event.currentTarget).style.background='#E6F4EA'"
               (mouseleave)="$any($event.currentTarget).style.background=''"
               [title]="p.partner_id ? t('reports.partners.openPartnerTooltip') : ''">
             <td style="padding:8px 14px">
-              <span *ngIf="p.partner_id" style="font-weight:600;color:#3BAA5D">{{ p.partner_name }}</span>
-              <span *ngIf="!p.partner_id" style="color:#71717a">{{ p.partner_name }}</span>
+              <span *ngIf="p.partner_id" style="font-weight:600;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)">{{ p.partner_name }}</span>
+              <span *ngIf="!p.partner_id" style="color:var(--gray-500)">{{ p.partner_name }}</span>
             </td>
-            <td *ngIf="isManager" style="padding:8px 10px;color:#a1a1aa;font-size:12px">{{ p.salesperson_name || '—' }}</td>
-            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#3BAA5D;font-family:'Sora',sans-serif">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:#3f3f46">{{ p.net_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:#3b82f6">{{ p.fees_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:#22C55E;font-weight:600">{{ p.revenue_pln | number:'1.0-0' }}</td>
+            <td *ngIf="isManager" style="padding:8px 10px;color:var(--gray-400);font-size:12px">{{ p.salesperson_name || '—' }}</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ p.gross_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:var(--gray-700)">{{ p.net_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)">{{ p.fees_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF);font-weight:600">{{ p.revenue_pln | number:'1.0-0' }}</td>
             <td style="padding:8px 10px;text-align:right">
-              <span [style.background]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#dcfce7' : '#f4f4f5'" [style.color]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? '#166534' : '#71717a'" style="border-radius:999px;padding:2px 8px;font-size:12px">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</span>
+              <span [style.background]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? 'color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface))' : 'var(--gray-100)'" [style.color]="calcMarginN(p.gross_turnover_pln,p.revenue_pln) >= 10 ? 'color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)' : 'var(--gray-500)'" style="border-radius:999px;padding:2px 8px;font-size:12px">{{ calcMargin(p.gross_turnover_pln, p.revenue_pln) }}%</span>
             </td>
-            <td style="padding:8px 10px;text-align:right;color:#71717a">{{ p.transactions_count }}</td>
+            <td style="padding:8px 10px;text-align:right;color:var(--gray-500)">{{ p.transactions_count }}</td>
             <td style="padding:8px 10px;text-align:center">
               <span [style.background]="healthBg(p.health_level)"
                     [style.color]="healthColor(p.health_level)"
@@ -387,17 +387,17 @@ function healthColor(engagement: number): string {
             </td>
           </tr>
           <tr *ngIf="!filteredByPartner.length">
-            <td [attr.colspan]="isManager ? 9 : 8" style="text-align:center;padding:24px;color:#a1a1aa;font-size:12px">{{ t('reports.partners.allPartners.empty') }}</td>
+            <td [attr.colspan]="isManager ? 9 : 8" style="text-align:center;padding:24px;color:var(--gray-400);font-size:12px">{{ t('reports.partners.allPartners.empty') }}</td>
           </tr>
         </tbody>
         <tfoot *ngIf="kpi && filteredByPartner.length">
-          <tr style="background:#fafafa;border-top:2px solid #e4e4e7;font-weight:700">
+          <tr style="background:var(--gray-50);border-top:2px solid var(--gray-200);font-weight:700">
             <td style="padding:8px 14px">{{ t('reports.partners.allPartners.total') }}</td>
             <td *ngIf="isManager"></td>
-            <td style="padding:8px 10px;text-align:right;color:#3BAA5D;font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">{{ kpi.gross_turnover_pln | number:'1.0-0' }}</td>
             <td style="padding:8px 10px;text-align:right">{{ kpi.net_turnover_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:#3b82f6">{{ kpi.fees_pln | number:'1.0-0' }}</td>
-            <td style="padding:8px 10px;text-align:right;color:#22C55E">{{ kpi.revenue_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)">{{ kpi.fees_pln | number:'1.0-0' }}</td>
+            <td style="padding:8px 10px;text-align:right;color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">{{ kpi.revenue_pln | number:'1.0-0' }}</td>
             <td style="padding:8px 10px;text-align:right">{{ kpi.margin_pct | number:'1.0-1' }}%</td>
             <td style="padding:8px 10px;text-align:right">{{ kpi.transactions_count | number }}</td>
             <td></td>
@@ -414,14 +414,14 @@ function healthColor(engagement: number): string {
   `,
   styles: [`
     /* Filter card under the title bar — same as the leads list (shadow/radius/padding from global .toolbar). */
-    .toolbar { background:white; display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; flex-shrink:0; }
+    .toolbar { background:var(--surface); display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; flex-shrink:0; }
     input[type=search] { height:36px; box-sizing:border-box; }
     input[type=month] { height:36px; box-sizing:border-box; }
     .btn-sm { height:36px; }
     .stat-clickable { cursor:pointer;transition:box-shadow .12s,border-color .12s,transform .1s }
     .stat-clickable:hover { box-shadow:var(--shadow);transform:translateY(-2px) }
-    .stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#333333;margin-bottom:2px }
-    .stat-lbl { font-size:12px;color:#a1a1aa;font-weight:500 }
+    .stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:var(--gray-800);margin-bottom:2px }
+    .stat-lbl { font-size:12px;color:var(--gray-400);font-weight:500 }
     .stat-trend { font-size:12px;margin-top:6px;font-weight:600 }
   `],
 })
@@ -588,11 +588,11 @@ export class CrmReportsPartnersComponent implements OnInit, AfterViewInit {
       const col = document.createElement('div');
       col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px';
       col.innerHTML = `
-        <div style="font-size:10px;font-weight:700;color:${isLast?'#3BAA5D':'#a1a1aa'}">${d.gross_turnover_pln>0?(d.gross_turnover_pln/1000).toFixed(0)+'k':''}</div>
-        <div style="width:100%;height:${h}px;background:${isLast?'#3BAA5D':'#BBF7D0'};border-radius:3px 3px 0 0"></div>`;
+        <div style="font-size:10px;font-weight:700;color:${isLast?'color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF)':'var(--gray-400)'}">${d.gross_turnover_pln>0?(d.gross_turnover_pln/1000).toFixed(0)+'k':''}</div>
+        <div style="width:100%;height:${h}px;background:${isLast?'#3BAA5D':'color-mix(in srgb, #bbf7d0 var(--tint-mix), var(--surface))'};border-radius:3px 3px 0 0"></div>`;
       el.appendChild(col);
       const lbl = document.createElement('div');
-      lbl.style.cssText = 'flex:1;text-align:center;font-size:10px;color:#a1a1aa';
+      lbl.style.cssText = 'flex:1;text-align:center;font-size:10px;color:var(--gray-400)';
       lbl.textContent = d.period.substring(5, 7) + '/' + d.period.substring(2, 4);
       lb.appendChild(lbl);
     });

@@ -62,7 +62,7 @@ function fmtDuration(sec: number): string {
 
     <!-- Spinner lookup -->
     <div *ngIf="call.contextLoading"
-         style="display:flex;align-items:center;gap:4px;font-size:12px;color:#9ca3af;margin-top:4px">
+         style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-400);margin-top:4px">
       <span class="sp-spinner"></span> {{ t('softphone.lookingUpContact') }}
     </div>
 
@@ -71,14 +71,14 @@ function fmtDuration(sec: number): string {
             (click)="goToEntity()"
             style="display:block;width:100%;text-align:left;background:#374151;
                    border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
-                   margin-top:6px;cursor:pointer;color:#4ade80;font-size:12px;
+                   margin-top:6px;cursor:pointer;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);font-size:12px;
                    font-weight:600;font-family:inherit">
       🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
 
     <!-- Nie znaleziono -->
     <div *ngIf="!call.contextLoading && !call.context.entityType"
-         style="font-size:12px;color:#6b7280;margin-top:4px">
+         style="font-size:12px;color:var(--gray-500);margin-top:4px">
       {{ t('softphone.incoming.unknownNumber') }}
     </div>
 
@@ -107,14 +107,14 @@ function fmtDuration(sec: number): string {
     <div class="sp-caller">{{ call.displayName }}</div>
 
     <div *ngIf="call.contextLoading"
-         style="display:flex;align-items:center;gap:4px;font-size:12px;color:#9ca3af;margin-top:4px">
+         style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-400);margin-top:4px">
       <span class="sp-spinner"></span> {{ t('softphone.lookingUpContact') }}
     </div>
     <button *ngIf="!call.contextLoading && call.context.entityType"
             (click)="goToEntity()"
             style="display:block;width:100%;text-align:left;background:#374151;
                    border:1px solid #3BAA5D;border-radius:6px;padding:8px 10px;
-                   margin-top:6px;cursor:pointer;color:#4ade80;font-size:12px;
+                   margin-top:6px;cursor:pointer;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);font-size:12px;
                    font-weight:600;font-family:inherit">
       🔗 {{ t(call.context.entityType === 'lead' ? 'labels.sourceTypes.lead' : 'labels.sourceTypes.partner') }}: {{ call.context.companyName || call.displayName }}
     </button>
@@ -142,23 +142,23 @@ function fmtDuration(sec: number): string {
     <div class="sp-phase-label">📞 {{ t('softphone.postCall.title') }}</div>
     <div class="sp-caller" style="font-size:14px">
       {{ call.displayName }}
-      <span *ngIf="call.durationSec > 0" style="color:#9ca3af;font-weight:400"> · {{ fmtDuration(call.durationSec) }}</span>
+      <span *ngIf="call.durationSec > 0" style="color:var(--gray-400);font-weight:400"> · {{ fmtDuration(call.durationSec) }}</span>
     </div>
-    <div *ngIf="call.context.entityType" style="font-size:12px;color:#6b7280;margin-top:2px">
+    <div *ngIf="call.context.entityType" style="font-size:12px;color:var(--gray-500);margin-top:2px">
       {{ t(call.context.entityType === 'lead' ? 'softphone.postCall.savedOnLead' : 'softphone.postCall.savedOnPartner') }}
     </div>
 
     <!-- Status transkrypcji -->
     <div *ngIf="transcriptionState === 'loading'"
-         style="font-size:12px;color:#9ca3af;margin-top:6px;display:flex;align-items:center;gap:4px">
+         style="font-size:12px;color:var(--gray-400);margin-top:6px;display:flex;align-items:center;gap:4px">
       <span class="sp-spinner"></span> {{ t('softphone.postCall.transcriptLoading') }}
     </div>
     <div *ngIf="transcriptionState === 'loaded'"
-         style="font-size:12px;color:#4ade80;margin-top:6px">
+         style="font-size:12px;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);margin-top:6px">
       ✓ {{ t('softphone.postCall.transcriptLoaded') }}
     </div>
     <div *ngIf="transcriptionState === 'unavailable'"
-         style="font-size:12px;color:#9ca3af;margin-top:6px">
+         style="font-size:12px;color:var(--gray-400);margin-top:6px">
       {{ t('softphone.postCall.transcriptUnavailable') }}
     </div>
 
@@ -188,15 +188,15 @@ function fmtDuration(sec: number): string {
   z-index: 9999;
 }
 .sp-card {
-  background: #fff; border-radius: 14px; padding: 24px 28px;
+  background: var(--surface); border-radius: 14px; padding: 24px 28px;
   box-shadow: 0 7px 29px rgba(0,0,0,0.198); min-width: 280px;
 }
 .sp-confirm .sp-title {
-  font-size: 16px; font-weight: 700; color: #333333; margin-bottom: 14px;
+  font-size: 16px; font-weight: 700; color: var(--gray-800); margin-bottom: 14px;
 }
 .sp-number-input {
   width: 100%; box-sizing: border-box;
-  border: 1.5px solid #d1d5db; border-radius: 8px;
+  border: 1.5px solid var(--gray-300); border-radius: 8px;
   padding: 8px 12px; font-size: 16px; outline: none;
 }
 .sp-number-input:focus { border-color: #3BAA5D; }
@@ -212,9 +212,9 @@ function fmtDuration(sec: number): string {
 
 .sp-phase-label {
   font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: #9ca3af; margin-bottom: 6px;
+  letter-spacing: .6px; color: var(--gray-400); margin-bottom: 6px;
 }
-.sp-label-active  { color: #4ade80; }
+.sp-label-active  { color: color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF); }
 .sp-label-incoming { color: #60a5fa; }
 .sp-caller {
   font-size: 16px; font-weight: 600; color: #f9fafb;
@@ -244,7 +244,7 @@ function fmtDuration(sec: number): string {
   border-radius: 8px; padding: 10px 12px; font-size: 14px;
   resize: vertical; outline: none; font-family: inherit; line-height: 1.5;
 }
-.sp-note::placeholder { color: #6b7280; }
+.sp-note::placeholder { color: var(--gray-500); }
 .sp-note:focus { border-color: #3BAA5D; }
 .sp-note:disabled { opacity: .6; cursor: wait; }
 .sp-error {

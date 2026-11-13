@@ -14,6 +14,12 @@
     "unknownDevice": "Unknown device"
   },
   "mySettings": {
+    "appearance": {
+      "dark": "Dark",
+      "hint": "Light or dark app theme.",
+      "light": "Light",
+      "title": "Appearance"
+    },
     "delete": "Delete",
     "manual": {
       "hint": "Interactive CRMtree manual with screenshots. Opens in a new tab.",

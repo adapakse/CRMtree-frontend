@@ -14,6 +14,12 @@
     "unknownDevice": "Dispozitiv necunoscut"
   },
   "mySettings": {
+    "appearance": {
+      "dark": "Întunecat",
+      "hint": "Temă luminoasă sau întunecată a aplicației.",
+      "light": "Luminos",
+      "title": "Aspect"
+    },
     "delete": "Ștergere",
     "manual": {
       "hint": "Manual interactiv CRMtree cu capturi de ecran. Se deschide într-o filă nouă.",

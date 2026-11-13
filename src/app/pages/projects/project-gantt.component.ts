@@ -130,7 +130,7 @@ interface DayTick { label: number; leftPx: number; isWeekend: boolean; }
     .zoom { display:flex; align-items:center; gap:6px; }
     .undated-note { font-size:12px; color:var(--gray-400); margin-left:8px; }
 
-    .gantt { display:flex; background:white; border:1px solid var(--gray-200); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:hidden; }
+    .gantt { display:flex; background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:hidden; }
     .names { width:340px; flex-shrink:0; border-right:1px solid var(--gray-200); }
     .names-head { display:flex; align-items:flex-end; padding:0 12px 8px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-500); background:var(--gray-50); border-bottom:1px solid var(--gray-200); box-sizing:border-box; }
     .name-cell { height:34px; display:flex; align-items:center; gap:6px; padding:0 12px; font-size:14px; color:var(--gray-800); border-bottom:1px solid var(--gray-100); cursor:pointer; white-space:nowrap; overflow:hidden; box-sizing:border-box; }
@@ -138,7 +138,7 @@ interface DayTick { label: number; leftPx: number; isWeekend: boolean; }
     .name-cell:hover { background:var(--gray-50); }
     .name-cell .root { font-weight:600; }
     .name-cell.project-cell { background:var(--gray-100); font-weight:700; cursor:default; }
-    .beyond-flag { color:#DC2626; font-size:12px; flex-shrink:0; }
+    .beyond-flag { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-size:12px; flex-shrink:0; }
     .mono { font-family:'Sora',monospace; font-size:12px; color:var(--gray-500); font-weight:600; }
 
     .timeline { flex:1; overflow-x:auto; min-width:0; }

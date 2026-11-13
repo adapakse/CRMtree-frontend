@@ -206,16 +206,16 @@ const ROLES_WITH_FIXED_ACCESS: ProjectRole[] = ['pm', 'controller'];
     .dates { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 20px; font-size:14px; color:var(--gray-800); }
     .date-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); margin-right:4px; }
     .dates-form { max-width:420px; }
-    .date-error { margin:0; font-size:12px; color:#DC2626; }
+    .date-error { margin:0; font-size:12px; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
     .hint { margin:0; font-size:12px; }
     .pill.closed { background:var(--gray-100); color:var(--gray-500); }
     .compact { padding:4px 8px; font-size:12px; width:auto; }
     .row-action { text-align:right; }
-    .link-danger { border:none; background:none; color:#B91C1C; font-size:12px; cursor:pointer; font-family:inherit; }
+    .link-danger { border:none; background:none; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); font-size:12px; cursor:pointer; font-family:inherit; }
     .add-row { display:grid; grid-template-columns:2.4fr 1fr .7fr auto; gap:8px; align-items:center; }
     .add-row.fields { grid-template-columns:1.6fr auto auto; justify-content:start; }
     .required-toggle { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--gray-700); }
-    a { color:var(--accent-blue, #3B82F6); text-decoration:none; }
+    a { color:var(--accent-blue, color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)); text-decoration:none; }
   `],
 })
 export class ProjectCardComponent {

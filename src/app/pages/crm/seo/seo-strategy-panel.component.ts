@@ -125,7 +125,7 @@ import { ToastService } from '../../../core/services/toast.service';
        the 24px gap between main SEO sections lives on the parent .seo-sections in crm-seo.component.ts. */
     .strategy-sections { display: flex; flex-direction: column; gap: 0.75rem; }
     .pillar-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
-    .pillar-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: #fff; }
+    .pillar-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: var(--surface); }
     .pillar-card-top { display:flex; align-items:center; justify-content:space-between; gap: 0.5rem; }
     .pillar-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
     .pillar-count { font-size: 0.72rem; color: var(--gray-500); white-space: nowrap; }
@@ -143,7 +143,7 @@ import { ToastService } from '../../../core/services/toast.service';
     }
     .btn-add-pillar:hover { color: var(--orange-dark); }
 
-    .competitors-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .competitors-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .competitors-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.75rem; }
     .competitors-list { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; }
@@ -159,12 +159,12 @@ import { ToastService } from '../../../core/services/toast.service';
       border: none; background: transparent; color: var(--gray-400); font-size: 1.1rem;
       cursor: pointer; line-height: 1; padding: 0 0.3rem; flex-shrink: 0;
     }
-    .btn-remove:hover { color: #991B1B; }
+    .btn-remove:hover { color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
     .competitor-form { display: flex; gap: 0.5rem; }
     .competitor-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; }
     .empty { color: var(--gray-500); font-size: 0.82rem; margin: 0; }
 
-    .backlinks-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .backlinks-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .backlinks-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .opt-in-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); margin: 0.5rem 0 0.75rem; cursor: pointer; }
     .backlinks-list { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.75rem; }
@@ -178,7 +178,7 @@ import { ToastService } from '../../../core/services/toast.service';
       padding: 0.15em 0.55em; border-radius: 4px; background: var(--gray-100); color: var(--gray-600);
     }
     .backlink-status[data-status="accepted"] { background: var(--orange-pale); color: var(--orange-dark); }
-    .backlink-status[data-status="rejected"] { background: #FEE2E2; color: #991B1B; }
+    .backlink-status[data-status="rejected"] { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
   `],
 })
 export class SeoStrategyPanelComponent implements OnInit {

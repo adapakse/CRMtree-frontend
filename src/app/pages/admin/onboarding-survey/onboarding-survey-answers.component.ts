@@ -69,9 +69,9 @@ import {
     .survey-status { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--gray-700); margin-bottom: 16px; }
     .survey-updated { margin-left: auto; font-size: 12px; color: var(--gray-500); }
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on  { background: #dcfce7; color: #16a34a; }
+    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
     .badge-off { background: var(--gray-100); color: var(--gray-500); }
-    .answers-card { background: white; border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: 12px; overflow: hidden; }
+    .answers-card { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: 12px; overflow: hidden; }
     .answers-title { padding: 12px 16px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); font-size: 14px; font-weight: 600; color: var(--gray-800); }
     .answer-row { display: grid; grid-template-columns: 300px 1fr; gap: 16px; padding: 8px 16px; border-bottom: 1px solid var(--gray-100); font-size: 14px; }
     .answer-row:last-child { border-bottom: none; }
@@ -80,7 +80,7 @@ import {
     .answer-value code { background: var(--gray-100); padding: 1px 8px; border-radius: 999px; font-size: 12px; }
     .answer-empty { color: var(--gray-400); }
     .btn-inline {
-      margin-left: 8px; padding: 2px 8px; font-size: 12px; background: white; color: var(--gray-700);
+      margin-left: 8px; padding: 2px 8px; font-size: 12px; background: var(--surface); color: var(--gray-700);
       border: 1px solid var(--gray-200); border-radius: 8px; cursor: pointer;
     }
     .btn-inline:hover { background: var(--gray-50); }

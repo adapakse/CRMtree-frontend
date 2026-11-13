@@ -5,7 +5,6 @@ import { GroupService } from '../../core/services/api.services';
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { GroupProfile } from '../../core/models/models';
-import { groupCssClass } from '../../core/services/helpers';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
@@ -32,14 +31,11 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
         @for (g of groups(); track g.id) {
           <div class="card" style="padding:20px;cursor:pointer" (click)="select(g)">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-              <div style="width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px"
-                   [class]="groupBg(g.name)">
-                {{ groupIcon(g.name) }}
-              </div>
+              <div class="group-tile" aria-hidden="true">{{ groupInitials(g.display_name || g.name) }}</div>
               <div>
                 <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--gray-900)">{{ g.display_name }}</div>
                 @if (g.has_owner_restriction) {
-                  <span style="font-size:10px;font-weight:600;background:#EFF6FF;color:#1D4ED8;padding:1px 8px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
+                  <span style="font-size:10px;font-weight:600;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF);padding:1px 8px;border-radius:10px">{{ t('userGroups.ownerRestriction') }}</span>
                 }
               </div>
               <span style="margin-left:auto">
@@ -136,7 +132,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
       <div class="mol open" (click)="openNew=false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:var(--orange-pale);color:var(--orange)">👥</div>
+            <div class="moico" style="background:var(--orange-pale);color: var(--orange-text)">👥</div>
             <div><div class="mot">{{ t('userGroups.create.title') }}</div><div class="mos">{{ t('userGroups.create.subtitle') }}</div></div>
           </div>
           <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
@@ -167,13 +163,14 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 </ng-container>
   `,
   styles: [`
-    #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
+    .group-tile { width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--gray-100); color: var(--gray-700); font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+    #topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
     .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); }
     .tsp { flex: 1; }
     #content { flex: 1; overflow-y: auto; padding: 24px; }
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; backdrop-filter: blur(2px); display: flex; align-items: flex-start; justify-content: flex-end; }
-    .panel { width: 520px; height: 100vh; background: white; box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
-    .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; position: sticky; top: 0; background: white; z-index: 1; }
+    .panel { width: 520px; height: 100vh; background: var(--surface); box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
+    .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; position: sticky; top: 0; background: var(--surface); z-index: 1; }
     .pt { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
     .ps { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
     .pc { margin-left: auto; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 6px; }
@@ -181,7 +178,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .pb { padding: 24px; flex: 1; }
     .pf { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; background: var(--gray-50); position: sticky; bottom: 0; }
     .mol { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-    .mo { background: white; border-radius: 12px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
+    .mo { background: var(--surface); border-radius: 12px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-lg); overflow: hidden; animation: scaleIn .2s ease; }
     .moh { padding: 20px 24px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
     .moico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mot { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
@@ -252,18 +249,16 @@ export class GroupsComponent implements OnInit {
     });
   }
 
+  /** Two letters for the group tile: first letters of two words, or the first two letters of one word. */
+  groupInitials(name: string): string {
+    const words = (name ?? '').trim().split(/\s+/).filter(Boolean);
+    const letters = words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? '').slice(0, 2);
+    return letters.toUpperCase();
+  }
+
   initials(name: string): string {
     return (name ?? '').split(' ').slice(0, 2).map(n => n[0] ?? '').join('').toUpperCase();
   }
 
-  groupIcon(name: string): string {
-    // Group names stored by tenants; the two Polish ones are spelled with escapes
-    // because the i18n check rejects Polish letters in translated source files.
-    const m: Record<string, string> = { Management: '🏢', 'Zarz\u0105d': '🏢', Sales: '💼', 'Sprzeda\u017c': '💼', Marketing: '📣', HR: '👥', Accounting: '💰', Operations: '⚙️' };
-    return m[name] ?? '📋';
-  }
 
-  groupBg(name: string): string {
-    return groupCssClass(name);
-  }
 }

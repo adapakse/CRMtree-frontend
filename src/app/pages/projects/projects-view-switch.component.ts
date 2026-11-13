@@ -31,7 +31,7 @@ export type ProjectsView = 'projects' | 'my-tasks' | 'portfolio';
       transition:background .15s, color .15s, box-shadow .15s;
     }
     .view:hover { color:var(--gray-800); }
-    .view.active { background:white; color:var(--gray-900); box-shadow:0 1px 3px rgba(0,0,0,.10); }
+    .view.active { background:var(--surface); color:var(--gray-900); box-shadow:0 1px 3px rgba(0,0,0,.10); }
   `],
 })
 export class ProjectsViewSwitchComponent {

@@ -3,13 +3,13 @@
 // one copy here instead of one per component.
 export const PROJECTS_SHARED_STYLES = `
   :host { display:flex; flex-direction:column; height:100%; min-height:0; }
-  #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
+  #topbar { height:60px; background:var(--surface); border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
   .page-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); }
   .tsp { flex:1; }
   #content { flex:1; overflow-y:auto; padding:20px 24px 24px; min-height:0; }
 
   .mol { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(3px); }
-  .mo { background:white; border-radius:14px; width:540px; max-width:95vw; box-shadow:var(--shadow-lg); overflow:hidden; }
+  .mo { background:var(--surface); border-radius:14px; width:540px; max-width:95vw; box-shadow:var(--shadow-lg); overflow:hidden; }
   .moh { padding:18px 24px 14px; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; }
   .mot { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:var(--gray-900); }
   .mox { margin-left:auto; cursor:pointer; color:var(--gray-400); padding:4px 8px; border-radius:6px; border:none; background:none; font-size:16px; }

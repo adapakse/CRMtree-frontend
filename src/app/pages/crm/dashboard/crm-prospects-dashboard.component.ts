@@ -92,9 +92,9 @@ function maxOf(rows: BarRow[]): number {
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div style="height:60px;background:white;border-bottom:1px solid var(--gray-200,#e5e7eb);display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#333333">{{ t('dashboard.title') }}</span>
-  <span style="font-size:12px;color:#a1a1aa">{{ t('dashboard.subtitle') }}</span>
+<div style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200,var(--gray-200));display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0">
+  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('dashboard.title') }}</span>
+  <span style="font-size:12px;color:var(--gray-400)">{{ t('dashboard.subtitle') }}</span>
 </div>
 
 <!-- CONTENT -->
@@ -113,7 +113,7 @@ function maxOf(rows: BarRow[]): number {
         </select>
         <ng-container *ngIf="period1 === 'custom'">
           <input type="date" class="pd-sel" [(ngModel)]="customFrom1" (ngModelChange)="loadChart1()">
-          <span style="font-size:12px;color:var(--gray-400,#9ca3af);flex-shrink:0">–</span>
+          <span style="font-size:12px;color:var(--gray-400,var(--gray-400));flex-shrink:0">–</span>
           <input type="date" class="pd-sel" [(ngModel)]="customTo1" (ngModelChange)="loadChart1()">
         </ng-container>
         <select class="pd-sel" [(ngModel)]="filter1Stage" (ngModelChange)="loadChart1()">
@@ -353,7 +353,7 @@ function maxOf(rows: BarRow[]): number {
         </select>
         <ng-container *ngIf="period5 === 'custom'">
           <input type="date" class="pd-sel" [(ngModel)]="customFrom5" (ngModelChange)="loadChart5()">
-          <span style="font-size:12px;color:var(--gray-400,#9ca3af);flex-shrink:0">–</span>
+          <span style="font-size:12px;color:var(--gray-400,var(--gray-400));flex-shrink:0">–</span>
           <input type="date" class="pd-sel" [(ngModel)]="customTo5" (ngModelChange)="loadChart5()">
         </ng-container>
         <select class="pd-sel" [(ngModel)]="filter5Direction" (ngModelChange)="loadChart5()">
@@ -418,7 +418,7 @@ function maxOf(rows: BarRow[]): number {
     /* ── Panel ─────────────────────────────────────────────────── */
     .pd-panel {
       box-sizing: border-box; width: 100%;
-      background: var(--white, #fff);
+      background: var(--var(--surface), var(--surface));
       border-radius: 12px; box-shadow: var(--shadow-sm);
       padding: 20px;
       margin-bottom: 20px;
@@ -432,7 +432,7 @@ function maxOf(rows: BarRow[]): number {
     }
     .pd-panel-head h2 {
       font-size: 14px; font-weight: 600;
-      color: var(--gray-800, #1f2937);
+      color: var(--gray-800, var(--gray-800));
       flex: 1; min-width: 120px; margin: 0; line-height: 1.5;
     }
     .pd-filters { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; flex-shrink: 0; }
@@ -447,64 +447,64 @@ function maxOf(rows: BarRow[]): number {
     .pd-ms-trigger {
       display: flex; align-items: center; gap: 8px; box-sizing: border-box;
       height: 36px; font-size: 12px; font-weight: 500; font-family: inherit; padding: 0 14px; border-radius: 12px;
-      border: 1px solid var(--gray-200, #e5e7eb); box-shadow: 0 1px 2px rgba(0,0,0,.05);
-      background: var(--white, #fff); cursor: pointer;
-      color: var(--gray-800, #1f2937); max-width: 200px;
+      border: 1px solid var(--gray-200, var(--gray-200)); box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      background: var(--var(--surface), var(--surface)); cursor: pointer;
+      color: var(--gray-800, var(--gray-800)); max-width: 200px;
     }
     .pd-ms-trigger span {
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
     }
     .pd-ms-trigger:hover { border-color: var(--orange, #3BAA5D); }
-    .pd-ms-trigger svg { flex-shrink: 0; color: var(--gray-500, #71717A); }
+    .pd-ms-trigger svg { flex-shrink: 0; color: var(--gray-500, var(--gray-500)); }
     /* Otwiera się w LEWĄ stronę — nie wychodzi poza prawą krawędź */
     .pd-ms-dropdown {
       position: absolute; top: calc(100% + 4px); right: 0; z-index: 20;
-      background: var(--white, #fff);
+      background: var(--var(--surface), var(--surface));
       width: 240px; padding: 8px 0;
     }
     .pd-ms-search {
       display: block; box-sizing: border-box;
       width: calc(100% - 16px); margin: 0 8px 6px;
       height: 32px; font-size: 12px; padding: 0 12px; border-radius: 10px;
-      border: 1px solid var(--gray-200, #e5e7eb);
-      background: var(--white, #fff); color: var(--gray-700, #374151); outline: none;
+      border: 1px solid var(--gray-200, var(--gray-200));
+      background: var(--var(--surface), var(--surface)); color: var(--gray-700, var(--gray-700)); outline: none;
     }
     .pd-ms-search:focus { border-color: var(--orange, #3BAA5D); }
     .pd-ms-actions {
       display: flex; gap: 4px; padding: 0 8px 6px;
-      border-bottom: 1px solid var(--gray-100, #f3f4f6);
+      border-bottom: 1px solid var(--gray-100, var(--gray-100));
     }
     .pd-ms-actions button {
       font-size: 12px; padding: 4px 8px; border-radius: 8px; cursor: pointer; font-family: inherit;
-      border: 1px solid var(--gray-200, #e5e7eb);
-      background: transparent; color: var(--gray-500, #6b7280);
+      border: 1px solid var(--gray-200, var(--gray-200));
+      background: transparent; color: var(--gray-500, var(--gray-500));
     }
-    .pd-ms-actions button:hover { background: var(--gray-100, #f3f4f6); }
+    .pd-ms-actions button:hover { background: var(--gray-100, var(--gray-100)); }
     .pd-ms-list { min-height: 0; max-height: 242px; overflow-y: auto; padding: 4px 0; }
     .pd-ms-item {
       display: flex; align-items: center; gap: 8px;
       padding: 8px 12px; cursor: pointer; font-size: 12px;
-      color: var(--gray-700, #374151);
+      color: var(--gray-700, var(--gray-700));
     }
-    .pd-ms-item:hover { background: var(--gray-50, #f9fafb); }
+    .pd-ms-item:hover { background: var(--gray-50, var(--gray-50)); }
     .pd-ms-item input[type="checkbox"] { flex-shrink: 0; }
     .pd-ms-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .pd-ms-empty { font-size: 12px; color: var(--gray-400, #9ca3af); padding: 8px 12px; }
+    .pd-ms-empty { font-size: 12px; color: var(--gray-400, var(--gray-400)); padding: 8px 12px; }
 
     /* ── Stany ─────────────────────────────────────────────────── */
-    .pd-loading { color: var(--gray-400, #9ca3af); font-size: 14px; padding: 16px 0; }
-    .pd-empty   { color: var(--gray-400, #9ca3af); font-size: 14px; padding: 16px 0; }
+    .pd-loading { color: var(--gray-400, var(--gray-400)); font-size: 14px; padding: 16px 0; }
+    .pd-empty   { color: var(--gray-400, var(--gray-400)); font-size: 14px; padding: 16px 0; }
 
     /* ── Period tabs ───────────────────────────────────────────── */
     .pd-period-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
     .pd-ptab {
       font-size: 12px; padding: 4px 12px; border-radius: 999px;
-      border: 1px solid var(--gray-200, #e5e7eb);
-      background: white; cursor: pointer; box-shadow: var(--shadow-sm);
-      color: var(--gray-600, #4b5563); white-space: nowrap; font-family: inherit; font-weight: 500;
+      border: 1px solid var(--gray-200, var(--gray-200));
+      background: var(--surface); cursor: pointer; box-shadow: var(--shadow-sm);
+      color: var(--gray-600, var(--gray-600)); white-space: nowrap; font-family: inherit; font-weight: 500;
     }
     .pd-ptab.active {
-      background: rgba(59,170,93,.18); color: var(--orange-dark, #2F8F4D); border-color: rgba(59,170,93,.45);
+      background: rgba(59,170,93,.18); color: var(--orange-dark, color-mix(in srgb, #2f8f4d var(--tint-text-mix), #FFFFFF)); border-color: rgba(59,170,93,.45);
     }
 
     /* ── Słupki ────────────────────────────────────────────────── */
@@ -514,7 +514,7 @@ function maxOf(rows: BarRow[]): number {
     .pd-bar-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .pd-bar-label {
       width: 130px; min-width: 70px; max-width: 130px;
-      font-size: 12px; color: var(--gray-700, #374151); text-align: right;
+      font-size: 12px; color: var(--gray-700, var(--gray-700)); text-align: right;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;
     }
     .pd-bar-track {
@@ -528,19 +528,19 @@ function maxOf(rows: BarRow[]): number {
     .pd-seg { transition: flex .3s; min-width: 2px; }
     .pd-bar-single { height: 18px; border-radius: 4px; min-width: 4px; transition: width .3s; }
     .pd-bar-val {
-      font-size: 12px; font-weight: 600; color: var(--gray-600, #4b5563);
+      font-size: 12px; font-weight: 600; color: var(--gray-600, var(--gray-600));
       min-width: 26px; flex-shrink: 0;
     }
 
     /* ── Legenda ───────────────────────────────────────────────── */
     .pd-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-    .pd-leg-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray-600, #4b5563); }
+    .pd-leg-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray-600, var(--gray-600)); }
     .pd-leg-dot  { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
     /* ── Checkbox filter ──────────────────────────────────────────── */
     .pd-chk {
       display: flex; align-items: center; gap: 4px; cursor: pointer;
-      font-size: 12px; color: var(--gray-800, #1f2937); white-space: nowrap;
+      font-size: 12px; color: var(--gray-800, var(--gray-800)); white-space: nowrap;
       user-select: none;
     }
     .pd-chk input[type="checkbox"] { margin: 0; cursor: pointer; }
@@ -553,21 +553,21 @@ function maxOf(rows: BarRow[]): number {
       position: relative; display: flex; align-items: center;
     }
     .pd-search-icon {
-      position: absolute; left: 12px; color: var(--gray-400, #9ca3af); pointer-events: none; flex-shrink: 0;
+      position: absolute; left: 12px; color: var(--gray-400, var(--gray-400)); pointer-events: none; flex-shrink: 0;
     }
     .pd-search-input {
       box-sizing: border-box; height: 36px; font-size: 12px; font-family: inherit;
       padding: 0 32px 0 34px; border-radius: 12px;
-      border: 1px solid var(--gray-200, #e5e7eb); box-shadow: 0 5px 16px rgba(0,0,0,0.099);
-      background: var(--white, #fff); color: var(--gray-800, #1f2937);
+      border: 1px solid var(--gray-200, var(--gray-200)); box-shadow: 0 5px 16px rgba(0,0,0,0.099);
+      background: var(--var(--surface), var(--surface)); color: var(--gray-800, var(--gray-800));
       width: 220px; outline: none;
     }
     .pd-search-input:focus { border-color: var(--orange, #3BAA5D); box-shadow: 0 5px 16px rgba(0,0,0,0.099), 0 0 2px 4px rgba(59,170,93,.2); }
     .pd-search-clear {
       position: absolute; right: 12px; background: none; border: none; display: inline-flex;
-      font-size: 12px; color: var(--gray-400, #9ca3af); cursor: pointer; line-height: 1; padding: 0;
+      font-size: 12px; color: var(--gray-400, var(--gray-400)); cursor: pointer; line-height: 1; padding: 0;
     }
-    .pd-search-clear:hover { color: var(--gray-600, #4b5563); }
+    .pd-search-clear:hover { color: var(--gray-600, var(--gray-600)); }
 
   `],
 })
@@ -950,7 +950,7 @@ export class CrmProspectsDashboardComponent implements OnInit {
         label: u.display_name, total,
         segments: [...u.byStatus.entries()].map(([key, val]) => {
           const status = key.split('/')[1];
-          return { label: this.callStatusLabel(status), value: val, pct: 0, color: CALL_STATUS_COLORS[status] ?? '#9ca3af' };
+          return { label: this.callStatusLabel(status), value: val, pct: 0, color: CALL_STATUS_COLORS[status] ?? 'var(--gray-400)' };
         }),
       });
     }

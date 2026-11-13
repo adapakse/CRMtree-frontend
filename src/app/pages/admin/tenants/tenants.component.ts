@@ -1117,7 +1117,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
 
     .page-header {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      height: 60px; padding: 0 24px; background: white; border-bottom: 1px solid var(--gray-200);
+      height: 60px; padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--gray-200);
     }
     .page-header > div { display: flex; align-items: baseline; gap: 12px; }
     .page-body { padding: 20px 24px 24px; max-width: 1400px; }
@@ -1129,12 +1129,12 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       border-radius: 12px; padding: 12px 16px; margin-top: 12px; font-size: 14px;
     }
-    .billing-hint-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
-    .billing-hint-ok   { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+    .billing-hint-warn { background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border: 1px solid #fde68a; color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .billing-hint-ok   { background: color-mix(in srgb, #ecfdf5 var(--tint-mix), var(--surface)); border: 1px solid #a7f3d0; color: color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); }
     .billing-hint .btn-secondary { flex-shrink: 0; padding: 4px 12px; font-size: 12px; border-radius: 9px; }
 
     /* Table */
-    .table-wrap { overflow-x: auto; background: white; border-radius: 12px; box-shadow: var(--shadow-sm); }
+    .table-wrap { overflow-x: auto; background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); }
     .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .data-table th {
       background: var(--gray-50); padding: 10px 14px; text-align: left;
@@ -1152,9 +1152,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .td-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on    { background: #dcfce7; color: #16a34a; }
+    .badge-on    { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
     .badge-off   { background: var(--gray-100); color: var(--gray-500); }
-    .badge-admin { background: #eff6ff; color: #2563eb; }
+    .badge-admin { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF); }
 
     .feat-pills { display: flex; flex-wrap: wrap; gap: 4px; }
     .pill { background: var(--orange-pale); color: var(--orange-dark); font-size: 12px; padding: 2px 8px; border-radius: 99px; }
@@ -1166,16 +1166,16 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     }
     .btn-icon:hover { background: var(--gray-100); color: var(--gray-700); }
     .btn-icon svg { width: 15px; height: 15px; transition: transform .2s; }
-    .btn-icon.btn-imp:hover { background: #eff6ff; color: #2563eb; }
-    .btn-icon.btn-danger-icon { color: #dc2626; }
-    .btn-icon.btn-danger-icon:hover { background: #fee2e2; color: #b91c1c; }
+    .btn-icon.btn-imp:hover { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF); }
+    .btn-icon.btn-danger-icon { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .btn-icon.btn-danger-icon:hover { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
 
     /* Edit panel */
     .edit-panel { background: var(--orange-pale); }
 
-    .tabs { padding: 0 20px; background: white; margin-bottom: 0; overflow-x: auto; }
+    .tabs { padding: 0 20px; background: var(--surface); margin-bottom: 0; overflow-x: auto; }
     .tabs .tab-btn { flex: none; padding: 10px 16px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .tab-badge { background: var(--orange); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    .tab-badge { background: var(--orange-strong); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
 
     .tab-body { padding: 16px 20px 20px; }
 
@@ -1186,13 +1186,13 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
     .field input:not([type=checkbox]):not([type=radio]) {
       width: 100%; height: 36px; padding: 0 12px; border: 1px solid var(--gray-200);
-      border-radius: 10px; font-size: 14px; background: white; box-sizing: border-box;
+      border-radius: 10px; font-size: 14px; background: var(--surface); box-sizing: border-box;
     }
     .field input:focus, .field textarea:focus { outline: none; border-color: var(--orange); }
     .field select { width: 100%; height: 36px; box-sizing: border-box; }
     .field textarea {
       width: 100%; padding: 8px 12px; border: 1px solid var(--gray-200);
-      border-radius: 10px; font-size: 14px; background: white; box-sizing: border-box;
+      border-radius: 10px; font-size: 14px; background: var(--surface); box-sizing: border-box;
       font-family: inherit; resize: vertical;
     }
     .field-check { display: flex; align-items: flex-end; padding-bottom: 2px; }
@@ -1202,7 +1202,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .feat-toggle {
       display: flex; align-items: center; gap: 6px;
       padding: 4px 12px; border-radius: 99px; cursor: pointer;
-      border: 1.5px solid var(--gray-300); background: white;
+      border: 1.5px solid var(--gray-300); background: var(--surface);
       font-size: 12px; color: var(--gray-600); user-select: none;
       transition: border-color .12s, background .12s, color .12s;
     }
@@ -1228,7 +1228,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     /* Buttons */
     .btn-primary {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px 16px; background: var(--orange); color: white;
+      padding: 8px 16px; background: var(--orange-strong); color: white;
       border: none; border-radius: 10px; font-size: 12px; font-weight: 500;
       cursor: pointer; transition: background .12s;
     }
@@ -1236,7 +1236,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
     .btn-secondary {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px 16px; background: white; color: var(--gray-700);
+      padding: 8px 16px; background: var(--surface); color: var(--gray-700);
       border: 1px solid var(--gray-200); border-radius: 10px; font-size: 12px;
       cursor: pointer; transition: background .12s;
     }
@@ -1244,10 +1244,10 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .btn-secondary:hover { background: var(--gray-50); }
     .btn-danger {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px 16px; background: #FEF2F2; color: #DC2626;
-      border: 1px solid #FECACA; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
+      padding: 8px 16px; background: var(--gray-50); color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);
+      border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
     }
-    .btn-danger:hover:not(:disabled) { background: #FEE2E2; }
+    .btn-danger:hover:not(:disabled) { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); }
     .btn-danger:disabled { opacity: .55; cursor: not-allowed; }
 
     /* Modal */
@@ -1255,7 +1255,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
       position: fixed; inset: 0; background: rgba(0,0,0,.45);
       display: flex; align-items: center; justify-content: center; z-index: 1000;
     }
-    .modal { background: white; border-radius: 16px; width: 480px; max-width: 95vw; box-shadow: 0 12px 39px rgba(0,0,0,0.163); }
+    .modal { background: var(--surface); border-radius: 16px; width: 480px; max-width: 95vw; box-shadow: 0 12px 39px rgba(0,0,0,0.163); }
     .modal-sm { width: 360px; }
     .modal-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -1278,7 +1278,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
 
     .reinit-box {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px;
+      background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border: 1px solid #fde68a; border-radius: 12px;
       padding: 12px 16px; margin-bottom: 16px;
     }
     .reinit-desc { display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
@@ -1294,7 +1294,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
 
     /* Email providers tab */
     .provider-card {
-      background: white; border-radius: 12px; box-shadow: var(--shadow-sm);
+      background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm);
       margin-bottom: 12px; overflow: hidden;
     }
     .provider-header {
@@ -1312,11 +1312,11 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .provider-form { padding: 14px 16px 16px; }
     .provider-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
     .btn-danger-sm {
-      padding: 8px 16px; background: #FEF2F2; color: #DC2626;
-      border: 1px solid #FECACA; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
+      padding: 8px 16px; background: var(--gray-50); color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF);
+      border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
       transition: background .12s;
     }
-    .btn-danger-sm:hover:not(:disabled) { background: #FEE2E2; }
+    .btn-danger-sm:hover:not(:disabled) { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); }
     .btn-danger-sm:disabled { opacity: .55; cursor: not-allowed; }
 
     /* Active email provider — small radio in each card header + toolbar "none" option */
@@ -1332,9 +1332,9 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
 
     .hint { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
     .hint-inline { font-size: 12px; color: var(--gray-400); font-weight: 400; }
-    .token-warning { margin-top: 8px; font-size: 12px; color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 8px 12px; line-height: 1.5; }
-    .req  { color: #dc2626; }
-    .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; font-size: 14px; color: #1e40af; }
+    .token-warning { margin-top: 8px; font-size: 12px; color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); background: var(--gray-50); border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; padding: 8px 12px; line-height: 1.5; }
+    .req  { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .info-box { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border: 1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius: 10px; padding: 12px 16px; font-size: 14px; color: color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
     .temp-pass-box {
       font-family: monospace; font-size: 20px; font-weight: 700; letter-spacing: 2px;
       background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 12px;

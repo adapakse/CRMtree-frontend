@@ -50,16 +50,16 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
   `,
   styles: [`
     #login-screen { position:fixed; top:var(--test-banner-height, 0px); right:0; bottom:0; left:0; background:radial-gradient(circle at 20% 10%, var(--orange-pale), var(--gray-50) 60%); display:flex; align-items:center; justify-content:center; }
-    .login-card { background:white; border-radius:16px; width:420px; max-width:95vw; overflow:hidden; box-shadow:var(--shadow-lg); }
+    .login-card { background:var(--surface); border-radius:16px; width:420px; max-width:95vw; overflow:hidden; box-shadow:var(--shadow-lg); }
     .login-top { background:#292A2D; padding:28px 32px 24px; text-align:center; }
     .login-logo-img { width:340px; max-width:100%; height:auto; display:block; margin:0 auto 4px; }
-    .login-sub { font-size:14px; color:#888; }
+    .login-sub { font-size:14px; color:var(--gray-400); }
     .login-body { padding:28px 32px 32px; }
     .cp-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin-bottom:6px; }
     .cp-hint  { font-size:14px; color:var(--gray-500); margin:0 0 18px; line-height:1.6; }
     .field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; position:relative; }
     .field label { font-size:12px; font-weight:500; color:var(--gray-600); }
-    .field input { padding:12px 14px; border:1px solid var(--gray-200); border-radius:12px; font-size:14px; outline:none; background:white; transition:border-color .12s, box-shadow .12s; }
+    .field input { padding:12px 14px; border:1px solid var(--gray-200); border-radius:12px; font-size:14px; outline:none; background:var(--surface); transition:border-color .12s, box-shadow .12s; }
     .field input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.15); }
     .pw-wrap { position:relative; }
     .pw-wrap input { width:100%; box-sizing:border-box; padding-right:44px !important; }
@@ -68,8 +68,8 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .lbtn { width:100%; background:var(--green-gradient); color:white; border:none; border-radius:12px; padding:12px; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm); transition:filter .15s, box-shadow .15s; margin-top:4px; }
     .lbtn:hover:not(:disabled) { filter:brightness(.95); box-shadow:var(--shadow); }
     .lbtn:disabled { opacity:.6; cursor:not-allowed; }
-    .l-error { background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:8px 12px; font-size:14px; color:#dc2626; margin-bottom:12px; }
-    .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+    .l-error { background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius:12px; padding:8px 12px; font-size:14px; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); margin-bottom:12px; }
+    .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:var(--surface); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
     @keyframes spin { to { transform:rotate(360deg); } }
   `],
 })

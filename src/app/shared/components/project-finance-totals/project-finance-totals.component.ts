@@ -35,11 +35,11 @@ import { ProjectFinanceTotals } from '../../../core/services/projects-api.servic
     </ng-container>
   `,
   styles: [`
-    :host { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:12px; color:#6b7280; }
+    :host { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:12px; color:var(--gray-500); }
     .figure { display:inline-flex; align-items:baseline; gap:4px; white-space:nowrap; font-variant-numeric:tabular-nums; }
-    .label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:#9ca3af; }
-    strong { color:#333333; font-weight:600; }
-    .danger, strong.danger { color:#DC2626; }
+    .label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-400); }
+    strong { color:var(--gray-800); font-weight:600; }
+    .danger, strong.danger { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
   `],
 })
 export class ProjectFinanceTotalsComponent {

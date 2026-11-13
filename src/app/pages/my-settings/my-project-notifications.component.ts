@@ -24,9 +24,9 @@ import { ToastService } from '../../core/services/toast.service';
   `,
   styles: [`
     .block { padding:24px; display:flex; flex-direction:column; gap:12px; }
-    h2 { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:#333333; margin:0; }
-    .switch { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:#333333; cursor:pointer; }
-    .hint { margin:0; font-size:12px; color:#6b7280; line-height:1.5; }
+    h2 { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:var(--gray-800); margin:0; }
+    .switch { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--gray-800); cursor:pointer; }
+    .hint { margin:0; font-size:12px; color:var(--gray-500); line-height:1.5; }
   `],
 })
 export class MyProjectNotificationsComponent {

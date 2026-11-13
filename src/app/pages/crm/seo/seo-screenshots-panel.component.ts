@@ -58,7 +58,7 @@ import { ToastService } from '../../../core/services/toast.service';
   styles: [`
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.75rem; }
     .shot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; align-items: start; }
-    .shot-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem; background: #fff; }
+    .shot-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem; background: var(--surface); }
     .shot-card-new { border-style: dashed; }
     .shot-img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 6px; border: 1px solid var(--gray-100); }
     .shot-tag {
@@ -73,7 +73,7 @@ import { ToastService } from '../../../core/services/toast.service';
     .shot-card-new .btn-sm { margin-top: 0.7rem; width: 100%; }
     .btn-delete {
       display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 9px; background: #FEE2E2; color: #991B1B; cursor: pointer; padding: 4px 10px;
+      border: none; border-radius: 9px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); cursor: pointer; padding: 4px 10px;
     }
   `],
 })

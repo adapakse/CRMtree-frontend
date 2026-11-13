@@ -104,7 +104,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
           <div class="th sortable" (click)="sortBy('status')">{{ t('labels.fields.status') }} <span class="sort-icon">{{ sortIcon('status') }}</span></div>
           <div class="th">
             {{ t('labels.activeTasks') }}
-            <span style="font-size:8px;background:var(--orange);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">{{ t('list.columns.newBadge') }}</span>
+            <span style="font-size:8px;background:var(--orange-strong);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">{{ t('list.columns.newBadge') }}</span>
           </div>
           <div class="th sortable" (click)="sortBy('expiration_date')">{{ t('labels.columns.validity') }} <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
           <div class="th sortable" (click)="sortBy('owner_name')">{{ t('labels.fields.owner') }} <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>
@@ -153,7 +153,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
               }
             </div>
 
-            <div class="td" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? '#DC2626' : ''"
+            <div class="td" [style.color]="isExpiring(doc.expiration_date) || doc.is_payment_overdue ? 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)' : ''"
                  [title]="doc.doc_type === invoiceDocType ? t('labels.fields.paymentDueDate') : ''">
               {{ doc.expiration_date ? (doc.expiration_date | date:'dd.MM.yy') : '—' }}
             </div>
@@ -203,15 +203,15 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
     </ng-container>
   `,
   styles: [`
-    #topbar { height: 60px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
+    #topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
     .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); }
     .tsp { flex: 1; }
     .srch-wrap { position: relative; display: flex; align-items: center; }
     .srch-wrap svg { position: absolute; left: 10px; width: 15px; height: 15px; color: var(--gray-400); pointer-events: none; }
     .srch { background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px; padding: 8px 14px 8px 34px; font-size: 14px; color: var(--gray-800); width: 260px; outline: none; font-family: inherit; }
-    .srch:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(59,170,93,.1); background: white; }
+    .srch:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(59,170,93,.1); background: var(--surface); }
     #content { flex: 1; overflow-y: auto; padding: 20px 24px 24px; }
-    .toolbar { background: white; border-radius: 14px; padding: 12px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px 12px; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
+    .toolbar { background: var(--surface); border-radius: 14px; padding: 12px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px 12px; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
     .sel { appearance:none; -webkit-appearance:none; background:var(--gray-100) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center; border:1px solid var(--gray-200); border-radius:8px; padding:6px 30px 6px 10px; font-size:12px; color:var(--gray-700); outline:none; font-family:inherit; cursor:pointer; }
     .sel:focus { border-color:var(--orange); }
     .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
@@ -225,7 +225,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
     .td { padding: 10px 8px; font-size: 14px; color: var(--gray-700); overflow: hidden; }
     .td-n-wrap { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
     .td-n { font-weight: 600; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .no-partner-tri { font-size: 14px; color: #f97316; cursor: default; line-height: 1; width: fit-content; }
+    .no-partner-tri { font-size: 14px; color: color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF); cursor: default; line-height: 1; width: fit-content; }
     .td-sub { font-size: 12px; color: var(--gray-400); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .td-muted { color: var(--gray-500); font-size: 13px; }
     .td-status { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
@@ -234,14 +234,14 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
     .task-col { display: flex; flex-direction: column; gap: 4px; overflow: visible; }
     .task-cell-row {
       display: flex; align-items: center; gap: 6px;
-      background: #F7F7F8; border: 1px solid #EFEFF1;
+      background: var(--gray-50); border: 1px solid var(--gray-100);
       border-radius: 8px; padding: 3px 8px 3px 3px;
       cursor: default;
     }
     .task-type { font-size: 12px; font-weight: 500; color: var(--gray-500); white-space: nowrap; flex-shrink: 0; }
     .task-assignee { font-size: 12px; font-weight: 500; color: var(--gray-700); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .task-due { font-size: 12px; font-weight: 600; color: var(--gray-500); white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; }
-    .task-due.overdue { color: #DC2626; }
+    .task-due.overdue { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
     .task-none { font-size: 12px; color: var(--gray-300); }
 
     /* ── No-files checkbox ── */

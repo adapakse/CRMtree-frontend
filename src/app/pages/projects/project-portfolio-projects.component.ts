@@ -93,8 +93,8 @@ const FINANCE_COLUMN_COUNT = 2;
     .progress-fill { display:block; height:100%; background:var(--orange); }
     .progress-label { font-size:12px; color:var(--gray-600); font-variant-numeric:tabular-nums; }
     .count { font-variant-numeric:tabular-nums; color:var(--gray-400); }
-    .count.overdue { color:#B91C1C; font-weight:700; }
-    .count.at-risk { color:#92400E; font-weight:700; }
+    .count.overdue { color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .count.at-risk { color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); font-weight:700; }
     .amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
     .state-cell { text-align:center; padding:36px 24px !important; color:var(--gray-400); }
     .empty-title { font-weight:600; color:var(--gray-600); margin-bottom:4px; }

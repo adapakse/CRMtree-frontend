@@ -14,6 +14,12 @@
     "unknownDevice": "Nieznane urządzenie"
   },
   "mySettings": {
+    "appearance": {
+      "dark": "Ciemny",
+      "hint": "Jasny lub ciemny motyw aplikacji.",
+      "light": "Jasny",
+      "title": "Wygląd"
+    },
     "delete": "Usuń",
     "manual": {
       "hint": "Interaktywna instrukcja CRMtree ze zrzutami ekranu. Otworzy się w nowej karcie.",

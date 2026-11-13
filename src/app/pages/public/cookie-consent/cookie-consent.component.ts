@@ -40,7 +40,7 @@ const CONSENT_KEY = 'crmtree_cookie_consent';
       border:none; border-radius:8px; padding:0.5rem 1rem; font-weight:600; cursor:pointer; font-size:0.85rem;
     }
     .btn-ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.3); }
-    .btn-accent { background:var(--orange); color:#fff; }
+    .btn-accent { background:var(--orange-strong); color:#fff; }
   `],
 })
 export class CookieConsentComponent {

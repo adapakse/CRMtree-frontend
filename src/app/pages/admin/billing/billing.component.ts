@@ -208,7 +208,7 @@ interface InvoiceListResponse {
   `,
   styles: [`
     .page { padding: 0; }
-    .page-header { display: flex; align-items: center; height: 60px; padding: 0 24px; background: white; border-bottom: 1px solid var(--gray-200); }
+    .page-header { display: flex; align-items: center; height: 60px; padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--gray-200); }
     .page-header > div { display: flex; align-items: baseline; gap: 12px; }
     .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); margin: 0; }
     .page-sub   { font-size: 12px; color: var(--gray-500); margin: 0; }
@@ -216,13 +216,13 @@ interface InvoiceListResponse {
     .state-msg { color: var(--gray-500); font-size: 14px; padding: 24px 0; text-align: center; }
 
     .toolbar {
-      display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; background: white;
+      display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; background: var(--surface);
       border-radius: 14px; padding: 12px 18px; margin-bottom: 16px; box-shadow: var(--shadow-sm);
     }
     .field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
     .field select { height: 36px; min-width: 180px; box-sizing: border-box; }
 
-    .table-wrap { overflow-x: auto; background: white; border-radius: 12px; box-shadow: var(--shadow-sm); }
+    .table-wrap { overflow-x: auto; background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); }
     .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .data-table th {
       background: var(--gray-50); padding: 10px 14px; text-align: left;
@@ -236,7 +236,7 @@ interface InvoiceListResponse {
     .td-muted { color: var(--gray-500); font-size: 14px; }
 
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .badge-on  { background: #dcfce7; color: #16a34a; }
+    .badge-on  { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
     .badge-off { background: var(--gray-100); color: var(--gray-500); }
 
     .btn-icon {
@@ -252,14 +252,14 @@ interface InvoiceListResponse {
 
     .field input:not([type=checkbox]), .field textarea {
       width: 100%; padding: 8px 12px; border: 1px solid var(--gray-200);
-      border-radius: 10px; font-size: 14px; background: white; box-sizing: border-box; font-family: inherit;
+      border-radius: 10px; font-size: 14px; background: var(--surface); box-sizing: border-box; font-family: inherit;
     }
     .field input:not([type=checkbox]) { height: 36px; }
     .field input:focus, .field textarea:focus { outline: none; border-color: var(--orange); }
     .field textarea { resize: vertical; }
 
     .seller-panel {
-      background: white; border-radius: 12px; box-shadow: var(--shadow-sm);
+      background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm);
       padding: 20px; margin-bottom: 16px;
     }
     .seller-panel-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
@@ -272,15 +272,15 @@ interface InvoiceListResponse {
 
     .td-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
-    .btn-icon.btn-danger-icon { color: #dc2626; }
-    .btn-icon.btn-danger-icon:hover { background: #fee2e2; color: #b91c1c; }
+    .btn-icon.btn-danger-icon { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .btn-icon.btn-danger-icon:hover { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
 
     /* Modal */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,.45);
       display: flex; align-items: center; justify-content: center; z-index: 1000;
     }
-    .modal { background: white; border-radius: 16px; width: 480px; max-width: 95vw; box-shadow: 0 12px 39px rgba(0,0,0,0.163); }
+    .modal { background: var(--surface); border-radius: 16px; width: 480px; max-width: 95vw; box-shadow: 0 12px 39px rgba(0,0,0,0.163); }
     .modal-sm { width: 360px; }
     .modal-header {
       display: flex; align-items: center; justify-content: space-between;

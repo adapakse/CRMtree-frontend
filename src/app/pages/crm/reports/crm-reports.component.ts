@@ -103,12 +103,12 @@ interface KpiData {
     <!-- ── KPI row — dane CRM (leady) ── -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-val" style="color:var(--orange)">{{ formatPLN(kpi.pipeline) }}</div>
+        <div class="stat-val" style="color: var(--orange-text)">{{ formatPLN(kpi.pipeline) }}</div>
         <div class="stat-lbl">{{ t('leadsList.stats.pipeline') }}</div>
         <div class="stat-trend trend-up">{{ t('reports.overview.kpi.activePipeline') }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val" style="color:#22C55E">{{ formatPLN(kpi.won) }}</div>
+        <div class="stat-val" style="color:color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)">{{ formatPLN(kpi.won) }}</div>
         <div class="stat-lbl">{{ t('reports.common.kpi.wonPln') }}</div>
         <div class="stat-trend trend-up" *ngIf="kpi.won > 0">✓ {{ t('reports.overview.kpi.wonContracts') }}</div>
         <div class="stat-trend" *ngIf="kpi.won === 0" style="color:var(--gray-400)">{{ t('reports.overview.kpi.noneInPeriod') }}</div>
@@ -135,29 +135,29 @@ interface KpiData {
     <!-- ── KPI row — dane zewnętrzne (obrót) — widoczne gdy są dane ── -->
     <div class="stats-row" *ngIf="salesSummary.length > 0">
       <div class="stat-card">
-        <div class="stat-val" style="color:#0EA5E9">{{ formatPLN(extKpi.grossTurnover) }}</div>
+        <div class="stat-val" style="color:color-mix(in srgb, #0ea5e9 var(--tint-text-mix), #FFFFFF)">{{ formatPLN(extKpi.grossTurnover) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.grossTurnoverPln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ t('reports.overview.external.source') }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ t('reports.overview.external.source') }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val" style="color:#0284C7">{{ formatPLN(extKpi.netTurnover) }}</div>
+        <div class="stat-val" style="color:color-mix(in srgb, #0284c7 var(--tint-text-mix), #FFFFFF)">{{ formatPLN(extKpi.netTurnover) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.netTurnoverPln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.margin', { value: (extKpi.netTurnover/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.margin', { value: (extKpi.netTurnover/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val" style="color:#7C3AED">{{ formatPLN(extKpi.fees) }}</div>
+        <div class="stat-val" style="color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF)">{{ formatPLN(extKpi.fees) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.feesPln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.feeRate', { value: (extKpi.fees/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.feeRate', { value: (extKpi.fees/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val" style="color:#059669">{{ formatPLN(extKpi.revenue) }}</div>
+        <div class="stat-val" style="color:color-mix(in srgb, #059669 var(--tint-text-mix), #FFFFFF)">{{ formatPLN(extKpi.revenue) }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.revenuePln') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.share', { value: (extKpi.revenue/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ extKpi.grossTurnover > 0 ? t('reports.overview.external.share', { value: (extKpi.revenue/extKpi.grossTurnover*100|number:'1.0-1') }) : '—' }}</div>
       </div>
       <div class="stat-card">
         <div class="stat-val">{{ extKpi.transactions | number }}</div>
         <div class="stat-lbl">{{ t('reports.overview.external.transactions') }}</div>
-        <div class="stat-trend" style="color:#64748B">{{ t('reports.overview.external.productsCount', { count: extKpi.pax }) }}</div>
+        <div class="stat-trend" style="color:var(--gray-500)">{{ t('reports.overview.external.productsCount', { count: extKpi.pax }) }}</div>
       </div>
     </div>
 
@@ -202,12 +202,12 @@ interface KpiData {
           <div class="card-title">{{ t('reports.overview.chart.title') }}</div>
           <div class="chart-legend">
             <span><span class="leg-dot" style="background:var(--orange)"></span>{{ t('reports.common.columns.won') }}</span>
-            <span><span class="leg-dot" style="background:#BFDBFE"></span>{{ t('reports.common.columns.pipeline') }}</span>
+            <span><span class="leg-dot" style="background:color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface))"></span>{{ t('reports.common.columns.pipeline') }}</span>
           </div>
         </div>
         <div class="bar-chart">
           <div *ngFor="let d of monthly" class="bar-col">
-            <div class="bar-won-lbl" *ngIf="d.won > 0" style="color:var(--orange)">{{ (d.won/1000).toFixed(0) }}k</div>
+            <div class="bar-won-lbl" *ngIf="d.won > 0" style="color: var(--orange-text)">{{ (d.won/1000).toFixed(0) }}k</div>
             <div class="bar-won-lbl" *ngIf="!d.won"></div>
             <div class="bar-bars">
               <div class="bar-pipe" [style.height.px]="barH(d.pipe)" [title]="t('reports.overview.chart.pipelineTooltip', { value: (d.pipe/1000).toFixed(0) })"></div>
@@ -222,7 +222,7 @@ interface KpiData {
         <!-- Projected -->
         <div class="proj-box" *ngIf="projected > 0">
           <span>📈 {{ t('reports.overview.chart.projectedWeighted') }}</span>
-          <strong style="color:var(--orange)">{{ formatPLN(projected) }} PLN</strong>
+          <strong style="color: var(--orange-text)">{{ formatPLN(projected) }} PLN</strong>
         </div>
       </div>
     </div>
@@ -234,7 +234,7 @@ interface KpiData {
       <div class="card" style="padding:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div class="card-title">{{ t('reports.common.salespeopleResults') }}</div>
-          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:#0EA5E9;display:inline-flex;align-items:center;gap:4px">📥 {{ t('reports.overview.external.source') }}</span>
+          <span class="mini-lbl" *ngIf="salesByPerson.length > 0" style="color:color-mix(in srgb, #0ea5e9 var(--tint-text-mix), #FFFFFF);display:inline-flex;align-items:center;gap:4px">📥 {{ t('reports.overview.external.source') }}</span>
         </div>
 
         <!-- Tabela z danych zewnętrznych (gdy dostępne) -->
@@ -259,16 +259,16 @@ interface KpiData {
                   </div>
                 </td>
                 <td class="tr" style="color:var(--gray-600)">{{ s.partners_count }}</td>
-                <td class="tr" style="font-weight:600;color:#0EA5E9;font-family:'Sora',sans-serif">
+                <td class="tr" style="font-weight:600;color:color-mix(in srgb, #0ea5e9 var(--tint-text-mix), #FFFFFF);font-family:'Sora',sans-serif">
                   {{ s.gross_turnover_pln ? (s.gross_turnover_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
                 <td class="tr" style="color:var(--gray-600)">
                   {{ s.net_turnover_pln ? (s.net_turnover_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
-                <td class="tr" style="color:#7C3AED">
+                <td class="tr" style="color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF)">
                   {{ s.fees_pln ? (s.fees_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
-                <td class="tr" style="color:#059669;font-weight:600">
+                <td class="tr" style="color:color-mix(in srgb, #059669 var(--tint-text-mix), #FFFFFF);font-weight:600">
                   {{ s.revenue_pln ? (s.revenue_pln/1000|number:'1.0-0')+'k' : '—' }}
                 </td>
               </tr>
@@ -298,13 +298,13 @@ interface KpiData {
                   </div>
                 </td>
                 <td class="tr" style="color:var(--gray-600)">{{ s.leads }}</td>
-                <td class="tr" style="font-weight:600;color:var(--orange);font-family:'Sora',sans-serif">
+                <td class="tr" style="font-weight:600;color: var(--orange-text);font-family:'Sora',sans-serif">
                   {{ s.pipeline ? (s.pipeline/1000).toFixed(0)+'k' : '—' }}
                 </td>
-                <td class="tr" [style.color]="s.won > 0 ? '#22C55E' : 'var(--gray-300)'" style="font-weight:600">
+                <td class="tr" [style.color]="s.won > 0 ? 'color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)' : 'var(--gray-300)'" style="font-weight:600">
                   {{ s.won > 0 ? (s.won/1000).toFixed(0)+'k' : '—' }}
                 </td>
-                <td class="tr" [style.color]="s.winPct >= 40 ? '#22C55E' : 'var(--gray-500)'">{{ s.winPct }}%</td>
+                <td class="tr" [style.color]="s.winPct >= 40 ? 'color-mix(in srgb, #22c55e var(--tint-text-mix), #FFFFFF)' : 'var(--gray-500)'">{{ s.winPct }}%</td>
                 <td>
                   <div class="prog-bar">
                     <div class="prog-fill" [style.width.%]="s.progress"
@@ -399,11 +399,11 @@ interface KpiData {
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-    #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
+    #topbar { height:60px; background:var(--surface); border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
     .page-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); }
     .tsp { flex:1; }
     /* Filter card under the title bar — same as the leads list (shadow/radius/padding from global .toolbar). */
-    .toolbar { background:white; display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; flex-shrink:0; }
+    .toolbar { background:var(--surface); display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; flex-shrink:0; }
     input[type=search], input[type=month] { height:36px; box-sizing:border-box; }
 
     #content { flex:1; overflow-y:auto; padding:20px 24px 24px; display:flex; flex-direction:column; gap:16px; }
@@ -413,7 +413,7 @@ interface KpiData {
     .stat-val { font-family:'Sora',sans-serif; font-size:22px; font-weight:700; color:var(--gray-900); }
     .stat-lbl { font-size:12px; color:var(--gray-400); font-weight:500; margin-top:2px; }
     .stat-trend { font-size:12px; margin-top:4px; font-weight:600; }
-    .trend-up { color:#16A34A; } .trend-dn { color:#DC2626; }
+    .trend-up { color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); } .trend-dn { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
 
     /* Layout */
     .chart-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -448,7 +448,7 @@ interface KpiData {
     .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:2px; }
     .bar-won-lbl { font-size:10px; font-weight:700; min-height:14px; display:flex; align-items:flex-end; }
     .bar-bars { display:flex; gap:2px; align-items:flex-end; justify-content:center; width:100%; }
-    .bar-pipe { flex:1; background:#BFDBFE; border-radius:3px 3px 0 0; min-height:4px; }
+    .bar-pipe { flex:1; background:color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius:3px 3px 0 0; min-height:4px; }
     .bar-win  { flex:1; background:var(--orange); border-radius:3px 3px 0 0; min-height:4px; }
     .bar-win.empty { flex:1; }
     .bar-labels { display:flex; gap:6px; margin-top:6px; }
@@ -478,8 +478,8 @@ interface KpiData {
     @keyframes spin { to { transform:rotate(360deg); } }
 
     /* Data source banner */
-    .data-source-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:12px; padding:8px 16px; font-size:12px; color:#1E40AF; display:flex; align-items:center; gap:8px; flex-shrink:0; }
-    .btn-link { background:none; border:none; color:#2563EB; font-size:12px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; font-family:inherit; margin-left:auto; }
+    .data-source-banner { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius:12px; padding:8px 16px; font-size:12px; color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .btn-link { background:none; border:none; color:color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF); font-size:12px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; font-family:inherit; margin-left:auto; }
   `],
 })
 export class CrmReportsComponent implements OnInit {

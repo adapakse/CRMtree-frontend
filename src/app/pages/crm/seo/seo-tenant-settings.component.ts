@@ -58,7 +58,7 @@ import { ToastService } from '../../../core/services/toast.service';
     </ng-container>
   `,
   styles: [`
-    .settings-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: #fff; }
+    .settings-box { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; background: var(--surface); }
     .settings-box > .btn, .superadmin-box .btn { margin-top: 0.9rem; }
     .settings-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .hint { font-size: 0.78rem; color: var(--gray-500); margin: 0 0 0.75rem; }

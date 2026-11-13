@@ -14,6 +14,12 @@
     "unknownDevice": "Neznana naprava"
   },
   "mySettings": {
+    "appearance": {
+      "dark": "Temna",
+      "hint": "Svetla ali temna tema aplikacije.",
+      "light": "Svetla",
+      "title": "Videz"
+    },
     "delete": "Izbriši",
     "manual": {
       "hint": "Interaktivni priročnik CRMtree s posnetki zaslona. Odpre se v novem zavihku.",

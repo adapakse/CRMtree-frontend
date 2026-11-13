@@ -86,7 +86,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 <!-- Grant widoczności NIE jest przynależnością do grupy — osobna
                      pigułka, żeby admin nie pomylił jej z rolą grupową. -->
                 @for (grant of user.visibility_grants ?? []; track grant.id) {
-                  <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
+                  <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF);padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap"
                         [title]="grantTooltip(grant)">
                     👁 {{ grant.group_display || grant.group_name }}
                     <span style="opacity:.7">{{ grant.access_level }}</span>
@@ -96,9 +96,9 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
             </div>
             <div class="td">
               @if (user.crm_role === 'sales_manager') {
-                <span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.managerShort') }}</span>
+                <span style="font-size:10px;background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.managerShort') }}</span>
               } @else if (user.crm_role === 'salesperson') {
-                <span style="font-size:10px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.salespersonShort') }}</span>
+                <span style="font-size:10px;background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap">{{ t('users.crmRoles.salespersonShort') }}</span>
               } @else {
                 <span style="font-size:12px;color:var(--gray-300)">—</span>
               }
@@ -149,17 +149,17 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
           <div style="padding:24px">
             <div class="fgrid">
               <div class="fg">
-                <label class="fl">{{ t('users.fields.firstName') }} <span style="color:var(--orange)">*</span></label>
+                <label class="fl">{{ t('users.fields.firstName') }} <span style="color: var(--orange-text)">*</span></label>
                 <input class="fi" [(ngModel)]="newFirst" [placeholder]="t('users.create.firstNamePlaceholder')" [class.fi-err]="submitted && !newFirst">
                 @if (submitted && !newFirst) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg">
-                <label class="fl">{{ t('users.fields.lastName') }} <span style="color:var(--orange)">*</span></label>
+                <label class="fl">{{ t('users.fields.lastName') }} <span style="color: var(--orange-text)">*</span></label>
                 <input class="fi" [(ngModel)]="newLast" [placeholder]="t('users.create.lastNamePlaceholder')" [class.fi-err]="submitted && !newLast">
                 @if (submitted && !newLast) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
               <div class="fg" style="grid-column:1/-1">
-                <label class="fl">{{ t('users.fields.email') }} <span style="color:var(--orange)">*</span></label>
+                <label class="fl">{{ t('users.fields.email') }} <span style="color: var(--orange-text)">*</span></label>
                 <input class="fi" type="email" [(ngModel)]="newEmail" [placeholder]="t('users.create.emailPlaceholder')" [class.fi-err]="submitted && !newEmail">
                 @if (submitted && !newEmail) { <span class="ferr">{{ t('users.fields.required') }}</span> }
               </div>
@@ -441,7 +441,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
                 </div>
                 <div style="flex:1;background:var(--orange-pale);border-radius:12px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
                   <span style="font-size:12px;font-weight:700;color:var(--orange-dark)">{{ t('users.budgets.annualTotal') }}</span>
-                  <span style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--orange)">{{ budgetAnnualTotal | number:'1.0-0' }} {{ budgetCurrency }}</span>
+                  <span style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color: var(--orange-text)">{{ budgetAnnualTotal | number:'1.0-0' }} {{ budgetCurrency }}</span>
                 </div>
               </div>
 
@@ -577,14 +577,14 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
 </ng-container>
   `,
   styles: [`
-    #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
+    #topbar { height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
     .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900); }
     .tsp { flex:1; }
     .srch-wrap { position:relative;display:flex;align-items:center; }
     .srch-wrap svg { position:absolute;left:10px;width:15px;height:15px;color:var(--gray-400);pointer-events:none; }
     #content { flex:1;overflow-y:auto;padding:24px; }
     .filter-select { width:auto; min-width:200px; }
-    .filters { display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 18px;margin-bottom:16px;background:white;border-radius:var(--radius);box-shadow:var(--shadow-sm); }
+    .filters { display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 18px;margin-bottom:16px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm); }
     .thead { display:grid;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:0 16px; }
     .th { padding:10px 8px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);display:flex;align-items:center;gap:4px; }
     .sortable { cursor:pointer;user-select:none; }
@@ -594,8 +594,8 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .tr:hover { background:var(--gray-50); }
     .td { padding:12px 8px;font-size:14px;color:var(--gray-700);overflow:hidden; }
     .overlay { position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:flex-end; }
-    .panel { width:580px;height:100vh;background:white;box-shadow:var(--shadow-lg);overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .2s ease; }
-    .ph { padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;background:white;position:sticky;top:0;z-index:1; }
+    .panel { width:580px;height:100vh;background:var(--surface);box-shadow:var(--shadow-lg);overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .2s ease; }
+    .ph { padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;background:var(--surface);position:sticky;top:0;z-index:1; }
     .pt { font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-900); }
     .ps { font-size:12px;color:var(--gray-500);margin-top:2px; }
     .pc { margin-left:auto;cursor:pointer;color:var(--gray-400);padding:4px;border-radius:6px; }
@@ -603,7 +603,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .pb { padding:24px;flex:1; }
     .pf { padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:8px;justify-content:flex-end;background:var(--gray-50);position:sticky;bottom:0; }
     .mol { position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px); }
-    .mo { background:white;border-radius:12px;width:540px;max-width:95vw;box-shadow:var(--shadow-lg);overflow:hidden; }
+    .mo { background:var(--surface);border-radius:12px;width:540px;max-width:95vw;box-shadow:var(--shadow-lg);overflow:hidden; }
     .moh { padding:20px 24px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px; }
     .moico { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
     .mot { font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-900); }
@@ -615,7 +615,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .check-field { grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--gray-800);cursor:pointer; }
     .fl { font-size:12px;font-weight:600;color:var(--gray-600); }
     .fi-err { border-color:#ef4444 !important; }
-    .ferr { font-size:14px;color:#ef4444; }
+    .ferr { font-size:14px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF); }
     .sec-title { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-500);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--gray-100); }
   `],
 })

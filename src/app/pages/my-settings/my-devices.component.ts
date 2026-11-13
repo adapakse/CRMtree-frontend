@@ -52,17 +52,17 @@ interface SignedInDevice {
   `,
   styles: [`
     .devices-card { padding: 24px; }
-    h2 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #333333; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
-    .hint { font-size: 12px; color: #6b7280; margin: 0 0 20px; line-height: 1.5; }
-    .empty { font-size: 14px; color: #71717a; margin: 0; }
+    h2 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-800); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+    .hint { font-size: 12px; color: var(--gray-500); margin: 0 0 20px; line-height: 1.5; }
+    .empty { font-size: 14px; color: var(--gray-500); margin: 0; }
     .device-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
     .device-row {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
       background: var(--gray-50); border-radius: 12px; padding: 12px 16px;
     }
     .device-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-    .device-name { font-size: 14px; font-weight: 600; color: #333333; }
-    .device-meta { font-size: 12px; color: #71717a; }
+    .device-name { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+    .device-meta { font-size: 12px; color: var(--gray-500); }
   `],
 })
 export class MyDevicesComponent implements OnInit {

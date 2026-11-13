@@ -79,7 +79,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                   <span>{{ t('labels.from', { name: task.assigner_name }) }}</span>
                   @if (task.group_name) { <span>· {{ task.group_name }}</span> }
                   @if (task.due_date) {
-                    <span [style.color]="isDue(task.due_date) ? '#DC2626' : '#065F46'">
+                    <span [style.color]="isDue(task.due_date) ? 'color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)' : 'color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF)'">
                       · ⏰ {{ task.due_date | date:'dd.MM.yy' }}
                     </span>
                     <wt-add-to-calendar [entry]="calendarEntryOf(task)" (click)="$event.stopPropagation(); $event.preventDefault()" />
@@ -159,7 +159,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
                         }
                         {{ t(doc.doc_type === 'invoice' ? 'workflow.kanban.paymentDue' : 'workflow.kanban.expires', { date: (doc.expiration_date | date:'dd.MM.yy') }) }}
                         @if (isExpiringSoon(doc.expiration_date) && !isExpired(doc.expiration_date)) {
-                          <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:999px;padding:1px 6px;font-weight:600">{{ t('workflow.kanban.soon') }}</span>
+                          <span style="font-size:10px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF);border-radius:999px;padding:1px 6px;font-weight:600">{{ t('workflow.kanban.soon') }}</span>
                         }
                       </div>
                     }
@@ -200,7 +200,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
     </ng-container>
   `,
   styles: [`
-    #topbar { height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
+    #topbar { height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0; }
     .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900); }
     .tsp { flex:1; }
     #content { flex:1;overflow-y:auto;padding:20px 24px 24px; }
@@ -213,19 +213,19 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
     /* ── Kanban task row ── */
     .ktask-row {
       display: flex; align-items: center; gap: 4px;
-      background: #FFF8F0; border: 1px solid #FDDBB4;
+      background: var(--gray-50); border: 1px solid color-mix(in srgb, #fddbb4 var(--tint-mix), var(--surface));
       border-radius: 5px; padding: 4px 6px;
     }
-    .ktask-name { font-size: 10px; font-weight: 600; color: #92400E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ktask-from { font-size: 10px; color: #B45309; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60px; flex-shrink: 0; }
-    .ktask-due  { font-size: 10px; font-weight: 700; color: #065F46; white-space: nowrap; flex-shrink: 0; }
-    .ktask-due.overdue { color: #DC2626; }
+    .ktask-name { font-size: 10px; font-weight: 600; color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ktask-from { font-size: 10px; color: color-mix(in srgb, #b45309 var(--tint-text-mix), #FFFFFF); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60px; flex-shrink: 0; }
+    .ktask-due  { font-size: 10px; font-weight: 700; color: color-mix(in srgb, #065f46 var(--tint-text-mix), #FFFFFF); white-space: nowrap; flex-shrink: 0; }
+    .ktask-due.overdue { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
 
     /* ── Kanban task type badges ── */
     .kbadge { display: inline-flex; align-items: center; font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
-    .kbadge-sign    { background: #EDE9FE; color: #5B21B6; }
-    .kbadge-edit    { background: #DBEAFE; color: #1E40AF; }
-    .kbadge-approve { background: #FEF3C7; color: #92400E; }
+    .kbadge-sign    { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color: color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF); }
+    .kbadge-edit    { background: color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color: color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .kbadge-approve { background: color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
     .kbadge-read    { background: var(--gray-100); color: var(--gray-600); }
   `],
 })

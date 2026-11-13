@@ -58,7 +58,7 @@ import { ProjectFinanceFormatService } from '../../core/services/project-finance
     .tile-line { font-size:12px; color:var(--gray-500); font-variant-numeric:tabular-nums; }
     .tile-line strong { color:var(--gray-800); font-weight:600; }
     .tile-line.minor { font-size:12px; }
-    .danger, .tile-line strong.danger { color:#DC2626; }
+    .danger, .tile-line strong.danger { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
   `],
 })
 export class ProjectFinanceSummaryComponent {

@@ -274,52 +274,52 @@ import { localizedApiErrorMessage } from '../../../core/services/api-error.util'
     .import-page { padding:20px; max-width:1100px; height:100%; overflow-y:auto; box-sizing:border-box; }
     .import-header { margin-bottom:24px; }
     .import-header h1 { font-size:20px; font-weight:700; margin:0 0 4px; }
-    .sub { color:#6b7280; font-size:14px; margin:0; }
+    .sub { color:var(--gray-500); font-size:14px; margin:0; }
     .import-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:32px; }
-    .field-list span.hint { background:#fef9c3; color:#713f12; cursor:help; border:1px dashed #fcd34d; }
+    .field-list span.hint { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #713f12 var(--tint-text-mix), #FFFFFF); cursor:help; border:1px dashed #fcd34d; }
     @media(max-width:720px) { .import-cards { grid-template-columns:1fr; } }
-    .import-card { background:white; border:none; border-radius:12px; box-shadow:var(--shadow-sm); padding:24px; display:flex; flex-direction:column; gap:12px; }
+    .import-card { background:var(--surface); border:none; border-radius:12px; box-shadow:var(--shadow-sm); padding:24px; display:flex; flex-direction:column; gap:12px; }
     .card-icon { font-size:28px; }
     .import-card h2 { font-size:16px; font-weight:700; margin:0; }
-    .card-desc { font-size:12px; color:#6b7280; margin:0; line-height:1.5; }
-    .field-hint { font-size:12px; color:#6b7280; background:#f9fafb; border-radius:6px; padding:6px 10px; } .field-hint code { font-family:monospace; background:#f3f4f6; padding:1px 4px; border-radius:3px; }
+    .card-desc { font-size:12px; color:var(--gray-500); margin:0; line-height:1.5; }
+    .field-hint { font-size:12px; color:var(--gray-500); background:var(--gray-50); border-radius:6px; padding:6px 10px; } .field-hint code { font-family:monospace; background:var(--gray-100); padding:1px 4px; border-radius:3px; }
     .field-list { display:flex; flex-wrap:wrap; gap:4px; }
-    .field-list span { background:#f3f4f6; border-radius:6px; padding:2px 8px; font-size:12px; font-family:monospace; }
-    .field-list span.required { background:#fef3c7; color:#92400e; font-weight:700; }
-    .field-list span.key { background:#dbeafe; color:#1e40af; font-weight:700; }
-    .card-icon svg { width:28px; height:28px; color:var(--orange); }
-    .drop-zone { background:var(--gray-50); border:1.5px dashed var(--gray-300); border-radius:14px; padding:28px; text-align:center; cursor:pointer; font-size:12px; color:#9ca3af; transition:.2s; }
-    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--orange); color:var(--orange); background:var(--orange-pale); }
-    .drop-zone.uploading { border-color:var(--orange); background:var(--orange-pale); color:var(--orange); }
+    .field-list span { background:var(--gray-100); border-radius:6px; padding:2px 8px; font-size:12px; font-family:monospace; }
+    .field-list span.required { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .field-list span.key { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); font-weight:700; }
+    .card-icon svg { width:28px; height:28px; color: var(--orange-text); }
+    .drop-zone { background:var(--gray-50); border:1.5px dashed var(--gray-300); border-radius:14px; padding:28px; text-align:center; cursor:pointer; font-size:12px; color:var(--gray-400); transition:.2s; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--orange); color: var(--orange-text); background:var(--orange-pale); }
+    .drop-zone.uploading { border-color:var(--orange); background:var(--orange-pale); color: var(--orange-text); }
     .result-panel { background:var(--gray-50); border:none; border-radius:12px; padding:14px; }
     .result-stats { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
     .stat { font-size:12px; font-weight:700; padding:4px 10px; border-radius:8px; }
-    .stat.green { background:#dcfce7; color:#166534; }
-    .stat.gray { background:#f3f4f6; color:#374151; }
-    .stat.red { background:#fee2e2; color:#991b1b; }
-    .stat.muted { background:#f9fafb; color:#6b7280; }
+    .stat.green { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
+    .stat.gray { background:var(--gray-100); color:var(--gray-700); }
+    .stat.red { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .stat.muted { background:var(--gray-50); color:var(--gray-500); }
     .errors-table { width:100%; border-collapse:collapse; font-size:12px; }
-    .errors-table th { text-align:left; padding:4px 8px; color:#9ca3af; font-weight:600; border-bottom:1px solid #f3f4f6; }
-    .errors-table td { padding:4px 8px; border-bottom:1px solid #f9fafb; vertical-align:top; }
-    .err-msg { color:#dc2626; }
+    .errors-table th { text-align:left; padding:4px 8px; color:var(--gray-400); font-weight:600; border-bottom:1px solid var(--gray-100); }
+    .errors-table td { padding:4px 8px; border-bottom:1px solid var(--gray-50); vertical-align:top; }
+    .err-msg { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
     .history-section { margin-top:8px; }
     .history-section h3 { font-size:16px; font-weight:700; margin:0 0 12px; }
     .history-table { width:100%; border-collapse:collapse; font-size:14px; }
-    .history-table th { text-align:left; padding:8px 12px; font-size:12px; color:#6b7280; border-bottom:2px solid #f3f4f6; white-space:nowrap; }
-    .history-table td { padding:8px 12px; border-bottom:1px solid #f3f4f6; vertical-align:middle; }
+    .history-table th { text-align:left; padding:8px 12px; font-size:12px; color:var(--gray-500); border-bottom:2px solid var(--gray-100); white-space:nowrap; }
+    .history-table td { padding:8px 12px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
     .type-badge { padding:2px 8px; border-radius:8px; font-size:12px; font-weight:700; }
-    .type-leads { background:#dbeafe; color:#1e40af; }
-    .type-partners { background:#dcfce7; color:#166534; }
-    .type-sales { background:#fef3c7; color:#92400e; }
-    .type-docs { background:#f3e8ff; color:#6b21a8; }
-    .filename { font-size:12px; color:#374151; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .type-leads { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .type-partners { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
+    .type-sales { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
+    .type-docs { background:color-mix(in srgb, #f3e8ff var(--tint-mix), var(--surface)); color:color-mix(in srgb, #6b21a8 var(--tint-text-mix), #FFFFFF); }
+    .filename { font-size:12px; color:var(--gray-700); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .num { text-align:right; }
-    .has-errors { color:#dc2626; font-weight:700; }
+    .has-errors { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-weight:700; }
     .status-dot { font-size:12px; font-weight:600; }
-    .status-dot.done { color:#16a34a; }
-    .status-dot.error { color:#dc2626; }
-    .muted { color:#9ca3af; font-size:12px; }
-    .empty { color:#9ca3af; padding:20px; text-align:center; }
+    .status-dot.done { color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF); }
+    .status-dot.error { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
+    .muted { color:var(--gray-400); font-size:12px; }
+    .empty { color:var(--gray-400); padding:20px; text-align:center; }
   `],
 })
 export class CrmImportComponent implements OnInit {

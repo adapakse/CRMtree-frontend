@@ -75,16 +75,16 @@ const TYPE_LABELS: Record<string, string> = {
 
   <!-- Launch success banner -->
   @if (launchResult()) {
-    <div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+    <div style="background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));border:1px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
       <span style="font-size:22px">🎉</span>
       <div style="flex:1">
-        <div style="font-weight:700;color:#166534;font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
-        <div style="font-size:12px;color:#4ade80;margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
+        <div style="font-weight:700;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);font-size:14px">{{ t('onboardingBoard.launch.successTitle', { company: launchResult()!.company }) }}</div>
+        <div style="font-size:12px;color:color-mix(in srgb, #4ade80 var(--tint-text-mix), #FFFFFF);margin-top:2px">{{ t('onboardingBoard.launch.successHint') }}</div>
       </div>
       <a [routerLink]="['/crm/partners', launchResult()!.id]" style="background:#3BAA5D;color:white;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none">
         → {{ t('onboardingBoard.launch.partnerProfile') }}
       </a>
-      <button (click)="launchResult.set(null)" style="background:none;border:none;color:#166534;font-size:18px;cursor:pointer;line-height:1">✕</button>
+      <button (click)="launchResult.set(null)" style="background:none;border:none;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);font-size:18px;cursor:pointer;line-height:1">✕</button>
     </div>
   }
 
@@ -135,7 +135,7 @@ const TYPE_LABELS: Record<string, string> = {
             <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
               @if (p.lead_id) {
                 <a [routerLink]="['/crm/leads', p.lead_id]" (click)="$event.stopPropagation()"
-                   style="font-size:12px;color:#3b82f6;font-weight:600;text-decoration:none;border:1px solid #bfdbfe;border-radius:6px;padding:4px 8px;background:#eff6ff">
+                   style="font-size:12px;color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF);font-weight:600;text-decoration:none;border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface));border-radius:6px;padding:4px 8px;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
                   🎯 {{ t('onboardingBoard.partners.leadData') }}
                 </a>
               }
@@ -389,7 +389,7 @@ const TYPE_LABELS: Record<string, string> = {
           </div>
           <!-- Przypisany -->
           <div class="fg full">
-            <label class="fl">{{ t('onboardingBoard.taskForm.assignedTo') }} <span style="color:var(--orange)">*</span></label>
+            <label class="fl">{{ t('onboardingBoard.taskForm.assignedTo') }} <span style="color: var(--orange-text)">*</span></label>
             <select class="fsel" [(ngModel)]="taskForm.assigned_to">
               <option value="">{{ t('onboardingBoard.taskForm.choosePerson') }}</option>
               @for (u of crmUsers; track u.id) {
@@ -429,7 +429,7 @@ const TYPE_LABELS: Record<string, string> = {
 </ng-container>
   `,
   styles: [`
-    #topbar { display:flex;align-items:center;gap:12px;height:60px;padding:0 24px;background:white;border-bottom:1px solid var(--gray-200);flex-shrink:0 }
+    #topbar { display:flex;align-items:center;gap:12px;height:60px;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--gray-200);flex-shrink:0 }
     .page-title { font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900);white-space:nowrap;display:inline-flex;align-items:center;gap:8px }
     .tsp { flex:1 }
 
@@ -439,16 +439,16 @@ const TYPE_LABELS: Record<string, string> = {
 
     /* Partners Grid */
     .partners-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px }
-    .partner-card { background:white;border-radius:var(--radius);padding:16px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .15s }
+    .partner-card { background:var(--surface);border-radius:var(--radius);padding:16px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .15s }
     .partner-card:hover { box-shadow:var(--shadow) }
     .pc-header { display:flex;align-items:flex-start;gap:10px;margin-bottom:12px }
-    .pc-icon { display:inline-flex;color:var(--orange) } .pc-icon svg { width:24px;height:24px }
+    .pc-icon { display:inline-flex;color: var(--orange-text) } .pc-icon svg { width:24px;height:24px }
     .pc-name { font-weight:700;font-size:16px }
     .pc-nip  { font-size:12px;color:var(--gray-400);font-family:monospace }
     .step-badge { background:var(--orange-pale);color:var(--orange-dark);border:1px solid var(--orange-muted);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;white-space:nowrap }
     .pc-progress { display:flex;gap:4px;margin-bottom:10px }
     .pc-step { flex:1;text-align:center;padding:6px 2px;border-radius:6px;background:var(--gray-100);font-size:10px;color:var(--gray-500) }
-    .pc-step.done   { background:#dcfce7;color:#166534 }
+    .pc-step.done   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF) }
     .pc-step.active { background:var(--orange-pale);color:var(--orange-dark);font-weight:700;border:1px solid var(--orange) }
     .pc-step-lbl { display:block;font-size:10px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
     .pc-tasks { display:flex;align-items:center;gap:8px;margin-bottom:6px }
@@ -462,7 +462,7 @@ const TYPE_LABELS: Record<string, string> = {
     .partners-toolbar { display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px }
 
     /* Partners table */
-    .pt-wrap { background:white;border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm) }
+    .pt-wrap { background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm) }
     .pt-head { display:grid;grid-template-columns:2fr 130px 160px 180px 140px 90px 150px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:0 12px }
     .pt-th { padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);display:flex;align-items:center;gap:4px }
     .pt-th.sortable { cursor:pointer;user-select:none }
@@ -485,12 +485,12 @@ const TYPE_LABELS: Record<string, string> = {
     /* Kanban */
     .kanban-wrap { display:flex;gap:16px;height:calc(100vh - 140px);overflow-x:auto }
     .kb-col { width:260px;flex-shrink:0;display:flex;flex-direction:column;background:var(--gray-50);border-radius:var(--radius);overflow:hidden }
-    .kb-head { display:flex;align-items:center;gap:6px;padding:10px 12px;background:white;border-bottom:1px solid var(--gray-200);font-weight:600;font-size:14px }
+    .kb-head { display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--gray-200);font-weight:600;font-size:14px }
     .kb-icon { font-size:16px }
     .kb-title { flex:1 }
     .kb-cnt { background:var(--gray-200);border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700 }
     .kb-cards { flex:1;overflow-y:auto;padding:8px }
-    .kb-card { background:white;border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .12s }
+    .kb-card { background:var(--surface);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .12s }
     .kb-card:hover { box-shadow:var(--shadow) }
     .kb-card.done { opacity:.6;background:var(--gray-50) }
     .kb-card-top { display:flex;align-items:center;gap:6px;margin-bottom:4px }
@@ -498,26 +498,26 @@ const TYPE_LABELS: Record<string, string> = {
     .kb-partner { flex:1;font-size:10px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
     .kb-card-title { font-size:12px;font-weight:600;color:var(--gray-800);margin-bottom:4px }
     .kb-due { font-size:12px;color:var(--gray-400) }
-    .kb-due.overdue { color:#ef4444;font-weight:600 }
+    .kb-due.overdue { color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);font-weight:600 }
     .kb-assignee { font-size:12px;color:var(--gray-400);margin-top:2px }
     .kb-empty { text-align:center;font-size:12px;color:var(--gray-400);padding:16px }
     .kb-add { width:100%;border:1px dashed var(--gray-300);background:none;border-radius:6px;padding:6px;font-size:12px;color:var(--gray-400);cursor:pointer;margin-top:4px }
     .kb-card-actions { display:flex;justify-content:flex-end;margin-top:4px }
     .kb-del-btn { background:none;border:none;font-size:12px;cursor:pointer;opacity:.3;padding:2px 4px;border-radius:4px }
-    .kb-del-btn:hover { opacity:1;background:#fee2e2 }
-    .kb-add:hover { border-color:var(--orange);color:var(--orange) }
-    .done-badge { background:#dcfce7;color:#166534;border-radius:4px;padding:1px 4px;font-size:10px;font-weight:700 }
+    .kb-del-btn:hover { opacity:1;background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)) }
+    .kb-add:hover { border-color:var(--orange);color: var(--orange-text) }
+    .done-badge { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);border-radius:4px;padding:1px 4px;font-size:10px;font-weight:700 }
 
     /* Timeline */
     .timeline-wrap { max-width:720px;margin:0 auto;padding-bottom:40px }
     .tl-group { margin-bottom:24px }
     .tl-date-label { display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px }
-    .tl-date-label.tl-today { color:var(--orange) }
+    .tl-date-label.tl-today { color: var(--orange-text) }
     .tl-date-label.tl-past  { color:var(--gray-300) }
     .tl-dot { width:10px;height:10px;border-radius:50%;background:var(--gray-300);flex-shrink:0 }
     .tl-today .tl-dot { background:var(--orange) }
-    .today-tag { background:var(--orange);color:white;border-radius:4px;padding:1px 6px;font-size:10px }
-    .tl-item { display:flex;gap:12px;padding:12px;background:white;border-radius:10px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .12s }
+    .today-tag { background:var(--orange-strong);color:white;border-radius:4px;padding:1px 6px;font-size:10px }
+    .tl-item { display:flex;gap:12px;padding:12px;background:var(--surface);border-radius:10px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .12s }
     .tl-item:hover { box-shadow:var(--shadow) }
     .tl-item.tl-done { opacity:.6 }
     .tl-time { font-size:12px;font-weight:700;color:var(--gray-600);width:44px;flex-shrink:0;padding-top:2px }
@@ -527,7 +527,7 @@ const TYPE_LABELS: Record<string, string> = {
     .tl-partner { font-weight:600;color:var(--gray-600) }
 
     /* Calendar */
-    .cal-wrap { background:white;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden }
+    .cal-wrap { background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden }
     .cal-nav { display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--gray-200) }
     .cal-month-label { font-size:16px;font-weight:700;flex:1;text-align:center }
     .cal-grid { display:grid;grid-template-columns:repeat(7,1fr) }
@@ -536,17 +536,17 @@ const TYPE_LABELS: Record<string, string> = {
     .cal-cell.cal-other { background:var(--gray-50) }
     .cal-cell.cal-today { background:var(--orange-pale) }
     .cal-day-num { font-size:12px;font-weight:600;color:var(--gray-400);margin-bottom:4px }
-    .cal-today .cal-day-num { color:var(--orange);font-weight:700 }
-    .cal-event { font-size:10px;padding:2px 4px;border-radius:4px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#eff6ff;color:#1d4ed8 }
+    .cal-today .cal-day-num { color: var(--orange-text);font-weight:700 }
+    .cal-event { font-size:10px;padding:2px 4px;border-radius:4px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF) }
     .cal-event.cal-done { opacity:.5;text-decoration:line-through }
-    .cal-step-0 { background:#fef3c7;color:#92400e }
-    .cal-step-1 { background:#ede9fe;color:#5b21b6 }
-    .cal-step-2 { background:#dcfce7;color:#166534 }
-    .cal-step-3 { background:#ffedd5;color:#9a3412 }
+    .cal-step-0 { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF) }
+    .cal-step-1 { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:color-mix(in srgb, #5b21b6 var(--tint-text-mix), #FFFFFF) }
+    .cal-step-2 { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF) }
+    .cal-step-3 { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface));color:color-mix(in srgb, #9a3412 var(--tint-text-mix), #FFFFFF) }
 
     /* Modal */
     .overlay { position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px) }
-    .modal { background:white;border-radius:14px;width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 39px rgba(0,0,0,0.13) }
+    .modal { background:var(--surface);border-radius:14px;width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 39px rgba(0,0,0,0.13) }
     .modal-head { display:flex;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid var(--gray-200) }
     .modal-title { font-size:16px;font-weight:700 }
     .dp-close { background:none;border:none;font-size:18px;color:var(--gray-400);cursor:pointer;margin-left:auto;line-height:1 }

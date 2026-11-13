@@ -73,7 +73,7 @@ const DEFAULT_COLOR = '#6B7280';
     .order { display:flex; flex-direction:column; width:22px; }
     .order-btn { border:none; background:none; font-size:8px; line-height:1; padding:2px; color:var(--gray-400); cursor:pointer; }
     .order-btn:disabled { opacity:.25; cursor:default; }
-    .color { width:34px; height:34px; padding:2px; border:1.5px solid var(--gray-200); border-radius:10px; background:white; cursor:pointer; flex-shrink:0; }
+    .color { width:34px; height:34px; padding:2px; border:1.5px solid var(--gray-200); border-radius:10px; background:var(--surface); cursor:pointer; flex-shrink:0; }
     .name { flex:1; }
     .category { width:160px; flex-shrink:0; }
     .active-toggle { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-600); white-space:nowrap; }

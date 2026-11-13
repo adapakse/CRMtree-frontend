@@ -312,7 +312,7 @@ const CREATE_PERMISSIONS: ProjectTaskPermissions = {
   styles: [PROJECTS_SHARED_STYLES, `
     :host { display:block; height:auto; }
     .overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:200; display:flex; justify-content:flex-end; }
-    .panel { width:620px; max-width:100vw; height:100%; background:white; display:flex; flex-direction:column; box-shadow:var(--shadow-lg); }
+    .panel { width:620px; max-width:100vw; height:100%; background:var(--surface); display:flex; flex-direction:column; box-shadow:var(--shadow-lg); }
     .panel-head { display:flex; align-items:flex-start; gap:12px; padding:18px 24px 14px; border-bottom:1px solid var(--gray-200); }
     .panel-body { flex:1; overflow-y:auto; padding:20px 24px; display:flex; flex-direction:column; gap:14px; }
     .panel-body > * { flex-shrink:0; }

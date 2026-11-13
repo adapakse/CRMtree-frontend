@@ -78,7 +78,7 @@ interface TaskCostRow {
   `,
   styles: [PROJECTS_SHARED_STYLES, PROJECT_FINANCE_STYLES, `
     .task { display:flex; align-items:baseline; gap:8px; color:var(--gray-800); font-size:14px; }
-    .task:hover { color:var(--orange); }
+    .task:hover { color: var(--orange-text); }
     .root-name { font-weight:600; }
   `],
 })

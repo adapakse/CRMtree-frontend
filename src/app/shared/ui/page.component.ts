@@ -24,7 +24,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .head {
       display: flex; align-items: center; gap: 12px; flex-shrink: 0;
       height: 60px; padding: 0 24px;
-      background: white; border-bottom: 1px solid var(--gray-200);
+      background: var(--surface); border-bottom: 1px solid var(--gray-200);
     }
     .title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 600; color: var(--gray-900); margin: 0; }
     .grow { flex: 1; }

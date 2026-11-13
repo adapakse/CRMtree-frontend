@@ -142,7 +142,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     /* ── Layout ─────────────────────────────────────────────────────── */
     .app-wrap { display: flex; height: calc(100vh - var(--test-banner-height, 0px)); overflow: hidden;
       /* Neutral grey a step darker than the content panel, so the panel sits in front. */
-      background: #EEEEF0; }
+      background: var(--frame-bg); }
 
     /* ── Sidebar: lies directly on the white frame; the grey content panel sits beside it ── */
     #sidebar {
@@ -170,6 +170,9 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     .s-mark { width: 36px; height: 36px; flex-shrink: 0; object-fit: contain; transition: opacity .12s; }
     /* Expanded: the full black logo; collapsed: only its tree (the mark button). */
     .s-logo-full { height: 52px; width: auto; margin-right: auto; object-fit: contain; }
+    /* The logo files are black; in the dark theme they turn white. */
+    :host-context([data-theme="dark"]) .s-logo-full,
+    :host-context([data-theme="dark"]) .s-mark { filter: invert(1); }
     .s-mark-btn { display: none; }
     #sidebar.collapsed .s-mark-btn { display: flex; }
     #sidebar.collapsed .s-head { justify-content: center; padding: 14px 0 10px; }
@@ -180,7 +183,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     .s-mark-btn { position: relative; padding: 0; border: none; background: none; border-radius: 10px; flex-shrink: 0; cursor: pointer; }
     .s-mark-expand {
       position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
-      border-radius: 10px; background: rgba(24,24,27,.08); color: #18181B;
+      border-radius: 10px; background: var(--hover-overlay); color: var(--ink-strong);
     }
     .s-mark-expand svg { width: 18px; height: 18px; }
     #sidebar.collapsed .s-mark-btn:hover .s-mark { opacity: 0; }
@@ -196,11 +199,11 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      color: #7B8494;
+      color: var(--nav-muted);
       flex-shrink: 0;
       transition: background .15s, color .15s;
     }
-    .toggle-btn:hover { background: rgba(24,24,27,.06); color: #18181B; }
+    .toggle-btn:hover { background: var(--hover-overlay); color: var(--ink-strong); }
     .toggle-btn.on, .toggle-btn.on:hover { background: var(--orange-pale); color: var(--orange-dark); }
     .toggle-btn svg { width: 18px; height: 18px; }
 
@@ -221,7 +224,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     .s-sec { padding: 0 10px; }
     .s-lbl {
       font-size: 12px; font-weight: 500;
-      color: #7B8494;
+      color: var(--nav-muted);
       padding: 16px 12px 6px;
       white-space: nowrap;
       max-height: 40px; overflow: hidden;
@@ -230,7 +233,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     #sidebar.collapsed .s-lbl { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
 
     .nav-sep { height: 0; margin: 0; }
-    #sidebar.collapsed .nav-sep { height: 1px; background: rgba(24,24,27,.08); margin: 8px 16px; }
+    #sidebar.collapsed .nav-sep { height: 1px; background: var(--hover-overlay); margin: 8px 16px; }
 
     /* ── Nav items ───────────────────────────────────────────────────── */
     .nav-item {
@@ -242,7 +245,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
       padding: 0 12px;
       border-radius: 10px;
       cursor: pointer;
-      color: #3F4654;
+      color: var(--nav-text);
       font-size: 14px;
       font-weight: 500;
       text-decoration: none;
@@ -251,12 +254,12 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
       white-space: nowrap;
       transition: background .12s, color .12s, padding .22s;
     }
-    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; color: #7B8494; stroke-width: 1.8; transition: color .12s; }
-    .nav-item:hover { background: rgba(24,24,27,.04); color: #18181B; }
-    .nav-item:hover svg { color: #3F4654; }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--nav-muted); stroke-width: 1.8; transition: color .12s; }
+    .nav-item:hover { background: var(--hover-overlay); color: var(--ink-strong); }
+    .nav-item:hover svg { color: var(--nav-text); }
     /* Active item: a white pill with a soft shadow; the icon in brand green. */
-    .nav-item.active { background: rgba(255,255,255,.9); color: #18181B; box-shadow: 0 0 0 1px rgba(24,24,27,.05), 0 1px 3px rgba(16,24,40,.07); }
-    .nav-item.active svg { color: var(--orange); }
+    .nav-item.active { background: var(--nav-active-bg); color: var(--ink-strong); box-shadow: var(--nav-active-shadow); }
+    .nav-item.active svg { color: var(--orange-text); }
 
     /* No browser focus box after a click; a soft green ring only for keyboard focus. */
     .nav-item:focus { outline: none; }
@@ -273,12 +276,12 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     .nav-edit .nav-eye {
       width: 26px; height: 26px; flex-shrink: 0; margin-right: -6px;
       display: flex; align-items: center; justify-content: center;
-      border: none; background: none; border-radius: 7px; cursor: pointer; color: #7B8494;
+      border: none; background: none; border-radius: 7px; cursor: pointer; color: var(--nav-muted);
     }
-    .nav-edit .nav-eye:hover { background: rgba(24,24,27,.07); color: #18181B; }
+    .nav-edit .nav-eye:hover { background: var(--hover-overlay); color: var(--ink-strong); }
     .nav-edit .nav-eye svg { width: 16px; height: 16px; color: inherit; }
     .nav-edit.is-hidden .nav-label, .nav-edit.is-hidden > svg { opacity: .4; }
-    .nav-edit.cdk-drag-preview { background: #FFFFFF; cursor: grabbing; box-shadow: 0 8px 20px rgba(16,24,40,.14), 0 0 0 1px rgba(24,24,27,.05); }
+    .nav-edit.cdk-drag-preview { background: var(--surface); cursor: grabbing; box-shadow: 0 8px 20px rgba(16,24,40,.14), 0 0 0 1px rgba(24,24,27,.05); }
     .nav-edit.cdk-drag-placeholder { opacity: .3; }
     .nav-edit.cdk-drag-animating,
     .s-items.cdk-drop-list-dragging .nav-edit:not(.cdk-drag-placeholder) { transition: transform .2s cubic-bezier(0,0,.2,1); }
@@ -295,11 +298,11 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     /* ── Badge ───────────────────────────────────────────────────────── */
     .nbadge {
       margin-left: auto;
-      background: var(--orange); color: #FFFFFF;
+      background: var(--orange-strong); color: #FFFFFF;
       font-size: 11px; font-weight: 600;
       padding: 1px 7px; border-radius: 10px;
     }
-    .nav-item.active .nbadge { background: var(--orange); color: #FFFFFF; }
+    .nav-item.active .nbadge { background: var(--orange-strong); color: #FFFFFF; }
 
     /* ── Tooltip (collapsed only) ────────────────────────────────────── */
     .nav-tip {
@@ -325,7 +328,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
 
     /* ── Bottom: My settings under a divider, then the profile card (a click logs out) ── */
     .s-bottom {
-      border-top: 1px solid rgba(24,24,27,.07);
+      border-top: 1px solid var(--divider);
       padding: 8px 10px 10px;
       flex-shrink: 0;
     }
@@ -335,7 +338,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
       overflow: hidden; white-space: nowrap;
       transition: background .15s;
     }
-    .u-card:hover { background: rgba(24,24,27,.05); }
+    .u-card:hover { background: var(--hover-overlay); }
     .u-avatar {
       width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
@@ -343,8 +346,8 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
       font-size: 13px; font-weight: 600;
     }
     .u-info { flex: 1; min-width: 0; overflow: hidden; transition: opacity .15s, width .22s; }
-    .u-name  { font-size: 14px; font-weight: 500; color: #18181B; overflow: hidden; text-overflow: ellipsis; }
-    .u-role  { font-size: 12px; color: #7B8494; overflow: hidden; text-overflow: ellipsis; }
+    .u-name  { font-size: 14px; font-weight: 500; color: var(--ink-strong); overflow: hidden; text-overflow: ellipsis; }
+    .u-role  { font-size: 12px; color: var(--nav-muted); overflow: hidden; text-overflow: ellipsis; }
     #sidebar.collapsed .u-card { gap: 0; justify-content: center; padding: 8px 0; }
     #sidebar.collapsed .u-info { display: none; }
 
@@ -353,7 +356,7 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
       background: var(--page-bg); flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; min-width: 0;
       margin: 0;
       border-radius: 28px 0 0 28px;
-      border-left: 1px solid rgba(24,24,27,.08);
+      border-left: 1px solid var(--divider);
       box-shadow: 0 1px 3px rgba(16,24,40,.06);
     }
   `],

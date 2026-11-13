@@ -66,7 +66,7 @@ const normalize = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, ''
   styles: [`
     :host { display:flex; gap:8px; width:100%; min-width:0; position:relative; }
     .cc { flex:0 0 auto; display:inline-flex; align-items:center; gap:6px; height:38px; box-sizing:border-box; padding:0 10px;
-          border:1.5px solid var(--gray-200); border-radius:10px; background:white; cursor:pointer; font:inherit; font-size:14px;
+          border:1.5px solid var(--gray-200); border-radius:10px; background:var(--surface); cursor:pointer; font:inherit; font-size:14px;
           font-weight:500; color:var(--gray-800); box-shadow:var(--shadow-field); transition:border-color .15s, box-shadow .15s; }
     .cc:hover:not(:disabled), .cc.open { border-color:var(--orange); }
     .cc.open { box-shadow:var(--shadow-field), var(--ring-field); }
@@ -76,11 +76,11 @@ const normalize = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, ''
     .dial { font-variant-numeric:tabular-nums; }
     .chev { width:14px; height:14px; fill:none; stroke:var(--gray-500); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
     .num { flex:1; min-width:0; height:38px; box-sizing:border-box; padding:8px 12px; border:1.5px solid var(--gray-200); border-radius:10px;
-           font-size:14px; font-family:inherit; color:var(--gray-800); background:white; outline:none; transition:border-color .15s, box-shadow .15s; }
+           font-size:14px; font-family:inherit; color:var(--gray-800); background:var(--surface); outline:none; transition:border-color .15s, box-shadow .15s; }
     .num:focus { border-color:var(--orange); }
     .num:disabled { background:var(--gray-50); color:var(--gray-400); }
     .panel { position:fixed; z-index:3000; width:${PANEL_WIDTH}px; max-height:${PANEL_HEIGHT}px; display:flex; flex-direction:column;
-             background:white; border:1px solid var(--gray-200); border-radius:12px; box-shadow:var(--shadow-lg); overflow:hidden; }
+             background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; box-shadow:var(--shadow-lg); overflow:hidden; }
     .search { margin:8px; width:auto !important; flex-shrink:0; }
     .list { list-style:none; margin:0; padding:0 4px 4px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--gray-300) transparent; }
     .option { display:flex; align-items:center; gap:10px; padding:8px; border-radius:8px; cursor:pointer; font-size:14px; color:var(--gray-800); }

@@ -69,7 +69,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     </section>
   `,
   styles: [PROJECTS_SHARED_STYLES, PROJECT_FINANCE_STYLES, `
-    tr.over-budget td { background:#FEF2F2; }
+    tr.over-budget td { background:var(--gray-50); }
   `],
 })
 export class ProjectFinanceCategoriesComponent {

@@ -99,7 +99,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
   `,
   styles: [`
     .author-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.6rem; align-items: start; }
-    .author-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: #fff; }
+    .author-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.7rem 0.85rem; background: var(--surface); }
     .author-card.inactive { opacity: 0.6; }
     .author-card-top { display:flex; align-items:center; gap: 0.6rem; }
     .author-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
@@ -107,7 +107,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .author-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
     .author-job-title { font-size: 0.72rem; color: var(--gray-500); }
     .author-bio { font-size: 0.78rem; color: var(--gray-600); margin: 0.5rem 0 0; line-height: 1.4; }
-    .author-linkedin { display: inline-flex; align-items: center; margin-top: 0.5rem; color: #0A66C2; }
+    .author-linkedin { display: inline-flex; align-items: center; margin-top: 0.5rem; color: color-mix(in srgb, #0a66c2 var(--tint-text-mix), #FFFFFF); }
     .author-linkedin:hover { opacity: 0.75; }
     .linkedin-icon { flex-shrink: 0; }
     .author-inactive-badge {
@@ -119,7 +119,7 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .author-card .field-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--gray-700); margin: 0.45rem 0 0.2rem; }
     .author-card .field-label:first-child { margin-top: 0; }
     .author-card .field-input { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.4rem 0.55rem; font-family: inherit; font-size: 0.8rem; }
-    .required-star { color: #DC2626; }
+    .required-star { color: color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
     .author-card-new { display: flex; flex-direction: column; justify-content: center; border-style: dashed; }
     .btn-add-author {
       border: none; background: transparent; color: var(--gray-500); font-weight: 600; font-size: 0.85rem;
@@ -128,10 +128,10 @@ import { normalizeLinkedinUrl } from '../../../shared/utils/linkedin-url.util';
     .btn-add-author:hover { color: var(--orange-dark); }
     .btn-delete {
       display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 9px; background: #FEE2E2; color: #991B1B;
+      border: none; border-radius: 9px; background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color: color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);
       cursor: pointer; padding: 4px 10px; flex-shrink: 0;
     }
-    .btn-delete:hover { background: #FECACA; }
+    .btn-delete:hover { background: color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); }
     .empty { color: var(--gray-500); font-size: 0.82rem; margin: 0.75rem 0 0; }
     .photo-upload-row { display: flex; align-items: center; gap: 0.6rem; }
     .photo-upload-row input[type="file"] { font-size: 0.75rem; flex: 1; min-width: 0; }

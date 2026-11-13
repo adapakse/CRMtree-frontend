@@ -46,7 +46,7 @@ import { taskLabel } from './project-ksef.styles';
     </div>
   `,
   styles: [PROJECTS_SHARED_STYLES, PROJECT_FINANCE_STYLES, `
-    .tw { background:white; }
+    .tw { background:var(--surface); }
   `],
 })
 export class ProjectKsefLinksTableComponent {

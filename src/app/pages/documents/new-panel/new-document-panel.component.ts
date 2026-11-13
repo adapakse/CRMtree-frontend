@@ -213,7 +213,7 @@ interface SelectOption { value: string; label: string; }
         <div class="pf">
           <button class="btn btn-g" (click)="close.emit()">{{ 'actions.cancel' | transloco }}</button>
           <button class="btn btn-p" [disabled]="!isValid() || saving()" (click)="save()">
-            @if (saving()) { <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;display:inline-block"></span> }
+            @if (saving()) { <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:var(--surface);display:inline-block"></span> }
             {{ t('newDocument.create') }}
           </button>
         </div>
@@ -223,8 +223,8 @@ interface SelectOption { value: string; label: string; }
   `,
   styles: [`
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; backdrop-filter: blur(2px); display: flex; align-items: flex-start; justify-content: flex-end; }
-    .panel { width: 640px; height: 100vh; background: white; box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
-    .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; background: white; position: sticky; top: 0; z-index: 1; }
+    .panel { width: 640px; height: 100vh; background: var(--surface); box-shadow: var(--shadow-lg); overflow-y: auto; display: flex; flex-direction: column; animation: slideIn .2s ease; }
+    .ph { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 12px; background: var(--surface); position: sticky; top: 0; z-index: 1; }
     .pt { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-900); }
     .ps { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
     .pc { margin-left: auto; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 6px; }

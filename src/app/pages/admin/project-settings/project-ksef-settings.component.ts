@@ -118,20 +118,20 @@ const MAX_SYNC_DAYS = 365;
     .head { display:flex; align-items:center; gap:10px; }
     .head .sec-title { margin:0; }
     .environment { padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; background:var(--orange-pale); color:var(--orange-dark); }
-    .environment.test { background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; }
+    .environment.test { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); border:1px solid #FCD34D; }
     .hint { margin:0; font-size:12px; color:var(--gray-500); line-height:1.6; }
-    .notice { padding:12px 16px; border-radius:10px; font-size:12px; line-height:1.5; background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; }
+    .notice { padding:12px 16px; border-radius:10px; font-size:12px; line-height:1.5; background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border:1px solid #FDE68A; color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
     .sync-days { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .sync-days .fl { margin:0; }
     .days { width:90px; }
     .group { width:auto; min-width:220px; max-width:100%; }
     .nowrap { white-space:nowrap; }
     .status { background:var(--orange-pale); color:var(--orange-dark); white-space:nowrap; }
-    .status.invalid, .status.error { background:#FEE2E2; color:#B91C1C; }
-    .last-error { display:block; margin-top:4px; font-size:12px; color:#B91C1C; overflow-wrap:anywhere; max-width:320px; }
+    .status.invalid, .status.error { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
+    .last-error { display:block; margin-top:4px; font-size:12px; color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); overflow-wrap:anywhere; max-width:320px; }
     .actions { text-align:right; white-space:nowrap; }
-    .link { border:none; background:none; padding:0; margin-left:10px; font-size:12px; cursor:pointer; font-family:inherit; color:var(--accent-blue, #3B82F6); }
-    .link.danger { color:#B91C1C; }
+    .link { border:none; background:none; padding:0; margin-left:10px; font-size:12px; cursor:pointer; font-family:inherit; color:var(--accent-blue, color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)); }
+    .link.danger { color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
     .link:disabled { opacity:.5; cursor:not-allowed; }
   `],
 })

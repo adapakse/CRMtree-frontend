@@ -13,6 +13,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { CrmSubstitutionsComponent } from '../crm/substitutions/crm-substitutions.component';
 import { MyProjectNotificationsComponent } from './my-project-notifications.component';
 import { MyDevicesComponent } from './my-devices.component';
+import { ThemePickerComponent } from '../../shared/components/theme-picker/theme-picker.component';
 import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { localizedApiErrorMessage } from '../../core/services/api-error.util';
@@ -22,7 +23,7 @@ const BASE = environment.apiUrl;
 @Component({
   selector: 'wt-my-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, MyProjectNotificationsComponent, LanguagePickerComponent, TranslocoDirective, TranslocoPipe],
+  imports: [CommonModule, FormsModule, QuillModule, CrmSubstitutionsComponent, MyDevicesComponent, MyProjectNotificationsComponent, LanguagePickerComponent, ThemePickerComponent, TranslocoDirective, TranslocoPipe],
   providers: [provideTranslocoScope('account')],
   template: `
 <ng-container *transloco="let t; prefix: 'account'">
@@ -41,12 +42,20 @@ const BASE = environment.apiUrl;
     </div>
   </div>
 
+  <!-- ── Wygląd ────────────────────────────────────────────────────────── -->
+  <div class="card" style="padding:24px">
+    <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0 0 4px">{{ t('mySettings.appearance.title') }}</h2>
+    <p style="font-size:13px;color:var(--gray-500);margin:0 0 20px">{{ t('mySettings.appearance.hint') }}</p>
+    <wt-theme-picker [ariaLabel]="t('mySettings.appearance.title')"
+                     [options]="[{ mode: 'light', label: t('mySettings.appearance.light') }, { mode: 'dark', label: t('mySettings.appearance.dark') }]" />
+  </div>
+
   <!-- ── Zmiana hasła ───────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px">
-    <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#333333;margin:0 0 4px;display:flex;align-items:center;gap:8px">
+    <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0 0 4px;display:flex;align-items:center;gap:8px">
       🔑 {{ t('mySettings.password.title') }}
     </h2>
-    <p style="font-size:12px;color:#6b7280;margin:0 0 20px;line-height:1.5">
+    <p style="font-size:12px;color:var(--gray-500);margin:0 0 20px;line-height:1.5">
       {{ t('mySettings.password.hint') }}
     </p>
 
@@ -89,7 +98,7 @@ const BASE = environment.apiUrl;
     </ng-template>
 
     @if (pwdError) {
-      <div style="font-size:12px;color:#991B1B;margin-top:8px">{{ pwdError }}</div>
+      <div style="font-size:12px;color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF);margin-top:8px">{{ pwdError }}</div>
     }
     <div style="margin-top:20px">
       <button class="btn btn-p" [disabled]="pwdSaving()" (click)="changePassword()">
@@ -100,10 +109,10 @@ const BASE = environment.apiUrl;
 
   <!-- ── Stopka email ───────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px">
-    <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#333333;margin:0 0 4px;display:flex;align-items:center;gap:8px">
+    <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0 0 4px;display:flex;align-items:center;gap:8px">
       ✉️ {{ t('mySettings.signature.title') }}
     </h2>
-    <p style="font-size:12px;color:#6b7280;margin:0 0 20px;line-height:1.5">
+    <p style="font-size:12px;color:var(--gray-500);margin:0 0 20px;line-height:1.5">
       {{ t('mySettings.signature.hint') }}
     </p>
 
@@ -129,10 +138,10 @@ const BASE = environment.apiUrl;
             🗑 {{ t('mySettings.delete') }}
           </button>
         </div>
-        <div *ngIf="saveSuccess" style="margin-top:8px;font-size:12px;color:#16a34a;font-weight:600">
+        <div *ngIf="saveSuccess" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-weight:600">
           ✓ {{ t('mySettings.signature.saved') }}
         </div>
-        <div *ngIf="saveError" style="margin-top:8px;font-size:12px;color:#dc2626">
+        <div *ngIf="saveError" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
           {{ saveError }}
         </div>
       </div>
@@ -143,7 +152,7 @@ const BASE = environment.apiUrl;
           {{ t('mySettings.signature.preview') }}
         </label>
         <div style="border:1.5px solid var(--gray-200);border-radius:10px;padding:16px;background:var(--gray-50);min-height:280px;overflow:auto">
-          <div *ngIf="!signatureHtml" style="color:#9ca3af;font-size:12px;font-style:italic">
+          <div *ngIf="!signatureHtml" style="color:var(--gray-400);font-size:12px;font-style:italic">
             {{ t('mySettings.signature.empty') }}
           </div>
           <div *ngIf="signatureHtml" [innerHTML]="safePreview"></div>
@@ -156,32 +165,32 @@ const BASE = environment.apiUrl;
   <!-- ── Szablony emaili ────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
-      <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#333333;margin:0;flex:1;display:flex;align-items:center;gap:8px">
+      <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0;flex:1;display:flex;align-items:center;gap:8px">
         📋 {{ t('mySettings.templates.title') }}
       </h2>
       <button class="btn btn-p" (click)="openTplForm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('mySettings.templates.new') }}</button>
     </div>
-    <p style="font-size:12px;color:#6b7280;margin:0 0 16px;line-height:1.5">
+    <p style="font-size:12px;color:var(--gray-500);margin:0 0 16px;line-height:1.5">
       {{ t('mySettings.templates.hint') }}
     </p>
 
     <!-- Lista szablonów -->
-    <div *ngIf="templates.length === 0 && !tplFormVisible" style="color:#9ca3af;font-size:14px;font-style:italic;text-align:center;padding:16px">
+    <div *ngIf="templates.length === 0 && !tplFormVisible" style="color:var(--gray-400);font-size:14px;font-style:italic;text-align:center;padding:16px">
       {{ t('mySettings.templates.empty') }}
     </div>
     <div *ngFor="let tpl of templates" style="background:var(--gray-50);border-radius:12px;padding:12px 16px;margin-bottom:8px">
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:14px;font-weight:700;color:#333333;flex:1">{{tpl.name}}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--gray-800);flex:1">{{tpl.name}}</span>
         <button class="btn btn-g btn-sm" (click)="editTpl(tpl)">✏️ {{ t('mySettings.templates.edit') }}</button>
         <button class="btn btn-d btn-sm" (click)="deleteTpl(tpl)" [disabled]="tplSaving">🗑</button>
       </div>
-      <div *ngIf="tpl.body" style="font-size:12px;color:#6b7280;margin-top:8px;max-height:48px;overflow:hidden;line-height:1.5"
+      <div *ngIf="tpl.body" style="font-size:12px;color:var(--gray-500);margin-top:8px;max-height:48px;overflow:hidden;line-height:1.5"
            [innerHTML]="tplPreview(tpl.body)"></div>
     </div>
 
     <!-- Formularz dodawania/edycji -->
     <div *ngIf="tplFormVisible" style="border:1.5px solid var(--orange);border-radius:14px;padding:16px;margin-top:8px">
-      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:#333333">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:var(--gray-800)">
         {{ tplEditingId ? t('mySettings.templates.editTitle') : t('mySettings.templates.new') }}
       </h3>
       <label class="fl" style="display:block;margin-bottom:8px">{{ t('mySettings.templates.nameLabel') }} *</label>
@@ -189,7 +198,7 @@ const BASE = environment.apiUrl;
              class="fi" style="margin-bottom:16px">
       <label class="fl" style="display:block;margin-bottom:8px">{{ t('mySettings.templates.bodyLabel') }} *</label>
       <quill-editor [(ngModel)]="tplForm.body" [modules]="quillModules"
-                    style="background:white"
+                    style="background:var(--surface)"
                     [placeholder]="t('mySettings.templates.bodyPlaceholder')"></quill-editor>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
         <button class="btn btn-g" (click)="cancelTplForm()">{{ 'actions.cancel' | transloco }}</button>
@@ -197,7 +206,7 @@ const BASE = environment.apiUrl;
           {{ tplSaving ? '⏳ ' + t('mySettings.saving') : '💾 ' + ('actions.save' | transloco) }}
         </button>
       </div>
-      <div *ngIf="tplError" style="margin-top:8px;font-size:12px;color:#dc2626">{{tplError}}</div>
+      <div *ngIf="tplError" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">{{tplError}}</div>
     </div>
   </div>
 
@@ -205,27 +214,27 @@ const BASE = environment.apiUrl;
 
   <!-- ── Softphone PBX ──────────────────────────────────────────────────── -->
   <div class="card" style="padding:24px" *ngIf="auth.hasFeature('pbx')">
-    <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#333333;margin:0 0 4px;display:flex;align-items:center;gap:8px">
+    <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin:0 0 4px;display:flex;align-items:center;gap:8px">
       📞 {{ t('mySettings.pbx.title') }}
     </h2>
-    <p style="font-size:12px;color:#6b7280;margin:0 0 20px;line-height:1.5">
+    <p style="font-size:12px;color:var(--gray-500);margin:0 0 20px;line-height:1.5">
       {{ t('mySettings.pbx.hint') }}
     </p>
 
     <!-- Status -->
-    <div *ngIf="pbxLoading" style="font-size:14px;color:#6b7280">{{ 'states.loading' | transloco }}</div>
+    <div *ngIf="pbxLoading" style="font-size:14px;color:var(--gray-500)">{{ 'states.loading' | transloco }}</div>
 
     <div *ngIf="!pbxLoading">
       <!-- Skonfigurowany -->
       <div *ngIf="pbxConfigured"
-           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f0fdf4;border-radius:12px;margin-bottom:16px">
+           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gray-50);border-radius:12px;margin-bottom:16px">
         <span style="font-size:18px;flex-shrink:0">✅</span>
         <div>
-          <div style="font-size:14px;font-weight:600;color:#166534">{{ t('mySettings.pbx.configured') }}</div>
-          <div *ngIf="pbxDirectPhone" style="font-size:12px;color:#166534;margin-top:1px">
+          <div style="font-size:14px;font-weight:600;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF)">{{ t('mySettings.pbx.configured') }}</div>
+          <div *ngIf="pbxDirectPhone" style="font-size:12px;color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF);margin-top:1px">
             {{ t('mySettings.pbx.directPhone') }} <strong>{{pbxDirectPhone}}</strong>
           </div>
-          <div *ngIf="!pbxDirectPhone" style="font-size:12px;color:#6b7280;margin-top:1px">
+          <div *ngIf="!pbxDirectPhone" style="font-size:12px;color:var(--gray-500);margin-top:1px">
             {{ t('mySettings.pbx.noDirectPhone') }}
           </div>
         </div>
@@ -233,9 +242,9 @@ const BASE = environment.apiUrl;
 
       <!-- Nieskonfigurowany -->
       <div *ngIf="!pbxConfigured"
-           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fefce8;border-radius:12px;margin-bottom:16px">
+           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:color-mix(in srgb, #fefce8 var(--tint-mix), var(--surface));border-radius:12px;margin-bottom:16px">
         <span style="font-size:18px;flex-shrink:0">⚠️</span>
-        <div style="font-size:14px;color:#854d0e">{{ t('mySettings.pbx.notConfigured') }}</div>
+        <div style="font-size:14px;color:color-mix(in srgb, #854d0e var(--tint-text-mix), #FFFFFF)">{{ t('mySettings.pbx.notConfigured') }}</div>
       </div>
 
       <!-- Formularz tokenu -->
@@ -256,7 +265,7 @@ const BASE = environment.apiUrl;
             {{ pbxShowToken ? t('mySettings.pbx.hideToken') : t('mySettings.pbx.showToken') }}
           </button>
         </div>
-        <div style="font-size:12px;color:#9ca3af;margin-top:4px;line-height:1.5">
+        <div style="font-size:12px;color:var(--gray-400);margin-top:4px;line-height:1.5">
           {{ t('mySettings.pbx.tokenHelpStart') }} → <em>API Tokens (PAT)</em> → Create token → {{ t('mySettings.pbx.tokenHelpEnd') }}
         </div>
       </div>
@@ -271,37 +280,37 @@ const BASE = environment.apiUrl;
         </button>
       </div>
 
-      <div *ngIf="pbxSaveOk" style="margin-top:8px;font-size:12px;color:#16a34a;font-weight:600">
+      <div *ngIf="pbxSaveOk" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-weight:600">
         ✓ {{ pbxDirectPhone ? t('mySettings.pbx.tokenSavedWithPhone', { phone: pbxDirectPhone }) : t('mySettings.pbx.tokenSaved') }}
       </div>
-      <div *ngIf="pbxSaveErr" style="margin-top:8px;font-size:12px;color:#dc2626">
+      <div *ngIf="pbxSaveErr" style="margin-top:8px;font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
         {{pbxSaveErr}}
       </div>
 
       <!-- Powiadomienia systemowe o połączeniach przychodzących -->
       <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--gray-100)">
-        <div style="font-size:14px;font-weight:600;color:#333333;margin-bottom:4px">
+        <div style="font-size:14px;font-weight:600;color:var(--gray-800);margin-bottom:4px">
           {{ t('mySettings.pbx.notifications.title') }}
         </div>
-        <div style="font-size:12px;color:#6b7280;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px">
           {{ t('mySettings.pbx.notifications.hint') }}
         </div>
 
         <ng-container [ngSwitch]="notifBrowserPerm">
           <div *ngSwitchCase="'granted'"
-               style="font-size:12px;color:#16a34a;font-weight:600">
+               style="font-size:12px;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-weight:600">
             ✓ {{ t('mySettings.pbx.notifications.enabled') }}
           </div>
           <div *ngSwitchCase="'denied'"
-               style="font-size:12px;color:#dc2626">
+               style="font-size:12px;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)">
             ✗ {{ t('mySettings.pbx.notifications.blocked') }}<br>
-            <span style="color:#6b7280">{{ t('mySettings.pbx.notifications.unblockPath') }}</span>
+            <span style="color:var(--gray-500)">{{ t('mySettings.pbx.notifications.unblockPath') }}</span>
           </div>
           <div *ngSwitchDefault style="display:flex;align-items:center;gap:12px">
             <button class="btn btn-p" (click)="enableNotifications()">
               {{ t('mySettings.pbx.notifications.enable') }}
             </button>
-            <span style="font-size:12px;color:#9ca3af">{{ t('mySettings.pbx.notifications.permissionHint') }}</span>
+            <span style="font-size:12px;color:var(--gray-400)">{{ t('mySettings.pbx.notifications.permissionHint') }}</span>
           </div>
         </ng-container>
       </div>
@@ -322,14 +331,14 @@ const BASE = environment.apiUrl;
   `,
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; }
-    #topbar { height:60px; background:white; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
+    #topbar { height:60px; background:var(--surface); border-bottom:1px solid var(--gray-200); display:flex; align-items:center; gap:12px; padding:0 24px; flex-shrink:0; }
     .page-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); }
     #content { flex:1; overflow-y:auto; }
     .settings-head { padding:24px; display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; }
     .settings-head > wt-language-picker { flex:1 1 320px; }
-    .manual-entry { flex:0 1 280px; border-left:1px solid #e5e7eb; padding-left:24px; }
-    .manual-title { font-size:14px; font-weight:600; color:#333333; }
-    .manual-hint { font-size:12px; color:#6b7280; margin:6px 0 12px; }
+    .manual-entry { flex:0 1 280px; border-left:1px solid var(--gray-200); padding-left:24px; }
+    .manual-title { font-size:14px; font-weight:600; color:var(--gray-800); }
+    .manual-hint { font-size:12px; color:var(--gray-500); margin:6px 0 12px; }
     a.btn { text-decoration:none; }
     .pw-wrap { position:relative; }
     .pw-wrap input { width:100%; box-sizing:border-box; padding-right:44px !important; }

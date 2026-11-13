@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     :host {
       display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
       padding: 12px 18px; margin-bottom: 16px;
-      background: white; border-radius: 14px; box-shadow: var(--shadow-filter);
+      background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-filter);
     }
   `],
 })

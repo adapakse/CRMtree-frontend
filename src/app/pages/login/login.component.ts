@@ -83,6 +83,21 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     </div>
   `,
   styles: [`
+    /* The login screen keeps the light look whatever theme the user picked. */
+    :host {
+      color-scheme: light;
+      --gray-50: #FAFAFA; --gray-100: #F4F4F5; --gray-200: #E4E4E7; --gray-300: #D1D1D6;
+      --gray-400: #76767C; --gray-500: #71717A; --gray-600: #52525B; --gray-700: #3F3F46;
+      --gray-800: #333333; --gray-900: #333333; --graphite: #28292D;
+      --page-bg: #F8F9FB; --surface: #FFFFFF; --ink-strong: #18181B;
+      --shadow-sm: 0 5px 14px rgba(0,0,0,.081); --shadow: 0 5px 16px rgba(0,0,0,.108);
+      --shadow-lg: 0 5px 16px rgba(0,0,0,.126), 0 13px 31px rgba(0,0,0,.09);
+      --shadow-field: 0 5px 16px rgba(0,0,0,.099);
+      --tint-mix: 100%; --tint-text-mix: 100%;
+      --orange: #3BAA5D; --orange-light: #4DC671; --orange-dark: #2B7B43; --orange-pale: #E6F4EA; --orange-muted: #A8D9B6;
+      --orange-text: #2B7B43; --orange-strong: #18864A; --ring-field: 0 0 0 3px rgba(59,170,93,.18);
+      --green-gradient: linear-gradient(180deg, #18864A 0%, #14833F 100%);
+    }
     #login-screen {
       position:fixed; top:var(--test-banner-height, 0px); right:0; bottom:0; left:0;
       background:var(--page-bg); overflow-y:auto; overflow-x:hidden;
@@ -102,11 +117,11 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     /* The PNG has ~25% empty space under the mark; pull it in so the logo sits just above the card. */
     .login-logo-img { width:240px; max-width:70vw; height:auto; display:block; margin-bottom:-20px; }
     .login-sub { font-size:12px; color:rgba(255,255,255,.55); }
-    .login-tenant-warning { font-size:12px; color:#FBBF24; }
+    .login-tenant-warning { font-size:12px; color:color-mix(in srgb, #fbbf24 var(--tint-text-mix), #FFFFFF); }
 
     .login-card {
       position:relative; margin-top:-220px; width:420px; max-width:calc(100vw - 32px);
-      box-sizing:border-box; background:white; border-radius:20px; padding:32px;
+      box-sizing:border-box; background:var(--surface); border-radius:20px; padding:32px;
       box-shadow:0 16px 40px rgba(0,0,0,.08);
     }
 
@@ -115,7 +130,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .input-wrap { position:relative; }
     #login-screen .field input {
       width:100%; box-sizing:border-box; height:50px; padding:0 16px;
-      border:1px solid #E3E5E9; border-radius:14px; background:white;
+      border:1px solid var(--gray-200); border-radius:14px; background:var(--surface);
       font-size:14px; outline:none; box-shadow:0 6px 18px rgba(0,0,0,.08);
       transition:border-color .15s, box-shadow .15s;
     }
@@ -135,13 +150,13 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
       transition:background .15s, box-shadow .15s, border-color .15s;
     }
     .lbtn {
-      margin-top:24px; background:var(--orange); color:white; border:none;
+      margin-top:24px; background:var(--orange-strong); color:white; border:none;
       font-size:16px; font-weight:600; box-shadow:0 8px 18px rgba(59,170,93,.25);
     }
     .lbtn:hover:not(:disabled) { background:var(--orange-dark); }
     .lbtn:disabled { background:rgba(59,170,93,.6); box-shadow:none; cursor:not-allowed; }
     .lbtn-secondary {
-      background:white; color:var(--gray-700); border:1px solid #E3E5E9;
+      background:var(--surface); color:var(--gray-700); border:1px solid var(--gray-200);
       font-size:14px; font-weight:500; box-shadow:0 4px 12px rgba(0,0,0,.06);
     }
     .lbtn-secondary:hover:not(:disabled) { background:var(--gray-50); border-color:var(--gray-300); }
@@ -150,11 +165,11 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .l-divider { display:flex; align-items:center; gap:12px; margin:20px 0; font-size:14px; color:var(--gray-400); }
     .l-divider::before, .l-divider::after { content:''; flex:1; height:1px; background:var(--gray-200); }
 
-    .l-error { background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:10px 16px; font-size:12px; color:#dc2626; }
+    .l-error { background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius:12px; padding:10px 16px; font-size:12px; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); }
     .login-note { font-size:12px; color:var(--gray-400); text-align:center; margin-top:12px; }
     .login-language { display:flex; justify-content:center; margin-top:20px; }
 
-    .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+    .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:var(--surface); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
     .spinner-dark { border-color:var(--gray-200); border-top-color:var(--gray-600); }
     @keyframes spin { to { transform:rotate(360deg); } }
 

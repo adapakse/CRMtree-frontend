@@ -28,8 +28,8 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div id="topbar" style="height:60px;background:white;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
-  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#333333">
+<div id="topbar" style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0">
+  <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">
     {{ t('reports.partnerAnalytics.title') }}
   </span>
   <span style="flex:1"></span>
@@ -78,18 +78,18 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
       <span class="pa-vs">VS</span>
       <span class="pa-leg">
         <span class="pa-dot" style="background:#3b82f6"></span>
-        <span>{{ t('reports.partnerAnalytics.period.b') }}</span> <span class="pa-leg-val" style="color:#2563eb">{{labelB || '—'}}</span>
+        <span>{{ t('reports.partnerAnalytics.period.b') }}</span> <span class="pa-leg-val" style="color:color-mix(in srgb, #2563eb var(--tint-text-mix), #FFFFFF)">{{labelB || '—'}}</span>
       </span>
 
       <ng-container *ngIf="mode==='custom'">
-        <span style="font-size:12px;color:#a1a1aa;margin-left:8px;white-space:nowrap">{{ t('reports.partnerAnalytics.period.customB') }}</span>
+        <span style="font-size:12px;color:var(--gray-400);margin-left:8px;white-space:nowrap">{{ t('reports.partnerAnalytics.period.customB') }}</span>
         <input type="month" [(ngModel)]="customFromB" style="width:140px" (change)="onCustomB()">
-        <span style="font-size:12px;color:#a1a1aa">{{ t('reports.partnerAnalytics.period.to') }}</span>
+        <span style="font-size:12px;color:var(--gray-400)">{{ t('reports.partnerAnalytics.period.to') }}</span>
         <input type="month" [(ngModel)]="customToB"   style="width:140px" (change)="onCustomB()">
       </ng-container>
 
       <span style="flex:1"></span>
-      <span *ngIf="data" style="font-size:12px;color:#a1a1aa">
+      <span *ngIf="data" style="font-size:12px;color:var(--gray-400)">
         {{ t('reports.partnerAnalytics.period.summary', { partners: +data.a.kpi.partners_count, products: +data.a.kpi.transactions_count }) }}
       </span>
     </div>
@@ -97,7 +97,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
 
   <div *ngIf="loading" style="height:3px;background:linear-gradient(90deg,#3BAA5D,#86efac);border-radius:2px;margin-bottom:16px"></div>
 
-  <div *ngIf="!loading && !data" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#a1a1aa">
+  <div *ngIf="!loading && !data" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--gray-400)">
     <div style="font-size:48px;margin-bottom:12px">📊</div>
     <div style="font-size:16px;font-weight:600">{{ t('reports.partnerAnalytics.emptyPeriod') }}</div>
   </div>
@@ -183,7 +183,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
           </div>
         </div>
       </div>
-      <div #trendEl style="display:flex;align-items:flex-end;gap:6px;height:150px;padding-bottom:24px;border-bottom:1px solid #e4e4e7;position:relative"></div>
+      <div #trendEl style="display:flex;align-items:flex-end;gap:6px;height:150px;padding-bottom:24px;border-bottom:1px solid var(--gray-200);position:relative"></div>
       <div #trendLabels style="display:flex;gap:6px;margin-top:6px"></div>
     </div>
 
@@ -289,7 +289,7 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
         <option value="">{{ t('reports.partnerAnalytics.partners.allIndustries') }}</option>
         <option *ngFor="let ind of availableIndustries" [value]="ind">{{ind}}</option>
       </select>
-      <span style="font-size:12px;color:#a1a1aa;white-space:nowrap">
+      <span style="font-size:12px;color:var(--gray-400);white-space:nowrap">
         {{ t('reports.partnerAnalytics.partners.count', { count: filteredPartners.length }) }}
       </span>
     </div>
@@ -364,14 +364,14 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
           </td>
         </tr>
         <tr *ngIf="!filteredPartners.length">
-          <td [attr.colspan]="data.b ? 14 : 8" style="text-align:center;padding:20px;color:#a1a1aa">{{ t('reports.partnerAnalytics.noData') }}</td>
+          <td [attr.colspan]="data.b ? 14 : 8" style="text-align:center;padding:20px;color:var(--gray-400)">{{ t('reports.partnerAnalytics.noData') }}</td>
         </tr>
       </tbody>
     </table>
     </div>
 
     <div *ngIf="filteredPartners.length > displayLimit"
-         style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid #f4f4f5">
+         style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--gray-100)">
       <button class="btn btn-g" (click)="showMore()">
         {{ t('reports.partnerAnalytics.partners.showMore', { count: filteredPartners.length - displayLimit }) }}
       </button>
@@ -386,41 +386,41 @@ type CompareMode = 'yoy' | 'qoq' | 'mom' | 'custom';
   `,
   styles: [`
     /* Filter card under the title bar — same as the leads list (shadow/radius/padding from global .toolbar). */
-    .toolbar { background:white; display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; margin-bottom:16px; }
+    .toolbar { background:var(--surface); display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; margin-bottom:16px; }
     .pa-period { flex-basis:100%; display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; padding-top:12px; border-top:1px solid var(--gray-100); }
     input[type=search], input[type=month] { height:36px; box-sizing:border-box; }
     .btn-sm { height:36px; }
-    .seg { display:flex;align-items:center;height:36px;box-sizing:border-box;background:#f4f4f5;border-radius:12px;padding:4px;gap:4px }
-    .mode-btn { height:28px;background:none;border:none;padding:0 12px;border-radius:9px;font-size:12px;font-weight:600;color:#71717a;cursor:pointer;font-family:inherit }
-    .mode-active  { background:white;color:#3BAA5D;box-shadow:0 1px 3px rgba(0,0,0,.1) }
-    .mode-year-b  { background:white;color:#3b82f6;box-shadow:0 1px 3px rgba(0,0,0,.1) }
-    .kpi-card { background:white;border-radius:12px;padding:16px 18px;box-shadow:var(--shadow-sm) }
+    .seg { display:flex;align-items:center;height:36px;box-sizing:border-box;background:var(--gray-100);border-radius:12px;padding:4px;gap:4px }
+    .mode-btn { height:28px;background:none;border:none;padding:0 12px;border-radius:9px;font-size:12px;font-weight:600;color:var(--gray-500);cursor:pointer;font-family:inherit }
+    .mode-active  { background:var(--surface);color:color-mix(in srgb, #3baa5d var(--tint-text-mix), #FFFFFF);box-shadow:0 1px 3px rgba(0,0,0,.1) }
+    .mode-year-b  { background:var(--surface);color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF);box-shadow:0 1px 3px rgba(0,0,0,.1) }
+    .kpi-card { background:var(--surface);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow-sm) }
     .kpi-lbl { font-size:12px;color:var(--gray-400);font-weight:500;margin-bottom:6px }
     /* Numbers in the body font: the rounded display face made big amounts look playful. */
-    .kpi-val { font-family:inherit;font-size:22px;font-weight:600;line-height:1.2;letter-spacing:-.01em;color:#333333;font-variant-numeric:tabular-nums }
+    .kpi-val { font-family:inherit;font-size:22px;font-weight:600;line-height:1.2;letter-spacing:-.01em;color:var(--gray-800);font-variant-numeric:tabular-nums }
     .pa-leg { display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;line-height:20px;color:var(--gray-700) }
     .pa-leg-val { font-weight:600 }
     .pa-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0 }
     .pa-vs { font-size:12px;font-weight:600;color:var(--gray-400);padding:2px 8px;background:var(--gray-100);border-radius:999px;line-height:16px }
-    .kpi-compare { display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #f4f4f5 }
-    .kpi-b { font-size:12px;color:#a1a1aa }
-    .card-title { font-family:inherit;font-size:14px;font-weight:600;color:#333333;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between }
-    .card-subtitle { font-size:14px;color:#a1a1aa;font-weight:400 }
+    .kpi-compare { display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--gray-100) }
+    .kpi-b { font-size:12px;color:var(--gray-400) }
+    .card-title { font-family:inherit;font-size:14px;font-weight:600;color:var(--gray-800);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between }
+    .card-subtitle { font-size:14px;color:var(--gray-400);font-weight:400 }
     .delta-pill { display:inline-flex;align-items:center;gap:2px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px }
-    .delta-pill.up   { background:#dcfce7;color:#16a34a }
-    .delta-pill.down { background:#fee2e2;color:#dc2626 }
-    .delta-pill.flat { background:#f4f4f5;color:#71717a }
+    .delta-pill.up   { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF) }
+    .delta-pill.down { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF) }
+    .delta-pill.flat { background:var(--gray-100);color:var(--gray-500) }
     table { width:100%;border-collapse:collapse;font-size:12px }
-    thead tr { border-bottom:1px solid #e4e4e7 }
-    th { text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;color:#a1a1aa;font-weight:600;letter-spacing:.3px;white-space:nowrap }
+    thead tr { border-bottom:1px solid var(--gray-200) }
+    th { text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;color:var(--gray-400);font-weight:600;letter-spacing:.3px;white-space:nowrap }
     th.r,td.r { text-align:right }
     tbody tr { cursor:default }
-    td { padding:8px 8px;color:#374151 }
-    td.num   { color:#374151;font-variant-numeric:tabular-nums }
-    td.num-a { color:#333333;font-weight:600;font-variant-numeric:tabular-nums }
-    td.num-b { color:#a1a1aa;font-variant-numeric:tabular-nums }
-    td.muted { color:#71717a;font-size:12px }
-    td.idx   { color:#a1a1aa;font-size:12px;width:24px }
+    td { padding:8px 8px;color:var(--gray-700) }
+    td.num   { color:var(--gray-700);font-variant-numeric:tabular-nums }
+    td.num-a { color:var(--gray-800);font-weight:600;font-variant-numeric:tabular-nums }
+    td.num-b { color:var(--gray-400);font-variant-numeric:tabular-nums }
+    td.muted { color:var(--gray-500);font-size:12px }
+    td.idx   { color:var(--gray-400);font-size:12px;width:24px }
   `],
 })
 export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
@@ -832,7 +832,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
       el.appendChild(group);
 
       const lbl = document.createElement('div');
-      lbl.style.cssText = 'flex:1;text-align:center;font-size:10px;color:#a1a1aa';
+      lbl.style.cssText = 'flex:1;text-align:center;font-size:10px;color:var(--gray-400)';
       lbl.textContent = rowA
         ? this.shortMonthName(parseInt(rowA.period.substring(5, 7)))
         : (rowB ? this.shortMonthName(parseInt(rowB.period.substring(5, 7))) : '');
@@ -847,7 +847,7 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
 
     const products = this.data.a.by_product.slice(0, 7);
     if (!products.length) {
-      el.innerHTML = '<div style="color:#a1a1aa;font-size:12px;text-align:center;padding:20px">' + this.transloco.translate('crm.reports.partnerAnalytics.noData') + '</div>';
+      el.innerHTML = '<div style="color:var(--gray-400);font-size:12px;text-align:center;padding:20px">' + this.transloco.translate('crm.reports.partnerAnalytics.noData') + '</div>';
       return;
     }
     const maxVal = Math.max(...products.map(p => +p.gross_turnover_pln), 1);
@@ -861,17 +861,17 @@ export class CrmPartnersAnalyticsComponent implements OnInit, AfterViewInit {
       row.style.marginBottom = '8px';
       const delta = bRow ? +p.gross_turnover_pln - +bRow.gross_turnover_pln : null;
       const deltaHtml = bRow
-        ? `<span style="margin-left:6px;font-size:10px;font-weight:700;padding:1px 4px;border-radius:10px;${delta! >= 0 ? 'background:#dcfce7;color:#16a34a' : 'background:#fee2e2;color:#dc2626'}">${this.fmtDelta(+p.gross_turnover_pln, +bRow.gross_turnover_pln)}</span>`
+        ? `<span style="margin-left:6px;font-size:10px;font-weight:700;padding:1px 4px;border-radius:10px;${delta! >= 0 ? 'background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)' : 'background:#fee2e2;color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF)'}">${this.fmtDelta(+p.gross_turnover_pln, +bRow.gross_turnover_pln)}</span>`
         : '';
       row.innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:12px;color:#52525b">${icon} ${label}</span>
-          <span style="display:flex;align-items:center;font-size:12px;font-weight:600;color:#374151">
+          <span style="font-size:12px;color:var(--gray-600)">${icon} ${label}</span>
+          <span style="display:flex;align-items:center;font-size:12px;font-weight:600;color:var(--gray-700)">
             ${(+p.gross_turnover_pln/1000).toFixed(0)}k${deltaHtml}
           </span>
         </div>
-        <div style="height:6px;background:#f4f4f5;border-radius:3px;overflow:hidden">
-          <div style="width:${pctA}%;height:100%;background:#d1d5db;border-radius:3px"></div>
+        <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
+          <div style="width:${pctA}%;height:100%;background:var(--gray-300);border-radius:3px"></div>
         </div>`;
       el.appendChild(row);
     });

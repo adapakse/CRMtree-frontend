@@ -62,7 +62,7 @@ const transitionKey = (fromStatusId: string, toStatusId: string): string => `${f
     :host { display:flex; flex-direction:column; gap:12px; }
     .hint { margin:0; font-size:12px; color:var(--gray-500); line-height:1.6; }
     .roles { display:flex; gap:6px; }
-    .role-btn { border:1px solid var(--gray-200); background:white; border-radius:999px; padding:6px 12px; font-size:12px; cursor:pointer; color:var(--gray-600); font-family:inherit; }
+    .role-btn { border:1px solid var(--gray-200); background:var(--surface); border-radius:999px; padding:6px 12px; font-size:12px; cursor:pointer; color:var(--gray-600); font-family:inherit; }
     .role-btn.active { border-color:var(--orange); color:var(--orange-dark); background:var(--orange-pale); font-weight:600; }
     .matrix-wrap { overflow-x:auto; }
     .matrix { border-collapse:collapse; font-size:12px; }

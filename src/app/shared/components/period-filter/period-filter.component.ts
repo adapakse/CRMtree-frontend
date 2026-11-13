@@ -22,26 +22,26 @@ export interface PeriodChangeEvent extends PeriodDates {
 
   <select [ngStyle]="selStyle" [class.sel]="variant !== 'inverted'" [(ngModel)]="preset" (ngModelChange)="onPresetChange($event)">
     <optgroup [label]="t('periodFilter.groups.current')">
-      <option value="cw"   style="color:#374151">{{ t('periodFilter.presets.currentWeek') }}</option>
-      <option value="cm"   style="color:#374151">{{ t('periodFilter.presets.currentMonth') }}</option>
-      <option value="cq"   style="color:#374151">{{ t('periodFilter.presets.currentQuarter') }}</option>
-      <option value="ytd"  style="color:#374151">{{ t('periodFilter.presets.currentYear', { year: year }) }}</option>
+      <option value="cw"   style="color:var(--gray-700)">{{ t('periodFilter.presets.currentWeek') }}</option>
+      <option value="cm"   style="color:var(--gray-700)">{{ t('periodFilter.presets.currentMonth') }}</option>
+      <option value="cq"   style="color:var(--gray-700)">{{ t('periodFilter.presets.currentQuarter') }}</option>
+      <option value="ytd"  style="color:var(--gray-700)">{{ t('periodFilter.presets.currentYear', { year: year }) }}</option>
     </optgroup>
     <optgroup [label]="t('periodFilter.groups.previous')">
-      <option value="prev_w"    style="color:#374151">{{ t('periodFilter.presets.previousWeek') }}</option>
-      <option value="prev_1m"   style="color:#374151">{{ t('periodFilter.presets.previousMonth') }}</option>
-      <option value="prev_q"    style="color:#374151">{{ t('periodFilter.presets.previousQuarter') }}</option>
-      <option value="prev_year" style="color:#374151">{{ t('periodFilter.presets.previousYear', { year: year - 1 }) }}</option>
+      <option value="prev_w"    style="color:var(--gray-700)">{{ t('periodFilter.presets.previousWeek') }}</option>
+      <option value="prev_1m"   style="color:var(--gray-700)">{{ t('periodFilter.presets.previousMonth') }}</option>
+      <option value="prev_q"    style="color:var(--gray-700)">{{ t('periodFilter.presets.previousQuarter') }}</option>
+      <option value="prev_year" style="color:var(--gray-700)">{{ t('periodFilter.presets.previousYear', { year: year - 1 }) }}</option>
     </optgroup>
     <optgroup [label]="t('periodFilter.groups.custom')">
-      <option value="custom" style="color:#374151">{{ t('periodFilter.presets.customRange') }}</option>
+      <option value="custom" style="color:var(--gray-700)">{{ t('periodFilter.presets.customRange') }}</option>
     </optgroup>
   </select>
 
   <ng-container *ngIf="preset === 'custom'">
     <input type="date" [ngStyle]="inputStyle"
            [(ngModel)]="customFrom" (ngModelChange)="onCustomChange()" />
-    <span [style.color]="variant === 'inverted' ? 'rgba(255,255,255,.6)' : '#71717a'"
+    <span [style.color]="variant === 'inverted' ? 'rgba(255,255,255,.6)' : 'var(--gray-500)'"
           style="font-size:12px">–</span>
     <input type="date" [ngStyle]="inputStyle"
            [(ngModel)]="customTo" (ngModelChange)="onCustomChange()" />

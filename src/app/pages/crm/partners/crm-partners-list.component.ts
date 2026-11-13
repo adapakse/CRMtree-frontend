@@ -72,11 +72,11 @@ type SortDir = 'asc' | 'desc';
       <div class="pc-top">
         <div class="pc-company">
           {{p.dwh_company_name || p.company}}
-          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle">DWH</span>
-          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="p.dwh_partner_id" style="background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle">DWH</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF);font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
-                style="color:#6b7280;font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                style="color:var(--gray-500);font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
                 (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </div>
         <span class="pbadge pbadge-{{p.status}}">{{statusLabel(p.status)}}</span>
@@ -106,9 +106,9 @@ type SortDir = 'asc' | 'desc';
       </div>
       <ng-container *ngIf="partnerSales(p) as s">
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-          <span style="font-size:12px;font-weight:700;color:#f97316">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
-          <span style="font-size:12px;font-weight:600;color:#16a34a">▲ {{ t('partnersList.card.marginAmount', { amount: (s.revenue_pln|number:'1.0-0') }) }}</span>
-          <span style="font-size:10px;color:#9ca3af">YTD</span>
+          <span style="font-size:12px;font-weight:700;color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF)">📈 {{s.gross_turnover_pln|number:'1.0-0'}} PLN</span>
+          <span style="font-size:12px;font-weight:600;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF)">▲ {{ t('partnersList.card.marginAmount', { amount: (s.revenue_pln|number:'1.0-0') }) }}</span>
+          <span style="font-size:10px;color:var(--gray-400)">YTD</span>
         </div>
       </ng-container>
       <div class="pc-onboarding" *ngIf="p.status==='onboarding'">
@@ -138,7 +138,7 @@ type SortDir = 'asc' | 'desc';
          (click)="goPartner(p.id, p.crm_uuid)">
       <div class="td">
         <span class="td-main">{{p.dwh_company_name || p.company}}
-          <span *ngIf="p.dwh_partner_id" style="background:#ede9fe;color:#7c3aed;font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle">DWH</span>
+          <span *ngIf="p.dwh_partner_id" style="background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface));color:color-mix(in srgb, #7c3aed var(--tint-text-mix), #FFFFFF);font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle">DWH</span>
           <span *ngIf="hasPbxFeature && (p.missed_call_count??0)>0"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>{{p.missed_call_count}}</span>
           <span *ngIf="hasPbxFeature && (p.unread_sms_count??0)>0"
@@ -147,10 +147,10 @@ type SortDir = 'asc' | 'desc';
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px;display:inline-flex;align-items:center;gap:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.53 3.68 1.44 5.2L2 22l4.94-1.3A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>{{p.unread_whatsapp_count}}</span>
           <span *ngIf="hasUnreadReply(p)"
                 style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;line-height:16px">✉️ {{unreadReplyCount(p)}}</span>
-          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:#f97316;font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
+          <span *ngIf="(p.doc_count??0)===0" [title]="t('partnersList.documents.noContract')" style="color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF);font-size:14px;margin-left:4px;vertical-align:middle">📄⚠️</span>
           <span *ngIf="p.crm_uuid && (p.doc_count??0)>0"
                 [title]="t('partnersList.documents.linkedCount', { count: p.doc_count })"
-                style="color:#6b7280;font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
+                style="color:var(--gray-500);font-size:14px;margin-left:4px;vertical-align:middle;cursor:pointer"
                 (click)="$event.stopPropagation(); openPartnerDocs(p)">📄</span>
         </span>
         <span class="td-sub" *ngIf="p.contact_name">{{p.contact_name}}</span>
@@ -159,10 +159,10 @@ type SortDir = 'asc' | 'desc';
       <div class="td td-sm">{{p.industry||'—'}}</div>
       <div class="td td-sm">{{p.group_name||'—'}}</div>
       <div class="td td-sm">{{p.manager_name||'—'}}</div>
-      <div class="td" style="font-weight:600;color:#f97316;font-size:12px">{{p.contract_value?(p.contract_value|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
+      <div class="td" style="font-weight:600;color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF);font-size:12px">{{p.contract_value?(p.contract_value|number:'1.0-0')+' '+(p.annual_turnover_currency||'PLN'):'—'}}</div>
       <ng-container *ngIf="partnerSales(p) as s; else noSales">
-        <div class="td" style="font-weight:700;color:#f97316;font-size:12px">{{s.gross_turnover_pln|number:'1.0-0'}}</div>
-        <div class="td" style="font-weight:600;color:#16a34a;font-size:12px">{{s.revenue_pln|number:'1.0-0'}}</div>
+        <div class="td" style="font-weight:700;color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF);font-size:12px">{{s.gross_turnover_pln|number:'1.0-0'}}</div>
+        <div class="td" style="font-weight:600;color:color-mix(in srgb, #16a34a var(--tint-text-mix), #FFFFFF);font-size:12px">{{s.revenue_pln|number:'1.0-0'}}</div>
       </ng-container>
       <ng-template #noSales>
         <div class="td td-sm" style="color:#d1d5db">—</div>
@@ -197,11 +197,11 @@ type SortDir = 'asc' | 'desc';
       <h3>{{ t('partnersList.create.title') }}</h3>
       <p class="hint">{{ t('partnersList.create.hint') }}</p>
       <label>{{ t('partnersList.fields.company') }} *<input [(ngModel)]="newP.company" [placeholder]="t('partnersList.create.companyPlaceholder')"></label>
-      <label>{{ t('partnersList.fields.taxId') }} <span style="font-size:10px;color:#9ca3af">{{ t('partnersList.create.taxIdHint') }}</span>
+      <label>{{ t('partnersList.fields.taxId') }} <span style="font-size:10px;color:var(--gray-400)">{{ t('partnersList.create.taxIdHint') }}</span>
         <input [(ngModel)]="newP.nip" placeholder="PL1234567890" maxlength="14"
                (ngModelChange)="onPartnerNipChange()"
                [style.border-color]="partnerNipError ? '#ef4444' : ''">
-        <span *ngIf="partnerNipError" style="font-size:12px;color:#ef4444;margin-top:2px;display:block">{{ partnerNipError }}</span>
+        <span *ngIf="partnerNipError" style="font-size:12px;color:color-mix(in srgb, #ef4444 var(--tint-text-mix), #FFFFFF);margin-top:2px;display:block">{{ partnerNipError }}</span>
       </label>
       <label>{{ t('partnersList.fields.contact') }}<input [(ngModel)]="newP.contact_name"></label>
       <label>{{ t('partnersList.fields.email') }}<input [(ngModel)]="newP.email" type="email"></label>
@@ -228,7 +228,7 @@ type SortDir = 'asc' | 'desc';
   styles: [`
     :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-    .topbar { display:flex; align-items:center; gap:12px; height:60px; padding:0 24px; background:white; border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+    .topbar { display:flex; align-items:center; gap:12px; height:60px; padding:0 24px; background:var(--surface); border-bottom:1px solid var(--gray-200); flex-shrink:0; }
     .topbar h1 { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin:0; }
     /* Toolbar */
     .content { flex:1; min-height:0; display:flex; flex-direction:column; padding:20px 24px 24px; overflow:hidden; }
@@ -237,60 +237,60 @@ type SortDir = 'asc' | 'desc';
     .srch-wrap svg { position:absolute; left:12px; width:15px; height:15px; color:var(--gray-400); pointer-events:none; }
     /* Cards */
     .cards-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; padding:0 0 8px; align-content:start; }
-    .partner-card { background:white; border-radius:var(--radius); padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s; }
+    .partner-card { background:var(--surface); border-radius:var(--radius); padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s; }
     .partner-card:hover { box-shadow:var(--shadow); }
     .pc-top { display:flex; align-items:flex-start; gap:8px; margin-bottom:4px; }
-    .pc-company { font-weight:700; font-size:14px; flex:1; color:#333333; }
-    .pc-contact { font-size:12px; color:#6b7280; margin-bottom:6px; }
+    .pc-company { font-weight:700; font-size:14px; flex:1; color:var(--gray-800); }
+    .pc-contact { font-size:12px; color:var(--gray-500); margin-bottom:6px; }
     .pc-meta { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px; }
-    .pc-tag { font-size:10px; color:#6b7280; background:#f4f4f5; padding:1px 6px; border-radius:4px; }
+    .pc-tag { font-size:10px; color:var(--gray-500); background:var(--gray-100); padding:1px 6px; border-radius:4px; }
     .pc-financials { display:flex; gap:8px; align-items:center; }
-    .pc-arr { font-size:12px; font-weight:700; color:#f97316; }
-    .pc-online { font-size:10px; font-weight:600; color:#3b82f6; }
-    .pc-opp { font-size:10px; background:#dbeafe; color:#1e40af; padding:2px 8px; border-radius:6px; font-weight:600; }
-    .pc-opp-valued { background:#fff7ed; color:#c2410c; }
+    .pc-arr { font-size:12px; font-weight:700; color:color-mix(in srgb, #f97316 var(--tint-text-mix), #FFFFFF); }
+    .pc-online { font-size:10px; font-weight:600; color:color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF); }
+    .pc-opp { font-size:10px; background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); padding:2px 8px; border-radius:6px; font-weight:600; }
+    .pc-opp-valued { background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color:color-mix(in srgb, #c2410c var(--tint-text-mix), #FFFFFF); }
     .pc-onboarding { margin-top:8px; }
-    .onb-bar { height:4px; background:#e5e7eb; border-radius:2px; overflow:hidden; margin-bottom:4px; }
+    .onb-bar { height:4px; background:var(--gray-200); border-radius:2px; overflow:hidden; margin-bottom:4px; }
     .onb-fill { height:100%; background:#3b82f6; }
-    .onb-label { font-size:10px; color:#6b7280; }
+    .onb-label { font-size:10px; color:var(--gray-500); }
     /* Badges */
     .pbadge { padding:2px 8px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; }
-    .pbadge-active { background:#dcfce7; color:#166534; }
-    .pbadge-onboarding { background:#dbeafe; color:#1e40af; }
-    .pbadge-inactive { background:#f3f4f6; color:#374151; }
-    .pbadge-churned { background:#fee2e2; color:#991b1b; }
+    .pbadge-active { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #166534 var(--tint-text-mix), #FFFFFF); }
+    .pbadge-onboarding { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
+    .pbadge-inactive { background:var(--gray-100); color:var(--gray-700); }
+    .pbadge-churned { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
     /* Table */
     .table-wrap { flex:1; overflow:auto; }
     .tw-head, .tw-row { display:grid; gap:0; }
     .tw-head { background:var(--gray-50); border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:1; }
-    .th { padding:8px 12px; font-size:10px; font-weight:700; text-transform:uppercase; color:#9ca3af; letter-spacing:.4px; display:flex; align-items:center; gap:4px; }
+    .th { padding:8px 12px; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--gray-400); letter-spacing:.4px; display:flex; align-items:center; gap:4px; }
     .th.sortable { cursor:pointer; user-select:none; }
-    .th.sortable:hover { color:#374151; }
+    .th.sortable:hover { color:var(--gray-700); }
     .si { font-size:10px; color:#d1d5db; }
-    .tw-row { border-bottom:1px solid #f4f4f5; cursor:pointer; }
+    .tw-row { border-bottom:1px solid var(--gray-100); cursor:pointer; }
     .tw-row:hover { background:var(--gray-50); }
-    .td { padding:10px 12px; font-size:14px; color:#374151; display:flex; flex-direction:column; justify-content:center; }
-    .td-main { font-weight:600; color:#333333; }
-    .td-sub { font-size:12px; color:#9ca3af; }
+    .td { padding:10px 12px; font-size:14px; color:var(--gray-700); display:flex; flex-direction:column; justify-content:center; }
+    .td-main { font-weight:600; color:var(--gray-800); }
+    .td-sub { font-size:12px; color:var(--gray-400); }
     .td-sm { font-size:12px; }
-    .expiring { color:#dc2626; font-weight:600; }
-    .no-data { text-align:center; color:#9ca3af; padding:40px; }
+    .expiring { color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); font-weight:600; }
+    .no-data { text-align:center; color:var(--gray-400); padding:40px; }
     /* Pager */
     .pager { display:flex; justify-content:center; gap:12px; align-items:center; padding:12px; flex-shrink:0; }
         .pager button:disabled { opacity:.4; }
     /* Churn badges */
     .churn-badge { display:inline-flex; align-items:center; padding:1px 8px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; margin-top:4px; }
-    .churn-critical { background:#fee2e2; color:#991b1b; }
-    .churn-high { background:#ffedd5; color:#c2410c; }
-    .churn-medium { background:#fef9c3; color:#854d0e; }
-    .churn-low { background:#dbeafe; color:#1e40af; }
+    .churn-critical { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #991b1b var(--tint-text-mix), #FFFFFF); }
+    .churn-high { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #c2410c var(--tint-text-mix), #FFFFFF); }
+    .churn-medium { background:color-mix(in srgb, #fef9c3 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #854d0e var(--tint-text-mix), #FFFFFF); }
+    .churn-low { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1e40af var(--tint-text-mix), #FFFFFF); }
     /* Side panel */
     .side-panel { position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:100; display:flex; justify-content:flex-end; }
-    .side-panel-inner { background:white; width:360px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; }
+    .side-panel-inner { background:var(--surface); width:360px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; }
     .side-panel-inner h3 { margin:0; font-size:16px; font-weight:700; }
-    .hint { font-size:12px; color:#9ca3af; margin:0; }
+    .hint { font-size:12px; color:var(--gray-400); margin:0; }
     .side-panel-inner label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
-    .side-panel-inner input, .side-panel-inner select { border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; font-size:14px; outline:none; }
+    .side-panel-inner input, .side-panel-inner select { border:1px solid var(--gray-300); border-radius:6px; padding:8px 10px; font-size:14px; outline:none; }
     .panel-actions { display:flex; gap:8px; margin-top:8px; }
   `],
 })

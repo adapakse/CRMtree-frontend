@@ -47,7 +47,7 @@ const FOLLOW_TENANT = 'tenant';
   styles: [`
     .picker { display:flex; flex-direction:column; gap:4px; max-width:360px; }
     .hint { font-size:12px; color:var(--gray-400); }
-    .compact { border:1px solid var(--gray-200); border-radius:7px; padding:4px 8px; font-size:12px; color:var(--gray-600); background:white; cursor:pointer; font-family:inherit; }
+    .compact { border:1px solid var(--gray-200); border-radius:7px; padding:4px 8px; font-size:12px; color:var(--gray-600); background:var(--surface); cursor:pointer; font-family:inherit; }
   `],
 })
 export class LanguagePickerComponent {

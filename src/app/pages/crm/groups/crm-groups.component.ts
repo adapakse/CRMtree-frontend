@@ -118,12 +118,12 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
   `,
   styles: [`
     .page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-    .topbar { display:flex; align-items:center; gap:12px; height:60px; padding:0 24px; background:white; border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+    .topbar { display:flex; align-items:center; gap:12px; height:60px; padding:0 24px; background:var(--surface); border-bottom:1px solid var(--gray-200); flex-shrink:0; }
     .topbar h1 { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--gray-900); margin:0; flex:1; }
-    .dwh-tag { font-size:10px; font-weight:700; background:#dbeafe; color:#1d4ed8; border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
-    .loading { padding:40px; text-align:center; color:#9ca3af; }
+    .dwh-tag { font-size:10px; font-weight:700; background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:color-mix(in srgb, #1d4ed8 var(--tint-text-mix), #FFFFFF); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
+    .loading { padding:40px; text-align:center; color:var(--gray-400); }
     .groups-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; padding:20px 24px 24px; align-content:start; }
-    .group-card { background:white; border-radius:12px; padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s, transform .15s; }
+    .group-card { background:var(--surface); border-radius:12px; padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s, transform .15s; }
     .group-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
     .group-card.highlighted { box-shadow:0 0 0 2px var(--orange), var(--shadow-sm); }
     .gc-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
@@ -131,48 +131,48 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .gc-icon svg.ic { width:20px; height:20px; }
     .gc-title { flex:1; }
     .gc-name { font-weight:700; font-size:16px; }
-    .gc-industry { font-size:12px; color:#9ca3af; }
+    .gc-industry { font-size:12px; color:var(--gray-400); }
     .gc-actions { }
     .icon-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:none; border:none; border-radius:999px; cursor:pointer; color:var(--gray-500); }
     .icon-btn:hover { background:var(--gray-100); color:var(--orange-dark); }
     .gc-stats { display:flex; gap:12px; margin-bottom:8px; }
-    .gc-stat { font-size:12px; color:#6b7280; }
-    .gc-stat.accent strong { color:var(--orange); }
-    .gc-mgr { display:flex; align-items:center; gap:4px; font-size:12px; color:#9ca3af; margin-bottom:8px; }
-    .gc-desc { font-size:12px; color:#6b7280; margin-bottom:8px; }
+    .gc-stat { font-size:12px; color:var(--gray-500); }
+    .gc-stat.accent strong { color: var(--orange-text); }
+    .gc-mgr { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--gray-400); margin-bottom:8px; }
+    .gc-desc { font-size:12px; color:var(--gray-500); margin-bottom:8px; }
     .gc-partners { display:flex; flex-wrap:wrap; gap:4px; }
     .partner-chip { background:var(--gray-100); border-radius:999px; padding:2px 8px; font-size:10px; }
-    .partner-chip.more { color:#9ca3af; }
-    .no-groups { grid-column:1/-1; text-align:center; color:#9ca3af; padding:32px; }
+    .partner-chip.more { color:var(--gray-400); }
+    .no-groups { grid-column:1/-1; text-align:center; color:var(--gray-400); padding:32px; }
     /* Side panels */
     .side-panel { position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:100; display:flex; justify-content:flex-end; }
-    .side-panel-inner { background:white; width:380px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-lg); }
+    .side-panel-inner { background:var(--surface); width:380px; height:100%; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-lg); }
     .side-panel-inner h3 { margin:0; font-size:16px; font-weight:700; }
     .side-panel-inner label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; }
     .panel-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
     /* View panel */
     .view-panel { gap:0; padding:0; }
-    .vp-header { display:flex; align-items:flex-start; justify-content:space-between; padding:20px 20px 16px; border-bottom:1px solid #f3f4f6; }
+    .vp-header { display:flex; align-items:flex-start; justify-content:space-between; padding:20px 20px 16px; border-bottom:1px solid var(--gray-100); }
     .vp-title { display:flex; align-items:center; gap:8px; font-family:'Sora',sans-serif; font-size:16px; font-weight:700; }
-    .vp-sub { font-size:12px; color:#9ca3af; margin-top:2px; }
+    .vp-sub { font-size:12px; color:var(--gray-400); margin-top:2px; }
     .vp-header-actions { display:flex; gap:8px; align-items:center; }
-    .close-btn { background:none; border:none; font-size:18px; color:#9ca3af; cursor:pointer; line-height:1; }
-    .vp-stats { display:flex; gap:0; border-bottom:1px solid #f3f4f6; }
+    .close-btn { background:none; border:none; font-size:18px; color:var(--gray-400); cursor:pointer; line-height:1; }
+    .vp-stats { display:flex; gap:0; border-bottom:1px solid var(--gray-100); }
     .vp-stat { flex:1; padding:14px 20px; text-align:center; }
-    .vp-stat:not(:last-child) { border-right:1px solid #f3f4f6; }
+    .vp-stat:not(:last-child) { border-right:1px solid var(--gray-100); }
     .vp-stat-val { font-size:20px; font-weight:800; }
-    .vp-stat-val.accent { color:var(--orange); }
-    .vp-stat-lbl { font-size:12px; color:#9ca3af; margin-top:2px; }
-    .vp-mgr { display:flex; align-items:center; gap:4px; font-size:12px; color:#6b7280; padding:12px 20px 0; }
-    .vp-desc { font-size:12px; color:#6b7280; padding:8px 20px 0; white-space:pre-line; }
+    .vp-stat-val.accent { color: var(--orange-text); }
+    .vp-stat-lbl { font-size:12px; color:var(--gray-400); margin-top:2px; }
+    .vp-mgr { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--gray-500); padding:12px 20px 0; }
+    .vp-desc { font-size:12px; color:var(--gray-500); padding:8px 20px 0; white-space:pre-line; }
     .vp-partners-section { padding:16px 20px; flex:1; }
-    .vp-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#9ca3af; margin-bottom:10px; }
-    .vp-empty { font-size:14px; color:#9ca3af; text-align:center; padding:20px; }
+    .vp-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-400); margin-bottom:10px; }
+    .vp-empty { font-size:14px; color:var(--gray-400); text-align:center; padding:20px; }
     .vp-partner-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; cursor:pointer; transition:.12s; }
     .vp-partner-row:hover { background:var(--orange-pale); }
     .vp-partner-name { font-size:14px; font-weight:600; }
     .vp-chev { width:16px; height:16px; color:#d1d5db; flex-shrink:0; }
-    .vp-partner-row:hover .vp-chev { color:var(--orange); }
+    .vp-partner-row:hover .vp-chev { color: var(--orange-text); }
   `],
 })
 export class CrmGroupsComponent implements OnInit {

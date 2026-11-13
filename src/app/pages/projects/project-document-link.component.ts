@@ -30,7 +30,7 @@ import { ProjectCostDocument } from '../../core/services/project-finance-api.ser
   `,
   styles: [`
     :host { display:inline-block; max-width:100%; }
-    .document { font-size:12px; line-height:1.4; overflow-wrap:anywhere; color:var(--accent-blue, #3B82F6); text-decoration:none; }
+    .document { font-size:12px; line-height:1.4; overflow-wrap:anywhere; color:var(--accent-blue, color-mix(in srgb, #3b82f6 var(--tint-text-mix), #FFFFFF)); text-decoration:none; }
     a.document:hover { text-decoration:underline; }
     .document.locked { color:var(--gray-600); }
     .number { font-weight:600; white-space:nowrap; }

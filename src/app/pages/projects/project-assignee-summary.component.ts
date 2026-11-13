@@ -55,15 +55,15 @@ const OPEN_STATUS_CATEGORIES = 'todo,in_progress';
   styles: [`
     :host { display:block; }
     .strip { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-    .person { display:inline-flex; align-items:center; gap:4px; padding:4px 6px 4px 10px; background:white; border:1px solid var(--gray-200); border-radius:9px; }
+    .person { display:inline-flex; align-items:center; gap:4px; padding:4px 6px 4px 10px; background:var(--surface); border:1px solid var(--gray-200); border-radius:9px; }
     .person.active { border-color:var(--orange); background:var(--orange-pale); }
     button { border:none; background:none; cursor:pointer; font-family:inherit; }
     .name { padding:0 4px 0 0; font-size:12px; font-weight:600; color:var(--gray-800); }
     .name:hover { color:var(--orange-dark); }
     .count { min-width:22px; padding:1px 6px; border-radius:8px; font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; background:var(--gray-100); color:var(--gray-700); }
     .count:hover { filter:brightness(.95); }
-    .count.overdue { background:#FEE2E2; color:#B91C1C; }
-    .count.at-risk { background:#FEF3C7; color:#92400E; }
+    .count.overdue { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #b91c1c var(--tint-text-mix), #FFFFFF); }
+    .count.at-risk { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:color-mix(in srgb, #92400e var(--tint-text-mix), #FFFFFF); }
     .count.zero { background:var(--gray-50); color:var(--gray-300); }
     .key { font-size:12px; color:var(--gray-400); }
   `],

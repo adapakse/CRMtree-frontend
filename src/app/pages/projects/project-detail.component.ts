@@ -129,7 +129,7 @@ const ADDRESS_PARAMS_OF_THE_SCREEN = ['tab', 'task'];
   `,
   styles: [PROJECTS_SHARED_STYLES, `
     .back { font-size:12px; color:var(--gray-500); text-decoration:none; margin-right:6px; }
-    .back:hover { color:var(--orange); }
+    .back:hover { color: var(--orange-text); }
     .pill.closed { background:var(--gray-100); color:var(--gray-500); }
     .tab-bar { display:flex; align-items:flex-start; gap:16px; }
     .tabs { width:560px; }

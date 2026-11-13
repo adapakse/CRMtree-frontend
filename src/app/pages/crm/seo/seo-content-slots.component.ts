@@ -130,10 +130,10 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
     </ng-container>
   `,
   styles: [`
-    .slots-box { border: 1px solid #FCD34D; background: #FFFBEB; border-radius: var(--radius); padding: 0.9rem 1rem; margin-top: 0.9rem; }
+    .slots-box { border: 1px solid #FCD34D; background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border-radius: var(--radius); padding: 0.9rem 1rem; margin-top: 0.9rem; }
     .slots-box h3 { font-size: 0.95rem; margin: 0 0 0.25rem; }
     .hint { font-size: 0.78rem; color: var(--gray-600); margin: 0 0 0.6rem; }
-    .slot-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.7rem 0.8rem; margin-top: 0.5rem; }
+    .slot-card { background: var(--surface); border: 1px solid var(--gray-200); border-radius: 8px; padding: 0.7rem 0.8rem; margin-top: 0.5rem; }
     .slot-card.done { opacity: 0.7; }
     .slot-head { display: flex; align-items: center; gap: 0.5rem; }
     .slot-type { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--orange-dark); }
@@ -150,7 +150,7 @@ const SLOT_TYPE_LABELS: Record<SeoSlotType, string> = {
     .suggestion-quote { font-style: italic; font-size: 0.85rem; margin: 0.3rem 0 0; }
     .suggestion-source { font-size: 0.78rem; color: var(--gray-600); margin: 0.25rem 0 0.4rem; }
     .shot-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.55rem; }
-    .shot-option { border: 2px solid var(--gray-200); border-radius: 8px; background: #fff; padding: 0.3rem; cursor: pointer; text-align: left; font-size: 0.72rem; color: var(--gray-700); }
+    .shot-option { border: 2px solid var(--gray-200); border-radius: 8px; background: var(--surface); padding: 0.3rem; cursor: pointer; text-align: left; font-size: 0.72rem; color: var(--gray-700); }
     .shot-option.selected { border-color: var(--orange); }
     .shot-option img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 4px; margin-bottom: 0.25rem; }
     .upload-new { margin-top: 0.6rem; font-size: 0.8rem; }

@@ -116,11 +116,11 @@ function parseOptions(text: string): string[] {
        Samo „btn-primary" jest klasą prywatną komponentu ustawień i tutaj nie
        działa — przycisk wyglądałby jak surowy, systemowy. */
     .row .del {
-      border:1px solid var(--gray-300); background:white;
+      border:1px solid var(--gray-300); background:var(--surface);
       color:var(--gray-400); border-radius:6px; width:26px; height:26px;
       cursor:pointer; font-size:12px; line-height:1;
     }
-    .row .del:hover:not(:disabled) { border-color:#fca5a5; color:#dc2626; background:#fef2f2; }
+    .row .del:hover:not(:disabled) { border-color:#fca5a5; color:color-mix(in srgb, #dc2626 var(--tint-text-mix), #FFFFFF); background:var(--gray-50); }
     .row .del:disabled { opacity:.5; cursor:default; }
   `],
 })

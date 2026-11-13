@@ -41,13 +41,13 @@ const MENU_GAP_PX = 4;
   `,
   styles: [`
     :host { position:relative; display:inline-flex; }
-    .trigger { display:inline-flex; align-items:center; gap:6px; border:1px solid #e5e7eb; background:white; border-radius:7px; padding:4px 6px; cursor:pointer; color:#6b7280; font-family:inherit; font-size:12px; }
-    .trigger:hover { color:#2F8F4D; border-color:#A8D9B6; }
+    .trigger { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--gray-200); background:var(--surface); border-radius:7px; padding:4px 6px; cursor:pointer; color:var(--gray-500); font-family:inherit; font-size:12px; }
+    .trigger:hover { color:color-mix(in srgb, #2f8f4d var(--tint-text-mix), #FFFFFF); border-color:#A8D9B6; }
     .trigger.labelled { padding:6px 10px; }
     .trigger svg { width:15px; height:15px; }
-    .menu { position:fixed; z-index:1000; width:200px; background:white; border:1px solid #e5e7eb; border-radius:9px; box-shadow:0 7px 22px rgba(0,0,0,0.108); padding:4px; display:flex; flex-direction:column; }
-    .menu a, .menu button { text-align:left; padding:8px 10px; border:none; background:none; border-radius:6px; font-size:12px; color:#333333; text-decoration:none; cursor:pointer; font-family:inherit; }
-    .menu a:hover, .menu button:hover { background:#f3f4f6; }
+    .menu { position:fixed; z-index:1000; width:200px; background:var(--surface); border:1px solid var(--gray-200); border-radius:9px; box-shadow:0 7px 22px rgba(0,0,0,0.108); padding:4px; display:flex; flex-direction:column; }
+    .menu a, .menu button { text-align:left; padding:8px 10px; border:none; background:none; border-radius:6px; font-size:12px; color:var(--gray-800); text-decoration:none; cursor:pointer; font-family:inherit; }
+    .menu a:hover, .menu button:hover { background:var(--gray-100); }
   `],
 })
 export class AddToCalendarComponent {
