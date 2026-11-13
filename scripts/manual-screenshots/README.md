@@ -24,7 +24,7 @@ How it works
 
 `shots.json`: `{ file, route, user, actions?, alsoCopyTo?, settle?, fakeDate?, skip? }`
 - `file`: name without the language prefix (`w01_dashboard` gives `pl_w01_dashboard.jpg` and `en_w01_dashboard.jpg`).
-- `alsoCopyTo`: other names that are byte-identical copies (the `*b_*_full.jpg` files are duplicates of the base image).
+- `alsoCopyTo`: other names that get a byte-identical copy (not used by the manual now; the old `*b_*_full.jpg` copies were removed).
 - `actions` (run in order after the page settles; text/selector values can be `{ "pl": "...", "en": "..." }`):
   `{wait: ms}`, `{click: css}`, `{clickText: text, exact?, nth?}`, `{clickRole: name, role?}`, `{fill: css, value}`,
   `{press: key}`, `{hover: css}`, `{waitFor: css}`, `{waitText: text}`, `{scroll: css|"window", to|by}`,
