@@ -865,7 +865,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
               </div>
             </div>
             @if (groupError()) {
-              <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">
+              <div style="background:color-mix(in srgb, #FEF2F2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">
                 ⚠️ {{ groupError() }}
               </div>
             }
@@ -1013,7 +1013,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                       </thead>
                       <tbody>
                         @for (tpl of getTemplates(field); track tpl.id; let idx = $index) {
-                          <tr style="border-bottom:1px solid var(--gray-100)" [style.background]="tpl.standard ? 'var(--gray-50)' : 'var(--surface)'">
+                          <tr style="border-bottom:1px solid var(--gray-100)" [style.background]="tpl.standard ? 'color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))' : 'var(--surface)'">
                             <td style="padding:6px 10px">
                               <input style="width:100%;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box"
                                      [ngModel]="tpl.title"
@@ -1103,7 +1103,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             <span style="font-size:18px;flex-shrink:0">💬</span>
             <div>
               <strong>{{ t('settings.tooltips.introTitle') }}</strong> {{ t('settings.tooltips.introBeforeIcon') }}
-              <strong style="font-family:sans-serif;background:var(--gray-200);border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">?</strong>
+              <strong style="font-family:sans-serif;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">?</strong>
               {{ t('settings.tooltips.introAfterIcon') }}
             </div>
           </div>
@@ -1140,7 +1140,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                         [placeholder]="t('settings.tooltips.contentPlaceholder')"></textarea>
             </div>
             @if (tipError()) {
-              <div style="background:var(--gray-50);border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
+              <div style="background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:12px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);margin-bottom:20px;display:flex;align-items:center;gap:8px">⚠ {{ tipError() }}</div>
             }
             <button class="btn btn-p"
                     [disabled]="tipSaving() || !newTipLabelKey || !newTipValue.trim()"
@@ -1165,7 +1165,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
                 <div class="card" style="margin-bottom:12px;overflow:hidden">
                   <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center;gap:12px">
                     <span class="cat-title" style="font-size:14px;font-weight:600">{{ t('settings.tooltips.catalog.' + catalogEntry(tip.key)?.labelKey) }}</span>
-                    <code style="font-size:10px;font-family:monospace;color:#a78bfa;background:var(--gray-50);padding:1px 6px;border-radius:4px">{{ tip.key }}</code>
+                    <code style="font-size:10px;font-family:monospace;color:#a78bfa;background:color-mix(in srgb, #f3f0ff var(--tint-mix), var(--surface));padding:1px 6px;border-radius:4px">{{ tip.key }}</code>
                     <span style="flex:1"></span>
                     @if (tip.updated_by_name) {
                       <span class="field-meta">{{ tip.updated_by_name }} · {{ tip.updated_at | date:'dd.MM.yy HH:mm' }}</span>
@@ -1196,7 +1196,7 @@ const AI_ASSISTANT_PURPOSE = 'assistant';
             @for (tip of uncategorizedTooltips(); track tip.key) {
               <div class="card" style="margin-bottom:12px;overflow:hidden">
                 <div class="cat-header" style="padding:12px 20px;display:flex;align-items:center;gap:12px">
-                  <code style="font-size:12px;font-family:monospace;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);background:var(--gray-50);padding:2px 8px;border-radius:4px">{{ tip.key }}</code>
+                  <code style="font-size:12px;font-family:monospace;color:oklch(from #7c3aed max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #f3f0ff var(--tint-mix), var(--surface));padding:2px 8px;border-radius:4px">{{ tip.key }}</code>
                   <span class="cat-title" style="font-size:12px;color:var(--gray-600);font-weight:500">{{ tip.label }}</span>
                   <span style="flex:1"></span>
                   @if (tip.updated_by_name) {

@@ -818,7 +818,7 @@ export class CrmReportsLeadsComponent implements OnInit, AfterViewInit {
           <span style="font-size:12px;color:var(--gray-700);font-weight:600">${d.label}${count}</span>
           <span style="font-size:14px;font-weight:700;color:${color}">${this.transloco.translate('crm.reports.common.days', { count: d.days })}</span>
         </div>
-        <div style="height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden">
+        <div style="height:8px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:4px;overflow:hidden">
           <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;transition:width .3s"></div>
         </div>`;
       el.appendChild(row);

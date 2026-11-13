@@ -81,10 +81,10 @@ interface WhatsappConvUiState {
           [style.background]="stages.pillBackground(lead.stage)"
           [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span>
     <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥{{ t('leadDetail.header.hot') }}</span>
-    <span *ngIf="lead.hold_active" style="background:var(--gray-200);color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
+    <span *ngIf="lead.hold_active" style="background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-g btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
-              [style.background]="lead.hold_active ? 'var(--gray-200)' : ''"
+              [style.background]="lead.hold_active ? 'color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))' : ''"
               [style.color]="lead.hold_active ? 'var(--gray-700)' : ''"
               (click)="openHoldModal()"
               [title]="lead.hold_active ? t('leadDetail.hold.editTooltip', { date: (lead.hold_until | date:'dd.MM.yyyy') }) : t('leadDetail.hold.set')">
@@ -249,7 +249,7 @@ interface WhatsappConvUiState {
                     (click)="canEditConsents && setConsentDraft(ct.consent_key, v.val)"
                     [style.background]="consentDraft[ct.consent_key]===v.val ? v.bg : 'var(--gray-50)'"
                     [style.color]="consentDraft[ct.consent_key]===v.val ? 'white' : 'var(--gray-500)'"
-                    [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : 'var(--gray-200)')"
+                    [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : 'color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))')"
                     [style.cursor]="canEditConsents ? 'pointer' : 'default'"
                     style="flex:1;font-size:10px;font-weight:600;padding:6px 2px;border-radius:8px;transition:all .12s;text-align:center;line-height:1.3;font-family:inherit">
               {{ t(v.labelKey) }}
@@ -372,12 +372,12 @@ interface WhatsappConvUiState {
                      style="position:absolute;top:calc(100% + 4px);left:0;min-width:200px;background:var(--surface);border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 7px 22px rgba(0,0,0,0.108);z-index:100;overflow:hidden">
                   <div *ngFor="let p of computedDueDatePresets"
                        style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--gray-100);white-space:nowrap"
-                       [style.background]="actDueDatePreset===p.value ? 'var(--gray-200)' : 'var(--surface)'"
+                       [style.background]="actDueDatePreset===p.value ? 'color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))' : 'var(--surface)'"
                        [style.color]="actDueDatePreset===p.value ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset===p.value ? '600' : '400'"
                        (mousedown)="selectDueDatePreset(p.value)">{{p.label}}</div>
                   <div style="padding:8px 12px;font-size:12px;cursor:pointer;white-space:nowrap"
-                       [style.background]="actDueDatePreset==='custom' ? 'var(--gray-200)' : 'var(--surface)'"
+                       [style.background]="actDueDatePreset==='custom' ? 'color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))' : 'var(--surface)'"
                        [style.color]="actDueDatePreset==='custom' ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
                        (mousedown)="selectDueDatePreset('custom')">📅 {{ t('activity.customDate') }}</div>
@@ -645,7 +645,7 @@ interface WhatsappConvUiState {
               <div *ngIf="a.safeBody" style="font-size:12px;line-height:1.6;color:var(--gray-700);background:var(--gray-50);border-radius:8px;padding:12px;max-height:400px;overflow-y:auto" [innerHTML]="a.safeBody"></div>
             </ng-template>
             <!-- Inline reply form -->
-            <div *ngIf="showReplyInline" style="border-radius:12px;padding:16px;background:var(--gray-50);display:flex;flex-direction:column;gap:8px">
+            <div *ngIf="showReplyInline" style="border-radius:12px;padding:16px;background:color-mix(in srgb, #f8faff var(--tint-mix), var(--surface));display:flex;flex-direction:column;gap:8px">
               <!-- Compact header -->
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                 <div style="font-size:12px;color:var(--gray-700);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
@@ -715,7 +715,7 @@ interface WhatsappConvUiState {
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);display:flex;align-items:center;gap:4px">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:var(--gray-50);border-radius:8px;overflow:hidden">
+            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:8px;overflow:hidden">
               <span style="padding:4px 10px;font-size:12px;color:var(--gray-700)">{{ t('whatsapp.from') }} <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
             </div>
           </div>
@@ -952,7 +952,7 @@ interface WhatsappConvUiState {
         <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px">{{ t('leadDetail.onboarding.inProgressHint') }}</div>
         <a routerLink="/crm/onboarding" style="font-size:12px;color:oklch(from #2563eb max(l, var(--text-min-l)) c h);font-weight:600;text-decoration:none">→ {{ t('leadDetail.onboarding.goTo') }}</a>
       </div>
-      <div *ngIf="lead.stage==='onboarded'" class="side-box" style="background:var(--gray-50)">
+      <div *ngIf="lead.stage==='onboarded'" class="side-box" style="background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))">
         <div style="font-size:12px;font-weight:700;color:oklch(from #15803d max(l, var(--text-min-l)) c h);margin-bottom:4px">✓ {{ t('leadDetail.onboarding.completed') }}</div>
         <div style="font-size:12px;color:var(--gray-400);margin-bottom:4px">{{lead.converted_at|date:'dd.MM.yyyy'}}</div>
         <div style="font-size:12px;color:var(--gray-500)">{{ t('leadDetail.onboarding.partnerAfterSync') }}</div>
@@ -1058,7 +1058,7 @@ interface WhatsappConvUiState {
         <div style="display:flex;gap:8px"><span style="color:var(--gray-400);min-width:40px">{{ t('email.date') }}</span><span style="color:var(--gray-700)">{{msgModalMsg.date|date:'dd.MM.yyyy HH:mm'}}</span></div>
       </div>
       <!-- Treść -->
-      <div style="border:1px solid var(--gray-200);border-radius:12px;padding:12px 16px;font-size:14px;line-height:1.6;color:var(--gray-700);white-space:pre-line;max-height:320px;overflow-y:auto"
+      <div style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:12px;padding:12px 16px;font-size:14px;line-height:1.6;color:var(--gray-700);white-space:pre-line;max-height:320px;overflow-y:auto"
            [innerHTML]="msgModalMsg.body || msgModalMsg.snippet"></div>
       <!-- Załączniki -->
       <div *ngIf="(msgModalMsg.attachments?.length||0)+(msgModalMsg.sentAttachments?.length||0)>0"
@@ -1079,7 +1079,7 @@ interface WhatsappConvUiState {
         </span>
       </div>
       <!-- Reply form -->
-      <div *ngIf="msgModalReply" style="border-top:1px solid var(--gray-200);padding-top:12px;display:flex;flex-direction:column;gap:8px">
+      <div *ngIf="msgModalReply" style="border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding-top:12px;display:flex;flex-direction:column;gap:8px">
         <div style="font-size:12px;font-weight:700;color:var(--gray-700)">↩ {{ t('email.reply.action') }}</div>
         <!-- Do -->
         <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px">
@@ -1318,11 +1318,11 @@ interface WhatsappConvUiState {
       <div *ngIf="!docSearching&&docResults.length===0&&docSearch.length>1" style="text-align:center;color:var(--gray-400);font-size:12px;padding:12px">{{ t('documents.picker.noResults') }}</div>
       <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
         <div *ngFor="let doc of docResults"
-             style="display:flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid var(--gray-200);border-radius:10px;transition:background .1s"
+             style="display:flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;transition:background .1s"
              [style.cursor]="doc._access==='read' ? 'default' : 'pointer'"
              [style.opacity]="doc._access==='read' ? '0.55' : '1'"
              [title]="doc._access==='read' ? t('documents.picker.readOnlyTooltip') : ''"
-             [style.background]="isLinked(doc.id)?'var(--gray-50)':'var(--surface)'"
+             [style.background]="isLinked(doc.id)?'color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))':'var(--surface)'"
              (click)="toggleLinkDoc(doc)">
           <span style="font-size:16px">📄</span>
           <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--gray-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{doc.name}}</div><div style="font-size:10px;color:var(--gray-400)"><span *ngIf="doc.doc_number">#{{doc.doc_number}} · </span>{{doc.doc_type}}</div></div>
@@ -1687,8 +1687,8 @@ interface WhatsappConvUiState {
     .comm-ic { width:16px; height:16px; color: var(--orange-text); }
     .lead-note { display:flex; align-items:center; gap:8px; font-size:12px; border-radius:10px; padding:8px 12px; }
     .lead-note-warn { background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface)); color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
-    .lead-note-err { background:var(--gray-50); color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
-    .lead-note-ok { background:var(--gray-50); color:oklch(from #15803d max(l, var(--text-min-l)) c h); }
+    .lead-note-err { background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
+    .lead-note-ok { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); color:oklch(from #15803d max(l, var(--text-min-l)) c h); }
     .file-chip { display:inline-flex; align-items:center; gap:4px; background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:12px; padding:2px 8px; font-size:12px; }
     .file-chip button { background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:12px; padding:0; }
     .file-chip button:hover { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
@@ -1706,8 +1706,8 @@ interface WhatsappConvUiState {
     .ta-row label.full { grid-column:1/-1; }
     .ta-row label input, .ta-row label select { border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:14px; outline:none; font-family:inherit; background:var(--surface); color:var(--gray-800); transition:border-color .15s; }
     .ta-row label input:focus, .ta-row label select:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
-    .ta-status-ok  { background:var(--gray-50); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
-    .ta-status-err { background:var(--gray-50); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+    .ta-status-ok  { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+    .ta-status-err { background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
     .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:16px; display:inline-block; }
     .info-section { margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--gray-100); }
     .info-section:last-child { border-bottom:none; }
@@ -1737,7 +1737,7 @@ interface WhatsappConvUiState {
     .comm-btn:disabled { opacity:.5; cursor:not-allowed; }
     .act-item { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--gray-100); transition:background .1s; border-radius:8px; }
     .act-item:last-child { border-bottom:none; }
-    .act-item:hover { background:var(--gray-50); }
+    .act-item:hover { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); }
     .act-item.act-closed { opacity:.6; }
     .act-item.act-overdue { border-left:3px solid #ef4444; padding-left:8px; }
     .act-item.act-today { border-left:3px solid #3BAA5D; padding-left:8px; }
@@ -1772,7 +1772,7 @@ interface WhatsappConvUiState {
     .act-ctrl-btn { background:none; border:none; cursor:pointer; font-size:12px; padding:4px 8px; border-radius:8px; color:var(--gray-400); display:inline-flex; align-items:center; justify-content:center; font-family:inherit; }
     .act-ctrl-btn:hover { background:var(--gray-100); color:var(--gray-700); }
     .act-ctrl-btn.del { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); opacity:.7; }
-    .act-ctrl-btn.del:hover { background:var(--gray-50); color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); opacity:1; }
+    .act-ctrl-btn.del:hover { background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); opacity:1; }
     .task-actions-row { display:flex; gap:8px; margin-top:8px; }
     .act-sel, .act-input { border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 12px; font-size:12px; font-family:inherit; outline:none; background:var(--surface); color:var(--gray-800); transition:border-color .15s; box-sizing:border-box; }
     .act-sel { cursor:pointer; }
@@ -1784,7 +1784,7 @@ interface WhatsappConvUiState {
     .wa-mode-switch { display:inline-flex; align-self:flex-start; gap:6px; }
     .wa-window-hint { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border-radius:10px; padding:8px 12px; }
     .wa-window-note { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
-    .wa-failed { font-size:10px; font-weight:700; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:var(--gray-50); border-radius:6px; padding:1px 6px; }
+    .wa-failed { font-size:10px; font-weight:700; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius:6px; padding:1px 6px; }
     .participant-input-wrap { position:relative; }
     .participant-chips { display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1.5px solid var(--gray-200);border-radius:10px;padding:4px 8px;min-height:36px;background:var(--surface);position:relative;box-sizing:border-box; }
     .participant-chips:focus-within { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }

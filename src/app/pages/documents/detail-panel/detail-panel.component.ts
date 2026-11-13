@@ -627,7 +627,7 @@ interface SelectOption { value: string; label: string; }
       <div class="mol open" (click)="signusOpen = false">
         <div class="mo" (click)="$event.stopPropagation()">
           <div class="moh">
-            <div class="moico" style="background:var(--gray-50);color:oklch(from #7e22ce max(l, var(--text-min-l)) c h)">✍</div>
+            <div class="moico" style="background:color-mix(in srgb, #F5F3FF var(--tint-mix), var(--surface));color:oklch(from #7e22ce max(l, var(--text-min-l)) c h)">✍</div>
             <div>
               <div class="mot">{{ t('detail.signus.modalTitle') }}</div>
               <div class="mos">{{ doc.doc_number }} · {{ doc.name }}</div>

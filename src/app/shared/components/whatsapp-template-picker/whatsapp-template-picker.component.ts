@@ -75,10 +75,10 @@ const INVALID_VARIABLE_RE = /[\n\t]| {5,}/;
     select, input { border: 1px solid var(--gray-300); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: inherit; outline: none; background: var(--surface); }
     .hint { font-size: 12px; color: var(--gray-500); }
     .warn { font-size: 12px; color: oklch(from #b45309 max(l, var(--text-min-l)) c h); }
-    .error { font-size: 12px; color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); background: var(--gray-50); border-radius: 6px; padding: 6px 10px; }
+    .error { font-size: 12px; color: oklch(from #ef4444 max(l, var(--text-min-l)) c h); background: color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius: 6px; padding: 6px 10px; }
     .link { background: none; border: none; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight: 600; cursor: pointer; padding: 0 0 0 6px; font-size: 12px; }
     .preview-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); }
-    .preview { background: var(--gray-200); border-radius: 8px; padding: 10px; font-size: 12px; line-height: 1.6; color: var(--gray-700); white-space: pre-wrap; display: flex; flex-direction: column; gap: 4px; }
+    .preview { background: color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)); border-radius: 8px; padding: 10px; font-size: 12px; line-height: 1.6; color: var(--gray-700); white-space: pre-wrap; display: flex; flex-direction: column; gap: 4px; }
     .footer { font-size: 12px; color: var(--gray-500); }
     .buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
     .buttons span { background: var(--surface); border: 1px solid var(--gray-300); border-radius: 6px; padding: 2px 8px; font-size: 12px; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }

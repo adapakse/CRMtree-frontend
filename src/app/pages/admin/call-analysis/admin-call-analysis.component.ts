@@ -52,7 +52,7 @@ interface CallAnalysisRow {
 <div style="display:flex;flex-direction:column;height:100%;background:var(--gray-50)" (click)="closeMenu()">
 
   <!-- HEADER -->
-  <div style="background:var(--surface);border-bottom:1px solid var(--gray-200);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+  <div style="background:var(--surface);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0">
     <div style="flex:1">
       <div style="font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('callAnalysis.title') }}</div>
       <div style="font-size:12px;color:var(--gray-500);margin-top:1px">{{ t('callAnalysis.subtitle') }}</div>
@@ -75,7 +75,7 @@ interface CallAnalysisRow {
 
   <!-- BACK LINK -->
   @if (navBack.ctx(); as ctx) {
-    <div style="padding:4px 24px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);flex-shrink:0">
+    <div style="padding:4px 24px;background:var(--gray-50);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));flex-shrink:0">
       <button (click)="navigateBack()" class="btn btn-g btn-sm">
         ← {{ctx.label}}
       </button>
@@ -84,7 +84,7 @@ interface CallAnalysisRow {
 
   <!-- PROGRESS BAR -->
   <div *ngIf="batchProgress.running || (batchProgress.total > 0 && !batchProgress.running)"
-       style="background:var(--surface);border-bottom:1px solid var(--gray-200);padding:10px 24px;flex-shrink:0">
+       style="background:var(--surface);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:10px 24px;flex-shrink:0">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="font-size:12px;color:var(--gray-700);font-weight:500">
         <ng-container *ngIf="batchProgress.running && batchStartedHere">{{ t('callAnalysis.progress.running') }}</ng-container>
@@ -96,7 +96,7 @@ interface CallAnalysisRow {
         {{ t('callAnalysis.progress.errors', { count: batchProgress.errors }) }}
       </span>
     </div>
-    <div style="height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden">
+    <div style="height:6px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;overflow:hidden">
       <div [style.width.%]="batchProgress.total ? ((batchProgress.done + batchProgress.errors) / batchProgress.total * 100) : 0"
            style="height:100%;background:#3BAA5D;border-radius:3px;transition:width 0.3s ease"></div>
     </div>
@@ -197,7 +197,7 @@ interface CallAnalysisRow {
   </div>
 
   <!-- IMPORT FEEDBACK -->
-  <div *ngIf="importResult" [style.background]="importResult.error ? 'var(--gray-50)' : 'var(--gray-50)'"
+  <div *ngIf="importResult" [style.background]="importResult.error ? 'color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface))' : 'color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))'"
        style="border-bottom:1px solid;padding:10px 24px;font-size:14px;flex-shrink:0"
        [style.border-color]="importResult.error ? '#fca5a5' : '#86efac'"
        [style.color]="importResult.error ? 'oklch(from #dc2626 max(l, var(--text-min-l)) c h)' : 'oklch(from #15803d max(l, var(--text-min-l)) c h)'">
@@ -215,7 +215,7 @@ interface CallAnalysisRow {
   <div class="ca-table-card">
     <table style="width:100%;border-collapse:collapse;font-size:14px">
       <thead>
-        <tr style="background:var(--gray-100);border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:1">
+        <tr style="background:var(--gray-100);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));position:sticky;top:0;z-index:1">
           <th style="padding:10px 12px;width:36px">
             <input type="checkbox" [checked]="allSelected && rows.length > 0" (change)="toggleSelectAll()"
                    style="cursor:pointer">
@@ -325,7 +325,7 @@ interface CallAnalysisRow {
               <button *ngIf="r.follow_up_done"
                       (click)="toggleFollowUpDone(r, $event)"
                       [title]="t('callAnalysis.followUp.undoTitle')"
-                      style="margin-left:6px;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:var(--gray-100);color:var(--gray-400);border:1px solid var(--gray-200);white-space:nowrap;cursor:pointer;text-decoration:line-through">
+                      style="margin-left:6px;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;background:var(--gray-100);color:var(--gray-400);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));white-space:nowrap;cursor:pointer;text-decoration:line-through">
                 📞 {{ t('callAnalysis.followUp.label') }}<span *ngIf="r.follow_up_date"> · {{r.follow_up_date | date:'dd.MM'}}</span>
               </button>
             </td>
@@ -365,7 +365,7 @@ interface CallAnalysisRow {
 
           <!-- Rozwinięty panel szczegółów -->
           <tr *ngIf="expandedNip === r.nip">
-            <td colspan="12" style="padding:0;background:var(--gray-50);border-bottom:2px solid #3BAA5D">
+            <td colspan="12" style="padding:0;background:color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface));border-bottom:2px solid #3BAA5D">
               <div style="padding:16px 24px">
                 <div *ngIf="r.analysis_status === 'error' && r.analysis_error"
                      style="color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);font-size:12px;margin-bottom:8px">
@@ -406,8 +406,8 @@ interface CallAnalysisRow {
                   </div>
                   <div *ngIf="transcriptExpanded.has(r.nip)">
                     <div *ngFor="let chunk of getTranscripts(r); let i = index"
-                         style="margin-bottom:12px;background:var(--surface);border:1px solid var(--gray-200);border-radius:8px;overflow:hidden">
-                      <div style="background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:6px 12px;font-size:12px;font-weight:600;color:var(--gray-500)">
+                         style="margin-bottom:12px;background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;overflow:hidden">
+                      <div style="background:var(--gray-50);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:6px 12px;font-size:12px;font-weight:600;color:var(--gray-500)">
                         {{ chunk.label || t('callAnalysis.transcript.callNumber', { number: i + 1 }) }}
                       </div>
                       <div class="transcript-body">{{ chunk.text }}</div>
@@ -437,7 +437,7 @@ interface CallAnalysisRow {
   </div>
 
   <!-- PAGINACJA -->
-  <div *ngIf="pages > 1" style="background:var(--surface);border-top:1px solid var(--gray-200);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0">
+  <div *ngIf="pages > 1" style="background:var(--surface);border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0">
     <button class="nav-btn" [disabled]="page <= 1" (click)="goPage(page - 1)">‹</button>
     <span style="font-size:14px;color:var(--gray-700)">{{page}} / {{pages}}</span>
     <button class="nav-btn" [disabled]="page >= pages" (click)="goPage(page + 1)">›</button>
@@ -448,12 +448,12 @@ interface CallAnalysisRow {
        (click)="$event.stopPropagation()"
        [style.top.px]="menuPos.top"
        [style.left.px]="menuPos.left"
-       style="position:fixed;z-index:9999;background:var(--surface);border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:190px;padding:4px 0">
+       style="position:fixed;z-index:9999;background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:190px;padding:4px 0">
     <ng-container *ngFor="let r of rows">
       <ng-container *ngIf="r.nip === openMenuNip">
         <button (click)="setStatus(r.nip, r.analysis_status === 'hold' ? 'pending' : 'hold', $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:var(--gray-700);cursor:pointer"
-                onmouseenter="this.style.background='var(--gray-50)'"
+                onmouseenter="this.style.background='color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface))'"
                 onmouseleave="this.style.background='none'">
           {{r.analysis_status === 'hold' ? '▶ ' + t('callAnalysis.menu.restoreFromHold') : '⏸ ' + t('callAnalysis.menu.putOnHold')}}
         </button>
@@ -475,7 +475,7 @@ interface CallAnalysisRow {
                 onmouseleave="this.style.background='none'">
           🔍 {{ t('callAnalysis.menu.inspect') }}
         </button>
-        <div style="height:1px;background:var(--gray-200);margin:4px 0"></div>
+        <div style="height:1px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));margin:4px 0"></div>
         <button (click)="deleteRow(r, $event)"
                 style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;font-size:14px;color:oklch(from #dc2626 max(l, var(--text-min-l)) c h);cursor:pointer"
                 onmouseenter="this.style.background='var(--gray-50)'"
@@ -501,7 +501,7 @@ interface CallAnalysisRow {
               display:flex;flex-direction:column;overflow:hidden">
 
     <!-- Header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--gray-200);flex-shrink:0">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));flex-shrink:0">
       <div style="display:flex;flex-direction:column;gap:4px">
         <span style="font-size:10px;color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:.6px">🔍 {{ t('callAnalysis.inspect.title') }}</span>
         <span style="font-size:16px;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">
@@ -527,7 +527,7 @@ interface CallAnalysisRow {
           </button>
         </div>
         <button (click)="closeInspect()"
-                style="width:28px;height:28px;border:1px solid var(--gray-200);border-radius:6px;background:none;cursor:pointer;font-size:14px;color:var(--gray-500);line-height:1">
+                style="width:28px;height:28px;border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:6px;background:none;cursor:pointer;font-size:14px;color:var(--gray-500);line-height:1">
           ✕
         </button>
       </div>
@@ -538,13 +538,13 @@ interface CallAnalysisRow {
       <div style="display:grid;grid-template-columns:210px 1fr;flex:1;min-height:0;overflow:hidden">
 
         <!-- Lewa kolumna: score + follow-up + status -->
-        <div style="padding:14px;border-right:1px solid var(--gray-200);overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+        <div style="padding:14px;border-right:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
-          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:12px">
             <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.purchasePotential') }}</div>
             <ng-container *ngIf="inspectRow.score !== null">
               <div style="display:flex;align-items:center;gap:10px">
-                <div style="flex:1;height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden">
+                <div style="flex:1;height:8px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:4px;overflow:hidden">
                   <div [style.width.%]="inspectRow.score" [style.background]="scoreColor(inspectRow.score)"
                        style="height:100%;border-radius:4px"></div>
                 </div>
@@ -557,7 +557,7 @@ interface CallAnalysisRow {
             <div *ngIf="inspectRow.score === null" style="color:var(--gray-400);font-size:14px">{{ t('callAnalysis.inspect.noScore') }}</div>
           </div>
 
-          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:12px">
             <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.followUp.label') }}</div>
             <div style="font-size:12px;display:flex;flex-direction:column;gap:4px">
               <span [style.color]="inspectRow.follow_up_required?'oklch(from #15803d max(l, var(--text-min-l)) c h)':'var(--gray-500)'" style="font-weight:600">
@@ -570,7 +570,7 @@ interface CallAnalysisRow {
             </div>
           </div>
 
-          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px">
+          <div style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:12px">
             <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">{{ t('callAnalysis.inspect.analysisStatus') }}</div>
             <div style="display:flex;flex-direction:column;gap:4px">
               <span [class]="statusClass(inspectRow.analysis_status)" style="font-size:12px;padding:2px 8px;border-radius:10px;font-weight:600;align-self:flex-start">
@@ -587,7 +587,7 @@ interface CallAnalysisRow {
         <div style="padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
           <div *ngIf="inspectRow.ai_summary">
             <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">{{ t('callAnalysis.inspect.aiSummary') }}</div>
-            <div style="font-size:14px;line-height:1.6;color:var(--gray-700);background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px">
+            <div style="font-size:14px;line-height:1.6;color:var(--gray-700);background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:10px 12px">
               {{inspectRow.ai_summary}}
             </div>
           </div>
@@ -625,7 +625,7 @@ interface CallAnalysisRow {
 
       <!-- Stopka: notatki z rozmów -->
       <div *ngIf="inspectRow.notes_text"
-           style="border-top:1px solid var(--gray-200);background:var(--gray-50);flex-shrink:0;max-height:200px;overflow-y:auto">
+           style="border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));background:var(--gray-50);flex-shrink:0;max-height:200px;overflow-y:auto">
         <div style="padding:10px 14px">
           <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">
             {{ t('callAnalysis.inspect.basis', { chars: inspectRow.notes_text.length, calls: getTranscripts(inspectRow).length }) }}
@@ -674,7 +674,7 @@ interface CallAnalysisRow {
     .status-done      { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface));color:oklch(from #15803d max(l, var(--text-min-l)) c h) }
     .status-error     { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #991b1b max(l, var(--text-min-l)) c h) }
     .status-hold      { background:var(--gray-100);color:var(--gray-700) }
-    .status-archived  { background:var(--gray-200);color:var(--gray-500) }
+    .status-archived  { background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-500) }
 
     /* Tooltip "?" dla kolumny Potencjał */
     .ca-info-wrap {
@@ -695,7 +695,7 @@ interface CallAnalysisRow {
       display: inline-flex; align-items: center; justify-content: center;
       padding: 0; line-height: 1;
     }
-    .ca-info:hover { background: var(--gray-50); border-color: #3BAA5D; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
+    .ca-info:hover { background: color-mix(in srgb, #f0f9ff var(--tint-mix), var(--surface)); border-color: #3BAA5D; color: oklch(from #3baa5d max(l, var(--text-min-l)) c h); }
     .ca-info-tip {
       display: none;
       position: absolute;

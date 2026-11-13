@@ -147,7 +147,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
   `,
   styles: [`
     .txn-page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-    .txn-header { display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--gray-200); }
+    .txn-header { display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); }
     .txn-header h1 { font-size:18px; font-weight:700; margin:0; flex:1; }
     .kpi-strip { display:flex; align-items:center; gap:24px; flex-wrap:wrap; padding:14px 20px; border-bottom:1px solid var(--gray-100); background:var(--gray-50); }
     .kpi { }
@@ -177,7 +177,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     code { font-size:12px; background:var(--gray-100); border-radius:4px; padding:1px 4px; }
     .product-tags { display:flex; flex-wrap:wrap; gap:4px; }
     .ptag { font-size:10px; background:var(--gray-100); border-radius:6px; padding:1px 6px; }
-    .ptag.more { background:var(--gray-200); color:var(--gray-500); }
+    .ptag.more { background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); color:var(--gray-500); }
     .status-chip { padding:2px 8px; border-radius:8px; font-size:12px; font-weight:600; }
     .status-confirmed { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
     .status-cancelled  { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
@@ -189,7 +189,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
     .products-table td { font-size:12px; padding:6px 10px; border-bottom:1px solid var(--gray-50); vertical-align:top; }
     .empty-msg { text-align:center; color:var(--gray-400); padding:32px; }
     .pager { display:flex; justify-content:center; gap:12px; align-items:center; padding:12px; }
-    .pager button { border:1px solid var(--gray-200); background:var(--surface); border-radius:6px; padding:4px 12px; cursor:pointer; }
+    .pager button { border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); background:var(--surface); border-radius:6px; padding:4px 12px; cursor:pointer; }
     .pager button:disabled { opacity:.4; cursor:default; }
   `],
 })

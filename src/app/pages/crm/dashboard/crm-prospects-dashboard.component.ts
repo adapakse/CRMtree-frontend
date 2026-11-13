@@ -92,7 +92,7 @@ function maxOf(rows: BarRow[]): number {
 <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
 
 <!-- TOPBAR -->
-<div style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200,var(--gray-200));display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0">
+<div style="height:60px;background:var(--surface);border-bottom:1px solid var(--gray-200,color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));display:flex;align-items:center;gap:10px;padding:0 24px;flex-shrink:0">
   <span style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--gray-800)">{{ t('dashboard.title') }}</span>
   <span style="font-size:12px;color:var(--gray-400)">{{ t('dashboard.subtitle') }}</span>
 </div>
@@ -447,7 +447,7 @@ function maxOf(rows: BarRow[]): number {
     .pd-ms-trigger {
       display: flex; align-items: center; gap: 8px; box-sizing: border-box;
       height: 36px; font-size: 12px; font-weight: 500; font-family: inherit; padding: 0 14px; border-radius: 12px;
-      border: 1px solid var(--gray-200, var(--gray-200)); box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))); box-shadow: 0 1px 2px rgba(0,0,0,.05);
       background: var(--var(--surface), var(--surface)); cursor: pointer;
       color: var(--gray-800, var(--gray-800)); max-width: 200px;
     }
@@ -466,7 +466,7 @@ function maxOf(rows: BarRow[]): number {
       display: block; box-sizing: border-box;
       width: calc(100% - 16px); margin: 0 8px 6px;
       height: 32px; font-size: 12px; padding: 0 12px; border-radius: 10px;
-      border: 1px solid var(--gray-200, var(--gray-200));
+      border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));
       background: var(--var(--surface), var(--surface)); color: var(--gray-700, var(--gray-700)); outline: none;
     }
     .pd-ms-search:focus { border-color: var(--orange, #3BAA5D); }
@@ -476,7 +476,7 @@ function maxOf(rows: BarRow[]): number {
     }
     .pd-ms-actions button {
       font-size: 12px; padding: 4px 8px; border-radius: 8px; cursor: pointer; font-family: inherit;
-      border: 1px solid var(--gray-200, var(--gray-200));
+      border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));
       background: transparent; color: var(--gray-500, var(--gray-500));
     }
     .pd-ms-actions button:hover { background: var(--gray-100, var(--gray-100)); }
@@ -499,7 +499,7 @@ function maxOf(rows: BarRow[]): number {
     .pd-period-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
     .pd-ptab {
       font-size: 12px; padding: 4px 12px; border-radius: 999px;
-      border: 1px solid var(--gray-200, var(--gray-200));
+      border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)));
       background: var(--surface); cursor: pointer; box-shadow: var(--shadow-sm);
       color: var(--gray-600, var(--gray-600)); white-space: nowrap; font-family: inherit; font-weight: 500;
     }
@@ -558,7 +558,7 @@ function maxOf(rows: BarRow[]): number {
     .pd-search-input {
       box-sizing: border-box; height: 36px; font-size: 12px; font-family: inherit;
       padding: 0 32px 0 34px; border-radius: 12px;
-      border: 1px solid var(--gray-200, var(--gray-200)); box-shadow: 0 5px 16px rgba(0,0,0,0.099);
+      border: 1px solid var(--gray-200, color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))); box-shadow: 0 5px 16px rgba(0,0,0,0.099);
       background: var(--var(--surface), var(--surface)); color: var(--gray-800, var(--gray-800));
       width: 220px; outline: none;
     }

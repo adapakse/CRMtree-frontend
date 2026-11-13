@@ -51,7 +51,7 @@ const SEARCH_DEBOUNCE_MS = 250;
   `,
   styles: [`
     :host { position:relative; display:block; }
-    .menu { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:300; max-height:260px; overflow-y:auto; background:var(--surface); border:1px solid var(--gray-200); border-radius:9px; box-shadow:0 7px 22px rgba(0,0,0,0.108); padding:4px; }
+    .menu { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:300; max-height:260px; overflow-y:auto; background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:9px; box-shadow:0 7px 22px rgba(0,0,0,0.108); padding:4px; }
     .option { width:100%; display:flex; align-items:baseline; gap:10px; text-align:left; padding:8px 10px; border:none; background:none; border-radius:6px; cursor:pointer; font-family:inherit; }
     .option:hover { background:var(--gray-100); }
     .label { font-size:14px; color:var(--gray-800); font-weight:600; }

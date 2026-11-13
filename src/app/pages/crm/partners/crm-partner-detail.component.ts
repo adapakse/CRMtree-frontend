@@ -492,12 +492,12 @@ function getMonthRange(preset: string): { from: string; to: string } {
                      style="position:absolute;top:calc(100% + 2px);left:0;min-width:200px;background:var(--surface);border:1px solid var(--gray-300);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.14);z-index:100;overflow:hidden">
                   <div *ngFor="let p of computedDueDatePresets"
                        style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--gray-100);white-space:nowrap"
-                       [style.background]="actDueDatePreset===p.value ? 'var(--gray-200)' : 'var(--surface)'"
+                       [style.background]="actDueDatePreset===p.value ? 'color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))' : 'var(--surface)'"
                        [style.color]="actDueDatePreset===p.value ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset===p.value ? '600' : '400'"
                        (mousedown)="selectDueDatePreset(p.value)">{{p.label}}</div>
                   <div style="padding:8px 12px;font-size:12px;cursor:pointer;white-space:nowrap"
-                       [style.background]="actDueDatePreset==='custom' ? 'var(--gray-200)' : 'var(--surface)'"
+                       [style.background]="actDueDatePreset==='custom' ? 'color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))' : 'var(--surface)'"
                        [style.color]="actDueDatePreset==='custom' ? 'oklch(from #3baa5d max(l, var(--text-min-l)) c h)' : 'var(--gray-700)'"
                        [style.fontWeight]="actDueDatePreset==='custom' ? '600' : '400'"
                        (mousedown)="selectDueDatePreset('custom')">📅 {{ t('activity.customDate') }}</div>
@@ -685,7 +685,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
 
         <!-- INLINE COMPOSE -->
-        <div *ngIf="showEmailCompose" style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
+        <div *ngIf="showEmailCompose" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">✉️ {{ t('email.new') }}</div>
             <button style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:14px" (click)="showEmailCompose=false">✕</button>
@@ -749,7 +749,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <div *ngIf="emailAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
               <span *ngFor="let f of emailAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
             </div>
-            <div *ngIf="emailError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
+            <div *ngIf="emailError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">⚠️ {{emailError}}</div>
             <div style="display:flex;gap:6px;justify-content:flex-end">
               <button class="btn-sm" (click)="showEmailCompose=false">{{ 'actions.cancel' | transloco }}</button>
               <button class="btn-sm primary" (click)="sendEmail()" [disabled]="sendingEmail || (!emailForm.recipientList?.length && !recipientQuery?.includes('@')) || !emailForm.subject">{{sendingEmail ? '⏳ ' + t('email.sending') : '📤 ' + t('email.sendAction')}}</button>
@@ -760,7 +760,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div *ngIf="emailActivities.length===0" class="empty-act">{{ emailStatus?.configured===false ? t('email.notConfigured') : t('partnerDetail.email.empty') }}</div>
 
         <!-- Email cards — expand/collapse inline -->
-        <div *ngFor="let a of emailActivities" style="border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;background:var(--surface)"
+        <div *ngFor="let a of emailActivities" style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;margin-bottom:8px;background:var(--surface)"
              [style.border-left]="expandedEmailId===a.id ? '3px solid #3b82f6' : hasUnreadInActivity(a) ? '3px solid #ef4444' : '3px solid #dbeafe'">
           <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
                [style.background]="expandedEmailId===a.id ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : hasUnreadInActivity(a) ? 'var(--gray-50)' : 'var(--surface)'"
@@ -779,7 +779,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </div>
             <span style="font-size:12px;color:var(--gray-400);flex-shrink:0">{{expandedEmailId===a.id ? '▲' : '▾'}}</span>
           </div>
-          <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid var(--gray-200);padding:12px;display:flex;flex-direction:column;gap:8px">
+          <div *ngIf="expandedEmailId===a.id" style="border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:12px;display:flex;flex-direction:column;gap:8px">
             <ng-container *ngIf="a.gmail_thread_id; else singleBody">
               <div *ngIf="loadingThread" style="font-size:12px;color:var(--gray-400);padding:4px 0">{{ t('email.thread.loading') }}</div>
               <div *ngIf="!loadingThread && threadUnavailableReason" style="font-size:12px;color:oklch(from #92400e max(l, var(--text-min-l)) c h);background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));border-radius:6px;padding:8px 10px">{{threadUnavailableReason}}</div>
@@ -844,7 +844,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <div *ngIf="inlineReplyAttachments.length>0" style="display:flex;flex-wrap:wrap;gap:4px">
                 <span *ngFor="let f of inlineReplyAttachments; let i=index" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);border-radius:12px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px">📎 {{f.name}}<button (click)="removeInlineReplyAttachment(i)" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px">✕</button></span>
               </div>
-              <div *ngIf="inlineReplyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:4px 10px">⚠️ {{inlineReplyError}}</div>
+              <div *ngIf="inlineReplyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">⚠️ {{inlineReplyError}}</div>
               <div style="display:flex;gap:6px;justify-content:flex-end">
                 <button class="btn-sm" (click)="cancelInlineReply()">{{ 'actions.cancel' | transloco }}</button>
                 <button class="btn-sm primary" (click)="sendInlineReply()" [disabled]="inlineReplySending || !inlineReplyForm.body?.trim()">{{inlineReplySending ? '⏳ ' + t('email.sending') : '📤 ' + t('email.reply.send')}}</button>
@@ -872,11 +872,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div style="font-size:14px;color:var(--gray-400);text-align:center">{{ t('whatsapp.notConfigured') }}</div>
         </div>
 
-        <div *ngIf="whatsappConfigured===true" id="wa-new-message" style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+        <div *ngIf="whatsappConfigured===true" id="wa-new-message" style="background:var(--gray-50);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">💬 {{ t('whatsapp.newMessage') }}</div>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:var(--gray-50);border-radius:6px;overflow:hidden">
+            <div style="display:inline-flex;align-items:center;border:1.5px solid #3BAA5D;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:6px;overflow:hidden">
               <span style="padding:4px 10px;font-size:12px;color:var(--gray-700)">{{ t('whatsapp.from') }} <strong>{{whatsappFromDisplay}}</strong> · WhatsApp</span>
             </div>
           </div>
@@ -902,8 +902,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <wt-whatsapp-template-picker *ngIf="whatsappMode==='template'" [disabled]="!canEdit || whatsappSending"
                                        (selectionChange)="whatsappTemplateSelection=$event" />
 
-          <div *ngIf="whatsappError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
-          <div *ngIf="whatsappSuccess" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
+          <div *ngIf="whatsappError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">⚠️ {{whatsappError}}</div>
+          <div *ngIf="whatsappSuccess" style="color:oklch(from #16a34a max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:6px;padding:6px 10px">✅ {{ t('whatsapp.sent') }}</div>
 
           <div style="display:flex;gap:6px;justify-content:flex-end">
             <button class="btn-sm primary" [disabled]="!canEdit || !whatsappToPhone.trim() || !canSendWhatsappContent || whatsappToPhoneMissingCountryCode || whatsappSending"
@@ -919,7 +919,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <div *ngIf="whatsappHistoryLoading && whatsappConversations.length===0" style="font-size:12px;color:var(--gray-400);padding:4px 0">{{ t('whatsapp.loadingHistory') }}</div>
           <div *ngIf="!whatsappHistoryLoading && whatsappConversations.length===0" class="empty-act">{{ t('whatsapp.empty') }}</div>
 
-          <div *ngFor="let conv of whatsappConversations" style="border:1px solid var(--gray-200);border-radius:10px;background:var(--surface)"
+          <div *ngFor="let conv of whatsappConversations" style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;background:var(--surface)"
                [style.border-left]="getWhatsappConvState(conv.phone).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
             <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none"
                  [style.background]="getWhatsappConvState(conv.phone).expanded ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : 'var(--surface)'"
@@ -936,7 +936,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
               <span style="font-size:12px;color:var(--gray-400);flex-shrink:0">{{getWhatsappConvState(conv.phone).expanded ? '▲' : '▾'}}</span>
             </div>
 
-            <div *ngIf="getWhatsappConvState(conv.phone).expanded" style="border-top:1px solid var(--gray-200);padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div *ngIf="getWhatsappConvState(conv.phone).expanded" style="border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:12px;display:flex;flex-direction:column;gap:8px">
               <div *ngFor="let h of conv.messages"
                    [style.background]="h.direction==='incoming' ? 'color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface))' : 'var(--surface)'"
                    [style.border]="h.direction==='incoming' ? '1px solid #fbbf24' : '1px solid #e5e7eb'"
@@ -967,14 +967,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 </ng-container>
               </div>
 
-              <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid var(--gray-200);border-radius:8px;padding:12px;background:var(--gray-50);display:flex;flex-direction:column;gap:8px">
+              <div *ngIf="getWhatsappConvState(conv.phone).replyOpen" style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;padding:12px;background:var(--gray-50);display:flex;flex-direction:column;gap:8px">
                 <div style="font-size:12px;color:var(--gray-700)"><strong>↩ {{ t('whatsapp.reply.replyingVia') }}</strong></div>
                 <div style="font-size:12px;color:var(--gray-500)">{{ t('whatsapp.to') }} {{formatWhatsappHistoryPhone(conv.phone)}}</div>
                 <textarea class="act-input" [ngModel]="getWhatsappConvState(conv.phone).replyMessage"
                           (ngModelChange)="setWhatsappConvReplyMessage(conv.phone, $event)"
                           [disabled]="getWhatsappConvState(conv.phone).replySending" rows="3"
                           [placeholder]="t('whatsapp.reply.placeholder')"></textarea>
-                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:var(--gray-50);border-radius:6px;padding:4px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
+                <div *ngIf="getWhatsappConvState(conv.phone).replyError" style="color:oklch(from #ef4444 max(l, var(--text-min-l)) c h);font-size:12px;background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-radius:6px;padding:4px 10px">⚠️ {{getWhatsappConvState(conv.phone).replyError}}</div>
                 <div style="display:flex;gap:6px;justify-content:flex-end">
                   <button class="btn-sm" (click)="cancelWhatsappConvReply(conv.phone)">{{ 'actions.cancel' | transloco }}</button>
                   <button class="btn-sm primary" [disabled]="getWhatsappConvState(conv.phone).replySending || !getWhatsappConvState(conv.phone).replyMessage.trim()" (click)="sendWhatsappConvReply(conv.phone)">
@@ -997,7 +997,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <div *ngIf="smsLoading && smsConversations.length===0" style="font-size:12px;color:var(--gray-400);padding:4px 0">{{ 'states.loading' | transloco }}</div>
         <div *ngIf="!smsLoading && !smsThreadError && smsConversations.length===0" class="empty-act">{{ t('sms.noNumbers') }}</div>
 
-        <div *ngFor="let conv of smsConversations" style="border:1px solid var(--gray-200);border-radius:10px;background:var(--surface);overflow:hidden"
+        <div *ngFor="let conv of smsConversations" style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;background:var(--surface);overflow:hidden"
              [style.border-left]="getSmsConvState(conv.number).expanded ? '3px solid #3b82f6' : '3px solid #dbeafe'">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer"
                [style.background]="getSmsConvState(conv.number).expanded ? 'color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))' : 'var(--surface)'"
@@ -1012,7 +1012,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             <span style="font-size:12px;color:var(--gray-400);flex-shrink:0">{{getSmsConvState(conv.number).expanded ? '▲' : '▾'}}</span>
           </div>
 
-          <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid var(--gray-200);display:flex;flex-direction:column">
+          <div *ngIf="getSmsConvState(conv.number).expanded" style="border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));display:flex;flex-direction:column">
             <div [id]="'sms-scroll-partner-' + smsDomId(conv.number)" style="max-height:360px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--gray-50)">
               <div *ngIf="!conv.messages.length" style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px 0">{{ t('sms.emptyConversation') }}</div>
               <div *ngFor="let m of conv.messages" style="display:flex" [style.justify-content]="m.direction==='outbound' ? 'flex-end' : 'flex-start'">
@@ -1027,7 +1027,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                 </div>
               </div>
             </div>
-            <div style="position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--gray-200);padding:10px;display:flex;gap:8px;align-items:flex-end">
+            <div style="position:sticky;bottom:0;background:var(--surface);border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:10px;display:flex;gap:8px;align-items:flex-end">
               <textarea [ngModel]="getSmsConvState(conv.number).replyMessage"
                         (ngModelChange)="setSmsConvReplyMessage(conv.number, $event)"
                         rows="1" style="flex:1;resize:none;border:1px solid var(--gray-300);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit"
@@ -1114,7 +1114,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       </div>
 
       <!-- Historia zmian mini-widget -->
-      <div style="background:var(--surface);border:1px solid var(--gray-200);border-radius:10px;padding:14px">
+      <div style="background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400)">🕐 {{ t('history.title') }}</div>
           <button *ngIf="history.length" class="btn-sm" (click)="showHistoryModal=true">{{ t('history.showAll') }}</button>
@@ -1141,7 +1141,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           <button class="btn-sm" *ngIf="canEdit" (click)="showDocPicker=true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> {{ t('documents.add') }}</button>
         </div>
         <div *ngIf="linkedDocs.length===0 && partner.crm_uuid"
-             style="display:flex;align-items:center;gap:6px;background:var(--gray-200);border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
+             style="display:flex;align-items:center;gap:6px;background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));border:1px solid #a7d7b5;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
           <span style="font-size:14px;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h)">⚠️</span>
           <span><strong>{{ t('partnerDetail.documents.noContractTitle') }}</strong> {{ t('partnerDetail.documents.noContractHint') }}</span>
         </div>
@@ -1174,7 +1174,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
             </button>
           </div>
           <div *ngIf="expandedConsent===ct.consent_key"
-               style="font-size:12px;color:var(--gray-500);background:var(--gray-50);border-radius:6px;padding:8px 10px;margin-bottom:8px;line-height:1.55;border-left:3px solid var(--gray-200)">
+               style="font-size:12px;color:var(--gray-500);background:var(--gray-50);border-radius:6px;padding:8px 10px;margin-bottom:8px;line-height:1.55;border-left:3px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))">
             {{ct.description}}
             <div *ngIf="ct.updated_at" style="margin-top:4px;font-size:10px;color:var(--gray-400)">
               {{ t('consents.lastChange') }} {{ct.updated_at | date:'dd.MM.yyyy HH:mm'}}
@@ -1186,7 +1186,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
                     (click)="canEdit && setConsentDraft(ct.consent_key, v.val)"
                     [style.background]="consentDraft[ct.consent_key]===v.val ? v.bg : 'var(--gray-50)'"
                     [style.color]="consentDraft[ct.consent_key]===v.val ? 'white' : 'var(--gray-500)'"
-                    [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : 'var(--gray-200)')"
+                    [style.border]="'1px solid '+(consentDraft[ct.consent_key]===v.val ? v.bg : 'color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))')"
                     [style.cursor]="canEdit ? 'pointer' : 'default'"
                     style="flex:1;font-size:10px;font-weight:600;padding:4px 2px;border-radius:6px;transition:all .12s;text-align:center;line-height:1.3">
               {{ t(v.labelKey) }}
@@ -1250,11 +1250,11 @@ function getMonthRange(preset: string): { from: string; to: string } {
              style="text-align:center;color:var(--gray-400);font-size:12px;padding:12px">{{ t('documents.picker.noResults') }}</div>
         <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
           <div *ngFor="let doc of docResults"
-               style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--gray-200);border-radius:8px;transition:background .1s"
+               style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;transition:background .1s"
                [style.cursor]="doc._access==='read' ? 'default' : 'pointer'"
                [style.opacity]="doc._access==='read' ? '0.55' : '1'"
                [title]="doc._access==='read' ? t('documents.picker.readOnlyTooltip') : ''"
-               [style.background]="isLinked(doc.id) ? 'var(--gray-50)' : 'var(--surface)'"
+               [style.background]="isLinked(doc.id) ? 'color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface))' : 'var(--surface)'"
                (click)="toggleLinkDoc(doc)">
             <span style="font-size:16px">📄</span>
             <div style="flex:1;min-width:0">
@@ -1825,8 +1825,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .onboarding-panel { flex-shrink:0; margin-bottom:24px; background:var(--surface); border:none; border-radius:12px; box-shadow:var(--shadow-sm); overflow:hidden; }
     .onboarding-steps { display:flex; padding:16px 16px 0; border-bottom:1px solid var(--gray-100); }
     .step { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; position:relative; padding-bottom:12px; }
-    .step:not(:last-child)::after { content:''; position:absolute; top:14px; left:calc(50% + 16px); right:0; height:2px; background:var(--gray-200); }
-    .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid var(--gray-200); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:var(--surface); position:relative; z-index:1; transition:all .2s; }
+    .step:not(:last-child)::after { content:''; position:absolute; top:14px; left:calc(50% + 16px); right:0; height:2px; background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); }
+    .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:var(--surface); position:relative; z-index:1; transition:all .2s; }
     .step.done .step-circle { background:#3BAA5D; border-color:#3BAA5D; color:white; }
     .step.current .step-circle { border-color:#3BAA5D; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); box-shadow:0 0 0 3px rgba(59,170,93,.15); }
     .step-label { font-size:10px; color:var(--gray-400); text-align:center; }
@@ -1878,8 +1878,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     @media(max-width:700px) { .detail-body{grid-template-columns:1fr;} }
     /* Left panel collapse */
     .left-panel-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink:0; }
-    .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid var(--gray-200); background:var(--surface); cursor:pointer; font-size:16px; line-height:1; color:var(--gray-400); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
-    .panel-collapse-btn:hover { background:var(--gray-200); color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); border-color:#a7d7b5; }
+    .panel-collapse-btn { width:22px; height:22px; border-radius:50%; border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); background:var(--surface); cursor:pointer; font-size:16px; line-height:1; color:var(--gray-400); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; padding:0; }
+    .panel-collapse-btn:hover { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)); color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); border-color:#a7d7b5; }
     .info-card.is-collapsed { padding:10px 4px; overflow:hidden; align-items:center; display:flex; flex-direction:column; }
     .info-card { background:var(--surface); border:none; border-radius:12px; box-shadow:var(--shadow-sm); padding:16px; overflow-y:auto; min-height:0; }
     .activities-card { background:var(--surface); border:none; border-radius:12px; box-shadow:var(--shadow-sm); overflow:hidden; min-height:0; display:flex; flex-direction:column; }
@@ -1891,14 +1891,14 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .dwh-kpi-val { font-size:16px; font-weight:800; color:white; line-height:1; }
     .dwh-kpi-lbl { font-size:10px; color:rgba(255,255,255,.6); margin-top:4px; }
     .dwh-kpi-wide { grid-column:span 2; }
-    .prod-box { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:14px; flex-shrink:0; }
+    .prod-box { background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:12px; padding:14px; flex-shrink:0; }
     .prod-box-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-400); margin-bottom:10px; }
     .prod-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; }
     .prod-name { width:90px; color:var(--gray-700); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
     .prod-bar-wrap { flex:1; background:var(--gray-100); border-radius:4px; height:6px; overflow:hidden; }
     .prod-bar { height:100%; background:#3BAA5D; border-radius:4px; transition:width .4s; }
     .prod-val { width:64px; text-align:right; color:var(--gray-400); flex-shrink:0; }
-    .churn-widget { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:14px; flex-shrink:0; }
+    .churn-widget { background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:12px; padding:14px; flex-shrink:0; }
     .churn-widget-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-400); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
     .churn-widget-loading { font-size:12px; color:var(--gray-400); text-align:center; padding:4px 0; }
     .churn-widget-ok { display:flex; align-items:center; gap:6px; font-size:12px; color:oklch(from #16a34a max(l, var(--text-min-l)) c h); font-weight:600; }
@@ -1916,10 +1916,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .risk-badge-low      { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); }
     .panel-email-box { background:var(--surface); border:1px solid color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); border-radius:12px; padding:14px; flex-shrink:0; }
     .panel-email-title { font-size:12px; font-weight:700; color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); margin-bottom:8px; padding-right:20px; display:flex; align-items:flex-start; gap:6px; }
-    .panel-msg { border:1px solid var(--gray-200); border-radius:8px; padding:8px; margin-bottom:6px; font-size:12px; }
+    .panel-msg { border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:8px; padding:8px; margin-bottom:6px; font-size:12px; }
     .panel-msg.unread { border-left:3px solid #ef4444; }
-    .panel-msg.read { border-left:3px solid var(--gray-200); }
-    .docs-box { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:14px; flex-shrink:0; }
+    .panel-msg.read { border-left:3px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); }
+    .docs-box { background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:12px; padding:14px; flex-shrink:0; }
     .info-card h3, .activities-card h3 { font-size:14px; font-weight:700; margin:0 0 12px; }
     .churn-hdr-badge { padding:4px 10px; border-radius:10px; font-size:12px; font-weight:700; }
     .churn-hdr-critical { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
@@ -1967,8 +1967,8 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .act-actions { display:flex; gap:6px; justify-content:flex-end; }
     .activity-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
     .act-item { display:flex; gap:10px; border-left:3px solid transparent; padding-left:6px; }
-    .act-item.act-today { border-left-color:#3BAA5D; background:var(--gray-200); border-radius:6px; }
-    .act-item.act-overdue { border-left-color:#fca5a5; background:var(--gray-50); border-radius:6px; }
+    .act-item.act-today { border-left-color:#3BAA5D; background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)); border-radius:6px; }
+    .act-item.act-overdue { border-left-color:#fca5a5; background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius:6px; }
     .act-item.act-closed { opacity:.65; }
     .act-status-badge { font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; }
     .act-status-new { background:var(--gray-100); color:var(--gray-500); }
@@ -1995,7 +1995,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .participant-chip button { background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:0;line-height:1; }
     .participant-chip button:hover { color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); }
     .participant-input { border:none;outline:none;font-size:12px;min-width:120px;flex:1;font-family:inherit; }
-    .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:var(--surface);border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:160px;overflow-y:auto;margin-top:2px; }
+    .suggestions-dropdown { position:absolute;top:100%;left:0;right:0;z-index:100;background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:160px;overflow-y:auto;margin-top:2px; }
     .suggestion-item { padding:8px 12px;font-size:12px;cursor:pointer; }
     .suggestion-item:hover { background:var(--gray-50); }
     .empty-act { color:var(--gray-400); font-size:12px; text-align:center; padding:16px; }
@@ -2004,10 +2004,10 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .wa-mode-switch { display:inline-flex; align-self:flex-start; border:1px solid var(--gray-300); border-radius:6px; overflow:hidden; }
     .wa-mode-switch button { background:var(--surface); border:none; padding:4px 12px; font-size:12px; font-weight:600; color:var(--gray-500); cursor:pointer; font-family:inherit; }
     .wa-mode-switch button + button { border-left:1px solid var(--gray-300); }
-    .wa-mode-switch button.active { background:var(--gray-200); color:oklch(from #2f8f4d max(l, var(--text-min-l)) c h); }
+    .wa-mode-switch button.active { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)); color:oklch(from #2f8f4d max(l, var(--text-min-l)) c h); }
     .wa-window-hint { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); border:1px solid #fde68a; border-radius:6px; padding:6px 10px; }
     .wa-window-note { font-size:12px; color:oklch(from #92400e max(l, var(--text-min-l)) c h); }
-    .wa-failed { font-size:10px; font-weight:700; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:var(--gray-50); border-radius:4px; padding:1px 6px; }
+    .wa-failed { font-size:10px; font-weight:700; color:oklch(from #b91c1c max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius:4px; padding:1px 6px; }
     .loading, .not-found { padding:40px; text-align:center; color:var(--gray-400); }
     /* Modal */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
@@ -2035,16 +2035,16 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .dwh-readonly-field.full { grid-column:1/-1; }
     .dwh-readonly-field label { font-size:12px; font-weight:600; color:var(--gray-700); display:flex; align-items:center; gap:4px; }
     .dwh-readonly-value { background:var(--gray-50); border:1px solid color-mix(in srgb, #e9d5ff var(--tint-mix), var(--surface)); border-radius:6px; padding:8px 10px; font-size:14px; color:var(--gray-500); cursor:not-allowed; }
-    .input-error { border-color:#ef4444 !important; background:var(--gray-50); }
+    .input-error { border-color:#ef4444 !important; background:color-mix(in srgb, #fff5f5 var(--tint-mix), var(--surface)); }
     .input-warn  { border-color:#f59e0b !important; background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); }
     .validation-msg { font-size:12px; color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); margin-top:2px; }
     .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:16px; display:inline-block; }
-    .suggest-dropdown { position:absolute;top:100%;left:0;right:0;z-index:300;background:var(--surface);border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;margin-top:2px; }
+    .suggest-dropdown { position:absolute;top:100%;left:0;right:0;z-index:300;background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;margin-top:2px; }
     .suggest-item { padding:8px 12px;font-size:12px;cursor:pointer; }
     .suggest-item:hover { background:var(--gray-50); }
     .att-chip { position:relative; display:inline-flex; align-items:center; gap:4px; border-radius:5px; padding:2px 8px; font-size:10px; cursor:default; user-select:none; }
     .att-chip::after { content:''; position:absolute; top:100%; left:0; right:0; height:6px; }
-    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:var(--surface); border:1px solid var(--gray-200); border-radius:7px; box-shadow:0 3px 10px rgba(0,0,0,.13); padding:4px; gap:2px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
+    .att-chip-actions { display:none; position:absolute; top:calc(100% + 2px); left:0; background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:7px; box-shadow:0 3px 10px rgba(0,0,0,.13); padding:4px; gap:2px; z-index:30; white-space:nowrap; align-items:center; min-width:max-content; }
     .att-chip:hover .att-chip-actions { display:flex; }
     .att-chip-actions:hover { display:flex; }
     .att-action-btn { background:none; border:none; cursor:pointer; padding:4px 10px; border-radius:5px; font-size:12px; white-space:nowrap; }
@@ -2052,7 +2052,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .att-action-btn.dl { color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
     .att-action-btn.view { color:var(--gray-700); }
     .act-input:focus { border-color:#3BAA5D; outline:none; }
-    .act-card { border:1px solid var(--gray-200); border-radius:10px; padding:12px 14px; background:var(--surface); cursor:pointer; transition:box-shadow .15s; position:relative; }
+    .act-card { border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:10px; padding:12px 14px; background:var(--surface); cursor:pointer; transition:box-shadow .15s; position:relative; }
     .act-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08); }
     .act-card.act-card-expanded { border-color:#3BAA5D; }
     .act-card-title { font-size:12px; font-weight:600; color:var(--gray-800); margin-bottom:2px; }
@@ -2068,7 +2068,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .btn-task-close:hover:not(:disabled) { background:color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); border-color:#86efac; }
     .btn-task-close:disabled { opacity:.5; cursor:default; }
     .btn-task-reopen { background:var(--gray-100); border:1px solid var(--gray-300); color:var(--gray-700); font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; }
-    .btn-task-reopen:hover:not(:disabled) { background:var(--gray-200); }
+    .btn-task-reopen:hover:not(:disabled) { background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); }
     .btn-task-reopen:disabled { opacity:.5; cursor:default; }
     .hist-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--gray-100); font-size:12px; }
   `],

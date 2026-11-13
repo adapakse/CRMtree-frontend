@@ -761,7 +761,7 @@ const TODAY_CALLS_GOAL = 37;
     /* Activity */
     .activity-feed { display: flex; flex-direction: column; gap: 14px; height: 300px; overflow-y: auto; overflow-x: hidden; flex-shrink: 0; scrollbar-width: thin; scrollbar-color: #E5E7EB transparent; }
     .activity-feed::-webkit-scrollbar { width: 4px; }
-    .activity-feed::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+    .activity-feed::-webkit-scrollbar-thumb { background: color-mix(in srgb, #E5E7EB var(--tint-mix), var(--surface)); border-radius: 2px; }
     .activity-feed::-webkit-scrollbar-track { background: transparent; }
     .act-item { display: flex; align-items: flex-start; gap: 12px; flex-shrink: 0; min-width: 0; }
     .act-icon-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--gray-700); background: var(--gray-100); }
@@ -771,7 +771,7 @@ const TODAY_CALLS_GOAL = 37;
     .act-sub { font-size: 12px; color: var(--gray-400); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .act-time { font-size: 12px; color: var(--gray-400); flex-shrink: 0; }
     .act-loading { display: flex; justify-content: center; padding: 10px 0; flex-shrink: 0; }
-    .act-spinner { width: 16px; height: 16px; border: 2px solid var(--gray-200); border-top-color: #3BAA5D; border-radius: 50%; animation: spin .7s linear infinite; }
+    .act-spinner { width: 16px; height: 16px; border: 2px solid color-mix(in srgb, #E5E7EB var(--tint-mix), var(--surface)); border-top-color: #3BAA5D; border-radius: 50%; animation: spin .7s linear infinite; }
     .act-end { font-size: 12px; color: #D1D5DB; text-align: center; padding: 8px 0; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
 

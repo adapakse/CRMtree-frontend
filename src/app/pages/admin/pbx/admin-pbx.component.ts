@@ -246,7 +246,7 @@ interface PbxUserRow {
     .ap-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border, var(--gray-200));
                        display: flex; justify-content: flex-end; gap: 8px; }
 
-    .ap-hint { background: var(--orange-pale, var(--gray-200)); border-left: 3px solid var(--orange, #3BAA5D);
+    .ap-hint { background: var(--orange-pale, color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface))); border-left: 3px solid var(--orange, #3BAA5D);
                padding: 10px 14px; font-size: 12px; color: var(--text, var(--ink-strong));
                border-radius: 10px; margin-bottom: 20px; line-height: 1.6; }
 

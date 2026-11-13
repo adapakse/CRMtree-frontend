@@ -569,7 +569,7 @@ interface DiscoveredCompany {
                 } @else {
                   <div style="display:flex;align-items:center;gap:6px">
                     @if (p.icp_score != null) {
-                      <div style="width:44px;height:6px;border-radius:3px;background:var(--gray-200);overflow:hidden">
+                      <div style="width:44px;height:6px;border-radius:3px;background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));overflow:hidden">
                         <div [style.width.%]="p.icp_score"
                           [style.background]="scoreColor(p.icp_score)"
                           style="height:100%"></div>
@@ -739,7 +739,7 @@ interface DiscoveredCompany {
                           <div>
                             <b>{{ t('admin.detail.pkdGus') }}</b>
                             @for (code of (p.enrichment_log?.gus?.pkd_codes ?? []); track code) {
-                              <span style="display:inline-block;margin:1px 4px 1px 0;padding:0 4px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:3px;font-size:12px;font-family:monospace">{{ code }}</span>
+                              <span style="display:inline-block;margin:1px 4px 1px 0;padding:0 4px;background:var(--gray-100);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;font-size:12px;font-family:monospace">{{ code }}</span>
                             }
                           </div>
                         }
@@ -935,7 +935,7 @@ interface DiscoveredCompany {
                       } @else if (p.key_contacts?.length) {
                         <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
                           @for (c of p.key_contacts!; track $index) {
-                            <div style="border:1px solid var(--gray-200);border-radius:6px;
+                            <div style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:6px;
                                         padding:8px 10px;background:var(--surface);font-size:12px">
                               @if (c.name || c.role === 'decision_maker') {
                                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
@@ -1005,7 +1005,7 @@ interface DiscoveredCompany {
                                   @if (expandedGusIds().has(p.id)) {
                                     <span style="display:inline-flex;flex-wrap:wrap;gap:2px;margin-left:4px;vertical-align:middle">
                                       @for (code of (p.enrichment_log?.gus?.pkd_codes ?? []); track code) {
-                                        <span style="padding:0 4px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:3px;font-size:10px;font-family:monospace">{{ code }}</span>
+                                        <span style="padding:0 4px;background:var(--gray-100);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;font-size:10px;font-family:monospace">{{ code }}</span>
                                       }
                                     </span>
                                     <button class="log-expand-btn" (click)="toggleGusExpand(p.id, $event)">{{ t('admin.log.collapse') }}</button>
@@ -1336,7 +1336,7 @@ interface DiscoveredCompany {
                         <span class="ik">{{ t('admin.inspect.pkdCodes') }}</span>
                         <span class="iv" style="display:flex;flex-wrap:wrap;gap:4px">
                           @for (code of (inspectTarget()!.enrichment_log?.gus?.pkd_codes ?? []); track code) {
-                            <span style="padding:1px 6px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:3px;font-size:10px;font-family:monospace"
+                            <span style="padding:1px 6px;background:var(--gray-100);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:3px;font-size:10px;font-family:monospace"
                               [class.inspect-highlight]="code === inspectTarget()!.enrichment_log?.gus?.pkd_main">{{ code }}</span>
                           }
                         </span>
@@ -1698,8 +1698,8 @@ interface DiscoveredCompany {
         </div>
 
         @if (discoveryResults().length > 0) {
-          <div style="border:1px solid var(--gray-200);border-radius:12px;overflow:hidden;margin-bottom:12px">
-            <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:6px 10px;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em">
+          <div style="border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:12px;overflow:hidden;margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:32px 1fr 110px 140px 120px 110px;background:var(--gray-50);border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));padding:6px 10px;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em">
               <label style="display:flex;align-items:center;cursor:pointer">
                 <input type="checkbox"
                   [checked]="discoveryAllSelected()"
@@ -1794,13 +1794,13 @@ interface DiscoveredCompany {
             }
           </div>
 
-          <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--gray-200)">
+          <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))">
             <span style="font-size:12px;color:var(--gray-500)">
               {{ t('admin.discoveryModal.selectedLabel') }} <b style="color:var(--gray-800)">{{ discoverySelectedCount() }}</b>
             </span>
             <span class="tsp"></span>
             @if (discoveryDone()) {
-              <div style="font-size:12px;padding:8px 12px;background:var(--gray-50);border:1px solid #86efac;border-radius:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
+              <div style="font-size:12px;padding:8px 12px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border:1px solid #86efac;border-radius:12px;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">
                 ✓ {{ t('admin.discoveryModal.addedPrefix') }} <b>{{ discoveryDone()!.added }}</b> {{ t('admin.discoveryModal.addedSuffix') }}
                 <b>„{{ discoveryDone()!.source_database }}"</b>
                 @if (discoveryDone()!.batchStarted) { {{ t('admin.discoveryModal.andEnrichmentStarted') }} }
@@ -1913,13 +1913,13 @@ interface DiscoveredCompany {
     .tbl { width:100%; border-collapse:collapse; font-size:12px; }
     .tbl th {
       background:var(--gray-50); text-align:left; padding:8px 10px 14px;
-      border-bottom:1px solid var(--gray-200); font-size:12px;
+      border-bottom:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); font-size:12px;
       font-weight:600; color:var(--gray-500); white-space:nowrap; position:sticky; top:0; z-index:1;
       vertical-align:bottom;
     }
     .tbl td { padding:8px 10px; border-bottom:1px solid var(--gray-100); vertical-align:top; }
     .tbl tr:hover td { background:var(--gray-50); }
-    .tbl tr.expanded td { background:var(--gray-50); }
+    .tbl tr.expanded td { background:color-mix(in srgb, #f0f9ff var(--tint-mix), var(--surface)); }
     .tbl tr.row-selected td { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)) !important; }
     .tbl tr.row-selected:hover td { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)) !important; }
     .tbl tr.detail-row td { background:var(--gray-50) !important; }
@@ -1970,7 +1970,7 @@ interface DiscoveredCompany {
       display: flex; align-items: center; justify-content: center;
       padding: 0; line-height: 1;
     }
-    .sig-info:hover { background: var(--gray-50); border-color: var(--orange); color: var(--orange-text); }
+    .sig-info:hover { background: color-mix(in srgb, #f0f9ff var(--tint-mix), var(--surface)); border-color: var(--orange); color: var(--orange-text); }
     .sig-info-tip {
       display: none;
       position: absolute;
@@ -2012,7 +2012,7 @@ interface DiscoveredCompany {
       width: 16px;
       height: 16px;
       border-radius: 4px;
-      background: var(--gray-200);
+      background: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
       border: 1px solid var(--gray-300);
     }
     .sig-yes {
@@ -2040,10 +2040,10 @@ interface DiscoveredCompany {
       font-size: 14px; cursor: default;
       border: 1px solid transparent;
     }
-    .scope-local    { background: var(--gray-100); border-color: var(--gray-200); }
+    .scope-local    { background: var(--gray-100); border-color: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); }
     .scope-national { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); border-color: color-mix(in srgb, #bfdbfe var(--tint-mix), var(--surface)); }
     .scope-eu       { background: color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); border-color: color-mix(in srgb, #c4b5fd var(--tint-mix), var(--surface)); }
-    .scope-global   { background: var(--gray-50); border-color: #86efac; }
+    .scope-global   { background: color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); border-color: #86efac; }
 
     /* Spinner na poziomie wiersza — zastępuje badge statusu podczas przetwarzania */
     @keyframes row-spin { to { transform: rotate(360deg); } }
@@ -2069,7 +2069,7 @@ interface DiscoveredCompany {
     .badge-db        { background:color-mix(in srgb, #fef0e9 var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); font-size:10px; padding:1px 6px; border-radius:8px; }
 
     .btn-menu {
-      width:28px; height:28px; border:1px solid var(--gray-200); border-radius:10px;
+      width:28px; height:28px; border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:10px;
       background:none; cursor:pointer; font-size:16px; line-height:1;
       display:flex; align-items:center; justify-content:center;
       color:var(--gray-500); transition:background .12s, border-color .12s;
@@ -2081,7 +2081,7 @@ interface DiscoveredCompany {
     /* Dropdown — position:fixed, poza flow tabeli */
     .row-menu {
       position:fixed; z-index:9999;
-      background:var(--surface); border:1px solid var(--gray-200); border-radius:14px;
+      background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:14px;
       box-shadow:0 4px 16px rgba(0,0,0,.12); padding:8px;
       min-width:180px;
     }
@@ -2102,7 +2102,7 @@ interface DiscoveredCompany {
     .enrich-log {
       margin-top: 16px;
       padding-top: 14px;
-      border-top: 1px solid var(--gray-200);
+      border-top: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
     }
     .log-steps { display: flex; flex-direction: column; gap: 6px; }
     .log-step {
@@ -2147,7 +2147,7 @@ interface DiscoveredCompany {
     .log-sig-dot {
       width: 10px; height: 10px; flex-shrink: 0;
       border-radius: 3px;
-      background: var(--gray-200); border: 1px solid var(--gray-300);
+      background: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border: 1px solid var(--gray-300);
       margin-top: 4px;
     }
     .log-signal-key {
@@ -2183,7 +2183,7 @@ interface DiscoveredCompany {
     .inspect-header {
       display: flex; align-items: flex-start; justify-content: space-between;
       padding: 16px 20px 12px;
-      border-bottom: 1px solid var(--gray-200);
+      border-bottom: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
       flex-shrink: 0;
     }
     .inspect-title {
@@ -2195,7 +2195,7 @@ interface DiscoveredCompany {
     .inspect-close {
       flex-shrink: 0; margin-top: 2px;
       width: 28px; height: 28px;
-      border: 1px solid var(--gray-200); border-radius: 10px;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 10px;
       background: none; cursor: pointer; font-size: 14px;
       display: inline-flex; align-items: center; justify-content: center;
       color: var(--gray-500); line-height: 1;
@@ -2207,7 +2207,7 @@ interface DiscoveredCompany {
     }
     .inspect-col-left {
       padding: 14px;
-      border-right: 1px solid var(--gray-200);
+      border-right: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
       overflow-y: auto;
       display: flex; flex-direction: column; gap: 10px;
     }
@@ -2221,7 +2221,7 @@ interface DiscoveredCompany {
       margin-bottom: 8px;
     }
     .inspect-card {
-      border: 1px solid var(--gray-200); border-radius: 12px;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 12px;
       padding: 8px 12px; background: var(--gray-50);
     }
     .inspect-card-header {
@@ -2263,7 +2263,7 @@ interface DiscoveredCompany {
     }
 
     .inspect-score-breakdown {
-      border: 1px solid var(--gray-200); border-radius: 12px; overflow: hidden;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 12px; overflow: hidden;
     }
     .sb-row {
       display: flex; justify-content: space-between; align-items: center;
@@ -2280,7 +2280,7 @@ interface DiscoveredCompany {
     .sb-minus { color: oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
 
     .inspect-footer {
-      border-top: 1px solid var(--gray-200);
+      border-top: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
       padding: 14px 20px;
       overflow-y: auto;
       flex-shrink: 0;
@@ -2288,7 +2288,7 @@ interface DiscoveredCompany {
       background: var(--gray-50);
     }
     .inspect-contact-card {
-      border: 1px solid var(--gray-200); border-radius: 10px;
+      border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius: 10px;
       padding: 8px 12px; background: var(--surface);
       min-width: 160px; max-width: 240px;
     }
@@ -2301,7 +2301,7 @@ interface DiscoveredCompany {
       background: none; cursor: pointer; font-size: 12px;
       font-weight: 500; color: var(--gray-500); transition: all .12s;
     }
-    .inspect-tab:hover { background: var(--gray-200); color: var(--gray-700); }
+    .inspect-tab:hover { background: color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); color: var(--gray-700); }
     .inspect-tab-active { background: var(--surface) !important; color: var(--gray-800) !important; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
     .inspect-prompt-view {
       flex: 1 1 auto; min-height: 0; overflow: hidden;
@@ -2314,7 +2314,7 @@ interface DiscoveredCompany {
       line-height: 1.6; color: var(--gray-800);
       white-space: pre-wrap; word-break: break-word;
       background: var(--gray-50);
-      border-top: 1px solid var(--gray-200);
+      border-top: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));
     }
   `],
 })

@@ -732,7 +732,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
 <div class="overlay" *ngIf="selectedMeeting" (click)="closeMeetingOnOverlay($event)" style="z-index:310">
   <div class="modal" (click)="$event.stopPropagation()" style="width:520px">
     <div class="modal-head">
-      <div class="modal-icon" style="background:var(--gray-50);font-size:18px"><wt-act-type-icon [type]="selectedMeeting.type"></wt-act-type-icon></div>
+      <div class="modal-icon" style="background:color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface));font-size:18px"><wt-act-type-icon [type]="selectedMeeting.type"></wt-act-type-icon></div>
       <div style="flex:1;min-width:0">
         <div class="modal-title">{{ meetingEditMode ? t('leadsList.meeting.editTitle') : t('leadsList.meeting.detailTitle') }}</div>
         <div style="font-size:12px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
@@ -913,7 +913,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     .tag-purple { background:var(--gray-50); color:oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
     .tag-green { background:var(--gray-50); color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
     .tag-orange { background:var(--orange-pale); color:var(--orange-dark); }
-    .tag-red { background:var(--gray-50); color:oklch(from #be123c max(l, var(--text-min-l)) c h); }
+    .tag-red { background:color-mix(in srgb, #FFF1F2 var(--tint-mix), var(--surface)); color:oklch(from #be123c max(l, var(--text-min-l)) c h); }
     .tag-gray { background:var(--gray-100); color:var(--gray-600); }
     .pipe-bar { height:4px; background:var(--gray-100); border-radius:2px; overflow:hidden; margin-top:8px; }
     .pipe-fill { height:100%; background:var(--orange); border-radius:2px; }
@@ -1032,7 +1032,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 18px 14px;
       border-bottom: 1px solid var(--gray-200);
-      background: linear-gradient(135deg, var(--gray-50) 0%, var(--surface) 60%);
+      background: linear-gradient(135deg, color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)) 0%, var(--surface) 60%);
       flex-shrink: 0;
     }
     .tl-head-left { display:flex; align-items:center; gap:10px; }
@@ -1087,7 +1087,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       background: var(--surface);
     }
     /* Today separator — highlighted */
-    .tl-sep-today { background: linear-gradient(180deg, var(--gray-50), var(--surface)); padding-top:16px; }
+    .tl-sep-today { background: linear-gradient(180deg, color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)), var(--surface)); padding-top:16px; }
     .tl-sep-today .tl-sep-line { background: #86EFAC; }
     .tl-sep-today .tl-sep-badge { background: color-mix(in srgb, #dcfce7 var(--tint-mix), var(--surface)); border-color: #86EFAC; color: oklch(from #15803d max(l, var(--text-min-l)) c h); font-size:12px; }
     .tl-today-dot { width:7px; height:7px; background:#22C55E; border-radius:50%; display:inline-block; flex-shrink:0; }
@@ -1146,7 +1146,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     }
     .tl-card-today {
       border-color: #86EFAC;
-      background: linear-gradient(135deg, var(--gray-50) 0%, var(--surface) 50%);
+      background: linear-gradient(135deg, color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)) 0%, var(--surface) 50%);
     }
     .tl-item-header {
       display: flex; align-items: center; gap:4px;
@@ -1157,7 +1157,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       padding: 1px 4px; border-radius: 4px; flex-shrink:0;
     }
     .tl-src-lead    { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
-    .tl-src-partner { background: var(--gray-50); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
+    .tl-src-partner { background: color-mix(in srgb, #FDF4FF var(--tint-mix), var(--surface)); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
     .tl-item-company { font-size:12px; color:var(--gray-500); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .tl-item-title { font-size:12px; font-weight:700; color:var(--gray-900); line-height:1.35; margin-bottom:4px; }
     .tl-item-meta { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }

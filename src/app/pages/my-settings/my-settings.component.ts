@@ -227,7 +227,7 @@ const BASE = environment.apiUrl;
     <div *ngIf="!pbxLoading">
       <!-- Skonfigurowany -->
       <div *ngIf="pbxConfigured"
-           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gray-50);border-radius:12px;margin-bottom:16px">
+           style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));border-radius:12px;margin-bottom:16px">
         <span style="font-size:18px;flex-shrink:0">✅</span>
         <div>
           <div style="font-size:14px;font-weight:600;color:oklch(from #166534 max(l, var(--text-min-l)) c h)">{{ t('mySettings.pbx.configured') }}</div>
@@ -336,7 +336,7 @@ const BASE = environment.apiUrl;
     #content { flex:1; overflow-y:auto; }
     .settings-head { padding:24px; display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; }
     .settings-head > wt-language-picker { flex:1 1 320px; }
-    .manual-entry { flex:0 1 280px; border-left:1px solid var(--gray-200); padding-left:24px; }
+    .manual-entry { flex:0 1 280px; border-left:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); padding-left:24px; }
     .manual-title { font-size:14px; font-weight:600; color:var(--gray-800); }
     .manual-hint { font-size:12px; color:var(--gray-500); margin:6px 0 12px; }
     a.btn { text-decoration:none; }

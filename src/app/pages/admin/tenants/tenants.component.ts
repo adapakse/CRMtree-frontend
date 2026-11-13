@@ -1244,7 +1244,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .btn-secondary:hover { background: var(--gray-50); }
     .btn-danger {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px 16px; background: var(--gray-50); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
+      padding: 8px 16px; background: color-mix(in srgb, #FEF2F2 var(--tint-mix), var(--surface)); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
       border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
     }
     .btn-danger:hover:not(:disabled) { background: color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface)); }
@@ -1312,7 +1312,7 @@ const PLAN_DISPLAY_ORDER: Record<string, number> = { lite: 0, standard: 1, profe
     .provider-form { padding: 14px 16px 16px; }
     .provider-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
     .btn-danger-sm {
-      padding: 8px 16px; background: var(--gray-50); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
+      padding: 8px 16px; background: color-mix(in srgb, #FEF2F2 var(--tint-mix), var(--surface)); color: oklch(from #dc2626 max(l, var(--text-min-l)) c h);
       border: 1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
       transition: background .12s;
     }

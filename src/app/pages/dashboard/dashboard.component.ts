@@ -182,7 +182,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
     .stat-val { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; color: var(--gray-900); line-height: 1; }
     .stat-sub { font-size: 12px; color: var(--gray-400); }
     .stat-ico { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-    .ico-or { background: var(--orange-pale); } .ico-bl { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); } .ico-gr { background: var(--gray-50); } .ico-pu { background: var(--gray-50); } .ico-re { background: var(--gray-50); }
+    .ico-or { background: var(--orange-pale); } .ico-bl { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); } .ico-gr { background: color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)); color: oklch(from #16A34A max(l, var(--text-min-l)) c h); } .ico-pu { background: color-mix(in srgb, #F5F3FF var(--tint-mix), var(--surface)); color: oklch(from #7C3AED max(l, var(--text-min-l)) c h); } .ico-re { background: color-mix(in srgb, #FEF2F2 var(--tint-mix), var(--surface)); color: oklch(from #DC2626 max(l, var(--text-min-l)) c h); }
     .thead { display: grid; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 0 16px; }
     .th { padding: 10px 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); display: flex; align-items: center; }
     .tr { display: grid; padding: 0 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .1s; }

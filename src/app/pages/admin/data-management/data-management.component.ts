@@ -309,7 +309,7 @@ interface SearchResult { id: string | number; label: string; sublabel?: string; 
     .result-err { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); background:var(--gray-50); border:1px solid color-mix(in srgb, #fecaca var(--tint-mix), var(--surface)); }
     .purge-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     @media(max-width:800px) { .purge-grid { grid-template-columns:1fr; } }
-    .purge-card { background:var(--gray-50); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:8px; }
+    .purge-card { background:color-mix(in srgb, #FFF7F7 var(--tint-mix), var(--surface)); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:8px; }
     .purge-card-head { display:flex; gap:12px; align-items:flex-start; }
     .purge-card-title { font-size:14px; font-weight:700; color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .purge-card-desc { font-size:12px; color:var(--gray-400); line-height:1.5; margin-top:2px; }

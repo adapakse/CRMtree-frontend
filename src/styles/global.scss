@@ -70,43 +70,43 @@
   --orange-dark:   #7ED59A;
   --orange-pale:   rgba(70,180,103,.16);
   --orange-muted:  rgba(70,180,103,.38);
-  --orange-text:   #46B467;
+  --orange-text:   #5CC67D;
   --orange-strong: #18864A;
-  --gray-50:       #2C2D31;
-  --gray-100:      #35363B;
-  --gray-200:      #45464C;
-  --gray-300:      #55565C;
-  --gray-400:      #9999A0;
-  --gray-500:      #A3A3AB;
-  --gray-600:      #B4B4BB;
-  --gray-700:      #CDCDD3;
-  --gray-800:      #E4E4E7;
-  --gray-900:      #F2F2F4;
+  --gray-50:       #2E2E2E;
+  --gray-100:      #343434;
+  --gray-200:      #474747;
+  --gray-300:      #5A5A5A;
+  --gray-400:      #A8A8A8;
+  --gray-500:      #B0B0B0;
+  --gray-600:      #C0C0C0;
+  --gray-700:      #D2D2D2;
+  --gray-800:      #E6E6E6;
+  --gray-900:      #F3F3F3;
   --graphite:      #1B1C1F;
-  --page-bg:       #27282C;
+  --page-bg:       #3C3C3C;
   --shadow-sm:     0 4px 14px rgba(0,0,0,.22);
   --shadow-filter: 0 4px 14px rgba(0,0,0,.22);
   --shadow:        0 6px 18px rgba(0,0,0,.28);
   --shadow-lg:     0 10px 30px rgba(0,0,0,.45);
   --shadow-field:  0 2px 6px rgba(0,0,0,.18);
   --ring-field:    0 0 0 3px rgba(70,180,103,.25);
-  --surface:           #313237;
-  --ink-strong:        #F2F2F4;
-  --frame-bg:          #202124;
-  --nav-text:          #BDBDC4;
-  --nav-muted:         #A3A3AB;
-  --nav-active-bg:     rgba(255,255,255,.08);
+  --surface:           #282828;
+  --ink-strong:        #F3F3F3;
+  --frame-bg:          #1F2020;
+  --nav-text:          #BDBDBD;
+  --nav-muted:         #A8A8A8;
+  --nav-active-bg:     rgba(255,255,255,.10);
   --nav-active-shadow: none;
-  --hover-overlay:     rgba(255,255,255,.05);
-  --divider:           rgba(255,255,255,.06);
+  --hover-overlay:     rgba(255,255,255,.06);
+  --divider:           rgba(255,255,255,.08);
   --tint-mix:          16%;
   --text-min-l:        0.74;
-  --control-bg:        #3A3B41;
-  --control-border:    #82838A;
+  --control-bg:        #1F1F1F;
+  --control-border:    #777777;
   --on-primary:        #FFFFFF;
   --green-gradient:    linear-gradient(180deg, #18864A 0%, #14833F 100%);
-  --chip-bg:           #45464C;
-  --chip-text:         #E4E4E7;
+  --chip-bg:           #474747;
+  --chip-text:         #E6E6E6;
 }
 
 /* ── Reset ─────────────────────────────────────────────── */
@@ -203,14 +203,14 @@ router-outlet + * {
   white-space: nowrap;
 }
 .bdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-.s-new       { background: var(--gray-50); color: oklch(from #0369a1 max(l, var(--text-min-l)) c h);  .bdot { background: #0EA5E9; } }
+.s-new       { background: color-mix(in srgb, #F0F9FF var(--tint-mix), var(--surface)); color: oklch(from #0369a1 max(l, var(--text-min-l)) c h);  .bdot { background: #0EA5E9; } }
 .s-editing   { background: color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color: oklch(from #c2410c max(l, var(--text-min-l)) c h);  .bdot { background: var(--orange); } }
-.s-signing   { background: var(--gray-50); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h);  .bdot { background: #A855F7; } }
+.s-signing   { background: color-mix(in srgb, #FDF4FF var(--tint-mix), var(--surface)); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h);  .bdot { background: #A855F7; } }
 .s-approving { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);  .bdot { background: #3B82F6; } }
-.s-signed    { background: var(--gray-50); color: oklch(from #15803d max(l, var(--text-min-l)) c h);  .bdot { background: #22C55E; } }
+.s-signed    { background: color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)); color: oklch(from #15803d max(l, var(--text-min-l)) c h);  .bdot { background: #22C55E; } }
 .s-hold      { background: color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); color: oklch(from #92400e max(l, var(--text-min-l)) c h);  .bdot { background: #F59E0B; } }
-.s-completed { background: var(--gray-50); color: oklch(from #166534 max(l, var(--text-min-l)) c h);  .bdot { background: #16A34A; } }
-.s-rejected  { background: var(--gray-50); color: oklch(from #be123c max(l, var(--text-min-l)) c h);  .bdot { background: #F43F5E; } }
+.s-completed { background: color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)); color: oklch(from #166534 max(l, var(--text-min-l)) c h);  .bdot { background: #16A34A; } }
+.s-rejected  { background: color-mix(in srgb, #FFF1F2 var(--tint-mix), var(--surface)); color: oklch(from #be123c max(l, var(--text-min-l)) c h);  .bdot { background: #F43F5E; } }
 
 /* ── GDPR Badges ───────────────────────────────────────── */
 .gbadge { padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 500; }
@@ -223,17 +223,17 @@ router-outlet + * {
 .pill-neutral { background: var(--gray-100); color: var(--gray-600); }
 .g-management { background: var(--orange-pale); color: var(--orange-dark); }
 .g-sales      { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
-.g-marketing  { background: var(--gray-50); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
+.g-marketing  { background: color-mix(in srgb, #FDF4FF var(--tint-mix), var(--surface)); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
 .g-hr         { background: color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color: oklch(from #c2410c max(l, var(--text-min-l)) c h); }
 .g-accounting { background: color-mix(in srgb, #ecfdf5 var(--tint-mix), var(--surface)); color: oklch(from #065f46 max(l, var(--text-min-l)) c h); }
-.g-operations { background: var(--gray-50); color: oklch(from #0c4a6e max(l, var(--text-min-l)) c h); }
+.g-operations { background: color-mix(in srgb, #F0F9FF var(--tint-mix), var(--surface)); color: oklch(from #0c4a6e max(l, var(--text-min-l)) c h); }
 .g-zarzad     { background: var(--orange-pale); color: var(--orange-dark); }
 .g-sprzedaz   { background: color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color: oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); }
 
 /* ── Task Type Badges ──────────────────────────────────── */
-.task-sign    { background: var(--gray-50); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
+.task-sign    { background: color-mix(in srgb, #FDF4FF var(--tint-mix), var(--surface)); color: oklch(from #7e22ce max(l, var(--text-min-l)) c h); }
 .task-edit    { background: color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color: oklch(from #c2410c max(l, var(--text-min-l)) c h); }
-.task-approve { background: var(--gray-50); color: oklch(from #0c4a6e max(l, var(--text-min-l)) c h); }
+.task-approve { background: color-mix(in srgb, #F0F9FF var(--tint-mix), var(--surface)); color: oklch(from #0c4a6e max(l, var(--text-min-l)) c h); }
 .task-read    { background: var(--gray-100); color: var(--gray-600); }
 
 /* ── Form Elements ─────────────────────────────────────── */
@@ -400,7 +400,7 @@ router-outlet + * {
   color: var(--gray-500);
   flex-shrink: 0;
   svg { width: 14px; height: 14px; }
-  &.signed { background: var(--gray-50); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
+  &.signed { background: color-mix(in srgb, #F0FDF4 var(--tint-mix), var(--surface)); color: oklch(from #16a34a max(l, var(--text-min-l)) c h); }
 }
 
 /* ── Chip filter ───────────────────────────────────────── */
@@ -539,14 +539,14 @@ router-outlet + * {
 quill-editor { display: block; }
 
 .ql-toolbar.ql-snow {
-  border: 1px solid var(--gray-200) !important;
+  border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)) !important;
   border-bottom: none !important;
   border-radius: 6px 6px 0 0 !important;
   padding: 4px 8px;
   background: var(--gray-50);
 }
 .ql-container.ql-snow {
-  border: 1px solid var(--gray-200) !important;
+  border: 1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)) !important;
   border-radius: 0 0 6px 6px !important;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;

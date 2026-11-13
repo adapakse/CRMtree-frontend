@@ -144,7 +144,7 @@ const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'churned'];
     .kpi-card.accent .kv { color:oklch(from #f97316 max(l, var(--text-min-l)) c h); }
     .kl { font-size:10px; color:var(--gray-400); text-transform:uppercase; margin-top:2px; }
     .dash-body { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .dash-panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:16px; }
+    .dash-panel { background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:12px; padding:16px; }
     .dash-panel.wide { grid-column:1/-1; }
     .dash-panel h3 { font-size:14px; font-weight:700; margin:0 0 12px; color:var(--gray-700); }
     .empty { color:var(--gray-400); font-size:12px; }

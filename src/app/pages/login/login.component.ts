@@ -130,7 +130,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .input-wrap { position:relative; }
     #login-screen .field input {
       width:100%; box-sizing:border-box; height:50px; padding:0 16px;
-      border:1px solid var(--gray-200); border-radius:14px; background:var(--surface);
+      border:1px solid color-mix(in srgb, #E3E5E9 var(--tint-mix), var(--surface)); border-radius:14px; background:var(--surface);
       font-size:14px; outline:none; box-shadow:0 6px 18px rgba(0,0,0,.08);
       transition:border-color .15s, box-shadow .15s;
     }
@@ -156,7 +156,7 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
     .lbtn:hover:not(:disabled) { background:var(--orange-dark); }
     .lbtn:disabled { background:rgba(59,170,93,.6); box-shadow:none; cursor:not-allowed; }
     .lbtn-secondary {
-      background:var(--surface); color:var(--gray-700); border:1px solid var(--gray-200);
+      background:var(--surface); color:var(--gray-700); border:1px solid color-mix(in srgb, #E3E5E9 var(--tint-mix), var(--surface));
       font-size:14px; font-weight:500; box-shadow:0 4px 12px rgba(0,0,0,.06);
     }
     .lbtn-secondary:hover:not(:disabled) { background:var(--gray-50); border-color:var(--gray-300); }

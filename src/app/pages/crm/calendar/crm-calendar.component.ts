@@ -291,7 +291,7 @@ interface CalendarDay {
 
       <!-- Formularz edycji (inline) -->
       <div *ngIf="isExpanded(task)"
-           style="margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-200);display:flex;flex-direction:column;gap:8px"
+           style="margin-top:12px;padding-top:12px;border-top:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));display:flex;flex-direction:column;gap:8px"
            (click)="$event.stopPropagation()">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div style="display:flex;flex-direction:column;gap:4px">
@@ -403,14 +403,14 @@ interface CalendarDay {
     .month-cell { min-height:100px;padding:6px;border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);background:var(--surface);vertical-align:top }
     .month-cell.weekend { background:var(--gray-50) }
     .month-cell.other-month { background:var(--gray-50) }
-    .month-cell.today { background:var(--gray-200) }
+    .month-cell.today { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)) }
     .day-num { font-size:12px;font-weight:700;color:var(--gray-800);margin-bottom:4px }
     .month-cell.today .day-num { width:22px;height:22px;background:#3BAA5D;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center }
     .month-cell.other-month .day-num { color:#d1d5db }
     .day-events { display:flex;flex-direction:column;gap:2px }
     .event-chip { display:flex;gap:4px;align-items:center;border-radius:4px;padding:2px 4px;font-size:10px;cursor:pointer;overflow:hidden }
     .lead-chip { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h) }
-    .partner-chip { background:var(--gray-200);color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
+    .partner-chip { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
     .event-chip:hover { opacity:.8 }
     .event-time { font-weight:700;flex-shrink:0 }
     .event-title { overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
@@ -421,16 +421,16 @@ interface CalendarDay {
     .week-grid { display:grid;grid-template-columns:50px repeat(7,1fr);border-left:1px solid var(--gray-200) }
     .wh-time { background:var(--gray-50);border-right:1px solid var(--gray-200);border-bottom:2px solid var(--gray-200) }
     .wh-day { padding:6px;text-align:center;border-right:1px solid var(--gray-200);border-bottom:2px solid var(--gray-200);background:var(--gray-50) }
-    .wh-day.today { background:var(--gray-200) }
+    .wh-day.today { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface)) }
     .wh-dayname { font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase }
     .wh-daynum { font-size:18px;font-weight:700;color:var(--gray-800);margin-top:2px }
     .today-circle { width:32px;height:32px;background:#3BAA5D;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:16px }
     .wt-hour { padding:8px 4px;font-size:10px;color:var(--gray-400);text-align:right;border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-100);min-height:60px;background:var(--gray-50) }
     .wt-cell { border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-100);min-height:60px;padding:2px;position:relative }
-    .wt-cell.today-col { background:var(--gray-50) }
+    .wt-cell.today-col { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)) }
     .week-event { border-radius:6px;padding:4px 8px;margin-bottom:2px;cursor:pointer;font-size:12px }
     .lead-event { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border-left:3px solid #3b82f6 }
-    .partner-event { background:var(--gray-200);border-left:3px solid #3BAA5D }
+    .partner-event { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));border-left:3px solid #3BAA5D }
     .week-event:hover { opacity:.85 }
     .we-time { font-weight:700;font-size:10px }
     .we-title { font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
@@ -444,13 +444,13 @@ interface CalendarDay {
     .ds-line { position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--gray-100) }
     .day-event { border-radius:8px;padding:8px 12px;cursor:pointer }
     .day-event.lead-event { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border-left:4px solid #3b82f6 }
-    .day-event.partner-event { background:var(--gray-200);border-left:4px solid #3BAA5D }
+    .day-event.partner-event { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));border-left:4px solid #3BAA5D }
     .day-event:hover { opacity:.85 }
     .de-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:2px }
     .de-time { font-size:12px;font-weight:700;color:var(--gray-700) }
     .de-badge { font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px }
     .lead-badge { background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface));color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h) }
-    .partner-badge { background:var(--gray-200);color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
+    .partner-badge { background:color-mix(in srgb, #E6F4EA var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h) }
     .de-title { font-size:14px;font-weight:700;color:var(--gray-800) }
     .de-source { font-size:12px;color:var(--gray-500);margin-top:1px }
     .de-meta { font-size:12px;color:var(--gray-500);margin-top:4px }
@@ -474,16 +474,16 @@ interface CalendarDay {
     .ef-input:focus { border-color:#3BAA5D }
 
     /* Tasks view */
-    .task-item { border:1px solid var(--gray-200);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--surface);border-left:4px solid var(--gray-200);transition:box-shadow .15s; }
+    .task-item { border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--surface);border-left:4px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));transition:box-shadow .15s; }
     .task-item:hover { box-shadow:0 2px 8px rgba(0,0,0,.07); }
     .task-item.task-today { background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface));border-left-color:#3b82f6; }
-    .project-chip, .project-event { background:var(--gray-50) !important; border-left-color:#8b5cf6 !important; color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h) !important; }
+    .project-chip, .project-event { background:color-mix(in srgb, #f5f3ff var(--tint-mix), var(--surface)) !important; border-left-color:#8b5cf6 !important; color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h) !important; }
     .project-badge, .task-src-project { background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color:oklch(from #5b21b6 max(l, var(--text-min-l)) c h); }
-    .task-item.task-overdue { background:var(--gray-50);border-left-color:#dc2626; }
+    .task-item.task-overdue { background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface));border-left-color:#dc2626; }
     .task-item.task-closed { opacity:.6;background:var(--gray-50); }
     .task-item.task-readonly { opacity:.55;background:var(--gray-50);cursor:default; }
     .task-item.task-expanded { border-left-color:#3BAA5D;box-shadow:0 2px 12px rgba(59,170,93,.12); }
-    .task-date-col { display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;padding-right:12px;border-right:1px solid var(--gray-200);flex-shrink:0;text-align:center; }
+    .task-date-col { display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;padding-right:12px;border-right:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));flex-shrink:0;text-align:center; }
     .task-date-day { font-size:22px;font-weight:800;color:var(--gray-800);line-height:1; }
     .task-date-mon { font-size:10px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-top:1px; }
     .task-date-time { font-size:12px;font-weight:700;color:oklch(from #3baa5d max(l, var(--text-min-l)) c h);margin-top:4px; }
@@ -494,7 +494,7 @@ interface CalendarDay {
     .task-st-closed { background:color-mix(in srgb, #d1fae5 var(--tint-mix), var(--surface));color:oklch(from #065f46 max(l, var(--text-min-l)) c h); }
     .task-source-badge { font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px; }
     .task-src-lead { background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface));color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
-    .task-src-partner { background:var(--gray-50);color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
+    .task-src-partner { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface));color:oklch(from #166534 max(l, var(--text-min-l)) c h); }
     .priority-badge { font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em; }
     .priority-asap { background:color-mix(in srgb, #fee2e2 var(--tint-mix), var(--surface));color:oklch(from #991b1b max(l, var(--text-min-l)) c h); }
     .priority-important { background:color-mix(in srgb, #ffedd5 var(--tint-mix), var(--surface));color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }

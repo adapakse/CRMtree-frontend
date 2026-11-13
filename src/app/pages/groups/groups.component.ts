@@ -163,7 +163,7 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService, provideTranslocoSc
 </ng-container>
   `,
   styles: [`
-    .group-tile { width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--gray-100); color: var(--gray-700); font-size: 16px; line-height: 1; }
+    .group-tile { width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--chip-bg); color: var(--gray-700); font-size: 16px; line-height: 1; }
     #topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
     .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-900); }
     .tsp { flex: 1; }
@@ -250,10 +250,28 @@ export class GroupsComponent implements OnInit {
   }
 
   groupIcon(name: string): string {
-    // Group names stored by tenants; the two Polish ones are spelled with escapes
-    // because the i18n check rejects Polish letters in translated source files.
-    const m: Record<string, string> = { Management: '🏢', 'Zarz\u0105d': '🏢', Sales: '💼', 'Sprzeda\u017c': '💼', Marketing: '📣', HR: '👥', Accounting: '💰', Operations: '⚙️' };
-    return m[name] ?? '📋';
+    // Diacritics stripped, so the keywords stay ASCII (the i18n check rejects Polish letters in source).
+    const words = (name ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\u0142/g, 'l').split(/[^a-z0-9]+/).filter(Boolean);
+    const matches = (key: string) => words.some(word => key.length <= 2 ? word === key : word.startsWith(key));
+    const icons: [string[], string][] = [
+      [['zarzad', 'management', 'board'], '🏢'],
+      [['sprzedaz', 'sales'], '💼'],
+      [['market'], '📣'],
+      [['hr', 'kadr'], '🧑‍🤝‍🧑'],
+      [['account', 'ksieg', 'finans', 'finance'], '💰'],
+      [['operat'], '⚙️'],
+      [['obslug', 'support', 'customer'], '🎧'],
+      [['prospekt', 'prospect', 'lead'], '🔍'],
+      [['seo', 'redakc', 'content'], '✍️'],
+      [['logist'], '🚚'],
+      [['prawn', 'legal'], '⚖️'],
+      [['zakup', 'purchas'], '🛒'],
+      [['partner'], '🤝'],
+      [['onboard'], '🚀'],
+      [['projekt', 'project'], '📁'],
+      [['it'], '💻'],
+    ];
+    return icons.find(([keys]) => keys.some(matches))?.[1] ?? '📋';
   }
 
   initials(name: string): string {

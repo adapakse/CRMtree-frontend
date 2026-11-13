@@ -250,7 +250,7 @@ type SortDir = 'asc' | 'desc';
     .pc-opp { font-size:10px; background:color-mix(in srgb, #dbeafe var(--tint-mix), var(--surface)); color:oklch(from #1e40af max(l, var(--text-min-l)) c h); padding:2px 8px; border-radius:6px; font-weight:600; }
     .pc-opp-valued { background:color-mix(in srgb, #fff7ed var(--tint-mix), var(--surface)); color:oklch(from #c2410c max(l, var(--text-min-l)) c h); }
     .pc-onboarding { margin-top:8px; }
-    .onb-bar { height:4px; background:var(--gray-200); border-radius:2px; overflow:hidden; margin-bottom:4px; }
+    .onb-bar { height:4px; background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:2px; overflow:hidden; margin-bottom:4px; }
     .onb-fill { height:100%; background:#3b82f6; }
     .onb-label { font-size:10px; color:var(--gray-500); }
     /* Badges */

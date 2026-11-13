@@ -120,7 +120,7 @@ function parseOptions(text: string): string[] {
       color:var(--gray-400); border-radius:6px; width:26px; height:26px;
       cursor:pointer; font-size:12px; line-height:1;
     }
-    .row .del:hover:not(:disabled) { border-color:#fca5a5; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); background:var(--gray-50); }
+    .row .del:hover:not(:disabled) { border-color:#fca5a5; color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); }
     .row .del:disabled { opacity:.5; cursor:default; }
   `],
 })
