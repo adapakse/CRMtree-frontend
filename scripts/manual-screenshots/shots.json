@@ -55,5 +55,8 @@
  {"file":"a09_groups_roles","route":"/groups","user":"jan"},
  {"file":"a10_audit_logs","route":"/logs","user":"jan","actions":[{"eval":"document.querySelectorAll('tr, .tr').forEach(r => { if (r.textContent.includes('adam.manka@')) r.remove(); })"}]},
  {"file":"a11_csv_import","route":"/crm/import","user":"jan","alsoCopyTo":["a11b_csv_import_full"]},
- {"file":"a12_data_management","route":"/admin/data","user":"jan"}
+ {"file":"a12_data_management","route":"/admin/data","user":"jan"},
+ {"file":"w30_menu_edit","route":"/crm/dashboard","user":"piotr","actions":[{"click":".s-head .toggle-btn:not(:last-child)"},{"wait":800}]},
+ {"file":"w31_settings_appearance","route":"/my-settings","user":"piotr","actions":[{"placeAt":"wt-theme-picker","top":220}]},
+ {"file":"w32_dark_mode","route":"/crm/dashboard","user":"piotr","theme":"dark"}
 ]}

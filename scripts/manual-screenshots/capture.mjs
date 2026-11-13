@@ -120,14 +120,14 @@ async function capture(browser, shot, lang) {
   const s = await session(shot.user);
   await setLocale(s, lang);
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: lang === 'pl' ? 'pl-PL' : 'en-GB', timezoneId: 'Europe/Warsaw' });
-  await ctx.addInitScript(({ t, lang }) => {
+  await ctx.addInitScript(({ t, lang, theme }) => {
     try {
-      localStorage.setItem('theme_mode', 'light');
+      localStorage.setItem('theme_mode', theme);
       localStorage.setItem('crmtree_locale', lang);
       sessionStorage.setItem('wt_access', t.access_token);
       sessionStorage.setItem('wt_refresh', t.refresh_token);
     } catch { /* ignore */ }
-  }, { t: s.tokens, lang });
+  }, { t: s.tokens, lang, theme: shot.theme || 'light' });
   await ctx.addInitScript(() => {
     document.addEventListener('DOMContentLoaded', () => {
       const st = document.createElement('style');
