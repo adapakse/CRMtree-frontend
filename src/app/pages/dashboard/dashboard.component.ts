@@ -158,7 +158,7 @@ import { LocaleService } from '../../core/i18n/locale.service';
             }
             @empty {
               <div class="empty-state" style="padding:32px 16px">
-                <div class="empty-icon">✅</div>
+                <div class="empty-tile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
                 <div class="empty-title">{{ t('labels.noPendingTasks') }}</div>
               </div>
             }

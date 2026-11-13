@@ -468,6 +468,8 @@ router-outlet + * {
   color: var(--gray-400);
   font-size: 14px;
   .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-tile { width: 48px; height: 48px; border-radius: 12px; margin-bottom: 12px; display: inline-flex; align-items: center; justify-content: center; background: var(--orange-pale); color: var(--orange-text); }
+  .empty-tile svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .empty-title { font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
 }
 

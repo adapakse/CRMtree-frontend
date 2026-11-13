@@ -60,7 +60,7 @@ const COLUMNS: { id: 'pending'|'in_progress'|'completed'|'cancelled'; labelKey: 
       @if (view === 'mine') {
         @if (myTasks().length === 0 && !loading()) {
           <div class="empty-state" style="margin-top:48px">
-            <div class="empty-icon">✅</div>
+            <div class="empty-tile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
             <div class="empty-title">{{ t('labels.noPendingTasks') }}</div>
             <div>{{ t('workflow.mine.allDone') }}</div>
           </div>
