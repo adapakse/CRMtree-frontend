@@ -4,7 +4,7 @@ import { CalendarEntry, downloadIcs, googleCalendarUrl, outlookCalendarUrl } fro
 
 const MENU_WIDTH_PX = 200;
 // Three items of ~33px plus padding; used only to decide whether the menu fits below the button.
-const MENU_HEIGHT_PX = 112;
+const MENU_HEIGHT_PX = 148;
 const MENU_GAP_PX = 4;
 
 /**
@@ -29,11 +29,12 @@ const MENU_GAP_PX = 4;
         @if (showLabel()) { <span>{{ t('title') }}</span> }
       </button>
       @if (isMenuOpen()) {
-        <div class="menu" [style.left.px]="menuPosition().left" [style.top.px]="menuPosition().top"
-             (click)="$event.stopPropagation()">
-          <a [href]="googleUrl()" target="_blank" rel="noopener" (click)="isMenuOpen.set(false)">{{ t('google') }}</a>
-          <a [href]="outlookUrl()" target="_blank" rel="noopener" (click)="isMenuOpen.set(false)">{{ t('outlook') }}</a>
-          <button type="button" (click)="download(calendarEntry)">{{ t('icsFile') }}</button>
+        <div class="menu popover" [style.left.px]="menuPosition().left" [style.top.px]="menuPosition().top"
+             (click)="$event.stopPropagation()" role="menu">
+          <div class="popover-title">{{ t('title') }}</div>
+          <a class="popover-item" role="menuitem" [href]="googleUrl()" target="_blank" rel="noopener" (click)="isMenuOpen.set(false)">{{ t('google') }}</a>
+          <a class="popover-item" role="menuitem" [href]="outlookUrl()" target="_blank" rel="noopener" (click)="isMenuOpen.set(false)">{{ t('outlook') }}</a>
+          <button type="button" class="popover-item" role="menuitem" (click)="download(calendarEntry)">{{ t('icsFile') }}</button>
         </div>
       }
       </ng-container>
@@ -45,9 +46,7 @@ const MENU_GAP_PX = 4;
     .trigger:hover { color:oklch(from #2f8f4d max(l, var(--text-min-l)) c h); border-color:#A8D9B6; }
     .trigger.labelled { padding:6px 10px; }
     .trigger svg { width:15px; height:15px; }
-    .menu { position:fixed; z-index:1000; width:200px; background:var(--surface); border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface)); border-radius:9px; box-shadow:0 7px 22px rgba(0,0,0,0.108); padding:4px; display:flex; flex-direction:column; }
-    .menu a, .menu button { text-align:left; padding:8px 10px; border:none; background:none; border-radius:6px; font-size:12px; color:var(--gray-800); text-decoration:none; cursor:pointer; font-family:inherit; }
-    .menu a:hover, .menu button:hover { background:var(--gray-100); }
+    .menu { position:fixed; z-index:1000; width:200px; }
   `],
 })
 export class AddToCalendarComponent {
@@ -87,6 +86,11 @@ export class AddToCalendarComponent {
 
   download(entry: CalendarEntry): void {
     downloadIcs(entry);
+    this.isMenuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  closeOnEscape(): void {
     this.isMenuOpen.set(false);
   }
 

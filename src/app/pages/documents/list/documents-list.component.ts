@@ -104,7 +104,7 @@ const GRID = '36px 1fr 120px 110px 95px 105px 200px 82px 50px';
           <div class="th sortable" (click)="sortBy('status')">{{ t('labels.fields.status') }} <span class="sort-icon">{{ sortIcon('status') }}</span></div>
           <div class="th">
             {{ t('labels.activeTasks') }}
-            <span style="font-size:8px;background:var(--orange-strong);color:white;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:.2px">{{ t('list.columns.newBadge') }}</span>
+            <span class="pill-new">{{ t('list.columns.newBadge') }}</span>
           </div>
           <div class="th sortable" (click)="sortBy('expiration_date')">{{ t('labels.columns.validity') }} <span class="sort-icon">{{ sortIcon('expiration_date') }}</span></div>
           <div class="th sortable" (click)="sortBy('owner_name')">{{ t('labels.fields.owner') }} <span class="sort-icon">{{ sortIcon('owner_name') }}</span></div>

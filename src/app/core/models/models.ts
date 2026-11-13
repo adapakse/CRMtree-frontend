@@ -47,6 +47,8 @@ export interface User {
   /** Interface language picked by the user; null = follow the tenant default. */
   locale?: string | null;
   tenant_default_locale?: string | null;
+  /** Light or dark theme saved on the account; null = not chosen yet. */
+  theme_mode?: 'light' | 'dark' | null;
   last_login_at?: string;
   created_at?: string;
   roles?: UserRole[];

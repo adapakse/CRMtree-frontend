@@ -296,13 +296,14 @@ import { NavSection, SidebarLayout, loadSidebarLayout, orderItems, saveSidebarLa
     #sidebar.collapsed .nav-label { opacity: 0; flex: 0; width: 0; overflow: hidden; }
 
     /* ── Badge ───────────────────────────────────────────────────────── */
+    /* Soft pill in the brand colour; a solid circle pulled the eye harder than the current page. */
     .nbadge {
       margin-left: auto;
-      background: var(--orange-strong); color: #FFFFFF;
-      font-size: 11px; font-weight: 600;
-      padding: 1px 7px; border-radius: 10px;
+      background: var(--orange-pale); color: var(--orange-text);
+      font-size: 12px; font-weight: 600; line-height: 1;
+      min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;
     }
-    .nav-item.active .nbadge { background: var(--orange-strong); color: #FFFFFF; }
 
     /* ── Tooltip (collapsed only) ────────────────────────────────────── */
     .nav-tip {

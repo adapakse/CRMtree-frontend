@@ -115,6 +115,7 @@
     "title": "Календарь активностей",
     "views": {
       "day": "День",
+      "label": "Вид",
       "month": "Месяц",
       "tasks": "Задачи",
       "week": "Неделя"
@@ -947,9 +948,13 @@
       "holdOnlyTitle": "Показать только лиды на паузе",
       "hot": "Горячие",
       "mine": "Мои",
+      "peopleGroup": "Люди",
       "repChip": "Менеджер по продажам: {name}",
       "reportFilter": "Фильтр из отчёта: {label}",
       "repsGroup": "Менеджеры по продажам",
+      "stagesClosed": "Закрытые",
+      "stagesOpen": "В работе",
+      "teamsGroup": "Команды",
       "wholeGroup": "Вся группа: {group}"
     },
     "importCsv": "Импорт CSV",
@@ -1063,6 +1068,7 @@
     "title": "Лиды продаж",
     "view": {
       "kanban": "Канбан",
+      "label": "Вид",
       "table": "Таблица",
       "timeline": "Шкала времени"
     }
@@ -1522,6 +1528,7 @@
     },
     "view": {
       "cards": "Карточки",
+      "label": "Вид",
       "table": "Таблица"
     }
   },

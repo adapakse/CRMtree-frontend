@@ -84,9 +84,9 @@ function getMonthRange(preset: string): { from: string; to: string } {
           [title]="churnBadgeTitle(partner)">
       🔥 {{ t('partnerDetail.header.churn', { level: churnLabel(partner.churn_risk) }) }}
     </span>
-    <button class="btn-outline" *ngIf="partner.phone || partner.billing_phone || partner.agent_phone"
-            (click)="makePartnerCall()" [title]="t('calls.call')">📞</button>
-    <button class="btn-outline" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('partnerDetail.edit.title') : t('partnerDetail.header.noEditPermission')">✏️ {{ t('partnerDetail.header.edit') }}</button>
+    <button class="btn btn-quiet btn-sm" *ngIf="partner.phone || partner.billing_phone || partner.agent_phone"
+            (click)="makePartnerCall()" [title]="t('calls.call')" [attr.aria-label]="t('calls.call')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></button>
+    <button class="btn btn-quiet btn-sm" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('partnerDetail.edit.title') : t('partnerDetail.header.noEditPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('partnerDetail.header.edit') }}</button>
   </div>
 
   <!-- Onboarding stepper + zadania -->
@@ -219,7 +219,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         <button class="panel-collapse-btn" (click)="toggleLeftPanel()" [title]="leftCollapsed ? t('partnerDetail.info.expandPanel') : t('partnerDetail.info.collapsePanel')">{{leftCollapsed?'›':'‹'}}</button>
       </div>
       <ng-container *ngIf="!leftCollapsed">
-      <div class="info-grid">
+      <div class="info-grid kv-list">
         <span class="lbl">{{ t('partnerDetail.fields.crmtreeId') }}</span>
         <span>
           <span *ngIf="partner.dwh_partner_id" style="font-family:monospace;font-weight:600;color: var(--orange-text)">{{partner.dwh_partner_id}}</span>
@@ -257,7 +257,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           👤 {{ t('partnerDetail.sections.partnerAdmin') }}
           <span class="dwh-badge" *ngIf="partner.admin_first_name_from_dwh || partner.admin_last_name_from_dwh || partner.admin_email_from_dwh">DWH</span>
         </div>
-        <div class="info-grid">
+        <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.firstName') }} <span class="dwh-badge" *ngIf="partner.admin_first_name_from_dwh">DWH</span></span>
           <span>{{partner.admin_first_name || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.lastName') }} <span class="dwh-badge" *ngIf="partner.admin_last_name_from_dwh">DWH</span></span>
@@ -270,7 +270,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Kontakt do spraw umowy -->
       <div class="info-subsection">
         <div class="info-subsection-title">{{ t('partnerDetail.sections.contractContact') }}</div>
-        <div class="info-grid">
+        <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.fullName') }}</span><span>{{partner.contact_name || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.contactTitle') }}</span><span>{{partner.contact_title || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.email') }}</span><span>{{partner.email || '—'}}</span>
@@ -295,7 +295,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
           📍 {{ t('partnerDetail.sections.billingAddress') }}
           <span class="dwh-badge" *ngIf="partner.billing_address_from_dwh || partner.billing_zip_from_dwh || partner.billing_city_from_dwh || partner.billing_country_from_dwh || partner.billing_email_address_from_dwh">DWH</span>
         </div>
-        <div class="info-grid">
+        <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.address') }} <span class="dwh-badge" *ngIf="partner.billing_address_from_dwh">DWH</span></span>
           <span>{{partner.billing_address || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.zip') }} <span class="dwh-badge" *ngIf="partner.billing_zip_from_dwh">DWH</span></span>
@@ -312,7 +312,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Kontakt do spraw rozliczeń -->
       <div class="info-subsection">
         <div class="info-subsection-title">{{ t('partnerDetail.sections.billingContact') }}</div>
-        <div class="info-grid">
+        <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.fullName') }}</span><span>{{partner.billing_contact_name || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.contactTitle') }}</span><span>{{partner.billing_contact_title || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.email') }}</span><span>{{partner.billing_email || '—'}}</span>
@@ -323,7 +323,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Finansowe dodatkowe -->
       <div class="info-subsection" *ngIf="partner.credit_limit_value != null || partner.deposit_value != null || partner.commission_value != null">
         <div class="info-subsection-title">{{ t('partnerDetail.sections.financialTerms') }}</div>
-        <div class="info-grid">
+        <div class="info-grid kv-list">
           <ng-container *ngIf="partner.credit_limit_value != null">
             <span class="lbl">{{ t('partnerDetail.fields.creditLimit') }}</span>
             <span>{{partner.credit_limit_value | number:'1.0-2'}} {{partner.credit_limit_currency}}</span>
@@ -343,7 +343,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
         </div>
       </div>
 
-      <div class="info-grid" style="margin-top:10px">
+      <div class="info-grid kv-list" style="margin-top:10px">
         <span class="lbl">{{ t('partnerDetail.fields.notes') }}</span><span class="notes">{{partner.notes || '—'}}</span>
         <ng-container *ngIf="partner.customer_service_note">
           <span class="lbl">{{ t('partnerDetail.fields.note') }} <span class="dwh-badge">DWH</span></span>
@@ -360,7 +360,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <!-- Dane dodatkowe — CRM + DWH -->
       <div class="info-subsection">
         <div class="info-subsection-title">⚙️ {{ t('partnerDetail.sections.additionalData') }}</div>
-        <div class="info-grid">
+        <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.onlinePct') }}</span><span>{{partner.online_pct != null ? partner.online_pct + '%' : '—'}}</span>
           <ng-container *ngIf="partner.subdomain || partner.dwh_partner_id">
             <span class="lbl">{{ t('partnerDetail.fields.subdomain') }} <span class="dwh-badge" *ngIf="partner.subdomain_from_dwh">DWH</span></span>
@@ -393,7 +393,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
       <div *ngIf="partner.agent_name || partner.agent_email || partner.agent_phone"
            class="info-subsection">
         <div class="info-subsection-title">🤝 {{ t('partnerDetail.sections.agent') }}</div>
-        <div class="info-grid">
+        <div class="info-grid kv-list">
           <span class="lbl">{{ t('partnerDetail.fields.fullName') }}</span><span>{{partner.agent_name || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.email') }}</span><span>{{partner.agent_email || '—'}}</span>
           <span class="lbl">{{ t('partnerDetail.fields.phone') }}</span><span>{{partner.agent_phone || '—'}}</span>
@@ -1045,7 +1045,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     </div>
 
     <!-- Right panel: DWH sales / email thread / products / docs -->
-    <div class="right-panel">
+    <div class="right-panel shadow-room">
 
       <!-- DWH: dane sprzedazowe -->
       <div *ngIf="partner.dwh_partner_id" class="dwh-box">
@@ -1930,8 +1930,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .tab-btn { background:none; border:none; border-bottom:2.5px solid transparent; margin-bottom:-1px; padding:10px 12px; font-size:12px; font-weight:500; color:var(--gray-500); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:6px; transition:all .15s; }
     .tab-btn.active { color:var(--orange-dark); font-weight:700; border-bottom-color:var(--orange); background:none; }
     .tab-btn:hover:not(.active) { color:var(--gray-700); }
-    .info-grid { display:grid; grid-template-columns:auto 1fr; gap:4px 10px; font-size:14px; }
-    .lbl { color:var(--gray-400); font-size:12px; white-space:nowrap; padding-top:2px; }
+    .info-grid { font-size:14px; }
     .sub { color:var(--gray-400); }
     .accent { color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); font-weight:700; }
     .notes { white-space:pre-line; }
@@ -2027,7 +2026,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .edit-textarea { width:100%; border:1px solid var(--gray-300); border-radius:6px; padding:8px 10px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
     .edit-textarea:focus { border-color:#3BAA5D; }
     .info-subsection { margin-top:14px; padding-top:12px; border-top:1px solid var(--gray-100); }
-    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); margin-bottom:8px; }
+    .info-subsection-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:oklch(from #3baa5d max(l, var(--text-min-l)) c h); margin-bottom:8px; margin-top:12px; padding-top:12px; border-top:1px solid var(--gray-100); }
     .link { color: var(--orange-text); text-decoration:none; }
     .link:hover { text-decoration:underline; }
     .dwh-badge { display:inline-block; background:color-mix(in srgb, #ede9fe var(--tint-mix), var(--surface)); color:oklch(from #7c3aed max(l, var(--text-min-l)) c h); font-size:10px; font-weight:700; padding:1px 4px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-left:4px; vertical-align:middle; }
@@ -2038,7 +2037,7 @@ function getMonthRange(preset: string): { from: string; to: string } {
     .input-error { border-color:#ef4444 !important; background:color-mix(in srgb, #fff5f5 var(--tint-mix), var(--surface)); }
     .input-warn  { border-color:#f59e0b !important; background:color-mix(in srgb, #fffbeb var(--tint-mix), var(--surface)); }
     .validation-msg { font-size:12px; color:oklch(from #ef4444 max(l, var(--text-min-l)) c h); margin-top:2px; }
-    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:16px; display:inline-block; }
+    .email-badge { background:color-mix(in srgb, #FEE2E2 var(--tint-mix), var(--surface)); color:oklch(from #B91C1C max(l, var(--text-min-l)) c h); border-radius:999px; font-size:12px; font-weight:600; min-width:20px; height:20px; padding:0 6px; line-height:1; display:inline-flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums; }
     .suggest-dropdown { position:absolute;top:100%;left:0;right:0;z-index:300;background:var(--surface);border:1px solid color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;margin-top:2px; }
     .suggest-item { padding:8px 12px;font-size:12px;cursor:pointer; }
     .suggest-item:hover { background:var(--gray-50); }

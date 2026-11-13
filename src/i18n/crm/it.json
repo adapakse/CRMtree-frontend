@@ -115,6 +115,7 @@
     "title": "Calendario delle azioni",
     "views": {
       "day": "Giorno",
+      "label": "Vista",
       "month": "Mese",
       "tasks": "Attività",
       "week": "Settimana"
@@ -947,9 +948,13 @@
       "holdOnlyTitle": "Mostra solo i lead in sospeso",
       "hot": "Caldi",
       "mine": "I miei",
+      "peopleGroup": "Persone",
       "repChip": "Commerciale: {name}",
       "reportFilter": "Filtro dal report: {label}",
       "repsGroup": "Commerciali",
+      "stagesClosed": "Chiusi",
+      "stagesOpen": "In corso",
+      "teamsGroup": "Team",
       "wholeGroup": "Tutto il gruppo: {group}"
     },
     "importCsv": "Importa CSV",
@@ -1063,6 +1068,7 @@
     "title": "Lead di vendita",
     "view": {
       "kanban": "Kanban",
+      "label": "Vista",
       "table": "Tabella",
       "timeline": "Timeline"
     }
@@ -1522,6 +1528,7 @@
     },
     "view": {
       "cards": "Schede",
+      "label": "Vista",
       "table": "Tabella"
     }
   },

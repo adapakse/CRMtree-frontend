@@ -89,14 +89,14 @@ import { localizedApiErrorMessage } from '../../core/services/api-error.util';
       --gray-50: #FAFAFA; --gray-100: #F4F4F5; --gray-200: #E4E4E7; --gray-300: #D1D1D6;
       --gray-400: #76767C; --gray-500: #71717A; --gray-600: #52525B; --gray-700: #3F3F46;
       --gray-800: #333333; --gray-900: #333333; --graphite: #28292D;
-      --page-bg: #F8F9FB; --surface: #FFFFFF; --ink-strong: #18181B;
+      --page-bg: #F8F9FB; --surface: #FFFFFF; --ink-strong: #333333;
       --shadow-sm: 0 5px 14px rgba(0,0,0,.081); --shadow: 0 5px 16px rgba(0,0,0,.108);
       --shadow-lg: 0 5px 16px rgba(0,0,0,.126), 0 13px 31px rgba(0,0,0,.09);
       --shadow-field: 0 5px 16px rgba(0,0,0,.099);
       --tint-mix: 100%; --text-min-l: 0;
-      --orange: #3BAA5D; --orange-light: #4DC671; --orange-dark: #2B7B43; --orange-pale: #E6F4EA; --orange-muted: #A8D9B6;
-      --orange-text: #2B7B43; --orange-strong: #18864A; --ring-field: 0 0 0 3px rgba(59,170,93,.18);
-      --green-gradient: linear-gradient(180deg, #18864A 0%, #14833F 100%);
+      --orange: #3BAA5D; --orange-light: #4DC671; --orange-dark: #34A055; --orange-pale: #E6F4EA; --orange-muted: #A8D9B6;
+      --orange-text: #3BAA5D; --orange-strong: #3BAA5D; --ring-field: 0 0 0 3px rgba(59,170,93,.18);
+      --green-gradient: linear-gradient(180deg, #3BAA5D 0%, #34A055 100%);
     }
     #login-screen {
       position:fixed; top:var(--test-banner-height, 0px); right:0; bottom:0; left:0;

@@ -115,6 +115,7 @@
     "title": "Kalendar aktivnosti",
     "views": {
       "day": "Dan",
+      "label": "Prikaz",
       "month": "Mjesec",
       "tasks": "Zadaci",
       "week": "Tjedan"
@@ -947,9 +948,13 @@
       "holdOnlyTitle": "Prikaži samo leadove na čekanju",
       "hot": "Vrući",
       "mine": "Moji",
+      "peopleGroup": "Osobe",
       "repChip": "Prodavač: {name}",
       "reportFilter": "Filtar iz izvješća: {label}",
       "repsGroup": "Prodavači",
+      "stagesClosed": "Zatvoreno",
+      "stagesOpen": "U tijeku",
+      "teamsGroup": "Timovi",
       "wholeGroup": "Cijela grupa: {group}"
     },
     "importCsv": "Uvoz CSV-a",
@@ -1063,6 +1068,7 @@
     "title": "Prodajni leadovi",
     "view": {
       "kanban": "Kanban",
+      "label": "Prikaz",
       "table": "Tablica",
       "timeline": "Vremenska crta"
     }
@@ -1522,6 +1528,7 @@
     },
     "view": {
       "cards": "Kartice",
+      "label": "Prikaz",
       "table": "Tablica"
     }
   },

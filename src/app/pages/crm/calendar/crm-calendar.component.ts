@@ -43,11 +43,11 @@ interface CalendarDay {
   <!-- Filtr handlowca (manager) -->
   <select class="ctl" *ngIf="isManager" [(ngModel)]="filterRep" (ngModelChange)="onFilterRepChange()">
     <option value="">{{ t('calendar.filters.allReps') }}</option>
-    <optgroup [label]="t('calendar.filters.repsGroup')" *ngIf="crmUsers.length > 0">
-      <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+    <optgroup [label]="t('leadsList.filters.peopleGroup')" *ngIf="crmUsers.length > 0">
+      <option *ngFor="let u of crmUsers" [value]="u.id"><span class="opt-ini">{{ initials(u.display_name) }}</span>{{ u.display_name }}</option>
     </optgroup>
-    <optgroup [label]="t('calendar.filters.groupsGroup')" *ngIf="crmGroups.length > 0">
-      <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">👥 {{ g.name }}</option>
+    <optgroup [label]="t('leadsList.filters.teamsGroup')" *ngIf="crmGroups.length > 0">
+      <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id"><svg class="opt-team" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>{{ g.name }}</option>
     </optgroup>
   </select>
 
@@ -93,13 +93,13 @@ interface CalendarDay {
   </ng-container>
 
   <!-- Przełącznik widoku -->
-  <div class="view-switch">
-    <button class="fchip" [class.on]="view === 'tasks'" (click)="setView('tasks')">
+  <div class="view-switch seg" role="group" [attr.aria-label]="t('calendar.views.label')">
+    <button class="seg-opt" type="button" [class.on]="view === 'tasks'" [attr.aria-pressed]="view === 'tasks'" (click)="setView('tasks')">
       {{ t('calendar.views.tasks') }}<span *ngIf="myTasksCount > 0" class="tasks-badge">{{myTasksCount}}</span>
     </button>
-    <button class="fchip" [class.on]="view === 'day'" (click)="setView('day')">{{ t('calendar.views.day') }}</button>
-    <button class="fchip" [class.on]="view === 'week'" (click)="setView('week')">{{ t('calendar.views.week') }}</button>
-    <button class="fchip" [class.on]="view === 'month'" (click)="setView('month')">{{ t('calendar.views.month') }}</button>
+    <button class="seg-opt" type="button" [class.on]="view === 'day'" [attr.aria-pressed]="view === 'day'" (click)="setView('day')">{{ t('calendar.views.day') }}</button>
+    <button class="seg-opt" type="button" [class.on]="view === 'week'" [attr.aria-pressed]="view === 'week'" (click)="setView('week')">{{ t('calendar.views.week') }}</button>
+    <button class="seg-opt" type="button" [class.on]="view === 'month'" [attr.aria-pressed]="view === 'month'" (click)="setView('month')">{{ t('calendar.views.month') }}</button>
   </div>
 
   <button class="nav-btn" (click)="view === 'tasks' ? loadTasks() : load()">↻</button>
@@ -392,9 +392,11 @@ interface CalendarDay {
   `,
   styles: [`
     :host { display:flex;flex-direction:column;height:100%;overflow:hidden; }
+    .opt-ini { width:20px; height:20px; border-radius:50%; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; background:var(--gray-100); color:var(--gray-700); }
+    .opt-team { width:16px; height:16px; flex-shrink:0; fill:none; stroke:var(--gray-500); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .ctl { background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:4px 10px;font-size:12px;outline:none;cursor:pointer;font-family:inherit }
     .ctl:focus { border-color:#3BAA5D }
-    .view-switch { display:flex;gap:6px }
+    
     .tasks-badge { display:inline-flex;min-width:16px;height:16px;background:#dc2626;color:white;border-radius:10px;font-size:10px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;line-height:1;margin-left:4px;vertical-align:middle }
 
     /* Month */
@@ -884,6 +886,11 @@ export class CrmCalendarComponent implements OnInit {
     const d = new Date(utcIso);
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  initials(name: string | null | undefined): string {
+    const p = (name ?? '').trim().split(/s+/).filter(Boolean);
+    return ((p[0]?.[0] ?? '') + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
   }
 
   onFilterRepChange(): void {

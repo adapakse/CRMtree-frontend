@@ -52,8 +52,12 @@ type SortDir = 'asc' | 'desc';
     </select>
     <button class="btn btn-g btn-sm" *ngIf="filterStatus||filterManager||filterGroup||filterIndustry||reportFilterLabel||onlyMine" (click)="clearFilters()">✕ {{ t('partnersList.toolbar.clear') }}</button>
     <div class="view-row">
-      <button class="fchip" [class.on]="viewMode==='cards'" (click)="viewMode='cards'">⊞ {{ t('partnersList.view.cards') }}</button>
-      <button class="fchip" [class.on]="viewMode==='table'" (click)="viewMode='table'">☰ {{ t('partnersList.view.table') }}</button>
+      <div class="seg" role="group" [attr.aria-label]="t('partnersList.view.label')">
+        <button type="button" class="seg-opt" [class.on]="viewMode==='cards'" [attr.aria-pressed]="viewMode==='cards'" (click)="viewMode='cards'">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>{{ t('partnersList.view.cards') }}</button>
+        <button type="button" class="seg-opt" [class.on]="viewMode==='table'" [attr.aria-pressed]="viewMode==='table'" (click)="viewMode='table'">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>{{ t('partnersList.view.table') }}</button>
+      </div>
     </div>
   </div>
 
@@ -236,7 +240,7 @@ type SortDir = 'asc' | 'desc';
     .srch-wrap { position:relative; display:flex; align-items:center; }
     .srch-wrap svg { position:absolute; left:12px; width:15px; height:15px; color:var(--gray-400); pointer-events:none; }
     /* Cards */
-    .cards-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; padding:0 0 8px; align-content:start; }
+    .cards-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; padding:8px 16px 20px; align-content:start; margin:-8px -16px -20px; }
     .partner-card { background:var(--surface); border-radius:var(--radius); padding:16px; cursor:pointer; box-shadow:var(--shadow-sm); transition:box-shadow .15s; }
     .partner-card:hover { box-shadow:var(--shadow); }
     .pc-top { display:flex; align-items:flex-start; gap:8px; margin-bottom:4px; }

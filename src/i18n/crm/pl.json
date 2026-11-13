@@ -115,6 +115,7 @@
     "title": "Kalendarz działań",
     "views": {
       "day": "Dzień",
+      "label": "Widok",
       "month": "Miesiąc",
       "tasks": "Zadania",
       "week": "Tydzień"
@@ -947,9 +948,13 @@
       "holdOnlyTitle": "Pokaż tylko leady na Holdzie",
       "hot": "Gorące",
       "mine": "Moje",
+      "peopleGroup": "Osoby",
       "repChip": "Handlowiec: {name}",
       "reportFilter": "Filtr z raportu: {label}",
       "repsGroup": "Handlowcy",
+      "stagesClosed": "Zamknięte",
+      "stagesOpen": "W toku",
+      "teamsGroup": "Zespoły",
       "wholeGroup": "Cała grupa: {group}"
     },
     "importCsv": "Import CSV",
@@ -1063,6 +1068,7 @@
     "title": "Leady sprzedażowe",
     "view": {
       "kanban": "Kanban",
+      "label": "Widok",
       "table": "Tabela",
       "timeline": "Time Line"
     }
@@ -1522,6 +1528,7 @@
     },
     "view": {
       "cards": "Karty",
+      "label": "Widok",
       "table": "Tabela"
     }
   },

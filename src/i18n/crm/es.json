@@ -115,6 +115,7 @@
     "title": "Calendario de actividades",
     "views": {
       "day": "Día",
+      "label": "Vista",
       "month": "Mes",
       "tasks": "Tareas",
       "week": "Semana"
@@ -947,9 +948,13 @@
       "holdOnlyTitle": "Mostrar solo los leads en espera",
       "hot": "Calientes",
       "mine": "Míos",
+      "peopleGroup": "Personas",
       "repChip": "Comercial: {name}",
       "reportFilter": "Filtro del informe: {label}",
       "repsGroup": "Comerciales",
+      "stagesClosed": "Cerrados",
+      "stagesOpen": "En curso",
+      "teamsGroup": "Equipos",
       "wholeGroup": "Todo el grupo: {group}"
     },
     "importCsv": "Importar CSV",
@@ -1063,6 +1068,7 @@
     "title": "Leads de ventas",
     "view": {
       "kanban": "Kanban",
+      "label": "Vista",
       "table": "Tabla",
       "timeline": "Cronología"
     }
@@ -1522,6 +1528,7 @@
     },
     "view": {
       "cards": "Tarjetas",
+      "label": "Vista",
       "table": "Tabla"
     }
   },

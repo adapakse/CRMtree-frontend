@@ -97,10 +97,17 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     <span style="flex:1"></span>
     <select class="sel" [(ngModel)]="filterStageUI" (ngModelChange)="onStageFilterChange()">
       <option value="">{{ t('leadsList.filters.allStages') }}</option>
-      @for (s of stages.selectable(); track s.key) {
-        <option [value]="s.key">{{ stageOptionPrefix(s.kind) }}{{ stages.label(s.key) }}</option>
-      }
-      <option value="archived">🗄️ {{ stages.label('archived') }}</option>
+      <optgroup [label]="t('leadsList.filters.stagesOpen')">
+        @for (s of openStages(); track s.key) {
+          <option [value]="s.key"><span class="opt-dot" [style.background]="stages.color(s.key)"></span>{{ stages.label(s.key) }}</option>
+        }
+      </optgroup>
+      <optgroup [label]="t('leadsList.filters.stagesClosed')">
+        @for (s of closedStages(); track s.key) {
+          <option [value]="s.key"><span class="opt-dot" [style.background]="stages.color(s.key)"></span>{{ stages.label(s.key) }}</option>
+        }
+        <option value="archived"><span class="opt-dot" [style.background]="stages.color('archived')"></span>{{ stages.label('archived') }}</option>
+      </optgroup>
     </select>
     <select class="sel" [(ngModel)]="filterSource" (ngModelChange)="onSourceFilterChange()">
       <option value="">{{ t('leadsList.filters.allSources') }}</option>
@@ -109,20 +116,20 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       }
       @for (g of sourceGroups(); track g) {
         <optgroup [label]="sourceGroupLabel(g)">
-          <option [value]="'__group__' + g">📂 {{ t('leadsList.filters.wholeGroup', { group: sourceGroupLabel(g) }) }}</option>
+          <option class="opt-parent" [value]="'__group__' + g">{{ t('leadsList.filters.wholeGroup', { group: sourceGroupLabel(g) }) }}</option>
+          @for (s of sourcesInGroup(g); track s.value) {
+            <option class="opt-sub" [value]="s.value">{{ sourceOptionLabel(s) }}</option>
+          }
         </optgroup>
-        @for (s of sourcesInGroup(g); track s.value) {
-          <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
-        }
       }
     </select>
     <select class="sel" [(ngModel)]="filterUser" (ngModelChange)="onRepFilterChange($event)" *ngIf="isManager">
       <option value="">{{ t('leadsList.filters.allReps') }}</option>
-      <optgroup [label]="t('leadsList.filters.repsGroup')" *ngIf="crmUsers.length > 0">
-        <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+      <optgroup [label]="t('leadsList.filters.peopleGroup')" *ngIf="crmUsers.length > 0">
+        <option *ngFor="let u of crmUsers" [value]="u.id"><span class="opt-ini">{{ initials(u.display_name) }}</span>{{ u.display_name }}</option>
       </optgroup>
-      <optgroup [label]="t('leadsList.filters.groupsGroup')" *ngIf="crmGroups.length > 0">
-        <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id">👥 {{ g.name }}</option>
+      <optgroup [label]="t('leadsList.filters.teamsGroup')" *ngIf="crmGroups.length > 0">
+        <option *ngFor="let g of crmGroups" [value]="'__group__' + g.id"><svg class="opt-team" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>{{ g.name }}</option>
       </optgroup>
     </select>
     <!-- Views sit on their own row, bottom-right of the filter card (same on every list). -->
@@ -134,16 +141,18 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
         <input type="date" class="sel" [(ngModel)]="filterCreatedTo" (ngModelChange)="load()" [min]="filterCreatedFrom || null">
         <span *ngIf="filterCreatedFrom || filterCreatedTo" class="date-range-x" (click)="filterCreatedFrom=''; filterCreatedTo=''; load()" [title]="t('leadsList.filters.clearDates')">×</span>
       </div>
-      <button class="btn btn-g btn-sm" (click)="openTimeline()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-          <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-          <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-        {{ t('leadsList.view.timeline') }}
-      </button>
-      <span class="fchip" [class.on]="isKanbanView" (click)="setViewMode('kanban')">{{ t('leadsList.view.kanban') }}</span>
-      <span class="fchip" [class.on]="!isKanbanView" (click)="setViewMode('table')">{{ t('leadsList.view.table') }}</span>
+      <div class="seg" role="group" [attr.aria-label]="t('leadsList.view.label')">
+        <button type="button" class="seg-opt" (click)="openTimeline()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          {{ t('leadsList.view.timeline') }}
+        </button>
+        <button type="button" class="seg-opt" [class.on]="isKanbanView" [attr.aria-pressed]="isKanbanView" (click)="setViewMode('kanban')">{{ t('leadsList.view.kanban') }}</button>
+        <button type="button" class="seg-opt" [class.on]="!isKanbanView" [attr.aria-pressed]="!isKanbanView" (click)="setViewMode('table')">{{ t('leadsList.view.table') }}</button>
+      </div>
     </div>
   </div>
 
@@ -546,7 +555,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
             @for (g of sourceGroups(); track g) {
               <optgroup [label]="sourceGroupLabel(g)">
                 @for (s of sourcesInGroup(g); track s.value) {
-                  <option [value]="s.value">{{ sourceOptionLabel(s) }}</option>
+                  <option class="opt-sub" [value]="s.value">{{ sourceOptionLabel(s) }}</option>
                 }
               </optgroup>
             }
@@ -562,7 +571,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <label class="fl">{{ t('leadsList.fields.stage') }}</label>
           <select class="fsel" [(ngModel)]="newForm.stage">
             @for (s of stages.creatable(); track s.key) {
-              <option [value]="s.key">{{ stages.label(s.key) }}</option>
+              <option [value]="s.key"><span class="opt-dot" [style.background]="stages.color(s.key)"></span>{{ stages.label(s.key) }}</option>
             }
           </select>
         </div>
@@ -570,7 +579,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
           <label class="fl">{{ t('leadsList.fields.salesRep') }} <span *ngIf="newFormRequiresFull" style="color: var(--orange-text)">*</span></label>
           <select class="fsel" [(ngModel)]="newForm.assigned_to" [class.fi-err]="newMissing('salesperson')">
             <option value="">{{ t('leadsList.newLead.unassigned') }}</option>
-            <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+            <option *ngFor="let u of crmUsers" [value]="u.id"><span class="opt-ini">{{ initials(u.display_name) }}</span>{{ u.display_name }}</option>
           </select>
           @if (newMissing('salesperson')) { <span class="ferr">{{ t('fieldErrors.salesperson') }}</span> }
         </div>
@@ -624,7 +633,7 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color:var(--gray-400);flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       <select class="sel" style="flex:1;font-size:12px" [(ngModel)]="timelineUser" (ngModelChange)="loadTimeline()">
         <option value="">{{ t('leadsList.filters.allReps') }}</option>
-        <option *ngFor="let u of crmUsers" [value]="u.id">{{ u.display_name }}</option>
+        <option *ngFor="let u of crmUsers" [value]="u.id"><span class="opt-ini">{{ initials(u.display_name) }}</span>{{ u.display_name }}</option>
       </select>
     </div>
 
@@ -866,6 +875,12 @@ const DEFAULT_SOURCE_GROUP_KEYS: Record<string, string> = { Marketing: 'marketin
     /* Toolbar */
     .toolbar { background:var(--surface); border:1px solid var(--gray-200); border-radius:10px; padding:10px 16px; margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-shrink:0; flex-wrap:wrap; }
     .sel { font-size:12px; font-family:inherit; }
+    /* Elementy wewnątrz opcji listy rozwijanej (działają tylko tam, gdzie przeglądarka obsługuje base-select). */
+    .opt-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .opt-ini { width:20px; height:20px; border-radius:50%; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; background:var(--gray-100); color:var(--gray-700); }
+    .opt-team { width:16px; height:16px; flex-shrink:0; fill:none; stroke:var(--gray-500); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    option.opt-sub { padding-left:28px; }
+    option.opt-parent:not(:checked) { font-weight:600; color:var(--gray-900); }
     .sel:focus { border-color:var(--orange); }
 
     /* Buttons */
@@ -1621,12 +1636,10 @@ export class CrmLeadsListComponent implements OnInit, OnDestroy {
     return this.allLeads.filter(l => this.stages.isClosed(l.stage));
   }
 
-  /** ✓ / ✗ przed nazwą etapu zamknięcia na liście filtrów. */
-  stageOptionPrefix(kind: string): string {
-    if (kind === 'won')  return '✓ ';
-    if (kind === 'lost') return '✗ ';
-    return '';
-  }
+  /** Etapy w toku / zamknięte — dwie grupy na liście filtra etapów. */
+  openStages() { return this.stages.selectable().filter(s => s.kind === 'open'); }
+  closedStages() { return this.stages.selectable().filter(s => s.kind !== 'open'); }
+
 
   valueFor(stage: string): number {
     return Math.round(this.leadsFor(stage).reduce((s, l) => s + +(l.value_pln || 0), 0) / 1000);

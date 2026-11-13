@@ -83,28 +83,28 @@ interface WhatsappConvUiState {
     <span *ngIf="lead.hot" style="background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🔥{{ t('leadDetail.header.hot') }}</span>
     <span *ngIf="lead.hold_active" style="background:color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface));color:var(--gray-700);font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px" title="{{lead.hold_reason}}">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-g btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
+      <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="canEdit && (lead.hold_active || isHoldEligibleStage(lead.stage))"
               [style.background]="lead.hold_active ? 'color-mix(in srgb, #e5e7eb var(--tint-mix), var(--surface))' : ''"
               [style.color]="lead.hold_active ? 'var(--gray-700)' : ''"
               (click)="openHoldModal()"
               [title]="lead.hold_active ? t('leadDetail.hold.editTooltip', { date: (lead.hold_until | date:'dd.MM.yyyy') }) : t('leadDetail.hold.set')">
-        ⏸️ {{ lead.hold_active ? t('leadDetail.hold.active') : t('leadDetail.hold.label') }}
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>{{ lead.hold_active ? t('leadDetail.hold.active') : t('leadDetail.hold.label') }}
       </button>
-      <button class="btn btn-g btn-sm hdr-btn" *ngIf="canEdit && lead.stage !== 'archived'" (click)="archiveLead()" [title]="t('leadDetail.archive.tooltip')">
-        🗄️ {{ t('leadDetail.archive.action') }}
+      <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="canEdit && lead.stage !== 'archived'" (click)="archiveLead()" [title]="t('leadDetail.archive.tooltip')">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg>{{ t('leadDetail.archive.action') }}
       </button>
-      <button class="btn btn-g btn-sm hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        [title]="t('calls.callNumber', { phone: lead.phone })">📞</button>
-      <button class="btn btn-g btn-sm hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  [title]="t('email.addressTooltip', { email: lead.email })">
-        ✉️ {{ t('email.label') }}
+      <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="lead.phone && canEdit"  (click)="mockCall()"        [title]="t('calls.callNumber', { phone: lead.phone })" [attr.aria-label]="t('calls.callNumber', { phone: lead.phone })"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></button>
+      <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="lead.email && canEdit"  (click)="openEmailCompose()"  [title]="t('email.addressTooltip', { email: lead.email })">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>{{ t('email.label') }}
         <span *ngIf="emailActivityCount>0" class="email-badge">{{emailActivityCount}}</span>
       </button>
-      <button class="btn btn-g btn-sm hdr-btn" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('leadDetail.edit.title') : t('leadDetail.edit.noPermission')">✏️ {{ t('leadDetail.header.edit') }}</button>
-      <button class="btn btn-g btn-sm hdr-btn" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" [title]="t('leadDetail.testAccount.openTooltip')">
-        🖥️ {{ t('leadDetail.testAccount.title') }}
+      <button class="btn btn-quiet btn-sm hdr-btn" (click)="openEdit()" [disabled]="!canEdit" [title]="canEdit ? t('leadDetail.edit.title') : t('leadDetail.edit.noPermission')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{{ t('leadDetail.header.edit') }}</button>
+      <button class="btn btn-quiet btn-sm hdr-btn" *ngIf="!lead.converted_at && canEdit" (click)="openTestAccountModal()" [title]="t('leadDetail.testAccount.openTooltip')">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>{{ t('leadDetail.testAccount.title') }}
         <span *ngIf="testAccount?.status==='created'" class="ta-badge-ok">✓</span>
         <span *ngIf="testAccount?.status==='error'"   class="ta-badge-err">!</span>
       </button>
-      <button class="btn btn-p btn-sm hdr-btn" *ngIf="!lead.converted_at && canEdit" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }}</button>
+      <button class="btn btn-p btn-sm hdr-btn" *ngIf="!lead.converted_at && canEdit" (click)="showConvert=true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15c-1.5 1.3-2 4-2 6 2 0 4.7-.5 6-2"/><path d="M9 18l-3-3c1-4 4-9 10-11 1 0 2 0 3 1 1 1 1 2 1 3-2 6-7 9-11 10z"/><circle cx="15" cy="9" r="1.6"/><path d="M8 12H4l2-3h4M12 16v4l3-2v-4"/></svg>{{ t('leadDetail.onboarding.start') }}</button>
     </div>
   </div>
 
@@ -122,13 +122,13 @@ interface WhatsappConvUiState {
       <!-- Firma -->
       <div class="info-section">
         <div class="info-section-title">{{ t('leadDetail.sections.company') }}</div>
-        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.name') }}</span><span class="val fw">{{lead.company}}</span></div>
-        <div class="info-kv" *ngIf="lead.nip"><span class="lbl">{{ t('leadDetail.fields.nip') }}</span><span class="val">{{lead.nip}}</span></div>
-        <div class="info-kv" *ngIf="lead.website">
+        <div class="info-kv kv-row"><span class="lbl">{{ t('leadDetail.fields.name') }}</span><span class="val fw">{{lead.company}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.nip"><span class="lbl">{{ t('leadDetail.fields.nip') }}</span><span class="val">{{lead.nip}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.website">
           <span class="lbl">{{ t('leadDetail.fields.www') }}</span>
           <span class="val val-line"><a class="link" [href]="'https://'+lead.website" target="_blank" [title]="lead.website">{{lead.website}}</a></span>
         </div>
-        <div class="info-kv" *ngIf="lead.industry"><span class="lbl">{{ t('leadDetail.fields.industry') }}</span><span class="val">{{lead.industry}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.industry"><span class="lbl">{{ t('leadDetail.fields.industry') }}</span><span class="val">{{lead.industry}}</span></div>
         <div *ngIf="lead.hot" style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, #fef3c7 var(--tint-mix), var(--surface));color:oklch(from #92400e max(l, var(--text-min-l)) c h);font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700;margin-top:4px">🔥{{ t('leadDetail.fields.hotLead') }}</div>
         <div *ngIf="lead.hold_active" style="display:inline-flex;flex-direction:column;gap:4px;background:var(--gray-100);color:var(--gray-700);font-size:12px;padding:8px 12px;border-radius:10px;font-weight:600;margin-top:4px">
           <span style="display:inline-flex;align-items:center;gap:4px">⏸️{{ t('leadDetail.hold.until', { date: (lead.hold_until | date:'dd.MM.yyyy') }) }}</span>
@@ -139,22 +139,22 @@ interface WhatsappConvUiState {
       <!-- Główny kontakt -->
       <div class="info-section" *ngIf="lead.contact_name || lead.email || lead.phone">
         <div class="info-section-title">{{ t('leadDetail.sections.contact') }}</div>
-        <div class="info-kv" *ngIf="lead.contact_name">
+        <div class="info-kv kv-row" *ngIf="lead.contact_name">
           <span class="lbl">{{ t('leadDetail.fields.person') }}</span>
           <span class="val">{{lead.contact_name}}<span style="color:var(--gray-400)" *ngIf="lead.contact_title"> · {{lead.contact_title}}</span></span>
         </div>
-        <div class="info-kv" *ngIf="lead.email">
+        <div class="info-kv kv-row" *ngIf="lead.email">
           <span class="lbl">{{ t('leadDetail.fields.email') }}</span>
           <span class="val val-line">
             <a class="link" href="mailto:{{lead.email}}" [title]="lead.email">{{lead.email}}</a>
-            <button class="info-icon-btn" (click)="openEmailCompose()" [title]="t('email.send')">✉️</button>
+            <button type="button" class="info-icon-btn" (click)="openEmailCompose()" [title]="t('email.send')"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></button>
           </span>
         </div>
-        <div class="info-kv" *ngIf="lead.phone">
+        <div class="info-kv kv-row" *ngIf="lead.phone">
           <span class="lbl">{{ t('leadDetail.fields.phone') }}</span>
           <span class="val val-line">
             <a class="link" href="tel:{{lead.phone}}" [title]="lead.phone">{{lead.phone}}</a>
-            <button *ngIf="canEdit" class="info-icon-btn" (click)="mockCall()" [title]="t('calls.call')">📞</button>
+            <button type="button" *ngIf="canEdit" class="info-icon-btn" (click)="mockCall()" [title]="t('calls.call')"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></button>
           </span>
         </div>
       </div>
@@ -176,35 +176,35 @@ interface WhatsappConvUiState {
       <!-- Agent -->
       <div class="info-section" *ngIf="lead.agent_name || lead.agent_email || lead.agent_phone">
         <div class="info-section-title" style="color: var(--orange-text)">🤝 {{ t('leadDetail.sections.agent') }}</div>
-        <div class="info-kv" *ngIf="lead.agent_name"><span class="lbl">{{ t('leadDetail.fields.fullName') }}</span><span class="val fw">{{lead.agent_name}}</span></div>
-        <div class="info-kv" *ngIf="lead.agent_email">
+        <div class="info-kv kv-row" *ngIf="lead.agent_name"><span class="lbl">{{ t('leadDetail.fields.fullName') }}</span><span class="val fw">{{lead.agent_name}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.agent_email">
           <span class="lbl">{{ t('leadDetail.fields.email') }}</span>
           <a class="val link" href="mailto:{{lead.agent_email}}">{{lead.agent_email}}</a>
         </div>
-        <div class="info-kv" *ngIf="lead.agent_phone"><span class="lbl">{{ t('leadDetail.fields.phone') }}</span><span class="val">{{lead.agent_phone}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.agent_phone"><span class="lbl">{{ t('leadDetail.fields.phone') }}</span><span class="val">{{lead.agent_phone}}</span></div>
       </div>
 
       <!-- Sprzedaż -->
       <div class="info-section">
         <div class="info-section-title">{{ t('leadDetail.sections.sales') }}</div>
-        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.stage') }}</span><span class="val"><span class="stage-badge" style="font-size:10px"
+        <div class="info-kv kv-row"><span class="lbl">{{ t('leadDetail.fields.stage') }}</span><span class="val"><span class="stage-badge" style="font-size:10px"
             [style.background]="stages.pillBackground(lead.stage)"
             [style.color]="stages.color(lead.stage)">{{stageLabel(lead.stage)}}</span></span></div>
-        <div class="info-kv" *ngIf="stages.isLost(lead.stage) && lead.lost_reason">
+        <div class="info-kv kv-row" *ngIf="stages.isLost(lead.stage) && lead.lost_reason">
           <span class="lbl">{{ t('leadDetail.fields.lostReason') }}</span>
           <span class="val" style="color:oklch(from #991b1b max(l, var(--text-min-l)) c h)">{{lead.lost_reason}}</span>
         </div>
-        <div class="info-kv"><span class="lbl">{{ t('leadDetail.fields.probability') }}</span><span class="val">{{lead.probability||0}}%</span></div>
-        <div class="info-kv" *ngIf="lead.value_pln">
+        <div class="info-kv kv-row"><span class="lbl">{{ t('leadDetail.fields.probability') }}</span><span class="val">{{lead.probability||0}}%</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.value_pln">
           <span class="lbl">{{ t('leadDetail.fields.annualTurnover') }}</span>
           <span class="val" style="color:var(--orange-dark);font-weight:600">{{lead.value_pln|number:'1.0-0'}} {{lead.annual_turnover_currency||'PLN'}}</span>
         </div>
-        <div class="info-kv" *ngIf="lead.online_pct!=null"><span class="lbl">{{ t('leadDetail.fields.onlinePct') }}</span><span class="val">{{lead.online_pct}}%</span></div>
-        <div class="info-kv" *ngIf="lead.source"><span class="lbl">{{ t('leadDetail.fields.source') }}</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
-        <div class="info-kv" *ngIf="lead.created_at"><span class="lbl">{{ t('leadDetail.fields.addedOn') }}</span><span class="val">{{lead.created_at|date:'dd.MM.yyyy HH:mm'}}</span></div>
-        <div class="info-kv" *ngIf="lead.first_contact_date"><span class="lbl">{{ t('leadDetail.fields.firstContact') }}</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
-        <div class="info-kv" *ngIf="lead.close_date"><span class="lbl">{{ t('leadDetail.fields.closeDate') }}</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
-        <div class="info-kv" *ngIf="lead.assigned_to_name"><span class="lbl">{{ t('leadDetail.fields.salesperson') }}</span><span class="val fw">{{lead.assigned_to_name}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.online_pct!=null"><span class="lbl">{{ t('leadDetail.fields.onlinePct') }}</span><span class="val">{{lead.online_pct}}%</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.source"><span class="lbl">{{ t('leadDetail.fields.source') }}</span><span class="val">{{sourceLabel(lead.source)}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.created_at"><span class="lbl">{{ t('leadDetail.fields.addedOn') }}</span><span class="val">{{lead.created_at|date:'dd.MM.yyyy HH:mm'}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.first_contact_date"><span class="lbl">{{ t('leadDetail.fields.firstContact') }}</span><span class="val">{{lead.first_contact_date|date:'dd.MM.yyyy'}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.close_date"><span class="lbl">{{ t('leadDetail.fields.closeDate') }}</span><span class="val">{{lead.close_date|date:'dd.MM.yyyy'}}</span></div>
+        <div class="info-kv kv-row" *ngIf="lead.assigned_to_name"><span class="lbl">{{ t('leadDetail.fields.salesperson') }}</span><span class="val fw">{{lead.assigned_to_name}}</span></div>
       </div>
 
       <!-- Notatki i tagi -->
@@ -884,7 +884,7 @@ interface WhatsappConvUiState {
     </div>
 
     <!-- PRAWA: Mock call/email + Konwertuj info -->
-    <div style="overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0">
+    <div class="shadow-room" style="overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0">
 
       <!-- Komunikacja -->
       <div class="side-box">
@@ -944,7 +944,7 @@ interface WhatsappConvUiState {
       <div *ngIf="!lead.converted_at && canEdit" class="side-box" style="background:var(--orange-pale)">
         <div class="side-box-title" style="color:var(--orange-dark)">🚀 {{ t('leadDetail.onboarding.start') }}</div>
         <div style="font-size:12px;color:var(--orange-dark);margin-bottom:12px">{{ t('leadDetail.onboarding.hint') }}</div>
-        <button class="btn btn-p btn-sm" style="width:100%;box-shadow:none" (click)="showConvert=true">🚀 {{ t('leadDetail.onboarding.start') }} →</button>
+        <button class="btn btn-p btn-sm" style="width:100%;box-shadow:none" (click)="showConvert=true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15c-1.5 1.3-2 4-2 6 2 0 4.7-.5 6-2"/><path d="M9 18l-3-3c1-4 4-9 10-11 1 0 2 0 3 1 1 1 1 2 1 3-2 6-7 9-11 10z"/><circle cx="15" cy="9" r="1.6"/><path d="M8 12H4l2-3h4M12 16v4l3-2v-4"/></svg>{{ t('leadDetail.onboarding.start') }} →</button>
       </div>
       <div *ngIf="lead.converted_at && lead.stage==='onboarding'" class="side-box" style="background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface))">
         <div style="font-size:12px;font-weight:700;color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h);margin-bottom:4px;display:flex;align-items:center;gap:4px">⏳ {{ t('leadDetail.onboarding.inProgress') }}</div>
@@ -1556,7 +1556,7 @@ interface WhatsappConvUiState {
     </div>
     <div class="modal-actions">
       <button class="btn btn-g" (click)="showConvert=false">{{ 'actions.cancel' | transloco }}</button>
-      <button class="btn btn-p" (click)="convertLead()" [disabled]="converting">{{converting?'…':'🚀 ' + t('leadDetail.onboarding.start')}}</button>
+      <button class="btn btn-p" (click)="convertLead()" [disabled]="converting">@if (!converting) {<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15c-1.5 1.3-2 4-2 6 2 0 4.7-.5 6-2"/><path d="M9 18l-3-3c1-4 4-9 10-11 1 0 2 0 3 1 1 1 1 2 1 3-2 6-7 9-11 10z"/><circle cx="15" cy="9" r="1.6"/><path d="M8 12H4l2-3h4M12 16v4l3-2v-4"/></svg>}{{converting?'…':t('leadDetail.onboarding.start')}}</button>
     </div>
   </div>
 </div>
@@ -1677,6 +1677,7 @@ interface WhatsappConvUiState {
     :host { display:flex; flex-direction:column; flex:1; overflow:hidden; height:100%; }
     .hdr-btn { position:relative; box-sizing:border-box; height:32px; padding:0 12px !important; font-size:12px !important; border-radius:10px !important; }
     .hdr-btn:has(> svg:first-child) { padding-left:10px !important; }
+    .hdr-btn.btn-quiet { gap:6px !important; }
     .lead-card { background:var(--surface); border-radius:12px; box-shadow:var(--shadow-sm); overflow:hidden; }
     .side-box { background:var(--surface); border-radius:14px; box-shadow:var(--shadow-sm); padding:16px; flex-shrink:0; }
     .side-box-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-800); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
@@ -1692,6 +1693,9 @@ interface WhatsappConvUiState {
     .file-chip { display:inline-flex; align-items:center; gap:4px; background:color-mix(in srgb, #eff6ff var(--tint-mix), var(--surface)); color:oklch(from #1d4ed8 max(l, var(--text-min-l)) c h); border-radius:12px; padding:2px 8px; font-size:12px; }
     .file-chip button { background:none; border:none; cursor:pointer; color:var(--gray-400); font-size:12px; padding:0; }
     .file-chip button:hover { color:oklch(from #dc2626 max(l, var(--text-min-l)) c h); }
+    button.info-icon-btn:not([data-n1]):not([data-n2]) { width:24px; height:24px; padding:0; margin-left:2px; border:none; border-radius:6px; background:none; box-shadow:none; color:var(--gray-500); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    button.info-icon-btn:not([data-n1]):not([data-n2]):hover { background:var(--orange-pale); color:var(--orange-text); }
+    button.info-icon-btn svg.ic { width:16px; height:16px; }
     .info-icon-btn { background:none; border:none; cursor:pointer; color:var(--gray-400); padding:0 4px; display:inline-flex; align-items:center; }
     .info-icon-btn:hover { color: var(--orange-text); }
     .act-modal-lbl { color:var(--gray-400); font-size:12px; min-width:100px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
@@ -1708,19 +1712,18 @@ interface WhatsappConvUiState {
     .ta-row label input:focus, .ta-row label select:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(59,170,93,.2); }
     .ta-status-ok  { background:color-mix(in srgb, #f0fdf4 var(--tint-mix), var(--surface)); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
     .ta-status-err { background:color-mix(in srgb, #fef2f2 var(--tint-mix), var(--surface)); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
-    .email-badge { background:#ef4444; color:white; border-radius:10px; font-size:10px; font-weight:700; padding:0 4px; line-height:16px; display:inline-block; }
+    .email-badge { background:color-mix(in srgb, #FEE2E2 var(--tint-mix), var(--surface)); color:oklch(from #B91C1C max(l, var(--text-min-l)) c h); border-radius:999px; font-size:12px; font-weight:600; min-width:20px; height:20px; padding:0 6px; line-height:1; display:inline-flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums; }
     .info-section { margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--gray-100); }
     .info-section:last-child { border-bottom:none; }
     .info-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-400); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
-    .info-kv { display:flex; gap:8px; align-items:baseline; margin-bottom:6px; font-size:12px; line-height:1.5; }
-    .lbl { color:var(--gray-500); font-size:12px; white-space:nowrap; min-width:80px; }
-    .val { color:var(--gray-800); flex:1; min-width:0; font-weight:500; overflow-wrap:break-word; font-variant-numeric:tabular-nums; }
+    .info-kv { font-size:12px; }
+    .val { font-weight:500; font-variant-numeric:tabular-nums; }
     /* E-mail, phone and website stay on one line; a long one ends with … (full text on hover). */
     .val-line { display:flex; align-items:center; gap:4px; min-width:0; }
     .val-line .link { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .info-icon-btn { height:20px; }
     .info-icon-btn svg.ic { vertical-align:0; }
-    .val.fw { font-weight:600; color:var(--gray-800); }
+    .val.fw { font-weight:600; }
     .link { color: var(--orange-text); text-decoration:none; }
     .link:hover { text-decoration:underline; }
     .tabs > .tab-btn { flex:0 0 auto; padding:10px 12px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; }
