@@ -151,6 +151,11 @@ app.use(
     maxAge: '1y',
     index: false,
     redirect: false,
+    // Hashed bundles may stay cached for a year, but /assets (manual, screenshots, translations) keeps
+    // its file names across releases: the browser must re-check them (ETag, a quick 304 when unchanged).
+    setHeaders: (res, filePath) => {
+      if (/[\/]assets[\/]/.test(filePath) || filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+    },
   }),
 );
 

@@ -356,7 +356,8 @@ export class MySettingsComponent implements OnInit {
   private locale     = inject(LocaleService);
 
   // src/assets/manual has a page for every interface language.
-  readonly manualUrl = computed(() => `/assets/manual/${this.locale.activeLocale()}.html`);
+  // ?v= makes browsers that cached the manual for a year (old server setting) fetch the current one.
+  readonly manualUrl = computed(() => `/assets/manual/${this.locale.activeLocale()}.html?v=20261113`);
 
   /** Substitutions panel — same scope as crmGuard: admin | salesperson | sales_manager. */
   get canSeeSubstitutions(): boolean {
